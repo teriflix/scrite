@@ -15,13 +15,13 @@ import QtQuick 2.13
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 ListView {
     id: attachmentsView
     property Attachments attachments
     readonly property real delegateSize: 83
-    property bool readonly: scriteDocument.readOnly
+    property bool readonly: Scrite.document.readOnly
     orientation: ListView.Horizontal
     model: attachments
     onAttachmentsChanged: currentIndex = -1
@@ -36,7 +36,7 @@ ListView {
 
     Rectangle {
         anchors.fill: parent
-        color: app.translucent(primaryColors.windowColor, 0.5)
+        color: Scrite.app.translucent(primaryColors.windowColor, 0.5)
         border.width: 1
         border.color: primaryColors.borderColor
         z: -1
@@ -46,7 +46,7 @@ ListView {
             anchors.margins: 10
             anchors.leftMargin: attachmentsView.delegateSize
             verticalAlignment: Text.AlignVCenter
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
             opacity: 0.5
             text: "Attachments"
             visible: attachments && attachments.attachmentCount === 0
@@ -77,7 +77,7 @@ ListView {
                 width: parent.width
                 elide: Text.ElideMiddle
                 padding: 2
-                font.pointSize: app.idealFontPointSize/2
+                font.pointSize: Scrite.app.idealFontPointSize/2
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
                 text: objectItem.originalFileName

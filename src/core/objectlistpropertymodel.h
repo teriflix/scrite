@@ -17,6 +17,7 @@
 #include <QSet>
 #include <QList>
 #include <QJSValue>
+#include <QQmlEngine>
 #include <QMetaMethod>
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
@@ -32,6 +33,12 @@ public:
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
     virtual int objectCount() const = 0;
     Q_SIGNAL void objectCountChanged();
+
+    /**
+     * Handling dataChanged() signal in QML is confusing, because Connections
+     * has its own dataChanged() signal.
+     */
+    Q_SIGNAL void dataChanged2(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
     Q_INVOKABLE virtual QObject *objectAt(int row) const = 0;
 
@@ -245,6 +252,7 @@ private:
 class SortFilterObjectListModel : public QSortFilterProxyModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     SortFilterObjectListModel(QObject *parent = nullptr);

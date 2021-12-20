@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
+import io.scrite.components 1.0
 import QtQuick 2.13
 import QtQuick.Dialogs 1.3
 import QtQuick.Controls 2.13
@@ -52,7 +52,7 @@ Item {
         selectFolder: true
         selectMultiple: false
         selectExisting: false
-        onAccepted: fileInfo.absolutePath = app.urlToLocalFile(fileUrl)
+        onAccepted: fileInfo.absolutePath = Scrite.app.urlToLocalFile(fileUrl)
     }
 
     Column {
@@ -67,7 +67,7 @@ Item {
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
             text: label + ":<br/><font size=\"-2\">(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
 
             MouseArea {
                 anchors.fill: parent
@@ -84,7 +84,7 @@ Item {
             placeholderText: "File Name"
             text: fileInfo.baseName
             width: parent.width
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
             onTextChanged: fileInfo.baseName = text
             TabSequenceItem.manager: tabSequenceManager
         }

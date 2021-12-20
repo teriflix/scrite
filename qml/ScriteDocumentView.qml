@@ -19,7 +19,7 @@ import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: documentUI
@@ -28,50 +28,50 @@ Item {
 
     readonly property url helpUrl: "https://www.scrite.io/index.php/help/"
 
-    enabled: !scriteDocument.loading
+    enabled: !Scrite.document.loading
 
     FontMetrics {
         id: sceneEditorFontMetrics
-        readonly property SceneElementFormat format: scriteDocument.formatting.elementFormat(SceneElement.Action)
+        readonly property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Action)
         readonly property int lettersPerLine: globalScreenplayEditorToolbar.editInFullscreen ? 70 : 60
         readonly property int marginLetters: 5
         readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
         readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
         readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
-        font: format ? format.font2 : scriteDocument.formatting.defaultFont2
+        font: format ? format.font2 : Scrite.document.formatting.defaultFont2
     }
 
     property bool canShowNotebookInStructure: width > 1600
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     onShowNotebookInStructureChanged: {
-        app.execLater(workspaceSettings, 100, function() {
+        Scrite.app.execLater(workspaceSettings, 100, function() {
             mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
         })
     }
 
     AppFeature {
         id: structureAppFeature
-        feature: UserType.StructureFeature
+        feature: Scrite.StructureFeature
     }
 
     AppFeature {
         id: notebookAppFeature
-        feature: UserType.NotebookFeature
+        feature: Scrite.NotebookFeature
     }
 
     AppFeature {
         id: scritedAppFeature
-        feature: UserType.ScritedFeature
+        feature: Scrite.ScritedFeature
     }
 
     AppFeature {
         id: crgraphAppFeature
-        feature: UserType.RelationshipGraphFeature
+        feature: Scrite.RelationshipGraphFeature
     }
 
     Settings {
         id: workspaceSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "Workspace"
         property real workspaceHeight
         property real screenplayEditorWidth: -1
@@ -82,8 +82,8 @@ Item {
         property bool animateNotebookIcon: true
         property real flickScrollSpeedFactor: 1.0
         property bool showScritedTab: false
-        property bool mouseWheelZoomsInCharacterGraph: app.isWindowsPlatform || app.isLinuxPlatform
-        property bool mouseWheelZoomsInStructureCanvas: app.isWindowsPlatform || app.isLinuxPlatform
+        property bool mouseWheelZoomsInCharacterGraph: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
+        property bool mouseWheelZoomsInStructureCanvas: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
         property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenPhotosFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.PicturesLocation)
         property string lastOpenImportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
@@ -95,7 +95,7 @@ Item {
 
     Settings {
         id: screenplayEditorSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "Screenplay Editor"
         property bool displayRuler: true
         property bool displaySceneCharacters: true
@@ -127,7 +127,7 @@ Item {
 
     Settings {
         id: paragraphLanguageSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "Paragraph Language"
 
         property string shotLanguage: "Default"
@@ -141,7 +141,7 @@ Item {
 
     Settings {
         id: notebookSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "Notebook"
         property int activeTab: 0 // 0 = Relationships, 1 = Notes
         property int graphLayoutMaxTime: 1000
@@ -245,7 +245,7 @@ Item {
         ShortcutsModelItem.enabled: true
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.visible: enabled
-        onActivated: app.launchNewInstance(qmlWindow)
+        onActivated: Scrite.app.launchNewInstance(Scrite.window)
     }
 
     Shortcut {
@@ -283,7 +283,7 @@ Item {
                     Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                 else {
                     mainTabBar.activateTab(1)
-                    app.execLater(mainTabBar, 250, function() {
+                    Scrite.app.execLater(mainTabBar, 250, function() {
                         Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                     })
                 }
@@ -309,7 +309,7 @@ Item {
             var nbt = showNotebookInStructure ? 1 : 2
             if(mainTabBar.currentIndex !== nbt) {
                 mainTabBar.activateTab(nbt)
-                app.execLater(mainTabBar, 250, function() {
+                Scrite.app.execLater(mainTabBar, 250, function() {
                     Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", type)
                 })
             } else
@@ -362,17 +362,17 @@ Item {
     }
 
     Connections {
-        target: scriteDocument
-        onJustReset: {
+        target: Scrite.document
+        function onJustReset() {
             appBusyOverlay.refCount = appBusyOverlay.refCount+1
             screenplayAdapter.initialLoadTreshold = 25
-            app.execLater(screenplayAdapter, 250, function() {
-                screenplayAdapter.sessionId = scriteDocument.sessionId
+            Scrite.app.execLater(screenplayAdapter, 250, function() {
+                screenplayAdapter.sessionId = Scrite.document.sessionId
                 appBusyOverlay.refCount = Math.max(appBusyOverlay.refCount-1,0)
             })
         }
-        onJustLoaded: {
-            var firstElement = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.firstSceneIndex())
+        function onJustLoaded() {
+            var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
             if(firstElement) {
                 var editorHints = firstElement.editorHints
                 if(editorHints) {
@@ -390,32 +390,32 @@ Item {
         onSourceChanged: globalScreenplayEditorToolbar.showScreenplayPreview = false
         property string sessionId
         source: {
-            if(scriteDocument.sessionId !== sessionId)
+            if(Scrite.document.sessionId !== sessionId)
                 return null
 
             if(mainTabBar.currentIndex === 0)
-                return scriteDocument.screenplay
+                return Scrite.document.screenplay
 
-            if(scriteDocument.screenplay.currentElementIndex < 0) {
-                var index = scriteDocument.structure.currentElementIndex
-                var element = scriteDocument.structure.elementAt(index)
+            if(Scrite.document.screenplay.currentElementIndex < 0) {
+                var index = Scrite.document.structure.currentElementIndex
+                var element = Scrite.document.structure.elementAt(index)
                 if(element) {
                     if(element.scene.addedToScreenplay) {
-                        scriteDocument.screenplay.currentElementIndex = element.scene.screenplayElementIndexList[0]
-                        return scriteDocument.screenplay
+                        Scrite.document.screenplay.currentElementIndex = element.scene.screenplayElementIndexList[0]
+                        return Scrite.document.screenplay
                     }
                     return element.scene
                 }
             }
 
-            return scriteDocument.screenplay
+            return Scrite.document.screenplay
         }
     }
 
     ScreenplayTextDocument {
         id: screenplayTextDocument
-        screenplay: scriteDocument.loading || paused ? null : (editor ? screenplayAdapter.screenplay : null)
-        formatting: scriteDocument.loading || paused ? null : (editor ? scriteDocument.printFormat : null)
+        screenplay: Scrite.document.loading || paused ? null : (editor ? screenplayAdapter.screenplay : null)
+        formatting: Scrite.document.loading || paused ? null : (editor ? Scrite.document.printFormat : null)
         property bool paused: screenplayEditorSettings.pausePageAndTimeComputation
         onPausedChanged: Qt.callLater( function() {
             screenplayEditorSettings.pausePageAndTimeComputation = screenplayTextDocument.paused
@@ -427,7 +427,7 @@ Item {
         listSceneCharacters: false
         includeSceneSynopsis: false
         printEachSceneOnANewPage: false
-        secondsPerPage: scriteDocument.printFormat.secondsPerPage
+        secondsPerPage: Scrite.document.printFormat.secondsPerPage
         property Item editor
         property bool overlayRefCountModified: false
         onUpdateScheduled: {
@@ -441,7 +441,7 @@ Item {
                 appBusyOverlay.refCount = Math.max(appBusyOverlay.refCount-1,0)
             overlayRefCountModified = false
         }
-        Component.onCompleted: app.registerObject(screenplayTextDocument, "screenplayTextDocument")
+        Component.onCompleted: Scrite.app.registerObject(screenplayTextDocument, "screenplayTextDocument")
     }
 
     Rectangle {
@@ -463,9 +463,9 @@ Item {
             }
 
             function saveQuestionText() {
-                if(scriteDocument.fileName === "")
+                if(Scrite.document.fileName === "")
                     return "Do you want to save this document first?"
-                return "Do you want to save changes to <strong>" + app.fileName(scriteDocument.fileName) + "</strong> first?"
+                return "Do you want to save changes to <strong>" + Scrite.app.fileName(Scrite.document.fileName) + "</strong> first?"
             }
 
             spacing: documentUI.width >= 1440 ? 2 : 0
@@ -477,7 +477,7 @@ Item {
                 shortcut: "Ctrl+N"
                 shortcutText: "N"
                 onClicked: {
-                    if(scriteDocument.modified)
+                    if(Scrite.document.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
                             "okButtonText": "Yes",
@@ -485,17 +485,17 @@ Item {
                             "abortButtonText": "Cancel",
                             "callback": function(val) {
                                 if(val) {
-                                    if(scriteDocument.fileName !== "")
-                                        scriteDocument.save()
+                                    if(Scrite.document.fileName !== "")
+                                        Scrite.document.save()
                                     else {
                                         cmdSave.doClick()
                                         return
                                     }
                                 }
                                 contentLoader.allowContent = false
-                                scriteDocument.reset()
+                                Scrite.document.reset()
                                 contentLoader.allowContent = true
-                                app.execLater(fileNewButton, 250, newFromTemplate)
+                                Scrite.app.execLater(fileNewButton, 250, newFromTemplate)
                             }
                         }, fileNewButton)
                     else
@@ -517,10 +517,10 @@ Item {
                 onClicked: recentFilesMenu.open()
 
                 function doOpen(filePath) {
-                    if(filePath === scriteDocument.fileName)
+                    if(filePath === Scrite.document.fileName)
                         return
 
-                    if(scriteDocument.modified)
+                    if(Scrite.document.modified)
                         askQuestion({
                                 "question": appToolBar.saveQuestionText(),
                                 "okButtonText": "Yes",
@@ -528,8 +528,8 @@ Item {
                                 "abortButtonText": "Cancel",
                                 "callback": function(val) {
                                     if(val) {
-                                        if(scriteDocument.fileName !== "")
-                                            scriteDocument.save()
+                                        if(Scrite.document.fileName !== "")
+                                            Scrite.document.save()
                                         else {
                                             cmdSave.doClick()
                                             return
@@ -537,7 +537,7 @@ Item {
                                     }
                                     recentFilesMenu.close()
                                     if(filePath === "#TEMPLATE")
-                                        app.execLater(fileOpenButton, 250, newFromTemplate)
+                                        Scrite.app.execLater(fileOpenButton, 250, newFromTemplate)
                                     else
                                         fileDialog.launch("OPEN", filePath)
                                 }
@@ -545,15 +545,15 @@ Item {
                     else {
                         recentFilesMenu.close()
                         if(filePath === "#TEMPLATE")
-                            app.execLater(fileOpenButton, 250, newFromTemplate)
+                            Scrite.app.execLater(fileOpenButton, 250, newFromTemplate)
                         else
                             fileDialog.launch("OPEN", filePath)
                     }
                 }
 
                 Connections {
-                    target: app
-                    onOpenFileRequest: fileOpenButton.doOpen(filePath)
+                    target: Scrite.app
+                    function onOpenFileRequest(filePath) { fileOpenButton.doOpen(filePath) }
                 }
 
                 ShortcutsModelItem.group: "File"
@@ -565,7 +565,7 @@ Item {
                     anchors.left: parent.left
 
                     Settings {
-                        fileName: app.settingsFilePath
+                        fileName: Scrite.app.settingsFilePath
                         category: "RecentFiles"
                         property alias files: recentFilesMenu.recentFiles
                     }
@@ -575,8 +575,8 @@ Item {
                         width: recentFiles.length > 1 ? 400 : 200
 
                         Connections {
-                            target: scriteDocument
-                            onJustLoaded: recentFilesMenu.add(scriteDocument.fileName)
+                            target: Scrite.document
+                            function onJustLoaded() { recentFilesMenu.add(Scrite.document.fileName) }
                         }
 
                         property int nrRecentFiles: recentFiles.length
@@ -601,7 +601,7 @@ Item {
                             var newFiles = []
                             var filesDropped = false
                             recentFilesMenu.recentFiles.forEach(function(filePath) {
-                                var fi = app.fileInfo(filePath)
+                                var fi = Scrite.app.fileInfo(filePath)
                                 if(fi.exists)
                                     newFiles.push(filePath)
                                 else
@@ -633,7 +633,7 @@ Item {
 
                             MenuItem2 {
                                 property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.nrRecentFiles-index-1]
-                                property var fileInfo: app.fileInfo(filePath)
+                                property var fileInfo: Scrite.app.fileInfo(filePath)
                                 text: recentFilesFontMetrics.elidedText(fileInfo.baseName, Qt.ElideMiddle, recentFilesMenu.width)
                                 ToolTip.text: filePath
                                 ToolTip.visible: hovered
@@ -648,7 +648,7 @@ Item {
                 id: backupOpenButton
                 iconSource: "../icons/file/backup_open.png"
                 text: "Open Backup"
-                visible: scriteDocument.backupFilesModel.count > 0
+                visible: Scrite.document.backupFilesModel.count > 0
                 onClicked: {
                     modalDialog.closeable = false
                     modalDialog.closeOnEscape = true
@@ -657,13 +657,13 @@ Item {
                     modalDialog.active = true
                 }
 
-                ToolTip.text: "Open any of the " + scriteDocument.backupFilesModel.count + " backup(s) available for this file."
+                ToolTip.text: "Open any of the " + Scrite.document.backupFilesModel.count + " backup(s) available for this file."
 
                 Text {
                     id: backupCountHint
                     font.pixelSize: parent.height * 0.2
                     font.bold: true
-                    text: scriteDocument.backupFilesModel.count
+                    text: Scrite.document.backupFilesModel.count
                     padding: 2
                     color: primaryColors.highlight.text
                     anchors.bottom: parent.bottom
@@ -677,14 +677,14 @@ Item {
                 text: "Save"
                 shortcut: "Ctrl+S"
                 shortcutText: "S"
-                enabled: scriteDocument.modified && !scriteDocument.readOnly
+                enabled: Scrite.document.modified && !Scrite.document.readOnly
                 onClicked: doClick()
                 function doClick() {
-                    if(scriteDocument.fileName === "")
+                    if(Scrite.document.fileName === "")
                         fileDialog.launch("SAVE")
                     else {
                         fileDialog.mode = "SAVE"
-                        scriteDocument.save()
+                        Scrite.document.save()
                     }
                 }
 
@@ -700,10 +700,10 @@ Item {
                 shortcutText: "Shift+S"
                 iconSource: "../icons/content/save_as.png"
                 onClicked: fileDialog.launch("SAVE")
-                enabled: scriteDocument.structure.elementCount > 0 ||
-                         scriteDocument.structure.noteCount > 0 ||
-                         scriteDocument.structure.annotationCount > 0 ||
-                         scriteDocument.screenplay.elementCount > 0
+                enabled: Scrite.document.structure.elementCount > 0 ||
+                         Scrite.document.structure.noteCount > 0 ||
+                         Scrite.document.structure.annotationCount > 0 ||
+                         Scrite.document.screenplay.elementCount > 0
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text
                 ShortcutsModelItem.shortcut: shortcut
@@ -723,7 +723,7 @@ Item {
                 }
 
                 onClicked: {
-                    if(scriteDocument.modified)
+                    if(Scrite.document.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
                             "okButtonText": "Yes",
@@ -731,14 +731,14 @@ Item {
                             "abortButtonText": "Cancel",
                             "callback": function(val) {
                                 if(val) {
-                                    if(scriteDocument.fileName !== "")
-                                        scriteDocument.save()
+                                    if(Scrite.document.fileName !== "")
+                                        Scrite.document.save()
                                     else {
                                         cmdSave.doClick()
                                         return
                                     }
                                 }
-                                app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
+                                Scrite.app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
                             }
                         }, fileNewButton)
                     else
@@ -766,15 +766,15 @@ Item {
             QtObject {
                 ShortcutsModelItem.group: "Edit"
                 ShortcutsModelItem.title: "Undo"
-                ShortcutsModelItem.enabled: app.canUndo && !scriteDocument.readOnly // enabled
+                ShortcutsModelItem.enabled: Scrite.app.canUndo && !Scrite.document.readOnly // enabled
                 ShortcutsModelItem.shortcut: "Ctrl+Z" // shortcut
             }
 
             QtObject {
                 ShortcutsModelItem.group: "Edit"
                 ShortcutsModelItem.title: "Redo"
-                ShortcutsModelItem.enabled: app.canRedo && !scriteDocument.readOnly // enabled
-                ShortcutsModelItem.shortcut: app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y" // shortcut
+                ShortcutsModelItem.enabled: Scrite.app.canRedo && !Scrite.document.readOnly // enabled
+                ShortcutsModelItem.shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y" // shortcut
             }
 
             ToolButton3 {
@@ -797,22 +797,22 @@ Item {
                             title: "Import"
 
                             Repeater {
-                                model: scriteDocument.supportedImportFormats
+                                model: Scrite.document.supportedImportFormats
 
                                 MenuItem2 {
                                     id: importMenuItem
                                     text: modelData
                                     onClicked: click()
                                     function click() {
-                                        if(scriteDocument.modified)
+                                        if(Scrite.document.modified)
                                             askQuestion({
                                                     "question": "Do you want to save your current project first?",
                                                     "okButtonText": "Yes",
                                                     "cancelButtonText": "No",
                                                     "callback": function(val) {
                                                         if(val) {
-                                                            if(scriteDocument.fileName !== "")
-                                                                scriteDocument.save()
+                                                            if(Scrite.document.fileName !== "")
+                                                                Scrite.document.save()
                                                             else {
                                                                 cmdSave.doClick()
                                                                 return
@@ -852,7 +852,7 @@ Item {
                             }
 
                             Component.onCompleted: {
-                                var formats = scriteDocument.supportedExportFormats
+                                var formats = Scrite.document.supportedExportFormats
                                 for(var i=0; i<formats.length; i++) {
                                     var format = formats[i]
                                     if(format === "")
@@ -866,11 +866,11 @@ Item {
                         Menu2 {
                             id: reportsMenu
                             title: "Reports"
-                            enabled: scriteDocument.screenplay.elementCount > 0
+                            enabled: Scrite.document.screenplay.elementCount > 0
                             width: 300
 
                             Repeater {
-                                model: scriteDocument.supportedReports
+                                model: Scrite.document.supportedReports
 
                                 MenuItem2 {
                                     leftPadding: 15
@@ -981,7 +981,7 @@ Item {
 
                         MenuItem2 {
                             id: settingsMenuItem
-                            text: "Settings\t\t" + app.polishShortcutTextForDisplay("Ctrl+,")
+                            text: "Settings\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+,")
                             icon.source: "../icons/action/settings_applications.png"
                             onClicked: activate()
                             enabled: appToolBar.visible
@@ -1006,11 +1006,11 @@ Item {
 
                         MenuItem2 {
                             id: shortcutsMenuItem
-                            text: "Shortcuts\t\t" + app.polishShortcutTextForDisplay("Ctrl+E")
+                            text: "Shortcuts\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+E")
                             icon.source: {
-                                if(app.isMacOSPlatform)
+                                if(Scrite.app.isMacOSPlatform)
                                     return "../icons/navigation/shortcuts_macos.png"
-                                if(app.isWindowsPlatform)
+                                if(Scrite.app.isWindowsPlatform)
                                     return "../icons/navigation/shortcuts_windows.png"
                                 return "../icons/navigation/shortcuts_linux.png"
                             }
@@ -1049,7 +1049,7 @@ Item {
                                 const idata = data
                                 if(stype === "72892ED6-BA58-47EC-B045-E92D9EC1C47A") {
                                     if(idata && typeof idata === "number")
-                                        app.execLater(ui, idata, showAboutDialog)
+                                        Scrite.app.execLater(ui, idata, showAboutDialog)
                                     else
                                         showAboutDialog()
                                 }
@@ -1065,14 +1065,14 @@ Item {
                         MenuItem2 {
                             text: "Toggle Fullscreen\tF7"
                             icon.source: "../icons/navigation/fullscreen.png"
-                            onClicked: app.execLater(app, 100, function() { app.toggleFullscreen(qmlWindow) })
+                            onClicked: Scrite.app.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: "Toggle Fullscreen"
                             ShortcutsModelItem.shortcut: "F7"
                             Shortcut {
                                 context: Qt.ApplicationShortcut
                                 sequence: "F7"
-                                onActivated: app.execLater(app, 100, function() { app.toggleFullscreen(qmlWindow) })
+                                onActivated: Scrite.app.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
                             }
                         }
 
@@ -1088,8 +1088,8 @@ Item {
                             MenuItem2 {
                                 icon.source: "../icons/content/blank.png"
                                 text: "Scan For Mute Characters"
-                                onClicked: scriteDocument.structure.scanForMuteCharacters()
-                                enabled: !scriteDocument.readOnly && screenplayEditorSettings.displaySceneCharacters
+                                onClicked: Scrite.document.structure.scanForMuteCharacters()
+                                enabled: !Scrite.document.readOnly && screenplayEditorSettings.displaySceneCharacters
                             }
 
                             MenuSeparator {  }
@@ -1101,25 +1101,25 @@ Item {
                             }
 
                             MenuItem2 {
-                                text: "Scene Synopsis\t\t" + app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
+                                text: "Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
                                 icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
                             }
 
                             MenuItem2 {
-                                text: "Scene Comments\t\t" + app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
+                                text: "Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
                                 icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
                             }
 
                             MenuItem2 {
-                                text: "Scene Characters and Tags\t" + app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
+                                text: "Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
                                 icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
                             }
 
                             MenuItem2 {
-                                text: "Enable Tagging Of Scenes\t" +app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
+                                text: "Enable Tagging Of Scenes\t" +Scrite.app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
                                 icon.source: screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 onTriggered: screenplayEditorSettings.allowTaggingOfScenes = !screenplayEditorSettings.allowTaggingOfScenes
                             }
@@ -1138,10 +1138,10 @@ Item {
             ToolButton3 {
                 id: languageToolButton
                 iconSource: "../icons/content/language.png"
-                text: app.transliterationEngine.languageAsString
+                text: Scrite.app.transliterationEngine.languageAsString
                 shortcut: "Ctrl+L"
                 shortcutText: "L"
-                ToolTip.text: app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
+                ToolTip.text: Scrite.app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
                 onClicked: languageMenu.visible = true
                 down: languageMenu.visible
                 visible: mainTabBar.currentIndex <= 2
@@ -1155,16 +1155,16 @@ Item {
                         width: 250
 
                         Repeater {
-                            model: app.enumerationModel(app.transliterationEngine, "Language")
+                            model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
                             MenuItem2 {
                                 property string baseText: modelData.key
-                                property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
-                                text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
-                                font.bold: app.transliterationEngine.language === modelData.value
+                                property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
+                                text: baseText + " (" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
+                                font.bold: Scrite.app.transliterationEngine.language === modelData.value
                                 onClicked: {
-                                    app.transliterationEngine.language = modelData.value
-                                    scriteDocument.formatting.defaultLanguage = modelData.value
+                                    Scrite.app.transliterationEngine.language = modelData.value
+                                    Scrite.document.formatting.defaultLanguage = modelData.value
                                     paragraphLanguageSettings.defaultLanguage = modelData.key
                                 }
                             }
@@ -1175,24 +1175,24 @@ Item {
                         MenuItem2 {
                             text: "Next-Language (F10)"
                             onClicked: {
-                                app.transliterationEngine.cycleLanguage()
-                                scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
-                                paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
+                                Scrite.app.transliterationEngine.cycleLanguage()
+                                Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
+                                paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
                             }
                         }
                     }
 
                     Repeater {
-                        model: app.enumerationModel(app.transliterationEngine, "Language")
+                        model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
                         Item {
                             Shortcut {
-                                property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
+                                property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
                                 context: Qt.ApplicationShortcut
                                 sequence: "Alt+"+shortcutKey
                                 onActivated: {
-                                    app.transliterationEngine.language = modelData.value
-                                    scriteDocument.formatting.defaultLanguage = modelData.value
+                                    Scrite.app.transliterationEngine.language = modelData.value
+                                    Scrite.document.formatting.defaultLanguage = modelData.value
                                     paragraphLanguageSettings.defaultLanguage = modelData.key
                                 }
 
@@ -1208,9 +1208,9 @@ Item {
                         context: Qt.ApplicationShortcut
                         sequence: "F10"
                         onActivated: {
-                            app.transliterationEngine.cycleLanguage()
-                            scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
-                            paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
+                            Scrite.app.transliterationEngine.cycleLanguage()
+                            Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
+                            paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
                         }
 
                         ShortcutsModelItem.priority: 1
@@ -1223,12 +1223,12 @@ Item {
 
             ToolButton3 {
                 iconSource: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
-                ToolTip.text: "Show English to " + app.transliterationEngine.languageAsString + " alphabet mappings.\t" + app.polishShortcutTextForDisplay(shortcut)
+                ToolTip.text: "Show English to " + Scrite.app.transliterationEngine.languageAsString + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
                 shortcut: "Ctrl+K"
                 shortcutText: "K"
                 onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
                 down: alphabetMappingsPopup.visible
-                enabled: app.transliterationEngine.language !== TransliterationEngine.English
+                enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
                 visible: mainTabBar.currentIndex <= 2
 
                 ShortcutsModelItem.priority: 1
@@ -1256,7 +1256,7 @@ Item {
                             width: item ? item.width : 0
                             height: item ? item.height : 0
                             sourceComponent: AlphabetMappings {
-                                enabled: app.transliterationEngine.textInputSourceIdForLanguage(app.transliterationEngine.language) === ""
+                                enabled: Scrite.app.transliterationEngine.textInputSourceIdForLanguage(Scrite.app.transliterationEngine.language) === ""
 
                                 Rectangle {
                                     visible: !parent.enabled
@@ -1266,14 +1266,14 @@ Item {
 
                                     Text {
                                         width: parent.width * 0.75
-                                        font.pointSize: app.idealFontPointSize + 5
+                                        font.pointSize: Scrite.app.idealFontPointSize + 5
                                         anchors.centerIn: parent
                                         horizontalAlignment: Text.AlignHCenter
                                         color: primaryColors.c300.text
                                         text: {
-                                            if(app.isMacOSPlatform)
-                                                return "Scrite is using an input source from macOS while typing in " + app.transliterationEngine.languageAsString + "."
-                                            return "Scrite is using an input method & keyboard layout from Windows while typing in " + app.transliterationEngine.languageAsString + "."
+                                            if(Scrite.app.isMacOSPlatform)
+                                                return "Scrite is using an input source from macOS while typing in " + Scrite.app.transliterationEngine.languageAsString + "."
+                                            return "Scrite is using an input method & keyboard layout from Windows while typing in " + Scrite.app.transliterationEngine.languageAsString + "."
                                         }
                                     }
                                 }
@@ -1286,8 +1286,8 @@ Item {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 text: documentUI.width > 1470 ? fullText : fullText.substring(0, 2)
-                font.pointSize: app.idealFontPointSize-2
-                property string fullText: app.transliterationEngine.languageAsString
+                font.pointSize: Scrite.app.idealFontPointSize-2
+                property string fullText: Scrite.app.transliterationEngine.languageAsString
                 width: 80
                 visible: mainTabBar.currentIndex <= 2
 
@@ -1347,7 +1347,7 @@ Item {
 
                                     MenuItem2 {
                                         property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
-                                        text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                        text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + Scrite.app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
                                         ToolTip.text: filePath
                                         ToolTip.visible: hovered
                                         onClicked: fileOpenButton.doOpen(filePath)
@@ -1383,7 +1383,7 @@ Item {
                                 title: "Import"
 
                                 Repeater {
-                                    model: scriteDocument.supportedImportFormats
+                                    model: Scrite.document.supportedImportFormats
 
                                     MenuItem2 {
                                         text: modelData
@@ -1398,7 +1398,7 @@ Item {
                                 width: 250
 
                                 Component.onCompleted: {
-                                    var formats = scriteDocument.supportedExportFormats
+                                    var formats = Scrite.document.supportedExportFormats
                                     for(var i=0; i<formats.length; i++) {
                                         var format = formats[i]
                                         if(format === "")
@@ -1414,7 +1414,7 @@ Item {
                                 width: 300
 
                                 Repeater {
-                                    model: scriteDocument.supportedReports
+                                    model: Scrite.document.supportedReports
 
                                     MenuItem2 {
                                         text: modelData.name
@@ -1433,16 +1433,16 @@ Item {
                             title: "Language"
 
                             Repeater {
-                                model: app.enumerationModel(app.transliterationEngine, "Language")
+                                model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
                                 MenuItem2 {
                                     property string baseText: modelData.key
-                                    property string shortcutKey: app.transliterationEngine.shortcutLetter(modelData.value)
-                                    text: baseText + " (" + app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
-                                    font.bold: app.transliterationEngine.language === modelData.value
+                                    property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
+                                    text: baseText + " (" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
+                                    font.bold: Scrite.app.transliterationEngine.language === modelData.value
                                     onClicked: {
-                                        app.transliterationEngine.language = modelData.value
-                                        scriteDocument.formatting.defaultLanguage = modelData.value
+                                        Scrite.app.transliterationEngine.language = modelData.value
+                                        Scrite.document.formatting.defaultLanguage = modelData.value
                                         paragraphLanguageSettings.defaultLanguage = modelData.key
                                     }
                                 }
@@ -1453,16 +1453,16 @@ Item {
                             MenuItem2 {
                                 text: "Next-Language (F10)"
                                 onClicked: {
-                                    app.transliterationEngine.cycleLanguage()
-                                    scriteDocument.formatting.defaultLanguage = app.transliterationEngine.language
-                                    paragraphLanguageSettings.defaultLanguage = app.transliterationEngine.languageAsString
+                                    Scrite.app.transliterationEngine.cycleLanguage()
+                                    Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
+                                    paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
                                 }
                             }
                         }
 
                         MenuItem2 {
-                            text: "Alphabet Mappings For " + app.transliterationEngine.languageAsString
-                            enabled: app.transliterationEngine.language !== TransliterationEngine.English
+                            text: "Alphabet Mappings For " + Scrite.app.transliterationEngine.languageAsString
+                            enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
                             onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
                         }
 
@@ -1473,26 +1473,26 @@ Item {
                             width: 250
 
                             MenuItem2 {
-                                text: "Screenplay (" + app.polishShortcutTextForDisplay("Alt+1") + ")"
+                                text: "Screenplay (" + Scrite.app.polishShortcutTextForDisplay("Alt+1") + ")"
                                 onTriggered: mainTabBar.activateTab(0)
                                 font.bold: mainTabBar.currentIndex === 0
                             }
 
                             MenuItem2 {
-                                text: "Structure (" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+                                text: "Structure (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                                 onTriggered: mainTabBar.activateTab(1)
                                 font.bold: mainTabBar.currentIndex === 1
                             }
 
                             MenuItem2 {
-                                text: "Notebook (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                                text: "Notebook (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                                 onTriggered: mainTabBar.activateTab(2)
                                 font.bold: mainTabBar.currentIndex === 2
                                 enabled: !showNotebookInStructure
                             }
 
                             MenuItem2 {
-                                text: "Scrited (" + app.polishShortcutTextForDisplay("Alt+4") + ")"
+                                text: "Scrited (" + Scrite.app.polishShortcutTextForDisplay("Alt+4") + ")"
                                 onTriggered: mainTabBar.currentIndex = 3
                                 font.bold: mainTabBar.currentIndex === 3
                             }
@@ -1550,18 +1550,18 @@ Item {
                 visible: appToolBar.visible
 
                 Connections {
-                    target: scriteDocument
-                    onJustReset: mainTabBar.activateTab(0)
-                    onAboutToSave: {
-                        var userData = scriteDocument.userData
+                    target: Scrite.document
+                    function onJustReset() { mainTabBar.activateTab(0) }
+                    function onAboutToSave() {
+                        var userData = Scrite.document.userData
                         userData["mainTabBar"] = {
                             "version": 0,
                             "currentIndex": mainTabBar.currentIndex
                         }
-                        scriteDocument.userData = userData
+                        Scrite.document.userData = userData
                     }
-                    onJustLoaded: {
-                        var userData = scriteDocument.userData
+                    function onJustLoaded() {
+                        var userData = Scrite.document.userData
                         if(userData.mainTabBar) {
                             var ci = userData.mainTabBar.currentIndex
                             if(ci >= 0 && ci <= 2)
@@ -1580,10 +1580,10 @@ Item {
                     if(!tab.visible)
                         index = 0
                     var message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
-                    scriteDocument.setBusyMessage(message)
-                    app.execLater(mainTabBar, 100, function() {
+                    Scrite.document.setBusyMessage(message)
+                    Scrite.app.execLater(mainTabBar, 100, function() {
                         mainTabBar.currentIndex = index
-                        scriteDocument.clearBusyMessage()
+                        Scrite.document.clearBusyMessage()
                     })
                 }
 
@@ -1662,7 +1662,7 @@ Item {
 
                         FontMetrics {
                             id: tabBarFontMetrics
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                         }
 
                         Image {
@@ -1683,7 +1683,7 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: mainTabBar.activateTab(index)
-                            ToolTip.text: modelData.name + "\t" + app.polishShortcutTextForDisplay("Alt+"+(index+1))
+                            ToolTip.text: modelData.name + "\t" + Scrite.app.polishShortcutTextForDisplay("Alt+"+(index+1))
                             ToolTip.delay: 1000
                             ToolTip.visible: containsMouse
                         }
@@ -1701,7 +1701,7 @@ Item {
 
     Loader {
         id: contentLoader
-        active: allowContent && !scriteDocument.loading
+        active: allowContent && !Scrite.document.loading
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right
@@ -1734,7 +1734,7 @@ Item {
         ScriptAction {
             script: {
                 if(resetContentAnimation.filePath === "")
-                    scriteDocument.reset()
+                    Scrite.document.reset()
                 else
                     resetContentAnimation.callback(resetContentAnimation.filePath)
                 resetContentAnimation.filePath = ""
@@ -1750,8 +1750,8 @@ Item {
 
     ScreenplayTracks {
         id: screenplayTracks
-        screenplay: scriteDocument.screenplay
-        Component.onCompleted: app.registerObject(screenplayTracks, "screenplayTracks")
+        screenplay: Scrite.document.screenplay
+        Component.onCompleted: Scrite.app.registerObject(screenplayTracks, "screenplayTracks")
     }
 
     Component {
@@ -1830,9 +1830,9 @@ Item {
 
             onAdditionalCharacterMenuItemClicked: {
                 if(menuItemName === "Character Notes" && showNotebookInStructure) {
-                    var ch = scriteDocument.structure.findCharacter(characterName)
+                    var ch = Scrite.document.structure.findCharacter(characterName)
                     if(ch === null)
-                        scriteDocument.structure.addCharacter(characterName)
+                        Scrite.document.structure.addCharacter(characterName)
                     Announcement.shout("7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8", characterName)
                 }
             }
@@ -1887,19 +1887,19 @@ Item {
                                         else if(sdata.startsWith("Notebook")) {
                                             structureEditorTabs.currentTabIndex = 1
                                             if(sdata !== "Notebook")
-                                                app.execLater(notebookViewLoader, 100, function() {
+                                                Scrite.app.execLater(notebookViewLoader, 100, function() {
                                                     notebookViewLoader.item.switchTo(sdata)
                                                 })
                                         }
                                     } else if(stype === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8") {
                                         structureEditorTabs.currentTabIndex = 1
-                                        app.execLater(notebookViewLoader, 100, function() {
+                                        Scrite.app.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToCharacterTab(data)
                                         })
                                     }
                                     else if(stype === "41EE5E06-FF97-4DB6-B32D-F938418C9529") {
                                         structureEditorTabs.currentTabIndex = 1
-                                        app.execLater(notebookViewLoader, 100, function() {
+                                        Scrite.app.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToSceneTab(data)
                                         })
                                     }
@@ -1931,7 +1931,7 @@ Item {
                                             down: structureEditorTabs.currentTabIndex === 0
                                             visible: ui.showNotebookInStructure
                                             iconSource: "../icons/navigation/structure_tab.png"
-                                            ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+                                            ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                                             onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
                                         }
 
@@ -1939,7 +1939,7 @@ Item {
                                             down: structureEditorTabs.currentTabIndex === 1
                                             visible: ui.showNotebookInStructure
                                             iconSource: "../icons/navigation/notebook_tab.png"
-                                            ToolTip.text: "Notebook Tab (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                                            ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                                             onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                                         }
                                     }
@@ -2003,7 +2003,7 @@ Item {
                             active: false
                             property string sessionId
                             sourceComponent: Rectangle {
-                                color: app.translucent(primaryColors.button, 0.5)
+                                color: Scrite.app.translucent(primaryColors.button, 0.5)
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -2039,7 +2039,7 @@ Item {
                                     Text {
                                         color: primaryColors.c50.background
                                         text: "Pull this handle to view the screenplay editor."
-                                        font.pointSize: app.idealFontPointSize + 2
+                                        font.pointSize: Scrite.app.idealFontPointSize + 2
                                         anchors.right: parent.left
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.rightMargin: 20
@@ -2088,7 +2088,7 @@ Item {
                                     Text {
                                         color: primaryColors.c50.background
                                         text: "Pull this handle to get the timeline view."
-                                        font.pointSize: app.idealFontPointSize
+                                        font.pointSize: Scrite.app.idealFontPointSize
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         anchors.bottom: parent.top
                                         anchors.bottomMargin: 20
@@ -2143,7 +2143,7 @@ Item {
                 active: height >= 50
                 sourceComponent: Rectangle {
                     color: FocusTracker.hasFocus ? accentColors.c300.background : accentColors.c200.background
-                    FocusTracker.window: qmlWindow
+                    FocusTracker.window: Scrite.window
 
                     Behavior on color {
                         enabled: screenplayEditorSettings.enableAnimations
@@ -2170,26 +2170,26 @@ Item {
             }
 
             Connections {
-                target: scriteDocument
-                onAboutToSave: structureEditorSplitView1.saveLayoutDetails()
-                onJustLoaded: structureEditorSplitView1.restoreLayoutDetails()
+                target: Scrite.document
+                function onAboutToSave() { structureEditorSplitView1.saveLayoutDetails() }
+                function onJustLoaded() { structureEditorSplitView1.restoreLayoutDetails() }
             }
 
             Component.onCompleted: restoreLayoutDetails()
             Component.onDestruction: saveLayoutDetails()
 
             function saveLayoutDetails() {
-                var userData = scriteDocument.userData
+                var userData = Scrite.document.userData
                 userData["structureTab"] = {
                     "version": 0,
                     "screenplayEditorWidth": screenplayEditor2.width/structureEditorRow1.width,
                     "timelineViewHeight": structureEditorRow2.height
                 }
-                scriteDocument.userData = userData
+                Scrite.document.userData = userData
             }
 
             function restoreLayoutDetails() {
-                var userData = scriteDocument.userData
+                var userData = Scrite.document.userData
                 if(userData.structureTab && userData.structureTab.version === 0) {
                     structureEditorRow2.SplitView.preferredHeight = userData.structureTab.timelineViewHeight
                     structureEditorRow2.height = structureEditorRow2.SplitView.preferredHeight
@@ -2197,11 +2197,11 @@ Item {
                     screenplayEditor2.width = screenplayEditor2.SplitView.preferredWidth
                 }
 
-                if(structureCanvasSettings.showPullHandleAnimation && contentLoader.sessionId !== scriteDocument.sessionId) {
-                    app.execLater(splitViewAnimationLoader, 250, function() {
+                if(structureCanvasSettings.showPullHandleAnimation && contentLoader.sessionId !== Scrite.document.sessionId) {
+                    Scrite.app.execLater(splitViewAnimationLoader, 250, function() {
                         splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
                     })
-                    contentLoader.sessionId = scriteDocument.sessionId
+                    contentLoader.sessionId = Scrite.document.sessionId
                 }
             }
         }
@@ -2247,12 +2247,12 @@ Item {
     }
 
     function newFromTemplate() {
-        if(!scriteDocument.empty) {
+        if(!Scrite.document.empty) {
             contentLoader.allowContent = false
-            scriteDocument.reset()
+            Scrite.document.reset()
             contentLoader.allowContent = true
         }
-        if(app.internetAvailable) {
+        if(Scrite.app.internetAvailable) {
             modalDialog.popupSource = fileNewButton
             modalDialog.sourceComponent = openTemplateDialogComponent
             modalDialog.closeable = false
@@ -2268,7 +2268,7 @@ Item {
             onImportFinished: contentLoader.allowContent = true
             onImportCancelled: {
                 contentLoader.allowContent = false
-                scriteDocument.reset()
+                Scrite.document.reset()
                 contentLoader.allowContent = true
             }
         }
@@ -2301,14 +2301,14 @@ Item {
         selectExisting: modes[mode].selectExisting
         property string mode: "OPEN"
 
-        property ErrorReport errorReport: Aggregation.findErrorReport(scriteDocument)
+        property ErrorReport errorReport: Aggregation.findErrorReport(Scrite.document)
         Notification.title: modes[mode].notificationTitle
         Notification.text: errorReport.errorMessage
         Notification.active: errorReport.hasError
         Notification.autoClose: false
         Notification.onDismissed: {
             if(errorReport.details && errorReport.details.revealOnDesktopRequest)
-                app.revealFileOnDesktop(errorReport.details.revealOnDesktopRequest)
+                Scrite.app.revealFileOnDesktop(errorReport.details.revealOnDesktopRequest)
             errorReport.clear()
         }
 
@@ -2319,7 +2319,7 @@ Item {
                     "selectExisting": true,
                     "callback": function(path) {
                         contentLoader.allowContent = false
-                        scriteDocument.open(path)
+                        Scrite.document.open(path)
                         contentLoader.allowContent = true
                         recentFilesMenu.add(path)
                     },
@@ -2330,7 +2330,7 @@ Item {
                     "nameFilters": ["Scrite Projects (*.scrite)"],
                     "selectExisting": false,
                     "callback": function(path) {
-                        scriteDocument.saveAs(path)
+                        Scrite.document.saveAs(path)
                         recentFilesMenu.add(path)
                     },
                     "reset": false,
@@ -2338,13 +2338,13 @@ Item {
                 }
             }
 
-            scriteDocument.supportedImportFormats.forEach(function(format) {
+            Scrite.document.supportedImportFormats.forEach(function(format) {
                 availableModes["IMPORT " + format] = {
-                    "nameFilters": scriteDocument.importFormatFileSuffix(format),
+                    "nameFilters": Scrite.document.importFormatFileSuffix(format),
                     "selectExisting": true,
                     "callback": function(path) {
                         contentLoader.allowContent = false
-                        scriteDocument.importFile(path, format)
+                        Scrite.document.importFile(path, format)
                         contentLoader.allowContent = true
                     },
                     "reset": true,
@@ -2362,7 +2362,7 @@ Item {
             folder = mode === "IMPORT" ? workspaceSettings.lastOpenImportFolderUrl : workspaceSettings.lastOpenFolderUrl
 
             if(filePath)
-                app.execLater(qmlWindow, 250, function() { processFile(filePath) } )
+                Scrite.app.execLater(Scrite.window, 250, function() { processFile(filePath) } )
             else {
                 var modeInfo = modes[mode]
                 if(modeInfo["reset"] === true) {
@@ -2378,17 +2378,17 @@ Item {
         function processFile(filePath) {
             var modeInfo = modes[mode]
             if(modeInfo["reset"] === true) {
-                resetContentAnimation.filePath = filePath ? filePath : app.urlToLocalFile(fileUrl)
+                resetContentAnimation.filePath = filePath ? filePath : Scrite.app.urlToLocalFile(fileUrl)
                 resetContentAnimation.callback = modeInfo.callback
                 resetContentAnimation.start()
             } else {
-                modeInfo.callback(app.urlToLocalFile(fileUrl))
+                modeInfo.callback(Scrite.app.urlToLocalFile(fileUrl))
             }
         }
     }
 
     Item {
-        property ErrorReport applicationErrors: Aggregation.findErrorReport(app)
+        property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
         Notification.active: applicationErrors ? applicationErrors.hasError : false
         Notification.title: "Scrite Error"
         Notification.text: applicationErrors ? applicationErrors.errorMessage : ""
@@ -2422,15 +2422,15 @@ Item {
         BackupsDialogBox {
             onOpenInThisWindow: {
                 contentLoader.allowContent = false
-                scriteDocument.openAnonymously(filePath)
+                Scrite.document.openAnonymously(filePath)
                 modalDialog.close()
-                app.execLater(contentLoader, 300, function() {
+                Scrite.app.execLater(contentLoader, 300, function() {
                     contentLoader.allowContent = true
                 })
             }
             onOpenInNewWindow: {
-                app.launchNewInstanceAndOpenAnonymously(qmlWindow, filePath)
-                app.execLater(modalDialog, 4000, function() {
+                Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
+                Scrite.app.execLater(modalDialog, 4000, function() {
                     modalDialog.close()
                 })
             }
@@ -2445,12 +2445,12 @@ Item {
 
         property bool handleCloseEvent: true
         Connections {
-            target: qmlWindow
-            onClosing: {
+            target: Scrite.window
+            function onClosing(close) {
                 if(closeEventHandler.handleCloseEvent) {
-                    app.saveWindowGeometry(qmlWindow, "Workspace")
+                    Scrite.app.saveWindowGeometry(Scrite.window, "Workspace")
 
-                    if(!scriteDocument.modified) {
+                    if(!Scrite.document.modified) {
                         close.accepted = true
                         return
                     }
@@ -2462,15 +2462,15 @@ Item {
                         "abortButtonText": "Cancel",
                         "callback": function(val) {
                             if(val) {
-                                if(scriteDocument.fileName !== "")
-                                    scriteDocument.save()
+                                if(Scrite.document.fileName !== "")
+                                    Scrite.document.save()
                                 else {
                                     cmdSave.doClick()
                                     return
                                 }
                             }
                             closeEventHandler.handleCloseEvent = false
-                            qmlWindow.close()
+                            Scrite.window.close()
                         }
                     }, closeEventHandler)
                 } else
@@ -2480,7 +2480,7 @@ Item {
     }
 
     QtObject {
-        ShortcutsModelItem.enabled: app.isTextInputItem(qmlWindow.activeFocusItem)
+        ShortcutsModelItem.enabled: Scrite.app.isTextInputItem(Scrite.window.activeFocusItem)
         ShortcutsModelItem.priority: 10
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: "Symbols & Smileys"
@@ -2502,7 +2502,7 @@ Item {
 
         Settings {
             id: shortcutsDockWidgetSettings
-            fileName: app.settingsFilePath
+            fileName: Scrite.app.settingsFilePath
             category: "Shortcuts Dock Widget"
             property alias contentX: shortcutsDockWidget.contentX
             property alias contentY: shortcutsDockWidget.contentY
@@ -2511,7 +2511,7 @@ Item {
 
         Connections {
             target: splashLoader
-            onActiveChanged: {
+            function onActiveChanged() {
                 if(splashLoader.active)
                     return
                 if(shortcutsDockWidget.contentX < 0 || shortcutsDockWidget.contentX + shortcutsDockWidget.contentWidth > documentUI.width)
@@ -2554,11 +2554,11 @@ Item {
     }
 
     Component.onCompleted: {
-        if(!app.restoreWindowGeometry(qmlWindow, "Workspace"))
+        if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
             workspaceSettings.screenplayEditorWidth = -1
-        if(app.maybeOpenAnonymously())
+        if(Scrite.app.maybeOpenAnonymously())
             splashLoader.active = false
-        screenplayAdapter.sessionId = scriteDocument.sessionId
+        screenplayAdapter.sessionId = Scrite.document.sessionId
     }
 
     BusyOverlay {

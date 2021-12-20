@@ -14,12 +14,13 @@
 #ifndef PROPERTYALIAS_H
 #define PROPERTYALIAS_H
 
-#include <QObject>
+#include <QQmlEngine>
 #include "qobjectproperty.h"
 
 class PropertyAlias : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     PropertyAlias(QObject *parent = nullptr);

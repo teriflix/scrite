@@ -17,7 +17,7 @@
 #include "execlatertimer.h"
 #include "qobjectproperty.h"
 
-#include <QObject>
+#include <QQmlEngine>
 #include <QQmlListProperty>
 #include <QQmlParserStatus>
 #include <QAbstractListModel>
@@ -26,6 +26,8 @@ class AbstractObjectTracker : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~AbstractObjectTracker();
@@ -66,6 +68,7 @@ protected:
 class TrackProperty : public AbstractObjectTracker
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TrackProperty(QObject *parent = nullptr);
@@ -86,6 +89,7 @@ private:
 class TrackModelRow : public AbstractObjectTracker
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TrackModelRow(QObject *parent = nullptr);
@@ -137,6 +141,7 @@ private:
 class TrackSignal : public AbstractObjectTracker
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TrackSignal(QObject *parent = nullptr);
@@ -157,6 +162,7 @@ private:
 class TrackerPack : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TrackerPack(QObject *parent = nullptr);

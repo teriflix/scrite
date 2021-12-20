@@ -28,8 +28,8 @@ Item {
         property point from: Qt.point(0,0)
         property point to: Qt.point(0,0)
 
-        color: app.translucent(app.palette.highlight,0.2)
-        border { width: 2; color: app.palette.highlight }
+        color: Scrite.app.translucent(Scrite.app.palette.highlight,0.2)
+        border { width: 2; color: Scrite.app.palette.highlight }
 
         property rect rectangle: {
             if(from === to)

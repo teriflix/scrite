@@ -13,11 +13,11 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Rectangle {
-    property var mappings: app.transliterationEngine.alphabetMappings
-    property font languageFont: app.transliterationEngine.font
+    property var mappings: Scrite.app.transliterationEngine.alphabetMappings
+    property font languageFont: Scrite.app.transliterationEngine.font
 
     property var mappingModels: [
         { "heading": "Vowels", "array": mappings.vowels },
@@ -35,12 +35,12 @@ Rectangle {
     FontMetrics {
         id: languageFontMetrics
         font.family: languageFont.family
-        font.pointSize: app.idealFontPointSize
+        font.pointSize: Scrite.app.idealFontPointSize
     }
 
     FontMetrics {
         id: normalFontMetrics
-        font.pointSize: app.idealFontPointSize
+        font.pointSize: Scrite.app.idealFontPointSize
     }
 
     Row {

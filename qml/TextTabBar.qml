@@ -13,7 +13,7 @@
 
 import QtQuick 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: textTabBar

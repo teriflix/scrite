@@ -15,12 +15,12 @@ import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Rectangle {
     id: dfNotice
-    property string reason: User.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
-    property string suggestion: User.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
+    property string reason: Scrite.user.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
+    property string suggestion: Scrite.user.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
     property string featureName
     color: primaryColors.c100.background
     clip: true
@@ -64,7 +64,7 @@ Rectangle {
 
             Text {
                 text: featureName
-                font.pointSize: app.idealFontPointSize + 8
+                font.pointSize: Scrite.app.idealFontPointSize + 8
                 font.bold: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: text !== ""
@@ -74,7 +74,7 @@ Rectangle {
                 id: reasonSuggestion
                 text: [reason, suggestion].join(" ").trim()
                 width: parent.width
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 visible: text !== ""
             }
@@ -89,7 +89,7 @@ Rectangle {
             }
 
             Button2 {
-                text: User.loggedIn ? "Subscribe" : "Sign Up / Login"
+                text: Scrite.user.loggedIn ? "Subscribe" : "Sign Up / Login"
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     dfNotice.clicked()

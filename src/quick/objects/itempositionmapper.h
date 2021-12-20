@@ -14,15 +14,16 @@
 #ifndef ITEMPOSITIONMAPPER_H
 #define ITEMPOSITIONMAPPER_H
 
+#include <QTimer>
 #include <QObject>
 #include <QQuickItem>
-#include <QTimer>
 
 #include "qobjectproperty.h"
 
 class ItemPositionMapper : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     ItemPositionMapper(QObject *parent = nullptr);

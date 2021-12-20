@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: formView
@@ -76,7 +76,7 @@ Item {
             Column {
                 width: parent.width
                 spacing: parent.spacing
-                property bool visibleToUser: app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                property bool visibleToUser: Scrite.app.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                     Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
                 opacity: visibleToUser ? 1 : 0
 
@@ -91,7 +91,7 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     font.bold: true
-                    font.pointSize: app.idealFontPointSize + 2
+                    font.pointSize: Scrite.app.idealFontPointSize + 2
                     placeholderText: "Title"
                     TabSequenceItem.manager: formTabManager
                     TabSequenceItem.sequence: 0
@@ -110,7 +110,7 @@ Item {
                     text: note ? note.content : ""
                     width: parent.width
                     wrapMode: Text.WordWrap
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     placeholderText: "Description"
                     TabSequenceItem.manager: formTabManager
                     TabSequenceItem.sequence: 1
@@ -195,7 +195,7 @@ Item {
                         if(note)
                             answer = note.getFormData(objectItem.id)
                     }
-                    property bool visibleToUser: app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                    property bool visibleToUser: Scrite.app.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                         Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
                     opacity: visibleToUser ? 1 : 0
                 }
@@ -204,7 +204,7 @@ Item {
             Item {
                 width: parent.width
                 height: 20
-                property bool visibleToUser: app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                property bool visibleToUser: Scrite.app.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                     Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
                 opacity: visibleToUser ? 1 : 0
             }

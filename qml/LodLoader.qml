@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Loader {
     id: lodLoader
@@ -52,8 +52,8 @@ Loader {
 
         active = true
         if(resetWidthBeforeLodChange)
-            app.resetObjectProperty(lodLoader, "width")
+            Scrite.app.resetObjectProperty(lodLoader, "width")
         if(resetHeightBeforeLodChange)
-            app.resetObjectProperty(lodLoader, "height")
+            Scrite.app.resetObjectProperty(lodLoader, "height")
     }
 }

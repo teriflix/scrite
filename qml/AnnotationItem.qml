@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 // For use from within StructureView only!!!!
 // Because we assume the existence of 'annotation' and 'annotationGripLoader'

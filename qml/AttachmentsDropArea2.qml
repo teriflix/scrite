@@ -13,11 +13,11 @@
 
 import QtQuick 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 AttachmentsDropArea {
     id: attachmentsDropArea
-    enabled: !scriteDocument.readOnly
+    enabled: !Scrite.document.readOnly
     property real noticeWidthFactor: 0.5
 
     property string attachmentNoticeSuffix: "Add this file as attachment by dropping it here."
@@ -25,7 +25,7 @@ AttachmentsDropArea {
     Rectangle {
         anchors.fill: parent
         visible: attachmentsDropArea.active
-        color: app.translucent(primaryColors.c500.background, 0.5)
+        color: Scrite.app.translucent(primaryColors.c500.background, 0.5)
 
         Rectangle {
             anchors.fill: attachmentNotice
@@ -42,7 +42,7 @@ AttachmentsDropArea {
             color: primaryColors.c700.text
             text: parent.visible ? "<b>" + attachmentsDropArea.attachment.originalFileName + "</b><br/><br/>" + attachmentNoticeSuffix : ""
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
         }
     }
 }

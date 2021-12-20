@@ -24,6 +24,7 @@
 class SimpleTabBarItem : public QQuickPaintedItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     SimpleTabBarItem(QQuickItem *parent = nullptr);

@@ -39,10 +39,10 @@ QObject *Aggregation::find(QObject *object, const QString &className,
 
 ErrorReport *Aggregation::findErrorReport(QObject *object) const
 {
-    return object->findChild<ErrorReport *>();
+    return object->findChild<ErrorReport *>(QString(), Qt::FindDirectChildrenOnly);
 }
 
 ProgressReport *Aggregation::findProgressReport(QObject *object) const
 {
-    return object->findChild<ProgressReport *>();
+    return object->findChild<ProgressReport *>(QString(), Qt::FindDirectChildrenOnly);
 }

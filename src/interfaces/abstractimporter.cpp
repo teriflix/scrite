@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "scrite.h"
 #include "undoredo.h"
 #include "application.h"
 #include "abstractimporter.h"
@@ -43,7 +44,7 @@ QString AbstractImporter::nameFilters() const
 bool AbstractImporter::isFeatureEnabled() const
 {
     if (User::instance()->isLoggedIn()) {
-        const bool allImportersEnabled = User::instance()->isFeatureEnabled(User::ImportFeature);
+        const bool allImportersEnabled = User::instance()->isFeatureEnabled(Scrite::ImportFeature);
         const bool thisSpecificImporterEnabled = allImportersEnabled
                 ? User::instance()->isFeatureNameEnabled(QStringLiteral("import/") + this->format())
                 : false;

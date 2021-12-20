@@ -21,6 +21,7 @@ class TextDocumentViewportItem;
 class TextDocumentItem : public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TextDocumentItem(QQuickItem *parent = nullptr);

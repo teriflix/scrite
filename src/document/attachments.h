@@ -21,11 +21,14 @@
 #include <QFileInfo>
 #include <QMimeType>
 #include <QQuickItem>
+#include <QQmlEngine>
 
 class Attachment : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Attachment(QObject *parent = nullptr);
@@ -97,6 +100,8 @@ class Attachments : public ObjectListPropertyModel<Attachment *>,
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Attachments(QObject *parent = nullptr);
@@ -162,6 +167,7 @@ private:
 class AttachmentsDropArea : public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     AttachmentsDropArea(QQuickItem *parent = nullptr);

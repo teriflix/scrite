@@ -25,6 +25,7 @@
 class ScreenplayTextDocumentOffsets : public GenericArrayModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     ScreenplayTextDocumentOffsets(QObject *parent = nullptr);

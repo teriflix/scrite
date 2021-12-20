@@ -46,6 +46,7 @@ class StructureElement : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
 
 public:
     Q_INVOKABLE StructureElement(QObject *parent = nullptr);
@@ -173,6 +174,8 @@ private:
 class StructureElementStack : public ObjectListPropertyModel<StructureElement *>
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
     StructureElementStack(QObject *parent = nullptr);
 
@@ -246,6 +249,8 @@ private:
 class StructureElementStacks : public ObjectListPropertyModel<StructureElementStack *>
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     StructureElementStacks(QObject *parent = nullptr);
@@ -278,6 +283,7 @@ class Relationship : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
 
 public:
     Q_INVOKABLE Relationship(QObject *parent = nullptr);
@@ -340,6 +346,8 @@ class Character : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_INVOKABLE Character(QObject *parent = nullptr);
@@ -512,6 +520,7 @@ private:
 class Annotation : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     Q_INVOKABLE Annotation(QObject *parent = nullptr);
@@ -597,6 +606,8 @@ class Structure : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Structure(QObject *parent = nullptr);
@@ -702,7 +713,7 @@ public:
 
     enum LayoutType { HorizontalLayout, VerticalLayout, FlowHorizontalLayout, FlowVerticalLayout };
     Q_ENUM(LayoutType)
-    Q_INVOKABLE QRectF layoutElements(LayoutType layoutType);
+    Q_INVOKABLE QRectF layoutElements(Structure::LayoutType layoutType);
 
     Q_PROPERTY(bool forceBeatBoardLayout READ isForceBeatBoardLayout WRITE setForceBeatBoardLayout NOTIFY forceBeatBoardLayoutChanged)
     void setForceBeatBoardLayout(bool val);
@@ -903,6 +914,7 @@ private:
 class StructureElementConnector : public AbstractShapeItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     StructureElementConnector(QQuickItem *parent = nullptr);
@@ -972,6 +984,7 @@ private:
 class StructureCanvasViewportFilterModel : public QSortFilterProxyModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     StructureCanvasViewportFilterModel(QObject *parent = nullptr);

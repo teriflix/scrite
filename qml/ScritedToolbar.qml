@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Layouts 1.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     property Item scritedView
@@ -51,7 +51,7 @@ Item {
 
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/rewind_10.png"
-                ToolTip.text: "Rewind 10 seconds.\t(" + app.polishShortcutTextForDisplay("Ctrl") + " + ←)"
+                ToolTip.text: "Rewind 10 seconds.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + " + ←)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.rewind()
 
@@ -77,7 +77,7 @@ Item {
 
             ToolButton3 {
                 iconSource: "../icons/mediaplayer/fast_forward.png"
-                ToolTip.text: "Forward half second.\t(" + app.polishShortcutTextForDisplay("Ctrl") + "+→)"
+                ToolTip.text: "Forward half second.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+→)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.miniForward()
 
@@ -103,7 +103,7 @@ Item {
 
             ToolButton3 {
                 iconSource: "../icons/action/keyboard_arrow_up.png"
-                ToolTip.text: "Previous Scene\t(" + app.polishShortcutTextForDisplay("Ctrl") + "+↑)"
+                ToolTip.text: "Previous Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↑)"
                 enabled: scritedView.previousSceneAvailable
                 onClicked: scritedView.scrollPreviousScene()
 
@@ -116,7 +116,7 @@ Item {
 
             ToolButton3 {
                 iconSource: "../icons/action/keyboard_arrow_down.png"
-                ToolTip.text: "Next Scene\t(" + app.polishShortcutTextForDisplay("Ctrl") + "+↓)"
+                ToolTip.text: "Next Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↓)"
                 enabled: scritedView.nextSceneAvailable
                 onClicked: scritedView.scrollNextScene()
 

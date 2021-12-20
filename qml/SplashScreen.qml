@@ -15,10 +15,10 @@ import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
-    property bool animationsEnabled: app.isWindowsPlatform ? !app.isNotWindows10 : true
+    property bool animationsEnabled: Scrite.app.isWindowsPlatform ? !Scrite.app.isNotWindows10 : true
     signal done()
 
     BoxShadow {
@@ -45,8 +45,8 @@ Item {
             id: versionText
             x: (1018 / splashImage.sourceSize.width) * parent.width
             y: (187 / splashImage.sourceSize.height) * parent.height
-            font.pixelSize: app.idealFontPointSize + 3
-            text: app.applicationVersion
+            font.pixelSize: Scrite.app.idealFontPointSize + 3
+            text: Scrite.app.applicationVersion
             color: "#4a4a4a"
         }
 
@@ -120,7 +120,7 @@ Item {
     }
 
     EventFilter.events: [6, 7, 31, 117, 51]
-    EventFilter.target: app
+    EventFilter.target: Scrite.app
     EventFilter.onFilter: {
         if(event.type === 6 && event.key === Qt.Key_Escape)
             done()

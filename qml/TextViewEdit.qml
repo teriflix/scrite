@@ -13,7 +13,7 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Loader {
     id: textViewEdit
@@ -77,7 +77,7 @@ Loader {
                 if(SearchAgent.currentSearchResultIndex < 0)
                     return
                 var result = searchResults[SearchAgent.currentSearchResultIndex]
-                markupText = SearchAgent.createMarkupText(textViewEdit.text, result.from, result.to, app.palette.highlight, app.palette.highlightedText)
+                markupText = SearchAgent.createMarkupText(textViewEdit.text, result.from, result.to, Scrite.app.palette.highlight, Scrite.app.palette.highlightedText)
                 textViewEdit.highlightRequest()
             }
             SearchAgent.onClearSearchRequest: searchResults = []
@@ -92,7 +92,7 @@ Loader {
             id: textArea
             text: textViewEdit.text
             font: textViewEdit.font
-            palette: app.palette
+            palette: Scrite.app.palette
             wrapMode: textViewEdit.wrapMode
             horizontalAlignment: textViewEdit.horizontalAlignment
             verticalAlignment: textViewEdit.verticalAlignment
@@ -157,9 +157,9 @@ Loader {
 
             Popup {
                 id: completionViewPopup
-                x: parent.cursorRectangle.x - app.boundingRect(completionModel.completionPrefix, parent.font).width
+                x: parent.cursorRectangle.x - Scrite.app.boundingRect(completionModel.completionPrefix, parent.font).width
                 y: parent.cursorRectangle.y + parent.cursorRectangle.height
-                width: app.largestBoundingRect(completionModel.strings, textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
+                width: Scrite.app.largestBoundingRect(completionModel.strings, textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
                 height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
                 focus: false
                 closePolicy: Popup.NoAutoClose

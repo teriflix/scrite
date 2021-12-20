@@ -14,7 +14,7 @@
 #ifndef CHARACTERRELATIONSHIPSGRAPH_H
 #define CHARACTERRELATIONSHIPSGRAPH_H
 
-#include <QObject>
+#include <QQmlEngine>
 
 #include "structure.h"
 #include "graphlayout.h"
@@ -28,6 +28,8 @@ class CharacterRelationshipsGraphExporter;
 class CharacterRelationshipsGraphNode : public QObject, public GraphLayout::AbstractNode
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~CharacterRelationshipsGraphNode();
@@ -87,6 +89,8 @@ private:
 class CharacterRelationshipsGraphEdge : public QObject, public GraphLayout::AbstractEdge
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~CharacterRelationshipsGraphEdge();
@@ -154,6 +158,7 @@ class CharacterRelationshipsGraph : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    QML_ELEMENT
 
 public:
     CharacterRelationshipsGraph(QObject *parent = nullptr);

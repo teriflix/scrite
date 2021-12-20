@@ -11,16 +11,25 @@
 **
 ****************************************************************************/
 
-import io.scrite.components 1.0
-import QtQuick 2.13
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.12
+#ifndef APPWINDOW_H
+#define APPWINDOW_H
 
-Button {
-    id: button
-    Material.background: primaryColors.button.background
-    Material.foreground: primaryColors.button.text
-    width: Math.max(textRect.width + 40, 120)
-    height: Math.max(textRect.height + 20, 50)
-    property rect textRect: Scrite.app.boundingRect(text, font)
-}
+#include <QQuickView>
+#include <QQmlEngine>
+
+class AppWindow : public QQuickView
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+public:
+    static AppWindow *instance();
+    AppWindow();
+    ~AppWindow();
+
+private:
+    void initializeFileNameToOpen();
+};
+
+#endif // APPWINDOW_H

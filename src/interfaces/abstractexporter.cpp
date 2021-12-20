@@ -13,6 +13,7 @@
 
 #include "abstractexporter.h"
 #include "application.h"
+#include "scrite.h"
 #include "user.h"
 
 #include <QScopeGuard>
@@ -49,7 +50,7 @@ QString AbstractExporter::nameFilters() const
 bool AbstractExporter::isFeatureEnabled() const
 {
     if (User::instance()->isLoggedIn()) {
-        const bool allReportsEnabled = User::instance()->isFeatureEnabled(User::ExportFeature);
+        const bool allReportsEnabled = User::instance()->isFeatureEnabled(Scrite::ExportFeature);
         const bool thisSpecificReportEnabled = allReportsEnabled
                 ? User::instance()->isFeatureNameEnabled(QStringLiteral("export/")
                                                          + this->formatName())

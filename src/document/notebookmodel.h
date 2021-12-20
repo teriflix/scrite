@@ -15,6 +15,7 @@
 #define NOTEBOOKMODEL_H
 
 #include <QTimer>
+#include <QQmlEngine>
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
 
@@ -32,6 +33,7 @@ class ObjectListPropertyModelBase;
 class NotebookModel : public QStandardItemModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     NotebookModel(QObject *parent = nullptr);
@@ -121,6 +123,8 @@ private:
 class BookmarkedNotes : public ObjectListPropertyModel<QObject *>
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     BookmarkedNotes(QObject *parent = nullptr);

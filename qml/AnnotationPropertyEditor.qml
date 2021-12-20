@@ -15,7 +15,7 @@ import QtQuick 2.13
 import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 // For use from within StructureView.qml only!
 
@@ -45,7 +45,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    font.pointSize: app.idealFontPointSize + 2
+                    font.pointSize: Scrite.app.idealFontPointSize + 2
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
@@ -54,7 +54,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     horizontalAlignment: Text.AlignHCenter
                     text: "<b>Position:</b> " + Math.round(annotation.geometry.x-canvasItemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-canvasItemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
                 }
@@ -79,7 +79,7 @@ Item {
                     Text {
                         width: parent.width
                         text: propertyInfo.title
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         font.bold: true
                     }
 
@@ -87,7 +87,7 @@ Item {
                         id: editorLoader
                         width: parent.width - 20
                         anchors.right: parent.right
-                        enabled: !scriteDocument.readOnly
+                        enabled: !Scrite.document.readOnly
 
                         property var propertyInfo: parent.propertyInfo
                         property var propertyValue: annotation.attributes[ propertyInfo.name ]
@@ -135,7 +135,7 @@ Item {
                     onClicked: {
                         var a = annotationGripLoader.annotation
                         annotationGripLoader.reset()
-                        scriteDocument.structure.bringToFront(a)
+                        Scrite.document.structure.bringToFront(a)
                     }
                 }
 
@@ -144,7 +144,7 @@ Item {
                     onClicked: {
                         var a = annotationGripLoader.annotation
                         annotationGripLoader.reset()
-                        scriteDocument.structure.sendToBack(a)
+                        Scrite.document.structure.sendToBack(a)
                     }
                 }
             }
@@ -155,7 +155,7 @@ Item {
                 onClicked: {
                     var a = annotationGripLoader.annotation
                     annotationGripLoader.reset()
-                    scriteDocument.structure.removeAnnotation(a)
+                    Scrite.document.structure.removeAnnotation(a)
                 }
             }
 
@@ -203,7 +203,7 @@ Item {
                         MenuItem2 {
                             text: "Custom Color"
                             onClicked: {
-                                var newColor = app.pickColor(propertyValue)
+                                var newColor = Scrite.app.pickColor(propertyValue)
                                 changePropertyValue( "" + newColor )
                                 colorMenu.close()
                             }
@@ -216,7 +216,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: propertyValue
                 font.capitalization: Font.AllUppercase
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
             }
         }
     }
@@ -257,7 +257,7 @@ Item {
                 border.color: primaryColors.borderColor
             }
             text: propertyValue
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
             height: Math.max(80, contentHeight) + topPadding + bottomPadding
             padding: 7.5
             onTextChanged: Qt.callLater(commitTextChanges)
@@ -291,15 +291,15 @@ Item {
                 id: urlField
                 text: propertyValue
                 onAccepted: changePropertyValue(text)
-                placeholderText: "Enter URL and press " + (app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
+                placeholderText: "Enter URL and press " + (Scrite.app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
                 width: parent.width
             }
 
             Text {
                 width: parent.width
-                font.pointSize: app.idealFontPointSize-1
+                font.pointSize: Scrite.app.idealFontPointSize-1
                 visible: propertyValue != urlField.text
-                text: "Press " + (app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
+                text: "Press " + (Scrite.app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
             }
         }
     }
@@ -312,7 +312,7 @@ Item {
 
             Text {
                 rightPadding: changeFontButton.width + 5
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 text: propertyValue
                 height: 42
                 verticalAlignment: Text.AlignVCenter
@@ -347,9 +347,9 @@ Item {
                 anchors.right: parent.right
                 onVisibleChanged: {
                     if(visible && fontListView.systemFontInfo === undefined)
-                        fontListView.systemFontInfo = app.systemFontInfo()
+                        fontListView.systemFontInfo = Scrite.app.systemFontInfo()
                     if(visible)
-                        app.execLater(fontListViewArea, 100, adjustScroll)
+                        Scrite.app.execLater(fontListViewArea, 100, adjustScroll)
                 }
 
                 function adjustScroll() {
@@ -365,7 +365,7 @@ Item {
                     width: parent.width
                     placeholderText: "search for a font"
                     anchors.top: parent.top
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     onTextEdited: Qt.callLater(highlightFont)
                     function highlightFont() {
                         var utext = text.toUpperCase()
@@ -391,7 +391,7 @@ Item {
                     anchors.bottom: parent.bottom
                     model: systemFontInfo ? systemFontInfo.families : 0
                     highlight: Rectangle {
-                        color: app.palette.highlight
+                        color: Scrite.app.palette.highlight
                     }
                     highlightMoveDuration: 0
                     clip: true
@@ -399,10 +399,10 @@ Item {
                     keyNavigationEnabled: false
                     delegate: Text {
                         font.family: modelData
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         text: modelData
                         width: fontListView.width-20
-                        color: fontListView.currentIndex === index ? app.palette.highlightedText : "black"
+                        color: fontListView.currentIndex === index ? Scrite.app.palette.highlightedText : "black"
                         MouseArea {
                             anchors.fill: parent
                             onClicked: changePropertyValue(modelData)
@@ -503,7 +503,7 @@ Item {
                     if(fileUrl != "") {
                         if(propertyValue != "")
                             annotation.removeImage(propertyValue)
-                        var newImageName = annotation.addImage(app.urlToLocalFile(fileUrl))
+                        var newImageName = annotation.addImage(Scrite.app.urlToLocalFile(fileUrl))
                         changePropertyValue(newImageName)
                     }
                 }
@@ -537,7 +537,7 @@ Item {
                     text: propertyValue == "" ? "Set" : "Change"
                     color: "blue"
                     font.underline: true
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
 
                     MouseArea {
                         anchors.fill: parent
@@ -551,7 +551,7 @@ Item {
                     color: "blue"
                     font.underline: true
                     visible: propertyValue != ""
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
 
                     MouseArea {
                         anchors.fill: parent

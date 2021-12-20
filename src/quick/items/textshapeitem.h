@@ -19,6 +19,7 @@
 class TextShapeItem : public AbstractShapeItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TextShapeItem(QQuickItem *parent = nullptr);

@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Layouts 1.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Row {
     id: screenplayEditorToolbar
@@ -55,7 +55,7 @@ Row {
         id: findButton
         iconSource: "../icons/action/search.png"
         shortcut: "Ctrl+F"
-        ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+        ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
         checked: false
         enabled: !showScreenplayPreview && screenplayTextDocument.editor
@@ -91,7 +91,7 @@ Row {
         iconSource: "../icons/navigation/refresh.png"
         shortcut: "F5"
         shortcutText: ""
-        ToolTip.text: "Reloads formatting for this scene.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
+        ToolTip.text: "Reloads formatting for this scene.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: binder && !showScreenplayPreview ? true : false
         onClicked: {
             var cp = editor.cursorPosition
@@ -124,15 +124,15 @@ Row {
     }
 
     property int breakInsertIndex: {
-        var idx = scriteDocument.screenplay.currentElementIndex
+        var idx = Scrite.document.screenplay.currentElementIndex
         if(idx < 0)
             return -1
 
         ++idx
 
         if(mainTabBar.currentIndex == 0 || mainUndoStack.screenplayEditorActive) {
-            while(idx < scriteDocument.screenplay.elementCount) {
-                var e = scriteDocument.screenplay.elementAt(idx)
+            while(idx < Scrite.document.screenplay.elementCount) {
+                var e = Scrite.document.screenplay.elementAt(idx)
                 if(e === null)
                     break
                 if(e.elementType === ScreenplayElement.BreakElementType)
@@ -148,17 +148,17 @@ Row {
     function addEpisode() {
         requestScreenplayEditor()
         if(breakInsertIndex < 0)
-            scriteDocument.screenplay.addBreakElement(Screenplay.Episode)
+            Scrite.document.screenplay.addBreakElement(Screenplay.Episode)
         else
-            scriteDocument.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
+            Scrite.document.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
     }
 
     ToolButton3 {
         iconSource: "../icons/action/add_episode.png"
         shortcut: "Ctrl+Shift+P"
         shortcutText: ""
-        ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+        ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
+        enabled: !showScreenplayPreview && !Scrite.document.readOnly
         onClicked: addEpisode()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
@@ -169,17 +169,17 @@ Row {
     function addAct() {
         requestScreenplayEditor()
         if(breakInsertIndex < 0)
-            scriteDocument.screenplay.addBreakElement(Screenplay.Act)
+            Scrite.document.screenplay.addBreakElement(Screenplay.Act)
         else
-            scriteDocument.screenplay.insertBreakElement(Screenplay.Act, breakInsertIndex)
+            Scrite.document.screenplay.insertBreakElement(Screenplay.Act, breakInsertIndex)
     }
 
     ToolButton3 {
         iconSource: "../icons/action/add_act.png"
         shortcut: "Ctrl+Shift+B"
         shortcutText: ""
-        ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+        ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
+        enabled: !showScreenplayPreview && !Scrite.document.readOnly
         onClicked: addAct()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Act Break" : "Insert Act Break"
@@ -189,27 +189,27 @@ Row {
 
     function addScene() {
         requestScreenplayEditor()
-        if(!scriteDocument.readOnly)
-            scriteDocument.createNewScene(mainTabBar.currentIndex > 0 ? mainUndoStack.screenplayEditorActive : false)
+        if(!Scrite.document.readOnly)
+            Scrite.document.createNewScene(mainTabBar.currentIndex > 0 ? mainUndoStack.screenplayEditorActive : false)
     }
 
     ToolButton3 {
         iconSource: "../icons/action/add_scene.png"
         shortcut: "Ctrl+Shift+N"
         shortcutText: ""
-        ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+        ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
+        enabled: !showScreenplayPreview && !Scrite.document.readOnly
         onClicked: addScene()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Create New Scene"
-        ShortcutsModelItem.enabled: !scriteDocument.readOnly
+        ShortcutsModelItem.enabled: !Scrite.document.readOnly
         ShortcutsModelItem.shortcut: shortcut
     }
 
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+L"
-        enabled: !showScreenplayPreview && !scriteDocument.readOnly
+        enabled: !showScreenplayPreview && !Scrite.document.readOnly
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Interval Break" : "Insert Interval Break"
@@ -219,9 +219,9 @@ Row {
         onActivated:  {
             requestScreenplayEditor()
             if(breakInsertIndex < 0)
-                scriteDocument.screenplay.addBreakElement(Screenplay.Interval)
+                Scrite.document.screenplay.addBreakElement(Screenplay.Interval)
             else
-                scriteDocument.screenplay.insertBreakElement(Screenplay.Interval, breakInsertIndex)
+                Scrite.document.screenplay.insertBreakElement(Screenplay.Interval, breakInsertIndex)
         }
     }
 
@@ -233,7 +233,7 @@ Row {
     }
 
     property bool formattable: {
-        if(scriteDocument.readOnly)
+        if(Scrite.document.readOnly)
             return false
         if(showScreenplayPreview)
             return false
@@ -252,7 +252,7 @@ Row {
             shortcut: "Ctrl+" + index
             shortcutText: (index+1)
             ToolTip.visible: containsMouse
-            ToolTip.text: app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
+            ToolTip.text: Scrite.app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
             enabled: screenplayEditorToolbar.formattable
             down: binder ? (binder.currentElement ? binder.currentElement.type === modelData.value : false) : false
             onClicked: {

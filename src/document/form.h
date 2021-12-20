@@ -15,7 +15,7 @@
 #define FORM_H
 
 #include <QUrl>
-#include <QObject>
+#include <QQmlEngine>
 #include <QQmlListProperty>
 
 #include "errorreport.h"
@@ -27,6 +27,8 @@ class Form;
 class FormQuestion : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     FormQuestion(QObject *parent = nullptr);
@@ -96,6 +98,8 @@ class Form : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Form(QObject *parent = nullptr);
@@ -189,6 +193,8 @@ class Forms : public ObjectListPropertyModel<Form *>, public QObjectSerializer::
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static Forms *global();

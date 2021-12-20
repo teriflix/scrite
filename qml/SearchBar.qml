@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: searchBar
@@ -166,7 +166,7 @@ Item {
                     suggestedHeight: 40
                     hoverEnabled: true
                     visible: allowReplace
-                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + app.polishShortcutTextForDisplay("Ctrl+Shift+F") + ")"
+                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F") + ")"
                 }
             }
         }
@@ -211,7 +211,7 @@ Item {
                     onClicked: click()
                     function click() {
                         searchEngine.replace(txtReplace.text)
-                        app.execLater(searchEngine, 250, function() { searchEngine.nextSearchResult() })
+                        Scrite.app.execLater(searchEngine, 250, function() { searchEngine.nextSearchResult() })
                     }
                 }
 

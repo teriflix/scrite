@@ -23,6 +23,9 @@
 class Notification : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(Notification)
 
 public:
     Notification(QObject *parent = nullptr);
@@ -91,7 +94,5 @@ private:
     QStringList m_buttons;
     ExecLaterTimer m_autoCloseTimer;
 };
-Q_DECLARE_METATYPE(Notification *)
-QML_DECLARE_TYPEINFO(Notification, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // NOTIFICATION_H

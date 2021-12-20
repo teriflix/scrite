@@ -21,6 +21,8 @@ class ShortcutsModelItem;
 class ShortcutsModel : public QAbstractListModel
 {
     Q_OBJECT
+    QML_NAMED_ELEMENT(ScriteShortcuts)
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static ShortcutsModel *instance();
@@ -55,6 +57,9 @@ private:
 class ShortcutsModelItem : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(ShortcutsModelItem)
 
 public:
     ShortcutsModelItem(QObject *parent = nullptr);
@@ -100,7 +105,5 @@ private:
     QString m_shortcut;
     int m_priority = 0;
 };
-Q_DECLARE_METATYPE(ShortcutsModelItem *)
-QML_DECLARE_TYPEINFO(ShortcutsModelItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // SHORTCUTSMODEL_H

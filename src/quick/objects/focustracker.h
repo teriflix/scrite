@@ -25,6 +25,8 @@ class FocusTracker;
 class FocusTrackerIndicator : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~FocusTrackerIndicator();
@@ -67,6 +69,9 @@ private:
 class FocusTracker : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(FocusTracker)
 
 public:
     FocusTracker(QObject *parent = nullptr);
@@ -100,7 +105,5 @@ private:
     FocusTrackerIndicator *m_indicator = new FocusTrackerIndicator(this);
     QObjectProperty<QQuickWindow> m_window;
 };
-Q_DECLARE_METATYPE(FocusTracker *)
-QML_DECLARE_TYPEINFO(FocusTracker, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // FOCUSTRACKER_H

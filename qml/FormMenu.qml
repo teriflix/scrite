@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Menu2 {
     title: "Forms"
@@ -26,7 +26,7 @@ Menu2 {
 
     SortFilterObjectListModel {
         id: formFilterModel
-        sourceModel: scriteDocument.globalForms
+        sourceModel: Scrite.document.globalForms
         sortByProperty: "title"
         filterByProperty: "type"
         filterValues: notes ? [notes.compatibleFormType] : []

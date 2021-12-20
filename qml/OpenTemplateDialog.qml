@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: newFileDialog
@@ -31,7 +31,7 @@ Item {
 
     AppFeature {
         id: templateAppFeature
-        feature: UserType.TemplateFeature
+        feature: Scrite.TemplateFeature
     }
 
     LibraryService {
@@ -43,7 +43,7 @@ Item {
         }
         onImportFinished: {
             newFileDialog.importFinished()
-            app.execLater(libraryService, 250, function() {
+            Scrite.app.execLater(libraryService, 250, function() {
                 modalDialog.close()
             })
         }
@@ -65,7 +65,7 @@ Item {
             }
 
             Text {
-                font.pointSize: app.idealFontPointSize-2
+                font.pointSize: Scrite.app.idealFontPointSize-2
                 text: "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com."
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 width: parent.width
@@ -148,7 +148,7 @@ Item {
                         Text {
                             id: description
                             width: parent.width-20
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             anchors.centerIn: parent
                             wrapMode: Text.WordWrap
                             color: primaryColors.c600.text
@@ -213,7 +213,7 @@ Item {
                             spacing: 5
 
                             Text {
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 font.bold: true
                                 text: record.name
                                 width: parent.width
@@ -223,7 +223,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-1
+                                font.pointSize: Scrite.app.idealFontPointSize-1
                                 text: record.authors
                                 width: parent.width
                                 wrapMode: Text.WordWrap
@@ -232,7 +232,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-3
+                                font.pointSize: Scrite.app.idealFontPointSize-3
                                 text: "More Info"
                                 font.underline: true
                                 width: parent.width

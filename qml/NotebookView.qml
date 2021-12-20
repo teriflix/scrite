@@ -19,7 +19,7 @@ import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 import QtQuick.Controls 1.4 as OldControls
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Rectangle {
     id: notebookView
@@ -32,17 +32,17 @@ Rectangle {
     property real minTextAreaSize: idealAppFontMetrics.averageCharacterWidth * 20
 
     function switchToStoryTab() {
-        switchTo(scriteDocument.structure.notes)
+        switchTo(Scrite.document.structure.notes)
     }
 
     function switchToSceneTab() {
-        var currentScene = scriteDocument.screenplay.activeScene
+        var currentScene = Scrite.document.screenplay.activeScene
         if(currentScene)
             switchTo(currentScene.notes)
     }
 
     function switchToCharacterTab(name) {
-        var character = scriteDocument.structure.findCharacter(name)
+        var character = Scrite.document.structure.findCharacter(name)
         if(character)
             switchTo(character.notes)
     }
@@ -65,7 +65,7 @@ Rectangle {
 
     NotebookModel {
         id: notebookModel
-        document: scriteDocument.loading ? null : scriteDocument
+        document: Scrite.document.loading ? null : Scrite.document
 
         onAboutToRefresh: noteCurrentItem()
         onJustRefreshed: restoreCurrentItem()
@@ -92,32 +92,36 @@ Rectangle {
     }
 
     Connections {
-        target: screenplayAdapter.isSourceScreenplay ? scriteDocument.screenplay : null
-        onElementInserted: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
-        onElementMoved: notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
-        onCurrentElementIndexChanged: {
+        target: screenplayAdapter.isSourceScreenplay ? Scrite.document.screenplay : null
+        function onElementInserted(element, index) {
+            notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
+        }
+        function onElementMoved(element, from, to) {
+            notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
+        }
+        function onCurrentElementIndexChanged(val) {
             if(workspaceSettings.syncCurrentSceneOnNotebook)
                 notebookTree.activateFromCurrentScreenplayElement()
         }
     }
 
     Connections {
-        target: scriteDocument
+        target: Scrite.document
         ignoreUnknownSignals: true
-        onLoadingChanged: {
-            if(!scriteDocument.loading)
+        function onLoadingChanged() {
+            if(!Scrite.document.loading)
                 notebookTree.activateFromCurrentScreenplayElement()
         }
     }
 
     Component.onCompleted: {
         notebookTree.activateFromCurrentScreenplayElement()
-        User.logActivity1("notebook")
+        Scrite.user.logActivity1("notebook")
     }
 
     FontMetrics {
         id: fontMetrics
-        font.pointSize: Math.ceil(app.idealFontPointSize*0.75)
+        font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*0.75)
     }
 
     Rectangle {
@@ -135,7 +139,7 @@ Rectangle {
                 id: structureTabButton
                 visible: ui.showNotebookInStructure
                 iconSource: "../icons/navigation/structure_tab.png"
-                ToolTip.text: "Structure Tab (" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+                ToolTip.text: "Structure Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
@@ -146,7 +150,7 @@ Rectangle {
                 visible: ui.showNotebookInStructure
                 iconSource: "../icons/navigation/notebook_tab.png"
                 down: true
-                ToolTip.text: "Notebook\t(" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                ToolTip.text: "Notebook\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
             }
@@ -181,7 +185,7 @@ Rectangle {
                     crGraphRefreshed = false
                     Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "refresh")
                     if(crGraphRefreshed)
-                        app.execLater(refreshButton, 250, function() { notebookModel.refresh() })
+                        Scrite.app.execLater(refreshButton, 250, function() { notebookModel.refresh() })
                     else
                         notebookModel.refresh()
                 }
@@ -220,7 +224,7 @@ Rectangle {
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
                 property Notes notes: notebookTree.currentNotes
-                enabled: notes && !scriteDocument.readOnly
+                enabled: notes && !Scrite.document.readOnly
                 ToolTip.text: {
                     var ret = "Adds a new text or form note"
                     if(!enabled)
@@ -249,7 +253,7 @@ Rectangle {
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
                 hasMenu: true
-                enabled: (character || note || (notes && notes.ownerType === Notes.SceneOwner)) && !scriteDocument.readOnly
+                enabled: (character || note || (notes && notes.ownerType === Notes.SceneOwner)) && !Scrite.document.readOnly
                 iconSource: {
                     if(note)
                         return "image://color/" + note.color + "/1"
@@ -306,7 +310,7 @@ Rectangle {
                 id: deleteNoteButton
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
-                enabled: (noteColorButton.note || noteColorButton.character) && !scriteDocument.readOnly
+                enabled: (noteColorButton.note || noteColorButton.character) && !Scrite.document.readOnly
                 ToolTip.text: "Delete the current note or character"
                 iconSource: "../icons/action/delete.png"
                 onClicked: notebookContentLoader.confirmAndDelete()
@@ -360,7 +364,7 @@ Rectangle {
                     return currentData.notebookItemObject.notes
                 if(currentData.notebookItemType === NotebookModel.CategoryType &&
                         currentData.notebookItemCategory === NotebookModel.ScreenplayCategory)
-                    return scriteDocument.structure.notes
+                    return Scrite.document.structure.notes
                 return null
             }
             property Note currentNote: currentData.notebookItemType === NotebookModel.NoteType ? currentData.notebookItemObject : null
@@ -465,7 +469,7 @@ Rectangle {
                                        (styleData.value.notebookItemType === NotebookModel.NotesType &&
                                         styleData.value.notebookItemObject.ownerType === Notes.StructureOwner)
                             text: styleData.value.notebookItemTitle ? styleData.value.notebookItemTitle : ""
-                            color: app.isLightColor(parent.parent.color) ? "black" : "white"
+                            color: Scrite.app.isLightColor(parent.parent.color) ? "black" : "white"
                             elide: Text.ElideRight
                             width: parent.width-(itemDelegateIcon.visible ? (itemDelegateIcon.width+parent.spacing) : 0)
                             anchors.verticalCenter: parent.verticalCenter
@@ -497,7 +501,7 @@ Rectangle {
             }
 
             function activateFromCurrentScreenplayElement() {
-                var spobj = scriteDocument.screenplay
+                var spobj = Scrite.document.screenplay
                 var element = spobj.elementAt(spobj.currentElementIndex)
                 if(element) {
                     if(element.elementType === ScreenplayElement.BreakElementType)
@@ -513,7 +517,7 @@ Rectangle {
                         var scene = notes.owner
                         var idxes = scene.screenplayElementIndexList
                         if(idxes.length > 0)
-                            scriteDocument.screenplay.currentElementIndex = idxes[0]
+                            Scrite.document.screenplay.currentElementIndex = idxes[0]
                     }
                 }
 
@@ -521,7 +525,7 @@ Rectangle {
                 case NotebookModel.EpisodeBreakType:
                 case NotebookModel.ActBreakType:
                     if(_modelData.notebookItemObject)
-                        scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.indexOfElement(_modelData.notebookItemObject)
+                        Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.indexOfElement(_modelData.notebookItemObject)
                     break
                 case NotebookModel.NotesType:
                     makeSceneCurrent(_modelData.notebookItemObject)
@@ -650,7 +654,7 @@ Rectangle {
                 active: false
                 sourceComponent: Rectangle {
                     id: deleteConfirmationItem
-                    color: app.translucent(primaryColors.c600.background,0.85)
+                    color: Scrite.app.translucent(primaryColors.c600.background,0.85)
                     focus: true
 
                     MouseArea {
@@ -671,7 +675,7 @@ Rectangle {
                                 return "Cannot remove this item."
                             }
                             font.bold: true
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
@@ -715,7 +719,7 @@ Rectangle {
         Rectangle {
             id: bookmarksItem
             property var componentData
-            color: app.translucent(primaryColors.c100.background, 0.5)
+            color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
             border.width: 1
             border.color: primaryColors.borderColor
             clip: true
@@ -769,7 +773,7 @@ Rectangle {
                                     anchors.verticalCenter: parent.verticalCenter
                                     mipmap: true
                                     source: {
-                                        if(app.typeName(noteObject) === "Notes") {
+                                        if(Scrite.app.typeName(noteObject) === "Notes") {
                                             switch(noteObject.ownerType) {
                                             case Notes.SceneOwner:
                                                 return "../icons/content/scene.png"
@@ -780,9 +784,9 @@ Rectangle {
                                             default:
                                                 break
                                             }
-                                        } else if(app.typeName(noteObject) === "Character")
+                                        } else if(Scrite.app.typeName(noteObject) === "Character")
                                             return "../icons/content/person_outline.png"
-                                        else if(app.typeName(noteObject) === "Note") {
+                                        else if(Scrite.app.typeName(noteObject) === "Note") {
                                             switch(styleData.value.notebookItemObject.type) {
                                             case Note.TextNoteType:
                                                 return "../icons/content/note.png"
@@ -798,7 +802,7 @@ Rectangle {
 
                                 Text {
                                     id: headingText
-                                    font.pointSize: app.idealFontPointSize
+                                    font.pointSize: Scrite.app.idealFontPointSize
                                     font.bold: true
                                     maximumLineCount: 1
                                     width: parent.width-32-parent.spacing
@@ -813,7 +817,7 @@ Rectangle {
                                 height: parent.height - headingText.height - parent.spacing
                                 wrapMode: Text.WordWrap
                                 elide: Text.ElideRight
-                                font.pointSize: app.idealFontPointSize-2
+                                font.pointSize: Scrite.app.idealFontPointSize-2
                                 text: noteSummary
                                 color: headingText.color
                                 opacity: 0.75
@@ -902,13 +906,13 @@ Rectangle {
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Heading"
-                            readOnly: scriteDocument.readOnly
+                            readOnly: Scrite.document.readOnly
                             enabled: scene.heading.enabled
                             onEditingComplete: scene.heading.parseFrom(text)
                             tabItem: sceneTitleField
                             font.capitalization: Font.AllUppercase
-                            font.family: scriteDocument.formatting.elementFormat(SceneElement.Heading).font.family
-                            font.pointSize: app.idealFontPointSize+2
+                            font.family: Scrite.document.formatting.elementFormat(SceneElement.Heading).font.family
+                            font.pointSize: Scrite.app.idealFontPointSize+2
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 
@@ -919,7 +923,7 @@ Rectangle {
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Title"
-                            readOnly: scriteDocument.readOnly
+                            readOnly: Scrite.document.readOnly
                             onEditingComplete: scene.structureElement.title = text
                             tabItem: sceneSynopsisField.textArea
                             backTabItem: sceneHeadingField
@@ -940,7 +944,7 @@ Rectangle {
                                 font.bold: true
                                 topPadding: 5
                                 bottomPadding: 5
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 visible: !scene.hasCharacters
                             }
 
@@ -959,10 +963,10 @@ Rectangle {
                                     leftPadding: 10; rightPadding: 10
                                     font.family: "Courier Prime"
                                     font.capitalization: Font.AllUppercase
-                                    font.pointSize: app.idealFontPointSize
-                                    closable: scene.isCharacterMute(modelData) && !scriteDocument.readOnly
+                                    font.pointSize: Scrite.app.idealFontPointSize
+                                    closable: scene.isCharacterMute(modelData) && !Scrite.document.readOnly
                                     onCloseRequest: {
-                                        if(!scriteDocument.readOnly)
+                                        if(!Scrite.document.readOnly)
                                             scene.removeMuteCharacter(modelData)
                                     }
                                 }
@@ -975,12 +979,12 @@ Rectangle {
                                 visible: active
                                 sourceComponent: TextField2 {
                                     id: newCharacterNameInput
-                                    readOnly: scriteDocument.readOnly
+                                    readOnly: Scrite.document.readOnly
                                     font.family: "Courier Prime"
                                     font.capitalization: length > 0 ? Font.AllUppercase : Font.MixedCase
-                                    font.pointSize: app.idealFontPointSize
+                                    font.pointSize: Scrite.app.idealFontPointSize
                                     wrapMode: Text.NoWrap
-                                    completionStrings: scriteDocument.structure.characterNames
+                                    completionStrings: Scrite.document.structure.characterNames
                                     placeholderText: "New Character Name"
                                     onEditingFinished: {
                                         if(text === "")
@@ -1007,7 +1011,7 @@ Rectangle {
                                 height: width
                                 opacity: 0.5
                                 visible: !newCharacterNameInputLoader.active
-                                enabled: !scriteDocument.readOnly
+                                enabled: !Scrite.document.readOnly
 
                                 MouseArea {
                                     ToolTip.text: "Click here to add a new character to this scene."
@@ -1027,7 +1031,7 @@ Rectangle {
                             height: parent.height - sceneHeadingField.height - sceneTitleField.height - parent.spacing*2
                             text: scene.title
                             placeholderText: "Scene Synopsis"
-                            readOnly: scriteDocument.readOnly
+                            readOnly: Scrite.document.readOnly
                             onTextChanged: scene.title = text
                             undoRedoEnabled: true
                             backTabItem: sceneTitleField
@@ -1075,19 +1079,19 @@ Rectangle {
                         structure: null
                         showBusyIndicator: true
                         onCharacterDoubleClicked: {
-                            var ch = scriteDocument.structure.findCharacter(characterName)
+                            var ch = Scrite.document.structure.findCharacter(characterName)
                             if(ch)
                                 switchTo(ch.notes)
                         }
                         function prepare() {
                             if(visible) {
                                 scene = sceneNotesItem.scene
-                                structure = scriteDocument.structure
+                                structure = Scrite.document.structure
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: app.execLater(sceneTabContentArea, 100, prepare)
-                        onVisibleChanged: app.execLater(sceneTabContentArea, 100, prepare)
+                        Component.onCompleted: Scrite.app.execLater(sceneTabContentArea, 100, prepare)
+                        onVisibleChanged: Scrite.app.execLater(sceneTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
@@ -1146,7 +1150,7 @@ Rectangle {
                             height: parent.height
                             text: scene.comments
                             placeholderText: "Scene Comments"
-                            readOnly: scriteDocument.readOnly
+                            readOnly: Scrite.document.readOnly
                             onTextChanged: scene.comments = text
                             undoRedoEnabled: true
                             ScrollBar.vertical: sceneCommentsVScrollBar
@@ -1182,7 +1186,7 @@ Rectangle {
             property real minimumNoteSize: Math.max(200, ui.width*0.15)
             property real noteSize: notesFlick.width > minimumNoteSize ? notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize) : notesFlick.width
             clip: true
-            color: app.translucent(primaryColors.c100.background, 0.5)
+            color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
             border.width: 1
             border.color: primaryColors.borderColor
 
@@ -1229,13 +1233,13 @@ Rectangle {
 
                                     Text {
                                         id: headingText
-                                        font.pointSize: app.idealFontPointSize
+                                        font.pointSize: Scrite.app.idealFontPointSize
                                         font.bold: true
                                         maximumLineCount: 1
                                         width: parent.width
                                         elide: Text.ElideRight
                                         text: objectItem.title
-                                        color: app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
+                                        color: Scrite.app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
                                     }
 
                                     Text {
@@ -1243,7 +1247,7 @@ Rectangle {
                                         height: parent.height - headingText.height - parent.spacing
                                         wrapMode: Text.WordWrap
                                         elide: Text.ElideRight
-                                        font.pointSize: app.idealFontPointSize-2
+                                        font.pointSize: Scrite.app.idealFontPointSize-2
                                         text: objectItem.type === Note.TextNoteType ? objectItem.content : objectItem.summary
                                         color: headingText.color
                                         opacity: 0.75
@@ -1272,12 +1276,12 @@ Rectangle {
 
                     Item {
                         width: noteSize; height: noteSize
-                        visible: !scriteDocument.readOnly
+                        visible: !Scrite.document.readOnly
 
                         Rectangle {
                             anchors.fill: parent
                             anchors.margins: 10
-                            color: app.translucent(primaryColors.c100.background, 0.5)
+                            color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
                             border.width: 1
                             border.color: primaryColors.borderColor
 
@@ -1399,7 +1403,7 @@ Rectangle {
                             Text {
                                 id: headingLabel
                                 text: breakElement.breakTitle + ": "
-                                font.pointSize: app.idealFontPointSize + 3
+                                font.pointSize: Scrite.app.idealFontPointSize + 3
                                 anchors.baseline: breakElementHeadingField.baseline
                             }
 
@@ -1409,7 +1413,7 @@ Rectangle {
                                 width: parent.width - headingLabel.width - parent.spacing
                                 label: ""
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                font.pointSize: app.idealFontPointSize + 5
+                                font.pointSize: Scrite.app.idealFontPointSize + 5
                                 placeholderText: breakKind + " Name"
                                 onTextChanged: breakElement.breakSubtitle = text
                                 tabItem: breakElementSummaryField.textArea
@@ -1464,7 +1468,7 @@ Rectangle {
                 width: parent.width * 0.6
                 anchors.centerIn: parent
                 horizontalAlignment: Text.AlignHCenter
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 text: "Create " + breakKind.toLowerCase() + " break in the screenplay to capture a summary for it."
                 wrapMode: Text.WordWrap
                 visible: breakElement === null
@@ -1478,12 +1482,12 @@ Rectangle {
 
         Rectangle {
             property var componentData
-            property Screenplay screenplay: scriteDocument.screenplay
+            property Screenplay screenplay: Scrite.document.screenplay
 
             FontMetrics {
                 id: screenplayFontMetrics
-                font.family: scriteDocument.formatting.defaultFont.family
-                font.pointSize: app.idealFontPointSize
+                font.family: Scrite.document.formatting.defaultFont.family
+                font.pointSize: Scrite.app.idealFontPointSize
             }
 
             TextTabBar {
@@ -1532,7 +1536,7 @@ Rectangle {
 
                             Image {
                                 width: {
-                                    switch(scriteDocument.screenplay.coverPagePhotoSize) {
+                                    switch(Scrite.document.screenplay.coverPagePhotoSize) {
                                     case Screenplay.SmallCoverPhoto:
                                         return parent.maxWidth / 4
                                     case Screenplay.MediumCoverPhoto:
@@ -1540,8 +1544,8 @@ Rectangle {
                                     }
                                     return parent.maxWidth
                                 }
-                                source: visible ? "file:///" + scriteDocument.screenplay.coverPagePhoto : ""
-                                visible: scriteDocument.screenplay.coverPagePhoto !== ""
+                                source: visible ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
+                                visible: Scrite.document.screenplay.coverPagePhoto !== ""
                                 smooth: true; mipmap: true
                                 fillMode: Image.PreserveAspectFit
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1554,7 +1558,7 @@ Rectangle {
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
-                                text: scriteDocument.screenplay.title === "" ? "<untitled>" : scriteDocument.screenplay.title
+                                text: Scrite.document.screenplay.title === "" ? "<untitled>" : Scrite.document.screenplay.title
                             }
 
                             Text {
@@ -1564,8 +1568,8 @@ Rectangle {
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
-                                text: scriteDocument.screenplay.subtitle
-                                visible: scriteDocument.screenplay.subtitle !== ""
+                                text: Scrite.document.screenplay.subtitle
+                                visible: Scrite.document.screenplay.subtitle !== ""
                             }
 
                             Column {
@@ -1585,7 +1589,7 @@ Rectangle {
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     horizontalAlignment: Text.AlignHCenter
-                                    text: (scriteDocument.screenplay.author === "" ? "<unknown author>" : scriteDocument.screenplay.author)
+                                    text: (Scrite.document.screenplay.author === "" ? "<unknown author>" : Scrite.document.screenplay.author)
                                 }
                             }
 
@@ -1594,7 +1598,7 @@ Rectangle {
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
-                                text: scriteDocument.screenplay.version === "" ? "Initial Version" : scriteDocument.screenplay.version
+                                text: Scrite.document.screenplay.version === "" ? "Initial Version" : Scrite.document.screenplay.version
                             }
 
                             Text {
@@ -1602,8 +1606,8 @@ Rectangle {
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
-                                text: scriteDocument.screenplay.basedOn
-                                visible: scriteDocument.screenplay.basedOn !== ""
+                                text: Scrite.document.screenplay.basedOn
+                                visible: Scrite.document.screenplay.basedOn !== ""
                             }
 
                             Item { width: parent.width; height: parent.spacing/2 }
@@ -1619,7 +1623,7 @@ Rectangle {
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                    text: scriteDocument.screenplay.contact
+                                    text: Scrite.document.screenplay.contact
                                     visible: text !== ""
                                 }
 
@@ -1628,7 +1632,7 @@ Rectangle {
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                    text: scriteDocument.screenplay.address
+                                    text: Scrite.document.screenplay.address
                                     visible: text !== ""
                                 }
 
@@ -1637,7 +1641,7 @@ Rectangle {
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                    text: scriteDocument.screenplay.phoneNumber
+                                    text: Scrite.document.screenplay.phoneNumber
                                     visible: text !== ""
                                 }
 
@@ -1648,7 +1652,7 @@ Rectangle {
                                     color: "blue"
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                    text: scriteDocument.screenplay.email
+                                    text: Scrite.document.screenplay.email
                                     visible: text !== ""
 
                                     MouseArea {
@@ -1665,7 +1669,7 @@ Rectangle {
                                     color: "blue"
                                     width: parent.width
                                     elide: Text.ElideRight
-                                    text: scriteDocument.screenplay.website
+                                    text: Scrite.document.screenplay.website
                                     visible: text !== ""
 
                                     MouseArea {
@@ -1689,7 +1693,7 @@ Rectangle {
                             modalDialog.sourceComponent = optionsDialogComponent
                             modalDialog.active = true
                         }
-                        enabled: !scriteDocument.readOnly
+                        enabled: !Scrite.document.readOnly
                     }
 
                     ScrollBar2 {
@@ -1730,12 +1734,12 @@ Rectangle {
 
                         FlickableTextArea {
                             id: loglineFieldArea
-                            text: scriteDocument.screenplay.logline
-                            onTextChanged: scriteDocument.screenplay.logline = text
+                            text: Scrite.document.screenplay.logline
+                            onTextChanged: Scrite.document.screenplay.logline = text
                             placeholderText: "Logline: a one-sentence summary or description."
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             height: parent.height
-                            readOnly: scriteDocument.readOnly
+                            readOnly: Scrite.document.readOnly
                             undoRedoEnabled: true
                             ScrollBar.vertical: loglineVScrollBar
                             adjustTextWidthBasedOnScrollBar: false
@@ -1761,7 +1765,7 @@ Rectangle {
                     width: screenplayTabContentArea.width
                     height: screenplayTabContentArea.height
                     sourceComponent: notesComponent
-                    onLoaded: item.notes = scriteDocument.structure.notes
+                    onLoaded: item.notes = Scrite.document.structure.notes
                     visible: screenplayTabBar.tabIndex === 2
                 }
             }
@@ -1777,7 +1781,7 @@ Rectangle {
             Text {
                 anchors.fill: parent
                 anchors.margins: 20
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 text: "<b><font size=\"+2\">Unused Scenes</font></b><br/><br/>Unused scenes are those that are placed on structure but are not yet dragged into the screenplay (or timeline). Click on any of the unused scenes in the tree to the left to view their notes."
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
@@ -1817,7 +1821,7 @@ Rectangle {
 
                     SortFilterObjectListModel {
                         id: sortedCharactersModel
-                        sourceModel: scriteDocument.structure.charactersModel
+                        sourceModel: Scrite.document.structure.charactersModel
                         sortByProperty: "name"
                     }
 
@@ -1858,7 +1862,7 @@ Rectangle {
                                 anchors.margins: 5
                                 color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : "#E7FFFFFF")
                                 border.width: 1
-                                border.color: app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "darkgray" : primaryColors.borderColor) : character.color
+                                border.color: Scrite.app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "darkgray" : primaryColors.borderColor) : character.color
 
                                 Row {
                                     anchors.fill: parent
@@ -1883,7 +1887,7 @@ Rectangle {
                                         anchors.verticalCenter: parent.verticalCenter
 
                                         Text {
-                                            font.pointSize: app.idealFontPointSize
+                                            font.pointSize: Scrite.app.idealFontPointSize
                                             font.bold: true
                                             text: character.name
                                             width: parent.width
@@ -1891,7 +1895,7 @@ Rectangle {
                                         }
 
                                         Text {
-                                            font.pointSize: app.idealFontPointSize - 2
+                                            font.pointSize: Scrite.app.idealFontPointSize - 2
                                             text: "Role: " + polishStr(character.designation, "-")
                                             width: parent.width
                                             elide: Text.ElideRight
@@ -1899,7 +1903,7 @@ Rectangle {
                                         }
 
                                         Text {
-                                            font.pointSize: app.idealFontPointSize - 2
+                                            font.pointSize: Scrite.app.idealFontPointSize - 2
                                             text: ["Age: " + polishStr(character.age, "-"), "Gender: " + polishStr(character.gender, "-")].join(", ")
                                             width: parent.width
                                             elide: Text.ElideRight
@@ -1949,7 +1953,7 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: app.translucent(primaryColors.windowColor, 0.5)
+                                color: Scrite.app.translucent(primaryColors.windowColor, 0.5)
                                 border { width: 1; color: primaryColors.borderColor }
 
                                 Row {
@@ -1959,9 +1963,9 @@ Rectangle {
 
                                     TextField2 {
                                         id: characterNameField
-                                        completionStrings: scriteDocument.structure.characterNames
+                                        completionStrings: Scrite.document.structure.characterNames
                                         width: parent.width - characterAddButton.width - parent.spacing
-                                        placeholderText: scriteDocument.readOnly ? "Enter character name to search." : "Enter character name to search/add."
+                                        placeholderText: Scrite.document.readOnly ? "Enter character name to search." : "Enter character name to search/add."
                                         label: ""
                                         onReturnPressed: characterAddButton.click()
                                     }
@@ -1972,11 +1976,11 @@ Rectangle {
                                         ToolTip.text: "Add Character"
                                         onClicked: {
                                             var chName = characterNameField.text
-                                            var ch = scriteDocument.structure.findCharacter(chName)
+                                            var ch = Scrite.document.structure.findCharacter(chName)
                                             if(ch)
                                                 switchTo(ch.notes)
-                                            else if(!scriteDocument.readOnly) {
-                                                ch = scriteDocument.structure.addCharacter(chName)
+                                            else if(!Scrite.document.readOnly) {
+                                                ch = Scrite.document.structure.addCharacter(chName)
                                                 notebookModel.preferredItem = ch.notes
                                             }
                                         }
@@ -2006,18 +2010,18 @@ Rectangle {
                         structure: null
                         showBusyIndicator: true
                         onCharacterDoubleClicked: {
-                            var ch = scriteDocument.structure.findCharacter(characterName)
+                            var ch = Scrite.document.structure.findCharacter(characterName)
                             if(ch)
                                 switchTo(ch.notes)
                         }
                         function prepare() {
                             if(visible) {
-                                structure = scriteDocument.structure
+                                structure = Scrite.document.structure
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: app.execLater(charactersTabContentArea, 100, prepare)
-                        onVisibleChanged: app.execLater(charactersTabContentArea, 100, prepare)
+                        Component.onCompleted: Scrite.app.execLater(charactersTabContentArea, 100, prepare)
+                        onVisibleChanged: Scrite.app.execLater(charactersTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
@@ -2061,7 +2065,7 @@ Rectangle {
 
             function deleteSelf() {
                 notebookModel.preferredItem = "Characters"
-                scriteDocument.structure.removeCharacter(character)
+                Scrite.document.structure.removeCharacter(character)
             }
 
             TextTabBar {
@@ -2117,13 +2121,15 @@ Rectangle {
                                 id: characterQuickInfoArea
                                 width: workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, ui.width*0.3)
                                 height: parent.height
-                                color: app.translucent(primaryColors.c100.background, 0.5)
+                                color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
 
                                 Connections {
                                     target: characterNotes
-                                    onCharacterChanged: app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+                                    function onCharacterChanged() {
+                                        Scrite.app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+                                    }
                                 }
-                                Component.onCompleted: app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+                                Component.onCompleted: Scrite.app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
 
                                 FileDialog {
                                     id: fileDialog
@@ -2137,7 +2143,7 @@ Rectangle {
 
                                     onAccepted: {
                                         if(fileUrl != "") {
-                                            character.addPhoto(app.urlToLocalFile(fileUrl))
+                                            character.addPhoto(Scrite.app.urlToLocalFile(fileUrl))
                                             photoSlides.currentIndex = character.photos.length - 1
                                         }
                                     }
@@ -2200,7 +2206,7 @@ Rectangle {
                                                         anchors.centerIn: parent
                                                         text: "Add Photo"
                                                         onClicked: fileDialog.open()
-                                                        enabled: !scriteDocument.readOnly && photoSlides.count <= 6
+                                                        enabled: !Scrite.document.readOnly && photoSlides.count <= 6
                                                     }
                                                 }
                                             }
@@ -2257,7 +2263,7 @@ Rectangle {
                                             TabSequenceItem.manager: characterInfoTabSequence
                                             onTextEdited: character.designation = text
                                             enableTransliteration: true
-                                            readOnly: scriteDocument.readOnly
+                                            readOnly: Scrite.document.readOnly
                                         }
 
                                         TextField2 {
@@ -2272,7 +2278,7 @@ Rectangle {
                                             TabSequenceItem.manager: characterInfoTabSequence
                                             onEditingComplete: character.aliases = text.split(",")
                                             enableTransliteration: true
-                                            readOnly: scriteDocument.readOnly
+                                            readOnly: Scrite.document.readOnly
                                         }
 
                                         Row {
@@ -2291,7 +2297,7 @@ Rectangle {
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.type = text
                                                 enableTransliteration: true
-                                                readOnly: scriteDocument.readOnly
+                                                readOnly: Scrite.document.readOnly
                                             }
 
                                             TextField2 {
@@ -2306,7 +2312,7 @@ Rectangle {
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.gender = text
                                                 enableTransliteration: true
-                                                readOnly: scriteDocument.readOnly
+                                                readOnly: Scrite.document.readOnly
                                             }
                                         }
 
@@ -2326,7 +2332,7 @@ Rectangle {
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.age = text
                                                 enableTransliteration: true
-                                                readOnly: scriteDocument.readOnly
+                                                readOnly: Scrite.document.readOnly
                                             }
 
                                             TextField2 {
@@ -2341,7 +2347,7 @@ Rectangle {
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.bodyType = text
                                                 enableTransliteration: true
-                                                readOnly: scriteDocument.readOnly
+                                                readOnly: Scrite.document.readOnly
                                             }
                                         }
 
@@ -2361,7 +2367,7 @@ Rectangle {
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.height = text
                                                 enableTransliteration: true
-                                                readOnly: scriteDocument.readOnly
+                                                readOnly: Scrite.document.readOnly
                                             }
 
                                             TextField2 {
@@ -2376,7 +2382,7 @@ Rectangle {
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.weight = text
                                                 enableTransliteration: true
-                                                readOnly: scriteDocument.readOnly
+                                                readOnly: Scrite.document.readOnly
                                             }
                                         }
                                     }
@@ -2469,14 +2475,14 @@ Rectangle {
                         character: null
                         structure: null
                         showBusyIndicator: true
-                        editRelationshipsEnabled: !scriteDocument.readOnly
+                        editRelationshipsEnabled: !Scrite.document.readOnly
                         onCharacterDoubleClicked:  {
                             if(characterNotes.character.name === characterName) {
                                 doAddNewRelationship(chNodeItem)
                                 return
                             }
 
-                            var ch = scriteDocument.structure.findCharacter(characterName)
+                            var ch = Scrite.document.structure.findCharacter(characterName)
                             if(ch)
                                 switchTo(ch.notes)
                         }
@@ -2497,12 +2503,12 @@ Rectangle {
                         function prepare() {
                             if(visible) {
                                 character = characterNotes.character
-                                structure = scriteDocument.structure
+                                structure = Scrite.document.structure
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: app.execLater(characterTabContentArea, 100, prepare)
-                        onVisibleChanged: app.execLater(characterTabContentArea, 100, prepare)
+                        Component.onCompleted: Scrite.app.execLater(characterTabContentArea, 100, prepare)
+                        onVisibleChanged: Scrite.app.execLater(characterTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
@@ -2617,7 +2623,7 @@ Rectangle {
 
                             Rectangle {
                                 id: characterRowItem
-                                property string thisCharacterName: app.camelCased(character.name)
+                                property string thisCharacterName: Scrite.app.camelCased(character.name)
                                 property string otherCharacterName: modelData
                                 property bool checked: relationshipName.length > 0
                                 property string relationship: relationshipName.text
@@ -2639,7 +2645,7 @@ Rectangle {
 
                                     Text {
                                         id: characterRowLabel1
-                                        font.pointSize: app.idealFontPointSize
+                                        font.pointSize: Scrite.app.idealFontPointSize
                                         text: thisCharacterName + ": "
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
@@ -2654,7 +2660,7 @@ Rectangle {
                                         width: parent.width - 32 - characterRowLabel1.width - characterRowLabel2.width - 3*parent.spacing
                                         label: ""
                                         color: foregroundColor
-                                        font.pointSize: app.idealFontPointSize
+                                        font.pointSize: Scrite.app.idealFontPointSize
                                         placeholderText: "husband of, wife of, friends with, reports to ..."
                                         Material.background: backgroundColor
                                         Material.foreground: foregroundColor
@@ -2666,8 +2672,8 @@ Rectangle {
 
                                     Text {
                                         id: characterRowLabel2
-                                        font.pointSize: app.idealFontPointSize
-                                        text: app.camelCased(otherCharacterName) + "."
+                                        font.pointSize: Scrite.app.idealFontPointSize
+                                        text: Scrite.app.camelCased(otherCharacterName) + "."
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
                                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -2711,7 +2717,7 @@ Rectangle {
                             for(var i=0; i<otherCharacterItems.count; i++) {
                                 var item = otherCharacterItems.itemAt(i)
                                 if(item.checked) {
-                                    var otherCharacter = scriteDocument.structure.addCharacter(item.otherCharacterName)
+                                    var otherCharacter = Scrite.document.structure.addCharacter(item.otherCharacterName)
                                     if(otherCharacter) {
                                         character.addRelationship(item.relationship, otherCharacter)
                                         character.characterRelationshipGraph = {}
@@ -2758,7 +2764,7 @@ Rectangle {
                 if(note) {
                     note.color = color
                     note.objectName = "_newNote"
-                    app.execLater(note, 10, function() {
+                    Scrite.app.execLater(note, 10, function() {
                         switchTo(note);
                     })
                 }
@@ -2770,7 +2776,7 @@ Rectangle {
             title: "Form Note"
             notes: newNoteMenu.notes
             onNoteAdded: {
-                app.execLater(note, 10, function() {
+                Scrite.app.execLater(note, 10, function() {
                     switchTo(note);
                 })
                 newNoteMenu.close()
@@ -2824,7 +2830,7 @@ Rectangle {
         }
     }
 
-    FocusTracker.window: qmlWindow
+    FocusTracker.window: Scrite.window
     FocusTracker.onHasFocusChanged: mainUndoStack.notebookActive = FocusTracker.hasFocus
 
     Loader {

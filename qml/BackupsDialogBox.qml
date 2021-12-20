@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     width: 640
@@ -62,7 +62,7 @@ Item {
                 clip: true
                 anchors.fill: parent
                 anchors.margins: 1
-                model: scriteDocument.backupFilesModel
+                model: Scrite.document.backupFilesModel
                 FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                 currentIndex: -1
                 ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
@@ -87,7 +87,7 @@ Item {
                             padding: 5
                             leftPadding: 12
                             elide: Text.ElideRight
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             anchors.top: parent.top
                         }
 
@@ -109,7 +109,7 @@ Item {
                             text: metaDataInfo + "<br/><font size=\"-2\">" + fileSizeInfo + "</font>"
                             padding: 5
                             elide: Text.ElideRight
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                         }
                     }
 
@@ -145,7 +145,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Open In: "
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                 }
 
                 Button2 {
@@ -156,7 +156,7 @@ Item {
                     ToolTip.text: "Closes the current document and loads the selected backup."
                     onClicked: {
                         busyOverlay.visible = true
-                        app.execLater(busyOverlay, 50, function() {
+                        Scrite.app.execLater(busyOverlay, 50, function() {
                             openInThisWindow(backupFilesView.currentBackupFilePath)
                         })
                     }
@@ -170,7 +170,7 @@ Item {
                     ToolTip.text: "Loads the selected backup in a new window."
                     onClicked: {
                         busyOverlay.visible = true
-                        app.execLater(busyOverlay, 50, function() {
+                        Scrite.app.execLater(busyOverlay, 50, function() {
                             openInNewWindow(backupFilesView.currentBackupFilePath)
                         })
                     }

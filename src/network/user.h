@@ -27,6 +27,8 @@
 class User : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static User *instance();
@@ -72,24 +74,9 @@ public:
     Q_PROPERTY(int currentInstallationIndex READ currentInstallationIndex NOTIFY installationsChanged)
     int currentInstallationIndex() const { return m_currentInstallationIndex; }
 
-    enum AppFeature {
-        ScreenplayFeature,
-        StructureFeature,
-        NotebookFeature,
-        RelationshipGraphFeature,
-        ScriptalayFeature,
-        TemplateFeature,
-        ReportFeature,
-        ImportFeature,
-        ExportFeature,
-        ScritedFeature,
-        MinFeature = ScreenplayFeature,
-        MaxFeature = ScritedFeature
-    };
-    Q_ENUM(AppFeature)
-
     QList<int> enabledFeatures() const { return m_enabledFeatures; }
-    bool isFeatureEnabled(AppFeature feature) const { return m_enabledFeatures.contains(feature); }
+    // here feature is anything from Scrite::AppFeature enum
+    bool isFeatureEnabled(int feature) const { return m_enabledFeatures.contains(feature); }
     bool isFeatureNameEnabled(const QString &featureName) const;
 
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
@@ -159,6 +146,7 @@ public:
 class AppFeature : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     AppFeature(QObject *parent = nullptr);

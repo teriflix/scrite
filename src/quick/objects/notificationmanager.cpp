@@ -13,6 +13,7 @@
 
 #include "notificationmanager.h"
 #include "notification.h"
+#include "application.h"
 
 #include <QtDebug>
 
@@ -20,6 +21,8 @@ static NotificationManager *theInstance = nullptr;
 
 NotificationManager *NotificationManager::instance()
 {
+    if (::theInstance == nullptr)
+        new NotificationManager(qApp);
     return ::theInstance;
 }
 

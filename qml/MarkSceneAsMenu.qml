@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Menu2 {
     id: msaMenu
@@ -25,7 +25,7 @@ Menu2 {
     signal triggered(var type)
 
     Repeater {
-        model: app.enumerationModelForType("Scene", "Type")
+        model: Scrite.app.enumerationModelForType("Scene", "Type")
 
         MenuItem2 {
             text: modelData.key + (scene ? (font.bold ? " ✔" : "") : "")

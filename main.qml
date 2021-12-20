@@ -18,7 +18,7 @@ import QtQuick.Controls 2.13
 // import QtGraphicalEffects 1.0
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 import "./qml" as UI
 
@@ -52,12 +52,12 @@ Rectangle {
 
     FontMetrics {
         id: minimumAppFontMetrics
-        font.pointSize: Math.min(app.idealFontPointSize-2, 12)
+        font.pointSize: Math.min(Scrite.app.idealFontPointSize-2, 12)
     }
 
     FontMetrics {
         id: idealAppFontMetrics
-        font.pointSize: app.idealFontPointSize
+        font.pointSize: Scrite.app.idealFontPointSize
     }
 
     Material.primary: primaryColors.key
@@ -85,8 +85,8 @@ Rectangle {
         property string droppedFilePath
         property string droppedFileName
         onDropped: {
-            if(scriteDocument.empty)
-                scriteDocument.openOrImport(attachment.filePath)
+            if(Scrite.document.empty)
+                Scrite.document.openOrImport(attachment.filePath)
             else {
                 droppedFilePath = attachment.filePath
                 droppedFileName = attachment.originalFileName
@@ -105,7 +105,7 @@ Rectangle {
         anchors.fill: fileOpenDropArea
         active: fileOpenDropArea.active || fileOpenDropArea.droppedFilePath !== ""
         sourceComponent: Rectangle {
-            color: app.translucent(primaryColors.c500.background, 0.5)
+            color: Scrite.app.translucent(primaryColors.c500.background, 0.5)
 
             Rectangle {
                 anchors.fill: fileOpenDropAreaNotice
@@ -127,7 +127,7 @@ Rectangle {
                     font.bold: true
                     text: parent.visible ? fileOpenDropArea.active ? fileOpenDropArea.attachment.originalFileName : fileOpenDropArea.droppedFileName : ""
                     horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                 }
 
                 Text {
@@ -135,7 +135,7 @@ Rectangle {
                     wrapMode: Text.WordWrap
                     color: primaryColors.c700.text
                     horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
                 }
 
@@ -144,20 +144,20 @@ Rectangle {
                     wrapMode: Text.WordWrap
                     color: primaryColors.c700.text
                     horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: app.idealFontPointSize
-                    visible: !scriteDocument.empty || scriteDocument.fileName !== ""
+                    font.pointSize: Scrite.app.idealFontPointSize
+                    visible: !Scrite.document.empty || Scrite.document.fileName !== ""
                     text: "NOTE: Any unsaved changes in the currently open document will be discarded."
                 }
 
                 Row {
                     spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
-                    visible: !scriteDocument.empty
+                    visible: !Scrite.document.empty
 
                     UI.Button2 {
                         text: "Open/Import"
                         onClicked: {
-                            scriteDocument.openOrImport(fileOpenDropArea.droppedFilePath)
+                            Scrite.document.openOrImport(fileOpenDropArea.droppedFilePath)
                             fileOpenDropArea.droppedFileName = ""
                             fileOpenDropArea.droppedFilePath = ""
                         }
@@ -260,14 +260,14 @@ Rectangle {
 
     Settings {
         id: scrollAreaSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "ScrollArea"
         property real zoomFactor: 0.05
     }
 
     Settings {
         id: structureCanvasSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "Structure Tab"
 
         property bool showGrid: true
@@ -281,7 +281,7 @@ Rectangle {
 
     Settings {
         id: timelineViewSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "Timeline View"
 
         property string textMode: "HeadingOrTitle"
@@ -351,7 +351,7 @@ Rectangle {
         id: modalDialog
         active: false
         anchors.fill: parent
-        enabled: notificationManager.count === 0
+        enabled: Scrite.notifications.count === 0
         onCloseRequest: {
             active = false
             closeable = true
@@ -365,7 +365,7 @@ Rectangle {
                 initItemCallback(dialogItem)
             initItemCallback = undefined
         }
-        opacity: !enabled || scriteDocument.busy ? 0.5 : 1
+        opacity: !enabled || Scrite.document.busy ? 0.5 : 1
     }
 
     Component {
@@ -469,7 +469,7 @@ Rectangle {
     }
 
     Loader {
-        active: scriteDocument.busy
+        active: Scrite.document.busy
         onActiveChanged: {
             if(active) {
                 dialogUnderlay.radius = dialogUnderlay.maxRadius
@@ -507,7 +507,7 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
-                    text: scriteDocument.busyMessage
+                    text: Scrite.document.busyMessage
                     font.pixelSize: 16
                     color: primaryColors.c600.text
                 }
@@ -517,7 +517,7 @@ Rectangle {
                 anchors.fill: parent
             }
 
-            EventFilter.target: app
+            EventFilter.target: Scrite.app
             EventFilter.events: [6,7]
             EventFilter.onFilter: {
                 result.filter = true
@@ -526,7 +526,7 @@ Rectangle {
     }
 
     Item {
-        property AutoUpdate autoUpdate: app.autoUpdate
+        property AutoUpdate autoUpdate: Scrite.app.autoUpdate
 
         Notification.active: autoUpdate.updateAvailable || autoUpdate.surveyAvailable
         Notification.title: autoUpdate.updateAvailable ? "Update Available" : (autoUpdate.surveyAvailable ? autoUpdate.surveyInfo.title : "")
@@ -567,9 +567,9 @@ Rectangle {
     }
 
     Connections {
-        target: qmlWindow
-        onScreenChanged: scriteDocument.formatting.setSreeenFromWindow(qmlWindow)
-        // onActiveFocusItemChanged: console.log("PA: " + qmlWindow.activeFocusItem)
+        target: Scrite.window
+        function onScreenChanged() { Scrite.document.formatting.setSreeenFromWindow(Scrite.window) }
+        // function onActiveFocusItemChanged() { console.log("PA: " + Scrite.window.activeFocusItem) }
     }
 
     Loader {
@@ -580,19 +580,19 @@ Rectangle {
             Component.onDestruction: dialogUnderlay.hide()
             onDone: {
                 splashLoader.active = false
-                if(app.isWindowsPlatform && app.isNotWindows10)
+                if(Scrite.app.isWindowsPlatform && Scrite.app.isNotWindows10)
                     showInformation({
                         "message": "The Windows version of Scrite works best on Windows 10. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on Windows 10 PCs."
                     })
                 if(fileNameToOpen !== "")
-                    scriteDocument.open(fileNameToOpen)
+                    Scrite.document.open(fileNameToOpen)
             }
         }
     }
 
     property int lastSnapshotTimestamp: 0
-    EventFilter.active: app.getEnvironmentVariable("SCRITE_SNAPSHOT_CAPTURE") === "YES"
-    EventFilter.target: app
+    EventFilter.active: Scrite.app.getEnvironmentVariable("SCRITE_SNAPSHOT_CAPTURE") === "YES"
+    EventFilter.target: Scrite.app
     EventFilter.events: [6]
     EventFilter.onFilter: {
         if(event.key === Qt.Key_F6) {
@@ -609,10 +609,10 @@ Rectangle {
         fileName: "scrite-window-capture.jpg"
         format: WindowCapture.JPGFormat
         forceCounterInFileName: true
-        window: qmlWindow
+        window: Scrite.window
         captureMode: WindowCapture.FileAndClipboard
     }
 
-    Component.onCompleted: qmlWindow.raise()
+    Component.onCompleted: Scrite.window.raise()
 }
 

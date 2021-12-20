@@ -29,6 +29,9 @@ class SearchEngine;
 class SearchAgent : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(SearchAgent)
 
 public:
     ~SearchAgent();
@@ -92,12 +95,11 @@ private:
     QObjectProperty<QQuickTextDocument> m_textDocument;
     QList<QPair<int, int>> m_textDocumentSearchResults;
 };
-Q_DECLARE_METATYPE(SearchAgent *)
-QML_DECLARE_TYPEINFO(SearchAgent, QML_HAS_ATTACHED_PROPERTIES)
 
 class SearchEngine : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     SearchEngine(QObject *parent = nullptr);
@@ -187,6 +189,7 @@ private:
 class TextDocumentSearch : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TextDocumentSearch(QObject *parent = nullptr);

@@ -15,7 +15,8 @@ import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+
+import io.scrite.components 1.0
 
 Item {
     readonly property real splashWidth: 1464
@@ -49,7 +50,7 @@ Item {
                 y: 135 * ascale
                 font.pixelSize: 18
                 color: "white"
-                text: app.applicationVersion
+                text: Scrite.app.applicationVersion
                 font.letterSpacing: screenplayEditorSettings.enableAnimations ? 10 : 0
 
                 NumberAnimation {
@@ -65,7 +66,7 @@ Item {
             Text {
                 font.pixelSize: 12
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: "Build Timestamp:\n" + app.buildTimestamp
+                text: "Build Timestamp:\n" + Scrite.app.buildTimestamp
                 anchors.left: versionText.left
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: versionText.x
@@ -111,7 +112,7 @@ Item {
 
                         Text {
                             text: "Using <strong>PhoneticTranslator</strong><br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
-                            font.pointSize: app.idealFontPointSize - 2
+                            font.pointSize: Scrite.app.idealFontPointSize - 2
 
                             MouseArea {
                                 anchors.fill: parent
@@ -122,7 +123,7 @@ Item {
 
                         Text {
                             text: "Using <strong>Sonnet</strong> from KDE Frameworks 5<br/><font color=\"blue\">https://api.kde.org/frameworks/sonnet/html/index.html</font>"
-                            font.pointSize: app.idealFontPointSize - 2
+                            font.pointSize: Scrite.app.idealFontPointSize - 2
 
                             MouseArea {
                                 anchors.fill: parent
@@ -133,7 +134,7 @@ Item {
 
                         Text {
                             text: "Using <strong>QuaZip</strong><br/><font color=\"blue\">https://github.com/stachenov/quazip</font>"
-                            font.pointSize: app.idealFontPointSize - 2
+                            font.pointSize: Scrite.app.idealFontPointSize - 2
 
                             MouseArea {
                                 anchors.fill: parent
@@ -150,8 +151,8 @@ Item {
                         anchors.top: parent.top
 
                         Text {
-                            text: "Developed using <strong>Qt " + app.qtVersion + "</strong><br/><font color=\"blue\">https://www.qt.io</font>"
-                            font.pointSize: app.idealFontPointSize - 2
+                            text: "Developed using <strong>Qt " + Scrite.app.qtVersion + "</strong><br/><font color=\"blue\">https://www.qt.io</font>"
+                            font.pointSize: Scrite.app.idealFontPointSize - 2
 
                             MouseArea {
                                 anchors.fill: parent
@@ -162,7 +163,7 @@ Item {
 
                         Text {
                             text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
-                            font.pointSize: app.idealFontPointSize - 2
+                            font.pointSize: Scrite.app.idealFontPointSize - 2
 
                             MouseArea {
                                 anchors.fill: parent
@@ -173,7 +174,7 @@ Item {
 
                         Text {
                             text: "Using <strong>SimpleCrypt</strong>.<br/><font color=\"blue\">Click here</font> to know more."
-                            font.pointSize: app.idealFontPointSize - 2
+                            font.pointSize: Scrite.app.idealFontPointSize - 2
 
                             MouseArea {
                                 anchors.fill: parent
@@ -241,7 +242,7 @@ Item {
                     font.pointSize: 12
                     topPadding: backButton.y
                     bottomPadding: backButton.y
-                    text: app.fileContents(":/LICENSE.txt")
+                    text: Scrite.app.fileContents(":/LICENSE.txt")
                     selectByMouse: true
                 }
             }

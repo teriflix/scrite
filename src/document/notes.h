@@ -15,6 +15,7 @@
 #define NOTES_H
 
 #include <QJsonValue>
+#include <QQmlEngine>
 #include <QQmlListProperty>
 #include <QAbstractListModel>
 
@@ -36,6 +37,8 @@ class Note : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static Note *findById(const QString &id);
@@ -130,6 +133,8 @@ class Notes : public ObjectListPropertyModel<Note *>, public QObjectSerializer::
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static Notes *findById(const QString &id);

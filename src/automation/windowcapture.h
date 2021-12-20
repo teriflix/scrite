@@ -15,6 +15,7 @@
 #define WINDOWCAPTURE_H
 
 #include <QWindow>
+#include <QQmlEngine>
 
 #include "automation.h"
 #include "qobjectproperty.h"
@@ -22,6 +23,7 @@
 class WindowCapture : public AbstractAutomationStep
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     WindowCapture(QObject *parent = nullptr);

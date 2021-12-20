@@ -20,7 +20,7 @@ import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: scritedView
@@ -40,14 +40,14 @@ Item {
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
         if(!scritedSettings.experimentalFeatureNoticeDisplayed) {
-            app.execLater(scritedView, 250, function() {
+            Scrite.app.execLater(scritedView, 250, function() {
                 showInformation({
                     "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
                 })
                 scritedSettings.experimentalFeatureNoticeDisplayed = true
             })
         }
-        User.logActivity1("scrited")
+        Scrite.user.logActivity1("scrited")
     }
     Component.onDestruction: scritedToolbar.scritedView = null
 
@@ -147,7 +147,7 @@ Item {
 
     Settings {
         id: scritedSettings
-        fileName: app.settingsFilePath
+        fileName: Scrite.app.settingsFilePath
         category: "Scrited"
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
         property bool experimentalFeatureNoticeDisplayed: false
@@ -183,8 +183,8 @@ Item {
             property bool keyFrameGrabMode: false
             function grabKeyFrame() {
                 keyFrameGrabMode = true
-                app.execLater(playerArea, 250, function() {
-                    var dpi = scriteDocument.formatting.devicePixelRatio
+                Scrite.app.execLater(playerArea, 250, function() {
+                    var dpi = Scrite.document.formatting.devicePixelRatio
                     playerArea.grabToImage( function(result) {
                         keyFrameImage.source = result.url
                         playerArea.keyFrameGrabMode = false
@@ -342,14 +342,14 @@ Item {
                         visible: mediaPlayer.status === MediaPlayer.NoMedia
                         padding: 20
                         text: {
-                            if(scriteDocument.screenplay.elementCount > 0)
-                                return "Click here to load movie of \"" + scriteDocument.screenplay.title + "\"."
+                            if(Scrite.document.screenplay.elementCount > 0)
+                                return "Click here to load movie of \"" + Scrite.document.screenplay.title + "\"."
                             return "Load a screenplay and then click here to load its movie for syncing."
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            enabled: scriteDocument.screenplay.elementCount > 0 && mediaPlayer.status === MediaPlayer.NoMedia
+                            enabled: Scrite.document.screenplay.elementCount > 0 && mediaPlayer.status === MediaPlayer.NoMedia
                             onClicked: fileDialog.open()
                             hoverEnabled: true
                             onEntered: parent.font.underline = true
@@ -424,7 +424,7 @@ Item {
                                     suggestedHeight: 36
                                     ToolTip.text: "Load a video file for this screenplay."
                                     focusPolicy: Qt.NoFocus
-                                    enabled: scriteDocument.screenplay.elementCount > 0
+                                    enabled: Scrite.document.screenplay.elementCount > 0
                                 }
 
                                 ToolButton2 {
@@ -523,7 +523,7 @@ Item {
                                     font.pointSize: 28
                                     font.bold: true
                                     color: "white"
-                                    text: scriteDocument.screenplay.title
+                                    text: Scrite.document.screenplay.title
                                 }
                             }
 
@@ -540,7 +540,7 @@ Item {
                                     font.pointSize: 20
                                     font.bold: true
                                     color: "white"
-                                    text: scriteDocument.screenplay.subtitle
+                                    text: Scrite.document.screenplay.subtitle
                                 }
                             }
 
@@ -557,7 +557,7 @@ Item {
                                     font.pointSize: 20
                                     font.bold: true
                                     color: "white"
-                                    text: "Written by " + scriteDocument.screenplay.author
+                                    text: "Written by " + Scrite.document.screenplay.author
                                 }
                             }
                         }
@@ -569,7 +569,7 @@ Item {
                     height: parent.height - (videoArea.visible ? videoArea.height : 0)
 
                     Component.onCompleted: {
-                        app.execLater(screenplayOffsetsModel, 100, function() {
+                        Scrite.app.execLater(screenplayOffsetsModel, 100, function() {
                             screenplayOffsetsModel.allowScreenplay = true
                         })
                     }
@@ -577,8 +577,8 @@ Item {
                     ScreenplayTextDocumentOffsets {
                         id: screenplayOffsetsModel
                         property bool allowScreenplay : false
-                        screenplay: allowScreenplay ? (scriteDocument.loading ? null : scriteDocument.screenplay) : null
-                        format: scriteDocument.loading ? null : scriteDocument.printFormat
+                        screenplay: allowScreenplay ? (Scrite.document.loading ? null : Scrite.document.screenplay) : null
+                        format: Scrite.document.loading ? null : Scrite.document.printFormat
 
                         Notification.title: "Time Offsets Error"
                         Notification.text: errorMessage
@@ -636,19 +636,19 @@ Item {
                                 gradient: Gradient {
                                     GradientStop {
                                         position: 0
-                                        color: app.translucent(primaryColors.c600.background, 1)
+                                        color: Scrite.app.translucent(primaryColors.c600.background, 1)
                                     }
                                     GradientStop {
                                         position: 0.175
-                                        color: app.translucent(primaryColors.c600.background, 0.5)
+                                        color: Scrite.app.translucent(primaryColors.c600.background, 0.5)
                                     }
                                     GradientStop {
                                         position: 0.35
-                                        color: app.translucent(primaryColors.c600.background, 0.3)
+                                        color: Scrite.app.translucent(primaryColors.c600.background, 0.3)
                                     }
                                     GradientStop {
                                         position: 0.56
-                                        color: app.translucent(primaryColors.c600.background, 0.1)
+                                        color: Scrite.app.translucent(primaryColors.c600.background, 0.1)
                                     }
                                     GradientStop {
                                         position: 0.7
@@ -739,7 +739,7 @@ Item {
                                 }
                             }
 
-                            onContentYChanged: app.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
+                            onContentYChanged: Scrite.app.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
                             function updateCurrentIndexOnScreenplayOffsetsView() {
                                 var offsetInfo = screenplayOffsetsModel.offsetInfoAtPoint(Qt.point(10, contentY/textDocumentView.documentScale))
                                 if(offsetInfo.row < 0)
@@ -912,7 +912,7 @@ Item {
 
                     Image {
                         id: filmPoster
-                        source: "file:///" + scriteDocument.screenplay.coverPagePhoto
+                        source: "file:///" + Scrite.document.screenplay.coverPagePhoto
                         width: parent.width
                         fillMode: Image.PreserveAspectFit
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -925,7 +925,7 @@ Item {
                         width: parent.width
                         wrapMode: Text.WordWrap
                         color: "white"
-                        text: scriteDocument.screenplay.title
+                        text: Scrite.document.screenplay.title
                     }
 
                     Text {
@@ -935,7 +935,7 @@ Item {
                         wrapMode: Text.WordWrap
                         color: "white"
                         opacity: 0.8
-                        text: scriteDocument.screenplay.subtitle
+                        text: Scrite.document.screenplay.subtitle
                         visible: text !== ""
                     }
 
@@ -947,10 +947,10 @@ Item {
                         color: "white"
                         opacity: 0.8
                         text: {
-                            var ret = "Written by " + scriteDocument.screenplay.author
+                            var ret = "Written by " + Scrite.document.screenplay.author
                             if(filmStudioLogo.visible)
                                 return ret
-                            ret += "<br/><br/><font size=\"-1\">" + scriteDocument.screenplay.contact + "</font>"
+                            ret += "<br/><br/><font size=\"-1\">" + Scrite.document.screenplay.contact + "</font>"
                             return ret
                         }
                     }
@@ -1276,7 +1276,7 @@ Item {
     }
 
     EventFilter.active: !modalDialog.active && !notificationsView.visible
-    EventFilter.target: qmlWindow
+    EventFilter.target: Scrite.window
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {
         var newY = 0
@@ -1376,12 +1376,12 @@ Item {
     QtObject {
         Notification.title: "Install Video Codecs"
         Notification.text: {
-            if(app.isWindowsPlatform)
+            if(Scrite.app.isWindowsPlatform)
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (app.isWindowsPlatform || app.isLinuxPlatform)
-        Notification.buttons: app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
+        Notification.active: !scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
+        Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
                 Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
@@ -1397,11 +1397,11 @@ Item {
 
     AttachmentsDropArea2 {
         anchors.fill: parent
-        enabled: !mediaIsLoaded && !scriteDocument.empty
+        enabled: !mediaIsLoaded && !Scrite.document.empty
         allowedType: Attachments.VideosOnly
         property string droppedFilePath
         property string droppedFileName
-        onDropped: loadMediaUrl( app.localFileToUrl(attachment.filePath) )
+        onDropped: loadMediaUrl( Scrite.app.localFileToUrl(attachment.filePath) )
         attachmentNoticeSuffix: "Drop this file to load video."
     }
 }

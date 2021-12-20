@@ -66,6 +66,7 @@ class ScreenplayTextDocument : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    QML_ELEMENT
 
 public:
     ScreenplayTextDocument(QObject *parent = nullptr);
@@ -347,6 +348,7 @@ private:
 class ScreenplayElementPageBreaks : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     ScreenplayElementPageBreaks(QObject *parent = nullptr);

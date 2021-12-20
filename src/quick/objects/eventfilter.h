@@ -26,6 +26,8 @@ class EventFilter;
 class EventFilterResult : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~EventFilterResult();
@@ -52,6 +54,9 @@ private:
 class EventFilter : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(EventFilter)
 
 public:
     EventFilter(QObject *parent = nullptr);
@@ -113,8 +118,5 @@ private:
     QEvent *m_currentEvent = nullptr;
     QObjectProperty<QObject> m_target;
 };
-
-Q_DECLARE_METATYPE(EventFilter *)
-QML_DECLARE_TYPEINFO(EventFilter, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // EVENTFILTER_H

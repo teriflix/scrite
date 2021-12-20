@@ -15,6 +15,7 @@
 #define SPELL_CHECK_SERVICE_H
 
 #include <QObject>
+#include <QQmlEngine>
 #include <QJsonArray>
 #include <QQmlParserStatus>
 
@@ -23,23 +24,27 @@
 
 struct TextFragment
 {
-    TextFragment() {}
+    TextFragment() { }
     TextFragment(const TextFragment &other)
-        : m_start(other.m_start), m_length(other.m_length),
-          m_suggestions(other.m_suggestions) { }
+        : m_start(other.m_start), m_length(other.m_length), m_suggestions(other.m_suggestions)
+    {
+    }
     TextFragment(int s, int l, const QStringList &slist)
-        : m_start(s), m_length(l), m_suggestions(slist) { }
+        : m_start(s), m_length(l), m_suggestions(slist)
+    {
+    }
 
     int start() const { return m_start; }
     int length() const { return m_length; }
-    int end() const { return m_start+m_length-1; }
+    int end() const { return m_start + m_length - 1; }
     bool isValid() { return m_length > 0 && m_start >= 0; }
-    bool operator == (const TextFragment &other) const {
-        return m_start == other.m_start &&
-               m_length == other.m_length &&
-               m_suggestions == other.m_suggestions;
+    bool operator==(const TextFragment &other) const
+    {
+        return m_start == other.m_start && m_length == other.m_length
+                && m_suggestions == other.m_suggestions;
     }
-    TextFragment & operator = (const TextFragment &other) {
+    TextFragment &operator=(const TextFragment &other)
+    {
         m_start = other.m_start;
         m_length = other.m_length;
         m_suggestions = other.m_suggestions;
@@ -59,9 +64,10 @@ class SpellCheckService : public QObject, public Modifiable, public QQmlParserSt
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    QML_ELEMENT
 
 public:
-    SpellCheckService(QObject *parent=nullptr);
+    SpellCheckService(QObject *parent = nullptr);
     ~SpellCheckService();
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
@@ -77,8 +83,14 @@ public:
     Q_SIGNAL void methodChanged();
 
     Q_PROPERTY(QJsonArray misspelledFragments READ misspelledFragmentsJson NOTIFY misspelledFragmentsChanged)
-    QJsonArray misspelledFragmentsJson() const { return m_misspelledFragmentsJson; } // for QML access
-    QList<TextFragment> misspelledFragments() const { return m_misspelledFragments; } // for C++ access
+    QJsonArray misspelledFragmentsJson() const
+    {
+        return m_misspelledFragmentsJson;
+    } // for QML access
+    QList<TextFragment> misspelledFragments() const
+    {
+        return m_misspelledFragments;
+    } // for C++ access
     Q_SIGNAL void misspelledFragmentsChanged();
 
     Q_PROPERTY(bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
@@ -105,7 +117,7 @@ private:
     void doUpdate();
     void timerEvent(QTimerEvent *event);
     Q_SLOT void spellCheckComplete();
-    void acceptResult(const SpellCheckServiceResult& result);
+    void acceptResult(const SpellCheckServiceResult &result);
 
 private:
     QString m_text;

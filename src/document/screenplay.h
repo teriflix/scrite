@@ -33,6 +33,7 @@ class ScreenplayElement : public QObject, public Modifiable, public QObjectSeria
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
 
 public:
     Q_INVOKABLE ScreenplayElement(QObject *parent = nullptr);
@@ -201,6 +202,8 @@ class Screenplay : public QAbstractListModel, public Modifiable, public QObjectS
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Screenplay(QObject *parent = nullptr);
@@ -339,9 +342,9 @@ public:
 
     enum BreakType { Act, Episode, Chapter = Episode, Interval };
     Q_ENUM(BreakType)
-    Q_INVOKABLE void addBreakElement(BreakType type);
+    Q_INVOKABLE void addBreakElement(Screenplay::BreakType type);
     Q_INVOKABLE void addBreakElementI(int type) { this->addBreakElement(BreakType(type)); }
-    Q_INVOKABLE void insertBreakElement(BreakType type, int index);
+    Q_INVOKABLE void insertBreakElement(Screenplay::BreakType type, int index);
     Q_INVOKABLE void insertBreakElementI(int type, int index)
     {
         this->insertBreakElement(BreakType(type), index);
@@ -479,6 +482,7 @@ private:
 class ScreenplayTracks : public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     ScreenplayTracks(QObject *parent = nullptr);

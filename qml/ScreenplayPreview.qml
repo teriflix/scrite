@@ -11,15 +11,15 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
 Rectangle {
     id: previewItem
-    property Screenplay screenplay: scriteDocument.loading ? null : scriteDocument.screenplay
-    property ScreenplayFormat screenplayFormat: scriteDocument.loading ? null : scriteDocument.printFormat
+    property Screenplay screenplay: Scrite.document.loading ? null : Scrite.document.screenplay
+    property ScreenplayFormat screenplayFormat: Scrite.document.loading ? null : Scrite.document.printFormat
     property alias titlePage: screenplayTextDocument.titlePage
     property alias titlePageIsCentered: screenplayTextDocument.titlePageIsCentered
     property bool fitPageToWidth: false
@@ -39,7 +39,7 @@ Rectangle {
     signal currentOffsetChanged(int row)
 
     Component.onCompleted: {
-        app.execLater(screenplayTextDocument, 250, function() {
+        Scrite.app.execLater(screenplayTextDocument, 250, function() {
             previewItem.screenplay.currentElementIndex = 0
             screenplayTextDocument.screenplay = previewItem.screenplay
             screenplayTextDocument.print(screenplayImagePrinter)

@@ -13,7 +13,7 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Rectangle {
     property bool includeEmojis: true
@@ -63,7 +63,7 @@ Rectangle {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         text: modelData.title
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         color: symbolsPanel.currentIndex === index ? "black" : "white"
                     }
 
@@ -99,7 +99,7 @@ Rectangle {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 anchors.centerIn: parent
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 text: includeEmojis ? "Emojis may not be included in PDF exports." : "Emojis are not supported in this text area."
             }
         }

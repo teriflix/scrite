@@ -15,7 +15,7 @@ import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Flickable {
     id: scrollAreaFlickable
@@ -25,7 +25,7 @@ Flickable {
     property real suggestedScale: zoomScale
     property alias handlePinchZoom: pinchHandler.enabled
     property bool showScrollBars: true
-    property bool zoomOnScroll: app.isWindowsPlatform || app.isLinuxPlatform
+    property bool zoomOnScroll: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
     property bool animatePanAndZoom: true
     property alias minimumScale: pinchHandler.minimumScale
     property alias maximumScale: pinchHandler.maximumScale
@@ -168,7 +168,7 @@ Flickable {
             ensureVisibleParams = {
                 "area": area, "scaling": scaling, "leaveMargin": leaveMargin
             }
-            app.execLater(scrollAreaFlickable, 500, function() {
+            Scrite.app.execLater(scrollAreaFlickable, 500, function() {
                 var params = ensureVisibleParams
                 ensureVisibleParams = undefined
                 ensureVisible(params.area, params.scaling, params.leaveMargin)
@@ -238,12 +238,12 @@ Flickable {
     property real zoomScale: 1
 
     onZoomScaleChanged: {
-        var cursorPos = app.cursorPosition()
-        var fCursorPos = app.mapGlobalPositionToItem(scrollAreaFlickable, cursorPos)
+        var cursorPos = Scrite.app.cursorPosition()
+        var fCursorPos = Scrite.app.mapGlobalPositionToItem(scrollAreaFlickable, cursorPos)
         var fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
         var visibleArea = Qt.rect(contentX, contentY, width, height)
         var mousePoint = fContainsCursor ?
-                    app.mapGlobalPositionToItem(contentItem, app.cursorPosition()) :
+                    Scrite.app.mapGlobalPositionToItem(contentItem, Scrite.app.cursorPosition()) :
                     Qt.point(contentX+width/2, contentY+height/2)
         var newWidth = initialContentWidth * zoomScale
         var newHeight = initialContentHeight * zoomScale

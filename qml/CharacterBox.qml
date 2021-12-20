@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Rectangle {
     id: characterBox
@@ -72,7 +72,7 @@ Rectangle {
             Text {
                 text: character.name
                 font.bold: true
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 font.capitalization: Font.AllUppercase
                 width: parent.width
                 elide: Text.ElideRight
@@ -81,7 +81,7 @@ Rectangle {
             Text {
                 width: parent.width
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                font.pointSize: app.idealFontPointSize-3
+                font.pointSize: Scrite.app.idealFontPointSize-3
                 maximumLineCount: 3
                 text: {
                     var fields = []

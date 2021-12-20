@@ -14,11 +14,11 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
-import Scrite 1.0
+import io.scrite.components 1.0
 
 TextArea {
     id: txtAreaInput
-    palette: app.palette
+    palette: Scrite.app.palette
     selectByKeyboard: true
     selectByMouse: true
     // renderType: Text.NativeRendering

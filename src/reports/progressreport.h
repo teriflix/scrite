@@ -14,13 +14,15 @@
 #ifndef PROGRESSREPORT_H
 #define PROGRESSREPORT_H
 
-#include <QObject>
+#include <QQmlEngine>
 
 #include "qobjectproperty.h"
 
 class ProgressReport : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ProgressReport(QObject *parent = nullptr);
@@ -78,5 +80,7 @@ private:
     QString m_progressText;
     QObjectProperty<ProgressReport> m_proxyFor;
 };
+
+QML_DECLARE_TYPE(ProgressReport)
 
 #endif // PROGRESSREPORT_H

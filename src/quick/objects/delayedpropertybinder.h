@@ -21,6 +21,7 @@
 class DelayedPropertyBinder : public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     DelayedPropertyBinder(QQuickItem *parent = nullptr);

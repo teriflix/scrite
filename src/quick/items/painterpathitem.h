@@ -26,6 +26,7 @@ class PainterPath;
 class PainterPathItem : public AbstractShapeItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     PainterPathItem(QQuickItem *parent = nullptr);
@@ -56,6 +57,8 @@ protected:
 class AbstractPathElement : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use subclasses of AbstractPathElement.")
 
 public:
     AbstractPathElement(QObject *parent = nullptr);
@@ -78,6 +81,7 @@ private:
 class PainterPath : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     PainterPath(QObject *parent = nullptr);
@@ -128,6 +132,8 @@ private:
 class MoveToElement : public AbstractPathElement
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_NAMED_ELEMENT(MoveTo)
 
 public:
     MoveToElement(QObject *parent = nullptr);
@@ -153,6 +159,8 @@ protected:
 class LineToElement : public MoveToElement
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_NAMED_ELEMENT(LineTo)
 
 public:
     LineToElement(QObject *parent = nullptr);
@@ -164,6 +172,7 @@ public:
 class CloseSubpathElement : public AbstractPathElement
 {
     Q_OBJECT
+    QML_NAMED_ELEMENT(CloseSubpath)
 
 public:
     CloseSubpathElement(QObject *parent = nullptr);
@@ -175,6 +184,8 @@ public:
 class CubicToElement : public AbstractPathElement
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_NAMED_ELEMENT(CubicTo)
 
 public:
     CubicToElement(QObject *parent = nullptr);
@@ -206,6 +217,8 @@ private:
 class QuadToElement : public AbstractPathElement
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_NAMED_ELEMENT(QuadTo)
 
 public:
     QuadToElement(QObject *parent = nullptr);
@@ -231,6 +244,8 @@ private:
 class ArcToElement : public AbstractPathElement
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_NAMED_ELEMENT(ArcTo)
 
 public:
     ArcToElement(QObject *parent = nullptr);

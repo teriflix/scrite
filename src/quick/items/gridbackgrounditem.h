@@ -21,6 +21,8 @@ class GridBackgroundItem;
 class GridBackgroundItemBorder : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~GridBackgroundItemBorder();
@@ -47,6 +49,8 @@ private:
 class GridBackgroundItem : public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_NAMED_ELEMENT(GridBackground)
 
 public:
     GridBackgroundItem(QQuickItem *parent = nullptr);

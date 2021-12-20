@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: structureView
@@ -48,14 +48,14 @@ Item {
                 visible: ui.showNotebookInStructure
                 iconSource: "../icons/navigation/structure_tab.png"
                 down: true
-                ToolTip.text: "Structure\t(" + app.polishShortcutTextForDisplay("Alt+2") + ")"
+                ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
             }
 
             ToolButton3 {
                 id: notebookTabButton
                 visible: ui.showNotebookInStructure
                 iconSource: "../icons/navigation/notebook_tab.png"
-                ToolTip.text: "Notebook Tab (" + app.polishShortcutTextForDisplay("Alt+3") + ")"
+                ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
             }
 
@@ -69,7 +69,7 @@ Item {
             ToolButton3 {
                 id: newSceneButton
                 down: newSceneMenu.visible
-                enabled: !scriteDocument.readOnly
+                enabled: !Scrite.document.readOnly
                 onClicked: newSceneMenu.open()
                 iconSource: "../icons/action/add_scene.png"
                 ToolTip.text: "Add Scene"
@@ -85,7 +85,7 @@ Item {
 
                         MenuItem2 {
                             text: "New Scene"
-                            enabled: !scriteDocument.readOnly
+                            enabled: !Scrite.document.readOnly
                             onClicked: {
                                 Qt.callLater( function() { newSceneMenu.close() } )
                                 createItemMouseHandler.handle("element")
@@ -95,7 +95,7 @@ Item {
                         ColorMenu {
                             title: "Colored Scene"
                             selectedColor: newSceneButton.activeColor
-                            enabled: !scriteDocument.readOnly
+                            enabled: !Scrite.document.readOnly
                             onMenuItemClicked: {
                                 Qt.callLater( function() { newSceneMenu.close() } )
                                 newSceneButton.activeColor = color
@@ -109,7 +109,7 @@ Item {
             ToolButton3 {
                 id: newAnnotationButton
                 down: newAnnotationMenu.visible
-                enabled: !scriteDocument.readOnly
+                enabled: !Scrite.document.readOnly
                 onClicked: newAnnotationMenu.open()
                 iconSource: "../icons/action/add_annotation.png"
                 ToolTip.text: "Add Annotation"
@@ -129,7 +129,7 @@ Item {
                             MenuItem2 {
                                 property var annotationInfo: canvas.annotationsList[index]
                                 text: annotationInfo.title
-                                enabled: !scriteDocument.readOnly && annotationInfo.what !== ""
+                                enabled: !Scrite.document.readOnly && annotationInfo.what !== ""
                                 onClicked: {
                                     Qt.callLater( function() { newAnnotationMenu.close() } )
                                     createItemMouseHandler.handle(annotationInfo.what)
@@ -149,7 +149,7 @@ Item {
 
             ToolButton3 {
                 id: selectionModeButton
-                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2)
+                enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2)
                 iconSource: "../icons/action/selection_drag.png"
                 ToolTip.text: "Selection mode"
                 checkable: true
@@ -157,14 +157,14 @@ Item {
             }
 
             ToolButton3 {
-                enabled: !scriteDocument.readOnly && scriteDocument.structure.elementCount >= 2
+                enabled: !Scrite.document.readOnly && Scrite.document.structure.elementCount >= 2
                 iconSource: "../icons/content/select_all.png"
                 ToolTip.text: "Select All"
                 onClicked: selection.init(elementItems, canvasItemsBoundingBox.boundingBox, true)
             }
 
             ToolButton3 {
-                enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
+                enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                 iconSource: "../icons/action/layout_options.png"
                 ToolTip.text: "Layout Options"
                 down: layoutOptionsMenu.visible
@@ -208,36 +208,40 @@ Item {
 
             ToolButton3 {
                 id: beatBoardLayoutToolButton
-                enabled: !scriteDocument.readOnly
+                enabled: !Scrite.document.readOnly
                 iconSource: "../icons/action/layout_beat_sheet.png"
                 ToolTip.text: "Beat Board Layout"
                 checkable: true
                 checked: false
                 onToggled: {
                     canvasPreview.allowed = false
-                    scriteDocument.structure.forceBeatBoardLayout = checked
-                    if(checked && scriteDocument.structure.elementCount > 0) {
-                        scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
+                    Scrite.document.structure.forceBeatBoardLayout = checked
+                    if(checked && Scrite.document.structure.elementCount > 0) {
+                        Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
                     }
-                    app.execLater(canvasPreview, 1000, function() {
+                    Scrite.app.execLater(canvasPreview, 1000, function() {
                         cmdZoomOne.click()
                         canvasPreview.allowed = true
                     })
                 }
 
-                Component.onCompleted: checked = scriteDocument.structure.forceBeatBoardLayout
+                Component.onCompleted: checked = Scrite.document.structure.forceBeatBoardLayout
 
                 Connections {
-                    target: scriteDocument.structure
-                    onForceBeatBoardLayoutChanged: beatBoardLayoutToolButton.checked = scriteDocument.structure.forceBeatBoardLayout
+                    target: Scrite.document.structure
+                    function onForceBeatBoardLayoutChanged() {
+                        beatBoardLayoutToolButton.checked = Scrite.document.structure.forceBeatBoardLayout
+                    }
                 }
 
                 Connections {
-                    target: scriteDocument.screenplay
-                    enabled: scriteDocument.structure.forceBeatBoardLayout
-                    onElementRemoved: Qt.callLater( function() {
-                        scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
-                    })
+                    target: Scrite.document.screenplay
+                    enabled: Scrite.document.structure.forceBeatBoardLayout
+                    function onElementRemoved(element, index) {
+                        Qt.callLater( function() {
+                            Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+                        })
+                    }
                 }
             }
 
@@ -260,10 +264,10 @@ Item {
                     MenuSeparator { }
 
                     Repeater {
-                        model: scriteDocument.structure.groupCategories
+                        model: Scrite.document.structure.groupCategories
 
                         MenuItem2 {
-                            text: app.camelCased(modelData)
+                            text: Scrite.app.camelCased(modelData)
                             font.bold: canvas.groupCategory === modelData
                             onTriggered: canvas.groupCategory = modelData
                         }
@@ -274,7 +278,7 @@ Item {
             ToolButton3 {
                 id: tagMenuOption
                 iconSource: "../icons/action/tag.png"
-                enabled: (selection.hasItems || currentElementItemBinder.get !== null) && scriteDocument.structure.canvasUIMode === Structure.IndexCardUI
+                enabled: (selection.hasItems || currentElementItemBinder.get !== null) && Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
                 ToolTip.text: {
                     if(selection.hasItems)
                         return "Tag the " + selection.items.length + " selected index card(s)"
@@ -293,12 +297,12 @@ Item {
                     menu: StructureGroupsMenu {
                         innerTitle: tagMenuOption.ToolTip.text
                         sceneGroup: SceneGroup {
-                            structure: scriteDocument.structure
+                            structure: Scrite.document.structure
                         }
 
                         onToggled: {
                             if(selection.hasItems)
-                                app.execLater(selection, 250, function() { selection.refit() })
+                                Scrite.app.execLater(selection, 250, function() { selection.refit() })
                         }
 
                         onAboutToShow: {
@@ -352,7 +356,7 @@ Item {
             ToolButton3 {
                 id: changeSceneTypeOption
                 enabled: changeColorOption.enabled
-                readonly property var sceneTypeModel: app.enumerationModelForType("Scene", "Type")
+                readonly property var sceneTypeModel: Scrite.app.enumerationModelForType("Scene", "Type")
                 property Scene scene: currentElementItemBinder.get ? currentElementItemBinder.get.element.scene :
                                       (selection.hasItems ? selection.items[0].element.scene : null)
                 property int sceneType: (scene && scene.type !== Scene.Standard) ? scene.type : Scene.Standard
@@ -393,7 +397,7 @@ Item {
                 ToolTip.text: enabled ? "Delete selected scene." : ""
                 onClicked: {
                     var element = currentElementItemBinder.get.element
-                    if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
+                    if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
                         element.follow.confirmAndDeleteSelf()
                     else
                         canvasScroll.deleteElement(element)
@@ -413,12 +417,12 @@ Item {
                 ToolTip.text: "Copy the selected scene or annotation."
                 onClicked: {
                     if(annotationGripLoader.active) {
-                        scriteDocument.structure.copy(annotationGripLoader.annotation)
+                        Scrite.document.structure.copy(annotationGripLoader.annotation)
                         statusText.show("Annotation Copied")
                     } else {
-                        var spe = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
+                        var spe = Scrite.document.structure.elementAt(Scrite.document.structure.currentElementIndex)
                         if(spe !== null) {
-                            scriteDocument.structure.copy(spe)
+                            Scrite.document.structure.copy(spe)
                             statusText.show("Scene Copied")
                         }
                     }
@@ -427,28 +431,28 @@ Item {
                 ShortcutsModelItem.group: "Edit"
                 ShortcutsModelItem.title: "Copy Annotation"
                 ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay("Ctrl+C")
+                ShortcutsModelItem.shortcut: Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
             }
 
             ToolButton3 {
-                enabled: !scriteDocument.readOnly && scriteDocument.structure.canPaste
+                enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste
                 iconSource: "../icons/content/content_paste.png"
                 ToolTip.text: "Paste from clipboard"
                 onClicked: {
-                    var gpos = app.globalMousePosition()
+                    var gpos = Scrite.app.globalMousePosition()
                     var pos = canvasScroll.mapFromGlobal(gpos.x, gpos.y)
                     if(pos.x < 0 || pos.y < 0 || pos.x >= canvasScroll.width || pos.y >= canvasScroll.height)
-                        scriteDocument.structure.paste()
+                        Scrite.document.structure.paste()
                     else {
                         pos = canvas.mapFromGlobal(gpos.x, gpos.y)
-                        scriteDocument.structure.paste(Qt.point(pos.x,pos.y))
+                        Scrite.document.structure.paste(Qt.point(pos.x,pos.y))
                     }
                 }
                 shortcut: "Ctrl+V"
                 ShortcutsModelItem.group: "Edit"
                 ShortcutsModelItem.title: "Paste"
                 ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: app.polishShortcutTextForDisplay(shortcut)
+                ShortcutsModelItem.shortcut: Scrite.app.polishShortcutTextForDisplay(shortcut)
             }
 
             ToolButton3 {
@@ -457,7 +461,7 @@ Item {
                 ToolTip.text: "Export the contents of the structure canvas to PDF."
                 onClicked: {
                     modalDialog.closeable = false
-                    modalDialog.arguments = scriteDocument.structure.createExporterObject()
+                    modalDialog.arguments = Scrite.document.structure.createExporterObject()
                     modalDialog.sourceComponent = exporterConfigurationComponent
                     modalDialog.popupSource = pdfExportButton
                     modalDialog.active = true
@@ -489,7 +493,7 @@ Item {
         initialContentWidth: canvas.width
         initialContentHeight: canvas.height
         clip: true
-        showScrollBars: scriteDocument.structure.elementCount >= 1
+        showScrollBars: Scrite.document.structure.elementCount >= 1
         zoomOnScroll: workspaceSettings.mouseWheelZoomsInStructureCanvas
         interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null && maybeDragItem === null
         minimumScale: canvasItemsBoundingBox.itemCount > 0 ? Math.min(0.25, width/canvasItemsBoundingBox.width, height/canvasItemsBoundingBox.height) : 0.25
@@ -500,7 +504,7 @@ Item {
 
         onEditItemChanged: {
             if(editItem) {
-                app.execLater(canvasScroll, 500, function() {
+                Scrite.app.execLater(canvasScroll, 500, function() {
                     if(canvasScroll.editItem !== null && canvas.scaleIsLessForEdit)
                         canvasScroll.zoomOneToItem(canvasScroll.editItem)
                 })
@@ -513,8 +517,8 @@ Item {
                                            visibleArea.heightRatio * contentHeight / canvas.scale )
 
         Connections {
-            target: scriteDocument
-            onJustLoaded: canvasScroll.updateFromScriteDocumentUserDataLater()
+            target: Scrite.document
+            function onJustLoaded() { canvasScroll.updateFromScriteDocumentUserDataLater() }
         }
 
         Component.onCompleted: canvasScroll.updateFromScriteDocumentUserDataLater()
@@ -528,10 +532,10 @@ Item {
         property bool updateScriteDocumentUserDataEnabled: false
 
         function updateScriteDocumentUserData() {
-            if(!updateScriteDocumentUserDataEnabled || scriteDocument.readOnly || animatingPanOrZoom)
+            if(!updateScriteDocumentUserDataEnabled || Scrite.document.readOnly || animatingPanOrZoom)
                 return
 
-            var userData = scriteDocument.userData
+            var userData = Scrite.document.userData
             userData["StructureView.canvasScroll"] = {
                 "version": 0,
                 "contentX": canvasScroll.contentX,
@@ -539,16 +543,16 @@ Item {
                 "zoomScale": canvasScroll.zoomScale,
                 "isZoomFit": canvasScroll.isZoomFit
             }
-            scriteDocument.userData = userData
+            Scrite.document.userData = userData
         }
 
         function updateFromScriteDocumentUserData() {
-            if(elementItems.count < scriteDocument.structure.elementCount) {
+            if(elementItems.count < Scrite.document.structure.elementCount) {
                 updateFromScriteDocumentUserDataLater()
                 return
             }
 
-            var userData = scriteDocument.userData
+            var userData = Scrite.document.userData
             var csData = userData["StructureView.canvasScroll"];
             if(csData && csData.version === 0) {
                 canvasScroll.zoomScale = csData.zoomScale
@@ -556,13 +560,13 @@ Item {
                 canvasScroll.contentY = csData.contentY
                 canvasScroll.isZoomFit = csData.isZoomFit === true
                 if(canvasScroll.isZoomFit) {
-                    app.execLater(canvasScroll, 500, function() {
+                    Scrite.app.execLater(canvasScroll, 500, function() {
                         var area = canvasItemsBoundingBox.boundingBox
                         canvasScroll.zoomFit(area)
                     })
                 }
             } else {
-                if(scriteDocument.structure.elementCount > 0) {
+                if(Scrite.document.structure.elementCount > 0) {
                     var item = currentElementItemBinder.get
                     if(item === null)
                         item = elementItems.itemAt(0)
@@ -571,24 +575,24 @@ Item {
                     canvasScroll.zoomOneMiddleArea()
             }
 
-            if(scriteDocument.structure.forceBeatBoardLayout)
-                scriteDocument.structure.placeElementsInBeatBoardLayout(scriteDocument.screenplay)
+            if(Scrite.document.structure.forceBeatBoardLayout)
+                Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
 
             updateScriteDocumentUserDataEnabled = true
             animatePanAndZoom = true
         }
 
         function updateFromScriteDocumentUserDataLater() {
-            app.execLater(canvasScroll, 500, updateFromScriteDocumentUserData)
+            Scrite.app.execLater(canvasScroll, 500, updateFromScriteDocumentUserData)
         }
 
         onUpdateScriteDocumentUserDataEnabledChanged: {
             if(updateScriteDocumentUserDataEnabled)
-                app.execLater(canvasScroll, 500, zoomSanityCheck)
+                Scrite.app.execLater(canvasScroll, 500, zoomSanityCheck)
         }
 
         function zoomSanityCheck() {
-            if( !app.doRectanglesIntersect(canvasItemsBoundingBox.boundingBox, canvasScroll.viewportRect) ) {
+            if( !Scrite.app.doRectanglesIntersect(canvasItemsBoundingBox.boundingBox, canvasScroll.viewportRect) ) {
                 var item = currentElementItemBinder.get
                 if(item === null)
                     item = elementItems.itemAt(0)
@@ -610,7 +614,7 @@ Item {
             var bbox = canvasItemsBoundingBox.boundingBox
             var itemRect = Qt.rect(item.x, item.y, item.width, item.height)
             var atBest = Qt.size(canvasScroll.width, canvasScroll.height)
-            var visibleArea = app.querySubRectangle(bbox, itemRect, atBest)
+            var visibleArea = Scrite.app.querySubRectangle(bbox, itemRect, atBest)
             canvasScroll.zoomFit(visibleArea)
         }
 
@@ -621,16 +625,16 @@ Item {
             var nextScene = null
             var nextElement = null
             if(element.scene.addedToScreenplay) {
-                nextElement = scriteDocument.screenplay.elementAt(element.scene.screenplayElementIndexList[0]+1)
+                nextElement = Scrite.document.screenplay.elementAt(element.scene.screenplayElementIndexList[0]+1)
                 if(nextElement === null)
-                    nextElement = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
+                    nextElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.lastSceneIndex())
                 if(nextElement !== null)
                     nextScene = nextElement.scene
             } else {
-                var idx = scriteDocument.structure.indexOfElement(element)
+                var idx = Scrite.document.structure.indexOfElement(element)
                 var i = 0;
-                for(i=idx+1; i<scriteDocument.structure.elementCount; i++) {
-                    nextElement = scriteDocument.structure.elementAt(i)
+                for(i=idx+1; i<Scrite.document.structure.elementCount; i++) {
+                    nextElement = Scrite.document.structure.elementAt(i)
                     if(nextElement.scene.addedToScreenplay)
                         continue;
                     nextScene = nextElement.scene
@@ -639,7 +643,7 @@ Item {
 
                 if(nextScene === null) {
                     for(i=0; i<idx; i++) {
-                        nextElement = scriteDocument.structure.elementAt(i)
+                        nextElement = Scrite.document.structure.elementAt(i)
                         if(nextElement.scene.addedToScreenplay)
                             continue;
                         nextScene = nextElement.scene
@@ -649,18 +653,18 @@ Item {
             }
 
             releaseEditor()
-            scriteDocument.screenplay.removeSceneElements(element.scene)
-            scriteDocument.structure.removeElement(element)
+            Scrite.document.screenplay.removeSceneElements(element.scene)
+            Scrite.document.structure.removeElement(element)
 
             Qt.callLater(function(scene) {
-                if(scriteDocument.screenplay.elementCount === 0)
+                if(Scrite.document.screenplay.elementCount === 0)
                     return
                 if(scene === null)
-                    scene = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.lastSceneIndex())
-                var idx = scriteDocument.structure.indexOfScene(scene)
+                    scene = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.lastSceneIndex())
+                var idx = Scrite.document.structure.indexOfScene(scene)
                 if(idx >= 0) {
-                    scriteDocument.structure.currentElementIndex = idx
-                    scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(scene)
+                    Scrite.document.structure.currentElementIndex = idx
+                    Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.firstIndexOfScene(scene)
                 }
             }, nextScene)
         }
@@ -668,8 +672,8 @@ Item {
         GridBackground {
             id: canvas
             antialiasing: false
-            majorTickLineWidth: 2*app.devicePixelRatio
-            minorTickLineWidth: 1*app.devicePixelRatio
+            majorTickLineWidth: 2*Scrite.app.devicePixelRatio
+            minorTickLineWidth: 1*Scrite.app.devicePixelRatio
             width: widthBinder.get
             height: heightBinder.get
             tickColorOpacity: 0.25 * scale
@@ -679,9 +683,9 @@ Item {
             gridIsVisible: structureCanvasSettings.showGrid && canvasScroll.interactive
             majorTickColor: structureCanvasSettings.gridColor
             minorTickColor: structureCanvasSettings.gridColor
-            tickDistance: scriteDocument.structure.canvasGridSize
+            tickDistance: Scrite.document.structure.canvasGridSize
             transformOrigin: Item.TopLeft
-            backgroundColor: canvasScroll.interactive ? primaryColors.c10.background : app.translucent(primaryColors.c300.background, 0.75)
+            backgroundColor: canvasScroll.interactive ? primaryColors.c10.background : Scrite.app.translucent(primaryColors.c300.background, 0.75)
             Behavior on backgroundColor {
                 enabled: screenplayEditorSettings.enableAnimations
                 ColorAnimation { duration: 250 }
@@ -701,7 +705,7 @@ Item {
             }
 
             function createItem(what, where) {
-                if(scriteDocument.readOnly)
+                if(Scrite.document.readOnly)
                     return
 
                 if(what === undefined || what === "" | what === "element")
@@ -711,18 +715,18 @@ Item {
             }
 
             function createElement(x, y, c) {
-                if(scriteDocument.readOnly)
+                if(Scrite.document.readOnly)
                     return
 
                 var props = {
-                    "x": Math.max(scriteDocument.structure.snapToGrid(x), 130),
-                    "y": Math.max(scriteDocument.structure.snapToGrid(y), 50)
+                    "x": Math.max(Scrite.document.structure.snapToGrid(x), 130),
+                    "y": Math.max(Scrite.document.structure.snapToGrid(y), 50)
                 }
 
-                var element = newStructureElementComponent.createObject(scriteDocument.structure, props)
+                var element = newStructureElementComponent.createObject(Scrite.document.structure, props)
                 element.scene.color = c
-                scriteDocument.structure.addElement(element)
-                scriteDocument.structure.currentElementIndex = scriteDocument.structure.elementCount-1
+                Scrite.document.structure.addElement(element)
+                Scrite.document.structure.currentElementIndex = Scrite.document.structure.elementCount-1
                 requestEditorLater()
                 canvas.forceActiveFocus()
                 element.scene.undoRedoEnabled = true
@@ -739,7 +743,7 @@ Item {
             ]
 
             function createAnnotation(type, x, y) {
-                if(scriteDocument.readOnly)
+                if(Scrite.document.readOnly)
                     return
 
                 switch(type) {
@@ -769,7 +773,7 @@ Item {
 
             BoundingBoxEvaluator {
                 id: canvasItemsBoundingBox
-                initialRect: scriteDocument.structure.annotationsBoundingBox
+                initialRect: Scrite.document.structure.annotationsBoundingBox
                 margin: 50
             }
 
@@ -777,17 +781,17 @@ Item {
                 id: widthBinder
                 initial: 1000
                 set: Math.max( Math.ceil(canvasItemsBoundingBox.right / 100) * 100, 120000 )
-                onGetChanged: scriteDocument.structure.canvasWidth = get
+                onGetChanged: Scrite.document.structure.canvasWidth = get
             }
 
             DelayedPropertyBinder {
                 id: heightBinder
                 initial: 1000
                 set: Math.max( Math.ceil(canvasItemsBoundingBox.bottom / 100) * 100, 120000 )
-                onGetChanged: scriteDocument.structure.canvasHeight = get
+                onGetChanged: Scrite.document.structure.canvasHeight = get
             }
 
-            FocusTracker.window: qmlWindow
+            FocusTracker.window: Scrite.window
             FocusTracker.indicator.target: mainUndoStack
             FocusTracker.indicator.property: "structureEditorActive"
 
@@ -797,6 +801,7 @@ Item {
                 acceptedButtons: Qt.LeftButton
                 enabled: false
                 hoverEnabled: true
+                property bool enabled2: enabled
                 z: 10000
 
                 property string what
@@ -817,7 +822,7 @@ Item {
                     visible: parent.enabled
                 }
 
-                EventFilter.target: app
+                EventFilter.target: Scrite.app
                 EventFilter.events: [EventFilter.KeyPress]
                 EventFilter.active: createItemMouseHandler.enabled
                 EventFilter.onFilter: {
@@ -831,7 +836,7 @@ Item {
                     var _what = what
                     what = ""
                     enabled = false
-                    if(!scriteDocument.readOnly) {
+                    if(!Scrite.document.readOnly) {
                         var where = Qt.point(mouse.x, mouse.y)
                         if(_what === "element")
                             where = Qt.point(mouse.x-130, mouse.y-22)
@@ -859,8 +864,8 @@ Item {
 
                 StructureCanvasViewportFilterModel {
                     id: annotationsFilterModel
-                    enabled: scriteDocument.loading ? false : scriteDocument.structure.annotationCount > 100
-                    structure: scriteDocument.structure
+                    enabled: Scrite.document.loading ? false : Scrite.document.structure.annotationCount > 100
+                    structure: Scrite.document.structure
                     type: StructureCanvasViewportFilterModel.AnnotationType
                     viewportRect: canvasScroll.viewportRect
                     computeStrategy: StructureCanvasViewportFilterModel.PreComputeStrategy
@@ -915,7 +920,7 @@ Item {
 
                     Connections {
                         target: structureCanvasSettings
-                        onDisplayAnnotationPropertiesChanged: {
+                        function onDisplayAnnotationPropertiesChanged() {
                             if(structureCanvasSettings.displayAnnotationProperties)
                                 floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
                             else
@@ -940,7 +945,7 @@ Item {
 
                     Connections {
                         target: createItemMouseHandler
-                        onEnabledChanged: {
+                        function onEnabled2Changed() {
                             if(canvasScroll.enabled)
                                 annotationGripLoader.reset()
                         }
@@ -948,7 +953,7 @@ Item {
 
                     Connections {
                         target: canvasScroll
-                        onEditItemChanged: {
+                        function onEditItemChanged() {
                             if(canvasScroll.editItem !== null)
                                 annotationGripLoader.reset()
                         }
@@ -956,29 +961,29 @@ Item {
 
                     Connections {
                         target: canvasContextMenu
-                        onVisibleChanged: {
+                        function onVisibleChanged() {
                             if(canvasContextMenu.visible)
                                 annotationGripLoader.reset()
                         }
                     }
 
                     Connections {
-                        target: scriteDocument.structure
-                        onCurrentElementIndexChanged: {
-                            if(scriteDocument.structure.currentElementIndex >= 0)
+                        target: Scrite.document.structure
+                        function onCurrentElementIndexChanged() {
+                            if(Scrite.document.structure.currentElementIndex >= 0)
                                 annotationGripLoader.reset()
                         }
                         onAnnotationCountChanged: annotationGripLoader.reset()
                     }
 
                     Connections {
-                        target: scriteDocument.screenplay
-                        onCurrentElementIndexChanged: {
-                            var element = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.currentElementIndex)
-                            var info = scriteDocument.structure.queryBreakElements(element)
+                        target: Scrite.document.screenplay
+                        function onCurrentElementIndexChanged(val) {
+                            var element = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.currentElementIndex)
+                            var info = Scrite.document.structure.queryBreakElements(element)
                             if(info.indexes && info.indexes.length > 0) {
                                 var fi = info.indexes[0]
-                                var fe = scriteDocument.structure.elementAt(fi)
+                                var fe = Scrite.document.structure.elementAt(fi)
                                 if(fe === null)
                                     return
                                 var febox = fe.geometry
@@ -1023,19 +1028,19 @@ Item {
                 DelayedPropertyBinder {
                     id: currentElementItemBinder
                     initial: null
-                    set: elementItems.count > scriteDocument.structure.currentElementIndex ? elementItems.itemAt(scriteDocument.structure.currentElementIndex) : null
+                    set: elementItems.count > Scrite.document.structure.currentElementIndex ? elementItems.itemAt(Scrite.document.structure.currentElementIndex) : null
                 }
 
-                EventFilter.target: app
-                EventFilter.active: !scriteDocument.readOnly && visible && opacity === 1 && !modalDialog.active && !createItemMouseHandler.enabled
+                EventFilter.target: Scrite.app
+                EventFilter.active: !Scrite.document.readOnly && visible && opacity === 1 && !modalDialog.active && !createItemMouseHandler.enabled
                 EventFilter.events: [EventFilter.KeyPress]
                 EventFilter.onFilter: {
                     var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
-                    var element = scriteDocument.structure.elementAt(scriteDocument.structure.currentElementIndex)
+                    var element = Scrite.document.structure.elementAt(Scrite.document.structure.currentElementIndex)
                     if(element === null)
                         return
 
-                    var fbbl = scriteDocument.structure.forceBeatBoardLayout
+                    var fbbl = Scrite.document.structure.forceBeatBoardLayout
 
                     switch(event.key) {
                     case Qt.Key_Left:
@@ -1066,7 +1071,7 @@ Item {
                     case Qt.Key_Backspace:
                         result.accept = true
                         result.filter = true
-                        if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
+                        if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
                             element.follow.confirmAndDeleteSelf()
                         else
                             canvasScroll.deleteElement(element)
@@ -1075,23 +1080,23 @@ Item {
                 }
             }
 
-            property string groupCategory: scriteDocument.structure.preferredGroupCategory
+            property string groupCategory: Scrite.document.structure.preferredGroupCategory
             property var groupBoxes: []
             property var episodeBoxes: []
             property bool groupsBeingMoved: false
-            Component.onCompleted: app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
+            Component.onCompleted: Scrite.app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
 
             function reevaluateEpisodeAndGroupBoxes() {
                 if(groupsBeingMoved)
                     return
-                var egBoxes = scriteDocument.structure.evaluateEpisodeAndGroupBoxes(scriteDocument.screenplay, canvas.groupCategory)
+                var egBoxes = Scrite.document.structure.evaluateEpisodeAndGroupBoxes(Scrite.document.screenplay, canvas.groupCategory)
                 canvas.groupBoxes = egBoxes.groupBoxes
                 canvas.episodeBoxes = egBoxes.episodeBoxes
             }
 
             onGroupCategoryChanged: {
-                scriteDocument.structure.preferredGroupCategory = groupCategory
-                app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
+                Scrite.document.structure.preferredGroupCategory = groupCategory
+                Scrite.app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
             }
 
             TrackerPack {
@@ -1103,32 +1108,32 @@ Item {
                 }
 
                 TrackSignal {
-                    target: scriteDocument.screenplay
+                    target: Scrite.document.screenplay
                     signal: "elementsChanged()"
                 }
 
                 TrackSignal {
-                    target: scriteDocument.screenplay
+                    target: Scrite.document.screenplay
                     signal: "breakTitleChanged()"
                 }
 
                 TrackSignal {
-                    target: scriteDocument
+                    target: Scrite.document
                     signal: "loadingChanged()"
                 }
 
                 TrackSignal {
-                    target: scriteDocument.structure
+                    target: Scrite.document.structure
                     signal: "structureChanged()"
                 }
 
                 TrackSignal {
-                    target: scriteDocument.screenplay
+                    target: Scrite.document.screenplay
                     signal: "elementSceneGroupsChanged(ScreenplayElement*)"
                 }
 
                 TrackSignal {
-                    target: scriteDocument.screenplay
+                    target: Scrite.document.screenplay
                     signal: "episodeCountChanged()"
                 }
 
@@ -1141,13 +1146,13 @@ Item {
                 Rectangle {
                     id: canvasEpisodeBox
 
-                    property real topMarginForStacks: scriteDocument.structure.elementStacks.objectCount > 0 ? 15 : 0
+                    property real topMarginForStacks: Scrite.document.structure.elementStacks.objectCount > 0 ? 15 : 0
 
                     x: modelData.geometry.x - 40
                     y: modelData.geometry.y - 120 - topMarginForStacks
                     width: modelData.geometry.width + 80
                     height: modelData.geometry.height + 120 + topMarginForStacks + 40
-                    color: app.translucent(accentColors.windowColor, scriteDocument.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+                    color: Scrite.app.translucent(accentColors.windowColor, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 2
                     border.color: accentColors.c600.background
                     enabled: !createItemMouseHandler.enabled && !currentElementItemShadow.visible && !annotationGripLoader.active
@@ -1175,7 +1180,7 @@ Item {
                         anchors.left: parent.left
                         anchors.top: parent.top
                         anchors.margins: 8
-                        font.pointSize: app.idealFontPointSize + 8
+                        font.pointSize: Scrite.app.idealFontPointSize + 8
                         font.bold: true
                         color: accentColors.c600.text
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
@@ -1188,13 +1193,13 @@ Item {
 
                 Rectangle {
                     id: canvasGroupBoxItem
-                    property real topMarginForStacks: scriteDocument.structure.elementStacks.objectCount > 0 ? 15 : 0
+                    property real topMarginForStacks: Scrite.document.structure.elementStacks.objectCount > 0 ? 15 : 0
                     x: modelData.geometry.x - 20
                     y: modelData.geometry.y - 20 - topMarginForStacks
                     width: modelData.geometry.width + 40
                     height: modelData.geometry.height + 40 + topMarginForStacks
                     radius: 0
-                    color: app.translucent(accentColors.windowColor, scriteDocument.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+                    color: Scrite.app.translucent(accentColors.windowColor, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 1
                     border.color: accentColors.borderColor
                     enabled: !createItemMouseHandler.enabled && !annotationGripLoader.active
@@ -1253,8 +1258,8 @@ Item {
                     MouseArea {
                         id: canvasBeatMouseArea
                         anchors.fill: parent
-                        drag.target: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? null : canvasGroupBoxItem
-                        drag.axis: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? Drag.None : Drag.XAndYAxis
+                        drag.target: controlPressed || Scrite.document.structure.forceBeatBoardLayout ? null : canvasGroupBoxItem
+                        drag.axis: controlPressed || Scrite.document.structure.forceBeatBoardLayout ? Drag.None : Drag.XAndYAxis
                         cursorShape: Qt.SizeAllCursor
                         property bool controlPressed: false
                         onPressed: {
@@ -1279,13 +1284,13 @@ Item {
                         anchors.margins: -parent.radius
                         border.width: parent.border.width
                         border.color: parent.border.color
-                        color: app.translucent(accentColors.windowColor, 0.4)
+                        color: Scrite.app.translucent(accentColors.windowColor, 0.4)
 
                         MouseArea {
                             id: canvasBeatLabelMouseArea
                             anchors.fill: parent
-                            drag.target: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? null : canvasGroupBoxItem
-                            drag.axis: controlPressed || scriteDocument.structure.forceBeatBoardLayout ? Drag.None : Drag.XAndYAxis
+                            drag.target: controlPressed || Scrite.document.structure.forceBeatBoardLayout ? null : canvasGroupBoxItem
+                            drag.axis: controlPressed || Scrite.document.structure.forceBeatBoardLayout ? Drag.None : Drag.XAndYAxis
                             cursorShape: Qt.SizeAllCursor
                             property bool controlPressed: false
                             onPressed: {
@@ -1308,7 +1313,7 @@ Item {
                     Text {
                         id: beatLabel
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
-                        font.pointSize: app.idealFontPointSize + 3
+                        font.pointSize: Scrite.app.idealFontPointSize + 3
                         anchors.bottom: parent.top
                         anchors.left: parent.left
                         anchors.leftMargin: parent.radius*2
@@ -1321,7 +1326,7 @@ Item {
 
             Repeater {
                 id: elementConnectorItems
-                model: scriteDocument.loading ? 0 : scriteDocument.structureElementConnectors
+                model: Scrite.document.loading ? 0 : Scrite.document.structureElementConnectors
                 delegate: elementConnectorComponent
             }
 
@@ -1353,7 +1358,7 @@ Item {
                 }
 
                 var sceneId = event.mimeData["scrite/sceneID"]
-                var element = scriteDocument.structure.findElementBySceneID(sceneId)
+                var element = Scrite.document.structure.findElementBySceneID(sceneId)
                 if(element === null)
                     return
 
@@ -1365,20 +1370,20 @@ Item {
 
                 if(event.type === EventFilter.Drop) {
                     element.stackId = ""
-                    app.execLater(element, 250, function() {
-                        if(!scriteDocument.structure.forceBeatBoardLayout) {
+                    Scrite.app.execLater(element, 250, function() {
+                        if(!Scrite.document.structure.forceBeatBoardLayout) {
                             element.x = event.pos.x
                             element.y = event.pos.y
                         }
-                        scriteDocument.structure.currentElementIndex = scriteDocument.structure.indexOfElement(element)
-                        scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.firstIndexOfScene(element.scene)
+                        Scrite.document.structure.currentElementIndex = Scrite.document.structure.indexOfElement(element)
+                        Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.firstIndexOfScene(element.scene)
                     })
                 }
             }
 
             Repeater {
                 id: stackBinders
-                model: scriteDocument.loading ? null : scriteDocument.structure.elementStacks
+                model: Scrite.document.loading ? null : Scrite.document.structure.elementStacks
                 delegate: Item {
                     id: stackBinderItem
                     x: objectItem.geometry.x
@@ -1416,12 +1421,12 @@ Item {
                             tabLabelStyle: SimpleTabBarItem.Alphabets
                             activeTabIndex: objectItem.topmostElementIndex
                             activeTabColor: Qt.tint(objectItem.topmostElement.scene.color, (objectItem.hasCurrentElement ? "#C0FFFFFF" : "#F0FFFFFF"))
-                            activeTabBorderColor: app.isLightColor(objectItem.topmostElement.scene.color) ? "black" : objectItem.topmostElement.scene.color
-                            activeTabFont.pointSize: app.idealFontPointSize
+                            activeTabBorderColor: Scrite.app.isLightColor(objectItem.topmostElement.scene.color) ? "black" : objectItem.topmostElement.scene.color
+                            activeTabFont.pointSize: Scrite.app.idealFontPointSize
                             activeTabFont.bold: true
-                            activeTabTextColor: app.textColorFor(activeTabColor)
-                            inactiveTabTextColor: app.translucent(app.textColorFor(inactiveTabColor), 0.75)
-                            inactiveTabFont.pointSize: app.idealFontPointSize-4
+                            activeTabTextColor: Scrite.app.textColorFor(activeTabColor)
+                            inactiveTabTextColor: Scrite.app.translucent(Scrite.app.textColorFor(inactiveTabColor), 0.75)
+                            inactiveTabFont.pointSize: Scrite.app.idealFontPointSize-4
                             minimumTabWidth: stackBinderItem.width*0.1
                             onTabClicked: objectItem.bringElementToTop(index)
                             onActiveTabIndexChanged: Qt.callLater(ensureActiveTabIsVisible)
@@ -1430,8 +1435,8 @@ Item {
                             Connections {
                                 target: objectItem
                                 ignoreUnknownSignals: true
-                                onDataChanged: tabBarItem.updateTabAttributes()
-                                onStackInitialized: tabBarItem.updateTabAttributes()
+                                function onDataChanged2() { tabBarItem.updateTabAttributes() }
+                                function onStackInitialized() { tabBarItem.updateTabAttributes() } // ???
                             }
 
                             onAttributeRequest: {
@@ -1443,7 +1448,7 @@ Item {
                                     requestedAttributeValue = Qt.tint(element.scene.color, "#D0FFFFFF")
                                     break
                                 case SimpleTabBarItem.TabBorderColor:
-                                    requestedAttributeValue = app.isLightColor(element.scene.color) ? "gray" : element.scene.color
+                                    requestedAttributeValue = Scrite.app.isLightColor(element.scene.color) ? "gray" : element.scene.color
                                     break
                                 default:
                                     break
@@ -1468,22 +1473,22 @@ Item {
 
             Repeater {
                 id: elementItems
-                model: scriteDocument.loading ? null : scriteDocument.structure.elementsModel
-                delegate: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? structureElementIndexCardUIDelegate : structureElementSynopsisEditorUIDelegate
+                model: Scrite.document.loading ? null : Scrite.document.structure.elementsModel
+                delegate: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI ? structureElementIndexCardUIDelegate : structureElementSynopsisEditorUIDelegate
             }
 
             Selection {
                 id: selection
                 z: 3
                 anchors.fill: parent
-                interactive: !scriteDocument.readOnly && !scriteDocument.structure.forceBeatBoardLayout
+                interactive: !Scrite.document.readOnly && !Scrite.document.structure.forceBeatBoardLayout
                 onMoveItem: {
                     item.x = item.x + dx
                     item.y = item.y + dy
                 }
                 onPlaceItem: {
-                    item.x = scriteDocument.structure.snapToGrid(item.x)
-                    item.y = scriteDocument.structure.snapToGrid(item.y)
+                    item.x = Scrite.document.structure.snapToGrid(item.x)
+                    item.y = Scrite.document.structure.snapToGrid(item.y)
                 }
 
                 contextMenu: Menu2 {
@@ -1517,28 +1522,28 @@ Item {
                         title: "Layout"
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
+                            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_horizontally.png"
                             text: "Layout Horizontally"
                             onClicked: selection.layout(Structure.HorizontalLayout)
                         }
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
+                            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_vertically.png"
                             text: "Layout Vertically"
                             onClicked: selection.layout(Structure.VerticalLayout)
                         }
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
+                            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_flow_horizontally.png"
                             text: "Flow Horizontally"
                             onClicked: selection.layout(Structure.FlowHorizontalLayout)
                         }
 
                         MenuItem2 {
-                            enabled: !scriteDocument.readOnly && (selection.hasItems ? selection.canLayout : scriteDocument.structure.elementCount >= 2) && !scriteDocument.structure.forceBeatBoardLayout
+                            enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_flow_vertically.png"
                             text: "Flow Vertically"
                             onClicked: selection.layout(Structure.FlowVerticalLayout)
@@ -1556,7 +1561,7 @@ Item {
                     MenuItem2 {
                         text: "Stack"
                         enabled: {
-                            if(scriteDocument.structure.canvasUIMode !== Structure.IndexCardUI)
+                            if(Scrite.document.structure.canvasUIMode !== Structure.IndexCardUI)
                                 return false
 
                             var items = selection.items
@@ -1579,7 +1584,7 @@ Item {
                         }
                         onTriggered: {
                             var items = selection.items
-                            var id = app.createUniqueId()
+                            var id = Scrite.app.createUniqueId()
                             items.forEach( function(item) {
                                 item.element.stackId = id
                             })
@@ -1592,7 +1597,7 @@ Item {
                         onClicked: {
                             var items = selection.items
                             items.forEach( function(item) {
-                                scriteDocument.screenplay.addScene(item.element.scene)
+                                Scrite.document.screenplay.addScene(item.element.scene)
                             })
                         }
                     }
@@ -1614,7 +1619,7 @@ Item {
                             var items = selection.items
                             var firstItem = items[0]
                             items.forEach( function(item) {
-                                scriteDocument.screenplay.removeSceneElements(item.element.scene)
+                                Scrite.document.screenplay.removeSceneElements(item.element.scene)
                             })
                             selection.clear()
                             canvasScroll.ensureItemVisibleLater(firstItem, canvas.scale)
@@ -1623,10 +1628,10 @@ Item {
 
                     StructureGroupsMenu {
                         sceneGroup: SceneGroup {
-                            structure: scriteDocument.structure
+                            structure: Scrite.document.structure
                         }
 
-                        onToggled: app.execLater(selection, 250, function() { selection.refit() })
+                        onToggled: Scrite.app.execLater(selection, 250, function() { selection.refit() })
 
                         onAboutToShow: {
                             sceneGroup.clearScenes()
@@ -1640,13 +1645,13 @@ Item {
                 }
 
                 function layout(type) {
-                    if(scriteDocument.readOnly || scriteDocument.structure.forceBeatBoardLayout)
+                    if(Scrite.document.readOnly || Scrite.document.structure.forceBeatBoardLayout)
                         return
 
                     if(!hasItems) {
                         canvasPreview.allowed = false
-                        var rect = scriteDocument.structure.layoutElements(type)
-                        app.execLater(selection, 1000, function() {
+                        var rect = Scrite.document.structure.layoutElements(type)
+                        Scrite.app.execLater(selection, 1000, function() {
                             cmdZoomOne.click()
                             canvasPreview.allowed = true
                         })
@@ -1687,12 +1692,12 @@ Item {
                             oldItems.forEach( function(item) {
                                 item.element.selected = true
                             })
-                            layoutAnimation.layoutItemBounds = scriteDocument.structure.layoutElements(layoutAnimation.layoutType)
+                            layoutAnimation.layoutItemBounds = Scrite.document.structure.layoutElements(layoutAnimation.layoutType)
                             layoutAnimation.layoutType = -1
                             oldItems.forEach( function(item) {
                                 item.element.selected = false
                             })
-                            scriteDocument.structure.forceBeatBoardLayout = false
+                            Scrite.document.structure.forceBeatBoardLayout = false
                         }
                     }
 
@@ -1723,7 +1728,7 @@ Item {
 
                 MenuItem2 {
                     text: "New Scene"
-                    enabled: !scriteDocument.readOnly
+                    enabled: !Scrite.document.readOnly
                     onClicked: {
                         Qt.callLater( function() { canvasContextMenu.close() } )
                         canvas.createItem("element", Qt.point(canvasContextMenu.x-130,canvasContextMenu.y-22), newSceneButton.activeColor)
@@ -1733,7 +1738,7 @@ Item {
                 ColorMenu {
                     title: "Colored Scene"
                     selectedColor: newSceneButton.activeColor
-                    enabled: !scriteDocument.readOnly
+                    enabled: !Scrite.document.readOnly
                     onMenuItemClicked: {
                         Qt.callLater( function() { canvasContextMenu.close() } )
                         newSceneButton.activeColor = color
@@ -1752,7 +1757,7 @@ Item {
                         MenuItem2 {
                             property var annotationInfo: canvas.annotationsList[index]
                             text: annotationInfo.title
-                            enabled: !scriteDocument.readOnly && annotationInfo.what !== ""
+                            enabled: !Scrite.document.readOnly && annotationInfo.what !== ""
                             onClicked: {
                                 Qt.callLater( function() { canvasContextMenu.close() } )
                                 canvas.createItem(annotationInfo.what, Qt.point(canvasContextMenu.x, canvasContextMenu.y))
@@ -1803,14 +1808,14 @@ Item {
 
                 MenuItem2 {
                     text: "Add To Timeline"
-                    property Scene lastScene: scriteDocument.screenplay.elementCount > 0 && scriteDocument.screenplay.elementAt(scriteDocument.screenplay.elementCount-1).scene
+                    property Scene lastScene: Scrite.document.screenplay.elementCount > 0 && Scrite.document.screenplay.elementAt(Scrite.document.screenplay.elementCount-1).scene
                     enabled: elementContextMenu.element && elementContextMenu.element.scene !== lastScene
                     onClicked: {
                         var lastScreenplayScene = null
-                        if(scriteDocument.screenplay.elementCount > 0)
-                            lastScreenplayScene = scriteDocument.screenplay.elementAt(scriteDocument.screenplay.elementCount-1).scene
+                        if(Scrite.document.screenplay.elementCount > 0)
+                            lastScreenplayScene = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.elementCount-1).scene
                         if(lastScreenplayScene === null || elementContextMenu.element.scene !== lastScreenplayScene)
-                            scriteDocument.screenplay.addScene(elementContextMenu.element.scene)
+                            Scrite.document.screenplay.addScene(elementContextMenu.element.scene)
                         elementContextMenu.element = null
                     }
                 }
@@ -1819,7 +1824,7 @@ Item {
                     text: "Remove From Timeline"
                     enabled: elementContextMenu.element && elementContextMenu.element.scene.addedToScreenplay
                     onClicked: {
-                        scriteDocument.screenplay.removeSceneElements(elementContextMenu.element.scene)
+                        Scrite.document.screenplay.removeSceneElements(elementContextMenu.element.scene)
                         canvasScroll.ensureItemVisibleLater(elementContextMenu.element.follow, canvas.scale)
                         elementContextMenu.element = null
                     }
@@ -1827,9 +1832,9 @@ Item {
 
                 StructureGroupsMenu {
                     sceneGroup: SceneGroup {
-                        structure: scriteDocument.structure
+                        structure: Scrite.document.structure
                     }
-                    onToggled: app.execLater(selection, 250, function() { selection.refit() })
+                    onToggled: Scrite.app.execLater(selection, 250, function() { selection.refit() })
                     onAboutToShow: {
                         sceneGroup.clearScenes()
                         sceneGroup.addScene(elementContextMenu.element.scene)
@@ -1845,7 +1850,7 @@ Item {
                     onClicked: {
                         var element = elementContextMenu.element
                         elementContextMenu.element = null
-                        if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
+                        if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI && element.follow)
                             element.follow.confirmAndDeleteSelf()
                         else
                             canvasScroll.deleteElement(element)
@@ -1927,7 +1932,7 @@ Item {
 
             Rectangle {
                 id: viewportIndicator
-                color: app.translucent(accentColors.highlight.background, 0.25)
+                color: Scrite.app.translucent(accentColors.highlight.background, 0.25)
                 border.width: 2
                 border.color: accentColors.borderColor
 
@@ -1939,10 +1944,10 @@ Item {
                             return Qt.rect(0,0,0,0)
 
                         var visibleRect = canvasScroll.viewportRect
-                        if( app.isRectangleInRectangle(visibleRect,canvasItemsBoundingBox.boundingBox) )
+                        if( Scrite.app.isRectangleInRectangle(visibleRect,canvasItemsBoundingBox.boundingBox) )
                             return Qt.rect(0,0,0,0)
 
-                        var intersect = app.intersectedRectangle(visibleRect, canvasItemsBoundingBox.boundingBox)
+                        var intersect = Scrite.app.intersectedRectangle(visibleRect, canvasItemsBoundingBox.boundingBox)
                         var scale = previewArea.width / Math.max(canvasItemsBoundingBox.width, 500)
                         var ret = Qt.rect( (intersect.x-canvasItemsBoundingBox.left)*scale,
                                            (intersect.y-canvasItemsBoundingBox.top)*scale,
@@ -2024,10 +2029,10 @@ Item {
             text: {
                 if(!canvasScroll.interactive)
                     return "Canvas Locked While Index Card Has Focus. Hit ESC To Release Focus."
-                var ret = scriteDocument.structure.elementCount + " Scenes";
+                var ret = Scrite.document.structure.elementCount + " Scenes";
                 if(canvas.episodeBoxes.length > 0)
                     ret += ", " + canvas.episodeBoxes.length + " Episodes";
-                if(scriteDocument.structure.forceBeatBoardLayout)
+                if(Scrite.document.structure.forceBeatBoardLayout)
                     ret += ", Scenes Not Movable"
                 ret += "."
                 return ret;
@@ -2144,14 +2149,14 @@ Item {
         StructureElement {
             objectName: "newElement"
             scene: Scene {
-                title: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI ? "" : "New Scene"
+                title: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI ? "" : "New Scene"
                 heading.locationType: "INT"
                 heading.location: "SOMEWHERE"
                 heading.moment: "DAY"
             }
             Component.onCompleted: {
                 scene.undoRedoEnabled = true
-                scriteDocument.structure.forceBeatBoardLayout = false
+                Scrite.document.structure.forceBeatBoardLayout = false
             }
         }
     }
@@ -2167,16 +2172,16 @@ Item {
             enabled: selection.active === false
 
             BoundingBoxItem.evaluator: canvasItemsBoundingBox
-            BoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
+            BoundingBoxItem.stackOrder: 3.0 + (index/Scrite.document.structure.elementCount)
             BoundingBoxItem.livePreview: false
             BoundingBoxItem.previewFillColor: selected ? Qt.darker(element.scene.color) : element.scene.color
-            BoundingBoxItem.previewBorderColor: app.isLightColor(element.scene.color) ? "black" : background.color
+            BoundingBoxItem.previewBorderColor: Scrite.app.isLightColor(element.scene.color) ? "black" : background.color
             BoundingBoxItem.previewBorderWidth: selected ? 3 : 1.5
             BoundingBoxItem.viewportItem: canvas
             BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
             BoundingBoxItem.viewportRect: canvasScroll.viewportRect
 
-            readonly property bool selected: scriteDocument.structure.currentElementIndex === index
+            readonly property bool selected: Scrite.document.structure.currentElementIndex === index
             readonly property bool editing: titleText.readOnly === false
             onEditingChanged: {
                 if(editing)
@@ -2230,10 +2235,10 @@ Item {
                     editMode = false
                     element.objectName = "oldElement"
                 }
-                onHighlightRequest: scriteDocument.structure.currentElementIndex = index
+                onHighlightRequest: Scrite.document.structure.currentElementIndex = index
                 Keys.onReturnPressed: editingFinished()
                 property bool editMode: element.objectName === "newElement"
-                readOnly: !(editMode && index === scriteDocument.structure.currentElementIndex)
+                readOnly: !(editMode && index === Scrite.document.structure.currentElementIndex)
                 leftPadding: 17
                 rightPadding: 17
                 topPadding: 5
@@ -2246,7 +2251,7 @@ Item {
                 onPressedChanged: {
                     if(pressed) {
                         canvasScroll.mouseOverItem = elementItem
-                        scriteDocument.structure.currentElementIndex = index
+                        Scrite.document.structure.currentElementIndex = index
                     } else if(canvasScroll.mouseOverItem === elementItem)
                         canvasScroll.mouseOverItem = null
                 }
@@ -2254,8 +2259,8 @@ Item {
                 onDoubleClicked: {
                     annotationGripLoader.reset()
                     canvas.forceActiveFocus()
-                    scriteDocument.structure.currentElementIndex = index
-                    if(!scriteDocument.readOnly) {
+                    Scrite.document.structure.currentElementIndex = index
+                    if(!Scrite.document.readOnly) {
                         titleText.editMode = true
                         if(canvasScroll.mouseOverItem === elementItem)
                             canvasScroll.mouseOverItem = null
@@ -2264,20 +2269,20 @@ Item {
                 onClicked: {
                     annotationGripLoader.reset()
                     canvas.forceActiveFocus()
-                    scriteDocument.structure.currentElementIndex = index
+                    Scrite.document.structure.currentElementIndex = index
                     requestEditorLater()
                 }
 
-                drag.target: scriteDocument.readOnly || scriteDocument.structure.forceBeatBoardLayout ? null : elementItem
+                drag.target: Scrite.document.readOnly || Scrite.document.structure.forceBeatBoardLayout ? null : elementItem
                 drag.axis: Drag.XAndYAxis
                 drag.minimumX: 0
                 drag.minimumY: 0
                 drag.onActiveChanged: {
                     canvas.forceActiveFocus()
-                    scriteDocument.structure.currentElementIndex = index
+                    Scrite.document.structure.currentElementIndex = index
                     if(drag.active === false) {
-                        elementItem.x = scriteDocument.structure.snapToGrid(parent.x)
-                        elementItem.y = scriteDocument.structure.snapToGrid(parent.y)
+                        elementItem.x = Scrite.document.structure.snapToGrid(parent.x)
+                        elementItem.y = Scrite.document.structure.snapToGrid(parent.y)
                     } else
                         elementItem.element.syncWithFollow = true
                 }
@@ -2286,8 +2291,8 @@ Item {
             Keys.onPressed: {
                 if(event.key === Qt.Key_F2) {
                     canvas.forceActiveFocus()
-                    scriteDocument.structure.currentElementIndex = index
-                    if(!scriteDocument.readOnly)
+                    Scrite.document.structure.currentElementIndex = index
+                    if(!Scrite.document.readOnly)
                         titleText.editMode = true
                     event.accepted = true
                 } else
@@ -2299,7 +2304,7 @@ Item {
                 acceptedButtons: Qt.RightButton
                 onClicked: {
                     canvas.forceActiveFocus()
-                    scriteDocument.structure.currentElementIndex = index
+                    Scrite.document.structure.currentElementIndex = index
                     elementContextMenu.element = elementItem.element
                     elementContextMenu.popup()
                 }
@@ -2333,8 +2338,8 @@ Item {
 
             Image {
                 id: dragHandle
-                visible: !parent.editing && !scriteDocument.readOnly
-                enabled: !canvasScroll.editItem && !scriteDocument.readOnly
+                visible: !parent.editing && !Scrite.document.readOnly
+                enabled: !canvasScroll.editItem && !Scrite.document.readOnly
                 source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
                 width: 24; height: 24
                 anchors.right: parent.right
@@ -2371,7 +2376,7 @@ Item {
                     }
                     onClicked: {
                         if(!elementItem.element.scene.addedToScreenplay)
-                            scriteDocument.screenplay.addScene(elementItem.element.scene)
+                            Scrite.document.screenplay.addScene(elementItem.element.scene)
                     }
                 }
             }
@@ -2388,17 +2393,17 @@ Item {
             id: elementItem
             property StructureElement element: modelData
             property int elementIndex: index
-            property bool selected: scriteDocument.structure.currentElementIndex === index
+            property bool selected: Scrite.document.structure.currentElementIndex === index
             z: selected ? 1 : 0
 
             function select() {
-                scriteDocument.structure.currentElementIndex = index
+                Scrite.document.structure.currentElementIndex = index
             }
 
             function activate() {
                 canvasTabSequence.releaseFocus()
                 annotationGripLoader.reset()
-                scriteDocument.structure.currentElementIndex = index
+                Scrite.document.structure.currentElementIndex = index
                 requestEditorLater()
             }
 
@@ -2419,7 +2424,7 @@ Item {
             visible: visibleInViewport && stackedOnTop
             onVisibleChanged: {
                 if(!visible) {
-                    if(app.hasActiveFocus(qmlWindow,indexCardLayout))
+                    if(Scrite.app.hasActiveFocus(Scrite.window,indexCardLayout))
                         canvasTabSequence.releaseFocus()
                 }
             }
@@ -2428,13 +2433,13 @@ Item {
                 if(element.stackId === "")
                     elementStack = null
                 else if(elementStack === null || elementStack.stackId !== element.stackId)
-                    elementStack = scriteDocument.structure.elementStacks.findStackById(element.stackId)
+                    elementStack = Scrite.document.structure.elementStacks.findStackById(element.stackId)
             }
 
             TrackerPack {
                 delay: 250
                 TrackSignal { target: element; signal: "stackIdChanged()" }
-                TrackSignal { target: scriteDocument.structure.elementStacks; signal: "objectCountChanged()" }
+                TrackSignal { target: Scrite.document.structure.elementStacks; signal: "objectCountChanged()" }
                 TrackSignal { target: elementStack; signal: "objectCountChanged()" }
                 TrackSignal { target: elementStack; signal: "stackLeaderChanged()" }
                 TrackSignal { target: elementStack; signal: "topmostElementChanged()" }
@@ -2447,10 +2452,10 @@ Item {
             }
 
             BoundingBoxItem.evaluator: canvasItemsBoundingBox
-            BoundingBoxItem.stackOrder: 3.0 + (index/scriteDocument.structure.elementCount)
+            BoundingBoxItem.stackOrder: 3.0 + (index/Scrite.document.structure.elementCount)
             BoundingBoxItem.livePreview: false
-            BoundingBoxItem.previewFillColor: app.translucent(element.scene.color, selected ? 0.75 : 0.1)
-            BoundingBoxItem.previewBorderColor: app.isLightColor(element.scene.color) ? "black" : element.scene.color
+            BoundingBoxItem.previewFillColor: Scrite.app.translucent(element.scene.color, selected ? 0.75 : 0.1)
+            BoundingBoxItem.previewBorderColor: Scrite.app.isLightColor(element.scene.color) ? "black" : element.scene.color
             BoundingBoxItem.previewBorderWidth: selected ? 3 : 1.5
             BoundingBoxItem.viewportItem: canvas
             BoundingBoxItem.visibilityMode: stackedOnTop ? BoundingBoxItem.VisibleUponViewportIntersection : BoundingBoxItem.IgnoreVisibility
@@ -2458,7 +2463,7 @@ Item {
             BoundingBoxItem.visibilityProperty: "visibleInViewport"
 
             onSelectedChanged: {
-                if(selected && (mainUndoStack.structureEditorActive || scriteDocument.structure.elementCount === 1))
+                if(selected && (mainUndoStack.structureEditorActive || Scrite.document.structure.elementCount === 1))
                     synopsisFieldLoader.forceActiveFocus()
                 else
                     canvasTabSequence.releaseFocus()
@@ -2485,7 +2490,7 @@ Item {
                 color: Qt.tint(element.scene.color, selected ? "#C0FFFFFF" : "#F0FFFFFF")
                 border.width: elementItem.selected ? 2 : 1
 
-                property color borderColor: app.isLightColor(element.scene.color) ? "gray" : element.scene.color
+                property color borderColor: Scrite.app.isLightColor(element.scene.color) ? "gray" : element.scene.color
                 border.color: elementItem.selected ? borderColor : Qt.lighter(borderColor)
 
                 Rectangle {
@@ -2505,16 +2510,16 @@ Item {
                         canvas.forceActiveFocus()
                     }
 
-                    drag.target: scriteDocument.readOnly || scriteDocument.structure.forceBeatBoardLayout ? null : elementItem
+                    drag.target: Scrite.document.readOnly || Scrite.document.structure.forceBeatBoardLayout ? null : elementItem
                     drag.axis: Drag.XAndYAxis
                     drag.minimumX: 0
                     drag.minimumY: 0
                     drag.onActiveChanged: {
                         canvas.forceActiveFocus()
-                        scriteDocument.structure.currentElementIndex = index
+                        Scrite.document.structure.currentElementIndex = index
                         if(drag.active === false) {
-                            elementItem.x = scriteDocument.structure.snapToGrid(elementItem.x)
-                            elementItem.y = scriteDocument.structure.snapToGrid(elementItem.y)
+                            elementItem.x = Scrite.document.structure.snapToGrid(elementItem.x)
+                            elementItem.y = Scrite.document.structure.snapToGrid(elementItem.y)
                         } else
                             elementItem.element.syncWithFollow = true
                     }
@@ -2561,9 +2566,9 @@ Item {
                         var indexes = element.scene.screenplayElementIndexList
                         if(indexes.length === 0)
                             return elementIndex * 2 + 0
-                        return (indexes[0] + scriteDocument.structure.elementCount) * 2 + 0
+                        return (indexes[0] + Scrite.document.structure.elementCount) * 2 + 0
                     }
-                    TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
+                    TabSequenceItem.onAboutToReceiveFocus: Scrite.document.structure.currentElementIndex = elementIndex
 
                     property bool hasFocus: false
 
@@ -2574,7 +2579,7 @@ Item {
                         topPadding: 8
                         bottomPadding: 16
                         font.bold: true
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         font.capitalization: Font.AllUppercase
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         Component.onCompleted: headingFieldLoader.hasFocus = false
@@ -2590,10 +2595,10 @@ Item {
                         placeholderText: "Scene Heading / Name"
                         maximumLength: 140
                         font.bold: true
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         font.capitalization: Font.AllUppercase
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        readOnly: scriteDocument.readOnly
+                        readOnly: Scrite.document.readOnly
                         onEditingComplete: { element.title = text; TabSequenceItem.focusNext() }
                         onActiveFocusChanged: {
                             if(activeFocus)
@@ -2602,7 +2607,7 @@ Item {
                         }
                         Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                         enableTransliteration: true
-                        property var currentLanguage: app.transliterationEngine.language
+                        property var currentLanguage: Scrite.app.transliterationEngine.language
                         onCurrentLanguageChanged: {
                             if(currentLanguage !== TransliterationEngine.English)
                                 font.capitalization = Font.MixedCase
@@ -2633,9 +2638,9 @@ Item {
                         var indexes = element.scene.screenplayElementIndexList
                         if(indexes.length === 0)
                             return elementIndex * 2 + 1
-                        return (indexes[0] + scriteDocument.structure.elementCount) * 2 + 1
+                        return (indexes[0] + Scrite.document.structure.elementCount) * 2 + 1
                     }
-                    TabSequenceItem.onAboutToReceiveFocus: scriteDocument.structure.currentElementIndex = elementIndex
+                    TabSequenceItem.onAboutToReceiveFocus: Scrite.document.structure.currentElementIndex = elementIndex
 
                     property real idealHeight: Math.max(minIndexCardHeight-headingFieldLoader.height-footerRow.height-2*parent.spacing, 200)
 
@@ -2657,7 +2662,7 @@ Item {
                             rightPadding: 4
                             bottomPadding: 4
                             text: element.scene.hasTitle ? element.scene.title : "Describe what happens in this scene."
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             color: element.scene.hasTitle ? "black" : "gray"
                             maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
                             elide: Text.ElideRight
@@ -2698,9 +2703,9 @@ Item {
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus
                                 placeholderText: "Describe what happens in this scene."
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                readOnly: scriteDocument.readOnly
+                                readOnly: Scrite.document.readOnly
                                 text: element.scene.title
                                 onTextChanged: element.scene.title = text
                                 onActiveFocusChanged: {
@@ -2717,7 +2722,7 @@ Item {
                                     anchors.left: parent.left
                                     textEditor: synopsisField
                                     textEditorHasCursorInterface: true
-                                    enabled: !scriteDocument.readOnly
+                                    enabled: !Scrite.document.readOnly
                                 }
                                 onCursorRectangleChanged: {
                                     var y1 = cursorRectangle.y
@@ -2755,7 +2760,7 @@ Item {
                                             }
                                         }
 
-                                        Component.onCompleted: app.execLater(cursorFocusRect, 250, function() {
+                                        Component.onCompleted: Scrite.app.execLater(cursorFocusRect, 250, function() {
                                             cursorFocusRect.visible = true
                                             cursorFocusRect.t = 1
                                         })
@@ -2810,16 +2815,16 @@ Item {
                         Text {
                             id: groupsLabel
                             x: characterList.x
-                            text: scriteDocument.structure.presentableGroupNames(element.scene.groups)
+                            text: Scrite.document.structure.presentableGroupNames(element.scene.groups)
                             width: parent.width
                             visible: element.scene.groups.length > 0 || !element.scene.hasCharacters
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            font.pointSize: app.idealAppFontSize - 2
+                            font.pointSize: Scrite.app.idealAppFontSize - 2
                         }
 
                         Text {
                             id: characterList
-                            font.pointSize: app.idealAppFontSize - 2
+                            font.pointSize: Scrite.app.idealAppFontSize - 2
                             width: parent.width
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             visible: element.scene.hasCharacters
@@ -2868,7 +2873,7 @@ Item {
                             }
                             onClicked: {
                                 if(!elementItem.element.scene.addedToScreenplay)
-                                    scriteDocument.screenplay.addScene(elementItem.element.scene)
+                                    Scrite.document.screenplay.addScene(elementItem.element.scene)
                             }
                         }
                     }
@@ -2894,8 +2899,8 @@ Item {
                 anchors.fill: parent
                 anchors.margins: -10
                 border.width: 2
-                border.color: app.translucent("black", alpha)
-                color: app.translucent("#cfd8dc", alpha)
+                border.color: Scrite.app.translucent("black", alpha)
+                color: Scrite.app.translucent("#cfd8dc", alpha)
                 radius: 6
                 property real alpha: 0
                 enabled: !dragHandleMouseArea.drag.active && element.scene.addedToScreenplay
@@ -2908,8 +2913,8 @@ Item {
                     onDropped: {
                         parent.alpha = 0
 
-                        var otherScene = app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
-                        if(scriteDocument.screenplay.firstIndexOfScene(otherScene) < 0) {
+                        var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
+                        if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
                             showInformation({
                                 "message": "Scenes must be added to the timeline before they can be stacked."
                             })
@@ -2923,7 +2928,7 @@ Item {
                             return
                         }
 
-                        var otherElement = scriteDocument.structure.findElementBySceneID(otherSceneId)
+                        var otherElement = Scrite.document.structure.findElementBySceneID(otherSceneId)
                         if(otherElement === null) {
                             drop.ignore()
                             return
@@ -2945,15 +2950,15 @@ Item {
                             return
                         }
 
-                        var otherElementIndex = scriteDocument.structure.indexOfElement(otherElement)
-                        Qt.callLater( function() { scriteDocument.structure.currentElementIndex = otherElementIndex } )
+                        var otherElementIndex = Scrite.document.structure.indexOfElement(otherElement)
+                        Qt.callLater( function() { Scrite.document.structure.currentElementIndex = otherElementIndex } )
 
                         var myStackId = element.stackId
                         var otherStackId = otherElement.stackId
                         drop.acceptProposedAction()
 
                         if(myStackId === "") {
-                            var uid = app.createUniqueId()
+                            var uid = Scrite.app.createUniqueId()
                             element.stackId = uid
                             otherElement.stackId = uid
                         } else {
@@ -2980,12 +2985,12 @@ Item {
                     Component.onCompleted: {
                         elementItem.zoomOneForFocus()
                         forceActiveFocus()
-                        app.execLater(deleteConfirmationItem, 500, function() {
+                        Scrite.app.execLater(deleteConfirmationItem, 500, function() {
                             deleteConfirmationItem.allowDeactivate = true
                         })
                     }
 
-                    color: app.translucent(primaryColors.c600.background,0.85)
+                    color: Scrite.app.translucent(primaryColors.c600.background,0.85)
 
                     property bool visibleInViewport: elementItem.visibleInViewport
                     onVisibleInViewportChanged: {
@@ -3010,7 +3015,7 @@ Item {
                         Text {
                             text: "Are you sure you want to delete this index card?"
                             font.bold: true
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
@@ -3047,7 +3052,7 @@ Item {
             fromElement: connectorFromElement
             toElement: connectorToElement
             arrowAndLabelSpacing: labelBg.width
-            outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
+            outlineWidth: Scrite.app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
             visible: {
                 if(canBeVisible)
                     return intersects(canvasScroll.viewportRect)
@@ -3092,7 +3097,7 @@ Item {
             y: annotationItem.y
             width: annotationItem.width
             height: annotationItem.height
-            enabled: !scriteDocument.readOnly
+            enabled: !Scrite.document.readOnly
             readonly property int geometryUpdateInterval: 50
 
             Component.onCompleted: canvas.forceActiveFocus()
@@ -3127,29 +3132,31 @@ Item {
                         onClicked: structureCanvasSettings.displayAnnotationProperties = !structureCanvasSettings.displayAnnotationProperties
                         Connections {
                             target: floatingDockWidget
-                            onCloseRequest: structureCanvasSettings.displayAnnotationProperties = false
+                            function onCloseRequest() {
+                                structureCanvasSettings.displayAnnotationProperties = false
+                            }
                         }
                     }
 
                     ToolButton3 {
                         iconSource: "../icons/action/keyboard_arrow_up.png"
                         ToolTip.text: "Bring this annotation to front"
-                        enabled: scriteDocument.structure.canBringToFront(annotationGripLoader.annotation)
+                        enabled: Scrite.document.structure.canBringToFront(annotationGripLoader.annotation)
                         onClicked: {
                             var a = annotationGripLoader.annotation
                             annotationGripLoader.reset()
-                            scriteDocument.structure.bringToFront(a)
+                            Scrite.document.structure.bringToFront(a)
                         }
                     }
 
                     ToolButton3 {
                         iconSource: "../icons/action/keyboard_arrow_down.png"
                         ToolTip.text: "Send this annotation to back"
-                        enabled: scriteDocument.structure.canSendToBack(annotationGripLoader.annotation)
+                        enabled: Scrite.document.structure.canSendToBack(annotationGripLoader.annotation)
                         onClicked: {
                             var a = annotationGripLoader.annotation
                             annotationGripLoader.reset()
-                            scriteDocument.structure.sendToBack(a)
+                            Scrite.document.structure.sendToBack(a)
                         }
                     }
 
@@ -3159,7 +3166,7 @@ Item {
                         onClicked: {
                             var a = annotationGripLoader.annotation
                             annotationGripLoader.reset()
-                            scriteDocument.structure.removeAnnotation(a)
+                            Scrite.document.structure.removeAnnotation(a)
                         }
                     }
                 }
@@ -3183,8 +3190,8 @@ Item {
                 }
             }
 
-            EventFilter.target: app
-            EventFilter.active: !scriteDocument.readOnly && !floatingDockWidget.contentHasFocus && !modalDialog.active && !createItemMouseHandler.enabled
+            EventFilter.target: Scrite.app
+            EventFilter.active: !Scrite.document.readOnly && !floatingDockWidget.contentHasFocus && !modalDialog.active && !createItemMouseHandler.enabled
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
@@ -3240,7 +3247,7 @@ Item {
             function deleteAnnotation() {
                 var a = annotationGripLoader.annotation
                 annotationGripLoader.reset()
-                scriteDocument.structure.removeAnnotation(a)
+                Scrite.document.structure.removeAnnotation(a)
             }
 
             onXChanged: annotGeoUpdateTimer.start()
@@ -3249,10 +3256,10 @@ Item {
             onHeightChanged: annotGeoUpdateTimer.start()
 
             function snapAnnotationGeometryToGrid(rect) {
-                var gx = scriteDocument.structure.snapToGrid(rect.x)
-                var gy = scriteDocument.structure.snapToGrid(rect.y)
-                var gw = scriteDocument.structure.snapToGrid(rect.width)
-                var gh = scriteDocument.structure.snapToGrid(rect.height)
+                var gx = Scrite.document.structure.snapToGrid(rect.x)
+                var gy = Scrite.document.structure.snapToGrid(rect.y)
+                var gw = Scrite.document.structure.snapToGrid(rect.width)
+                var gh = Scrite.document.structure.snapToGrid(rect.height)
                 annotation.geometry = Qt.rect(gx, gy, gw, gh)
             }
 
@@ -3388,7 +3395,7 @@ Item {
     }
 
     function createNewRectangleAnnotation(x, y, w, h) {
-        if(scriteDocument.readOnly)
+        if(Scrite.document.readOnly)
             return
 
         var doNotAlignRect = w && h
@@ -3399,7 +3406,7 @@ Item {
         var annot = annotationObject.createObject(canvas)
         annot.type = "rectangle"
         annot.geometry = rect
-        scriteDocument.structure.addAnnotation(annot)
+        Scrite.document.structure.addAnnotation(annot)
     }
 
     Component {
@@ -3411,7 +3418,7 @@ Item {
     }
 
     function createNewOvalAnnotation(x, y) {
-        if(scriteDocument.readOnly)
+        if(Scrite.document.readOnly)
             return
 
         var w = 80
@@ -3420,7 +3427,7 @@ Item {
         var annot = annotationObject.createObject(canvas)
         annot.type = "oval"
         annot.geometry = rect
-        scriteDocument.structure.addAnnotation(annot)
+        Scrite.document.structure.addAnnotation(annot)
     }
 
     Component {
@@ -3456,7 +3463,7 @@ Item {
     }
 
     function createNewTextAnnotation(x, y) {
-        if(scriteDocument.readOnly)
+        if(Scrite.document.readOnly)
             return
 
         var w = 200
@@ -3465,7 +3472,7 @@ Item {
         var annot = annotationObject.createObject(canvas)
         annot.type = "text"
         annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
-        scriteDocument.structure.addAnnotation(annot)
+        Scrite.document.structure.addAnnotation(annot)
     }
 
     Component {
@@ -3506,16 +3513,16 @@ Item {
     }
 
     function createNewUrlAnnotation(x, y) {
-        if(scriteDocument.readOnly)
+        if(Scrite.document.readOnly)
             return
 
         var w = 300
-        var h = 350 // app.isMacOSPlatform ? 60 : 350
+        var h = 350 // Scrite.app.isMacOSPlatform ? 60 : 350
 
         var annot = annotationObject.createObject(canvas)
         annot.type = "url"
         annot.geometry = Qt.rect(x-w/2, y-20, w, h)
-        scriteDocument.structure.addAnnotation(annot)
+        Scrite.document.structure.addAnnotation(annot)
     }
 
     Component {
@@ -3579,7 +3586,7 @@ Item {
                                     annotation.imageUrl(annotation.attributes.imageName)
                                 // Lets avoid using HTTPS for as long as possible
                                 // Want to avoid having to bundle OpenSSL with Scrite.
-                                return app.toHttpUrl(annotation.attributes.imageUrl)
+                                return Scrite.app.toHttpUrl(annotation.attributes.imageUrl)
                             }
                             onStatusChanged: {
                                 if(status === Image.Ready) {
@@ -3597,7 +3604,7 @@ Item {
 
                     Text {
                         font.bold: true
-                        font.pointSize: app.idealFontPointSize + 2
+                        font.pointSize: Scrite.app.idealFontPointSize + 2
                         text: annotation.attributes.title
                         width: parent.width
                         maximumLineCount: 2
@@ -3606,7 +3613,7 @@ Item {
                     }
 
                     Text {
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         text: annotation.attributes.description
                         width: parent.width
                         wrapMode: Text.WordWrap
@@ -3615,7 +3622,7 @@ Item {
                     }
 
                     Text {
-                        font.pointSize: app.idealFontPointSize - 2
+                        font.pointSize: Scrite.app.idealFontPointSize - 2
                         color: urlAttribs.status === UrlAttributes.Error ? "red" : "blue"
                         text: annotation.attributes.url
                         width: parent.width
@@ -3643,15 +3650,15 @@ Item {
                 anchors.margins: 10
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                font.pointSize: app.idealFontPointSize
-                text: app.isMacOSPlatform && annotationGripLoader.annotationItem !== urlAnnotItem ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
+                font.pointSize: Scrite.app.idealFontPointSize
+                text: Scrite.app.isMacOSPlatform && annotationGripLoader.annotationItem !== urlAnnotItem ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
                 visible: annotation.attributes.url === ""
             }
         }
     }
 
     function createNewImageAnnotation(x, y, filePath) {
-        if(scriteDocument.readOnly)
+        if(Scrite.document.readOnly)
             return
 
         var w = 300
@@ -3667,7 +3674,7 @@ Item {
             annot.attributes = attrs
         }
 
-        scriteDocument.structure.addAnnotation(annot)
+        Scrite.document.structure.addAnnotation(annot)
     }
 
     Component {
@@ -3703,7 +3710,7 @@ Item {
                 visible: height > 0
                 wrapMode: Text.WordWrap
                 elide: Text.ElideRight
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 text: image.isSet ? annotation.attributes.caption : (annotationGripLoader.annotationItem === imageAnnotItem ? "Set an image" : "Click to set an image")
                 color: annotation.attributes.captionColor
                 anchors.top: image.bottom
@@ -3722,7 +3729,7 @@ Item {
     }
 
     function createNewLineAnnotation(x, y, orientation) {
-        if(scriteDocument.readOnly)
+        if(Scrite.document.readOnly)
             return
 
         var w = 300
@@ -3739,7 +3746,7 @@ Item {
             h = 300
         }
         annot.geometry = Qt.rect(x-w/2, y-h/2, w, h)
-        scriteDocument.structure.addAnnotation(annot)
+        Scrite.document.structure.addAnnotation(annot)
     }
 
     Component {
@@ -3770,7 +3777,7 @@ Item {
     }
 
     function requestEditorLater() {
-        app.execLater(structureView, 100, function() { requestEditor() })
+        Scrite.app.execLater(structureView, 100, function() { requestEditor() })
     }
 
     Loader {
@@ -3790,5 +3797,5 @@ Item {
         }
     }
 
-    Component.onCompleted: User.logActivity1("structure")
+    Component.onCompleted: Scrite.user.logActivity1("structure")
 }

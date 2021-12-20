@@ -20,6 +20,7 @@
 #include <QUndoStack>
 #include <QJsonObject>
 #include <QQmlProperty>
+#include <QQmlEngine>
 
 #include "qobjectfactory.h"
 #include "garbagecollector.h"
@@ -28,6 +29,7 @@
 class UndoStack : public QUndoStack
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     UndoStack(QObject *parent = nullptr);
@@ -340,6 +342,8 @@ private:
 class UndoResult : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     UndoResult(QObject *parent = nullptr);
@@ -357,6 +361,7 @@ private:
 class UndoHandler : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     static QList<UndoHandler *> all();

@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
+import io.scrite.components 1.0
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
@@ -19,7 +19,7 @@ import QtQuick.Controls.Material 2.12
 Item {
     id: tabBarTab
     width: implicitTabSize
-    height: app.idealFontPointSize + 16
+    height: Scrite.app.idealFontPointSize + 16
 
     readonly property real tabTextWidth: tabText.width
     readonly property real implicitTabSize: tabTextWidth*1.1 + 2*tabShapeOffset
@@ -58,7 +58,7 @@ Item {
             id: tabText
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
             font.bold: tabBarTab.active
             rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
             Behavior on font.pixelSize {

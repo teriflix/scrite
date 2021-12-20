@@ -14,11 +14,13 @@
 import QtQml 2.13
 import QtQuick 2.13
 
+import io.scrite.components 1.0
+
 Text {
     property alias containsMouse: linkMouseArea.containsMouse
     signal clicked()
 
-    font.pointSize: app.idealFontPointSize
+    font.pointSize: Scrite.app.idealFontPointSize
     font.underline: true
     color: linkMouseArea.containsMouse ? hoverColor : defaultColor
 

@@ -31,6 +31,7 @@ class ImagePrinter : public QAbstractListModel,
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    QML_ELEMENT
 
 public:
     ImagePrinter(QObject *parent = nullptr);

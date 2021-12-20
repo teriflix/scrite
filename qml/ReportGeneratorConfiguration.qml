@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 import QtQml 2.13
 import QtQuick 2.13
@@ -33,7 +33,7 @@ Item {
         modalDialog.closeOnEscape = false
 
         var reportName = typeof modalDialog.arguments === "string" ? modalDialog.arguments : modalDialog.arguments.reportName
-        generator = scriteDocument.createReportGenerator(reportName)
+        generator = Scrite.document.createReportGenerator(reportName)
         if(generator === null) {
             modalDialog.closeable = true
             notice.text = "Report generator for '" + JSON.stringify(modalDialog.arguments) + "' could not be created."
@@ -286,7 +286,7 @@ Item {
                         modalDialog.close()
                     }
 
-                    EventFilter.target: app
+                    EventFilter.target: Scrite.app
                     EventFilter.events: [6]
                     EventFilter.onFilter: {
                         if(event.key === Qt.Key_Escape) {
@@ -314,9 +314,9 @@ Item {
 
                 onVisibleChanged: {
                     if(visible) {
-                        app.execLater(busyOverlay, 100, function() {
+                        Scrite.app.execLater(busyOverlay, 100, function() {
                             if(generator.generate()) {
-                                app.revealFileOnDesktop(generator.fileName)
+                                Scrite.app.revealFileOnDesktop(generator.fileName)
                                 modalDialog.close()
                             } else
                                 busyOverlay.visible = false
@@ -380,7 +380,7 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
             }
 
             Loader {
@@ -473,7 +473,7 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.rightMargin: 30
                 anchors.leftMargin: 5
-                charactersModel.array: charactersModel.stringListArray(scriteDocument.structure.characterNames)
+                charactersModel.array: charactersModel.stringListArray(Scrite.document.structure.characterNames)
             }
         }
     }
@@ -483,7 +483,7 @@ Item {
 
         Item {
             property var fieldInfo
-            property var allLocations: scriteDocument.structure.allLocations()
+            property var allLocations: Scrite.document.structure.allLocations()
             property var selectedLocations: []
 
             height: multipleLocationSelectorLayout.height
@@ -499,7 +499,7 @@ Item {
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
                     elide: Text.ElideRight
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                 }
 
                 Text {
@@ -525,7 +525,7 @@ Item {
                         FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                         delegate: CheckBox2 {
                             width: locationListView.width-1
-                            font.family: scriteDocument.formatting.defaultFont.family
+                            font.family: Scrite.document.formatting.defaultFont.family
                             text: modelData
                             onToggled: {
                                 var locs = selectedLocations
@@ -606,7 +606,7 @@ Item {
                     id: locFilter
                     width: parent.width - locTypeFilter.width - locTypeFilter.width
                     label: ""
-                    placeholderText: scriteDocument.structure.allLocations()[0] + " ..."
+                    placeholderText: Scrite.document.structure.allLocations()[0] + " ..."
                     property var items: parent.split(text)
                     font.capitalization: Font.AllUppercase
                 }
@@ -631,7 +631,7 @@ Item {
                 }
                 ListView {
                     id: sceneListView
-                    model: scriteDocument.screenplay
+                    model: Scrite.document.screenplay
                     clip: true
                     property var selectedSceneNumbers: []
                     property var selectedEpisodeNumbers: generator.episodeNumbers
@@ -686,8 +686,8 @@ Item {
                         CheckBox2 {
                             id: sceneCheckBox
                             width: parent.width-1
-                            font.pointSize: app.idealFontPointSize
-                            font.family: scriteDocument.formatting.defaultFont.family
+                            font.pointSize: Scrite.app.idealFontPointSize
+                            font.family: Scrite.document.formatting.defaultFont.family
                             visible: sceneListView.filter(screenplayElement.scene) && screenplayElement.scene && screenplayElement.scene.heading.enabled
                             text: {
                                 var scene = screenplayElement.scene
@@ -709,10 +709,10 @@ Item {
                 Button2 {
                     text: "Select All"
                     onClicked: {
-                        var count = scriteDocument.screenplay.elementCount
+                        var count = Scrite.document.screenplay.elementCount
                         var numbers = generator.getConfigurationValue(fieldInfo.name)
                         for(var i=0; i<count; i++) {
-                            var element = scriteDocument.screenplay.elementAt(i)
+                            var element = Scrite.document.screenplay.elementAt(i)
                             if( sceneListView.filter(element.scene) ) {
                                 if(numbers.indexOf(element.elementIndex) < 0)
                                     numbers.push(element.elementIndex)
@@ -726,10 +726,10 @@ Item {
                 Button2 {
                     text: "Unselect All"
                     onClicked: {
-                        var count = scriteDocument.screenplay.elementCount
+                        var count = Scrite.document.screenplay.elementCount
                         var numbers = generator.getConfigurationValue(fieldInfo.name)
                         for(var i=0; i<count; i++) {
-                            var element = scriteDocument.screenplay.elementAt(i)
+                            var element = Scrite.document.screenplay.elementAt(i)
                             if( sceneListView.filter(element.scene) ) {
                                 var idx = numbers.indexOf(element.elementIndex)
                                 if(idx >= 0)
@@ -742,7 +742,7 @@ Item {
                 }
 
                 Text {
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
                     anchors.verticalCenter: parent.verticalCenter
                     padding: 5
@@ -787,7 +787,7 @@ Item {
                 }
                 ListView {
                     id: episodeListView
-                    model: scriteDocument.screenplay.episodeCount + 1
+                    model: Scrite.document.screenplay.episodeCount + 1
                     clip: true
                     property var episodeNumbers: generator.getConfigurationValue(fieldInfo.name)
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
@@ -812,11 +812,11 @@ Item {
 
                     delegate: Item {
                         width: episodeListView.width-1
-                        height: index > 0 ? 40 : (scriteDocument.screenplay.episodeCount === 0 ? 40 : 0)
+                        height: index > 0 ? 40 : (Scrite.document.screenplay.episodeCount === 0 ? 40 : 0)
 
                         Text {
                             text: "No espisodes in this screenplay"
-                            visible: scriteDocument.screenplay.episodeCount === 0
+                            visible: Scrite.document.screenplay.episodeCount === 0
                             anchors.centerIn: parent
                         }
 
@@ -824,8 +824,8 @@ Item {
                             text: "EPISODE " + index
                             anchors.verticalCenter: parent.verticalCenter
                             visible: index > 0
-                            font.pointSize: app.idealFontPointSize
-                            font.family: scriteDocument.formatting.defaultFont.family
+                            font.pointSize: Scrite.app.idealFontPointSize
+                            font.family: Scrite.document.formatting.defaultFont.family
                             checked: episodeListView.episodeNumbers.indexOf(index) >= 0
                             onToggled: episodeListView.select(index, checked)
                         }
@@ -870,7 +870,7 @@ Item {
                     id: groupsView
                     clip: true
                     model: GenericArrayModel {
-                        array: scriteDocument.structure.groupsModel
+                        array: Scrite.document.structure.groupsModel
                         objectMembers: ["category", "label", "name"]
                     }
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
@@ -889,7 +889,7 @@ Item {
                                 bottomPadding: 5
                                 anchors.centerIn: parent
                                 color: primaryColors.button.text
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                             }
                         }
                     }
@@ -919,7 +919,7 @@ Item {
             property var fieldInfo
             text: fieldInfo.label
             checkable: true
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
             checked: generator ? generator.getConfigurationValue(fieldInfo.name) : false
             onToggled: generator ? generator.setConfigurationValue(fieldInfo.name, checked) : false
         }
@@ -961,14 +961,14 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 font.capitalization: Font.Capitalize
-                font.pointSize: app.idealFontPointSize-2
+                font.pointSize: Scrite.app.idealFontPointSize-2
             }
 
             Text {
                 text: fieldInfo.note
                 width: parent.width
                 wrapMode: Text.WordWrap
-                font.pointSize: app.idealFontPointSize-2
+                font.pointSize: Scrite.app.idealFontPointSize-2
                 font.italic: true
                 visible: text !== ""
             }
@@ -999,14 +999,14 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
             }
 
             Text {
                 text: fieldInfo.note
                 width: parent.width-10
                 wrapMode: Text.WordWrap
-                font.pointSize: app.idealFontPointSize-4
+                font.pointSize: Scrite.app.idealFontPointSize-4
                 font.italic: true
                 visible: text !== ""
             }

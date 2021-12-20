@@ -15,7 +15,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Flickable {
     property Item textArea: __textArea
@@ -44,7 +44,7 @@ Flickable {
         id: __textArea
         width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired && textAreaFlickable.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(textAreaFlickable.height-topPadding-bottomPadding, contentHeight+20)
-        font.pointSize: app.idealFontPointSize
+        font.pointSize: Scrite.app.idealFontPointSize
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         selectByMouse: true
         selectByKeyboard: true
@@ -54,7 +54,7 @@ Flickable {
         Transliterator.cursorPosition: cursorPosition
         Transliterator.hasActiveFocus: activeFocus
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
-        readOnly: scriteDocument.readOnly
+        readOnly: Scrite.document.readOnly
         KeyNavigation.tab: textAreaFlickable.tabItem
         KeyNavigation.backtab: textAreaFlickable.backTabItem
         KeyNavigation.priority: KeyNavigation.AfterItem
@@ -64,7 +64,7 @@ Flickable {
             anchors.left: parent.left
             textEditor: __textArea
             textEditorHasCursorInterface: true
-            enabled: !scriteDocument.readOnly
+            enabled: !Scrite.document.readOnly
         }
         UndoHandler {
             enabled: !__textArea.readOnly && __textArea.activeFocus && textAreaFlickable.undoRedoEnabled

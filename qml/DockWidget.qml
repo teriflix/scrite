@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: dockWidget
@@ -99,7 +99,7 @@ Item {
         property rect sourceGeometry: Qt.rect(0, 0, 100, 100)
         property rect targetGeometry: Qt.rect(contentX, contentY, contentWidth, contentHeight)
         property real t: 1
-        property real distance: app.distanceBetweenPoints( Qt.point(sourceGeometry.x,sourceGeometry.y), Qt.point(targetGeometry.x,targetGeometry.y) )
+        property real distance: Scrite.app.distanceBetweenPoints( Qt.point(sourceGeometry.x,sourceGeometry.y), Qt.point(targetGeometry.x,targetGeometry.y) )
 
         x: (sourceGeometry.x + (targetGeometry.x - sourceGeometry.x)*t)
         y: (sourceGeometry.y + (targetGeometry.y - sourceGeometry.y)*t)
@@ -117,7 +117,7 @@ Item {
             Text {
                 id: titleText
                 anchors.centerIn: parent
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 text: primaryColors.c300.text
             }
 
@@ -159,7 +159,7 @@ Item {
             clip: true
             transformOrigin: Item.TopLeft
             scale: parent.t
-            FocusTracker.window: qmlWindow
+            FocusTracker.window: Scrite.window
         }
     }
 

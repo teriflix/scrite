@@ -20,7 +20,12 @@ ShortcutsModel *ShortcutsModel::instance()
     return theInstance;
 }
 
-ShortcutsModel::ShortcutsModel(QObject *parent) : QAbstractListModel(parent) { }
+ShortcutsModel::ShortcutsModel(QObject *parent) : QAbstractListModel(parent)
+{
+    setGroups({ QStringLiteral("Application"), QStringLiteral("Formatting"),
+                QStringLiteral("Settings"), QStringLiteral("Language"), QStringLiteral("File"),
+                QStringLiteral("Edit") });
+}
 
 ShortcutsModel::~ShortcutsModel() { }
 

@@ -15,14 +15,15 @@
 #define URLATTRIBUTES_H
 
 #include <QUrl>
-#include <QObject>
 #include <QPointer>
+#include <QQmlEngine>
 #include <QJsonObject>
 #include <QNetworkReply>
 
 class UrlAttributes : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     UrlAttributes(QObject *parent = nullptr);

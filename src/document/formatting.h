@@ -35,6 +35,8 @@ class ScreenplayFormat;
 class SceneElementFormat : public QObject, public Modifiable
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~SceneElementFormat();
@@ -182,6 +184,8 @@ private:
 class ScreenplayPageLayout : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ScreenplayPageLayout(ScreenplayFormat *parent = nullptr);
@@ -288,6 +292,8 @@ private:
 class ScreenplayFormat : public QAbstractListModel, public Modifiable
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ScreenplayFormat(QObject *parent = nullptr);
@@ -413,6 +419,8 @@ private:
 class TextFormat : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     TextFormat(QObject *parent = nullptr);
@@ -471,6 +479,7 @@ class SceneDocumentBinder : public QSyntaxHighlighter, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    QML_ELEMENT
 
 public:
     SceneDocumentBinder(QObject *parent = nullptr);

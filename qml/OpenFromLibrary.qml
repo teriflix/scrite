@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: importFromLibraryUi
@@ -65,7 +65,7 @@ Item {
 
         Text {
             text: pageView.pagesArray[pageView.currentIndex].disclaimer
-            font.pointSize: app.idealFontPointSize-2
+            font.pointSize: Scrite.app.idealFontPointSize-2
             width: parent.width * 0.9
             wrapMode: Text.WordWrap
             anchors.horizontalCenter: parent.horizontalCenter
@@ -90,7 +90,7 @@ Item {
             importFromLibraryUi.importStarted()
         }
         onImportFinished: {
-            app.execLater(libraryService, 250, function() {
+            Scrite.app.execLater(libraryService, 250, function() {
                 importFromLibraryUi.importFinished()
                 modalDialog.close()
             })
@@ -107,8 +107,8 @@ Item {
         pageListWidth: 180
 
         pagesArray: [
-            { "kind": "Screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>.", appFeature: UserType.ScriptalayFeature },
-            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com.", appFeature: UserType.TemplateFeature }
+            { "kind": "Screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>.", appFeature: Scrite.ScriptalayFeature },
+            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com.", appFeature: Scrite.TemplateFeature }
         ]
 
         pageTitleRole: "title"
@@ -181,7 +181,7 @@ Item {
 
                 Text {
                     text: loader.item.statusText
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     anchors.left: parent.left
                     anchors.right: rightButtons.left
                     anchors.verticalCenter: parent.verticalCenter
@@ -293,7 +293,7 @@ Item {
                         Text {
                             id: description
                             width: parent.width-20
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             anchors.centerIn: parent
                             wrapMode: Text.WordWrap
                             color: primaryColors.c600.text
@@ -349,7 +349,7 @@ Item {
                             spacing: 5
 
                             Text {
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 font.bold: true
                                 text: record.name
                                 width: parent.width
@@ -359,7 +359,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-1
+                                font.pointSize: Scrite.app.idealFontPointSize-1
                                 text: record.authors
                                 width: parent.width
                                 wrapMode: Text.WordWrap
@@ -368,7 +368,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-3
+                                font.pointSize: Scrite.app.idealFontPointSize-3
                                 text: record.pageCount + " Pages"
                                 width: parent.width
                                 elide: Text.ElideRight
@@ -469,7 +469,7 @@ Item {
                         Text {
                             id: description
                             width: parent.width-20
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             anchors.centerIn: parent
                             wrapMode: Text.WordWrap
                             color: primaryColors.c600.text
@@ -534,7 +534,7 @@ Item {
                             spacing: 5
 
                             Text {
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 font.bold: true
                                 text: record.name
                                 width: parent.width
@@ -544,7 +544,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-1
+                                font.pointSize: Scrite.app.idealFontPointSize-1
                                 text: record.authors
                                 width: parent.width
                                 wrapMode: Text.WordWrap
@@ -553,7 +553,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-3
+                                font.pointSize: Scrite.app.idealFontPointSize-3
                                 text: "More Info"
                                 font.underline: true
                                 width: parent.width

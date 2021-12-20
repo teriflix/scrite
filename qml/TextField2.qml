@@ -15,7 +15,7 @@ import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 TextField {
     id: textField
@@ -41,7 +41,7 @@ TextField {
     selectedTextColor: accentColors.c700.text
     selectionColor: accentColors.c700.background
     selectByMouse: true
-    font.pointSize: app.idealFontPointSize
+    font.pointSize: Scrite.app.idealFontPointSize
 
     signal editingComplete()
     signal returnPressed()
@@ -133,7 +133,7 @@ TextField {
         if(includingLastWord === undefined)
             includingLastWord = false
         if(enableTransliteration & userTypedSomeText) {
-            var newText = app.transliterationEngine.transliteratedParagraph(text, includingLastWord)
+            var newText = Scrite.app.transliterationEngine.transliteratedParagraph(text, includingLastWord)
             if(text === newText)
                 return
             userTypedSomeText = false
@@ -153,7 +153,7 @@ TextField {
     Text {
         id: labelText
         text: parent.placeholderText
-        font.pointSize: 2*app.idealFontPointSize/3
+        font.pointSize: 2*Scrite.app.idealFontPointSize/3
         anchors.left: parent.left
         anchors.verticalCenter: parent.top
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""

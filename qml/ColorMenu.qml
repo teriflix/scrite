@@ -14,6 +14,8 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
+import io.scrite.components 1.0
+
 Menu2 {
     id: colorMenu
     width: minCellSize * 5 + 10
@@ -37,7 +39,7 @@ Menu2 {
             columns: Math.floor(width / minCellSize)
 
             Repeater {
-                model: app.standardColors.concat(workspaceSettings.customColors)
+                model: Scrite.app.standardColors.concat(workspaceSettings.customColors)
                 delegate: colorItemDelegate
             }
 
@@ -47,7 +49,7 @@ Menu2 {
                 suggestedHeight: colorGrid.cellSize
                 ToolTip.text: "Pick a custom color"
                 onClicked: {
-                    var color = app.pickColor("white")
+                    var color = Scrite.app.pickColor("white")
                     var colors = workspaceSettings.customColors
                     colors.unshift(color)
                     if(colors.length > 10)
@@ -67,7 +69,7 @@ Menu2 {
         Rectangle {
             width: parent.cellSize
             height: parent.cellSize
-            color: (colorGrid.currentIndex === index) ? app.translucent(app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+            color: (colorGrid.currentIndex === index) ? Scrite.app.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
             Component.onCompleted: {
                 if(modelData == selectedColor)
                     colorGrid.currentIndex = index

@@ -55,6 +55,48 @@
 
 bool QtApplicationEventNotificationCallback(void **cbdata);
 
+void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context,
+                                 const QString &message)
+{
+#ifdef QT_NO_DEBUG
+    Q_UNUSED(type)
+    Q_UNUSED(context)
+    Q_UNUSED(message)
+#else
+    QString logMessage;
+
+    QTextStream ts(&logMessage, QIODevice::WriteOnly);
+    switch (type) {
+    case QtDebugMsg:
+        ts << "Debug: ";
+        break;
+    case QtWarningMsg:
+        ts << "Warning: ";
+        break;
+    case QtCriticalMsg:
+        ts << "Critical: ";
+        break;
+    case QtFatalMsg:
+        ts << "Fatal: ";
+        break;
+    case QtInfoMsg:
+        ts << "Info: ";
+        break;
+    }
+
+    const char *where = context.function ? context.function : context.file;
+    static const char *somewhere = "Somewhere";
+    if (where == nullptr)
+        where = somewhere;
+
+    ts << "[" << where << " / " << context.line << "] - ";
+    ts << message;
+    ts.flush();
+
+    fprintf(stderr, "%s\n", qPrintable(logMessage));
+#endif
+}
+
 Application *Application::instance()
 {
     return qobject_cast<Application *>(qApp);
@@ -138,6 +180,56 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
             &Application::internetAvailableChanged);
 
     QtConcurrent::run(&Application::systemFontInfo);
+
+    this->setWindowIcon(QIcon(QStringLiteral(":/images/appicon.png")));
+    this->computeIdealFontPointSize();
+}
+
+QVersionNumber Application::prepare()
+{
+    const QVersionNumber applicationVersion(0, 8, 1);
+
+    if (qApp != nullptr)
+        return applicationVersion;
+
+    qInstallMessageHandler(ApplicationQtMessageHandler);
+
+    Application::setApplicationName(QStringLiteral("Scrite"));
+    Application::setOrganizationName(QStringLiteral("TERIFLIX"));
+    Application::setOrganizationDomain(QStringLiteral("teriflix.com"));
+
+#ifdef Q_OS_MAC
+    Application::setApplicationVersion(applicationVersion.toString() + QStringLiteral("-beta"));
+    if (QOperatingSystemVersion::current() > QOperatingSystemVersion::MacOSCatalina)
+        qputenv("QT_MAC_WANTS_LAYER", QByteArrayLiteral("1"));
+#else
+    if (QSysInfo::WordSize == 32)
+        Application::setApplicationVersion(applicationVersion.toString() + "-beta-x86");
+    else
+        Application::setApplicationVersion(applicationVersion.toString() + "-beta-x64");
+#endif
+
+#ifdef Q_OS_WIN
+    // Maybe helps address https://www.github.com/teriflix/scrite/issues/247
+    const QByteArray dpiMode = qgetenv("SCRITE_DPI_MODE");
+    if (dpiMode == QByteArrayLiteral("HIGH_DPI")) {
+        Application::setAttribute(Qt::AA_EnableHighDpiScaling);
+        Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    } else if (dpiMode == QByteArrayLiteral("96_DPI_ONLY")) {
+        Application::setAttribute(Qt::AA_Use96Dpi);
+        Application::setAttribute(Qt::AA_DisableHighDpiScaling);
+    } else
+        Application::setAttribute(Qt::AA_Use96Dpi);
+    Application::setAttribute(Qt::AA_UseDesktopOpenGL);
+#endif
+
+    QPalette palette = Application::palette();
+    palette.setColor(QPalette::Active, QPalette::Highlight, QColor::fromRgbF(0, 0.4, 1));
+    palette.setColor(QPalette::Active, QPalette::HighlightedText, QColor(Qt::white));
+    palette.setColor(QPalette::Active, QPalette::Text, QColor(Qt::black));
+    Application::setPalette(palette);
+
+    return applicationVersion;
 }
 
 Application::~Application()

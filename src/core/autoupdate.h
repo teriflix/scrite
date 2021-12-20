@@ -16,6 +16,7 @@
 
 #include <QUrl>
 #include <QObject>
+#include <QQmlEngine>
 #include <QJsonObject>
 
 #include "execlatertimer.h"
@@ -23,6 +24,8 @@
 class AutoUpdate : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static AutoUpdate *instance();
@@ -78,5 +81,7 @@ private:
     QJsonObject m_surveyInfo;
     ExecLaterTimer m_updateTimer;
 };
+
+QML_DECLARE_TYPE(AutoUpdate)
 
 #endif // AUTOUPDATE_H

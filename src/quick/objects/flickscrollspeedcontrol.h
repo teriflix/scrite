@@ -23,6 +23,9 @@
 class FlickScrollSpeedControl : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_ATTACHED(FlickScrollSpeedControl)
+    QML_UNCREATABLE("Use as attached property.")
 
 public:
     FlickScrollSpeedControl(QObject *parent = nullptr);
@@ -74,8 +77,5 @@ private:
     qreal m_maximumVelocityFactor = -1.0;
     qreal m_flickDecelerationFactor = -1.0;
 };
-
-Q_DECLARE_METATYPE(FlickScrollSpeedControl *)
-QML_DECLARE_TYPEINFO(FlickScrollSpeedControl, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // FLICKSCROLLSPEEDCONTROL_H

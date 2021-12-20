@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: configurationBox
@@ -33,12 +33,12 @@ Item {
     Component.onCompleted: {
         modalDialog.closeOnEscape = false
 
-        exporter = typeof modalDialog.arguments === "string" ? scriteDocument.createExporter(modalDialog.arguments) : modalDialog.arguments
+        exporter = typeof modalDialog.arguments === "string" ? Scrite.document.createExporter(modalDialog.arguments) : modalDialog.arguments
         if(exporter === null) {
             modalDialog.closeable = true
             var exportKind = modalDialog.arguments.split("/").last()
             notice.text = exportKind + " Export"
-        } else if(app.verifyType(exporter, "StructureExporter"))
+        } else if(Scrite.app.verifyType(exporter, "StructureExporter"))
             mainTabBar.currentIndex = 1 // FIXME: Ugly hack to ensure that structure tab is active for StructureExporter.
         modalDialog.arguments = undefined
     }
@@ -110,7 +110,7 @@ Item {
                             width: parent.width
                             label: Text {
                                 text: "Export fonts for the following languages"
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                             }
                             height: languageBundleView.height+45
 
@@ -122,7 +122,7 @@ Item {
                                 columns: 3
 
                                 Repeater {
-                                    model: app.enumerationModel(app.transliterationEngine, "Language")
+                                    model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
                                     delegate: CheckBox2 {
                                         width: languageBundleView.width/languageBundleView.columns
                                         checkable: true
@@ -130,7 +130,7 @@ Item {
                                         text: modelData.key
                                         onToggled: exporter.bundleFontForLanguage(modelData.value,checked)
                                         TabSequenceItem.manager: tabSequence
-                                        font.pointSize: app.idealFontPointSize
+                                        font.pointSize: Scrite.app.idealFontPointSize
                                     }
                                 }
                             }
@@ -174,7 +174,7 @@ Item {
                         modalDialog.close()
                     }
 
-                    EventFilter.target: app
+                    EventFilter.target: Scrite.app
                     EventFilter.events: [6]
                     EventFilter.onFilter: {
                         if(event.key === Qt.Key_Escape) {
@@ -200,9 +200,9 @@ Item {
 
                 onVisibleChanged: {
                     if(visible) {
-                        app.execLater(busyOverlay, 100, function() {
+                        Scrite.app.execLater(busyOverlay, 100, function() {
                             if(exporter.write()) {
-                                app.revealFileOnDesktop(exporter.fileName)
+                                Scrite.app.revealFileOnDesktop(exporter.fileName)
                                 modalDialog.close()
                             } else
                                 busyOverlay.visible = false
@@ -243,7 +243,7 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
             }
 
             SpinBox {
@@ -272,7 +272,7 @@ Item {
                 checkable: true
                 checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
                 onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 TabSequenceItem.manager: tabSequence
             }
 
@@ -281,7 +281,7 @@ Item {
                 wrapMode: Text.WordWrap
                 leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
                 text: fieldInfo.note
-                font.pointSize: app.idealFontPointSize-2
+                font.pointSize: Scrite.app.idealFontPointSize-2
                 color: primaryColors.c600.background
                 visible: fieldInfo.note !== ""
             }
@@ -298,7 +298,7 @@ Item {
             Text {
                 text: fieldInfo.name
                 font.capitalization: Font.Capitalize
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
             }
 
             TextField2 {

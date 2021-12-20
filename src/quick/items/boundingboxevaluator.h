@@ -40,6 +40,7 @@ class BoundingBoxItem;
 class BoundingBoxEvaluator : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     BoundingBoxEvaluator(QObject *parent = nullptr);
@@ -135,6 +136,8 @@ private:
 class BoundingBoxItem : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     BoundingBoxItem(QObject *parent = nullptr);
@@ -251,6 +254,7 @@ private:
 class BoundingBoxPreview : public QQuickPaintedItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     BoundingBoxPreview(QQuickItem *parent = nullptr);

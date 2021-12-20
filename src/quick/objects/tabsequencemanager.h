@@ -25,6 +25,7 @@ class TabSequenceItem;
 class TabSequenceManager : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TabSequenceManager(QObject *parent = nullptr);
@@ -114,6 +115,9 @@ private:
 class TabSequenceItem : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(TabSequenceItem)
 
 public:
     ~TabSequenceItem();
@@ -161,7 +165,5 @@ private:
     int m_insertIndex = -1;
     QObjectProperty<TabSequenceManager> m_manager;
 };
-Q_DECLARE_METATYPE(TabSequenceItem *)
-QML_DECLARE_TYPEINFO(TabSequenceItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // TABSEQUENCEMANAGER_H

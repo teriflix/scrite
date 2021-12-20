@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Loader {
     id: menuLoader
@@ -42,7 +42,7 @@ Loader {
     function dismiss() {
         if(item)
             item.dismiss()
-        app.execLater( menuLoader, 0, function() { menuLoader.active = false } )
+        Scrite.app.execLater( menuLoader, 0, function() { menuLoader.active = false } )
     }
 
     function close() { dismiss() }
@@ -54,7 +54,7 @@ Loader {
 
     onItemChanged: {
         if( item ) {
-            if( app.verifyType(item, "QQuickMenu") ) {
+            if( Scrite.app.verifyType(item, "QQuickMenu") ) {
                 item.enabled = false
                 if(itemInitMode === "popup")
                     item.popup()
@@ -78,7 +78,7 @@ Loader {
     Connections {
         target: menuLoader.item
         ignoreUnknownSignals: true
-        onVisibleChanged: menuLoader.dismiss()
+        function onVisibleChanged() { menuLoader.dismiss() }
     }
 
     property string itemInitMode: "show"

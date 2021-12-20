@@ -21,6 +21,8 @@
 class AbstractExporter : public AbstractDeviceIO
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~AbstractExporter();

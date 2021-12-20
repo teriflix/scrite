@@ -13,7 +13,7 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: selection
@@ -171,7 +171,7 @@ Item {
         }
     }
 
-    EventFilter.target: app
+    EventFilter.target: Scrite.app
     EventFilter.active: hasItems && !modalDialog.active && !floatingDockWidget.contentHasFocus
     EventFilter.events: [EventFilter.KeyPress]
     EventFilter.onFilter: {
@@ -210,8 +210,8 @@ Item {
 
     Rectangle {
         id: tightRect
-        color: app.translucent(app.palette.highlight,0.2)
-        border { width: 2; color: app.palette.highlight }
+        color: Scrite.app.translucent(Scrite.app.palette.highlight,0.2)
+        border { width: 2; color: Scrite.app.palette.highlight }
         visible: parent.items.length > 0
 
         property point topLeft: Qt.point(0,0)
@@ -241,7 +241,7 @@ Item {
             topLeft = Qt.point(x,y)
             for(i=0; i<elements.length; i++)
                 selection.moveItem(elements[i], dx, dy)
-            scriteDocument.structure.forceBeatBoardLayout = false
+            Scrite.document.structure.forceBeatBoardLayout = false
         }
 
         MenuLoader {

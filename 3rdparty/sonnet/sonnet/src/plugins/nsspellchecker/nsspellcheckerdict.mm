@@ -26,15 +26,20 @@
 using namespace Sonnet;
 
 NSSpellCheckerDict::NSSpellCheckerDict(const QString &lang)
-    : SpellerPlugin(lang)
-    , m_langCode([lang.toNSString() retain])
+    : SpellerPlugin(lang), m_langCode([lang.toNSString() retain])
 {
-    NSSpellChecker *checker = [NSSpellChecker sharedSpellChecker];
-    if ([checker setLanguage:m_langCode]) {
-        qCDebug(SONNET_NSSPELLCHECKER) << "Loading dictionary for" << lang;
-        [checker updatePanels];
-    } else {
-        qCWarning(SONNET_NSSPELLCHECKER) << "Loading dictionary for unsupported language" << lang;
+    const bool spellCheckerExists = [NSSpellChecker sharedSpellCheckerExists];
+    if (!spellCheckerExists)
+        qCWarning(SONNET_NSSPELLCHECKER) << "Shared spell checker instance not found for: " << lang;
+    else {
+        NSSpellChecker *checker = [NSSpellChecker sharedSpellChecker];
+        if ([checker setLanguage:m_langCode]) {
+            qCDebug(SONNET_NSSPELLCHECKER) << "Loading dictionary for" << lang;
+            [checker updatePanels];
+        } else {
+            qCWarning(SONNET_NSSPELLCHECKER)
+                    << "Loading dictionary for unsupported language" << lang;
+        }
     }
 }
 
@@ -45,11 +50,18 @@ NSSpellCheckerDict::~NSSpellCheckerDict()
 
 bool NSSpellCheckerDict::isCorrect(const QString &word) const
 {
+    const bool spellCheckerExists = [NSSpellChecker sharedSpellCheckerExists];
+    if (!spellCheckerExists)
+        return true;
+
     NSString *nsWord = word.toNSString();
     NSSpellChecker *checker = [NSSpellChecker sharedSpellChecker];
     NSRange range = [checker checkSpellingOfString:nsWord
-        startingAt:0 language:m_langCode
-        wrap:NO inSpellDocumentWithTag:0 wordCount:nullptr];
+                                        startingAt:0
+                                          language:m_langCode
+                                              wrap:NO
+                            inSpellDocumentWithTag:0
+                                         wordCount:nullptr];
     if (range.length == 0) {
         // Check if the user configured a replacement text for this string. Sadly
         // we can only signal an error if that's the case, Sonnet has no other way
@@ -65,10 +77,16 @@ bool NSSpellCheckerDict::isCorrect(const QString &word) const
 
 QStringList NSSpellCheckerDict::suggest(const QString &word) const
 {
+    const bool spellCheckerExists = [NSSpellChecker sharedSpellCheckerExists];
+    if (!spellCheckerExists)
+        return QStringList();
+
     NSString *nsWord = word.toNSString();
     NSSpellChecker *checker = [NSSpellChecker sharedSpellChecker];
     NSArray *suggestions = [checker guessesForWordRange:NSMakeRange(0, word.length())
-        inString:nsWord language:m_langCode inSpellDocumentWithTag:0];
+                                               inString:nsWord
+                                               language:m_langCode
+                                 inSpellDocumentWithTag:0];
     QStringList lst;
     NSDictionary *replacements = [checker userReplacementsDictionary];
     QString replacement;
@@ -88,8 +106,7 @@ QStringList NSSpellCheckerDict::suggest(const QString &word) const
     return lst;
 }
 
-bool NSSpellCheckerDict::storeReplacement(const QString &bad,
-                                    const QString &good)
+bool NSSpellCheckerDict::storeReplacement(const QString &bad, const QString &good)
 {
     qCDebug(SONNET_NSSPELLCHECKER) << "Not storing replacement" << good << "for" << bad;
     return false;
@@ -97,6 +114,10 @@ bool NSSpellCheckerDict::storeReplacement(const QString &bad,
 
 bool NSSpellCheckerDict::addToPersonal(const QString &word)
 {
+    const bool spellCheckerExists = [NSSpellChecker sharedSpellCheckerExists];
+    if (!spellCheckerExists)
+        return false;
+
     NSString *nsWord = word.toNSString();
     NSSpellChecker *checker = [NSSpellChecker sharedSpellChecker];
     if (![checker hasLearnedWord:nsWord]) {

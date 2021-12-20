@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Menu {
     id: thisMenu
@@ -27,7 +27,7 @@ Menu {
 
     Connections {
         target: dialogUnderlay
-        onVisibleChanged: {
+        function onVisibleChanged() {
             if(dialogUnderlay.visible)
                 thisMenu.close()
         }

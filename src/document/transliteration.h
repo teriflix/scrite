@@ -37,6 +37,8 @@ class QQuickTextDocument;
 class TransliterationEngine : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static TransliterationEngine *instance(QCoreApplication *app = nullptr);
@@ -161,6 +163,9 @@ private:
 class Transliterator : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(Transliterator)
 
 public:
     ~Transliterator();
@@ -235,8 +240,6 @@ private:
     bool m_textDocumentUndoRedoEnabled = false;
     QObjectProperty<QQuickTextDocument> m_textDocument;
 };
-Q_DECLARE_METATYPE(Transliterator *)
-QML_DECLARE_TYPEINFO(Transliterator, QML_HAS_ATTACHED_PROPERTIES)
 
 class TransliterationEvent : public QEvent
 {
@@ -264,6 +267,7 @@ private:
 class TransliteratedText : public QQuickPaintedItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     TransliteratedText(QQuickItem *parent = nullptr);

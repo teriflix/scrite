@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: userLogin
@@ -32,7 +32,7 @@ Item {
     Image {
         id: profilePic
         property int counter: 0
-        source: User.loggedIn ? "image://userIcon/me" + counter : "image://userIcon/default"
+        source: Scrite.user.loggedIn ? "image://userIcon/me" + counter : "image://userIcon/default"
         x: 20
         height: parent.height
         width: parent.height
@@ -40,11 +40,11 @@ Item {
         mipmap: true
         fillMode: Image.PreserveAspectFit
         transformOrigin: Item.Right
-        ToolTip.text: User.loggedIn ? "Account Information" : "Login"
+        ToolTip.text: Scrite.user.loggedIn ? "Account Information" : "Login"
 
         BusyIndicator {
-            visible: User.busy
-            running: User.busy
+            visible: Scrite.user.busy
+            running: Scrite.user.busy
             anchors.centerIn: parent
             onRunningChanged: parent.counter = parent.counter+1
         }
@@ -68,9 +68,9 @@ Item {
     }
 
     Connections {
-        target: User
+        target: Scrite.user
         enabled: privateData.showLoginWizardOnForceLoginRequest
-        onForceLoginRequest: {
+        function onForceLoginRequest() {
             if(privateData.showLoginWizardOnForceLoginRequest) {
                 if(splashLoader.active)
                     splashLoader.activeChanged.connect( () => {
@@ -141,10 +141,10 @@ Item {
                     case e_USER_INSTALLATIONS_PAGE: return loginWizardUserInstallationsPage
                     default: break
                     }
-                    return User.busy ? loginWizardBusyPage : (User.loggedIn ? loginWizardUserProfilePage : loginWizardEmailPage)
+                    return Scrite.user.busy ? loginWizardBusyPage : (Scrite.user.loggedIn ? loginWizardUserProfilePage : loginWizardEmailPage)
                 }
 
-                Component.onCompleted: page = User.busy ? e_BUSY_PAGE : (User.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
+                Component.onCompleted: page = Scrite.user.busy ? e_BUSY_PAGE : (Scrite.user.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
 
                 Announcement.onIncoming: {
                     const stype = "" + type
@@ -173,9 +173,9 @@ Item {
             }
 
             Timer {
-                running: !User.busy
+                running: !Scrite.user.busy
                 interval: 100
-                onTriggered: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", User.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
+                onTriggered: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", Scrite.user.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
             }
         }
     }
@@ -203,7 +203,7 @@ Item {
                     Text {
                         width: parent.width
                         wrapMode: Text.WordWrap
-                        font.pointSize: app.idealFontPointSize + 4
+                        font.pointSize: Scrite.app.idealFontPointSize + 4
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Signup / login with your email to unlock Structure, Notebook and many more features in Scrite."
@@ -215,7 +215,7 @@ Item {
                         id: emailField
                         width: parent.width
                         placeholderText: length > 0 && acceptableInput ? "Hit Return to Continue" : "Enter Email ID and hit Return"
-                        font.pointSize: app.idealFontPointSize + 4
+                        font.pointSize: Scrite.app.idealFontPointSize + 4
                         text: sendActivationCodeCall.email()
                         validator: RegExpValidator {
                             regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -259,7 +259,7 @@ Item {
                             anchors.topMargin: 20
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
-                            font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                            font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                             maximumLineCount: 3
                             color: "red"
                             text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
@@ -345,7 +345,7 @@ Item {
                         id: activationCodeField
                         width: parent.width
                         placeholderText: "Paste the activation code here..."
-                        font.pointSize: app.idealFontPointSize + 2
+                        font.pointSize: Scrite.app.idealFontPointSize + 2
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
                         Component.onCompleted: forceActiveFocus()
@@ -355,7 +355,7 @@ Item {
                     Text {
                         width: parent.width * 0.8
                         wrapMode: Text.WordWrap
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "We have emailed an activation code to <b>" + activateCall.fetch("email") + "</b>."
@@ -384,7 +384,7 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                     maximumLineCount: 3
                     color: "red"
                     text: activateCall.hasError ? (activateCall.errorCode + ": " + activateCall.errorText) : ""
@@ -434,7 +434,7 @@ Item {
 
                     store("loginToken", responseData.loginToken)
                     store("sessionToken", responseData.sessionToken)
-                    User.reload()
+                    Scrite.user.reload()
                     Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_PROFILE_PAGE)
                 }
                 onBusyChanged: modalDialog.closeable = !busy
@@ -447,16 +447,16 @@ Item {
 
         Item {
             property string pageTitle: {
-                if(User.loggedIn) {
-                    if(User.info.firstName && User.info.firstName !== "")
-                        return "Hi, " + User.info.firstName + "."
-                    if(User.info.lastName && User.info.lastName !== "")
-                        return "Hi, " + User.info.lastName + "."
+                if(Scrite.user.loggedIn) {
+                    if(Scrite.user.info.firstName && Scrite.user.info.firstName !== "")
+                        return "Hi, " + Scrite.user.info.firstName + "."
+                    if(Scrite.user.info.lastName && Scrite.user.info.lastName !== "")
+                        return "Hi, " + Scrite.user.info.lastName + "."
                 }
                 return "Hi, there."
             }
 
-            property bool userLoggedIn: User.loggedIn
+            property bool userLoggedIn: Scrite.user.loggedIn
             onUserLoggedInChanged: {
                 if(!userLoggedIn)
                     Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
@@ -485,18 +485,18 @@ Item {
                         Text {
                             width: parent.width
                             wrapMode: Text.WordWrap
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             horizontalAlignment: Text.AlignHCenter
                             anchors.horizontalCenter: parent.horizontalCenter
-                            visible: User.loggedIn
-                            text: "You're currently logged in via <b>" + User.info.email + "</b>."
+                            visible: Scrite.user.loggedIn
+                            text: "You're currently logged in via <b>" + Scrite.user.info.email + "</b>."
                         }
 
                         Link {
                             width: parent.width
                             anchors.horizontalCenter: parent.horizontalCenter
                             horizontalAlignment: Text.AlignHCenter
-                            font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                            font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                             text: "Review Your Scrite Installations »"
                             onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_INSTALLATIONS_PAGE)
                         }
@@ -517,7 +517,7 @@ Item {
                             id: nameField
                             width: (parent.width-parent.columnSpacing)/2
                             placeholderText: "Name"
-                            text: User.fullName
+                            text: Scrite.user.fullName
                             Component.onCompleted: forceActiveFocus()
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 0
@@ -530,7 +530,7 @@ Item {
                         TextField2 {
                             id: experienceField
                             width: (parent.width-parent.columnSpacing)/2
-                            text: User.experience
+                            text: Scrite.user.experience
                             placeholderText: "Experience"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 1
@@ -547,13 +547,13 @@ Item {
                         TextField2 {
                             id: locationField
                             width: (parent.width-parent.columnSpacing)/2
-                            text: User.location
+                            text: Scrite.user.location
                             placeholderText: "Location (City, Country)"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 2
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
-                            completionStrings: User.locations
+                            completionStrings: Scrite.user.locations
                             minimumCompletionPrefixLength: 0
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()
                             undoRedoEnabled: true
@@ -562,7 +562,7 @@ Item {
                         TextField2 {
                             id: wdyhasField
                             width: (parent.width-parent.columnSpacing)/2
-                            text: User.wdyhas
+                            text: Scrite.user.wdyhas
                             placeholderText: "Where did you hear about Scrite?"
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 3
@@ -590,7 +590,7 @@ Item {
 
                         CheckBox2 {
                             id: chkAnalyticsConsent
-                            checked: User.info.consent.activity
+                            checked: Scrite.user.info.consent.activity
                             text: "Send analytics data."
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 4
@@ -599,7 +599,7 @@ Item {
 
                         CheckBox2 {
                             id: chkEmailConsent
-                            checked: User.info.consent.email
+                            checked: Scrite.user.info.consent.email
                             text: "Send marketing email."
                             TabSequenceItem.manager: userInfoFields
                             TabSequenceItem.sequence: 5
@@ -609,12 +609,12 @@ Item {
                 }
             }
 
-            property bool needsSaving: nameField.text.trim() !== User.fullName ||
-                                       locationField.text.trim() !== User.location ||
-                                       experienceField.text.trim() !== User.experience ||
-                                       wdyhasField.text.trim() !== User.wdyhas ||
-                                       chkAnalyticsConsent.checked !== User.info.consent.activity ||
-                                       chkEmailConsent.checked !== User.info.consent.email
+            property bool needsSaving: nameField.text.trim() !== Scrite.user.fullName ||
+                                       locationField.text.trim() !== Scrite.user.location ||
+                                       experienceField.text.trim() !== Scrite.user.experience ||
+                                       wdyhasField.text.trim() !== Scrite.user.wdyhas ||
+                                       chkAnalyticsConsent.checked !== Scrite.user.info.consent.activity ||
+                                       chkEmailConsent.checked !== Scrite.user.info.consent.email
             onNeedsSavingChanged: modalDialog.closeable = !needsSaving
             Component.onCompleted: modalDialog.closeable = !needsSaving
 
@@ -635,14 +635,14 @@ Item {
 
                 Link {
                     text: needsSaving ? "Cancel" : "Logout"
-                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                     opacity: needsSaving ? 0.85 : 1
                     onClicked: {
                         if(needsSaving) {
                             Announcement.shout("76281526-A16C-4414-8129-AD8770A17F16", undefined)
                         } else {
-                            User.logout()
-                            if(!User.loggedIn)
+                            Scrite.user.logout()
+                            if(!Scrite.user.loggedIn)
                                 Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
                         }
                     }
@@ -651,7 +651,7 @@ Item {
                 Link {
                     text: "Privacy Policy"
                     opacity: needsSaving ? 0.5 : 1
-                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                     anchors.right: parent.right
                     onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
                 }
@@ -670,7 +670,7 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                     maximumLineCount: 3
                     color: "red"
                     text: {
@@ -678,7 +678,7 @@ Item {
                             return userError.details && userError.details.code && userError.details.message ? (userError.details.code + ": " + userError.details.message) : ""
                         return ""
                     }
-                    property ErrorReport userError: Aggregation.findErrorReport(User)
+                    property ErrorReport userError: Aggregation.findErrorReport(Scrite.user)
                 }
 
                 Image {
@@ -686,7 +686,7 @@ Item {
                     height: parent.height
                     fillMode: Image.PreserveAspectFit
                     anchors.centerIn: parent
-                    visible: User.info.discordInviteUrl && User.info.discordInviteUrl !== "" && errorText.text === ""
+                    visible: Scrite.user.info.discordInviteUrl && Scrite.user.info.discordInviteUrl !== "" && errorText.text === ""
                     enabled: visible
                     opacity: needsSaving ? 0.5 : 1
                     mipmap: true
@@ -694,7 +694,7 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Qt.openUrlExternally(User.info.discordInviteUrl)
+                        onClicked: Qt.openUrlExternally(Scrite.user.info.discordInviteUrl)
                         ToolTip.text: "Ask questions, post feedback, request features and connect with other Scrite users."
                         ToolTip.visible: containsMouse
                         ToolTip.delay: 1000
@@ -713,7 +713,7 @@ Item {
                 Link {
                     id: saveRefreshLink
                     text: needsSaving ? "Save" : "Refresh"
-                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                     transformOrigin: Item.BottomRight
                     anchors.right: parent.right
                     property real characterSpacing: 0
@@ -741,19 +741,21 @@ Item {
                                 }
                             }
                             allowHighlightSaveAnimation = false
-                            User.update(newInfo)
+                            Scrite.user.update(newInfo)
                         } else
-                            User.reload()
+                            Scrite.user.reload()
                     }
 
                     Connections {
-                        target: User
-                        onInfoChanged: saveRefreshLink.restore()
+                        target: Scrite.user
+                        function onInfoChanged() {
+                            saveRefreshLink.restore()
+                        }
                     }
 
                     function restore() {
                         saveRefreshLink.font.bold = needsSaving
-                        saveRefreshLink.font.pointSize = app.idealFontPointSize + (needsSaving ? 5 : 0)
+                        saveRefreshLink.font.pointSize = Scrite.app.idealFontPointSize + (needsSaving ? 5 : 0)
                     }
 
                     SequentialAnimation {
@@ -804,7 +806,7 @@ Item {
                 Link {
                     text: "Feedback / About"
                     opacity: needsSaving ? 0.5 : 1
-                    font.pointSize: (app.isMacOSPlatform ? app.idealFontPointSize-2 : app.idealFontPointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                     onClicked: {
                         modalDialog.close()
                         var time = 100
@@ -817,7 +819,7 @@ Item {
 
             BusyOverlay {
                 anchors.fill: parent
-                visible: User.busy
+                visible: Scrite.user.busy
                 busyMessage: "Please wait.."
                 onVisibleChanged: modalDialog.closeable = !visible
             }
@@ -830,7 +832,7 @@ Item {
         Item {
             property string pageTitle: "Your Scrite Installations"
 
-            property bool userLoggedIn: User.loggedIn
+            property bool userLoggedIn: Scrite.user.loggedIn
             onUserLoggedInChanged: {
                 if(!userLoggedIn)
                     Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
@@ -838,13 +840,13 @@ Item {
 
             Component.onCompleted: {
                 busyOverlay.busyMessage = "Fetching installations information ..."
-                User.refreshInstallations()
+                Scrite.user.refreshInstallations()
             }
 
             Link {
                 id: backLink
                 text: "« Back"
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 20
@@ -860,7 +862,7 @@ Item {
                 anchors.margins: 20
                 clip: true
 
-                model: User.installations
+                model: Scrite.user.installations
                 ScrollBar.vertical: ScrollBar2 {
                     flickable: installationsView
                 }
@@ -869,8 +871,8 @@ Item {
                 header: Text {
                     width: installationsView.availableDelegateWidth
                     wrapMode: Text.WordWrap
-                    font.pointSize: app.idealFontPointSize
-                    text: "<strong>" + User.email + "</strong> is currently logged in at " + (User.installations.length) + " computers(s)."
+                    font.pointSize: Scrite.app.idealFontPointSize
+                    text: "<strong>" + Scrite.user.email + "</strong> is currently logged in at " + (Scrite.user.installations.length) + " computers(s)."
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
                 }
@@ -896,7 +898,7 @@ Item {
                             spacing: 4
 
                             Text {
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 font.bold: true
                                 text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
                                 color: colors.text
@@ -905,7 +907,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 text: "Runs Scrite " + modelData.appVersions[0]
                                 color: colors.text
                                 width: parent.width
@@ -913,8 +915,8 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-4
-                                text: "Since: " + app.relativeTime(new Date(modelData.firstActivationDate))
+                                font.pointSize: Scrite.app.idealFontPointSize-4
+                                text: "Since: " + Scrite.app.relativeTime(new Date(modelData.firstActivationDate))
                                 color: colors.text
                                 opacity: 0.90
                                 width: parent.width
@@ -922,8 +924,8 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: app.idealFontPointSize-4
-                                text: "Last Login: " + app.relativeTime(new Date(modelData.lastActivationDate))
+                                font.pointSize: Scrite.app.idealFontPointSize-4
+                                text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastActivationDate))
                                 color: colors.text
                                 opacity: 0.75
                                 width: parent.width
@@ -936,11 +938,11 @@ Item {
                             iconSource: "../icons/action/logout.png"
                             anchors.top: parent.top
                             anchors.right: parent.right
-                            enabled: index !== User.currentInstallationIndex
+                            enabled: index !== Scrite.user.currentInstallationIndex
                             opacity: enabled ? 1 : 0.2
                             onClicked: {
                                 busyOverlay.busyMessage = "Logging out of selected installation ..."
-                                User.deactivateInstallation(modelData._id)
+                                Scrite.user.deactivateInstallation(modelData._id)
                             }
                         }
                     }
@@ -950,13 +952,13 @@ Item {
             BusyOverlay {
                 id: busyOverlay
                 anchors.fill: parent
-                visible: User.busy
+                visible: Scrite.user.busy
                 busyMessage: "Please wait ..."
             }
         }
     }
 
-    property ErrorReport userErrorReport: Aggregation.findErrorReport(User)
+    property ErrorReport userErrorReport: Aggregation.findErrorReport(Scrite.user)
     Notification.active: userErrorReport.hasError
     Notification.title: "User Account"
     Notification.text: (userErrorReport.details && userErrorReport.details.code ? (userErrorReport.details.code + ": ") : "") + userErrorReport.errorMessage

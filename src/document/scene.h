@@ -18,6 +18,7 @@
 #include <QList>
 #include <QColor>
 #include <QPointer>
+#include <QQmlEngine>
 #include <QJsonArray>
 #include <QTextLayout>
 #include <QUndoCommand>
@@ -47,6 +48,8 @@ class PushSceneUndoCommand;
 class SceneHeading : public QObject, public Modifiable
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     SceneHeading(QObject *parent = nullptr);
@@ -114,6 +117,7 @@ class SceneElement : public QObject, public Modifiable, public QObjectSerializer
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
 
 public:
     Q_INVOKABLE SceneElement(QObject *parent = nullptr);
@@ -220,6 +224,7 @@ class Scene : public QAbstractListModel, public QObjectSerializer::Interface, pu
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
 
 public:
     Q_INVOKABLE Scene(QObject *parent = nullptr);
@@ -401,7 +406,7 @@ public:
     Q_INVOKABLE void removeLastElementIfEmpty();
 
     enum SceneElementChangeType { ElementTypeChange, ElementTextChange };
-    Q_SIGNAL void sceneElementChanged(SceneElement *element, SceneElementChangeType type);
+    Q_SIGNAL void sceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     Q_SIGNAL void aboutToRemoveSceneElement(SceneElement *element);
     Q_SIGNAL void sceneChanged();
     Q_SIGNAL void sceneRefreshed();
@@ -503,6 +508,7 @@ class ScreenplayFormat;
 class SceneSizeHintItem : public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     SceneSizeHintItem(QQuickItem *parent = nullptr);
@@ -601,6 +607,7 @@ private:
 class SceneGroup : public GenericArrayModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     SceneGroup(QObject *parent = nullptr);

@@ -15,7 +15,7 @@ import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Rectangle {
     property alias scene: crgraph.scene
@@ -29,7 +29,7 @@ Rectangle {
     signal addNewRelationshipRequest(Item sourceItem)
     signal removeRelationshipWithRequest(Character otherCharacter, Item sourceItem)
 
-    color: app.translucent(primaryColors.c100.background, 0.5)
+    color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
     border.width: 1
     border.color: primaryColors.borderColor
 
@@ -44,14 +44,14 @@ Rectangle {
 
     CharacterRelationshipsGraph {
         id: crgraph
-        structure: scriteDocument.loading ? null : scriteDocument.structure
+        structure: Scrite.document.loading ? null : Scrite.document.structure
         nodeSize: Qt.size(150,150)
         maxTime: notebookSettings.graphLayoutMaxTime
         maxIterations: notebookSettings.graphLayoutMaxIterations
         leftMargin: 1000
         topMargin: 1000
         onUpdated: {
-            app.execLater(crgraph, 250, function() {
+            Scrite.app.execLater(crgraph, 250, function() {
                 canvasScroll.animatePanAndZoom = false
                 canvas.zoomFit()
                 canvasScroll.animatePanAndZoom = true
@@ -101,7 +101,7 @@ Rectangle {
             var bbox = nodeItemsBoxEvaluator.boundingBox
             var itemRect = Qt.rect(item.x, item.y, item.width, item.height)
             var atBest = Qt.size(canvasScroll.width, canvasScroll.height)
-            var visibleArea = app.querySubRectangle(bbox, itemRect, atBest)
+            var visibleArea = Scrite.app.querySubRectangle(bbox, itemRect, atBest)
             canvasScroll.zoomFit(visibleArea)
         }
 
@@ -168,7 +168,7 @@ Rectangle {
                     model: crgraph.edges
 
                     PainterPathItem {
-                        outlineWidth: app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
+                        outlineWidth: Scrite.app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
                         outlineColor: primaryColors.c700.background
                         renderType: PainterPathItem.OutlineOnly
                         renderingMechanism: PainterPathItem.UseOpenGL
@@ -197,7 +197,7 @@ Rectangle {
                             Text {
                                 id: nameLabel
                                 text: modelData.relationship.name
-                                font.pointSize: Math.floor(app.idealFontPointSize*0.75)
+                                font.pointSize: Math.floor(Scrite.app.idealFontPointSize*0.75)
                                 anchors.centerIn: parent
                                 color: nameLabelMouseArea.containsMouse ? accentColors.c700.text : primaryColors.c700.text
                                 horizontalAlignment: Text.AlignHCenter
@@ -207,7 +207,7 @@ Rectangle {
                                 id: nameLabelMouseArea
                                 hoverEnabled: enabled
                                 anchors.fill: parent
-                                enabled: !scriteDocument.readOnly
+                                enabled: !Scrite.document.readOnly
                                 cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                                 onClicked: {
                                     modalDialog.closeable = false
@@ -261,7 +261,7 @@ Rectangle {
                                 iconSource: "../icons/navigation/refresh.png"
                                 autoRepeat: true
                                 ToolTip.text: "Refresh"
-                                visible: !scriteDocument.readOnly && (crgraph.character ? crgraph.character == canvas.activeCharacter : true)
+                                visible: !Scrite.document.readOnly && (crgraph.character ? crgraph.character == canvas.activeCharacter : true)
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
@@ -273,7 +273,7 @@ Rectangle {
                                 autoRepeat: false
                                 ToolTip.text: "Add A New Relationship"
                                 enabled: visible
-                                visible: crgraph.character && (crgraph.character && crgraph.character == canvas.activeCharacter) && editRelationshipsEnabled && !scriteDocument.readOnly
+                                visible: crgraph.character && (crgraph.character && crgraph.character == canvas.activeCharacter) && editRelationshipsEnabled && !Scrite.document.readOnly
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
@@ -285,7 +285,7 @@ Rectangle {
                                 autoRepeat: false
                                 ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
                                 enabled: visible
-                                visible: crgraph.character && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !scriteDocument.readOnly
+                                visible: crgraph.character && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !Scrite.document.readOnly
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
@@ -318,9 +318,9 @@ Rectangle {
                             anchors.fill: parent
                             radius: Math.min(width,height)*0.0375
                             anchors.margins: -Math.min(width,height)*0.075
-                            color: app.translucent(character.color, 0.15)
+                            color: Scrite.app.translucent(character.color, 0.15)
                             border.width: 1
-                            border.color: app.translucent(character.color, 0.5)
+                            border.color: Scrite.app.translucent(character.color, 0.5)
                         }
 
                         Image {
@@ -383,7 +383,7 @@ Rectangle {
 
                         MouseArea {
                             anchors.fill: parent
-                            drag.target: !scriteDocument.readOnly ? parent : null
+                            drag.target: !Scrite.document.readOnly ? parent : null
                             drag.axis: Drag.XAndYAxis
                             hoverEnabled: true
                             onPressed: {
@@ -412,7 +412,7 @@ Rectangle {
                         active: false
                         sourceComponent: Rectangle {
                             id: removeRelationshipConfirmationItem
-                            color: app.translucent(primaryColors.c600.background,0.85)
+                            color: Scrite.app.translucent(primaryColors.c600.background,0.85)
                             focus: true
                             width: removeRelationshipConfirmationContentLayout.width + 45
                             height: removeRelationshipConfirmationContentLayout.height + 40
@@ -456,7 +456,7 @@ Rectangle {
 
                                 Text {
                                     text: "<b>Are you sure you want to delete this relationship?</b><br/><br/>NOTE: This action cannot be undone!!"
-                                    font.pointSize: app.idealFontPointSize
+                                    font.pointSize: Scrite.app.idealFontPointSize
                                     width: parent.width
                                     horizontalAlignment: Text.AlignHCenter
                                     wrapMode: Text.WordWrap
@@ -575,7 +575,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.margins: 25
-            font.pointSize: app.idealFontPointSize
+            font.pointSize: Scrite.app.idealFontPointSize
             width: parent.width * 0.65
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             text: "Graph will be refreshed when you use it next."
@@ -604,7 +604,7 @@ Rectangle {
             height: dialogLayout.height + 50
 
             Component.onCompleted: {
-                app.execLater(dialogLayout, 100, function() {
+                Scrite.app.execLater(dialogLayout, 100, function() {
                     txtRelationshipName.forceActiveFocus()
                 })
             }
@@ -616,7 +616,7 @@ Rectangle {
                 anchors.centerIn: parent
 
                 Text {
-                    font.pointSize: app.idealFontPointSize + 4
+                    font.pointSize: Scrite.app.idealFontPointSize + 4
                     text: "Edit Relationship"
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.bold: true
@@ -655,8 +655,8 @@ Rectangle {
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             maximumLineCount: 2
                             elide: Text.ElideRight
-                            text: app.camelCased(ofCharacter.name)
-                            font.pointSize: app.idealFontPointSize
+                            text: Scrite.app.camelCased(ofCharacter.name)
+                            font.pointSize: Scrite.app.idealFontPointSize
                         }
                     }
 
@@ -665,12 +665,12 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         text: relationship.name
                         label: "Relationship:"
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         placeholderText: "husband of, wife of, friends with, reports to ..."
                         maximumLength: 50
                         width: 300
                         enableTransliteration: true
-                        readOnly: scriteDocument.readOnly
+                        readOnly: Scrite.document.readOnly
                         onReturnPressed: doneButton.click()
                         focus: true
                     }
@@ -705,8 +705,8 @@ Rectangle {
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             maximumLineCount: 2
                             elide: Text.ElideRight
-                            text: app.camelCased(withCharacter.name)
-                            font.pointSize: app.idealFontPointSize
+                            text: Scrite.app.camelCased(withCharacter.name)
+                            font.pointSize: Scrite.app.idealFontPointSize
                         }
                     }
                 }

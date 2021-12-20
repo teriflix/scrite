@@ -17,11 +17,13 @@
 #include <QColor>
 #include <QObject>
 #include <QJSValue>
+#include <QQmlEngine>
 #include <QJsonObject>
 
 class MaterialColors : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     MaterialColors(QObject *parent = nullptr);

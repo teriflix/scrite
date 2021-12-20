@@ -29,6 +29,7 @@ class LibraryService : public AbstractImporter
 {
     Q_OBJECT
     Q_CLASSINFO("Format", "Library")
+    QML_ELEMENT
 
 public:
     LibraryService(QObject *parent = nullptr);
@@ -67,6 +68,8 @@ private:
 class Library : public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ~Library();

@@ -19,6 +19,7 @@
 class RulerItem : public QQuickPaintedItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     RulerItem(QQuickItem *parent = nullptr);

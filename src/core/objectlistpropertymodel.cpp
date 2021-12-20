@@ -24,6 +24,8 @@ ObjectListPropertyModelBase::ObjectListPropertyModelBase(QObject *parent)
             &ObjectListPropertyModelBase::objectCountChanged);
     connect(this, &QAbstractListModel::modelReset, this,
             &ObjectListPropertyModelBase::objectCountChanged);
+    connect(this, &QAbstractListModel::dataChanged, this,
+            &ObjectListPropertyModelBase::dataChanged2);
 }
 
 QHash<int, QByteArray> ObjectListPropertyModelBase::roleNames() const

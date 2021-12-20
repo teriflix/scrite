@@ -15,10 +15,12 @@
 #define COMPLETIONMODEL_H
 
 #include <QAbstractListModel>
+#include <QQmlEngine>
 
 class CompletionModel : public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     CompletionModel(QObject *parent = nullptr);

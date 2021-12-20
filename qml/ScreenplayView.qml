@@ -15,7 +15,7 @@ import QtQml 2.13
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: screenplayView
@@ -28,19 +28,19 @@ Item {
     property string dropAreaKey: "scrite/sceneID"
     property real preferredHeight: screenplayToolsLayout.height
     property bool showNotesIcon: false
-    property bool enableDragDrop: !scriteDocument.readOnly
+    property bool enableDragDrop: !Scrite.document.readOnly
 
     Connections {
-        target: scriteDocument.screenplay
-        onCurrentElementIndexChanged: {
-            if(!scriteDocument.loading) {
-                app.execLater(screenplayElementList, 150, function() {
+        target: Scrite.document.screenplay
+        function onCurrentElementIndexChanged(val) {
+            if(!Scrite.document.loading) {
+                Scrite.app.execLater(screenplayElementList, 150, function() {
                     if(screenplayElementList.currentIndex === 0)
                         screenplayElementList.positionViewAtBeginning()
                     else if(screenplayElementList.currentIndex === screenplayElementList.count-1)
                         screenplayElementList.positionViewAtEnd()
                     else
-                        screenplayElementList.positionViewAtIndex(scriteDocument.screenplay.currentElementIndex, ListView.Contain)
+                        screenplayElementList.positionViewAtIndex(Scrite.document.screenplay.currentElementIndex, ListView.Contain)
                 })
             }
         }
@@ -66,7 +66,7 @@ Item {
             ToolButton3 {
                 iconSource: "../icons/content/clear_all.png"
                 ToolTip.text: "Clear the screenplay, while retaining the scenes."
-                enabled: !scriteDocument.readOnly
+                enabled: !Scrite.document.readOnly
                 onClicked: {
                     askQuestion({
                         "question": "Are you sure you want to clear the screenplay?",
@@ -75,7 +75,7 @@ Item {
                         "callback": function(val) {
                             if(val) {
                                 screenplayElementList.forceActiveFocus()
-                                scriteDocument.screenplay.clearElements()
+                                Scrite.document.screenplay.clearElements()
                             }
                         }
                     }, this)
@@ -166,7 +166,7 @@ Item {
                     width: screenplayTracksFlickContent.width
                     height: minimumAppFontMetrics.height + 8
                     y: index * (minimumAppFontMetrics.height + 10)
-                    color: app.translucent( border.color, 0.1 )
+                    color: Scrite.app.translucent( border.color, 0.1 )
                     border.color: accentColors.c900.background
                     border.width: 0.5
 
@@ -199,7 +199,7 @@ Item {
                             readonly property var groupData: trackData.tracks[index]
                             readonly property var groupExtents: screenplayElementList.extents(groupData.startIndex, groupData.endIndex)
                             color: parent.border.color
-                            border.color: app.translucent(app.textColorFor(color), 0.25)
+                            border.color: Scrite.app.translucent(Scrite.app.textColorFor(color), 0.25)
                             border.width: 0.5
                             x: groupExtents.from
                             width: groupExtents.to - groupExtents.from
@@ -213,7 +213,7 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
                                 anchors.centerIn: parent
                                 elide: Text.ElideMiddle
-                                color: app.textColorFor(parent.color)
+                                color: Scrite.app.textColorFor(parent.color)
                             }
 
                             MouseArea {
@@ -232,8 +232,8 @@ Item {
                                         else
                                             ttText += (1 + groupData.endIndex - groupData.startIndex) + " Scenes"
                                         if(!screenplayTextDocument.paused) {
-                                            var from = scriteDocument.screenplay.elementWithIndex(groupData.startIndex)
-                                            var to = scriteDocument.screenplay.elementWithIndex(groupData.endIndex)
+                                            var from = Scrite.document.screenplay.elementWithIndex(groupData.startIndex)
+                                            var to = Scrite.document.screenplay.elementWithIndex(groupData.endIndex)
                                             ttText += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
                                         }
 
@@ -268,27 +268,27 @@ Item {
         }
 
         TrackProperty {
-            target: scriteDocument.screenplay
+            target: Scrite.document.screenplay
             property: "currentElementIndex"
         }
 
         TrackSignal {
-            target: scriteDocument.screenplay
+            target: Scrite.document.screenplay
             signal: "elementsChanged()"
         }
 
         TrackSignal {
-            target: scriteDocument.screenplay
+            target: Scrite.document.screenplay
             signal: "elementInserted(ScreenplayElement*,int)"
         }
 
         TrackSignal {
-            target: scriteDocument.screenplay
+            target: Scrite.document.screenplay
             signal: "elementRemoved(ScreenplayElement*,int)"
         }
 
         TrackSignal {
-            target: scriteDocument.screenplay
+            target: Scrite.document.screenplay
             signal: "elementMoved(ScreenplayElement*,int,int)"
         }
 
@@ -307,13 +307,13 @@ Item {
         clip: true
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
-        model: scriteDocument.loading ? null : scriteDocument.screenplay
+        model: Scrite.document.loading ? null : Scrite.document.screenplay
         property real minimumDelegateWidth: {
             var treshold = Math.floor(width / 100)
-            if(scriteDocument.screenplay.elementCount < treshold)
+            if(Scrite.document.screenplay.elementCount < treshold)
                 return 100
 
-            var pc = scriteDocument.screenplay.maximumParagraphCount
+            var pc = Scrite.document.screenplay.maximumParagraphCount
             if(pc < 4)
                 return 100
             if(pc >= 5 && pc < 10)
@@ -330,9 +330,9 @@ Item {
         readonly property real minimumDelegateWidthForTextVisibility: 50
         property bool moveMode: false
         orientation: Qt.Horizontal
-        currentIndex: scriteDocument.screenplay.currentElementIndex
-        Keys.onRightPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex+1
-        Keys.onLeftPressed: scriteDocument.screenplay.currentElementIndex = scriteDocument.screenplay.currentElementIndex-1
+        currentIndex: Scrite.document.screenplay.currentElementIndex
+        Keys.onRightPressed: Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.currentElementIndex+1
+        Keys.onLeftPressed: Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.currentElementIndex-1
         Keys.onPressed: {
             event.accepted = false
             if(event.key === Qt.Key_Backspace || event.key === Qt.Key_Delete) {
@@ -346,14 +346,14 @@ Item {
         }
 
         function removeCurrentElement() {
-            if(scriteDocument.loading)
+            if(Scrite.document.loading)
                 return
             var cidx = currentIndex
             if(cidx < 0)
                 return
-            var celement = scriteDocument.screenplay.elementAt(cidx)
+            var celement = Scrite.document.screenplay.elementAt(cidx)
             if(celement)
-                scriteDocument.screenplay.removeElement(celement)
+                Scrite.document.screenplay.removeElement(celement)
         }
 
         property bool scrollBarRequired: screenplayElementList.width < screenplayElementList.contentWidth
@@ -362,7 +362,7 @@ Item {
             opacity: 1
         }
 
-        FocusTracker.window: qmlWindow
+        FocusTracker.window: Scrite.window
         FocusTracker.indicator.target: mainUndoStack
         FocusTracker.indicator.property: "timelineEditorActive"
 
@@ -374,7 +374,7 @@ Item {
         moveDisplaced: moveAndDisplace
         move: moveAndDisplace
 
-        EventFilter.active: app.isWindowsPlatform || app.isLinuxPlatform
+        EventFilter.active: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
         EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
             if(event.delta < 0)
@@ -405,12 +405,12 @@ Item {
                 border.color: primaryColors.borderColor
                 border.width: 1
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5
-                visible: scriteDocument.structure.elementCount > 0 && enableDragDrop
+                visible: Scrite.document.structure.elementCount > 0 && enableDragDrop
 
                 Text {
                     anchors.fill: parent
                     anchors.margins: 5
-                    font.pointSize: app.idealFontPointSize-2
+                    font.pointSize: Scrite.app.idealFontPointSize-2
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     wrapMode: Text.WordWrap
@@ -476,9 +476,9 @@ Item {
                 return ret;
 
             var idx = -1
-            var nrElements = scriteDocument.screenplay.elementCount
+            var nrElements = Scrite.document.screenplay.elementCount
             for(var i=0; i<nrElements; i++) {
-                var element = scriteDocument.screenplay.elementAt(i)
+                var element = Scrite.document.screenplay.elementAt(i)
                 if(element.elementType === ScreenplayElement.SceneElementType)
                     ++idx
                 if(idx === startIndex)
@@ -501,7 +501,7 @@ Item {
             property ScreenplayElement element: screenplayElement
             property bool isBreakElement: element.elementType === ScreenplayElement.BreakElementType
             property bool isEpisodeBreak: isBreakElement && element.breakType === Screenplay.Episode
-            property bool active: element.scene ? scriteDocument.screenplay.activeScene === element.scene : false
+            property bool active: element.scene ? Scrite.document.screenplay.activeScene === element.scene : false
             property int sceneElementCount: element.scene ? element.scene.elementCount : 1
             property string sceneTitle: {
                 var ret = ""
@@ -534,7 +534,7 @@ Item {
             property color sceneColor: colorPalette.background
             property var colorPalette: {
                 if(element.scene) {
-                    if(app.isLightColor(element.scene.color))
+                    if(Scrite.app.isLightColor(element.scene.color))
                         return { "background": element.scene.color, "text": "black" }
                     return { "background": element.scene.color, "text": "white" }
                 }
@@ -618,7 +618,7 @@ Item {
                             var ret = ""
 
                             if(isBreakElement) {
-                                var idxList = scriteDocument.screenplay.sceneElementsInBreak(elementItemDelegate.element)
+                                var idxList = Scrite.document.screenplay.sceneElementsInBreak(elementItemDelegate.element)
                                 if(idxList.length === 0)
                                     return "No Scenes"
 
@@ -627,8 +627,8 @@ Item {
                                 else
                                     ret = idxList.length + " Scenes"
 
-                                var from = scriteDocument.screenplay.elementAt(idxList[0])
-                                var to = scriteDocument.screenplay.elementAt(idxList[idxList.length-1])
+                                var from = Scrite.document.screenplay.elementAt(idxList[0])
+                                var to = Scrite.document.screenplay.elementAt(idxList[idxList.length-1])
                                 ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
 
                                 return ret
@@ -661,8 +661,8 @@ Item {
                             if(screenplayElementList.mutiSelectionMode)
                                 elementItemDelegate.element.toggleSelection()
                             else
-                                scriteDocument.screenplay.clearSelection()
-                            scriteDocument.screenplay.currentElementIndex = index
+                                Scrite.document.screenplay.clearSelection()
+                            Scrite.document.screenplay.currentElementIndex = index
                             requestEditorLater()
 
                             if(mouse.button === Qt.RightButton) {
@@ -689,7 +689,7 @@ Item {
                     }
                     Drag.onActiveChanged: {
                         if(!isBreakElement)
-                            scriteDocument.screenplay.currentElementIndex = index
+                            Scrite.document.screenplay.currentElementIndex = index
                         screenplayElementList.moveMode = Drag.active
                     }
 
@@ -727,7 +727,7 @@ Item {
                         anchors.rightMargin: parent.width > width+10 ? 5 : (parent.width - width)/2
                         opacity: dragMouseArea.containsMouse ? 1 : 0.1
                         scale: dragMouseArea.containsMouse ? 2 : 1
-                        visible: !scriteDocument.readOnly && enableDragDrop
+                        visible: !Scrite.document.readOnly && enableDragDrop
                         enabled: visible
                         Behavior on scale {
                             enabled: screenplayEditorSettings.enableAnimations
@@ -870,9 +870,9 @@ Item {
 
         MenuItem2 {
             text: "Remove"
-            enabled: !scriteDocument.readOnly
+            enabled: !Scrite.document.readOnly
             onClicked: {
-                scriteDocument.screenplay.removeElement(breakItemMenu.element)
+                Scrite.document.screenplay.removeElement(breakItemMenu.element)
                 breakItemMenu.close()
             }
         }
@@ -901,7 +901,7 @@ Item {
 
         StructureGroupsMenu {
             sceneGroup: SceneGroup {
-                structure: scriteDocument.structure
+                structure: Scrite.document.structure
             }
             onAboutToShow: {
                 sceneGroup.clearScenes()
@@ -915,9 +915,9 @@ Item {
 
         MenuItem2 {
             text: "Remove"
-            enabled: !scriteDocument.readOnly
+            enabled: !Scrite.document.readOnly
             onClicked: {
-                scriteDocument.screenplay.removeElement(elementItemMenu.element)
+                Scrite.document.screenplay.removeElement(elementItemMenu.element)
                 elementItemMenu.close()
             }
         }
@@ -927,18 +927,18 @@ Item {
         if(source === null)
             return
 
-        var sourceType = app.typeName(source)
+        var sourceType = Scrite.app.typeName(source)
 
         if(sourceType === "ScreenplayElement") {
-            var fromIndex = scriteDocument.screenplay.indexOfElement(source)
+            var fromIndex = Scrite.document.screenplay.indexOfElement(source)
             if(fromIndex < index)
                 --index
             if(screenplayElementList.mutiSelectionMode)
-                app.execLater(screenplayElementList, 100, function() {
-                    scriteDocument.screenplay.moveSelectedElements(index)
+                Scrite.app.execLater(screenplayElementList, 100, function() {
+                    Scrite.document.screenplay.moveSelectedElements(index)
                 })
             else
-                scriteDocument.screenplay.moveElement(source, index)
+                Scrite.document.screenplay.moveElement(source, index)
             return
         }
 
@@ -946,13 +946,13 @@ Item {
         if(sceneID.length === 0)
             return
 
-        var scene = scriteDocument.structure.findElementBySceneID(sceneID)
+        var scene = Scrite.document.structure.findElementBySceneID(sceneID)
         if(scene === null)
             return
 
         var element = screenplayElementComponent.createObject()
         element.sceneID = sceneID
-        scriteDocument.screenplay.insertElementAt(element, index)
+        Scrite.document.screenplay.insertElementAt(element, index)
         requestEditorLater()
     }
 
@@ -960,11 +960,11 @@ Item {
         id: screenplayElementComponent
 
         ScreenplayElement {
-            screenplay: scriteDocument.screenplay
+            screenplay: Scrite.document.screenplay
         }
     }
 
     function requestEditorLater() {
-        app.execLater(screenplayView, 100, function() { requestEditor() })
+        Scrite.app.execLater(screenplayView, 100, function() { requestEditor() })
     }
 }

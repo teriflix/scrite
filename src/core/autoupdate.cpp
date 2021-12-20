@@ -141,7 +141,7 @@ void AutoUpdate::checkForUpdates()
     if (reply == nullptr)
         return;
 
-    connect(reply, &QNetworkReply::finished, [reply, this]() {
+    connect(reply, &QNetworkReply::finished, this, [reply, this]() {
         if (reply->error() != QNetworkReply::NoError) {
             this->checkForUpdatesAfterSometime();
             return;

@@ -15,8 +15,8 @@
 #define JSONHTTPREQUEST_H
 
 #include <QUrl>
-#include <QObject>
 #include <QVariant>
+#include <QQmlEngine>
 #include <QJsonObject>
 #include <QQmlParserStatus>
 
@@ -28,6 +28,7 @@ class JsonHttpRequest : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
+    QML_ELEMENT
 
 public:
     JsonHttpRequest(QObject *parent = nullptr);

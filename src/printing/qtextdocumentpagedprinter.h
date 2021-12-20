@@ -28,6 +28,8 @@ class QTextDocumentPagedPrinter;
 class HeaderFooter : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     enum Type { Header, Footer };
@@ -130,6 +132,8 @@ private:
 class Watermark : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Watermark(QObject *parent = nullptr);
@@ -198,6 +202,8 @@ private:
 class QTextDocumentPagedPrinter : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     QTextDocumentPagedPrinter(QObject *parent = nullptr);

@@ -14,6 +14,7 @@
 #ifndef GENERICARRAYMODEL_H
 #define GENERICARRAYMODEL_H
 
+#include <QQmlEngine>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QAbstractListModel>
@@ -24,6 +25,7 @@
 class GenericArrayModel : public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     GenericArrayModel(QObject *parent = nullptr);
@@ -74,6 +76,7 @@ private:
 class GenericArraySortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     GenericArraySortFilterProxyModel(QObject *parent = nullptr);

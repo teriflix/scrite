@@ -20,6 +20,7 @@
 class ResetOnChange : public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     ResetOnChange(QQuickItem *parent = nullptr);

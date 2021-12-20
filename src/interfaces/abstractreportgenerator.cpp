@@ -14,6 +14,7 @@
 #include "abstractreportgenerator.h"
 
 #include "user.h"
+#include "scrite.h"
 #include "application.h"
 #include "qtextdocumentpagedprinter.h"
 
@@ -71,7 +72,7 @@ QString AbstractReportGenerator::description() const
 bool AbstractReportGenerator::isFeatureEnabled() const
 {
     if (User::instance()->isLoggedIn()) {
-        const bool allReportsEnabled = User::instance()->isFeatureEnabled(User::ReportFeature);
+        const bool allReportsEnabled = User::instance()->isFeatureEnabled(Scrite::ReportFeature);
         const bool thisSpecificImporterEnabled = allReportsEnabled
                 ? User::instance()->isFeatureNameEnabled(QStringLiteral("report/") + this->title())
                 : false;

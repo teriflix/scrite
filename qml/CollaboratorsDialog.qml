@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     width: 640
@@ -26,7 +26,7 @@ Item {
         anchors.fill: parent
         anchors.margins: 30
         spacing: 20
-        enabled: User.loggedIn
+        enabled: Scrite.user.loggedIn
 
         Text {
             id: titleText
@@ -44,29 +44,29 @@ Item {
             Text {
                 width: parent.width - protectionSwitch.width - parent.spacing
                 text: {
-                    if(scriteDocument.canModifyCollaborators) {
-                        var ret = "Allow opening of this screenplay only on Scrite installations logged in with <strong>" + User.info.email + "</strong>. "
-                        if(scriteDocument.hasCollaborators)
+                    if(Scrite.document.canModifyCollaborators) {
+                        var ret = "Allow opening of this screenplay only on Scrite installations logged in with <strong>" + Scrite.user.info.email + "</strong>. "
+                        if(Scrite.document.hasCollaborators)
                             ret += "You can optionally add emails of one or more collaborators to the list below."
                         return ret
                     }
-                    return "This screenplay has been marked for collaboration by <strong>" + scriteDocument.primaryCollaborator + "</strong> with the emails listed below."
+                    return "This screenplay has been marked for collaboration by <strong>" + Scrite.document.primaryCollaborator + "</strong> with the emails listed below."
                 }
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 wrapMode: Text.WordWrap
                 anchors.verticalCenter: parent.verticalCenter
             }
 
             Switch {
                 id: protectionSwitch
-                checked: scriteDocument.hasCollaborators
-                enabled: scriteDocument.canModifyCollaborators
+                checked: Scrite.document.hasCollaborators
+                enabled: Scrite.document.canModifyCollaborators
                 anchors.verticalCenter: parent.verticalCenter
                 onToggled: {
                     if(checked)
-                        scriteDocument.enableCollaboration()
+                        Scrite.document.enableCollaboration()
                     else
-                        scriteDocument.disableCollaboration()
+                        Scrite.document.disableCollaboration()
                 }
             }
         }
@@ -77,15 +77,15 @@ Item {
             border.width: 1
             border.color: primaryColors.c700.background
             color: primaryColors.c100.background
-            enabled: scriteDocument.hasCollaborators
+            enabled: Scrite.document.hasCollaborators
             opacity: enabled ? 1.0 : 0.5
 
             Connections {
-                target: scriteDocument
-                onCollaboratorsChanged: Qt.callLater(saveDocument)
+                target: Scrite.document
+                function onCollaboratorsChanged() { Qt.callLater(saveDocument) }
                 function saveDocument() {
-                    if(scriteDocument.fileName !== "")
-                        scriteDocument.save()
+                    if(Scrite.document.fileName !== "")
+                        Scrite.document.save()
                 }
             }
 
@@ -99,7 +99,7 @@ Item {
                 ScrollBar.vertical: ScrollBar2 {
                     flickable: collaboratorsList
                 }
-                header: scriteDocument.canModifyCollaborators ? collaboratorsListHeader : null
+                header: Scrite.document.canModifyCollaborators ? collaboratorsListHeader : null
 
                 model: ScriteDocumentCollaborators { }
                 property var collaboratorsMetaData
@@ -123,7 +123,7 @@ Item {
                         Text {
                             width: parent.width - (deleteIcon.opacity > 0 ? (deleteIcon.width+parent.spacing) : 0)
                             wrapMode: Text.WordWrap
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                             font.italic: collaboratorName === ""
                             text: collaborator
                             anchors.verticalCenter: parent.verticalCenter
@@ -134,8 +134,8 @@ Item {
                             opacity: delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
                             iconSource: "../icons/action/close.png"
                             anchors.verticalCenter: parent.verticalCenter
-                            onClicked: scriteDocument.removeCollaborator(collaboratorEmail)
-                            enabled: scriteDocument.canModifyCollaborators
+                            onClicked: Scrite.document.removeCollaborator(collaboratorEmail)
+                            enabled: Scrite.document.canModifyCollaborators
                         }
                     }
                 }
@@ -146,14 +146,14 @@ Item {
 
                 Row {
                     width: collaboratorsList.width
-                    enabled: scriteDocument.canModifyCollaborators
+                    enabled: Scrite.document.canModifyCollaborators
                     opacity: enabled ? 1 : 0.5
 
                     TextField {
                         id: newCollaboratorEmail
                         width: parent.width - addCollaboratorButton.width - parent.spacing
                         placeholderText: "Enter Email ID and hit Return"
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         validator: RegExpValidator {
                             regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                         }
@@ -162,7 +162,7 @@ Item {
 
                         function addCollaborator() {
                             if(acceptableInput) {
-                                scriteDocument.addCollaborator(text)
+                                Scrite.document.addCollaborator(text)
                                 clear()
                                 forceActiveFocus()
                                 queryCollaboratorsCall.fetchUsersInfo()

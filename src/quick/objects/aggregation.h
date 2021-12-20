@@ -14,13 +14,17 @@
 #ifndef AGGREGATION_H
 #define AGGREGATION_H
 
-#include <QObject>
+#include <QQmlEngine>
+
 #include "errorreport.h"
 #include "progressreport.h"
 
 class Aggregation : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_SINGLETON
 
 public:
     Aggregation(QObject *parent = nullptr);

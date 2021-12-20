@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-import Scrite 1.0
+import io.scrite.components 1.0
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
@@ -103,7 +103,7 @@ Item {
         onActivated: toolButton.click()
     }
 
-    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + app.polishShortcutTextForDisplay(shortcutText) + ")")
+    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
     ToolTip.visible: ToolTip.text === "" ? false : (toolButtonMouseArea.containsMouse && !down)
     ToolTip.delay: 500
 

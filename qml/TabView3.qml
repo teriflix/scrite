@@ -15,7 +15,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: tabView
@@ -45,8 +45,8 @@ Item {
                 text: modelData
                 tabIndex: index
                 tabCount: 2
-                textColor: active ? app.textColorFor(tabColor) : "black"
-                font.pointSize: app.idealFontPointSize
+                textColor: active ? Scrite.app.textColorFor(tabColor) : "black"
+                font.pointSize: Scrite.app.idealFontPointSize
                 font.bold: active
                 currentTabIndex: tabBar.currentIndex
                 onRequestActivation: tabBar.currentIndex = index

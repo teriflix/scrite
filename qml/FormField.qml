@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Column {
     id: formField
@@ -70,9 +70,9 @@ Column {
         id: answerArea
         width: questionText.width
         anchors.right: parent.right
-        color: app.translucent(primaryColors.c100.background, 0.75)
+        color: Scrite.app.translucent(primaryColors.c100.background, 0.75)
         border.width: 1
-        border.color: app.translucent(primaryColors.borderColor, 0.25)
+        border.color: Scrite.app.translucent(primaryColors.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
         property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength === FormQuestion.ShortParagraph ? 1 : 3)
 
@@ -92,7 +92,7 @@ Column {
             TabSequenceItem.onAboutToReceiveFocus: lod = eHIGH
 
             lowDetailComponent: Text {
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 text: formField.answer === "" ? formField.placeholderText : formField.answer
                 opacity: formField.answer === "" ? 0.5 : 1
@@ -101,7 +101,7 @@ Column {
 
             highDetailComponent: TextArea {
                 id: answerText
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 selectByMouse: true
                 selectByKeyboard: true
@@ -111,14 +111,14 @@ Column {
                 Transliterator.cursorPosition: cursorPosition
                 Transliterator.hasActiveFocus: activeFocus
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
-                readOnly: scriteDocument.readOnly
+                readOnly: Scrite.document.readOnly
                 background: Item { }
                 SpecialSymbolsSupport {
                     anchors.top: parent.bottom
                     anchors.left: parent.left
                     textEditor: answerText
                     textEditorHasCursorInterface: true
-                    enabled: !scriteDocument.readOnly
+                    enabled: !Scrite.document.readOnly
                 }
                 UndoHandler {
                     enabled: !answerText.readOnly && answerText.activeFocus && enableUndoRedo

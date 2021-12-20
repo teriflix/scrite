@@ -157,6 +157,9 @@ private:
 class ProfilerItem : public QObject
 {
     Q_OBJECT
+    QML_NAMED_ELEMENT(Profiler)
+    QML_ATTACHED(ProfilerItem)
+    QML_UNCREATABLE("Use as attached property.")
 
 public:
     ProfilerItem(QObject *parent = nullptr);
@@ -179,9 +182,6 @@ private:
     QString m_context;
     QElapsedTimer *m_timer = nullptr;
 };
-
-Q_DECLARE_METATYPE(ProfilerItem *)
-QML_DECLARE_TYPEINFO(ProfilerItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #define PROFILE_THIS_FUNCTION TimeProfiler profiler##__LINE__(Q_FUNC_INFO, false)
 #define PROFILE_THIS_FUNCTION2 TimeProfiler profiler##__LINE__(Q_FUNC_INFO, true)

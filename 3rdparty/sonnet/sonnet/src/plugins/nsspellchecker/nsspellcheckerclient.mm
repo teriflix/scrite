@@ -23,15 +23,29 @@
 
 #import <AppKit/AppKit.h>
 
+#include <QtDebug>
+#include <QThread>
+
 using namespace Sonnet;
 
-NSSpellCheckerClient::NSSpellCheckerClient(QObject *parent)
-    : Client(parent)
-{
-}
+NSSpellCheckerClient::NSSpellCheckerClient(QObject *parent) : Client(parent) { }
 
-NSSpellCheckerClient::~NSSpellCheckerClient()
+NSSpellCheckerClient::~NSSpellCheckerClient() { }
+
+/**
+ * In Qt 5.15.7, for whatever reason, [NSSpellChecker sharedSpellChecker]
+ * doesnt create or return a shared spell checker, if we ask for it in a
+ * background thread. So, we call this function in the main thread once
+ * before we query for availableLanguages() and so on in the background thread.
+ */
+bool NSSpellCheckerClient::ensureSpellCheckerAvailability()
 {
+    const bool spellCheckerExists = [NSSpellChecker sharedSpellCheckerExists];
+    if (!spellCheckerExists) {
+        NSSpellChecker *spellChecker = [NSSpellChecker sharedSpellChecker];
+        return spellChecker != nullptr;
+    }
+    return spellCheckerExists;
 }
 
 int NSSpellCheckerClient::reliability() const
@@ -47,11 +61,15 @@ SpellerPlugin *NSSpellCheckerClient::createSpeller(const QString &language)
 QStringList NSSpellCheckerClient::languages() const
 {
     QStringList lst;
-    NSArray* availableLanguages = [[NSSpellChecker sharedSpellChecker]
-                                   availableLanguages];
-    for (NSString* lang_code in availableLanguages) {
+
+    const bool spellCheckerExists = [NSSpellChecker sharedSpellCheckerExists];
+    if (!spellCheckerExists)
+        return lst;
+
+    NSSpellChecker *spellChecker = [NSSpellChecker sharedSpellChecker];
+    NSArray *availableLanguages = [spellChecker availableLanguages];
+    for (NSString *lang_code in availableLanguages) {
         lst.append(QString::fromNSString(lang_code));
     }
     return lst;
 }
-

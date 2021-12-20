@@ -15,8 +15,8 @@
 #define SCRITEDOCUMENT_H
 
 #include <QDir>
-#include <QObject>
 #include <QJsonArray>
+#include <QQmlEngine>
 
 #include "screenplay.h"
 #include "structure.h"
@@ -141,6 +141,7 @@ private:
 class ScriteDocumentCollaborators : public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     ScriteDocumentCollaborators(QObject *parent = nullptr);
@@ -174,6 +175,8 @@ class ScriteDocument : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
     ScriteDocument(QObject *parent = nullptr);
 

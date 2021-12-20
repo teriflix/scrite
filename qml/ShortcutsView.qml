@@ -13,7 +13,7 @@
 
 import QtQuick 2.13
 import QtQuick.Controls 2.13
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     property alias backgroundColor: background.color
@@ -34,7 +34,7 @@ Item {
         id: shortcutsView
         anchors.fill: parent
         anchors.margins: 5
-        model: shortcutsModel
+        model: Scrite.shortcuts
         FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
         clip: true
         boundsBehavior: Flickable.StopAtBounds
@@ -54,7 +54,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 5
                     // font.family: "Courier Prime"
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     font.bold: true
                     text: section
                 }
@@ -75,7 +75,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     // font.family: "Courier Prime"
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     text: itemTitle
                     width: parent.width * 0.65
                     elide: Text.ElideRight
@@ -84,8 +84,8 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     font.family: "Courier Prime"
-                    font.pointSize: app.idealFontPointSize-2
-                    text: app.polishShortcutTextForDisplay(itemShortcut)
+                    font.pointSize: Scrite.app.idealFontPointSize-2
+                    text: Scrite.app.polishShortcutTextForDisplay(itemShortcut)
                     width: parent.width * 0.35
                 }
             }

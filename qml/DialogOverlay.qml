@@ -14,11 +14,11 @@
 import QtQml 2.13
 import QtQuick 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Rectangle {
     id: dialogOverlay
-    color: app.translucent(accentColors.c50.background, t*0.4)
+    color: Scrite.app.translucent(accentColors.c50.background, t*0.4)
     property alias sourceComponent: contentsLoader.sourceComponent
     property alias active: contentsLoader.active
     property alias dialogItem: contentsLoader.item
@@ -81,7 +81,7 @@ Rectangle {
         }
     }
 
-    EventFilter.target: app
+    EventFilter.target: Scrite.app
     EventFilter.events: [6] // KeyPress
     EventFilter.active: closeOnEscape && visible
     EventFilter.onFilter: {

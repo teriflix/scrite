@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: textNoteView
@@ -47,7 +47,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.WordWrap
             font.bold: true
-            font.pointSize: app.idealFontPointSize + 2
+            font.pointSize: Scrite.app.idealFontPointSize + 2
             placeholderText: "Heading"
             TabSequenceItem.manager: noteTabManager
             TabSequenceItem.sequence: 0

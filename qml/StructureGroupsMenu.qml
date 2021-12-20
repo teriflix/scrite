@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Menu2 {
     id: structureGroupsMenu
@@ -64,7 +64,7 @@ Menu2 {
                         }
                         return ret;
                     }
-                    font.pointSize: app.idealFontPointSize
+                    font.pointSize: Scrite.app.idealFontPointSize
                     visible: text !== ""
                     horizontalAlignment: Text.AlignHCenter
                     padding: 5
@@ -96,7 +96,7 @@ Menu2 {
                             bottomPadding: 5
                             anchors.centerIn: parent
                             color: primaryColors.button.text
-                            font.pointSize: app.idealFontPointSize
+                            font.pointSize: Scrite.app.idealFontPointSize
                         }
                     }
                     property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
@@ -110,7 +110,7 @@ Menu2 {
                             return
                         }
 
-                        var prefCategory = scriteDocument.structure.preferredGroupCategory
+                        var prefCategory = Scrite.document.structure.preferredGroupCategory
 
                         var acts = sceneGroup.sceneActs
                         var index = -1
@@ -128,7 +128,7 @@ Menu2 {
                     }
 
                     function adjustScrollingLater() {
-                        app.execLater(groupsView, 50, adjustScrolling)
+                        Scrite.app.execLater(groupsView, 50, adjustScrolling)
                     }
 
                     delegate: Rectangle {
@@ -164,7 +164,7 @@ Menu2 {
                                 width: parent.width - parent.spacing - 24
                                 anchors.verticalCenter: parent.verticalCenter
                                 font.bold: groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 leftPadding: arrayItem.type > 0 ? 20 : 0
                                 elide: Text.ElideRight
                             }

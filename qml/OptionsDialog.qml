@@ -18,34 +18,34 @@ import Qt.labs.settings 1.0
 import QtQuick.Controls 2.13
 import QtQuick.Controls.Material 2.12
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Item {
     id: optionsDialog
     width: 1050
     height: Math.min(documentUI.height*0.9, 750)
     readonly property color dialogColor: primaryColors.windowColor
-    readonly property var systemFontInfo: app.systemFontInfo()
+    readonly property var systemFontInfo: Scrite.app.systemFontInfo()
 
     Component.onCompleted: {
         tabView.currentIndex = modalDialog.arguments && modalDialog.arguments.activeTabIndex ? modalDialog.arguments.activeTabIndex : 0
         modalDialog.arguments = undefined
         modalDialog.closeable = true
 
-        scriteDocument.formatting.beginTransaction();
-        scriteDocument.printFormat.beginTransaction();
+        Scrite.document.formatting.beginTransaction();
+        Scrite.document.printFormat.beginTransaction();
     }
 
     Connections {
         target: modalDialog
-        onAboutToClose: {
-            if(scriteDocument.formatting.hasChangesToCommit()) {
+        function onAboutToClose() {
+            if(Scrite.document.formatting.hasChangesToCommit()) {
                 busyOverlay.visible = true
-                app.sleep(100)
+                Scrite.app.sleep(100)
             }
 
-            scriteDocument.formatting.commitTransaction();
-            scriteDocument.printFormat.commitTransaction();
+            Scrite.document.formatting.commitTransaction();
+            Scrite.document.printFormat.commitTransaction();
         }
     }
 
@@ -127,13 +127,13 @@ Item {
                     columns: 4
 
                     Repeater {
-                        model: app.transliterationEngine.getLanguages()
+                        model: Scrite.app.transliterationEngine.getLanguages()
                         delegate: CheckBox2 {
                             width: activeLanguagesView.width/activeLanguagesView.columns
                             checkable: true
                             checked: modelData.active
                             text: modelData.key
-                            onToggled: app.transliterationEngine.markLanguage(modelData.value,checked)
+                            onToggled: Scrite.app.transliterationEngine.markLanguage(modelData.value,checked)
                         }
                     }
                 }
@@ -159,21 +159,21 @@ Item {
 
                             CheckBox2 {
                                 text: "Auto Save"
-                                checked: scriteDocument.autoSave
-                                onToggled: scriteDocument.autoSave = checked
+                                checked: Scrite.document.autoSave
+                                onToggled: Scrite.document.autoSave = checked
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width/2
                             }
 
                             TextField2 {
                                 label: enabled ? "Interval in seconds:" : ""
-                                enabled: scriteDocument.autoSave
-                                text: enabled ? scriteDocument.autoSaveDurationInSeconds : "No Auto Save"
+                                enabled: Scrite.document.autoSave
+                                text: enabled ? Scrite.document.autoSaveDurationInSeconds : "No Auto Save"
                                 width: parent.width/2
                                 validator: IntValidator {
                                     bottom: 1; top: 3600
                                 }
-                                onTextEdited: scriteDocument.autoSaveDurationInSeconds = parseInt(text)
+                                onTextEdited: Scrite.document.autoSaveDurationInSeconds = parseInt(text)
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
@@ -183,21 +183,21 @@ Item {
 
                             CheckBox2 {
                                 text: "Limit Backups"
-                                checked: scriteDocument.maxBackupCount > 0
-                                onToggled: scriteDocument.maxBackupCount = checked ? 20 : 0
+                                checked: Scrite.document.maxBackupCount > 0
+                                onToggled: Scrite.document.maxBackupCount = checked ? 20 : 0
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width/2
                             }
 
                             TextField2 {
                                 label: enabled ? "Number of backups to retain:" : ""
-                                enabled: scriteDocument.maxBackupCount > 0
-                                text: enabled ? scriteDocument.maxBackupCount : "Unlimited Backups"
+                                enabled: Scrite.document.maxBackupCount > 0
+                                text: enabled ? Scrite.document.maxBackupCount : "Unlimited Backups"
                                 width: parent.width/2
                                 validator: IntValidator {
                                     bottom: 1; top: 3600
                                 }
-                                onTextEdited: scriteDocument.maxBackupCount = parseInt(text)
+                                onTextEdited: Scrite.document.maxBackupCount = parseInt(text)
                                 anchors.verticalCenter: parent.verticalCenter
                             }
                         }
@@ -319,7 +319,7 @@ Item {
 
                         TextField {
                             id: appFontSizeField
-                            text: app.customFontPointSize === 0 ? app.idealFontPointSize : app.customFontPointSize
+                            text: Scrite.app.customFontPointSize === 0 ? Scrite.app.idealFontPointSize : Scrite.app.customFontPointSize
                             width: idealAppFontMetrics.averageCharacterWidth*5
                             selectByMouse: true
                             onActiveFocusChanged: {
@@ -334,9 +334,9 @@ Item {
 
                             function applyCustomFontSize() {
                                 if(length > 0)
-                                    app.customFontPointSize = parseInt(text)
+                                    Scrite.app.customFontPointSize = parseInt(text)
                                 else
-                                    app.customFontPointSize = 0
+                                    Scrite.app.customFontPointSize = 0
                             }
                         }
 
@@ -349,8 +349,8 @@ Item {
 
                 GroupBox {
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
-                    enabled: !app.isMacOSPlatform
+                    label: Text { text: Scrite.app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
+                    enabled: !Scrite.app.isMacOSPlatform
                     opacity: enabled ? 1 : 0.5
 
                     Row {
@@ -419,7 +419,7 @@ Item {
             Item { width: parent.width; height: 20 }
 
             Repeater {
-                model: app.enumerationModelForType("TransliterationEngine", "Language")
+                model: Scrite.app.enumerationModelForType("TransliterationEngine", "Language")
 
                 Row {
                     spacing: 10
@@ -428,7 +428,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         text: modelData.key
                         width: 175
                         horizontalAlignment: Text.AlignRight
@@ -437,13 +437,13 @@ Item {
 
                     ComboBox2 {
                         id: fontCombo
-                        property var fontFamilies: app.transliterationEngine.availableLanguageFontFamilies(modelData.value)
+                        property var fontFamilies: Scrite.app.transliterationEngine.availableLanguageFontFamilies(modelData.value)
                         model: fontFamilies.families
                         width: 400
                         currentIndex: fontFamilies.preferredFamilyIndex
                         onActivated: {
                             var family = fontFamilies.families[index]
-                            app.transliterationEngine.setPreferredFontFamilyForLanguage(modelData.value, family)
+                            Scrite.app.transliterationEngine.setPreferredFontFamilyForLanguage(modelData.value, family)
                             previewText.font.family = family
                         }
                     }
@@ -451,7 +451,7 @@ Item {
                     Text {
                         id: previewText
                         anchors.verticalCenter: parent.verticalCenter
-                        font.family: app.transliterationEngine.preferredFontFamilyForLanguage(modelData.value)
+                        font.family: Scrite.app.transliterationEngine.preferredFontFamilyForLanguage(modelData.value)
                         font.pixelSize: fontCombo.font.pixelSize * 1.2
                         text: fontSettingsUi.languagePreviewString[modelData.value]
                         width: 150
@@ -474,7 +474,7 @@ Item {
 
             Text {
                 id: titleText
-                font.pointSize: app.idealFontPointSize
+                font.pointSize: Scrite.app.idealFontPointSize
                 wrapMode: Text.WordWrap
                 width: parent.width - 40
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -482,7 +482,7 @@ Item {
             }
 
             Repeater {
-                model: app.enumerationModelForType("TransliterationEngine", "Language")
+                model: Scrite.app.enumerationModelForType("TransliterationEngine", "Language")
 
                 Row {
                     spacing: 10
@@ -491,7 +491,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         text: modelData.key + ": "
                         width: 175
                         horizontalAlignment: Text.AlignRight
@@ -506,12 +506,12 @@ Item {
                         textRole: "title"
                         onActivated: {
                             var item = sources[currentIndex]
-                            app.transliterationEngine.setTextInputSourceIdForLanguage(modelData.value, item.id)
+                            Scrite.app.transliterationEngine.setTextInputSourceIdForLanguage(modelData.value, item.id)
                         }
 
                         Component.onCompleted: {
-                            var tisSources = app.textInputManager.sourcesForLanguageJson(modelData.value)
-                            var tisSourceId = app.transliterationEngine.textInputSourceIdForLanguage(modelData.value)
+                            var tisSources = Scrite.app.textInputManager.sourcesForLanguageJson(modelData.value)
+                            var tisSourceId = Scrite.app.transliterationEngine.textInputSourceIdForLanguage(modelData.value)
                             tisSources.unshift({"id": "", "title": "Default (Inbuilt Scrite Transliterator)"})
                             enabled = tisSources.length > 1
                             sources = tisSources
@@ -585,7 +585,7 @@ Item {
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: structureCanvasSettings.canvasColor = app.pickColor(structureCanvasSettings.canvasColor)
+                                    onClicked: structureCanvasSettings.canvasColor = Scrite.app.pickColor(structureCanvasSettings.canvasColor)
                                 }
                             }
 
@@ -606,7 +606,7 @@ Item {
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: structureCanvasSettings.gridColor = app.pickColor(structureCanvasSettings.gridColor)
+                                    onClicked: structureCanvasSettings.gridColor = Scrite.app.pickColor(structureCanvasSettings.gridColor)
                                 }
                             }
                         }
@@ -614,7 +614,7 @@ Item {
                         Row {
                             spacing: 10
                             width: parent.width
-                            visible: app.isWindowsPlatform || app.isLinuxPlatform
+                            visible: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
 
                             Text {
                                 id: wzfText
@@ -647,21 +647,21 @@ Item {
                         CheckBox2 {
                             text: "Use Index Card UI On Canvas"
                             checkable: true
-                            enabled: scriteDocument.structure.elementStacks.objectCount === 0
-                            checked: scriteDocument.structure.canvasUIMode === Structure.IndexCardUI
+                            enabled: Scrite.document.structure.elementStacks.objectCount === 0
+                            checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
                             onToggled: {
                                 var toggleCanvasUI = function() {
-                                    if(scriteDocument.structure.canvasUIMode === Structure.IndexCardUI)
-                                        scriteDocument.structure.canvasUIMode = Structure.SynopsisEditorUI
+                                    if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
+                                        Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
                                     else
-                                        scriteDocument.structure.canvasUIMode = Structure.IndexCardUI
+                                        Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
                                 }
 
                                 if(mainTabBar.currentIndex === 0) {
                                     toggleCanvasUI()
                                 } else {
                                     contentLoader.active = false
-                                    app.execLater(contentLoader, 100, function() {
+                                    Scrite.app.execLater(contentLoader, 100, function() {
                                         toggleCanvasUI()
                                         contentLoader.active = true
                                     })
@@ -701,19 +701,19 @@ Item {
                         Text {
                             width: parent.width
                             wrapMode: Text.WordWrap
-                            text: "Default Resolution: <strong>" + Math.round(scriteDocument.displayFormat.pageLayout.defaultResolution) + "</strong>"
+                            text: "Default Resolution: <strong>" + Math.round(Scrite.document.displayFormat.pageLayout.defaultResolution) + "</strong>"
                         }
 
                         TextField2 {
                             width: parent.width
                             placeholderText: "leave empty for default, or enter a custom value."
-                            text: scriteDocument.displayFormat.pageLayout.customResolution > 0 ? scriteDocument.displayFormat.pageLayout.customResolution : ""
+                            text: Scrite.document.displayFormat.pageLayout.customResolution > 0 ? Scrite.document.displayFormat.pageLayout.customResolution : ""
                             onEditingComplete: {
                                 var value = parseFloat(text)
                                 if(isNaN(value))
-                                    scriteDocument.displayFormat.pageLayout.customResolution = 0
+                                    Scrite.document.displayFormat.pageLayout.customResolution = 0
                                 else
-                                    scriteDocument.displayFormat.pageLayout.customResolution = value
+                                    Scrite.document.displayFormat.pageLayout.customResolution = value
                             }
                         }
                     }
@@ -736,7 +736,7 @@ Item {
                         Text {
                             id: windowTabsExplainerText
                             width: parent.width
-                            font.pointSize: app.idealFontPointSize-2
+                            font.pointSize: Scrite.app.idealFontPointSize-2
                             text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. (Note: This works when Scrite window size is atleast 1600 px wide.)"
                             wrapMode: Text.WordWrap
                         }
@@ -772,7 +772,7 @@ Item {
 
                     Settings {
                         id: pdfExportSettings
-                        fileName: app.settingsFilePath
+                        fileName: Scrite.app.settingsFilePath
                         category: "PdfExport"
                         property bool usePdfDriver: true
                     }
@@ -784,7 +784,7 @@ Item {
                         Text {
                             width: parent.width
                             height: windowTabsExplainerText.height
-                            font.pointSize: app.idealFontPointSize-2
+                            font.pointSize: Scrite.app.idealFontPointSize-2
                             text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
                             wrapMode: Text.WordWrap
                         }
@@ -823,7 +823,7 @@ Item {
                     width: parent.width
 
                     TextArea {
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         width: parent.width
                         wrapMode: Text.WordWrap
                         textFormat: TextArea.RichText
@@ -842,14 +842,14 @@ Item {
 
                             Text {
                                 font.bold: true
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 text: "Max Time In Milliseconds"
                                 width: parent.width
                             }
 
                             Text {
                                 font.bold: false
-                                font.pointSize: app.idealFontPointSize-2
+                                font.pointSize: Scrite.app.idealFontPointSize-2
                                 text: "Default: 1000"
                             }
 
@@ -877,14 +877,14 @@ Item {
 
                             Text {
                                 font.bold: true
-                                font.pointSize: app.idealFontPointSize
+                                font.pointSize: Scrite.app.idealFontPointSize
                                 text: "Max Iterations"
                                 width: parent.width
                             }
 
                             Text {
                                 font.bold: false
-                                font.pointSize: app.idealFontPointSize-2
+                                font.pointSize: Scrite.app.idealFontPointSize-2
                                 text: "Default: 50000"
                             }
 
@@ -917,11 +917,11 @@ Item {
 
         Item {
             property real labelWidth: 60
-            property var fieldsModel: app.enumerationModelForType("HeaderFooter", "Field")
+            property var fieldsModel: Scrite.app.enumerationModelForType("HeaderFooter", "Field")
 
             Settings {
                 id: pageSetupSettings
-                fileName: app.settingsFilePath
+                fileName: Scrite.app.settingsFilePath
                 category: "PageSetup"
                 property var paperSize: ScreenplayPageLayout.Letter
                 property var headerLeft: HeaderFooter.Title
@@ -968,10 +968,10 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             onActivated: {
                                 pageSetupSettings.paperSize = currentIndex
-                                scriteDocument.formatting.pageLayout.paperSize = currentIndex
-                                scriteDocument.printFormat.pageLayout.paperSize = currentIndex
+                                Scrite.document.formatting.pageLayout.paperSize = currentIndex
+                                Scrite.document.printFormat.pageLayout.paperSize = currentIndex
                             }
-                            model: app.enumerationModelForType("ScreenplayPageLayout", "PaperSize")
+                            model: Scrite.app.enumerationModelForType("ScreenplayPageLayout", "PaperSize")
                         }
                     }
 
@@ -988,9 +988,9 @@ Item {
                         TextField2 {
                             label: "Seconds (15 - 300)"
                             labelAlwaysVisible: true
-                            text: scriteDocument.printFormat.secondsPerPage
+                            text: Scrite.document.printFormat.secondsPerPage
                             validator: IntValidator { bottom: 15; top: 300 }
-                            onTextEdited: scriteDocument.printFormat.secondsPerPage = parseInt(text)
+                            onTextEdited: Scrite.document.printFormat.secondsPerPage = parseInt(text)
                             width: sceneEditorFontMetrics.averageCharacterWidth*3
                         }
 
@@ -1218,7 +1218,7 @@ Item {
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: pageSetupSettings.watermarkColor = app.pickColor(pageSetupSettings.watermarkColor)
+                                    onClicked: pageSetupSettings.watermarkColor = Scrite.app.pickColor(pageSetupSettings.watermarkColor)
                                 }
                             }
                         }
@@ -1315,7 +1315,7 @@ Item {
 
             Settings {
                 id: titlePageSettings
-                fileName: app.settingsFilePath
+                fileName: Scrite.app.settingsFilePath
                 category: "TitlePage"
 
                 property string author
@@ -1340,20 +1340,20 @@ Item {
                   So, we need to provide a image preview in this aspect ratio.
                   */
                     width: 400; height: 225
-                    border.width: scriteDocument.screenplay.coverPagePhoto === "" ? 1 : 0
+                    border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
                     border.color: "black"
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     Loader {
                         anchors.fill: parent
-                        active: scriteDocument.screenplay.coverPagePhoto !== "" && (coverPagePhoto.paintedWidth < parent.width || coverPagePhoto.paintedHeight < parent.height)
+                        active: Scrite.document.screenplay.coverPagePhoto !== "" && (coverPagePhoto.paintedWidth < parent.width || coverPagePhoto.paintedHeight < parent.height)
                         opacity: 0.1
                         sourceComponent: Item {
                             Image {
                                 id: coverPageImage
                                 anchors.fill: parent
                                 fillMode: Image.PreserveAspectCrop
-                                source: "file://" + scriteDocument.screenplay.coverPagePhoto
+                                source: "file://" + Scrite.document.screenplay.coverPagePhoto
                                 asynchronous: true
                             }
                         }
@@ -1365,7 +1365,7 @@ Item {
                         anchors.margins: 1
                         smooth: true; mipmap: true
                         fillMode: Image.PreserveAspectFit
-                        source: scriteDocument.screenplay.coverPagePhoto !== "" ? "file:///" + scriteDocument.screenplay.coverPagePhoto : ""
+                        source: Scrite.document.screenplay.coverPagePhoto !== "" ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
                         opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
 
                         BusyIndicator {
@@ -1379,8 +1379,8 @@ Item {
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        opacity: coverPagePhotoMouseArea.containsMouse ? 1 : (scriteDocument.screenplay.coverPagePhoto === "" ? 0.5 : 0)
-                        text: scriteDocument.screenplay.coverPagePhoto === "" ? "Click here to set the cover page photo" : "Click here to change the cover page photo"
+                        opacity: coverPagePhotoMouseArea.containsMouse ? 1 : (Scrite.document.screenplay.coverPagePhoto === "" ? 0.5 : 0)
+                        text: Scrite.document.screenplay.coverPagePhoto === "" ? "Click here to set the cover page photo" : "Click here to change the cover page photo"
                     }
 
                     MouseArea {
@@ -1388,20 +1388,20 @@ Item {
                         anchors.fill: parent
                         cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                         hoverEnabled: true
-                        enabled: !scriteDocument.readOnly
+                        enabled: !Scrite.document.readOnly
                         onClicked: fileDialog.open()
                     }
 
                     AttachmentsDropArea2 {
                         anchors.fill: parent
                         attachmentNoticeSuffix: "Drop to set as cover page photo."
-                        visible: !scriteDocument.readOnly
+                        visible: !Scrite.document.readOnly
                         allowedType: Attachments.PhotosOnly
                         onDropped: {
-                            scriteDocument.screenplay.clearCoverPagePhoto()
+                            Scrite.document.screenplay.clearCoverPagePhoto()
                             var filePath = attachment.filePath
                             Qt.callLater( function(fp) {
-                                scriteDocument.screenplay.setCoverPagePhoto(fp)
+                                Scrite.document.screenplay.setCoverPagePhoto(fp)
                             }, filePath)
                         }
                     }
@@ -1410,8 +1410,8 @@ Item {
                         spacing: 0
                         anchors.left: parent.right
                         anchors.leftMargin: 20
-                        visible: scriteDocument.screenplay.coverPagePhoto !== ""
-                        enabled: visible && !scriteDocument.readOnly
+                        visible: Scrite.document.screenplay.coverPagePhoto !== ""
+                        enabled: visible && !Scrite.document.readOnly
 
                         Text {
                             text: "Cover Photo Size"
@@ -1424,25 +1424,25 @@ Item {
 
                         RadioButton2 {
                             text: "Small"
-                            checked: scriteDocument.screenplay.coverPagePhotoSize === Screenplay.SmallCoverPhoto
-                            onToggled: scriteDocument.screenplay.coverPagePhotoSize = Screenplay.SmallCoverPhoto
+                            checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.SmallCoverPhoto
+                            onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.SmallCoverPhoto
                         }
 
                         RadioButton2 {
                             text: "Medium"
-                            checked: scriteDocument.screenplay.coverPagePhotoSize === Screenplay.MediumCoverPhoto
-                            onToggled: scriteDocument.screenplay.coverPagePhotoSize = Screenplay.MediumCoverPhoto
+                            checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.MediumCoverPhoto
+                            onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.MediumCoverPhoto
                         }
 
                         RadioButton2 {
                             text: "Large"
-                            checked: scriteDocument.screenplay.coverPagePhotoSize === Screenplay.LargeCoverPhoto
-                            onToggled: scriteDocument.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
+                            checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.LargeCoverPhoto
+                            onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
                         }
 
                         Button2 {
                             text: "Remove"
-                            onClicked: scriteDocument.screenplay.clearCoverPagePhoto()
+                            onClicked: Scrite.document.screenplay.clearCoverPagePhoto()
                         }
                     }
 
@@ -1455,7 +1455,7 @@ Item {
                         selectExisting: true
                         onAccepted: {
                             if(fileUrl != "")
-                                scriteDocument.screenplay.setCoverPagePhoto(app.urlToLocalFile(fileUrl))
+                                Scrite.document.screenplay.setCoverPagePhoto(Scrite.app.urlToLocalFile(fileUrl))
                         }
                         folder: workspaceSettings.lastOpenPhotosFolderUrl
                         onFolderChanged: workspaceSettings.lastOpenPhotosFolderUrl = folder
@@ -1466,7 +1466,7 @@ Item {
                     id: titlePageFields
                     width: parent.width
                     spacing: 20
-                    enabled: !scriteDocument.readOnly
+                    enabled: !Scrite.document.readOnly
 
                     Column {
                         width: (parent.width - parent.spacing)/2
@@ -1488,9 +1488,9 @@ Item {
                             TextField2 {
                                 id: titleField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.title
+                                text: Scrite.document.screenplay.title
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.title = text
+                                onTextEdited: Scrite.document.screenplay.title = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
@@ -1516,9 +1516,9 @@ Item {
                             TextField2 {
                                 id: subtitleField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.subtitle
+                                text: Scrite.document.screenplay.subtitle
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.subtitle = text
+                                onTextEdited: Scrite.document.screenplay.subtitle = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
@@ -1544,9 +1544,9 @@ Item {
                             TextField2 {
                                 id: basedOnField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.basedOn
+                                text: Scrite.document.screenplay.basedOn
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.basedOn = text
+                                onTextEdited: Scrite.document.screenplay.basedOn = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
@@ -1572,9 +1572,9 @@ Item {
                             TextField2 {
                                 id: versionField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.version
+                                text: Scrite.document.screenplay.version
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.version = text
+                                onTextEdited: Scrite.document.screenplay.version = text
                                 font.pixelSize: 20
                                 maximumLength: 20
                                 placeholderText: "(max 20 letters)"
@@ -1600,9 +1600,9 @@ Item {
                             TextField2 {
                                 id: authorField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.author
+                                text: Scrite.document.screenplay.author
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.author = text
+                                onTextEdited: Scrite.document.screenplay.author = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(max 100 letters)"
@@ -1633,9 +1633,9 @@ Item {
                             TextField2 {
                                 id: contactField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.contact
+                                text: Scrite.document.screenplay.contact
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.contact = text
+                                onTextEdited: Scrite.document.screenplay.contact = text
                                 font.pixelSize: 20
                                 placeholderText: "(Optional) Company / Studio name (max 100 letters)"
                                 maximumLength: 100
@@ -1661,9 +1661,9 @@ Item {
                             TextField2 {
                                 id: addressField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.address
+                                text: Scrite.document.screenplay.address
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.address = text
+                                onTextEdited: Scrite.document.screenplay.address = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Address (max 100 letters)"
@@ -1688,9 +1688,9 @@ Item {
                             TextField2 {
                                 id: emailField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.email
+                                text: Scrite.document.screenplay.email
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.email = text
+                                onTextEdited: Scrite.document.screenplay.email = text
                                 font.pixelSize: 20
                                 maximumLength: 100
                                 placeholderText: "(Optional) Email (max 100 letters)"
@@ -1715,9 +1715,9 @@ Item {
                             TextField2 {
                                 id: phoneField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.phoneNumber
+                                text: Scrite.document.screenplay.phoneNumber
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.phoneNumber = text
+                                onTextEdited: Scrite.document.screenplay.phoneNumber = text
                                 font.pixelSize: 20
                                 maximumLength: 20
                                 placeholderText: "(Optional) Phone number (max 20 digits/letters)"
@@ -1742,9 +1742,9 @@ Item {
                             TextField2 {
                                 id: websiteField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: scriteDocument.screenplay.website
+                                text: Scrite.document.screenplay.website
                                 selectByMouse: true
-                                onTextEdited: scriteDocument.screenplay.website = text
+                                onTextEdited: Scrite.document.screenplay.website = text
                                 font.pixelSize: 20
                                 maximumLength: 150
                                 placeholderText: "(Optional) Website (max 150 letters)"
@@ -1767,8 +1767,8 @@ Item {
 
                     CheckBox2 {
                         text: "Center Align Title Page"
-                        checked: scriteDocument.screenplay.titlePageIsCentered
-                        onToggled: scriteDocument.screenplay.titlePageIsCentered = checked
+                        checked: Scrite.document.screenplay.titlePageIsCentered
+                        onToggled: Scrite.document.screenplay.titlePageIsCentered = checked
                     }
                 }
 
@@ -1780,12 +1780,12 @@ Item {
                     ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
                     ToolTip.delay: 1000
                     onClicked: {
-                        titlePageSettings.author = scriteDocument.screenplay.author
-                        titlePageSettings.contact = scriteDocument.screenplay.contact
-                        titlePageSettings.address = scriteDocument.screenplay.address
-                        titlePageSettings.email = scriteDocument.screenplay.email
-                        titlePageSettings.phone = scriteDocument.screenplay.phoneNumber
-                        titlePageSettings.website = scriteDocument.screenplay.website
+                        titlePageSettings.author = Scrite.document.screenplay.author
+                        titlePageSettings.contact = Scrite.document.screenplay.contact
+                        titlePageSettings.address = Scrite.document.screenplay.address
+                        titlePageSettings.email = Scrite.document.screenplay.email
+                        titlePageSettings.phone = Scrite.document.screenplay.phoneNumber
+                        titlePageSettings.website = Scrite.document.screenplay.website
                         defaultsSavedNotice.opacity = true
                     }
                 }
@@ -1800,7 +1800,7 @@ Item {
                 opacity: 0
                 onOpacityChanged: {
                     if(opacity > 0)
-                        app.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
+                        Scrite.app.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
                 }
             }
         }
@@ -1813,8 +1813,8 @@ Item {
             id: formattingRulesPageView
             readonly property real labelWidth: 125
             property var pageData: pagesArray[currentIndex]
-            property SceneElementFormat displayElementFormat: scriteDocument.formatting.elementFormat(pageData.elementType)
-            property SceneElementFormat printElementFormat: scriteDocument.printFormat.elementFormat(pageData.elementType)
+            property SceneElementFormat displayElementFormat: Scrite.document.formatting.elementFormat(pageData.elementType)
+            property SceneElementFormat printElementFormat: Scrite.document.printFormat.elementFormat(pageData.elementType)
 
             pagesArray: [
                 { "elementName": "Heading", "elementType": SceneElement.Heading },
@@ -1837,8 +1837,8 @@ Item {
                     anchors.bottom: parent.bottom
                     anchors.bottomMargin: 10
                     onClicked: {
-                        scriteDocument.formatting.resetToDefaults()
-                        scriteDocument.printFormat.resetToDefaults()
+                        Scrite.document.formatting.resetToDefaults()
+                        Scrite.document.printFormat.resetToDefaults()
                     }
                 }
             }
@@ -1846,7 +1846,7 @@ Item {
             pageContent: Column {
                 id: scrollViewContent
                 spacing: 0
-                enabled: !scriteDocument.readOnly
+                enabled: !Scrite.document.readOnly
 
                 Item { width: parent.width; height: 10 }
 
@@ -1862,7 +1862,7 @@ Item {
 
                         TextArea {
                             id: previewText
-                            font: scriteDocument.formatting.defaultFont
+                            font: Scrite.document.formatting.defaultFont
                             readOnly: true
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             background: Rectangle {
@@ -1870,7 +1870,7 @@ Item {
                             }
 
                             SceneDocumentBinder {
-                                screenplayFormat: scriteDocument.formatting
+                                screenplayFormat: Scrite.document.formatting
                                 applyFormattingEvenInTransaction: true
                                 scene: Scene {
                                     elements: [
@@ -1929,7 +1929,7 @@ Item {
                     }
 
                     ComboBox2 {
-                        property var enumModel: app.enumerationModel(displayElementFormat, "DefaultLanguage")
+                        property var enumModel: Scrite.app.enumerationModel(displayElementFormat, "DefaultLanguage")
                         model: enumModel
                         width: 300
                         textRole: "key"
@@ -2131,7 +2131,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    displayElementFormat.textColor = app.pickColor(displayElementFormat.textColor)
+                                    displayElementFormat.textColor = Scrite.app.pickColor(displayElementFormat.textColor)
                                     printElementFormat.textColor = displayElementFormat.textColor
                                 }
                             }
@@ -2154,7 +2154,7 @@ Item {
                                 anchors.fill: parent
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: {
-                                    displayElementFormat.backgroundColor = app.pickColor(displayElementFormat.backgroundColor)
+                                    displayElementFormat.backgroundColor = Scrite.app.pickColor(displayElementFormat.backgroundColor)
                                     printElementFormat.backgroundColor = displayElementFormat.backgroundColor
                                 }
                             }
@@ -2276,7 +2276,7 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 20
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pointSize: app.idealFontPointSize-2
+                        font.pointSize: Scrite.app.idealFontPointSize-2
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.WordWrap
                         color: primaryColors.c100.background
@@ -2326,9 +2326,9 @@ Item {
 
                     TextArea {
                         id: groupsDataEdit
-                        text: scriteDocument.structure.groupsData
+                        text: Scrite.document.structure.groupsData
                         font.family: "Courier Prime"
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         background: Item { }
                         leftPadding: 5
                         rightPadding: 10
@@ -2350,7 +2350,7 @@ Item {
                     Button2 {
                         text: "Apply"
                         onClicked: {
-                            scriteDocument.structure.groupsData = groupsDataEdit.text
+                            Scrite.document.structure.groupsData = groupsDataEdit.text
                             modalDialog.close()
                         }
                     }
@@ -2381,9 +2381,9 @@ Item {
 
                     TextArea {
                         id: groupsDataEdit
-                        text: app.fileContents(scriteDocument.structure.defaultGroupsDataFile)
+                        text: Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
                         font.family: "Courier Prime"
-                        font.pointSize: app.idealFontPointSize
+                        font.pointSize: Scrite.app.idealFontPointSize
                         background: Item { }
                         leftPadding: 5
                         rightPadding: 10
@@ -2405,7 +2405,7 @@ Item {
                     Button2 {
                         text: "Apply"
                         onClicked: {
-                            app.writeToFile(scriteDocument.structure.defaultGroupsDataFile, groupsDataEdit.text)
+                            Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, groupsDataEdit.text)
                             modalDialog.close()
                         }
                     }

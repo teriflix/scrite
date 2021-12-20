@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "scrite.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
@@ -29,6 +30,7 @@ static QString GetSessionExpiredErrorMessage()
                           "deactivated. Please connect to the Internet and "
                           "login/reactivate your installation of Scrite.");
 }
+
 User *User::instance()
 {
     User::locations(); // preload
@@ -175,6 +177,7 @@ void User::setInfo(const QJsonObject &val)
     m_analyticsConsent = false;
 
     if (!m_info.isEmpty()) {
+        // Must be in sync with Scrite.AppFeatures enumeration
         static const QStringList availableFeatures = {
             QStringLiteral("screenplay"), QStringLiteral("structure"),
             QStringLiteral("notebook"),   QStringLiteral("relationshipgraph"),
@@ -190,7 +193,7 @@ void User::setInfo(const QJsonObject &val)
                 continue;
 
             if (feature == QStringLiteral("*")) {
-                for (int i = MinFeature; i <= MaxFeature; i++)
+                for (int i = Scrite::MinFeature; i <= Scrite::MaxFeature; i++)
                     ifeatures += i;
             } else {
                 const bool invert = feature.startsWith(QChar('!'));
@@ -745,7 +748,7 @@ void AppFeature::reevaluate()
     if (User::instance()->isLoggedIn()) {
         const bool flag1 = m_feature < 0
                 ? true
-                : User::instance()->isFeatureEnabled(User::AppFeature(m_feature));
+                : User::instance()->isFeatureEnabled(Scrite::AppFeature(m_feature));
         const bool flag2 = m_featureName.isEmpty()
                 ? true
                 : User::instance()->isFeatureNameEnabled(m_featureName);

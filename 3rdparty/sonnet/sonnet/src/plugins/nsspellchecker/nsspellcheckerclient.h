@@ -38,14 +38,13 @@ public:
     explicit NSSpellCheckerClient(QObject *parent = nullptr);
     ~NSSpellCheckerClient();
 
+    static bool ensureSpellCheckerAvailability();
+
     int reliability() const;
 
     SpellerPlugin *createSpeller(const QString &language);
     QStringList languages() const;
-    QString name() const
-    {
-        return QStringLiteral("NSSpellChecker");
-    }
+    QString name() const { return QStringLiteral("NSSpellChecker"); }
 };
 
 #endif

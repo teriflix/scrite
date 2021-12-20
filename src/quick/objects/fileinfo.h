@@ -21,6 +21,7 @@
 class FileInfo : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     FileInfo(QObject *parent = nullptr);

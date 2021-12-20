@@ -15,6 +15,7 @@
 #define NOTIFICATIONMANAGER_H
 
 #include <QAbstractListModel>
+#include <QQmlEngine>
 
 class PlayerApp;
 class Notification;
@@ -22,9 +23,12 @@ class Notification;
 class NotificationManager : public QAbstractListModel
 {
     Q_OBJECT
+    QML_NAMED_ELEMENT(ScriteNotifications)
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static NotificationManager *instance();
+
     NotificationManager(QObject *parent = nullptr);
     ~NotificationManager();
 

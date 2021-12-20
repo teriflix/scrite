@@ -16,7 +16,7 @@ import QtQuick 2.13
 import QtQuick.Window 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 /**
   This item is used for highlighting UI elements to educate users about where
@@ -61,7 +61,7 @@ Item {
                 id: descLabel
                 text: description
                 font.bold: true
-                font.pointSize: app.idealFontPointSize+2
+                font.pointSize: Scrite.app.idealFontPointSize+2
                 color: accentColors.highlight.text
                 leftPadding: (descriptionPosition === Item.Right ? descIcon.width : 0) + 5
                 rightPadding: (descriptionPosition === Item.Left ? descIcon.width : 0) + 5

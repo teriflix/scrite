@@ -14,6 +14,7 @@
 #ifndef ERRORREPORT_H
 #define ERRORREPORT_H
 
+#include <QQmlEngine>
 #include <QJsonObject>
 #include <QAbstractListModel>
 
@@ -22,6 +23,8 @@
 class ErrorReport : public QAbstractListModel
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     ErrorReport(QObject *parent = nullptr);
@@ -77,5 +80,7 @@ private:
     QStringList m_warningMessages;
     QObjectProperty<ErrorReport> m_proxyFor;
 };
+
+QML_DECLARE_TYPE(ErrorReport)
 
 #endif // ERRORREPORT_H

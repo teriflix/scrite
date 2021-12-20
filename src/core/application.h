@@ -46,7 +46,9 @@ class Application : public QtApplicationClass
     Q_OBJECT
 
 public:
+    static QVersionNumber prepare();
     static Application *instance();
+
     Application(int &argc, char **argv, const QVersionNumber &version);
     ~Application();
 

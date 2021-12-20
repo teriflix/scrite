@@ -7,6 +7,10 @@ DEFINES += PHTRANSLATE_STATICLIB
 #DEFINES += SCRITE_ENABLE_AUTOMATION
 #QT += testlib
 
+CONFIG += qmltypes
+QML_IMPORT_NAME = io.scrite.components
+QML_IMPORT_MAJOR_VERSION = 1
+
 CONFIG(release, debug|release): {
     DEFINES += QT_NO_DEBUG_OUTPUT
     CONFIG += qtquickcompiler
@@ -48,11 +52,13 @@ HEADERS += \
     src/automation/pausestep.h \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
+    src/core/appwindow.h \
     src/core/filelocker.h \
     src/core/objectlistpropertymodel.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/printerobject.h \
     src/core/qobjectproperty.h \
+    src/core/scrite.h \
     src/core/systemtextinputmanager.h \
     src/document/attachments.h \
     src/document/characterrelationshipsgraph.h \
@@ -166,10 +172,12 @@ SOURCES += \
     src/automation/scriptautomationstep.cpp \
     src/automation/windowcapture.cpp \
     src/core/application_build_timestamp.cpp \
+    src/core/appwindow.cpp \
     src/core/filelocker.cpp \
     src/core/objectlistpropertymodel.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/qobjectproperty.cpp \
+    src/core/scrite.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
     src/document/characterrelationshipsgraph.cpp \

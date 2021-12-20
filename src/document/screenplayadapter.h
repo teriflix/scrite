@@ -16,6 +16,7 @@
 
 #include <QTimer>
 #include <QPointer>
+#include <QQmlEngine>
 #include <QIdentityProxyModel>
 
 #include "qobjectproperty.h"
@@ -30,6 +31,7 @@ class ScreenplayElement;
 class ScreenplayAdapter : public QIdentityProxyModel
 {
     Q_OBJECT
+    QML_ELEMENT
 
 public:
     ScreenplayAdapter(QObject *parent = nullptr);

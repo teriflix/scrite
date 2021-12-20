@@ -14,7 +14,7 @@
 import QtQuick 2.13
 import QtQuick.Controls 2.13
 
-import Scrite 1.0
+import io.scrite.components 1.0
 
 Flickable {
     id: notificationsView
@@ -29,14 +29,14 @@ Flickable {
         width: notificationsView.width
 
         Repeater {
-            model: notificationManager.count
+            model: Scrite.notifications.count
 
             Rectangle {
                 width: notificationsView.width-1
                 height: Math.max(100, ntextLayout.implicitHeight+20)
                 color: notification.color
                 border { width: 1; color: primaryColors.borderColor }
-                property Notification notification: notificationManager.notificationAt(index)
+                property Notification notification: Scrite.notifications.notificationAt(index)
 
                 Column {
                     id: ntextLayout
@@ -95,7 +95,7 @@ Flickable {
                     anchors.right: parent.right
                     anchors.rightMargin: 20
                     text: "Dismiss"
-                    onClicked: notificationManager.dismissNotification(index)
+                    onClicked: Scrite.notifications.dismissNotification(index)
                 }
             }
         }
