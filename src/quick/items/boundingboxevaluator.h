@@ -138,6 +138,7 @@ class BoundingBoxItem : public QObject
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_ATTACHED(BoundingBoxItem)
 
 public:
     BoundingBoxItem(QObject *parent = nullptr);
@@ -188,7 +189,7 @@ public:
         VisibleUponViewportIntersection,
         VisibleUponViewportContains
     };
-    Q_ENUMS(VisibilityMode)
+    Q_ENUM(VisibilityMode)
     Q_PROPERTY(VisibilityMode visibilityMode READ visibilityMode WRITE setVisibilityMode NOTIFY visibilityModeChanged)
     void setVisibilityMode(VisibilityMode val);
     VisibilityMode visibilityMode() const { return m_visibilityMode; }
@@ -288,8 +289,5 @@ private:
     qreal m_backgroundOpacity = 1.0;
     QObjectProperty<BoundingBoxEvaluator> m_evaluator;
 };
-
-Q_DECLARE_METATYPE(BoundingBoxItem *)
-QML_DECLARE_TYPEINFO(BoundingBoxItem, QML_HAS_ATTACHED_PROPERTIES)
 
 #endif // ITEMSBOUNDINGBOX_H
