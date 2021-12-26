@@ -2355,7 +2355,6 @@ Rectangle {
             }
 
             function assumeFocus() {
-                Scrite.app.log("assumeFocus: " + sceneTextEditor.activeFocus)
                 if(!sceneTextEditor.activeFocus)
                     sceneTextEditor.forceActiveFocus()
             }

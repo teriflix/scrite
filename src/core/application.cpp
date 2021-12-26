@@ -187,7 +187,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
 QVersionNumber Application::prepare()
 {
-    const QVersionNumber applicationVersion(0, 8, 1);
+    const QVersionNumber applicationVersion(0, 8, 2);
 
     if (qApp != nullptr)
         return applicationVersion;
