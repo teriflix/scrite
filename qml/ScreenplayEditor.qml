@@ -409,10 +409,10 @@ Rectangle {
                                 editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
                                 editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis ||
                                 componentData.scene.elementCount <= 1) {
-                                active = true
-                                initialized = true
-                                return
-                            }
+                                    active = true
+                                    initialized = true
+                                    return
+                                }
 
                             height = editorHints.height * zoomLevel
                             active = false
@@ -558,6 +558,7 @@ Rectangle {
                         }
 
                         Row {
+                            id: addButtonsRow
                             anchors.centerIn: parent
                             anchors.verticalCenterOffset: screenplayAdapter.elementCount > 0 ? contentView.spacing/2 : 0
                             visible: screenplayAdapter.isSourceScreenplay && enabled
@@ -599,6 +600,18 @@ Rectangle {
                                 suggestedWidth: 48
                                 suggestedHeight: 48
                                 onClicked: Scrite.document.screenplay.addBreakElement(Screenplay.Episode)
+                            }
+                        }
+
+                        Loader {
+                            id: addButtonsAnimator
+                            active: mainTabBar.currentIndex === 0 && contentView.count === 1 && !modalDialog.active && !splashLoader.active
+                            anchors.fill: parent
+                            sourceComponent: UiElementHighlight {
+                                uiElement: addButtonsRow
+                                descriptionPosition: Item.Bottom
+                                description: "Use these buttons to add new a scene, act or episode."
+                                onDone: addButtonsAnimator.active = false
                             }
                         }
                     }
@@ -2342,6 +2355,7 @@ Rectangle {
             }
 
             function assumeFocus() {
+                Scrite.app.log("assumeFocus: " + sceneTextEditor.activeFocus)
                 if(!sceneTextEditor.activeFocus)
                     sceneTextEditor.forceActiveFocus()
             }
@@ -3678,5 +3692,21 @@ Rectangle {
         color: Qt.rgba(0,0,0,0)
         border.width: 1
         border.color: primaryColors.borderColor
+    }
+
+    Connections {
+        target: modalDialog
+        function onActiveChanged() {
+            if(modalDialog.active === false && mainTabBar.currentIndex === 0 && contentView.count === 1)
+                contentView.itemAtIndex(0).item.assumeFocus()
+        }
+    }
+
+    Connections {
+        target: splashLoader
+        function onActiveChanged() {
+            if(splashLoader.active === false && mainTabBar.currentIndex === 0 && contentView.count === 1)
+                contentView.itemAtIndex(0).item.assumeFocus()
+        }
     }
 }

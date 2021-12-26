@@ -640,8 +640,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 
     const QVector<QColor> standardColors = Application::standardColors(QVersionNumber());
-    const QColor defaultColor =
-            standardColors.at(QRandomGenerator::global()->bounded(standardColors.size() - 1));
+    const QColor defaultColor = standardColors.first();
 
     Scene *scene = new Scene(m_structure);
     scene->setColor(activeScene ? activeScene->color() : defaultColor);
@@ -816,6 +815,7 @@ void ScriteDocument::reset()
     this->setFileName(QString());
     this->setUserData(QJsonObject());
     this->evaluateStructureElementSequence();
+    this->createNewScene(); // Create a blank scene in new documents.
     this->setModified(false);
     emit emptyChanged();
 
