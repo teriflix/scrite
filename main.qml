@@ -11,12 +11,12 @@
 **
 ****************************************************************************/
 
-import QtQml 2.13
-import QtQuick 2.13
+import QtQml 2.15
+import QtQuick 2.15
 import Qt.labs.settings 1.0
-import QtQuick.Controls 2.13
+import QtQuick.Controls 2.15
 // import QtGraphicalEffects 1.0
-import QtQuick.Controls.Material 2.12
+import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 

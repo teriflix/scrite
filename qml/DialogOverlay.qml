@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-import QtQml 2.13
-import QtQuick 2.13
+import QtQml 2.15
+import QtQuick 2.15
 
 import io.scrite.components 1.0
 
@@ -30,7 +30,7 @@ Rectangle {
     property bool closeOnEscape: closeable || closeUponClickOutsideContentArea
     property bool closeUponClickOutsideContentArea: false
     property bool animationsEnabled: true
-    readonly property int animationDuration: 150
+    readonly property int animationDuration: 400
     signal closeRequest()
     signal aboutToClose()
 
@@ -77,7 +77,7 @@ Rectangle {
         NumberAnimation {
             id: tAnimation
             duration: animationDuration
-            easing.type: Easing.Linear
+            easing.type: Easing.OutBack
         }
     }
 

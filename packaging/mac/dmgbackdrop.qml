@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-import QtQml 2.13
-import QtQuick 2.13
+import QtQml 2.15
+import QtQuick 2.15
 
 Item {
     id: dmgBackdrop

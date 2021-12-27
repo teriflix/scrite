@@ -11,12 +11,12 @@
 **
 ****************************************************************************/
 
-import QtQml 2.13
-import QtQuick 2.13
+import QtQml 2.15
+import QtQuick 2.15
 import Qt.labs.settings 1.0
 import QtQuick.Dialogs 1.3
-import QtQuick.Controls 2.13
-import QtQuick.Controls.Material 2.12
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 import QtQuick.Controls 1.4 as OldControls
 
 import io.scrite.components 1.0

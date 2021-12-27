@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.13
+import QtQuick 2.15
 
 Rectangle {
     id: focusIndicator
