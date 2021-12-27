@@ -304,35 +304,41 @@ Rectangle {
                         id: contentViewDelegateLoader
                         property var componentData: modelData
                         property int componentIndex: index
-
                         z: contentViewModel.value.currentIndex === index ? 2 : 1
                         width: contentView.width
+                        onComponentDataChanged: {
+                            if(componentData === undefined)
+                                active = false
+                        }
 
                         active: false
-                        sourceComponent: modelData.scene ? contentComponent : (modelData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)
+                        sourceComponent: componentData ? (componentData.scene ? contentComponent : (componentData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)) : noContentComponent
 
+                        // Background for episode and act break components, when "Scene Blocks" is enabled.
                         Rectangle {
                             z: -1
                             anchors.fill: parent
                             anchors.leftMargin: -1
                             anchors.rightMargin: -1
-                            anchors.topMargin: modelData.scene ? -1 : -contentView.spacing/2
-                            anchors.bottomMargin: modelData.scene ? -1 : -contentView.spacing/2
+                            anchors.topMargin: componentData.scene ? -1 : -contentView.spacing/2
+                            anchors.bottomMargin: componentData.scene ? -1 : -contentView.spacing/2
                             visible: contentView.spacing > 0
-                            color: modelData.scene ? Qt.rgba(0,0,0,0) : (modelData.breakType === Screenplay.Episode ? accentColors.c100.background : accentColors.c50.background)
-                            border.width: modelData.scene ? 1 : 0
-                            border.color: modelData.scene ? (Scrite.app.isLightColor(modelData.scene.color) ? "black" : modelData.scene.color) : Qt.rgba(0,0,0,0)
-                            opacity: modelData.scene ? 0.25 : 1
+                            color: componentData.scene ? Qt.rgba(0,0,0,0) : (componentData.breakType === Screenplay.Episode ? accentColors.c100.background : accentColors.c50.background)
+                            border.width: componentData.scene ? 1 : 0
+                            border.color: componentData.scene ? (Scrite.app.isLightColor(componentData.scene.color) ? "black" : componentData.scene.color) : Qt.rgba(0,0,0,0)
+                            opacity: componentData.scene ? 0.25 : 1
                         }
 
-                        /*
-                        Profiler.context: "ScreenplayEditorContentDelegate"
-                        Profiler.active: true
-                        onStatusChanged: {
-                            if(status === Loader.Ready)
-                                Profiler.active = false
+                        // Placeholder item for when scrolling is rapid.
+                        Loader {
+                            anchors.fill: parent
+                            readonly property int spElementIndex: componentIndex
+                            readonly property var spElementData: componentData
+                            readonly property int spElementType: screenplayElementType
+
+                            active: componentData.scene && !parent.active
+                            sourceComponent: placeholderSceneComponent
                         }
-                        */
 
                         property bool initialized: false
                         property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex) && !contentView.ScrollBar.vertical.active
@@ -342,63 +348,13 @@ Rectangle {
                         }
 
                         function load() {
-                            if(active)
+                            if(active || componentData === undefined)
                                 return
-                            active = true
-                            Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
-                        }
-
-                        Rectangle {
-                            anchors.fill: parent
-                            visible: !parent.active
-                            border.width: 1
-                            border.color: modelData.screenplayElement.scene ? modelData.screenplayElement.scene.color : primaryColors.c400.background
-                            color: modelData.screenplayElement.scene ? Qt.tint(modelData.screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
-
-                            Text {
-                                font: sceneHeadingText.font
-                                anchors.verticalCenter: sceneHeadingText.verticalCenter
-                                anchors.right: sceneHeadingText.left
-                                anchors.rightMargin: 20
-                                width: headingFontMetrics.averageCharacterWidth*5
-                                color: screenplayElement.hasUserSceneNumber ? "black" : "gray"
-                                text: screenplayElement.resolvedSceneNumber
-                            }
-
-                            Text {
-                                id: sceneHeadingText
-                                anchors.left: parent.left
-                                anchors.leftMargin: ruler.leftMarginPx
-                                anchors.right: parent.right
-                                anchors.rightMargin: ruler.rightMarginPx
-                                anchors.top: parent.top
-                                anchors.topMargin: 20
-
-                                width: parent.width - 20
-                                property SceneElementFormat headingFormat: screenplayFormat.elementFormat(SceneElement.Heading)
-                                font: headingFormat.font2
-
-                                color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
-                                elide: Text.ElideMiddle
-                                text: {
-                                    if(scene && scene.heading.enabled)
-                                        return scene.heading.text
-                                    if(screenplayElementType === ScreenplayElement.BreakElementType)
-                                        return screenplayElement.breakTitle
-                                    return "NO SCENE HEADING"
-                                }
-                            }
-
-                            Image {
-                                anchors.left: parent.left
-                                anchors.right: parent.right
-                                anchors.bottom: parent.bottom
-                                anchors.top: sceneHeadingText.bottom
-                                anchors.topMargin: 20
-                                anchors.bottomMargin: 20
-                                fillMode: Image.TileVertically
-                                source: "../images/sample_scene.png"
-                                opacity: 0.5
+                            if(contentView.moving)
+                                contentView.movingChanged.connect(load)
+                            else {
+                                active = true
+                                Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
                             }
                         }
 
@@ -430,6 +386,15 @@ Rectangle {
                             }
                             componentData.screenplayElement.editorHints = editorHints
                         }
+
+                        /*
+                        Profiler.context: "ScreenplayEditorContentDelegate"
+                        Profiler.active: true
+                        onStatusChanged: {
+                            if(status === Loader.Ready)
+                                Profiler.active = false
+                        }
+                        */
                     }
                     snapMode: ListView.NoSnap
                     boundsBehavior: Flickable.StopAtBounds
@@ -1223,6 +1188,75 @@ Rectangle {
                 onClicked: screenplayAdapter.screenplay.removeElement(actBreakItem.theElement)
                 ToolTip.text: "Deletes this act break."
             }
+        }
+    }
+
+    Component {
+        id: placeholderSceneComponent
+
+        Rectangle {
+            border.width: 1
+            border.color: screenplayElement.scene ? screenplayElement.scene.color : primaryColors.c400.background
+            color: screenplayElement.scene ? Qt.tint(screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
+
+            readonly property ScreenplayElement screenplayElement: spElementData.screenplayElement
+            readonly property Scene scene: spElementData.scene
+            readonly property int screenplayElementType: spElementData.screenplayElementType
+
+            Text {
+                font: sceneHeadingText.font
+                anchors.verticalCenter: sceneHeadingText.verticalCenter
+                anchors.right: sceneHeadingText.left
+                anchors.rightMargin: 20
+                width: headingFontMetrics.averageCharacterWidth*5
+                color: screenplayElement.hasUserSceneNumber ? "black" : "gray"
+                text: screenplayElement.resolvedSceneNumber
+            }
+
+            Text {
+                id: sceneHeadingText
+                anchors.left: parent.left
+                anchors.leftMargin: ruler.leftMarginPx
+                anchors.right: parent.right
+                anchors.rightMargin: ruler.rightMarginPx
+                anchors.top: parent.top
+                anchors.topMargin: 20
+
+                width: parent.width - 20
+                property SceneElementFormat headingFormat: screenplayFormat.elementFormat(SceneElement.Heading)
+                font: headingFormat.font2
+
+                color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
+                elide: Text.ElideMiddle
+                text: {
+                    if(scene && scene.heading.enabled)
+                        return scene.heading.text
+                    if(screenplayElementType === ScreenplayElement.BreakElementType)
+                        return screenplayElement.breakTitle
+                    return "NO SCENE HEADING"
+                }
+            }
+
+            Image {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.top: sceneHeadingText.bottom
+                anchors.topMargin: 20
+                anchors.bottomMargin: 20
+                fillMode: Image.TileVertically
+                source: "../images/sample_scene.png"
+                opacity: 0.5
+            }
+        }
+    }
+
+    Component {
+        id: noContentComponent
+
+        Item {
+            width: contentArea.width
+            height: 0
         }
     }
 
