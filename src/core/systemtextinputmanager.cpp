@@ -72,7 +72,7 @@ QList<AbstractSystemTextInputSource *>
 SystemTextInputManager::sourcesForLanguage(int language) const
 {
     QList<AbstractSystemTextInputSource *> ret;
-    Q_FOREACH (AbstractSystemTextInputSource *source, m_inputSources) {
+    for (AbstractSystemTextInputSource *source : m_inputSources) {
         if (source->language() == language)
             ret.append(source);
     }
@@ -83,8 +83,8 @@ SystemTextInputManager::sourcesForLanguage(int language) const
 QJsonArray SystemTextInputManager::sourcesForLanguageJson(int language) const
 {
     QJsonArray ret;
-    QList<AbstractSystemTextInputSource *> sources = this->sourcesForLanguage(language);
-    Q_FOREACH (AbstractSystemTextInputSource *source, sources) {
+    const QList<AbstractSystemTextInputSource *> sources = this->sourcesForLanguage(language);
+    for (AbstractSystemTextInputSource *source : sources) {
         QJsonObject item;
         item.insert("id", source->id());
         item.insert("title", source->title());
@@ -96,7 +96,7 @@ QJsonArray SystemTextInputManager::sourcesForLanguageJson(int language) const
 
 AbstractSystemTextInputSource *SystemTextInputManager::findSourceById(const QString &id) const
 {
-    Q_FOREACH (AbstractSystemTextInputSource *source, m_inputSources) {
+    for (AbstractSystemTextInputSource *source : m_inputSources) {
         if (source->id() == id)
             return source;
     }
@@ -123,8 +123,8 @@ void SystemTextInputManager::reload()
     this->clear();
 
     if (m_backend != nullptr) {
-        QList<AbstractSystemTextInputSource *> sources = m_backend->reloadSources();
-        Q_FOREACH (AbstractSystemTextInputSource *source, sources)
+        const QList<AbstractSystemTextInputSource *> sources = m_backend->reloadSources();
+        for (AbstractSystemTextInputSource *source : sources)
             this->add(source);
 
         m_backend->determineSelectedInputSource();

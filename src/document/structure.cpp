@@ -1110,7 +1110,7 @@ void Character::setPhotos(const QStringList &val)
     DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
 
     m_photos.reserve(val.size());
-    Q_FOREACH (QString item, val) {
+    for (const QString &item : val) {
         if (dfs->contains(item))
             m_photos << dfs->absolutePath(item);
     }
@@ -1230,7 +1230,7 @@ void Character::setAliases(const QStringList &val)
         return;
 
     m_aliases.clear();
-    Q_FOREACH (QString item, val)
+    for (const QString &item : val)
         m_aliases << item.trimmed();
 
     emit aliasesChanged();
@@ -1365,7 +1365,7 @@ Relationship *Character::findRelationshipWith(const QString &with) const
     if (with2 == m_name)
         return nullptr;
 
-    Q_FOREACH (Relationship *rel, m_relationships.list()) {
+    for (Relationship *rel : m_relationships.constList()) {
         if (rel->with()->name() == with2)
             return rel;
     }
@@ -1378,7 +1378,7 @@ Relationship *Character::findRelationship(Character *with) const
     if (with == nullptr || with == this)
         return nullptr;
 
-    Q_FOREACH (Relationship *rel, m_relationships.list()) {
+    for (Relationship *rel : m_relationships.constList()) {
         if (rel->with() == with)
             return rel;
     }
@@ -1397,7 +1397,7 @@ QList<Relationship *> Character::findRelationshipsWith(const QString &name) cons
     QList<Relationship *> ret;
 
     const QString name2 = Relationship::polishName(name);
-    Q_FOREACH (Relationship *rel, m_relationships.list()) {
+    for (Relationship *rel : m_relationships.constList()) {
         if (rel->name() == name2)
             ret << rel;
     }
@@ -1410,7 +1410,7 @@ QStringList Character::unrelatedCharacterNames() const
     const QStringList names = this->structure()->characterNames();
 
     QStringList ret;
-    Q_FOREACH (QString name, names) {
+    for (const QString &name : names) {
         if (this->name() == name || this->hasRelationshipWith(name))
             continue;
 
@@ -1433,7 +1433,7 @@ void Character::serializeToJson(QJsonObject &json) const
 {
     DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
     QJsonArray array;
-    Q_FOREACH (QString photo, m_photos)
+    for (const QString photo : m_photos)
         array.append(dfs->relativePath(photo));
     json.insert("photos", array);
 }
@@ -1492,7 +1492,7 @@ void Character::setPropertyFromObjectList(const QString &propName, const QList<Q
 
 void Character::resolveRelationships()
 {
-    Q_FOREACH (Relationship *rel, m_relationships.list())
+    for (Relationship *rel : m_relationships.constList())
         rel->resolveRelationship();
 }
 
@@ -2123,7 +2123,7 @@ QJsonArray Structure::detectCharacters() const
 
     const QStringList names = this->allCharacterNames();
 
-    Q_FOREACH (QString name, names) {
+    for (const QString name : names) {
         Character *character = this->findCharacter(name);
 
         QJsonObject item;
@@ -2153,14 +2153,14 @@ Character *Structure::addCharacter(const QString &name)
 
 void Structure::addCharacters(const QStringList &names)
 {
-    Q_FOREACH (QString name, names)
+    for (const QString &name : names)
         this->addCharacter(name);
 }
 
 Character *Structure::findCharacter(const QString &name) const
 {
     const QString name2 = name.trimmed().toUpper();
-    Q_FOREACH (Character *character, m_characters.list()) {
+    for (Character *character : m_characters.constList()) {
         if (character->name() == name2)
             return character;
     }
@@ -2392,7 +2392,7 @@ StructureElement *Structure::findElementBySceneID(const QString &id) const
     if (id.isEmpty())
         return nullptr;
 
-    Q_FOREACH (StructureElement *element, m_elements.list()) {
+    for (StructureElement *element : m_elements.constList()) {
         if (element->scene()->id() == id)
             return element;
     }
@@ -2405,7 +2405,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     QRectF newBoundingRect;
 
     QList<StructureElement *> elementsToLayout;
-    Q_FOREACH (StructureElement *element, m_elements.list())
+    for (StructureElement *element : m_elements.constList())
         if (element->isSelected())
             elementsToLayout << element;
 
@@ -2443,7 +2443,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
     std::sort(elementsToLayout.begin(), elementsToLayout.end(), lessThan);
 
     QRectF oldBoundingRect;
-    Q_FOREACH (StructureElement *element, elementsToLayout)
+    for (StructureElement *element : qAsConst(elementsToLayout))
         oldBoundingRect |= QRectF(element->x(), element->y(), element->width(), element->height());
 
     const qreal verticalLayoutSpacing = m_canvasUIMode == IndexCardUI ? 100 : 50;
@@ -2962,7 +2962,7 @@ void Structure::scanForMuteCharacters()
     m_scriteDocument->setBusyMessage("Scanning for mute characters..");
 
     const QStringList characterNames = this->characterNames();
-    Q_FOREACH (StructureElement *element, m_elements.list())
+    for (StructureElement *element : m_elements.constList())
         element->scene()->scanMuteCharacters(characterNames);
 
     m_scriteDocument->clearBusyMessage();
@@ -3724,12 +3724,12 @@ void Structure::serializeToJson(QJsonObject &) const
 
 void Structure::deserializeFromJson(const QJsonObject &json)
 {
-    Q_FOREACH (Character *character, m_characters.list())
+    for (Character *character : m_characters.constList())
         character->resolveRelationships();
 
     // Forward and reverse relationships must be a tuple. If one is deleted, the other must
     // get deleted right away. We cannot afford to have zombie relationships.
-    Q_FOREACH (Character *character, m_characters.list()) {
+    for (Character *character : m_characters.constList()) {
         for (int i = 0; i < character->relationshipCount(); i++) {
             Relationship *ofWith = character->relationshipAt(i);
             if (ofWith->direction() == Relationship::OfWith) {
@@ -3923,7 +3923,7 @@ int Structure::staticElementCount(QQmlListProperty<StructureElement> *list)
 void Structure::updateLocationHeadingMap()
 {
     QMap<QString, QList<SceneHeading *>> map;
-    Q_FOREACH (StructureElement *element, m_elements.list()) {
+    for (StructureElement *element : m_elements.constList()) {
         Scene *scene = element->scene();
         if (scene == nullptr || !scene->heading()->isEnabled())
             continue;

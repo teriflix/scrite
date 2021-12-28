@@ -303,7 +303,7 @@ QJsonObject QObjectSerializer::toJson(const QObject *object)
 
 #ifdef SERIALIZE_DYNAMIC_PROPERTIES
     const QList<QByteArray> dynPropNames = object->dynamicPropertyNames();
-    Q_FOREACH (QByteArray propName, dynPropNames) {
+    for (const QByteArray &propName : dynPropNames) {
         const QVariant propValue = object->property(propName);
         const QString key = QString("(%1)").arg(QString::fromLatin1(propName));
         const QJsonValue value = QJsonValue::fromVariant(propValue);
@@ -647,21 +647,21 @@ QJsonValue QListHelper::toJson(const QVariant &value) const
 
     if (value.userType() == m_QListInt_type) {
         const QList<int> ints = value.value<QList<int>>();
-        Q_FOREACH (int i, ints)
+        for (int i : ints)
             ret.append(i);
         return ret;
     }
 
     if (value.userType() == m_QListReal_type) {
         const QList<qreal> reals = value.value<QList<qreal>>();
-        Q_FOREACH (qreal r, reals)
+        for (qreal r : reals)
             ret.append(r);
         return ret;
     }
 
     if (value.userType() == m_QListColor_type) {
         const QList<QColor> colors = value.value<QList<QColor>>();
-        Q_FOREACH (QColor c, colors)
+        for (const QColor &c : colors)
             ret.append(c.name());
         return ret;
     }

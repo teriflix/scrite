@@ -249,7 +249,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 continue;
 
             bool sceneHasSaidCharacters = false;
-            Q_FOREACH (QString characterName, m_characterNames) {
+            for (const QString &characterName : qAsConst(m_characterNames)) {
                 if (scene->characterNames().contains(characterName)) {
                     sceneCount[characterName] = sceneCount.value(characterName, 0) + 1;
 
@@ -358,7 +358,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 }
             }
 
-            Q_FOREACH (QString characterName, m_characterNames) {
+            for (const QString &characterName : qAsConst(m_characterNames)) {
                 if (characterHasDialogue.value(characterName, false) == false) {
                     QTextBlockFormat blockFormat = defaultBlockFormat;
                     blockFormat.setIndent(1);

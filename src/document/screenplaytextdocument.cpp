@@ -1064,7 +1064,7 @@ inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString 
 {
     const QList<TransliterationEngine::Boundary> items =
             TransliterationEngine::instance()->evaluateBoundaries(text);
-    Q_FOREACH (TransliterationEngine::Boundary item, items) {
+    for (const TransliterationEngine::Boundary &item : items) {
         if (item.string.isEmpty())
             continue;
 
@@ -2648,8 +2648,8 @@ void ScreenplayTextDocument::clearTextFrames()
 {
     m_elementFrameMap.clear();
 
-    QList<QObject *> textFrames = m_frameElementMap.keys();
-    Q_FOREACH (QObject *textFrame, textFrames)
+    const QList<QObject *> textFrames = m_frameElementMap.keys();
+    for (QObject *textFrame : textFrames)
         disconnect(textFrame, &QTextFrame::destroyed, this,
                    &ScreenplayTextDocument::onTextFrameDestroyed);
     m_frameElementMap.clear();
@@ -2715,8 +2715,8 @@ void ScreenplayTextDocument::processSceneResetList()
     while (!scenes.isEmpty()) {
         Scene *scene = scenes.takeFirst();
 
-        QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
-        Q_FOREACH (ScreenplayElement *element, elements) {
+        const QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
+        for (ScreenplayElement *element : elements) {
             QTextFrame *frame = this->findTextFrame(element);
 #ifdef QT_NO_DEBUG
             // This will probably get updated in the next cycle. Trying to fix
@@ -2819,8 +2819,7 @@ void ScreenplayElementPageBreaks::updatePageBreaks()
 
         const QList<QPair<int, int>> ibreaks =
                 m_screenplayDocument->pageBreaksFor(m_screenplayElement);
-        QPair<int, int> ibreak;
-        Q_FOREACH (ibreak, ibreaks) {
+        for (const QPair<int, int> &ibreak : ibreaks) {
             QJsonObject item;
             item.insert(positionKey, ibreak.first);
             item.insert(pageNumberKey, ibreak.second);

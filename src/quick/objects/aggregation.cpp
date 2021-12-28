@@ -23,8 +23,8 @@ QObject *Aggregation::find(QObject *object, const QString &className,
     if (object == nullptr)
         return nullptr;
 
-    QObjectList children = object->children();
-    Q_FOREACH (QObject *child, children) {
+    const QObjectList children = object->children();
+    for (QObject *child : children) {
         if (child->inherits(qPrintable(className))) {
             if (objectName.isEmpty())
                 return child;

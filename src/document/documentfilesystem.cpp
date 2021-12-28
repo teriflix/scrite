@@ -57,7 +57,7 @@ void DocumentFileSystemData::pack(QDataStream &ds, const QString &path)
     if (fi.isDir()) {
         const QFileInfoList fiList = QDir(path).entryInfoList(
                 QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::DirsLast);
-        Q_FOREACH (QFileInfo fi2, fiList)
+        for (const QFileInfo &fi2 : fiList)
             this->pack(ds, fi2.absoluteFilePath());
     } else {
         const QString filePath = fi.absoluteFilePath();
@@ -98,7 +98,7 @@ void DocumentFileSystemData::filePaths(QStringList &paths, const QString &dirPat
     if (fi.isDir()) {
         const QFileInfoList fiList = QDir(dirPath).entryInfoList(
                 QDir::Dirs | QDir::Files | QDir::NoDotAndDotDot, QDir::Name | QDir::DirsLast);
-        Q_FOREACH (QFileInfo fi2, fiList)
+        for (const QFileInfo &fi2 : fiList)
             this->filePaths(paths, fi2.absoluteFilePath());
     } else
         paths.append(fsDir.relativeFilePath(fi.absoluteFilePath()));

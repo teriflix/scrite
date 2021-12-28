@@ -57,7 +57,7 @@ QJsonObject GenericArrayModel::objectMemberRoles() const
 {
     QJsonObject ret;
 
-    Q_FOREACH (QString objectMember, m_objectMembers)
+    for (const QString &objectMember : m_objectMembers)
         ret.insert(objectMember, this->objectMemberRole(objectMember));
 
     return ret;
@@ -77,7 +77,7 @@ int GenericArrayModel::objectMemberRole(const QString &objectMember) const
 QJsonArray GenericArrayModel::stringListArray(const QStringList &list) const
 {
     QJsonArray ret;
-    Q_FOREACH (QString item, list)
+    for (const QString &item : list)
         ret.append(QJsonValue(item.trimmed()));
     return ret;
 }
@@ -118,7 +118,7 @@ QHash<int, QByteArray> GenericArrayModel::roleNames() const
     QHash<int, QByteArray> roles;
     roles[Qt::DisplayRole] = QByteArrayLiteral("arrayItem");
 
-    Q_FOREACH (QString objectMember, m_objectMembers)
+    for (const QString &objectMember : m_objectMembers)
         roles[this->objectMemberRole(objectMember)] = objectMember.toLatin1();
 
     return roles;

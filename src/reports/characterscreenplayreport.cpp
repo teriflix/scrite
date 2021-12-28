@@ -58,7 +58,7 @@ bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement
         return true;
 
     const QStringList sceneCharacters = scene->characterNames();
-    Q_FOREACH (QString characterName, m_characterNames)
+    for (const QString &characterName : qAsConst(m_characterNames))
         if (sceneCharacters.contains(characterName))
             return true;
 
@@ -117,7 +117,7 @@ void CharacterScreenplayReport::inject(
     cursor.insertText("NOTES:");
 
     const Structure *structure = this->document()->structure();
-    Q_FOREACH (QString characterName, m_characterNames) {
+    for (const QString &characterName : qAsConst(m_characterNames)) {
         blockFormat = defaultBlockFormat;
         blockFormat.setIndent(1);
 

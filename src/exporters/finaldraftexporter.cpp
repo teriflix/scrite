@@ -60,9 +60,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
     auto addTextToParagraph = [&doc, this](QDomElement &element, const QString &text) {
         if (m_markLanguagesExplicitly) {
-            QList<TransliterationEngine::Boundary> breakup =
+            const QList<TransliterationEngine::Boundary> breakup =
                     TransliterationEngine::instance()->evaluateBoundaries(text, true);
-            Q_FOREACH (TransliterationEngine::Boundary item, breakup) {
+            for (const TransliterationEngine::Boundary item : breakup) {
                 QDomElement textE = doc.createElement(QStringLiteral("Text"));
                 element.appendChild(textE);
                 if (item.language == TransliterationEngine::English) {
@@ -137,7 +137,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     const QStringList characters = structure->allCharacterNames();
     QDomElement charactersE = doc.createElement(QStringLiteral("Characters"));
     smartTypeE.appendChild(charactersE);
-    Q_FOREACH (QString name, characters) {
+    for (QString name : qAsConst(characters)) {
         QDomElement characterE = doc.createElement(QStringLiteral("Character"));
         charactersE.appendChild(characterE);
         characterE.appendChild(doc.createTextNode(name));
@@ -150,7 +150,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     smartTypeE.appendChild(timesOfDayE);
     timesOfDayE.setAttribute(QStringLiteral("Separator"), QStringLiteral(" - "));
     std::sort(moments.begin(), moments.end());
-    Q_FOREACH (QString moment, moments) {
+    for (QString moment : qAsConst(moments)) {
         QDomElement timeOfDayE = doc.createElement(QStringLiteral("TimeOfDay"));
         timesOfDayE.appendChild(timeOfDayE);
         timeOfDayE.appendChild(doc.createTextNode(moment));
@@ -160,7 +160,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     QDomElement sceneIntrosE = doc.createElement(QStringLiteral("SceneIntros"));
     smartTypeE.appendChild(sceneIntrosE);
     sceneIntrosE.setAttribute(QStringLiteral("Separator"), QStringLiteral(". "));
-    Q_FOREACH (QString locationType, locationTypes) {
+    for (const QString &locationType : qAsConst(locationTypes)) {
         QDomElement sceneIntroE = doc.createElement(QStringLiteral("SceneIntro"));
         sceneIntrosE.appendChild(sceneIntroE);
         sceneIntroE.appendChild(doc.createTextNode(locationType));

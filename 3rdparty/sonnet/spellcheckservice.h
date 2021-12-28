@@ -37,7 +37,7 @@ struct TextFragment
     int start() const { return m_start; }
     int length() const { return m_length; }
     int end() const { return m_start + m_length - 1; }
-    bool isValid() { return m_length > 0 && m_start >= 0; }
+    bool isValid() const { return m_length > 0 && m_start >= 0; }
     bool operator==(const TextFragment &other) const
     {
         return m_start == other.m_start && m_length == other.m_length

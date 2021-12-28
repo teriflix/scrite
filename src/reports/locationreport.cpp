@@ -110,7 +110,7 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
         cursor.insertText(" (" + QString::number(headings.size()) + " occurances)");
 
         const QStringList locTypes = map.keys();
-        Q_FOREACH (QString locType, locTypes) {
+        for (const QString &locType : locTypes) {
             const QMap<QString, QList<SceneHeading *>> momentMap = map.value(locType);
             QMap<QString, QList<SceneHeading *>>::const_iterator it2 = momentMap.constBegin();
             QMap<QString, QList<SceneHeading *>>::const_iterator end2 = momentMap.constEnd();
@@ -140,7 +140,7 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
                         cursor, it2.value().first()->text());
                 cursor.insertText(" (" + QString::number(it.value().size()) + ")");
 
-                Q_FOREACH (SceneHeading *heading, it2.value()) {
+                for (SceneHeading *heading : qAsConst(it2.value())) {
                     Scene *scene = heading->scene();
                     int sceneNr = screenplay->firstIndexOfScene(scene) + 1;
                     ScreenplayElement *screenplayElement = screenplay->elementAt(sceneNr - 1);

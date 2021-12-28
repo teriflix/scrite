@@ -123,9 +123,10 @@ void AppWindow::initializeFileNameToOpen()
         fileNameToOpen = scriteApp.fileToOpen();
     scriteApp.setHandleFileOpenEvents(true);
 #else
-    if (a.arguments().size() > 1) {
+    const QStringList appArgs = a.arguments();
+    if (appArgs.size() > 1) {
         bool hasOptions = false;
-        Q_FOREACH (QString arg, a.arguments()) {
+        for (const QString &arg, appArgs) {
             if (arg.startsWith(QStringLiteral("--"))) {
                 hasOptions = true;
                 break;

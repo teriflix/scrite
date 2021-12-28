@@ -709,7 +709,7 @@ void ScreenplayFormat::applyToAll(const SceneElementFormat *from,
     if (from == nullptr)
         return;
 
-    Q_FOREACH (SceneElementFormat *format, m_elementFormats) {
+    for (SceneElementFormat *format : qAsConst(m_elementFormats)) {
         if (from == format)
             continue;
 
@@ -1941,7 +1941,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         spellingErrorFormat.setBackground(QColor(255, 0, 0, 32));
         spellingErrorFormat.setProperty(IsWordMisspelledProperty, true);
 
-        Q_FOREACH (TextFragment fragment, fragments) {
+        for (const TextFragment &fragment : fragments) {
             if (!fragment.isValid())
                 continue;
 
@@ -2055,7 +2055,7 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
         if (m_rehighlightBlockQueue.size() > nrTresholdBlocks || m_rehighlightBlockQueue.isEmpty())
             this->QSyntaxHighlighter::rehighlight();
         else {
-            Q_FOREACH (QTextBlock block, m_rehighlightBlockQueue)
+            for (const QTextBlock &block : qAsConst(m_rehighlightBlockQueue))
                 this->rehighlightBlock(block);
         }
 

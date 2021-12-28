@@ -171,7 +171,7 @@ void PainterPath::markDirty()
 void PainterPath::composePath()
 {
     m_path = QPainterPath();
-    Q_FOREACH (AbstractPathElement *element, m_pathElements) {
+    for (AbstractPathElement *element : qAsConst(m_pathElements)) {
         if (element->isEnabled())
             element->apply(m_path);
     }

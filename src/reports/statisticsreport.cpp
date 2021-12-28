@@ -571,7 +571,7 @@ void StatisticsReport::prepareTextDocument()
     auto polishFontsAndInsertTextAtCursor = [](QTextCursor &cursor, const QString &text) {
         const QList<TransliterationEngine::Boundary> items =
                 TransliterationEngine::instance()->evaluateBoundaries(text);
-        Q_FOREACH (TransliterationEngine::Boundary item, items) {
+        for (const TransliterationEngine::Boundary &item : items) {
             if (item.string.isEmpty())
                 continue;
             const QFont font = TransliterationEngine::instance()->languageFont(item.language);

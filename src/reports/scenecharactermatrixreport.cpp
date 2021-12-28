@@ -270,7 +270,7 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
         const Scene *scene = element->scene();
         if (scene) {
             const QStringList characters = scene->characterNames();
-            Q_FOREACH (QString character, characters) {
+            for (const QString &character : characters) {
                 const int row =
                         m_type == SceneVsCharacter ? sceneNumber : rowHeadings.indexOf(character);
                 const int column = m_type == SceneVsCharacter ? columnHeadings.indexOf(character)

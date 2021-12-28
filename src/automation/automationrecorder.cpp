@@ -73,7 +73,7 @@ void AutomationRecorder::stopRecording()
     ts << "    ScriptStep { onRunScript: splashLoader.active = false }\n\n";
     ts << "    PauseStep { duration: 500 }\n\n";
 
-    Q_FOREACH (QVariant statement, m_recordedStatements) {
+    for (const QVariant &statement, qAsConst(m_recordedStatements)) {
         if (statement.userType() == QMetaType::QString) {
             ts << "    EventStep {\n";
             ts << "        window: qmlWindow\n";

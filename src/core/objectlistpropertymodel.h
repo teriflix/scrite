@@ -57,6 +57,7 @@ public:
     operator QList<T>() { return m_list; }
     QList<T> &list() { return m_list; }
     const QList<T> &list() const { return m_list; }
+    const QList<T> &constList() const { return m_list; }
 
     bool empty() const { return m_list.empty(); }
     bool isEmpty() const { return m_list.isEmpty(); }

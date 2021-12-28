@@ -116,7 +116,7 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
         return result;
 
     EnglishLanguageSpeller speller;
-    Q_FOREACH (Sonnet::TextBreaks::Position wordPosition, wordPositions) {
+    for (const Sonnet::TextBreaks::Position &wordPosition : wordPositions) {
         const QString word = request.text.mid(wordPosition.start, wordPosition.length);
         if (word.isEmpty())
             continue; // not sure why this would happen, but just keeping safe.
@@ -330,7 +330,7 @@ void SpellCheckService::setMisspelledFragments(const QList<TextFragment> &val)
     m_misspelledFragments = val;
 
     QJsonArray json;
-    Q_FOREACH (TextFragment textFrag, m_misspelledFragments) {
+    for (const TextFragment &textFrag : m_misspelledFragments) {
         QJsonObject item;
         item.insert("start", textFrag.start());
         item.insert("length", textFrag.length());

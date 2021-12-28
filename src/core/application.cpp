@@ -367,7 +367,7 @@ bool Application::isTextInputItem(QQuickItem *item) const
 UndoStack *Application::findUndoStack(const QString &objectName) const
 {
     const QList<QUndoStack *> stacks = m_undoGroup->stacks();
-    Q_FOREACH (QUndoStack *stack, stacks) {
+    for (QUndoStack *stack : stacks) {
         if (stack->objectName() == objectName) {
             UndoStack *ret = qobject_cast<UndoStack *>(stack);
             return ret;
@@ -405,8 +405,8 @@ QJsonObject Application::systemFontInfo()
         ret.insert("families", QJsonArray::fromStringList(families));
 
         QJsonArray sizes;
-        QList<int> stdSizes = fontdb.standardSizes();
-        Q_FOREACH (int stdSize, stdSizes)
+        const QList<int> stdSizes = fontdb.standardSizes();
+        for (int stdSize : stdSizes)
             sizes.append(QJsonValue(stdSize));
         ret.insert("standardSizes", sizes);
     }

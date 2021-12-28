@@ -630,7 +630,7 @@ inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString 
 {
     const QList<TransliterationEngine::Boundary> items =
             TransliterationEngine::instance()->evaluateBoundaries(text);
-    Q_FOREACH (TransliterationEngine::Boundary item, items) {
+    for (const TransliterationEngine::Boundary &item : items) {
         if (item.string.isEmpty())
             continue;
 

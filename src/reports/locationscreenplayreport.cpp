@@ -142,7 +142,7 @@ void LocationScreenplayReport::inject(
 
             blockFormat.setIndent(3);
 
-            Q_FOREACH (const ScreenplayElement *element, it.value()) {
+            for (const ScreenplayElement *element : qAsConst(it.value())) {
                 cursor.insertBlock(blockFormat, charFormat);
                 cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber()
                                   + QStringLiteral("] - ") + element->scene()->heading()->text());

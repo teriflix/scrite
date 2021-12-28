@@ -441,7 +441,7 @@ void ImagePrinterImageProvider::remove(ImagePrinter *printer)
 ImagePrinter *ImagePrinterImageProvider::find(const QString &name)
 {
     QReadLocker lock(&m_printersLock);
-    Q_FOREACH (ImagePrinter *printer, m_printers) {
+    for (ImagePrinter *printer : qAsConst(m_printers)) {
         if (printer->objectName() == name)
             return printer;
     }

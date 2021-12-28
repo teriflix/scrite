@@ -1129,7 +1129,7 @@ void UndoClearScreenplayCommand::undo()
 
     ScriteDocument *document = m_screenplay->scriteDocument();
     Structure *structure = document->structure();
-    Q_FOREACH (QString sceneId, m_sceneIds) {
+    for (const QString &sceneId : qAsConst(m_sceneIds)) {
         StructureElement *element = structure->findElementBySceneID(sceneId);
         if (element == nullptr)
             continue;
@@ -1285,7 +1285,7 @@ void SplitElementUndoCommand::undo()
     Scene *originalScene = pair.first->scene();
 
     // Reset our screenplay first, one of the scenes that it refers to is about to be destroyed.
-    Q_FOREACH (int index, m_splitElementIndexes)
+    for (int index : qAsConst(m_splitElementIndexes))
         m_screenplay->removeElement(m_screenplay->elementAt(index));
 
     // Destroy the split scene
@@ -1344,7 +1344,7 @@ void SplitElementUndoCommand::redo()
     originalScene->resetFromByteArray(m_splitScenesData[0]);
 
     // Reset our screenplay now
-    Q_FOREACH (int index, m_splitElementIndexes) {
+    for (int index : qAsConst(m_splitElementIndexes)) {
         ScreenplayElement *element = new ScreenplayElement(m_screenplay);
         element->setElementType(ScreenplayElement::SceneElementType);
         element->setScene(splitScene);

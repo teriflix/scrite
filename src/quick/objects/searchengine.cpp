@@ -431,8 +431,7 @@ void SearchEngine::doSearch()
 
     if (!m_searchResults.isEmpty()) {
         SearchAgent *agent = nullptr;
-        QPair<SearchAgent *, int> result;
-        Q_FOREACH (result, m_searchResults) {
+        for (const QPair<SearchAgent *, int> &result : qAsConst(m_searchResults)) {
             if (agent == result.first)
                 continue;
 
@@ -457,7 +456,7 @@ void SearchEngine::doSearch()
     if (m_searchString.isEmpty())
         return;
 
-    Q_FOREACH (SearchAgent *agent, m_searchAgents) {
+    for (SearchAgent *agent : qAsConst(m_searchAgents)) {
         // Ask the agent to perform search
         agent->searchRequest(m_searchString);
 

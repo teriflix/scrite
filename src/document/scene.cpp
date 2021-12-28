@@ -542,7 +542,7 @@ bool CharacterElementMap::remove(const QString &name)
     if (elements.isEmpty())
         return false;
 
-    Q_FOREACH (SceneElement *element, elements)
+    for (SceneElement *element : elements)
         m_forwardMap.take(element);
 
     return true;
@@ -571,7 +571,7 @@ QList<SceneElement *> CharacterElementMap::characterElements(const QString &name
 void CharacterElementMap::include(const CharacterElementMap &other)
 {
     const QList<SceneElement *> elements = other.characterElements();
-    Q_FOREACH (SceneElement *element, elements)
+    for (SceneElement *element : elements)
         this->include(element);
 }
 
@@ -624,7 +624,7 @@ Scene *Scene::clone(QObject *parent) const
     newScene->heading()->setLocation(m_heading->location());
     newScene->heading()->setLocationType(m_heading->locationType());
 
-    Q_FOREACH (SceneElement *element, m_elements) {
+    for (SceneElement *element : m_elements) {
         SceneElement *newElement = new SceneElement(newScene);
         newElement->setType(element->type());
         newElement->setText(element->text());
@@ -943,19 +943,19 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
     }
 
     const QStringList existingCharacters = this->characterNames();
-    Q_FOREACH (QString existingCharacter, existingCharacters)
+    for (const QString &existingCharacter : existingCharacters)
         names.removeAll(existingCharacter);
 
     const QList<SceneElement::Type> skipTypes = QList<SceneElement::Type>()
             << SceneElement::Character << SceneElement::Transition << SceneElement::Shot;
 
-    Q_FOREACH (SceneElement *element, m_elements) {
+    for (SceneElement *element : qAsConst(m_elements)) {
         if (skipTypes.contains(element->type()))
             continue;
 
         const QString text = element->text();
 
-        Q_FOREACH (QString name, names) {
+        for (const QString name : qAsConst(names)) {
             int pos = 0;
             while (pos < text.length()) {
                 pos = text.indexOf(name, pos, Qt::CaseInsensitive);
@@ -1460,7 +1460,7 @@ QByteArray Scene::toByteArray() const
     ds << m_heading->location();
     ds << m_heading->moment();
     ds << m_elements.size();
-    Q_FOREACH (SceneElement *element, m_elements) {
+    for (SceneElement *element : m_elements) {
         ds << element->id();
         ds << int(element->type());
         ds << element->text();
@@ -1593,7 +1593,7 @@ void Scene::serializeToJson(QJsonObject &json) const
     const QStringList names = m_characterElementMap.characterNames();
     QJsonArray invisibleCharacters;
 
-    Q_FOREACH (QString name, names) {
+    for (const QString &name : names) {
         if (this->isCharacterMute(name))
             invisibleCharacters.append(name);
     }
@@ -1660,7 +1660,7 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
 {
     QScopedValueRollback<bool> isel(m_inSetElementsList, true);
 
-    Q_FOREACH (SceneElement *item, list) {
+    for (SceneElement *item : list) {
         if (item->scene() != this)
             return;
     }
@@ -1675,7 +1675,7 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
 
     m_elements.clear();
     m_elements.reserve(list.size());
-    Q_FOREACH (SceneElement *item, list) {
+    for (SceneElement *item : list) {
         if (!oldElements.removeOne(item))
             this->addElement(item);
         else

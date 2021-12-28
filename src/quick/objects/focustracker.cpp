@@ -158,7 +158,7 @@ void FocusTracker::evaluateHasFocus()
     }
 
     QList<QQuickItem *> trackedItems;
-    Q_FOREACH (FocusTracker *tracker, *::GlobalFocusTrackerList) {
+    for (FocusTracker *tracker : qAsConst(*::GlobalFocusTrackerList)) {
         if (tracker == this)
             continue;
         trackedItems << tracker->item();

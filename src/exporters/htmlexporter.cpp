@@ -91,7 +91,7 @@ bool HtmlExporter::doExport(QIODevice *device)
 
             const QStringList fontSources =
                     TransliterationEngine::instance()->languageFontFilePaths(it.key());
-            Q_FOREACH (QString fontSource, fontSources) {
+            for (const QString &fontSource : fontSources) {
                 const QString lang = QString::fromLatin1(langEnum.valueToKey(it.key()));
                 const QString fontFile = QFileInfo(fontSource).fileName();
                 const QString fontDest = fontsDir + "/" + lang + "/" + fontFile;
@@ -213,9 +213,9 @@ bool HtmlExporter::doExport(QIODevice *device)
                                                               const QString &text) {
         const QString styleName = "scrite-" + typeStringMap.value(type);
         ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\">";
-        QList<TransliterationEngine::Boundary> breakup =
+        const QList<TransliterationEngine::Boundary> breakup =
                 TransliterationEngine::instance()->evaluateBoundaries(text);
-        Q_FOREACH (TransliterationEngine::Boundary item, breakup) {
+        for (const TransliterationEngine::Boundary &item : breakup) {
             if (!langBundleMap.value(item.language, false))
                 ts << "<span>" << item.string << "</span>";
             else

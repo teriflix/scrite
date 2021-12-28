@@ -1044,7 +1044,7 @@ QStringList ScriteDocument::supportedImportFormats() const
     static QList<QByteArray> keys = deviceIOFactories->ImporterFactory.keys();
     static QStringList formats;
     if (formats.isEmpty())
-        Q_FOREACH (QByteArray key, keys)
+        for (const QByteArray &key : keys)
             formats << key;
     return formats;
 }
@@ -1068,7 +1068,7 @@ QStringList ScriteDocument::supportedExportFormats() const
     static QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
     static QStringList formats;
     if (formats.isEmpty()) {
-        Q_FOREACH (QByteArray key, keys)
+        for (const QByteArray &key : keys)
             formats << key;
         std::sort(formats.begin(), formats.end());
 
@@ -1081,7 +1081,7 @@ QStringList ScriteDocument::supportedExportFormats() const
                     seps << i + 1;
             }
 
-            Q_FOREACH (int sep, seps)
+            for (int sep : qAsConst(seps))
                 formats.insert(sep, QString());
         }
     }
@@ -1107,7 +1107,7 @@ QJsonArray ScriteDocument::supportedReports() const
     static QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
     static QJsonArray reports;
     if (reports.isEmpty()) {
-        Q_FOREACH (QByteArray key, keys) {
+        for (const QByteArray &key : keys) {
             QJsonObject item;
             item.insert("name", QString::fromLatin1(key));
 

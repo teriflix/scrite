@@ -73,7 +73,7 @@ QVector<QPointF> PolygonTessellator::tessellate(const QList<QPolygonF> &polygons
     QRectF logicalSegmentArea;
     QList<QPolygonF> logicalSegment;
 
-    Q_FOREACH (QPolygonF polygon, polygons) {
+    for (const QPolygonF &polygon : polygons) {
         const QRectF polygonRect = polygon.boundingRect();
 
         if (logicalSegmentArea.isNull() || logicalSegmentArea.contains(polygonRect)

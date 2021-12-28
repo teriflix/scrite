@@ -153,7 +153,7 @@ bool FountainImporter::doImport(QIODevice *device)
             }
 
             if (isHeader == false) {
-                Q_FOREACH (QString hint, headerHints) {
+                for (const QString &hint : headerHints) {
                     if (line.startsWith(hint) && line.length() > hint.length()
                         && !line.at(hint.length()).isLetterOrNumber()) {
                         if (inCharacter) {

@@ -41,8 +41,8 @@ bool UndoStack::isActive() const
 
 void UndoStack::clearAllStacks()
 {
-    QList<QUndoStack *> stacks = Application::instance()->undoGroup()->stacks();
-    Q_FOREACH (QUndoStack *stack, stacks)
+    const QList<QUndoStack *> stacks = Application::instance()->undoGroup()->stacks();
+    for (QUndoStack *stack : stacks)
         stack->clear();
 }
 
@@ -141,7 +141,7 @@ QVariant ObjectPropertyInfo::read() const
 {
     QVariantList ret;
     ret << object->property(property);
-    Q_FOREACH (QByteArray prop, propertyBundle)
+    for (const QByteArray &prop : propertyBundle)
         ret << object->property(prop);
     return ret;
 }
@@ -152,7 +152,7 @@ bool ObjectPropertyInfo::write(const QVariant &val)
     QObject *o = const_cast<QObject *>(object);
     QVariantList list = val.toList();
     const bool ret = o->setProperty(property, list.takeFirst());
-    Q_FOREACH (QByteArray prop, propertyBundle) {
+    for (const QByteArray &prop : propertyBundle) {
         if (list.isEmpty())
             break;
         o->setProperty(prop, list.takeFirst());

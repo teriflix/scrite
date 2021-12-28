@@ -92,7 +92,7 @@ static QList<TimeProfile> sortedProfiles(TimeProfile::PrintSortOrder sortOrder)
 void TimeProfile::print(TimeProfile::PrintSortOrder sortOrder, TimeProfile::PrintFormat format)
 {
     const QList<TimeProfile> profiles = ::sortedProfiles(sortOrder);
-    Q_FOREACH (const TimeProfile p, profiles)
+    for (const TimeProfile &p : profiles)
         p.printSelf(0, format);
 }
 
@@ -120,7 +120,7 @@ void TimeProfile::save(const QString &fileName, TimeProfile::PrintSortOrder sort
        << "\n";
 
     const QList<TimeProfile> profiles = ::sortedProfiles(sortOrder);
-    Q_FOREACH (TimeProfile p, profiles)
+    for (const TimeProfile &p : profiles)
         ts << p.toString(0, format) << "\n";
 
     ts.flush();

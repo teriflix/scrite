@@ -76,7 +76,8 @@ TransliterationEngine::TransliterationEngine(QObject *parent) : QObject(parent)
 {
     const QMetaObject *mo = this->metaObject();
     const QMetaEnum metaEnum = mo->enumerator(mo->indexOfEnumerator("Language"));
-    Q_FOREACH (QString customFont, getCustomFontFilePaths()) {
+    const QStringList customFontPaths = ::getCustomFontFilePaths();
+    for (const QString &customFont : customFontPaths) {
         const int id = QFontDatabase::addApplicationFont(customFont);
         const QString language = customFont.split("/", QString::SkipEmptyParts).at(2);
         Language lang = Language(metaEnum.keyToValue(qPrintable(language)));
@@ -113,7 +114,7 @@ TransliterationEngine::TransliterationEngine(QObject *parent) : QObject(parent)
         m_activeLanguages[English] = true;
         m_activeLanguages[Kannada] = true;
     } else {
-        Q_FOREACH (QString lang, activeLanguages) {
+        for (const QString &lang : activeLanguages) {
             bool ok = false;
             int val = metaEnum.keyToValue(qPrintable(lang.trimmed()), &ok);
             m_activeLanguages[Language(val)] = true;
@@ -848,9 +849,9 @@ QString TransliterationEngine::formattedHtmlOf(const QString &text) const
     QString html;
     QTextStream ts(&html, QIODevice::WriteOnly);
 
-    QList<TransliterationEngine::Boundary> breakup =
+    const QList<TransliterationEngine::Boundary> breakup =
             TransliterationEngine::instance()->evaluateBoundaries(text);
-    Q_FOREACH (TransliterationEngine::Boundary item, breakup) {
+    for (const TransliterationEngine::Boundary &item : breakup) {
         if (item.language == TransliterationEngine::English)
             ts << item.string;
         else

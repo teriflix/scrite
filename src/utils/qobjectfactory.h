@@ -51,13 +51,13 @@ public:
         } else
             keys.append(QByteArray(mo->className()));
         m_metaObjects.insert(mo, keys);
-        Q_FOREACH (QByteArray key, keys)
+        for (const QByteArray &key : qAsConst(keys))
             m_keyMap[key].append(mo);
     }
     void remove(const QMetaObject *mo)
     {
         const QList<QByteArray> keys = m_metaObjects.take(mo);
-        Q_FOREACH (QByteArray key, keys) {
+        for (const QByteArray &key : keys) {
             QList<const QMetaObject *> mos = m_keyMap.take(key);
             mos.removeOne(mo);
             if (mos.isEmpty())
