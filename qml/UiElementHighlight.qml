@@ -28,6 +28,7 @@ Item {
     property Item uiElement
     property string description
     property int descriptionPosition: Item.Right
+    property bool uiElementBoxVisible: false
 
     signal done()
     signal scaleAnimationDone()
@@ -44,6 +45,15 @@ Item {
         y: uiElementPosition.mappedPosition.y
         width: uiElement.width * uiElement.scale
         height: uiElement.height * uiElement.scale
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.margins: -2.5
+            color: Qt.rgba(0,0,0,0)
+            border.width: 2
+            border.color: accentColors.highlight.background
+            visible: uiElementBoxVisible
+        }
 
         BoxShadow {
             anchors.fill: descTip

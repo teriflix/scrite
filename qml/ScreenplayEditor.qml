@@ -574,6 +574,7 @@ Rectangle {
                             anchors.fill: parent
                             sourceComponent: UiElementHighlight {
                                 uiElement: addButtonsRow
+                                uiElementBoxVisible: true
                                 descriptionPosition: Item.Bottom
                                 description: "Use these buttons to add new a scene, act or episode."
                                 onDone: addButtonsAnimator.active = false
