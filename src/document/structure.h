@@ -155,6 +155,10 @@ protected:
     void groupVerificationRequired();
 
 private:
+    friend class Structure;
+    void renameCharacter(const QString &from, const QString &to);
+
+private:
     friend class StructurePositionCommand;
     qreal m_x = 0;
     qreal m_y = 0;
@@ -366,6 +370,14 @@ public:
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
+    Q_INVOKABLE bool rename(const QString &name);
+
+    Q_INVOKABLE void clearRenameError();
+
+    Q_PROPERTY(QString renameError READ renameError NOTIFY renameErrorChanged)
+    QString renameError() const { return m_renameError; }
+    Q_SIGNAL void renameErrorChanged();
+
     Q_PROPERTY(bool visibleOnNotebook READ isVisibleOnNotebook WRITE setVisibleOnNotebook NOTIFY visibleOnNotebookChanged)
     void setVisibleOnNotebook(bool val);
     bool isVisibleOnNotebook() const { return m_visibleOnNotebook; }
@@ -509,6 +521,7 @@ private:
     QStringList m_photos;
     QString m_designation;
     QStringList m_aliases;
+    QString m_renameError;
     bool m_visibleOnNotebook = true;
     Structure *m_structure = nullptr;
     Notes *m_notes = new Notes(this);
@@ -843,11 +856,14 @@ protected:
     void onClipboardDataChanged();
 
 private:
+    friend class Character;
     friend class Screenplay;
     friend class ScriteDocument;
     StructureElement *splitElement(StructureElement *ptr, SceneElement *element, int textPosition);
     QList<QPair<QString, QList<StructureElement *>>>
     evaluateGroupsImpl(Screenplay *screenplay, const QString &category = QString()) const;
+
+    bool renameCharacter(const QString &from, const QString &to, QString *errMsg);
 
 private:
     qreal m_canvasWidth = 120000;

@@ -292,6 +292,8 @@ public:
 
     static QString painterPathToString(const QPainterPath &val);
     static QPainterPath stringToPainterPath(const QString &val);
+    static QString replaceCharacterName(const QString &from, const QString &to, const QString &in,
+                                        int *nrReplacements = nullptr);
 
     Q_SIGNAL void openFileRequest(const QString &filePath);
 

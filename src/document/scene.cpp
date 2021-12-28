@@ -313,6 +313,17 @@ void SceneHeading::parseFrom(const QString &text)
     this->setMoment(_moment);
 }
 
+void SceneHeading::renameCharacter(const QString &from, const QString &to)
+{
+    int nrReplacements = 0;
+    const QString newLocation =
+            Application::replaceCharacterName(from, to, m_location, &nrReplacements);
+    if (nrReplacements > 0) {
+        m_location = newLocation.toUpper();
+        emit locationChanged();
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 SceneElement::SceneElement(QObject *parent)
@@ -478,6 +489,34 @@ bool SceneElement::event(QEvent *event)
     return QObject::event(event);
 }
 
+void SceneElement::renameCharacter(const QString &from, const QString &to)
+{
+    /**
+     * This function must be called from within Scene::renameCharacter() only.
+     * Reason being, we don't check parameter sanity in this function because
+     * its assumed that the calling function has already performed all sanity
+     * checks. Checking for sanity in each element costs performance.
+     */
+    int nrReplacements = 0;
+    const QString text = Application::replaceCharacterName(from, to, m_text, &nrReplacements);
+
+    if (nrReplacements > 0) {
+        switch (m_type) {
+        case SceneElement::Shot:
+        case SceneElement::Heading:
+        case SceneElement::Character:
+        case SceneElement::Transition:
+            m_text = text.toUpper();
+        default:
+            m_text = text;
+            break;
+        }
+
+        emit textChanged(m_text);
+        emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 CharacterElementMap::CharacterElementMap() { }
@@ -555,7 +594,7 @@ QStringList CharacterElementMap::characterNames() const
 
 bool CharacterElementMap::containsCharacter(const QString &name) const
 {
-    return m_reverseMap.contains(name);
+    return m_reverseMap.contains(name.toUpper());
 }
 
 QList<SceneElement *> CharacterElementMap::characterElements() const
@@ -955,7 +994,7 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
 
         const QString text = element->text();
 
-        for (const QString name : qAsConst(names)) {
+        for (const QString &name : qAsConst(names)) {
             int pos = 0;
             while (pos < text.length()) {
                 pos = text.indexOf(name, pos, Qt::CaseInsensitive);
@@ -1712,6 +1751,66 @@ void Scene::onAboutToRemoveSceneElement(SceneElement *element)
 {
     if (m_characterElementMap.remove(element))
         emit characterNamesChanged();
+}
+
+void Scene::renameCharacter(const QString &from, const QString &to)
+{
+    emit sceneAboutToReset();
+
+    /**
+     * This function must be called from Structure::renameCharacter() only.
+     *
+     * This that function verifies and validates the parameters properly,
+     * we don't have to repeat that step in here.
+     */
+
+    const bool isFromMute = this->isCharacterMute(from);
+    int renamedElementCount = 0;
+
+    // Rename character name in title.
+    {
+        int nrReplacements = 0;
+        const QString newTitle =
+                Application::replaceCharacterName(from, to, m_title, &nrReplacements);
+        if (nrReplacements > 0) {
+            m_title = newTitle;
+            emit titleChanged();
+        }
+    }
+
+    // Rename character name in scene heading location
+    m_heading->renameCharacter(from, to);
+
+    // Rename character name in paragraphs
+    for (SceneElement *element : qAsConst(m_elements))
+        element->renameCharacter(from, to);
+
+    if (isFromMute) {
+        this->removeMuteCharacter(from);
+        this->addMuteCharacter(to);
+    }
+
+    // Rename in notes
+    if (m_notes)
+        m_notes->renameCharacter(from, to);
+
+    // Rename in comments
+    {
+        int nrReplacements = 0;
+        const QString newComments =
+                Application::replaceCharacterName(from, to, m_comments, &nrReplacements);
+        if (nrReplacements > 0) {
+            m_comments = newComments;
+            emit commentsChanged();
+        }
+    }
+
+    if (renamedElementCount > 0 || isFromMute) {
+        this->setCharacterRelationshipGraph(QJsonObject());
+        emit characterNamesChanged();
+    }
+
+    emit sceneReset(0);
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)

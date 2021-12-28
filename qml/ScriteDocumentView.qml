@@ -1812,7 +1812,7 @@ Item {
                     if(showNotebookInStructure)
                         return [{"name": "Character Notes", "description": "Create/switch to notes for the character in notebook"}]
                 }
-                return []
+                ret.push({"name": "Rename Character", "description": "Rename character across all scenes & notes."})
             }
             additionalSceneMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
@@ -1828,7 +1828,7 @@ Item {
 
             enableSceneListPanel: mainTabBar.currentIndex === 0
 
-            onAdditionalCharacterMenuItemClicked: {
+            onAdditionalCharacterMenuItemClicked: (characterName,menuItemName) => {
                 if(menuItemName === "Character Notes" && showNotebookInStructure) {
                     var ch = Scrite.document.structure.findCharacter(characterName)
                     if(ch === null)

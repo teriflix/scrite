@@ -243,6 +243,48 @@ void Note::deserializeFromJson(const QJsonObject &json)
     }
 }
 
+void Note::renameCharacter(const QString &from, const QString &to)
+{
+    {
+        int nrReplacements = 0;
+        const QString newTitle =
+                Application::replaceCharacterName(from, to, m_title, &nrReplacements);
+        if (nrReplacements > 0) {
+            m_title = newTitle;
+            emit titleChanged();
+        }
+    }
+
+    if (m_content.isString()) {
+        int nrReplacements = 0;
+        const QString newContent =
+                Application::replaceCharacterName(from, to, m_content.toString(), &nrReplacements);
+        if (nrReplacements > 0) {
+            m_content = newContent;
+            emit contentChanged();
+        }
+    }
+
+    {
+        bool formDataModified = false;
+        QJsonObject::iterator it = m_formData.begin();
+        QJsonObject::iterator end = m_formData.end();
+        while (it != end) {
+            int nrReplacements = 0;
+            const QString newValue = Application::replaceCharacterName(
+                    from, to, it.value().toString(), &nrReplacements);
+            if (nrReplacements > 0) {
+                it.value() = newValue;
+                formDataModified = true;
+            }
+            ++it;
+        }
+
+        if (formDataModified)
+            emit formDataChanged();
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class RemoveNoteUndoCommand : public QUndoCommand
@@ -639,4 +681,10 @@ void Notes::loadOldNotes(const QJsonArray &jsNotes)
     }
 
     this->setNotes(notes);
+}
+
+void Notes::renameCharacter(const QString &from, const QString &to)
+{
+    for (Note *note : this->constList())
+        note->renameCharacter(from, to);
 }

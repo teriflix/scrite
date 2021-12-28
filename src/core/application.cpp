@@ -953,6 +953,57 @@ QPainterPath Application::stringToPainterPath(const QString &val)
     return path;
 }
 
+QString Application::replaceCharacterName(const QString &from, const QString &to, const QString &in,
+                                          int *nrReplacements)
+{
+    QString text = in.trimmed();
+    QList<int> replacePositions;
+
+    int pos = 0; // search from last
+    while (pos < text.length()) {
+        pos = text.indexOf(from, pos, Qt::CaseInsensitive);
+        if (pos < 0)
+            break;
+
+        if (pos > 0) {
+            const QChar ch = text.at(pos - 1);
+            if (!ch.isPunct() && !ch.isSpace()) {
+                pos += from.length();
+                continue;
+            }
+        }
+
+        bool found = false;
+        if (pos + from.length() < text.length()) {
+            const QChar ch = text.at(pos + from.length());
+            found = ch.isPunct() || ch.isSpace();
+        } else
+            found = (text.compare(from, Qt::CaseInsensitive) == 0);
+
+        if (found)
+            replacePositions << pos;
+
+        pos += from.length();
+    }
+
+    if (!replacePositions.isEmpty()) {
+        if (nrReplacements)
+            *nrReplacements = replacePositions.size();
+
+        for (int i = replacePositions.size() - 1; i >= 0; i--) {
+            const int pos = replacePositions.at(i);
+            const bool allCaps = [](const QString &val) {
+                return val == val.toUpper();
+            }(text.mid(pos, from.length()));
+            text = text.replace(pos, from.length(), allCaps ? to.toUpper() : to);
+        }
+
+        return text;
+    }
+
+    return in;
+}
+
 QString Application::sanitiseFileName(const QString &fileName) const
 {
     const QFileInfo fi(fileName);

@@ -13,6 +13,9 @@
 
 #include "undoredo.h"
 #include "structure.h"
+#include "hourglass.h"
+#include "aggregation.h"
+#include "errorreport.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
@@ -374,6 +377,21 @@ void StructureElement::groupVerificationRequired()
 {
     if (m_scene && m_structure)
         m_scene->verifyGroups(m_structure->groupsModel());
+}
+
+void StructureElement::renameCharacter(const QString &from, const QString &to)
+{
+    if (!m_title.isEmpty()) {
+        int nrReplacements = 0;
+        const QString newTitle =
+                Application::replaceCharacterName(from, to, m_title, &nrReplacements);
+        if (nrReplacements > 0) {
+            m_title = newTitle;
+            emit titleChanged();
+        }
+    }
+
+    m_scene->renameCharacter(from, to);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1091,6 +1109,54 @@ void Character::setName(const QString &val)
 
     m_name = val.toUpper().trimmed();
     emit nameChanged();
+}
+
+bool Character::rename(const QString &name)
+{
+    if (m_structure == nullptr)
+        return false;
+
+    HourGlass hourGlass;
+
+    this->clearRenameError();
+
+    QString errMsg;
+    const bool ret = m_structure->renameCharacter(m_name, name, &errMsg);
+
+    if (ret) {
+        if (m_notes)
+            m_notes->renameCharacter(m_name, name);
+
+        {
+            int nrReplacements = 0;
+            const QString newSummary =
+                    Application::replaceCharacterName(m_name, name, m_summary, &nrReplacements);
+            if (nrReplacements > 0) {
+                m_summary = newSummary;
+                emit summaryChanged();
+            }
+        }
+
+        this->setCharacterRelationshipGraph(QJsonObject());
+        m_structure->setCharacterRelationshipGraph(QJsonObject());
+        m_name = name.toUpper().trimmed();
+        emit nameChanged();
+    }
+
+    if (!errMsg.isEmpty()) {
+        m_renameError = errMsg;
+        emit renameErrorChanged();
+    }
+
+    return ret;
+}
+
+void Character::clearRenameError()
+{
+    if (!m_renameError.isEmpty()) {
+        m_renameError.clear();
+        emit renameErrorChanged();
+    }
 }
 
 void Character::setVisibleOnNotebook(bool val)
@@ -2955,6 +3021,49 @@ Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) c
     }
 
     return ret;
+}
+
+bool Structure::renameCharacter(const QString &from, const QString &to, QString *errMsg)
+{
+    auto setError = [=](const QString &msg) {
+        if (errMsg)
+            *errMsg = msg;
+    };
+
+    // Run basic sanity checks on parameters
+    if (from.isEmpty() || to.isEmpty()) {
+        setError(QStringLiteral("Cannot rename empty character names."));
+        return false;
+    }
+
+    if (from == to)
+        return true;
+
+    // Format character names properly
+    const QString from2 = Application::camelCased(from.trimmed());
+    const QString to2 = Application::camelCased(to.trimmed());
+
+    // Make sure that the from character exists.
+    if (!m_characterElementMap.containsCharacter(from2) && !this->findCharacter(from2)) {
+        setError(QStringLiteral("Character name '%1' doesnt exist.").arg(from2));
+        return false;
+    }
+
+    // Make sure that the to character doesnt exist
+    if (m_characterElementMap.containsCharacter(to2) || this->findCharacter(to2)) {
+        setError(QStringLiteral("Character name '%1' already exists.").arg(to2));
+        return false;
+    }
+
+    // Replace character names in all scenes
+    for (StructureElement *element : m_elements.constList())
+        element->renameCharacter(from2, to2);
+
+    // Rename in notes
+    if (m_notes)
+        m_notes->renameCharacter(from, to);
+
+    return true;
 }
 
 void Structure::scanForMuteCharacters()

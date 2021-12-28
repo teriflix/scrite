@@ -487,6 +487,7 @@ Rectangle {
                         } else if(styleData.value.notebookItemType === NotebookModel.NotesType &&
                                   styleData.value.notebookItemObject.ownerType === Notes.CharacterOwner) {
                             characterContextMenu.character = styleData.value.notebookItemObject.character
+                            characterContextMenu.characterItem = parent
                             characterContextMenu.popup()
                         }
                     }
@@ -2810,6 +2811,7 @@ Rectangle {
     Menu2 {
         id: characterContextMenu
         property Character character
+        property Item characterItem
         enabled: character
 
         onAboutToHide: character = null
@@ -2818,6 +2820,17 @@ Rectangle {
             title: "Character Color"
             onMenuItemClicked: {
                 characterContextMenu.character.color = color
+                characterContextMenu.close()
+            }
+        }
+
+        MenuItem2 {
+            text: "Rename Character"
+            onClicked: {
+                modalDialog.arguments = characterContextMenu.character
+                modalDialog.popupSource = characterContextMenu.characterItem
+                modalDialog.sourceComponent = renameCharacterDialog
+                modalDialog.active = true
                 characterContextMenu.close()
             }
         }
@@ -2848,5 +2861,11 @@ Rectangle {
                     workspaceSettings.animateStructureIcon = false
             }
         }
+    }
+
+    Component {
+        id: renameCharacterDialog
+
+        RenameCharacterDialog { }
     }
 }

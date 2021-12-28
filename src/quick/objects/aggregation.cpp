@@ -17,8 +17,7 @@ Aggregation::Aggregation(QObject *parent) : QObject(parent) { }
 
 Aggregation::~Aggregation() { }
 
-QObject *Aggregation::find(QObject *object, const QString &className,
-                           const QString &objectName) const
+QObject *Aggregation::find(QObject *object, const QString &className, const QString &objectName)
 {
     if (object == nullptr)
         return nullptr;
@@ -37,12 +36,12 @@ QObject *Aggregation::find(QObject *object, const QString &className,
     return nullptr;
 }
 
-ErrorReport *Aggregation::findErrorReport(QObject *object) const
+ErrorReport *Aggregation::findErrorReport(QObject *object)
 {
     return object->findChild<ErrorReport *>(QString(), Qt::FindDirectChildrenOnly);
 }
 
-ProgressReport *Aggregation::findProgressReport(QObject *object) const
+ProgressReport *Aggregation::findProgressReport(QObject *object)
 {
     return object->findChild<ProgressReport *>(QString(), Qt::FindDirectChildrenOnly);
 }

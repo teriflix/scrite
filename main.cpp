@@ -32,8 +32,6 @@ int main(int argc, char **argv)
     AppWindow scriteWindow;
     scriteWindow.setSource(QUrl("qrc:/main.qml"));
     scriteWindow.show();
-    scriteWindow.raise();
-    scriteWindow.requestActivate();
 
     return scriteApp.exec();
 }

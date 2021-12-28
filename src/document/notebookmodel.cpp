@@ -626,6 +626,14 @@ NotesItem::NotesItem(Notes *notes) : ObjectItem(notes), m_notes(notes)
                                           &Scene::screenplayElementIndexListChanged, m_notes,
                                           updateTextSlot);
     } break;
+    case Notes::CharacterOwner: {
+        Character *character = m_notes->character();
+        if (character) {
+            auto updateTextSlot = [=]() { this->updateText(); };
+            m_connections << QObject::connect(character, &Character::nameChanged, m_notes,
+                                              updateTextSlot);
+        }
+    } break;
     default:
         break;
     }

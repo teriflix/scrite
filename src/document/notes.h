@@ -113,6 +113,7 @@ private:
     void setForm(Form *val);
     void resetForm();
     void addAttachment(Attachment *ptr);
+    void renameCharacter(const QString &from, const QString &to);
 
 private:
     friend class Notes;
@@ -221,9 +222,13 @@ public:
     void loadOldNotes(const QJsonArray &array);
 
 private:
+    friend class Scene;
+    friend class Character;
+    friend class Structure;
     void setId(const QString &val);
     void addNote(Note *ptr);
     void setNotes(const QList<Note *> &list);
+    void renameCharacter(const QString &from, const QString &to);
 
 private:
     friend class RemoveNoteUndoCommand;

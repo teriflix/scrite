@@ -2874,7 +2874,7 @@ Rectangle {
                     font.capitalization: headingFontMetrics.font.capitalization
                     font.pointSize: sceneHeadingFieldsFontPointSize
                     closable: scene.isCharacterMute(modelData) && !Scrite.document.readOnly
-                    onClicked: requestCharacterMenu(modelData)
+                    onClicked: requestCharacterMenu(modelData, characterNameLabel)
                     onCloseRequest: {
                         if(!Scrite.document.readOnly)
                             scene.removeMuteCharacter(modelData)
@@ -3256,7 +3256,7 @@ Rectangle {
         }
     }
 
-    function requestCharacterMenu(characterName) {
+    function requestCharacterMenu(characterName, popupSource) {
         if(characterMenu.characterReports.length === 0) {
             var reports = Scrite.document.supportedReports
             var chReports = []
@@ -3267,6 +3267,7 @@ Rectangle {
             characterMenu.characterReports = chReports
         }
 
+        characterMenu.popupSource = popupSource
         characterMenu.characterName = characterName
         characterMenu.popup()
     }
@@ -3274,6 +3275,7 @@ Rectangle {
     Menu2 {
         id: characterMenu
         width: 300
+        property Item popupSource
         property string characterName
         property var characterReports: []
 
@@ -3317,12 +3319,6 @@ Rectangle {
         }
 
         Repeater {
-            model: characterMenu.characterReports.length > 0 ? (additionalCharacterMenuItems.length ? 1 : 0) : 0
-
-            MenuSeparator { }
-        }
-
-        Repeater {
             model: characterMenu.characterReports.length > 0 ? additionalCharacterMenuItems : []
 
             MenuItem2 {
@@ -3354,6 +3350,54 @@ Rectangle {
                 onTriggered: additionalCharacterMenuItemClicked(characterMenu.characterName, modelData.name)
             }
         }
+
+        Repeater {
+            model: characterMenu.characterReports.length > 0 ? 1 : 0
+
+            MenuItem2 {
+                leftPadding: 15
+                rightPadding: 15
+                topPadding: 5
+                bottomPadding: 5
+                width: reportsMenu.width
+                height: 65
+                contentItem: Column {
+                    width: characterMenu.width - 30
+                    spacing: 5
+
+                    Text {
+                        font.bold: true
+                        font.pixelSize: 16
+                        text: "Rename Character"
+                    }
+
+                    Text {
+                        text: "Rename character across all scenes, notes, comments, titles and descriptions."
+                        width: parent.width
+                        wrapMode: Text.WordWrap
+                        font.pixelSize: 12
+                        font.italic: true
+                    }
+                }
+
+                onTriggered: {
+                    const character = Scrite.document.structure.addCharacter(characterMenu.characterName)
+                    if(character) {
+                        modalDialog.popupSource = characterMenu.popupSource
+                        modalDialog.arguments = character
+                        modalDialog.sourceComponent = renameCharacterDialog
+                        modalDialog.active = true
+                        characterMenu.close()
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: renameCharacterDialog
+
+        RenameCharacterDialog { }
     }
 
     Component {

@@ -393,16 +393,20 @@ void CharacterRelationshipsGraph::setCharacter(Character *val)
     if (m_character == val)
         return;
 
-    if (!m_character.isNull())
+    if (!m_character.isNull()) {
         disconnect(m_character, &Character::relationshipCountChanged, this,
                    &CharacterRelationshipsGraph::loadLater);
+        disconnect(m_character, &Character::nameChanged, this, &CharacterRelationshipsGraph::reset);
+    }
 
     m_character = val;
     emit characterChanged();
 
-    if (!m_character.isNull())
+    if (!m_character.isNull()) {
         connect(m_character, &Character::relationshipCountChanged, this,
                 &CharacterRelationshipsGraph::loadLater);
+        connect(m_character, &Character::nameChanged, this, &CharacterRelationshipsGraph::reset);
+    }
 
     this->loadLater();
 }

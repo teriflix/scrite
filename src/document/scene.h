@@ -88,6 +88,10 @@ public:
     Q_INVOKABLE void parseFrom(const QString &text);
 
 private:
+    friend class Scene;
+    void renameCharacter(const QString &from, const QString &to);
+
+private:
     bool m_enabled = true;
     char m_padding[3];
     Scene *m_scene = nullptr;
@@ -185,6 +189,10 @@ public:
 
 protected:
     bool event(QEvent *event);
+
+private:
+    friend class Scene;
+    void renameCharacter(const QString &from, const QString &to);
 
 private:
     mutable QString m_id;
@@ -460,6 +468,7 @@ private:
     void onSceneElementChanged(SceneElement *element, SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
     const CharacterElementMap &characterElementMap() const { return m_characterElementMap; }
+    void renameCharacter(const QString &from, const QString &to);
 
 private:
     friend class Structure;

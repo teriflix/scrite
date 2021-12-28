@@ -79,5 +79,6 @@
         <file>qml/Link.qml</file>
         <file>qml/SocialShareIcons.qml</file>
         <file>qml/CollaboratorsDialog.qml</file>
+        <file>qml/RenameCharacterDialog.qml</file>
     </qresource>
 </RCC>

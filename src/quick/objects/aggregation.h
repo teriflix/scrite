@@ -30,10 +30,10 @@ public:
     Aggregation(QObject *parent = nullptr);
     ~Aggregation();
 
-    Q_INVOKABLE QObject *find(QObject *object, const QString &className,
-                              const QString &objectName = QString()) const;
-    Q_INVOKABLE ErrorReport *findErrorReport(QObject *object) const;
-    Q_INVOKABLE ProgressReport *findProgressReport(QObject *object) const;
+    Q_INVOKABLE static QObject *find(QObject *object, const QString &className,
+                                     const QString &objectName = QString());
+    Q_INVOKABLE static ErrorReport *findErrorReport(QObject *object);
+    Q_INVOKABLE static ProgressReport *findProgressReport(QObject *object);
 };
 
 #endif // AGGREGATION_H
