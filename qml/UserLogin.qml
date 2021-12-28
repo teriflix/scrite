@@ -206,15 +206,14 @@ Item {
                         font.pointSize: Scrite.app.idealFontPointSize + 4
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: "Signup / login with your email to unlock Structure, Notebook and many more features in Scrite."
+                        text: "Signup / login to unlock Structure, Notebook and many more features in Scrite."
                         color: Qt.darker("#65318f")
-                        visible: !privateData.loginPageShownForTheFirstTime
                     }
 
                     TextField {
                         id: emailField
                         width: parent.width
-                        placeholderText: length > 0 && acceptableInput ? "Hit Return to Continue" : "Enter Email ID and hit Return"
+                        placeholderText: "Enter your Email ID"
                         font.pointSize: Scrite.app.idealFontPointSize + 4
                         text: sendActivationCodeCall.email()
                         validator: RegExpValidator {
@@ -223,10 +222,11 @@ Item {
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
                         Component.onCompleted: Qt.callLater( () => {
-                                forceActiveFocus()
                                 cursorPosition = Math.max(0,length)
+
                             })
                         Keys.onReturnPressed: requestActivationCode()
+                        Keys.onEscapePressed: focus = false
 
                         function requestActivationCode() {
                             if(acceptableInput) {
@@ -243,7 +243,7 @@ Item {
                             anchors.top: parent.bottom
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.topMargin: 10
-                            text: "Continue »"
+                            text: parent.acceptableInput ? "Continue »" : "Provide your Email ID"
                             defaultColor: releaseNotesLink.defaultColor
                             hoverColor: releaseNotesLink.hoverColor
                             font.underline: false
@@ -348,8 +348,8 @@ Item {
                         font.pointSize: Scrite.app.idealFontPointSize + 2
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
-                        Component.onCompleted: forceActiveFocus()
                         Keys.onReturnPressed: nextButton.click()
+                        Keys.onEscapePressed: focus = false
                     }
 
                     Text {
@@ -358,7 +358,11 @@ Item {
                         font.pointSize: Scrite.app.idealFontPointSize
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: "We have emailed an activation code to <b>" + activateCall.fetch("email") + "</b>."
+                        text: {
+                            if(activationCodeField.length < 20)
+                                return "Paste the activation code sent to your email: <b>" + activateCall.fetch("email") + "</b> into the field above."
+                            return "Click on the Activate button to complete activating your installation of Scrite."
+                        }
                     }
                 }
             }
