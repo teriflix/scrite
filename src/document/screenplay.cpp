@@ -551,8 +551,8 @@ bool Screenplay::isEmpty() const
         return settings->value(titlePageGroup + QStringLiteral("/") + key).toString();
     };
 
-    const bool allEmpty = m_title.isEmpty() && m_elements.isEmpty() && m_subtitle.isEmpty()
-            && m_logline.isEmpty() && m_basedOn.isEmpty()
+    bool allEmpty = m_title.isEmpty() && m_subtitle.isEmpty() && m_logline.isEmpty()
+            && m_basedOn.isEmpty()
             && (m_author == QSysInfo::machineHostName()
                 || m_author == configuredValue(QStringLiteral("author")))
             && (m_contact.isEmpty() || m_contact == configuredValue(QStringLiteral("contact")))
@@ -562,6 +562,24 @@ bool Screenplay::isEmpty() const
             && (m_email.isEmpty() || m_email == configuredValue(QStringLiteral("email")))
             && (m_website.isEmpty() || m_website == configuredValue(QStringLiteral("website")))
             && (m_version == QStringLiteral("Initial Draft"));
+
+    if (allEmpty) {
+        if (m_elements.size() == 1) {
+            const ScreenplayElement *firstElement = m_elements.first();
+            if (firstElement->elementType() == ScreenplayElement::SceneElementType) {
+                const Scene *firstScene = firstElement->scene();
+                if (firstScene->elementCount() == 0)
+                    return true;
+
+                const SceneElement *para = firstScene->elementAt(0);
+                if (para->text().isEmpty())
+                    return true;
+            }
+        }
+
+        allEmpty &= m_elements.isEmpty();
+    }
+
     return allEmpty;
 }
 

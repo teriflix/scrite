@@ -2450,7 +2450,7 @@ Item {
                 if(closeEventHandler.handleCloseEvent) {
                     Scrite.app.saveWindowGeometry(Scrite.window, "Workspace")
 
-                    if(!Scrite.document.modified) {
+                    if(!Scrite.document.modified || Scrite.document.empty) {
                         close.accepted = true
                         return
                     }

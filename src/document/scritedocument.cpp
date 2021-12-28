@@ -817,6 +817,7 @@ void ScriteDocument::reset()
     this->evaluateStructureElementSequence();
     this->createNewScene(); // Create a blank scene in new documents.
     this->setModified(false);
+    this->clearModifiedLater();
     emit emptyChanged();
 
     connect(m_structure, &Structure::currentElementIndexChanged, this,
@@ -844,6 +845,15 @@ void ScriteDocument::reset()
     connect(m_printFormat, &ScreenplayFormat::formatChanged, this, &ScriteDocument::markAsModified);
 
     emit justReset();
+
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(250);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, [=]() {
+        timer->deleteLater();
+        this->setModified(false);
+    });
+    timer->start();
 }
 
 bool ScriteDocument::openOrImport(const QString &fileName)
@@ -881,6 +891,7 @@ bool ScriteDocument::open(const QString &fileName)
     if (ret)
         this->setFileName(fileName);
     this->setModified(false);
+    this->clearModifiedLater();
     this->clearBusyMessage();
 
     return ret;
@@ -1041,7 +1052,7 @@ void ScriteDocument::save()
 
 QStringList ScriteDocument::supportedImportFormats() const
 {
-    static QList<QByteArray> keys = deviceIOFactories->ImporterFactory.keys();
+    static const QList<QByteArray> keys = deviceIOFactories->ImporterFactory.keys();
     static QStringList formats;
     if (formats.isEmpty())
         for (const QByteArray &key : keys)
@@ -1065,7 +1076,7 @@ QString ScriteDocument::importFormatFileSuffix(const QString &format) const
 
 QStringList ScriteDocument::supportedExportFormats() const
 {
-    static QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
+    static const QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
     static QStringList formats;
     if (formats.isEmpty()) {
         for (const QByteArray &key : keys)
@@ -1104,7 +1115,7 @@ QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
 
 QJsonArray ScriteDocument::supportedReports() const
 {
-    static QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
+    static const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
     static QJsonArray reports;
     if (reports.isEmpty()) {
         for (const QByteArray &key : keys) {
@@ -1924,6 +1935,18 @@ void ScriteDocument::screenplayElementRemoved(ScreenplayElement *ptr, int)
             element->setStackId(QString());
         }
     }
+}
+
+void ScriteDocument::clearModifiedLater()
+{
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(250);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, this, [=]() {
+        timer->deleteLater();
+        this->setModified(false);
+    });
+    timer->start();
 }
 
 void ScriteDocument::prepareForSerialization()

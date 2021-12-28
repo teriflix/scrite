@@ -409,6 +409,7 @@ private:
     void screenplayElementIndexChanged();
     void setCreatedOnThisComputer(bool val);
     void screenplayElementRemoved(ScreenplayElement *ptr, int index);
+    void clearModifiedLater();
 
 public:
     // QObjectSerializer::Interface implementation
