@@ -1812,7 +1812,7 @@ Item {
                     if(showNotebookInStructure)
                         return [{"name": "Character Notes", "description": "Create/switch to notes for the character in notebook"}]
                 }
-                ret.push({"name": "Rename Character", "description": "Rename character across all scenes & notes."})
+                return []
             }
             additionalSceneMenuItems: {
                 if(mainTabBar.currentIndex === 1) {

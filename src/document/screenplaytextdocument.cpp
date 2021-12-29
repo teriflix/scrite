@@ -15,7 +15,6 @@
 
 #include "hourglass.h"
 #include "application.h"
-#include "imageprinter.h"
 #include "timeprofiler.h"
 #include "printerobject.h"
 #include "scritedocument.h"
@@ -507,8 +506,6 @@ void ScreenplayTextDocument::print(QObject *printerObject)
 
     QPdfWriter *pdfWriter = qobject_cast<QPdfWriter *>(printerObject);
     PrinterObject *qprinter = pdfWriter ? nullptr : qobject_cast<PrinterObject *>(printerObject);
-    ImagePrinter *imagePrinter =
-            pdfWriter || qprinter ? nullptr : qobject_cast<ImagePrinter *>(printerObject);
 
     if (pdfWriter) {
         printer = pdfWriter;
@@ -525,8 +522,7 @@ void ScreenplayTextDocument::print(QObject *printerObject)
                              + qApp->applicationVersion() + QStringLiteral(" PdfWriter"));
         if (qprinter->outputFormat() == QPrinter::PdfFormat)
             qprinter->setPdfVersion(QPagedPaintDevice::PdfVersion_1_6);
-    } else if (imagePrinter)
-        printer = imagePrinter;
+    }
 
     if (printer) {
         m_formatting->pageLayout()->configure(printer);

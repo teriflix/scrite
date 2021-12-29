@@ -3247,12 +3247,39 @@ Rectangle {
         visible: globalScreenplayEditorToolbar.showScreenplayPreview
         active: globalScreenplayEditorToolbar.showScreenplayPreview
         anchors.fill: parent
-        sourceComponent: ScreenplayPreview {
-            purpose: ScreenplayTextDocument.ForPrinting
-            screenplay: screenplayTextDocument.paused ? Scrite.document.screenplay : screenplayTextDocument.screenplay
-            screenplayFormat: screenplayTextDocument.paused ? Scrite.document.printFormat : screenplayTextDocument.formatting
-            titlePage: screenplayEditorSettings.includeTitlePageInPreview
-            titlePageIsCentered: Scrite.document.screenplay.titlePageIsCentered
+        sourceComponent: PdfView {
+            id: pdfView
+
+            BusyOverlay {
+                id: busyOverlay
+                anchors.fill: parent
+                busyMessage: "Generating Preview ..."
+                visible: true
+            }
+
+            FileManager {
+                id: fileManager
+            }
+
+            Timer {
+                interval: 50
+                repeat: false
+                running: true
+                onTriggered: {
+                    stop()
+
+                    const fileName = fileManager.generateUniqueTemporaryFileName("pdf");
+                    fileManager.addToAutoDeleteList(fileName)
+
+                    var exporter = Scrite.document.createExporter("Screenplay/Adobe PDF");
+                    exporter.fileName = fileName
+                    exporter.write()
+
+                    pdfView.pagesPerRow = pdfView.width > Screen.desktopAvailableWidth/2 ? 2 : 1
+                    pdfView.source = "file://" + fileName
+                    busyOverlay.visible = false
+                }
+            }
         }
     }
 

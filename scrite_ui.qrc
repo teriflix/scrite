@@ -56,7 +56,6 @@
         <file>qml/CharacterBox.qml</file>
         <file>qml/TabView3.qml</file>
         <file>qml/ScritedView.qml</file>
-        <file>qml/ScreenplayPreview.qml</file>
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
         <file>qml/OpenTemplateDialog.qml</file>
@@ -80,5 +79,6 @@
         <file>qml/SocialShareIcons.qml</file>
         <file>qml/CollaboratorsDialog.qml</file>
         <file>qml/RenameCharacterDialog.qml</file>
+        <file>qml/PdfView.qml</file>
     </qresource>
 </RCC>

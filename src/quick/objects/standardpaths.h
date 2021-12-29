@@ -55,14 +55,18 @@ public:
     };
     Q_ENUM(StandardLocation)
 
-    Q_INVOKABLE QString writableLocation(StandardLocation type) const;
-    Q_INVOKABLE QString displayName(StandardLocation type) const;
+    Q_INVOKABLE QString writableLocation(StandardPaths::StandardLocation type) const;
+    Q_INVOKABLE QString displayName(StandardPaths::StandardLocation type) const;
     Q_INVOKABLE QString findExecutable(const QString &executableName,
                                        const QStringList &paths = QStringList());
-    Q_INVOKABLE QString locateFile(StandardLocation type, const QString &fileName) const;
-    Q_INVOKABLE QStringList locateAllFiles(StandardLocation type, const QString &fileName) const;
-    Q_INVOKABLE QString locateFolder(StandardLocation type, const QString &fileName) const;
-    Q_INVOKABLE QStringList locateAllFolders(StandardLocation type, const QString &fileName) const;
+    Q_INVOKABLE QString locateFile(StandardPaths::StandardLocation type,
+                                   const QString &fileName) const;
+    Q_INVOKABLE QStringList locateAllFiles(StandardPaths::StandardLocation type,
+                                           const QString &fileName) const;
+    Q_INVOKABLE QString locateFolder(StandardPaths::StandardLocation type,
+                                     const QString &fileName) const;
+    Q_INVOKABLE QStringList locateAllFolders(StandardPaths::StandardLocation type,
+                                             const QString &fileName) const;
     Q_INVOKABLE QUrl fromLocalFile(const QString &file) const;
     Q_INVOKABLE QString resolvePath(const QString &path) const;
 

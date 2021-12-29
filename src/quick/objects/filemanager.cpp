@@ -1,0 +1,65 @@
+/****************************************************************************
+**
+** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+#include "filemanager.h"
+#include "standardpaths.h"
+
+#include <QDir>
+#include <QDateTime>
+
+FileManager::FileManager(QObject *parent) : QObject(parent) { }
+
+FileManager::~FileManager()
+{
+    while (!m_autoDeleteList.isEmpty()) {
+        const QString filePath = m_autoDeleteList.takeFirst();
+        QFile::remove(filePath);
+    }
+}
+
+QString FileManager::generateUniqueTemporaryFileName(const QString &ext)
+{
+    const QDir tmp = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+
+    qint64 counter = QDateTime::currentMSecsSinceEpoch();
+    while (1) {
+        const QString baseName = QString::number(counter) + QStringLiteral(".") + ext;
+        const QString filePath = tmp.absoluteFilePath(baseName);
+        if (!QFile::exists(filePath))
+            return filePath;
+
+        ++counter;
+    }
+
+    return QString();
+}
+
+void FileManager::setAutoDeleteList(const QStringList &val)
+{
+    if (m_autoDeleteList == val)
+        return;
+
+    m_autoDeleteList = val;
+    emit autoDeleteListChanged();
+}
+
+void FileManager::addToAutoDeleteList(const QString &filePath)
+{
+    if (!m_autoDeleteList.contains(filePath))
+        m_autoDeleteList.append(filePath);
+}
+
+void FileManager::removeFromAutoDeleteList(const QString &filePath)
+{
+    m_autoDeleteList.removeOne(filePath);
+}

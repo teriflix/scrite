@@ -74,13 +74,13 @@ HEADERS += \
     src/network/networkaccessmanager.h \
     src/network/user.h \
     src/printing/qtextdocumentpagedprinter.h \
-    src/printing/imageprinter.h \
     src/quick/items/boundingboxevaluator.h \
     src/quick/items/simpletabbaritem.h \
     src/quick/items/textdocumentitem.h \
     src/quick/objects/announcement.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
+    src/quick/objects/filemanager.h \
     src/quick/objects/flickscrollspeedcontrol.h \
     src/quick/objects/itempositionmapper.h \
     src/quick/objects/modelaggregator.h \
@@ -193,13 +193,13 @@ SOURCES += \
     src/network/networkaccessmanager.cpp \
     src/network/user.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
-    src/printing/imageprinter.cpp \
     src/quick/items/boundingboxevaluator.cpp \
     src/quick/items/simpletabbaritem.cpp \
     src/quick/items/textdocumentitem.cpp \
     src/quick/objects/announcement.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
+    src/quick/objects/filemanager.cpp \
     src/quick/objects/flickscrollspeedcontrol.cpp \
     src/quick/objects/itempositionmapper.cpp \
     src/quick/objects/modelaggregator.cpp \

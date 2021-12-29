@@ -13,7 +13,6 @@
 
 #include "pdfexporter.h"
 #include "application.h"
-#include "imageprinter.h"
 #include "qtextdocumentpagedprinter.h"
 
 #include <QDir>
