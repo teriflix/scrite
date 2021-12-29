@@ -21,6 +21,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "screenplaytextdocument.h"
+#include "pdfexportablegraphicsscene.h"
 
 #include <QDir>
 #include <QUrl>
@@ -36,8 +37,10 @@
 #include <QTextCursor>
 #include <QPaintEngine>
 #include <QJsonDocument>
+#include <QGraphicsScene>
 #include <QTextCharFormat>
 #include <QTextBlockFormat>
+#include <QGraphicsRectItem>
 #include <QPropertyAnimation>
 #include <QTextBlockUserData>
 #include <QScopedValueRollback>
@@ -2898,8 +2901,9 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         ret.moveLeft(margin);
         return ret;
     };
-    const QRectF rect =
+    const QRectF rectOnPage =
             format.property(TitlePageIsCentered).toBool() ? evaluateCenteredPaintRect() : givenRect;
+    const QRectF sceneRect = QRectF(0, 0, rectOnPage.width(), rectOnPage.height());
 
     const Screenplay *screenplay =
             qobject_cast<Screenplay *>(format.property(ScreenplayProperty).value<QObject *>());
@@ -2911,7 +2915,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     if (screenplay->property("#useDocumentScreenplayForCoverPagePhoto").toBool() == true)
         coverPageImageScreenplay = masterScreenplay;
 
-    auto fetch = [](const QString &given, const QString &defaultValue) {
+    auto fetch = [](const QString &given, const QString &defaultValue = QString()) {
         const QString val = given.trimmed();
         return val.isEmpty() ? defaultValue : val;
     };
@@ -2920,95 +2924,31 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     const QString subtitle = screenplay->subtitle();
     const QString writtenBy = QStringLiteral("Written By");
     const QString basedOn = screenplay->basedOn();
-    const QString version = fetch(screenplay->version(), QStringLiteral("Initial Draft"));
-    const QString authors = fetch(screenplay->author(), QStringLiteral("A Good Writer"));
-    const QString contact = fetch(screenplay->contact(), authors);
+    const QString version = fetch(screenplay->version());
+    const QString authors = fetch(screenplay->author());
+    const QString contact = fetch(screenplay->contact());
     const QString address = screenplay->address();
     const QString phoneNumber = screenplay->phoneNumber();
     const QString email = screenplay->email();
     const QString website = screenplay->website();
-    const QString marketing = QStringLiteral("Written/Generated using Scrite (www.scrite.io)");
-
     const QFont normalFont = doc->defaultFont();
-    const QFontMetricsF normalFontMetrics(normalFont);
 
-    QFont titleFont = normalFont;
-    titleFont.setBold(true);
-    titleFont.setPointSize(titleFont.pointSize() + 2);
-    const QFontMetricsF titleFontMetrics(titleFont);
-
-    QFont marketingFont = normalFont;
-    marketingFont.setPointSize(8);
-    const QFontMetricsF marketingFontMetrics(marketingFont);
-
-    const QString newline = QStringLiteral("\n");
-    const QString emptyPara = QStringLiteral(".");
-    auto createParagraph = [newline, emptyPara](const QStringList &items) {
-        QString ret;
-        for (int i = 0; i < items.size(); i++) {
-            const QString item = items.at(i);
-            if (item.isEmpty())
-                continue;
-            if (!ret.isEmpty())
-                ret += newline;
-            if (item != emptyPara)
-                ret += item;
-        }
-        return ret.trimmed();
+    auto itemRect = [](const QGraphicsItem *item) {
+        return item->mapToScene(item->boundingRect()).boundingRect();
     };
 
-    const QString centerFrameText =
-            createParagraph(QStringList() << subtitle << emptyPara << writtenBy << authors
-                                          << emptyPara << basedOn << emptyPara << version);
-    QRectF centerFrameRect =
-            normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, centerFrameText);
-    centerFrameRect.moveCenter(rect.center());
-    centerFrameRect.moveBottom(rect.center().y());
+    QGraphicsScene scene;
+    scene.setSceneRect(sceneRect);
 
-    const QString titleFrameText = title;
-    QRectF titleFrameRect = titleFontMetrics.boundingRect(rect, Qt::TextWordWrap, titleFrameText);
-    titleFrameRect.moveCenter(centerFrameRect.center());
-    titleFrameRect.moveBottom(centerFrameRect.top());
-
-    const QString marketingText = marketing;
-    QRectF marketingFrame =
-            marketingFontMetrics.boundingRect(rect, Qt::TextWordWrap, marketingText);
-    marketingFrame.moveCenter(rect.center());
-    marketingFrame.moveTop(rect.bottom() + marketingFrame.height() * 3);
-
-    const QString contactFrameText =
-            createParagraph(QStringList() << contact << address << phoneNumber << email << website);
-    QRectF contactFrameRect =
-            normalFontMetrics.boundingRect(rect, Qt::TextWordWrap, contactFrameText);
-    contactFrameRect.moveBottomLeft(rect.bottomLeft());
-
-    const bool isPdfDevice = painter->device()->paintEngine()->type() == QPaintEngine::Pdf;
-    const qreal defaultDpi = qt_defaultDpi();
-    auto paintText = [isPdfDevice, defaultDpi](QPainter *painter, const QRectF &rect, int flags,
-                                               const QString &text) {
-        if (isPdfDevice) {
-            const qreal invScaleX = defaultDpi / qreal(painter->device()->logicalDpiX());
-            const qreal invScaleY = defaultDpi / qreal(painter->device()->logicalDpiY());
-            painter->save();
-            painter->translate(rect.left(), rect.top());
-            painter->scale(invScaleX, invScaleY);
-            const QRectF textRect(0, 0, (rect.width() * 1.1) / invScaleX,
-                                  rect.height() / invScaleY);
-            painter->drawText(textRect, flags, text);
-            painter->restore();
-        } else
-            painter->drawText(rect, flags, text);
-    };
-
-    painter->save();
-
+    // Place the cover photo
+    GraphicsImageRectItem *coverPagePhotoItem = nullptr;
     if (!coverPageImageScreenplay->coverPagePhoto().isEmpty()) {
         QImage photo(coverPageImageScreenplay->coverPagePhoto());
         QRectF photoRect = photo.rect();
         QSizeF photoSize = photoRect.size();
 
-        QRectF spaceAvailable = rect;
-        spaceAvailable.setBottom(titleFrameRect.top() - titleFrameRect.height());
+        QRectF spaceAvailable = sceneRect;
+        spaceAvailable.setBottom(sceneRect.center().y());
         photoSize.scale(spaceAvailable.size(), Qt::KeepAspectRatio);
 
         switch (coverPageImageScreenplay->coverPagePhotoSize()) {
@@ -3016,38 +2956,78 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
             break;
         case Screenplay::MediumCoverPhoto:
             photoSize /= 2.0;
-            photo = photo.scaled(photo.size() / 2.0, Qt::IgnoreAspectRatio,
-                                 Qt::SmoothTransformation);
             break;
         case Screenplay::SmallCoverPhoto:
             photoSize /= 4.0;
-            photo = photo.scaled(photo.size() / 4.0, Qt::IgnoreAspectRatio,
-                                 Qt::SmoothTransformation);
             break;
         }
 
-        photoRect.setSize(photoSize);
+        photoRect = QRectF(0, 0, photoSize.width(), photoSize.height());
         photoRect.moveCenter(spaceAvailable.center());
-        photoRect.moveBottom(spaceAvailable.bottom());
+        photoRect.moveTop(spaceAvailable.top());
 
-        const bool flag = painter->renderHints().testFlag(QPainter::SmoothPixmapTransform);
-        painter->setRenderHint(QPainter::SmoothPixmapTransform);
-        painter->drawImage(photoRect, photo);
-        painter->setRenderHint(QPainter::SmoothPixmapTransform, flag);
+        coverPagePhotoItem = new GraphicsImageRectItem;
+        scene.addItem(coverPagePhotoItem);
+        coverPagePhotoItem->setImage(photo);
+        coverPagePhotoItem->setRect(0, 0, photoRect.width(), photoRect.height());
+        coverPagePhotoItem->setPos(photoRect.topLeft());
     }
 
-    painter->setFont(titleFont);
-    paintText(painter, titleFrameRect, Qt::AlignHCenter | Qt::TextWordWrap, titleFrameText);
+    // Place title, subtitle, based on, written by and version into a card
+    // and place them in the middle of the page or under the cover page.
+    QGraphicsTextItem *titleCardItem = new QGraphicsTextItem;
+    scene.addItem(titleCardItem);
+    titleCardItem->setFont(normalFont);
+    titleCardItem->setTextWidth(sceneRect.width());
+    QString titleHtml;
+    {
+        QTextStream ts(&titleHtml, QIODevice::WriteOnly);
+        ts << "<center>";
+        ts << "<font size=\"+2\"><strong>" << title << "</strong></font>";
+        if (!subtitle.isEmpty())
+            ts << "<br/>" << subtitle;
+        if (!authors.isEmpty())
+            ts << "<br/><br/>" << writtenBy << "<br/>" << authors;
 
-    painter->setFont(normalFont);
-    paintText(painter, centerFrameRect, Qt::AlignHCenter | Qt::TextWordWrap, centerFrameText);
-    paintText(painter, contactFrameRect, Qt::AlignLeft | Qt::TextWordWrap, contactFrameText);
+        if (!basedOn.isEmpty())
+            ts << "<br/><br/>" << basedOn;
 
-    painter->setFont(marketingFont);
-    painter->setPen(Qt::darkGray);
-    paintText(painter, marketingFrame, Qt::AlignRight | Qt::TextWordWrap, marketingText);
+        if (!version.isEmpty())
+            ts << "<br/><br/>" << version;
 
-    painter->restore();
+        ts << "</center>";
+    }
+    titleCardItem->setHtml(titleHtml);
+
+    QRectF titleCardRect = titleCardItem->boundingRect();
+    if (coverPagePhotoItem) {
+        const QRectF cpr = itemRect(coverPagePhotoItem);
+        titleCardRect.moveTopLeft(QPointF(0, cpr.bottom() + sceneRect.height() * 0.05));
+    } else {
+        titleCardRect.moveCenter(sceneRect.center());
+    }
+    titleCardItem->setPos(titleCardRect.topLeft());
+
+    // Place contact, address, phoneNumber, email, website, marketing in a card
+    // and place them on the bottom left corner
+    QStringList contactCardFields({ contact, address, phoneNumber, email, website });
+    contactCardFields.removeAll(QString());
+    if (!contactCardFields.isEmpty()) {
+        QString contactHtml;
+        contactCardFields.prepend(QStringLiteral("Contact:"));
+        contactHtml = contactCardFields.join(QStringLiteral("<br/>"));
+        QGraphicsTextItem *contactCardItem = new QGraphicsTextItem;
+        scene.addItem(contactCardItem);
+        contactCardItem->setTextWidth(sceneRect.width());
+        contactCardItem->setFont(normalFont);
+        contactCardItem->setHtml(contactHtml);
+
+        QRectF contactCardRect = contactCardItem->boundingRect();
+        contactCardRect.moveBottomLeft(sceneRect.bottomLeft());
+        contactCardItem->setPos(contactCardRect.topLeft());
+    }
+
+    scene.render(painter, rectOnPage, sceneRect, Qt::IgnoreAspectRatio);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

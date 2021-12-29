@@ -377,3 +377,26 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
 }
 
 GraphicsHeaderItem::~GraphicsHeaderItem() { }
+
+///////////////////////////////////////////////////////////////////////////////
+
+GraphicsImageRectItem::GraphicsImageRectItem(QGraphicsItem *parent) : QGraphicsRectItem(parent)
+{
+    this->setBrush(Qt::NoBrush);
+    this->setPen(Qt::NoPen);
+}
+
+GraphicsImageRectItem::~GraphicsImageRectItem() { }
+
+void GraphicsImageRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
+                                  QWidget *widget)
+{
+    QGraphicsRectItem::paint(painter, option, widget);
+    if (m_image.isNull())
+        return;
+
+    const bool spt = painter->testRenderHint(QPainter::SmoothPixmapTransform);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+    painter->drawImage(this->boundingRect(), m_image);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform, spt);
+}

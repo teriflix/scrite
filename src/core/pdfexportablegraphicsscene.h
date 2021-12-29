@@ -111,4 +111,19 @@ public:
     ~GraphicsHeaderItem();
 };
 
+class GraphicsImageRectItem : public QGraphicsRectItem
+{
+public:
+    GraphicsImageRectItem(QGraphicsItem *parent = nullptr);
+    ~GraphicsImageRectItem();
+
+    void setImage(const QImage &image) { m_image = image; }
+    QImage image() const { return m_image; }
+
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+private:
+    QImage m_image;
+};
+
 #endif // PDFEXPORTABLEGRAPHICSSCENE_H
