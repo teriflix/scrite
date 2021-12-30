@@ -24,6 +24,7 @@
 #include <QMenuBar>
 #include <QQuickStyle>
 #include <QQmlContext>
+#include <QOperatingSystemVersion>
 
 static AppWindow *AppWindowInstance = nullptr;
 
@@ -55,9 +56,9 @@ AppWindow::AppWindow()
     this->setFormat(format);
 #ifdef Q_OS_WIN
     if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10)
-        qmlView.setSceneGraphBackend(QSGRendererInterface::Direct3D12);
+        this->setSceneGraphBackend(QSGRendererInterface::Direct3D12);
     else
-        qmlView.setSceneGraphBackend(QSGRendererInterface::Software);
+        this->setSceneGraphBackend(QSGRendererInterface::Software);
 #endif
 
 #ifdef Q_OS_MAC
@@ -123,10 +124,10 @@ void AppWindow::initializeFileNameToOpen()
         fileNameToOpen = scriteApp.fileToOpen();
     scriteApp.setHandleFileOpenEvents(true);
 #else
-    const QStringList appArgs = a.arguments();
+    const QStringList appArgs = scriteApp.arguments();
     if (appArgs.size() > 1) {
         bool hasOptions = false;
-        for (const QString &arg, appArgs) {
+        for (const QString &arg : appArgs) {
             if (arg.startsWith(QStringLiteral("--"))) {
                 hasOptions = true;
                 break;
@@ -135,9 +136,9 @@ void AppWindow::initializeFileNameToOpen()
 
         if (!hasOptions) {
 #ifdef Q_OS_WIN
-            fileNameToOpen = a.arguments().last();
+            fileNameToOpen = appArgs.last();
 #else
-            QStringList args = a.arguments();
+            QStringList args = appArgs;
             args.takeFirst();
             fileNameToOpen = args.join(QStringLiteral(" "));
 #endif
