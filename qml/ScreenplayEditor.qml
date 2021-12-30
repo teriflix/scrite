@@ -511,6 +511,7 @@ Rectangle {
                     }
                     footer: Item {
                         width: contentView.width
+                        z: 10 // So that the UiElementHightlight doesnt get clipped at the top-edge of the footer.
                         height: {
                             if(!screenplayAdapter.isSourceScreenplay)
                                 return contentView.spacing
@@ -3277,7 +3278,7 @@ Rectangle {
                     exporter.write()
 
                     pdfView.pagesPerRow = pdfView.width > Screen.desktopAvailableWidth/2 ? 2 : 1
-                    pdfView.source = "file://" + fileName
+                    pdfView.source = Scrite.app.localFileToUrl(fileName)
                     busyOverlay.visible = false
                 }
             }
