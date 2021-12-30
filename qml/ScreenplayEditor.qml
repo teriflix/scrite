@@ -207,6 +207,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.bottom: statusBar.top
         clip: true
+        enabled: !screenplayPreview.active
 
         EventFilter.events: [31]
         EventFilter.onFilter: {

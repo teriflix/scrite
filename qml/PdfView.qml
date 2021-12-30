@@ -23,6 +23,13 @@ Item {
     property alias source: pdfDoc.source
     property alias pagesPerRow: pdfDoc.pagesPerRow
 
+    // Catch all mouse-area, which doesnt let mouse events
+    // propagate to layers underneath this item.
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+    }
+
     Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
