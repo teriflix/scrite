@@ -494,12 +494,12 @@ Rectangle {
                 width: Math.min(parent.width * 0.4, implicitWidth)
                 property real maxWidth: parent.width*0.4
 
-                BusyIndicator {
+                UI.BusyIcon {
                     id: busyIndicator
                     anchors.verticalCenter: parent.verticalCenter
                     running: true
                     width: 50; height: 50
-                    Material.accent: primaryColors.c600.text
+                    forDarkBackground: true
                 }
 
                 Text {

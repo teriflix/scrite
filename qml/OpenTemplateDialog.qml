@@ -200,7 +200,7 @@ Item {
                                 visible: parent.status !== Image.Ready
                             }
 
-                            BusyIndicator {
+                            BusyIcon {
                                 anchors.centerIn: parent
                                 running: parent.status === Image.Loading
                                 opacity: 0.5

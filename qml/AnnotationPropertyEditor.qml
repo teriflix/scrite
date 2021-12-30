@@ -518,7 +518,7 @@ Item {
                 asynchronous: true
             }
 
-            BusyIndicator {
+            BusyIcon {
                 anchors.centerIn: parent
                 running: parent.status === Image.Loading
             }

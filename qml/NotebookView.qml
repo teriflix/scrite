@@ -637,7 +637,7 @@ Rectangle {
                     color: Qt.rgba(0,0,0,0.05)
                     visible: notebookContentActiveProperty.value === false
 
-                    BusyIndicator {
+                    BusyIcon {
                         running: notebookContentActiveProperty.value === false
                         anchors.centerIn: parent
                     }

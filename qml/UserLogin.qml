@@ -42,7 +42,7 @@ Item {
         transformOrigin: Item.Right
         ToolTip.text: Scrite.user.loggedIn ? "Account Information" : "Login"
 
-        BusyIndicator {
+        BusyIcon {
             visible: Scrite.user.busy
             running: Scrite.user.busy
             anchors.centerIn: parent

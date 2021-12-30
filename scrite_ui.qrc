@@ -80,5 +80,6 @@
         <file>qml/CollaboratorsDialog.qml</file>
         <file>qml/RenameCharacterDialog.qml</file>
         <file>qml/PdfView.qml</file>
+        <file>qml/BusyIcon.qml</file>
     </qresource>
 </RCC>

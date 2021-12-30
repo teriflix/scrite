@@ -39,10 +39,10 @@ Rectangle {
         width: parent.width * 0.8
         anchors.centerIn: parent
 
-        BusyIndicator {
+        BusyIcon {
             running: busyOverlay.visible
             anchors.horizontalCenter: parent.horizontalCenter
-            Material.accent: primaryColors.c700.text
+            forDarkBackground: true
         }
 
         Text {

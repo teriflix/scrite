@@ -1368,7 +1368,7 @@ Item {
                         source: Scrite.document.screenplay.coverPagePhoto !== "" ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
                         opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
 
-                        BusyIndicator {
+                        BusyIcon {
                             anchors.centerIn: parent
                             running: parent.status === Image.Loading
                         }

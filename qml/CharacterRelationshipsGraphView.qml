@@ -588,7 +588,7 @@ Rectangle {
         }
     }
 
-    BusyIndicator {
+    BusyIcon {
         running: crgraph.busy || showBusyIndicator
         anchors.centerIn: parent
     }

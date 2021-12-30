@@ -3640,7 +3640,7 @@ Item {
                 }
             }
 
-            BusyIndicator {
+            BusyIcon {
                 anchors.centerIn: parent
                 running: urlAttribs.status === UrlAttributes.Loading
             }

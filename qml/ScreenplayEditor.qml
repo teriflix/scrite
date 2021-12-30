@@ -713,7 +713,7 @@ Rectangle {
             }
         }
 
-        BusyIndicator {
+        BusyIcon {
             anchors.centerIn: parent
             running: Scrite.document.loading || !screenplayTextDocument.paused && screenplayTextDocument.updating
             visible: running
