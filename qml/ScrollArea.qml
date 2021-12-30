@@ -273,7 +273,7 @@ Flickable {
     }
 
     EventFilter.active: zoomOnScroll
-    EventFilter.events: [31]
+    EventFilter.events: [EventFilter.Wheel]
     EventFilter.onFilter: {
         if(event.delta < 0)
             zoomOut()
