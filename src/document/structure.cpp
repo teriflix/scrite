@@ -4393,8 +4393,6 @@ void StructureElementConnector::computeConnectorShape()
 
     auto computeFn = [](const QRectF &box1, const QRectF &box2,
                         const qreal arrowSize) -> QPainterPath {
-        PROFILE_THIS_FUNCTION;
-
         QPainterPath path;
         static QString getBoxToBoxArrowJs = []() {
             QFile file(QStringLiteral(":/dragonman225-curved-arrows/getBoxToBoxArrow.js"));
