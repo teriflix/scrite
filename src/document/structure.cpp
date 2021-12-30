@@ -24,13 +24,18 @@
 
 #include <QDir>
 #include <QStack>
+#include <QJSValue>
 #include <QMimeData>
 #include <QDateTime>
+#include <QJSEngine>
 #include <QClipboard>
+#include <QQuickWindow>
 #include <QJsonDocument>
 #include <QStandardPaths>
+#include <QtConcurrentRun>
 #include <QFileSystemWatcher>
 #include <QScopedValueRollback>
+#include <QFutureWatcher>
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent), m_structure(qobject_cast<Structure *>(parent)), m_follow(this, "follow")
@@ -3598,42 +3603,6 @@ void Structure::setPreferredGroupCategory(const QString &val)
 
 QString Structure::presentableGroupNames(const QStringList &groups) const
 {
-#if 0
-    QMap< QString, QStringList > map;
-    QStringList groups2 = groups;
-
-    const QString nameKey = QStringLiteral("name");
-    const QString labelKey = QStringLiteral("label");
-    const QString categoryKey = QStringLiteral("category");
-
-    for(int i=0; i<m_groupsModel.size(); i++)
-    {
-        if(groups2.isEmpty())
-            break;
-
-        const QJsonObject item = m_groupsModel.at(i).toObject();
-
-        const QString name = item.value(nameKey).toString();
-        if( groups2.contains(name) )
-        {
-            groups2.removeOne(name);
-            map[ item.value(categoryKey).toString() ].append( item.value(labelKey).toString() );
-        }
-    }
-
-    QMap< QString, QStringList >::iterator it = map.begin();
-    QMap< QString, QStringList >::iterator end = map.end();
-    QString ret;
-    while(it != end)
-    {
-        if(!ret.isEmpty())
-            ret += QStringLiteral("<br/>");
-        ret += QStringLiteral("<b>") + it.key() + QStringLiteral(":</b> ") + it.value().join( QStringLiteral(", ") );
-        ++it;
-    }
-
-    return ret;
-#else
     const QString slash = QStringLiteral("/");
 
     QMap<QString, QStringList> map;
@@ -3655,7 +3624,6 @@ QString Structure::presentableGroupNames(const QStringList &groups) const
     }
 
     return ret;
-#endif
 }
 
 Annotation *Structure::createAnnotation(const QString &type)
@@ -4130,13 +4098,15 @@ int Structure::staticAnnotationCount(QQmlListProperty<Annotation> *list)
 
 StructureElementConnector::StructureElementConnector(QQuickItem *parent)
     : AbstractShapeItem(parent),
-      m_updateTimer("StructureElementConnector.m_updateTimer"),
+      m_computeConnectorShapeTimer("StructureElementConnector.m_updateTimer"),
       m_toElement(this, "toElement"),
       m_fromElement(this, "fromElement")
 {
     this->setRenderType(OutlineOnly);
     this->setOutlineColor(Qt::black);
-    this->setOutlineWidth(4);
+
+    const qreal dpr = this->window() ? this->window()->devicePixelRatio() : 1.0;
+    this->setOutlineWidth(4 * dpr);
 
     connect(this, &AbstractShapeItem::contentRectChanged, this,
             &StructureElementConnector::updateArrowAndLabelPositions);
@@ -4166,13 +4136,13 @@ void StructureElementConnector::setFromElement(StructureElement *val)
 
     if (m_fromElement != nullptr) {
         disconnect(m_fromElement, &StructureElement::xChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_fromElement, &StructureElement::yChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_fromElement, &StructureElement::widthChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_fromElement, &StructureElement::heightChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_fromElement, &StructureElement::stackIdChanged, this,
                    &StructureElementConnector::canBeVisibleChanged);
 
@@ -4184,13 +4154,13 @@ void StructureElementConnector::setFromElement(StructureElement *val)
 
     if (m_fromElement != nullptr) {
         connect(m_fromElement, &StructureElement::xChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_fromElement, &StructureElement::yChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_fromElement, &StructureElement::widthChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_fromElement, &StructureElement::heightChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_fromElement, &StructureElement::stackIdChanged, this,
                 &StructureElementConnector::canBeVisibleChanged);
 
@@ -4199,10 +4169,8 @@ void StructureElementConnector::setFromElement(StructureElement *val)
     }
 
     emit fromElementChanged();
-
     this->pickElementColor();
-
-    this->update();
+    this->computeConnectorShapeLater();
 }
 
 void StructureElementConnector::setToElement(StructureElement *val)
@@ -4212,13 +4180,13 @@ void StructureElementConnector::setToElement(StructureElement *val)
 
     if (m_toElement != nullptr) {
         disconnect(m_toElement, &StructureElement::xChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_toElement, &StructureElement::yChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_toElement, &StructureElement::widthChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_toElement, &StructureElement::heightChanged, this,
-                   &StructureElementConnector::requestUpdateLater);
+                   &StructureElementConnector::computeConnectorShapeLater);
         disconnect(m_toElement, &StructureElement::stackIdChanged, this,
                    &StructureElementConnector::canBeVisibleChanged);
 
@@ -4230,13 +4198,13 @@ void StructureElementConnector::setToElement(StructureElement *val)
 
     if (m_toElement != nullptr) {
         connect(m_toElement, &StructureElement::xChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_toElement, &StructureElement::yChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_toElement, &StructureElement::widthChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_toElement, &StructureElement::heightChanged, this,
-                &StructureElementConnector::requestUpdateLater);
+                &StructureElementConnector::computeConnectorShapeLater);
         connect(m_toElement, &StructureElement::stackIdChanged, this,
                 &StructureElementConnector::canBeVisibleChanged);
 
@@ -4245,10 +4213,8 @@ void StructureElementConnector::setToElement(StructureElement *val)
     }
 
     emit toElementChanged();
-
     this->pickElementColor();
-
-    this->update();
+    this->computeConnectorShapeLater();
 }
 
 void StructureElementConnector::setArrowAndLabelSpacing(qreal val)
@@ -4271,143 +4237,40 @@ bool StructureElementConnector::canBeVisible() const
 
 bool StructureElementConnector::intersects(const QRectF &rect) const
 {
-    const QPainterPath shape = this->currentShape();
-    if (shape.isEmpty())
+    if (m_fromElement == nullptr || m_toElement == nullptr)
         return false;
 
-    const QRectF shapeBoundingRect = this->currentShape().boundingRect();
-    return rect.isValid() && !rect.isNull() ? rect.intersects(shapeBoundingRect) : true;
-}
-
-QPainterPath StructureElementConnector::shape() const
-{
-    QPainterPath path;
-    if (m_fromElement == nullptr || m_toElement == nullptr)
-        return path;
-
-    if (!m_fromElement->stackId().isEmpty() && !m_toElement->stackId().isEmpty()
-        && m_fromElement->stackId() == m_toElement->stackId())
-        return path;
-
     auto getElementRect = [](StructureElement *e) {
-        QRectF r(e->x(), e->y(), e->width(), qMin(e->height(), 100.0));
-        // r.moveCenter(QPointF(e->x(), e->y()));
-        return r;
+        return QRectF(e->x(), e->y(), e->width(), e->height());
     };
 
     const QRectF r1 = getElementRect(m_fromElement);
     const QRectF r2 = getElementRect(m_toElement);
-    const QLineF line(r1.center(), r2.center());
-    QPointF p1, p2;
-    Qt::Edge e1, e2;
+    return rect.isValid() && rect.isNull() ? rect.intersects(r1.united(r2)) : true;
+}
 
-    if (r2.center().x() < r1.left()) {
-        p1 = QLineF(r1.topLeft(), r1.bottomLeft()).center();
-        e1 = Qt::LeftEdge;
-
-        if (r2.top() > r1.bottom()) {
-            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
-            e2 = Qt::TopEdge;
-        } else if (r1.top() > r2.bottom()) {
-            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
-            e2 = Qt::BottomEdge;
-        } else {
-            p2 = QLineF(r2.topRight(), r2.bottomRight()).center();
-            e2 = Qt::RightEdge;
-        }
-    } else if (r2.center().x() > r1.right()) {
-        p1 = QLineF(r1.topRight(), r1.bottomRight()).center();
-        e1 = Qt::RightEdge;
-
-        if (r2.top() > r1.bottom()) {
-            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
-            e2 = Qt::TopEdge;
-        } else if (r1.top() > r2.bottom()) {
-            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
-            e2 = Qt::BottomEdge;
-        } else {
-            p2 = QLineF(r2.topLeft(), r2.bottomLeft()).center();
-            e2 = Qt::LeftEdge;
-        }
-    } else {
-        if (r2.top() > r1.bottom()) {
-            p1 = QLineF(r1.bottomLeft(), r1.bottomRight()).center();
-            e1 = Qt::BottomEdge;
-
-            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
-            e2 = Qt::TopEdge;
-        } else {
-            p1 = QLineF(r1.topLeft(), r1.topRight()).center();
-            e1 = Qt::TopEdge;
-
-            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
-            e2 = Qt::BottomEdge;
-        }
-    }
-
-    if (m_lineType == StraightLine) {
-        path.moveTo(p1);
-        path.lineTo(p2);
-    } else {
-        QPointF cp = p1;
-        switch (e1) {
-        case Qt::LeftEdge:
-        case Qt::RightEdge:
-            cp = (e2 == Qt::BottomEdge || e2 == Qt::TopEdge) ? QPointF(p2.x(), p1.y()) : p1;
-            break;
-        default:
-            cp = p1;
-            break;
-        }
-
-        if (cp == p1) {
-            path.moveTo(p1);
-            path.lineTo(p2);
-        } else {
-            const qreal length = line.length();
-            const qreal dist = 20.0;
-            const qreal dt = dist / length;
-            const qreal maxdt = 1.0 - dt;
-            const QLineF l1(p1, cp);
-            const QLineF l2(cp, p2);
-            qreal t = dt;
-
-            path.moveTo(p1);
-            while (t < maxdt) {
-                const QLineF l(l1.pointAt(t), l2.pointAt(t));
-                const QPointF p = l.pointAt(t);
-                path.lineTo(p);
-                t += dt;
-            }
-            path.lineTo(p2);
-        }
-    }
-
-    static const QList<QPointF> arrowPoints = QList<QPointF>()
-            << QPointF(-10, -5) << QPointF(0, 0) << QPointF(-10, 5);
-
-    const qreal angle = path.angleAtPercent(0.5);
-    const QPointF lineCenter = path.pointAtPercent(0.5);
-
-    QTransform tx;
-    tx.translate(lineCenter.x(), lineCenter.y());
-    tx.rotate(-angle);
-    path.moveTo(tx.map(arrowPoints.at(0)));
-    path.lineTo(tx.map(arrowPoints.at(1)));
-    path.lineTo(tx.map(arrowPoints.at(2)));
-
-    return path;
+QPainterPath StructureElementConnector::shape() const
+{
+    return m_connectorShape;
 }
 
 void StructureElementConnector::timerEvent(QTimerEvent *te)
 {
-    if (m_updateTimer.timerId() == te->timerId()) {
-        m_updateTimer.stop();
-        this->requestUpdate();
+    if (m_computeConnectorShapeTimer.timerId() == te->timerId()) {
+        m_computeConnectorShapeTimer.stop();
+        this->computeConnectorShape();
         return;
     }
 
     AbstractShapeItem::timerEvent(te);
+}
+
+void StructureElementConnector::itemChange(ItemChange change, const ItemChangeData &data)
+{
+    if (change == ItemDevicePixelRatioHasChanged)
+        this->setOutlineWidth(data.realValue * 4);
+
+    QQuickItem::itemChange(change, data);
 }
 
 void StructureElementConnector::resetFromElement()
@@ -4426,9 +4289,9 @@ void StructureElementConnector::resetToElement()
     this->update();
 }
 
-void StructureElementConnector::requestUpdateLater()
+void StructureElementConnector::computeConnectorShapeLater()
 {
-    m_updateTimer.start(0, this);
+    m_computeConnectorShapeTimer.start(0, this);
 }
 
 void StructureElementConnector::pickElementColor()
@@ -4458,7 +4321,7 @@ void StructureElementConnector::updateArrowAndLabelPositions()
         return;
 
     const qreal arrowT = 0.5;
-    const qreal labelT = 0.45 - (m_arrowAndLabelSpacing / pathLength);
+    const qreal labelT = 0.55 - (m_arrowAndLabelSpacing / pathLength);
 
     this->setArrowPosition(this->currentShape().pointAtPercent(arrowT));
     if (labelT < 0 || labelT > 1)
@@ -4483,6 +4346,116 @@ void StructureElementConnector::setSuggestedLabelPosition(const QPointF &val)
 
     m_suggestedLabelPosition = val;
     emit suggestedLabelPositionChanged();
+}
+
+void StructureElementConnector::computeConnectorShape()
+{
+    if (m_fromElement == nullptr || m_toElement == nullptr) {
+        m_connectorShape = QPainterPath();
+        this->update();
+        return;
+    }
+
+    if (!m_fromElement->stackId().isEmpty() && !m_toElement->stackId().isEmpty()
+        && m_fromElement->stackId() == m_toElement->stackId()) {
+        m_connectorShape = QPainterPath();
+        this->update();
+        return;
+    }
+
+    const QString futureWatcherName = QStringLiteral("futureWatcher");
+    QFutureWatcher<QPainterPath> *futureWatcher = this->findChild<QFutureWatcher<QPainterPath> *>(
+            futureWatcherName, Qt::FindDirectChildrenOnly);
+    if (futureWatcher) {
+        futureWatcher->cancel();
+        futureWatcher->deleteLater();
+    }
+
+    auto getElementRect = [](StructureElement *e) {
+        return QRectF(e->x(), e->y(), e->width(), e->height());
+    };
+    const QRectF r1 = getElementRect(m_fromElement);
+    const QRectF r2 = getElementRect(m_toElement);
+    const qreal arrowHeadSize = 9;
+    if (m_lineType == StraightLine) {
+        m_connectorShape.moveTo(r1.center());
+        m_connectorShape.lineTo(r2.center());
+        this->update();
+        return;
+    }
+
+    /**
+     * Evaluating JavaScript code to compute the curved line can be
+     * time-consuming, especially if we have a lot of arrows. So we
+     * are better off delegating the whole computation to a separate
+     * thread.
+     */
+
+    auto computeFn = [](const QRectF &box1, const QRectF &box2,
+                        const qreal arrowSize) -> QPainterPath {
+        PROFILE_THIS_FUNCTION;
+
+        QPainterPath path;
+        static QString getBoxToBoxArrowJs = []() {
+            QFile file(QStringLiteral(":/dragonman225-curved-arrows/getBoxToBoxArrow.js"));
+            file.open(QFile::ReadOnly);
+            return file.readAll();
+        }();
+
+        QString fnCallCode;
+        {
+            QTextStream ts(&fnCallCode, QIODevice::WriteOnly);
+            ts << "getBoxToBoxArrow(";
+            ts << box1.x() << ", " << box1.y() << ", " << box1.width() << ", " << box1.height()
+               << ", " << box2.x() << ", " << box2.y() << ", " << box2.width() << ", "
+               << box2.height() << ", ";
+            ts << "{padStart: 0, padEnd: 0});";
+        }
+
+        QJSEngine jsEngine;
+
+        const QString jsCode = getBoxToBoxArrowJs + QStringLiteral("\n") + fnCallCode;
+        const QJSValue jsValue = jsEngine.evaluate(jsCode, QStringLiteral("getBoxToBoxArrow.js"));
+        if (jsValue.isError()) {
+            const QString errMsg = QStringLiteral("Uncaught exception at line ")
+                    + QString::number(jsValue.property(QStringLiteral("lineNumber")).toInt())
+                    + QStringLiteral(": ") + jsValue.toString();
+            Application::log(errMsg);
+
+            path.moveTo(box1.center());
+            path.lineTo(box2.center());
+        } else {
+            const QPointF p1(jsValue.property(0).toNumber(), jsValue.property(1).toNumber());
+            const QPointF cp1(jsValue.property(2).toNumber(), jsValue.property(3).toNumber());
+            const QPointF cp2(jsValue.property(4).toNumber(), jsValue.property(5).toNumber());
+            const QPointF p2(jsValue.property(6).toNumber(), jsValue.property(7).toNumber());
+            const qreal bestEndSide = jsValue.property(8).toNumber();
+
+            const QPolygonF polygon(
+                    { QPointF(0, -arrowSize), QPointF(arrowSize * 2, 0), QPointF(0, arrowSize) });
+            QTransform polygonTx;
+            polygonTx.translate(p2.x(), p2.y());
+            polygonTx.rotate(bestEndSide);
+            polygonTx.translate(-2 * arrowSize, 0);
+
+            path.moveTo(p1);
+            path.cubicTo(cp1, cp2, p2);
+            path.addPolygon(polygonTx.map(polygon));
+        }
+
+        return path;
+    };
+
+    futureWatcher = new QFutureWatcher<QPainterPath>(this);
+    futureWatcher->setObjectName(futureWatcherName);
+    connect(futureWatcher, &QFutureWatcher<QPainterPath>::finished, this, [=]() {
+        if (!futureWatcher->isCanceled()) {
+            m_connectorShape = futureWatcher->result();
+            this->update();
+        }
+        futureWatcher->deleteLater();
+    });
+    futureWatcher->setFuture(QtConcurrent::run(computeFn, r1, r2, arrowHeadSize));
 }
 
 ///////////////////////////////////////////////////////////////////////////////

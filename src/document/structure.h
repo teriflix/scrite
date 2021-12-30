@@ -975,23 +975,29 @@ public:
     QPainterPath shape() const;
 
 protected:
+    // QObject interface
     void timerEvent(QTimerEvent *te);
+
+protected:
+    // QQuickItem interface
+    void itemChange(ItemChange, const ItemChangeData &);
 
 private:
     void resetFromElement();
     void resetToElement();
-    void requestUpdateLater();
-    void requestUpdate() { this->update(); }
     void pickElementColor();
     void updateArrowAndLabelPositions();
     void setArrowPosition(const QPointF &val);
     void setSuggestedLabelPosition(const QPointF &val);
+    void computeConnectorShape();
+    void computeConnectorShapeLater();
 
 private:
+    QPainterPath m_connectorShape;
     LineType m_lineType = StraightLine;
     QPointF m_arrowPosition;
-    ExecLaterTimer m_updateTimer;
     qreal m_arrowAndLabelSpacing = 30;
+    ExecLaterTimer m_computeConnectorShapeTimer;
     QObjectProperty<StructureElement> m_toElement;
     QObjectProperty<StructureElement> m_fromElement;
     QPointF m_suggestedLabelPosition;

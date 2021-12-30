@@ -1,0 +1,57 @@
+{
+  "version": "0.1.0",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/curved-arrows.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
+  },
+  "scripts": {
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "arrowParens": "avoid",
+    "jsxBracketSameLine": true,
+    "printWidth": 80,
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5"
+  },
+  "name": "curved-arrows",
+  "author": "Alexander Wang <zxcvb22217@gmail.com>",
+  "description": "Draw S-curved arrows between points or shapes",
+  "homepage": "https://github.com/dragonman225/curved-arrows",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dragonman225/curved-arrows"
+  },
+  "keywords": [
+    "arrow",
+    "2d",
+    "point",
+    "rectangle",
+    "shape",
+    "between"
+  ],
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.3"
+  }
+}

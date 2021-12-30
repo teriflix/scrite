@@ -1,4 +1,7 @@
 <RCC>
+    <qresource prefix="/dragonman225-curved-arrows">
+        <file alias="getBoxToBoxArrow.js">js/getBoxToBoxArrow.js</file>
+    </qresource>
     <qresource prefix="/">
         <file>LICENSE.txt</file>
         <file>main.qml</file>
