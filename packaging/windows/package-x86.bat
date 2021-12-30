@@ -1,5 +1,5 @@
 copy ..\..\..\Release\scrite.exe .
-copy C:\Qt\Qt5.13.2\vcredist\vcredist_msvc2017_x86.exe vcredist_x86.exe
+copy C:\Qt\vcredist\vcredist_msvc2019_x86.exe vcredist_x86.exe
 copy %SCRITE_OPENSSL_LIBS%\openssl-1.1\x86\bin\libcrypto-1_1.dll .
 copy %SCRITE_OPENSSL_LIBS%\openssl-1.1\x86\bin\libssl-1_1.dll .
 windeployqt --qmldir ..\..\qml --no-compiler-runtime --no-translations . --list relative > files.txt

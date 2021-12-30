@@ -394,7 +394,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::episodeDistribution() co
 
 bool StatisticsReport::doGenerate(QTextDocument *textDocument)
 {
-    qScopeGuard([=]() { this->cleanupTextDocument(); });
+    auto guard = qScopeGuard([=]() { this->cleanupTextDocument(); });
     this->prepareTextDocument();
 
     /**
@@ -529,7 +529,7 @@ bool StatisticsReport::usePdfWriter() const
 
 bool StatisticsReport::directPrintToPdf(QPdfWriter *pdfWriter)
 {
-    qScopeGuard([=]() { this->cleanupTextDocument(); });
+    auto guard = qScopeGuard([=]() { this->cleanupTextDocument(); });
     this->prepareTextDocument();
 
     const Screenplay *screenplay = this->document()->screenplay();

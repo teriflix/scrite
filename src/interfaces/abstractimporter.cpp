@@ -87,7 +87,7 @@ bool AbstractImporter::read()
         return false;
     }
 
-    qScopeGuard([=]() {
+    auto guard = qScopeGuard([=]() {
         const QString importerName = QString::fromLatin1(this->metaObject()->className());
         User::instance()->logActivity2(QStringLiteral("import"), importerName);
     });

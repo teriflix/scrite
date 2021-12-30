@@ -624,7 +624,7 @@ Item {
 
                             Slider {
                                 from: 1
-                                to: 20
+                                to: 100
                                 orientation: Qt.Horizontal
                                 snapMode: Slider.SnapAlways
                                 value: scrollAreaSettings.zoomFactor * 100
