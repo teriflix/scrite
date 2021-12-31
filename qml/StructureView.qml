@@ -1332,7 +1332,7 @@ Item {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: canvasScroll.editItem !== null
+                enabled: canvasScroll.editItem
                 acceptedButtons: Qt.LeftButton
                 onClicked: canvasScroll.editItem.finishEditing()
             }

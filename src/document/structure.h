@@ -974,6 +974,9 @@ public:
 
     QPainterPath shape() const;
 
+    static QPainterPath curvedArrowPath(const QRectF &box1, const QRectF &box2,
+                                        const qreal arrowSize = 9, bool fillArrow = false);
+
 protected:
     // QObject interface
     void timerEvent(QTimerEvent *te);

@@ -252,110 +252,18 @@ StructureIndexCard::~StructureIndexCard() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-QPainterPath evaluateConnectorPath(const QRectF &givenR1, const QRectF &givenR2,
-                                   QPointF *labelPos = nullptr)
+QPainterPath evaluateConnectorPath(const QRectF &r1, const QRectF &r2, QPointF *labelPos = nullptr)
 {
-    const QRectF r1(givenR1.x(), givenR1.y(), givenR1.width(), qMin(givenR1.height(), 100.0));
-    const QRectF r2(givenR2.x(), givenR2.y(), givenR2.width(), qMin(givenR2.height(), 100.0));
-
-    const QLineF line(r1.center(), r2.center());
-    QPointF p1, p2;
-    Qt::Edge e1, e2;
-    QPainterPath path;
-
-    if (r2.center().x() < r1.left()) {
-        p1 = QLineF(r1.topLeft(), r1.bottomLeft()).center();
-        e1 = Qt::LeftEdge;
-
-        if (r2.top() > r1.bottom()) {
-            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
-            e2 = Qt::TopEdge;
-        } else if (r1.top() > r2.bottom()) {
-            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
-            e2 = Qt::BottomEdge;
-        } else {
-            p2 = QLineF(r2.topRight(), r2.bottomRight()).center();
-            e2 = Qt::RightEdge;
-        }
-    } else if (r2.center().x() > r1.right()) {
-        p1 = QLineF(r1.topRight(), r1.bottomRight()).center();
-        e1 = Qt::RightEdge;
-
-        if (r2.top() > r1.bottom()) {
-            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
-            e2 = Qt::TopEdge;
-        } else if (r1.top() > r2.bottom()) {
-            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
-            e2 = Qt::BottomEdge;
-        } else {
-            p2 = QLineF(r2.topLeft(), r2.bottomLeft()).center();
-            e2 = Qt::LeftEdge;
-        }
-    } else {
-        if (r2.top() > r1.bottom()) {
-            p1 = QLineF(r1.bottomLeft(), r1.bottomRight()).center();
-            e1 = Qt::BottomEdge;
-
-            p2 = QLineF(r2.topLeft(), r2.topRight()).center();
-            e2 = Qt::TopEdge;
-        } else {
-            p1 = QLineF(r1.topLeft(), r1.topRight()).center();
-            e1 = Qt::TopEdge;
-
-            p2 = QLineF(r2.bottomLeft(), r2.bottomRight()).center();
-            e2 = Qt::BottomEdge;
-        }
+    const QPainterPath path = StructureElementConnector::curvedArrowPath(r1, r2, 9, false);
+    if (!path.isEmpty() && labelPos) {
+        const qreal pathLength = path.length();
+        const qreal labelD = 30 / pathLength;
+        const qreal labelT = 0.55 - labelD;
+        if (labelT < 0 || labelT > 1)
+            *labelPos = path.pointAtPercent(1.0 - labelD);
+        else
+            *labelPos = path.pointAtPercent(labelT);
     }
-
-    QPointF cp = p1;
-    switch (e1) {
-    case Qt::LeftEdge:
-    case Qt::RightEdge:
-        cp = (e2 == Qt::BottomEdge || e2 == Qt::TopEdge) ? QPointF(p2.x(), p1.y()) : p1;
-        break;
-    default:
-        cp = p1;
-        break;
-    }
-
-    if (cp == p1) {
-        path.moveTo(p1);
-        path.lineTo(p2);
-    } else {
-        const qreal length = line.length();
-        const qreal dist = 20.0;
-        const qreal dt = dist / length;
-        const qreal maxdt = 1.0 - dt;
-        const QLineF l1(p1, cp);
-        const QLineF l2(cp, p2);
-        qreal t = dt;
-
-        path.moveTo(p1);
-        while (t < maxdt) {
-            const QLineF l(l1.pointAt(t), l2.pointAt(t));
-            const QPointF p = l.pointAt(t);
-            path.lineTo(p);
-            t += dt;
-        }
-        path.lineTo(p2);
-    }
-
-    static const QList<QPointF> arrowPoints = QList<QPointF>()
-            << QPointF(-10, -5) << QPointF(0, 0) << QPointF(-10, 5);
-
-    const qreal angle = path.angleAtPercent(0.5);
-    const QPointF lineCenter = path.pointAtPercent(0.5);
-
-    if (labelPos)
-        *labelPos = path.pointAtPercent(0.65);
-
-    QTransform tx;
-    tx.translate(lineCenter.x(), lineCenter.y());
-    tx.rotate(-angle);
-    path.moveTo(tx.map(arrowPoints.at(0)));
-    path.lineTo(tx.map(arrowPoints.at(1)));
-    path.lineTo(tx.map(arrowPoints.at(2)));
-
     return path;
 }
 
@@ -369,6 +277,8 @@ StructureIndexCardConnector::StructureIndexCardConnector(const StructureIndexCar
 
     const QPainterPath path = evaluateConnectorPath(r1, r2, &labelPos);
     this->setPath(path);
+    this->setPen(QPen(Qt::black));
+    this->setBrush(Qt::NoBrush);
 
     const QFont labelFont = ::applicationFont();
 

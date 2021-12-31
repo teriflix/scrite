@@ -4254,6 +4254,64 @@ QPainterPath StructureElementConnector::shape() const
     return m_connectorShape;
 }
 
+QPainterPath StructureElementConnector::curvedArrowPath(const QRectF &box1, const QRectF &box2,
+                                                        const qreal arrowSize, bool fillArrow)
+{
+    QPainterPath path;
+    static QString getBoxToBoxArrowJs = []() {
+        QFile file(QStringLiteral(":/dragonman225-curved-arrows/getBoxToBoxArrow.js"));
+        file.open(QFile::ReadOnly);
+        return file.readAll();
+    }();
+
+    QString fnCallCode;
+    {
+        QTextStream ts(&fnCallCode, QIODevice::WriteOnly);
+        ts << "getBoxToBoxArrow(";
+        ts << box1.x() << ", " << box1.y() << ", " << box1.width() << ", " << box1.height() << ", "
+           << box2.x() << ", " << box2.y() << ", " << box2.width() << ", " << box2.height() << ", ";
+        ts << "{padStart: 0, padEnd: 0});";
+    }
+
+    QJSEngine jsEngine;
+
+    const QString jsCode = getBoxToBoxArrowJs + QStringLiteral("\n") + fnCallCode;
+    const QJSValue jsValue = jsEngine.evaluate(jsCode, QStringLiteral("getBoxToBoxArrow.js"));
+    if (jsValue.isError()) {
+        const QString errMsg = QStringLiteral("Uncaught exception at line ")
+                + QString::number(jsValue.property(QStringLiteral("lineNumber")).toInt())
+                + QStringLiteral(": ") + jsValue.toString();
+        Application::log(errMsg);
+
+        path.moveTo(box1.center());
+        path.lineTo(box2.center());
+    } else {
+        const QPointF p1(jsValue.property(0).toNumber(), jsValue.property(1).toNumber());
+        const QPointF cp1(jsValue.property(2).toNumber(), jsValue.property(3).toNumber());
+        const QPointF cp2(jsValue.property(4).toNumber(), jsValue.property(5).toNumber());
+        const QPointF p2(jsValue.property(6).toNumber(), jsValue.property(7).toNumber());
+
+        path.moveTo(p1);
+        path.cubicTo(cp1, cp2, p2);
+
+        const qreal arrowPadding = arrowSize * 4 / path.length();
+        const QPointF arrowPt = path.pointAtPercent(1.0 - arrowPadding);
+        const qreal arrowAngle = path.angleAtPercent(1.0 - arrowPadding);
+
+        QPolygonF polygon({ QPointF(-2 * arrowSize, -arrowSize), QPointF(0, 0),
+                            QPointF(-2 * arrowSize, arrowSize) });
+        if (fillArrow)
+            polygon.append(polygon.first());
+        QTransform polygonTx;
+        polygonTx.translate(arrowPt.x(), arrowPt.y());
+        polygonTx.rotate(-arrowAngle);
+
+        path.addPolygon(polygonTx.map(polygon));
+    }
+
+    return path;
+}
+
 void StructureElementConnector::timerEvent(QTimerEvent *te)
 {
     if (m_computeConnectorShapeTimer.timerId() == te->timerId()) {
@@ -4371,12 +4429,13 @@ void StructureElementConnector::computeConnectorShape()
         futureWatcher->deleteLater();
     }
 
-    auto getElementRect = [](StructureElement *e) {
-        return QRectF(e->x(), e->y(), e->width(), e->height());
+    auto getElementRect = [=](StructureElement *e) {
+        return QRect(e->x(), e->y(), e->width(), e->height());
     };
     const QRectF r1 = getElementRect(m_fromElement);
     const QRectF r2 = getElementRect(m_toElement);
     const qreal arrowHeadSize = 9;
+
     if (m_lineType == StraightLine) {
         m_connectorShape.moveTo(r1.center());
         m_connectorShape.lineTo(r2.center());
@@ -4390,60 +4449,6 @@ void StructureElementConnector::computeConnectorShape()
      * are better off delegating the whole computation to a separate
      * thread.
      */
-
-    auto computeFn = [](const QRectF &box1, const QRectF &box2,
-                        const qreal arrowSize) -> QPainterPath {
-        QPainterPath path;
-        static QString getBoxToBoxArrowJs = []() {
-            QFile file(QStringLiteral(":/dragonman225-curved-arrows/getBoxToBoxArrow.js"));
-            file.open(QFile::ReadOnly);
-            return file.readAll();
-        }();
-
-        QString fnCallCode;
-        {
-            QTextStream ts(&fnCallCode, QIODevice::WriteOnly);
-            ts << "getBoxToBoxArrow(";
-            ts << box1.x() << ", " << box1.y() << ", " << box1.width() << ", " << box1.height()
-               << ", " << box2.x() << ", " << box2.y() << ", " << box2.width() << ", "
-               << box2.height() << ", ";
-            ts << "{padStart: 0, padEnd: 0});";
-        }
-
-        QJSEngine jsEngine;
-
-        const QString jsCode = getBoxToBoxArrowJs + QStringLiteral("\n") + fnCallCode;
-        const QJSValue jsValue = jsEngine.evaluate(jsCode, QStringLiteral("getBoxToBoxArrow.js"));
-        if (jsValue.isError()) {
-            const QString errMsg = QStringLiteral("Uncaught exception at line ")
-                    + QString::number(jsValue.property(QStringLiteral("lineNumber")).toInt())
-                    + QStringLiteral(": ") + jsValue.toString();
-            Application::log(errMsg);
-
-            path.moveTo(box1.center());
-            path.lineTo(box2.center());
-        } else {
-            const QPointF p1(jsValue.property(0).toNumber(), jsValue.property(1).toNumber());
-            const QPointF cp1(jsValue.property(2).toNumber(), jsValue.property(3).toNumber());
-            const QPointF cp2(jsValue.property(4).toNumber(), jsValue.property(5).toNumber());
-            const QPointF p2(jsValue.property(6).toNumber(), jsValue.property(7).toNumber());
-            const qreal bestEndSide = jsValue.property(8).toNumber();
-
-            const QPolygonF polygon(
-                    { QPointF(0, -arrowSize), QPointF(arrowSize * 2, 0), QPointF(0, arrowSize) });
-            QTransform polygonTx;
-            polygonTx.translate(p2.x(), p2.y());
-            polygonTx.rotate(bestEndSide);
-            polygonTx.translate(-2 * arrowSize, 0);
-
-            path.moveTo(p1);
-            path.cubicTo(cp1, cp2, p2);
-            path.addPolygon(polygonTx.map(polygon));
-        }
-
-        return path;
-    };
-
     futureWatcher = new QFutureWatcher<QPainterPath>(this);
     futureWatcher->setObjectName(futureWatcherName);
     connect(futureWatcher, &QFutureWatcher<QPainterPath>::finished, this, [=]() {
@@ -4453,7 +4458,8 @@ void StructureElementConnector::computeConnectorShape()
         }
         futureWatcher->deleteLater();
     });
-    futureWatcher->setFuture(QtConcurrent::run(computeFn, r1, r2, arrowHeadSize));
+    futureWatcher->setFuture(QtConcurrent::run(&StructureElementConnector::curvedArrowPath, r1, r2,
+                                               arrowHeadSize, false));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
