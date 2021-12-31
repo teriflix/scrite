@@ -382,10 +382,13 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     bool documentPaginated =
             pageSize.isValid() && !pageSize.isNull() && int(pageSize.height()) != INT_MAX;
 
-    QPagedPaintDevice::Margins m = printer->margins();
-    if (!documentPaginated && m.left == 0. && m.right == 0. && m.top == 0. && m.bottom == 0.) {
-        m.left = m.right = m.top = m.bottom = 2.;
-        printer->setMargins(m);
+    QMarginsF m = printer->pageLayout().margins(QPageLayout::Millimeter);
+    if (!documentPaginated && m.left() == 0 && m.right() == 0 && m.top() == 0 && m.bottom() == 0) {
+        m.setLeft(2.);
+        m.setRight(2.);
+        m.setTop(2.);
+        m.setBottom(2.);
+        printer->setPageMargins(m, QPageLayout::Millimeter);
     }
 
     QPainter painter(printer);
