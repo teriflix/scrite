@@ -46,6 +46,7 @@ Item {
             visible: Scrite.user.busy
             running: Scrite.user.busy
             anchors.centerIn: parent
+            forDarkBackground: true
             onRunningChanged: parent.counter = parent.counter+1
         }
 
