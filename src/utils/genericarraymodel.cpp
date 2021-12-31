@@ -84,7 +84,7 @@ QJsonArray GenericArrayModel::stringListArray(const QStringList &list) const
 
 QJsonArray GenericArrayModel::arrayFromCsv(const QString &text) const
 {
-    return this->stringListArray(text.split(",", QString::SkipEmptyParts));
+    return this->stringListArray(text.split(",", Qt::SkipEmptyParts));
 }
 
 QJsonValue GenericArrayModel::at(int row) const

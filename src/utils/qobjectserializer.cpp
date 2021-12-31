@@ -597,7 +597,7 @@ QJsonValue QMarginsFHelper::toJson(const QVariant &value) const
 
 QVariant QMarginsFHelper::fromJson(const QJsonValue &value, int type) const
 {
-    const QStringList comps = value.toString().split(",", QString::SkipEmptyParts);
+    const QStringList comps = value.toString().split(",", Qt::SkipEmptyParts);
     if (comps.size() != 4) {
         if (type == m_QMarginsF_type)
             return QVariant::fromValue<QMarginsF>(QMarginsF());

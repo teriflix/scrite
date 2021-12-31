@@ -1449,7 +1449,7 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
         return true;
     }
 
-    const QStringList geometry = geometryString.split(QStringLiteral(" "), QString::SkipEmptyParts);
+    const QStringList geometry = geometryString.split(QStringLiteral(" "), Qt::SkipEmptyParts);
     if (geometry.length() != 4) {
         window->setGeometry(screenGeo);
         return false;

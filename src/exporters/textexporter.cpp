@@ -49,7 +49,7 @@ bool TextExporter::doExport(QIODevice *device)
         const QString rightAlignPrefix(maxChars - maxCharsInBlock, ' ');
         const QString centerAlignPrefix(int(qreal(maxChars - maxCharsInBlock) / 2.0), ' ');
 
-        QStringList words = text.trimmed().split(" ", QString::SkipEmptyParts);
+        QStringList words = text.trimmed().split(" ", Qt::SkipEmptyParts);
         QStringList lines;
         QString line;
         while (!words.isEmpty()) {

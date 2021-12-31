@@ -756,7 +756,7 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
             const QJsonValue pageValue = element.value(QStringLiteral("page"));
             const QString page = pageValue.toVariant().toString();
             if (page.contains(QStringLiteral("-"))) {
-                const QStringList fields = page.split(QStringLiteral("-"), QString::SkipEmptyParts);
+                const QStringList fields = page.split(QStringLiteral("-"), Qt::SkipEmptyParts);
                 const int a = fields.size() >= 2 ? fields.first().toInt() : 0;
                 const int b = fields.size() >= 2 ? fields.last().toInt() : 0;
                 if (a == 0 || b == 0)

@@ -866,9 +866,9 @@ bool Scene::validatePageTarget(int pageNumber) const
     if (pageNumber < 0)
         return false;
 
-    const QStringList fields = m_pageTarget.split(QStringLiteral(","), QString::SkipEmptyParts);
+    const QStringList fields = m_pageTarget.split(QStringLiteral(","), Qt::SkipEmptyParts);
     for (QString field : fields) {
-        const QStringList nos = field.trimmed().split(QStringLiteral("-"), QString::SkipEmptyParts);
+        const QStringList nos = field.trimmed().split(QStringLiteral("-"), Qt::SkipEmptyParts);
         if (nos.isEmpty())
             continue;
 

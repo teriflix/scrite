@@ -120,7 +120,7 @@ bool FountainImporter::doImport(QIODevice *device)
 
         if (line.startsWith(pound)) {
             line = line.remove(pound).trimmed();
-            line = line.split(space, QString::SkipEmptyParts).first();
+            line = line.split(space, Qt::SkipEmptyParts).first();
 
             ScreenplayElement *element = new ScreenplayElement(screenplay);
             element->setElementType(ScreenplayElement::BreakElementType);

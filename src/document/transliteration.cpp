@@ -79,7 +79,7 @@ TransliterationEngine::TransliterationEngine(QObject *parent) : QObject(parent)
     const QStringList customFontPaths = ::getCustomFontFilePaths();
     for (const QString &customFont : customFontPaths) {
         const int id = QFontDatabase::addApplicationFont(customFont);
-        const QString language = customFont.split("/", QString::SkipEmptyParts).at(2);
+        const QString language = customFont.split("/", Qt::SkipEmptyParts).at(2);
         Language lang = Language(metaEnum.keyToValue(qPrintable(language)));
         m_languageBundledFontId[lang] = id;
         m_languageFontFamily[lang] = QFontDatabase::applicationFontFamilies(id).first();

@@ -22,7 +22,7 @@ ColorImageProvider::~ColorImageProvider() { }
 
 QImage ColorImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    const QStringList fields = id.split(QStringLiteral("/"), QString::SkipEmptyParts);
+    const QStringList fields = id.split(QStringLiteral("/"), Qt::SkipEmptyParts);
 
     const QSize defaultSize(64, 64);
     QImage image(requestedSize.isEmpty() ? defaultSize : requestedSize, QImage::Format_ARGB32);
