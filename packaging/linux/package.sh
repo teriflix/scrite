@@ -1,5 +1,5 @@
-export PATH=/home/prashanthudupa/Qt5.13.2/5.13.2/gcc_64/bin:/home/prashanthudupa/QtPackaging/linuxdeployqt/bin:/home/prashanthudupa/QtPackaging:$PATH
-export LD_LIBRARY_PATH=export LD_LIBRARY_PATH=/home/prashanthudupa/Qt5.13.2/5.13.2/gcc_64/lib:/home/prashanthudupa/Qt5.13.2/5.13.2/gcc_64/bin:$LD_LIBRARY_PATH
+export PATH=/home/prashanthudupa/Qt/5.15.7/gcc_64/bin:/usr/lib/x86_64-linux-gnu:$PATH
+export LD_LIBRARY_PATH=export LD_LIBRARY_PATH=/home/prashanthudupa/Qt/5.15.7/gcc_64/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 export VERSION=0.8.2-beta
 mkdir Scrite-0.8.2-beta.AppImage
 cd Scrite-0.8.2-beta.AppImage
