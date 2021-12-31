@@ -1330,6 +1330,7 @@ void ScriteDocument::setupExporter(AbstractExporter *exporter)
             suggestedName += QStringLiteral(" - Screenplay");
         suggestedName += QStringLiteral(" - ") + createTimestampString();
 
+#if 0
         QFileInfo fi(m_fileName);
         if (fi.exists())
             exporter->setFileName(fi.absoluteDir().absoluteFilePath(suggestedName));
@@ -1342,18 +1343,22 @@ void ScriteDocument::setupExporter(AbstractExporter *exporter)
             const QString path = folderUrl.isEmpty()
                     ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
                     : folderUrl.toLocalFile();
-            exporter->setFileName(path + QStringLiteral("/") + suggestedName);
         }
+#else
+        const QString path = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+#endif
+        exporter->setFileName(path + QStringLiteral("/") + suggestedName);
     }
 
     ProgressReport *progressReport = exporter->findChild<ProgressReport *>();
     if (progressReport) {
-        connect(progressReport, &ProgressReport::statusChanged, [progressReport, this, exporter]() {
-            if (progressReport->status() == ProgressReport::Started)
-                this->setBusyMessage("Exporting into \"" + exporter->fileName() + "\" ...");
-            else if (progressReport->status() == ProgressReport::Finished)
-                this->clearBusyMessage();
-        });
+        connect(progressReport, &ProgressReport::statusChanged, this,
+                [progressReport, this, exporter]() {
+                    if (progressReport->status() == ProgressReport::Started)
+                        this->setBusyMessage("Exporting into \"" + exporter->fileName() + "\" ...");
+                    else if (progressReport->status() == ProgressReport::Finished)
+                        this->clearBusyMessage();
+                });
     }
 }
 
@@ -1377,6 +1382,7 @@ void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerat
         suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ")
                 + createTimestampString() + suffix;
 
+#if 0
         QFileInfo fi(m_fileName);
         if (fi.exists())
             reportGenerator->setFileName(fi.absoluteDir().absoluteFilePath(suggestedName));
@@ -1389,13 +1395,16 @@ void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerat
             const QString path = folderUrl.isEmpty()
                     ? QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
                     : folderUrl.toLocalFile();
-            reportGenerator->setFileName(path + QStringLiteral("/") + suggestedName);
         }
+#else
+        const QString path = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+#endif
+        reportGenerator->setFileName(path + QStringLiteral("/") + suggestedName);
     }
 
     ProgressReport *progressReport = reportGenerator->findChild<ProgressReport *>();
     if (progressReport) {
-        connect(progressReport, &ProgressReport::statusChanged,
+        connect(progressReport, &ProgressReport::statusChanged, this,
                 [progressReport, this, reportGenerator]() {
                     if (progressReport->status() == ProgressReport::Started)
                         this->setBusyMessage("Generating \"" + reportGenerator->fileName()

@@ -450,6 +450,8 @@ Item {
         anchors.right: parent.right
         height: 53
         color: primaryColors.c50.background
+        visible: !pdfViewer.active
+        enabled: visible
 
         Row {
             id: appToolBar
@@ -1699,9 +1701,43 @@ Item {
         }
     }
 
+    Rectangle {
+        id: pdfViewerToolBar
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 53
+        color: accentColors.c900.background
+        border.width: 1
+        border.color: accentColors.c100.background
+        visible: pdfViewer.active
+        enabled: visible && !notificationsView.visible
+
+        Text {
+            text: pdfViewer.pdfTitle
+            color: accentColors.c900.text
+            elide: Text.ElideMiddle
+            anchors.centerIn: parent
+            width: parent.width * 0.7
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize: Scrite.app.idealFontPointSize + 2
+            font.bold: true
+        }
+
+        Button2 {
+            text: "Close"
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: 5
+            onClicked: pdfViewer.active = false
+            Material.foreground: accentColors.c500.text
+            Material.background: accentColors.c500.background
+        }
+    }
+
     Loader {
         id: contentLoader
         active: allowContent && !Scrite.document.loading
+        visible: !pdfViewer.active
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right
@@ -1713,6 +1749,45 @@ Item {
 
         property bool allowContent: true
         property string sessionId
+    }
+
+    Loader {
+        id: pdfViewer
+        active: false
+        visible: active
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: pdfViewerToolBar.visible ? pdfViewerToolBar.bottom : parent.top
+        anchors.bottom: parent.bottom
+        property string pdfFilePath
+        property string pdfTitle
+        property int pdfPagesPerRow: 2
+        enabled: !notificationsView.visible
+        onActiveChanged: {
+            pdfPagesPerRow = 2
+        }
+
+        function show(title, filePath, pagesPerRow) {
+            active = false
+            pdfTitle = title
+            pdfPagesPerRow = pagesPerRow
+            pdfFilePath = filePath
+            Qt.callLater( function() {
+                pdfViewer.active = true
+            })
+        }
+
+        Connections {
+            target: Scrite.document
+            onAboutToReset: pdfViewer.active = false
+        }
+
+        sourceComponent: PdfView {
+            source: Scrite.app.localFileToUrl(pdfViewer.pdfFilePath)
+            allowFileSave: false
+            pagesPerRow: pdfViewer.pdfPagesPerRow
+            allowFileReveal: true
+        }
     }
 
     SequentialAnimation {

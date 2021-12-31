@@ -201,8 +201,7 @@ Item {
                                         }
                                         onSelectedExtensionChanged: generator.format = selectedExtension.value
                                         onAbsoluteFilePathChanged: generator.fileName = absoluteFilePath
-                                        folder: workspaceSettings.lastOpenReportsFolderUrl
-                                        onFolderChanged: workspaceSettings.lastOpenReportsFolderUrl = folder
+                                        folder: StandardPaths.writableLocation(StandardPaths.DownloadsFolder)
                                     }
 
                                     Repeater {
@@ -316,7 +315,11 @@ Item {
                     if(visible) {
                         Scrite.app.execLater(busyOverlay, 100, function() {
                             if(generator.generate()) {
-                                Scrite.app.revealFileOnDesktop(generator.fileName)
+                                if(generator.format === AbstractReportGenerator.AdobePDF) {
+                                    const ppr = generator.singlePageReport ? 1 : 2
+                                    pdfViewer.show(generator.title, generator.fileName, ppr)
+                                } else
+                                    Scrite.app.revealFileOnDesktop(generator.fileName)
                                 modalDialog.close()
                             } else
                                 busyOverlay.visible = false

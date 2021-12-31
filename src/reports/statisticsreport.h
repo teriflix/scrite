@@ -40,6 +40,7 @@ public:
     static const QColor pickColor(int index, bool cycleAround = true, ColorGroup group = Character);
 
     bool requiresConfiguration() const { return true; }
+    bool isSinglePageReport() const { return true; }
 
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldGroup", "Basic")
     Q_CLASSINFO("includeCharacterPresenceGraphs_FieldLabel", "Include Character Presence Graphs.")

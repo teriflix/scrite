@@ -790,13 +790,15 @@ Item {
                         }
 
                         ComboBox2 {
+                            enabled: false // Qt 5.15.7's PdfWriter is broken!
                             width: parent.width
                             model: [
                                 { "key": "PDF Driver", "value": true },
                                 { "key": "Printer Driver", "value": false }
                             ]
                             textRole: "key"
-                            currentIndex: pdfExportSettings.usePdfDriver ? 0 : 1
+                            // currentIndex: pdfExportSettings.usePdfDriver ? 0 : 1
+                            currentIndex: 1
                             onCurrentIndexChanged: pdfExportSettings.usePdfDriver = (currentIndex === 0)
                         }
                     }

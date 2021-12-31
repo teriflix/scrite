@@ -479,21 +479,21 @@ void Application::revealFileOnDesktop(const QString &pathIn)
     Notification *notification = new Notification(this);
     connect(notification, &Notification::dismissed, &Notification::deleteLater);
     if (fi.isFile()) {
-        notification->setTitle(QStringLiteral("File saved"));
+        notification->setTitle(QStringLiteral("File available"));
 
 #ifdef Q_OS_MAC
-        notification->setText(QStringLiteral("<b>%1</b> was saved into '<i>%2</i>'.")
+        notification->setText(QStringLiteral("Revealing <b>%1</b> in '<i>%2</i>'...")
                                       .arg(fi.fileName(), fi.absolutePath()));
 #else
 #ifdef Q_OS_WIN
         notification->setText(
-                QStringLiteral("<b>%1</b> was saved into '<i>%2</i>'. You can take a look at the "
+                QStringLiteral("<b>%1</b> is available at '<i>%2</i>'. You can take a look at the "
                                "file by switching to the Explorer window which has been "
                                "opened in the background with this file selected.")
                         .arg(fi.fileName(), fi.absolutePath()));
 #else
         notification->setText(
-                QStringLiteral("<b>%1</b> was saved. Please launch your file manager app "
+                QStringLiteral("<b>%1</b> is available. Please launch your file manager app "
                                "and navigate to '<i>%2</i>' to open the file.")
                         .arg(fi.fileName(), fi.absolutePath()));
 #endif

@@ -47,6 +47,9 @@ public:
     Q_PROPERTY(QString description READ description CONSTANT)
     QString description() const;
 
+    Q_PROPERTY(bool singlePageReport READ isSinglePageReport CONSTANT)
+    virtual bool isSinglePageReport() const { return false; }
+
     Q_PROPERTY(bool featureEnabled READ isFeatureEnabled NOTIFY featureEnabledChanged)
     bool isFeatureEnabled() const;
     Q_SIGNAL void featureEnabledChanged();

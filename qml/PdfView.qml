@@ -27,6 +27,7 @@ Item {
     property alias pagesPerRow: pdfDoc.pagesPerRow
     property string fileName: Scrite.app.fileName( Scrite.app.urlToLocalFile(source) ) + ".pdf"
     property bool allowFileSave: true
+    property bool allowFileReveal: false
 
     // Catch all mouse-area, which doesnt let mouse events
     // propagate to layers underneath this item.
@@ -63,6 +64,7 @@ Item {
 
         TableView {
             id: pdfView
+            clip: true
             anchors.fill: parent
             model: Math.ceil(pdfDoc.pageCount / pdfPagesPerRow)
             property real pdfPageScale: pageScaleSlider.value
@@ -153,6 +155,7 @@ Item {
                 width: 1
                 height: parent.height
                 color: accentColors.c100.background
+                visible: pdfDoc.pageCount > 1
             }
 
             Text {
@@ -160,24 +163,24 @@ Item {
                 font.pointSize: Scrite.app.idealFontPointSize
                 anchors.verticalCenter: parent.verticalCenter
                 color: accentColors.c900.text
+                visible: pdfDoc.pageCount > 1
             }
 
             ComboBox2 {
                 Material.foreground: accentColors.c500.text
                 Material.background: accentColors.c500.background
                 currentIndex: Math.max(pdfDoc.pagesPerRow-1,0)
+                visible: pdfDoc.pageCount > 1
                 model: {
                     const nrPages = Math.min(3, pdfDoc.pageCount)
-                    var ret = []
-                    for(var i=0; i<nrPages; i++) {
-                        if(i)
-                            ret.push("" + (i+1) + " Pages")
-                        else
-                            ret.push("1 Page")
-                    }
+                    var ret = ["1 Page"]
+                    for(var i=1; i<nrPages; i++)
+                        ret.push("" + (i+1) + " Pages")
                     return ret
                 }
-                onModelChanged: currentIndex = Qt.binding( function() { return Math.max(pdfDoc.pagesPerRow-1,0) } )
+                onModelChanged: Qt.callLater( function() {
+                    currentIndex = Qt.binding( function() { return Math.max(pdfDoc.pagesPerRow-1,0) } )
+                })
                 onCurrentIndexChanged: pageScaleSlider.value = pdfDoc.evaluatePageScale(currentIndex+1,pdfDoc.pageCount)
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -186,12 +189,13 @@ Item {
                 width: 1
                 height: parent.height
                 color: accentColors.c100.background
-                visible: allowFileSave
+                visible: allowFileSave || allowFileReveal
             }
 
             ToolButton2 {
                 visible: allowFileSave
                 icon.source: "../icons/content/save_as_inverted.png"
+                ToolTip.text: "Save a copy of this PDF."
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
                     const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source),
@@ -199,6 +203,14 @@ Item {
                     if(downloadedFilePath !== "")
                         Scrite.app.revealFileOnDesktop(downloadedFilePath)
                 }
+            }
+
+            ToolButton2 {
+                visible: allowFileReveal
+                icon.source: "../icons/file/folder_open_inverted.png"
+                ToolTip.text: "Reveal the location of this PDF on your computer."
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: Scrite.app.revealFileOnDesktop( Scrite.app.urlToLocalFile(pdfDoc.source) )
             }
         }
     }

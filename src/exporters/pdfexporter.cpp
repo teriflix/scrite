@@ -122,10 +122,15 @@ bool PdfExporter::doExport(QIODevice *device)
     Screenplay *screenplay = this->document()->screenplay();
     ScreenplayFormat *format = this->document()->printFormat();
 
+    // Qt 5.15.7's PdfWriter is broken!
+#if 0
     const bool usePdfWriter = Application::instance()
                                       ->settings()
                                       ->value(QStringLiteral("PdfExport/usePdfDriver"), true)
                                       .toBool();
+#else
+    const bool usePdfWriter = false;
+#endif
 
     QScopedPointer<QPdfWriter> qpdfWriter;
     QScopedPointer<QPrinter> qprinter;

@@ -29,6 +29,7 @@ public:
     ~SceneCharacterMatrixReport();
 
     bool requiresConfiguration() const { return true; }
+    bool isSinglePageReport() const { return true; }
 
     enum Type { SceneVsCharacter, CharacterVsScene };
     Q_ENUM(Type)
@@ -85,7 +86,7 @@ protected:
     QString polishFileName(const QString &fileName) const;
 
     // AbstractReportGenerator interface
-    bool usePdfWriter() const { return true; }
+    bool usePdfWriter() const { return false; }
     bool doGenerate(QTextDocument *document);
     void configureWriter(QPdfWriter *pdfWriter, const QTextDocument *document) const;
     void configureWriter(QPrinter *printer, const QTextDocument *document) const;

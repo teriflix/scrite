@@ -313,9 +313,13 @@ QString AbstractReportGenerator::polishFileName(const QString &fileName) const
 
 bool AbstractReportGenerator::usePdfWriter() const
 {
+#if 0
     const bool val = Application::instance()
                              ->settings()
                              ->value(QStringLiteral("PdfExport/usePdfDriver"), true)
                              .toBool();
     return val;
+#else
+    return false; // Qt 5.15.7's PdfWriter is broken!
+#endif
 }

@@ -98,8 +98,7 @@ Item {
                         absoluteFilePath: exporter.fileName
                         onAbsoluteFilePathChanged: exporter.fileName = absoluteFilePath
                         nameFilters: exporter.nameFilters
-                        folder: workspaceSettings.lastOpenExportFolderUrl
-                        onFolderChanged: workspaceSettings.lastOpenExportFolderUrl = folder
+                        folder: StandardPaths.writableLocation(StandardPaths.DownloadsFolder)
                         tabSequenceManager: tabSequence
                     }
 
