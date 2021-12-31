@@ -219,13 +219,16 @@ inline void packIntoJson(QWheelEvent *event, QJsonObject &object)
         return ret;
     };
 
+    const int delta = event->angleDelta().x() + event->angleDelta().y();
+    const int orientation = event->angleDelta().x() > 0 ? Qt::Horizontal : Qt::Vertical;
+
     object.insert("modifiers", int(event->modifiers()));
     object.insert("pixelDelta", pointToJson(event->pixelDelta()));
     object.insert("angleDelta", pointToJson(event->angleDelta()));
-    object.insert("delta", event->delta());
-    object.insert("orientation", event->orientation());
-    object.insert("pos", pointToJson(event->posF()));
-    object.insert("globalPos", pointToJson(event->globalPosF()));
+    object.insert("delta", delta);
+    object.insert("orientation", orientation);
+    object.insert("pos", pointToJson(event->position()));
+    object.insert("globalPos", pointToJson(event->globalPosition()));
     object.insert("buttons", int(event->buttons()));
     object.insert("phase", int(event->phase()));
     object.insert("inverted", event->inverted());
@@ -396,9 +399,9 @@ QEvent *EventFilter::cloneCurrentEvent() const
     }
     case QEvent::Wheel: {
         QWheelEvent *we = static_cast<QWheelEvent *>(m_currentEvent);
-        return new QWheelEvent(we->posF(), we->globalPosF(), we->pixelDelta(), we->angleDelta(),
-                               we->delta(), we->orientation(), we->buttons(), we->modifiers(),
-                               we->phase(), we->source(), we->inverted());
+        return new QWheelEvent(we->position(), we->globalPosition(), we->pixelDelta(),
+                               we->angleDelta(), we->buttons(), we->modifiers(), we->phase(),
+                               we->inverted(), we->source());
     }
     case QEvent::KeyPress:
     case QEvent::KeyRelease: {

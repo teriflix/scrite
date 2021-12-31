@@ -382,7 +382,7 @@ bool JsonHttpRequest::call()
         emit busyChanged();
 
         connect(m_reply, &QNetworkReply::finished, this, &JsonHttpRequest::onNetworkReplyFinished);
-        connect(m_reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), this,
+        connect(m_reply, &QNetworkReply::errorOccurred, this,
                 &JsonHttpRequest::onNetworkReplyError);
     }
 

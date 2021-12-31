@@ -1446,6 +1446,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
 
         if (blockData) {
             switch (blockData->elementType()) {
+            case SceneElement::All:
+                break;
             case SceneElement::Character: {
                 const SceneElement *element = blockData->element();
                 if (element->scene()->elementAt(0) == element)

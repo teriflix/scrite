@@ -205,7 +205,7 @@ void CharacterRelationshipsGraphEdge::evaluatePath()
                     << Qt::LeftEdge << Qt::TopEdge << Qt::RightEdge << Qt::BottomEdge;
             for (int i = 0; i < edges.size(); i++) {
                 const QLineF edge = edges.at(i);
-                if (line.intersect(edge, nullptr) == QLineF::BoundedIntersection) {
+                if (line.intersects(edge, nullptr) == QLineF::BoundedIntersection) {
                     if (type)
                         *type = types[i];
                     return edge;

@@ -56,12 +56,11 @@ void UrlAttributes::setUrl(const QUrl &val)
         m_reply = nam.post(request, postDataBytes);
         if (m_reply != nullptr) {
             connect(m_reply, &QNetworkReply::finished, this, &UrlAttributes::onHttpRequestFinished);
-            connect(m_reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-                    [=](QNetworkReply::NetworkError) {
-                        m_reply->deleteLater();
-                        m_reply = nullptr;
-                        this->setStatus(Error);
-                    });
+            connect(m_reply, &QNetworkReply::errorOccurred, this, [=](QNetworkReply::NetworkError) {
+                m_reply->deleteLater();
+                m_reply = nullptr;
+                this->setStatus(Error);
+            });
         }
     } else {
         this->setAttributes(QJsonObject());
@@ -114,7 +113,7 @@ QJsonObject UrlAttributes::createDefaultAttributes() const
     defaultAttrs.insert(QStringLiteral("url"), m_url.toString());
     defaultAttrs.insert(QStringLiteral("type"), QStringLiteral("website"));
     defaultAttrs.insert(QStringLiteral("title"), QStringLiteral("Website URL"));
-    defaultAttrs.insert(QStringLiteral("image"), QStringLiteral(""));
-    defaultAttrs.insert(QStringLiteral("description"), QStringLiteral(""));
+    defaultAttrs.insert(QStringLiteral("image"), QLatin1String(""));
+    defaultAttrs.insert(QStringLiteral("description"), QLatin1String(""));
     return defaultAttrs;
 }

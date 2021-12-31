@@ -73,6 +73,8 @@ bool FountainExporter::doExport(QIODevice *device)
                 const SceneElement *para = scene->elementAt(j);
 
                 switch (para->type()) {
+                case SceneElement::All:
+                    break;
                 case SceneElement::Shot:
                 case SceneElement::Transition:
                     ts << "> ";
@@ -92,6 +94,8 @@ bool FountainExporter::doExport(QIODevice *device)
                 ts << para->formattedText();
 
                 switch (para->type()) {
+                case SceneElement::All:
+                    break;
                 case SceneElement::Transition:
                 case SceneElement::Heading:
                 case SceneElement::Action:
