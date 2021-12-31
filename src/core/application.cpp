@@ -17,6 +17,7 @@
 #include "autoupdate.h"
 #include "application.h"
 #include "timeprofiler.h"
+#include "notification.h"
 #include "execlatertimer.h"
 #include "scritedocument.h"
 #include "jsonhttprequest.h"
@@ -472,6 +473,42 @@ void Application::revealFileOnDesktop(const QString &pathIn)
             showGraphicalShellError(parent, app, error);
 #endif
     }
+
+    const QFileInfo fi(pathIn);
+
+    Notification *notification = new Notification(this);
+    connect(notification, &Notification::dismissed, &Notification::deleteLater);
+    if (fi.isFile()) {
+        notification->setTitle(QStringLiteral("File saved"));
+
+#ifdef Q_OS_MAC
+        notification->setText(QStringLiteral("<b>%1</b> was saved into '<i>%2</i>'.")
+                                      .arg(fi.fileName(), fi.absolutePath()));
+#else
+#ifdef Q_OS_WIN
+        notification->setText(
+                QStringLiteral("<b>%1</b> was saved into '<i>%2</i>'. You can take a look at the "
+                               "file by switching to the Explorer window which has been "
+                               "opened in the background with this file selected.")
+                        .arg(fi.fileName(), fi.absolutePath()));
+#else
+        notification->setText(
+                QStringLiteral("<b>%1</b> was saved. Please launch your file manager app "
+                               "and navigate to '<i>%2</i>' to open the file.")
+                        .arg(fi.fileName(), fi.absolutePath()));
+#endif
+#endif
+
+    } else {
+        notification->setTitle(QStringLiteral("Unable to open folder"));
+        notification->setText(fi.absolutePath());
+    }
+#ifdef Q_OS_MAC
+    notification->setAutoClose(true);
+#else
+    notification->setAutoClose(false);
+#endif
+    notification->setActive(true);
 }
 
 QJsonArray enumerationModel(const QMetaObject *metaObject, const QString &enumName)
@@ -1246,6 +1283,33 @@ QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around,
     return around2;
 }
 
+QString Application::copyFile(const QString &fromFilePath, const QString &toFolder)
+{
+    const QFileInfo fromFileInfo(fromFilePath);
+    if (fromFileInfo.isDir() || !fromFileInfo.isReadable() || fromFileInfo.isSymbolicLink())
+        return QString();
+
+    const QFileInfo toInfo(toFolder);
+    QString toFilePath = toInfo.isDir() ? toInfo.dir().absoluteFilePath(fromFileInfo.fileName())
+                                        : toInfo.absoluteFilePath();
+    int counter = 1;
+    while (1) {
+        if (QFile::exists(toFilePath)) {
+            const QFileInfo toFileInfo(toFilePath);
+            toFilePath = toFileInfo.absoluteDir().absoluteFilePath(
+                    toFileInfo.baseName() + QStringLiteral(" ") + QString::number(counter++)
+                    + QStringLiteral(".") + toFileInfo.suffix());
+        } else
+            break;
+    }
+
+    const bool success = QFile::copy(fromFileInfo.absoluteFilePath(), toFilePath);
+    if (success)
+        return toFilePath;
+
+    return QString();
+}
+
 bool Application::writeToFile(const QString &fileName, const QString &fileContent)
 {
     QFile file(fileName);
@@ -1257,7 +1321,7 @@ bool Application::writeToFile(const QString &fileName, const QString &fileConten
     return false;
 }
 
-QString Application::fileContents(const QString &fileName) const
+QString Application::fileContents(const QString &fileName)
 {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly))
@@ -1266,12 +1330,12 @@ QString Application::fileContents(const QString &fileName) const
     return QString::fromLatin1(file.readAll());
 }
 
-QString Application::fileName(const QString &path) const
+QString Application::fileName(const QString &path)
 {
     return QFileInfo(path).baseName();
 }
 
-QString Application::neighbouringFilePath(const QString &filePath, const QString &nfileName) const
+QString Application::neighbouringFilePath(const QString &filePath, const QString &nfileName)
 {
     const QFileInfo fi(filePath);
     return fi.absoluteDir().absoluteFilePath(nfileName);

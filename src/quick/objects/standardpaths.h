@@ -55,20 +55,20 @@ public:
     };
     Q_ENUM(StandardLocation)
 
-    Q_INVOKABLE QString writableLocation(StandardPaths::StandardLocation type) const;
-    Q_INVOKABLE QString displayName(StandardPaths::StandardLocation type) const;
-    Q_INVOKABLE QString findExecutable(const QString &executableName,
-                                       const QStringList &paths = QStringList());
-    Q_INVOKABLE QString locateFile(StandardPaths::StandardLocation type,
-                                   const QString &fileName) const;
-    Q_INVOKABLE QStringList locateAllFiles(StandardPaths::StandardLocation type,
-                                           const QString &fileName) const;
-    Q_INVOKABLE QString locateFolder(StandardPaths::StandardLocation type,
-                                     const QString &fileName) const;
-    Q_INVOKABLE QStringList locateAllFolders(StandardPaths::StandardLocation type,
-                                             const QString &fileName) const;
-    Q_INVOKABLE QUrl fromLocalFile(const QString &file) const;
-    Q_INVOKABLE QString resolvePath(const QString &path) const;
+    Q_INVOKABLE static QString writableLocation(StandardPaths::StandardLocation type);
+    Q_INVOKABLE static QString displayName(StandardPaths::StandardLocation type);
+    Q_INVOKABLE static QString findExecutable(const QString &executableName,
+                                              const QStringList &paths = QStringList());
+    Q_INVOKABLE static QString locateFile(StandardPaths::StandardLocation type,
+                                          const QString &fileName);
+    Q_INVOKABLE static QStringList locateAllFiles(StandardPaths::StandardLocation type,
+                                                  const QString &fileName);
+    Q_INVOKABLE static QString locateFolder(StandardPaths::StandardLocation type,
+                                            const QString &fileName);
+    Q_INVOKABLE static QStringList locateAllFolders(StandardPaths::StandardLocation type,
+                                                    const QString &fileName);
+    Q_INVOKABLE static QUrl fromLocalFile(const QString &file);
+    Q_INVOKABLE static QString resolvePath(const QString &path);
 
     static QString resolvedPath(const QString &path);
 };

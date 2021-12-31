@@ -237,11 +237,12 @@ public:
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
 
-    Q_INVOKABLE bool writeToFile(const QString &fileName, const QString &fileContent);
-    Q_INVOKABLE QString fileContents(const QString &fileName) const;
-    Q_INVOKABLE QString fileName(const QString &path) const;
-    Q_INVOKABLE QString neighbouringFilePath(const QString &filePath,
-                                             const QString &nfileName) const;
+    Q_INVOKABLE static QString copyFile(const QString &fromFilePath, const QString &toFolder);
+    Q_INVOKABLE static bool writeToFile(const QString &fileName, const QString &fileContent);
+    Q_INVOKABLE static QString fileContents(const QString &fileName);
+    Q_INVOKABLE static QString fileName(const QString &path);
+    Q_INVOKABLE static QString neighbouringFilePath(const QString &filePath,
+                                                    const QString &nfileName);
 
     Q_INVOKABLE QScreen *windowScreen(QObject *window) const;
 

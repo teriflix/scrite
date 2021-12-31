@@ -15,6 +15,9 @@ import QtQuick 2.15
 import QtQuick.Pdf 5.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
+
+import io.scrite.components 1.0
 
 Item {
     width: 1280
@@ -22,6 +25,8 @@ Item {
 
     property alias source: pdfDoc.source
     property alias pagesPerRow: pdfDoc.pagesPerRow
+    property string fileName: Scrite.app.fileName( Scrite.app.urlToLocalFile(source) ) + ".pdf"
+    property bool allowFileSave: true
 
     // Catch all mouse-area, which doesnt let mouse events
     // propagate to layers underneath this item.
@@ -40,13 +45,20 @@ Item {
         PdfDocument {
             id: pdfDoc
             property int  pagesPerRow: 1
-            property real minPageScale: status === PdfDocument.Ready ?
-                                            Math.max(0.0000001,((pdfView.width/4)-5*pdfView.spacing)/maxPageWidth) : 1
-            property real idealPageScale: status === PdfDocument.Ready ?
-                                            Math.max(0.0000001,((pdfView.width/Math.min(pagesPerRow,2))-(2+pagesPerRow-1)*pdfView.spacing)/maxPageWidth) : 1
-            property real maxPageScale: status === PdfDocument.Ready ?
-                                            Math.max(0.0000001,(pdfView.width*2)/maxPageWidth) : 1
+            property real minPageScale: evaluatePageScale(4)
+            property real idealPageScale: evaluatePageScale(Math.min(nrPages,2))
+            property real maxPageScale: evaluatePageScale(0.5)
             onIdealPageScaleChanged: pageScaleSlider.value = idealPageScale
+            onStatusChanged: Qt.callLater( function() {
+                pageScaleSlider.value = pdfDoc.evaluatePageScale(Math.min(pagesPerRow,pageCount))
+            })
+
+            function evaluatePageScale(nrPages) {
+                return status === PdfDocument.Ready ?
+                        Math.max(0.0000001,
+                                 ((pdfView.width/nrPages)-(2+nrPages-1)*pdfView.spacing)/maxPageWidth) :
+                        1
+            }
         }
 
         TableView {
@@ -107,6 +119,85 @@ Item {
                             }
                         }
                     }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        id: floatingToolBar
+        radius: 8
+        color: accentColors.c900.background
+        border.width: 1
+        border.color: accentColors.c100.background
+        width: floatingButtonsRow.width + 30
+        height: floatingButtonsRow.height + 20
+        anchors.bottom: statusBar.top
+        anchors.bottomMargin: height
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        Row {
+            id: floatingButtonsRow
+            anchors.centerIn: parent
+            anchors.horizontalCenterOffset: 5
+            spacing: 20
+
+            Text {
+                text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
+                font.pointSize: Scrite.app.idealFontPointSize
+                anchors.verticalCenter: parent.verticalCenter
+                color: accentColors.c900.text
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: accentColors.c100.background
+            }
+
+            Text {
+                text: "Zoom: "
+                font.pointSize: Scrite.app.idealFontPointSize
+                anchors.verticalCenter: parent.verticalCenter
+                color: accentColors.c900.text
+            }
+
+            ComboBox2 {
+                Material.foreground: accentColors.c500.text
+                Material.background: accentColors.c500.background
+                currentIndex: Math.max(pdfDoc.pagesPerRow-1,0)
+                model: {
+                    const nrPages = Math.min(3, pdfDoc.pageCount)
+                    var ret = []
+                    for(var i=0; i<nrPages; i++) {
+                        if(i)
+                            ret.push("" + (i+1) + " Pages")
+                        else
+                            ret.push("1 Page")
+                    }
+                    return ret
+                }
+                onModelChanged: currentIndex = Qt.binding( function() { return Math.max(pdfDoc.pagesPerRow-1,0) } )
+                onCurrentIndexChanged: pageScaleSlider.value = pdfDoc.evaluatePageScale(currentIndex+1,pdfDoc.pageCount)
+                anchors.verticalCenter: parent.verticalCenter
+            }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: accentColors.c100.background
+                visible: allowFileSave
+            }
+
+            ToolButton2 {
+                visible: allowFileSave
+                icon.source: "../icons/content/save_as_inverted.png"
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: {
+                    const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source),
+                            StandardPaths.writableLocation(StandardPaths.DownloadLocation) + "/" + fileName )
+                    if(downloadedFilePath !== "")
+                        Scrite.app.revealFileOnDesktop(downloadedFilePath)
                 }
             }
         }
