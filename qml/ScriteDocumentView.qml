@@ -1768,6 +1768,9 @@ Item {
         enabled: !notificationsView.visible
         onActiveChanged: {
             pdfPagesPerRow = 2
+            pdfDownloadFilePath = ""
+            pdfFilePath = ""
+            pdfTitle = ""
         }
 
         function show(title, filePath, dlFilePath, pagesPerRow) {
