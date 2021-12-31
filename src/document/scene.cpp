@@ -399,6 +399,8 @@ QString SceneElement::typeAsString() const
         return "Transition";
     case Heading:
         return "Scene Heading";
+    default:
+        break;
     }
 
     return "Unknown";
@@ -507,6 +509,7 @@ void SceneElement::renameCharacter(const QString &from, const QString &to)
         case SceneElement::Character:
         case SceneElement::Transition:
             m_text = text.toUpper();
+            break;
         default:
             m_text = text;
             break;
