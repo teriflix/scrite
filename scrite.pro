@@ -2,6 +2,7 @@ QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia pri
 DESTDIR = $$PWD/../Release/
 TARGET = Scrite
 
+CONFIG += c++11
 DEFINES += PHTRANSLATE_STATICLIB
 
 #DEFINES += SCRITE_ENABLE_AUTOMATION
