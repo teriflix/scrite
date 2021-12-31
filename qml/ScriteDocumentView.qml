@@ -1726,8 +1726,10 @@ Item {
         Button2 {
             text: "Close"
             anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
+            anchors.right: Scrite.app.isMacOSPlatform ? undefined : parent.right
+            anchors.left: Scrite.app.isMacOSPlatform ? parent.left : undefined
             anchors.rightMargin: 5
+            anchors.leftMargin: 5
             onClicked: pdfViewer.active = false
             Material.foreground: accentColors.c500.text
             Material.background: accentColors.c500.background
@@ -1760,6 +1762,7 @@ Item {
         anchors.top: pdfViewerToolBar.visible ? pdfViewerToolBar.bottom : parent.top
         anchors.bottom: parent.bottom
         property string pdfFilePath
+        property string pdfDownloadFilePath
         property string pdfTitle
         property int pdfPagesPerRow: 2
         enabled: !notificationsView.visible
@@ -1767,10 +1770,11 @@ Item {
             pdfPagesPerRow = 2
         }
 
-        function show(title, filePath, pagesPerRow) {
+        function show(title, filePath, dlFilePath, pagesPerRow) {
             active = false
             pdfTitle = title
             pdfPagesPerRow = pagesPerRow
+            pdfDownloadFilePath = dlFilePath
             pdfFilePath = filePath
             Qt.callLater( function() {
                 pdfViewer.active = true
@@ -1784,9 +1788,14 @@ Item {
 
         sourceComponent: PdfView {
             source: Scrite.app.localFileToUrl(pdfViewer.pdfFilePath)
-            allowFileSave: false
+            saveFilePath: pdfViewer.pdfDownloadFilePath
+            allowFileSave: true
             pagesPerRow: pdfViewer.pdfPagesPerRow
-            allowFileReveal: true
+            allowFileReveal: false
+
+            FileManager {
+                autoDeleteList: [pdfViewer.pdfFilePath]
+            }
         }
     }
 

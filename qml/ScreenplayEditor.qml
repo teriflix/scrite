@@ -3251,7 +3251,7 @@ Rectangle {
         anchors.fill: parent
         sourceComponent: PdfView {
             id: pdfView
-            fileName: Scrite.document.fileName === "" ? "Untitled Screenplay.pdf" : ( Scrite.app.fileName(Scrite.document.fileName) + ".pdf" )
+            saveFileName: Scrite.document.fileName === "" ? "Untitled Screenplay.pdf" : ( Scrite.app.fileName(Scrite.document.fileName) + ".pdf" )
 
             BusyOverlay {
                 id: busyOverlay

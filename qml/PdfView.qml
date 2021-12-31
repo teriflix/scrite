@@ -25,7 +25,8 @@ Item {
 
     property alias source: pdfDoc.source
     property alias pagesPerRow: pdfDoc.pagesPerRow
-    property string fileName: Scrite.app.fileName( Scrite.app.urlToLocalFile(source) ) + ".pdf"
+    property string saveFilePath
+    property string saveFileName: Scrite.app.fileName( Scrite.app.urlToLocalFile(source) ) + ".pdf"
     property bool allowFileSave: true
     property bool allowFileReveal: false
 
@@ -159,7 +160,7 @@ Item {
             }
 
             Text {
-                text: "Zoom: "
+                text: "View: "
                 font.pointSize: Scrite.app.idealFontPointSize
                 anchors.verticalCenter: parent.verticalCenter
                 color: accentColors.c900.text
@@ -198,8 +199,10 @@ Item {
                 ToolTip.text: "Save a copy of this PDF."
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
-                    const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source),
-                            StandardPaths.writableLocation(StandardPaths.DownloadLocation) + "/" + fileName )
+                    const filePath = saveFilePath === "" ?
+                                       (StandardPaths.writableLocation(StandardPaths.DownloadLocation) + "/" + saveFileName) :
+                                       saveFilePath
+                    const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), filePath)
                     if(downloadedFilePath !== "")
                         Scrite.app.revealFileOnDesktop(downloadedFilePath)
                 }

@@ -311,13 +311,21 @@ Item {
                 anchors.fill: parent
                 busyMessage: "Generating \"" + generator.fileName + "\" ..."
 
+                FileManager {
+                    id: fileManager
+                }
+
                 onVisibleChanged: {
                     if(visible) {
                         Scrite.app.execLater(busyOverlay, 100, function() {
+                            const dlFileName = generator.fileName
+                            if(generator.format === AbstractReportGenerator.AdobePDF)
+                                generator.fileName = fileManager.generateUniqueTemporaryFileName("pdf")
+
                             if(generator.generate()) {
                                 if(generator.format === AbstractReportGenerator.AdobePDF) {
                                     const ppr = generator.singlePageReport ? 1 : 2
-                                    pdfViewer.show(generator.title, generator.fileName, ppr)
+                                    pdfViewer.show(generator.title, generator.fileName, dlFileName, ppr)
                                 } else
                                     Scrite.app.revealFileOnDesktop(generator.fileName)
                                 modalDialog.close()
