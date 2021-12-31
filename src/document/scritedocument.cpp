@@ -565,7 +565,8 @@ void ScriteDocument::setBusyMessage(const QString &val)
 
 void ScriteDocument::setSpellCheckIgnoreList(const QStringList &val)
 {
-    QStringList val2 = val.toSet().toList(); // so that we eliminate all duplicates
+    QStringList val2 =
+            QSet<QString>(val.begin(), val.end()).values(); // so that we eliminate all duplicates
     std::sort(val2.begin(), val2.end());
     if (m_spellCheckIgnoreList == val)
         return;

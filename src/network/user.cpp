@@ -126,7 +126,7 @@ QStringList User::locations()
                 ++it;
             }
 
-            ret = locs.toList();
+            ret = locs.values();
         }
     }
 
@@ -207,7 +207,7 @@ void User::setInfo(const QJsonObject &val)
             }
         }
 
-        m_enabledFeatures = ifeatures.toList();
+        m_enabledFeatures = ifeatures.values();
         std::sort(m_enabledFeatures.begin(), m_enabledFeatures.end());
 
         const QJsonObject consentObj = m_info.value(QStringLiteral("consent")).toObject();

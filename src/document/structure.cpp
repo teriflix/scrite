@@ -604,7 +604,7 @@ void StructureElementStack::initialize()
         }
 
         const QStringList elementGroups = element->scene()->groups();
-        stackGroups += QSet<QString>::fromList(elementGroups);
+        stackGroups += QSet<QString>(elementGroups.begin(), elementGroups.end());
     }
 
     if (list.isEmpty()) {
@@ -643,7 +643,7 @@ void StructureElementStack::initialize()
         }
     }
 
-    const QStringList groups = stackGroups.toList();
+    const QStringList groups = stackGroups.values();
     for (StructureElement *element : qAsConst(this->list())) {
         element->setX(x);
         element->setY(y);

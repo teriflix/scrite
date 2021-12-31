@@ -1079,7 +1079,7 @@ void Scene::setGroups(const QStringList &val)
     if (m_groups == val)
         return;
 
-    m_groups = QSet<QString>::fromList(val).toList();
+    m_groups = QSet<QString>(val.begin(), val.end()).values();
     emit groupsChanged();
 }
 
@@ -2337,7 +2337,7 @@ void SceneGroup::reeval()
     }
 
     this->setSceneActs(acts);
-    this->setSceneStackIds(stackIds.toList());
+    this->setSceneStackIds(stackIds.values());
 }
 
 void SceneGroup::reevalLater()
