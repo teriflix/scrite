@@ -341,6 +341,7 @@ Rectangle {
             headerVisible: false
             model: notebookModel
             frameVisible: false
+            backgroundVisible: false
             alternatingRowColors: false
             horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
             verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
