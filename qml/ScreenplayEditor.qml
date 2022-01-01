@@ -572,7 +572,7 @@ Rectangle {
 
                         Loader {
                             id: addButtonsAnimator
-                            active: mainTabBar.currentIndex === 0 && contentView.count === 1 && !modalDialog.active && !splashLoader.active
+                            active: mainTabBar.currentIndex === 0 && contentView.count === 1 && !modalDialog.active && !splashLoader.active && !instanceSettings.screenplayEditorAddButtonsAnimationShown
                             anchors.fill: parent
                             sourceComponent: UiElementHighlight {
                                 uiElement: addButtonsRow
@@ -580,6 +580,7 @@ Rectangle {
                                 descriptionPosition: Item.Bottom
                                 description: "Use these buttons to add new a scene, act or episode."
                                 onDone: addButtonsAnimator.active = false
+                                Component.onCompleted: instanceSettings.screenplayEditorAddButtonsAnimationShown = true
                             }
                         }
                     }

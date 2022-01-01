@@ -287,6 +287,12 @@ Rectangle {
         property string textMode: "HeadingOrTitle"
     }
 
+    QtObject {
+        id: instanceSettings
+
+        property bool screenplayEditorAddButtonsAnimationShown: false
+    }
+
     function showInformation(params, popupSource) {
         var okCallback = function() {
             if(params.callback)
