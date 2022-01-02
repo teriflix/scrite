@@ -461,6 +461,19 @@ Item {
 
         property bool mutiSelectionMode: false
 
+        QtObject {
+            EventFilter.target: Scrite.app
+            EventFilter.active: screenplayElementList.multiSelectionMode
+            EventFilter.events: [EventFilter.KeyPress]
+            EventFilter.onFilter: (object,event,result) => {
+                                      if(event.key === Qt.Key_Escape) {
+                                          Scrite.document.screenplay.clearSelection()
+                                          result.acceptEvent = true
+                                          result.filter = true
+                                      }
+                                  }
+        }
+
         onCountChanged: updateCacheBuffer()
         function updateCacheBuffer() {
             if(screenplayTracks.trackCount > 0)
@@ -656,11 +669,26 @@ Item {
                         }
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         onClicked: {
+                            const isControlPressed = mouse.modifiers & Qt.ControlModifier
+                            const isShiftPressed = mouse.modifiers & Qt.ShiftModifier
                             screenplayElementList.forceActiveFocus()
-                            screenplayElementList.mutiSelectionMode = mouse.modifiers & Qt.ControlModifier
-                            if(screenplayElementList.mutiSelectionMode)
+                            screenplayElementList.mutiSelectionMode = isControlPressed || isShiftPressed
+                            if(isControlPressed)
                                 elementItemDelegate.element.toggleSelection()
-                            else
+                            else if(isShiftPressed) {
+                                function selectRange() {
+                                    const fromIndex = Math.min(Scrite.document.screenplay.currentElementIndex,index)
+                                    const toIndex = Math.max(Scrite.document.screenplay.currentElementIndex,index)
+                                    if(fromIndex === toIndex)
+                                        return
+                                    for(var i=fromIndex; i<=toIndex; i++) {
+                                        var element = Scrite.document.screenplay.elementAt(i)
+                                        if(element.elementType === ScreenplayElement.SceneElementType)
+                                            element.selected = true
+                                    }
+                                }
+                                selectRange()
+                            } else
                                 Scrite.document.screenplay.clearSelection()
                             Scrite.document.screenplay.currentElementIndex = index
                             requestEditorLater()
