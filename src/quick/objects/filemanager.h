@@ -32,6 +32,7 @@ public:
     QStringList autoDeleteList() const { return m_autoDeleteList; }
     Q_SIGNAL void autoDeleteListChanged();
 
+    Q_INVOKABLE void removeFilesInAutoDeleteList();
     Q_INVOKABLE void addToAutoDeleteList(const QString &filePath);
     Q_INVOKABLE void removeFromAutoDeleteList(const QString &filePath);
     Q_INVOKABLE void clearAutoDeleteList() { this->setAutoDeleteList(QStringList()); }

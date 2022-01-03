@@ -21,10 +21,7 @@ FileManager::FileManager(QObject *parent) : QObject(parent) { }
 
 FileManager::~FileManager()
 {
-    while (!m_autoDeleteList.isEmpty()) {
-        const QString filePath = m_autoDeleteList.takeFirst();
-        QFile::remove(filePath);
-    }
+    this->removeFilesInAutoDeleteList();
 }
 
 QString FileManager::generateUniqueTemporaryFileName(const QString &ext)
@@ -50,6 +47,19 @@ void FileManager::setAutoDeleteList(const QStringList &val)
         return;
 
     m_autoDeleteList = val;
+    emit autoDeleteListChanged();
+}
+
+void FileManager::removeFilesInAutoDeleteList()
+{
+    if (m_autoDeleteList.isEmpty())
+        return;
+
+    while (!m_autoDeleteList.isEmpty()) {
+        const QString filePath = m_autoDeleteList.takeFirst();
+        QFile::remove(filePath);
+    }
+
     emit autoDeleteListChanged();
 }
 

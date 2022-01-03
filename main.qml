@@ -291,6 +291,7 @@ Rectangle {
         id: instanceSettings
 
         property bool screenplayEditorAddButtonsAnimationShown: false
+        property bool refreshButtonInStatsReportAnimationDone: false
     }
 
     function showInformation(params, popupSource) {

@@ -180,11 +180,11 @@ Rectangle {
                 id: refreshButton
                 iconSource: "../icons/navigation/refresh.png"
                 ToolTip.text: "Reloads the current character relationships graph and the notebook tree."
-                property bool crGraphRefreshed: false
+                property bool refreshAck: false
                 onClicked: {
-                    crGraphRefreshed = false
+                    refreshAck = false
                     Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "refresh")
-                    if(crGraphRefreshed)
+                    if(refreshAck)
                         Scrite.app.execLater(refreshButton, 250, function() { notebookModel.refresh() })
                     else
                         notebookModel.refresh()
@@ -1105,7 +1105,7 @@ Rectangle {
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
                                 if(sdata === "refresh") {
                                     crGraphView.resetGraph()
-                                    refreshButton.crGraphRefreshed = true
+                                    refreshButton.refreshAck = true
                                 } else if(sdata == "pdfexport")
                                     crGraphView.exportToPdf(pdfExportButton)
                             }
@@ -1498,9 +1498,9 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.margins: 8
                 tabIndex: screenplayNotesTabIndex
-                onTabIndexChanged: screenplayNotesTabIndex = tabIndex
+                onTabIndexChanged: screenplayNotesTabIndex = Math.min(tabIndex, 2)
                 name: "Screenplay"
-                tabs: ["Title Page", "Logline", "Notes"]
+                tabs: ["Title Page", "Logline", "Notes", "Stats"]
             }
 
             Item {
@@ -1770,6 +1770,18 @@ Rectangle {
                     onLoaded: item.notes = Scrite.document.structure.notes
                     visible: screenplayTabBar.tabIndex === 2
                 }
+
+                Loader {
+                    width: screenplayTabContentArea.width
+                    height: screenplayTabContentArea.height
+                    sourceComponent: storyStatsReport
+                    visible: screenplayTabBar.tabIndex === 3
+                    active: false
+                    onVisibleChanged: {
+                        if(visible)
+                            Qt.callLater(function() { active = true })
+                    }
+                }
             }
         }
     }
@@ -2035,7 +2047,7 @@ Rectangle {
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
                                 if(sdata === "refresh") {
                                     crGraphView.resetGraph()
-                                    refreshButton.crGraphRefreshed = true
+                                    refreshButton.refreshAck = true
                                 } else if(sdata == "pdfexport")
                                     crGraphView.exportToPdf(pdfExportButton)
                             }
@@ -2522,7 +2534,7 @@ Rectangle {
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
                                 if(sdata === "refresh") {
                                     crGraphView.resetGraph()
-                                    refreshButton.crGraphRefreshed = true
+                                    refreshButton.refreshAck = true
                                 } else if(sdata == "pdfexport")
                                     crGraphView.exportToPdf(pdfExportButton)
                             }
@@ -2868,5 +2880,44 @@ Rectangle {
         id: renameCharacterDialog
 
         RenameCharacterDialog { }
+    }
+
+    Component {
+        id: storyStatsReport
+
+        PdfView {
+            id: storyStatsView
+            pagesPerRow: 1
+            displayRefreshButton: true
+
+            FileManager {
+                id: fileManager
+            }
+
+            BusyOverlay {
+                id: busyMessage
+                anchors.fill: parent
+                busyMessage: "Loading Stats ..."
+                visible: true
+            }
+
+            onRefreshRequest: {
+                busyMessage.visible = true
+                Qt.callLater(generateStatsReport)
+            }
+
+            function generateStatsReport() {
+                const fileName = fileManager.generateUniqueTemporaryFileName("pdf")
+                var generator = Scrite.document.createReportGenerator("Statistics Report")
+                generator.fileName = fileName
+                generator.generate()
+                fileManager.addToAutoDeleteList(fileName)
+                pagesPerRow = 1
+                source = Scrite.app.localFileToUrl(fileName)
+                busyMessage.visible = false
+            }
+
+            Component.onCompleted: Qt.callLater(generateStatsReport)
+        }
     }
 }

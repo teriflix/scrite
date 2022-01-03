@@ -29,6 +29,11 @@ Item {
     property string saveFileName: Scrite.app.fileName( Scrite.app.urlToLocalFile(source) ) + ".pdf"
     property bool allowFileSave: true
     property bool allowFileReveal: false
+    property bool displayRefreshButton: false
+
+    signal refreshRequest()
+
+    function getRefreshButton() { return refreshButton }
 
     // Catch all mouse-area, which doesnt let mouse events
     // propagate to layers underneath this item.
@@ -133,7 +138,7 @@ Item {
 
                                 Connections {
                                     target: pageScaleSlider
-                                    onPressedChanged: {
+                                    function onPressedChanged() {
                                         if(!pageScaleSlider.pressed)
                                             Qt.callLater(() => { pdfPage.configureSourceSize() } )
                                     }
@@ -215,7 +220,15 @@ Item {
                 width: 1
                 height: parent.height
                 color: accentColors.c100.background
-                visible: allowFileSave || allowFileReveal
+                visible: allowFileSave || allowFileReveal || displayRefreshButton
+            }
+
+            ToolButton2 {
+                visible: displayRefreshButton
+                icon.source: "../icons/navigation/refresh_inverted.png"
+                ToolTip.text: "Refresh the stats displayed in this report."
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: refreshRequest()
             }
 
             ToolButton2 {
