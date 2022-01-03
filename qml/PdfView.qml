@@ -48,7 +48,7 @@ Item {
             id: pdfDoc
             property int  pagesPerRow: 1
             property real minPageScale: evaluatePageScale(4)
-            property real idealPageScale: evaluatePageScale(Math.min(nrPages,2))
+            property real idealPageScale: evaluatePageScale(Math.min(pageCount,2))
             property real maxPageScale: evaluatePageScale(0.5)
             onIdealPageScaleChanged: pageScaleSlider.value = idealPageScale
             onStatusChanged: Qt.callLater( function() {
@@ -87,6 +87,8 @@ Item {
                 flickable: pdfView
             }
 
+            onPdfPageScaleChanged: Qt.callLater(returnToBounds)
+
             delegate: Item {
                 width: pdfView.width
                 height: pdfView.pdfPageCellHeight
@@ -110,8 +112,8 @@ Item {
                                 id: pdfPage
                                 anchors.fill: parent
                                 sourceSize {
-                                    width: Math.min(pdfDoc.maxPageWidth*2,pdfView.pdfPageWidth)
-                                    height: Math.min(pdfDoc.maxPageHeight*2,pdfView.pdfPageHeight)
+                                    width: pdfDoc.maPageWidth
+                                    height: pdfDoc.maxPageHeight
                                 }
                                 asynchronous: true
                                 fillMode: Image.PreserveAspectFit
@@ -119,6 +121,29 @@ Item {
                                 mipmap: true
                                 source: pdfDoc.source
                                 currentFrame: startPageIndex+index
+
+                                Component.onCompleted: configureSourceSize()
+                                function configureSourceSize() {
+                                    const bound = (min, val, max) => {
+                                        return Math.min(max, Math.max(min,val))
+                                    }
+                                    sourceSize = Qt.size(bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
+                                                         bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
+                                }
+
+                                Connections {
+                                    target: pageScaleSlider
+                                    onPressedChanged: {
+                                        if(!pageScaleSlider.pressed)
+                                            Qt.callLater(() => { pdfPage.configureSourceSize() } )
+                                    }
+                                }
+
+                                BusyIcon {
+                                    anchors.centerIn: parent
+                                    running: pdfPage.status !== Image.Ready
+                                    opacity: 0.5
+                                }
                             }
                         }
                     }
@@ -228,15 +253,14 @@ Item {
         border.width: 1
         border.color: primaryColors.borderColor
 
-        Slider {
+        ZoomSlider {
             id: pageScaleSlider
-            orientation: Qt.Horizontal
-            width: 200
             from: pdfDoc.minPageScale
             to: pdfDoc.maxPageScale
             value: 1
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
+            anchors.rightMargin: 20
         }
     }
 }

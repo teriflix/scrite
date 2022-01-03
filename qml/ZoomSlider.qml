@@ -18,9 +18,10 @@ import io.scrite.components 1.0
 Row {
     id: zoomSliderBox
 
-    property alias from: zoomSlider.from
     property alias to: zoomSlider.to
+    property alias from: zoomSlider.from
     property alias value: zoomSlider.value
+    property alias pressed: zoomSlider.pressed
     property alias stepSize: zoomSlider.stepSize
     property alias zoomLevel: zoomSlider.zoomLevel
 
