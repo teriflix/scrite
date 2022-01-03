@@ -14,17 +14,13 @@
 #include "announcement.h"
 #include "application.h"
 
-Q_GLOBAL_STATIC(QList<Announcement *>, Announcements)
-
 Announcement::Announcement(QObject *parent) : QObject(parent)
 {
-    ::Announcements->append(this);
+    connect(AnnouncementBroadcast::instance(), &AnnouncementBroadcast::shout, this,
+            &Announcement::hearing);
 }
 
-Announcement::~Announcement()
-{
-    ::Announcements->removeOne(this);
-}
+Announcement::~Announcement() { }
 
 Announcement *Announcement::qmlAttachedProperties(QObject *object)
 {
@@ -33,11 +29,30 @@ Announcement *Announcement::qmlAttachedProperties(QObject *object)
 
 void Announcement::shout(const QString &type, const QJsonValue &data)
 {
-    for (Announcement *a : qAsConst(*::Announcements)) {
-        if (a == this)
-            continue;
+    AnnouncementBroadcast::instance()->doShout(this, type, data);
+}
 
-        QMetaObject::invokeMethod(a, "incoming", Qt::QueuedConnection, Q_ARG(QString, type),
-                                  Q_ARG(QJsonValue, data));
-    }
+void Announcement::hearing(Announcement *from, const QString &type, const QJsonValue &data)
+{
+    if (from == this)
+        return;
+
+    emit incoming(type, data);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+AnnouncementBroadcast *AnnouncementBroadcast::instance()
+{
+    static AnnouncementBroadcast *theInstance = new AnnouncementBroadcast(qApp);
+    return theInstance;
+}
+
+AnnouncementBroadcast::AnnouncementBroadcast(QObject *parent) : QObject(parent) { }
+
+AnnouncementBroadcast::~AnnouncementBroadcast() { }
+
+void AnnouncementBroadcast::doShout(Announcement *from, const QString &type, const QJsonValue &data)
+{
+    emit shout(from, type, data);
 }

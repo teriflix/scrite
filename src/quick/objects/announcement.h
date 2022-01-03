@@ -32,6 +32,24 @@ public:
 
     Q_INVOKABLE void shout(const QString &type, const QJsonValue &data);
     Q_SIGNAL void incoming(const QString &type, const QJsonValue &data);
+
+private:
+    void hearing(Announcement *from, const QString &type, const QJsonValue &data);
+};
+
+class AnnouncementBroadcast : public QObject
+{
+    Q_OBJECT
+
+public:
+    static AnnouncementBroadcast *instance();
+    ~AnnouncementBroadcast();
+
+    void doShout(Announcement *from, const QString &type, const QJsonValue &data);
+    Q_SIGNAL void shout(Announcement *from, const QString &type, const QJsonValue &data);
+
+private:
+    AnnouncementBroadcast(QObject *parent = nullptr);
 };
 
 #endif // ANNOUNCEMENT_H
