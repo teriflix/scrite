@@ -22,12 +22,15 @@
 
 #include <QtMath>
 #include <QtDebug>
+#include <QFuture>
 #include <QDateTime>
 #include <QPdfWriter>
 #include <QQuickItem>
 #include <QFontMetrics>
 #include <QElapsedTimer>
+#include <QFutureWatcher>
 #include <QStandardPaths>
+#include <QtConcurrentRun>
 
 CharacterRelationshipsGraphNode::CharacterRelationshipsGraphNode(QObject *parent)
     : QObject(parent), m_item(this, "item"), m_character(this, "character")
@@ -186,17 +189,34 @@ void CharacterRelationshipsGraphEdge::evaluatePath()
     if (!m_evaluatePathAllowed)
         return;
 
-    QPainterPath path;
-
     if (!m_fromNode.isNull() && !m_toNode.isNull() && !m_relationship.isNull()) {
         const QRectF r1 = m_fromNode->rect();
         const QRectF r2 = m_toNode->rect();
         const QRectF box1 = m_relationship->direction() == Relationship::WithOf ? r2 : r1;
         const QRectF box2 = m_relationship->direction() == Relationship::WithOf ? r1 : r2;
-        path = StructureElementConnector::curvedArrowPath(box1, box2);
-    }
 
-    this->setPath(path);
+        const QString futureName = QStringLiteral("curvedArrowFuture");
+        QFutureWatcher<QPainterPath> *futureWatcher =
+                this->findChild<QFutureWatcher<QPainterPath> *>(futureName,
+                                                                Qt::FindDirectChildrenOnly);
+        if (futureWatcher) {
+            futureWatcher->cancel();
+            futureWatcher->deleteLater();
+        }
+
+        futureWatcher = new QFutureWatcher<QPainterPath>(this);
+        futureWatcher->setObjectName(futureName);
+        connect(futureWatcher, &QFutureWatcher<QPainterPath>::finished, this, [=]() {
+            if (futureWatcher->isCanceled())
+                return;
+
+            const QPainterPath path = futureWatcher->result();
+            this->setPath(path);
+            futureWatcher->deleteLater();
+        });
+        futureWatcher->setFuture(QtConcurrent::run(&StructureElementConnector::curvedArrowPath,
+                                                   box1, box2, 9, false));
+    }
 }
 
 void CharacterRelationshipsGraphEdge::setRelationship(Relationship *val)
