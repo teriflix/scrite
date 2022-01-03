@@ -378,6 +378,19 @@ GraphicsHeaderItem::GraphicsHeaderItem(const QString &title, const QString &subt
 
 GraphicsHeaderItem::~GraphicsHeaderItem() { }
 
+qreal GraphicsHeaderItem::idealContainerWidth(const QString &title)
+{
+    const QFont titleFont = []() {
+        QFont ret = Application::font();
+        ret.setPointSize(24);
+        ret.setBold(true);
+        return ret;
+    }();
+    const QFontMetricsF titleFontMetrics(titleFont);
+    const qreal actualTitleWidth = titleFontMetrics.width(title);
+    return qMax(712.0, actualTitleWidth / 0.35);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 GraphicsImageRectItem::GraphicsImageRectItem(QGraphicsItem *parent) : QGraphicsRectItem(parent)

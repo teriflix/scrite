@@ -11,7 +11,9 @@
 **
 ****************************************************************************/
 
+#include "screenplay.h"
 #include "application.h"
+#include "scritedocument.h"
 #include "characterrelationshipsgraphexporter_p.h"
 
 #include <QPainter>
@@ -31,6 +33,35 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
         const CharacterRelationshipsGraph *graph, QObject *parent)
     : PdfExportableGraphicsScene(parent)
 {
+    const QString title = [graph]() {
+        const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
+        const QString sptitle = screenplay->title();
+        if (graph->character()) {
+            const QString chname = Application::camelCased(graph->character()->name());
+            return sptitle.isEmpty() ? chname : chname + QStringLiteral(" of ") + sptitle;
+        }
+        if (graph->scene()) {
+            const Scene *scene = graph->scene();
+            const QList<int> idxlist = scene->screenplayElementIndexList();
+            if (idxlist.isEmpty())
+                return QStringLiteral("A scene in ") + sptitle;
+
+            const ScreenplayElement *element = screenplay->elementAt(idxlist.first());
+            return QStringLiteral("Scene #") + element->resolvedSceneNumber()
+                    + QStringLiteral(" of ") + sptitle;
+        }
+        return sptitle;
+    }();
+    const QString subtitle = QStringLiteral("Relationship Graph");
+    this->setTitle(title + QStringLiteral(" ") + subtitle);
+
+    const qreal idealContainerWidth = GraphicsHeaderItem::idealContainerWidth(title);
+
+    QGraphicsRectItem *nodesAndEdges = new QGraphicsRectItem;
+    nodesAndEdges->setBrush(Qt::NoBrush);
+    nodesAndEdges->setPen(Qt::NoPen);
+    this->addItem(nodesAndEdges);
+
     const ObjectListPropertyModel<CharacterRelationshipsGraphNode *> *nodes =
             dynamic_cast<ObjectListPropertyModel<CharacterRelationshipsGraphNode *> *>(
                     graph->nodes());
@@ -46,7 +77,7 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
         CharacterRelationshipsGraphNodeItem *nodeItem =
                 new CharacterRelationshipsGraphNodeItem(node);
         nodeItem->setZValue(2);
-        this->addItem(nodeItem);
+        nodeItem->setParentItem(nodesAndEdges);
     }
 
     for (int i = 0; i < nrEdges; i++) {
@@ -54,18 +85,24 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
         CharacterRelationshipsGraphEdgeItem *edgeItem =
                 new CharacterRelationshipsGraphEdgeItem(edge);
         edgeItem->setZValue(1);
-        this->addItem(edgeItem);
+        edgeItem->setParentItem(nodesAndEdges);
     }
 
-    const QRectF brect = this->itemsBoundingRect();
+    const QRectF brect = [nodesAndEdges, nodes]() {
+        const QRectF rect = nodesAndEdges->childrenBoundingRect();
+        if (nodes->isEmpty())
+            return rect;
+        const CharacterRelationshipsGraphNode *node = nodes->at(0);
+        const qreal margin = qMax(node->rect().width(), node->rect().height()) * 0.075;
+        return rect.adjusted(-margin, -margin, margin, margin);
+    }();
+    nodesAndEdges->setRect(brect);
 
-    const QString title = graph->character()->name();
-    const QString subtitle = QStringLiteral("Relationships");
-    this->setTitle(title + QStringLiteral(" ") + subtitle);
-
-    GraphicsHeaderItem *headerItem = new GraphicsHeaderItem(title, subtitle, brect.width());
+    GraphicsHeaderItem *headerItem =
+            new GraphicsHeaderItem(title, subtitle, qMax(brect.width(), idealContainerWidth));
     QRectF headerItemRect = headerItem->boundingRect();
-    headerItemRect.moveBottomLeft(brect.topLeft());
+    headerItemRect.moveCenter(brect.center());
+    headerItemRect.moveBottom(brect.top());
     headerItem->setPos(headerItemRect.topLeft());
     this->addItem(headerItem);
 }

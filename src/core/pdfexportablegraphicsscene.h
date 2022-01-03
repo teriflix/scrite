@@ -109,6 +109,8 @@ class GraphicsHeaderItem : public QGraphicsRectItem
 public:
     GraphicsHeaderItem(const QString &title, const QString &subtitle, qreal containerWidth);
     ~GraphicsHeaderItem();
+
+    static qreal idealContainerWidth(const QString &title);
 };
 
 class GraphicsImageRectItem : public QGraphicsRectItem
