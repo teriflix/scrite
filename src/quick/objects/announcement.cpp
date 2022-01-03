@@ -14,7 +14,7 @@
 #include "announcement.h"
 #include "application.h"
 
-Q_GLOBAL_STATIC(QList<Announcement *>, Announcements);
+Q_GLOBAL_STATIC(QList<Announcement *>, Announcements)
 
 Announcement::Announcement(QObject *parent) : QObject(parent)
 {
@@ -37,6 +37,7 @@ void Announcement::shout(const QString &type, const QJsonValue &data)
         if (a == this)
             continue;
 
-        emit a->incoming(type, data);
+        QMetaObject::invokeMethod(a, "incoming", Qt::DirectConnection, Q_ARG(QString, type),
+                                  Q_ARG(QJsonValue, data));
     }
 }
