@@ -974,7 +974,7 @@ public:
 
     QPainterPath shape() const;
 
-    static QPainterPath curvedArrowPath(const QRectF &box1, const QRectF &box2,
+    static QPainterPath curvedArrowPath(const QRectF &rect1, const QRectF &rect2,
                                         const qreal arrowSize = 9, bool fillArrow = false);
 
 protected:

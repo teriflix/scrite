@@ -4254,9 +4254,54 @@ QPainterPath StructureElementConnector::shape() const
     return m_connectorShape;
 }
 
-QPainterPath StructureElementConnector::curvedArrowPath(const QRectF &box1, const QRectF &box2,
+QPainterPath StructureElementConnector::curvedArrowPath(const QRectF &rect1, const QRectF &rect2,
                                                         const qreal arrowSize, bool fillArrow)
 {
+    auto splitBox = [](const QRectF &rect) -> QList<QRectF> {
+        const qreal wb3 = rect.width() / 3;
+        const qreal hb3 = rect.height() / 3;
+
+        const qreal x0 = rect.left();
+        const qreal x1 = rect.left() + wb3;
+        const qreal x2 = rect.right() - wb3;
+        const qreal x3 = rect.right();
+
+        const qreal y0 = rect.top();
+        const qreal y1 = rect.top() + hb3;
+        const qreal y2 = rect.bottom() - hb3;
+        const qreal y3 = rect.bottom();
+
+        return QList<QRectF>({ QRectF(QPointF(x0, y0), QPointF(x1, y1)),
+                               QRectF(QPointF(x1, y0), QPointF(x2, y1)),
+                               QRectF(QPointF(x2, y0), QPointF(x3, y1)),
+                               QRectF(QPointF(x0, y1), QPointF(x1, y2)),
+                               QRectF(QPointF(x1, y1), QPointF(x2, y2)),
+                               QRectF(QPointF(x2, y1), QPointF(x3, y2)),
+                               QRectF(QPointF(x0, y2), QPointF(x1, y3)),
+                               QRectF(QPointF(x1, y2), QPointF(x2, y3)),
+                               QRectF(QPointF(x2, y2), QPointF(x3, y3)) });
+    };
+
+    static const QList<QPair<int, int>> boxPairs(
+            { { 0, 8 }, { 1, 7 }, { 2, 6 }, { 5, 3 }, { 8, 0 }, { 7, 1 }, { 6, 2 }, { 3, 5 } });
+
+    const QList<QRectF> rect1Splits = splitBox(rect1);
+    const QList<QRectF> rect2Splits = splitBox(rect2);
+
+    QRectF box1 = rect1;
+    QRectF box2 = rect2;
+    qreal dist = QLineF(box1.center(), box2.center()).length();
+    for (auto boxPair : boxPairs) {
+        const QRectF b1 = rect1Splits.at(boxPair.first);
+        const QRectF b2 = rect2Splits.at(boxPair.second);
+        const qreal bdist = QLineF(b1.center(), b2.center()).length();
+        if (bdist < dist) {
+            box1 = b1;
+            box2 = b2;
+            dist = bdist;
+        }
+    }
+
     QPainterPath path;
     static QString getBoxToBoxArrowJs = []() {
         QFile file(QStringLiteral(":/dragonman225-curved-arrows/getBoxToBoxArrow.js"));

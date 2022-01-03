@@ -37,7 +37,7 @@ void Announcement::shout(const QString &type, const QJsonValue &data)
         if (a == this)
             continue;
 
-        QMetaObject::invokeMethod(a, "incoming", Qt::DirectConnection, Q_ARG(QString, type),
+        QMetaObject::invokeMethod(a, "incoming", Qt::QueuedConnection, Q_ARG(QString, type),
                                   Q_ARG(QJsonValue, data));
     }
 }
