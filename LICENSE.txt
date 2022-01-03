@@ -34,6 +34,13 @@ licenses compatible with GPLv3.
    Additional information about this library can be found at the following link:
    https://wiki.qt.io/Simple_encryption_with_SimpleCrypt
 
+7. 3rdparty/dragonman225-curved-arrows: This JavaScript package enables generation
+   of beautiful curved arrow connectors. We use a modified version of it to
+   generate curved arrow connectors betweeen index cards on the structure canvas
+   and between nodes in character relationship graph. The original JavaScript
+   package is provided under MIT License. Additional information can be found at:
+   https://github.com/dragonman225/curved-arrows
+
 ===============================================================================
 
 Scrite is originally developed by TERIFLIX Entertainment Spaces Pvt. Ltd.

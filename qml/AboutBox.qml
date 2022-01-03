@@ -162,17 +162,6 @@ Item {
                         }
 
                         Text {
-                            text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: aboutBoxPages.currentIndex = 1
-                            }
-                        }
-
-                        Text {
                             text: "Using <strong>SimpleCrypt</strong>.<br/><font color=\"blue\">Click here</font> to know more."
                             font.pointSize: Scrite.app.idealFontPointSize - 2
 
@@ -182,12 +171,40 @@ Item {
                                 onClicked: Qt.openUrlExternally("https://wiki.qt.io/Simple_encryption_with_SimpleCrypt")
                             }
                         }
+
+                        Text {
+                            text: "Using <strong>Curved Arrows</strong>.<br/><font color=\"blue\">Click here</font> to know more."
+                            font.pointSize: Scrite.app.idealFontPointSize - 2
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Qt.openUrlExternally("https://github.com/dragonman225/curved-arrows")
+                            }
+                        }
                     }
                 }
 
                 Item {
                     width: parent.width
-                    height: 20
+                    height: 14
+                }
+
+                Text {
+                    text: "This app is released under <strong>GPLv3</strong>. <font color=\"blue\">Click here</font> to view the license terms."
+                    font.pointSize: Scrite.app.idealFontPointSize - 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: aboutBoxPages.currentIndex = 1
+                    }
+                }
+
+                Item {
+                    width: parent.width
+                    height: 14
                 }
 
                 SocialShareIcons {
