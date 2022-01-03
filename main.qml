@@ -97,7 +97,7 @@ Rectangle {
     UI.ScriteDocumentView {
         id: ui
         anchors.fill: parent
-        enabled: !dialogUnderlay.visible && !fileOpenDropAreaNotification.active
+        enabled: !dialogUnderlay.visible && !fileOpenDropAreaNotification.active && !notificationsView.visible
     }
 
     Loader {
@@ -231,8 +231,8 @@ Rectangle {
 
         property int visibilityCounter: 0
         function show() {
-            visible = true
             visibilityCounter = Math.max(visibilityCounter+1,1)
+            visible = true
         }
 
         function hide() {
@@ -558,17 +558,17 @@ Rectangle {
         }
     }
 
-    UI.NotificationsView {
-        id: notificationsView
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.topMargin: -1
-        width: parent.width * 0.7
-        onVisibleChanged: {
-            if(visible)
-                dialogUnderlay.show()
-            else
-                dialogUnderlay.hide()
+    Rectangle {
+        anchors.fill: parent
+        visible: Scrite.notifications.count > 0
+        color: Scrite.app.translucent(primaryColors.borderColor, 0.6)
+
+        UI.NotificationsView {
+            id: notificationsView
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: -1
+            width: parent.width * 0.7
         }
     }
 
