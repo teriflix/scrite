@@ -973,7 +973,9 @@ Item {
                             if(Scrite.document.structure.currentElementIndex >= 0)
                                 annotationGripLoader.reset()
                         }
-                        onAnnotationCountChanged: annotationGripLoader.reset()
+                        function onAnnotationCountChanged() {
+                            annotationGripLoader.reset()
+                        }
                     }
 
                     Connections {

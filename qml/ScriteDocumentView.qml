@@ -1788,7 +1788,9 @@ Item {
 
         Connections {
             target: Scrite.document
-            onAboutToReset: pdfViewer.active = false
+            function onAboutToReset() {
+                pdfViewer.active = false
+            }
         }
 
         sourceComponent: PdfView {
