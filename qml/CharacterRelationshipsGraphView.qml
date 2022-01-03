@@ -248,7 +248,7 @@ Rectangle {
                         anchors.bottomMargin: canvas.selectedNodeItem ? Math.min(canvas.selectedNodeItem.width,canvas.selectedNodeItem.height)*0.075+5 : 5
                         enabled: !removeRelationshipConfirmation.active
                         opacity: enabled ? 1 : 0.5
-                        visible: floatingToolbarLayout.width >= floatingToolbarLayout.height
+                        visible: canvas.activeCharacter
 
                         Row {
                             id: floatingToolbarLayout
@@ -261,7 +261,7 @@ Rectangle {
                                 iconSource: "../icons/navigation/refresh.png"
                                 autoRepeat: true
                                 ToolTip.text: "Refresh"
-                                visible: !Scrite.document.readOnly && (crgraph.character ? crgraph.character == canvas.activeCharacter : true)
+                                visible: !Scrite.document.readOnly && (crgraph.character ? crgraph.character === canvas.activeCharacter : true)
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
@@ -273,7 +273,7 @@ Rectangle {
                                 autoRepeat: false
                                 ToolTip.text: "Add A New Relationship"
                                 enabled: visible
-                                visible: crgraph.character && (crgraph.character && crgraph.character == canvas.activeCharacter) && editRelationshipsEnabled && !Scrite.document.readOnly
+                                visible: crgraph.character && (crgraph.character && crgraph.character === canvas.activeCharacter) && editRelationshipsEnabled && !Scrite.document.readOnly
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
