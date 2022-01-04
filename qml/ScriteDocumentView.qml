@@ -364,6 +364,7 @@ Item {
     Connections {
         target: Scrite.document
         function onJustReset() {
+            instanceSettings.firstSwitchToStructureTab = true
             appBusyOverlay.refCount = appBusyOverlay.refCount+1
             screenplayAdapter.initialLoadTreshold = 25
             Scrite.app.execLater(screenplayAdapter, 250, function() {
@@ -372,6 +373,7 @@ Item {
             })
         }
         function onJustLoaded() {
+            instanceSettings.firstSwitchToStructureTab = true
             var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
             if(firstElement) {
                 var editorHints = firstElement.editorHints

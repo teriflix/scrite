@@ -505,7 +505,7 @@ Item {
         onEditItemChanged: {
             if(editItem) {
                 Scrite.app.execLater(canvasScroll, 500, function() {
-                    if(canvasScroll.editItem !== null && canvas.scaleIsLessForEdit)
+                    if(!canvasScroll.editItem && canvas.scaleIsLessForEdit)
                         canvasScroll.zoomOneToItem(canvasScroll.editItem)
                 })
             }
@@ -563,6 +563,7 @@ Item {
                     Scrite.app.execLater(canvasScroll, 500, function() {
                         var area = canvasItemsBoundingBox.boundingBox
                         canvasScroll.zoomFit(area)
+                        canvasScroll.animatePanAndZoom = true
                     })
                 }
             } else {
@@ -570,16 +571,21 @@ Item {
                     var item = currentElementItemBinder.get
                     if(item === null)
                         item = elementItems.itemAt(0)
-                    canvasScroll.ensureItemVisible(item, canvas.scale)
+                    if(instanceSettings.firstSwitchToStructureTab)
+                        canvasScroll.zoomFit(visibleArea)
+                    else
+                        canvasScroll.ensureItemVisible(item, canvas.scale)
                 } else
                     canvasScroll.zoomOneMiddleArea()
+
+                Qt.callLater( function() { canvasScroll.animatePanAndZoom = true } )
             }
 
             if(Scrite.document.structure.forceBeatBoardLayout)
                 Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
 
             updateScriteDocumentUserDataEnabled = true
-            animatePanAndZoom = true
+            instanceSettings.firstSwitchToStructureTab = false
         }
 
         function updateFromScriteDocumentUserDataLater() {

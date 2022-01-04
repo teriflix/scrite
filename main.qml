@@ -292,6 +292,7 @@ Rectangle {
 
         property bool screenplayEditorAddButtonsAnimationShown: false
         property bool refreshButtonInStatsReportAnimationDone: false
+        property bool firstSwitchToStructureTab: true
     }
 
     function showInformation(params, popupSource) {
