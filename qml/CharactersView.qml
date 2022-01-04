@@ -38,13 +38,23 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
 
-        ToolButton2 {
+        ToolButton3 {
             id: filterButton
-            icon.source: "../icons/action/filter.png"
+            iconSource: "../icons/action/filter.png"
             ToolTip.text: "Filter character names by their tags."
             enabled: charactersModel.availableTags.length > 0
             onClicked: tagsMenu.open()
             down: tagsMenu.visible
+
+            Text {
+                font.pixelSize: parent.height * 0.2
+                font.bold: true
+                text: charactersModel.tags.length > 0 ? charactersModel.tags.length : ""
+                padding: 2
+                color: primaryColors.highlight.text
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+            }
 
             Item {
                 anchors.left: parent.left
