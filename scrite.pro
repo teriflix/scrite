@@ -152,7 +152,7 @@ HEADERS += \
     src/reports/characterscreenplayreport.h \
     src/reports/progressreport.h \
     src/reports/screenplaysubsetreport.h \
-    src/reports/locationscreenplayreport.h \
+    # src/reports/locationscreenplayreport.h \
     src/utils/urlattributes.h
 
 SOURCES += \
@@ -268,7 +268,7 @@ SOURCES += \
     src/reports/screenplaysubsetreport.cpp \
     src/reports/characterscreenplayreport.cpp \
     src/reports/progressreport.cpp \
-    src/reports/locationscreenplayreport.cpp \
+    # src/reports/locationscreenplayreport.cpp \
     src/utils/urlattributes.cpp
 
 RESOURCES += \

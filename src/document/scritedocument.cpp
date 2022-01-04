@@ -39,7 +39,6 @@
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
 #include "screenplaysubsetreport.h"
-#include "locationscreenplayreport.h"
 #include "characterscreenplayreport.h"
 #include "scenecharactermatrixreport.h"
 
@@ -329,7 +328,6 @@ DeviceIOFactories::DeviceIOFactories()
 
     ReportsFactory.addClass<ScreenplaySubsetReport>();
     ReportsFactory.addClass<LocationReport>();
-    ReportsFactory.addClass<LocationScreenplayReport>();
     ReportsFactory.addClass<CharacterReport>();
     ReportsFactory.addClass<CharacterScreenplayReport>();
     ReportsFactory.addClass<SceneCharacterMatrixReport>();
