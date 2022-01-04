@@ -193,7 +193,7 @@ private:
     qreal m_opacity = 0.5;
     qreal m_rotation = -45;
     Qt::Alignment m_alignment = Qt::AlignCenter;
-    bool m_enabled = true;
+    bool m_enabled = false;
     bool m_visibleFromPageOne = false;
     char m_padding[2];
     QRectF m_rect;
