@@ -572,7 +572,7 @@ Item {
                     if(item === null)
                         item = elementItems.itemAt(0)
                     if(instanceSettings.firstSwitchToStructureTab)
-                        canvasScroll.zoomFit(visibleArea)
+                        canvasScroll.zoomOneToItem(item)
                     else
                         canvasScroll.ensureItemVisible(item, canvas.scale)
                 } else
