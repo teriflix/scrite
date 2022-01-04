@@ -19,10 +19,10 @@ import io.scrite.components 1.0
 
 Rectangle {
     id: busyOverlay
-    anchors.fill: parent
     color: primaryColors.windowColor
     opacity: 0.9
     visible: false
+    onVisibleChanged: parent.enabled = !visible
 
     property string busyMessage: "Busy Doing Something..."
 

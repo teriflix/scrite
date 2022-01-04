@@ -263,5 +263,7 @@
         <file>icons/file/protected_inverted.png</file>
         <file>icons/action/logout_inverted.png</file>
         <file>icons/action/logout.png</file>
+        <file>icons/action/filter.png</file>
+        <file>icons/action/filter_inverted.png</file>
     </qresource>
 </RCC>

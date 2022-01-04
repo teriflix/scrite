@@ -934,6 +934,16 @@ void Scene::setCursorPosition(int val)
     emit cursorPositionChanged();
 }
 
+bool Scene::hasCharacter(const QString &characterName) const
+{
+    return m_characterElementMap.containsCharacter(characterName);
+}
+
+int Scene::characterPresence(const QString &characterName) const
+{
+    return m_characterElementMap.characterElements(characterName).size();
+}
+
 void Scene::addMuteCharacter(const QString &characterName)
 {
     HourGlass hourGlass;
@@ -1747,13 +1757,13 @@ void Scene::setElementsList(const QList<SceneElement *> &list)
 void Scene::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
 {
     if (m_characterElementMap.include(element))
-        emit characterNamesChanged();
+        this->evaluateSortedCharacterNames();
 }
 
 void Scene::onAboutToRemoveSceneElement(SceneElement *element)
 {
     if (m_characterElementMap.remove(element))
-        emit characterNamesChanged();
+        this->evaluateSortedCharacterNames();
 }
 
 void Scene::renameCharacter(const QString &from, const QString &to)
@@ -1810,10 +1820,23 @@ void Scene::renameCharacter(const QString &from, const QString &to)
 
     if (renamedElementCount > 0 || isFromMute) {
         this->setCharacterRelationshipGraph(QJsonObject());
-        emit characterNamesChanged();
+        this->evaluateSortedCharacterNames();
     }
 
     emit sceneReset(0);
+}
+
+void Scene::evaluateSortedCharacterNames()
+{
+    const QStringList names = m_characterElementMap.characterNames();
+
+    if (m_structureElement && m_structureElement->structure()) {
+        const Structure *structure = m_structureElement->structure();
+        m_sortedCharacterNames = structure->sortCharacterNames(names);
+    } else
+        m_sortedCharacterNames = names;
+
+    emit characterNamesChanged();
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)

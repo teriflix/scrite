@@ -338,19 +338,11 @@ public:
     bool hasCharacters() const { return !m_characterElementMap.isEmpty(); }
 
     Q_PROPERTY(QStringList characterNames READ characterNames NOTIFY characterNamesChanged)
-    QStringList characterNames() const { return m_characterElementMap.characterNames(); }
+    QStringList characterNames() const { return m_sortedCharacterNames; }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_INVOKABLE bool hasCharacter(const QString &characterName) const
-    {
-        return m_characterElementMap.containsCharacter(characterName);
-    }
-
-    Q_INVOKABLE int characterPresence(const QString &characterName) const
-    {
-        return m_characterElementMap.characterElements(characterName).size();
-    }
-
+    Q_INVOKABLE bool hasCharacter(const QString &characterName) const;
+    Q_INVOKABLE int characterPresence(const QString &characterName) const;
     Q_INVOKABLE void addMuteCharacter(const QString &characterName);
     Q_INVOKABLE void removeMuteCharacter(const QString &characterName);
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
@@ -469,6 +461,7 @@ private:
     void onAboutToRemoveSceneElement(SceneElement *element);
     const CharacterElementMap &characterElementMap() const { return m_characterElementMap; }
     void renameCharacter(const QString &from, const QString &to);
+    void evaluateSortedCharacterNames();
 
 private:
     friend class Structure;
@@ -500,6 +493,7 @@ private:
     bool m_inSetElementsList = false;
     PushSceneUndoCommand *m_pushUndoCommand = nullptr;
     QJsonObject m_characterRelationshipGraph;
+    QStringList m_sortedCharacterNames;
     CharacterElementMap m_characterElementMap;
     QList<int> m_screenplayElementIndexList;
 

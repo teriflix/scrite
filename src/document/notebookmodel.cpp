@@ -512,8 +512,11 @@ void NotebookModel::syncCharacters()
     charactersItem->setData(CharactersCategory, CategoryRole);
 
     QList<Character *> characters = charactersModel->list();
-    std::sort(characters.begin(), characters.end(),
-              [](Character *a, Character *b) { return a->name() < b->name(); });
+    std::sort(characters.begin(), characters.end(), [](Character *a, Character *b) {
+        if (a->priority() == b->priority())
+            return a->name() < b->name();
+        return a->priority() > b->priority();
+    });
 
     for (Character *character : qAsConst(characters)) {
         Notes *characterNotes = character->notes();

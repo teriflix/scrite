@@ -377,7 +377,7 @@ Item {
                 if(fieldInfo)
                     generator.setConfigurationValue(fieldInfo.name, characterNames)
             }
-            height: fieldTitleText.height + fieldLabelText.height + (characterNameListView.visible ? 275 : 10)
+            height: fieldTitleText.height + fieldLabelText.height + (characterNameListView.visible ? 325 : 10)
 
             onFieldInfoChanged: {
                 characterNameListView.selectedCharacters = generator.getConfigurationValue(fieldInfo.name)
@@ -484,7 +484,6 @@ Item {
                 anchors.bottom: parent.bottom
                 anchors.rightMargin: 30
                 anchors.leftMargin: 5
-                charactersModel.array: charactersModel.stringListArray(Scrite.document.structure.characterNames)
             }
         }
     }

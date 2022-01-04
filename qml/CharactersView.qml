@@ -11,38 +11,78 @@
 **
 ****************************************************************************/
 
-import io.scrite.components 1.0
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import io.scrite.components 1.0
+
 Rectangle {
     property bool showFilterBox: true
-    property var selectedCharacters: []
+    property alias selectedCharacters: charactersModel.selectedCharacters
     property int sortFilterRole: 0
+    property alias filterTags: charactersModel.tags
 
     color: primaryColors.c10.background
     border { width: 1; color: primaryColors.borderColor }
     implicitWidth: charactersListLayout.width
 
-    property GenericArrayModel charactersModel: GenericArrayModel {
-        array: Scrite.document.structure.characterNames
+    CharacterNamesModel {
+        id: charactersModel
+        structure: Scrite.document.structure
     }
 
-    SearchBar {
-        id: searchBar
+    Row {
+        id: searchBarRow
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        searchEngine.objectName: "Characters Search Engine"
+
+        ToolButton2 {
+            id: filterButton
+            icon.source: "../icons/action/filter.png"
+            ToolTip.text: "Filter character names by their tags."
+            enabled: charactersModel.availableTags.length > 0
+            onClicked: tagsMenu.open()
+            down: tagsMenu.visible
+
+            Item {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                height: 1
+
+                Menu2 {
+                    id: tagsMenu
+
+                    Repeater {
+                        model: charactersModel.availableTags
+
+                        MenuItem2 {
+                            text: modelData
+                            checkable: true
+                            checked: charactersModel.hasTag(modelData)
+                            onToggled: charactersModel.toggleTag(modelData)
+                        }
+                    }
+                }
+            }
+        }
+
+        SearchBar {
+            id: searchBar
+            searchEngine.objectName: "Characters Search Engine"
+            width: parent.width - filterButton.width - parent.spacing
+        }
     }
 
     ScrollArea {
         id: charactersListView
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: searchBar.bottom
-        anchors.bottom: parent.bottom
+        anchors.top: searchBarRow.bottom
+        anchors.bottom: buttonsRow.top
+        anchors.bottomMargin: 8
         clip: true
         contentWidth: charactersListLayout.width
         contentHeight: height
@@ -64,18 +104,9 @@ Rectangle {
                     width: charactersListLayout.columnWidth
                     Component.onCompleted: charactersListLayout.columnWidth = Math.max(charactersListLayout.columnWidth, implicitWidth)
                     checkable: true
-                    checked: selectedCharacters.indexOf(text) >= 0 || (charactersModel.arrayHasObjects ? arrayItem.added : false)
-                    enabled: charactersModel.arrayHasObjects ? (arrayItem.added === false) : true
-                    opacity: enabled ? 1 : 0.5
-                    text: charactersModel.arrayHasObjects ? arrayItem.name : arrayItem
-                    onToggled: {
-                        var chs = selectedCharacters
-                        if(checked)
-                            chs.push(text)
-                        else
-                            chs.splice(chs.indexOf(text), 1)
-                        selectedCharacters = chs
-                    }
+                    checked: charactersModel.isInSelection(modelData)
+                    text: modelData
+                    onToggled: charactersModel.toggleSelection(modelData)
 
                     property bool highlight: false
                     background: Rectangle {
@@ -93,8 +124,36 @@ Rectangle {
                         charactersListView.ensureItemVisible(characterCheckBox,1,10)
                     }
                     SearchAgent.onClearSearchRequest: characterCheckBox.font.bold = false
+
+                    Connections {
+                        target: charactersModel
+                        function onSelectedCharactersChanged() {
+                            characterCheckBox.checked = charactersModel.isInSelection(characterCheckBox.text)
+                        }
+                    }
                 }
             }
+        }
+    }
+
+    Row {
+        id: buttonsRow
+        spacing: 20
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.leftMargin: 10
+        anchors.bottomMargin: 4
+
+        Button2 {
+            text: "Select All"
+            enabled: charactersModel.count > 0
+            onClicked: charactersModel.selectAll()
+        }
+
+        Button2 {
+            text: "Unselect All"
+            enabled: charactersModel.count > 0
+            onClicked: charactersModel.unselectAll()
         }
     }
 }

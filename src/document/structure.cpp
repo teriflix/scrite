@@ -1103,6 +1103,13 @@ Character::Character(QObject *parent)
 
     DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
     connect(dfs, &DocumentFileSystem::auction, this, &Character::onDfsAuction);
+
+    if (m_structure) {
+        connect(this, &Character::tagsChanged, m_structure,
+                &Structure::updateCharacterNamesAndTagsLater);
+        connect(this, &Character::priorityChanged, m_structure,
+                &Structure::updateCharacterNamesAndTagsLater);
+    }
 }
 
 Character::~Character() { }
@@ -1323,6 +1330,71 @@ void Character::setSummary(const QString &val)
 
     m_summary = val;
     emit summaryChanged();
+}
+
+void Character::setTags(const QStringList &val)
+{
+    if (m_tags == val)
+        return;
+
+    m_tags = val;
+    for (int i = m_tags.size() - 1; i >= 0; i--) {
+        m_tags[i] = m_tags[i].trimmed();
+        if (m_tags[i].isEmpty())
+            m_tags.removeAt(i);
+    }
+
+    emit tagsChanged();
+}
+
+bool Character::addTag(const QString &givenTag)
+{
+    const QString tag = givenTag.trimmed();
+    if (tag.isEmpty())
+        return false;
+
+    if (m_tags.contains(tag, Qt::CaseInsensitive))
+        return false;
+
+    m_tags.append(tag);
+    emit tagsChanged();
+    return true;
+}
+
+bool Character::removeTag(const QString &givenTag)
+{
+    const QString tag = givenTag.trimmed();
+    if (tag.isEmpty())
+        return false;
+
+    for (int i = m_tags.size() - 1; i >= 0; i--) {
+        const QString itag = m_tags.at(i);
+        if (itag.compare(tag, Qt::CaseInsensitive) == 0) {
+            m_tags.removeAt(i);
+            emit tagsChanged();
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Character::hasTag(const QString &givenTag) const
+{
+    const QString tag = givenTag.trimmed();
+    if (tag.isEmpty())
+        return false;
+
+    return m_tags.contains(tag, Qt::CaseInsensitive);
+}
+
+void Character::setPriority(int val)
+{
+    if (m_priority == val)
+        return;
+
+    m_priority = qBound(-100, val, 100);
+    emit priorityChanged();
 }
 
 QQmlListProperty<Relationship> Character::relationships()
@@ -1569,8 +1641,15 @@ void Character::resolveRelationships()
 
 bool Character::event(QEvent *event)
 {
-    if (event->type() == QEvent::ParentChange)
+    if (event->type() == QEvent::ParentChange) {
         m_structure = qobject_cast<Structure *>(this->parent());
+        if (m_structure) {
+            connect(this, &Character::tagsChanged, m_structure,
+                    &Structure::updateCharacterNamesAndTagsLater);
+            connect(this, &Character::priorityChanged, m_structure,
+                    &Structure::updateCharacterNamesAndTagsLater);
+        }
+    }
 
     return QObject::event(event);
 }
@@ -1631,6 +1710,221 @@ Relationship *Character::staticRelationshipAt(QQmlListProperty<Relationship> *li
 int Character::staticRelationshipCount(QQmlListProperty<Relationship> *list)
 {
     return reinterpret_cast<Character *>(list->data)->relationshipCount();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+CharacterNamesModel::CharacterNamesModel(QObject *parent) : QStringListModel(parent)
+{
+    connect(this, &CharacterNamesModel::tagsChanged, this, &CharacterNamesModel::reload);
+    connect(this, &CharacterNamesModel::structureChanged, this,
+            &CharacterNamesModel::availableTagsChanged);
+    connect(this, &CharacterNamesModel::structureChanged, this,
+            &CharacterNamesModel::allNamesChanged);
+
+    connect(this, &QStringListModel::rowsInserted, this, &CharacterNamesModel::countChanged);
+    connect(this, &QStringListModel::rowsRemoved, this, &CharacterNamesModel::countChanged);
+    connect(this, &QStringListModel::modelReset, this, &CharacterNamesModel::countChanged);
+}
+
+CharacterNamesModel::~CharacterNamesModel() { }
+
+Character *CharacterNamesModel::findCharacter(const QString &name) const
+{
+    if (m_structure)
+        return m_structure->findCharacter(name);
+
+    return nullptr;
+}
+
+int CharacterNamesModel::count() const
+{
+    return this->rowCount(QModelIndex());
+}
+
+void CharacterNamesModel::setStructure(Structure *val)
+{
+    if (m_structure == val)
+        return;
+
+    if (m_structure) {
+        disconnect(m_structure, &Structure::characterNamesChanged, this,
+                   &CharacterNamesModel::reload);
+        disconnect(m_structure, &Structure::characterTagsChanged, this,
+                   &CharacterNamesModel::availableTagsChanged);
+        disconnect(m_structure, &Structure::characterNamesChanged, this,
+                   &CharacterNamesModel::allNamesChanged);
+    }
+
+    m_structure = val;
+
+    if (m_structure) {
+        connect(m_structure, &Structure::characterNamesChanged, this, &CharacterNamesModel::reload);
+        connect(m_structure, &Structure::characterTagsChanged, this,
+                &CharacterNamesModel::availableTagsChanged);
+        connect(m_structure, &Structure::characterNamesChanged, this,
+                &CharacterNamesModel::allNamesChanged);
+    }
+
+    emit structureChanged();
+
+    this->reload();
+}
+
+void CharacterNamesModel::setTags(const QStringList &val)
+{
+    if (m_tags == val)
+        return;
+
+    m_tags = val;
+    for (int i = m_tags.size() - 1; i >= 0; i--) {
+        m_tags[i] = m_tags[i].trimmed();
+        if (m_tags[i].isEmpty())
+            m_tags.removeAt(i);
+    }
+
+    emit tagsChanged();
+}
+
+void CharacterNamesModel::addTag(const QString &givenTag)
+{
+    const QString tag = givenTag.trimmed();
+    if (tag.isEmpty())
+        return;
+
+    if (!m_tags.contains(tag, Qt::CaseInsensitive)) {
+        m_tags.append(tag);
+        emit tagsChanged();
+    }
+}
+
+void CharacterNamesModel::removeTag(const QString &givenTag)
+{
+    const QString tag = givenTag.trimmed();
+    if (tag.isEmpty())
+        return;
+
+    if (m_tags.contains(tag, Qt::CaseInsensitive)) {
+        m_tags.removeOne(tag);
+        emit tagsChanged();
+    }
+}
+
+void CharacterNamesModel::toggleTag(const QString &givenTag)
+{
+    const QString tag = givenTag.trimmed();
+    if (tag.isEmpty())
+        return;
+
+    if (hasTag(tag))
+        removeTag(tag);
+    else
+        addTag(tag);
+}
+
+void CharacterNamesModel::clearTags()
+{
+    this->setTags(QStringList());
+}
+
+bool CharacterNamesModel::hasTag(const QString &givenTag) const
+{
+    const QString tag = givenTag.trimmed();
+    return tag.isEmpty() ? false : m_tags.contains(tag, Qt::CaseInsensitive);
+}
+
+QStringList CharacterNamesModel::availableTags() const
+{
+    return m_structure ? m_structure->characterTags() : QStringList();
+}
+
+QStringList CharacterNamesModel::allNames() const
+{
+    return m_structure ? m_structure->characterNames() : QStringList();
+}
+
+void CharacterNamesModel::setSelectedCharacters(const QStringList &val)
+{
+    if (m_selectedCharacters == val)
+        return;
+
+    m_selectedCharacters = val;
+    for (int i = m_selectedCharacters.size() - 1; i >= 0; i--) {
+        m_selectedCharacters[i] = m_selectedCharacters[i].trimmed();
+        if (m_selectedCharacters[i].isEmpty())
+            m_selectedCharacters.removeAt(i);
+    }
+
+    emit selectedCharactersChanged();
+}
+
+void CharacterNamesModel::addToSelection(const QString &givenName)
+{
+    const QString name = givenName.trimmed();
+    if (name.isEmpty() || !this->stringList().contains(name, Qt::CaseInsensitive)
+        || m_selectedCharacters.contains(name, Qt::CaseInsensitive))
+        return;
+
+    m_selectedCharacters.append(name);
+    emit selectedCharactersChanged();
+}
+
+void CharacterNamesModel::removeFromSelection(const QString &givenName)
+{
+    const QString name = givenName.trimmed();
+    if (name.isEmpty() || !m_selectedCharacters.contains(name, Qt::CaseInsensitive))
+        return;
+
+    m_selectedCharacters.removeOne(name);
+    emit selectedCharactersChanged();
+}
+
+bool CharacterNamesModel::isInSelection(const QString &givenName) const
+{
+    const QString name = givenName.trimmed();
+    if (name.isEmpty())
+        return false;
+
+    return m_selectedCharacters.contains(name, Qt::CaseInsensitive);
+}
+
+void CharacterNamesModel::clearSelection()
+{
+    this->setSelectedCharacters(QStringList());
+}
+
+void CharacterNamesModel::toggleSelection(const QString &name)
+{
+    if (this->isInSelection(name))
+        this->removeFromSelection(name);
+    else
+        this->addToSelection(name);
+}
+
+void CharacterNamesModel::selectAll()
+{
+    const QStringList names = this->stringList();
+    for (const QString &name : names)
+        this->addToSelection(name);
+}
+
+void CharacterNamesModel::unselectAll()
+{
+    const QStringList names = this->stringList();
+    for (const QString &name : names)
+        this->removeFromSelection(name);
+}
+
+QHash<int, QByteArray> CharacterNamesModel::roleNames() const
+{
+    return QHash<int, QByteArray>({ { Qt::DisplayRole, QByteArrayLiteral("modelData") } });
+}
+
+void CharacterNamesModel::reload()
+{
+    QStringList names = m_structure->filteredCharacterNames(m_tags);
+    names = m_structure->sortCharacterNames(names);
+    this->setStringList(names);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2122,7 +2416,7 @@ void Structure::addCharacter(Character *ptr)
     m_characters.append(ptr);
     emit characterCountChanged();
 
-    this->updateCharacterNamesLater();
+    this->updateCharacterNamesAndTagsLater();
 }
 
 void Structure::removeCharacter(Character *ptr)
@@ -2141,7 +2435,7 @@ void Structure::removeCharacter(Character *ptr)
 
     emit characterCountChanged();
 
-    this->updateCharacterNamesLater();
+    this->updateCharacterNamesAndTagsLater();
 
     if (ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
@@ -2179,7 +2473,7 @@ void Structure::setCharacters(const QList<Character *> &list)
     m_characters.assign(list2);
     emit characterCountChanged();
 
-    this->updateCharacterNamesLater();
+    this->updateCharacterNamesAndTagsLater();
 }
 
 void Structure::clearCharacters()
@@ -2194,7 +2488,7 @@ QJsonArray Structure::detectCharacters() const
 
     const QStringList names = this->allCharacterNames();
 
-    for (const QString name : names) {
+    for (const QString &name : names) {
         Character *character = this->findCharacter(name);
 
         QJsonObject item;
@@ -2425,7 +2719,7 @@ void Structure::setElements(const QList<StructureElement *> &list)
     emit elementCountChanged();
     emit elementsChanged();
 
-    this->updateCharacterNamesLater();
+    this->updateCharacterNamesAndTagsLater();
 }
 
 StructureElement *Structure::elementAt(int index) const
@@ -3125,6 +3419,27 @@ void Structure::setZoomLevel(qreal val)
 
     m_zoomLevel = val;
     emit zoomLevelChanged();
+}
+
+QStringList Structure::filteredCharacterNames(const QStringList &tags) const
+{
+    if (tags.isEmpty())
+        return m_characterNames;
+
+    QSet<QString> ret;
+
+    const QList<Character *> characters = m_characters.list();
+    for (Character *character : characters) {
+        const QString name = character->name();
+        for (const QString &tag : tags) {
+            if (character->hasTag(tag)) {
+                ret += name;
+                break;
+            }
+        }
+    }
+
+    return ret.values();
 }
 
 QQmlListProperty<Annotation> Structure::annotations()
@@ -3851,7 +4166,7 @@ void Structure::deserializeFromJson(const QJsonObject &json)
     if (notes.isArray())
         m_notes->loadOldNotes(notes.toArray());
 
-    this->updateCharacterNamesLater();
+    this->updateCharacterNamesAndTagsLater();
 }
 
 bool Structure::canSetPropertyFromObjectList(const QString &propName) const
@@ -3879,6 +4194,26 @@ void Structure::setPropertyFromObjectList(const QString &propName, const QList<Q
     }
 }
 
+QStringList Structure::sortCharacterNames(const QStringList &givenNames) const
+{
+    if (givenNames.length() <= 1)
+        return givenNames;
+
+    QStringList names = givenNames;
+
+    std::sort(names.begin(), names.end(), [=](const QString &a, const QString &b) {
+        const Character *ac = this->findCharacter(a);
+        const Character *bc = this->findCharacter(b);
+        const int ap = ac ? ac->priority() : 0;
+        const int bp = bc ? bc->priority() : 0;
+        if (ap == bp)
+            return a < b;
+        return ap > bp;
+    });
+
+    return names;
+}
+
 bool Structure::event(QEvent *event)
 {
     if (event->type() == QEvent::ParentChange)
@@ -3897,7 +4232,7 @@ void Structure::timerEvent(QTimerEvent *event)
 
     if (m_updateCharacterNamesTimer.timerId() == event->timerId()) {
         m_updateCharacterNamesTimer.stop();
-        this->updateCharacterNames();
+        this->updateCharacterNamesAndTags();
         return;
     }
 
@@ -4039,37 +4374,38 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
 void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
 {
     if (m_characterElementMap.include(element))
-        updateCharacterNamesLater();
+        updateCharacterNamesAndTagsLater();
 }
 
 void Structure::onAboutToRemoveSceneElement(SceneElement *element)
 {
     if (m_characterElementMap.remove(element))
-        updateCharacterNamesLater();
+        updateCharacterNamesAndTagsLater();
 }
 
-void Structure::updateCharacterNames()
+void Structure::updateCharacterNamesAndTags()
 {
     QStringList names = m_characterElementMap.characterNames();
+    QSet<QString> tags;
 
-    bool requiresSort = false;
     const QList<Character *> characters = m_characters.list();
     for (Character *character : characters) {
         const QString name = character->name();
-        if (!names.contains(name)) {
+        if (!names.contains(name))
             names.append(name);
-            requiresSort = true;
-        }
+
+        const QStringList ctags = character->tags();
+        tags += QSet<QString>(ctags.begin(), ctags.end());
     }
 
-    if (requiresSort)
-        std::sort(names.begin(), names.end());
-
-    m_characterNames = names;
+    m_characterNames = this->sortCharacterNames(names);
     emit characterNamesChanged();
+
+    m_characterTags = tags.values();
+    emit characterTagsChanged();
 }
 
-void Structure::updateCharacterNamesLater()
+void Structure::updateCharacterNamesAndTagsLater()
 {
     m_updateCharacterNamesTimer.start(0, this);
 }

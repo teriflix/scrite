@@ -2280,15 +2280,108 @@ Rectangle {
                                             readOnly: Scrite.document.readOnly
                                         }
 
+                                        Column {
+                                            width: parent.width
+                                            spacing: parent.spacing/2
+
+                                            TextField2 {
+                                                id: newTagField
+                                                label: "Tags:"
+                                                width: parent.width
+                                                labelAlwaysVisible: true
+                                                placeholderText: Scrite.app.isMacOSPlatform ? "<type & hit Return, max 25 chars>" : "<type and hit Enter, max 25 chars>"
+                                                maximumLength: 25
+                                                TabSequenceItem.sequence: 1
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                                onEditingComplete: {
+                                                    character.addTag(text)
+                                                    clear()
+                                                }
+                                                enableTransliteration: true
+                                                readOnly: Scrite.document.readOnly
+                                            }
+
+                                            Flow {
+                                                id: tagsFlow
+                                                visible: character.tags.length > 0
+                                                width: parent.width
+
+                                                Repeater {
+                                                    model: character.tags
+
+                                                    TagText {
+                                                        property var colors: containsMouse ? accentColors.c900 : accentColors.c500
+                                                        border.color: colors.text
+                                                        border.width: 1
+                                                        color: colors.background
+                                                        textColor: colors.text
+                                                        text: modelData
+                                                        topPadding: 4; bottomPadding: 4
+                                                        leftPadding: 12; rightPadding: 8
+                                                        closable: Scrite.document.readOnly ? false : true
+                                                        onCloseRequest: {
+                                                            if(!Scrite.document.readOnly)
+                                                                character.removeTag(text)
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            Item {
+                                                width: parent.width
+                                                height: 1
+                                            }
+                                        }
+
+                                        Column {
+                                            width: parent.width
+
+                                            Text {
+                                                function priority(val) {
+                                                    var ret = ""
+                                                    if(val >= -2 && val <= 2)
+                                                        ret = "Normal"
+                                                    else if(val >= -6 && val <= -3)
+                                                        ret = "Low"
+                                                    else if(val <=-7)
+                                                        ret = "Very Low"
+                                                    else if(val>=3 && val <=6)
+                                                        ret = "High"
+                                                    else if(val >= 7)
+                                                        ret = "Very High"
+
+                                                    return ret += " (" + val + ")"
+                                                }
+
+                                                text: "Priority: " + priority(character.priority) + ""
+                                                width: parent.width
+                                                elide: Text.ElideMiddle
+                                                font.pointSize: 2*Scrite.app.idealFontPointSize/3
+                                            }
+
+                                            Slider {
+                                                width: parent.width-10
+                                                orientation: Qt.Horizontal
+                                                from: -10
+                                                to: 10
+                                                padding: 0
+                                                stepSize: 1
+                                                value: character.priority
+                                                onValueChanged: character.priority = value
+                                                TabSequenceItem.sequence: 2
+                                                TabSequenceItem.manager: characterInfoTabSequence
+                                            }
+                                        }
+
                                         TextField2 {
                                             id: aliasesField
                                             label: "Aliases:"
                                             width: parent.width
                                             labelAlwaysVisible: true
-                                            placeholderText: "<max 100 letters>"
+                                            placeholderText: "<max 50 letters>"
                                             maximumLength: 50
                                             text: character.aliases.join(", ")
-                                            TabSequenceItem.sequence: 1
+                                            TabSequenceItem.sequence: 3
                                             TabSequenceItem.manager: characterInfoTabSequence
                                             onEditingComplete: character.aliases = text.split(",")
                                             enableTransliteration: true
@@ -2307,7 +2400,7 @@ Rectangle {
                                                 placeholderText: "Human/Animal/Robot <max 25 letters>"
                                                 maximumLength: 25
                                                 text: character.type
-                                                TabSequenceItem.sequence: 2
+                                                TabSequenceItem.sequence: 4
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.type = text
                                                 enableTransliteration: true
@@ -2322,7 +2415,7 @@ Rectangle {
                                                 placeholderText: "<max 20 letters>"
                                                 maximumLength: 20
                                                 text: character.gender
-                                                TabSequenceItem.sequence: 3
+                                                TabSequenceItem.sequence: 5
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.gender = text
                                                 enableTransliteration: true
@@ -2342,7 +2435,7 @@ Rectangle {
                                                 placeholderText: "<max 20 letters>"
                                                 maximumLength: 20
                                                 text: character.age
-                                                TabSequenceItem.sequence: 4
+                                                TabSequenceItem.sequence: 6
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.age = text
                                                 enableTransliteration: true
@@ -2357,7 +2450,7 @@ Rectangle {
                                                 placeholderText: "<max 20 letters>"
                                                 maximumLength: 20
                                                 text: character.bodyType
-                                                TabSequenceItem.sequence: 5
+                                                TabSequenceItem.sequence: 7
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.bodyType = text
                                                 enableTransliteration: true
@@ -2377,7 +2470,7 @@ Rectangle {
                                                 placeholderText: "<max 20 letters>"
                                                 maximumLength: 20
                                                 text: character.height
-                                                TabSequenceItem.sequence: 6
+                                                TabSequenceItem.sequence: 7
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.height = text
                                                 enableTransliteration: true
@@ -2392,7 +2485,7 @@ Rectangle {
                                                 placeholderText: "<max 20 letters>"
                                                 maximumLength: 20
                                                 text: character.weight
-                                                TabSequenceItem.sequence: 7
+                                                TabSequenceItem.sequence: 8
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.weight = text
                                                 enableTransliteration: true

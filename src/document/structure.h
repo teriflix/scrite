@@ -28,6 +28,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QUndoCommand>
+#include <QStringListModel>
 #include <QSortFilterProxyModel>
 
 class Structure;
@@ -445,6 +446,23 @@ public:
     QString summary() const { return m_summary; }
     Q_SIGNAL void summaryChanged();
 
+    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    void setTags(const QStringList &val);
+    QStringList tags() const { return m_tags; }
+    Q_SIGNAL void tagsChanged();
+
+    Q_INVOKABLE bool addTag(const QString &tag);
+    Q_INVOKABLE bool removeTag(const QString &tag);
+    Q_INVOKABLE bool hasTag(const QString &tag) const;
+
+    Q_PROPERTY(bool hasTags READ hasTags NOTIFY tagsChanged)
+    bool hasTags() const { return !m_tags.isEmpty(); }
+
+    Q_PROPERTY(int priority READ priority WRITE setPriority NOTIFY priorityChanged)
+    void setPriority(int val);
+    int priority() const { return m_priority; }
+    Q_SIGNAL void priorityChanged();
+
     Q_PROPERTY(QAbstractListModel* relationshipsModel READ relationshipsModel CONSTANT STORED false)
     ObjectListPropertyModel<Relationship *> *relationshipsModel() const
     {
@@ -518,6 +536,8 @@ private:
     QString m_gender;
     QString m_summary;
     QString m_bodyType;
+    int m_priority = 0;
+    QStringList m_tags;
     QStringList m_photos;
     QString m_designation;
     QStringList m_aliases;
@@ -528,6 +548,70 @@ private:
     QJsonObject m_characterRelationshipGraph;
     Attachments *m_attachments = new Attachments(this);
     ObjectListPropertyModel<Relationship *> m_relationships;
+};
+
+class CharacterNamesModel : public QStringListModel
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    CharacterNamesModel(QObject *parent = nullptr);
+    ~CharacterNamesModel();
+
+    Q_INVOKABLE Character *findCharacter(const QString &name) const;
+
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    int count() const;
+    Q_SIGNAL void countChanged();
+
+    Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged)
+    void setStructure(Structure *val);
+    Structure *structure() const { return m_structure; }
+    Q_SIGNAL void structureChanged();
+
+    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    void setTags(const QStringList &val);
+    QStringList tags() const { return m_tags; }
+    Q_SIGNAL void tagsChanged();
+
+    Q_INVOKABLE void addTag(const QString &tag);
+    Q_INVOKABLE void removeTag(const QString &tag);
+    Q_INVOKABLE void toggleTag(const QString &tag);
+    Q_INVOKABLE void clearTags();
+    Q_INVOKABLE bool hasTag(const QString &tag) const;
+
+    Q_PROPERTY(QStringList availableTags READ availableTags NOTIFY availableTagsChanged)
+    QStringList availableTags() const;
+    Q_SIGNAL void availableTagsChanged();
+
+    Q_PROPERTY(QStringList allNames READ allNames NOTIFY allNamesChanged)
+    QStringList allNames() const;
+    Q_SIGNAL void allNamesChanged();
+
+    Q_PROPERTY(QStringList selectedCharacters READ selectedCharacters WRITE setSelectedCharacters NOTIFY selectedCharactersChanged)
+    void setSelectedCharacters(const QStringList &val);
+    QStringList selectedCharacters() const { return m_selectedCharacters; }
+    Q_SIGNAL void selectedCharactersChanged();
+
+    Q_INVOKABLE void addToSelection(const QString &name);
+    Q_INVOKABLE void removeFromSelection(const QString &name);
+    Q_INVOKABLE bool isInSelection(const QString &name) const;
+    Q_INVOKABLE void clearSelection();
+    Q_INVOKABLE void toggleSelection(const QString &name);
+    Q_INVOKABLE void selectAll();
+    Q_INVOKABLE void unselectAll();
+
+    // QAbstractItemModel interface
+    QHash<int, QByteArray> roleNames() const;
+
+private:
+    void reload();
+
+private:
+    QStringList m_tags;
+    Structure *m_structure = nullptr;
+    QStringList m_selectedCharacters;
 };
 
 class Annotation : public QObject
@@ -765,6 +849,12 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_PROPERTY(QStringList characterTags READ characterTags NOTIFY characterTagsChanged)
+    QStringList characterTags() const { return m_characterTags; }
+    Q_SIGNAL void characterTagsChanged();
+
+    QStringList filteredCharacterNames(const QStringList &tags) const;
+
     Q_PROPERTY(QAbstractListModel* annotationsModel READ annotationsModel CONSTANT STORED false)
     QAbstractListModel *annotationsModel() const
     {
@@ -848,6 +938,8 @@ public:
     bool canSetPropertyFromObjectList(const QString &propName) const;
     void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
 
+    Q_INVOKABLE QStringList sortCharacterNames(const QStringList &names) const;
+
 protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *event);
@@ -900,10 +992,11 @@ private:
     void onStructureElementSceneChanged(StructureElement *element = nullptr);
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
-    void updateCharacterNames();
-    void updateCharacterNamesLater();
+    void updateCharacterNamesAndTags();
+    void updateCharacterNamesAndTagsLater();
     ExecLaterTimer m_updateCharacterNamesTimer;
     CharacterElementMap m_characterElementMap;
+    QStringList m_characterTags;
     QStringList m_characterNames;
 
     static void staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr);
