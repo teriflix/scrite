@@ -31,6 +31,12 @@ Rectangle {
         anchors.margins: -30
         radius: 4
         color: primaryColors.c700.background
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            propagateComposedEvents: false
+        }
     }
 
     Column {

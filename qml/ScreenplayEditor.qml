@@ -3019,6 +3019,7 @@ Rectangle {
                         color: screenplayAdapter.currentIndex < 0 ? accentColors.windowColor : Qt.rgba(0,0,0,0)
 
                         Text {
+                            id: headingText
                             readonly property real iconWidth: 18
                             property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
                             property real leftMargin: 6 + (iconWidth+12)*t
@@ -3033,7 +3034,7 @@ Rectangle {
                             anchors.right: parent.right
                             elide: Text.ElideRight
                             font.family: "Courier Prime"
-                            font.pixelSize: Scrite.app.idealFontPointSize
+                            font.pixelSize: Math.ceil(Scrite.app.idealFontPointSize * 1.2)
                             font.bold: true
                             font.capitalization: Font.AllUppercase
                             text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
@@ -3041,7 +3042,13 @@ Rectangle {
 
                         MouseArea {
                             anchors.fill: parent
+                            hoverEnabled: headingText.truncated
+                            ToolTip.text: headingText.text
+                            ToolTip.delay: 1000
+                            ToolTip.visible: headingText.truncated && containsMouse
                             onClicked: {
+                                if(screenplayAdapter.isSourceScreenplay)
+                                    screenplayAdapter.screenplay.clearSelection()
                                 screenplayAdapter.currentIndex = -1
                                 contentView.positionViewAtBeginning()
                             }
@@ -3052,11 +3059,20 @@ Rectangle {
                         id: delegateItem
                         width: sceneListView.width-1
                         height: 40
-                        color: scene ? Qt.tint(scene.color, (screenplayAdapter.currentIndex === index ? "#9CFFFFFF" : "#E7FFFFFF"))
+                        color: scene ? Qt.tint(scene.color, (screenplayElement.selected ? "#9CFFFFFF" : "#E7FFFFFF"))
                                      : screenplayAdapter.currentIndex === index ? Scrite.app.translucent(accentColors.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
                         property bool elementIsBreak: screenplayElementType === ScreenplayElement.BreakElementType
                         property bool elementIsEpisodeBreak: screenplayElementType === ScreenplayElement.BreakElementType && breakType === Screenplay.Episode
+
+                        Rectangle {
+                            anchors.top: parent.top
+                            anchors.left: parent.left
+                            anchors.bottom: parent.bottom
+                            visible: screenplayElement.selected
+                            width: 5
+                            color: accentColors.windowColor
+                        }
 
                         SceneTypeImage {
                             id: sceneTypeImage
@@ -3078,7 +3094,7 @@ Rectangle {
 
                         Text {
                             id: delegateText
-                            property real leftMargin: 6 + (sceneTypeImage.width+12)*sceneTypeImage.t
+                            property real leftMargin: 11 + (sceneTypeImage.width+12)*sceneTypeImage.t
                             anchors.left: parent.left
                             anchors.leftMargin: leftMargin
                             anchors.right: parent.right
@@ -3086,7 +3102,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
-                            font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*(parent.elementIsBreak ? 1 : 0.75))
+                            font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*(parent.elementIsBreak ? 1.2 : 1))
                             horizontalAlignment: parent.elementIsBreak & !sceneListView.hasEpisodes ? Qt.AlignHCenter : Qt.AlignLeft
                             color: primaryColors.c10.text
                             font.capitalization: Font.AllUppercase
@@ -3107,26 +3123,41 @@ Rectangle {
 
                         MouseArea {
                             id: delegateMouseArea
+                            hoverEnabled: delegateText.truncated
+                            ToolTip.text: delegateText.text
+                            ToolTip.delay: 1000
+                            ToolTip.visible: delegateText.truncated && containsMouse
                             anchors.fill: parent
-                            onClicked: {
-                                navigateToScreenplayElement()
-                                Scrite.app.execLater(delegateMouseArea, 500, navigateToScreenplayElement)
-                            }
+                            onClicked: (mouse) => {
+                                           if(screenplayAdapter.isSourceScreenplay) {
+                                               const isControlPressed = mouse.modifiers & Qt.ControlModifier
+                                               const isShiftPressed = mouse.modifiers & Qt.ShiftModifier
+                                               if(isControlPressed) {
+                                                   screenplayElement.toggleSelection()
+                                               } else if(isShiftPressed) {
+                                                   const fromIndex = Math.min(screenplayAdapter.currentIndex, index)
+                                                   const toIndex = Math.max(screenplayAdapter.currentIndex, index)
+                                                   if(fromIndex === toIndex) {
+                                                       screenplayElement.toggleSelection()
+                                                   } else {
+                                                       for(var i=fromIndex; i<=toIndex; i++) {
+                                                           var element = screenplayAdapter.screenplay.elementAt(i)
+                                                           if(element.elementType === ScreenplayElement.SceneElementType) {
+                                                               element.selected = true
+                                                           }
+                                                       }
+                                                   }
+                                               } else {
+                                                   screenplayAdapter.screenplay.clearSelection()
+                                                   screenplayElement.toggleSelection()
+                                               }
+                                           }
+
+                                           navigateToScreenplayElement()
+                                           Scrite.app.execLater(delegateMouseArea, 500, navigateToScreenplayElement)
+                                       }
                             drag.target: screenplayAdapter.isSourceScreenplay && !Scrite.document.readOnly ? parent : null
                             drag.axis: Drag.YAxis
-                            onPressed: {
-                                dragHotspotItem.text = delegateText.text
-                                dragHotspotItem.grabToImage(function(result) {
-                                    delegateItem.Drag.imageSource = result.url
-                                })
-                            }
-                            onDoubleClicked: {
-                                navigateToScreenplayElement()
-                                Scrite.app.execLater(delegateMouseArea, 500, function() {
-                                    delegateMouseArea.navigateToScreenplayElement()
-                                    sceneListSidePanel.expanded = false
-                                })
-                            }
 
                             function navigateToScreenplayElement() {
                                 contentView.positionViewAtIndex(index, ListView.Beginning)
@@ -3165,8 +3196,14 @@ Rectangle {
 
                             onDropped: {
                                 dropIndicator.visible = false
-                                var dropSource = drop.source
-                                Scrite.app.execLater(sceneListView, 100, function() { sceneListView.dropSceneAt(dropSource, index) })
+                                if(screenplayAdapter.isSourceScreenplay) {
+                                    Scrite.app.execLater(sceneListView, 100, function() {
+                                        screenplayAdapter.screenplay.moveSelectedElements(index)
+                                    })
+                                } else {
+                                    var dropSource = drop.source
+                                    Scrite.app.execLater(sceneListView, 100, function() { sceneListView.dropSceneAt(dropSource, index) })
+                                }
                                 drop.acceptProposedAction()
                             }
                         }
