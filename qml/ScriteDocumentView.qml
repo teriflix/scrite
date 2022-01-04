@@ -460,7 +460,7 @@ Item {
             anchors.leftMargin: 5
             visible: appToolBarArea.width >= 1200
             onVisibleChanged: {
-                if(!visible)
+                if(enabled && !visible)
                     mainTabBar.activateTab(0)
             }
 
