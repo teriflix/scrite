@@ -155,6 +155,26 @@ Item {
                 }
             }
         }
+
+        Item {
+            id: pinchScaler
+            scale: pageScaleSlider.value
+            width: parent.width
+            height: parent.height
+        }
+
+        PinchHandler {
+            id: pinchHandler
+            target: pinchScaler
+
+            minimumScale: pageScaleSlider.from
+            maximumScale: pageScaleSlider.to
+            minimumRotation: 0
+            maximumRotation: 0
+            minimumPointCount: 2
+
+            onScaleChanged: pageScaleSlider.value = activeScale
+        }
     }
 
     Rectangle {

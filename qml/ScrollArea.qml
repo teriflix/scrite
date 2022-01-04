@@ -263,8 +263,6 @@ Flickable {
         minimumPointCount: 2
 
         onScaleChanged: {
-            if(scrollAreaFlickable === null)
-                return
             zoomScaleBehavior.allow = false
             zoomScale = activeScale
             zoomScaleChangedInteractively()
