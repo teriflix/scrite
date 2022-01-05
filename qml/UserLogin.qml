@@ -581,6 +581,7 @@ Item {
                                 "Friend",
                                 "Instagram",
                                 "Internet Search",
+                                "Invited to Collaborate",
                                 "LinkedIn",
                                 "Twitter",
                                 "Workshop",
