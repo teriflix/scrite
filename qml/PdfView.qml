@@ -253,7 +253,7 @@ Item {
 
             ToolButton2 {
                 visible: allowFileSave
-                icon.source: "../icons/content/save_as_inverted.png"
+                icon.source: "../icons/file/file_download_inverted.png"
                 ToolTip.text: "Save a copy of this PDF."
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
