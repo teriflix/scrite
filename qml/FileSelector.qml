@@ -68,6 +68,8 @@ Item {
             lineHeightMode: Text.ProportionalHeight
             text: label + ":<br/><font size=\"-2\">(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
             font.pointSize: Scrite.app.idealFontPointSize
+            visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF
+            enabled: visible
 
             MouseArea {
                 anchors.fill: parent
@@ -87,6 +89,8 @@ Item {
             font.pointSize: Scrite.app.idealFontPointSize
             onTextChanged: fileInfo.baseName = text
             TabSequenceItem.manager: tabSequenceManager
+            visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF
+            enabled: visible
         }
 
         Row {

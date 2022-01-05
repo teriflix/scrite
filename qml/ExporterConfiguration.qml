@@ -100,6 +100,8 @@ Item {
                         nameFilters: exporter.nameFilters
                         folder: StandardPaths.writableLocation(StandardPaths.DownloadsFolder)
                         tabSequenceManager: tabSequence
+                        visible: exporter.format !== "Screenplay/Adobe PDF"
+                        enabled: visible
                     }
 
                     Loader {
