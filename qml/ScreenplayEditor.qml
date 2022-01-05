@@ -3289,12 +3289,20 @@ Rectangle {
         anchors.fill: parent
         sourceComponent: PdfView {
             id: pdfView
-            saveFileName: Scrite.document.fileName === "" ? "Untitled Screenplay.pdf" : ( Scrite.app.fileName(Scrite.document.fileName) + ".pdf" )
+            saveFileName: {
+                if(Scrite.document.fileName !== "")
+                    return Scrite.app.fileName(Scrite.document.fileName) + ".pdf"
+
+                if(Scrite.document.screenplay.title !== "")
+                    return Scrite.document.screenplay.title + ".pdf"
+
+                return "Untitled Screenplay.pdf"
+            }
 
             BusyOverlay {
                 id: busyOverlay
                 anchors.fill: parent
-                busyMessage: "Generating Preview ..."
+                busyMessage: "Generating PDF ..."
                 visible: true
             }
 

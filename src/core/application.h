@@ -298,7 +298,7 @@ public:
 
     Q_SIGNAL void openFileRequest(const QString &filePath);
 
-    QString sanitiseFileName(const QString &fileName) const;
+    static QString sanitiseFileName(const QString &fileName);
 
     Q_INVOKABLE static void log(const QString &message);
 

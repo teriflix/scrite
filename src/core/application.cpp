@@ -1041,7 +1041,7 @@ QString Application::replaceCharacterName(const QString &from, const QString &to
     return in;
 }
 
-QString Application::sanitiseFileName(const QString &fileName) const
+QString Application::sanitiseFileName(const QString &fileName)
 {
     const QFileInfo fi(fileName);
 
@@ -1302,6 +1302,8 @@ QString Application::copyFile(const QString &fromFilePath, const QString &toFold
         } else
             break;
     }
+
+    toFilePath = Application::sanitiseFileName(toFilePath);
 
     const bool success = QFile::copy(fromFileInfo.absoluteFilePath(), toFilePath);
     if (success)
