@@ -88,6 +88,66 @@ Row {
     }
 
     ToolButton3 {
+        id: screenplayViewOptions
+        iconSource: "../icons/content/view_options.png"
+        ToolTip.text: "Screenplay View Options"
+        down: screenplayViewOptionsMenu.visible
+        onClicked: screenplayViewOptionsMenu.open()
+
+        Item {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            Menu2 {
+                id: screenplayViewOptionsMenu
+                width: 500
+                title: "Screenplay Options"
+
+                MenuItem2 {
+                    text: "Show Logline Editor"
+                    icon.source: screenplayEditorSettings.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.showLoglineEditor = !screenplayEditorSettings.showLoglineEditor
+                }
+
+                MenuItem2 {
+                    text: "Show Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
+                    icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
+                }
+
+                MenuItem2 {
+                    text: "Show Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
+                    icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
+                }
+
+                MenuItem2 {
+                    text: "Show Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
+                    icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
+                }
+
+                MenuItem2 {
+                    text: "Enable Tagging Of Scenes\t\t" +Scrite.app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
+                    icon.source: screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.allowTaggingOfScenes = !screenplayEditorSettings.allowTaggingOfScenes
+                }
+
+                MenuSeparator {  }
+
+                MenuItem2 {
+                    icon.source: "../icons/content/blank.png"
+                    text: "Scan For Mute Characters"
+                    onClicked: Scrite.document.structure.scanForMuteCharacters()
+                    enabled: !Scrite.document.readOnly && screenplayEditorSettings.displaySceneCharacters
+                }
+
+            }
+        }
+    }
+
+    ToolButton3 {
         iconSource: "../icons/navigation/refresh.png"
         shortcut: "F5"
         shortcutText: ""

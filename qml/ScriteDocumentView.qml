@@ -460,7 +460,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 5
-            visible: appToolBarArea.width >= 1200
+            visible: appToolBarArea.width >= 1295
             onVisibleChanged: {
                 if(enabled && !visible)
                     mainTabBar.activateTab(0)
@@ -1079,55 +1079,6 @@ Item {
                                 onActivated: Scrite.app.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
                             }
                         }
-
-                        MenuSeparator {
-
-                        }
-
-                        Menu2 {
-                            id: sceneCharactersMenu
-                            width: 400
-                            title: "Screenplay Options"
-
-                            MenuItem2 {
-                                icon.source: "../icons/content/blank.png"
-                                text: "Scan For Mute Characters"
-                                onClicked: Scrite.document.structure.scanForMuteCharacters()
-                                enabled: !Scrite.document.readOnly && screenplayEditorSettings.displaySceneCharacters
-                            }
-
-                            MenuSeparator {  }
-
-                            MenuItem2 {
-                                text: "Logline Editor"
-                                icon.source: screenplayEditorSettings.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                onTriggered: screenplayEditorSettings.showLoglineEditor = !screenplayEditorSettings.showLoglineEditor
-                            }
-
-                            MenuItem2 {
-                                text: "Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
-                                icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
-                            }
-
-                            MenuItem2 {
-                                text: "Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
-                                icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
-                            }
-
-                            MenuItem2 {
-                                text: "Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
-                                icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
-                            }
-
-                            MenuItem2 {
-                                text: "Enable Tagging Of Scenes\t" +Scrite.app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
-                                icon.source: screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                onTriggered: screenplayEditorSettings.allowTaggingOfScenes = !screenplayEditorSettings.allowTaggingOfScenes
-                            }
-                        }
                     }
                 }
             }
@@ -1512,7 +1463,7 @@ Item {
 
                         MenuItem2 {
                             text: "Help"
-                            onTriggered: helpButton.click()
+                            onTriggered: Qt.openUrlExternally(helpUrl)
                         }
                     }
                 }

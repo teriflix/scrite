@@ -57,8 +57,6 @@
         <file>icons/action/lock_outline_inverted.png</file>
         <file>icons/action/note_add.png</file>
         <file>icons/action/note_add_inverted.png</file>
-        <file>icons/action/preview.png</file>
-        <file>icons/action/preview_inverted.png</file>
         <file>icons/action/remove_all.png</file>
         <file>icons/action/remove_all_inverted.png</file>
         <file>icons/action/remove_one.png</file>
@@ -265,5 +263,7 @@
         <file>icons/action/logout.png</file>
         <file>icons/action/filter.png</file>
         <file>icons/action/filter_inverted.png</file>
+        <file>icons/content/view_options.png</file>
+        <file>icons/content/view_options_inverted.png</file>
     </qresource>
 </RCC>
