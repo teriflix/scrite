@@ -1807,6 +1807,8 @@ void Screenplay::setCurrentElementIndex(int val)
     if (m_currentElementIndex >= 0) {
         ScreenplayElement *element = m_elements.at(m_currentElementIndex);
         this->setActiveScene(element->scene());
+        if (!element->isSelected())
+            this->clearSelection();
     } else
         this->setActiveScene(nullptr);
 }
