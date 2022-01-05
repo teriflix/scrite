@@ -177,6 +177,7 @@ Menu2 {
                             onClicked: {
                                 sceneGroup.toggle(index)
                                 structureGroupsMenu.toggled(index, arrayItem.name)
+                                Scrite.user.logActivity2("structure", "tag: " + arrayItem.name)
                             }
                         }
                     }
