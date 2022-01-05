@@ -1531,6 +1531,7 @@ Item {
                 function activateTab(index) {
                     if(index < 0 || index >= tabs.length)
                         return
+                    globalScreenplayEditorToolbar.showScreenplayPreview = false
                     var tab = tabs[index]
                     if(!tab.visible)
                         index = 0
