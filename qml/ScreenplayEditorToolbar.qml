@@ -44,8 +44,8 @@ Row {
 
     ToolButton3 {
         id: screenplayPreviewButton
-        iconSource: "../icons/action/preview.png"
-        ToolTip.text: "Preview the screenplay in print format."
+        iconSource: "../icons/file/generate_pdf.png"
+        ToolTip.text: checked ? "Closes the PDF preview of the screenplay." : "Generates a PDF of the screenplay for preview."
         checkable: true
         checked: false
         enabled: screenplayTextDocument.editor
