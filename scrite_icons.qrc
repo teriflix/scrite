@@ -265,5 +265,7 @@
         <file>icons/action/filter_inverted.png</file>
         <file>icons/content/view_options.png</file>
         <file>icons/content/view_options_inverted.png</file>
+        <file>icons/content/stats.png</file>
+        <file>icons/content/stats_inverted.png</file>
     </qresource>
 </RCC>

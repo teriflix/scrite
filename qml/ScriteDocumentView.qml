@@ -389,7 +389,6 @@ Item {
 
     ScreenplayAdapter {
         id: screenplayAdapter
-        onSourceChanged: globalScreenplayEditorToolbar.showScreenplayPreview = false
         property string sessionId
         source: {
             if(Scrite.document.sessionId !== sessionId)
@@ -460,7 +459,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 5
-            visible: appToolBarArea.width >= 1295
+            visible: appToolBarArea.width >= 1280
             onVisibleChanged: {
                 if(enabled && !visible)
                     mainTabBar.activateTab(0)
@@ -1531,7 +1530,6 @@ Item {
                 function activateTab(index) {
                     if(index < 0 || index >= tabs.length)
                         return
-                    globalScreenplayEditorToolbar.showScreenplayPreview = false
                     var tab = tabs[index]
                     if(!tab.visible)
                         index = 0

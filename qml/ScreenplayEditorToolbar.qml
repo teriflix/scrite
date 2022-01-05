@@ -22,7 +22,6 @@ Row {
     id: screenplayEditorToolbar
     property SceneDocumentBinder binder
     property TextArea editor
-    property alias showScreenplayPreview: screenplayPreviewButton.checked
     property alias showFind: findButton.checked
     property bool showReplace: false
 
@@ -43,12 +42,36 @@ Row {
     spacing: documentUI.width >= 1440 ? 2 : 0
 
     ToolButton3 {
+        id: statsReportButton
+        iconSource: "../icons/content/stats.png"
+        ToolTip.text: "Generate statistics report."
+        checkable: false
+        checked: false
+        onClicked: Qt.callLater(generateStatsReport)
+        visible: documentUI.width >= 1400 || !appToolBar.visible
+
+        function generateStatsReport() {
+            modalDialog.closeable = false
+            modalDialog.arguments = "Statistics Report"
+            modalDialog.sourceComponent = reportGeneratorConfigurationComponent
+            modalDialog.popupSource = statsReportButton
+            modalDialog.active = true
+        }
+    }
+
+    ToolButton3 {
         id: screenplayPreviewButton
         iconSource: "../icons/file/generate_pdf.png"
-        ToolTip.text: checked ? "Closes the PDF preview of the screenplay." : "Generates a PDF of the screenplay for preview."
-        checkable: true
-        checked: false
-        enabled: screenplayTextDocument.editor
+        ToolTip.text: "Generates a PDF of the screenplay."
+        onClicked: Qt.callLater(generatePdf)
+
+        function generatePdf() {
+            modalDialog.closeable = false
+            modalDialog.arguments = "Screenplay/Adobe PDF"
+            modalDialog.sourceComponent = exporterConfigurationComponent
+            modalDialog.popupSource = screenplayPreviewButton
+            modalDialog.active = true
+        }
     }
 
     ToolButton3 {
@@ -58,7 +81,7 @@ Row {
         ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
         checked: false
-        enabled: !showScreenplayPreview && screenplayTextDocument.editor
+        enabled: screenplayTextDocument.editor
         onToggled: {
             if(!checked)
                 showReplace = false
@@ -80,7 +103,7 @@ Row {
                 showReplace = !showReplace
             }
         }
-        enabled: !showScreenplayPreview && screenplayTextDocument.editor
+        enabled: screenplayTextDocument.editor
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find & Replace"
@@ -108,6 +131,13 @@ Row {
                     text: "Show Logline Editor"
                     icon.source: screenplayEditorSettings.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: screenplayEditorSettings.showLoglineEditor = !screenplayEditorSettings.showLoglineEditor
+                }
+
+                MenuItem2 {
+                    text: "Show Scene Blocks"
+                    property bool sceneBlocksVisible: screenplayEditorSettings.spaceBetweenScenes > 0
+                    icon.source: sceneBlocksVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.spaceBetweenScenes = sceneBlocksVisible ? 0 : 40
                 }
 
                 MenuItem2 {
@@ -152,7 +182,7 @@ Row {
         shortcut: "F5"
         shortcutText: ""
         ToolTip.text: "Reloads formatting for this scene.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: binder && !showScreenplayPreview ? true : false
+        enabled: binder ? true : false
         onClicked: {
             var cp = editor.cursorPosition
             binder.preserveScrollAndReload()
@@ -169,7 +199,7 @@ Row {
         context: Qt.ApplicationShortcut
         sequence: "Shift+F5"
         onActivated: screenplayTextDocument.reload()
-        enabled: !showScreenplayPreview && screenplayTextDocument.editor
+        enabled: screenplayTextDocument.editor
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Redo Page Layout"
@@ -218,7 +248,7 @@ Row {
         shortcut: "Ctrl+Shift+P"
         shortcutText: ""
         ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview && !Scrite.document.readOnly
+        enabled: !Scrite.document.readOnly
         onClicked: addEpisode()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
@@ -239,7 +269,7 @@ Row {
         shortcut: "Ctrl+Shift+B"
         shortcutText: ""
         ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview && !Scrite.document.readOnly
+        enabled: !Scrite.document.readOnly
         onClicked: addAct()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Act Break" : "Insert Act Break"
@@ -258,7 +288,7 @@ Row {
         shortcut: "Ctrl+Shift+N"
         shortcutText: ""
         ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
-        enabled: !showScreenplayPreview && !Scrite.document.readOnly
+        enabled: !Scrite.document.readOnly
         onClicked: addScene()
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Create New Scene"
@@ -269,7 +299,7 @@ Row {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+L"
-        enabled: !showScreenplayPreview && !Scrite.document.readOnly
+        enabled: !Scrite.document.readOnly
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Interval Break" : "Insert Interval Break"
@@ -294,8 +324,6 @@ Row {
 
     property bool formattable: {
         if(Scrite.document.readOnly)
-            return false
-        if(showScreenplayPreview)
             return false
         if(!binder)
             return false

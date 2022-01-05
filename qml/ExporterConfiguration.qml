@@ -197,11 +197,23 @@ Item {
                 anchors.fill: parent
                 busyMessage: "Exporting to \"" + exporter.fileName + "\" ..."
 
+                FileManager {
+                    id: fileManager
+                }
+
                 onVisibleChanged: {
                     if(visible) {
                         Scrite.app.execLater(busyOverlay, 100, function() {
+                            const dlFileName = exporter.fileName
+                            const isPdfExport = exporter.format === "Screenplay/Adobe PDF"
+                            if(isPdfExport)
+                                exporter.fileName = fileManager.generateUniqueTemporaryFileName("pdf")
+
                             if(exporter.write()) {
-                                Scrite.app.revealFileOnDesktop(exporter.fileName)
+                                if(isPdfExport)
+                                    pdfViewer.show("Screenplay", exporter.fileName, dlFileName, 2)
+                                else
+                                    Scrite.app.revealFileOnDesktop(exporter.fileName)
                                 modalDialog.close()
                             } else
                                 busyOverlay.visible = false

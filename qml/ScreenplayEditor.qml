@@ -131,7 +131,6 @@ Rectangle {
             allowReplace: !Scrite.document.readOnly
             showReplace: globalScreenplayEditorToolbar.showReplace
             width: toolbar.width * 0.6
-            enabled: !screenplayPreview.active
             onShowReplaceRequest: globalScreenplayEditorToolbar.showReplace = flag
 
             Repeater {
@@ -207,7 +206,6 @@ Rectangle {
         anchors.right: parent.right
         anchors.bottom: statusBar.top
         clip: true
-        enabled: !screenplayPreview.active
 
         EventFilter.events: [31]
         EventFilter.onFilter: {
@@ -3277,56 +3275,6 @@ Rectangle {
                             sceneListView.model = screenplayAdapter
                         }, curIndex )
                     }
-                }
-            }
-        }
-    }
-
-    Loader {
-        id: screenplayPreview
-        visible: globalScreenplayEditorToolbar.showScreenplayPreview
-        active: globalScreenplayEditorToolbar.showScreenplayPreview
-        anchors.fill: parent
-        sourceComponent: PdfView {
-            id: pdfView
-            saveFileName: {
-                if(Scrite.document.fileName !== "")
-                    return Scrite.app.fileName(Scrite.document.fileName) + ".pdf"
-
-                if(Scrite.document.screenplay.title !== "")
-                    return Scrite.document.screenplay.title + ".pdf"
-
-                return "Untitled Screenplay.pdf"
-            }
-
-            BusyOverlay {
-                id: busyOverlay
-                anchors.fill: parent
-                busyMessage: "Generating PDF ..."
-                visible: true
-            }
-
-            FileManager {
-                id: fileManager
-            }
-
-            Timer {
-                interval: 50
-                repeat: false
-                running: true
-                onTriggered: {
-                    stop()
-
-                    const fileName = fileManager.generateUniqueTemporaryFileName("pdf");
-                    fileManager.addToAutoDeleteList(fileName)
-
-                    var exporter = Scrite.document.createExporter("Screenplay/Adobe PDF");
-                    exporter.fileName = fileName
-                    exporter.write()
-
-                    pdfView.pagesPerRow = pdfView.width > Screen.desktopAvailableWidth/2 ? 2 : 1
-                    pdfView.source = Scrite.app.localFileToUrl(fileName)
-                    busyOverlay.visible = false
                 }
             }
         }
