@@ -60,7 +60,10 @@ Item {
             property real maxPageScale: evaluatePageScale(0.5)
             onIdealPageScaleChanged: pageScaleSlider.value = idealPageScale
             onStatusChanged: Qt.callLater( function() {
-                pageScaleSlider.value = pdfDoc.evaluatePageScale(Math.min(pagesPerRow,pageCount))
+                if(pageCount === 1 && pagesPerRow > 1)
+                    pageScaleSlider.value = pdfView.height/maxPageHeight
+                else
+                    pageScaleSlider.value = pdfDoc.evaluatePageScale(Math.min(pagesPerRow,pageCount))
             })
 
             function evaluatePageScale(nrPages) {
@@ -192,7 +195,7 @@ Item {
         width: floatingButtonsRow.width + 10
         height: floatingButtonsRow.height + 20
         anchors.bottom: statusBar.top
-        anchors.bottomMargin: saveMenu.height + height/2
+        anchors.bottomMargin: height
         anchors.horizontalCenter: parent.horizontalCenter
 
         Row {
@@ -279,9 +282,10 @@ Item {
                 onClicked: saveMenu.open()
 
                 Item {
+                    anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    anchors.bottom: parent.bottom
+                    anchors.topMargin: -saveMenu.height
                     height: 1
 
                     FileDialog {
