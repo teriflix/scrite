@@ -1528,7 +1528,7 @@ Item {
                 }
 
                 function activateTab(index) {
-                    if(index < 0 || index >= tabs.length)
+                    if(index < 0 || index >= tabs.length || pdfViewer.active)
                         return
                     var tab = tabs[index]
                     if(!tab.visible)
@@ -1653,6 +1653,23 @@ Item {
         }
     }
 
+    Loader {
+        id: contentLoader
+        active: allowContent && !Scrite.document.loading
+        visible: !pdfViewer.active
+        sourceComponent: uiLayoutComponent
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
+        anchors.bottom: parent.bottom
+        onActiveChanged: {
+            globalScreenplayEditorToolbar.sceneEditor = null
+        }
+
+        property bool allowContent: true
+        property string sessionId
+    }
+
     Rectangle {
         id: pdfViewerToolBar
         anchors.left: parent.left
@@ -1679,23 +1696,6 @@ Item {
             color: primaryColors.borderColor
             anchors.bottom: parent.bottom
         }
-    }
-
-    Loader {
-        id: contentLoader
-        active: allowContent && !Scrite.document.loading
-        visible: !pdfViewer.active
-        sourceComponent: uiLayoutComponent
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
-        anchors.bottom: parent.bottom
-        onActiveChanged: {
-            globalScreenplayEditorToolbar.sceneEditor = null
-        }
-
-        property bool allowContent: true
-        property string sessionId
     }
 
     Loader {
@@ -1744,6 +1744,23 @@ Item {
             allowFileSave: true
             pagesPerRow: pdfViewer.pdfPagesPerRow
             allowFileReveal: false
+
+            Component.onCompleted: forceActiveFocus()
+
+            // While this PDF view is active, we don't want shortcuts to be
+            // processed by any other part of the application.
+            EventFilter.target: Scrite.app
+            EventFilter.events: [EventFilter.KeyPress,EventFilter.Shortcut,EventFilter.ShortcutOverride]
+            EventFilter.onFilter: (object,event,result) => {
+                                      result.filter = true
+                                      result.acceptEvent = true
+                                      if(event.type === EventFilter.KeyPress) {
+                                          if(event.key === Qt.Key_Escape) {
+                                              pdfViewer.active = false
+                                              return
+                                          }
+                                      }
+                                  }
 
             FileManager {
                 autoDeleteList: [pdfViewer.pdfFilePath]

@@ -210,6 +210,13 @@ inline void packIntoJson(QKeyEvent *event, QJsonObject &object)
     object.insert("altModifier", event->modifiers() & Qt::AltModifier ? true : false);
 }
 
+inline void packIntoJson(QShortcutEvent *event, QJsonObject &object)
+{
+    object.insert("isAmbiguous", event->isAmbiguous());
+    object.insert("key", event->key().toString());
+    object.insert("shortcutId", event->shortcutId());
+}
+
 inline void packIntoJson(QWheelEvent *event, QJsonObject &object)
 {
     auto pointToJson = [](const QPointF &pos) {
@@ -318,8 +325,12 @@ inline bool eventToJson(QEvent *event, QJsonObject &object)
     case QEvent::MouseMove:
         packIntoJson(static_cast<QMouseEvent *>(event), object);
         break;
+    case QEvent::Shortcut:
+        packIntoJson(static_cast<QShortcutEvent *>(event), object);
+        break;
     case QEvent::KeyPress:
     case QEvent::KeyRelease:
+    case QEvent::ShortcutOverride:
         packIntoJson(static_cast<QKeyEvent *>(event), object);
         break;
     case QEvent::Wheel:

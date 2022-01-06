@@ -96,6 +96,8 @@ public:
         MouseMove = QEvent::MouseMove,
         KeyPress = QEvent::KeyPress,
         KeyRelease = QEvent::KeyRelease,
+        Shortcut = QEvent::Shortcut,
+        ShortcutOverride = QEvent::ShortcutOverride,
         Wheel = QEvent::Wheel,
         HoverEnter = QEvent::HoverEnter,
         HoverLeave = QEvent::HoverLeave,
