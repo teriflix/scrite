@@ -44,7 +44,10 @@ Item {
             maximumLineCount: 2
             elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
-            Component.onCompleted: text = "Rename character: <b>" + Scrite.app.camelCased(character.name) + "</b>"
+            Component.onCompleted: {
+                busyOverlay.oldName = Scrite.app.camelCased(character.name)
+                text = "Rename character: <b>" + busyOverlay.oldName + "</b>"
+            }
         }
 
         TextField2 {
@@ -123,23 +126,16 @@ Item {
     }
 
 
-    Rectangle {
+    BusyOverlay {
         id: busyOverlay
         anchors.fill: parent
-        color: primaryColors.c200.background
-        opacity: 0.9
-        visible: false
-
-        Text {
-            width: parent.width
-            font.pointSize: Scrite.app.idealFontPointSize + 3
-            horizontalAlignment: Text.AlignHCenter
-            text: "Renaming ..."
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            color: primaryColors.c200.text
-            anchors.centerIn: parent
-            anchors.verticalCenterOffset: 20
+        property string oldName
+        property string newName
+        onVisibleChanged: {
+            if(visible)
+                newName = Scrite.app.camelCased(newNameField.text)
         }
+        busyMessage: "Renaming '" + oldName + "' to '<b>" + newName + "</b>' ..."
     }
 
     SequentialAnimation {

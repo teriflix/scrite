@@ -74,10 +74,10 @@ Item {
                 font.bold: true
                 font.pointSize: Scrite.app.idealFontPointSize+2
                 color: accentColors.highlight.text
-                leftPadding: (descriptionPosition === Item.Right ? descIcon.width : 0) + 5
-                rightPadding: (descriptionPosition === Item.Left ? descIcon.width : 0) + 5
-                topPadding: (descriptionPosition === Item.Bottom ? descIcon.width : 0) + 5
-                bottomPadding: (descriptionPosition === Item.Top ? descIcon.width : 0) + 5
+                leftPadding: (descriptionPosition === Item.Right ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
+                rightPadding: (descriptionPosition === Item.Left ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
+                topPadding: descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? descIcon.height : 10
+                bottomPadding: descriptionPosition === Item.Top || descriptionPosition === Item.Bottom ? descIcon.height : 10
 
                 Image {
                     id: descIcon
