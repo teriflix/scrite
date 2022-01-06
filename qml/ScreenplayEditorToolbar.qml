@@ -44,7 +44,7 @@ Row {
     ToolButton3 {
         id: statsReportButton
         iconSource: "../icons/content/stats.png"
-        ToolTip.text: "Generate statistics report."
+        ToolTip.text: "Generate Statistics Report"
         checkable: false
         checked: false
         onClicked: Qt.callLater(generateStatsReport)
@@ -62,7 +62,7 @@ Row {
     ToolButton3 {
         id: screenplayPreviewButton
         iconSource: "../icons/file/generate_pdf.png"
-        ToolTip.text: "Generates a PDF of the screenplay."
+        ToolTip.text: "Generate PDF Output"
         onClicked: Qt.callLater(generatePdf)
 
         function generatePdf() {

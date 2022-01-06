@@ -28,6 +28,7 @@ Item {
     width: 750
     height: formInfo.fields.length > 0 || (generator && !generator.featureEnabled) ? 720 : 275
     readonly property color dialogColor: primaryColors.c300.background
+    readonly property bool isPdfExport: generator ? generator.format === AbstractReportGenerator.AdobePDF : false
 
     Component.onCompleted: {
         modalDialog.closeOnEscape = false
@@ -309,7 +310,7 @@ Item {
             BusyOverlay {
                 id: busyOverlay
                 anchors.fill: parent
-                busyMessage: "Generating \"" + generator.fileName + "\" ..."
+                busyMessage: "Generating \"" + (isPdfExport ? generator.title : generator.fileName) + "\" ..."
 
                 FileManager {
                     id: fileManager
