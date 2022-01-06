@@ -27,10 +27,12 @@ Item {
     property alias pagesPerRow: pdfDoc.pagesPerRow
     property string saveFilePath
     property string saveFileName: Scrite.app.fileName( Scrite.app.urlToLocalFile(source) ) + ".pdf"
+    property bool closable: true
     property bool allowFileSave: true
     property bool allowFileReveal: false
     property bool displayRefreshButton: false
 
+    signal closeRequest()
     signal refreshRequest()
 
     function getRefreshButton() { return refreshButton }
@@ -177,13 +179,16 @@ Item {
         }
     }
 
+    BoxShadow {
+        anchors.fill: floatingToolBar
+    }
+
     Rectangle {
         id: floatingToolBar
-        radius: 8
-        color: accentColors.c900.background
+        color: primaryColors.c100.background
         border.width: 1
-        border.color: accentColors.c100.background
-        width: floatingButtonsRow.width + 30
+        border.color: primaryColors.c500.background
+        width: floatingButtonsRow.width + 10
         height: floatingButtonsRow.height + 20
         anchors.bottom: statusBar.top
         anchors.bottomMargin: height
@@ -192,34 +197,40 @@ Item {
         Row {
             id: floatingButtonsRow
             anchors.centerIn: parent
-            anchors.horizontalCenterOffset: 5
-            spacing: 20
 
-            Text {
-                text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
-                font.pointSize: Scrite.app.idealFontPointSize
+            ToolButton2 {
+                icon.source: "../icons/action/close.png"
+                ToolTip.text: "Closes the PDF View"
                 anchors.verticalCenter: parent.verticalCenter
-                color: accentColors.c900.text
+                onClicked: closeRequest()
+                visible: closable
             }
 
-            Rectangle {
-                width: 1
+            Item {
+                width: 12
                 height: parent.height
-                color: accentColors.c100.background
-                visible: pdfDoc.pageCount > 1
+                visible: closable && pdfDoc.pageCount > 1
+
+                Rectangle {
+                    width: 1
+                    height: parent.height
+                    anchors.left: parent.left
+                    color: primaryColors.c400.background
+                }
             }
 
             Text {
                 text: "View: "
                 font.pointSize: Scrite.app.idealFontPointSize
                 anchors.verticalCenter: parent.verticalCenter
-                color: accentColors.c900.text
+                color: primaryColors.c300.text
                 visible: pdfDoc.pageCount > 1
+                rightPadding: 10
             }
 
             ComboBox2 {
-                Material.foreground: accentColors.c500.text
-                Material.background: accentColors.c500.background
+                Material.foreground: primaryColors.c300.text
+                Material.background: primaryColors.c300.background
                 currentIndex: Math.max(pdfDoc.pagesPerRow-1,0)
                 visible: pdfDoc.pageCount > 1
                 model: {
@@ -236,16 +247,22 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
             }
 
-            Rectangle {
-                width: 1
+            Item {
+                width: 12
                 height: parent.height
-                color: accentColors.c100.background
-                visible: allowFileSave || allowFileReveal || displayRefreshButton
+                visible: pdfDoc.pageCount > 1 && (allowFileSave || allowFileReveal || displayRefreshButton)
+
+                Rectangle {
+                    width: 1
+                    height: parent.height
+                    anchors.right: parent.right
+                    color: primaryColors.c400.background
+                }
             }
 
             ToolButton2 {
                 visible: displayRefreshButton
-                icon.source: "../icons/navigation/refresh_inverted.png"
+                icon.source: "../icons/navigation/refresh.png"
                 ToolTip.text: "Refresh the stats displayed in this report."
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: refreshRequest()
@@ -253,7 +270,7 @@ Item {
 
             ToolButton2 {
                 visible: allowFileSave
-                icon.source: "../icons/file/file_download_inverted.png"
+                icon.source: "../icons/file/file_download.png"
                 ToolTip.text: "Save a copy of this PDF."
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: {
@@ -268,7 +285,7 @@ Item {
 
             ToolButton2 {
                 visible: allowFileReveal
-                icon.source: "../icons/file/folder_open_inverted.png"
+                icon.source: "../icons/file/folder_open.png"
                 ToolTip.text: "Reveal the location of this PDF on your computer."
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: Scrite.app.revealFileOnDesktop( Scrite.app.urlToLocalFile(pdfDoc.source) )
@@ -282,18 +299,27 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: 30
-        color: primaryColors.windowColor
+        color: primaryColors.c300.background
         border.width: 1
-        border.color: primaryColors.borderColor
+        border.color: primaryColors.c400.background
+
+        Text {
+            text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
+            font.pixelSize: statusBar.height * 0.5
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: 10
+            color: accentColors.c300.text
+        }
 
         ZoomSlider {
             id: pageScaleSlider
             from: pdfDoc.minPageScale
             to: pdfDoc.maxPageScale
             value: 1
+            height: parent.height-6
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            anchors.rightMargin: 20
         }
     }
 }

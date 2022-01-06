@@ -1658,33 +1658,26 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 53
-        color: accentColors.c900.background
-        border.width: 1
-        border.color: accentColors.c100.background
+        color: primaryColors.c50.background
         visible: pdfViewer.active
         enabled: visible && !notificationsView.visible
 
         Text {
             text: pdfViewer.pdfTitle
-            color: accentColors.c900.text
+            color: accentColors.c50.text
             elide: Text.ElideMiddle
             anchors.centerIn: parent
-            width: parent.width * 0.7
+            width: parent.width * 0.8
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: Scrite.app.idealFontPointSize + 2
             font.bold: true
         }
 
-        Button2 {
-            text: "Close"
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: Scrite.app.isMacOSPlatform ? undefined : parent.right
-            anchors.left: Scrite.app.isMacOSPlatform ? parent.left : undefined
-            anchors.rightMargin: 5
-            anchors.leftMargin: 5
-            onClicked: pdfViewer.active = false
-            Material.foreground: accentColors.c500.text
-            Material.background: accentColors.c500.background
+        Rectangle {
+            width: parent.width
+            height: 1
+            color: primaryColors.borderColor
+            anchors.bottom: parent.bottom
         }
     }
 
@@ -1755,6 +1748,8 @@ Item {
             FileManager {
                 autoDeleteList: [pdfViewer.pdfFilePath]
             }
+
+            onCloseRequest: pdfViewer.active = false
         }
     }
 

@@ -2980,6 +2980,7 @@ Rectangle {
 
         PdfView {
             id: storyStatsView
+            closable: false
             pagesPerRow: 1
             displayRefreshButton: true
 
