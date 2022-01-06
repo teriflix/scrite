@@ -68,13 +68,12 @@ bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement
 QString CharacterScreenplayReport::screenplaySubtitle() const
 {
     if (m_characterNames.isEmpty())
-        return QStringLiteral("Location Screenplay of: ALL CHARACTERS");
+        return QStringLiteral("Character Screenplay Of: ALL CHARACTERS");
 
-    const QString subtitle =
-            QStringLiteral("Character Screenplay Of: ") + m_characterNames.join(", ");
+    QString subtitle = m_characterNames.join(", ") + QStringLiteral(": Character Screenplay");
     if (subtitle.length() > 60)
-        return m_characterNames.first() + QStringLiteral(" and ")
-                + QString::number(m_characterNames.size() - 1)
+        return QStringLiteral("Character Screenplay of") + m_characterNames.first()
+                + QStringLiteral(" and ") + QString::number(m_characterNames.size() - 1)
                 + QStringLiteral(" other characters(s).");
 
     return subtitle;
