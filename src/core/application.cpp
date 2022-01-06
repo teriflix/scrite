@@ -1337,6 +1337,11 @@ QString Application::fileName(const QString &path)
     return QFileInfo(path).baseName();
 }
 
+QString Application::filePath(const QString &fileName)
+{
+    return QFileInfo(fileName).absolutePath();
+}
+
 QString Application::neighbouringFilePath(const QString &filePath, const QString &nfileName)
 {
     const QFileInfo fi(filePath);

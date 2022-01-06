@@ -13,6 +13,7 @@
 
 import QtQuick 2.15
 import QtQuick.Pdf 5.15
+import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
@@ -191,7 +192,7 @@ Item {
         width: floatingButtonsRow.width + 10
         height: floatingButtonsRow.height + 20
         anchors.bottom: statusBar.top
-        anchors.bottomMargin: height
+        anchors.bottomMargin: saveMenu.height + height/2
         anchors.horizontalCenter: parent.horizontalCenter
 
         Row {
@@ -263,21 +264,69 @@ Item {
             ToolButton2 {
                 visible: displayRefreshButton
                 icon.source: "../icons/navigation/refresh.png"
-                ToolTip.text: "Refresh the stats displayed in this report."
+                ToolTip.text: "Refresh"
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: refreshRequest()
             }
 
             ToolButton2 {
+                id: saveFileButton
                 visible: allowFileSave
                 icon.source: "../icons/file/file_download.png"
-                ToolTip.text: "Save a copy of this PDF."
+                ToolTip.text: "Save PDF"
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: {
-                    const filePath = saveFilePath === "" ?
-                                       (StandardPaths.writableLocation(StandardPaths.DownloadLocation) + "/" + saveFileName) :
-                                       saveFilePath
-                    const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), filePath)
+                down: saveMenu.visible
+                onClicked: saveMenu.open()
+
+                Item {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+                    height: 1
+
+                    FileDialog {
+                        id: folderPathDialog
+                        folder: Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DesktopLocation))
+                        selectFolder: true
+                        selectMultiple: false
+                        selectExisting: false
+                        onAccepted: saveFileButton.savePdf(Scrite.app.urlToLocalFile(folderPathDialog.folder))
+                    }
+
+                    Menu2 {
+                        id: saveMenu
+                        width: 325
+
+                        MenuItem2 {
+                            text: "To 'Downloads' folder"
+                            property string targetFolder: StandardPaths.writableLocation(StandardPaths.DownloadLocation)
+                            onClicked: saveFileButton.savePdf(targetFolder)
+                        }
+
+                        MenuItem2 {
+                            text: Scrite.document.fileName === "" ?
+                                  "To 'Desktop' folder" :
+                                  "To the Scrite document folder"
+                            property string targetFolder: Scrite.document.fileName === "" ? StandardPaths.writableLocation(StandardPaths.DesktopLocation) : Scrite.app.filePath(Scrite.document.fileName)
+                            onClicked: saveFileButton.savePdf(targetFolder)
+                        }
+
+                        MenuItem2 {
+                            text: "Other ..."
+                            onClicked: folderPathDialog.open()
+                        }
+                    }
+                }
+
+                function savePdf(folderPath) {
+                    var targetFilePath = ""
+                    if(saveFilePath !== "")
+                        targetFilePath = Scrite.app.fileName(saveFilePath) + ".pdf"
+                    else
+                        targetFilePath = saveFileName
+                    targetFilePath = folderPath + "/" + targetFilePath
+
+                    const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath)
                     if(downloadedFilePath !== "")
                         Scrite.app.revealFileOnDesktop(downloadedFilePath)
                 }

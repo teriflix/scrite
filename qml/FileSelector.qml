@@ -24,7 +24,6 @@ Item {
     property var selectedExtension
     property string filePathPrefix: "File will be saved as: "
     property alias nameFilters: folderPathDialog.nameFilters
-    property url folder
     property TabSequenceManager tabSequenceManager
 
     width: 400
@@ -44,9 +43,9 @@ Item {
         folder: {
             if(fileInfo.absolutePath !== "") {
                 if(fileInfo.exists)
-                    return "file:///" + fileInfo.absolutePath
+                    return Scrite.app.localFileToUrl(fileInfo.absolutePath)
             }
-            return fileSelector.folder
+            return Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadFolder))
         }
         onFolderChanged: fileSelector.folder = folder
         selectFolder: true

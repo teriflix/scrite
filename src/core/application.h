@@ -241,6 +241,7 @@ public:
     Q_INVOKABLE static bool writeToFile(const QString &fileName, const QString &fileContent);
     Q_INVOKABLE static QString fileContents(const QString &fileName);
     Q_INVOKABLE static QString fileName(const QString &path);
+    Q_INVOKABLE static QString filePath(const QString &fileName);
     Q_INVOKABLE static QString neighbouringFilePath(const QString &filePath,
                                                     const QString &nfileName);
 

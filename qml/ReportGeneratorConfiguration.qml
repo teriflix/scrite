@@ -202,7 +202,6 @@ Item {
                                         }
                                         onSelectedExtensionChanged: generator.format = selectedExtension.value
                                         onAbsoluteFilePathChanged: generator.fileName = absoluteFilePath
-                                        folder: StandardPaths.writableLocation(StandardPaths.DownloadsFolder)
                                     }
 
                                     Repeater {

@@ -99,7 +99,6 @@ Item {
                         absoluteFilePath: exporter.fileName
                         onAbsoluteFilePathChanged: exporter.fileName = absoluteFilePath
                         nameFilters: exporter.nameFilters
-                        folder: StandardPaths.writableLocation(StandardPaths.DownloadsFolder)
                         tabSequenceManager: tabSequence
                         visible: !isPdfExport
                         enabled: visible
