@@ -29,6 +29,7 @@ Item {
     property string description
     property int descriptionPosition: Item.Right
     property bool uiElementBoxVisible: false
+    property bool highlightAnimationEnabled: true
 
     signal done()
     signal scaleAnimationDone()
@@ -135,7 +136,7 @@ Item {
         NumberAnimation {
             target: uiElement
             property: "scale"
-            from: 1; to: 2
+            from: 1; to: highlightAnimationEnabled ? 2 : 1
             duration: 500
         }
 
@@ -146,7 +147,7 @@ Item {
         NumberAnimation {
             target: uiElement
             property: "scale"
-            from: 2; to: 1
+            from: highlightAnimationEnabled ? 2 : 1; to: 1
             duration: 500
         }
 

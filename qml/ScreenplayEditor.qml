@@ -577,6 +577,7 @@ Rectangle {
                                 uiElementBoxVisible: true
                                 descriptionPosition: Item.Bottom
                                 description: "Use these buttons to add new a scene, act or episode."
+                                highlightAnimationEnabled: false
                                 onDone: addButtonsAnimator.active = false
                                 Component.onCompleted: instanceSettings.screenplayEditorAddButtonsAnimationShown = true
                             }
