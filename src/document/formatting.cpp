@@ -2033,7 +2033,9 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
             script = chScript;
         }
 
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+        cursor.movePosition(QTextCursor::NextCharacter,
+                            ch.isSpace() || ch.isPunct() ? QTextCursor::MoveAnchor
+                                                         : QTextCursor::KeepAnchor);
     }
 
     applyFormatChanges(cursor, script);
