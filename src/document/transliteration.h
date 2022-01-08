@@ -76,14 +76,14 @@ public:
     Q_PROPERTY(QFont font READ font NOTIFY languageChanged)
     QFont font() const { return this->languageFont(m_language); }
 
-    Q_INVOKABLE QString shortcutLetter(Language val) const;
+    Q_INVOKABLE QString shortcutLetter(TransliterationEngine::Language val) const;
 
-    Q_INVOKABLE QJsonObject alphabetMappingsFor(Language val) const;
+    Q_INVOKABLE QJsonObject alphabetMappingsFor(TransliterationEngine::Language val) const;
 
     Q_INVOKABLE void cycleLanguage();
 
-    Q_INVOKABLE void markLanguage(Language language, bool active);
-    Q_INVOKABLE bool queryLanguage(Language language) const;
+    Q_INVOKABLE void markLanguage(TransliterationEngine::Language language, bool active);
+    Q_INVOKABLE bool queryLanguage(TransliterationEngine::Language language) const;
     QMap<Language, bool> activeLanguages() const { return m_activeLanguages; }
 
     Q_PROPERTY(QJsonArray languages READ languages NOTIFY languagesChanged)
@@ -93,11 +93,13 @@ public:
     Q_INVOKABLE QJsonArray getLanguages() const { return this->languages(); }
 
     void *transliterator() const;
-    static void *transliteratorFor(Language language);
+    static void *transliteratorFor(TransliterationEngine::Language language);
     static Language languageOf(void *transliterator);
 
-    Q_INVOKABLE void setTextInputSourceIdForLanguage(Language language, const QString &id);
-    Q_INVOKABLE QString textInputSourceIdForLanguage(Language language) const;
+    Q_INVOKABLE void setTextInputSourceIdForLanguage(TransliterationEngine::Language language,
+                                                     const QString &id);
+    Q_INVOKABLE QString
+    textInputSourceIdForLanguage(TransliterationEngine::Language language) const;
 
     Q_PROPERTY(QJsonObject languageTextInputSourceMap READ languageTextInputSourceMap NOTIFY languageTextInputSourceMapChanged)
     QJsonObject languageTextInputSourceMap() const;
@@ -106,29 +108,32 @@ public:
     Q_INVOKABLE QString transliteratedWord(const QString &word) const;
     Q_INVOKABLE QString transliteratedParagraph(const QString &paragraph,
                                                 bool includingLastWord = true) const;
-    Q_INVOKABLE QString transliteratedWordInLanguage(const QString &word, Language language) const;
+    Q_INVOKABLE QString transliteratedWordInLanguage(
+            const QString &word, TransliterationEngine::Language language) const;
 
     static QString transliteratedWord(const QString &word, void *transliterator);
     static QString transliteratedParagraph(const QString &paragraph, void *transliterator,
                                            bool includingLastWord = true);
 
-    Q_INVOKABLE QFont languageFont(Language language) const
+    Q_INVOKABLE QFont languageFont(TransliterationEngine::Language language) const
     {
         return this->languageFont(language, true);
     }
-    QFont languageFont(Language language, bool preferAppFonts) const;
-    QStringList languageFontFilePaths(Language language) const;
+    QFont languageFont(TransliterationEngine::Language language, bool preferAppFonts) const;
+    QStringList languageFontFilePaths(TransliterationEngine::Language language) const;
 
-    Q_INVOKABLE QJsonObject availableLanguageFontFamilies(Language language) const;
-    Q_INVOKABLE QString preferredFontFamilyForLanguage(Language language);
-    Q_INVOKABLE void setPreferredFontFamilyForLanguage(Language language,
+    Q_INVOKABLE QJsonObject
+    availableLanguageFontFamilies(TransliterationEngine::Language language) const;
+    Q_INVOKABLE QString preferredFontFamilyForLanguage(TransliterationEngine::Language language);
+    Q_INVOKABLE void setPreferredFontFamilyForLanguage(TransliterationEngine::Language language,
                                                        const QString &fontFamily);
-    Q_SIGNAL void preferredFontFamilyForLanguageChanged(Language language,
+    Q_SIGNAL void preferredFontFamilyForLanguageChanged(TransliterationEngine::Language language,
                                                         const QString &fontFamily);
 
     static Language languageForScript(QChar::Script script);
-    static QChar::Script scriptForLanguage(Language language);
-    static QFontDatabase::WritingSystem writingSystemForLanguage(Language language);
+    static QChar::Script scriptForLanguage(TransliterationEngine::Language language);
+    static QFontDatabase::WritingSystem
+    writingSystemForLanguage(TransliterationEngine::Language language);
 
     struct Boundary
     {
@@ -137,6 +142,7 @@ public:
         QFont font;
         QString string;
         TransliterationEngine::Language language = TransliterationEngine::English;
+        void evalStringLanguageAndFont(const QString &sourceText);
         void append(const QChar &ch, int pos);
         bool isEmpty() const;
     };

@@ -91,7 +91,7 @@ AppWindow::AppWindow()
 
     // Other inits
     this->setResizeMode(QQuickView::SizeRootObjectToView);
-    // qmlView.setTextRenderType(QQuickView::NativeTextRendering);
+    // this->setTextRenderType(QQuickView::NativeTextRendering);
     Automation::init(this);
 
     // Register image providers

@@ -32,6 +32,7 @@
 #include <QtConcurrentRun>
 #include <QQuickTextDocument>
 #include <QAbstractTextDocumentLayout>
+#include <QTextBoundaryFinder>
 
 #include <PhTranslateLib>
 
@@ -732,6 +733,27 @@ TransliterationEngine::writingSystemForLanguage(TransliterationEngine::Language 
     return languageWritingSystemMap.value(language);
 }
 
+void TransliterationEngine::Boundary::evalStringLanguageAndFont(const QString &sourceText)
+{
+    if (this->isEmpty())
+        return;
+
+    auto determineScript = [](const QString &val) -> QChar::Script {
+        for (int i = 0; i < val.length(); i++) {
+            const QChar ch = val.at(i);
+            if (ch.script() == QChar::Script_Common || ch.script() == QChar::Script_Inherited)
+                continue;
+            return ch.script();
+        }
+        QChar::Script_Latin;
+    };
+
+    this->string = sourceText.mid(this->start, (this->end - this->start + 1));
+    this->language =
+            TransliterationEngine::instance()->languageForScript(determineScript(this->string));
+    this->font = TransliterationEngine::instance()->languageFont(this->language);
+}
+
 void TransliterationEngine::Boundary::append(const QChar &ch, int pos)
 {
     string += ch;
@@ -742,60 +764,71 @@ void TransliterationEngine::Boundary::append(const QChar &ch, int pos)
 
 bool TransliterationEngine::Boundary::isEmpty() const
 {
-    return end < 0 || start < 0 || start == end;
+    return end < 0 || start < 0 || (end - start + 1) == 0;
 }
 
 QList<TransliterationEngine::Boundary>
-TransliterationEngine::evaluateBoundaries(const QString &text, bool bundleCommonScriptChars) const
+TransliterationEngine::evaluateBoundaries(const QString &text,
+                                          bool /*bundleCommonScriptChars*/) const
 {
     QList<Boundary> ret;
     if (text.isEmpty())
         return ret;
 
-    bool lettersStarted = false;
-    QChar::Script script = QChar::Script_Latin;
-
-    Boundary item;
-    auto captureBoundary = [&ret, this](Boundary &item, QChar::Script script) {
-        if (!item.string.isEmpty()) {
-            item.language = languageForScript(script);
-            item.font = this->languageFont(item.language);
-            ret.append(item);
-        }
-
-        item = Boundary();
-    };
-
-    for (int index = 0; index < text.length(); index++) {
-        const QChar ch = text.at(index);
-        if (!lettersStarted) {
-            item.append(ch, index);
-
-            if (ch.isLetterOrNumber()) {
-                lettersStarted = true;
-                script = ch.script();
+    QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Word, text);
+    while (boundaryFinder.position() < text.length()) {
+        if (!(boundaryFinder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem))) {
+            if (boundaryFinder.toNextBoundary() == -1) {
+                break;
             }
-
             continue;
         }
 
-        //        const bool isSplChar = ch.isSpace() || ch.isDigit() || ch.isPunct() ||
-        //        ch.category() == QChar::Separator_Line; if(isSplChar)
-        //            script = QChar::Script_Latin;
+        Boundary item;
+        item.start = boundaryFinder.position();
+        item.end = boundaryFinder.toNextBoundary();
+        if (item.end < 0)
+            item.end = text.length() - 1;
 
-        if (ch.script() == script
-            || (bundleCommonScriptChars && ch.script() == QChar::Script_Common)) {
-            item.append(ch, index);
+        if (item.isEmpty())
             continue;
+
+        item.evalStringLanguageAndFont(text);
+
+        if (ret.isEmpty()) {
+            ret.append(item);
+        } else {
+            // If this new boundary item and the immediate previous one are of the same language,
+            // then we can combine them into a single boundary.
+            if (ret.last().language == item.language) {
+                ret.last().end = item.end;
+                ret.last().string += item.string;
+            }
         }
-
-        captureBoundary(item, script);
-
-        script = ch.script();
-        item.append(ch, index);
     }
 
-    captureBoundary(item, script);
+    if (ret.isEmpty()) {
+        Boundary item;
+        item.start = 0;
+        item.end = text.length() - 1;
+        if (!item.isEmpty()) {
+            item.evalStringLanguageAndFont(text);
+            ret.append(item);
+        }
+    } else if (ret.last().end < text.length() - 1) {
+        Boundary item;
+        item.start = ret.last().end + 1;
+        item.end = text.length() - 1;
+        if (!item.isEmpty()) {
+            item.evalStringLanguageAndFont(text);
+            if (ret.last().language == item.language) {
+                ret.last().end = item.end;
+                ret.last().string += item.string;
+            } else {
+                ret.append(item);
+            }
+        }
+    }
 
     return ret;
 }
