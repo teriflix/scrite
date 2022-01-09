@@ -569,17 +569,7 @@ void StatisticsReport::prepareTextDocument()
     };
 
     auto polishFontsAndInsertTextAtCursor = [](QTextCursor &cursor, const QString &text) {
-        const QList<TransliterationEngine::Boundary> items =
-                TransliterationEngine::instance()->evaluateBoundaries(text);
-        for (const TransliterationEngine::Boundary &item : items) {
-            if (item.string.isEmpty())
-                continue;
-            const QFont font = TransliterationEngine::instance()->languageFont(item.language);
-            QTextCharFormat format;
-            format.setFontFamily(font.family());
-            cursor.mergeCharFormat(format);
-            cursor.insertText(item.string);
-        }
+        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, text);
     };
 
     const int nrElements = screenplay->elementCount();

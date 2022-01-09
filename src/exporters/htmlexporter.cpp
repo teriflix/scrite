@@ -213,6 +213,7 @@ bool HtmlExporter::doExport(QIODevice *device)
                                                               const QString &text) {
         const QString styleName = "scrite-" + typeStringMap.value(type);
         ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\">";
+
         const QList<TransliterationEngine::Boundary> breakup =
                 TransliterationEngine::instance()->evaluateBoundaries(text);
         for (const TransliterationEngine::Boundary &item : breakup) {

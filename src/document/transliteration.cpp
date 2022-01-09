@@ -794,17 +794,7 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
             continue;
 
         item.evalStringLanguageAndFont(text);
-
-        if (ret.isEmpty()) {
-            ret.append(item);
-        } else {
-            // If this new boundary item and the immediate previous one are of the same language,
-            // then we can combine them into a single boundary.
-            if (ret.last().language == item.language) {
-                ret.last().end = item.end;
-                ret.last().string += item.string;
-            }
-        }
+        ret.append(item);
     }
 
     if (ret.isEmpty()) {
@@ -815,34 +805,50 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
             item.evalStringLanguageAndFont(text);
             ret.append(item);
         }
-    } else {
-        if (ret.first().start > 0) {
-            Boundary firstItem;
-            firstItem.start = 0;
-            firstItem.end = ret.first().start - 1;
-            if (!firstItem.isEmpty()) {
-                firstItem.evalStringLanguageAndFont(text);
-                if (ret.first().language == firstItem.language) {
-                    ret.first().start = 0;
-                    ret.first().string = firstItem.string + ret.first().string;
-                } else {
-                    ret.prepend(firstItem);
-                }
+
+        return ret;
+    }
+
+    if (ret.first().start > 0) {
+        Boundary firstItem;
+        firstItem.start = 0;
+        firstItem.end = ret.first().start - 1;
+        if (!firstItem.isEmpty()) {
+            firstItem.evalStringLanguageAndFont(text);
+            ret.prepend(firstItem);
+        }
+    }
+
+    if (ret.last().end < text.length() - 1) {
+        Boundary lastItem;
+        lastItem.start = ret.last().end + 1;
+        lastItem.end = text.length() - 1;
+        if (!lastItem.isEmpty()) {
+            lastItem.evalStringLanguageAndFont(text);
+            ret.append(lastItem);
+        }
+    }
+
+    if (ret.size() >= 2) {
+        for (int i = ret.size() - 2; i >= 0; i--) {
+            const Boundary left = ret.at(i);
+            const Boundary right = ret.at(i + 1);
+            if (left.end + 1 != right.start) {
+                Boundary inbetween;
+                inbetween.start = left.end + 1;
+                inbetween.end = right.start - 1;
+                inbetween.evalStringLanguageAndFont(text);
+                ret.insert(i + 1, inbetween);
             }
         }
 
-        if (ret.last().end < text.length() - 1) {
-            Boundary lastItem;
-            lastItem.start = ret.last().end + 1;
-            lastItem.end = text.length() - 1;
-            if (!lastItem.isEmpty()) {
-                lastItem.evalStringLanguageAndFont(text);
-                if (ret.last().language == lastItem.language) {
-                    ret.last().end = lastItem.end;
-                    ret.last().string += lastItem.string;
-                } else {
-                    ret.append(lastItem);
-                }
+        for (int i = ret.size() - 2; i >= 0; i--) {
+            Boundary &left = ret[i];
+            const Boundary right = ret.at(i + 1);
+            if (left.language == right.language) {
+                left.end = right.end;
+                left.string += right.string;
+                ret.removeAt(i + 1);
             }
         }
     }
@@ -857,22 +863,18 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
     cursor.insertText(text);
     const int endPosition = cursor.position();
 
-    cursor.setPosition(beginPosition);
-
     const QList<TransliterationEngine::Boundary> items = this->evaluateBoundaries(text);
     for (const TransliterationEngine::Boundary &item : items) {
         if (item.isEmpty())
-            return;
+            continue;
 
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, item.start);
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
-                            item.end - item.start + 1);
+        cursor.setPosition(beginPosition + item.start);
+        cursor.setPosition(beginPosition + item.end, QTextCursor::KeepAnchor);
 
         QTextCharFormat format;
         format.setFontFamily(item.font.family());
         cursor.mergeCharFormat(format);
         cursor.clearSelection();
-        cursor.setPosition(beginPosition);
     }
 
     cursor.setPosition(endPosition);

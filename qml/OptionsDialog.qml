@@ -100,7 +100,6 @@ Item {
                 return coreSettingsComponent
             }
             pageContentSpacing: 0
-
             cornerContent: currentIndex === 1 ? fontSettingsCornerComponent : null
         }
     }
@@ -404,7 +403,7 @@ Item {
             Text {
                 id: fontSettingsTip
                 width: parent.width-20
-                anchors.bottom: parent.bottom
+                anchors.bottom: fontSettingsComboBox.top
                 anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pointSize: Scrite.app.idealFontPointSize-2
@@ -412,7 +411,11 @@ Item {
                 wrapMode: Text.WordWrap
                 color: primaryColors.c100.background
                 property string englishFontFamily: Scrite.app.transliterationEngine.languageFont(TransliterationEngine.English).family
-                text: "For display, only '" + englishFontFamily + "' will be used. Custom fonts for languages are used only in exported PDF & HTML files. In a future update we will address this limitation."
+                text: {
+                    if(screenplayEditorSettings.applyLanguageFonts)
+                        return "Custom fonts are used for both display and in PDF & HTML. If you are facing display issues with fonts, then we recommend that you change this setting."
+                    return "For display, only '" + englishFontFamily + "' will be used. Custom fonts for languages are used only in exported PDF & HTML files."
+                }
 
                 Announcement.onIncoming: (type,data) => {
                                              const stype = "" + type
@@ -421,6 +424,19 @@ Item {
                                                  fontSettingsTip.englishFontFamily = sdata
                                              }
                                          }
+            }
+
+            ComboBox2 {
+                id: fontSettingsComboBox
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width-20
+                model: ["PDF, HTML Only", "Display, PDF, HTML"]
+                currentIndex: screenplayEditorSettings.applyLanguageFonts ? 1 : 0
+                onActivated: (index) => {
+                                 screenplayEditorSettings.applyLanguageFonts = (index === 1)
+                             }
             }
         }
     }
