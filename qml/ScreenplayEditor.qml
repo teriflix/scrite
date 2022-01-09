@@ -1448,7 +1448,7 @@ Rectangle {
                             item.editSceneNumber()
                     }
 
-                    Announcement.onIncoming: {
+                    Announcement.onIncoming: (type,data) => {
                         if(!sceneTextEditor.activeFocus)
                             return
                         var stype = "" + type
@@ -1524,7 +1524,7 @@ Rectangle {
                                 sceneTextEditor.forceActiveFocus()
                             }
 
-                            Announcement.onIncoming: {
+                            Announcement.onIncoming: (type,data) => {
                                 if(!sceneTextEditor.activeFocus || !screenplayEditorSettings.displaySceneSynopsis)
                                     return
                                 var sdata = "" + data
@@ -2751,7 +2751,7 @@ Rectangle {
                     active: screenplayEditorSettings.displaySceneCharacters && allow
                     sourceComponent: sceneCharactersList
 
-                    Announcement.onIncoming: {
+                    Announcement.onIncoming: (type,data) => {
                         var stype = "" + type
                         var sdata = "" + data
                         if(stype === "E69D2EA0-D26D-4C60-B551-FD3B45C5BE60" && sdata === headingItem.theScene.id) {
@@ -2945,7 +2945,7 @@ Rectangle {
                     onClicked: newCharacterInput.active = true
                 }
 
-                Announcement.onIncoming: {
+                Announcement.onIncoming: (type,data) => {
                     if(!editorHasActiveFocus)
                         return
 

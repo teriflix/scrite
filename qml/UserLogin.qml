@@ -90,7 +90,7 @@ Item {
         modalDialog.active = true
     }
 
-    Announcement.onIncoming: {
+    Announcement.onIncoming: (type,data) => {
         var stype = "" + type
         if(stype === "97369507-721E-4A7F-886C-4CE09A5BCCFB") {
             modalDialog.sourceComponent = loginWizard
@@ -147,7 +147,7 @@ Item {
 
                 Component.onCompleted: page = Scrite.user.busy ? e_BUSY_PAGE : (Scrite.user.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
 
-                Announcement.onIncoming: {
+                Announcement.onIncoming: (type,data) => {
                     const stype = "" + type
                     const idata = data
                     if(stype === "93DC1133-58CA-4EDD-B803-82D9B6F2AA50")

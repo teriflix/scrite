@@ -544,7 +544,7 @@ void User::reload()
 void User::logout()
 {
     ScriteDocument *document = ScriteDocument::instance();
-    if (document && document->isModified()) {
+    if (document && document->isModified() && !document->isEmpty()) {
         m_errorReport->setErrorMessage(QStringLiteral(
                 "Current document is not saved. Please save the document before logging out."));
         return;

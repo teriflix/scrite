@@ -202,7 +202,7 @@ Rectangle {
                 suggestedHeight: toolButtonSize
                 property int crGraphViewCount: 0
                 enabled: crGraphViewCount > 0
-                Announcement.onIncoming: {
+                Announcement.onIncoming: (type,data) => {
                     const stype = ""+type
                     const idata = 0+data
                     if(stype === "4D37E093-1F58-4978-8060-CD6B9AD4E03C")
@@ -1099,7 +1099,7 @@ Rectangle {
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
                         Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
 
-                        Announcement.onIncoming: {
+                        Announcement.onIncoming: (type,data) => {
                             const stype = ""+type
                             const sdata = ""+data
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
@@ -2041,7 +2041,7 @@ Rectangle {
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
                         Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
 
-                        Announcement.onIncoming: {
+                        Announcement.onIncoming: (type,data) => {
                             const stype = "" + type
                             const sdata = "" + data
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
@@ -2621,7 +2621,7 @@ Rectangle {
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
                         Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
 
-                        Announcement.onIncoming: {
+                        Announcement.onIncoming: (type,data) => {
                             const stype = "" + type
                             const sdata = "" + data
                             if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {

@@ -1047,7 +1047,7 @@ Item {
                             text: "About"
                             onClicked: showAboutDialog()
 
-                            Announcement.onIncoming: {
+                            Announcement.onIncoming: (type,data) => {
                                 const stype = "" + type
                                 const idata = data
                                 if(stype === "72892ED6-BA58-47EC-B045-E92D9EC1C47A") {
@@ -1932,7 +1932,7 @@ Item {
                             anchors.fill: parent
                             property int currentTabIndex: 0
 
-                            Announcement.onIncoming: {
+                            Announcement.onIncoming: (type,data) => {
                                 var sdata = "" + data
                                 var stype = "" + type
                                 if(showNotebookInStructure) {
@@ -2268,7 +2268,7 @@ Item {
         Loader {
             active: notebookAppFeature.enabled
             sourceComponent: NotebookView {
-                Announcement.onIncoming: {
+                Announcement.onIncoming: (type,data) => {
                     var stype = "" + "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
                     var sdata = "" + data
                     if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C")

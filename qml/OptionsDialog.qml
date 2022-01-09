@@ -402,6 +402,7 @@ Item {
         Item {
 
             Text {
+                id: fontSettingsTip
                 width: parent.width-20
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 20
@@ -410,7 +411,16 @@ Item {
                 horizontalAlignment: Text.AlignLeft
                 wrapMode: Text.WordWrap
                 color: primaryColors.c100.background
-                text: "Custom fonts for languages are used only in exported PDF & HTML files. In a future update we will address this limitation."
+                property string englishFontFamily: Scrite.app.transliterationEngine.languageFont(TransliterationEngine.English).family
+                text: "For display, only '" + englishFontFamily + "' will be used. Custom fonts for languages are used only in exported PDF & HTML files. In a future update we will address this limitation."
+
+                Announcement.onIncoming: (type,data) => {
+                                             const stype = "" + type
+                                             const sdata = "" + data
+                                             if(stype === "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1") {
+                                                 fontSettingsTip.englishFontFamily = sdata
+                                             }
+                                         }
             }
         }
     }
@@ -430,6 +440,7 @@ Item {
                 model: Scrite.app.enumerationModelForType("TransliterationEngine", "Language")
 
                 Row {
+                    readonly property int languageIndex: index
                     spacing: 10
                     width: parent.width - 20
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -453,6 +464,8 @@ Item {
                             var family = fontFamilies.families[index]
                             Scrite.app.transliterationEngine.setPreferredFontFamilyForLanguage(modelData.value, family)
                             previewText.font.family = family
+                            if(languageIndex === 0)
+                                Announcement.shout("763E8FAD-8681-4F64-B574-F9BB7CF8A7F1", family)
                         }
                     }
 
