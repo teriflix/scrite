@@ -100,6 +100,8 @@ Item {
                 return coreSettingsComponent
             }
             pageContentSpacing: 0
+
+            cornerContent: currentIndex === 1 ? fontSettingsCornerComponent : null
         }
     }
 
@@ -395,26 +397,32 @@ Item {
     }
 
     Component {
+        id: fontSettingsCornerComponent
+
+        Item {
+
+            Text {
+                width: parent.width-20
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                font.pointSize: Scrite.app.idealFontPointSize-2
+                horizontalAlignment: Text.AlignLeft
+                wrapMode: Text.WordWrap
+                color: primaryColors.c100.background
+                text: "Custom fonts for languages are used only in exported PDF & HTML files. In a future update we will address this limitation."
+            }
+        }
+    }
+
+    Component {
         id: fontSettingsComponent
 
         Column {
             id: fontSettingsUi
             spacing: 10
 
-            readonly property var languagePreviewString: [
-                "Greetings",
-                "বাংলা",
-                "ગુજરાતી",
-                "हिन्दी",
-                "ಕನ್ನಡ",
-                "മലയാളം",
-                "मराठी",
-                "ଓଡିଆ",
-                "ਪੰਜਾਬੀ",
-                "संस्कृत",
-                "தமிழ்",
-                "తెలుగు"
-            ]
+            readonly property var languagePreviewString: [ "Greetings", "বাংলা", "ગુજરાતી", "हिन्दी", "ಕನ್ನಡ", "മലയാളം", "मराठी", "ଓଡିଆ", "ਪੰਜਾਬੀ", "संस्कृत", "தமிழ்", "తెలుగు" ]
 
             Item { width: parent.width; height: 20 }
 

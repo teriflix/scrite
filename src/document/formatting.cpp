@@ -1134,10 +1134,12 @@ public:
     void setHadMisspelledFragments(bool val) { m_hadMisspelledFragments = val; }
     bool hadMisspelledFragments() const { return m_hadMisspelledFragments; }
 
+#if 0
     // By keeping track of text that we have already highlighted, we can
     // simply highlight the delta-text in a highlightBlock() call.
     void setHighlightedText(const QString &text) { m_highlightedText = text; }
     QString highlightedText() const { return m_highlightedText; }
+#endif
 
     void setTransliteratedSegment(int start, int end, TransliterationEngine::Language language)
     {
@@ -1959,6 +1961,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
         emit spellingMistakesDetected();
     }
 
+#if 0
     /**
      * Here we apply font different languages.
      */
@@ -2039,6 +2042,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     }
 
     applyFormatChanges(cursor, script);
+#endif
 
     if (m_currentElement == element)
         emit currentFontChanged();

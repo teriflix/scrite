@@ -815,17 +815,34 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
             item.evalStringLanguageAndFont(text);
             ret.append(item);
         }
-    } else if (ret.last().end < text.length() - 1) {
-        Boundary item;
-        item.start = ret.last().end + 1;
-        item.end = text.length() - 1;
-        if (!item.isEmpty()) {
-            item.evalStringLanguageAndFont(text);
-            if (ret.last().language == item.language) {
-                ret.last().end = item.end;
-                ret.last().string += item.string;
-            } else {
-                ret.append(item);
+    } else {
+        if (ret.first().start > 0) {
+            Boundary firstItem;
+            firstItem.start = 0;
+            firstItem.end = ret.first().start - 1;
+            if (!firstItem.isEmpty()) {
+                firstItem.evalStringLanguageAndFont(text);
+                if (ret.first().language == firstItem.language) {
+                    ret.first().start = 0;
+                    ret.first().string = firstItem.string + ret.first().string;
+                } else {
+                    ret.prepend(firstItem);
+                }
+            }
+        }
+
+        if (ret.last().end < text.length() - 1) {
+            Boundary lastItem;
+            lastItem.start = ret.last().end + 1;
+            lastItem.end = text.length() - 1;
+            if (!lastItem.isEmpty()) {
+                lastItem.evalStringLanguageAndFont(text);
+                if (ret.last().language == lastItem.language) {
+                    ret.last().end = lastItem.end;
+                    ret.last().string += lastItem.string;
+                } else {
+                    ret.append(lastItem);
+                }
             }
         }
     }
@@ -836,45 +853,29 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
 void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
                                                             const QString &text) const
 {
-    const QTextCharFormat givenFormat = cursor.charFormat();
-    const int givenPosition = cursor.position();
-
+    const int beginPosition = cursor.position();
     cursor.insertText(text);
-    cursor.setPosition(qMax(givenPosition, 0));
+    const int endPosition = cursor.position();
 
-    auto applyFormatChanges = [this](QTextCursor &cursor, QChar::Script script) {
-        if (cursor.hasSelection()) {
-            TransliterationEngine::Language language = this->languageForScript(script);
-            const QFont font = this->languageFont(language);
+    cursor.setPosition(beginPosition);
 
-            QTextCharFormat format;
-            format.setFontFamily(font.family());
-            // format.setForeground(script == QChar::Script_Latin ? Qt::black : Qt::red);
-            cursor.mergeCharFormat(format);
-            cursor.clearSelection();
-        }
-    };
+    const QList<TransliterationEngine::Boundary> items = this->evaluateBoundaries(text);
+    for (const TransliterationEngine::Boundary &item : items) {
+        if (item.isEmpty())
+            return;
 
-    auto isEnglishChar = [](const QChar &ch) {
-        return ch.isSpace() || ch.isDigit() || ch.isPunct()
-                || ch.category() == QChar::Separator_Line || ch.script() == QChar::Script_Latin;
-    };
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor, item.start);
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                            item.end - item.start + 1);
 
-    QChar::Script script = QChar::Script_Unknown;
-
-    while (!cursor.atBlockEnd()) {
-        const int index = cursor.position() - givenPosition;
-        const QChar ch = text.at(index);
-        const QChar::Script chScript = isEnglishChar(ch) ? QChar::Script_Latin : ch.script();
-        if (script != chScript) {
-            applyFormatChanges(cursor, script);
-            script = chScript;
-        }
-
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+        QTextCharFormat format;
+        format.setFontFamily(item.font.family());
+        cursor.mergeCharFormat(format);
+        cursor.clearSelection();
+        cursor.setPosition(beginPosition);
     }
 
-    applyFormatChanges(cursor, script);
+    cursor.setPosition(endPosition);
 }
 
 QString TransliterationEngine::formattedHtmlOf(const QString &text) const

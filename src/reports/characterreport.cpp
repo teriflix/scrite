@@ -99,10 +99,13 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
         QString title = screenplay->title();
         if (title.isEmpty())
             title = "Untitled Screenplay";
-        cursor.insertText(title);
+        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, title);
+        // cursor.insertText(title);
         if (!screenplay->subtitle().isEmpty()) {
             cursor.insertBlock();
-            cursor.insertText(screenplay->subtitle());
+            // cursor.insertText(screenplay->subtitle());
+            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                    cursor, screenplay->subtitle());
         }
 
         blockFormat.setBottomMargin(20);
@@ -154,7 +157,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             charFormat.setFontWeight(QFont::Bold);
 
             cursor.insertBlock(blockFormat, charFormat);
-            cursor.insertText(characterName);
+            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor,
+                                                                               characterName);
 
             charFormat.setFontWeight(QFont::Normal);
             cursor.setCharFormat(charFormat);
@@ -187,7 +191,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 charFormat.setFontWeight(QFont::Bold);
 
                 cursor.insertBlock(blockFormat, charFormat);
-                cursor.insertText(heading);
+                // cursor.insertText(heading);
+                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, heading);
 
                 charFormat.setFontPointSize(charFormat.fontPointSize() - 2);
                 charFormat.setFontUnderline(false);
@@ -199,7 +204,9 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 charFormat.setFontWeight(QFont::Normal);
                 cursor.insertBlock(blockFormat, charFormat);
 
-                cursor.insertText(note->content().toString());
+                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                        cursor, note->content().toString());
+                // cursor.insertText(note->content().toString());
                 if (note->type() == Note::FormNoteType) {
                     Form *form = note->form();
                     if (form != nullptr) {
@@ -208,10 +215,14 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                             charFormat.setFontWeight(QFont::Bold);
                             cursor.insertBlock(blockFormat, charFormat);
                             cursor.insertBlock();
-                            cursor.insertText(q->questionText());
+                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                                    cursor, q->questionText());
+                            // cursor.insertText(q->questionText());
                             charFormat.setFontWeight(QFont::Normal);
                             cursor.insertBlock(blockFormat, charFormat);
-                            cursor.insertText(note->getFormData(q->id()).toString());
+                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                                    cursor, note->getFormData(q->id()).toString());
+                            // cursor.insertText(note->getFormData(q->id()).toString());
                         }
                     }
                 }
@@ -316,7 +327,9 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                                              .firstCursorPosition();
                             cursor.setCharFormat(charFormat);
                             cursor.setBlockFormat(blockFormat);
-                            cursor.insertText(characterName);
+                            // cursor.insertText(characterName);
+                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                                    cursor, characterName);
 
                             cursor = dialogueTable->cellAt(dialogueTable->rows() - 1, 1)
                                              .firstCursorPosition();
@@ -367,7 +380,9 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                     QTextCharFormat charFormat = defaultCharFormat;
 
                     cursor.insertBlock(blockFormat, charFormat);
-                    cursor.insertText(characterName + " is in this scene.");
+                    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                            cursor, characterName + " is in this scene.");
+                    // cursor.insertText(characterName + " is in this scene.");
                 }
             }
 
@@ -406,7 +421,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             charFormat.setFontCapitalization(QFont::AllUppercase);
 
             cursor.insertBlock(blockFormat, charFormat);
-            cursor.insertText(it.key());
+            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, it.key());
+            // cursor.insertText(it.key());
 
             charFormat = defaultCharFormat;
             cursor.setCharFormat(charFormat);

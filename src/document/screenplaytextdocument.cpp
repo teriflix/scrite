@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-// #define DISPLAY_DOCUMENT_IN_TEXTEDIT
+//#define DISPLAY_DOCUMENT_IN_TEXTEDIT
 
 #include "hourglass.h"
 #include "application.h"
@@ -1061,18 +1061,7 @@ void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
 
 inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
 {
-    const QList<TransliterationEngine::Boundary> items =
-            TransliterationEngine::instance()->evaluateBoundaries(text);
-    for (const TransliterationEngine::Boundary &item : items) {
-        if (item.string.isEmpty())
-            continue;
-
-        const QFont font = TransliterationEngine::instance()->languageFont(item.language);
-        QTextCharFormat format;
-        format.setFontFamily(font.family());
-        cursor.mergeCharFormat(format);
-        cursor.insertText(item.string);
-    }
+    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, text);
 };
 
 #ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
@@ -2399,14 +2388,20 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
 
-            const QString headingText =
-                    heading->isEnabled() ? heading->text() : QStringLiteral("NO SCENE HEADING");
-            if (m_purpose == ForPrinting)
-                polishFontsAndInsertTextAtCursor(cursor, headingText);
-            else {
+            if (m_purpose == ForPrinting) {
+                polishFontsAndInsertTextAtCursor(cursor, heading->locationType());
+                cursor.insertText(QStringLiteral(". "));
+                polishFontsAndInsertTextAtCursor(cursor, heading->location());
+                cursor.insertText(QStringLiteral(" - "));
+                polishFontsAndInsertTextAtCursor(cursor, heading->moment());
+            } else {
                 if (m_sceneNumbers)
                     cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
-                cursor.insertText(headingText);
+                cursor.insertText(heading->locationType());
+                cursor.insertText(QStringLiteral(". "));
+                cursor.insertText(heading->location());
+                cursor.insertText(QStringLiteral(" - "));
+                cursor.insertText(heading->moment());
             }
 
             insertBlock = true;
