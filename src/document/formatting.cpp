@@ -1135,7 +1135,7 @@ public:
 
     TextFragment findMisspelledFragment(int start, int end) const
     {
-        const QList<TextFragment> fragments = m_spellCheck->misspelledFragments();
+        const QList<TextFragment> fragments = this->misspelledFragments();
         for (const TextFragment &fragment : fragments) {
             if ((fragment.start() >= start && fragment.start() < end)
                 || (fragment.end() > start && fragment.end() <= end))
