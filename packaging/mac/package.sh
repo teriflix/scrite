@@ -1,11 +1,11 @@
 cp -vaRf ../../../Release/Scrite.app .
 cp -vaf ../../Info.plist Scrite.app/Contents
-~/Qt/5.15.7/clang_64/bin/macdeployqt Scrite.app -qmldir=../../qml -verbose=1 -appstore-compliant -hardened-runtime -codesign="$TERIFLIX_IDENT"
+~/Qt/5.15.8/clang_64/bin/macdeployqt Scrite.app -qmldir=../../qml -verbose=1 -appstore-compliant -hardened-runtime -codesign="$TERIFLIX_IDENT"
 mkdir Scrite-0.8.4-beta
 mv Scrite.app Scrite-0.8.4-beta
 cp ../../images/dmgbackdrop.png dmgbackdrop.png
 sed "s/{{VERSION}}/Version 0.8.4 Beta/" dmgbackdrop.qml > dmgbackdropgen.qml
-~/Qt/5.15.7/clang_64/bin/qmlscene dmgbackdropgen.qml
+~/Qt/5.15.8/clang_64/bin/qmlscene dmgbackdropgen.qml
 rm -f dmgbackdropgen.qml
 
 # https://ss64.com/osx/sips.html

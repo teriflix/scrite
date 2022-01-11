@@ -897,6 +897,7 @@ private:
     bool m_initialized = false;
     QVariantList m_after;
     QVariantList m_before;
+    int m_currentIndex = -1;
     QPointer<Screenplay> m_screenplay;
     QMetaObject::Connection m_connection;
 };
@@ -946,10 +947,12 @@ QVariantList ScreenplayElementsMoveCommand::save() const
 
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
+        QVariant item;
         if (element->elementType() == ScreenplayElement::BreakElementType)
-            ret << element->breakType();
+            item = QVariantList({ element->breakType(), false });
         else
-            ret << element->sceneID();
+            item = QVariantList({ element->sceneID(), element->isSelected() });
+        ret << item;
     }
 
     return ret;
@@ -987,32 +990,54 @@ bool ScreenplayElementsMoveCommand::restore(const QVariantList &array) const
         return (ScreenplayElement *)nullptr;
     };
 
+    int currentIndex = -1;
     QList<ScreenplayElement *> newElements;
-    for (QVariant item : array) {
+    for (const QVariant &item : array) {
+        const QVariantList itemData = item.toList();
+        const QVariant elementData = itemData.first();
+        const bool elementIsSelected = itemData.last().toBool();
+
         ScreenplayElement *element = nullptr;
 
-        if (item.userType() == QMetaType::QString)
-            element = findSceneElement(item.toString());
+        if (elementData.userType() == QMetaType::QString)
+            element = findSceneElement(elementData.toString());
         else
-            element = findBreakElement(item.toInt());
+            element = findBreakElement(elementData.toInt());
 
         if (element == nullptr)
             return false;
 
+        if (elementIsSelected)
+            currentIndex =
+                    currentIndex < 0 ? newElements.size() : qMin(currentIndex, newElements.size());
+
         newElements.append(element);
+        element->setSelected(elementIsSelected);
     }
 
     if (newElements.size() != array.size() || !elements.isEmpty())
         return false;
 
-    return m_screenplay->setElements(newElements);
+    const bool ret = m_screenplay->setElements(newElements);
+    if (ret && currentIndex >= 0) {
+        QTimer *timer = new QTimer(m_screenplay);
+        timer->setSingleShot(true);
+        timer->setInterval(50);
+        QObject::connect(timer, &QTimer::timeout, m_screenplay, [=]() {
+            m_screenplay->setCurrentElementIndex(currentIndex);
+            timer->deleteLater();
+        });
+        timer->start();
+    }
+
+    return ret;
 }
 
 void Screenplay::moveSelectedElements(int toRow)
 {
     HourGlass hourGlass;
 
-    toRow = qBound(0, toRow, m_elements.size() - 1);
+    toRow = qBound(0, toRow, m_elements.size());
 
     /**
      * Why are we resetting the models while moving multiple elements, instead of removing and
@@ -1028,10 +1053,7 @@ void Screenplay::moveSelectedElements(int toRow)
     ScreenplayElementsMoveCommand *cmd = nullptr;
 
     ScreenplayElement *toRowElement = this->elementAt(toRow);
-    if (toRowElement == nullptr)
-        return;
 
-    int fromRow = -1;
     QList<ScreenplayElement *> selectedElements;
     for (int i = m_elements.size() - 1; i >= 0; i--) {
         ScreenplayElement *element = m_elements.at(i);
@@ -1045,20 +1067,14 @@ void Screenplay::moveSelectedElements(int toRow)
 
         selectedElements.prepend(element);
         m_elements.removeAt(i);
-        fromRow = i;
     }
 
     if (cmd == nullptr)
         return;
 
-    toRow = m_elements.indexOf(toRowElement);
-    if (toRow < 0) {
-        delete cmd;
-        return;
-    }
-
-    if (toRow > fromRow)
-        ++toRow;
+    toRow = toRowElement ? m_elements.indexOf(toRowElement) : -1;
+    if (toRow < 0)
+        toRow = m_elements.size();
 
     while (!selectedElements.isEmpty()) {
         ScreenplayElement *element = selectedElements.takeLast();
@@ -1070,6 +1086,15 @@ void Screenplay::moveSelectedElements(int toRow)
     emit elementsChanged();
 
     this->updateBreakTitlesLater();
+
+    QTimer *timer = new QTimer(this);
+    timer->setSingleShot(true);
+    timer->setInterval(50);
+    QObject::connect(timer, &QTimer::timeout, this, [=]() {
+        this->setCurrentElementIndex(toRow);
+        timer->deleteLater();
+    });
+    timer->start();
 
     if (UndoStack::active() != nullptr)
         UndoStack::active()->push(cmd);
