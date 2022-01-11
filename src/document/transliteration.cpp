@@ -907,6 +907,10 @@ QString TransliterationEngine::formattedHtmlOf(const QString &text) const
             ts << "<font family=\"" << item.font.family() << "\">" << item.string << "</font>";
     }
 
+    ts.flush();
+
+    Application::log(html);
+
     return html;
 }
 

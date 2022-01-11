@@ -2580,17 +2580,27 @@ Item {
 
                     property bool hasFocus: false
 
-                    lowDetailComponent: Text {
+                    lowDetailComponent: TextEdit {
                         id: basicHeadingField
                         text: element.hasTitle ? element.title : "Index Card Title"
                         color: element.hasTitle ? "black" : "gray"
                         topPadding: 8
                         bottomPadding: 16
+                        readOnly: true
+                        selectByKeyboard: false
+                        selectByMouse: false
+                        Transliterator.textDocument: textDocument
+                        Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                         font.bold: true
                         font.pointSize: Scrite.app.idealFontPointSize
                         font.capitalization: Font.AllUppercase
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         Component.onCompleted: headingFieldLoader.hasFocus = false
+                        EventFilter.events: [EventFilter.MouseButtonPress,EventFilter.MouseButtonRelease,EventFilter.MouseButtonDblClick,EventFilter.MouseMove,EventFilter.Wheel]
+                        EventFilter.onFilter: (object,event,result) => {
+                                                  result.filter = true
+                                                  result.accepted = false
+                                              }
                     }
 
                     highDetailComponent: TextField2 {
@@ -2661,7 +2671,7 @@ Item {
                         border.color: primaryColors.borderColor
                         color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
 
-                        Text {
+                        TextEdit {
                             id: synopsisTextDisplay
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             width: parent.width
@@ -2670,10 +2680,20 @@ Item {
                             rightPadding: 4
                             bottomPadding: 4
                             text: element.scene.hasTitle ? element.scene.title : "Describe what happens in this scene."
+                            readOnly: true
+                            selectByKeyboard: false
+                            selectByMouse: false
+                            Transliterator.textDocument: textDocument
+                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                             font.pointSize: Scrite.app.idealFontPointSize
                             color: element.scene.hasTitle ? "black" : "gray"
-                            maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
-                            elide: Text.ElideRight
+                            // maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
+                            // elide: Text.ElideRight
+                            EventFilter.events: [EventFilter.MouseButtonPress,EventFilter.MouseButtonRelease,EventFilter.MouseButtonDblClick,EventFilter.MouseMove,EventFilter.Wheel]
+                            EventFilter.onFilter: (object,event,result) => {
+                                                      result.filter = true
+                                                      result.accepted = false
+                                                  }
                         }
 
                         Component.onCompleted: synopsisFieldLoader.hasFocus = false
