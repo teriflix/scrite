@@ -738,19 +738,9 @@ void TransliterationEngine::Boundary::evalStringLanguageAndFont(const QString &s
     if (this->isEmpty())
         return;
 
-    auto determineScript = [](const QString &val) -> QChar::Script {
-        for (int i = 0; i < val.length(); i++) {
-            const QChar ch = val.at(i);
-            if (ch.script() == QChar::Script_Common || ch.script() == QChar::Script_Inherited)
-                continue;
-            return ch.script();
-        }
-        QChar::Script_Latin;
-    };
-
     this->string = sourceText.mid(this->start, (this->end - this->start + 1));
-    this->language =
-            TransliterationEngine::instance()->languageForScript(determineScript(this->string));
+    this->language = TransliterationEngine::instance()->languageForScript(
+            TransliterationEngine::determineScript(this->string));
     this->font = TransliterationEngine::instance()->languageFont(this->language);
 }
 
@@ -878,6 +868,18 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
     }
 
     cursor.setPosition(endPosition);
+}
+
+QChar::Script TransliterationEngine::determineScript(const QString &val)
+{
+    for (int i = 0; i < val.length(); i++) {
+        const QChar ch = val.at(i);
+        if (ch.script() == QChar::Script_Common || ch.script() == QChar::Script_Inherited)
+            continue;
+        return ch.script();
+    }
+
+    return QChar::Script_Latin;
 }
 
 QString TransliterationEngine::formattedHtmlOf(const QString &text) const

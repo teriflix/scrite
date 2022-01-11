@@ -649,7 +649,6 @@ private:
     Q_SLOT void onSpellCheckUpdated();
     void onContentsChange(int from, int charsRemoved, int charsAdded);
     void syncSceneFromDocument(int nrBlocks = -1);
-    bool eventFilter(QObject *object, QEvent *event);
 
     void evaluateAutoCompleteHints();
     void setAutoCompleteHintsFor(SceneElement::Type val);

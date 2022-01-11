@@ -150,6 +150,8 @@ public:
                                        bool bundleCommonScriptChars = false) const;
     void evaluateBoundariesAndInsertText(QTextCursor &cursor, const QString &text) const;
 
+    static QChar::Script determineScript(const QString &val);
+
     Q_INVOKABLE QString formattedHtmlOf(const QString &text) const;
 
 private:
