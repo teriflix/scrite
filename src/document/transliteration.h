@@ -26,6 +26,7 @@
 #include <QJsonObject>
 #include <QFontDatabase>
 #include <QQuickPaintedItem>
+#include <QSyntaxHighlighter>
 
 #include "qobjectproperty.h"
 
@@ -168,6 +169,19 @@ private:
     mutable QMap<Language, QStringList> m_availableLanguageFontFamilies;
 };
 
+class FontSyntaxHighlighter : public QSyntaxHighlighter
+{
+    Q_OBJECT
+
+public:
+    FontSyntaxHighlighter(QObject *parent = nullptr);
+    ~FontSyntaxHighlighter();
+
+protected:
+    // QSyntaxHighlighter interface
+    void highlightBlock(const QString &text);
+};
+
 class Transliterator : public QObject
 {
     Q_OBJECT
@@ -204,6 +218,11 @@ public:
     void setHasActiveFocus(bool val);
     bool hasActiveFocus() const { return m_hasActiveFocus; }
     Q_SIGNAL void hasActiveFocusChanged();
+
+    Q_PROPERTY(bool applyLanguageFonts READ isApplyLanguageFonts WRITE setApplyLanguageFonts NOTIFY applyLanguageFontsChanged)
+    void setApplyLanguageFonts(bool val);
+    bool isApplyLanguageFonts() const { return m_applyLanguageFonts; }
+    Q_SIGNAL void applyLanguageFontsChanged();
 
     Q_PROPERTY(bool transliterateCurrentWordOnly READ isTransliterateCurrentWordOnly WRITE setTransliterateCurrentWordOnly NOTIFY transliterateCurrentWordOnlyChanged)
     void setTransliterateCurrentWordOnly(bool val);
@@ -244,8 +263,10 @@ private:
     Mode m_mode = AutomaticMode;
     int m_cursorPosition = -1;
     bool m_hasActiveFocus = false;
+    bool m_applyLanguageFonts = false;
     bool m_transliterateCurrentWordOnly = true;
     bool m_textDocumentUndoRedoEnabled = false;
+    QPointer<FontSyntaxHighlighter> m_fontHighlighter;
     QObjectProperty<QQuickTextDocument> m_textDocument;
 };
 

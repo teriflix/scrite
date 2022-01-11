@@ -500,6 +500,7 @@ Rectangle {
                                     Transliterator.textDocument: textDocument
                                     Transliterator.cursorPosition: cursorPosition
                                     Transliterator.hasActiveFocus: activeFocus
+                                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
                                     onTextChanged: Scrite.document.screenplay.logline = text
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     placeholderText: "Enter the logline of your screenplay here.."
@@ -1396,6 +1397,7 @@ Rectangle {
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
                     Transliterator.hasActiveFocus: activeFocus
+                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
 
                     SpecialSymbolsSupport {
                         anchors.top: parent.bottom
@@ -1501,6 +1503,7 @@ Rectangle {
                             Transliterator.textDocument: textDocument
                             Transliterator.cursorPosition: cursorPosition
                             Transliterator.hasActiveFocus: activeFocus
+                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
                             onTextChanged: contentItem.theScene.title = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
@@ -1748,6 +1751,7 @@ Rectangle {
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
                     Transliterator.hasActiveFocus: activeFocus
+                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
                     Transliterator.onAboutToTransliterate: {
                         contentItem.theScene.beginUndoCapture(false)
                         contentItem.theScene.undoRedoEnabled = false

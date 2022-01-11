@@ -1891,7 +1891,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
 
             QTextCharFormat format = this->format(boundary.start);
             format.setFontFamily(boundary.font.family());
-            this->setFormat(boundary.start, boundary.end - boundary.start, format);
+            this->setFormat(boundary.start, boundary.end - boundary.start + 1, format);
         }
 
         if (m_currentElement == element)

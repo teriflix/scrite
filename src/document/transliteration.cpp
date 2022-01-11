@@ -901,6 +901,41 @@ QString TransliterationEngine::formattedHtmlOf(const QString &text) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+FontSyntaxHighlighter::FontSyntaxHighlighter(QObject *parent) : QSyntaxHighlighter(parent)
+{
+    connect(TransliterationEngine::instance(),
+            &TransliterationEngine::preferredFontFamilyForLanguageChanged, this,
+            &FontSyntaxHighlighter::rehighlight);
+}
+
+FontSyntaxHighlighter::~FontSyntaxHighlighter() { }
+
+void FontSyntaxHighlighter::highlightBlock(const QString &text)
+{
+    const QTextDocument *doc = this->document();
+    const QFont defaultFont = doc->defaultFont();
+    const QTextBlock block = this->QSyntaxHighlighter::currentBlock();
+
+    QTextCharFormat defaultFormat;
+    defaultFormat.setFont(defaultFont);
+    this->setFormat(0, block.length(), defaultFormat);
+
+    // Per-language fonts.
+    const QList<TransliterationEngine::Boundary> boundaries =
+            TransliterationEngine::instance()->evaluateBoundaries(text);
+
+    for (const TransliterationEngine::Boundary &boundary : boundaries) {
+        if (boundary.isEmpty())
+            return;
+
+        QTextCharFormat format = this->QSyntaxHighlighter::format(boundary.start);
+        format.setFontFamily(boundary.font.family());
+        this->setFormat(boundary.start, boundary.end - boundary.start + 1, format);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 Transliterator::Transliterator(QObject *parent)
     : QObject(parent), m_textDocument(this, "textDocument")
 {
@@ -941,6 +976,8 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
 
         this->setCursorPosition(-1);
         this->setHasActiveFocus(false);
+        if (!m_fontHighlighter.isNull())
+            m_fontHighlighter->setDocument(nullptr);
     }
 
     m_textDocument = val;
@@ -952,6 +989,8 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
             doc->setUndoRedoEnabled(m_textDocumentUndoRedoEnabled);
             connect(doc, &QTextDocument::contentsChange, this,
                     &Transliterator::processTransliteration);
+            if (!m_fontHighlighter.isNull())
+                m_fontHighlighter->setDocument(doc);
         }
     }
 
@@ -997,6 +1036,25 @@ void Transliterator::setHasActiveFocus(bool val)
     }
 
     emit hasActiveFocusChanged();
+}
+
+void Transliterator::setApplyLanguageFonts(bool val)
+{
+    if (m_applyLanguageFonts == val)
+        return;
+
+    m_applyLanguageFonts = val;
+
+    if (m_applyLanguageFonts) {
+        if (m_fontHighlighter.isNull())
+            m_fontHighlighter = new FontSyntaxHighlighter(this);
+        m_fontHighlighter->setDocument(this->document());
+    } else {
+        m_fontHighlighter->setDocument(nullptr);
+        delete m_fontHighlighter;
+    }
+
+    emit applyLanguageFontsChanged();
 }
 
 void Transliterator::setTransliterateCurrentWordOnly(bool val)
