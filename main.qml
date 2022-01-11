@@ -75,7 +75,6 @@ Rectangle {
         property bool sceneEditorActive: false
         property bool notebookActive: false
         active: sceneListPanelActive || screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
-        onActiveChanged: Scrite.app.log("Undo stack: " + active)
     }
 
     AttachmentsDropArea {

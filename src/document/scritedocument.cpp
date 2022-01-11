@@ -749,6 +749,8 @@ void ScriteDocument::reset()
 {
     HourGlass hourGlass;
 
+    emit aboutToReset();
+
     m_connectors.clear();
 
     if (m_structure != nullptr) {

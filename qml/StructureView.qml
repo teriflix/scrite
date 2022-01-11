@@ -2931,17 +2931,14 @@ Item {
                 border.color: Scrite.app.translucent("black", alpha)
                 color: Scrite.app.translucent("#cfd8dc", alpha)
                 radius: 6
-                property real alpha: 0
+                property real alpha: dropAreaForStacking.containsDrag ? 0.5 : 0
                 enabled: !dragHandleMouseArea.drag.active && element.scene.addedToScreenplay
 
                 DropArea {
+                    id: dropAreaForStacking
                     anchors.fill: parent
                     keys: ["scrite/sceneID"]
-                    onEntered: parent.alpha = 0.5
-                    onExited: parent.alpha = 0
                     onDropped: {
-                        parent.alpha = 0
-
                         var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                         if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
                             showInformation({

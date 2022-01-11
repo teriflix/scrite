@@ -1047,8 +1047,10 @@ void Screenplay::moveSelectedElements(int toRow)
     });
     timer->start();
 
-    if (UndoStack::active() != nullptr)
+    if (UndoStack::active())
         UndoStack::active()->push(cmd);
+    else
+        delete cmd;
 }
 
 // TODO implement undo-command to revert group remove operation

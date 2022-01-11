@@ -3200,6 +3200,7 @@ Rectangle {
                             "sceneListView/sceneID": screenplayElement.sceneID
                         }
                         Drag.onActiveChanged: {
+                            screenplayElement.selected = true
                             moveSelectedElementsAnimation.draggedElement = screenplayElement
                             if(screenplayElementType === ScreenplayElement.BreakElementType)
                                 Scrite.document.screenplay.currentElementIndex = index
@@ -3216,10 +3217,6 @@ Rectangle {
                                            sceneListView.forceActiveFocus()
                                        }
 
-                            onExited: (drag) => {
-                                          drag.acceptProposedAction()
-                                      }
-
                             onDropped: (drop) => {
                                            moveSelectedElementsAnimation.targetIndex = delegateItem.elementIndex
                                            drop.acceptProposedAction()
@@ -3227,6 +3224,7 @@ Rectangle {
                         }
 
                         Rectangle {
+                            id: dropIndicator
                             width: parent.width
                             height: 2
                             color: primaryColors.borderColor
@@ -3257,10 +3255,6 @@ Rectangle {
                                            sceneListView.forceActiveFocus()
                                        }
 
-                            onExited: (drag) => {
-                                          drag.acceptProposedAction()
-                                      }
-
                             onDropped: (drop) => {
                                            drop.acceptProposedAction()
                                            moveSelectedElementsAnimation.targetIndex = screenplayAdapter.elementCount
@@ -3282,7 +3276,7 @@ Rectangle {
                         property ScreenplayElement draggedElement
                         onTargetIndexChanged: {
                             if(targetIndex >= 0)
-                                Qt.callLater(start)
+                                start()
                         }
 
                         PauseAnimation { duration: 50 }

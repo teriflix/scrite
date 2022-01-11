@@ -126,10 +126,6 @@ Item {
                        drag.acceptProposedAction()
                    }
 
-        onExited: (drag) => {
-                      drag.acceptProposedAction()
-                  }
-
         onDropped: (drop) => {
                        dropSceneAt(drop.source, Scrite.document.screenplay.elementCount)
                        drop.acceptProposedAction()
@@ -432,10 +428,6 @@ Item {
                                screenplayElementList.forceActiveFocus()
                                drag.acceptProposedAction()
                            }
-
-                onExited: (drag) => {
-                              drag.acceptProposedAction()
-                          }
 
                 onDropped: (drop) => {
                                screenplayElementList.footerItem.highlightAsDropArea = false
@@ -793,10 +785,6 @@ Item {
                                screenplayElementList.forceActiveFocus()
                                drag.acceptProposedAction()
                            }
-
-                onExited: (drag) => {
-                              drag.acceptProposedAction()
-                          }
 
                 onDropped: (drop) => {
                                dropSceneAt(drop.source, index)
