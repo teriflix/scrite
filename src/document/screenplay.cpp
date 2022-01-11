@@ -785,97 +785,14 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
         GarbageCollector::instance()->add(ptr);
 }
 
-class ScreenplayElementMoveCommand : public QUndoCommand
-{
-public:
-    ScreenplayElementMoveCommand(Screenplay *screenplay, ScreenplayElement *element, int fromRow,
-                                 int toRow);
-    ~ScreenplayElementMoveCommand();
-
-    static bool lock;
-
-    // QUndoCommand interface
-    void undo();
-    void redo();
-
-    void markAsObselete();
-
-private:
-    int m_toRow = -1;
-    int m_fromRow = -1;
-    QPointer<Screenplay> m_screenplay;
-    QPointer<ScreenplayElement> m_element;
-};
-
-bool ScreenplayElementMoveCommand::lock = false;
-
-ScreenplayElementMoveCommand::ScreenplayElementMoveCommand(Screenplay *screenplay,
-                                                           ScreenplayElement *element, int fromRow,
-                                                           int toRow)
-    : QUndoCommand(),
-      m_toRow(toRow),
-      m_fromRow(fromRow),
-      m_screenplay(screenplay),
-      m_element(element)
-{
-}
-
-ScreenplayElementMoveCommand::~ScreenplayElementMoveCommand() { }
-
-void ScreenplayElementMoveCommand::undo()
-{
-    if (m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0) {
-        this->setObsolete(true);
-        return;
-    }
-
-    lock = true;
-    m_screenplay->moveElement(m_element, m_fromRow);
-    lock = false;
-}
-
-void ScreenplayElementMoveCommand::redo()
-{
-    if (m_screenplay.isNull() || m_element.isNull() || m_fromRow < 0 || m_toRow < 0) {
-        this->setObsolete(true);
-        return;
-    }
-
-    lock = true;
-    m_screenplay->moveElement(m_element, m_toRow);
-    lock = false;
-}
-
 void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
 {
-    if (ptr == nullptr || toRow >= m_elements.size())
+    if (ptr == nullptr)
         return;
 
-    if (toRow < 0)
-        toRow = m_elements.size() - 1;
-
-    const int fromRow = m_elements.indexOf(ptr);
-    if (fromRow < 0)
-        return;
-
-    if (fromRow == toRow)
-        return;
-
-    this->beginMoveRows(QModelIndex(), fromRow, fromRow, QModelIndex(),
-                        toRow < fromRow ? toRow : toRow + 1);
-    m_elements.move(fromRow, toRow);
-    this->endMoveRows();
-
-    if (fromRow == m_currentElementIndex)
-        this->setCurrentElementIndex(toRow);
-
-    emit elementMoved(ptr, fromRow, toRow);
-    emit elementsChanged();
-
-    this->updateBreakTitlesLater();
-
-    if (UndoStack::active() != nullptr && !ScreenplayElementMoveCommand::lock)
-        UndoStack::active()->push(new ScreenplayElementMoveCommand(this, ptr, fromRow, toRow));
+    this->clearSelection();
+    ptr->setSelected(true);
+    this->moveSelectedElements(toRow);
 }
 
 // TODO implement undo-command to revert group move operation
@@ -886,12 +803,19 @@ public:
     ScreenplayElementsMoveCommand(Screenplay *screenplay);
     ~ScreenplayElementsMoveCommand();
 
+    void setMovement(const QHash<ScreenplayElement *, QPair<int, int>> &movement)
+    {
+        if (m_movement.isEmpty())
+            m_movement = movement;
+    }
+    QHash<ScreenplayElement *, QPair<int, int>> movement() const { return m_movement; }
+
     void undo();
     void redo();
 
 private:
     QVariantList save() const;
-    bool restore(const QVariantList &array) const;
+    bool restore(const QVariantList &array, bool forward) const;
 
 private:
     bool m_initialized = false;
@@ -900,6 +824,7 @@ private:
     int m_currentIndex = -1;
     QPointer<Screenplay> m_screenplay;
     QMetaObject::Connection m_connection;
+    QHash<ScreenplayElement *, QPair<int, int>> m_movement;
 };
 
 ScreenplayElementsMoveCommand::ScreenplayElementsMoveCommand(Screenplay *screenplay)
@@ -907,7 +832,7 @@ ScreenplayElementsMoveCommand::ScreenplayElementsMoveCommand(Screenplay *screenp
 {
     m_before = this->save();
 
-    m_connection = QObject::connect(screenplay, &Screenplay::aboutToDelete,
+    m_connection = QObject::connect(screenplay, &Screenplay::aboutToDelete, screenplay,
                                     [=]() { this->setObsolete(true); });
 }
 
@@ -918,7 +843,7 @@ ScreenplayElementsMoveCommand::~ScreenplayElementsMoveCommand()
 
 void ScreenplayElementsMoveCommand::undo()
 {
-    if (m_screenplay.isNull() || !this->restore(m_before))
+    if (m_screenplay.isNull() || !this->restore(m_before, false))
         this->setObsolete(true);
 }
 
@@ -933,7 +858,7 @@ void ScreenplayElementsMoveCommand::redo()
         return;
     }
 
-    if (m_screenplay.isNull() || !this->restore(m_after))
+    if (m_screenplay.isNull() || !this->restore(m_after, true))
         this->setObsolete(true);
 }
 
@@ -958,7 +883,7 @@ QVariantList ScreenplayElementsMoveCommand::save() const
     return ret;
 }
 
-bool ScreenplayElementsMoveCommand::restore(const QVariantList &array) const
+bool ScreenplayElementsMoveCommand::restore(const QVariantList &array, bool forward) const
 {
     HourGlass hourGlass;
 
@@ -1020,11 +945,24 @@ bool ScreenplayElementsMoveCommand::restore(const QVariantList &array) const
 
     const bool ret = m_screenplay->setElements(newElements);
     if (ret && currentIndex >= 0) {
+        auto it = m_movement.begin();
+        auto end = m_movement.end();
+        while (it != end) {
+            const int from = forward ? it.value().first : it.value().second;
+            const int to = forward ? it.value().second : it.value().first;
+            QMetaObject::invokeMethod(m_screenplay, "elementMoved", Qt::DirectConnection,
+                                      Q_ARG(ScreenplayElement *, it.key()), Q_ARG(int, from),
+                                      Q_ARG(int, to));
+            ++it;
+        }
+
         QTimer *timer = new QTimer(m_screenplay);
         timer->setSingleShot(true);
         timer->setInterval(50);
         QObject::connect(timer, &QTimer::timeout, m_screenplay, [=]() {
             m_screenplay->setCurrentElementIndex(currentIndex);
+            QMetaObject::invokeMethod(m_screenplay, "requestEditorAt", Qt::DirectConnection,
+                                      Q_ARG(int, currentIndex));
             timer->deleteLater();
         });
         timer->start();
@@ -1055,6 +993,7 @@ void Screenplay::moveSelectedElements(int toRow)
     ScreenplayElement *toRowElement = this->elementAt(toRow);
 
     QList<ScreenplayElement *> selectedElements;
+    QHash<ScreenplayElement *, QPair<int, int>> movement;
     for (int i = m_elements.size() - 1; i >= 0; i--) {
         ScreenplayElement *element = m_elements.at(i);
         if (!element->isSelected())
@@ -1066,6 +1005,7 @@ void Screenplay::moveSelectedElements(int toRow)
         }
 
         selectedElements.prepend(element);
+        movement[element] = qMakePair(i, 0);
         m_elements.removeAt(i);
     }
 
@@ -1079,6 +1019,7 @@ void Screenplay::moveSelectedElements(int toRow)
     while (!selectedElements.isEmpty()) {
         ScreenplayElement *element = selectedElements.takeLast();
         m_elements.insert(toRow, element);
+        movement[element].second = toRow + selectedElements.size();
     }
 
     this->endResetModel();
@@ -1087,11 +1028,21 @@ void Screenplay::moveSelectedElements(int toRow)
 
     this->updateBreakTitlesLater();
 
+    cmd->setMovement(movement);
+
+    auto it = movement.begin();
+    auto end = movement.end();
+    while (it != end) {
+        emit elementMoved(it.key(), it.value().first, it.value().second);
+        ++it;
+    }
+
     QTimer *timer = new QTimer(this);
     timer->setSingleShot(true);
     timer->setInterval(50);
     QObject::connect(timer, &QTimer::timeout, this, [=]() {
         this->setCurrentElementIndex(toRow);
+        emit this->requestEditorAt(toRow);
         timer->deleteLater();
     });
     timer->start();
@@ -1710,6 +1661,8 @@ bool Screenplay::setElements(const QList<ScreenplayElement *> &list)
 
     if (!copy.isEmpty())
         return false;
+
+    copy = m_elements;
 
     this->beginResetModel();
     m_elements = list;

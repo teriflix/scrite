@@ -68,12 +68,14 @@ Rectangle {
     UndoStack {
         id: mainUndoStack
         objectName: "MainUndoStack"
+        property bool sceneListPanelActive: true
         property bool screenplayEditorActive: false
         property bool timelineEditorActive: false
         property bool structureEditorActive: false
         property bool sceneEditorActive: false
         property bool notebookActive: false
-        active: screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
+        active: sceneListPanelActive || screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
+        onActiveChanged: Scrite.app.log("Undo stack: " + active)
     }
 
     AttachmentsDropArea {

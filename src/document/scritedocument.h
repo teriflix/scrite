@@ -409,6 +409,7 @@ private:
     void screenplayElementIndexChanged();
     void setCreatedOnThisComputer(bool val);
     void screenplayElementRemoved(ScreenplayElement *ptr, int index);
+    void screenplayElementMoved(ScreenplayElement *ptr, int from, int to);
     void clearModifiedLater();
 
 public:

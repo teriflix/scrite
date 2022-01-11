@@ -44,6 +44,10 @@ Item {
                 })
             }
         }
+
+        function onRequestEditorAt(index) {
+            screenplayElementList.positionViewAtIndex(index, ListView.Contain)
+        }
     }
 
     Rectangle {
@@ -112,24 +116,24 @@ Item {
     }
 
     DropArea {
+        id: mainDropArea
         anchors.fill: parent
         keys: [dropAreaKey]
         enabled: screenplayElementList.count === 0 && enableDragDrop
 
-        onEntered: {
-            screenplayElementList.forceActiveFocus()
-            screenplayElementList.footerItem.highlightAsDropArea = true
-        }
+        onEntered: (drag) => {
+                       screenplayElementList.forceActiveFocus()
+                       drag.acceptProposedAction()
+                   }
 
-        onExited: {
-            screenplayElementList.footerItem.highlightAsDropArea = false
-        }
+        onExited: (drag) => {
+                      drag.acceptProposedAction()
+                  }
 
-        onDropped: {
-            screenplayElementList.footerItem.highlightAsDropArea = false
-            dropSceneAt(drop.source, -1)
-            drop.acceptProposedAction()
-        }
+        onDropped: (drop) => {
+                       dropSceneAt(drop.source, Scrite.document.screenplay.elementCount)
+                       drop.acceptProposedAction()
+                   }
     }
 
     Flickable {
@@ -386,7 +390,7 @@ Item {
         }
 
         footer: Item {
-            property bool highlightAsDropArea: false
+            property bool highlightAsDropArea: footerDropArea.containsDrag || mainDropArea.containsDrag
             width: 100 // screenplayElementList.minimumDelegateWidth
             height: screenplayElementList.height
 
@@ -419,24 +423,25 @@ Item {
             }
 
             DropArea {
+                id: footerDropArea
                 anchors.fill: parent
                 keys: [dropAreaKey]
                 enabled: enableDragDrop
 
-                onEntered: {
-                    screenplayElementList.forceActiveFocus()
-                    parent.highlightAsDropArea = true
-                }
+                onEntered: (drag) => {
+                               screenplayElementList.forceActiveFocus()
+                               drag.acceptProposedAction()
+                           }
 
-                onExited: {
-                    parent.highlightAsDropArea = false
-                }
+                onExited: (drag) => {
+                              drag.acceptProposedAction()
+                          }
 
-                onDropped: {
-                    screenplayElementList.footerItem.highlightAsDropArea = false
-                    dropSceneAt(drop.source, -1)
-                    drop.acceptProposedAction()
-                }
+                onDropped: (drop) => {
+                               screenplayElementList.footerItem.highlightAsDropArea = false
+                               dropSceneAt(drop.source, Scrite.document.screenplay.elementCount)
+                               drop.acceptProposedAction()
+                           }
             }
         }
 
@@ -574,7 +579,7 @@ Item {
                 anchors.rightMargin: 2.5
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 17 : 3
                 active: element !== null // && (isBreakElement || element.scene !== null)
-                enabled: !dragArea.containsDrag
+                enabled: !delegateDropArea.containsDrag
                 sourceComponent: Rectangle {
                     color: element.scene ? Qt.tint(sceneColor, "#C0FFFFFF") : sceneColor
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
@@ -780,28 +785,23 @@ Item {
             }
 
             DropArea {
-                id: dragArea
+                id: delegateDropArea
                 anchors.fill: parent
                 keys: [dropAreaKey]
 
-                onEntered: {
-                    screenplayElementList.forceActiveFocus()
-                    drag.accepted = true
-                    dropAreaIndicator.highlightAsDropArea = true
-                }
+                onEntered: (drag) => {
+                               screenplayElementList.forceActiveFocus()
+                               drag.acceptProposedAction()
+                           }
 
-                onExited: {
-                    drag.accepted = true
-                    dropAreaIndicator.highlightAsDropArea = false
-                }
+                onExited: (drag) => {
+                              drag.acceptProposedAction()
+                          }
 
-                onDropped: {
-                    dropAreaIndicator.highlightAsDropArea = false
-                    dropSceneAt(drop.source, index)
-                    drop.acceptProposedAction()
-                    if(!screenplayElementList.moveMode)
-                        screenplayElementList.positionViewAtIndex(index,ListView.Contain)
-                }
+                onDropped: (drop) => {
+                               dropSceneAt(drop.source, index)
+                               drop.acceptProposedAction()
+                           }
             }
 
             Rectangle {
@@ -810,7 +810,7 @@ Item {
                 height: parent.height
                 anchors.left: parent.left
 
-                property bool highlightAsDropArea: false
+                property bool highlightAsDropArea: delegateDropArea.containsDrag
                 color: highlightAsDropArea ? dropAreaHighlightColor : Qt.rgba(0,0,0,0)
             }
         }
@@ -958,13 +958,8 @@ Item {
         var sourceType = Scrite.app.typeName(source)
 
         if(sourceType === "ScreenplayElement") {
-            var fromIndex = Scrite.document.screenplay.indexOfElement(source)
-            if(fromIndex < index)
-                --index
             if(screenplayElementList.mutiSelectionMode)
-                Scrite.app.execLater(screenplayElementList, 100, function() {
-                    Scrite.document.screenplay.moveSelectedElements(index)
-                })
+                Scrite.document.screenplay.moveSelectedElements(index)
             else
                 Scrite.document.screenplay.moveElement(source, index)
             return

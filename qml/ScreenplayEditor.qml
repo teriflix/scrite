@@ -85,6 +85,14 @@ Rectangle {
         }
     }
 
+    Connections {
+        target: Scrite.document.screenplay
+        enabled: screenplayAdapter.isSourceScreenplay
+        function onRequestEditorAt(index) {
+            contentView.positionViewAtIndex(index, ListView.Beginning)
+        }
+    }
+
     // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
     Connections {
         target: screenplayAdapter.isSourceScreenplay ? Scrite.document : null
@@ -3003,6 +3011,14 @@ Rectangle {
                     visible: screenplayAdapter.elementCount === 0
                 }
 
+                Connections {
+                    target: Scrite.document.screenplay
+                    enabled: screenplayAdapter.isSourceScreenplay
+                    function onElementMoved(element, from, to) {
+                        Qt.callLater(sceneListView.forceLayout)
+                    }
+                }
+
                 ListView {
                     id: sceneListView
                     anchors.fill: parent
@@ -3019,7 +3035,7 @@ Rectangle {
 
                     FocusTracker.window: Scrite.window
                     FocusTracker.indicator.target: mainUndoStack
-                    FocusTracker.indicator.property: "timelineEditorActive"
+                    FocusTracker.indicator.property: "sceneListPanelActive"
 
                     header: Rectangle {
                         width: sceneListView.width-1
@@ -3296,6 +3312,8 @@ Rectangle {
 
                                 contentView.positionViewAtIndex(targetndex, ListView.Beginning)
                                 screenplayAdapter.currentIndex = targetndex
+
+                                sceneListView.forceActiveFocus()
                             }
                         }
                     }

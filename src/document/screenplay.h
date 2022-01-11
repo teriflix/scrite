@@ -372,6 +372,8 @@ public:
     int currentElementIndex() const { return m_currentElementIndex; }
     Q_SIGNAL void currentElementIndexChanged(int val);
 
+    Q_SIGNAL void requestEditorAt(int index);
+
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();
 

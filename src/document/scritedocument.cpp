@@ -777,6 +777,8 @@ void ScriteDocument::reset()
                    &ScriteDocument::evaluateStructureElementSequenceLater);
         disconnect(m_screenplay, &Screenplay::elementRemoved, this,
                    &ScriteDocument::screenplayElementRemoved);
+        disconnect(m_screenplay, &Screenplay::elementMoved, this,
+                   &ScriteDocument::screenplayElementMoved);
         disconnect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
         disconnect(m_screenplay, &Screenplay::elementCountChanged, this,
                    &ScriteDocument::emptyChanged);
@@ -841,6 +843,7 @@ void ScriteDocument::reset()
             &ScriteDocument::evaluateStructureElementSequenceLater);
     connect(m_screenplay, &Screenplay::elementRemoved, this,
             &ScriteDocument::screenplayElementRemoved);
+    connect(m_screenplay, &Screenplay::elementMoved, this, &ScriteDocument::screenplayElementMoved);
     connect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
     connect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
 
@@ -1946,6 +1949,18 @@ void ScriteDocument::screenplayElementRemoved(ScreenplayElement *ptr, int)
             StructureElement *element = m_structure->elementAt(index);
             element->setStackId(QString());
         }
+    }
+}
+
+void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, int to)
+{
+    Q_UNUSED(from);
+    Q_UNUSED(to);
+
+    const int index = m_structure->indexOfScene(ptr->scene());
+    if (index >= 0) {
+        StructureElement *element = m_structure->elementAt(index);
+        element->setStackId(QString());
     }
 }
 
