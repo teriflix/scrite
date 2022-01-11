@@ -123,7 +123,7 @@ Item {
 
         property bool pausePageAndTimeComputation: false
         property bool highlightCurrentLine: true
-        property bool applyLanguageFonts: false
+        property bool applyUserDefinedLanguageFonts: true
     }
 
     Settings {

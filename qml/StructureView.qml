@@ -2710,7 +2710,7 @@ Item {
                                 Transliterator.textDocument: textDocument
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus
-                                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+                                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                                 placeholderText: "Describe what happens in this scene."
                                 font.pointSize: Scrite.app.idealFontPointSize
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere

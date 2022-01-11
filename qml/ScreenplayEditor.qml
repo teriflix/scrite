@@ -500,7 +500,7 @@ Rectangle {
                                     Transliterator.textDocument: textDocument
                                     Transliterator.cursorPosition: cursorPosition
                                     Transliterator.hasActiveFocus: activeFocus
-                                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+                                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                                     onTextChanged: Scrite.document.screenplay.logline = text
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     placeholderText: "Enter the logline of your screenplay here.."
@@ -1301,7 +1301,7 @@ Rectangle {
                 onDocumentInitialized: sceneTextEditor.cursorPosition = 0
                 onRequestCursorPosition: Scrite.app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
-                applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+                applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 onCurrentParagraphTypeChanged: {
                     if(currentParagraphType === SceneElement.Action) {
                         ruler.paragraphLeftMargin = 0
@@ -1397,7 +1397,7 @@ Rectangle {
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
                     Transliterator.hasActiveFocus: activeFocus
-                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
 
                     SpecialSymbolsSupport {
                         anchors.top: parent.bottom
@@ -1503,7 +1503,7 @@ Rectangle {
                             Transliterator.textDocument: textDocument
                             Transliterator.cursorPosition: cursorPosition
                             Transliterator.hasActiveFocus: activeFocus
-                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                             onTextChanged: contentItem.theScene.title = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
@@ -1751,7 +1751,7 @@ Rectangle {
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
                     Transliterator.hasActiveFocus: activeFocus
-                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                     Transliterator.onAboutToTransliterate: {
                         contentItem.theScene.beginUndoCapture(false)
                         contentItem.theScene.undoRedoEnabled = false

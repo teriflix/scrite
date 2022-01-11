@@ -42,5 +42,5 @@ TextArea {
     Transliterator.textDocument: textDocument
     Transliterator.cursorPosition: cursorPosition
     Transliterator.hasActiveFocus: activeFocus
-    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
 }

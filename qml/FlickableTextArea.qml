@@ -53,7 +53,7 @@ Flickable {
         Transliterator.textDocument: textDocument
         Transliterator.cursorPosition: cursorPosition
         Transliterator.hasActiveFocus: activeFocus
-        Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+        Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
         readOnly: Scrite.document.readOnly
         KeyNavigation.tab: textAreaFlickable.tabItem

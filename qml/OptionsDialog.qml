@@ -412,8 +412,8 @@ Item {
                 color: primaryColors.c100.background
                 property string englishFontFamily: Scrite.app.transliterationEngine.languageFont(TransliterationEngine.English).family
                 text: {
-                    if(screenplayEditorSettings.applyLanguageFonts)
-                        return "Custom fonts are used for both display and in PDF & HTML. If you are facing display issues with fonts, then we recommend that you change this setting."
+                    if(screenplayEditorSettings.applyUserDefinedLanguageFonts)
+                        return "Custom fonts are used for both display and in PDF & HTML."
                     return "For display, only '" + englishFontFamily + "' will be used. Custom fonts for languages are used only in exported PDF & HTML files."
                 }
 
@@ -433,9 +433,9 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width-20
                 model: ["PDF, HTML Only", "Display, PDF, HTML"]
-                currentIndex: screenplayEditorSettings.applyLanguageFonts ? 1 : 0
+                currentIndex: screenplayEditorSettings.applyUserDefinedLanguageFonts ? 1 : 0
                 onActivated: (index) => {
-                                 screenplayEditorSettings.applyLanguageFonts = (index === 1)
+                                 screenplayEditorSettings.applyUserDefinedLanguageFonts = (index === 1)
                              }
             }
         }

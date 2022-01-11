@@ -925,8 +925,8 @@ void FontSyntaxHighlighter::highlightBlock(const QString &text)
             TransliterationEngine::instance()->evaluateBoundaries(text);
 
     for (const TransliterationEngine::Boundary &boundary : boundaries) {
-        if (boundary.isEmpty())
-            return;
+        if (boundary.isEmpty() || boundary.language == TransliterationEngine::English)
+            continue;
 
         QTextCharFormat format = this->QSyntaxHighlighter::format(boundary.start);
         format.setFontFamily(boundary.font.family());

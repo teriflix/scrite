@@ -271,7 +271,7 @@ Item {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
-            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
             onCursorRectangleChanged: {
                 if(activeFocus) {
                     var pt = mapToItem(propertyEditorItems, cursorRectangle.x, cursorRectangle.y)

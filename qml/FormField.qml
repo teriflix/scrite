@@ -110,7 +110,7 @@ Column {
                 Transliterator.textDocument: textDocument
                 Transliterator.cursorPosition: cursorPosition
                 Transliterator.hasActiveFocus: activeFocus
-                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyLanguageFonts
+                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
                 readOnly: Scrite.document.readOnly
                 background: Item { }
