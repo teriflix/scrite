@@ -408,11 +408,15 @@ void ScriteDocument::setLocked(bool val)
 
 bool ScriteDocument::isEmpty() const
 {
+    const bool spIsEmpty = m_screenplay->isEmpty();
+
     const int objectCount = m_structure->elementCount() + m_structure->annotationCount()
             + m_screenplay->elementCount() + m_structure->notes()->noteCount()
             + m_structure->characterCount() + m_structure->attachments()->attachmentCount()
-            + m_collaborators.size();
-    const bool ret = objectCount == 0 && m_screenplay->isEmpty();
+            + m_collaborators.size() - (spIsEmpty ? 2 : 0);
+
+    const bool ret = objectCount <= 0 && m_screenplay->isEmpty();
+
     return ret;
 }
 

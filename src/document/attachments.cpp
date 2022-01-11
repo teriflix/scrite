@@ -33,8 +33,8 @@ static QStringList supportedExtensions(Attachment::Type type)
             QStringLiteral("jpg,bmp,png,jpeg,svg").split(comma, Qt::SkipEmptyParts);
     static const QStringList videoExtensions =
             QStringLiteral("mp4,mov,avi,wmv,m4v,mpg,mpeg").split(comma, Qt::SkipEmptyParts);
-    static const QStringList audioExtensions = QStringLiteral("mp3,wav,m4a,ogg,flac,aiff,au")
-                                                       .split(QChar(','), Qt::SkipEmptyParts);
+    static const QStringList audioExtensions =
+            QStringLiteral("mp3,wav,m4a,ogg,flac,aiff,au").split(QChar(','), Qt::SkipEmptyParts);
     static const QStringList documentExtensions =
             QStringLiteral(
                     "pdf,txt,zip,docx,xlsx,doc,xls,ppt,pptx,odt,odp,ods,ics,ical,scrite,fdx,xml")
@@ -649,6 +649,11 @@ bool AttachmentsDropArea::prepareAttachmentFromMimeData(const QMimeData *mimeDat
     const QString filePath = url.toLocalFile();
     const QFileInfo fi(filePath);
 
+    if (m_attachment != nullptr) {
+        if (m_attachment->filePath() == fi.absoluteFilePath())
+            return true;
+    }
+
     if (!fi.exists() || !fi.isReadable() || fi.isDir()) {
         this->setAttachment(nullptr);
         return false;
@@ -677,7 +682,7 @@ bool AttachmentsDropArea::prepareAttachmentFromMimeData(const QMimeData *mimeDat
     ptr->setMimeType(mimeType.name());
     ptr->setOriginalFileName(fi.fileName());
     ptr->setType(Attachment::determineType(fi));
-    ptr->setRemoveFileOnDelete(true);
+    ptr->setRemoveFileOnDelete(false);
 
     this->setAttachment(ptr);
 
