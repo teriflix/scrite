@@ -215,7 +215,7 @@ void CharacterRelationshipsGraphEdge::evaluatePath()
             futureWatcher->deleteLater();
         });
         futureWatcher->setFuture(QtConcurrent::run(&StructureElementConnector::curvedArrowPath,
-                                                   box1, box2, 9, false));
+                                                   box1, box2, 5, false));
     }
 }
 

@@ -4675,12 +4675,12 @@ QPainterPath StructureElementConnector::curvedArrowPath(const QRectF &rect1, con
         path.moveTo(p1);
         path.cubicTo(cp1, cp2, p2);
 
-        const qreal arrowPadding = arrowSize * 4 / path.length();
+        const qreal arrowPadding = 0; // arrowSize * 4 / path.length();
         const QPointF arrowPt = path.pointAtPercent(1.0 - arrowPadding);
         const qreal arrowAngle = path.angleAtPercent(1.0 - arrowPadding);
 
-        QPolygonF polygon({ QPointF(-2 * arrowSize, -arrowSize), QPointF(0, 0),
-                            QPointF(-2 * arrowSize, arrowSize) });
+        QPolygonF polygon({ QPointF(-2 * arrowSize, -0.75 * arrowSize), QPointF(0, 0),
+                            QPointF(-2 * arrowSize, 0.75 * arrowSize) });
         if (fillArrow)
             polygon.append(polygon.first());
         QTransform polygonTx;
@@ -4815,7 +4815,7 @@ void StructureElementConnector::computeConnectorShape()
     };
     const QRectF r1 = getElementRect(m_fromElement);
     const QRectF r2 = getElementRect(m_toElement);
-    const qreal arrowHeadSize = 9;
+    const qreal arrowHeadSize = 6;
 
     if (m_lineType == StraightLine) {
         m_connectorShape.moveTo(r1.center());

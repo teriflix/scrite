@@ -162,6 +162,7 @@ Rectangle {
 
             Item {
                 id: edgeItems
+                z: 1
 
                 Repeater {
                     id: edgeItemsRepeater
@@ -226,6 +227,7 @@ Rectangle {
 
             Item {
                 id: nodeItems
+                z: 0
 
                 Item {
                     anchors.fill: canvas.selectedNodeItem

@@ -254,7 +254,7 @@ StructureIndexCard::~StructureIndexCard() { }
 
 QPainterPath evaluateConnectorPath(const QRectF &r1, const QRectF &r2, QPointF *labelPos = nullptr)
 {
-    const QPainterPath path = StructureElementConnector::curvedArrowPath(r1, r2, 9, false);
+    const QPainterPath path = StructureElementConnector::curvedArrowPath(r1, r2, 7, false);
     if (!path.isEmpty() && labelPos) {
         const qreal pathLength = path.length();
         const qreal labelD = 30 / pathLength;

@@ -76,7 +76,7 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
         const CharacterRelationshipsGraphNode *node = nodes->at(i);
         CharacterRelationshipsGraphNodeItem *nodeItem =
                 new CharacterRelationshipsGraphNodeItem(node);
-        nodeItem->setZValue(2);
+        nodeItem->setZValue(1);
         nodeItem->setParentItem(nodesAndEdges);
     }
 
@@ -84,7 +84,7 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
         const CharacterRelationshipsGraphEdge *edge = edges->at(i);
         CharacterRelationshipsGraphEdgeItem *edgeItem =
                 new CharacterRelationshipsGraphEdgeItem(edge);
-        edgeItem->setZValue(1);
+        edgeItem->setZValue(2);
         edgeItem->setParentItem(nodesAndEdges);
     }
 

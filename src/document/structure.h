@@ -1068,7 +1068,7 @@ public:
     QPainterPath shape() const;
 
     static QPainterPath curvedArrowPath(const QRectF &rect1, const QRectF &rect2,
-                                        const qreal arrowSize = 9, bool fillArrow = false);
+                                        const qreal arrowSize = 6, bool fillArrow = false);
 
 protected:
     // QObject interface
