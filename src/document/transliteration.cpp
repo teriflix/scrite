@@ -765,6 +765,7 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
     if (text.isEmpty())
         return ret;
 
+    // Create a boundary item for each word found in the given text
     QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Word, text);
     while (boundaryFinder.position() < text.length()) {
         if (!(boundaryFinder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem))) {
@@ -787,6 +788,7 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
         ret.append(item);
     }
 
+    // If no boundaries were found, then the whole text is one boundary.
     if (ret.isEmpty()) {
         Boundary item;
         item.start = 0;
@@ -799,6 +801,8 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
         return ret;
     }
 
+    // If the first few characters were not captured in the boundary, then
+    // capture them now.
     if (ret.first().start > 0) {
         Boundary firstItem;
         firstItem.start = 0;
@@ -809,6 +813,8 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
         }
     }
 
+    // If the last few characters were not captured in the boundary, then
+    // capture them now.
     if (ret.last().end < text.length() - 1) {
         Boundary lastItem;
         lastItem.start = ret.last().end + 1;
@@ -819,6 +825,7 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
         }
     }
 
+    // Merge boundaries if they belong to the same language.
     if (ret.size() >= 2) {
         for (int i = ret.size() - 2; i >= 0; i--) {
             const Boundary left = ret.at(i);
@@ -842,6 +849,10 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
             }
         }
     }
+
+    // TODO: break apart a single boundary if it combines two distinct languages
+    // But, we won't do that now. Its rather rare that users will write a single word in
+    // two separate languages.
 
     return ret;
 }
