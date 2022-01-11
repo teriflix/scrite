@@ -1153,10 +1153,6 @@ private:
     QString m_highlightedText;
     int m_formatMTime = -1;
     int m_spellCheckMTime = -1;
-    int m_transliterationEnd = 0;
-    int m_transliterationStart = 0;
-    bool m_hadMisspelledFragments = false;
-    TransliterationEngine::Language m_translitrationLanguage = TransliterationEngine::English;
     QMetaObject::Connection m_spellCheckConnection;
 };
 
