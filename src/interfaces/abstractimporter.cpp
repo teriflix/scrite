@@ -80,6 +80,11 @@ bool AbstractImporter::read()
 
     document->reset();
 
+    // Remove any blank scenes created in reset()
+    Structure *structure = document->structure();
+    while (structure->elementCount())
+        structure->removeElement(structure->elementAt(0));
+
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
         this->error()->setErrorMessage(
