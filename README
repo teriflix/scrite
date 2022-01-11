@@ -12,8 +12,8 @@ FEATURES
 
 Building from source
 ------------
-Scrite is developed using Qt 5.15.7. To build scrite, simply install
-Qt on your computer (Windows, macOS or Linux).
+Scrite is developed using Qt 5.15.8. To build scrite, simply install
+this version of Qt on your computer (Windows, macOS or Linux).
 
 Open scrite.pro in Qt Creator and build.
 
