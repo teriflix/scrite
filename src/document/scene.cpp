@@ -433,13 +433,6 @@ int SceneElement::cursorPosition() const
     return m_scene->cursorPosition();
 }
 
-SceneElementContentChange SceneElement::lastContentChange() const
-{
-    SceneElementContentChange ret = m_lastContentChange;
-    m_lastContentChange = SceneElementContentChange();
-    return ret;
-}
-
 QString SceneElement::formattedText() const
 {
     if (m_type == SceneElement::Parenthetical) {

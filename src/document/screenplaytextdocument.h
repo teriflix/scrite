@@ -62,6 +62,8 @@ Q_DECLARE_INTERFACE(AbstractScreenplayTextDocumentInjectionInterface,
 
 class QQmlEngine;
 class ScreenplayTextDocumentUpdate;
+class SceneElementBlockTextUpdater;
+
 class ScreenplayTextDocument : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -302,6 +304,7 @@ private:
     void resetInjection();
 
 private:
+    friend class SceneElementBlockTextUpdater;
     int m_pageCount = 0;
     bool m_updating = false;
     bool m_titlePage = false;
@@ -423,6 +426,27 @@ private:
     void drawSceneIcon(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
                        const QTextFormat &format);
     void drawText(QPainter *painter, const QRectF &rect, const QString &text);
+};
+
+class SceneElementBlockTextUpdater : public QObject
+{
+    Q_OBJECT
+
+public:
+    static void completeOthers(SceneElementBlockTextUpdater *than);
+
+    SceneElementBlockTextUpdater(ScreenplayTextDocument *document, SceneElement *para);
+    ~SceneElementBlockTextUpdater();
+
+    void schedule();
+    void abort();
+    void timerEvent(QTimerEvent *event);
+    void update();
+
+private:
+    QBasicTimer m_timer;
+    QPointer<SceneElement> m_sceneElement;
+    QPointer<ScreenplayTextDocument> m_document;
 };
 
 #endif // SCREENPLAYTEXTDOCUMENT_H

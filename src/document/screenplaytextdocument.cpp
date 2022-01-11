@@ -1893,8 +1893,6 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para,
 
     ScreenplayTextDocumentUpdate update(this);
 
-    const SceneElementContentChange lastParaChange = para->lastContentChange();
-
     QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
     for (ScreenplayElement *element : qAsConst(elements)) {
         QTextFrame *frame = this->findTextFrame(element);
@@ -1919,23 +1917,13 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para,
             if (type == Scene::ElementTypeChange)
                 this->formatBlock(block);
             else if (type == Scene::ElementTextChange) {
-                if (m_purpose == ForDisplay && !block.text().isEmpty()) {
-                    QTextCursor cursor(block);
-                    if (lastParaChange.isValid()) {
-                        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor,
-                                            lastParaChange.position);
-                        if (lastParaChange.charsRemoved > 0) {
-                            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
-                                                lastParaChange.charsRemoved);
-                            cursor.removeSelectedText();
-                        }
-
-                        if (lastParaChange.charsAdded > 0)
-                            cursor.insertText(lastParaChange.content);
-                    } else {
-                        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-                        cursor.insertText(para->text());
-                    }
+                if (m_purpose == ForDisplay) {
+                    SceneElementBlockTextUpdater *paraUpdater =
+                            para->findChild<SceneElementBlockTextUpdater *>(
+                                    QString(), Qt::FindDirectChildrenOnly);
+                    if (!paraUpdater)
+                        paraUpdater = new SceneElementBlockTextUpdater(this, para);
+                    paraUpdater->schedule();
                 } else
                     this->formatBlock(block, para->text());
             }
@@ -2295,9 +2283,6 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
                 : (scene->heading()->isEnabled() ? scene->heading()->text()
                                                  : QStringLiteral("NO SCENE HEADING"));
 
-        if (para)
-            para->lastContentChange();
-
         ScreenplayParagraphBlockData *data = ScreenplayParagraphBlockData::get(block);
 
         QTextCursor cursor(block);
@@ -2558,7 +2543,6 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             if (highlightParagraph)
                 cursor.mergeCharFormat(highlightCharFormat);
 
-            para->lastContentChange();
             const QString text = para->text();
             if (m_purpose == ForPrinting)
                 polishFontsAndInsertTextAtCursor(cursor, text);
@@ -3175,4 +3159,100 @@ void ScreenplayTextObjectInterface::drawText(QPainter *painter, const QRectF &re
         painter->restore();
     } else
         painter->drawText(rect.bottomLeft(), text);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Q_GLOBAL_STATIC(QList<SceneElementBlockTextUpdater *>, SceneElementBlockTextUpdaterList)
+
+void SceneElementBlockTextUpdater::completeOthers(SceneElementBlockTextUpdater *than)
+{
+    for (SceneElementBlockTextUpdater *updater : qAsConst(*SceneElementBlockTextUpdaterList)) {
+        if (updater != than)
+            updater->update();
+    }
+}
+
+SceneElementBlockTextUpdater::SceneElementBlockTextUpdater(ScreenplayTextDocument *document,
+                                                           SceneElement *para)
+    : QObject(para), m_sceneElement(para), m_document(document)
+{
+    SceneElementBlockTextUpdaterList->append(this);
+    if (!m_document.isNull())
+        connect(m_document, &ScreenplayTextDocument::destroyed, this,
+                &SceneElementBlockTextUpdater::abort);
+}
+
+SceneElementBlockTextUpdater::~SceneElementBlockTextUpdater()
+{
+    m_timer.stop();
+    SceneElementBlockTextUpdaterList->removeOne(this);
+}
+
+void SceneElementBlockTextUpdater::schedule()
+{
+    if (m_sceneElement.isNull())
+        return;
+
+    m_timer.stop();
+    m_timer.start(500, this);
+
+    completeOthers(this);
+}
+
+void SceneElementBlockTextUpdater::abort()
+{
+    m_timer.stop();
+    this->deleteLater();
+}
+
+void SceneElementBlockTextUpdater::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() != m_timer.timerId()) {
+        QObject::timerEvent(event);
+        return;
+    }
+
+    this->update();
+}
+
+void SceneElementBlockTextUpdater::update()
+{
+    this->deleteLater();
+    if (!m_timer.isActive())
+        return;
+
+    m_timer.stop();
+    if (m_sceneElement.isNull() || m_document.isNull())
+        return;
+
+    Scene *scene = m_sceneElement->scene();
+    if (scene == nullptr)
+        return;
+
+    Screenplay *screenplay = m_document->screenplay();
+    if (screenplay == nullptr)
+        return;
+
+    ScreenplayTextDocumentUpdate update(m_document);
+
+    const int paraIndex = scene->indexOfElement(m_sceneElement);
+    if (paraIndex < 0)
+        return; // This can happen when the paragraph is not part of the scene text, but
+                // it exists as a way to capture a mute-character in the scene.
+
+    QList<ScreenplayElement *> elements = screenplay->sceneElements(scene);
+    for (ScreenplayElement *element : qAsConst(elements)) {
+        QTextFrame *frame = m_document->findTextFrame(element);
+        if (frame == nullptr)
+            continue;
+
+        const int nrBlocks = paraIndex + (scene->heading()->isEnabled() ? 1 : 0);
+
+        QTextCursor cursor = frame->firstCursorPosition();
+        cursor.movePosition(QTextCursor::NextBlock, QTextCursor::MoveAnchor, nrBlocks);
+
+        QTextBlock block = cursor.block();
+        m_document->formatBlock(block, m_sceneElement->text());
+    }
 }

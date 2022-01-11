@@ -1157,7 +1157,6 @@ private:
     int m_transliterationStart = 0;
     bool m_hadMisspelledFragments = false;
     TransliterationEngine::Language m_translitrationLanguage = TransliterationEngine::English;
-    SceneElementContentChange m_lastContentChange;
     QMetaObject::Connection m_spellCheckConnection;
 };
 
@@ -2243,8 +2242,6 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         return;
     }
 
-    sceneElement->setLastContentChange(SceneElementContentChange());
-
     /**
       If the number of paragraphs in the document is differnet from the number of
       paragraphs in our internal Scene data structure, then we better sync it once.
@@ -2257,12 +2254,8 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
         return;
     }
 
-    const int blockPosition = from - block.position();
-    const QString changedText =
-            charsAdded > 0 ? block.text().mid(blockPosition, charsAdded) : QString();
-    const SceneElementContentChange change(blockPosition, charsAdded, charsRemoved, changedText);
-    sceneElement->setLastContentChange(change);
     sceneElement->setText(block.text());
+
     if (m_spellCheckEnabled && m_liveSpellCheckEnabled && (charsAdded > 0 || charsRemoved > 0))
         userData->scheduleSpellCheckUpdate();
 }
