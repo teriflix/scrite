@@ -2012,9 +2012,15 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
     if (previousStructureElementAfterMove->stackId() != nextStructureElementAfterMove->stackId())
         return;
 
+    if (previousStructureElementAfterMove->stackId().isEmpty())
+        return;
+
     // Split the stack into which the element is moved.
     const StructureElementStack *stack = m_structure->elementStacks()->findStackById(
             previousStructureElementAfterMove->stackId());
+    if (stack == nullptr)
+        return;
+
     const int nextElementIndex = stack->constList().indexOf(nextStructureElementAfterMove);
     const QList<StructureElement *> afterElements = stack->constList().mid(nextElementIndex);
     const QString newStackId =
