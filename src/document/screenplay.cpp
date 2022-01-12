@@ -978,7 +978,7 @@ void Screenplay::moveSelectedElements(int toRow)
     toRow = qBound(0, toRow, m_elements.size());
 
     /**
-     * Why are we resetting the models while moving multiple elements, instead of removing and
+     * Why are we resetting the models while moving multiple elements, instead of removing and *
      * inserting them? Or better yet, moving them?
      *
      * The ScreenplayTextDocument class was built with the assumption that elements will be added,
@@ -991,6 +991,8 @@ void Screenplay::moveSelectedElements(int toRow)
     ScreenplayElementsMoveCommand *cmd = nullptr;
 
     ScreenplayElement *toRowElement = this->elementAt(toRow);
+    if (toRowElement->isSelected())
+        return;
 
     QList<ScreenplayElement *> selectedElements;
     QHash<ScreenplayElement *, QPair<int, int>> movement;
