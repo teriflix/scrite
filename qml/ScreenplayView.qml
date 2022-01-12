@@ -771,6 +771,7 @@ Item {
                                 if(!elementItemDelegate.element.selected)
                                     Scrite.document.screenplay.clearSelection()
                                 elementItemDelegate.element.selected = true
+                                screenplayElementList.forceActiveFocus()
                                 elementItemDelegate.grabToImage(function(result) {
                                     elementItemDelegate.Drag.imageSource = result.url
                                 })
