@@ -1973,7 +1973,7 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
      * them as needed.
      */
 
-    StructureElement *element = ptr->scene()->structureElement();
+    StructureElement *element = ptr->scene() ? ptr->scene()->structureElement() : nullptr;
     if (element == nullptr)
         return;
 
