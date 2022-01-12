@@ -2346,7 +2346,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                color: Qt.tint(contentItem.theScene.color, "#A7FFFFFF")
+                color: Scrite.app.isVeryLightColor(contentItem.theScene.color) ? primaryColors.highlight.background : Qt.tint(contentItem.theScene.color, "#9CFFFFFF")
                 visible: screenplayAdapter.currentIndex === contentItem.theIndex
             }
 
@@ -3019,6 +3019,19 @@ Rectangle {
                     }
                 }
 
+                QtObject {
+                    EventFilter.target: Scrite.app
+                    EventFilter.active: screenplayAdapter.isSourceScreenplay && Scrite.document.screenplay.hasSelectedElements
+                    EventFilter.events: [EventFilter.KeyPress]
+                    EventFilter.onFilter: (object,event,result) => {
+                                              if(event.key === Qt.Key_Escape) {
+                                                  Scrite.document.screenplay.clearSelection()
+                                                  result.acceptEvent = true
+                                                  result.filter = true
+                                              }
+                                          }
+                }
+
                 ListView {
                     id: sceneListView
                     anchors.fill: parent
@@ -3083,9 +3096,11 @@ Rectangle {
                         id: delegateItem
                         width: sceneListView.width-1
                         height: 40
-                        color: scene ? Qt.tint(scene.color, (screenplayElement.selected ? "#9CFFFFFF" : "#E7FFFFFF"))
+                        color: scene ? screenplayElement.selected ? selectedColor : normalColor
                                      : screenplayAdapter.currentIndex === index ? Scrite.app.translucent(accentColors.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
+                        property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(primaryColors.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
+                        property color normalColor: Qt.tint(scene.color, "#E7FFFFFF")
                         property int elementIndex: index
                         property bool elementIsBreak: screenplayElementType === ScreenplayElement.BreakElementType
                         property bool elementIsEpisodeBreak: screenplayElementType === ScreenplayElement.BreakElementType && breakType === Screenplay.Episode
@@ -3211,6 +3226,7 @@ Rectangle {
                             id: delegateDropArea
                             anchors.fill: parent
                             keys: ["sceneListView/sceneID"]
+                            enabled: !screenplayElement.selected
 
                             onEntered: (drag) => {
                                            drag.acceptProposedAction()

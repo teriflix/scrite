@@ -623,6 +623,15 @@ void Screenplay::setTitlePageIsCentered(bool val)
     emit titlePageIsCenteredChanged();
 }
 
+bool Screenplay::hasSelectedElements() const
+{
+    for (ScreenplayElement *element : m_elements)
+        if (element->isSelected())
+            return true;
+
+    return false;
+}
+
 QQmlListProperty<ScreenplayElement> Screenplay::elements()
 {
     return QQmlListProperty<ScreenplayElement>(
@@ -706,6 +715,8 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
     connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
     connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
+    connect(ptr, &ScreenplayElement::selectedChanged, this,
+            &Screenplay::hasSelectedElementsChanged);
 
     this->endInsertRows();
 
@@ -772,6 +783,8 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::breakTypeChanged, this,
                &Screenplay::updateBreakTitlesLater);
     disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
+    disconnect(ptr, &ScreenplayElement::selectedChanged, this,
+               &Screenplay::hasSelectedElementsChanged);
 
     this->endRemoveRows();
 

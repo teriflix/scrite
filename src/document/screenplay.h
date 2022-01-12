@@ -298,6 +298,10 @@ public:
     bool hasNonStandardScenes() const { return m_hasNonStandardScenes; }
     Q_SIGNAL void hasNonStandardScenesChanged();
 
+    Q_PROPERTY(bool hasSelectedElements READ hasSelectedElements NOTIFY hasSelectedElementsChanged)
+    bool hasSelectedElements() const;
+    Q_SIGNAL void hasSelectedElementsChanged();
+
     Q_PROPERTY(QQmlListProperty<ScreenplayElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<ScreenplayElement> elements();
     Q_INVOKABLE void addElement(ScreenplayElement *ptr);
