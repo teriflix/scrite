@@ -216,6 +216,7 @@ public:
 
     Q_INVOKABLE QColor pickStandardColor(int counter) const;
     Q_INVOKABLE static bool isLightColor(const QColor &color);
+    Q_INVOKABLE static bool isVeryLightColor(const QColor &color);
     Q_INVOKABLE static QColor textColorFor(const QColor &bgColor);
     const QVector<QColor> standardColors() const { return standardColors(QVersionNumber()); }
 

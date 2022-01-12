@@ -1154,6 +1154,11 @@ bool Application::isLightColor(const QColor &color)
     return evaluateLuminance(color) > 0.5;
 }
 
+bool Application::isVeryLightColor(const QColor &color)
+{
+    return evaluateLuminance(color) > 0.8;
+}
+
 QColor Application::textColorFor(const QColor &bgColor)
 {
     // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color/1855903#1855903
