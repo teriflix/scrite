@@ -460,7 +460,7 @@ Item {
 
         QtObject {
             EventFilter.target: Scrite.app
-            EventFilter.active: screenplayElementList.multiSelectionMode
+            EventFilter.active: Scrite.document.screenplay.hasSelectedElements
             EventFilter.events: [EventFilter.KeyPress]
             EventFilter.onFilter: (object,event,result) => {
                                       if(event.key === Qt.Key_Escape) {
@@ -603,7 +603,7 @@ Item {
 
                         Text {
                             text: sceneTitle
-                            color: element.scene ? app.textColorFor(parent.parent.color) : colorPalette.text
+                            color: element.scene ? Scrite.app.textColorFor(parent.parent.color) : colorPalette.text
                             elide: Text.ElideRight
                             width: parent.width
                             height: parent.height
@@ -781,6 +781,7 @@ Item {
                 id: delegateDropArea
                 anchors.fill: parent
                 keys: [dropAreaKey]
+                enabled: !screenplayElement.selected
 
                 onEntered: (drag) => {
                                screenplayElementList.forceActiveFocus()
@@ -940,32 +941,55 @@ Item {
         }
     }
 
+    SequentialAnimation {
+        id: dropSceneAnimation
+
+        property var dropSource // must be a QObject subclass
+        property int dropIndex
+
+        PauseAnimation { duration: 50 }
+
+        ScriptAction {
+            script: {
+                const source = dropSceneAnimation.dropSource
+                const index = dropSceneAnimation.dropIndex
+
+                dropSceneAnimation.dropSource = null
+                dropSceneAnimation.dropIndex = -2
+
+                var sourceType = Scrite.app.typeName(source)
+
+                if(sourceType === "ScreenplayElement") {
+                    if(screenplayElementList.mutiSelectionMode)
+                        Scrite.document.screenplay.moveSelectedElements(index)
+                    else
+                        Scrite.document.screenplay.moveElement(source, index)
+                    return
+                }
+
+                var sceneID = source.id
+                if(sceneID.length === 0)
+                    return
+
+                var scene = Scrite.document.structure.findElementBySceneID(sceneID)
+                if(scene === null)
+                    return
+
+                var element = screenplayElementComponent.createObject()
+                element.sceneID = sceneID
+                Scrite.document.screenplay.insertElementAt(element, index)
+                requestEditorLater()
+            }
+        }
+    }
+
     function dropSceneAt(source, index) {
         if(source === null)
             return
 
-        var sourceType = Scrite.app.typeName(source)
-
-        if(sourceType === "ScreenplayElement") {
-            if(screenplayElementList.mutiSelectionMode)
-                Scrite.document.screenplay.moveSelectedElements(index)
-            else
-                Scrite.document.screenplay.moveElement(source, index)
-            return
-        }
-
-        var sceneID = source.id
-        if(sceneID.length === 0)
-            return
-
-        var scene = Scrite.document.structure.findElementBySceneID(sceneID)
-        if(scene === null)
-            return
-
-        var element = screenplayElementComponent.createObject()
-        element.sceneID = sceneID
-        Scrite.document.screenplay.insertElementAt(element, index)
-        requestEditorLater()
+        dropSceneAnimation.dropSource = source
+        dropSceneAnimation.dropIndex = index
+        dropSceneAnimation.start()
     }
 
     Component {
