@@ -1969,6 +1969,16 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
      * them as needed.
      */
 
+    auto stackEm = [](const QList<StructureElement *> &elements) {
+        if (elements.isEmpty())
+            return;
+
+        const QString newStackId =
+                elements.size() == 1 ? QString() : QUuid::createUuid().toString();
+        for (StructureElement *element : elements)
+            element->setStackId(newStackId);
+    };
+
     StructureElement *element = ptr->scene()->structureElement();
     if (element == nullptr)
         return;
@@ -1987,11 +1997,8 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
             // If the element removed was not at the end of its stack, then
             // we will have to split the stack across its position
             if (elementIndex > 0 || elementIndex < stackElements.size() - 1) {
-                const QList<StructureElement *> afterElements = stackElements.mid(elementIndex + 1);
-                const QString newStackId =
-                        afterElements.size() == 1 ? QString() : QUuid::createUuid().toString();
-                for (StructureElement *afterElement : afterElements)
-                    afterElement->setStackId(newStackId);
+                stackEm(stackElements.mid(0, elementIndex));
+                stackEm(stackElements.mid(elementIndex + 1));
             }
         }
     }
@@ -2021,12 +2028,10 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
     if (stack == nullptr)
         return;
 
+    const int previousElementIndex = stack->constList().indexOf(previousStructureElementAfterMove);
     const int nextElementIndex = stack->constList().indexOf(nextStructureElementAfterMove);
-    const QList<StructureElement *> afterElements = stack->constList().mid(nextElementIndex);
-    const QString newStackId =
-            afterElements.size() == 1 ? QString() : QUuid::createUuid().toString();
-    for (StructureElement *afterElement : afterElements)
-        afterElement->setStackId(newStackId);
+    stackEm(stack->constList().mid(0, previousElementIndex + 1));
+    stackEm(stack->constList().mid(nextElementIndex));
 }
 
 void ScriteDocument::clearModifiedLater()

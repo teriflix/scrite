@@ -366,11 +366,18 @@ void StructureElement::unstack()
     if (elementIndex == 0 || elementIndex == stack->constList().size() - 1)
         return;
 
-    const QList<StructureElement *> afterElements = stack->constList().mid(elementIndex + 1);
-    const QString newStackId =
-            afterElements.size() == 1 ? QString() : QUuid::createUuid().toString();
-    for (StructureElement *afterElement : afterElements)
-        afterElement->setStackId(newStackId);
+    auto stackEm = [](const QList<StructureElement *> &elements) {
+        if (elements.isEmpty())
+            return;
+
+        const QString newStackId =
+                elements.size() == 1 ? QString() : QUuid::createUuid().toString();
+        for (StructureElement *element : elements)
+            element->setStackId(newStackId);
+    };
+
+    stackEm(stack->constList().mid(0, elementIndex));
+    stackEm(stack->constList().mid(elementIndex + 1));
 }
 
 void StructureElement::serializeToJson(QJsonObject &json) const
