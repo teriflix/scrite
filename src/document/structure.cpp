@@ -17,6 +17,7 @@
 #include "aggregation.h"
 #include "errorreport.h"
 #include "application.h"
+#include "focustracker.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
@@ -98,10 +99,12 @@ void StructureElement::setX(qreal val)
     if (!m_placed)
         m_placed = !qFuzzyIsNull(m_x) && !qFuzzyIsNull(m_y);
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if (!info->isLocked())
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property, m_placed));
+    if (m_undoRedoEnabled) {
+        ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
+        QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+        if (!info->isLocked())
+            cmd.reset(new PushObjectPropertyUndoCommand(this, info->property, m_placed));
+    }
 
     m_x = val;
     emit xChanged();
@@ -115,10 +118,12 @@ void StructureElement::setY(qreal val)
     if (!m_placed)
         m_placed = !qFuzzyIsNull(m_x) && !qFuzzyIsNull(m_y);
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if (!info->isLocked())
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property, m_placed));
+    if (m_undoRedoEnabled) {
+        ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "position");
+        QScopedPointer<PushObjectPropertyUndoCommand> cmd;
+        if (!info->isLocked())
+            cmd.reset(new PushObjectPropertyUndoCommand(this, info->property, m_placed));
+    }
 
     m_y = val;
     emit yChanged();
@@ -177,6 +182,15 @@ void StructureElement::setFollow(QQuickItem *val)
         timer->deleteLater();
     });
     timer->start();
+}
+
+void StructureElement::setUndoRedoEnabled(bool val)
+{
+    if (m_undoRedoEnabled == val)
+        return;
+
+    m_undoRedoEnabled = val;
+    emit undoRedoEnabledChanged();
 }
 
 void StructureElement::setSyncWithFollow(bool val)

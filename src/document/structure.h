@@ -88,6 +88,11 @@ public:
     QQuickItem *follow() const { return m_follow; }
     Q_SIGNAL void followChanged();
 
+    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY undoRedoEnabledChanged)
+    void setUndoRedoEnabled(bool val);
+    bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
+    Q_SIGNAL void undoRedoEnabledChanged();
+
     Q_PROPERTY(bool syncWithFollow READ isSyncWithFollow WRITE setSyncWithFollow NOTIFY syncWithFollowChanged STORED false)
     void setSyncWithFollow(bool val);
     bool isSyncWithFollow() const { return m_syncWithFollow; }
@@ -172,6 +177,7 @@ private:
     Scene *m_scene = nullptr;
     bool m_selected = false;
     bool m_syncWithFollow = false;
+    bool m_undoRedoEnabled = false;
     Structure *m_structure = nullptr;
     QObjectProperty<QQuickItem> m_follow;
 };

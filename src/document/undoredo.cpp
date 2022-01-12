@@ -235,9 +235,8 @@ ObjectPropertyUndoCommand::ObjectPropertyUndoCommand(QObject *object, const QByt
                 m_propertyInfo = nullptr;
             else {
                 m_oldValue = m_propertyInfo->read();
-                this->setText(QString("%1.%2")
-                                      .arg(object->metaObject()->className())
-                                      .arg(QString::fromLatin1(property)));
+                this->setText(QString("%1.%2").arg(object->metaObject()->className(),
+                                                   QString::fromLatin1(property)));
                 m_connection = QObject::connect(object, &QObject::destroyed, object, [this]() {
                     m_propertyInfo = nullptr;
                     this->setObsolete(true);

@@ -665,6 +665,7 @@ Item {
                                 ToolTip.text = evalToolTipText()
                         }
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        onPressed: screenplayElementList.forceActiveFocus()
                         onClicked: {
                             const isControlPressed = mouse.modifiers & Qt.ControlModifier
                             const isShiftPressed = mouse.modifiers & Qt.ShiftModifier

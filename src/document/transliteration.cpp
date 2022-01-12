@@ -909,8 +909,6 @@ QString TransliterationEngine::formattedHtmlOf(const QString &text) const
 
     ts.flush();
 
-    Application::log(html);
-
     return html;
 }
 

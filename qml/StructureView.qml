@@ -1050,6 +1050,9 @@ Item {
 
                     var fbbl = Scrite.document.structure.forceBeatBoardLayout
 
+                    if(!fbbl)
+                        element.undoRedoEnabled = true
+
                     switch(event.key) {
                     case Qt.Key_Left:
                         if(fbbl) return
@@ -1085,6 +1088,8 @@ Item {
                             canvasScroll.deleteElement(element)
                         break
                     }
+
+                    element.undoRedoEnabled = false
                 }
             }
 
@@ -2511,11 +2516,16 @@ Item {
 
                 // Move index-card around
                 MouseArea {
+                    id: moveMouseArea
                     anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
                     onPressed: {
+                        elementItem.element.undoRedoEnabled = true
                         elementItem.select()
                         canvas.forceActiveFocus()
+                    }
+                    onReleased: {
+                        elementItem.element.undoRedoEnabled = false
                     }
 
                     drag.target: Scrite.document.readOnly || Scrite.document.structure.forceBeatBoardLayout ? null : elementItem

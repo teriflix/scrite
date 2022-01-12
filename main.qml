@@ -68,7 +68,7 @@ Rectangle {
     UndoStack {
         id: mainUndoStack
         objectName: "MainUndoStack"
-        property bool sceneListPanelActive: true
+        property bool sceneListPanelActive: false
         property bool screenplayEditorActive: false
         property bool timelineEditorActive: false
         property bool structureEditorActive: false

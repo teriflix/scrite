@@ -847,10 +847,8 @@ bool Application::notify(QObject *object, QEvent *event)
         }
 
         if (ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Z) {
-            if (!UndoHandler::handleUndo()) {
-                Application::log("Got Undo Hit: " + QString::number(m_undoGroup->canUndo()));
+            if (!UndoHandler::handleUndo())
                 m_undoGroup->undo();
-            }
             return true;
         }
 
