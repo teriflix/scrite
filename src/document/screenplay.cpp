@@ -1004,8 +1004,10 @@ void Screenplay::moveSelectedElements(int toRow)
     ScreenplayElementsMoveCommand *cmd = nullptr;
 
     ScreenplayElement *toRowElement = this->elementAt(toRow);
-    if (toRowElement->isSelected())
+    if (toRowElement && toRowElement->isSelected())
         return;
+
+    emit aboutToMoveElements(toRow);
 
     QList<ScreenplayElement *> selectedElements;
     QHash<ScreenplayElement *, QPair<int, int>> movement;

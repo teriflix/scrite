@@ -231,6 +231,10 @@ public:
     Q_INVOKABLE void moveToStack(StructureElementStack *other);
     Q_INVOKABLE void bringElementToTop(int index);
 
+    void sortByScreenplayOccurance(Screenplay *screenplay);
+
+    static void stackEm(const QList<StructureElement *> &elements);
+
 protected:
     void timerEvent(QTimerEvent *te);
     void itemInsertEvent(StructureElement *ptr);

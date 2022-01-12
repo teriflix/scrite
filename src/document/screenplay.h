@@ -322,6 +322,7 @@ public:
     Q_SIGNAL void elementInserted(ScreenplayElement *element, int index);
     Q_SIGNAL void elementRemoved(ScreenplayElement *element, int index);
     Q_SIGNAL void elementMoved(ScreenplayElement *element, int from, int to);
+    Q_SIGNAL void aboutToMoveElements(int at);
 
     Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
 

@@ -366,18 +366,8 @@ void StructureElement::unstack()
     if (elementIndex == 0 || elementIndex == stack->constList().size() - 1)
         return;
 
-    auto stackEm = [](const QList<StructureElement *> &elements) {
-        if (elements.isEmpty())
-            return;
-
-        const QString newStackId =
-                elements.size() == 1 ? QString() : QUuid::createUuid().toString();
-        for (StructureElement *element : elements)
-            element->setStackId(newStackId);
-    };
-
-    stackEm(stack->constList().mid(0, elementIndex));
-    stackEm(stack->constList().mid(elementIndex + 1));
+    StructureElementStack::stackEm(stack->constList().mid(0, elementIndex));
+    StructureElementStack::stackEm(stack->constList().mid(elementIndex + 1));
 }
 
 void StructureElement::serializeToJson(QJsonObject &json) const
@@ -519,6 +509,42 @@ void StructureElementStack::bringElementToTop(int index)
     StructureElement *element = this->list().at(index);
     int elementIndex = structure->indexOfElement(element);
     structure->setCurrentElementIndex(elementIndex);
+}
+
+void StructureElementStack::sortByScreenplayOccurance(Screenplay *screenplay)
+{
+    QList<StructureElement *> &list = this->list();
+
+    bool shifted = false;
+    std::sort(list.begin(), list.end(),
+              [screenplay, &shifted](StructureElement *e1, StructureElement *e2) {
+                  const int i1 = screenplay->firstIndexOfScene(e1->scene());
+                  const int i2 = screenplay->firstIndexOfScene(e2->scene());
+                  e1->setStackLeader(false);
+                  e2->setStackLeader(false);
+                  if (i1 > i2)
+                      shifted = true;
+                  return i1 < i2;
+              });
+
+    list.first()->setStackLeader(true);
+    this->setTopmostElement(nullptr);
+
+    if (shifted) {
+        const QModelIndex start = this->index(0);
+        const QModelIndex end = this->index(list.size() - 1);
+        emit dataChanged(start, end);
+    }
+}
+
+void StructureElementStack::stackEm(const QList<StructureElement *> &elements)
+{
+    if (elements.isEmpty())
+        return;
+
+    const QString newStackId = elements.size() == 1 ? QString() : QUuid::createUuid().toString();
+    for (StructureElement *element : elements)
+        element->setStackId(newStackId);
 }
 
 void StructureElementStack::timerEvent(QTimerEvent *te)
@@ -668,28 +694,8 @@ void StructureElementStack::initialize()
 
     this->setGeometry(QRectF(x, y, w, h));
 
-    if (screenplay != nullptr) {
-        bool shifted = false;
-        std::sort(list.begin(), list.end(),
-                  [screenplay, &shifted](StructureElement *e1, StructureElement *e2) {
-                      const int i1 = screenplay->firstIndexOfScene(e1->scene());
-                      const int i2 = screenplay->firstIndexOfScene(e2->scene());
-                      e1->setStackLeader(false);
-                      e2->setStackLeader(false);
-                      if (i1 > i2)
-                          shifted = true;
-                      return i1 < i2;
-                  });
-
-        list.first()->setStackLeader(true);
-        this->setTopmostElement(nullptr);
-
-        if (shifted) {
-            const QModelIndex start = this->index(0);
-            const QModelIndex end = this->index(list.size() - 1);
-            emit dataChanged(start, end);
-        }
-    }
+    if (screenplay != nullptr)
+        this->sortByScreenplayOccurance(screenplay);
 
     const QStringList groups = stackGroups.values();
     for (StructureElement *element : qAsConst(this->list())) {

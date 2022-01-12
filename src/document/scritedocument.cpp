@@ -781,6 +781,8 @@ void ScriteDocument::reset()
                    &ScriteDocument::screenplayElementRemoved);
         disconnect(m_screenplay, &Screenplay::elementMoved, this,
                    &ScriteDocument::screenplayElementMoved);
+        disconnect(m_screenplay, &Screenplay::aboutToMoveElements, this,
+                   &ScriteDocument::screenplayAboutToMoveElements);
         disconnect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
         disconnect(m_screenplay, &Screenplay::elementCountChanged, this,
                    &ScriteDocument::emptyChanged);
@@ -845,6 +847,8 @@ void ScriteDocument::reset()
             &ScriteDocument::evaluateStructureElementSequenceLater);
     connect(m_screenplay, &Screenplay::elementRemoved, this,
             &ScriteDocument::screenplayElementRemoved);
+    connect(m_screenplay, &Screenplay::aboutToMoveElements, this,
+            &ScriteDocument::screenplayAboutToMoveElements);
     connect(m_screenplay, &Screenplay::elementMoved, this, &ScriteDocument::screenplayElementMoved);
     connect(m_screenplay, &Screenplay::emptyChanged, this, &ScriteDocument::emptyChanged);
     connect(m_screenplay, &Screenplay::elementCountChanged, this, &ScriteDocument::emptyChanged);
@@ -1969,16 +1973,6 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
      * them as needed.
      */
 
-    auto stackEm = [](const QList<StructureElement *> &elements) {
-        if (elements.isEmpty())
-            return;
-
-        const QString newStackId =
-                elements.size() == 1 ? QString() : QUuid::createUuid().toString();
-        for (StructureElement *element : elements)
-            element->setStackId(newStackId);
-    };
-
     StructureElement *element = ptr->scene()->structureElement();
     if (element == nullptr)
         return;
@@ -1989,23 +1983,23 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
         auto unstackElement = qScopeGuard([=] { element->setStackId(QString()); });
         Q_UNUSED(unstackElement)
 
-        const StructureElementStack *stack = m_structure->elementStacks()->findStackById(stackId);
+        StructureElementStack *stack = m_structure->elementStacks()->findStackById(stackId);
+
         if (stack != nullptr && stack->indexOf(element) >= 0) {
+            stack->sortByScreenplayOccurance(m_screenplay);
+
             const QList<StructureElement *> stackElements = stack->constList();
             const int elementIndex = stackElements.indexOf(element);
-
-            // If the element removed was not at the end of its stack, then
-            // we will have to split the stack across its position
-            if (elementIndex > 0 || elementIndex < stackElements.size() - 1) {
-                stackEm(stackElements.mid(0, elementIndex));
-                stackEm(stackElements.mid(elementIndex + 1));
-            }
+            StructureElementStack::stackEm(stackElements.mid(0, elementIndex));
+            StructureElementStack::stackEm(stackElements.mid(elementIndex + 1));
         }
     }
+}
 
-    // Check if the element is now splitting another existing stack.
-    const ScreenplayElement *previousElementAfterMove = m_screenplay->elementAt(to - 1);
-    const ScreenplayElement *nextElementAfterMove = m_screenplay->elementAt(to + 1);
+void ScriteDocument::screenplayAboutToMoveElements(int at)
+{
+    const ScreenplayElement *previousElementAfterMove = m_screenplay->elementAt(at - 1);
+    const ScreenplayElement *nextElementAfterMove = m_screenplay->elementAt(at);
     if (previousElementAfterMove == nullptr || nextElementAfterMove == nullptr)
         return;
 
@@ -2023,15 +2017,17 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
         return;
 
     // Split the stack into which the element is moved.
-    const StructureElementStack *stack = m_structure->elementStacks()->findStackById(
+    StructureElementStack *stack = m_structure->elementStacks()->findStackById(
             previousStructureElementAfterMove->stackId());
     if (stack == nullptr)
         return;
 
+    stack->sortByScreenplayOccurance(m_screenplay);
+
     const int previousElementIndex = stack->constList().indexOf(previousStructureElementAfterMove);
     const int nextElementIndex = stack->constList().indexOf(nextStructureElementAfterMove);
-    stackEm(stack->constList().mid(0, previousElementIndex + 1));
-    stackEm(stack->constList().mid(nextElementIndex));
+    StructureElementStack::stackEm(stack->constList().mid(0, previousElementIndex + 1));
+    StructureElementStack::stackEm(stack->constList().mid(nextElementIndex));
 }
 
 void ScriteDocument::clearModifiedLater()
