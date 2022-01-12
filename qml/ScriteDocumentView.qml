@@ -1536,6 +1536,7 @@ Item {
                         index = 0
                     var message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
                     Scrite.document.setBusyMessage(message)
+                    Scrite.document.screenplay.clearSelection()
                     Scrite.app.execLater(mainTabBar, 100, function() {
                         mainTabBar.currentIndex = index
                         Scrite.document.clearBusyMessage()
