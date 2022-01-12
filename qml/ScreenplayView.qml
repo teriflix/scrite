@@ -573,7 +573,7 @@ Item {
                 active: element !== null // && (isBreakElement || element.scene !== null)
                 enabled: !delegateDropArea.containsDrag
                 sourceComponent: Rectangle {
-                    color: element.scene ? Qt.tint(sceneColor, "#C0FFFFFF") : sceneColor
+                    color: element.scene ? Qt.tint(sceneColor, (element.selected || elementItemDelegate.active) ? "#9CFFFFFF" : "#C0FFFFFF") : sceneColor
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width {
@@ -603,12 +603,12 @@ Item {
 
                         Text {
                             text: sceneTitle
-                            color: element.scene ? "black" : colorPalette.text
+                            color: element.scene ? app.textColorFor(parent.parent.color) : colorPalette.text
                             elide: Text.ElideRight
                             width: parent.width
                             height: parent.height
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            font.bold: isBreakElement
+                            font.bold: isBreakElement || elementItemDelegate.active
                             lineHeight: 1.25
                             font.pointSize: 12
                             transformOrigin: Item.Center

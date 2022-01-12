@@ -1959,11 +1959,68 @@ void ScriteDocument::screenplayElementMoved(ScreenplayElement *ptr, int from, in
     Q_UNUSED(from);
     Q_UNUSED(to);
 
-    const int index = m_structure->indexOfScene(ptr->scene());
-    if (index >= 0) {
-        StructureElement *element = m_structure->elementAt(index);
-        element->setStackId(QString());
+    /**
+     * When a screenplay element is moved, in other words when a scenes are
+     * resequenced in the screenplay, the corresponding structure element may
+     * be part of a stack. Simply moving that one structure element out of the
+     * stack can leave the structure canvas with overlapping loops.
+     *
+     * So, it is best if we completely unstack the whole thing and then restack
+     * them as needed.
+     */
+
+    StructureElement *element = ptr->scene()->structureElement();
+    if (element == nullptr)
+        return;
+
+    // Split the stack from which the element was moved
+    const QString stackId = element->stackId();
+    if (!stackId.isEmpty()) {
+        auto unstackElement = qScopeGuard([=] { element->setStackId(QString()); });
+        Q_UNUSED(unstackElement)
+
+        const StructureElementStack *stack = m_structure->elementStacks()->findStackById(stackId);
+        if (stack != nullptr && stack->indexOf(element) >= 0) {
+            const QList<StructureElement *> stackElements = stack->constList();
+            const int elementIndex = stackElements.indexOf(element);
+
+            // If the element removed was not at the end of its stack, then
+            // we will have to split the stack across its position
+            if (elementIndex > 0 || elementIndex < stackElements.size() - 1) {
+                const QList<StructureElement *> afterElements = stackElements.mid(elementIndex + 1);
+                const QString newStackId =
+                        afterElements.size() == 1 ? QString() : QUuid::createUuid().toString();
+                for (StructureElement *afterElement : afterElements)
+                    afterElement->setStackId(newStackId);
+            }
+        }
     }
+
+    // Check if the element is now splitting another existing stack.
+    const ScreenplayElement *previousElementAfterMove = m_screenplay->elementAt(to - 1);
+    const ScreenplayElement *nextElementAfterMove = m_screenplay->elementAt(to + 1);
+    if (previousElementAfterMove == nullptr || nextElementAfterMove == nullptr)
+        return;
+
+    if (previousElementAfterMove->scene() == nullptr || nextElementAfterMove->scene() == nullptr)
+        return;
+
+    StructureElement *previousStructureElementAfterMove =
+            previousElementAfterMove->scene()->structureElement();
+    StructureElement *nextStructureElementAfterMove =
+            nextElementAfterMove->scene()->structureElement();
+    if (previousStructureElementAfterMove->stackId() != nextStructureElementAfterMove->stackId())
+        return;
+
+    // Split the stack into which the element is moved.
+    const StructureElementStack *stack = m_structure->elementStacks()->findStackById(
+            previousStructureElementAfterMove->stackId());
+    const int nextElementIndex = stack->constList().indexOf(nextStructureElementAfterMove);
+    const QList<StructureElement *> afterElements = stack->constList().mid(nextElementIndex);
+    const QString newStackId =
+            afterElements.size() == 1 ? QString() : QUuid::createUuid().toString();
+    for (StructureElement *afterElement : afterElements)
+        afterElement->setStackId(newStackId);
 }
 
 void ScriteDocument::clearModifiedLater()
@@ -2150,9 +2207,11 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 
                 notification->setTitle(QStringLiteral("Document is locked for edit."));
                 notification->setText(QStringLiteral(
-                        "This document is being opened in read only mode.\nYou cannot edit this "
+                        "This document is being opened in read only mode.\nYou cannot edit "
+                        "this "
                         "document on your "
-                        "computer, because it has been locked for edit on another computer.\nYou "
+                        "computer, because it has been locked for edit on another "
+                        "computer.\nYou "
                         "can however save a "
                         "copy using the 'Save As' option and edit the copy on your computer."));
                 notification->setAutoClose(false);
