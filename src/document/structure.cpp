@@ -30,13 +30,14 @@
 #include <QDateTime>
 #include <QJSEngine>
 #include <QClipboard>
+#include <QScopeGuard>
 #include <QQuickWindow>
 #include <QJsonDocument>
 #include <QStandardPaths>
+#include <QFutureWatcher>
 #include <QtConcurrentRun>
 #include <QFileSystemWatcher>
 #include <QScopedValueRollback>
-#include <QFutureWatcher>
 
 StructureElement::StructureElement(QObject *parent)
     : QObject(parent), m_structure(qobject_cast<Structure *>(parent)), m_follow(this, "follow")
@@ -344,6 +345,32 @@ void StructureElement::setStackLeader(bool val)
 
     m_stackLeader = val;
     emit stackLeaderChanged();
+}
+
+void StructureElement::unstack()
+{
+    if (m_stackId.isEmpty())
+        return;
+
+    auto clearStackId = qScopeGuard([=] { this->setStackId(QString()); });
+    Q_UNUSED(clearStackId)
+
+    if (m_structure == nullptr)
+        return;
+
+    const StructureElementStack *stack = m_structure->elementStacks()->findStackById(m_stackId);
+    if (stack == nullptr)
+        return;
+
+    const int elementIndex = stack->constList().indexOf(this);
+    if (elementIndex == 0 || elementIndex == stack->constList().size() - 1)
+        return;
+
+    const QList<StructureElement *> afterElements = stack->constList().mid(elementIndex + 1);
+    const QString newStackId =
+            afterElements.size() == 1 ? QString() : QUuid::createUuid().toString();
+    for (StructureElement *afterElement : afterElements)
+        afterElement->setStackId(newStackId);
 }
 
 void StructureElement::serializeToJson(QJsonObject &json) const

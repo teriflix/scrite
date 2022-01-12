@@ -1484,6 +1484,32 @@ Item {
                 }
             }
 
+            DropArea {
+                id: catchAllDropArea
+                anchors.fill: parent
+                keys: ["scrite/sceneID"]
+                onDropped: (drop) => {
+                    var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
+                    if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
+                        showInformation({
+                            "message": "Scenes must be added to the timeline before they can be stacked."
+                        })
+                        drop.ignore()
+                        return
+                    }
+
+                    var otherSceneId = otherScene.id
+                    var otherElement = Scrite.document.structure.findElementBySceneID(otherSceneId)
+                    if(otherElement === null) {
+                        drop.ignore()
+                        return
+                    }
+
+                    otherElement.unstack()
+                    drop.acceptProposedAction()
+                }
+            }
+
             Repeater {
                 id: elementItems
                 model: Scrite.document.loading ? null : Scrite.document.structure.elementsModel
@@ -2948,7 +2974,7 @@ Item {
                     id: dropAreaForStacking
                     anchors.fill: parent
                     keys: ["scrite/sceneID"]
-                    onDropped: {
+                    onDropped: (drop) => {
                         var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                         if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
                             showInformation({

@@ -147,6 +147,8 @@ public:
     bool isStackLeader() const { return m_stackLeader; }
     Q_SIGNAL void stackLeaderChanged();
 
+    Q_INVOKABLE void unstack();
+
     Q_SIGNAL void elementChanged();
     Q_SIGNAL void sceneHeadingChanged();
     Q_SIGNAL void sceneLocationChanged();
