@@ -3215,6 +3215,8 @@ Rectangle {
                             "sceneListView/sceneID": screenplayElement.sceneID
                         }
                         Drag.onActiveChanged: {
+                            if(!screenplayElement.selected)
+                               Scrite.document.screenplay.clearSelection()
                             screenplayElement.selected = true
                             moveSelectedElementsAnimation.draggedElement = screenplayElement
                             if(screenplayElementType === ScreenplayElement.BreakElementType)

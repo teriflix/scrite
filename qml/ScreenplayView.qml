@@ -768,6 +768,9 @@ Item {
                             cursorShape: Qt.SizeAllCursor
                             enabled: enableDragDrop
                             onPressed: {
+                                if(!elementItemDelegate.element.selected)
+                                    Scrite.document.screenplay.clearSelection()
+                                elementItemDelegate.element.selected = true
                                 elementItemDelegate.grabToImage(function(result) {
                                     elementItemDelegate.Drag.imageSource = result.url
                                 })
@@ -960,10 +963,7 @@ Item {
                 var sourceType = Scrite.app.typeName(source)
 
                 if(sourceType === "ScreenplayElement") {
-                    if(screenplayElementList.mutiSelectionMode)
-                        Scrite.document.screenplay.moveSelectedElements(index)
-                    else
-                        Scrite.document.screenplay.moveElement(source, index)
+                    Scrite.document.screenplay.moveSelectedElements(index)
                     return
                 }
 
