@@ -556,6 +556,7 @@ void StatisticsReport::prepareTextDocument()
     m_pageHeight = qCeil(format->pageLayout()->contentRect().height());
     m_millisecondsPerPixel = (format->secondsPerPage() * 1000) / m_pageHeight;
 
+    m_textDocument.setUseDesignMetrics(true);
     m_textDocument.setTextWidth(pageWidth);
     m_textDocument.setDefaultFont(format->defaultFont());
 

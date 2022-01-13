@@ -201,6 +201,7 @@ bool AbstractReportGenerator::generate()
     QTextDocument textDocument;
 
     textDocument.setDefaultFont(format->defaultFont());
+    textDocument.setUseDesignMetrics(true);
     textDocument.setProperty("#title", screenplay->title());
     textDocument.setProperty("#subtitle", screenplay->subtitle());
     textDocument.setProperty("#author", screenplay->author());

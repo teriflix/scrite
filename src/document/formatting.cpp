@@ -495,6 +495,7 @@ void ScreenplayPageLayout::configure(QTextDocument *document) const
     const QSizeF pageSize = stdResolution ? m_paperRect.size()
                                           : m_pageLayout.pageSize().sizePixels(qt_defaultDpi());
 
+    document->setUseDesignMetrics(true);
     document->setPageSize(pageSize);
 
     QTextFrameFormat format;
@@ -1983,6 +1984,7 @@ void SceneDocumentBinder::initializeDocument()
     document->blockSignals(true);
     document->clear();
     document->setDefaultFont(defaultFont);
+    document->setUseDesignMetrics(true);
 
     const int nrElements = m_scene->elementCount();
 
