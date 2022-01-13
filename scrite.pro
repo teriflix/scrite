@@ -328,6 +328,7 @@ DISTFILES += \
     packaging/mac/prepare.sh \
     packaging/mac/dmgbackdrop.qml \
     3rdparty/poly2tri/License.txt \
+    packaging/windows/qt.conf \
     tools/urlattribs/urlattribs.php \
     tools/urlattribs/OpenGraph.php
 
