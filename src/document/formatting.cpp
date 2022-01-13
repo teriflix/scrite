@@ -63,9 +63,6 @@ struct ParagraphMetrics
     }
 };
 
-static const int IsWordMisspelledProperty = QTextCharFormat::UserProperty + 100;
-static const int WordSuggestionsProperty = IsWordMisspelledProperty + 1;
-
 SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat *parent)
     : QObject(parent), m_font(parent->defaultFont()), m_format(parent), m_elementType(type)
 {
@@ -1216,9 +1213,11 @@ public:
         this->select(QTextCursor::WordUnderCursor);
 
         m_blockData = SceneDocumentBlockUserData::get(this->block());
-        if (m_blockData != nullptr)
-            m_misspelledFragment = m_blockData->findMisspelledFragment(this->selectionStart(),
-                                                                       this->selectionEnd());
+        if (m_blockData != nullptr) {
+            const int start = this->selectionStart() - this->block().position();
+            const int end = this->selectionEnd() - this->block().position();
+            m_misspelledFragment = m_blockData->findMisspelledFragment(start, end);
+        }
     }
     ~SpellCheckCursor() { }
 
@@ -1403,6 +1402,9 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if (m_initializingDocument)
         return;
 
+    if (m_cursorPosition == val)
+        return;
+
     if (m_textDocument == nullptr || this->document() == nullptr) {
         m_cursorPosition = -1;
         m_currentElementCursorPosition = -1;
@@ -1410,9 +1412,6 @@ void SceneDocumentBinder::setCursorPosition(int val)
         emit cursorPositionChanged();
         return;
     }
-
-    if (m_cursorPosition == val)
-        return;
 
     m_cursorPosition = val;
     m_currentElementCursorPosition = -1;
@@ -1430,6 +1429,9 @@ void SceneDocumentBinder::setCursorPosition(int val)
         emit cursorPositionChanged();
         return;
     }
+
+    this->setWordUnderCursorIsMisspelled(false);
+    this->setSpellingSuggestions(QStringList());
 
     SpellCheckCursor cursor(this->document(), val);
 
@@ -1457,10 +1459,10 @@ void SceneDocumentBinder::setCursorPosition(int val)
         if (!m_autoCompleteHints.isEmpty())
             this->setCompletionPrefix(block.text());
 
-        const QTextCharFormat format = cursor.charFormat();
         this->setWordUnderCursorIsMisspelled(cursor.isMisspelled());
         this->setSpellingSuggestions(cursor.suggestions());
 
+        const QTextCharFormat format = cursor.charFormat();
         m_textFormat->updateFromFormat(format);
     }
 

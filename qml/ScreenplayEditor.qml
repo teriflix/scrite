@@ -1851,18 +1851,19 @@ Rectangle {
                         // Context menus must ideally show up directly below the cursor
                         // So, we keep the menu loaders inside the cursorOverlay
                         MenuLoader {
-                            id: spellingSuggestionsMenu
+                            id: spellingSuggestionsMenuLoader
                             anchors.bottom: parent.bottom
                             enabled: !Scrite.document.readOnly
 
                             function replace(cursorPosition, suggestion) {
                                 sceneDocumentBinder.replaceWordAt(cursorPosition, suggestion)
-                                sceneDocumentBinder.preserveScrollAndReload()
+                                // sceneDocumentBinder.preserveScrollAndReload()
                                 if(cursorPosition >= 0)
                                     sceneTextEditor.cursorPosition = cursorPosition
                             }
 
                             menu: Menu2 {
+                                id: spellingSuggestionsMenu
                                 property int cursorPosition: -1
                                 onAboutToShow: {
                                     cursorPosition = sceneTextEditor.cursorPosition
@@ -1881,10 +1882,8 @@ Rectangle {
                                         text: modelData
                                         focusPolicy: Qt.NoFocus
                                         onClicked: {
-                                            Qt.callLater(function() {
-                                                spellingSuggestionsMenu.replace(cursorPosition, modelData)
-                                            })
-                                            spellingSuggestionsMenu.close()
+                                            Qt.callLater(spellingSuggestionsMenuLoader.replace, spellingSuggestionsMenu.cursorPosition, modelData)
+                                            spellingSuggestionsMenuLoader.close()
                                         }
                                     }
                                 }
@@ -1895,7 +1894,7 @@ Rectangle {
                                     text: "Add to dictionary"
                                     focusPolicy: Qt.NoFocus
                                     onClicked: {
-                                        spellingSuggestionsMenu.close()
+                                        spellingSuggestionsMenuLoader.close()
                                         sceneDocumentBinder.addWordUnderCursorToDictionary()
                                         ++contentView.numberOfWordsAddedToDict
                                     }
@@ -1905,7 +1904,7 @@ Rectangle {
                                     text: "Ignore"
                                     focusPolicy: Qt.NoFocus
                                     onClicked: {
-                                        spellingSuggestionsMenu.close()
+                                        spellingSuggestionsMenuLoader.close()
                                         sceneDocumentBinder.addWordUnderCursorToIgnoreList()
                                         ++contentView.numberOfWordsAddedToDict
                                     }
@@ -2116,7 +2115,7 @@ Rectangle {
                             if(!sceneTextEditor.hasSelection && sceneDocumentBinder.spellCheckEnabled) {
                                 sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
                                 if(sceneDocumentBinder.wordUnderCursorIsMisspelled) {
-                                    spellingSuggestionsMenu.popup()
+                                    spellingSuggestionsMenuLoader.popup()
                                     return
                                 }
                             }
@@ -2126,7 +2125,7 @@ Rectangle {
                         DelayedPropertyBinder {
                             id: contextMenuEnableBinder
                             initial: false
-                            set: !editorContextMenu.active && !spellingSuggestionsMenu.active && sceneTextEditor.activeFocus
+                            set: !editorContextMenu.active && !spellingSuggestionsMenuLoader.active && sceneTextEditor.activeFocus
                             delay: 100
                         }
                     }
