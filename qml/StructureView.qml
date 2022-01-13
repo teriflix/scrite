@@ -1909,7 +1909,11 @@ Item {
         property bool allowed: true
 
         readonly property real maxSize: 150
-        property size previewSize: {
+        property size previewSize: evaluatePreviewSize()
+        width: previewSize.width
+        height: previewSize.height
+
+        function evaluatePreviewSize() {
             var w = Math.max(canvasItemsBoundingBox.width, 500)
             var h = Math.max(canvasItemsBoundingBox.height, 500)
 
@@ -1934,8 +1938,6 @@ Item {
 
             return Qt.size(w+10, h+10)
         }
-        width: previewSize.width
-        height: previewSize.height
 
         BoxShadow {
             anchors.fill: parent

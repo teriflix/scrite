@@ -703,20 +703,7 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
     // Keep the following connections in sync with the ones we make in
     // Screenplay::setPropertyFromObjectList()
     ptr->setParent(this);
-    connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
-    connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
-    connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
-    connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
-            &Screenplay::evaluateSceneNumbersLater);
-    connect(ptr, &ScreenplayElement::sceneTypeChanged, this,
-            &Screenplay::evaluateSceneNumbersLater);
-    connect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
-            &Screenplay::elementSceneGroupsChanged);
-    connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater);
-    connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater);
-    connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
-    connect(ptr, &ScreenplayElement::selectedChanged, this,
-            &Screenplay::hasSelectedElementsChanged);
+    this->connectToScreenplayElementSignals(ptr);
 
     this->endInsertRows();
 
@@ -769,22 +756,7 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
         // it is going to get the above properties set in evaluateSceneNumbers() shortly.
     }
 
-    disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
-    disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
-    disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
-    disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
-               &Screenplay::evaluateSceneNumbersLater);
-    disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this,
-               &Screenplay::evaluateSceneNumbersLater);
-    disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
-               &Screenplay::elementSceneGroupsChanged);
-    disconnect(ptr, &ScreenplayElement::elementTypeChanged, this,
-               &Screenplay::updateBreakTitlesLater);
-    disconnect(ptr, &ScreenplayElement::breakTypeChanged, this,
-               &Screenplay::updateBreakTitlesLater);
-    disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
-    disconnect(ptr, &ScreenplayElement::selectedChanged, this,
-               &Screenplay::hasSelectedElementsChanged);
+    this->disconnectFromScreenplayElementSignals(ptr);
 
     this->endRemoveRows();
 
@@ -834,7 +806,6 @@ private:
     bool m_initialized = false;
     QVariantList m_after;
     QVariantList m_before;
-    int m_currentIndex = -1;
     QPointer<Screenplay> m_screenplay;
     QMetaObject::Connection m_connection;
     QHash<ScreenplayElement *, QPair<int, int>> m_movement;
@@ -963,9 +934,7 @@ bool ScreenplayElementsMoveCommand::restore(const QVariantList &array, bool forw
         while (it != end) {
             const int from = forward ? it.value().first : it.value().second;
             const int to = forward ? it.value().second : it.value().first;
-            QMetaObject::invokeMethod(m_screenplay, "elementMoved", Qt::DirectConnection,
-                                      Q_ARG(ScreenplayElement *, it.key()), Q_ARG(int, from),
-                                      Q_ARG(int, to));
+            emit m_screenplay->elementMoved(it.key(), from, to);
             ++it;
         }
 
@@ -974,8 +943,7 @@ bool ScreenplayElementsMoveCommand::restore(const QVariantList &array, bool forw
         timer->setInterval(50);
         QObject::connect(timer, &QTimer::timeout, m_screenplay, [=]() {
             m_screenplay->setCurrentElementIndex(currentIndex);
-            QMetaObject::invokeMethod(m_screenplay, "requestEditorAt", Qt::DirectConnection,
-                                      Q_ARG(int, currentIndex));
+            emit m_screenplay->requestEditorAt(currentIndex);
             timer->deleteLater();
         });
         timer->start();
@@ -1073,7 +1041,164 @@ void Screenplay::moveSelectedElements(int toRow)
 // TODO implement undo-command to revert group remove operation
 // This could be a simple pre-and-post scene id list thing.
 
-void Screenplay::removeSelectedElements() { }
+class ScreenplayRemoveElementsUndoCommand : public QUndoCommand
+{
+public:
+    ScreenplayRemoveElementsUndoCommand(Screenplay *screenplay);
+    ~ScreenplayRemoveElementsUndoCommand() { }
+
+    int id() const { return -1; }
+    void undo();
+    void redo();
+
+private:
+    QJsonArray save() const;
+
+private:
+    bool m_initialized = false;
+
+    int m_afterCurrentIndex = -1;
+    QJsonArray m_after;
+
+    int m_beforeCurrentIndex = -1;
+    QJsonArray m_before;
+
+    QPointer<Screenplay> m_screenplay;
+};
+
+ScreenplayRemoveElementsUndoCommand::ScreenplayRemoveElementsUndoCommand(Screenplay *screenplay)
+    : QUndoCommand(QStringLiteral("Remove Scenes From Screenplay")), m_screenplay(screenplay)
+{
+    m_before = this->save();
+    m_afterCurrentIndex = m_screenplay.isNull() ? -1 : m_screenplay->currentElementIndex();
+}
+
+void ScreenplayRemoveElementsUndoCommand::undo()
+{
+    if (m_screenplay.isNull()) {
+        this->setObsolete(true);
+        return;
+    }
+
+    HourGlass hourGlass;
+
+    QList<ScreenplayElement *> elements = m_screenplay->getElements();
+    if (m_before.size() == elements.size()) {
+        this->setObsolete(true);
+        return;
+    }
+
+    for (int i = 0; i < m_before.size(); i++) {
+        const QJsonValue item = m_before.at(i);
+        const QJsonObject elementJson = item.toObject();
+        const QString sceneID = elementJson.value(QStringLiteral("sceneID")).toString();
+
+        ScreenplayElement *element = elements.isEmpty() ? nullptr : elements.first();
+        if (element && element->sceneID() == sceneID) {
+            elements.takeFirst();
+            continue;
+        }
+
+        element = new ScreenplayElement(m_screenplay);
+        QObjectSerializer::fromJson(elementJson, element);
+        m_screenplay->insertElementAt(element, i);
+    }
+
+    m_screenplay->setCurrentElementIndex(m_beforeCurrentIndex);
+    if (m_beforeCurrentIndex >= 0)
+        emit m_screenplay->requestEditorAt(m_beforeCurrentIndex);
+
+    Structure *structure = m_screenplay->scriteDocument()->structure();
+    if (structure && structure->isForceBeatBoardLayout())
+        structure->placeElementsInBeatBoardLayout(m_screenplay);
+}
+
+void ScreenplayRemoveElementsUndoCommand::redo()
+{
+    if (m_screenplay.isNull()) {
+        this->setObsolete(true);
+        return;
+    }
+
+    if (!m_initialized) {
+        m_after = this->save();
+        m_afterCurrentIndex = m_screenplay.isNull() ? -1 : m_screenplay->currentElementIndex();
+        return;
+    }
+
+    const QList<ScreenplayElement *> elements = m_screenplay->getElements();
+    if (m_after.size() == elements.size()) {
+        this->setObsolete(true);
+        return;
+    }
+
+    QJsonArray array = m_after;
+    for (ScreenplayElement *element : elements) {
+        const QJsonValue item = m_after.isEmpty() ? QJsonValue() : m_after.first();
+        const QJsonObject elementJson = item.toObject();
+        const QString sceneID = elementJson.value(QStringLiteral("sceneID")).toString();
+
+        if (element->sceneID() == sceneID) {
+            array.takeAt(0);
+            continue;
+        }
+
+        m_screenplay->removeElement(element);
+    }
+
+    m_screenplay->setCurrentElementIndex(m_afterCurrentIndex);
+    if (m_afterCurrentIndex >= 0)
+        emit m_screenplay->requestEditorAt(m_afterCurrentIndex);
+
+    Structure *structure = m_screenplay->scriteDocument()->structure();
+    if (structure && structure->isForceBeatBoardLayout())
+        structure->placeElementsInBeatBoardLayout(m_screenplay);
+}
+
+QJsonArray ScreenplayRemoveElementsUndoCommand::save() const
+{
+    HourGlass hourGlass;
+
+    QJsonArray ret;
+    if (m_screenplay.isNull())
+        return ret;
+
+    for (int i = 0; i < m_screenplay->elementCount(); i++) {
+        const ScreenplayElement *element = m_screenplay->elementAt(i);
+        const QJsonObject elementJson = QObjectSerializer::toJson(element);
+        ret.append(elementJson);
+    }
+
+    return ret;
+}
+
+void Screenplay::removeSelectedElements()
+{
+    HourGlass hourGlass;
+
+    QList<ScreenplayElement *> selectedElements;
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->isSelected())
+            selectedElements.append(element);
+    }
+
+    ObjectPropertyInfo *info =
+            m_scriteDocument == nullptr ? nullptr : ObjectPropertyInfo::get(this, "elements");
+    if (info)
+        info->lock();
+
+    ScreenplayRemoveElementsUndoCommand *cmd = new ScreenplayRemoveElementsUndoCommand(this);
+    for (ScreenplayElement *element : qAsConst(selectedElements))
+        this->removeElement(element);
+
+    if (UndoStack::active())
+        UndoStack::active()->push(cmd);
+    else
+        delete cmd;
+
+    if (info)
+        info->unlock();
+}
 
 void Screenplay::clearSelection()
 {
@@ -1216,6 +1341,16 @@ void Screenplay::clearElements()
 
     if (info)
         info->unlock();
+}
+
+void Screenplay::gatherSelectedScenes(SceneGroup *into)
+{
+    into->clearScenes();
+
+    for (ScreenplayElement *element : m_elements) {
+        if (element->isSelected())
+            into->addScene(element->scene());
+    }
 }
 
 class SplitElementUndoCommand : public QUndoCommand
@@ -1792,6 +1927,56 @@ void Screenplay::onDfsAuction(const QString &filePath, int *claims)
         *claims = *claims + 1;
 }
 
+void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
+{
+    if (ptr == nullptr)
+        return;
+
+    connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged,
+            Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement,
+            Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset,
+            Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
+            &Screenplay::evaluateSceneNumbersLater, Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::sceneTypeChanged, this, &Screenplay::evaluateSceneNumbersLater,
+            Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
+            &Screenplay::elementSceneGroupsChanged, Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::elementTypeChanged, this, &Screenplay::updateBreakTitlesLater,
+            Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::breakTypeChanged, this, &Screenplay::updateBreakTitlesLater,
+            Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged,
+            Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::selectedChanged, this, &Screenplay::hasSelectedElementsChanged,
+            Qt::UniqueConnection);
+}
+
+void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
+{
+    if (ptr == nullptr)
+        return;
+
+    disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
+    disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
+    disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
+    disconnect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
+               &Screenplay::evaluateSceneNumbersLater);
+    disconnect(ptr, &ScreenplayElement::sceneTypeChanged, this,
+               &Screenplay::evaluateSceneNumbersLater);
+    disconnect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
+               &Screenplay::elementSceneGroupsChanged);
+    disconnect(ptr, &ScreenplayElement::elementTypeChanged, this,
+               &Screenplay::updateBreakTitlesLater);
+    disconnect(ptr, &ScreenplayElement::breakTypeChanged, this,
+               &Screenplay::updateBreakTitlesLater);
+    disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
+    disconnect(ptr, &ScreenplayElement::selectedChanged, this,
+               &Screenplay::hasSelectedElementsChanged);
+}
+
 void Screenplay::setCurrentElementIndex(int val)
 {
     val = qBound(-1, val, m_elements.size() - 1);
@@ -2005,22 +2190,7 @@ void Screenplay::setPropertyFromObjectList(const QString &propName, const QList<
             // Keep the following connections in sync with the ones we make in
             // Screenplay::insertElementAt()
             ptr->setParent(this);
-            connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
-            connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
-            connect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
-            connect(ptr, &ScreenplayElement::evaluateSceneNumberRequest, this,
-                    &Screenplay::evaluateSceneNumbersLater);
-            connect(ptr, &ScreenplayElement::sceneTypeChanged, this,
-                    &Screenplay::evaluateSceneNumbersLater);
-            connect(ptr, &ScreenplayElement::sceneGroupsChanged, this,
-                    &Screenplay::elementSceneGroupsChanged);
-            connect(ptr, &ScreenplayElement::elementTypeChanged, this,
-                    &Screenplay::updateBreakTitlesLater);
-            connect(ptr, &ScreenplayElement::breakTypeChanged, this,
-                    &Screenplay::updateBreakTitlesLater);
-            connect(ptr, &ScreenplayElement::breakTitleChanged, this,
-                    &Screenplay::breakTitleChanged);
-
+            this->connectToScreenplayElementSignals(ptr);
             m_elements.append(ptr);
         }
 

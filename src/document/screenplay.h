@@ -326,6 +326,8 @@ public:
 
     Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
 
+    Q_INVOKABLE void gatherSelectedScenes(SceneGroup *into);
+
     Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element,
                                                 int textPosition);
     Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
@@ -439,6 +441,8 @@ protected:
     void setSceneCount(int val);
     void setEpisodeCount(int val);
     void onDfsAuction(const QString &filePath, int *claims);
+    void connectToScreenplayElementSignals(ScreenplayElement *ptr);
+    void disconnectFromScreenplayElementSignals(ScreenplayElement *ptr);
 
 private:
     QString m_title;

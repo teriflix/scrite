@@ -667,6 +667,21 @@ Item {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         onPressed: screenplayElementList.forceActiveFocus()
                         onClicked: {
+                            if(mouse.button === Qt.RightButton) {
+                                if(element.elementType === ScreenplayElement.BreakElementType) {
+                                    breakItemMenu.element = element
+                                    breakItemMenu.popup(this)
+                                } else {
+                                    elementItemMenu.element = element
+                                    elementItemMenu.popup(this)
+                                }
+
+                                Scrite.document.screenplay.currentElementIndex = index
+                                requestEditorLater()
+
+                                return
+                            }
+
                             const isControlPressed = mouse.modifiers & Qt.ControlModifier
                             const isShiftPressed = mouse.modifiers & Qt.ShiftModifier
                             screenplayElementList.forceActiveFocus()
@@ -688,18 +703,9 @@ Item {
                                 selectRange()
                             } else
                                 Scrite.document.screenplay.clearSelection()
+
                             Scrite.document.screenplay.currentElementIndex = index
                             requestEditorLater()
-
-                            if(mouse.button === Qt.RightButton) {
-                                if(element.elementType === ScreenplayElement.BreakElementType) {
-                                    breakItemMenu.element = element
-                                    breakItemMenu.popup(this)
-                                } else {
-                                    elementItemMenu.element = element
-                                    elementItemMenu.popup(this)
-                                }
-                            }
                         }
                     }
 
@@ -904,13 +910,33 @@ Item {
         id: elementItemMenu
         property ScreenplayElement element
 
-        onClosed: element = null
+        SceneGroup {
+            id: elementItemMenuSceneGroup
+            structure: Scrite.document.structure
+        }
+
+        onAboutToShow: {
+            if(element.selected) {
+                Scrite.document.screenplay.gatherSelectedScenes(elementItemMenuSceneGroup)
+            } else {
+                Scrite.document.screenplay.clearSelection()
+                element.selected = true
+                elementItemMenuSceneGroup.addScene(element.scene)
+            }
+        }
+
+        onClosed: {
+            element = null
+            elementItemMenuSceneGroup.clearScenes()
+        }
 
         ColorMenu {
             title: "Color"
-            enabled: elementItemMenu.element
+            enabled: !Scrite.document.readOnly && elementItemMenu.element
             onMenuItemClicked: {
-                elementItemMenu.element.scene.color = color
+                for(var i=0; i<elementItemMenuSceneGroup.sceneCount; i++) {
+                    elementItemMenuSceneGroup.sceneAt(i).color = color
+                }
                 elementItemMenu.close()
             }
         }
@@ -918,19 +944,18 @@ Item {
         MarkSceneAsMenu {
             title: "Mark Scene As"
             scene: elementItemMenu.element ? elementItemMenu.element.scene : null
-            onTriggered: elementItemMenu.close()
+            enabled: !Scrite.document.readOnly
+            onTriggered: {
+                for(var i=0; i<elementItemMenuSceneGroup.sceneCount; i++) {
+                    elementItemMenuSceneGroup.sceneAt(i).type = scene.type
+                }
+                elementItemMenu.close()
+            }
         }
 
         StructureGroupsMenu {
-            sceneGroup: SceneGroup {
-                structure: Scrite.document.structure
-            }
-            onAboutToShow: {
-                sceneGroup.clearScenes()
-                if(elementItemMenu.element)
-                    sceneGroup.addScene(elementItemMenu.element.scene)
-            }
-            onClosed: sceneGroup.clearScenes()
+            sceneGroup: elementItemMenuSceneGroup
+            enabled: !Scrite.document.readOnly
         }
 
         MenuSeparator { }
@@ -939,7 +964,10 @@ Item {
             text: "Remove"
             enabled: !Scrite.document.readOnly
             onClicked: {
-                Scrite.document.screenplay.removeElement(elementItemMenu.element)
+                if(elementItemMenuSceneGroup.sceneCount <= 1)
+                    Scrite.document.screenplay.removeElement(elementItemMenu.element)
+                else
+                    Scrite.document.screenplay.removeSelectedElements();
                 elementItemMenu.close()
             }
         }

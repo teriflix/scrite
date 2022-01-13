@@ -62,7 +62,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         if (m_markLanguagesExplicitly) {
             const QList<TransliterationEngine::Boundary> breakup =
                     TransliterationEngine::instance()->evaluateBoundaries(text, true);
-            for (const TransliterationEngine::Boundary item : breakup) {
+            for (const TransliterationEngine::Boundary &item : breakup) {
                 QDomElement textE = doc.createElement(QStringLiteral("Text"));
                 element.appendChild(textE);
                 if (item.language == TransliterationEngine::English) {

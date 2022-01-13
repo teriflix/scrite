@@ -1630,7 +1630,7 @@ void Character::serializeToJson(QJsonObject &json) const
 {
     DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
     QJsonArray array;
-    for (const QString photo : m_photos)
+    for (const QString &photo : m_photos)
         array.append(dfs->relativePath(photo));
     json.insert("photos", array);
 }
