@@ -2225,22 +2225,27 @@ Rectangle {
 
                         onLoadCountChanged: Qt.callLater(highlightSearchResultTextSnippet)
                         onSelectionChanged: Qt.callLater(highlightSearchResultTextSnippet)
+                        Component.onCompleted: Qt.callLater(highlightSearchResultTextSnippet)
 
                         function highlightSearchResultTextSnippet() {
                             if(selection.start >= 0 && selection.end >= 0) {
                                 if(sceneTextEditor.selectionStart === selection.start && sceneTextEditor.selectionEnd === selection.end )
                                     return;
 
-                                var rect = Scrite.app.uniteRectangles( sceneTextEditor.positionToRectangle(selection.start),
-                                                               sceneTextEditor.positionToRectangle(selection.end) )
-                                rect = Scrite.app.adjustRectangle(rect, -20, -50, 20, 50)
-                                contentView.ensureVisible(contentItem, rect)
-
                                 sceneTextEditor.select(selection.start, selection.end)
                                 sceneTextEditor.update()
+                                Scrite.app.execLater(textDocumentSearch, 50, scrollToSelection)
                             } else {
                                 sceneTextEditor.deselect()
                             }
+                        }
+
+                        function scrollToSelection() {
+                            var rect = Scrite.app.uniteRectangles( sceneTextEditor.positionToRectangle(selection.start),
+                                                           sceneTextEditor.positionToRectangle(selection.end) )
+                            rect = Scrite.app.adjustRectangle(rect, -20, -50, 20, 50)
+                            contentView.ensureVisible(contentItem, rect)
+                            contentView.ensureVisible(contentItem, rect)
                         }
                     }
 

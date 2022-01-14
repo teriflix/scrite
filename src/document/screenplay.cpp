@@ -2086,11 +2086,14 @@ QJsonArray Screenplay::search(const QString &text, int flags) const
                     const QJsonObject result = results.at(r).toObject();
 
                     QJsonObject item;
-                    item.insert("sceneIndex", i);
-                    item.insert("elementIndex", j);
-                    item.insert("sceneResultIndex", sceneResultIndex++);
-                    item.insert("from", result.value("from"));
-                    item.insert("to", result.value("to"));
+                    item.insert(QStringLiteral("sceneIndex"), i);
+                    item.insert(QStringLiteral("elementIndex"), j);
+                    item.insert(QStringLiteral("sceneResultIndex"), sceneResultIndex++);
+
+                    const QString _from = QStringLiteral("from");
+                    const QString _to = QStringLiteral("to");
+                    item.insert(_from, _from);
+                    item.insert(_to, _to);
                     ret.append(item);
                 }
             }
@@ -2130,9 +2133,11 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
 
             QString elementText = element->text();
             for (int r = results.size() - 1; r >= 0; r--) {
+                const QString _from = QStringLiteral("from");
+                const QString _to = QStringLiteral("to");
                 const QJsonObject result = results.at(r).toObject();
-                const int from = result.value("from").toInt();
-                const int to = result.value("to").toInt();
+                const int from = result.value(_from).toInt();
+                const int to = result.value(_to).toInt();
                 elementText = elementText.replace(from, to - from + 1, replacementText);
             }
 

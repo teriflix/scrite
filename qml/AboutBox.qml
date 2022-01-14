@@ -85,14 +85,14 @@ Item {
 
                 Text {
                     font.pixelSize: 20
-                    text: "© TERIFLIX Entertainment Spaces Pvt. Ltd.<br/><font color=\"blue\">https://www.teriflix.com</font>"
+                    text: "<font color=\"gray\">WRITE YOUR NEXT BLOCKBUSTER!</font><br/><font color=\"blue\">https://www.scrite.io</font>"
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: Qt.openUrlExternally("https://www.teriflix.com")
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io")
                     }
                 }
 
