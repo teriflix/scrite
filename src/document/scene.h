@@ -78,9 +78,13 @@ public:
     QString moment() const { return m_moment; }
     Q_SIGNAL void momentChanged();
 
+    Q_PROPERTY(QString editText READ text NOTIFY textChanged)
     Q_PROPERTY(QString text READ text NOTIFY textChanged)
-    QString text() const;
+    QString text() const { return this->toString(EditMode); }
     Q_SIGNAL void textChanged();
+
+    Q_PROPERTY(QString displayText READ displayText NOTIFY textChanged)
+    QString displayText() const { return this->toString(DisplayMode); }
 
     static bool parse(const QString &text, QString &locationType, QString &location,
                       QString &moment, bool strict = false);
@@ -90,6 +94,9 @@ public:
 private:
     friend class Scene;
     void renameCharacter(const QString &from, const QString &to);
+
+    enum Mode { DisplayMode, EditMode };
+    QString toString(Mode mode) const;
 
 private:
     bool m_enabled = true;

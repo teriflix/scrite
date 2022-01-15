@@ -234,24 +234,6 @@ void SceneHeading::setMoment(const QString &val2)
     emit momentChanged();
 }
 
-QString SceneHeading::text() const
-{
-    if (m_enabled) {
-        const QString dot = QStringLiteral(". ");
-        const QString dash = QStringLiteral(" - ");
-
-        if (m_locationType.isEmpty())
-            return m_moment.isEmpty() ? m_location : (m_location + dash + m_moment);
-
-        if (m_moment.isEmpty())
-            return m_locationType + dot + m_location;
-
-        return m_locationType + dot + m_location + dash + m_moment;
-    }
-
-    return QString();
-}
-
 bool SceneHeading::parse(const QString &text, QString &locationType, QString &location,
                          QString &moment, bool strict)
 {
@@ -322,6 +304,24 @@ void SceneHeading::renameCharacter(const QString &from, const QString &to)
         m_location = newLocation.toUpper();
         emit locationChanged();
     }
+}
+
+QString SceneHeading::toString(Mode mode) const
+{
+    if (m_enabled) {
+        const QString dot = QStringLiteral(". ");
+        const QString dash = QStringLiteral(" - ");
+
+        if (m_locationType.isEmpty())
+            return m_moment.isEmpty() ? m_location : (m_location + dash + m_moment);
+
+        if (m_moment.isEmpty())
+            return m_locationType + dot + m_location + (mode == DisplayMode ? dash : QString());
+
+        return m_locationType + dot + m_location + dash + m_moment;
+    }
+
+    return QString();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

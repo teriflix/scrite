@@ -2557,7 +2557,7 @@ Rectangle {
 
                             property SceneHeading sceneHeading: headingItem.theScene.heading
 
-                            text: sceneHeading.text
+                            text: activeFocus ? sceneHeading.editText : sceneHeading.displayText
                             enabled: sceneHeading.enabled
                             label: ""
                             placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
