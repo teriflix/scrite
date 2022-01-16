@@ -3485,186 +3485,180 @@ Rectangle {
     Component {
         id: titleCardComponent
 
-        Column {
-            property int defaultFontSize: screenplayFormat.defaultFont2.pointSize
-            property real maxWidth: parent.width - 2*ruler.leftMarginPx
-            spacing: 10 * zoomLevel
-
-            Item { width: parent.width; height: 35 * zoomLevel }
-
-            Image {
-                width: {
-                    switch(Scrite.document.screenplay.coverPagePhotoSize) {
-                    case Screenplay.SmallCoverPhoto:
-                        return parent.maxWidth / 4
-                    case Screenplay.MediumCoverPhoto:
-                        return parent.maxWidth / 2
-                    }
-                    return parent.maxWidth
-                }
-
-                source: visible ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
-                visible: Scrite.document.screenplay.coverPagePhoto !== ""
-                smooth: true; mipmap: true
-                fillMode: Image.PreserveAspectFit
-                anchors.horizontalCenter: parent.horizontalCenter
-            }
-
-            Item { width: parent.width; height: Scrite.document.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0 }
-
-            Text {
-                font.family: Scrite.document.formatting.defaultFont.family
-                font.pointSize: defaultFontSize + 2
-                font.bold: true
-                width: parent.width
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                horizontalAlignment: Text.AlignHCenter
-                text: Scrite.document.screenplay.title === "" ? "<untitled>" : Scrite.document.screenplay.title
-                anchors.horizontalCenter: parent.horizontalCenter
-                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
-                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
-            }
-
-            Text {
-                font.family: Scrite.document.formatting.defaultFont.family
-                font.pointSize: defaultFontSize
-                width: parent.width
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                horizontalAlignment: Text.AlignHCenter
-                text: Scrite.document.screenplay.subtitle
-                visible: Scrite.document.screenplay.subtitle !== ""
-                anchors.horizontalCenter: parent.horizontalCenter
-                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
-                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
-            }
+        Item {
+            readonly property int defaultFontSize: screenplayFormat.defaultFont2.pointSize
+            readonly property real leftPadding: (ruler.leftMarginPx+ruler.rightMarginPx)/2
+            readonly property real rightPadding: leftPadding
+            height: titleCardContents.height
 
             Column {
-                width: parent.width
-                spacing: 0
-
-                Text {
-                    font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize
-                    width: parent.width
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Written By"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
-
-                Text {
-                    font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize
-                    width: parent.width
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    horizontalAlignment: Text.AlignHCenter
-                    text: (Scrite.document.screenplay.author === "" ? "<unknown author>" : Scrite.document.screenplay.author)
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
-                    rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
-                }
-            }
-
-            Text {
-                font.family: Scrite.document.formatting.defaultFont.family
-                font.pointSize: defaultFontSize
-                width: parent.width
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                horizontalAlignment: Text.AlignHCenter
-                text: Scrite.document.screenplay.version === "" ? "Initial Version" : Scrite.document.screenplay.version
-                anchors.horizontalCenter: parent.horizontalCenter
-                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
-                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
-            }
-
-            Text {
-                font.family: Scrite.document.formatting.defaultFont.family
-                font.pointSize: defaultFontSize
-                width: parent.width
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                horizontalAlignment: Text.AlignHCenter
-                text: Scrite.document.screenplay.basedOn
-                visible: Scrite.document.screenplay.basedOn !== ""
-                anchors.horizontalCenter: parent.horizontalCenter
-                leftPadding: contentWidth > maxWidth ? ruler.leftMarginPx : 0
-                rightPadding: contentWidth > maxWidth ? ruler.rightMarginPx : 0
-            }
-
-            Column {
-                spacing: parent.spacing/2
-                width: parent.width * 0.5
+                id: titleCardContents
+                spacing: 10 * zoomLevel
                 anchors.left: parent.left
-                anchors.leftMargin: ruler.leftMarginPx
+                anchors.right: parent.right
+                anchors.leftMargin: parent.leftPadding
+                anchors.rightMargin: parent.rightPadding
 
-                Item {
+                Item { width: parent.width; height: 35 * zoomLevel }
+
+                Image {
+                    width: {
+                        switch(Scrite.document.screenplay.coverPagePhotoSize) {
+                        case Screenplay.SmallCoverPhoto:
+                            return parent.width / 4
+                        case Screenplay.MediumCoverPhoto:
+                            return parent.width / 2
+                        }
+                        return parent.width
+                    }
+
+                    source: visible ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
+                    visible: Scrite.document.screenplay.coverPagePhoto !== ""
+                    smooth: true; mipmap: true
+                    fillMode: Image.PreserveAspectFit
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                Item { width: parent.width; height: Scrite.document.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0 }
+
+                Text {
+                    font.family: Scrite.document.formatting.defaultFont.family
+                    font.pointSize: defaultFontSize + 2
+                    font.bold: true
                     width: parent.width
-                    height: 20 * zoomLevel
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    text: Scrite.document.screenplay.title === "" ? "<untitled>" : Scrite.document.screenplay.title
                 }
 
                 Text {
                     font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize - 2
+                    font.pointSize: defaultFontSize
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: Scrite.document.screenplay.contact
-                    visible: text !== ""
+                    horizontalAlignment: Text.AlignHCenter
+                    text: Scrite.document.screenplay.subtitle
+                    visible: Scrite.document.screenplay.subtitle !== ""
                 }
 
-                Text {
-                    font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize - 2
+                Column {
                     width: parent.width
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: Scrite.document.screenplay.address
-                    visible: text !== ""
-                }
+                    spacing: 0
 
-                Text {
-                    font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize - 2
-                    width: parent.width
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: Scrite.document.screenplay.phoneNumber
-                    visible: text !== ""
-                }
+                    Text {
+                        font.family: Scrite.document.formatting.defaultFont.family
+                        font.pointSize: defaultFontSize
+                        width: parent.width
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        horizontalAlignment: Text.AlignHCenter
+                        text: "Written By"
+                    }
 
-                Text {
-                    font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize - 2
-                    font.underline: true
-                    color: "blue"
-                    width: parent.width
-                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                    text: Scrite.document.screenplay.email
-                    visible: text !== ""
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: Qt.openUrlExternally("mailto:" + parent.text)
-                        cursorShape: Qt.PointingHandCursor
+                    Text {
+                        font.family: Scrite.document.formatting.defaultFont.family
+                        font.pointSize: defaultFontSize
+                        width: parent.width
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        horizontalAlignment: Text.AlignHCenter
+                        text: (Scrite.document.screenplay.author === "" ? "<unknown author>" : Scrite.document.screenplay.author)
                     }
                 }
 
                 Text {
                     font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: defaultFontSize - 2
-                    font.underline: true
-                    color: "blue"
+                    font.pointSize: defaultFontSize
                     width: parent.width
-                    elide: Text.ElideRight
-                    text: Scrite.document.screenplay.website
-                    visible: text !== ""
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    text: Scrite.document.screenplay.version
+                }
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: Qt.openUrlExternally(parent.text)
-                        cursorShape: Qt.PointingHandCursor
+                Text {
+                    font.family: Scrite.document.formatting.defaultFont.family
+                    font.pointSize: defaultFontSize
+                    width: parent.width
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    text: Scrite.document.screenplay.basedOn
+                    visible: Scrite.document.screenplay.basedOn !== ""
+                }
+
+                Column {
+                    spacing: parent.spacing/2
+                    width: parent.width * 0.5
+                    anchors.left: parent.left
+
+                    Item {
+                        width: parent.width
+                        height: 20 * zoomLevel
+                    }
+
+                    Text {
+                        font.family: Scrite.document.formatting.defaultFont.family
+                        font.pointSize: defaultFontSize - 2
+                        width: parent.width
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        text: Scrite.document.screenplay.contact
+                        visible: text !== ""
+                    }
+
+                    Text {
+                        font.family: Scrite.document.formatting.defaultFont.family
+                        font.pointSize: defaultFontSize - 2
+                        width: parent.width
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        text: Scrite.document.screenplay.address
+                        visible: text !== ""
+                    }
+
+                    Text {
+                        font.family: Scrite.document.formatting.defaultFont.family
+                        font.pointSize: defaultFontSize - 2
+                        width: parent.width
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        text: Scrite.document.screenplay.phoneNumber
+                        visible: text !== ""
+                    }
+
+                    Text {
+                        font.family: Scrite.document.formatting.defaultFont.family
+                        font.pointSize: defaultFontSize - 2
+                        font.underline: true
+                        color: "blue"
+                        width: parent.width
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                        text: Scrite.document.screenplay.email
+                        visible: text !== ""
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: Qt.openUrlExternally("mailto:" + parent.text)
+                            cursorShape: Qt.PointingHandCursor
+                        }
+                    }
+
+                    Text {
+                        font.family: Scrite.document.formatting.defaultFont.family
+                        font.pointSize: defaultFontSize - 2
+                        font.underline: true
+                        color: "blue"
+                        width: parent.width
+                        elide: Text.ElideRight
+                        text: Scrite.document.screenplay.website
+                        visible: text !== ""
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: Qt.openUrlExternally(parent.text)
+                            cursorShape: Qt.PointingHandCursor
+                        }
                     }
                 }
+
+                Item { width: parent.width; height: 35 * zoomLevel }
             }
-
-            Item { width: parent.width; height: 35 * zoomLevel }
         }
+
     }
 
     Connections {
