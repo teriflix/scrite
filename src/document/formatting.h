@@ -669,6 +669,7 @@ private:
     friend class SpellCheckService;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
+    bool m_pastingContent = false;
     int m_documentLoadCount = 0;
     TextFormat *m_textFormat = new TextFormat(this);
     bool m_sceneIsBeingReset = false;

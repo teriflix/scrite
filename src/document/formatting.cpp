@@ -22,15 +22,16 @@
 #include <QMarginsF>
 #include <QSettings>
 #include <QMetaEnum>
+#include <QMimeData>
+#include <QClipboard>
 #include <QPdfWriter>
 #include <QTextCursor>
 #include <QPageLayout>
 #include <QFontDatabase>
-#include <QTextBlockUserData>
-#include <QClipboard>
-#include <QMimeData>
 #include <QJsonDocument>
+#include <QTextBlockUserData>
 #include <QTextBoundaryFinder>
+#include <QScopedValueRollback>
 
 struct ParagraphMetrics
 {
@@ -1400,10 +1401,7 @@ void SceneDocumentBinder::setTextWidth(qreal val)
 
 void SceneDocumentBinder::setCursorPosition(int val)
 {
-    if (m_initializingDocument)
-        return;
-
-    if (m_cursorPosition == val)
+    if (m_initializingDocument || m_pastingContent || m_cursorPosition == val)
         return;
 
     if (m_textDocument == nullptr || this->document() == nullptr) {
@@ -1776,49 +1774,98 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
 int SceneDocumentBinder::paste(int fromPosition)
 {
-    if (this->document() == nullptr)
+    if (this->document() == nullptr || m_pastingContent)
         return -1;
+
+    QScopedValueRollback<bool> pastingContentRollback(m_pastingContent, true);
+
+    struct Paragraph
+    {
+        Paragraph() { }
+        Paragraph(const QString &_text, SceneElement::Type _type = SceneElement::Action)
+            : text(_text), type(_type)
+        {
+        }
+
+        QString text;
+        SceneElement::Type type = SceneElement::Action;
+    };
+
+    QVector<Paragraph> paragraphs;
 
     const QClipboard *clipboard = Application::instance()->clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
-    const QByteArray contentJson = mimeData->data(QStringLiteral("scrite/screenplay"));
-    if (contentJson.isEmpty())
-        return -1;
 
-    const QJsonArray content = QJsonDocument::fromJson(contentJson).array();
-    if (content.isEmpty())
-        return -1;
+    const QByteArray contentJson = mimeData->data(QStringLiteral("scrite/screenplay"));
+    if (contentJson.isEmpty()) {
+        if (mimeData->hasText()) {
+            const QStringList lines =
+                    mimeData->text().split(QStringLiteral("\n"), Qt::SkipEmptyParts);
+            for (const QString &line : lines) {
+                Paragraph paragraph;
+                paragraph.text = line;
+                paragraphs.append(paragraph);
+            }
+        }
+    } else {
+        const QJsonArray content = QJsonDocument::fromJson(contentJson).array();
+        if (content.isEmpty())
+            return -1;
+
+        for (const QJsonValue &item : content) {
+            const QJsonObject itemObject = item.toObject();
+            const int type = itemObject.value(QStringLiteral("type")).toInt();
+
+            Paragraph paragraph;
+            paragraph.type = (type < SceneElement::Min || type > SceneElement::Max
+                              || type == SceneElement::Heading)
+                    ? SceneElement::Action
+                    : SceneElement::Type(type);
+            paragraph.text = itemObject.value(QStringLiteral("text")).toString();
+            paragraphs.append(paragraph);
+        }
+    }
 
     fromPosition = fromPosition >= 0 ? fromPosition : m_cursorPosition;
 
     QTextCursor cursor(this->document());
-    cursor.setPosition(fromPosition >= 0 ? fromPosition : m_cursorPosition);
+    cursor.setPosition(fromPosition);
 
-    const bool pasteFormatting = content.size() > 1;
+    const bool pasteFormatting = paragraphs.size() > 1;
+    QTextBlock lastPastedBlock;
 
-    for (int i = 0; i < content.size(); i++) {
-        const QJsonObject item = content.at(i).toObject();
-        const int type = item.value(QStringLiteral("type")).toInt();
-        if (type < SceneElement::Min || type > SceneElement::Max || type == SceneElement::Heading)
-            continue;
-
+    for (int i = 0; i < paragraphs.size(); i++) {
+        const Paragraph paragraph = paragraphs.at(i);
         if (i > 0)
             cursor.insertBlock();
 
-        const QString text = item.value(QStringLiteral("text")).toString();
-        cursor.insertText(text);
+        cursor.insertText(paragraph.text);
 
         if (pasteFormatting) {
-            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(cursor.block());
+            lastPastedBlock = cursor.block();
+            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(lastPastedBlock);
             if (userData) {
-                userData->sceneElement()->setType(SceneElement::Type(type));
+                if (userData->sceneElement())
+                    userData->sceneElement()->setType(paragraph.type);
                 userData->resetFormat();
             }
         }
     }
 
-    const int ret = cursor.position();
     this->refresh();
+
+    int ret = cursor.position();
+
+    if (pasteFormatting && lastPastedBlock.isValid()) {
+        m_rehighlightTimer.stop();
+        this->rehighlight();
+
+        cursor = QTextCursor(lastPastedBlock);
+        cursor.movePosition(QTextCursor::EndOfBlock);
+        ret = cursor.position();
+    }
+
+    ret = qMin(this->document()->characterCount(), ret);
 
     return ret;
 }
