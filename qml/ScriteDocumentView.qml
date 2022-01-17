@@ -1845,6 +1845,7 @@ Item {
             }
 
             Loader {
+                id: uiLoader
                 anchors.fill: parent
                 anchors.topMargin: 1
                 clip: true
@@ -1856,6 +1857,14 @@ Item {
                     }
                     return screenplayEditorComponent
                 }
+
+                Announcement.onIncoming: (type,data) => {
+                                             const stype = "" + type
+                                             if(mainTabBar.currentIndex === 0 && stype === "{f4048da2-775d-11ec-90d6-0242ac120003}") {
+                                                 uiLoader.active = false
+                                                 Qt.callLater( function() { uiLoader.active = true } )
+                                             }
+                                         }
             }
         }
     }
@@ -2662,6 +2671,9 @@ Item {
         if(Scrite.app.maybeOpenAnonymously())
             splashLoader.active = false
         screenplayAdapter.sessionId = Scrite.document.sessionId
+        Qt.callLater( function() {
+            Announcement.shout("{f4048da2-775d-11ec-90d6-0242ac120003}", "restoreWindowGeometryDone")
+        })
     }
 
     BusyOverlay {
