@@ -13,6 +13,7 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Window 2.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.15
 import Qt.labs.settings 1.0
@@ -1863,7 +1864,52 @@ Item {
         id: screenplayEditorComponent
 
         ScreenplayEditor {
-            zoomLevelModifier: mainTabBar.currentIndex > 0 ? -3 : 0
+            // zoomLevelModifier: mainTabBar.currentIndex > 0 ? -3 : 0
+            Component.onCompleted: {
+                const evalZoomLevelModifierFn = () => {
+                    screenplayFormat.pageLayout.evaluateRectsNow()
+
+                    const pageLayout = screenplayFormat.pageLayout
+                    const zoomLevels = screenplayFormat.fontZoomLevels
+                    const indexOfZoomLevel = (val) => {
+                        for(var i=0; i<zoomLevels.length; i++) {
+                            if(zoomLevels[i] === val)
+                                return i
+                        }
+                        return -1
+                    }
+                    const _oneValue = indexOfZoomLevel(1)
+
+                    var _value = _oneValue
+                    var zl = zoomLevels[_value]
+                    var pageWidth = pageLayout.paperWidth * zl * Screen.devicePixelRatio
+                    var totalMargin =  width - pageWidth
+                    if(totalMargin < 0) {
+                        while(totalMargin < 20) { // 20 is width of vertical scrollbar.
+                            if(_value-1 < 0)
+                                break
+                            _value = _value - 1
+                            zl = zoomLevels[_value]
+                            pageWidth = pageLayout.paperWidth * zl * Screen.devicePixelRatio
+                            totalMargin = width - pageWidth
+                        }
+                    } else if(totalMargin > pageWidth) {
+                        while(totalMargin > pageWidth) {
+                            if(_value >= zoomLevels.length-1)
+                                break
+                            _value = _value + 1
+                            zl = zoomLevels[_value]
+                            pageWidth = pageLayout.paperWidth * zl * Screen.devicePixelRatio
+                            totalMargin = width - pageWidth
+                        }
+                    }
+
+                    return _value - _oneValue
+                }
+
+                zoomLevelModifier = evalZoomLevelModifierFn()
+            }
+
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
                     if(showNotebookInStructure)

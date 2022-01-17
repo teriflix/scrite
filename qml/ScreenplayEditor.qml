@@ -1062,23 +1062,10 @@ Rectangle {
                 }
             }
 
-            onValueChanged: {
-                if(mainTabBar.currentIndex === 0)
-                    screenplayEditorSettings.mainEditorZoomValue = value
-                else
-                    screenplayEditorSettings.embeddedEditorZoomValue = value
-                screenplayFormat.fontZoomLevelIndex = value
-            }
+            onValueChanged: screenplayFormat.fontZoomLevelIndex = value
             Component.onCompleted: {
-                var _value = -1
-                if(mainTabBar.currentIndex === 0)
-                    _value = screenplayEditorSettings.mainEditorZoomValue
-                else
-                    _value = screenplayEditorSettings.embeddedEditorZoomValue
-                if(_value >= from && _value <= to)
-                    value = _value
-                else
-                    value = screenplayFormat.fontZoomLevelIndex + zoomLevelModifier
+                reset()
+                value = value + zoomLevelModifier
                 screenplayFormat.fontZoomLevelIndex = value
             }
 

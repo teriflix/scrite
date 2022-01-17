@@ -512,6 +512,14 @@ void ScreenplayPageLayout::configure(QPagedPaintDevice *printer) const
     printer->setPageLayout(m_pageLayout);
 }
 
+void ScreenplayPageLayout::evaluateRectsNow()
+{
+    if (m_evaluateRectsTimer.isActive()) {
+        m_evaluateRectsTimer.stop();
+        this->evaluateRects();
+    }
+}
+
 void ScreenplayPageLayout::evaluateRects()
 {
     if (m_format->screen()) {
@@ -564,7 +572,7 @@ void ScreenplayPageLayout::evaluateRects()
 
 void ScreenplayPageLayout::evaluateRectsLater()
 {
-    m_evaluateRectsTimer.start(100, this);
+    m_evaluateRectsTimer.start(0, this);
 }
 
 void ScreenplayPageLayout::timerEvent(QTimerEvent *event)

@@ -111,7 +111,7 @@ public:
     qreal resolution() const { return m_resolution; }
     Q_SIGNAL void resolutionChanged();
 
-    Q_INVOKABLE qreal convert(qreal val, Unit from, Unit to) const;
+    Q_INVOKABLE qreal convert(qreal val, RulerItem::Unit from, RulerItem::Unit to) const;
     static qreal Convert(qreal val, Unit from, Unit to, const qreal pixelsPerIn);
 
 protected:

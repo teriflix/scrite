@@ -261,6 +261,8 @@ public:
     void configure(QTextDocument *document) const;
     void configure(QPagedPaintDevice *printer) const;
 
+    Q_INVOKABLE void evaluateRectsNow();
+
 signals:
     void rectsChanged();
 
