@@ -16,6 +16,7 @@
 #include "hourglass.h"
 #include "aggregation.h"
 #include "errorreport.h"
+#include "filemanager.h"
 #include "application.h"
 #include "focustracker.h"
 #include "timeprofiler.h"
@@ -24,7 +25,9 @@
 #include "structureexporter.h"
 
 #include <QDir>
+#include <QtMath>
 #include <QStack>
+#include <QBuffer>
 #include <QJSValue>
 #include <QMimeData>
 #include <QDateTime>
@@ -2238,16 +2241,38 @@ QUrl Annotation::imageUrl(const QString &name) const
 
 void Annotation::createCopyOfFileAttributes()
 {
+    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+    FileManager fileManager;
+
     for (int i = 0; i < m_metaData.size(); i++) {
         const QJsonObject item = m_metaData.at(i).toObject();
         const QJsonValue isFileVal = item.value(QStringLiteral("isFile"));
         if (isFileVal.isBool() && isFileVal.toBool()) {
             const QString attrName = item.value(QStringLiteral("name")).toString();
-            const QString fileName = m_attributes.value(attrName).toString();
+            QString fileName = m_attributes.value(attrName).toString();
             if (fileName.isEmpty())
                 continue;
 
-            DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+            // Special case scenario only for images.
+            const QString imageKey = QStringLiteral("image");
+            if (m_type == imageKey && attrName == imageKey) {
+                const QString base64Prefix = QStringLiteral("data://base64:");
+                if (fileName.startsWith(base64Prefix)) {
+                    QByteArray bytes = fileName.midRef(base64Prefix.length()).toLatin1();
+                    bytes = QByteArray::fromBase64(bytes);
+                    QBuffer buffer(&bytes);
+                    buffer.open(QIODevice::ReadOnly);
+                    QImage image;
+                    if (image.load(&buffer, "JPG")) {
+                        const QString tmpFile = dfs->absolutePath(QStringLiteral("tmp.jpg"));
+                        image.save(tmpFile, "JPG");
+                        fileManager.addToAutoDeleteList(tmpFile);
+                        fileName = dfs->relativePath(tmpFile);
+                    } else
+                        fileName.clear();
+                }
+            }
+
             m_attributes.insert(attrName, dfs->duplicate(fileName, QStringLiteral("annotation")));
             emit attributesChanged();
         }
@@ -2338,6 +2363,13 @@ Structure::Structure(QObject *parent)
 
     QClipboard *clipboard = qApp->clipboard();
     connect(clipboard, &QClipboard::dataChanged, this, &Structure::onClipboardDataChanged);
+
+    // Load clipboard data after the constructor returns
+    QTimer *clipboardTimer = new QTimer(this);
+    clipboardTimer->setSingleShot(true);
+    connect(clipboardTimer, &QTimer::timeout, this, &Structure::onClipboardDataChanged);
+    connect(clipboardTimer, &QTimer::timeout, clipboardTimer, &QTimer::deleteLater);
+    clipboardTimer->start();
 
     m_elementsBoundingBoxAggregator.setModel(&m_elements);
     m_elementsBoundingBoxAggregator.setAggregateFunction(
@@ -4017,6 +4049,23 @@ void Structure::copy(QObject *elementOrAnnotation)
             QJsonObject sceneJson = objectJson.value(QStringLiteral("scene")).toObject();
             sceneJson.remove(QStringLiteral("id"));
             objectJson.insert(QStringLiteral("scene"), sceneJson);
+        } else if (annotation != nullptr) {
+            if (annotation->type() == QStringLiteral("image")) {
+                const QString attrKey = QStringLiteral("attributes");
+                const QString imageKey = QStringLiteral("image");
+
+                QJsonObject attrJson = objectJson.value(attrKey).toObject();
+                QString imageVal = attrJson.value(imageKey).toString();
+
+                imageVal = [imageVal]() {
+                    DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
+                    const QByteArray imageBytes = dfs->read(imageVal);
+                    return QStringLiteral("data://base64:") + imageBytes.toBase64();
+                }();
+
+                attrJson.insert(imageKey, imageVal);
+                objectJson.insert(attrKey, attrJson);
+            }
         }
 
         QJsonObject clipboardJson;
@@ -4053,28 +4102,144 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
     if (mimeData == nullptr)
         return ret;
 
-    const QByteArray clipboardText = mimeData->data(QStringLiteral("scrite/structure"));
-    if (clipboardText.isEmpty())
-        return ret;
+    QJsonObject data;
 
-    QJsonParseError parseError;
-    const QJsonDocument jsonDoc = QJsonDocument::fromJson(clipboardText, &parseError);
-    if (parseError.error != QJsonParseError::NoError)
-        return ret;
+    const QString structureMimeType = QStringLiteral("scrite/structure");
+    if (mimeData->hasFormat(structureMimeType)) {
+        const QByteArray clipboardText = mimeData->data(structureMimeType);
+        if (clipboardText.isEmpty())
+            return ret;
 
-    const QString appString =
-            qApp->applicationName() + QStringLiteral("-") + qApp->applicationVersion();
+        QJsonParseError parseError;
+        const QJsonDocument jsonDoc = QJsonDocument::fromJson(clipboardText, &parseError);
+        if (parseError.error != QJsonParseError::NoError)
+            return ret;
 
-    const QJsonObject clipboardJson = jsonDoc.object();
-    if (clipboardJson.value(QStringLiteral("app")).toString() != appString)
-        return ret; // We dont want to support copy/paste between different versions of Scrite.
+        const QString appString =
+                qApp->applicationName() + QStringLiteral("-") + qApp->applicationVersion();
 
-    if (clipboardJson.value(QStringLiteral("source")).toString() != QStringLiteral("Structure"))
-        return ret;
+        const QJsonObject clipboardJson = jsonDoc.object();
+        if (clipboardJson.value(QStringLiteral("app")).toString() != appString)
+            return ret; // We dont want to support copy/paste between different versions of Scrite.
 
-    const QJsonObject data = clipboardJson.value("data").toObject();
-    if (!data.isEmpty() && className)
-        *className = clipboardJson.value(QStringLiteral("class")).toString();
+        if (clipboardJson.value(QStringLiteral("source")).toString() != QStringLiteral("Structure"))
+            return ret;
+
+        data = clipboardJson.value("data").toObject();
+        if (!data.isEmpty() && className)
+            *className = clipboardJson.value(QStringLiteral("class")).toString();
+    } else {
+        const QString text = mimeData->hasText() ? mimeData->text() : QString();
+        const QUrl url = mimeData->hasUrls() ? [mimeData]() {
+            const QList<QUrl> urls = mimeData->urls();
+            return urls.first();
+        }() : QUrl(text);
+
+        if (url.isValid()) {
+            const QString json = QStringLiteral("{"
+                                                "    \"attributes\": {"
+                                                "        \"url\": \"%1\""
+                                                "    },"
+                                                "    \"geometry\": {"
+                                                "        \"height\": 350,"
+                                                "        \"width\": 300,"
+                                                "        \"x\": 5000,"
+                                                "        \"y\": 5000"
+                                                "    },"
+                                                "    \"type\": \"url\""
+                                                "}")
+                                         .arg(url.toString());
+            data = QJsonDocument::fromJson(json.toLatin1()).object();
+            if (className)
+                *className = QLatin1String(Annotation::staticMetaObject.className());
+        } else if (mimeData->hasText()) {
+            const QFont font = []() {
+                QFont ret = qApp->font();
+                ret.setBold(true);
+                ret.setPointSize(24);
+                return ret;
+            }();
+            const qreal textWidth = 400;
+            const qreal textHeight = [textWidth, font, mimeData]() {
+                QTextDocument doc;
+                doc.setDefaultFont(font);
+                doc.setPlainText(mimeData->text());
+                doc.setTextWidth(textWidth);
+                return doc.size().height();
+            }();
+            const QString json = QStringLiteral("{"
+                                                "    \"attributes\": {"
+                                                "        \"backgroundColor\": \"white\","
+                                                "        \"borderColor\": \"black\","
+                                                "        \"borderWidth\": 0,"
+                                                "        \"fillBackground\": false,"
+                                                "        \"fontFamily\": \"%1\","
+                                                "        \"fontSize\": %2,"
+                                                "        \"fontStyle\": ["
+                                                "            \"bold\""
+                                                "        ],"
+                                                "        \"hAlign\": \"center\","
+                                                "        \"opacity\": 100,"
+                                                "        \"text\": \"%3\","
+                                                "        \"textColor\": \"black\","
+                                                "        \"vAlign\": \"center\""
+                                                "    },"
+                                                "    \"geometry\": {"
+                                                "        \"height\": %4,"
+                                                "        \"width\": %5,"
+                                                "        \"x\": 5000,"
+                                                "        \"y\": 5000"
+                                                "    },"
+                                                "    \"type\": \"text\""
+                                                "}")
+                                         .arg(font.family())
+                                         .arg(font.pointSize())
+                                         .arg(mimeData->text())
+                                         .arg(qCeil(textHeight))
+                                         .arg(qCeil(textWidth));
+            data = QJsonDocument::fromJson(json.toLatin1()).object();
+            if (className)
+                *className = QLatin1String(Annotation::staticMetaObject.className());
+        } else if (mimeData->hasImage()) {
+            const QImage image = mimeData->imageData().value<QImage>();
+
+            QByteArray imageBytes;
+            QBuffer buffer(&imageBytes);
+            buffer.open(QBuffer::WriteOnly);
+            image.save(&buffer, "JPG");
+            buffer.close();
+            imageBytes = imageBytes.toBase64();
+
+            const QSize imageSize = image.size().scaled(320, 320, Qt::KeepAspectRatio);
+
+            const QString json = QStringLiteral("{"
+                                                "    \"attributes\": {"
+                                                "        \"backgroundColor\": \"white\","
+                                                "        \"borderColor\": \"black\","
+                                                "        \"borderWidth\": 0,"
+                                                "        \"caption\": \"\","
+                                                "        \"captionAlignment\": \"center\","
+                                                "        \"captionColor\": \"black\","
+                                                "        \"fillBackground\": false,"
+                                                "        \"image\": \"data://base64:%1\","
+                                                "        \"opacity\": 100"
+                                                "    },"
+                                                "    \"geometry\": {"
+                                                "        \"height\": %2,"
+                                                "        \"width\": %3,"
+                                                "        \"x\": 5000,"
+                                                "        \"y\": 5000"
+                                                "    },"
+                                                "    \"type\": \"image\""
+                                                "}")
+                                         .arg(imageBytes.constData())
+                                         .arg(imageSize.height())
+                                         .arg(imageSize.width());
+            data = QJsonDocument::fromJson(json.toLatin1()).object();
+            if (className)
+                *className = QLatin1String(Annotation::staticMetaObject.className());
+        }
+    }
 
     return data;
 }
@@ -4082,7 +4247,7 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
 void Structure::paste(const QPointF &pos)
 {
     QString className;
-    const QJsonObject data = fetchPasteDataFromClipboard(&className);
+    QJsonObject data = fetchPasteDataFromClipboard(&className);
     if (data.isEmpty())
         return;
 
