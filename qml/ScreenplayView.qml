@@ -321,7 +321,7 @@ Item {
             return 34
         }
         Behavior on minimumDelegateWidth {
-            enabled: screenplayEditorSettings.enableAnimations
+            enabled: applicationSettings.enableAnimations
             NumberAnimation { duration: 250 }
         }
 
@@ -577,7 +577,7 @@ Item {
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width {
-                        enabled: screenplayEditorSettings.enableAnimations
+                        enabled: applicationSettings.enableAnimations
                         NumberAnimation { duration: 400 }
                     }
 
@@ -762,7 +762,7 @@ Item {
                         visible: !Scrite.document.readOnly && enableDragDrop
                         enabled: visible
                         Behavior on scale {
-                            enabled: screenplayEditorSettings.enableAnimations
+                            enabled: applicationSettings.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
 
@@ -818,7 +818,7 @@ Item {
 
     Loader {
         anchors.fill: screenplayElementList
-        active: screenplayEditorSettings.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
+        active: applicationSettings.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
         sourceComponent: Item {
             id: highlightedItemOverlay
 

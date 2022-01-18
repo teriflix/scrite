@@ -39,6 +39,7 @@
 #include <QMetaEnum>
 #include <QQuickItem>
 #include <QJsonArray>
+#include <QQuickStyle>
 #include <QMessageBox>
 #include <QJsonObject>
 #include <QColorDialog>
@@ -184,6 +185,29 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     this->setWindowIcon(QIcon(QStringLiteral(":/images/appicon.png")));
     this->computeIdealFontPointSize();
+
+#ifdef Q_OS_WIN
+    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10)
+        QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Direct3D12);
+    else
+        QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+#endif
+
+    {
+        const QVariant theme = m_settings->value(QStringLiteral("Application/theme"));
+        const QVariant useSoftwareRenderer =
+                m_settings->value(QStringLiteral("Application/useSoftwareRenderer"));
+
+        if (useSoftwareRenderer.toBool()) {
+            QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+            if (theme == QStringLiteral("Material"))
+                QQuickStyle::setStyle(QStringLiteral("Default"));
+            else
+                QQuickStyle::setStyle(queryQtQuickStyleFor(theme.toString()));
+        } else {
+            QQuickStyle::setStyle(queryQtQuickStyleFor(theme.toString()));
+        }
+    }
 }
 
 QVersionNumber Application::prepare()
@@ -314,6 +338,29 @@ Application::Platform Application::platform() const
 }
 #endif
 #endif
+
+QStringList Application::availableThemes()
+{
+    // return QQuickStyle::availableStyles();
+    static QStringList themes({ QStringLiteral("Basic"), QStringLiteral("Fusion"),
+                                QStringLiteral("Imagine"), QStringLiteral("Material"),
+                                QStringLiteral("Universal") });
+    return themes;
+}
+
+QString Application::queryQtQuickStyleFor(const QString &theme)
+{
+    const QString defaultStyle = QStringLiteral("Material");
+    if (theme.isEmpty())
+        return defaultStyle;
+
+    const int idx = availableThemes().indexOf(theme);
+    if (idx < 0)
+        return defaultStyle;
+    if (idx == 0)
+        return QStringLiteral("Default");
+    return theme;
+}
 
 bool Application::isInternetAvailable() const
 {

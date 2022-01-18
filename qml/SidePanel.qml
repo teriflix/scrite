@@ -35,7 +35,7 @@ Item {
     readonly property real minPanelWidth: 25
     property real maxPanelWidth: 450
     Behavior on width {
-        enabled: screenplayEditorSettings.enableAnimations
+        enabled: applicationSettings.enableAnimations
         NumberAnimation { duration: 50 }
     }
 
@@ -103,7 +103,7 @@ Item {
             visible: opacity > 0
             opacity: sidePanel.expanded ? 1 : 0
             Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
+                enabled: applicationSettings.enableAnimations
                 NumberAnimation { duration: 50 }
             }
             active: opacity > 0
@@ -122,7 +122,7 @@ Item {
         border.color: sidePanel.expanded ? primaryColors.windowColor : borderColor
 
         Behavior on height {
-            enabled: screenplayEditorSettings.enableAnimations
+            enabled: applicationSettings.enableAnimations
             NumberAnimation { duration: 50 }
         }
 

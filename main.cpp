@@ -28,7 +28,6 @@ int main(int argc, char **argv)
     ShortcutsModel::instance();
     ScriteDocument::instance();
 
-    QQuickStyle::setStyle("Material");
     AppWindow scriteWindow;
     scriteWindow.setSource(QUrl("qrc:/main.qml"));
     scriteWindow.show();

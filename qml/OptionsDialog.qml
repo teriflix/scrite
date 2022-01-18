@@ -715,15 +715,53 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 GroupBox {
+                    id: graphicsGroup
                     width: (parent.width - parent.spacing)/2
                     label: Text {
-                        text: "Animations"
+                        text: "Graphics (Requires Restart)"
                     }
 
-                    CheckBox2 {
-                        checked: screenplayEditorSettings.enableAnimations
-                        text: "Enable Animations"
-                        onToggled: screenplayEditorSettings.enableAnimations = checked
+                    Column {
+                        width: graphicsGroup.availableWidth
+
+                        CheckBox2 {
+                            checked: applicationSettings.enableAnimations
+                            text: "Enable Animations"
+                            onToggled: applicationSettings.enableAnimations = checked
+                        }
+
+                        CheckBox2 {
+                            checked: applicationSettings.useSoftwareRenderer
+                            text: "Use Software Renderer"
+                            onToggled: applicationSettings.useSoftwareRenderer = checked
+                        }
+
+                        Row {
+                            width: parent.width
+                            spacing: 10
+
+                            Text {
+                                id: themeLabel
+                                text: "Theme: "
+                                leftPadding: 10
+                                font.pointSize: Scrite.app.idealFontPointSize-2
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            ComboBox2 {
+                                width: parent.width - themeLabel.width - parent.spacing
+                                anchors.verticalCenter: parent.verticalCenter
+                                model: Scrite.app.availableThemes
+                                readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
+                                currentIndex: {
+                                    const idx = Scrite.app.availableThemes.indexOf(applicationSettings.theme)
+                                    if(idx < 0)
+                                        return materialStyleIndex
+                                    return idx
+                                }
+                                onCurrentTextChanged: applicationSettings.theme = currentText
+                            }
+                        }
                     }
                 }
 
@@ -840,6 +878,12 @@ Item {
                         }
                     }
                 }
+            }
+
+            Item {
+                height: 30
+                width: parent.width - 60
+                anchors.horizontalCenter: parent.horizontalCenter
             }
         }
     }

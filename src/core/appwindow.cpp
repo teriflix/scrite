@@ -54,12 +54,6 @@ AppWindow::AppWindow()
 #endif
     this->setObjectName(QStringLiteral("ScriteWindow"));
     this->setFormat(format);
-#ifdef Q_OS_WIN
-    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10)
-        this->setSceneGraphBackend(QSGRendererInterface::Direct3D12);
-    else
-        this->setSceneGraphBackend(QSGRendererInterface::Software);
-#endif
 
 #ifdef Q_OS_MAC
     QMenuBar *menuBar = new QMenuBar(nullptr);

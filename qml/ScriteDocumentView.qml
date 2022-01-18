@@ -71,6 +71,23 @@ Item {
     }
 
     Settings {
+        id: applicationSettings
+        fileName: Scrite.app.settingsFilePath
+        category: "Application"
+
+        property bool enableAnimations: true
+        property bool useSoftwareRenderer: false
+        property string theme: "Material"
+        onEnableAnimationsChanged: applyAnimationSettings()
+        Component.onCompleted: applyAnimationSettings()
+
+        function applyAnimationSettings() {
+            modalDialog.animationsEnabled = enableAnimations
+            statusText.enableAnimations = enableAnimations
+        }
+    }
+
+    Settings {
         id: workspaceSettings
         fileName: Scrite.app.settingsFilePath
         category: "Workspace"
@@ -106,7 +123,6 @@ Item {
         property int embeddedEditorZoomValue: -1
         property bool includeTitlePageInPreview: true
         property bool enableSpellCheck: false // until we can fix https://github.com/teriflix/scrite/issues/138
-        property bool enableAnimations: true
         property int lastLanguageRefreshNoticeBoxTimestamp: 0
         property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
         property bool showLanguageRefreshNoticeBox: true
@@ -114,10 +130,6 @@ Item {
         property bool showLoglineEditor: false
         property bool allowTaggingOfScenes: false
         property real spaceBetweenScenes: 0
-        onEnableAnimationsChanged: {
-            modalDialog.animationsEnabled = enableAnimations
-            statusText.enableAnimations = enableAnimations
-        }
 
         property real textFormatDockWidgetX: -1
         property real textFormatDockWidgetY: -1
@@ -225,9 +237,9 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+A"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: screenplayEditorSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
+        ShortcutsModelItem.title: applicationSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: screenplayEditorSettings.enableAnimations = !screenplayEditorSettings.enableAnimations
+        onActivated: applicationSettings.enableAnimations = !applicationSettings.enableAnimations
     }
 
     Shortcut {
@@ -1626,7 +1638,7 @@ Item {
                             source: modelData.icon
                             width: parent.active ? 32 : 24; height: width
                             Behavior on width {
-                                enabled: screenplayEditorSettings.enableAnimations
+                                enabled: applicationSettings.enableAnimations
                                 NumberAnimation { duration: 250 }
                             }
 
@@ -1934,7 +1946,7 @@ Item {
                 return []
             }
             Behavior on opacity {
-                enabled: screenplayEditorSettings.enableAnimations
+                enabled: applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
 
@@ -2258,7 +2270,7 @@ Item {
                     FocusTracker.window: Scrite.window
 
                     Behavior on color {
-                        enabled: screenplayEditorSettings.enableAnimations
+                        enabled: applicationSettings.enableAnimations
                         ColorAnimation { duration: 250 }
                     }
 

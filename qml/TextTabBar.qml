@@ -72,11 +72,11 @@ Item {
         anchors.topMargin: idealAppFontMetrics.descent
         property bool placedOnce: false
         Behavior on x {
-            enabled: currentTabUnderline.placedOnce && screenplayEditorSettings.enableAnimations
+            enabled: currentTabUnderline.placedOnce && applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
         Behavior on width {
-            enabled: currentTabUnderline.placedOnce && screenplayEditorSettings.enableAnimations
+            enabled: currentTabUnderline.placedOnce && applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
     }

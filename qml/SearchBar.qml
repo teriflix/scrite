@@ -27,7 +27,7 @@ Item {
     clip: true
 
     Behavior on height {
-        enabled: screenplayEditorSettings.enableAnimations
+        enabled: applicationSettings.enableAnimations
         NumberAnimation { duration: 100 }
     }
 

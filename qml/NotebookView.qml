@@ -1224,7 +1224,7 @@ Rectangle {
                                 color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
 
                                 Behavior on color {
-                                    enabled: screenplayEditorSettings.enableAnimations
+                                    enabled: applicationSettings.enableAnimations
                                     ColorAnimation { duration: 250 }
                                 }
 
@@ -2844,7 +2844,7 @@ Rectangle {
             }
 
             Behavior on height {
-                enabled: screenplayEditorSettings.enableAnimations
+                enabled: applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
 

@@ -180,7 +180,7 @@ Rectangle {
                         }
                         z: opacity
                         Behavior on opacity {
-                            enabled: screenplayEditorSettings.enableAnimations
+                            enabled: applicationSettings.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
 
@@ -377,7 +377,7 @@ Rectangle {
                                     return character.isDirectlyRelatedTo(canvas.activeCharacter) ? 0 : 0.75
                                 }
                                 Behavior on alpha {
-                                    enabled: screenplayEditorSettings.enableAnimations
+                                    enabled: applicationSettings.enableAnimations
                                     NumberAnimation { duration: 250 }
                                 }
                             }

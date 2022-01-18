@@ -65,7 +65,7 @@ ToolButton {
                     font.pixelSize: toolButton.font.pixelSize
                     font.bold: toolButton.down
                     Behavior on color {
-                        enabled: screenplayEditorSettings.enableAnimations
+                        enabled: applicationSettings.enableAnimations
                         ColorAnimation { duration: 250 }
                     }
                     visible: toolButton.display !== AbstractButton.IconOnly

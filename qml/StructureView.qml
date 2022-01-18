@@ -693,7 +693,7 @@ Item {
             transformOrigin: Item.TopLeft
             backgroundColor: canvasScroll.interactive ? primaryColors.c10.background : Scrite.app.translucent(primaryColors.c300.background, 0.75)
             Behavior on backgroundColor {
-                enabled: screenplayEditorSettings.enableAnimations
+                enabled: applicationSettings.enableAnimations
                 ColorAnimation { duration: 250 }
             }
 
@@ -858,7 +858,7 @@ Item {
                 opacity: rubberBand.selectionMode || rubberBand.selecting ? 0.1 : 1
 
                 Behavior on opacity {
-                    enabled: screenplayEditorSettings.enableAnimations
+                    enabled: applicationSettings.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
 
@@ -1029,7 +1029,7 @@ Item {
                 opacity: canvas.activeFocus && !selection.hasItems ? 1 : 0.25
 
                 Behavior on opacity {
-                    enabled: screenplayEditorSettings.enableAnimations
+                    enabled: applicationSettings.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
 
@@ -2258,7 +2258,7 @@ Item {
                 border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : element.scene.color)
                 color: Qt.tint(element.scene.color, "#C0FFFFFF")
                 Behavior on border.width {
-                    enabled: screenplayEditorSettings.enableAnimations
+                    enabled: applicationSettings.enableAnimations
                     NumberAnimation { duration: 400 }
                 }
             }
@@ -2390,7 +2390,7 @@ Item {
                 opacity: elementItem.selected ? 1 : 0.1
                 scale: dragMouseArea.pressed ? 2 : 1
                 Behavior on scale {
-                    enabled: screenplayEditorSettings.enableAnimations
+                    enabled: applicationSettings.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
 
@@ -2912,7 +2912,7 @@ Item {
                         scale: dragHandleMouseArea.pressed ? 2 : 1
                         opacity: elementItem.selected ? 1 : 0.1
                         Behavior on scale {
-                            enabled: screenplayEditorSettings.enableAnimations
+                            enabled: applicationSettings.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
 

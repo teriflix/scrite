@@ -62,11 +62,11 @@ Item {
             font.bold: tabBarTab.active
             rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
             Behavior on font.pixelSize {
-                enabled: screenplayEditorSettings.enableAnimations
+                enabled: applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
             Behavior on color {
-                enabled: screenplayEditorSettings.enableAnimations
+                enabled: applicationSettings.enableAnimations
                 ColorAnimation { duration: 125 }
             }
         }

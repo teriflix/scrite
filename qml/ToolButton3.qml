@@ -71,7 +71,7 @@ Item {
             return parent.width-2*am < 16 ? (parent.width*0.15) : am
         }
         Behavior on anchorMargins {
-            enabled: iconImage.anchorMargins > 0 && screenplayEditorSettings.enableAnimations
+            enabled: iconImage.anchorMargins > 0 && applicationSettings.enableAnimations
             NumberAnimation {
                 duration: 250
             }

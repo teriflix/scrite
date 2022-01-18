@@ -123,7 +123,7 @@ Rectangle {
         visible: opacity > 0
         opacity: globalScreenplayEditorToolbar.showFind ? 1 : 0
         Behavior on opacity {
-            enabled: screenplayEditorSettings.enableAnimations
+            enabled: applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
 
@@ -230,7 +230,7 @@ Rectangle {
             anchors.leftMargin: leftMargin
             property real leftMargin: contentView.commentsExpanded && sidePanels.expanded ? 80 : (parent.width-width)/2
             Behavior on leftMargin {
-                enabled: screenplayEditorSettings.enableAnimations && contentView.commentsExpandCounter > 0
+                enabled: applicationSettings.enableAnimations && contentView.commentsExpandCounter > 0
                 NumberAnimation { duration: 50 }
             }
 
@@ -300,7 +300,7 @@ Rectangle {
 
                     property bool allowContentYAnimation
                     Behavior on contentY {
-                        enabled: screenplayEditorSettings.enableAnimations && contentView.allowContentYAnimation
+                        enabled: applicationSettings.enableAnimations && contentView.allowContentYAnimation
                         NumberAnimation {
                             duration: 100
                             onFinished: contentView.allowContentYAnimation = false
@@ -1365,7 +1365,7 @@ Rectangle {
                 visible: width >= 100 && screenplayEditorSettings.displaySceneComments
                 opacity: expanded ? (screenplayAdapter.currentIndex < 0 || screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
                 Behavior on opacity {
-                    enabled: screenplayEditorSettings.enableAnimations
+                    enabled: applicationSettings.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
                 content: TextArea {
@@ -3052,7 +3052,7 @@ Rectangle {
                             property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
                             property real leftMargin: 6 + (iconWidth+12)*t
                             Behavior on t {
-                                enabled: screenplayEditorSettings.enableAnimations
+                                enabled: applicationSettings.enableAnimations
                                 NumberAnimation { duration: 250 }
                             }
 
@@ -3118,7 +3118,7 @@ Rectangle {
                             visible: t > 0
                             property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
                             Behavior on t {
-                                enabled: screenplayEditorSettings.enableAnimations
+                                enabled: applicationSettings.enableAnimations
                                 NumberAnimation { duration: 250 }
                             }
                         }

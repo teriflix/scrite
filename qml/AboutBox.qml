@@ -51,14 +51,14 @@ Item {
                 font.pixelSize: 18
                 color: "white"
                 text: Scrite.app.applicationVersion
-                font.letterSpacing: screenplayEditorSettings.enableAnimations ? 10 : 0
+                font.letterSpacing: applicationSettings.enableAnimations ? 10 : 0
 
                 NumberAnimation {
                     target: versionText
                     property: "font.letterSpacing"
                     from: 10; to: 0
                     duration: 1500
-                    running: true && screenplayEditorSettings.enableAnimations
+                    running: true && applicationSettings.enableAnimations
                     easing.type: Easing.OutBack
                 }
             }

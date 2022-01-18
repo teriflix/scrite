@@ -31,7 +31,7 @@ Item {
     function show() {
         if(visible)
             return
-        if(sourceItem && screenplayEditorSettings.enableAnimations)
+        if(sourceItem && applicationSettings.enableAnimations)
             showAnimation.start()
         else {
             container.t = 1
@@ -42,7 +42,7 @@ Item {
     function hide() {
         if(!visible)
             return
-        if(sourceItem && screenplayEditorSettings.enableAnimations)
+        if(sourceItem && applicationSettings.enableAnimations)
             hideAnimation.start()
         else {
             container.t = 1
