@@ -122,6 +122,9 @@ public:
     static QStringList availableThemes();
     static QString queryQtQuickStyleFor(const QString &theme);
 
+    Q_PROPERTY(bool usingMaterialTheme READ usingMaterialTheme CONSTANT)
+    bool usingMaterialTheme() const;
+
     Q_PROPERTY(bool internetAvailable READ isInternetAvailable NOTIFY internetAvailableChanged)
     bool isInternetAvailable() const;
     Q_SIGNAL void internetAvailableChanged();

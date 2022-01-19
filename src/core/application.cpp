@@ -362,6 +362,11 @@ QString Application::queryQtQuickStyleFor(const QString &theme)
     return theme;
 }
 
+bool Application::usingMaterialTheme() const
+{
+    return QQuickStyle::name() == QStringLiteral("Material");
+}
+
 bool Application::isInternetAvailable() const
 {
     return m_networkConfiguration != nullptr && m_networkConfiguration->isOnline();

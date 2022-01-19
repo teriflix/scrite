@@ -718,7 +718,7 @@ Item {
                     id: graphicsGroup
                     width: (parent.width - parent.spacing)/2
                     label: Text {
-                        text: "Graphics (Requires Restart)"
+                        text: "Graphics"
                     }
 
                     Column {
@@ -733,7 +733,16 @@ Item {
                         CheckBox2 {
                             checked: applicationSettings.useSoftwareRenderer
                             text: "Use Software Renderer"
-                            onToggled: applicationSettings.useSoftwareRenderer = checked
+                            onToggled: {
+                                applicationSettings.useSoftwareRenderer = checked
+                                Notification.active = true
+                            }
+                            Notification.title: "Requires Restart"
+                            Notification.text: checked ? "Software renderer will be used when you restart Scrite." : "Accelerated graphics renderer will be used when you restart Scrite."
+                            Notification.autoClose: false
+                            ToolTip.text: "If you feel that Scrite is not responding fast enough, then you may want to switch to using a Software Renderer to speed things up. Otherwise, keep this option unchecked for best experience."
+                            ToolTip.visible: hovered
+                            ToolTip.delay: 1000
                         }
 
                         Row {
@@ -759,7 +768,18 @@ Item {
                                         return materialStyleIndex
                                     return idx
                                 }
-                                onCurrentTextChanged: applicationSettings.theme = currentText
+                                onCurrentTextChanged: {
+                                    const oldTheme = applicationSettings.theme
+                                    applicationSettings.theme = currentText
+                                    Notification.active = oldTheme !== currentText
+                                }
+                                Notification.title: "Requires Restart"
+                                Notification.text: "\"" + currentText + "\" theme will be used when you restart Scrite."
+                                Notification.autoClose: false
+
+                                ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
+                                ToolTip.visible: hovered
+                                ToolTip.delay: 1000
                             }
                         }
                     }

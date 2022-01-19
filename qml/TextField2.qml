@@ -156,6 +156,7 @@ TextField {
         font.pointSize: 2*Scrite.app.idealFontPointSize/3
         anchors.left: parent.left
         anchors.verticalCenter: parent.top
+        anchors.verticalCenterOffset: parent.topPadding/2
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""
     }
 
@@ -203,6 +204,30 @@ TextField {
             currentIndex: completionModel.currentRow
             height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
             ScrollBar.vertical: ScrollBar2 { flickable: completionView }
+        }
+    }
+
+    Component {
+        id: backgroundComponent
+
+        Item {
+            implicitWidth: textField.width
+            implicitHeight: fontMetrics.lineSpacing
+
+            Rectangle {
+                width: parent.width
+                height: 1
+                color: textField.activeFocus ? primaryColors.c700.background : primaryColors.c300.background
+                anchors.bottom: parent.bottom
+            }
+        }
+    }
+
+    Component.onCompleted: {
+        if(!Scrite.app.usingMaterialTheme) {
+            background = backgroundComponent.createObject(textField)
+            topPadding = topPadding + 4
+            bottomPadding = bottomPadding + 4
         }
     }
 }
