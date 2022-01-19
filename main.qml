@@ -257,6 +257,14 @@ Rectangle {
             color: parent.color
             opacity: 0.9 * (parent.radius/parent.maxRadius)
         }
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            preventStealing: true
+            propagateComposedEvents: false
+            enabled: parent.visible
+        }
     }
 
     Settings {
