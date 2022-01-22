@@ -18,7 +18,7 @@ licenses compatible with GPLv3.
    https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
 
 4. 3rdparty/sonnet: This is a library from KDE Frameworks 5 for enabling spell
-   check feature in Scrite. While we have added out own code to it, much of it
+   check feature in Scrite. While we have added our own code to it, much of it
    is directly taken from the KDE project. Read 3rdparty/sonnet/README file for
    more information.
 
@@ -48,14 +48,15 @@ Certain icons and graphics art work owned by TERIFLIX are used in the
 application. 3rd party builds of Scrite must not use the following icons and
 graphics artwork.
 
-1. images/teriflix_logo.png: All rights to this image rest with
+1. images/teriflix_logo.png, images/teriflix_logo_inverted.png,
+   images/teriflix_icon.png: All rights to this image rest with
    TERIFLIX Entertainment Spaces Pvt. Ltd. (https://www.teriflix.com)
 
-The development of Scrite is done using a commercial version of Qt 5.13.2
+The development of Scrite is done using a commercial version of Qt 5.15.8
 However the entire source code of Scrite is made available under GPLv3.
 The complete license text of GPLv3 is given below. TERIFLIX reserves the
 right to release the source code of Scrite, in parts or whole, under any
-other license terms at point in the future. Contributions to Scrite are
+other license terms at any point in the future. Contributions to Scrite are
 currently accepted, only if they are offered under the terms of GPLv3.
 
 The complete source code and documentation accompying this project are
