@@ -1128,7 +1128,8 @@ Item {
                             MenuItem2 {
                                 property string baseText: modelData.key
                                 property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
-                                text: baseText + " (" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
+                                property string tabs: modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t"
+                                text: baseText + tabs + "" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
                                 font.bold: Scrite.app.transliterationEngine.language === modelData.value
                                 onClicked: {
                                     Scrite.app.transliterationEngine.language = modelData.value
@@ -1141,7 +1142,7 @@ Item {
                         MenuSeparator { }
 
                         MenuItem2 {
-                            text: "Next-Language (F10)"
+                            text: "Next-Language\tF10"
                             onClicked: {
                                 Scrite.app.transliterationEngine.cycleLanguage()
                                 Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
