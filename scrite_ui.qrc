@@ -84,5 +84,6 @@
         <file>qml/RenameCharacterDialog.qml</file>
         <file>qml/PdfView.qml</file>
         <file>qml/BusyIcon.qml</file>
+        <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
     </qresource>
 </RCC>

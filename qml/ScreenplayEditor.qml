@@ -3159,7 +3159,23 @@ Rectangle {
                             ToolTip.delay: 1000
                             ToolTip.visible: delegateText.truncated && containsMouse
                             anchors.fill: parent
+                            acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onClicked: (mouse) => {
+                                           if(mouse.button === Qt.RightButton) {
+                                               if(screenplayElement.elementType === ScreenplayElement.BreakElementType) {
+                                                   breakElementContextMenu.element = screenplayElement
+                                                   breakElementContextMenu.popup(this)
+                                               } else {
+                                                   sceneElementsContextMenu.element = screenplayElement
+                                                   sceneElementsContextMenu.popup(this)
+                                               }
+
+                                               Scrite.document.screenplay.currentElementIndex = index
+                                               requestEditorLater()
+
+                                               return
+                                           }
+
                                            if(screenplayAdapter.isSourceScreenplay) {
                                                const isControlPressed = mouse.modifiers & Qt.ControlModifier
                                                const isShiftPressed = mouse.modifiers & Qt.ShiftModifier
@@ -3320,6 +3336,25 @@ Rectangle {
                             }
                         }
                     }
+                }
+
+                Menu2 {
+                    id: breakElementContextMenu
+                    property ScreenplayElement element
+                    onClosed: element = null
+
+                    MenuItem2 {
+                        text: "Remove"
+                        enabled: !Scrite.document.readOnly
+                        onClicked: {
+                            Scrite.document.screenplay.removeElement(breakElementContextMenu.element)
+                            breakElementContextMenu.close()
+                        }
+                    }
+                }
+
+                ScreenplaySceneElementsContextMenu {
+                    id: sceneElementsContextMenu
                 }
             }
         }
