@@ -1288,6 +1288,8 @@ Rectangle {
                 scene: contentItem.theScene
                 textDocument: sceneTextEditor.textDocument
                 cursorPosition: sceneTextEditor.activeFocus ? sceneTextEditor.cursorPosition : -1
+                shots: Scrite.document.structure.shots
+                transitions: Scrite.document.structure.transitions
                 characterNames: Scrite.document.structure.characterNames
                 screenplayFormat: screenplayEditor.screenplayFormat
                 forceSyncDocument: !sceneTextEditor.activeFocus

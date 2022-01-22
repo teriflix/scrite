@@ -1163,9 +1163,9 @@ Character::Character(QObject *parent)
 
     if (m_structure) {
         connect(this, &Character::tagsChanged, m_structure,
-                &Structure::updateCharacterNamesAndTagsLater);
+                &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
         connect(this, &Character::priorityChanged, m_structure,
-                &Structure::updateCharacterNamesAndTagsLater);
+                &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
     }
 }
 
@@ -1702,9 +1702,9 @@ bool Character::event(QEvent *event)
         m_structure = qobject_cast<Structure *>(this->parent());
         if (m_structure) {
             connect(this, &Character::tagsChanged, m_structure,
-                    &Structure::updateCharacterNamesAndTagsLater);
+                    &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
             connect(this, &Character::priorityChanged, m_structure,
-                    &Structure::updateCharacterNamesAndTagsLater);
+                    &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
         }
     }
 
@@ -2344,6 +2344,29 @@ void Annotation::onDfsAuction(const QString &filePath, int *claims)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static QStringList defaultTransitions()
+{
+    return QStringList({ QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"),
+                         QStringLiteral("FADE IN"), QStringLiteral("FADE OUT"),
+                         QStringLiteral("FADE TO"), QStringLiteral("FLASH CUT TO"),
+                         QStringLiteral("FREEZE FRAME"), QStringLiteral("IRIS IN"),
+                         QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"),
+                         QStringLiteral("MATCH CUT TO"), QStringLiteral("MATCH DISSOLVE TO"),
+                         QStringLiteral("SMASH CUT TO"), QStringLiteral("STOCK SHOT"),
+                         QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
+}
+
+static QStringList defaultShots()
+{
+    return QStringList({ QStringLiteral("AIR"), QStringLiteral("CLOSE ON"),
+                         QStringLiteral("CLOSER ON"), QStringLiteral("CLOSEUP"),
+                         QStringLiteral("ESTABLISHING"), QStringLiteral("EXTREME CLOSEUP"),
+                         QStringLiteral("INSERT"), QStringLiteral("POV"), QStringLiteral("SURFACE"),
+                         QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"),
+                         QStringLiteral("UNDERWATER"), QStringLiteral("WIDE"),
+                         QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
+}
+
 Structure::Structure(QObject *parent)
     : QObject(parent),
       m_scriteDocument(qobject_cast<ScriteDocument *>(parent)),
@@ -2408,6 +2431,9 @@ Structure::Structure(QObject *parent)
     }
 
     this->loadDefaultGroupsData();
+
+    m_transitions = defaultTransitions();
+    m_shots = defaultShots();
 }
 
 Structure::~Structure()
@@ -2502,7 +2528,7 @@ void Structure::addCharacter(Character *ptr)
     m_characters.append(ptr);
     emit characterCountChanged();
 
-    this->updateCharacterNamesAndTagsLater();
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
 }
 
 void Structure::removeCharacter(Character *ptr)
@@ -2521,7 +2547,7 @@ void Structure::removeCharacter(Character *ptr)
 
     emit characterCountChanged();
 
-    this->updateCharacterNamesAndTagsLater();
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
 
     if (ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
@@ -2559,7 +2585,7 @@ void Structure::setCharacters(const QList<Character *> &list)
     m_characters.assign(list2);
     emit characterCountChanged();
 
-    this->updateCharacterNamesAndTagsLater();
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
 }
 
 void Structure::clearCharacters()
@@ -2805,7 +2831,7 @@ void Structure::setElements(const QList<StructureElement *> &list)
     emit elementCountChanged();
     emit elementsChanged();
 
-    this->updateCharacterNamesAndTagsLater();
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
 }
 
 StructureElement *Structure::elementAt(int index) const
@@ -4385,7 +4411,7 @@ void Structure::deserializeFromJson(const QJsonObject &json)
     if (notes.isArray())
         m_notes->loadOldNotes(notes.toArray());
 
-    this->updateCharacterNamesAndTagsLater();
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
 }
 
 bool Structure::canSetPropertyFromObjectList(const QString &propName) const
@@ -4449,9 +4475,9 @@ void Structure::timerEvent(QTimerEvent *event)
         return;
     }
 
-    if (m_updateCharacterNamesTimer.timerId() == event->timerId()) {
-        m_updateCharacterNamesTimer.stop();
-        this->updateCharacterNamesAndTags();
+    if (m_updateCharacterNamesShotsTransitionsAndTagsTimer.timerId() == event->timerId()) {
+        m_updateCharacterNamesShotsTransitionsAndTagsTimer.stop();
+        this->updateCharacterNamesShotsTransitionsAndTags();
         return;
     }
 
@@ -4585,24 +4611,33 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
     connect(element->scene(), &Scene::sceneElementChanged, this, &Structure::onSceneElementChanged);
     connect(element->scene(), &Scene::aboutToRemoveSceneElement, this,
             &Structure::onAboutToRemoveSceneElement);
-    m_characterElementMap.include(element->scene()->characterElementMap());
+
+    Scene *scene = element->scene();
+    for (int i = 0; i < scene->elementCount(); i++) {
+        SceneElement *element = scene->elementAt(i);
+        if (!m_characterElementMap.include(element))
+            if (!m_transitionElementMap.include(element))
+                !m_shotElementMap.include(element);
+    }
 
     this->updateLocationHeadingMapLater();
 }
 
 void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
 {
-    if (m_characterElementMap.include(element))
-        updateCharacterNamesAndTagsLater();
+    if (m_characterElementMap.include(element) || m_transitionElementMap.include(element)
+        || m_shotElementMap.include(element))
+        updateCharacterNamesShotsTransitionsAndTagsLater();
 }
 
 void Structure::onAboutToRemoveSceneElement(SceneElement *element)
 {
-    if (m_characterElementMap.remove(element))
-        updateCharacterNamesAndTagsLater();
+    if (m_characterElementMap.remove(element) || m_transitionElementMap.remove(element)
+        || m_shotElementMap.remove(element))
+        updateCharacterNamesShotsTransitionsAndTagsLater();
 }
 
-void Structure::updateCharacterNamesAndTags()
+void Structure::updateCharacterNamesShotsTransitionsAndTags()
 {
     QStringList names = m_characterElementMap.characterNames();
     QSet<QString> tags;
@@ -4617,16 +4652,45 @@ void Structure::updateCharacterNamesAndTags()
         tags += QSet<QString>(ctags.begin(), ctags.end());
     }
 
-    m_characterNames = this->sortCharacterNames(names);
-    emit characterNamesChanged();
+    names = this->sortCharacterNames(names);
+    if (names != m_characterNames) {
+        m_characterNames = names;
+        emit characterNamesChanged();
+    }
 
-    m_characterTags = tags.values();
-    emit characterTagsChanged();
+    if (tags.values() != m_characterTags) {
+        m_characterTags = tags.values();
+        emit characterTagsChanged();
+    }
+
+    const QStringList shots = [=]() {
+        QSet<QString> set = m_shotElementMap.shots().toSet();
+        set += defaultShots().toSet();
+        QStringList ret = set.toList();
+        std::sort(ret.begin(), ret.end());
+        return ret;
+    }();
+    if (shots != m_shots) {
+        m_shots = shots;
+        emit shotsChanged();
+    }
+
+    const QStringList transitions = [=]() {
+        QSet<QString> set = m_transitionElementMap.transitions().toSet();
+        set += defaultTransitions().toSet();
+        QStringList ret = set.toList();
+        std::sort(ret.begin(), ret.end());
+        return ret;
+    }();
+    if (transitions != m_transitions) {
+        m_transitions = transitions;
+        emit transitionsChanged();
+    }
 }
 
-void Structure::updateCharacterNamesAndTagsLater()
+void Structure::updateCharacterNamesShotsTransitionsAndTagsLater()
 {
-    m_updateCharacterNamesTimer.start(0, this);
+    m_updateCharacterNamesShotsTransitionsAndTagsTimer.start(0, this);
 }
 
 void Structure::staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr)

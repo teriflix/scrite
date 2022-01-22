@@ -1486,6 +1486,24 @@ void SceneDocumentBinder::setCharacterNames(const QStringList &val)
     emit characterNamesChanged();
 }
 
+void SceneDocumentBinder::setTransitions(const QStringList &val)
+{
+    if (m_transitions == val)
+        return;
+
+    m_transitions = val;
+    emit transitionsChanged();
+}
+
+void SceneDocumentBinder::setShots(const QStringList &val)
+{
+    if (m_shots == val)
+        return;
+
+    m_shots = val;
+    emit shotsChanged();
+}
+
 void SceneDocumentBinder::setForceSyncDocument(bool val)
 {
     if (m_forceSyncDocument == val)
@@ -2406,33 +2424,15 @@ void SceneDocumentBinder::evaluateAutoCompleteHints()
         return;
     }
 
-    static QStringList transitions = QStringList()
-            << QStringLiteral("CUT TO") << QStringLiteral("DISSOLVE TO")
-            << QStringLiteral("FADE IN") << QStringLiteral("FADE OUT") << QStringLiteral("FADE TO")
-            << QStringLiteral("FLASH CUT TO") << QStringLiteral("FREEZE FRAME")
-            << QStringLiteral("IRIS IN") << QStringLiteral("IRIS OUT")
-            << QStringLiteral("JUMP CUT TO") << QStringLiteral("MATCH CUT TO")
-            << QStringLiteral("MATCH DISSOLVE TO") << QStringLiteral("SMASH CUT TO")
-            << QStringLiteral("STOCK SHOT") << QStringLiteral("TIME CUT")
-            << QStringLiteral("WIPE TO");
-
-    static QStringList shots = QStringList()
-            << QStringLiteral("AIR") << QStringLiteral("CLOSE ON") << QStringLiteral("CLOSER ON")
-            << QStringLiteral("CLOSEUP") << QStringLiteral("ESTABLISHING")
-            << QStringLiteral("EXTREME CLOSEUP") << QStringLiteral("INSERT")
-            << QStringLiteral("POV") << QStringLiteral("SURFACE") << QStringLiteral("THREE SHOT")
-            << QStringLiteral("TWO SHOT") << QStringLiteral("UNDERWATER") << QStringLiteral("WIDE")
-            << QStringLiteral("WIDE ON") << QStringLiteral("WIDER ANGLE");
-
     switch (m_currentElement->type()) {
     case SceneElement::Character:
         hints = m_characterNames;
         break;
     case SceneElement::Transition:
-        hints = transitions;
+        hints = m_transitions;
         break;
     case SceneElement::Shot:
-        hints = shots;
+        hints = m_shots;
         break;
     default:
         break;
