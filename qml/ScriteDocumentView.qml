@@ -1128,7 +1128,7 @@ Item {
                             MenuItem2 {
                                 property string baseText: modelData.key
                                 property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
-                                property string tabs: modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t"
+                                property string tabs: Scrite.app.isWindowsPlatform ? (modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t") : "\t\t"
                                 text: baseText + tabs + "" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
                                 font.bold: Scrite.app.transliterationEngine.language === modelData.value
                                 onClicked: {
