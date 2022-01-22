@@ -186,28 +186,23 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     this->setWindowIcon(QIcon(QStringLiteral(":/images/appicon.png")));
     this->computeIdealFontPointSize();
 
+    const bool useSoftwareRenderer = [=]() -> bool {
 #ifdef Q_OS_WIN
-    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion::Windows10)
-        QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Direct3D12);
-    else
-        QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+        if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows10)
+            return true;
 #endif
+        return m_settings->value(QStringLiteral("Application/useSoftwareRenderer"), false).toBool();
+    }();
+    const QString style = [=]() -> QString {
+        const QString ret = m_settings->value(QStringLiteral("Application/theme")).toString();
+        if (useSoftwareRenderer && ret == QStringLiteral("Material"))
+            return QStringLiteral("Default");
+        return Application::queryQtQuickStyleFor(ret);
+    }();
 
-    {
-        const QVariant theme = m_settings->value(QStringLiteral("Application/theme"));
-        const QVariant useSoftwareRenderer =
-                m_settings->value(QStringLiteral("Application/useSoftwareRenderer"));
-
-        if (useSoftwareRenderer.toBool()) {
-            QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
-            if (theme == QStringLiteral("Material"))
-                QQuickStyle::setStyle(QStringLiteral("Default"));
-            else
-                QQuickStyle::setStyle(queryQtQuickStyleFor(theme.toString()));
-        } else {
-            QQuickStyle::setStyle(queryQtQuickStyleFor(theme.toString()));
-        }
-    }
+    if (useSoftwareRenderer)
+        QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+    QQuickStyle::setStyle(style);
 }
 
 QVersionNumber Application::prepare()
