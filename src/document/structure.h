@@ -861,6 +861,14 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_PROPERTY(QStringList transitions READ transitions NOTIFY transitionsChanged)
+    QStringList transitions() const { return m_transitions; }
+    Q_SIGNAL void transitionsChanged();
+
+    Q_PROPERTY(QStringList shots READ shots NOTIFY shotsChanged)
+    QStringList shots() const { return m_shots; }
+    Q_SIGNAL void shotsChanged();
+
     Q_PROPERTY(QStringList characterTags READ characterTags NOTIFY characterTagsChanged)
     QStringList characterTags() const { return m_characterTags; }
     Q_SIGNAL void characterTagsChanged();
@@ -1004,12 +1012,16 @@ private:
     void onStructureElementSceneChanged(StructureElement *element = nullptr);
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     void onAboutToRemoveSceneElement(SceneElement *element);
-    void updateCharacterNamesAndTags();
-    void updateCharacterNamesAndTagsLater();
-    ExecLaterTimer m_updateCharacterNamesTimer;
+    void updateCharacterNamesShotsTransitionsAndTags();
+    void updateCharacterNamesShotsTransitionsAndTagsLater();
+    ExecLaterTimer m_updateCharacterNamesShotsTransitionsAndTagsTimer;
     CharacterElementMap m_characterElementMap;
+    TransitionElementMap m_transitionElementMap;
+    ShotElementMap m_shotElementMap;
     QStringList m_characterTags;
     QStringList m_characterNames;
+    QStringList m_shots;
+    QStringList m_transitions;
 
     static void staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr);
     static void staticClearAnnotations(QQmlListProperty<Annotation> *list);

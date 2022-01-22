@@ -532,6 +532,16 @@ public:
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
+    Q_PROPERTY(QStringList transitions READ transitions WRITE setTransitions NOTIFY transitionsChanged)
+    void setTransitions(const QStringList &val);
+    QStringList transitions() const { return m_transitions; }
+    Q_SIGNAL void transitionsChanged();
+
+    Q_PROPERTY(QStringList shots READ shots WRITE setShots NOTIFY shotsChanged)
+    void setShots(const QStringList &val);
+    QStringList shots() const { return m_shots; }
+    Q_SIGNAL void shotsChanged();
+
     Q_PROPERTY(SceneElement* currentElement READ currentElement NOTIFY currentElementChanged RESET resetCurrentElement)
     SceneElement *currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
@@ -680,6 +690,8 @@ private:
     bool m_applyLanguageFonts = false;
     QString m_completionPrefix;
     bool m_initializingDocument = false;
+    QStringList m_shots;
+    QStringList m_transitions;
     QStringList m_characterNames;
     bool m_liveSpellCheckEnabled = true;
     QObjectProperty<Scene> m_scene;

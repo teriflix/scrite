@@ -515,17 +515,18 @@ void SceneElement::renameCharacter(const QString &from, const QString &to)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CharacterElementMap::CharacterElementMap() { }
-CharacterElementMap::~CharacterElementMap() { }
+DistinctElementValuesMap::DistinctElementValuesMap(SceneElement::Type type) : m_type(type) { }
 
-bool CharacterElementMap::include(SceneElement *element)
+DistinctElementValuesMap::~DistinctElementValuesMap() { }
+
+bool DistinctElementValuesMap::include(SceneElement *element)
 {
-    // This function returns true if characterNames() would return
+    // This function returns true if distinctValues() would return
     // a different list after this function returns
     if (element == nullptr)
         return false;
 
-    if (element->type() == SceneElement::Character) {
+    if (element->type() == m_type) {
         const bool ret = this->remove(element);
 
         QString newName = element->formattedText();
@@ -544,9 +545,9 @@ bool CharacterElementMap::include(SceneElement *element)
     return false;
 }
 
-bool CharacterElementMap::remove(SceneElement *element)
+bool DistinctElementValuesMap::remove(SceneElement *element)
 {
-    // This function returns true if characterNames() would return
+    // This function returns true if distinctValues() would return
     // a different list after this function returns
     const QString oldName = m_forwardMap.take(element);
     if (!oldName.isEmpty()) {
@@ -558,7 +559,8 @@ bool CharacterElementMap::remove(SceneElement *element)
             }
 
             if (list.size() == 1) {
-                const QVariant value = list.first()->property("#mute");
+                const QVariant value =
+                        m_type == SceneElement::Character ? list.first()->property("#mute") : false;
                 if (value.isValid() && value.toBool())
                     return true;
             }
@@ -568,7 +570,7 @@ bool CharacterElementMap::remove(SceneElement *element)
     return false;
 }
 
-bool CharacterElementMap::remove(const QString &name)
+bool DistinctElementValuesMap::remove(const QString &name)
 {
     if (name.isEmpty())
         return false;
@@ -583,29 +585,29 @@ bool CharacterElementMap::remove(const QString &name)
     return true;
 }
 
-QStringList CharacterElementMap::characterNames() const
+QStringList DistinctElementValuesMap::distinctValues() const
 {
     return m_reverseMap.keys();
 }
 
-bool CharacterElementMap::containsCharacter(const QString &name) const
+bool DistinctElementValuesMap::containsValue(const QString &value) const
 {
-    return m_reverseMap.contains(name.toUpper());
+    return m_reverseMap.contains(value.toUpper());
 }
 
-QList<SceneElement *> CharacterElementMap::characterElements() const
+QList<SceneElement *> DistinctElementValuesMap::elements() const
 {
     return m_forwardMap.keys();
 }
 
-QList<SceneElement *> CharacterElementMap::characterElements(const QString &name) const
+QList<SceneElement *> DistinctElementValuesMap::elements(const QString &value) const
 {
-    return m_reverseMap.value(name.toUpper());
+    return m_reverseMap.value(value.toUpper());
 }
 
-void CharacterElementMap::include(const CharacterElementMap &other)
+void DistinctElementValuesMap::include(const DistinctElementValuesMap &other)
 {
-    const QList<SceneElement *> elements = other.characterElements();
+    const QList<SceneElement *> elements = other.elements();
     for (SceneElement *element : elements)
         this->include(element);
 }

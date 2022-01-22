@@ -189,29 +189,72 @@ private:
     mutable SpellCheckService *m_spellCheck = nullptr;
 };
 
-class CharacterElementMap
+class DistinctElementValuesMap
 {
 public:
-    CharacterElementMap();
-    ~CharacterElementMap();
+    DistinctElementValuesMap(SceneElement::Type type = SceneElement::Character);
+    ~DistinctElementValuesMap();
 
-    // These functions returns true if characterNames() would return
+    // These functions returns true if distinctValues() would return
     // a different list after this function returns
     bool include(SceneElement *element);
     bool remove(SceneElement *element);
     bool remove(const QString &name);
     bool isEmpty() const { return m_forwardMap.isEmpty() && m_reverseMap.isEmpty(); }
 
-    QStringList characterNames() const;
-    bool containsCharacter(const QString &name) const;
-    QList<SceneElement *> characterElements() const;
-    QList<SceneElement *> characterElements(const QString &name) const;
+    QStringList distinctValues() const;
+    bool containsValue(const QString &value) const;
+    QList<SceneElement *> elements() const;
+    QList<SceneElement *> elements(const QString &value) const;
 
-    void include(const CharacterElementMap &other);
+    void include(const DistinctElementValuesMap &other);
 
 private:
+    SceneElement::Type m_type = SceneElement::Character;
     QMap<SceneElement *, QString> m_forwardMap;
     QMap<QString, QList<SceneElement *>> m_reverseMap;
+};
+
+class CharacterElementMap : public DistinctElementValuesMap
+{
+public:
+    CharacterElementMap() : DistinctElementValuesMap(SceneElement::Character) { }
+    ~CharacterElementMap() { }
+
+    QStringList characterNames() const { return this->distinctValues(); }
+    bool containsCharacter(const QString &name) const { return this->containsValue(name); }
+    QList<SceneElement *> characterElements() const { return this->elements(); }
+    QList<SceneElement *> characterElements(const QString &name) const
+    {
+        return this->elements(name);
+    }
+};
+
+class TransitionElementMap : public DistinctElementValuesMap
+{
+public:
+    TransitionElementMap() : DistinctElementValuesMap(SceneElement::Transition) { }
+    ~TransitionElementMap() { }
+
+    QStringList transitions() const { return this->distinctValues(); }
+    bool containsTransition(const QString &name) const { return this->containsValue(name); }
+    QList<SceneElement *> transitionElements() const { return this->elements(); }
+    QList<SceneElement *> transitionElements(const QString &name) const
+    {
+        return this->elements(name);
+    }
+};
+
+class ShotElementMap : public DistinctElementValuesMap
+{
+public:
+    ShotElementMap() : DistinctElementValuesMap(SceneElement::Shot) { }
+    ~ShotElementMap() { }
+
+    QStringList shots() const { return this->distinctValues(); }
+    bool containsShot(const QString &name) const { return this->containsValue(name); }
+    QList<SceneElement *> shotElements() const { return this->elements(); }
+    QList<SceneElement *> shotElements(const QString &name) const { return this->elements(name); }
 };
 
 class Scene : public QAbstractListModel, public QObjectSerializer::Interface, public Modifiable
