@@ -809,12 +809,12 @@ void ScriteDocument::reset()
     if (m_formatting == nullptr)
         this->setFormatting(new ScreenplayFormat(this));
     else
-        m_formatting->resetToDefaults();
+        m_formatting->resetToUserDefaults();
 
     if (m_printFormat == nullptr)
         this->setPrintFormat(new ScreenplayFormat(this));
     else
-        m_printFormat->resetToDefaults();
+        m_printFormat->resetToUserDefaults();
 
     this->setForms(new Forms(this));
     this->setScreenplay(new Screenplay(this));
@@ -2194,8 +2194,8 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // work anymore. We better reset to defaults in the new version and then
     // let the user alter it anyway he sees fit.
     if (version <= QVersionNumber(0, 3, 9)) {
-        m_formatting->resetToDefaults();
-        m_printFormat->resetToDefaults();
+        m_formatting->resetToFactoryDefaults();
+        m_printFormat->resetToFactoryDefaults();
     }
 
     // Starting with 0.4.5, it is possible for users to lock a document

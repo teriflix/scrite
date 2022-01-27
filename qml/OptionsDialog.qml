@@ -1934,16 +1934,35 @@ Item {
             currentIndex: 0
 
             cornerContent: Item {
-                Button2 {
-                    text: "Reset"
+                Column {
+                    width: parent.width-40
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 10
-                    onClicked: {
-                        Scrite.document.formatting.resetToDefaults()
-                        Scrite.document.printFormat.resetToDefaults()
+                    anchors.bottomMargin: 15
+                    spacing: 10
+
+                    Button2 {
+                        text: "Make Default"
+                        width: parent.width
+                        ToolTip.text: "Saves current formatting options as default for all current and future documents."
+                        ToolTip.visible: hovered
+                        onClicked: {
+                            Scrite.document.formatting.saveAsUserDefaults()
+                        }
+                    }
+
+                    Button2 {
+                        text: "Factory Reset"
+                        width: parent.width
+                        ToolTip.text: "Restores formatting options to defaults for current document only."
+                        ToolTip.visible: hovered
+                        onClicked: {
+                            Scrite.document.formatting.resetToFactoryDefaults()
+                            Scrite.document.printFormat.resetToFactoryDefaults()
+                        }
                     }
                 }
+
             }
 
             pageContent: Column {

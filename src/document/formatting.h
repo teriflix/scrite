@@ -152,7 +152,7 @@ public:
     bool isInTransaction() const { return m_inTransaction; }
     Q_SIGNAL void inTransactionChanged();
 
-    void resetToDefaults();
+    void resetToFactoryDefaults();
 
 private:
     friend class ScreenplayFormat;
@@ -375,7 +375,10 @@ public:
     int secondsPerPage() const { return m_secondsPerPage; }
     Q_SIGNAL void secondsPerPageChanged();
 
-    Q_INVOKABLE void resetToDefaults();
+    Q_INVOKABLE void resetToFactoryDefaults();
+
+    Q_INVOKABLE bool saveAsUserDefaults();
+    Q_INVOKABLE void resetToUserDefaults();
 
     Q_INVOKABLE void beginTransaction();
     Q_INVOKABLE bool hasChangesToCommit() { return m_nrChangesDuringTransation > 0; }

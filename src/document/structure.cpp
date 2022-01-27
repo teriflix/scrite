@@ -4617,7 +4617,7 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
         SceneElement *element = scene->elementAt(i);
         if (!m_characterElementMap.include(element))
             if (!m_transitionElementMap.include(element))
-                !m_shotElementMap.include(element);
+                m_shotElementMap.include(element);
     }
 
     this->updateLocationHeadingMapLater();

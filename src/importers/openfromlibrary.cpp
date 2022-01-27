@@ -163,6 +163,9 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
             ScriteDocument::instance()->screenplay()->setCurrentElementIndex(
                     ScriteDocument::instance()->screenplay()->firstSceneIndex());
             ScriteDocument::instance()->structure()->setForceBeatBoardLayout(true);
+
+            ScriteDocument::instance()->printFormat()->resetToUserDefaults();
+            ScriteDocument::instance()->formatting()->resetToUserDefaults();
         }
 
         this->progress()->finish();

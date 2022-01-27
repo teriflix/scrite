@@ -25,6 +25,7 @@
 #include <QMimeData>
 #include <QClipboard>
 #include <QPdfWriter>
+#include <QScopeGuard>
 #include <QTextCursor>
 #include <QPageLayout>
 #include <QFontDatabase>
@@ -369,7 +370,7 @@ void SceneElementFormat::commitTransaction()
     m_nrChangesDuringTransation = 0;
 }
 
-void SceneElementFormat::resetToDefaults()
+void SceneElementFormat::resetToFactoryDefaults()
 {
     this->setFont(m_format->defaultFont());
     this->setLineHeight(0.85);
@@ -610,7 +611,12 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
                 emit formatChanged();
             });
 
-    this->resetToDefaults();
+    QTimer *timer = new QTimer(this);
+    timer->setSingleShot(true);
+    timer->setInterval(0);
+    connect(timer, &QTimer::timeout, this, &ScreenplayFormat::resetToUserDefaults);
+    connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
+    timer->start();
 }
 
 ScreenplayFormat::~ScreenplayFormat() { }
@@ -779,7 +785,7 @@ void ScreenplayFormat::setSecondsPerPage(int val)
     emit formatChanged();
 }
 
-void ScreenplayFormat::resetToDefaults()
+void ScreenplayFormat::resetToFactoryDefaults()
 {
     QSettings *settings = Application::instance()->settings();
     const int iPaperSize = settings->value("PageSetup/paperSize").toInt();
@@ -812,7 +818,7 @@ void ScreenplayFormat::resetToDefaults()
     }
 
     for (int i = SceneElement::Min; i <= SceneElement::Max; i++)
-        m_elementFormats.at(i)->resetToDefaults();
+        m_elementFormats.at(i)->resetToFactoryDefaults();
 
     const ParagraphMetrics paraMetrics;
     const qreal lm = paraMetrics.leftMargin;
@@ -829,6 +835,58 @@ void ScreenplayFormat::resetToDefaults()
         m_elementFormats[i]->setFontCapitalization(paraMetrics.fontCappingOf(i));
         m_elementFormats[i]->setTextAlignment(paraMetrics.textAlignOf(i));
     }
+}
+
+bool ScreenplayFormat::saveAsUserDefaults()
+{
+    const QJsonObject json = QObjectSerializer::toJson(this);
+    const QJsonDocument jsonDoc(json);
+    const QByteArray jsonStr = jsonDoc.toJson();
+
+    const QFileInfo settingsPath(Application::instance()->settingsFilePath());
+    const QString formatFile =
+            settingsPath.absoluteDir().absoluteFilePath(QStringLiteral("formatting.json"));
+
+    QFile file(formatFile);
+    if (!file.open(QFile::WriteOnly))
+        return false;
+
+    file.write(jsonStr);
+    return true;
+}
+
+void ScreenplayFormat::resetToUserDefaults()
+{
+    const QFileInfo settingsPath(Application::instance()->settingsFilePath());
+    const QString formatFile =
+            settingsPath.absoluteDir().absoluteFilePath(QStringLiteral("formatting.json"));
+
+    this->resetToFactoryDefaults();
+
+    if (!QFile::exists(formatFile))
+        return;
+
+    QFile file(formatFile);
+    if (!file.open(QFile::ReadOnly))
+        return;
+
+    const QByteArray jsonStr = file.readAll();
+    if (jsonStr.isEmpty())
+        return;
+
+    QJsonParseError jsonError;
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonStr, &jsonError);
+    if (jsonError.error != QJsonParseError::NoError)
+        return;
+
+    if (!jsonDoc.isObject())
+        return;
+
+    const QJsonObject json = jsonDoc.object();
+    if (json.isEmpty())
+        return;
+
+    QObjectSerializer::fromJson(json, this);
 }
 
 void ScreenplayFormat::beginTransaction()
