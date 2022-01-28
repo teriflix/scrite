@@ -285,7 +285,7 @@ private:
 
     // Other methods
     void evaluateCurrentPageAndPosition();
-    void evaluatePageBoundaries();
+    void evaluatePageBoundaries(bool revalCurrentPageAndPosition = true);
     void evaluatePageBoundariesLater();
     void formatAllBlocks();
     bool updateFromScreenplayElement(const ScreenplayElement *element);

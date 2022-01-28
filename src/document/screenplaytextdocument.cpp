@@ -2059,7 +2059,7 @@ void ScreenplayTextDocument::evaluateCurrentPageAndPosition()
 
     const int documentLength = endCursor.position();
     if (documentLength > 0 && m_pageBoundaries.isEmpty())
-        this->evaluatePageBoundaries();
+        this->evaluatePageBoundaries(false);
 
     QTextCursor userCursor = frame->firstCursorPosition();
     QTextBlock block = userCursor.block();
@@ -2081,7 +2081,7 @@ void ScreenplayTextDocument::evaluateCurrentPageAndPosition()
     this->setCurrentPageAndPosition(m_pageCount, 1.0);
 }
 
-void ScreenplayTextDocument::evaluatePageBoundaries()
+void ScreenplayTextDocument::evaluatePageBoundaries(bool revalCurrentPageAndPosition)
 {
     // NOTE: Please do not call this function from anywhere other than
     // timerEvent(), while handling m_pageBoundaryEvalTimer
@@ -2145,7 +2145,8 @@ void ScreenplayTextDocument::evaluatePageBoundaries()
     m_pageBoundaries = pgBoundaries;
     emit pageBoundariesChanged();
 
-    this->evaluateCurrentPageAndPosition();
+    if (revalCurrentPageAndPosition)
+        this->evaluateCurrentPageAndPosition();
 }
 
 void ScreenplayTextDocument::evaluatePageBoundariesLater()
