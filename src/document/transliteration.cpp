@@ -919,6 +919,17 @@ FontSyntaxHighlighter::FontSyntaxHighlighter(QObject *parent) : QSyntaxHighlight
     connect(TransliterationEngine::instance(),
             &TransliterationEngine::preferredFontFamilyForLanguageChanged, this,
             &FontSyntaxHighlighter::rehighlight);
+
+    if (parent != nullptr) {
+        QQuickItem *qmlItem = qobject_cast<QQuickItem *>(parent->parent());
+
+        if (qmlItem->inherits("QQuickTextEdit")) {
+            connect(qmlItem, SIGNAL(fontChanged(QFont)), this, SLOT(rehighlight()));
+        } else {
+            connect(qmlItem, &QQuickItem::widthChanged, this, &FontSyntaxHighlighter::rehighlight);
+            connect(qmlItem, &QQuickItem::heightChanged, this, &FontSyntaxHighlighter::rehighlight);
+        }
+    }
 }
 
 FontSyntaxHighlighter::~FontSyntaxHighlighter() { }
