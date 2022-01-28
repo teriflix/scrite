@@ -138,8 +138,8 @@ Item {
                                     const bound = (min, val, max) => {
                                         return Math.min(max, Math.max(min,val))
                                     }
-                                    sourceSize = Qt.size(bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
-                                                         bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
+                                    sourceSize = Qt.size(2*bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
+                                                         2*bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
                                 }
 
                                 Connections {
