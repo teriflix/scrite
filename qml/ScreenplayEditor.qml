@@ -1075,6 +1075,23 @@ Rectangle {
                     zoomSlider.value = screenplayFormat.fontZoomLevelIndex
                 }
             }
+
+            property int savedZoomValue: -1
+
+            Announcement.onIncoming: (type,data) => {
+                                         const stype = "" + type
+                                         const sdata = "" + data
+                                         if(stype === "DF77A452-FDB2-405C-8A0F-E48982012D36") {
+                                             if(sdata === "save") {
+                                                 zoomSlider.savedZoomValue = zoomSlider.value
+                                                 zoomSlider.reset()
+                                             } else if(sdata === "restore") {
+                                                 if(zoomSlider.savedZoomValue >= 0)
+                                                    zoomSlider.value = zoomSlider.savedZoomValue
+                                                 zoomSlider.savedZoomValue = -1
+                                             }
+                                         }
+                                     }
         }
     }
 

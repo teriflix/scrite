@@ -1933,6 +1933,9 @@ Item {
 
             currentIndex: 0
 
+            Component.onCompleted: Announcement.shout("DF77A452-FDB2-405C-8A0F-E48982012D36", "save")
+            Component.onDestruction: Announcement.shout("DF77A452-FDB2-405C-8A0F-E48982012D36", "restore")
+
             cornerContent: Item {
                 Column {
                     width: parent.width-40
@@ -2002,7 +2005,7 @@ Item {
                                         },
                                         SceneElement {
                                             type: SceneElement.Action
-                                            text: "Dr. Rajkumar enters the club house like a boss. He looks around at everybody in their eyes."
+                                            text: "Dr. Rajkumar enters the club house like a boss. He makes eye contact with everybody in the room."
                                         },
                                         SceneElement {
                                             type: SceneElement.Character
