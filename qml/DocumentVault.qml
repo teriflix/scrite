@@ -91,6 +91,12 @@ Item {
                             documentsView.currentDocumentFilePath = filePath
                             documentsView.currentIndex = index
                         }
+                        onDoubleClicked: {
+                            documentsView.currentDocumentFilePath = filePath
+                            documentsView.currentIndex = index
+                            busyOverlay.visible = true
+                            Qt.callLater(openRequest, documentsView.currentDocumentFilePath)
+                        }
                     }
                 }
             }
