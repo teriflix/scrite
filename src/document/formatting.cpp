@@ -611,12 +611,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
                 emit formatChanged();
             });
 
-    QTimer *timer = new QTimer(this);
-    timer->setSingleShot(true);
-    timer->setInterval(0);
-    connect(timer, &QTimer::timeout, this, &ScreenplayFormat::resetToUserDefaults);
-    connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
-    timer->start();
+    ExecLaterTimer::call("resetToUserDefaults", this, [=]() { this->resetToUserDefaults(); });
 }
 
 ScreenplayFormat::~ScreenplayFormat() { }

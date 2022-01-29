@@ -178,14 +178,9 @@ void StructureElement::setFollow(QQuickItem *val)
 
     emit followChanged();
 
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(250);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, [=]() {
-        this->setSyncWithFollow(true);
-        timer->deleteLater();
-    });
-    timer->start();
+    ExecLaterTimer::call(
+            "StructureElement::setSyncWithFollow", this, [=]() { this->setSyncWithFollow(true); },
+            250);
 }
 
 void StructureElement::setUndoRedoEnabled(bool val)
@@ -3006,14 +3001,12 @@ void Structure::setForceBeatBoardLayout(bool val)
 
     m_forceBeatBoardLayout = val;
     if (val && ScriteDocument::instance()->structure() == this) {
-        QTimer *timer = new QTimer(this);
-        timer->setInterval(250);
-        timer->setSingleShot(true);
-        connect(timer, &QTimer::timeout, [=]() {
-            this->placeElementsInBeatBoardLayout(ScriteDocument::instance()->screenplay());
-            timer->deleteLater();
-        });
-        timer->start();
+        ExecLaterTimer::call(
+                "Structure::placeElementsInBeatBoardLayout", this,
+                [=]() {
+                    this->placeElementsInBeatBoardLayout(ScriteDocument::instance()->screenplay());
+                },
+                250);
     }
 
     emit forceBeatBoardLayoutChanged();

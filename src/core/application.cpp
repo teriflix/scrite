@@ -1493,15 +1493,8 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
             m_settings->value(group + QStringLiteral("/windowGeometry")).toString();
     if (geometryString == QStringLiteral("Maximized")) {
 #ifdef Q_OS_WIN
-        window->setGeometry(screenGeo);
-        QTimer *timer = new QTimer(window);
-        timer->setInterval(100);
-        timer->setSingleShot(true);
-        connect(timer, &QTimer::timeout, [=]() {
-            window->showMaximized();
-            timer->deleteLater();
-        });
-        timer->start();
+        ExecLaterTimer::call(
+                "window.showMaximized", window, [=]() { window->showMaximized(); }, 100);
 #else
         window->setGeometry(screenGeo);
 #endif

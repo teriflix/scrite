@@ -319,7 +319,7 @@ void ScriteDocumentVault::updateModelFromFolder()
 
 void ScriteDocumentVault::updateModelFromFolderLater()
 {
-    ExecLaterTimer::call(QStringLiteral("updateModelFromFolderLater"), this,
+    ExecLaterTimer::call("updateModelFromFolderLater", this,
                          [=]() { this->updateModelFromFolder(); });
 }
 
@@ -333,8 +333,7 @@ void ScriteDocumentVault::pauseSaveToVault(int timeout)
 {
     m_nrUnsavedChanges = -100000;
     ExecLaterTimer::call(
-            QStringLiteral("pauseSaveToVaultTimer"), this, [=]() { m_nrUnsavedChanges = 0; },
-            timeout);
+            "pauseSaveToVaultTimer", this, [=]() { m_nrUnsavedChanges = 0; }, timeout);
 }
 
 void ScriteDocumentVault::prepareModel()

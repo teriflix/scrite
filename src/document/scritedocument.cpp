@@ -868,14 +868,8 @@ void ScriteDocument::reset()
 
     emit justReset();
 
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(250);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, this, [=]() {
-        timer->deleteLater();
-        this->setModified(false);
-    });
-    timer->start();
+    ExecLaterTimer::call(
+            "ScriteDocument::clearModified", this, [=]() { this->setModified(false); }, 250);
 }
 
 bool ScriteDocument::openOrImport(const QString &fileName)
@@ -2044,14 +2038,8 @@ void ScriteDocument::screenplayAboutToMoveElements(int at)
 
 void ScriteDocument::clearModifiedLater()
 {
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(250);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, this, [=]() {
-        timer->deleteLater();
-        this->setModified(false);
-    });
-    timer->start();
+    ExecLaterTimer::call(
+            "ScriteDocument::clearModified", this, [=]() { this->setModified(false); }, 250);
 }
 
 void ScriteDocument::prepareForSerialization()
@@ -2669,12 +2657,7 @@ void ScriteDocumentCollaborators::onCallFinished()
     this->updateModel();
 
     if (m_pendingFetchUsersInfoRequests > 0) {
-        QTimer *timer = new QTimer(this);
-        timer->setInterval(0);
-        timer->setSingleShot(true);
-        QObject::connect(timer, &QTimer::timeout, this,
-                         &ScriteDocumentCollaborators::fetchUsersInfo);
-        QObject::connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
-        timer->start();
+        ExecLaterTimer::call("ScriteDocumentCollaborators::fetchUsersInfo", this,
+                             [=]() { this->fetchUsersInfo(); });
     }
 }

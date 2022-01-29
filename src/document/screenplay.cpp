@@ -938,15 +938,13 @@ bool ScreenplayElementsMoveCommand::restore(const QVariantList &array, bool forw
             ++it;
         }
 
-        QTimer *timer = new QTimer(m_screenplay);
-        timer->setSingleShot(true);
-        timer->setInterval(50);
-        QObject::connect(timer, &QTimer::timeout, m_screenplay, [=]() {
-            m_screenplay->setCurrentElementIndex(currentIndex);
-            emit m_screenplay->requestEditorAt(currentIndex);
-            timer->deleteLater();
-        });
-        timer->start();
+        ExecLaterTimer::call(
+                "ScreenplayElementsMoveCommand::restore", m_screenplay,
+                [=]() {
+                    m_screenplay->setCurrentElementIndex(currentIndex);
+                    emit m_screenplay->requestEditorAt(currentIndex);
+                },
+                50);
     }
 
     return ret;
@@ -1022,15 +1020,13 @@ void Screenplay::moveSelectedElements(int toRow)
         ++it;
     }
 
-    QTimer *timer = new QTimer(this);
-    timer->setSingleShot(true);
-    timer->setInterval(50);
-    QObject::connect(timer, &QTimer::timeout, this, [=]() {
-        this->setCurrentElementIndex(toRow);
-        emit this->requestEditorAt(toRow);
-        timer->deleteLater();
-    });
-    timer->start();
+    ExecLaterTimer::call(
+            "moveSelectedElements", this,
+            [=]() {
+                this->setCurrentElementIndex(toRow);
+                emit this->requestEditorAt(toRow);
+            },
+            50);
 
     if (UndoStack::active())
         UndoStack::active()->push(cmd);
