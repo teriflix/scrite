@@ -135,6 +135,7 @@ Item {
                             checked: modelData.active
                             text: modelData.key
                             onToggled: Scrite.app.transliterationEngine.markLanguage(modelData.value,checked)
+                            padding: 0
                         }
                     }
                 }
@@ -201,6 +202,13 @@ Item {
                                 onTextEdited: Scrite.document.maxBackupCount = parseInt(text)
                                 anchors.verticalCenter: parent.verticalCenter
                             }
+                        }
+
+                        CheckBox2 {
+                            text: "Enable Restore (" + (Scrite.document.autoSave ? "New Files Only" : "All Files") + ")"
+                            width: parent.width
+                            checked: Scrite.vault.enabled
+                            onToggled: Scrite.vault.enabled = checked
                         }
                     }
                 }

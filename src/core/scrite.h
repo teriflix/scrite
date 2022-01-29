@@ -22,6 +22,7 @@ class Application;
 class ScriteDocument;
 class ShortcutsModel;
 class NotificationManager;
+class ScriteDocumentVault;
 
 class Scrite : public QObject
 {
@@ -64,6 +65,10 @@ public:
     Q_PROPERTY(QObject *document READ documentObject CONSTANT)
     QObject *documentObject() const;
     ScriteDocument *document() const;
+
+    Q_PROPERTY(QObject *vault READ vaultObject CONSTANT)
+    QObject *vaultObject() const;
+    ScriteDocumentVault *vault() const;
 
     Q_PROPERTY(QObject *shortcuts READ shortcutsObject CONSTANT)
     QObject *shortcutsObject() const;

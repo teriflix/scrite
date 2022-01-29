@@ -204,21 +204,21 @@ void ScriteDocumentBackups::reloadBackupFileInformation()
      * We push directory query to a separate thread and update the model whenever its job is
      * done.
      */
-    QFuture<QFileInfoList> future = QtConcurrent::run([=]() -> QFileInfoList {
-        return m_backupFilesDir.entryInfoList({ QStringLiteral("*.scrite") }, QDir::Files,
-                                              QDir::Time);
-    });
     QFutureWatcher<QFileInfoList> *futureWatcher = new QFutureWatcher<QFileInfoList>(this);
     futureWatcher->setObjectName(futureWatcherName);
-    connect(futureWatcher, &QFutureWatcher<QFileInfoList>::finished, [=]() {
+    connect(futureWatcher, &QFutureWatcher<QFileInfoList>::finished, this, [=]() {
         futureWatcher->deleteLater();
 
         this->beginResetModel();
-        m_backupFiles = future.result();
+        m_backupFiles = futureWatcher->result();
         m_metaDataList.resize(m_backupFiles.size());
         this->endResetModel();
 
         emit countChanged();
+    });
+    QFuture<QFileInfoList> future = QtConcurrent::run([=]() -> QFileInfoList {
+        return m_backupFilesDir.entryInfoList({ QStringLiteral("*.scrite") }, QDir::Files,
+                                              QDir::Time);
     });
     futureWatcher->setFuture(future);
 }
@@ -391,9 +391,17 @@ ScriteDocument::ScriteDocument(QObject *parent)
             &ScriteDocument::canModifyCollaboratorsChanged);
     connect(User::instance(), &User::loggedInChanged, this,
             &ScriteDocument::canModifyCollaboratorsChanged);
+
+    connect(qApp, &QApplication::aboutToQuit, this, [=]() {
+        if (m_autoSave && !m_fileName.isEmpty())
+            this->save();
+    });
 }
 
-ScriteDocument::~ScriteDocument() { }
+ScriteDocument::~ScriteDocument()
+{
+    emit aboutToDelete(this);
+}
 
 void ScriteDocument::setLocked(bool val)
 {
@@ -408,16 +416,14 @@ void ScriteDocument::setLocked(bool val)
 
 bool ScriteDocument::isEmpty() const
 {
-    const bool spIsEmpty = m_screenplay->isEmpty();
+    const int objectCount = qMax(
+            0,
+            m_structure->elementCount() + m_structure->annotationCount()
+                    + m_screenplay->elementCount() + m_structure->notes()->noteCount()
+                    + m_structure->characterCount() + m_structure->attachments()->attachmentCount()
+                    + m_collaborators.size() - (m_screenplay->isEmpty() ? 2 : 0));
 
-    const int objectCount = m_structure->elementCount() + m_structure->annotationCount()
-            + m_screenplay->elementCount() + m_structure->notes()->noteCount()
-            + m_structure->characterCount() + m_structure->attachments()->attachmentCount()
-            + m_collaborators.size() - (spIsEmpty ? 2 : 0);
-
-    const bool ret = objectCount <= 0 && m_screenplay->isEmpty();
-
-    return ret;
+    return objectCount == 0;
 }
 
 void ScriteDocument::setCollaborators(const QStringList &val)
@@ -749,6 +755,9 @@ void ScriteDocument::reset()
 {
     HourGlass hourGlass;
 
+    if (m_autoSave && !m_fileName.isEmpty())
+        this->save();
+
     emit aboutToReset();
 
     m_connectors.clear();
@@ -800,6 +809,7 @@ void ScriteDocument::reset()
     m_docFileSystem.reset();
 
     this->setSessionId(QUuid::createUuid().toString());
+    this->setDocumentId(QUuid::createUuid().toString());
     this->setReadOnly(false);
     this->setLocked(false);
 
@@ -919,6 +929,7 @@ bool ScriteDocument::openAnonymously(const QString &fileName)
     this->setModified(false);
     this->clearBusyMessage();
 
+    m_fileLocker->setFilePath(QString());
     m_fileName.clear();
     emit fileNameChanged();
 
@@ -1668,6 +1679,7 @@ void ScriteDocument::evaluateStructureElementSequenceLater()
 void ScriteDocument::markAsModified()
 {
     this->setModified(!this->isEmpty());
+    emit documentChanged();
 }
 
 void ScriteDocument::setModified(bool val)
@@ -2060,6 +2072,7 @@ bool ScriteDocument::canSerialize(const QMetaObject *, const QMetaProperty &) co
 void ScriteDocument::serializeToJson(QJsonObject &json) const
 {
     json.insert(QStringLiteral("collaborators"), QJsonValue::fromVariant(m_collaborators));
+    json.insert(QStringLiteral("documentId"), m_documentId);
 
     QJsonObject metaInfo;
     metaInfo.insert(QStringLiteral("appName"), qApp->applicationName());
@@ -2096,6 +2109,13 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
 
 void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 {
+    const QString storedDocumentId = json.value(QStringLiteral("documentId")).toString();
+    if (storedDocumentId.isEmpty())
+        m_documentId = QUuid::createUuid().toString();
+    else
+        m_documentId = storedDocumentId;
+    emit documentIdChanged();
+
     const QJsonObject metaInfo = json.value(QStringLiteral("meta")).toObject();
     const QJsonObject systemInfo = metaInfo.value(QStringLiteral("system")).toObject();
 
@@ -2286,6 +2306,15 @@ void ScriteDocument::setSessionId(QString val)
 
     m_sessionId = val;
     emit sessionIdChanged();
+}
+
+void ScriteDocument::setDocumentId(const QString &val)
+{
+    if (m_documentId == val)
+        return;
+
+    m_documentId = val;
+    emit documentIdChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

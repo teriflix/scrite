@@ -67,6 +67,7 @@ HEADERS += \
     src/document/notebookmodel.h \
     src/document/notes.h \
     src/document/screenplaytextdocumentoffsets.h \
+    src/document/scritedocumentvault.h \
     src/exporters/characterrelationshipsgraphexporter.h \
     src/exporters/characterrelationshipsgraphexporter_p.h \
     src/exporters/structureexporter_p.h \
@@ -186,6 +187,7 @@ SOURCES += \
     src/document/notebookmodel.cpp \
     src/document/notes.cpp \
     src/document/screenplaytextdocumentoffsets.cpp \
+    src/document/scritedocumentvault.cpp \
     src/exporters/characterrelationshipsgraphexporter.cpp \
     src/exporters/characterrelationshipsgraphexporter_p.cpp \
     src/exporters/structureexporter_p.cpp \

@@ -85,5 +85,6 @@
         <file>qml/PdfView.qml</file>
         <file>qml/BusyIcon.qml</file>
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
+        <file>qml/DocumentVault.qml</file>
     </qresource>
 </RCC>

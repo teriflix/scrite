@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "qobjectserializer.h"
+#include "timeprofiler.h"
 
 #include <QtDebug>
 #include <QStack>

@@ -43,6 +43,10 @@ public:
     int timerId() const { return m_timerId; }
     bool isActive() const { return m_timerId >= 0 && m_timer.isActive(); }
 
+    static void call(const QString &name, QObject *receiver, const std::function<void()> &func,
+                     int timeout = 0);
+    static void call(const QString &name, const std::function<void()> &func, int timeout = 0);
+
 private:
     void onTimeout();
     void onObjectDestroyed(QObject *ptr);

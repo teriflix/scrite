@@ -494,6 +494,9 @@ Item {
                 shortcut: "Ctrl+N"
                 shortcutText: "N"
                 onClicked: {
+                    if(Scrite.document.autoSave && Scrite.document.fileName !== "")
+                        Scrite.document.save()
+
                     if(Scrite.document.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
@@ -536,6 +539,9 @@ Item {
                 function doOpen(filePath) {
                     if(filePath === Scrite.document.fileName)
                         return
+
+                    if(Scrite.document.autoSave && Scrite.document.fileName !== "")
+                        Scrite.document.save()
 
                     if(Scrite.document.modified)
                         askQuestion({
@@ -593,7 +599,11 @@ Item {
 
                         Connections {
                             target: Scrite.document
-                            function onJustLoaded() { recentFilesMenu.add(Scrite.document.fileName) }
+                            function onJustLoaded() { Qt.callLater( ()=> {
+                                                                       if(Scrite.document.fileName !== "")
+                                                                            recentFilesMenu.add(Scrite.document.fileName)
+                                                                   } )
+                            }
                         }
 
                         property int nrRecentFiles: recentFiles.length
@@ -633,6 +643,18 @@ Item {
                         MenuItem2 {
                             text: "Open..."
                             onClicked: fileOpenButton.doOpen()
+                        }
+
+                        MenuItem2 {
+                            text: "Restore"
+                            enabled: Scrite.vault.documentCount > 0
+                            onClicked: {
+                                modalDialog.closeable = false
+                                modalDialog.closeOnEscape = true
+                                modalDialog.popupSource = fileOpenButton
+                                modalDialog.sourceComponent = documentVaultDialogBox
+                                modalDialog.active = true
+                            }
 
                             Rectangle {
                                 width: parent.width; height: 1
@@ -740,6 +762,9 @@ Item {
                 }
 
                 onClicked: {
+                    if(Scrite.document.autoSave && Scrite.document.fileName !== "")
+                        Scrite.document.save()
+
                     if(Scrite.document.modified)
                         askQuestion({
                             "question": appToolBar.saveQuestionText(),
@@ -821,6 +846,9 @@ Item {
                                     text: modelData
                                     onClicked: click()
                                     function click() {
+                                        if(Scrite.document.autoSave && Scrite.document.fileName !== "")
+                                            Scrite.document.save()
+
                                         if(Scrite.document.modified)
                                             askQuestion({
                                                     "question": "Do you want to save your current project first?",
@@ -2548,9 +2576,9 @@ Item {
             onOpenInThisWindow: {
                 contentLoader.allowContent = false
                 Scrite.document.openAnonymously(filePath)
-                modalDialog.close()
-                Scrite.app.execLater(contentLoader, 300, function() {
+                Scrite.app.execLater(contentLoader, 50, function() {
                     contentLoader.allowContent = true
+                    modalDialog.close()
                 })
             }
             onOpenInNewWindow: {
@@ -2559,6 +2587,21 @@ Item {
                     modalDialog.close()
                 })
             }
+        }
+    }
+
+    Component {
+        id: documentVaultDialogBox
+
+        DocumentVault {
+            onOpenRequest: (filePath) => {
+                               contentLoader.allowContent = false
+                               Scrite.document.openAnonymously(filePath)
+                               Scrite.app.execLater(contentLoader, 50, function() {
+                                   contentLoader.allowContent = true
+                                   modalDialog.close()
+                               })
+                           }
         }
     }
 
@@ -2579,6 +2622,13 @@ Item {
                         close.accepted = true
                         return
                     }
+
+                    if(Scrite.document.autoSave && Scrite.document.fileName !== "") {
+                        Scrite.document.save()
+                        close.accepted = true
+                        return
+                    }
+
                     close.accepted = false
                     askQuestion({
                         "question": "Do you want to save your current project before closing?",

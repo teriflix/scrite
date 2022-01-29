@@ -19,6 +19,7 @@
 #include "scritedocument.h"
 #include "shortcutsmodel.h"
 #include "notificationmanager.h"
+#include "scritedocumentvault.h"
 
 Scrite::Scrite(QObject *parent) : QObject(parent)
 {
@@ -68,6 +69,16 @@ QObject *Scrite::documentObject() const
 ScriteDocument *Scrite::document() const
 {
     return ScriteDocument::instance();
+}
+
+QObject *Scrite::vaultObject() const
+{
+    return ScriteDocumentVault::instance();
+}
+
+ScriteDocumentVault *Scrite::vault() const
+{
+    return ScriteDocumentVault::instance();
 }
 
 QObject *Scrite::shortcutsObject() const
