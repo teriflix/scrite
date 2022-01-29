@@ -2098,9 +2098,13 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
 void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 {
     const QString storedDocumentId = json.value(QStringLiteral("documentId")).toString();
-    if (storedDocumentId.isEmpty())
+    if (storedDocumentId.isEmpty()) {
         m_documentId = QUuid::createUuid().toString();
-    else
+
+        // Without a proper document-id, we will end up having too many restore
+        // points of the same doucment.
+        ExecLaterTimer::call("ScriteDocument.saveNewDocumentId", this, [=]() { this->save(); });
+    } else
         m_documentId = storedDocumentId;
     emit documentIdChanged();
 
