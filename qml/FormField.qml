@@ -91,12 +91,19 @@ Column {
             TabSequenceItem.sequence: tabSequenceIndex
             TabSequenceItem.onAboutToReceiveFocus: lod = eHIGH
 
-            lowDetailComponent: Text {
+            lowDetailComponent: TextArea {
                 font.pointSize: Scrite.app.idealFontPointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 text: formField.answer === "" ? formField.placeholderText : formField.answer
                 opacity: formField.answer === "" ? 0.5 : 1
                 padding: 5
+                Transliterator.textDocument: textDocument
+                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                readOnly: true
+                selectByMouse: false
+                selectByKeyboard: false
+                background: Item { }
+                onPressed: Qt.callLater( () => { answerItemLoader.TabSequenceItem.assumeFocus() } )
             }
 
             highDetailComponent: TextArea {
