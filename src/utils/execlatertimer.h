@@ -43,6 +43,7 @@ public:
     int timerId() const { return m_timerId; }
     bool isActive() const { return m_timerId >= 0 && m_timer.isActive(); }
 
+    static void discardCall(const char *name, QObject *receiver);
     static void call(const char *name, QObject *receiver, const std::function<void()> &func,
                      int timeout = 0);
     static void call(const char *name, const std::function<void()> &func, int timeout = 0);

@@ -63,6 +63,9 @@ public:
     qreal factor() const { return m_factor; }
     Q_SIGNAL void factorChanged();
 
+protected:
+    bool eventFilter(QObject *watched, QEvent *event);
+
 private:
     void resetFlickable();
     void computeValues();
@@ -76,6 +79,7 @@ private:
     qreal m_factor = 1.0;
     qreal m_maximumVelocityFactor = -1.0;
     qreal m_flickDecelerationFactor = -1.0;
+    bool m_wheeling = false;
 };
 
 #endif // FLICKSCROLLSPEEDCONTROL_H

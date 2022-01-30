@@ -12,12 +12,17 @@
 ****************************************************************************/
 
 #include "flickscrollspeedcontrol.h"
+#include "execlatertimer.h"
+#include "application.h"
+
+#include <QQmlProperty>
 
 FlickScrollSpeedControl::FlickScrollSpeedControl(QObject *parent)
     : QObject(parent), m_flickable(this, "flickable")
 {
     if (parent->inherits("QQuickFlickable")) {
         m_flickable = qobject_cast<QQuickItem *>(parent);
+        m_flickable->installEventFilter(this);
         this->computeValues();
     }
 }
@@ -34,10 +39,19 @@ void FlickScrollSpeedControl::setFlickable(QQuickItem *val)
     if (m_flickable == val)
         return;
 
+    if (!m_flickable.isNull())
+        m_flickable->removeEventFilter(this);
+
     m_flickable = val;
+
+    if (!m_flickable.isNull())
+        m_flickable->installEventFilter(this);
+
     emit flickableChanged();
 
     this->computeValues();
+
+    Application::log("Flickable was set");
 }
 
 void FlickScrollSpeedControl::setDefaultFlickDeceleration(qreal val)
@@ -95,17 +109,45 @@ void FlickScrollSpeedControl::setFactor(qreal val)
     this->computeValues();
 }
 
+bool FlickScrollSpeedControl::eventFilter(QObject *watched, QEvent *event)
+{
+    Q_UNUSED(watched);
+
+#ifndef Q_OS_MAC
+    if (m_flickable.isNull())
+        return false;
+
+    const bool wheeling = (event->type() == QEvent::Wheel);
+    if (wheeling != m_wheeling) {
+        m_wheeling = wheeling;
+        this->computeValues();
+    }
+#else
+    Q_UNUSED(event)
+#endif
+
+    return false;
+}
+
 void FlickScrollSpeedControl::computeValues()
 {
 #ifndef Q_OS_MAC
     if (m_flickable.isNull())
         return;
 
-    const qreal mv = m_defaultMaximumVelocity
-            * (m_maximumVelocityFactor < 0 ? m_factor : m_maximumVelocityFactor);
-    const qreal fd = m_defaultFlickDeceleration
-            * (m_flickDecelerationFactor < 0 ? m_factor : m_flickDecelerationFactor);
-    m_flickable->setProperty("flickDeceleration", fd);
-    m_flickable->setProperty("maximumFlickVelocity", mv);
+    QQmlProperty flickDecelerationProp(m_flickable, "flickDeceleration");
+    QQmlProperty maximumFlickVelocityProp(m_flickable, "maximumFlickVelocity");
+
+    if (m_wheeling) {
+        flickDecelerationProp.write(10000);
+    } else {
+        const qreal mv = m_defaultMaximumVelocity
+                * (m_maximumVelocityFactor < 0 ? m_factor : m_maximumVelocityFactor);
+        const qreal fd = m_defaultFlickDeceleration
+                * (m_flickDecelerationFactor < 0 ? m_factor : m_flickDecelerationFactor);
+
+        flickDecelerationProp.write(fd);
+        maximumFlickVelocityProp.write(mv);
+    }
 #endif
 }

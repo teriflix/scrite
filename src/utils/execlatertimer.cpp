@@ -106,9 +106,27 @@ void ExecLaterTimer::stop()
     m_timerId = -1;
 }
 
+void ExecLaterTimer::discardCall(const char *givenName, QObject *receiver)
+{
+    if (receiver == nullptr)
+        receiver = qApp;
+
+    const QString name = QLatin1String(givenName);
+    QTimer *timer = name.isEmpty()
+            ? nullptr
+            : receiver->findChild<QTimer *>(name, Qt::FindDirectChildrenOnly);
+    if (timer) {
+        timer->stop();
+        timer->deleteLater();
+    }
+}
+
 void ExecLaterTimer::call(const char *givenName, QObject *receiver,
                           const std::function<void()> &func, int timeout)
 {
+    if (receiver == nullptr)
+        receiver = qApp;
+
     const QString name = QLatin1String(givenName);
     QTimer *timer = name.isEmpty()
             ? nullptr
@@ -119,6 +137,7 @@ void ExecLaterTimer::call(const char *givenName, QObject *receiver,
     }
 
     timer = new QTimer(receiver);
+    timer->setObjectName(name);
     timer->setInterval(timeout);
     timer->setSingleShot(true);
     connect(timer, &QTimer::timeout, receiver, [=]() {
