@@ -97,6 +97,8 @@ Item {
             ScrollBar.horizontal: ScrollBar2 {
                 flickable: pdfView
             }
+            FlickScrollSpeedControl.flickable: flickableItem
+            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
             onPdfPageScaleChanged: Qt.callLater(returnToBounds)
 
@@ -146,7 +148,7 @@ Item {
                                     target: pageScaleSlider
                                     function onPressedChanged() {
                                         if(!pageScaleSlider.pressed)
-                                            Qt.callLater(() => { pdfPage.configureSourceSize() } )
+                                            pdfPage.configureSourceSize()
                                     }
                                 }
 

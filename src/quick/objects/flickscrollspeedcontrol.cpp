@@ -111,7 +111,7 @@ void FlickScrollSpeedControl::setFactor(qreal val)
 
 bool FlickScrollSpeedControl::eventFilter(QObject *watched, QEvent *event)
 {
-    Q_UNUSED(watched);
+    Q_UNUSED(watched)
 
 #ifndef Q_OS_MAC
     if (m_flickable.isNull())
