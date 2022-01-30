@@ -168,6 +168,9 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
             ScriteDocument::instance()->formatting()->resetToUserDefaults();
         }
 
+        if (library == this->screenplays())
+            ScriteDocument::instance()->setFromScriptalay(true);
+
         this->progress()->finish();
         qApp->restoreOverrideCursor();
 

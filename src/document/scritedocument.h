@@ -202,6 +202,13 @@ public:
     QString documentId() const { return m_documentId; }
     Q_SIGNAL void documentIdChanged();
 
+    // Will be true of the currently open scrite document is from Scriptalay's
+    // script library.
+    Q_PROPERTY(bool fromScriptalay READ isFromScriptalay NOTIFY fromScriptalayChanged)
+    void setFromScriptalay(bool val);
+    bool isFromScriptalay() const { return m_fromScriptalay; }
+    Q_SIGNAL void fromScriptalayChanged();
+
     Q_PROPERTY(QString sessionId READ sessionId NOTIFY sessionIdChanged)
     QString sessionId() const { return m_sessionId; }
     Q_SIGNAL void sessionIdChanged();
@@ -443,6 +450,7 @@ private:
     bool m_autoSaveMode = false;
     int m_maxBackupCount = 20;
     QString m_sessionId;
+    bool m_fromScriptalay = false;
     QString m_documentId;
     QJsonObject m_userData;
     QString m_fileName;

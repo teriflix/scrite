@@ -426,6 +426,15 @@ bool ScriteDocument::isEmpty() const
     return objectCount == 0;
 }
 
+void ScriteDocument::setFromScriptalay(bool val)
+{
+    if (m_fromScriptalay == val)
+        return;
+
+    m_fromScriptalay = val;
+    emit fromScriptalayChanged();
+}
+
 void ScriteDocument::setCollaborators(const QStringList &val)
 {
     if (m_collaborators == val || !User::instance()->isLoggedIn()
@@ -810,6 +819,7 @@ void ScriteDocument::reset()
 
     this->setSessionId(QUuid::createUuid().toString());
     this->setDocumentId(QUuid::createUuid().toString());
+    this->setFromScriptalay(false);
     this->setReadOnly(false);
     this->setLocked(false);
 
@@ -2103,7 +2113,10 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 
         // Without a proper document-id, we will end up having too many restore
         // points of the same doucment.
-        ExecLaterTimer::call("ScriteDocument.saveNewDocumentId", this, [=]() { this->save(); });
+        ExecLaterTimer::call("ScriteDocument.saveNewDocumentId", this, [=]() {
+            if (!m_fileName.isEmpty())
+                this->save();
+        });
     } else
         m_documentId = storedDocumentId;
     emit documentIdChanged();
