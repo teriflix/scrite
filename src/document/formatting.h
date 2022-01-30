@@ -142,7 +142,7 @@ public:
         TextAndBackgroundColors
     };
     Q_ENUM(Properties)
-    Q_INVOKABLE void applyToAll(Properties properties);
+    Q_INVOKABLE void applyToAll(SceneElementFormat::Properties properties);
 
     Q_INVOKABLE void beginTransaction();
     Q_INVOKABLE bool hasChangesToCommit() { return m_nrChangesDuringTransation > 0; }
