@@ -117,6 +117,7 @@ void ScriteDocumentVault::clearAllDocuments()
     for (const MetaData &data : qAsConst(m_allMetaDataList))
         QFile::remove(data.fileInfo.absoluteFilePath());
 
+    ++m_nrUnsavedChanges;
     this->updateModelFromFolderLater();
 }
 
