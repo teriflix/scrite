@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Scrite"
-!define PRODUCT_VERSION "0.8.6-Beta"
+!define PRODUCT_VERSION "0.8.7-Beta"
 !define PRODUCT_PUBLISHER "TERIFLIX Entertainment Spaces Pvt. Ltd."
 !define PRODUCT_WEB_SITE "https://www.scrite.io"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\scrite.exe"
