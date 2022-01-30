@@ -4154,7 +4154,45 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
             return urls.first();
         }() : QUrl(text);
 
-        if (url.isValid()) {
+        if (mimeData->hasImage()) {
+            const QImage image = mimeData->imageData().value<QImage>();
+
+            QByteArray imageBytes;
+            QBuffer buffer(&imageBytes);
+            buffer.open(QBuffer::WriteOnly);
+            image.save(&buffer, "JPG");
+            buffer.close();
+            imageBytes = imageBytes.toBase64();
+
+            const QSize imageSize = image.size().scaled(320, 320, Qt::KeepAspectRatio);
+
+            const QString json = QStringLiteral("{"
+                                                "    \"attributes\": {"
+                                                "        \"backgroundColor\": \"white\","
+                                                "        \"borderColor\": \"black\","
+                                                "        \"borderWidth\": 0,"
+                                                "        \"caption\": \"\","
+                                                "        \"captionAlignment\": \"center\","
+                                                "        \"captionColor\": \"black\","
+                                                "        \"fillBackground\": false,"
+                                                "        \"image\": \"data://base64:%1\","
+                                                "        \"opacity\": 100"
+                                                "    },"
+                                                "    \"geometry\": {"
+                                                "        \"height\": %2,"
+                                                "        \"width\": %3,"
+                                                "        \"x\": 5000,"
+                                                "        \"y\": 5000"
+                                                "    },"
+                                                "    \"type\": \"image\""
+                                                "}")
+                                         .arg(imageBytes.constData())
+                                         .arg(imageSize.height())
+                                         .arg(imageSize.width());
+            data = QJsonDocument::fromJson(json.toLatin1()).object();
+            if (className)
+                *className = QLatin1String(Annotation::staticMetaObject.className());
+        } else if (url.isValid()) {
             const QString json = QStringLiteral("{"
                                                 "    \"attributes\": {"
                                                 "        \"url\": \"%1\""
@@ -4216,44 +4254,6 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
                                          .arg(mimeData->text())
                                          .arg(qCeil(textHeight))
                                          .arg(qCeil(textWidth));
-            data = QJsonDocument::fromJson(json.toLatin1()).object();
-            if (className)
-                *className = QLatin1String(Annotation::staticMetaObject.className());
-        } else if (mimeData->hasImage()) {
-            const QImage image = mimeData->imageData().value<QImage>();
-
-            QByteArray imageBytes;
-            QBuffer buffer(&imageBytes);
-            buffer.open(QBuffer::WriteOnly);
-            image.save(&buffer, "JPG");
-            buffer.close();
-            imageBytes = imageBytes.toBase64();
-
-            const QSize imageSize = image.size().scaled(320, 320, Qt::KeepAspectRatio);
-
-            const QString json = QStringLiteral("{"
-                                                "    \"attributes\": {"
-                                                "        \"backgroundColor\": \"white\","
-                                                "        \"borderColor\": \"black\","
-                                                "        \"borderWidth\": 0,"
-                                                "        \"caption\": \"\","
-                                                "        \"captionAlignment\": \"center\","
-                                                "        \"captionColor\": \"black\","
-                                                "        \"fillBackground\": false,"
-                                                "        \"image\": \"data://base64:%1\","
-                                                "        \"opacity\": 100"
-                                                "    },"
-                                                "    \"geometry\": {"
-                                                "        \"height\": %2,"
-                                                "        \"width\": %3,"
-                                                "        \"x\": 5000,"
-                                                "        \"y\": 5000"
-                                                "    },"
-                                                "    \"type\": \"image\""
-                                                "}")
-                                         .arg(imageBytes.constData())
-                                         .arg(imageSize.height())
-                                         .arg(imageSize.width());
             data = QJsonDocument::fromJson(json.toLatin1()).object();
             if (className)
                 *className = QLatin1String(Annotation::staticMetaObject.className());
