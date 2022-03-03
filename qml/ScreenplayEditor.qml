@@ -692,9 +692,9 @@ Rectangle {
                             return
 
                         if( pt.y < startY )
-                            contentView.contentY = pt.y
+                            contentView.contentY = Math.round(pt.y)
                         else
-                            contentView.contentY = (pt.y + 2*rect.height) - contentView.height
+                            contentView.contentY = Math.round((pt.y + 2*rect.height) - contentView.height)
                     }
 
                     function loadedItemAtIndex(index) {
@@ -1646,13 +1646,36 @@ Rectangle {
                         } )
                     }
 
-                    onCursorRectangleChanged: {
+                    Connections {
+                        target: contentItem.theScene
+
+                        function onSceneAboutToReset() {
+                            sceneTextEditor.keepCursorInView = false
+                        }
+
+                        function onSceneReset(cp) {
+                            Scrite.app.execLater(sceneTextEditor, 100, () => { sceneTextEditor.keepCursorInView = true } )
+                        }
+                    }
+
+                    property bool keepCursorInView: true
+                    onCursorRectangleChanged: if(keepCursorInView) Qt.callLater(bringCursorToView)
+
+                    function bringCursorToView() {
                         if(activeFocus /*&& contentView.isVisible(contentItem.theIndex)*/) {
-                            var buffer = Math.max(contentView.height * 0.2, cursorRectangle.height*3)
-                            var cr = Qt.rect(cursorRectangle.x, cursorRectangle.y-buffer*0.3,
-                                             cursorRectangle.width, buffer)
+                            const tcr = cursorRectangle
+                            const buffer = Math.max(contentView.height * 0.2, tcr.height*3)
+                            const cr = Qt.rect(tcr.x, tcr.y-buffer*0.3, tcr.width, buffer)
+
+                            const crv = contentView.mapFromItem(sceneTextEditor, cr)
+                            if(crv.y >= 0 && crv.y < contentView.height)
+                                return
+
+                            const cy = contentView.contentY
                             contentView.allowContentYAnimation = true
                             contentView.ensureVisible(sceneTextEditor, cr)
+                            if(cy == contentView.contentY)
+                                contentView.allowContentYAnimation = false
                         }
                     }
 
