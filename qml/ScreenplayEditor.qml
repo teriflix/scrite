@@ -1072,7 +1072,8 @@ Rectangle {
             Connections {
                 target: screenplayFormat
                 function onFontZoomLevelIndexChanged() {
-                    zoomSlider.value = screenplayFormat.fontZoomLevelIndex
+                    if(!Scrite.document.empty)
+                        zoomSlider.value = screenplayFormat.fontZoomLevelIndex
                 }
             }
 

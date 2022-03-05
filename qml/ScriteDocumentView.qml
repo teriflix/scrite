@@ -1903,7 +1903,9 @@ Item {
                                              const stype = "" + type
                                              if(mainTabBar.currentIndex === 0 && stype === "{f4048da2-775d-11ec-90d6-0242ac120003}") {
                                                  uiLoader.active = false
-                                                 Qt.callLater( function() { uiLoader.active = true } )
+                                                 Scrite.app.execLater(uiLoader, 250, function() {
+                                                    uiLoader.active = true
+                                                 })
                                              }
                                          }
             }
@@ -1930,10 +1932,11 @@ Item {
                     }
                     const _oneValue = indexOfZoomLevel(1)
 
+                    const availableWidth = mainTabBar.currentIndex === 0 ? width-500 : width
                     var _value = _oneValue
                     var zl = zoomLevels[_value]
                     var pageWidth = pageLayout.paperWidth * zl * Screen.devicePixelRatio
-                    var totalMargin =  width - pageWidth
+                    var totalMargin = availableWidth - pageWidth
                     if(totalMargin < 0) {
                         while(totalMargin < 20) { // 20 is width of vertical scrollbar.
                             if(_value-1 < 0)
@@ -1941,16 +1944,16 @@ Item {
                             _value = _value - 1
                             zl = zoomLevels[_value]
                             pageWidth = pageLayout.paperWidth * zl * Screen.devicePixelRatio
-                            totalMargin = width - pageWidth
+                            totalMargin = availableWidth - pageWidth
                         }
-                    } else if(totalMargin > pageWidth) {
-                        while(totalMargin > pageWidth) {
+                    } else if(totalMargin > pageWidth/2) {
+                        while(totalMargin > pageWidth/2) {
                             if(_value >= zoomLevels.length-1)
                                 break
                             _value = _value + 1
                             zl = zoomLevels[_value]
                             pageWidth = pageLayout.paperWidth * zl * Screen.devicePixelRatio
-                            totalMargin = width - pageWidth
+                            totalMargin = availableWidth - pageWidth
                         }
                     }
 
@@ -1958,7 +1961,7 @@ Item {
                 }
 
                 zoomLevelModifier = evalZoomLevelModifierFn()
-            }
+            }            
 
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
