@@ -646,9 +646,8 @@ void TransliterationEngine::setPreferredFontFamilyForLanguage(
     const QString before = m_languageFontFamily.value(language);
 
     const int builtInFontId = m_languageBundledFontId.value(language);
-    const QString builtInFontFamily = builtInFontId < 0
-            ? QString()
-            : QFontDatabase::applicationFontFamilies(builtInFontId).first();
+    const QStringList appFontFamilies = QFontDatabase::applicationFontFamilies(builtInFontId);
+    const QString builtInFontFamily = builtInFontId < 0 ? QString() : appFontFamilies.first();
     if (fontFamily.isEmpty()
         || (!fontFamily.isEmpty() && !builtInFontFamily.isEmpty()
             && fontFamily == builtInFontFamily))

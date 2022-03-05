@@ -1077,6 +1077,15 @@ Rectangle {
                 }
             }
 
+            Connections {
+                target: Scrite.app.transliterationEngine
+                function onPreferredFontFamilyForLanguageChanged() {
+                    const oldValue = zoomSlider.value
+                    zoomSlider.value = screenplayFormat.fontZoomLevelIndex
+                    Qt.callLater( (val) => { zoomSlider.value = val }, oldValue )
+                }
+            }
+
             property int savedZoomValue: -1
 
             Announcement.onIncoming: (type,data) => {
