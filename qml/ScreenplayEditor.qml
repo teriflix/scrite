@@ -3212,6 +3212,12 @@ Rectangle {
                             ToolTip.visible: delegateText.truncated && containsMouse
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
+                            onDoubleClicked: (mouse) => {
+                                                 screenplayAdapter.screenplay.clearSelection()
+                                                 screenplayElement.toggleSelection()
+                                                 navigateToScreenplayElement()
+                                                 sceneListSidePanel.expanded = false
+                                             }
                             onClicked: (mouse) => {
                                            if(mouse.button === Qt.RightButton) {
                                                if(screenplayElement.elementType === ScreenplayElement.BreakElementType) {
