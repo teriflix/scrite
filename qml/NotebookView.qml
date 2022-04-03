@@ -1030,7 +1030,7 @@ Rectangle {
                         FlickableTextArea {
                             id: sceneSynopsisField
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
-                            height: parent.height - sceneHeadingField.height - sceneTitleField.height - parent.spacing*2
+                            height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneCharactersList.height - parent.spacing*3
                             text: scene.title
                             placeholderText: "Scene Synopsis"
                             readOnly: Scrite.document.readOnly
