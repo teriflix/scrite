@@ -1678,7 +1678,7 @@ Rectangle {
                             const cr = Qt.rect(tcr.x, tcr.y-buffer*0.3, tcr.width, buffer)
 
                             const crv = contentView.mapFromItem(sceneTextEditor, cr)
-                            if(crv.y >= 0 && crv.y < contentView.height)
+                            if(crv.y >= 0 && crv.y < contentView.height-cr.height)
                                 return
 
                             const cy = contentView.contentY
