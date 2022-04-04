@@ -248,6 +248,8 @@ void ScriteDocumentVault::updateModelFromFolder()
 {
     auto fetchInfoAboutFilesInVault = [](const QString &currentDocumentId, const QString &folder,
                                          QList<MetaData> oldMetaDataList) -> QList<MetaData> {
+        Q_UNUSED(currentDocumentId);
+
         QList<MetaData> ret;
         const QFileInfoList fiList =
                 QDir(folder).entryInfoList({ QStringLiteral("*.scrite") }, QDir::Files, QDir::Time);

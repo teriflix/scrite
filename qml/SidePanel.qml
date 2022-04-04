@@ -26,6 +26,7 @@ Item {
     property real borderWidth: 1
 
     property bool expanded: false
+    property alias contentData: contentLoader.contentData
     property alias content: contentLoader.sourceComponent
     property alias contentInstance: contentLoader.item
 
@@ -97,11 +98,13 @@ Item {
 
         Loader {
             id: contentLoader
+            anchors.topMargin: 2
             anchors.top: textLabel.visible ? textLabel.bottom : parent.top
             anchors.bottom: parent.bottom
             width: sidePanel.maxPanelWidth - expandCollapseButton.width
             visible: opacity > 0
             opacity: sidePanel.expanded ? 1 : 0
+            property var contentData
             Behavior on opacity {
                 enabled: applicationSettings.enableAnimations
                 NumberAnimation { duration: 50 }

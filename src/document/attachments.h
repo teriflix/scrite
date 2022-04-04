@@ -41,6 +41,11 @@ public:
     Type type() const { return m_type; }
     Q_SIGNAL void typeChanged();
 
+    Q_PROPERTY(bool featured READ isFeatured WRITE setFeatured NOTIFY featuredChanged)
+    void setFeatured(bool val);
+    bool isFeatured() const { return m_featured; }
+    Q_SIGNAL void featuredChanged();
+
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     void setTitle(const QString &val);
     QString title() const { return m_title; }
@@ -89,6 +94,7 @@ private:
     QString m_title;
     QString m_filePath;
     QString m_mimeType;
+    bool m_featured = false;
     QString m_originalFileName;
     Type m_type = Document;
     QString m_anonFilePath;
@@ -128,6 +134,10 @@ public:
     QStringList nameFilters() const { return m_nameFilters; }
     Q_SIGNAL void nameFiltersChanged();
 
+    Q_PROPERTY(Attachment* featuredAttachment READ featuredAttachment NOTIFY featuredAttachmentChanged)
+    Attachment *featuredAttachment() const { return m_featuredAttachment; }
+    Q_SIGNAL void featuredAttachmentChanged();
+
     Q_INVOKABLE Attachment *includeAttachmentFromFileUrl(const QUrl &fileUrl)
     {
         if (fileUrl.isLocalFile())
@@ -158,10 +168,14 @@ private:
     void includeAttachment(Attachment *ptr);
     void attachmentDestroyed(Attachment *ptr);
     void includeAttachments(const QList<Attachment *> &list);
+    void evaluateFeaturedAttachment();
+    void evaluateFeaturedAttachmentLater();
 
 private:
     AllowedType m_allowedType = DocumentsOfAnyType;
     QStringList m_nameFilters;
+    Attachment *m_featuredAttachment = nullptr;
+    QTimer *m_evalutateFeaturedAttachmentTimer = nullptr;
 };
 
 class AttachmentsDropArea : public QQuickItem

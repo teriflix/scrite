@@ -295,6 +295,7 @@ Rectangle {
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
                     property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
+                    property int commentsPanelTabIndex: 1
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
@@ -1375,7 +1376,7 @@ Rectangle {
                 }
 
                 // anchors.leftMargin: expanded ? 0 : -minPanelWidth
-                label: expanded && anchors.topMargin > 0 ? ("Scene " + contentItem.theElement.resolvedSceneNumber + " Comments") : ""
+                label: expanded && anchors.topMargin > 0 ? ("Scene " + contentItem.theElement.resolvedSceneNumber) : ""
                 height: {
                     if(expanded) {
                         if(contentItem.isCurrent)
@@ -1397,49 +1398,85 @@ Rectangle {
                     enabled: applicationSettings.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
-                content: TextArea {
-                    id: commentsEdit
-                    background: Rectangle {
-                        color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
-                    }
-                    font.pointSize: Scrite.app.idealFontPointSize + 1
-                    onTextChanged: contentItem.theScene.comments = text
-                    wrapMode: Text.WordWrap
-                    text: contentItem.theScene.comments
-                    selectByMouse: true
-                    selectByKeyboard: true
-                    leftPadding: 10
-                    rightPadding: 10
-                    topPadding: 10
-                    bottomPadding: 10
-                    readOnly: Scrite.document.readOnly
-                    onActiveFocusChanged: {
-                        if(activeFocus)
-                            screenplayAdapter.currentIndex = contentItem.theIndex
+                content: TabView3 {
+                    id: commentsSidePanelTabView
+                    tabNames: ["Featured Photo", "Comments"]
+                    tabColor: contentItem.theScene.color
+                    currentTabContent: currentTabIndex === 0 ? featuredPhotoComponent : commentsEditComponent
+                    currentTabIndex: contentView.commentsPanelTabIndex
+                    onCurrentTabIndexChanged: contentView.commentsPanelTabIndex = currentTabIndex
+
+                    Connections {
+                        target: contentView
+                        function onCommentsPanelTabIndexChanged() {
+                            commentsSidePanelTabView.currentTabIndex = contentView.commentsPanelTabIndex
+                        }
                     }
 
-                    Transliterator.textDocument: textDocument
-                    Transliterator.cursorPosition: cursorPosition
-                    Transliterator.hasActiveFocus: activeFocus
-                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                    Component {
+                        id: featuredPhotoComponent
 
-                    SpecialSymbolsSupport {
-                        anchors.top: parent.bottom
-                        anchors.left: parent.left
-                        textEditor: commentsEdit
-                        textEditorHasCursorInterface: true
-                        enabled: !Scrite.document.readOnly
+                        Item {
+                            property Attachments sceneAttachments: contentItem.theScene.attachments
+                            property Attachment featuredAttachment: sceneAttachments.featuredAttachment
+                            property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
+
+                            Image {
+                                anchors.fill: parent
+                                fillMode: Image.PreserveAspectFit
+                                source: featuredAttachment.filePath
+                            }
+                        }
                     }
 
-                    Item {
-                        x: parent.cursorRectangle.x
-                        y: parent.cursorRectangle.y
-                        width: parent.cursorRectangle.width
-                        height: parent.cursorRectangle.height
+                    Component {
+                        id: commentsEditComponent
 
-                        ToolTip.visible: parent.height < parent.contentHeight
-                        ToolTip.text: "Please consider capturing long comments as scene notes in the notebook tab."
-                        ToolTip.delay: 1000
+                        TextArea {
+                            id: commentsEdit
+                            background: Rectangle {
+                                color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
+                            }
+                            font.pointSize: Scrite.app.idealFontPointSize + 1
+                            onTextChanged: contentItem.theScene.comments = text
+                            wrapMode: Text.WordWrap
+                            text: contentItem.theScene.comments
+                            selectByMouse: true
+                            selectByKeyboard: true
+                            leftPadding: 10
+                            rightPadding: 10
+                            topPadding: 10
+                            bottomPadding: 10
+                            readOnly: Scrite.document.readOnly
+                            onActiveFocusChanged: {
+                                if(activeFocus)
+                                    screenplayAdapter.currentIndex = contentItem.theIndex
+                            }
+
+                            Transliterator.textDocument: textDocument
+                            Transliterator.cursorPosition: cursorPosition
+                            Transliterator.hasActiveFocus: activeFocus
+                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+
+                            SpecialSymbolsSupport {
+                                anchors.top: parent.bottom
+                                anchors.left: parent.left
+                                textEditor: commentsEdit
+                                textEditorHasCursorInterface: true
+                                enabled: !Scrite.document.readOnly
+                            }
+
+                            Item {
+                                x: parent.cursorRectangle.x
+                                y: parent.cursorRectangle.y
+                                width: parent.cursorRectangle.width
+                                height: parent.cursorRectangle.height
+
+                                ToolTip.visible: parent.height < parent.contentHeight
+                                ToolTip.text: "Please consider capturing long comments as scene notes in the notebook tab."
+                                ToolTip.delay: 1000
+                            }
+                        }
                     }
                 }
             }

@@ -76,6 +76,15 @@ Attachment::~Attachment()
     emit aboutToDelete(this);
 }
 
+void Attachment::setFeatured(bool val)
+{
+    if (m_featured == val)
+        return;
+
+    m_featured = val;
+    emit featuredChanged();
+}
+
 void Attachment::setTitle(const QString &val)
 {
     if (m_title == val)
@@ -250,6 +259,8 @@ Attachments::Attachments(QObject *parent) : ObjectListPropertyModel<Attachment *
     connect(this, &Attachments::dataChanged, this, &Attachments::attachmentsModified);
     connect(this, &Attachments::objectCountChanged, this, &Attachments::attachmentsModified);
     connect(this, &Attachments::objectCountChanged, this, &Attachments::attachmentCountChanged);
+    connect(this, &Attachments::attachmentsModified, this,
+            &Attachments::evaluateFeaturedAttachmentLater);
 }
 
 Attachments::~Attachments() { }
@@ -427,6 +438,7 @@ void Attachments::includeAttachment(Attachment *ptr)
 
     connect(ptr, &Attachment::aboutToDelete, this, &Attachments::attachmentDestroyed);
     connect(ptr, &Attachment::attachmentModified, this, &Attachments::attachmentsModified);
+    this->evaluateFeaturedAttachmentLater();
 
     this->append(ptr);
 }
@@ -442,10 +454,16 @@ void Attachments::attachmentDestroyed(Attachment *ptr)
 
     disconnect(ptr, &Attachment::aboutToDelete, this, &Attachments::attachmentDestroyed);
     disconnect(ptr, &Attachment::attachmentModified, this, &Attachments::attachmentsModified);
-
     this->removeAt(index);
 
+    if (m_featuredAttachment == ptr) {
+        m_featuredAttachment = nullptr;
+        emit featuredAttachmentChanged();
+    }
+
     ptr->deleteLater();
+
+    this->evaluateFeaturedAttachmentLater();
 }
 
 void Attachments::includeAttachments(const QList<Attachment *> &list)
@@ -462,6 +480,39 @@ void Attachments::includeAttachments(const QList<Attachment *> &list)
     }
 
     this->assign(list);
+    this->evaluateFeaturedAttachmentLater();
+}
+
+void Attachments::evaluateFeaturedAttachment()
+{
+    const QList<Attachment *> &_list = this->list();
+
+    Attachment *fattachment = [_list]() -> Attachment * {
+        for (int i = _list.size() - 1; i >= 0; i--) {
+            Attachment *ptr = _list.at(i);
+            if (ptr->isFeatured())
+                return ptr;
+        }
+        return nullptr;
+    }();
+
+    if (fattachment != m_featuredAttachment) {
+        m_featuredAttachment = fattachment;
+        emit featuredAttachmentChanged();
+    }
+}
+
+void Attachments::evaluateFeaturedAttachmentLater()
+{
+    if (m_evalutateFeaturedAttachmentTimer == nullptr) {
+        m_evalutateFeaturedAttachmentTimer = new QTimer(this);
+        m_evalutateFeaturedAttachmentTimer->setSingleShot(true);
+        m_evalutateFeaturedAttachmentTimer->setInterval(0);
+        connect(m_evalutateFeaturedAttachmentTimer, &QTimer::timeout, this,
+                &Attachments::evaluateFeaturedAttachment);
+    }
+
+    m_evalutateFeaturedAttachmentTimer->start();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
