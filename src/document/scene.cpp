@@ -865,7 +865,7 @@ bool Scene::validatePageTarget(int pageNumber) const
         return false;
 
     const QStringList fields = m_pageTarget.split(QStringLiteral(","), Qt::SkipEmptyParts);
-    for (QString field : fields) {
+    for (const QString &field : fields) {
         const QStringList nos = field.trimmed().split(QStringLiteral("-"), Qt::SkipEmptyParts);
         if (nos.isEmpty())
             continue;
@@ -1649,14 +1649,39 @@ void Scene::serializeToJson(QJsonObject &json) const
         json.insert(QStringLiteral("#invisibleCharacters"), invisibleCharacters);
 }
 
+class AddInvisibleCharactersTimer : public QTimer
+{
+public:
+    AddInvisibleCharactersTimer(const QJsonArray &chars, Scene *parent)
+        : QTimer(parent), m_scene(parent), m_characters(chars)
+    {
+        this->setInterval(100);
+        this->setSingleShot(true);
+        connect(this, &QTimer::timeout, this, &AddInvisibleCharactersTimer::itsTime);
+        this->start();
+    }
+
+    ~AddInvisibleCharactersTimer() { }
+
+private:
+    void itsTime()
+    {
+        for (int i = 0; i < m_characters.size(); i++)
+            m_scene->addMuteCharacter(m_characters.at(i).toString());
+        this->deleteLater();
+    }
+
+private:
+    Scene *m_scene;
+    QJsonArray m_characters;
+};
+
 void Scene::deserializeFromJson(const QJsonObject &json)
 {
     const QJsonArray invisibleCharacters =
             json.value(QStringLiteral("#invisibleCharacters")).toArray();
-    if (!invisibleCharacters.isEmpty()) {
-        for (int i = 0; i < invisibleCharacters.size(); i++)
-            this->addMuteCharacter(invisibleCharacters.at(i).toString());
-    }
+    if (!invisibleCharacters.isEmpty())
+        new AddInvisibleCharactersTimer(invisibleCharacters, this);
 
     // Previously notes was an array, because the notes property used to be
     // a list property. Now notes is an object, because it represents Notes class.
