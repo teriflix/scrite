@@ -575,11 +575,63 @@ Rectangle {
             }
         }
 
-        Item {
+        Rectangle {
+            color: {
+                // Keep these colors in sync with actual component colors loaded
+                // by notebookContentLoader
+                if(!notebookTree.currentData)
+                    return Qt.rgba(0,0,0,0)
+
+                switch(notebookTree.currentData.notebookItemType) {
+                case NotebookModel.CategoryType:
+                    switch(notebookTree.currentData.notebookItemCategory) {
+                    case NotebookModel.ScreenplayCategory:
+                        return "white"
+                    case NotebookModel.UnusedScenesCategory:
+                    case NotebookModel.CharactersCategory:
+                        return Qt.rgba(0,0,0,0)
+                    case NotebookModel.BookmarksCategory:
+                        return Scrite.app.translucent(primaryColors.c100.background, 0.5)
+                    }
+                    break
+                case NotebookModel.NotesType:
+                    switch(notebookTree.currentData.notebookItemObject.ownerType) {
+                    case Notes.CharacterOwner: {
+                        const character = notebookTree.currentData.notebookItemObject.character
+                        return Qt.tint(character.color, "#e7ffffff")
+                        }
+                    case Notes.SceneOwner: {
+                        const notes = notebookTree.currentData.notebookItemObject
+                        const scene = notes.scene
+                        return Qt.tint(scene.color, "#e7ffffff")
+                        }
+                    default:
+                        return Scrite.app.translucent(primaryColors.c100.background, 0.5)
+                    }
+                case NotebookModel.NoteType:
+                    switch(notebookTree.currentData.notebookItemObject.type) {
+                    case Note.TextNoteType:
+                    case Note.FormNoteType:
+                        const note = notebookTree.currentData.notebookItemObject
+                        return Qt.tint(note.color, "#E7FFFFFF")
+                    }
+                    break
+                case NotebookModel.EpisodeBreakType:
+                case NotebookModel.ActBreakType:
+                    return Qt.rgba(0,0,0,0)
+                }
+
+                return Qt.rgba(0,0,0,0)
+            }
+
             Loader {
                 id: notebookContentLoader
-                active: notebookContentActiveProperty.value
+                opacity: notebookContentActiveProperty.value ? 1 : 0
                 anchors.fill: parent
+                Behavior on opacity {
+                    NumberAnimation { duration: notebookContentActiveProperty.delay-50 }
+                }
+                active: opacity > 0
 
                 property int currentNotebookItemId: notebookTree.currentData ? notebookTree.currentData.notebookItemId : -1
 
@@ -588,6 +640,7 @@ Rectangle {
                     trackChangesOn: notebookContentLoader.currentNotebookItemId
                     from: false
                     to: true
+                    delay: 250
                 }
 
                 sourceComponent: {
@@ -927,7 +980,7 @@ Rectangle {
                             placeholderText: "Scene Title"
                             readOnly: Scrite.document.readOnly
                             onEditingComplete: scene.structureElement.title = text
-                            tabItem: sceneSynopsisField.textArea
+                            tabItem: synopsisContentTabView.currentTabIndex === 0 ? synopsisContentTabView.currentTabItem.textArea : null
                             backTabItem: sceneHeadingField
                             font.capitalization: Font.AllUppercase
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -1001,7 +1054,7 @@ Rectangle {
                                             newCharacterNameInputLoader.active = false
                                     }
                                     tabItemUponReturn: false
-                                    tabItem: sceneSynopsisField.textArea
+                                    tabItem: synopsisContentTabView.currentTabIndex === 0 ? synopsisContentTabView.currentTabItem.textArea : null
                                     backTabItem: sceneTitleField
                                     Component.onCompleted: forceActiveFocus()
                                 }
@@ -1027,33 +1080,64 @@ Rectangle {
                             }
                         }
 
-                        FlickableTextArea {
-                            id: sceneSynopsisField
+                        TabView3 {
+                            id: synopsisContentTabView
+                            tabNames: ["Synopsis", "Featured Photo"]
+                            tabColor: scene.color
+                            currentTabContent: currentTabIndex === 0 ? sceneSynopsisFieldComponent : featuredPhotoComponent
+                            currentTabIndex: screenplayEditorSettings.commentsPanelTabIndex
+                            onCurrentTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneCharactersList.height - parent.spacing*3
-                            text: scene.title
-                            placeholderText: "Scene Synopsis"
-                            readOnly: Scrite.document.readOnly
-                            onTextChanged: scene.title = text
-                            undoRedoEnabled: true
-                            backTabItem: sceneTitleField
-                            adjustTextWidthBasedOnScrollBar: false
-                            ScrollBar.vertical: sceneSynopsisVScrollBar
                             anchors.horizontalCenter: parent.horizontalCenter
-                            background: Rectangle {
-                                color: primaryColors.windowColor
-                                opacity: 0.15
+
+                            Component {
+                                id: sceneSynopsisFieldComponent
+
+                                Item {
+                                    property alias textArea: sceneSynopsisField.textArea
+
+                                    FlickableTextArea {
+                                        id: sceneSynopsisField
+                                        anchors.fill: parent
+                                        anchors.rightMargin: sceneSynopsisVScrollBar.visible ? sceneSynopsisVScrollBar.width : 0
+                                        text: scene.title
+                                        placeholderText: "Scene Synopsis"
+                                        readOnly: Scrite.document.readOnly
+                                        onTextChanged: scene.title = text
+                                        undoRedoEnabled: true
+                                        backTabItem: sceneTitleField
+                                        adjustTextWidthBasedOnScrollBar: false
+                                        ScrollBar.vertical: sceneSynopsisVScrollBar
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        background: Rectangle {
+                                            color: primaryColors.windowColor
+                                            opacity: 0.15
+                                        }
+                                    }
+
+                                    ScrollBar2 {
+                                        id: sceneSynopsisVScrollBar
+                                        orientation: Qt.Vertical
+                                        flickable: sceneSynopsisField
+                                        anchors.top: parent.top
+                                        anchors.right: parent.right
+                                        anchors.bottom: parent.bottom
+                                    }
+                                }
+                            }
+
+                            Component {
+                                id: featuredPhotoComponent
+
+                                SceneFeaturedImage {
+                                    scene: sceneNotesItem.scene
+                                    fillModeAttrib: "notebookFillMode"
+                                    defaultFillMode: Image.PreserveAspectFit
+                                    mipmap: true
+                                }
                             }
                         }
-                    }
-
-                    ScrollBar2 {
-                        id: sceneSynopsisVScrollBar
-                        orientation: Qt.Vertical
-                        flickable: sceneSynopsisField
-                        anchors.top: parent.top
-                        anchors.right: parent.right
-                        anchors.bottom: sceneAttachments.top
                     }
 
                     AttachmentsView {
@@ -1065,8 +1149,9 @@ Rectangle {
                     }
 
                     AttachmentsDropArea2 {
-                        anchors.fill: parent
+                        id: sceneAttachmentsDropArea
                         target: scene ? scene.attachments : null
+                        anchors.fill: synopsisContentTabView.currentTabIndex === 1 ? sceneAttachments : parent
                     }
                 }
 

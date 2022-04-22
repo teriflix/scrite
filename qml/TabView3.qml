@@ -26,6 +26,7 @@ Item {
     property alias tabBarVisible: tabBar.visible
     property alias cornerItem: cornerLoader.sourceComponent
     property real cornerItemSpace: cornerLoader.width
+    property alias currentTabItem: tabContentLoader.item
 
     Row {
         id: tabBar
@@ -40,7 +41,7 @@ Item {
 
             TabBarTab {
                 tabFillColor: active ? tabColor : Qt.tint(tabColor, "#C0FFFFFF")
-                tabBorderColor: tabColor
+                tabBorderColor: Scrite.app.isVeryLightColor(tabColor) ? "gray" : tabColor
                 tabBorderWidth: 1
                 text: modelData
                 tabIndex: index
@@ -79,7 +80,7 @@ Item {
         Rectangle {
             anchors.fill: tabContentLoader
             border.width: 1
-            border.color: tabBar.visible ? tabColor : primaryColors.borderColor
+            border.color: tabBar.visible ? (Scrite.app.isVeryLightColor(tabColor) ? "gray" : tabColor) : primaryColors.borderColor
             color: Qt.rgba(0,0,0,0)
         }
     }

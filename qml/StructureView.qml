@@ -2039,13 +2039,39 @@ Item {
         }
     }
 
-    AttachmentsDropArea2 {
+    AttachmentsDropArea {
+        id: annotationAttachmentDropArea
+        z: -10
         allowedType: Attachments.PhotosOnly
         anchors.fill: canvasScroll
-        attachmentNoticeSuffix: "Drop this photo here as an annotation."
         onDropped: {
             var pos = canvas.mapFromItem(canvasScroll, mouse.x, mouse.y)
             createNewImageAnnotation(pos.x, pos.y, attachment.filePath)
+        }
+    }
+
+    Rectangle {
+        id: annotationAttachmentNotice
+        anchors.fill: parent
+        visible: annotationAttachmentDropArea.active
+        color: Scrite.app.translucent(primaryColors.c500.background, 0.5)
+
+        Rectangle {
+            anchors.fill: attachmentNotice
+            anchors.margins: -30
+            radius: 4
+            color: primaryColors.c700.background
+        }
+
+        Text {
+            id: attachmentNotice
+            anchors.centerIn: parent
+            width: parent.width * noticeWidthFactor
+            wrapMode: Text.WordWrap
+            color: primaryColors.c700.text
+            text: parent.visible ? "<b>" + annotationAttachmentDropArea.attachment.originalFileName + "</b><br/><br/>" + "Drop this photo here as an annotation." : ""
+            horizontalAlignment: Text.AlignHCenter
+            font.pointSize: Scrite.app.idealFontPointSize
         }
     }
 
@@ -2094,6 +2120,63 @@ Item {
             spacing: 10
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
+
+            ToolButton3 {
+                iconSource: "../icons/content/view_options.png"
+                autoRepeat: false
+                ToolTip.text: "Toggle between index-card view options."
+                checkable: false
+                suggestedWidth: parent.height
+                suggestedHeight: parent.height
+                onClicked: structureViewOptionsMenu.show()
+                down: structureViewOptionsMenu.active
+
+                MenuLoader {
+                    id: structureViewOptionsMenu
+                    anchors.left: parent.left
+                    anchors.bottom: parent.top
+                    anchors.bottomMargin: item ? item.height : 0
+                    menu: Menu2 {
+                        Menu2 {
+                            title: "Card UI Mode"
+
+                            MenuItem2 {
+                                text: "Index Card UI"
+                                checkable: true
+                                checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
+                                onToggled: if(checked) Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
+                            }
+
+                            MenuItem2 {
+                                text: "Synopsis Card UI"
+                                enabled: Scrite.document.structure.elementStacks.objectCount === 0
+                                checkable: true
+                                checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
+                                onToggled: if(checked) Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
+                            }
+                        }
+
+                        Menu2 {
+                            title: "Index Card Content"
+                            enabled: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
+
+                            MenuItem2 {
+                                text: "Synopsis"
+                                checkable: true
+                                checked: Scrite.document.structure.indexCardContent === Structure.Synopsis
+                                onToggled: if(checked) Scrite.document.structure.indexCardContent = Structure.Synopsis
+                            }
+
+                            MenuItem2 {
+                                text: "Featured Photo"
+                                checkable: true
+                                checked: Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
+                                onToggled: if(checked) Scrite.document.structure.indexCardContent = Structure.FeaturedPhoto
+                            }
+                        }
+                    }
+                }
+            }
 
             ToolButton3 {
                 iconSource: "../icons/hardware/mouse.png"
@@ -2687,6 +2770,8 @@ Item {
                     id: synopsisFieldLoader
                     width: parent.width
                     lod: elementItem.selected && !canvas.scaleIsLessForEdit ? eHIGH : eLOW
+                    sanctioned: Scrite.document.structure.indexCardContent === Structure.Synopsis
+                    visible: sanctioned
 
                     TabSequenceItem.enabled: elementItem.stackedOnTop
                     TabSequenceItem.manager: canvasTabSequence
@@ -2738,7 +2823,7 @@ Item {
                     }
 
                     highDetailComponent: Item {
-                        width: parent.width
+                        width: synopsisFieldLoader.width
                         height: synopsisFieldLoader.idealHeight
 
                         function assumeFocus() {
@@ -2850,6 +2935,67 @@ Item {
                     function maybeAssumeFocus() {
                         if(focus && lod === eHIGH && item)
                             item.assumeFocus()
+                    }
+                }
+
+                LodLoader {
+                    id: featuredImageFieldLoader
+                    width: parent.width
+                    height: synopsisFieldLoader.idealHeight
+                    lod: synopsisFieldLoader.lod
+                    sanctioned: Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
+                    visible: sanctioned
+                    resetWidthBeforeLodChange: false
+                    resetHeightBeforeLodChange: false
+                    lowDetailComponent: Image {
+                        id: lowLodfeaturedImageField
+                        property Attachments sceneAttachments: element.scene.attachments
+                        property Attachment featuredAttachment: sceneAttachments.featuredAttachment
+                        property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
+                        property string fillModeAttrib: "fillMode"
+                        property int defaultFillMode: Image.PreserveAspectCrop
+
+                        fillMode: {
+                            if(!featuredImage)
+                                return defaultFillMode
+                            const ud = featuredImage.userData
+                            if(ud[fillModeAttrib])
+                                return ud[fillModeAttrib] === "fit" ? Image.PreserveAspectFit : Image.PreserveAspectCrop
+                            return defaultFillMode
+                        }
+                        source: featuredImage ? featuredImage.fileSource : ""
+                        mipmap: !(canvasScroll.moving || canvasScroll.flicking)
+
+                        Loader {
+                            anchors.fill: parent
+                            active: !parent.featuredAttachment
+                            sourceComponent: AttachmentsDropArea2 {
+                                allowedType: Attachments.PhotosOnly
+                                target: lowLodfeaturedImageField.sceneAttachments
+                                onDropped: {
+                                    attachment.featured = true
+                                    allowDrop()
+                                }
+                                attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this scene."
+
+                                Text {
+                                    width: parent.width
+                                    horizontalAlignment: Text.AlignHCenter
+                                    anchors.centerIn: parent
+                                    wrapMode: Text.WordWrap
+                                    font.pointSize: Scrite.app.idealFontPointSize
+                                    text: "Drag & Drop a Photo"
+                                    visible: !parent.active
+                                }
+                            }
+                        }
+                    }
+
+                    highDetailComponent: SceneFeaturedImage {
+                        scene: element.scene
+                        fillModeAttrib: "indexCardFillMode"
+                        defaultFillMode: Image.PreserveAspectCrop
+                        mipmap: !(canvasScroll.moving || canvasScroll.flicking)
                     }
                 }
 

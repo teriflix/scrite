@@ -130,6 +130,7 @@ Item {
         property bool showLoglineEditor: false
         property bool allowTaggingOfScenes: false
         property real spaceBetweenScenes: 0
+        property int commentsPanelTabIndex: 1
 
         property real textFormatDockWidgetX: -1
         property real textFormatDockWidgetY: -1

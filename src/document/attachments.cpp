@@ -58,6 +58,7 @@ Attachment::Attachment(QObject *parent) : QObject(parent)
     connect(this, &Attachment::titleChanged, this, &Attachment::attachmentModified);
     connect(this, &Attachment::filePathChanged, this, &Attachment::attachmentModified);
     connect(this, &Attachment::mimeTypeChanged, this, &Attachment::attachmentModified);
+    connect(this, &Attachment::featuredChanged, this, &Attachment::attachmentModified);
     connect(this, &Attachment::originalFileNameChanged, this, &Attachment::attachmentModified);
 
     DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
@@ -92,6 +93,15 @@ void Attachment::setTitle(const QString &val)
 
     m_title = val;
     emit titleChanged();
+}
+
+void Attachment::setUserData(const QJsonObject &val)
+{
+    if (m_userData == val)
+        return;
+
+    m_userData = val;
+    emit userDataChanged();
 }
 
 void Attachment::openAttachmentAnonymously()
@@ -168,6 +178,7 @@ void Attachment::setFilePath(const QString &val)
         return;
 
     m_filePath = val;
+    m_fileSource = QUrl::fromLocalFile(path);
     emit filePathChanged();
 }
 
@@ -356,6 +367,7 @@ Attachment *Attachments::includeAttachment(const QString &filePath)
     ptr->setMimeType(mimeType.name());
     ptr->setFilePath(attachedFilePath);
     ptr->setOriginalFileName(fi.fileName());
+    ptr->setType(Attachment::determineType(fi));
     this->includeAttachment(ptr);
 
     return ptr;
@@ -631,8 +643,10 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
         if (m_allowDrop) {
             de->acceptProposedAction();
 
-            if (m_target != nullptr)
-                m_target->includeAttachment(m_attachment->filePath());
+            if (m_target != nullptr) {
+                auto attachment = m_target->includeAttachment(m_attachment->filePath());
+                attachment->setFeatured(m_attachment->isFeatured());
+            }
         }
 
         m_attachment->deleteLater();

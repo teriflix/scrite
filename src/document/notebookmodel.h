@@ -39,7 +39,8 @@ public:
     NotebookModel(QObject *parent = nullptr);
     ~NotebookModel();
 
-    Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument RESET resetDocument NOTIFY documentChanged)
+    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument RESET resetDocument NOTIFY
+                       documentChanged)
     void setDocument(ScriteDocument *val);
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();
@@ -76,10 +77,10 @@ public:
     Q_INVOKABLE QVariant modelIndexData(const QModelIndex &index) const;
     Q_INVOKABLE QModelIndex findModelIndexFor(QObject *owner) const;
     Q_INVOKABLE QModelIndex findModelIndexForTopLevelItem(const QString &label) const;
-    Q_INVOKABLE QModelIndex findModelIndexForCategory(ItemCategory cat) const;
+    Q_INVOKABLE QModelIndex findModelIndexForCategory(NotebookModel::ItemCategory cat) const;
     Q_INVOKABLE void refresh();
 
-    Q_PROPERTY(BookmarkedNotes* bookmarkedNotes READ bookmarkedNotes CONSTANT STORED false)
+    Q_PROPERTY(BookmarkedNotes *bookmarkedNotes READ bookmarkedNotes CONSTANT STORED false)
     BookmarkedNotes *bookmarkedNotes() const { return m_bookmarkedNotes; }
     Q_SIGNAL void bookmarkedNotesChanged();
 

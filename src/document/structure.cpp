@@ -2475,6 +2475,15 @@ void Structure::setCanvasUIMode(Structure::CanvasUIMode val)
     emit canvasUIModeChanged();
 }
 
+void Structure::setIndexCardContent(IndexCardContent val)
+{
+    if (m_indexCardContent == val)
+        return;
+
+    m_indexCardContent = val;
+    emit indexCardContentChanged();
+}
+
 qreal Structure::snapToGrid(qreal val) const
 {
     return Structure::snapToGrid(val, this);

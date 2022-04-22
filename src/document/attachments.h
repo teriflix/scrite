@@ -59,9 +59,18 @@ public:
     QString filePath() const { return m_filePath; }
     Q_SIGNAL void filePathChanged();
 
+    // For use with Image {}, PdfViewer etc..
+    Q_PROPERTY(QUrl fileSource READ fileSource NOTIFY filePathChanged)
+    QUrl fileSource() const { return m_fileSource; }
+
     Q_PROPERTY(QString mimeType READ mimeType NOTIFY mimeTypeChanged)
     QString mimeType() const { return m_mimeType; }
     Q_SIGNAL void mimeTypeChanged();
+
+    Q_PROPERTY(QJsonObject userData READ userData WRITE setUserData NOTIFY userDataChanged)
+    void setUserData(const QJsonObject &val);
+    QJsonObject userData() const { return m_userData; }
+    Q_SIGNAL void userDataChanged();
 
     Q_INVOKABLE void openAttachmentAnonymously();
     Q_INVOKABLE void openAttachmentInPlace();
@@ -92,8 +101,10 @@ private:
 private:
     QString m_name;
     QString m_title;
+    QUrl m_fileSource;
     QString m_filePath;
     QString m_mimeType;
+    QJsonObject m_userData;
     bool m_featured = false;
     QString m_originalFileName;
     Type m_type = Document;
@@ -134,7 +145,9 @@ public:
     QStringList nameFilters() const { return m_nameFilters; }
     Q_SIGNAL void nameFiltersChanged();
 
-    Q_PROPERTY(Attachment* featuredAttachment READ featuredAttachment NOTIFY featuredAttachmentChanged)
+    // clang-format off
+    Q_PROPERTY(Attachment *featuredAttachment READ featuredAttachment NOTIFY featuredAttachmentChanged STORED false)
+    // clang-format on
     Attachment *featuredAttachment() const { return m_featuredAttachment; }
     Q_SIGNAL void featuredAttachmentChanged();
 
@@ -187,7 +200,7 @@ public:
     AttachmentsDropArea(QQuickItem *parent = nullptr);
     ~AttachmentsDropArea();
 
-    Q_PROPERTY(Attachments* target READ target WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY(Attachments *target READ target WRITE setTarget NOTIFY targetChanged)
     void setTarget(Attachments *val);
     Attachments *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -197,7 +210,8 @@ public:
     int allowedType() const { return m_allowedType; }
     Q_SIGNAL void allowedTypeChanged();
 
-    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions NOTIFY allowedExtensionsChanged)
+    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions
+                       NOTIFY allowedExtensionsChanged)
     void setAllowedExtensions(const QStringList &val);
     QStringList allowedExtensions() const { return m_allowedExtensions; }
     Q_SIGNAL void allowedExtensionsChanged();
@@ -205,7 +219,7 @@ public:
     Q_PROPERTY(bool active READ isActive NOTIFY attachmentChanged)
     bool isActive() const { return m_attachment != nullptr; }
 
-    Q_PROPERTY(Attachment* attachment READ attachment NOTIFY attachmentChanged)
+    Q_PROPERTY(Attachment *attachment READ attachment NOTIFY attachmentChanged)
     Attachment *attachment() const { return m_attachment; }
     Q_SIGNAL void attachmentChanged();
 

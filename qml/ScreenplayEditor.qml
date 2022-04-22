@@ -13,6 +13,7 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.15
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
@@ -216,11 +217,11 @@ Rectangle {
         clip: true
 
         EventFilter.events: [EventFilter.Wheel]
-        EventFilter.onFilter: {
-            EventFilter.forwardEventTo(contentView)
-            result.filter = true
-            result.accepted = true
-        }
+        EventFilter.onFilter: (object,event,result) => {
+                                  EventFilter.forwardEventTo(contentView)
+                                  result.filter = true
+                                  result.accepted = true
+                              }
 
         Item {
             id: pageRulerArea
@@ -295,7 +296,7 @@ Rectangle {
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
                     property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
-                    property int commentsPanelTabIndex: 1
+                    property int commentsPanelTabIndex: screenplayEditorSettings.commentsPanelTabIndex
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
@@ -1296,6 +1297,7 @@ Rectangle {
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
             property bool isCurrent: theElement === screenplayAdapter.currentElement
+            z: isCurrent ? 2 : 1
 
             width: contentArea.width
             height: contentItemLayout.height
@@ -1404,7 +1406,7 @@ Rectangle {
                     tabColor: contentItem.theScene.color
                     currentTabContent: currentTabIndex === 0 ? featuredPhotoComponent : commentsEditComponent
                     currentTabIndex: contentView.commentsPanelTabIndex
-                    onCurrentTabIndexChanged: contentView.commentsPanelTabIndex = currentTabIndex
+                    onCurrentTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
 
                     Connections {
                         target: contentView
@@ -1416,16 +1418,11 @@ Rectangle {
                     Component {
                         id: featuredPhotoComponent
 
-                        Item {
-                            property Attachments sceneAttachments: contentItem.theScene.attachments
-                            property Attachment featuredAttachment: sceneAttachments.featuredAttachment
-                            property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
-
-                            Image {
-                                anchors.fill: parent
-                                fillMode: Image.PreserveAspectFit
-                                source: featuredAttachment.filePath
-                            }
+                        SceneFeaturedImage {
+                            scene: contentItem.theScene
+                            fillModeAttrib: "commentsPanelFillMode"
+                            defaultFillMode: Image.PreserveAspectCrop
+                            mipmap: !(contentView.moving || contentView.flicking)
                         }
                     }
 
