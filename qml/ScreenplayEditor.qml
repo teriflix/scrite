@@ -215,7 +215,7 @@ Rectangle {
         anchors.bottom: statusBar.top
         clip: true
 
-        EventFilter.events: [31]
+        EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
             EventFilter.forwardEventTo(contentView)
             result.filter = true
