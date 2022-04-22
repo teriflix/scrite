@@ -291,12 +291,19 @@ Item {
                     height: 1
 
                     FileDialog {
-                        id: folderPathDialog
-                        folder: Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DesktopLocation))
-                        selectFolder: true
+                        id: saveFileDialog
+                        nameFilters: ["Adobe PDF Files (*.pdf)"]
+                        folder: Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
+                        selectFolder: false
                         selectMultiple: false
                         selectExisting: false
-                        onAccepted: saveFileButton.savePdf(Scrite.app.urlToLocalFile(folderPathDialog.folder))
+                        sidebarVisible: true
+                        onAccepted: {
+                            const targetFilePath = Scrite.app.urlToLocalFile(saveFileDialog.fileUrl)
+                            const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath )
+                            if(downloadedFilePath !== "")
+                                Scrite.app.revealFileOnDesktop(downloadedFilePath)
+                        }
                     }
 
                     Menu2 {
@@ -319,7 +326,7 @@ Item {
 
                         MenuItem2 {
                             text: "Other ..."
-                            onClicked: folderPathDialog.open()
+                            onClicked: saveFileDialog.open()
                         }
                     }
                 }

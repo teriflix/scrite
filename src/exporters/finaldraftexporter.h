@@ -33,6 +33,14 @@ public:
     bool isMarkLanguagesExplicitly() const { return m_markLanguagesExplicitly; }
     Q_SIGNAL void markLanguagesExplicitlyChanged();
 
+    Q_CLASSINFO("useScriteFonts_FieldLabel", "Use language fonts as specified in Settings > Fonts panel.")
+    Q_CLASSINFO("useScriteFonts_FieldNote", "Please make sure that the font selected in Settings > Fonts panel is instaled in your computer and is available for all users.")
+    Q_CLASSINFO("useScriteFonts_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool useScriteFonts READ isUseScriteFonts WRITE setUseScriteFonts NOTIFY useScriteFontsChanged)
+    void setUseScriteFonts(bool val);
+    bool isUseScriteFonts() const { return m_useScriteFonts; }
+    Q_SIGNAL void useScriteFontsChanged();
+
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return true; }
 
@@ -46,6 +54,7 @@ private:
 #else
     bool m_markLanguagesExplicitly = true;
 #endif
+    bool m_useScriteFonts = false;
 };
 
 #endif // FINALDRAFTEXPORTER_H

@@ -768,9 +768,8 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
     QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Word, text);
     while (boundaryFinder.position() < text.length()) {
         if (!(boundaryFinder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem))) {
-            if (boundaryFinder.toNextBoundary() == -1) {
+            if (boundaryFinder.toNextBoundary() == -1)
                 break;
-            }
             continue;
         }
 
@@ -849,9 +848,38 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
         }
     }
 
-    // TODO: break apart a single boundary if it combines two distinct languages
-    // But, we won't do that now. Its rather rare that users will write a single word in
-    // two separate languages.
+    for (int i = ret.size() - 1; i >= 0; i--) {
+        Boundary &b = ret[i];
+        const QSet<QChar::Script> scripts = [](const QString &text) -> QSet<QChar::Script> {
+            QSet<QChar::Script> ret;
+            for (const QChar &ch : text) {
+                if (ch.script() != QChar::Script_Common)
+                    ret += ch.script();
+            }
+            return ret;
+        }(b.string);
+
+        if (scripts.size() <= 1 || b.string.length() <= 1)
+            continue;
+
+        QChar::Script script = TransliterationEngine::scriptForLanguage(b.language);
+        for (int j = b.end; j >= b.start; j--) {
+            const QChar ch = b.string.at(j - b.start);
+            if (ch.script() == QChar::Script_Common || ch.script() == QChar::Script_Inherited)
+                continue;
+
+            if (ch.script() != script) {
+                Boundary b2;
+                b2.start = j + 1;
+                b2.end = b.end;
+                b2.evalStringLanguageAndFont(text);
+                ret.insert(i + 1, b2);
+                b.end = j;
+                b.evalStringLanguageAndFont(text);
+                script = ch.script();
+            }
+        }
+    }
 
     return ret;
 }

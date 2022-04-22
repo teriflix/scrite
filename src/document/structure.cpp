@@ -4614,6 +4614,7 @@ void Structure::onStructureElementSceneChanged(StructureElement *element)
     }
 
     this->updateLocationHeadingMapLater();
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
 }
 
 void Structure::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType)
@@ -4651,14 +4652,15 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
         emit characterNamesChanged();
     }
 
-    if (tags.values() != m_characterTags) {
+    const QStringList tagValues = tags.values();
+    if (tagValues != m_characterTags) {
         m_characterTags = tags.values();
         emit characterTagsChanged();
     }
 
     const QStringList shots = [=]() {
         QSet<QString> set = m_shotElementMap.shots().toSet();
-        set += defaultShots().toSet();
+        set += QSet<QString>::fromList(defaultShots());
         QStringList ret = set.toList();
         std::sort(ret.begin(), ret.end());
         return ret;
@@ -4670,7 +4672,7 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
 
     const QStringList transitions = [=]() {
         QSet<QString> set = m_transitionElementMap.transitions().toSet();
-        set += defaultTransitions().toSet();
+        set += QSet<QString>::fromList(defaultTransitions());
         QStringList ret = set.toList();
         std::sort(ret.begin(), ret.end());
         return ret;
