@@ -694,24 +694,7 @@ Item {
                             checkable: true
                             enabled: Scrite.document.structure.elementStacks.objectCount === 0
                             checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
-                            onToggled: {
-                                var toggleCanvasUI = function() {
-                                    if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
-                                        Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
-                                    else
-                                        Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
-                                }
-
-                                if(mainTabBar.currentIndex === 0) {
-                                    toggleCanvasUI()
-                                } else {
-                                    contentLoader.active = false
-                                    Scrite.app.execLater(contentLoader, 100, function() {
-                                        toggleCanvasUI()
-                                        contentLoader.active = true
-                                    })
-                                }
-                            }
+                            onToggled: contentLoader.reset( contentLoader.toggleCanvasUI )
                         }
                     }
                 }

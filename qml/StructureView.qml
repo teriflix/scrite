@@ -2144,7 +2144,7 @@ Item {
                                 text: "Index Card UI"
                                 checkable: true
                                 checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
-                                onToggled: if(checked) Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
+                                onToggled: if(checked) contentLoader.reset( contentLoader.toggleCanvasUI )
                             }
 
                             MenuItem2 {
@@ -2152,7 +2152,7 @@ Item {
                                 enabled: Scrite.document.structure.elementStacks.objectCount === 0
                                 checkable: true
                                 checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
-                                onToggled: if(checked) Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
+                                onToggled: if(checked) contentLoader.reset( contentLoader.toggleCanvasUI )
                             }
                         }
 
