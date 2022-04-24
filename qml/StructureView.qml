@@ -2614,16 +2614,8 @@ Item {
                 color: Qt.tint(element.scene.color, selected ? "#C0FFFFFF" : "#F0FFFFFF")
                 border.width: elementItem.selected ? 2 : 1
 
-                property color borderColor: Scrite.app.isLightColor(element.scene.color) ? "gray" : element.scene.color
+                property color borderColor: Scrite.app.isLightColor(element.scene.color) ? Qt.rgba(0.75,0.75,0.75,1.0) : element.scene.color
                 border.color: elementItem.selected ? borderColor : Qt.lighter(borderColor)
-
-                Rectangle {
-                    y: parent.border.width
-                    color: parent.border.color
-                    width: parent.width-2*parent.border.width
-                    height: 2*parent.border.width
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
 
                 // Move index-card around
                 MouseArea {
@@ -3004,6 +2996,7 @@ Item {
                     width: parent.width
                     height: Math.max(Math.max(sceneTypeImage.height, dragHandle.height), footerLabels.height)
                     readonly property real spacing: 5
+                    property bool lightBackground: Scrite.app.isLightColor(footerBackgrund.color)
 
                     SceneTypeImage {
                         id: sceneTypeImage
@@ -3014,6 +3007,15 @@ Item {
                         anchors.left: parent.left
                         anchors.bottom: parent.bottom
                         visible: sceneType !== Scene.Standard
+                        lightBackground: parent.lightBackground
+                    }
+
+                    Rectangle {
+                        id: footerBackgrund
+                        anchors.fill: parent
+                        anchors.margins: -5
+                        property color baseColor: background.border.color
+                        color: Qt.tint(baseColor, elementItem.selected ? "#70FFFFFF" : "#A0FFFFFF")
                     }
 
                     Column {
@@ -3033,6 +3035,7 @@ Item {
                             visible: element.scene.groups.length > 0 || !element.scene.hasCharacters
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             font.pointSize: Scrite.app.idealAppFontSize - 2
+                            color: footerRow.lightBackground ? "black" : "white"
                         }
 
                         Text {
@@ -3046,12 +3049,15 @@ Item {
                                     return "<b>Characters</b>: " + element.scene.characterNames.join(", ")
                                 return ""
                             }
+                            color: footerRow.lightBackground ? "black" : "white"
                         }
                     }
 
                     Image {
                         id: dragHandle
-                        source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
+                        source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ?
+                               (parent.lightBackground ? "../icons/action/view_array.png" : "../icons/action/view_array_inverted.png") :
+                               (parent.lightBackground ? "../icons/content/add_circle_outline.png" : "../icons/content/add_circle_outline_inverted.png")
                         width: 24; height: 24
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
