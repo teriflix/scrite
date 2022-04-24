@@ -229,7 +229,19 @@ Rectangle {
             height: parent.height
             anchors.left: parent.left
             anchors.leftMargin: leftMargin
-            property real leftMargin: contentView.commentsExpanded && sidePanels.expanded ? 80 : (parent.width-width)/2
+            readonly property real minLeftMargin: 80
+            property real leftMargin: {
+                const availableMargin = (parent.width-width-20)/2 // 20 is width of scrollbar
+                if(contentView.commentsExpanded && sidePanels.expanded)
+                    return Math.max(minLeftMargin, availableMargin)
+                if(contentView.commentsExpanded && !sidePanels.expanded) {
+                    const commentsWidth = Math.min(contentView.spaceForComments, 400)
+                    if(availableMargin > commentsWidth)
+                        return availableMargin
+                    return availableMargin - (commentsWidth - availableMargin)
+                }
+                return availableMargin
+            }
             Behavior on leftMargin {
                 enabled: applicationSettings.enableAnimations && contentView.commentsExpandCounter > 0
                 NumberAnimation { duration: 50 }
@@ -295,7 +307,11 @@ Rectangle {
                     spacing: screenplayAdapter.elementCount > 0 ? screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
-                    property real spaceForComments: screenplayEditorSettings.displaySceneComments && commentsPanelAllowed ? ((sidePanels.expanded ? (screenplayEditorWorkspace.width - pageRulerArea.width - 80) : (screenplayEditorWorkspace.width - pageRulerArea.width)/2) - 20) : 0
+                    property real spaceForComments: {
+                        if(screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
+                            return Math.round(screenplayEditorWorkspace.width - pageRulerArea.width - pageRulerArea.minLeftMargin - 20)
+                        return 0
+                    }
                     property int commentsPanelTabIndex: screenplayEditorSettings.commentsPanelTabIndex
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
@@ -1362,6 +1378,7 @@ Rectangle {
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
                 borderColor: expanded ? primaryColors.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
+                z: contentItem.isCurrent ? 1 : 0
                 borderWidth: contentItem.isCurrent ? 2 : 1
                 anchors.top: parent.top
                 anchors.left: parent.right
