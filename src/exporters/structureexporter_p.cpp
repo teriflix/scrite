@@ -41,7 +41,7 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
     QHash<StructureElement *, StructureIndexCard *> elementIndexCardMap;
     for (int i = 0; i < structure->elementCount(); i++) {
         StructureElement *element = structure->elementAt(i);
-        StructureIndexCard *indexCard = new StructureIndexCard(element);
+        StructureIndexCard *indexCard = new StructureIndexCard(exporter, element);
         indexCard->setZValue(10);
         this->addItem(indexCard);
 
@@ -156,7 +156,8 @@ StructureExporterScene::~StructureExporterScene() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StructureIndexCard::StructureIndexCard(const StructureElement *element)
+StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
+                                       const StructureElement *element)
 {
     this->setPos(element->x(), element->y());
     this->setRect(0, 0, element->width(), element->height());
@@ -226,26 +227,49 @@ StructureIndexCard::StructureIndexCard(const StructureElement *element)
             headingTextItem->mapToParent(headingTextItem->boundingRect()).boundingRect();
     const QRectF tagsTextRect =
             tagsTextItem->mapToParent(tagsTextItem->boundingRect()).boundingRect();
-    const QRectF synopsisTextRect =
+    const QRectF cardContentRect =
             QRectF(headingTextRect.bottomLeft(), tagsTextRect.topRight()).adjusted(0, 10, 0, -10);
 
-    // Synopsis text in between
-    QGraphicsRectItem *synopsisTextRectItem = new QGraphicsRectItem(this);
-    synopsisTextRectItem->setPos(synopsisTextRect.topLeft());
-    synopsisTextRectItem->setRect(
-            QRectF(0, 0, synopsisTextRect.width(), synopsisTextRect.height()));
-    synopsisTextRectItem->setBrush(QColor::fromRgbF(1, 1, 1, 0.4));
-    synopsisTextRectItem->setPen(Qt::NoPen);
-    synopsisTextRectItem->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
+    // Content in between. The content may be synopsis text or featured image.
+    QGraphicsRectItem *cardContentRectItem = new QGraphicsRectItem(this);
+    cardContentRectItem->setPos(cardContentRect.topLeft());
+    cardContentRectItem->setRect(QRectF(0, 0, cardContentRect.width(), cardContentRect.height()));
+    cardContentRectItem->setBrush(QColor::fromRgbF(1, 1, 1, 0.4));
+    cardContentRectItem->setPen(Qt::NoPen);
+    cardContentRectItem->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 
-    QGraphicsTextItem *synopsisTextItem = new QGraphicsTextItem(synopsisTextRectItem);
-    synopsisTextItem->setPos(0, 0);
-    synopsisTextItem->setTextWidth(contentRect.width());
-    synopsisTextItem->setPlainText(element->scene()->title());
-    synopsisTextItem->setFont(normalFont);
+    // Check if the scene has featured image.
+    const bool preferFeaturedImage = exporter->isPreferFeaturedImage();
+    const Attachments *sceneAttachments =
+            preferFeaturedImage ? element->scene()->attachments() : nullptr;
+    const Attachment *featuredAttachment =
+            sceneAttachments ? sceneAttachments->featuredAttachment() : nullptr;
+    const Attachment *featuredImage =
+            featuredAttachment && featuredAttachment->type() == Attachment::Photo
+            ? featuredAttachment
+            : nullptr;
 
-    if (synopsisTextItem->boundingRect().height() > synopsisTextRectItem->rect().height())
-        synopsisTextRectItem->setPen(QPen(QColor::fromRgbF(0, 0, 0, 0.5), 1));
+    if (preferFeaturedImage && featuredImage) {
+        GraphicsImageRectItem *featuredImageItem = new GraphicsImageRectItem(cardContentRectItem);
+        featuredImageItem->setRect(cardContentRectItem->rect());
+        featuredImageItem->setImage(QImage(featuredImage->fileSource().toLocalFile()));
+
+        const QJsonObject userData = featuredImage->userData();
+        const QString fillMode = userData.value(QLatin1String("indexCardFillMode")).toString();
+        if (fillMode == QLatin1String("fit"))
+            featuredImageItem->setFillMode(GraphicsImageRectItem::PreserveAspectFit);
+        else
+            featuredImageItem->setFillMode(GraphicsImageRectItem::PreserveAspectCrop);
+    } else {
+        QGraphicsTextItem *synopsisTextItem = new QGraphicsTextItem(cardContentRectItem);
+        synopsisTextItem->setPos(0, 0);
+        synopsisTextItem->setTextWidth(contentRect.width());
+        synopsisTextItem->setPlainText(element->scene()->title());
+        synopsisTextItem->setFont(normalFont);
+
+        if (synopsisTextItem->boundingRect().height() > cardContentRectItem->rect().height())
+            cardContentRectItem->setPen(QPen(QColor::fromRgbF(0, 0, 0, 0.5), 1));
+    }
 }
 
 StructureIndexCard::~StructureIndexCard() { }

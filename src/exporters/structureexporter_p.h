@@ -34,7 +34,7 @@ public:
 class StructureIndexCard : public QGraphicsRectItem
 {
 public:
-    StructureIndexCard(const StructureElement *element);
+    StructureIndexCard(const StructureExporter *exporter, const StructureElement *element);
     ~StructureIndexCard();
 };
 

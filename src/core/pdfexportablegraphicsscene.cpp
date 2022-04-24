@@ -401,6 +401,15 @@ GraphicsImageRectItem::GraphicsImageRectItem(QGraphicsItem *parent) : QGraphicsR
 
 GraphicsImageRectItem::~GraphicsImageRectItem() { }
 
+void GraphicsImageRectItem::setFillMode(FillMode val)
+{
+    if (m_fillMode == val)
+        return;
+
+    m_fillMode = val;
+    this->update();
+}
+
 void GraphicsImageRectItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
                                   QWidget *widget)
 {
@@ -408,8 +417,35 @@ void GraphicsImageRectItem::paint(QPainter *painter, const QStyleOptionGraphicsI
     if (m_image.isNull())
         return;
 
+    QSizeF imageSize = m_image.size();
+    switch (m_fillMode) {
+    case Stretch:
+        imageSize = this->boundingRect().size();
+        break;
+    case PreserveAspectFit:
+        imageSize.scale(this->boundingRect().size(), Qt::KeepAspectRatio);
+        break;
+    case PreserveAspectCrop:
+        imageSize.scale(this->boundingRect().size(), Qt::KeepAspectRatioByExpanding);
+        break;
+    }
+
+    QRectF imageRect(QPointF(0, 0), imageSize);
+    imageRect.moveCenter(this->boundingRect().center());
+
     const bool spt = painter->testRenderHint(QPainter::SmoothPixmapTransform);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-    painter->drawImage(this->boundingRect(), m_image);
+
+    if (m_fillMode == PreserveAspectCrop) {
+        painter->save();
+        painter->setClipping(true);
+        painter->setClipRect(this->boundingRect());
+    }
+
+    painter->drawImage(imageRect, m_image);
+
+    if (m_fillMode == PreserveAspectCrop)
+        painter->restore();
+
     painter->setRenderHint(QPainter::SmoothPixmapTransform, spt);
 }

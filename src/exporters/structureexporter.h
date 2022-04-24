@@ -43,6 +43,13 @@ public:
     bool isEnableHeaderFooter() const { return m_enableHeaderFooter; }
     Q_SIGNAL void enableHeaderFooterChanged();
 
+    Q_CLASSINFO("preferFeaturedImage_FieldLabel", "Use featured image for scene, if available.")
+    Q_CLASSINFO("preferFeaturedImage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool preferFeaturedImage READ isPreferFeaturedImage WRITE setPreferFeaturedImage NOTIFY preferFeaturedImageChanged)
+    void setPreferFeaturedImage(bool val);
+    bool isPreferFeaturedImage() const { return m_preferFeaturedImage; }
+    Q_SIGNAL void preferFeaturedImageChanged();
+
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")
     Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
@@ -66,6 +73,7 @@ private:
     bool m_enableHeaderFooter = true;
     QString m_comment;
     QString m_watermark;
+    bool m_preferFeaturedImage = false;
 };
 
 #endif // STRUCTUREEXPORTER_H

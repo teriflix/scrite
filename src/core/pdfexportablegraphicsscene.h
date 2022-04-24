@@ -119,6 +119,11 @@ public:
     GraphicsImageRectItem(QGraphicsItem *parent = nullptr);
     ~GraphicsImageRectItem();
 
+    enum FillMode { Stretch, PreserveAspectFit, PreserveAspectCrop };
+
+    void setFillMode(FillMode val);
+    FillMode fillMode() const { return m_fillMode; }
+
     void setImage(const QImage &image) { m_image = image; }
     QImage image() const { return m_image; }
 
@@ -126,6 +131,7 @@ public:
 
 private:
     QImage m_image;
+    FillMode m_fillMode = PreserveAspectCrop;
 };
 
 #endif // PDFEXPORTABLEGRAPHICSSCENE_H

@@ -2944,7 +2944,7 @@ Item {
                         property Attachments sceneAttachments: element.scene.attachments
                         property Attachment featuredAttachment: sceneAttachments.featuredAttachment
                         property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
-                        property string fillModeAttrib: "fillMode"
+                        property string fillModeAttrib: "indexCardFillMode"
                         property int defaultFillMode: Image.PreserveAspectCrop
 
                         fillMode: {
