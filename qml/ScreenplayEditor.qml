@@ -232,13 +232,13 @@ Rectangle {
             readonly property real minLeftMargin: 80
             property real leftMargin: {
                 const availableMargin = (parent.width-width-20)/2 // 20 is width of scrollbar
+                const commentsWidth = Math.min(contentView.spaceForComments, 400)
                 if(contentView.commentsExpanded && sidePanels.expanded)
-                    return Math.max(minLeftMargin, availableMargin)
+                    return Math.max(minLeftMargin, (parent.width-(commentsWidth+width))/2)
                 if(contentView.commentsExpanded && !sidePanels.expanded) {
-                    const commentsWidth = Math.min(contentView.spaceForComments, 400)
                     if(availableMargin > commentsWidth)
                         return availableMargin
-                    return availableMargin - (commentsWidth - availableMargin)
+                    return 2*availableMargin - commentsWidth
                 }
                 return availableMargin
             }
