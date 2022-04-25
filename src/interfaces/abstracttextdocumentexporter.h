@@ -43,7 +43,7 @@ public:
     Q_SIGNAL void includeSceneSynopsisChanged();
 
     Q_CLASSINFO("includeSceneFeaturedImage_FieldLabel",
-                "Include scene featured photo if available.")
+                "Include featured image for scene, if available.")
     Q_CLASSINFO("includeSceneFeaturedImage_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneFeaturedImage READ isIncludeSceneFeaturedImage WRITE
                        setIncludeSceneFeaturedImage NOTIFY includeSceneFeaturedImageChanged)

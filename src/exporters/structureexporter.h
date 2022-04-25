@@ -43,7 +43,7 @@ public:
     bool isEnableHeaderFooter() const { return m_enableHeaderFooter; }
     Q_SIGNAL void enableHeaderFooterChanged();
 
-    Q_CLASSINFO("preferFeaturedImage_FieldLabel", "Use featured image for scene, if available.")
+    Q_CLASSINFO("preferFeaturedImage_FieldLabel", "Include featured image for scene, if available.")
     Q_CLASSINFO("preferFeaturedImage_FieldEditor", "CheckBox")
     Q_PROPERTY(bool preferFeaturedImage READ isPreferFeaturedImage WRITE setPreferFeaturedImage NOTIFY preferFeaturedImageChanged)
     void setPreferFeaturedImage(bool val);

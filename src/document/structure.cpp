@@ -4668,9 +4668,9 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
     }
 
     const QStringList shots = [=]() {
-        QSet<QString> set = m_shotElementMap.shots().toSet();
+        QSet<QString> set = QSet<QString>::fromList(m_shotElementMap.shots());
         set += QSet<QString>::fromList(defaultShots());
-        QStringList ret = set.toList();
+        QStringList ret = QStringList::fromSet(set);
         std::sort(ret.begin(), ret.end());
         return ret;
     }();
@@ -4680,9 +4680,9 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
     }
 
     const QStringList transitions = [=]() {
-        QSet<QString> set = m_transitionElementMap.transitions().toSet();
+        QSet<QString> set = QSet<QString>::fromList(m_transitionElementMap.transitions());
         set += QSet<QString>::fromList(defaultTransitions());
-        QStringList ret = set.toList();
+        QStringList ret = QStringList::fromSet(set);
         std::sort(ret.begin(), ret.end());
         return ret;
     }();
