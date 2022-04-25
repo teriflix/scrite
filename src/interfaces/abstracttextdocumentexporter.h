@@ -28,21 +28,33 @@ public:
 
     Q_CLASSINFO("listSceneCharacters_FieldLabel", "List characters for each scene")
     Q_CLASSINFO("listSceneCharacters_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters NOTIFY listSceneCharactersChanged)
+    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters
+                       NOTIFY listSceneCharactersChanged)
     void setListSceneCharacters(bool val);
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
     Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include synopsis of each scene.")
     Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis
+                       NOTIFY includeSceneSynopsisChanged)
     void setIncludeSceneSynopsis(bool val);
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();
 
+    Q_CLASSINFO("includeSceneFeaturedImage_FieldLabel",
+                "Include scene featured photo if available.")
+    Q_CLASSINFO("includeSceneFeaturedImage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneFeaturedImage READ isIncludeSceneFeaturedImage WRITE
+                       setIncludeSceneFeaturedImage NOTIFY includeSceneFeaturedImageChanged)
+    void setIncludeSceneFeaturedImage(bool val);
+    bool isIncludeSceneFeaturedImage() const { return m_includeSceneFeaturedImage; }
+    Q_SIGNAL void includeSceneFeaturedImageChanged();
+
     Q_CLASSINFO("includeSceneContents_FieldLabel", "Include scene content.")
     Q_CLASSINFO("includeSceneContents_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeSceneContents READ isIncludeSceneContents WRITE setIncludeSceneContents NOTIFY includeSceneContentsChanged)
+    Q_PROPERTY(bool includeSceneContents READ isIncludeSceneContents WRITE setIncludeSceneContents
+                       NOTIFY includeSceneContentsChanged)
     void setIncludeSceneContents(bool val);
     bool isIncludeSceneContents() const { return m_includeSceneContents; }
     Q_SIGNAL void includeSceneContentsChanged();
@@ -69,6 +81,7 @@ private:
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
     bool m_includeSceneContents = true;
+    bool m_includeSceneFeaturedImage = false;
 };
 
 #endif // ABSTRACTTEXTDOCUMENTEXPORTER_H

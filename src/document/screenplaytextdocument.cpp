@@ -402,6 +402,17 @@ void ScreenplayTextDocument::setIncludeSceneSynopsis(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setIncludeSceneFeaturedImage(bool val)
+{
+    if (m_includeSceneFeaturedImage == val)
+        return;
+
+    m_includeSceneFeaturedImage = val;
+    emit includeSceneFeaturedImageChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
 {
     if (m_purpose == val)
@@ -2485,6 +2496,38 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 }
 
                 insertBlock = true;
+            }
+        }
+
+        if (m_includeSceneFeaturedImage) {
+            const Attachments *sceneAttachments = scene->attachments();
+            const Attachment *featuredAttachment =
+                    sceneAttachments ? sceneAttachments->featuredAttachment() : nullptr;
+            const Attachment *featuredImage =
+                    featuredAttachment && featuredAttachment->type() == Attachment::Photo
+                    ? featuredAttachment
+                    : nullptr;
+
+            if (featuredImage) {
+                const QUrl url(QStringLiteral("scrite://") + featuredImage->filePath());
+                const QImage image(featuredImage->fileSource().toLocalFile());
+
+                m_textDocument->addResource(QTextDocument::ImageResource, url,
+                                            QVariant::fromValue<QImage>(image));
+
+                const QSizeF imageSize = image.size().scaled(QSize(320, 240), Qt::KeepAspectRatio);
+
+                QTextBlockFormat blockFormat;
+                blockFormat.setTopMargin(10);
+                cursor.insertBlock(blockFormat);
+
+                insertBlock = true;
+
+                QTextImageFormat imageFormat;
+                imageFormat.setName(url.toString());
+                imageFormat.setWidth(imageSize.width());
+                imageFormat.setHeight(imageSize.height());
+                cursor.insertImage(imageFormat);
             }
         }
 
