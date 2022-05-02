@@ -1193,8 +1193,8 @@ bool Character::rename(const QString &name)
 
         {
             int nrReplacements = 0;
-            const QString newSummary =
-                    Application::replaceCharacterName(m_name, name, m_summary, &nrReplacements);
+            const QJsonObject newSummary = Application::replaceCharacterName(
+                    m_name, name, m_summary.toObject(), &nrReplacements);
             if (nrReplacements > 0) {
                 m_summary = newSummary;
                 emit summaryChanged();
@@ -1375,7 +1375,7 @@ void Character::setColor(const QColor &val)
     emit colorChanged();
 }
 
-void Character::setSummary(const QString &val)
+void Character::setSummary(const QJsonValue &val)
 {
     if (m_summary == val)
         return;

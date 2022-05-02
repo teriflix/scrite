@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Rich Text Editor Based On Quill - Scrite</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="language" content="english">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="quill/quill.snow.css" />
+    <style>
+    .standalone-container {
+        width: 100%
+    }
+    #snow-container {
+        height: 250px;
+        font-size: 12px;
+        font-family: "Rubik"
+    }
+    body {
+        overflow: hidden;
+    }
+    </style>
+</head>
+<body>
+    <div class="standalone-container">
+      <div id="toolbar-container">
+          <span class="ql-formats">
+            <select class="ql-font"></select>
+            <select class="ql-size"></select>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-bold"></button>
+            <button class="ql-italic"></button>
+            <button class="ql-underline"></button>
+            <button class="ql-strike"></button>
+          </span>
+          <span class="ql-formats">
+            <select class="ql-color"></select>
+            <select class="ql-background"></select>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-script" value="sub"></button>
+            <button class="ql-script" value="super"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-header" value="1"></button>
+            <button class="ql-header" value="2"></button>
+            <button class="ql-blockquote"></button>
+            <button class="ql-code-block"></button>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-list" value="ordered"></button>
+            <button class="ql-list" value="bullet"></button>
+            <button class="ql-indent" value="-1"></button>
+            <button class="ql-indent" value="+1"></button>
+          </span>
+          <span class="ql-formats">
+            <select class="ql-align"></select>
+          </span>
+          <span class="ql-formats">
+            <button class="ql-clean"></button>
+          </span>
+        </div>
+        <div id="snow-container"></div>
+    </div>
+    <script src="quill/quill.min.js"></script>
+    <script src="qwebchannel.js"></script>
+    <script>
+    var quill = new Quill('#snow-container', {
+        modules: {
+            toolbar: '#toolbar-container'
+        },
+        placeholder: 'Type something here...',
+        theme: 'snow'
+    });
+
+    var scrite = null    
+    window.onload = function() {
+        new QWebChannel(qt.webChannelTransport, function(channel) {
+            scrite = channel.objects.scrite;
+
+            quill.on('text-change', function(delta, oldDelta, source) {
+                if(source === "user") {
+                    const content = quill.getContents()
+                    scrite.contentUpdated(content)
+                }
+            })
+
+            scrite.requestPlaceholderText.connect( function(text) {
+                quill.root.dataset.placeholder = text
+            })
+
+            scrite.requestContentSize.connect( function(size) {
+                var container = document.getElementById("snow-container")
+                container.style.height = (size.height-42) + "px"
+            })
+
+            scrite.requestFont.connect( function(font) {
+                var container = document.getElementById("snow-container")
+                container.style.fontSize = font.size + "px"
+                container.style.fontFamily = font.family
+            })
+
+            scrite.requestContent.connect( function(content) {
+                scrite.log("Content type: " + typeof content)
+                if(typeof content === "object")
+                    quill.setContents(content)
+                else
+                    quill.setText(content)
+            })
+
+            scrite.requestReadOnly.connect( function(readOnly) {
+                quill.enable(!readOnly)
+            })
+
+            scrite.requestFocus.connect( function(focus) {
+                if(focus)
+                    quill.focus()
+            })
+
+            scrite.getInitialParameters( function(result) {
+                const toolbar = document.getElementById("toolbar-container")
+                var container = document.getElementById("snow-container")
+                container.style.height = (result.size.height-toolbar.offsetHeight) + "px"
+                container.style.fontSize = result.font.size + "px"
+                container.style.fontFamily = result.font.family
+
+                quill.root.dataset.placeholder = result.placeholderText
+                quill.enable(!result.readOnly)
+
+                const content = result.content
+                if(typeof content === "object")
+                    quill.setContents(content)
+                else
+                    quill.setText(content)
+            })
+        })
+    }
+    </script>
+</body>
+</html>

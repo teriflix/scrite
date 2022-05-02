@@ -2430,26 +2430,18 @@ Item {
                 anchors.rightMargin: 20
                 spacing: 20
 
-                ScrollView {
+                FlickableTextArea {
+                    id: groupsDataEdit
                     width: parent.width
                     height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
+                    font.family: "Courier Prime"
+                    font.pointSize: Scrite.app.idealFontPointSize
+                    text: Scrite.document.structure.groupsData
                     background: Rectangle {
                         color: primaryColors.c50.background
                         border.width: 1
                         border.color: primaryColors.borderColor
-                    }
-
-                    TextArea {
-                        id: groupsDataEdit
-                        text: Scrite.document.structure.groupsData
-                        font.family: "Courier Prime"
-                        font.pointSize: Scrite.app.idealFontPointSize
-                        background: Item { }
-                        leftPadding: 5
-                        rightPadding: 10
-                        selectByMouse: true
-                        selectByKeyboard: true
                     }
                 }
 
@@ -2485,26 +2477,18 @@ Item {
                 anchors.rightMargin: 20
                 spacing: 20
 
-                ScrollView {
+                FlickableTextArea {
+                    id: groupsDataEdit
                     width: parent.width
                     height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
+                    font.family: "Courier Prime"
+                    font.pointSize: Scrite.app.idealFontPointSize + 2
+                    text: Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
                     background: Rectangle {
                         color: accentColors.c50.background
                         border.width: 1
                         border.color: accentColors.borderColor
-                    }
-
-                    TextArea {
-                        id: groupsDataEdit
-                        text: Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
-                        font.family: "Courier Prime"
-                        font.pointSize: Scrite.app.idealFontPointSize
-                        background: Item { }
-                        leftPadding: 5
-                        rightPadding: 10
-                        selectByMouse: true
-                        selectByKeyboard: true
                     }
                 }
 

@@ -61,11 +61,12 @@ Item {
             }
         }
 
-        FlickableTextArea {
+        RichTextEdit {
             id: contentField
             text: note ? note.content : ""
             placeholderText: "Content"
             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+            readOnly: Scrite.document.readOnly
             anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height - titleField.height - parent.spacing
             tabSequenceManager: noteTabManager

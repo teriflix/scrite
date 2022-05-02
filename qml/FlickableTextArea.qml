@@ -30,6 +30,8 @@ Flickable {
     property alias placeholderText: __textArea.placeholderText
     property alias readOnly: __textArea.readOnly
     property alias background: __textArea.background
+    property bool enforceDefaultFont: true
+    property bool enforceHeadingFontSize: false
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
@@ -55,6 +57,8 @@ Flickable {
         Transliterator.hasActiveFocus: activeFocus
         Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
+        Transliterator.enforeDefaultFont: textAreaFlickable.enforceDefaultFont
+        Transliterator.enforceHeadingFontSize: textAreaFlickable.enforceHeadingFontSize
         readOnly: Scrite.document.readOnly
         KeyNavigation.tab: textAreaFlickable.tabItem
         KeyNavigation.backtab: textAreaFlickable.backTabItem

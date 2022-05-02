@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "form.h"
+#include "deltadocument.h"
 #include "characterreport.h"
 #include "transliteration.h"
 
@@ -204,8 +205,15 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 charFormat.setFontWeight(QFont::Normal);
                 cursor.insertBlock(blockFormat, charFormat);
 
-                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                        cursor, note->content().toString());
+                if (note->type() == Note::TextNoteType) {
+                    const QJsonValue noteContent = note->content();
+                    if (noteContent.isString())
+                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                                cursor, noteContent.toString());
+                    else
+                        DeltaDocument::blockingResolveAndInsertHtml(noteContent.toObject(), cursor);
+                }
+
                 // cursor.insertText(note->content().toString());
                 if (note->type() == Note::FormNoteType) {
                     Form *form = note->form();

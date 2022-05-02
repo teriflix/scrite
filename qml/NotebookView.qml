@@ -121,7 +121,7 @@ Rectangle {
 
     FontMetrics {
         id: fontMetrics
-        font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*0.75)
+        font.pointSize: Scrite.app.idealFontPointSize
     }
 
     Rectangle {
@@ -1335,9 +1335,14 @@ Rectangle {
                                         wrapMode: Text.WordWrap
                                         elide: Text.ElideRight
                                         font.pointSize: Scrite.app.idealFontPointSize-2
-                                        text: objectItem.type === Note.TextNoteType ? objectItem.content : objectItem.summary
+                                        text: objectItem.type === Note.TextNoteType ? deltaDoc.plainText : objectItem.summary
                                         color: headingText.color
                                         opacity: 0.75
+
+                                        DeltaDocument {
+                                            id: deltaDoc
+                                            content: objectItem.type === Note.TextNoteType ? objectItem.content : {}
+                                        }
                                     }
                                 }
                             }
@@ -2609,7 +2614,7 @@ Rectangle {
                                     target: character ? character.attachments : null
                                 }
 
-                                FlickableTextArea {
+                                RichTextEdit {
                                     id: characterSummaryField
                                     width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                                     height: parent.height

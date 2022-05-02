@@ -6,5 +6,10 @@
         <file>misc/structure_groups.lst</file>
         <file>misc/scrited_closing_frame_video.mp4</file>
         <file>misc/city-country-map.json.compressed</file>
+        <file alias="quill/quill.min.js">3rdparty/quill/quill.min.js</file>
+        <file alias="quill/quill.snow.css">3rdparty/quill/quill.snow.css</file>
+        <file alias="richtexteditor.html">misc/richtexteditor.html</file>
+        <file alias="qwebchannel.js">misc/qwebchannel.js</file>
+        <file alias="richtexttransform.html">misc/richtexttransform.html</file>
     </qresource>
 </RCC>

@@ -19,4 +19,5 @@ import QtQuick.Controls.Material 2.15
 ComboBox {
     Material.background: primaryColors.button.background
     Material.foreground: primaryColors.button.text
+    font.pointSize: Scrite.app.fontPointSize
 }

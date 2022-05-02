@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Rich Text Editor Based On Quill - txAttrs</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="language" content="english">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="quill/quill.snow.css" />
+    <style>
+    .standalone-container {
+        width: 100%
+    }
+    #snow-container {
+        height: 250px;
+        font-size: 12px;
+        font-family: "Rubik"
+    }
+    body {
+        overflow: hidden;
+    }
+    </style>
+</head>
+<body>
+    <div class="standalone-container">
+        <div id="snow-container"></div>
+    </div>
+    <script src="quill/quill.min.js"></script>
+    <script src="qwebchannel.js"></script>
+    <script>
+    var quill = new Quill('#snow-container', {
+        placeholder: 'Type something here...',
+        theme: 'snow'
+    });
+
+    window.onload = function() {
+        new QWebChannel(qt.webChannelTransport, function(channel) {
+            var tx = channel.objects.transform;
+
+            tx.getContent( function(content) {
+                if(typeof content === "object")
+                    quill.setContents(content)
+                else
+                    quill.setText(content)
+
+                const plainText = quill.getText()
+                const html = quill.root.innerHTML
+                tx.setTransformedTexts(plainText, html)
+                tx.quit()
+            })
+        })
+    }
+    </script>
+</body>
+</html>

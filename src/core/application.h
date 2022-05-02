@@ -302,6 +302,9 @@ public:
 
     static QString painterPathToString(const QPainterPath &val);
     static QPainterPath stringToPainterPath(const QString &val);
+    static QJsonObject replaceCharacterName(const QString &from, const QString &to,
+                                            const QJsonObject &delta,
+                                            int *nrReplacements = nullptr);
     static QString replaceCharacterName(const QString &from, const QString &to, const QString &in,
                                         int *nrReplacements = nullptr);
 

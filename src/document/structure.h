@@ -459,9 +459,9 @@ public:
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
-    Q_PROPERTY(QString summary READ summary WRITE setSummary NOTIFY summaryChanged)
-    void setSummary(const QString &val);
-    QString summary() const { return m_summary; }
+    Q_PROPERTY(QJsonValue summary READ summary WRITE setSummary NOTIFY summaryChanged)
+    void setSummary(const QJsonValue &val);
+    QJsonValue summary() const { return m_summary; }
     Q_SIGNAL void summaryChanged();
 
     Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
@@ -554,7 +554,7 @@ private:
     QString m_weight;
     QString m_height;
     QString m_gender;
-    QString m_summary;
+    QJsonValue m_summary;
     QString m_bodyType;
     int m_priority = 0;
     QStringList m_tags;

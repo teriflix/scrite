@@ -1,4 +1,4 @@
-QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport svg charts pdf
+QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport svg charts pdf webengine webenginewidgets
 DESTDIR = $$PWD/../Release/
 TARGET = Scrite
 
@@ -82,6 +82,7 @@ HEADERS += \
     src/quick/objects/announcement.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
+    src/quick/objects/deltadocument.h \
     src/quick/objects/filemanager.h \
     src/quick/objects/flickscrollspeedcontrol.h \
     src/quick/objects/itempositionmapper.h \
@@ -202,6 +203,7 @@ SOURCES += \
     src/quick/objects/announcement.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
+    src/quick/objects/deltadocument.cpp \
     src/quick/objects/filemanager.cpp \
     src/quick/objects/flickscrollspeedcontrol.cpp \
     src/quick/objects/itempositionmapper.cpp \

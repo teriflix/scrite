@@ -156,7 +156,7 @@ TextField {
         font.pointSize: 2*Scrite.app.idealFontPointSize/3
         anchors.left: parent.left
         anchors.verticalCenter: parent.top
-        anchors.verticalCenterOffset: parent.topPadding/2
+        anchors.verticalCenterOffset: -parent.topPadding/3
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""
     }
 

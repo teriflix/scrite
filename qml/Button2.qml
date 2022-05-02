@@ -23,6 +23,7 @@ Button {
     width: Math.max(textRect.width + 40, 120)
     height: Math.max(textRect.height + 20, 50)
     property rect textRect: Scrite.app.boundingRect(text, font)
+    font.pointSize: Scrite.app.fontPointSize
 
     Component {
         id: backgroundComponent

@@ -87,5 +87,6 @@
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/DocumentVault.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
+        <file>qml/RichTextEdit.qml</file>
     </qresource>
 </RCC>

@@ -184,6 +184,13 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     QtConcurrent::run(&Application::systemFontInfo);
 
     this->setWindowIcon(QIcon(QStringLiteral(":/images/appicon.png")));
+
+    m_customFontPointSize = [=]() -> int {
+        const QVariant val = m_settings->value(QLatin1String("Application/customFontPointSize"));
+        if (val.isValid() && !val.isNull() && val.canConvert(QMetaType::Int))
+            return val.toInt();
+        return 0;
+    }();
     this->computeIdealFontPointSize();
 
     const bool useSoftwareRenderer = [=]() -> bool {
@@ -273,12 +280,13 @@ QString Application::installationId() const
 
 QDateTime Application::installationTimestamp() const
 {
-    QString installTimestampStr = m_settings->value("Installation/timestamp").toString();
+    QString installTimestampStr =
+            m_settings->value(QLatin1String("Installation/timestamp")).toString();
     QDateTime installTimestamp = QDateTime::fromString(installTimestampStr);
     if (installTimestampStr.isEmpty() || !installTimestamp.isValid()) {
         installTimestamp = QDateTime::currentDateTime();
         installTimestampStr = installTimestamp.toString();
-        m_settings->setValue("Installation/timestamp", installTimestampStr);
+        m_settings->setValue(QLatin1String("Installation/timestamp"), installTimestampStr);
     }
 
     return installTimestamp;
@@ -295,6 +303,8 @@ void Application::setCustomFontPointSize(int val)
         return;
 
     m_customFontPointSize = val;
+    m_settings->setValue(QLatin1String("Application/customFontPointSize"), val);
+
     emit customFontPointSizeChanged();
 
     this->computeIdealFontPointSize();
@@ -1035,6 +1045,44 @@ QPainterPath Application::stringToPainterPath(const QString &val)
     QPainterPath path;
     ds >> path;
     return path;
+}
+
+QJsonObject Application::replaceCharacterName(const QString &from, const QString &to,
+                                              const QJsonObject &delta, int *nrReplacements)
+{
+    const QString opsAttr = QStringLiteral("ops");
+    const QString insertAttr = QStringLiteral("insert");
+
+    QJsonArray ops = delta.value(opsAttr).toArray();
+
+    int totalCount = 0;
+
+    for (int i = 0; i < ops.size(); i++) {
+        QJsonValueRef item = ops[i];
+        QJsonObject op = item.toObject();
+
+        QJsonValue insert = op.value(insertAttr);
+        if (insert.isString()) {
+            int count = 0;
+            insert = replaceCharacterName(from, to, insert.toString(), &count);
+            if (count > 0) {
+                totalCount += count;
+                op.insert(insertAttr, insert);
+                item = op;
+            }
+        }
+    }
+
+    if (totalCount > 0) {
+        if (nrReplacements)
+            *nrReplacements = totalCount;
+
+        QJsonObject ret = delta;
+        ret.insert(opsAttr, ops);
+        return ret;
+    }
+
+    return delta;
 }
 
 QString Application::replaceCharacterName(const QString &from, const QString &to, const QString &in,

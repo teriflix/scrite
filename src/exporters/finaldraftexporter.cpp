@@ -146,7 +146,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     const QStringList characters = structure->allCharacterNames();
     QDomElement charactersE = doc.createElement(QStringLiteral("Characters"));
     smartTypeE.appendChild(charactersE);
-    for (QString name : qAsConst(characters)) {
+    for (const QString &name : qAsConst(characters)) {
         QDomElement characterE = doc.createElement(QStringLiteral("Character"));
         charactersE.appendChild(characterE);
         characterE.appendChild(doc.createTextNode(name));
@@ -159,7 +159,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
     smartTypeE.appendChild(timesOfDayE);
     timesOfDayE.setAttribute(QStringLiteral("Separator"), QStringLiteral(" - "));
     std::sort(moments.begin(), moments.end());
-    for (QString moment : qAsConst(moments)) {
+    for (const QString &moment : qAsConst(moments)) {
         QDomElement timeOfDayE = doc.createElement(QStringLiteral("TimeOfDay"));
         timesOfDayE.appendChild(timeOfDayE);
         timeOfDayE.appendChild(doc.createTextNode(moment));

@@ -177,9 +177,23 @@ public:
     FontSyntaxHighlighter(QObject *parent = nullptr);
     ~FontSyntaxHighlighter();
 
+    Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY enforceDefaultFontChanged)
+    void setEnforceDefaultFont(bool val);
+    bool isEnforceDefaultFont() const { return m_enforceDefaultFont; }
+    Q_SIGNAL void enforceDefaultFontChanged();
+
+    Q_PROPERTY(bool enforceHeadingFontSize READ isEnforceHeadingFontSize WRITE setEnforceHeadingFontSize NOTIFY enforceHeadingFontSizeChanged)
+    void setEnforceHeadingFontSize(bool val);
+    bool isEnforceHeadingFontSize() const { return m_enforceHeadingFontSize; }
+    Q_SIGNAL void enforceHeadingFontSizeChanged();
+
 protected:
     // QSyntaxHighlighter interface
     void highlightBlock(const QString &text);
+
+private:
+    bool m_enforceDefaultFont = true;
+    bool m_enforceHeadingFontSize = false;
 };
 
 class Transliterator : public QObject
@@ -224,6 +238,16 @@ public:
     bool isApplyLanguageFonts() const { return m_applyLanguageFonts; }
     Q_SIGNAL void applyLanguageFontsChanged();
 
+    Q_PROPERTY(bool enforeDefaultFont READ isEnforeDefaultFont WRITE setEnforeDefaultFont NOTIFY enforeDefaultFontChanged)
+    void setEnforeDefaultFont(bool val);
+    bool isEnforeDefaultFont() const { return m_enforeDefaultFont; }
+    Q_SIGNAL void enforeDefaultFontChanged();
+
+    Q_PROPERTY(bool enforceHeadingFontSize READ isEnforceHeadingFontSize WRITE setEnforceHeadingFontSize NOTIFY enforceHeadingFontSizeChanged)
+    void setEnforceHeadingFontSize(bool val);
+    bool isEnforceHeadingFontSize() const { return m_enforceHeadingFontSize; }
+    Q_SIGNAL void enforceHeadingFontSizeChanged();
+
     Q_PROPERTY(bool transliterateCurrentWordOnly READ isTransliterateCurrentWordOnly WRITE setTransliterateCurrentWordOnly NOTIFY transliterateCurrentWordOnlyChanged)
     void setTransliterateCurrentWordOnly(bool val);
     bool isTransliterateCurrentWordOnly() const { return m_transliterateCurrentWordOnly; }
@@ -259,6 +283,8 @@ private:
 
 private:
     bool m_enabled = true;
+    bool m_enforeDefaultFont = true;
+    bool m_enforceHeadingFontSize = false;
     bool m_enableFromNextWord = false;
     Mode m_mode = AutomaticMode;
     int m_cursorPosition = -1;

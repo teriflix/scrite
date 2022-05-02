@@ -887,6 +887,7 @@ TransliterationEngine::evaluateBoundaries(const QString &text,
 void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
                                                             const QString &text) const
 {
+#if 0
     const int beginPosition = cursor.position();
     cursor.insertText(text);
     const int endPosition = cursor.position();
@@ -906,6 +907,17 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
     }
 
     cursor.setPosition(endPosition);
+#else
+    const QList<TransliterationEngine::Boundary> items = this->evaluateBoundaries(text);
+    for (const TransliterationEngine::Boundary &item : items) {
+        if (item.isEmpty())
+            continue;
+
+        QTextCharFormat format;
+        format.setFontFamily(item.font.family());
+        cursor.insertText(item.string, format);
+    }
+#endif
 }
 
 QChar::Script TransliterationEngine::determineScript(const QString &val)
@@ -961,15 +973,37 @@ FontSyntaxHighlighter::FontSyntaxHighlighter(QObject *parent) : QSyntaxHighlight
 
 FontSyntaxHighlighter::~FontSyntaxHighlighter() { }
 
+void FontSyntaxHighlighter::setEnforceDefaultFont(bool val)
+{
+    if (m_enforceDefaultFont == val)
+        return;
+
+    m_enforceDefaultFont = val;
+    emit enforceDefaultFontChanged();
+
+    this->rehighlight();
+}
+
+void FontSyntaxHighlighter::setEnforceHeadingFontSize(bool val)
+{
+    if (m_enforceHeadingFontSize == val)
+        return;
+
+    m_enforceHeadingFontSize = val;
+    emit enforceHeadingFontSizeChanged();
+}
+
 void FontSyntaxHighlighter::highlightBlock(const QString &text)
 {
-    const QTextDocument *doc = this->document();
-    const QFont defaultFont = doc->defaultFont();
-    const QTextBlock block = this->QSyntaxHighlighter::currentBlock();
+    if (m_enforceDefaultFont) {
+        const QTextDocument *doc = this->document();
+        const QFont defaultFont = doc->defaultFont();
+        const QTextBlock block = this->QSyntaxHighlighter::currentBlock();
 
-    QTextCharFormat defaultFormat;
-    defaultFormat.setFont(defaultFont);
-    this->setFormat(0, block.length(), defaultFormat);
+        QTextCharFormat defaultFormat;
+        defaultFormat.setFont(defaultFont);
+        this->setFormat(0, block.length(), defaultFormat);
+    }
 
     // Per-language fonts.
     const QList<TransliterationEngine::Boundary> boundaries =
@@ -982,6 +1016,21 @@ void FontSyntaxHighlighter::highlightBlock(const QString &text)
         QTextCharFormat format = this->QSyntaxHighlighter::format(boundary.start);
         format.setFontFamily(boundary.font.family());
         this->setFormat(boundary.start, boundary.end - boundary.start + 1, format);
+    }
+
+    if (m_enforceHeadingFontSize) {
+        const QTextBlock block = this->currentBlock();
+        const int headingLevel = block.blockFormat().headingLevel();
+
+        const QFont font = this->document()->defaultFont();
+        const int fontSize = headingLevel == 0 ? font.pointSize()
+                                               : font.pointSize() + qMax(0, 8 - 2 * headingLevel);
+        for (int i = 0; i < block.length(); i++) {
+            QTextCharFormat charFormat = this->format(i);
+            charFormat.setFontPointSize(fontSize);
+            charFormat.setFontWeight(headingLevel == 0 ? QFont::Normal : QFont::Bold);
+            this->setFormat(i, 1, charFormat);
+        }
     }
 }
 
@@ -1100,12 +1149,40 @@ void Transliterator::setApplyLanguageFonts(bool val)
         if (m_fontHighlighter.isNull())
             m_fontHighlighter = new FontSyntaxHighlighter(this);
         m_fontHighlighter->setDocument(this->document());
+        m_fontHighlighter->setEnforceDefaultFont(m_enforeDefaultFont);
+        m_fontHighlighter->setEnforceHeadingFontSize(m_enforceHeadingFontSize);
     } else {
         m_fontHighlighter->setDocument(nullptr);
         delete m_fontHighlighter;
     }
 
     emit applyLanguageFontsChanged();
+}
+
+void Transliterator::setEnforeDefaultFont(bool val)
+{
+    if (m_enforeDefaultFont == val)
+        return;
+
+    m_enforeDefaultFont = val;
+
+    if (!m_fontHighlighter.isNull())
+        m_fontHighlighter->setEnforceDefaultFont(val);
+
+    emit enforeDefaultFontChanged();
+}
+
+void Transliterator::setEnforceHeadingFontSize(bool val)
+{
+    if (m_enforceHeadingFontSize == val)
+        return;
+
+    m_enforceHeadingFontSize = val;
+
+    if (!m_fontHighlighter.isNull())
+        m_fontHighlighter->setEnforceHeadingFontSize(val);
+
+    emit enforceHeadingFontSizeChanged();
 }
 
 void Transliterator::setTransliterateCurrentWordOnly(bool val)
