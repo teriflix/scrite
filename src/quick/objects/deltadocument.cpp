@@ -30,7 +30,7 @@ DeltaDocument::DeltaDocument(QObject *parent) : QObject(parent) { }
 
 DeltaDocument::~DeltaDocument() { }
 
-void DeltaDocument::setContent(const QJsonObject &val)
+void DeltaDocument::setContent(const QJsonValue &val)
 {
     if (m_content == val)
         return;
@@ -61,6 +61,8 @@ void DeltaDocument::setPlainText(const QString &val)
 
 void DeltaDocument::transformNow()
 {
+    const QJsonObject contentObject = m_content.toObject();
+
 #if 0
     QFutureWatcher<QVariantList> *futureWatcher = new QFutureWatcher<QVariantList>(this);
     connect(futureWatcher, &QFutureWatcher<QVariantList>::finished, this, [=]() {
@@ -71,11 +73,11 @@ void DeltaDocument::transformNow()
         }
         futureWatcher->deleteLater();
     });
-    QFuture<QVariantList> future = QtConcurrent::run(&QuillDeltaTransform::transformProc, m_content,
+    QFuture<QVariantList> future = QtConcurrent::run(&QuillDeltaTransform::transformProc, contentObject,
                                                      ++m_modificationCounter);
     futureWatcher->setFuture(future);
 #else
-    DeltaDocument::asyncResolve(m_content, ++m_modificationCounter, this,
+    DeltaDocument::asyncResolve(contentObject, ++m_modificationCounter, this,
                                 [=](const ResolveResult &result) {
                                     if (result.callId == m_modificationCounter) {
                                         this->setPlainText(result.plainText);
@@ -87,14 +89,30 @@ void DeltaDocument::transformNow()
 
 void DeltaDocument::transformLater()
 {
-    if (m_content.isEmpty()) {
+    if (m_content.isString()) {
+        ++m_modificationCounter;
+
+        const QString text = m_content.toString();
+        const QStringList paras = text.split(QStringLiteral("\n"), Qt::KeepEmptyParts);
+        this->setPlainText(text);
+
+        QString html;
+        for (const QString &para : paras)
+            html += QStringLiteral("<p>") + para + QStringLiteral("</p>");
+        this->setHtml(html);
+        return;
+    }
+
+    const QJsonObject contentObject = m_content.toObject();
+    if (contentObject.isEmpty()) {
         ++m_modificationCounter;
         this->setPlainText(QString());
         this->setHtml(QString());
-    } else {
-        ExecLaterTimer::call(
-                "QuillDeltaTransform.transform", this, [=]() { this->transformNow(); }, 50);
+        return;
     }
+
+    ExecLaterTimer::call(
+            "QuillDeltaTransform.transform", this, [=]() { this->transformNow(); }, 50);
 }
 
 class TransformAttributes : public QObject
@@ -178,4 +196,4 @@ void DeltaDocument::blockingResolveAndInsertHtml(const QJsonObject &content, QTe
     }
 }
 
-#include "quilldeltatransform.moc"
+#include "deltadocument.moc"

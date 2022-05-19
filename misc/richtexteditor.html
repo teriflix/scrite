@@ -21,7 +21,7 @@
     }
     </style>
 </head>
-<body>
+<body id="rte">
     <div class="standalone-container">
       <div id="toolbar-container">
           <span class="ql-formats">
@@ -91,14 +91,19 @@
             })
 
             scrite.requestContentSize.connect( function(size) {
+                const toolbar = document.getElementById("toolbar-container")
                 var container = document.getElementById("snow-container")
-                container.style.height = (size.height-42) + "px"
+                container.style.height = (size.height-toolbar.offsetHeight-10) + "px"
             })
 
             scrite.requestFont.connect( function(font) {
                 var container = document.getElementById("snow-container")
-                container.style.fontSize = font.size + "px"
+                container.style.fontSize = font.size + "pt"
                 container.style.fontFamily = font.family
+
+                var body = document.getElementById("rte")
+                body.style.fontSize = font.size + "pt"
+                body.style.fontFamily = font.family
             })
 
             scrite.requestContent.connect( function(content) {
@@ -121,9 +126,13 @@
             scrite.getInitialParameters( function(result) {
                 const toolbar = document.getElementById("toolbar-container")
                 var container = document.getElementById("snow-container")
-                container.style.height = (result.size.height-toolbar.offsetHeight) + "px"
-                container.style.fontSize = result.font.size + "px"
+                container.style.height = (result.size.height-toolbar.offsetHeight-10) + "px"
+                container.style.fontSize = result.font.size + "pt"
                 container.style.fontFamily = result.font.family
+
+                var body = document.getElementById("rte")
+                body.style.fontSize = result.font.size + "pt"
+                body.style.fontFamily = result.font.family
 
                 quill.root.dataset.placeholder = result.placeholderText
                 quill.enable(!result.readOnly)

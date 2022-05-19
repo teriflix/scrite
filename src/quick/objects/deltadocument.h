@@ -28,9 +28,9 @@ public:
     DeltaDocument(QObject *parent = nullptr);
     ~DeltaDocument();
 
-    Q_PROPERTY(QJsonObject content READ content WRITE setContent NOTIFY contentChanged)
-    void setContent(const QJsonObject &val);
-    QJsonObject content() const { return m_content; }
+    Q_PROPERTY(QJsonValue content READ content WRITE setContent NOTIFY contentChanged)
+    void setContent(const QJsonValue &val);
+    QJsonValue content() const { return m_content; }
     Q_SIGNAL void contentChanged();
 
     Q_PROPERTY(QString plainText READ plainText NOTIFY plainTextChanged)
@@ -66,7 +66,7 @@ private:
 private:
     QString m_html;
     QString m_plainText;
-    QJsonObject m_content;
+    QJsonValue m_content;
     int m_modificationCounter = 0;
 };
 

@@ -63,7 +63,10 @@ Item {
         property font defaultFont
         property bool readOnly: false
 
-        Component.onCompleted: font.pointSize = Scrite.app.idealFontPointSize
+        Component.onCompleted: {
+            font.family = "Verdana"
+            font.pointSize = Qt.binding( () => { return Scrite.app.idealFontPointSize } )
+        }
 
         // internal private property only
         property bool contentUpdatedFromQuill: false
