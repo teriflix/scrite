@@ -917,7 +917,7 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
 
         QTextCharFormat format = defaultFormat;
         format.setFontFamily(item.font.family());
-        cursor.insertText(item.string);
+        cursor.insertText(item.string, format);
     }
 #endif
 }
