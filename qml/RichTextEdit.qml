@@ -104,6 +104,8 @@ Item {
 
         WebChannel.id: "scrite"
 
+        readonly property string fontSizeUint: Scrite.app.isMacOSPlatform ? "px" : "pt"
+
         function contentUpdated(content) {
             webEngineView.contentUpdatedFromQuill = true
             webEngineView.content = content
