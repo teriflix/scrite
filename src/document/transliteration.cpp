@@ -908,14 +908,16 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
 
     cursor.setPosition(endPosition);
 #else
+    const QTextCharFormat defaultFormat = cursor.charFormat();
+
     const QList<TransliterationEngine::Boundary> items = this->evaluateBoundaries(text);
     for (const TransliterationEngine::Boundary &item : items) {
         if (item.isEmpty())
             continue;
 
-        QTextCharFormat format;
+        QTextCharFormat format = defaultFormat;
         format.setFontFamily(item.font.family());
-        cursor.insertText(item.string, format);
+        cursor.insertText(item.string);
     }
 #endif
 }
