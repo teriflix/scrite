@@ -1907,8 +1907,8 @@ Item {
             id: formattingRulesPageView
             readonly property real labelWidth: 125
             property var pageData: pagesArray[currentIndex]
-            property SceneElementFormat displayElementFormat: Scrite.document.formatting.elementFormat(pageData.elementType)
             property SceneElementFormat printElementFormat: Scrite.document.printFormat.elementFormat(pageData.elementType)
+            property SceneElementFormat displayElementFormat: Scrite.document.formatting.elementFormat(pageData.elementType)
 
             pagesArray: [
                 { "elementName": "Heading", "elementType": SceneElement.Heading },
@@ -2311,7 +2311,7 @@ Item {
                             text: "Left"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignLeft
-                            onCheckedChanged: {
+                            onToggled: {
                                 if(checked) {
                                     displayElementFormat.textAlignment = Qt.AlignLeft
                                     printElementFormat.textAlignment = Qt.AlignLeft
@@ -2323,7 +2323,7 @@ Item {
                             text: "Center"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignHCenter
-                            onCheckedChanged: {
+                            onToggled: {
                                 if(checked) {
                                     displayElementFormat.textAlignment = Qt.AlignHCenter
                                     printElementFormat.textAlignment = Qt.AlignHCenter
@@ -2335,7 +2335,7 @@ Item {
                             text: "Right"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignRight
-                            onCheckedChanged: {
+                            onToggled: {
                                 if(checked) {
                                     displayElementFormat.textAlignment = Qt.AlignRight
                                     printElementFormat.textAlignment = Qt.AlignRight
@@ -2347,7 +2347,7 @@ Item {
                             text: "Justify"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignJustify
-                            onCheckedChanged: {
+                            onToggled: {
                                 if(checked) {
                                     displayElementFormat.textAlignment = Qt.AlignJustify
                                     printElementFormat.textAlignment = Qt.AlignJustify
