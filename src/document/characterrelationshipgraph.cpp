@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-#include "characterrelationshipsgraph.h"
+#include "characterrelationshipgraph.h"
 #include "characterrelationshipsgraphexporter.h"
 
 #include "hourglass.h"
@@ -32,14 +32,14 @@
 #include <QStandardPaths>
 #include <QtConcurrentRun>
 
-CharacterRelationshipsGraphNode::CharacterRelationshipsGraphNode(QObject *parent)
+CharacterRelationshipGraphNode::CharacterRelationshipGraphNode(QObject *parent)
     : QObject(parent), m_item(this, "item"), m_character(this, "character")
 {
 }
 
-CharacterRelationshipsGraphNode::~CharacterRelationshipsGraphNode() { }
+CharacterRelationshipGraphNode::~CharacterRelationshipGraphNode() { }
 
-void CharacterRelationshipsGraphNode::setMarked(bool val)
+void CharacterRelationshipGraphNode::setMarked(bool val)
 {
     if (m_marked == val)
         return;
@@ -48,29 +48,29 @@ void CharacterRelationshipsGraphNode::setMarked(bool val)
     emit markedChanged();
 }
 
-void CharacterRelationshipsGraphNode::setItem(QQuickItem *val)
+void CharacterRelationshipGraphNode::setItem(QQuickItem *val)
 {
     if (m_item == val)
         return;
 
     if (!m_item.isNull()) {
         disconnect(m_item, &QQuickItem::xChanged, this,
-                   &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+                   &CharacterRelationshipGraphNode::updateRectFromItemLater);
         disconnect(m_item, &QQuickItem::yChanged, this,
-                   &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+                   &CharacterRelationshipGraphNode::updateRectFromItemLater);
     }
 
     m_item = val;
 
     if (!m_item.isNull()) {
         connect(m_item, &QQuickItem::xChanged, this,
-                &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+                &CharacterRelationshipGraphNode::updateRectFromItemLater);
         connect(m_item, &QQuickItem::yChanged, this,
-                &CharacterRelationshipsGraphNode::updateRectFromItemLater);
+                &CharacterRelationshipGraphNode::updateRectFromItemLater);
 
         m_placedByUser = true;
-        CharacterRelationshipsGraph *graph =
-                qobject_cast<CharacterRelationshipsGraph *>(this->parent());
+        CharacterRelationshipGraph *graph =
+                qobject_cast<CharacterRelationshipGraph *>(this->parent());
         if (graph)
             graph->updateGraphJsonFromNode(this);
     }
@@ -78,14 +78,14 @@ void CharacterRelationshipsGraphNode::setItem(QQuickItem *val)
     emit itemChanged();
 }
 
-void CharacterRelationshipsGraphNode::move(const QPointF &pos)
+void CharacterRelationshipGraphNode::move(const QPointF &pos)
 {
     QRectF rect = m_rect;
     rect.moveCenter(pos);
     this->setRect(rect);
 }
 
-void CharacterRelationshipsGraphNode::setCharacter(Character *val)
+void CharacterRelationshipGraphNode::setCharacter(Character *val)
 {
     if (m_character == val)
         return;
@@ -94,7 +94,7 @@ void CharacterRelationshipsGraphNode::setCharacter(Character *val)
     emit characterChanged();
 }
 
-void CharacterRelationshipsGraphNode::resetCharacter()
+void CharacterRelationshipGraphNode::resetCharacter()
 {
     m_character = nullptr;
     emit characterChanged();
@@ -103,13 +103,13 @@ void CharacterRelationshipsGraphNode::resetCharacter()
     emit rectChanged();
 }
 
-void CharacterRelationshipsGraphNode::resetItem()
+void CharacterRelationshipGraphNode::resetItem()
 {
     m_item = nullptr;
     emit itemChanged();
 }
 
-void CharacterRelationshipsGraphNode::updateRectFromItem()
+void CharacterRelationshipGraphNode::updateRectFromItem()
 {
     if (m_item.isNull())
         return;
@@ -119,20 +119,20 @@ void CharacterRelationshipsGraphNode::updateRectFromItem()
         this->setRect(rect);
 
         if (m_placedByUser) {
-            CharacterRelationshipsGraph *graph =
-                    qobject_cast<CharacterRelationshipsGraph *>(this->parent());
+            CharacterRelationshipGraph *graph =
+                    qobject_cast<CharacterRelationshipGraph *>(this->parent());
             if (graph)
                 graph->updateGraphJsonFromNode(this);
         }
     }
 }
 
-void CharacterRelationshipsGraphNode::updateRectFromItemLater()
+void CharacterRelationshipGraphNode::updateRectFromItemLater()
 {
     m_updateRectTimer.start(0, this);
 }
 
-void CharacterRelationshipsGraphNode::setRect(const QRectF &val)
+void CharacterRelationshipGraphNode::setRect(const QRectF &val)
 {
     if (m_rect == val)
         return;
@@ -141,7 +141,7 @@ void CharacterRelationshipsGraphNode::setRect(const QRectF &val)
     emit rectChanged();
 }
 
-void CharacterRelationshipsGraphNode::timerEvent(QTimerEvent *te)
+void CharacterRelationshipGraphNode::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == m_updateRectTimer.timerId()) {
         m_updateRectTimer.stop();
@@ -152,29 +152,29 @@ void CharacterRelationshipsGraphNode::timerEvent(QTimerEvent *te)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CharacterRelationshipsGraphEdge::CharacterRelationshipsGraphEdge(
-        CharacterRelationshipsGraphNode *from, CharacterRelationshipsGraphNode *to, QObject *parent)
+CharacterRelationshipGraphEdge::CharacterRelationshipGraphEdge(
+        CharacterRelationshipGraphNode *from, CharacterRelationshipGraphNode *to, QObject *parent)
     : QObject(parent), m_relationship(this, "relationship")
 {
     m_fromNode = from;
     if (!m_fromNode.isNull())
-        connect(m_fromNode, &CharacterRelationshipsGraphNode::rectChanged, this,
-                &CharacterRelationshipsGraphEdge::evaluatePath);
+        connect(m_fromNode, &CharacterRelationshipGraphNode::rectChanged, this,
+                &CharacterRelationshipGraphEdge::evaluatePath);
 
     m_toNode = to;
     if (!m_toNode.isNull())
-        connect(m_toNode, &CharacterRelationshipsGraphNode::rectChanged, this,
-                &CharacterRelationshipsGraphEdge::evaluatePath);
+        connect(m_toNode, &CharacterRelationshipGraphNode::rectChanged, this,
+                &CharacterRelationshipGraphEdge::evaluatePath);
 }
 
-CharacterRelationshipsGraphEdge::~CharacterRelationshipsGraphEdge() { }
+CharacterRelationshipGraphEdge::~CharacterRelationshipGraphEdge() { }
 
-QString CharacterRelationshipsGraphEdge::pathString() const
+QString CharacterRelationshipGraphEdge::pathString() const
 {
     return Application::instance()->painterPathToString(m_path);
 }
 
-void CharacterRelationshipsGraphEdge::setEvaluatePathAllowed(bool val)
+void CharacterRelationshipGraphEdge::setEvaluatePathAllowed(bool val)
 {
     if (m_evaluatePathAllowed == val)
         return;
@@ -184,7 +184,7 @@ void CharacterRelationshipsGraphEdge::setEvaluatePathAllowed(bool val)
         this->evaluatePath();
 }
 
-void CharacterRelationshipsGraphEdge::evaluatePath()
+void CharacterRelationshipGraphEdge::evaluatePath()
 {
     if (!m_evaluatePathAllowed)
         return;
@@ -219,7 +219,7 @@ void CharacterRelationshipsGraphEdge::evaluatePath()
     }
 }
 
-void CharacterRelationshipsGraphEdge::setRelationship(Relationship *val)
+void CharacterRelationshipGraphEdge::setRelationship(Relationship *val)
 {
     if (m_relationship == val)
         return;
@@ -228,7 +228,7 @@ void CharacterRelationshipsGraphEdge::setRelationship(Relationship *val)
     emit relationshipChanged();
 }
 
-void CharacterRelationshipsGraphEdge::resetRelationship()
+void CharacterRelationshipGraphEdge::resetRelationship()
 {
     m_relationship = nullptr;
     emit relationshipChanged();
@@ -237,7 +237,7 @@ void CharacterRelationshipsGraphEdge::resetRelationship()
     emit pathChanged();
 }
 
-void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
+void CharacterRelationshipGraphEdge::setPath(const QPainterPath &val)
 {
     if (m_path == val)
         return;
@@ -255,7 +255,7 @@ void CharacterRelationshipsGraphEdge::setPath(const QPainterPath &val)
     emit pathChanged();
 }
 
-void CharacterRelationshipsGraphEdge::setForwardLabel(const QString &val)
+void CharacterRelationshipGraphEdge::setForwardLabel(const QString &val)
 {
     if (m_forwardLabel == val)
         return;
@@ -264,7 +264,7 @@ void CharacterRelationshipsGraphEdge::setForwardLabel(const QString &val)
     emit forwardLabelChanged();
 }
 
-void CharacterRelationshipsGraphEdge::setReverseLabel(const QString &val)
+void CharacterRelationshipGraphEdge::setReverseLabel(const QString &val)
 {
     if (m_reverseLabel == val)
         return;
@@ -275,34 +275,34 @@ void CharacterRelationshipsGraphEdge::setReverseLabel(const QString &val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CharacterRelationshipsGraph::CharacterRelationshipsGraph(QObject *parent)
+CharacterRelationshipGraph::CharacterRelationshipGraph(QObject *parent)
     : QObject(parent),
       m_scene(this, "scene"),
       m_character(this, "character"),
       m_structure(this, "structure")
 {
-    connect(this, &CharacterRelationshipsGraph::structureChanged, this,
-            &CharacterRelationshipsGraph::evaluateTitle);
-    connect(this, &CharacterRelationshipsGraph::sceneChanged, this,
-            &CharacterRelationshipsGraph::evaluateTitle);
-    connect(this, &CharacterRelationshipsGraph::characterChanged, this,
-            &CharacterRelationshipsGraph::evaluateTitle);
-    connect(this, &CharacterRelationshipsGraph::updated, this,
-            &CharacterRelationshipsGraph::emptyChanged);
+    connect(this, &CharacterRelationshipGraph::structureChanged, this,
+            &CharacterRelationshipGraph::evaluateTitle);
+    connect(this, &CharacterRelationshipGraph::sceneChanged, this,
+            &CharacterRelationshipGraph::evaluateTitle);
+    connect(this, &CharacterRelationshipGraph::characterChanged, this,
+            &CharacterRelationshipGraph::evaluateTitle);
+    connect(this, &CharacterRelationshipGraph::updated, this,
+            &CharacterRelationshipGraph::emptyChanged);
 }
 
-CharacterRelationshipsGraph::~CharacterRelationshipsGraph()
+CharacterRelationshipGraph::~CharacterRelationshipGraph()
 {
     if (m_loadTimer.isActive())
         this->load();
 }
 
-bool CharacterRelationshipsGraph::isEmpty() const
+bool CharacterRelationshipGraph::isEmpty() const
 {
     return m_nodes.isEmpty();
 }
 
-void CharacterRelationshipsGraph::setNodeSize(const QSizeF &val)
+void CharacterRelationshipGraph::setNodeSize(const QSizeF &val)
 {
     if (m_nodeSize == val)
         return;
@@ -313,53 +313,53 @@ void CharacterRelationshipsGraph::setNodeSize(const QSizeF &val)
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::setStructure(Structure *val)
+void CharacterRelationshipGraph::setStructure(Structure *val)
 {
     if (m_structure == val)
         return;
 
     if (!m_structure.isNull())
         disconnect(m_structure, &Structure::characterCountChanged, this,
-                   &CharacterRelationshipsGraph::markDirty);
+                   &CharacterRelationshipGraph::markDirty);
 
     m_structure = val;
     emit structureChanged();
 
     if (!m_structure.isNull())
         connect(m_structure, &Structure::characterCountChanged, this,
-                &CharacterRelationshipsGraph::markDirty);
+                &CharacterRelationshipGraph::markDirty);
 
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::setScene(Scene *val)
+void CharacterRelationshipGraph::setScene(Scene *val)
 {
     if (m_scene == val)
         return;
 
     if (!m_scene.isNull())
         disconnect(m_scene, &Scene::characterNamesChanged, this,
-                   &CharacterRelationshipsGraph::markDirty);
+                   &CharacterRelationshipGraph::markDirty);
 
     m_scene = val;
     emit sceneChanged();
 
     if (!m_scene.isNull())
         connect(m_scene, &Scene::characterNamesChanged, this,
-                &CharacterRelationshipsGraph::markDirty);
+                &CharacterRelationshipGraph::markDirty);
 
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::setCharacter(Character *val)
+void CharacterRelationshipGraph::setCharacter(Character *val)
 {
     if (m_character == val)
         return;
 
     if (!m_character.isNull()) {
         disconnect(m_character, &Character::relationshipCountChanged, this,
-                   &CharacterRelationshipsGraph::loadLater);
-        disconnect(m_character, &Character::nameChanged, this, &CharacterRelationshipsGraph::reset);
+                   &CharacterRelationshipGraph::loadLater);
+        disconnect(m_character, &Character::nameChanged, this, &CharacterRelationshipGraph::reset);
     }
 
     m_character = val;
@@ -367,14 +367,14 @@ void CharacterRelationshipsGraph::setCharacter(Character *val)
 
     if (!m_character.isNull()) {
         connect(m_character, &Character::relationshipCountChanged, this,
-                &CharacterRelationshipsGraph::loadLater);
-        connect(m_character, &Character::nameChanged, this, &CharacterRelationshipsGraph::reset);
+                &CharacterRelationshipGraph::loadLater);
+        connect(m_character, &Character::nameChanged, this, &CharacterRelationshipGraph::reset);
     }
 
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::setMaxTime(int val)
+void CharacterRelationshipGraph::setMaxTime(int val)
 {
     const int val2 = qBound(10, val, 5000);
     if (m_maxTime == val2)
@@ -384,7 +384,7 @@ void CharacterRelationshipsGraph::setMaxTime(int val)
     emit maxTimeChanged();
 }
 
-void CharacterRelationshipsGraph::setMaxIterations(int val)
+void CharacterRelationshipGraph::setMaxIterations(int val)
 {
     if (m_maxIterations == val)
         return;
@@ -393,7 +393,7 @@ void CharacterRelationshipsGraph::setMaxIterations(int val)
     emit maxIterationsChanged();
 }
 
-void CharacterRelationshipsGraph::setLeftMargin(qreal val)
+void CharacterRelationshipGraph::setLeftMargin(qreal val)
 {
     if (qFuzzyCompare(m_leftMargin, val))
         return;
@@ -404,7 +404,7 @@ void CharacterRelationshipsGraph::setLeftMargin(qreal val)
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::setTopMargin(qreal val)
+void CharacterRelationshipGraph::setTopMargin(qreal val)
 {
     if (qFuzzyCompare(m_topMargin, val))
         return;
@@ -415,7 +415,7 @@ void CharacterRelationshipsGraph::setTopMargin(qreal val)
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::setRightMargin(qreal val)
+void CharacterRelationshipGraph::setRightMargin(qreal val)
 {
     if (qFuzzyCompare(m_rightMargin, val))
         return;
@@ -426,7 +426,7 @@ void CharacterRelationshipsGraph::setRightMargin(qreal val)
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::setBottomMargin(qreal val)
+void CharacterRelationshipGraph::setBottomMargin(qreal val)
 {
     if (qFuzzyCompare(m_bottomMargin, val))
         return;
@@ -437,12 +437,12 @@ void CharacterRelationshipsGraph::setBottomMargin(qreal val)
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::reload()
+void CharacterRelationshipGraph::reload()
 {
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::reset()
+void CharacterRelationshipGraph::reset()
 {
     QObject *gjObject = this->graphJsonObject();
     if (gjObject != nullptr)
@@ -452,7 +452,7 @@ void CharacterRelationshipsGraph::reset()
     this->reload();
 }
 
-CharacterRelationshipsGraphExporter *CharacterRelationshipsGraph::createExporter()
+CharacterRelationshipsGraphExporter *CharacterRelationshipGraph::createExporter()
 {
     CharacterRelationshipsGraphExporter *exporter = new CharacterRelationshipsGraphExporter(this);
 
@@ -463,12 +463,12 @@ CharacterRelationshipsGraphExporter *CharacterRelationshipsGraph::createExporter
     return exporter;
 }
 
-QObject *CharacterRelationshipsGraph::createExporterObject()
+QObject *CharacterRelationshipGraph::createExporterObject()
 {
     return this->createExporter();
 }
 
-QObject *CharacterRelationshipsGraph::graphJsonObject() const
+QObject *CharacterRelationshipGraph::graphJsonObject() const
 {
     if (m_structure.isNull())
         return nullptr;
@@ -482,7 +482,7 @@ QObject *CharacterRelationshipsGraph::graphJsonObject() const
     return m_character;
 }
 
-void CharacterRelationshipsGraph::updateGraphJsonFromNode(CharacterRelationshipsGraphNode *node)
+void CharacterRelationshipGraph::updateGraphJsonFromNode(CharacterRelationshipGraphNode *node)
 {
     if (m_structure.isNull() || m_nodes.indexOf(node) < 0)
         return;
@@ -501,18 +501,18 @@ void CharacterRelationshipsGraph::updateGraphJsonFromNode(CharacterRelationships
                                          QVariant::fromValue<QJsonObject>(graphJson));
 }
 
-void CharacterRelationshipsGraph::classBegin()
+void CharacterRelationshipGraph::classBegin()
 {
     m_componentLoaded = false;
 }
 
-void CharacterRelationshipsGraph::componentComplete()
+void CharacterRelationshipGraph::componentComplete()
 {
     m_componentLoaded = true;
     this->loadLater();
 }
 
-void CharacterRelationshipsGraph::timerEvent(QTimerEvent *te)
+void CharacterRelationshipGraph::timerEvent(QTimerEvent *te)
 {
     if (te->timerId() == m_loadTimer.timerId()) {
         m_loadTimer.stop();
@@ -520,7 +520,7 @@ void CharacterRelationshipsGraph::timerEvent(QTimerEvent *te)
     }
 }
 
-void CharacterRelationshipsGraph::setGraphBoundingRect(const QRectF &val)
+void CharacterRelationshipGraph::setGraphBoundingRect(const QRectF &val)
 {
     if (m_graphBoundingRect == val)
         return;
@@ -531,46 +531,46 @@ void CharacterRelationshipsGraph::setGraphBoundingRect(const QRectF &val)
     emit graphBoundingRectChanged();
 }
 
-void CharacterRelationshipsGraph::resetStructure()
+void CharacterRelationshipGraph::resetStructure()
 {
     m_structure = nullptr;
     this->loadLater();
     emit structureChanged();
 }
 
-void CharacterRelationshipsGraph::resetScene()
+void CharacterRelationshipGraph::resetScene()
 {
     m_scene = nullptr;
     this->loadLater();
     emit sceneChanged();
 }
 
-void CharacterRelationshipsGraph::resetCharacter()
+void CharacterRelationshipGraph::resetCharacter()
 {
     m_character = nullptr;
     this->loadLater();
     emit characterChanged();
 }
 
-void CharacterRelationshipsGraph::load()
+void CharacterRelationshipGraph::load()
 {
     HourGlass hourGlass;
     this->setBusy(true);
 
-    QList<CharacterRelationshipsGraphEdge *> edges = m_edges.list();
+    QList<CharacterRelationshipGraphEdge *> edges = m_edges.list();
     m_edges.clear();
-    for (CharacterRelationshipsGraphEdge *edge : qAsConst(edges)) {
+    for (CharacterRelationshipGraphEdge *edge : qAsConst(edges)) {
         disconnect(edge->relationship(), &Relationship::aboutToDelete, this,
-                   &CharacterRelationshipsGraph::loadLater);
+                   &CharacterRelationshipGraph::loadLater);
         GarbageCollector::instance()->add(edge);
     }
     edges.clear();
 
-    QList<CharacterRelationshipsGraphNode *> nodes = m_nodes.list();
+    QList<CharacterRelationshipGraphNode *> nodes = m_nodes.list();
     m_nodes.clear();
-    for (CharacterRelationshipsGraphNode *node : qAsConst(nodes)) {
+    for (CharacterRelationshipGraphNode *node : qAsConst(nodes)) {
         disconnect(node->character(), &Character::aboutToDelete, this,
-                   &CharacterRelationshipsGraph::loadLater);
+                   &CharacterRelationshipGraph::loadLater);
         GarbageCollector::instance()->add(node);
     }
     nodes.clear();
@@ -595,7 +595,7 @@ void CharacterRelationshipsGraph::load()
     const QJsonObject previousGraphJson =
             this->graphJsonObject()->property("characterRelationshipGraph").value<QJsonObject>();
 
-    QHash<Character *, CharacterRelationshipsGraphNode *> nodeMap;
+    QHash<Character *, CharacterRelationshipGraphNode *> nodeMap;
 
     // Lets begin by create graph groups. Each group consists of nodes and edges
     // of characters related to each other.
@@ -633,7 +633,7 @@ void CharacterRelationshipsGraph::load()
                 continue;
         }
 
-        CharacterRelationshipsGraphNode *node = new CharacterRelationshipsGraphNode(this);
+        CharacterRelationshipGraphNode *node = new CharacterRelationshipGraphNode(this);
         node->setCharacter(character);
         node->setRect(QRectF(QPointF(0, 0), m_nodeSize));
         if (!m_scene.isNull())
@@ -652,8 +652,8 @@ void CharacterRelationshipsGraph::load()
         // in which this character has relationships. Otherwise, we create a new group.
         for (GraphLayout::Graph &graph : graphs) {
             for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
-                CharacterRelationshipsGraphNode *gnode =
-                        qobject_cast<CharacterRelationshipsGraphNode *>(agnode->containerObject());
+                CharacterRelationshipGraphNode *gnode =
+                        qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
                 if (character->isRelatedTo(gnode->character())) {
                     graph.nodes.append(node);
                     grouped = true;
@@ -683,8 +683,8 @@ void CharacterRelationshipsGraph::load()
         int col = 0;
         QPointF pos;
         for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
-            CharacterRelationshipsGraphNode *node =
-                    qobject_cast<CharacterRelationshipsGraphNode *>(agnode->containerObject());
+            CharacterRelationshipGraphNode *node =
+                    qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
             node->move(pos);
             ++col;
             if (col < nrCols)
@@ -702,8 +702,8 @@ void CharacterRelationshipsGraph::load()
     // constains lone character nodes) and bundle relationships.
     for (GraphLayout::Graph &graph : graphs) {
         for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
-            CharacterRelationshipsGraphNode *node1 =
-                    qobject_cast<CharacterRelationshipsGraphNode *>(agnode->containerObject());
+            CharacterRelationshipGraphNode *node1 =
+                    qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
             Character *character = node1->character();
 
             const QList<Relationship *> relationships = character->relationshipsModel()->list();
@@ -712,12 +712,12 @@ void CharacterRelationshipsGraph::load()
                     continue;
 
                 Character *with = relationship->with();
-                CharacterRelationshipsGraphNode *node2 = nodeMap.value(with);
+                CharacterRelationshipGraphNode *node2 = nodeMap.value(with);
                 if (node2 == nullptr)
                     continue;
 
-                CharacterRelationshipsGraphEdge *edge =
-                        new CharacterRelationshipsGraphEdge(node1, node2, this);
+                CharacterRelationshipGraphEdge *edge =
+                        new CharacterRelationshipGraphEdge(node1, node2, this);
                 edge->setRelationship(relationship);
                 edge->setForwardLabel(relationship->name());
                 const Relationship *reverseRelationship = with->findRelationship(character);
@@ -743,8 +743,8 @@ void CharacterRelationshipsGraph::load()
         if (i >= 1) {
             QString longestRelationshipName;
             for (GraphLayout::AbstractEdge *agedge : qAsConst(graph.edges)) {
-                CharacterRelationshipsGraphEdge *gedge =
-                        qobject_cast<CharacterRelationshipsGraphEdge *>(agedge->containerObject());
+                CharacterRelationshipGraphEdge *gedge =
+                        qobject_cast<CharacterRelationshipGraphEdge *>(agedge->containerObject());
                 longestRelationshipName =
                         longerText(gedge->forwardLabel(), longestRelationshipName);
                 longestRelationshipName =
@@ -763,8 +763,8 @@ void CharacterRelationshipsGraph::load()
         // Compute bounding rect of the nodes.
         QRectF graphRect;
         for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
-            CharacterRelationshipsGraphNode *gnode =
-                    qobject_cast<CharacterRelationshipsGraphNode *>(agnode->containerObject());
+            CharacterRelationshipGraphNode *gnode =
+                    qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
 
             const Character *character = gnode->character();
 
@@ -786,8 +786,8 @@ void CharacterRelationshipsGraph::load()
         // Move the nodes such that they are layed out in a row.
         const QPointF dp = -graphRect.topLeft() + boundingRect.topRight();
         for (GraphLayout::AbstractNode *agnode : qAsConst(graph.nodes)) {
-            CharacterRelationshipsGraphNode *gnode =
-                    qobject_cast<CharacterRelationshipsGraphNode *>(agnode->containerObject());
+            CharacterRelationshipGraphNode *gnode =
+                    qobject_cast<CharacterRelationshipGraphNode *>(agnode->containerObject());
             if (gnode->m_placedByUser)
                 continue;
 
@@ -802,13 +802,13 @@ void CharacterRelationshipsGraph::load()
             boundingRect.setRight(boundingRect.right() + 100);
     }
 
-    for (CharacterRelationshipsGraphNode *node : qAsConst(nodes))
+    for (CharacterRelationshipGraphNode *node : qAsConst(nodes))
         connect(node->character(), &Character::aboutToDelete, this,
-                &CharacterRelationshipsGraph::loadLater, Qt::UniqueConnection);
+                &CharacterRelationshipGraph::loadLater, Qt::UniqueConnection);
 
-    for (CharacterRelationshipsGraphEdge *edge : qAsConst(edges)) {
+    for (CharacterRelationshipGraphEdge *edge : qAsConst(edges)) {
         connect(edge->relationship(), &Relationship::aboutToDelete, this,
-                &CharacterRelationshipsGraph::loadLater, Qt::UniqueConnection);
+                &CharacterRelationshipGraph::loadLater, Qt::UniqueConnection);
         edge->setEvaluatePathAllowed(true);
     }
 
@@ -826,12 +826,12 @@ void CharacterRelationshipsGraph::load()
     emit updated();
 }
 
-void CharacterRelationshipsGraph::loadLater()
+void CharacterRelationshipGraph::loadLater()
 {
     m_loadTimer.start(0, this);
 }
 
-void CharacterRelationshipsGraph::evaluateTitle()
+void CharacterRelationshipGraph::evaluateTitle()
 {
     const QString defaultTitle = QStringLiteral("Character Relationship Graph");
 
@@ -852,7 +852,7 @@ void CharacterRelationshipsGraph::evaluateTitle()
     emit titleChanged();
 }
 
-void CharacterRelationshipsGraph::setDirty(bool val)
+void CharacterRelationshipGraph::setDirty(bool val)
 {
     if (m_dirty == val)
         return;
@@ -861,7 +861,7 @@ void CharacterRelationshipsGraph::setDirty(bool val)
     emit dirtyChanged();
 }
 
-void CharacterRelationshipsGraph::setBusy(bool val)
+void CharacterRelationshipGraph::setBusy(bool val)
 {
     if (m_busy == val)
         return;

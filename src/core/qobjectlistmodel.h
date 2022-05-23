@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef OBJECTLISTPROPERTYMODEL_H
-#define OBJECTLISTPROPERTYMODEL_H
+#ifndef QOBJECTLISTMODEL_H
+#define QOBJECTLISTMODEL_H
 
 #include <QSet>
 #include <QList>
@@ -22,13 +22,13 @@
 #include <QAbstractListModel>
 #include <QSortFilterProxyModel>
 
-class ObjectListPropertyModelBase : public QAbstractListModel
+class AbstractQObjectListModel : public QAbstractListModel
 {
     Q_OBJECT
 
 public:
-    ObjectListPropertyModelBase(QObject *parent = nullptr);
-    ~ObjectListPropertyModelBase() { }
+    AbstractQObjectListModel(QObject *parent = nullptr);
+    ~AbstractQObjectListModel() { }
 
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
     virtual int objectCount() const = 0;
@@ -48,11 +48,11 @@ public:
 };
 
 template<class T>
-class ObjectListPropertyModel : public ObjectListPropertyModelBase
+class QObjectListModel : public AbstractQObjectListModel
 {
 public:
-    ObjectListPropertyModel(QObject *parent = nullptr) : ObjectListPropertyModelBase(parent) { }
-    ~ObjectListPropertyModel() { }
+    QObjectListModel(QObject *parent = nullptr) : AbstractQObjectListModel(parent) { }
+    ~QObjectListModel() { }
 
     operator QList<T>() { return m_list; }
     QList<T> &list() { return m_list; }
@@ -327,4 +327,4 @@ inline QList<T> qobject_list_cast(const QList<QObject *> &list, bool deleteUncas
     return ret;
 }
 
-#endif // OBJECTLISTPROPERTYMODEL_H
+#endif // QOBJECTLISTMODEL_H

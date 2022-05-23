@@ -495,7 +495,7 @@ void NotebookModel::syncScenes()
 void NotebookModel::syncCharacters()
 {
     Structure *structure = m_document->structure();
-    ObjectListPropertyModel<Character *> *charactersModel = structure->charactersModel();
+    QObjectListModel<Character *> *charactersModel = structure->charactersModel();
 
     QList<QStandardItem *> characterItems =
             this->findItems(QStringLiteral("Characters"), Qt::MatchExactly, 0);
@@ -891,7 +891,7 @@ StoryNode *StoryNode::create(ScriteDocument *document)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-BookmarkedNotes::BookmarkedNotes(QObject *parent) : ObjectListPropertyModel<QObject *>(parent)
+BookmarkedNotes::BookmarkedNotes(QObject *parent) : QObjectListModel<QObject *>(parent)
 {
     this->reload();
 }

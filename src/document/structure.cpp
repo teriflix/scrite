@@ -438,7 +438,7 @@ void StructureElement::renameCharacter(const QString &from, const QString &to)
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementStack::StructureElementStack(QObject *parent)
-    : ObjectListPropertyModel<StructureElement *>(parent)
+    : QObjectListModel<StructureElement *>(parent)
 {
     StructureElementStacks *stacks = qobject_cast<StructureElementStacks *>(parent);
     if (stacks)
@@ -551,7 +551,7 @@ void StructureElementStack::timerEvent(QTimerEvent *te)
         m_initializeTimer.stop();
         this->initialize();
     } else
-        ObjectListPropertyModel<StructureElement *>::timerEvent(te);
+        QObjectListModel<StructureElement *>::timerEvent(te);
 }
 
 void StructureElementStack::itemInsertEvent(StructureElement *ptr)
@@ -832,7 +832,7 @@ void StructureElementStack::onStructureCurrentElementChanged()
 ///////////////////////////////////////////////////////////////////////////////
 
 StructureElementStacks::StructureElementStacks(QObject *parent)
-    : ObjectListPropertyModel<StructureElementStack *>(parent)
+    : QObjectListModel<StructureElementStack *>(parent)
 {
 }
 
@@ -2722,9 +2722,9 @@ void Structure::removeElement(StructureElement *ptr)
     disconnect(ptr, &StructureElement::sceneLocationChanged, this,
                &Structure::updateLocationHeadingMapLater);
     disconnect(ptr, &StructureElement::geometryChanged, &m_elements,
-               &ObjectListPropertyModel<StructureElement *>::objectChanged);
+               &QObjectListModel<StructureElement *>::objectChanged);
     disconnect(ptr, &StructureElement::aboutToDelete, &m_elements,
-               &ObjectListPropertyModel<StructureElement *>::objectDestroyed);
+               &QObjectListModel<StructureElement *>::objectDestroyed);
     disconnect(ptr, &StructureElement::stackIdChanged, &m_elementStacks,
                &StructureElementStacks::evaluateStacksLater);
     this->updateLocationHeadingMapLater();
@@ -2771,9 +2771,9 @@ void Structure::insertElement(StructureElement *ptr, int index)
     connect(ptr, &StructureElement::sceneLocationChanged, this,
             &Structure::updateLocationHeadingMapLater);
     connect(ptr, &StructureElement::geometryChanged, &m_elements,
-            &ObjectListPropertyModel<StructureElement *>::objectChanged);
+            &QObjectListModel<StructureElement *>::objectChanged);
     connect(ptr, &StructureElement::aboutToDelete, &m_elements,
-            &ObjectListPropertyModel<StructureElement *>::objectDestroyed);
+            &QObjectListModel<StructureElement *>::objectDestroyed);
     connect(ptr, &StructureElement::stackIdChanged, &m_elementStacks,
             &StructureElementStacks::evaluateStacksLater);
     this->updateLocationHeadingMapLater();
@@ -2822,9 +2822,9 @@ void Structure::setElements(const QList<StructureElement *> &list)
         connect(element, &StructureElement::sceneLocationChanged, this,
                 &Structure::updateLocationHeadingMapLater);
         connect(element, &StructureElement::geometryChanged, &m_elements,
-                &ObjectListPropertyModel<StructureElement *>::objectChanged);
+                &QObjectListModel<StructureElement *>::objectChanged);
         connect(element, &StructureElement::aboutToDelete, &m_elements,
-                &ObjectListPropertyModel<StructureElement *>::objectDestroyed);
+                &QObjectListModel<StructureElement *>::objectDestroyed);
         connect(element, &StructureElement::stackIdChanged, &m_elementStacks,
                 &StructureElementStacks::evaluateStacksLater);
         this->onStructureElementSceneChanged(element);
@@ -3606,9 +3606,9 @@ void Structure::addAnnotation(Annotation *ptr)
     connect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
     connect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
     connect(ptr, &Annotation::geometryChanged, &m_annotations,
-            &ObjectListPropertyModel<Annotation *>::objectChanged);
+            &QObjectListModel<Annotation *>::objectChanged);
     connect(ptr, &Annotation::aboutToDelete, &m_annotations,
-            &ObjectListPropertyModel<Annotation *>::objectDestroyed);
+            &QObjectListModel<Annotation *>::objectDestroyed);
 
     emit annotationCountChanged();
 }
@@ -3637,9 +3637,9 @@ void Structure::removeAnnotation(Annotation *ptr)
     disconnect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
     disconnect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
     disconnect(ptr, &Annotation::geometryChanged, &m_annotations,
-               &ObjectListPropertyModel<Annotation *>::objectChanged);
+               &QObjectListModel<Annotation *>::objectChanged);
     disconnect(ptr, &Annotation::aboutToDelete, &m_annotations,
-               &ObjectListPropertyModel<Annotation *>::objectDestroyed);
+               &QObjectListModel<Annotation *>::objectDestroyed);
 
     emit annotationCountChanged();
 
@@ -3714,9 +3714,9 @@ void Structure::setAnnotations(const QList<Annotation *> &list)
         connect(ptr, &Annotation::aboutToDelete, this, &Structure::removeAnnotation);
         connect(ptr, &Annotation::annotationChanged, this, &Structure::structureChanged);
         connect(ptr, &Annotation::geometryChanged, &m_annotations,
-                &ObjectListPropertyModel<Annotation *>::objectChanged);
+                &QObjectListModel<Annotation *>::objectChanged);
         connect(ptr, &Annotation::aboutToDelete, &m_annotations,
-                &ObjectListPropertyModel<Annotation *>::objectDestroyed);
+                &QObjectListModel<Annotation *>::objectDestroyed);
     }
 
     m_annotations.assign(list);
@@ -5272,8 +5272,8 @@ bool StructureCanvasViewportFilterModel::filterAcceptsRow(int source_row,
     if (!m_enabled || m_viewportRect.size().isEmpty())
         return true;
 
-    const ObjectListPropertyModelBase *model =
-            qobject_cast<ObjectListPropertyModelBase *>(this->sourceModel());
+    const AbstractQObjectListModel *model =
+            qobject_cast<AbstractQObjectListModel *>(this->sourceModel());
     if (model == nullptr)
         return true;
 
@@ -5327,9 +5327,9 @@ void StructureCanvasViewportFilterModel::updateSourceModel()
 void StructureCanvasViewportFilterModel::invalidateSelf()
 {
     m_visibleSourceRows.clear();
-    const ObjectListPropertyModelBase *model = m_computeStrategy == OnDemandComputeStrategy
+    const AbstractQObjectListModel *model = m_computeStrategy == OnDemandComputeStrategy
             ? nullptr
-            : qobject_cast<ObjectListPropertyModelBase *>(this->sourceModel());
+            : qobject_cast<AbstractQObjectListModel *>(this->sourceModel());
     if (model == nullptr || m_computeStrategy == OnDemandComputeStrategy) {
         this->invalidateFilter();
         return;

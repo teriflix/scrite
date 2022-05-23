@@ -20,7 +20,7 @@
 
 #include "errorreport.h"
 #include "qobjectserializer.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
 class Form;
 
@@ -145,7 +145,7 @@ public:
     Q_SIGNAL void moreInfoUrlChanged();
 
     Q_PROPERTY(QAbstractListModel* questionsModel READ questionsModel CONSTANT STORED false)
-    ObjectListPropertyModel<FormQuestion *> *questionsModel() const;
+    QObjectListModel<FormQuestion *> *questionsModel() const;
 
     Q_INVOKABLE FormQuestion *questionAt(int index) const;
 
@@ -186,10 +186,10 @@ private:
     Type m_type = GeneralForm;
     QJsonObject m_formDataTemplate;
 
-    ObjectListPropertyModel<FormQuestion *> m_questions;
+    QObjectListModel<FormQuestion *> m_questions;
 };
 
-class Forms : public ObjectListPropertyModel<Form *>, public QObjectSerializer::Interface
+class Forms : public QObjectListModel<Form *>, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)

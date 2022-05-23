@@ -16,7 +16,7 @@
 
 #include "abstractexporter.h"
 
-class CharacterRelationshipsGraph;
+class CharacterRelationshipGraph;
 
 class CharacterRelationshipsGraphExporter : public AbstractExporter
 {
@@ -28,8 +28,8 @@ public:
     CharacterRelationshipsGraphExporter(QObject *parent = nullptr);
     ~CharacterRelationshipsGraphExporter();
 
-    void setGraph(CharacterRelationshipsGraph *val);
-    CharacterRelationshipsGraph *graph() const { return m_graph; }
+    void setGraph(CharacterRelationshipGraph *val);
+    CharacterRelationshipGraph *graph() const { return m_graph; }
 
     virtual bool requiresConfiguration() const { return true; }
 
@@ -62,7 +62,7 @@ private:
     bool m_enableHeaderFooter = true;
     QString m_comment;
     QString m_watermark;
-    CharacterRelationshipsGraph *m_graph = nullptr;
+    CharacterRelationshipGraph *m_graph = nullptr;
 };
 
 #endif // CHARACTERRELATIONSHIPSGRAPHEXPORTER_H

@@ -130,7 +130,7 @@ private:
 };
 
 class RemoveNoteUndoCommand;
-class Notes : public ObjectListPropertyModel<Note *>, public QObjectSerializer::Interface
+class Notes : public QObjectListModel<Note *>, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
