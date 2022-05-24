@@ -3097,7 +3097,7 @@ Rectangle {
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: 16
+                    font.pixelSize: Scrite.app.idealFontPointSize
                     text: "Scene headings will be listed here as you add them into your screenplay."
                     anchors.horizontalCenter: sceneListView.horizontalCenter
                     anchors.top: parent.top
