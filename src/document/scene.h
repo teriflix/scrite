@@ -36,7 +36,7 @@
 #include "qobjectserializer.h"
 #include "spellcheckservice.h"
 #include "genericarraymodel.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
 class Scene;
 class SceneHeading;

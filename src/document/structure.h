@@ -21,7 +21,7 @@
 #include "modelaggregator.h"
 #include "qobjectproperty.h"
 #include "abstractshapeitem.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
 #include <QColor>
 #include <QPointer>
@@ -187,7 +187,7 @@ private:
     QObjectProperty<QQuickItem> m_follow;
 };
 
-class StructureElementStack : public ObjectListPropertyModel<StructureElement *>
+class StructureElementStack : public QObjectListModel<StructureElement *>
 {
     Q_OBJECT
     QML_ELEMENT
@@ -266,7 +266,7 @@ private:
     StructureElement *m_topmostElement = nullptr;
 };
 
-class StructureElementStacks : public ObjectListPropertyModel<StructureElementStack *>
+class StructureElementStacks : public QObjectListModel<StructureElementStack *>
 {
     Q_OBJECT
     QML_ELEMENT
@@ -304,6 +304,7 @@ class Relationship : public QObject, public QObjectSerializer::Interface
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
     QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_INVOKABLE Relationship(QObject *parent = nullptr);
@@ -324,10 +325,10 @@ public:
     QString name() const { return m_name; }
     Q_SIGNAL void nameChanged();
 
-    Q_PROPERTY(Character *withCharacter READ with WRITE setWith NOTIFY withChanged RESET resetWith
-                       STORED false)
-    Q_PROPERTY(
-            Character *with READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
+    // clang-format off
+    Q_PROPERTY(Character *withCharacter READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
+    Q_PROPERTY(Character *with READ with WRITE setWith NOTIFY withChanged RESET resetWith STORED false)
+    // clang-format on
     void setWith(Character *val);
     Character *with() const { return m_with; }
     Q_SIGNAL void withChanged();
@@ -482,7 +483,7 @@ public:
     Q_SIGNAL void priorityChanged();
 
     Q_PROPERTY(QAbstractListModel *relationshipsModel READ relationshipsModel CONSTANT STORED false)
-    ObjectListPropertyModel<Relationship *> *relationshipsModel() const
+    QObjectListModel<Relationship *> *relationshipsModel() const
     {
         return &((const_cast<Character *>(this))->m_relationships);
     }
@@ -567,7 +568,7 @@ private:
     Notes *m_notes = new Notes(this);
     QJsonObject m_characterRelationshipGraph;
     Attachments *m_attachments = new Attachments(this);
-    ObjectListPropertyModel<Relationship *> m_relationships;
+    QObjectListModel<Relationship *> m_relationships;
 };
 
 class CharacterNamesModel : public QStringListModel
@@ -778,7 +779,7 @@ public:
     ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
     Q_PROPERTY(QAbstractListModel *charactersModel READ charactersModel CONSTANT STORED false)
-    ObjectListPropertyModel<Character *> *charactersModel() const
+    QObjectListModel<Character *> *charactersModel() const
     {
         return &((const_cast<Structure *>(this))->m_characters);
     }
@@ -807,7 +808,7 @@ public:
     Notes *notes() const { return m_notes; }
 
     Q_PROPERTY(QAbstractListModel *elementsModel READ elementsModel CONSTANT STORED false)
-    ObjectListPropertyModel<StructureElement *> *elementsModel() const
+    QObjectListModel<StructureElement *> *elementsModel() const
     {
         return &((const_cast<Structure *>(this))->m_elements);
     }
@@ -1019,7 +1020,7 @@ private:
     static void staticClearCharacters(QQmlListProperty<Character> *list);
     static Character *staticCharacterAt(QQmlListProperty<Character> *list, int index);
     static int staticCharacterCount(QQmlListProperty<Character> *list);
-    ObjectListPropertyModel<Character *> m_characters;
+    QObjectListModel<Character *> m_characters;
 
     Notes *m_notes = new Notes(this);
 
@@ -1029,7 +1030,7 @@ private:
     static void staticClearElements(QQmlListProperty<StructureElement> *list);
     static StructureElement *staticElementAt(QQmlListProperty<StructureElement> *list, int index);
     static int staticElementCount(QQmlListProperty<StructureElement> *list);
-    ObjectListPropertyModel<StructureElement *> m_elements;
+    QObjectListModel<StructureElement *> m_elements;
     ModelAggregator m_elementsBoundingBoxAggregator;
     StructureElementStacks m_elementStacks;
     int m_currentElementIndex = -1;
@@ -1058,7 +1059,7 @@ private:
     static void staticClearAnnotations(QQmlListProperty<Annotation> *list);
     static Annotation *staticAnnotationAt(QQmlListProperty<Annotation> *list, int index);
     static int staticAnnotationCount(QQmlListProperty<Annotation> *list);
-    ObjectListPropertyModel<Annotation *> m_annotations;
+    QObjectListModel<Annotation *> m_annotations;
     ModelAggregator m_annotationsBoundingBoxAggregator;
     bool m_canPaste = false;
 

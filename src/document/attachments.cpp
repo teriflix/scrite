@@ -264,7 +264,7 @@ void Attachment::setType(Type val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Attachments::Attachments(QObject *parent) : ObjectListPropertyModel<Attachment *>(parent)
+Attachments::Attachments(QObject *parent) : QObjectListModel<Attachment *>(parent)
 {
     connect(this, &Attachments::rowsMoved, this, &Attachments::attachmentsModified);
     connect(this, &Attachments::dataChanged, this, &Attachments::attachmentsModified);

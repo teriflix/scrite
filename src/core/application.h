@@ -31,7 +31,7 @@
 #include "errorreport.h"
 #include "transliteration.h"
 #include "systemtextinputmanager.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
 typedef QApplication QtApplicationClass;
 
@@ -321,7 +321,7 @@ signals:
 
 public:
     Q_PROPERTY(QAbstractListModel* objectReigstry READ objectRegistry CONSTANT STORED false)
-    ObjectListPropertyModel<QObject *> *objectRegistry() const
+    QObjectListModel<QObject *> *objectRegistry() const
     {
         return &(const_cast<Application *>(this)->m_objectRegistry);
     }
@@ -347,7 +347,7 @@ private:
     ErrorReport *m_errorReport = new ErrorReport(this);
     QVersionNumber m_versionNumber;
     QVariantList m_standardColors;
-    ObjectListPropertyModel<QObject *> m_objectRegistry;
+    QObjectListModel<QObject *> m_objectRegistry;
     QNetworkConfigurationManager *m_networkConfiguration = nullptr;
 };
 

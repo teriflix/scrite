@@ -55,14 +55,14 @@ HEADERS += \
     src/automation/windowcapture.h \
     src/core/appwindow.h \
     src/core/filelocker.h \
-    src/core/objectlistpropertymodel.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/printerobject.h \
+    src/core/qobjectlistmodel.h \
     src/core/qobjectproperty.h \
     src/core/scrite.h \
     src/core/systemtextinputmanager.h \
     src/document/attachments.h \
-    src/document/characterrelationshipsgraph.h \
+    src/document/characterrelationshipgraph.h \
     src/document/form.h \
     src/document/notebookmodel.h \
     src/document/notes.h \
@@ -177,13 +177,13 @@ SOURCES += \
     src/core/application_build_timestamp.cpp \
     src/core/appwindow.cpp \
     src/core/filelocker.cpp \
-    src/core/objectlistpropertymodel.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
+    src/core/qobjectlistmodel.cpp \
     src/core/qobjectproperty.cpp \
     src/core/scrite.cpp \
     src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
-    src/document/characterrelationshipsgraph.cpp \
+    src/document/characterrelationshipgraph.cpp \
     src/document/form.cpp \
     src/document/notebookmodel.cpp \
     src/document/notes.cpp \

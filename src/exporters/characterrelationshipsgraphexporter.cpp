@@ -14,19 +14,19 @@
 #include "characterrelationshipsgraphexporter.h"
 #include "characterrelationshipsgraphexporter_p.h"
 
-#include "characterrelationshipsgraph.h"
+#include "characterrelationshipgraph.h"
 
 #include <QStandardPaths>
 
 CharacterRelationshipsGraphExporter::CharacterRelationshipsGraphExporter(QObject *parent)
     : AbstractExporter(parent)
 {
-    this->setGraph(qobject_cast<CharacterRelationshipsGraph *>(this));
+    this->setGraph(qobject_cast<CharacterRelationshipGraph *>(this));
 }
 
 CharacterRelationshipsGraphExporter::~CharacterRelationshipsGraphExporter() { }
 
-void CharacterRelationshipsGraphExporter::setGraph(CharacterRelationshipsGraph *val)
+void CharacterRelationshipsGraphExporter::setGraph(CharacterRelationshipGraph *val)
 {
     if (m_graph == val)
         return;

@@ -16,7 +16,7 @@
 
 #include "qobjectproperty.h"
 #include "qobjectserializer.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
 #include <QFileInfo>
 #include <QMimeType>
@@ -112,7 +112,7 @@ private:
     bool m_removeFileOnDelete = false;
 };
 
-class Attachments : public ObjectListPropertyModel<Attachment *>,
+class Attachments : public QObjectListModel<Attachment *>,
                     public QObjectSerializer::Interface
 {
     Q_OBJECT

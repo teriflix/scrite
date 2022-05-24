@@ -18,10 +18,10 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 Rectangle {
-    property alias scene: crgraph.scene
-    property alias character: crgraph.character
-    property alias structure: crgraph.structure
-    property alias graphIsEmpty: crgraph.empty
+    property alias scene: crGraph.scene
+    property alias character: crGraph.character
+    property alias structure: crGraph.structure
+    property alias graphIsEmpty: crGraph.empty
     property bool editRelationshipsEnabled: false
     property bool showBusyIndicator: false
 
@@ -33,17 +33,17 @@ Rectangle {
     border.width: 1
     border.color: primaryColors.borderColor
 
-    function resetGraph() { crgraph.reset() }
+    function resetGraph() { crGraph.reset() }
     function exportToPdf(popupSource) {
         modalDialog.closeable = false
-        modalDialog.arguments = crgraph.createExporterObject()
+        modalDialog.arguments = crGraph.createExporterObject()
         modalDialog.sourceComponent = exporterConfigurationComponent
         modalDialog.popupSource = popupSource
         modalDialog.active = true
     }
 
-    CharacterRelationshipsGraph {
-        id: crgraph
+    CharacterRelationshipGraph {
+        id: crGraph
         structure: Scrite.document.loading ? null : Scrite.document.structure
         nodeSize: Qt.size(150,150)
         maxTime: notebookSettings.graphLayoutMaxTime
@@ -51,7 +51,7 @@ Rectangle {
         leftMargin: 1000
         topMargin: 1000
         onUpdated: {
-            Scrite.app.execLater(crgraph, 250, function() {
+            Scrite.app.execLater(crGraph, 250, function() {
                 canvasScroll.animatePanAndZoom = false
                 canvas.zoomFit()
                 canvasScroll.animatePanAndZoom = true
@@ -114,7 +114,7 @@ Rectangle {
 
             MouseArea {
                 anchors.fill: parent
-                enabled: canvas.selectedNodeItem || crgraph.dirty
+                enabled: canvas.selectedNodeItem || crGraph.dirty
                 onClicked: {
                     canvas.selectedNodeItem = null;
                     canvas.reloadIfDirty();
@@ -127,12 +127,12 @@ Rectangle {
 
             Rectangle {
                 id: nodeItemsBox
-                x: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.x - 50) : 0
-                y: crgraph.nodes.objectCount > 0 ? nodeItemsBoxEvaluator.boundingBox.y - 50 : 0
-                width: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.width + 100) : Math.floor(Math.min(canvasScroll.width,canvasScroll.height)/100)*100
-                height: crgraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.height + 100) : width
+                x: crGraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.x - 50) : 0
+                y: crGraph.nodes.objectCount > 0 ? nodeItemsBoxEvaluator.boundingBox.y - 50 : 0
+                width: crGraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.width + 100) : Math.floor(Math.min(canvasScroll.width,canvasScroll.height)/100)*100
+                height: crGraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.height + 100) : width
                 color: Qt.rgba(0,0,0,0)
-                border.width: crgraph.nodes.objectCount > 0 ? 1 : 0
+                border.width: crGraph.nodes.objectCount > 0 ? 1 : 0
                 border.color: primaryColors.borderColor
                 radius: 6
             }
@@ -142,8 +142,8 @@ Rectangle {
             }
 
             function reloadIfDirty() {
-                if(crgraph.dirty)
-                    crgraph.reload()
+                if(crGraph.dirty)
+                    crGraph.reload()
             }
 
             function zoomFit() {
@@ -162,66 +162,12 @@ Rectangle {
 
             Item {
                 id: edgeItems
-                z: 1
+                z: removeRelationshipConfirmation.active ? 0 : 1
 
                 Repeater {
                     id: edgeItemsRepeater
-                    model: crgraph.edges
-
-                    PainterPathItem {
-                        outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * tructureCanvasSettings.connectorLineWidth
-                        outlineColor: primaryColors.c700.background
-                        renderType: PainterPathItem.OutlineOnly
-                        renderingMechanism: PainterPathItem.UseOpenGL
-                        opacity: {
-                            if(canvas.activeCharacter)
-                                return (modelData.relationship.of === canvas.activeCharacter || modelData.relationship.withCharacter === canvas.activeCharacter) ? 1 : 0.2
-                            return 1
-                        }
-                        z: opacity
-                        Behavior on opacity {
-                            enabled: applicationSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
-                        }
-
-                        property string pathString: modelData.pathString
-                        onPathStringChanged: setPathFromString(pathString)
-
-                        Rectangle {
-                            x: modelData.labelPosition.x - width/2
-                            y: modelData.labelPosition.y - height/2
-                            rotation: modelData.labelAngle
-                            width: nameLabel.width + 10
-                            height: nameLabel.height + 4
-                            color: nameLabelMouseArea.containsMouse ? accentColors.c700.background : primaryColors.c700.background
-
-                            Text {
-                                id: nameLabel
-                                text: modelData.relationship.name
-                                font.pointSize: Math.floor(Scrite.app.idealFontPointSize*0.75)
-                                anchors.centerIn: parent
-                                color: nameLabelMouseArea.containsMouse ? accentColors.c700.text : primaryColors.c700.text
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-
-                            MouseArea {
-                                id: nameLabelMouseArea
-                                hoverEnabled: enabled
-                                anchors.fill: parent
-                                enabled: !Scrite.document.readOnly
-                                cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
-                                onClicked: {
-                                    modalDialog.closeable = false
-                                    modalDialog.popupSource = parent
-                                    modalDialog.initItemCallback = function(item) {
-                                        item.relationship = modelData.relationship
-                                    }
-                                    modalDialog.sourceComponent = relationshipNameEditorDialog
-                                    modalDialog.active = true
-                                }
-                            }
-                        }
-                    }
+                    model: crGraph.edges
+                    delegate: crGraphEdgeDelegate
                 }
             }
 
@@ -259,11 +205,11 @@ Rectangle {
 
                             ToolButton3 {
                                 id: floatingRefreshButton
-                                onClicked: crgraph.reset()
+                                onClicked: crGraph.reset()
                                 iconSource: "../icons/navigation/refresh.png"
                                 autoRepeat: true
                                 ToolTip.text: "Refresh"
-                                visible: !Scrite.document.readOnly && (crgraph.character ? crgraph.character === canvas.activeCharacter : true)
+                                visible: !Scrite.document.readOnly && (crGraph.character ? crGraph.character === canvas.activeCharacter : true)
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
@@ -275,7 +221,7 @@ Rectangle {
                                 autoRepeat: false
                                 ToolTip.text: "Add A New Relationship"
                                 enabled: visible
-                                visible: crgraph.character && (crgraph.character && crgraph.character === canvas.activeCharacter) && editRelationshipsEnabled && !Scrite.document.readOnly
+                                visible: crGraph.character && (crGraph.character && crGraph.character === canvas.activeCharacter) && editRelationshipsEnabled && !Scrite.document.readOnly
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
@@ -287,7 +233,7 @@ Rectangle {
                                 autoRepeat: false
                                 ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
                                 enabled: visible
-                                visible: crgraph.character && canvas.activeCharacter !== crgraph.character && canvas.activeCharacter && editRelationshipsEnabled && !Scrite.document.readOnly
+                                visible: crGraph.character && canvas.activeCharacter !== crGraph.character && canvas.activeCharacter && editRelationshipsEnabled && !Scrite.document.readOnly
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height
                             }
@@ -297,111 +243,8 @@ Rectangle {
 
                 Repeater {
                     id: nodeItemsRepeater
-                    model: crgraph.nodes
-
-                    Rectangle {
-                        id: nodeItem
-                        property Character character: modelData.character
-                        x: modelData.rect.x
-                        y: modelData.rect.y
-                        width: modelData.rect.width
-                        height: modelData.rect.height
-                        color: character.photos.length === 0 ? Qt.tint(character.color, "#C0FFFFFF") : Qt.rgba(0,0,0,0)
-                        Component.onCompleted: {
-                            modelData.item = nodeItem
-                            if(crgraph.character === modelData.character)
-                                canvas.mainCharacterNodeItem = nodeItem
-                        }
-
-                        BoundingBoxItem.evaluator: nodeItemsBoxEvaluator
-
-                        Rectangle {
-                            visible: character.photos.length > 0
-                            anchors.fill: parent
-                            radius: Math.min(width,height)*0.0375
-                            anchors.margins: -Math.min(width,height)*0.075
-                            color: Scrite.app.translucent(character.color, 0.15)
-                            border.width: 1
-                            border.color: Scrite.app.translucent(character.color, 0.5)
-                        }
-
-                        Image {
-                            anchors.fill: parent
-                            source: {
-                                if(character.photos.length > 0)
-                                    return "file:///" + character.photos[0]
-                                return "../icons/content/character_icon.png"
-                            }
-                            fillMode: Image.PreserveAspectCrop
-                            mipmap: true; smooth: true
-                            z: character === canvas.activeCharacter ? 1 : 0
-
-                            Rectangle {
-                                anchors.fill: infoLabel
-                                anchors.margins: -4
-                                radius: 4
-                                color: modelData.marked ? accentColors.a700.background : Qt.tint(character.color, "#C0FFFFFF")
-                                opacity: character.photos.length === 0 ? 1 : 0.8
-                                border.width: 1
-                                border.color: modelData.marked ? accentColors.a700.text : "black"
-                            }
-
-                            Text {
-                                id: infoLabel
-                                width: parent.width - 30
-                                anchors.bottom: parent.bottom
-                                anchors.horizontalCenter: parent.horizontalCenter
-                                anchors.bottomMargin: 15
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pixelSize: 10
-                                maximumLineCount: 3
-                                color: modelData.marked ? accentColors.a700.text : "black"
-                                text: {
-                                    var fields = []
-                                    fields.push("<b>" + character.name + "</b>");
-                                    if(character.designation !== "")
-                                        fields.push("<i>" + character.designation + "</i>")
-                                    return fields.join("<br/>")
-                                }
-                            }
-
-                            Rectangle {
-                                anchors.fill: parent
-                                border.width: character === canvas.activeCharacter ? 3 : 1
-                                border.color: character === canvas.activeCharacter ? "black" : primaryColors.borderColor
-                                color: Qt.rgba(1,1,1,alpha)
-                                property real alpha: {
-                                    if(canvas.activeCharacter === null || character === canvas.activeCharacter)
-                                        return 0
-                                    return character.isDirectlyRelatedTo(canvas.activeCharacter) ? 0 : 0.75
-                                }
-                                Behavior on alpha {
-                                    enabled: applicationSettings.enableAnimations
-                                    NumberAnimation { duration: 250 }
-                                }
-                            }
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            drag.target: !Scrite.document.readOnly ? parent : null
-                            drag.axis: Drag.XAndYAxis
-                            hoverEnabled: true
-                            onPressed: {
-                                canvasScroll.interactive = false
-                                canvas.selectedNodeItem = parent
-                                canvas.reloadIfDirty()
-                            }
-                            onReleased: canvasScroll.interactive = true
-                            onDoubleClicked: characterDoubleClicked(character.name, parent)
-                            ToolTip.text: (crgraph.character && character.name === crgraph.character.name) ?
-                                          "Double click to add a relationship to this character." :
-                                          "Double click to switch to " + character.name + "'s notes."
-                            ToolTip.delay: 1500
-                            ToolTip.visible: containsMouse && !removeRelationshipConfirmation.active
-                        }
-                    }
+                    model: crGraph.nodes
+                    delegate: crGraphNodeDelegate
                 }
 
                 Item {
@@ -571,7 +414,7 @@ Rectangle {
 
     Item {
         anchors.fill: parent
-        visible: crgraph.dirty
+        visible: crGraph.dirty
 
         Text {
             anchors.left: parent.left
@@ -586,12 +429,12 @@ Rectangle {
 
         MouseArea {
             anchors.fill: parent
-            enabled: crgraph.busy
+            enabled: crGraph.busy
         }
     }
 
     BusyIcon {
-        running: crgraph.busy || showBusyIndicator
+        running: crGraph.busy || showBusyIndicator
         anchors.centerIn: parent
     }
 
@@ -737,6 +580,174 @@ Rectangle {
                             modalDialog.close()
                         }
                         anchors.right: parent.right
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: crGraphNodeDelegate
+
+        Rectangle {
+            id: nodeItem
+            property CharacterRelationshipGraphNode node: modelData
+            property Character character: node.character
+            x: node.rect.x
+            y: node.rect.y
+            width: node.rect.width
+            height: node.rect.height
+            color: character.photos.length === 0 ? Qt.tint(character.color, "#C0FFFFFF") : Qt.rgba(0,0,0,0)
+            Component.onCompleted: {
+                node.item = nodeItem
+                if(crGraph.character === node.character)
+                    canvas.mainCharacterNodeItem = nodeItem
+            }
+
+            BoundingBoxItem.evaluator: nodeItemsBoxEvaluator
+
+            Rectangle {
+                visible: character.photos.length > 0
+                anchors.fill: parent
+                radius: Math.min(width,height)*0.0375
+                anchors.margins: -Math.min(width,height)*0.075
+                color: Scrite.app.translucent(character.color, 0.15)
+                border.width: 1
+                border.color: Scrite.app.translucent(character.color, 0.5)
+            }
+
+            Image {
+                anchors.fill: parent
+                source: {
+                    if(character.photos.length > 0)
+                        return "file:///" + character.photos[0]
+                    return "../icons/content/character_icon.png"
+                }
+                fillMode: Image.PreserveAspectCrop
+                mipmap: true; smooth: true
+                z: character === canvas.activeCharacter ? 1 : 0
+
+                Rectangle {
+                    anchors.fill: infoLabel
+                    anchors.margins: -4
+                    radius: 4
+                    color: node.marked ? accentColors.a700.background : Qt.tint(character.color, "#C0FFFFFF")
+                    opacity: character.photos.length === 0 ? 1 : 0.8
+                    border.width: 1
+                    border.color: node.marked ? accentColors.a700.text : "black"
+                }
+
+                Text {
+                    id: infoLabel
+                    width: parent.width - 30
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.bottomMargin: 15
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: 10
+                    maximumLineCount: 3
+                    color: node.marked ? accentColors.a700.text : "black"
+                    text: {
+                        var fields = []
+                        fields.push("<b>" + character.name + "</b>");
+                        if(character.designation !== "")
+                            fields.push("<i>" + character.designation + "</i>")
+                        return fields.join("<br/>")
+                    }
+                }
+
+                Rectangle {
+                    anchors.fill: parent
+                    border.width: character === canvas.activeCharacter ? 3 : 1
+                    border.color: character === canvas.activeCharacter ? "black" : primaryColors.borderColor
+                    color: Qt.rgba(1,1,1,alpha)
+                    property real alpha: {
+                        if(!canvas.activeCharacter || character === canvas.activeCharacter)
+                            return 0
+                        return character.isDirectlyRelatedTo(canvas.activeCharacter) ? 0 : 0.75
+                    }
+                    Behavior on alpha {
+                        enabled: applicationSettings.enableAnimations
+                        NumberAnimation { duration: 250 }
+                    }
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                drag.target: !Scrite.document.readOnly ? parent : null
+                drag.axis: Drag.XAndYAxis
+                hoverEnabled: true
+                onPressed: {
+                    canvasScroll.interactive = false
+                    canvas.selectedNodeItem = parent
+                    canvas.reloadIfDirty()
+                }
+                onReleased: canvasScroll.interactive = true
+                onDoubleClicked: characterDoubleClicked(character.name, parent)
+                ToolTip.text: (crGraph.character && character.name === crGraph.character.name) ?
+                              "Double click to add a relationship to this character." :
+                              "Double click to switch to " + character.name + "'s notes."
+                ToolTip.delay: 1500
+                ToolTip.visible: containsMouse && !removeRelationshipConfirmation.active
+            }
+        }
+    }
+
+    Component {
+        id: crGraphEdgeDelegate
+
+        PainterPathItem {
+            outlineWidth: Scrite.app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
+            outlineColor: primaryColors.c700.background
+            renderType: PainterPathItem.OutlineOnly
+            renderingMechanism: PainterPathItem.UseOpenGL
+            opacity: {
+                if(canvas.activeCharacter)
+                    return (modelData.relationship.of === canvas.activeCharacter || modelData.relationship.withCharacter === canvas.activeCharacter) ? 1 : 0.2
+                return 1
+            }
+            z: opacity
+            Behavior on opacity {
+                enabled: applicationSettings.enableAnimations
+                NumberAnimation { duration: 250 }
+            }
+
+            property string pathString: modelData.pathString
+            onPathStringChanged: setPathFromString(pathString)
+
+            Rectangle {
+                x: modelData.labelPosition.x - width/2
+                y: modelData.labelPosition.y - height/2
+                rotation: modelData.labelAngle
+                width: nameLabel.width + 10
+                height: nameLabel.height + 4
+                color: nameLabelMouseArea.containsMouse ? accentColors.c700.background : primaryColors.c700.background
+
+                Text {
+                    id: nameLabel
+                    text: modelData.relationship.name
+                    font.pointSize: Math.floor(Scrite.app.idealFontPointSize*0.75)
+                    anchors.centerIn: parent
+                    color: nameLabelMouseArea.containsMouse ? accentColors.c700.text : primaryColors.c700.text
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                MouseArea {
+                    id: nameLabelMouseArea
+                    hoverEnabled: enabled
+                    anchors.fill: parent
+                    enabled: !Scrite.document.readOnly
+                    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    onClicked: {
+                        modalDialog.closeable = false
+                        modalDialog.popupSource = parent
+                        modalDialog.initItemCallback = function(item) {
+                            item.relationship = modelData.relationship
+                        }
+                        modalDialog.sourceComponent = relationshipNameEditorDialog
+                        modalDialog.active = true
                     }
                 }
             }

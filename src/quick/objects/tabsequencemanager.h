@@ -19,7 +19,7 @@
 
 #include "execlatertimer.h"
 #include "qobjectproperty.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
 class TabSequenceItem;
 class TabSequenceManager : public QObject

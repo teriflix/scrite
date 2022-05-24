@@ -116,9 +116,9 @@ QUrl Form::moreInfoUrl() const
     return m_moreInfoUrl;
 }
 
-ObjectListPropertyModel<FormQuestion *> *Form::questionsModel() const
+QObjectListModel<FormQuestion *> *Form::questionsModel() const
 {
-    return const_cast<ObjectListPropertyModel<FormQuestion *> *>(&m_questions);
+    return const_cast<QObjectListModel<FormQuestion *> *>(&m_questions);
 }
 
 FormQuestion *Form::questionAt(int index) const
@@ -225,7 +225,7 @@ void Form::deserializeFromJson(const QJsonObject &json)
         const QJsonObject qjs = qjsi.toObject();
         FormQuestion *question = new FormQuestion(this);
         connect(question, &FormQuestion::aboutToDelete, &m_questions,
-                &ObjectListPropertyModel<FormQuestion *>::objectDestroyed);
+                &QObjectListModel<FormQuestion *>::objectDestroyed);
 
         if (qjs.contains(idAttr))
             question->setId(qjs.value(idAttr).toString());
@@ -361,13 +361,13 @@ Forms *Forms::global()
     return forms;
 }
 
-Forms::Forms(QObject *parent) : ObjectListPropertyModel<Form *>(parent)
+Forms::Forms(QObject *parent) : QObjectListModel<Form *>(parent)
 {
-    connect(this, &ObjectListPropertyModel<Form *>::objectCountChanged, this,
+    connect(this, &QObjectListModel<Form *>::objectCountChanged, this,
             &Forms::formCountChanged);
 }
 
-Forms::Forms(bool, QObject *parent) : ObjectListPropertyModel<Form *>(parent)
+Forms::Forms(bool, QObject *parent) : QObjectListModel<Form *>(parent)
 {
     this->downloadForms();
 }

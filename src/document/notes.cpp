@@ -355,7 +355,7 @@ Notes *Notes::findById(const QString &id)
     return ::GlobalIdNotesMap->value(id);
 }
 
-Notes::Notes(QObject *parent) : ObjectListPropertyModel<Note *>(parent)
+Notes::Notes(QObject *parent) : QObjectListModel<Note *>(parent)
 {
     connect(this, &Notes::objectCountChanged, this, &Notes::noteCountChanged);
     connect(this, &Notes::noteCountChanged, this, &Notes::notesModified);

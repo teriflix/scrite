@@ -17,12 +17,12 @@
 #include <QGraphicsRectItem>
 
 #include "pdfexportablegraphicsscene.h"
-#include "characterrelationshipsgraph.h"
+#include "characterrelationshipgraph.h"
 
 class CharacterRelationshipsGraphScene : public PdfExportableGraphicsScene
 {
 public:
-    CharacterRelationshipsGraphScene(const CharacterRelationshipsGraph *graph,
+    CharacterRelationshipsGraphScene(const CharacterRelationshipGraph *graph,
                                      QObject *parent = nullptr);
     ~CharacterRelationshipsGraphScene();
 };
@@ -30,20 +30,20 @@ public:
 class CharacterRelationshipsGraphNodeItem : public QGraphicsRectItem
 {
 public:
-    CharacterRelationshipsGraphNodeItem(const CharacterRelationshipsGraphNode *node);
+    CharacterRelationshipsGraphNodeItem(const CharacterRelationshipGraphNode *node);
     ~CharacterRelationshipsGraphNodeItem();
 
     // QGraphicsItem interface
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 private:
-    const CharacterRelationshipsGraphNode *m_node;
+    const CharacterRelationshipGraphNode *m_node;
 };
 
 class CharacterRelationshipsGraphEdgeItem : public QGraphicsPathItem
 {
 public:
-    CharacterRelationshipsGraphEdgeItem(const CharacterRelationshipsGraphEdge *edge);
+    CharacterRelationshipsGraphEdgeItem(const CharacterRelationshipGraphEdge *edge);
     ~CharacterRelationshipsGraphEdgeItem();
 };
 

@@ -20,7 +20,7 @@
 #include <QSortFilterProxyModel>
 
 #include "qobjectproperty.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
 class Note;
 class Notes;
@@ -28,7 +28,7 @@ class Scene;
 class Character;
 class ScriteDocument;
 class BookmarkedNotes;
-class ObjectListPropertyModelBase;
+class AbstractQObjectListModel;
 
 class NotebookModel : public QStandardItemModel
 {
@@ -121,7 +121,7 @@ private:
     BookmarkedNotes *m_bookmarkedNotes = nullptr;
 };
 
-class BookmarkedNotes : public ObjectListPropertyModel<QObject *>
+class BookmarkedNotes : public QObjectListModel<QObject *>
 {
     Q_OBJECT
     QML_ELEMENT

@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef CHARACTERRELATIONSHIPSGRAPH_H
-#define CHARACTERRELATIONSHIPSGRAPH_H
+#ifndef CHARACTERRELATIONSHIPGRAPH_H
+#define CHARACTERRELATIONSHIPGRAPH_H
 
 #include <QQmlEngine>
 
@@ -20,21 +20,21 @@
 #include "graphlayout.h"
 #include "errorreport.h"
 #include "qobjectproperty.h"
-#include "objectlistpropertymodel.h"
+#include "qobjectlistmodel.h"
 
-class CharacterRelationshipsGraph;
+class CharacterRelationshipGraph;
 class CharacterRelationshipsGraphExporter;
 
-class CharacterRelationshipsGraphNode : public QObject, public GraphLayout::AbstractNode
+class CharacterRelationshipGraphNode : public QObject, public GraphLayout::AbstractNode
 {
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~CharacterRelationshipsGraphNode();
+    ~CharacterRelationshipGraphNode();
 
-    Q_PROPERTY(Character* character READ character NOTIFY characterChanged RESET resetCharacter)
+    Q_PROPERTY(Character *character READ character NOTIFY characterChanged RESET resetCharacter)
     Character *character() const { return m_character; }
     Q_SIGNAL void characterChanged();
 
@@ -47,7 +47,7 @@ public:
     QRectF rect() const { return m_rect; }
     Q_SIGNAL void rectChanged();
 
-    Q_PROPERTY(QQuickItem* item READ item WRITE setItem NOTIFY itemChanged RESET resetItem)
+    Q_PROPERTY(QQuickItem *item READ item WRITE setItem NOTIFY itemChanged RESET resetItem)
     void setItem(QQuickItem *val);
     QQuickItem *item() const { return m_item; }
     Q_SIGNAL void itemChanged();
@@ -66,8 +66,8 @@ protected:
     void move(const QPointF &pos);
 
 protected:
-    friend class CharacterRelationshipsGraph;
-    CharacterRelationshipsGraphNode(QObject *parent = nullptr);
+    friend class CharacterRelationshipGraph;
+    CharacterRelationshipGraphNode(QObject *parent = nullptr);
     void setCharacter(Character *val);
     void resetCharacter();
     void resetItem();
@@ -86,16 +86,18 @@ private:
     QObjectProperty<Character> m_character;
 };
 
-class CharacterRelationshipsGraphEdge : public QObject, public GraphLayout::AbstractEdge
+class CharacterRelationshipGraphEdge : public QObject, public GraphLayout::AbstractEdge
 {
     Q_OBJECT
     QML_ELEMENT
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ~CharacterRelationshipsGraphEdge();
+    ~CharacterRelationshipGraphEdge();
 
-    Q_PROPERTY(Relationship* relationship READ relationship NOTIFY relationshipChanged RESET resetRelationship)
+    // clang-format off
+    Q_PROPERTY(Relationship *relationship READ relationship NOTIFY relationshipChanged RESET resetRelationship)
+    // clang-format on
     Relationship *relationship() const { return m_relationship; }
     Q_SIGNAL void relationshipChanged();
 
@@ -133,9 +135,9 @@ public:
     void evaluatePath();
 
 protected:
-    friend class CharacterRelationshipsGraph;
-    CharacterRelationshipsGraphEdge(CharacterRelationshipsGraphNode *from,
-                                    CharacterRelationshipsGraphNode *to, QObject *parent = nullptr);
+    friend class CharacterRelationshipGraph;
+    CharacterRelationshipGraphEdge(CharacterRelationshipGraphNode *from,
+                                   CharacterRelationshipGraphNode *to, QObject *parent = nullptr);
     void setRelationship(Relationship *val);
     void resetRelationship();
     void setPath(const QPainterPath &val);
@@ -150,30 +152,30 @@ private:
     QString m_reverseLabel;
     bool m_evaluatePathAllowed = false;
     QObjectProperty<Relationship> m_relationship;
-    QPointer<CharacterRelationshipsGraphNode> m_toNode;
-    QPointer<CharacterRelationshipsGraphNode> m_fromNode;
+    QPointer<CharacterRelationshipGraphNode> m_toNode;
+    QPointer<CharacterRelationshipGraphNode> m_fromNode;
 };
 
-class CharacterRelationshipsGraph : public QObject, public QQmlParserStatus
+class CharacterRelationshipGraph : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
     QML_ELEMENT
 
 public:
-    CharacterRelationshipsGraph(QObject *parent = nullptr);
-    ~CharacterRelationshipsGraph();
+    CharacterRelationshipGraph(QObject *parent = nullptr);
+    ~CharacterRelationshipGraph();
 
-    Q_PROPERTY(QAbstractListModel* nodes READ nodes CONSTANT STORED false)
+    Q_PROPERTY(QAbstractListModel *nodes READ nodes CONSTANT STORED false)
     QAbstractListModel *nodes() const
     {
-        return &((const_cast<CharacterRelationshipsGraph *>(this))->m_nodes);
+        return &((const_cast<CharacterRelationshipGraph *>(this))->m_nodes);
     }
 
-    Q_PROPERTY(QAbstractListModel* edges READ edges CONSTANT STORED false)
+    Q_PROPERTY(QAbstractListModel *edges READ edges CONSTANT STORED false)
     QAbstractListModel *edges() const
     {
-        return &(const_cast<CharacterRelationshipsGraph *>(this))->m_edges;
+        return &(const_cast<CharacterRelationshipGraph *>(this))->m_edges;
     }
 
     Q_PROPERTY(bool empty READ isEmpty NOTIFY emptyChanged)
@@ -185,17 +187,19 @@ public:
     QSizeF nodeSize() const { return m_nodeSize; }
     Q_SIGNAL void nodeSizeChanged();
 
-    Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged RESET resetStructure)
+    Q_PROPERTY(Structure *structure READ structure WRITE setStructure NOTIFY structureChanged RESET
+                       resetStructure)
     void setStructure(Structure *val);
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();
 
-    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
+    Q_PROPERTY(Scene *scene READ scene WRITE setScene NOTIFY sceneChanged RESET resetScene)
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(Character* character READ character WRITE setCharacter NOTIFY characterChanged RESET resetCharacter)
+    Q_PROPERTY(Character *character READ character WRITE setCharacter NOTIFY characterChanged RESET
+                       resetCharacter)
     void setCharacter(Character *val);
     Character *character() const { return m_character; }
     Q_SIGNAL void characterChanged();
@@ -209,7 +213,8 @@ public:
     int maxTime() const { return m_maxTime; }
     Q_SIGNAL void maxTimeChanged();
 
-    Q_PROPERTY(int maxIterations READ maxIterations WRITE setMaxIterations NOTIFY maxIterationsChanged)
+    Q_PROPERTY(
+            int maxIterations READ maxIterations WRITE setMaxIterations NOTIFY maxIterationsChanged)
     void setMaxIterations(int val);
     int maxIterations() const { return m_maxIterations; }
     Q_SIGNAL void maxIterationsChanged();
@@ -233,7 +238,8 @@ public:
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();
 
-    Q_PROPERTY(qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
+    Q_PROPERTY(
+            qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
     void setBottomMargin(qreal val);
     qreal bottomMargin() const { return m_bottomMargin; }
     Q_SIGNAL void bottomMarginChanged();
@@ -256,7 +262,7 @@ public:
 
     QObject *graphJsonObject() const;
 
-    void updateGraphJsonFromNode(CharacterRelationshipsGraphNode *node);
+    void updateGraphJsonFromNode(CharacterRelationshipGraphNode *node);
 
     // QQmlParserStatus interface
     void classBegin();
@@ -295,8 +301,8 @@ private:
     ErrorReport *m_errorReport = new ErrorReport(this);
     QObjectProperty<Character> m_character;
     QObjectProperty<Structure> m_structure;
-    ObjectListPropertyModel<CharacterRelationshipsGraphNode *> m_nodes;
-    ObjectListPropertyModel<CharacterRelationshipsGraphEdge *> m_edges;
+    QObjectListModel<CharacterRelationshipGraphNode *> m_nodes;
+    QObjectListModel<CharacterRelationshipGraphEdge *> m_edges;
 };
 
-#endif // CHARACTERRELATIONSHIPSGRAPH_H
+#endif // CHARACTERRELATIONSHIPGRAPH_H
