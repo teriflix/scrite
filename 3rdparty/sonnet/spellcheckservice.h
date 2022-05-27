@@ -82,7 +82,9 @@ public:
     Method method() const { return m_method; }
     Q_SIGNAL void methodChanged();
 
+    // clang-format off
     Q_PROPERTY(QJsonArray misspelledFragments READ misspelledFragmentsJson NOTIFY misspelledFragmentsChanged)
+    // // clang-format on
     QJsonArray misspelledFragmentsJson() const
     {
         return m_misspelledFragmentsJson;
@@ -93,7 +95,9 @@ public:
     } // for C++ access
     Q_SIGNAL void misspelledFragmentsChanged();
 
+    // clang-format off
     Q_PROPERTY(bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
+    // clang-format on
     void setAsynchronous(bool val);
     bool isAsynchronous() const { return m_asynchronous; }
     Q_SIGNAL void asynchronousChanged();

@@ -2689,7 +2689,10 @@ Item {
                             return elementIndex * 2 + 0
                         return (indexes[0] + Scrite.document.structure.elementCount) * 2 + 0
                     }
-                    TabSequenceItem.onAboutToReceiveFocus: Scrite.document.structure.currentElementIndex = elementIndex
+                    TabSequenceItem.onAboutToReceiveFocus: {
+                        Scrite.document.structure.currentElementIndex = elementIndex
+                        Qt.callLater(maybeAssumeFocus)
+                    }
 
                     property bool hasFocus: false
 
@@ -2736,6 +2739,7 @@ Item {
                                 elementItem.select()
                             headingFieldLoader.hasFocus = activeFocus
                         }
+                        Component.onCompleted: headingFieldLoader.hasFocus = activeFocus
                         Keys.onEscapePressed: canvasTabSequence.releaseFocus()
                         enableTransliteration: true
                         property var currentLanguage: Scrite.app.transliterationEngine.language
@@ -2773,7 +2777,10 @@ Item {
                             return elementIndex * 2 + 1
                         return (indexes[0] + Scrite.document.structure.elementCount) * 2 + 1
                     }
-                    TabSequenceItem.onAboutToReceiveFocus: Scrite.document.structure.currentElementIndex = elementIndex
+                    TabSequenceItem.onAboutToReceiveFocus: {
+                        Scrite.document.structure.currentElementIndex = elementIndex
+                        Qt.callLater(maybeAssumeFocus)
+                    }
 
                     property real idealHeight: Math.max(minIndexCardHeight-headingFieldLoader.height-footerRow.height-2*parent.spacing, 200)
 
@@ -2861,6 +2868,7 @@ Item {
                                     synopsisFieldLoader.hasFocus = activeFocus
                                 }
                                 Keys.onEscapePressed: canvasTabSequence.releaseFocus()
+                                Component.onCompleted: synopsisFieldLoader.hasFocus = activeFocus
                                 SpecialSymbolsSupport {
                                     anchors.top: parent.bottom
                                     anchors.left: parent.left

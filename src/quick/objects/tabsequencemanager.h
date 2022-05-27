@@ -31,6 +31,11 @@ public:
     TabSequenceManager(QObject *parent = nullptr);
     ~TabSequenceManager();
 
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
     Q_PROPERTY(int tabKey READ tabKey WRITE setTabKey NOTIFY tabKeyChanged)
     void setTabKey(int val);
     int tabKey() const { return m_tabKey; }
@@ -41,27 +46,37 @@ public:
     int backtabKey() const { return m_backtabKey; }
     Q_SIGNAL void backtabKeyChanged();
 
+    // clang-format off
     Q_PROPERTY(int tabKeyModifiers READ tabKeyModifiers WRITE setTabKeyModifiers NOTIFY tabKeyModifiersChanged)
+    // clang-format on
     void setTabKeyModifiers(int val);
     int tabKeyModifiers() const { return m_tabKeyModifiers; }
     Q_SIGNAL void tabKeyModifiersChanged();
 
+    // clang-format off
     Q_PROPERTY(int backtabKeyModifiers READ backtabKeyModifiers WRITE setBacktabKeyModifiers NOTIFY backtabKeyModifiersChanged)
+    // clang-format on
     void setBacktabKeyModifiers(int val);
     int backtabKeyModifiers() const { return m_backtabKeyModifiers; }
     Q_SIGNAL void backtabKeyModifiersChanged();
 
+    // clang-format off
     Q_PROPERTY(int disabledKeyModifier READ disabledKeyModifier WRITE setDisabledKeyModifier NOTIFY disabledKeyModifierChanged)
+    // clang-format on
     void setDisabledKeyModifier(int val);
     int disabledKeyModifier() const { return m_disabledKeyModifier; }
     Q_SIGNAL void disabledKeyModifierChanged();
 
+    // clang-format off
     Q_PROPERTY(int releaseFocusKey READ releaseFocusKey WRITE setReleaseFocusKey NOTIFY releaseFocusKeyChanged)
+    // clang-format on
     void setReleaseFocusKey(int val);
     int releaseFocusKey() const { return m_releaseFocusKey; }
     Q_SIGNAL void releaseFocusKeyChanged();
 
+    // clang-format off
     Q_PROPERTY(bool releaseFocusEnabled READ isReleaseFocusEnabled WRITE setReleaseFocusEnabled NOTIFY releaseFocusEnabledChanged)
+    // clang-format on
     void setReleaseFocusEnabled(bool val);
     bool isReleaseFocusEnabled() const { return m_releaseFocusEnabled; }
     Q_SIGNAL void releaseFocusEnabledChanged();
@@ -99,6 +114,7 @@ private:
 
 private:
     friend class TabSequenceItem;
+    bool m_enabled = true;
     bool m_wrapAround = false;
     int m_insertCounter = 0;
     ExecLaterTimer m_timer;
@@ -129,7 +145,9 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(TabSequenceManager* manager READ manager WRITE setManager NOTIFY managerChanged RESET resetManager)
+    // clang-format off
+    Q_PROPERTY(TabSequenceManager *manager READ manager WRITE setManager NOTIFY managerChanged RESET resetManager)
+    // clang-format on
     void setManager(TabSequenceManager *val);
     TabSequenceManager *manager() const { return m_manager; }
     Q_SIGNAL void managerChanged();

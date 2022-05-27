@@ -13,6 +13,7 @@
 
 #include "textdocumentitem.h"
 
+#include <QtMath>
 #include <QImage>
 #include <QTimer>
 #include <QPainter>
@@ -199,9 +200,9 @@ void TextDocumentItem::onDocumentChanged()
         return;
     }
 
-    if (m_document->textWidth() == 0)
+    if (qFuzzyIsNull(m_document->textWidth()))
         m_document->setTextWidth(this->width());
-    this->setHeight(m_document->size().height() * m_documentScale);
+    this->setHeight(qCeil(m_document->size().height() * m_documentScale));
     this->updateViewport();
 }
 

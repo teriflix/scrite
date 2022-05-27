@@ -65,11 +65,13 @@ Flickable {
     signal zoomScaleChangedInteractively()
 
     function zoomIn() {
-        zoomScale = Math.min(zoomScale*(1+scrollAreaSettings.zoomFactor), pinchHandler.maximumScale)
+        const zf = 1+scrollAreaSettings.zoomFactor
+        zoomScale = Math.min(zoomScale*zf, pinchHandler.maximumScale)
     }
 
     function zoomOut() {
-        zoomScale = Math.max(zoomScale*(1-scrollAreaSettings.zoomFactor), pinchHandler.minimumScale)
+        const zf = 1-scrollAreaSettings.zoomFactor
+        zoomScale = Math.max(zoomScale*zf, pinchHandler.minimumScale)
     }
 
     function zoomOne() {

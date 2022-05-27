@@ -664,8 +664,8 @@ Item {
 
                         Flickable {
                             id: textDocumentFlick
-                            contentWidth: width
-                            contentHeight: textDocumentView.height + height
+                            contentWidth: Math.ceil(width)
+                            contentHeight: Math.ceil(textDocumentView.height + height)
                             boundsBehavior: Flickable.StopAtBounds
                             width: parent.width
                             anchors.top: textDocumentFlickPadding.bottom
@@ -675,6 +675,14 @@ Item {
                             property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
                             property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
                             ScrollBar.vertical: textDocumentScrollBar
+
+                            // Looks like this is the only way to get the flickable
+                            // to realize that it is scrollable.
+                            onContentHeightChanged: {
+                                const cy = contentY
+                                contentY = textDocumentView.height
+                                Qt.callLater( (cy) => { contentY = cy }, cy )
+                            }
 
                             TextDocumentItem {
                                 id: textDocumentView

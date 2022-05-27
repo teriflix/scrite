@@ -325,102 +325,7 @@ Rectangle {
                         }
                     }
 
-                    delegate: Loader {
-                        id: contentViewDelegateLoader
-                        property var componentData: modelData
-                        property int componentIndex: index
-                        z: contentViewModel.value.currentIndex === index ? 2 : 1
-                        width: contentView.width
-                        onComponentDataChanged: {
-                            if(componentData === undefined)
-                                active = false
-                        }
-
-                        active: false
-                        sourceComponent: componentData ? (componentData.scene ? contentComponent : (componentData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)) : noContentComponent
-
-                        // Background for episode and act break components, when "Scene Blocks" is enabled.
-                        Rectangle {
-                            z: -1
-                            anchors.fill: parent
-                            anchors.leftMargin: -1
-                            anchors.rightMargin: -1
-                            anchors.topMargin: componentData.scene ? -1 : -contentView.spacing/2
-                            anchors.bottomMargin: componentData.scene ? -1 : -contentView.spacing/2
-                            visible: contentView.spacing > 0
-                            color: componentData.scene ? Qt.rgba(0,0,0,0) : (componentData.breakType === Screenplay.Episode ? accentColors.c100.background : accentColors.c50.background)
-                            border.width: componentData.scene ? 1 : 0
-                            border.color: componentData.scene ? (Scrite.app.isLightColor(componentData.scene.color) ? "black" : componentData.scene.color) : Qt.rgba(0,0,0,0)
-                            opacity: componentData.scene ? 0.25 : 1
-                        }
-
-                        // Placeholder item for when scrolling is rapid.
-                        Loader {
-                            anchors.fill: parent
-                            readonly property int spElementIndex: componentIndex
-                            readonly property var spElementData: componentData
-                            readonly property int spElementType: screenplayElementType
-
-                            active: componentData.scene && !parent.active
-                            sourceComponent: placeholderSceneComponent
-                        }
-
-                        property bool initialized: false
-                        property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex) && !contentView.ScrollBar.vertical.active
-                        onIsVisibleToUserChanged: {
-                            if(!active && isVisibleToUser)
-                                Scrite.app.execLater(contentViewDelegateLoader, 100, load)
-                        }
-
-                        function load() {
-                            if(active || componentData === undefined)
-                                return
-                            if(contentView.moving)
-                                contentView.movingChanged.connect(load)
-                            else {
-                                active = true
-                                Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
-                            }
-                        }
-
-                        Component.onCompleted: {
-                            var editorHints = componentData.screenplayElement.editorHints
-                            if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
-                                !editorHints ||
-                                editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
-                                editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis ||
-                                componentData.scene.elementCount <= 1) {
-                                    active = true
-                                    initialized = true
-                                    return
-                                }
-
-                            height = editorHints.height * zoomLevel
-                            active = false
-                            initialized = true
-                            Scrite.app.execLater(contentViewDelegateLoader, 400, load)
-                        }
-
-                        Component.onDestruction: {
-                            if(!active || componentData.screenplayElementType === ScreenplayElement.BreakElementType)
-                                return
-                            var editorHints = {
-                                "height": height / zoomLevel,
-                                "displaySceneCharacters": screenplayEditorSettings.displaySceneCharacters,
-                                "displaySceneSynopsis": screenplayEditorSettings.displaySceneSynopsis
-                            }
-                            componentData.screenplayElement.editorHints = editorHints
-                        }
-
-                        /*
-                        Profiler.context: "ScreenplayEditorContentDelegate"
-                        Profiler.active: true
-                        onStatusChanged: {
-                            if(status === Loader.Ready)
-                                Profiler.active = false
-                        }
-                        */
-                    }
+                    delegate: contentViewDelegateComponent
                     snapMode: ListView.NoSnap
                     boundsBehavior: Flickable.StopAtBounds
                     boundsMovement: Flickable.StopAtBounds
@@ -3992,6 +3897,107 @@ Rectangle {
         function onActiveChanged() {
             if(splashLoader.active === false && mainTabBar.currentIndex === 0 && contentView.count === 1)
                 contentView.itemAtIndex(0).item.assumeFocus()
+        }
+    }
+
+    Component {
+        id: contentViewDelegateComponent
+
+        Loader {
+            id: contentViewDelegateLoader
+            property var componentData: modelData
+            property int componentIndex: index
+            z: contentViewModel.value.currentIndex === index ? 2 : 1
+            width: contentView.width
+            onComponentDataChanged: {
+                if(componentData === undefined)
+                    active = false
+            }
+
+            active: false
+            sourceComponent: componentData ? (componentData.scene ? contentComponent : (componentData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)) : noContentComponent
+
+            // Background for episode and act break components, when "Scene Blocks" is enabled.
+            Rectangle {
+                z: -1
+                anchors.fill: parent
+                anchors.leftMargin: -1
+                anchors.rightMargin: -1
+                anchors.topMargin: componentData.scene ? -1 : -contentView.spacing/2
+                anchors.bottomMargin: componentData.scene ? -1 : -contentView.spacing/2
+                visible: contentView.spacing > 0
+                color: componentData.scene ? Qt.rgba(0,0,0,0) : (componentData.breakType === Screenplay.Episode ? accentColors.c100.background : accentColors.c50.background)
+                border.width: componentData.scene ? 1 : 0
+                border.color: componentData.scene ? (Scrite.app.isLightColor(componentData.scene.color) ? "black" : componentData.scene.color) : Qt.rgba(0,0,0,0)
+                opacity: componentData.scene ? 0.25 : 1
+            }
+
+            // Placeholder item for when scrolling is rapid.
+            Loader {
+                anchors.fill: parent
+                readonly property int spElementIndex: componentIndex
+                readonly property var spElementData: componentData
+                readonly property int spElementType: screenplayElementType
+
+                active: componentData.scene && !parent.active
+                sourceComponent: placeholderSceneComponent
+            }
+
+            property bool initialized: false
+            property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex) && !contentView.ScrollBar.vertical.active
+            onIsVisibleToUserChanged: {
+                if(!active && isVisibleToUser)
+                    Scrite.app.execLater(contentViewDelegateLoader, 100, load)
+            }
+
+            function load() {
+                if(active || componentData === undefined)
+                    return
+                if(contentView.moving)
+                    contentView.movingChanged.connect(load)
+                else {
+                    active = true
+                    Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
+                }
+            }
+
+            Component.onCompleted: {
+                var editorHints = componentData.screenplayElement.editorHints
+                if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
+                    !editorHints ||
+                    editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
+                    editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis ||
+                    componentData.scene.elementCount <= 1) {
+                        active = true
+                        initialized = true
+                        return
+                    }
+
+                height = editorHints.height * zoomLevel
+                active = false
+                initialized = true
+                Scrite.app.execLater(contentViewDelegateLoader, 400, load)
+            }
+
+            Component.onDestruction: {
+                if(!active || componentData.screenplayElementType === ScreenplayElement.BreakElementType)
+                    return
+                var editorHints = {
+                    "height": height / zoomLevel,
+                    "displaySceneCharacters": screenplayEditorSettings.displaySceneCharacters,
+                    "displaySceneSynopsis": screenplayEditorSettings.displaySceneSynopsis
+                }
+                componentData.screenplayElement.editorHints = editorHints
+            }
+
+            /*
+            Profiler.context: "ScreenplayEditorContentDelegate"
+            Profiler.active: true
+            onStatusChanged: {
+                if(status === Loader.Ready)
+                    Profiler.active = false
+            }
+            */
         }
     }
 }

@@ -77,7 +77,7 @@
     var scrite = null    
     window.onload = function() {
         new QWebChannel(qt.webChannelTransport, function(channel) {
-            scrite = channel.objects.scrite;
+            scrite = channel.objects.scrite
 
             const fontSizeUnit = scrite.fontSizeUint
 
@@ -109,7 +109,6 @@
             })
 
             scrite.requestContent.connect( function(content) {
-                scrite.log("Content type: " + typeof content)
                 if(typeof content === "object")
                     quill.setContents(content)
                 else

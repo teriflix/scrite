@@ -33,6 +33,15 @@ TabSequenceManager::~TabSequenceManager()
     qApp->removeEventFilter(this);
 }
 
+void TabSequenceManager::setEnabled(bool val)
+{
+    if (m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+}
+
 void TabSequenceManager::setTabKey(int val)
 {
     if (m_tabKey == val)
@@ -197,7 +206,7 @@ void TabSequenceManager::timerEvent(QTimerEvent *te)
 
 bool TabSequenceManager::eventFilter(QObject *watched, QEvent *event)
 {
-    if (event->type() == QEvent::KeyPress) {
+    if (m_enabled && event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
         if (m_releaseFocusEnabled && m_releaseFocusKey == ke->key()) {
             this->releaseFocus();

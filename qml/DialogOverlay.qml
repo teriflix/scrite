@@ -84,7 +84,7 @@ Rectangle {
     EventFilter.target: Scrite.app
     EventFilter.events: [6] // KeyPress
     EventFilter.active: closeOnEscape && visible
-    EventFilter.onFilter: {
+    EventFilter.onFilter: (event) => {
         if(event.key === Qt.Key_Escape) {
             result.acceptEvent = true
             result.filter = true
