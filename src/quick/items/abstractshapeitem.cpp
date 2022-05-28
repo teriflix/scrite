@@ -224,7 +224,7 @@ QSGNode *AbstractShapeItem::constructSceneGraph() const
     }
 
     // Construct one geometry node for each outline will outline color
-    for (const QPolygonF polygon : outlines) {
+    for (const QPolygonF &polygon : outlines) {
         if (polygon.isEmpty())
             continue;
 

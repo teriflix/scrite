@@ -23,6 +23,7 @@
 
 int main(int argc, char **argv)
 {
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     Application scriteApp(argc, argv, Application::prepare());
     NotificationManager::instance();
     DocumentFileSystem::setMarker(QByteArrayLiteral("SCRITE"));

@@ -663,7 +663,7 @@ Rectangle {
                     border.color: character === canvas.activeCharacter ? "black" : primaryColors.borderColor
                     color: Qt.rgba(1,1,1,alpha)
                     property real alpha: {
-                        if(canvas.activeCharacter === null || character === canvas.activeCharacter)
+                        if(!canvas.activeCharacter || character === canvas.activeCharacter)
                             return 0
                         return character.isDirectlyRelatedTo(canvas.activeCharacter) ? 0 : 0.75
                     }
