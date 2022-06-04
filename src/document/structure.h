@@ -415,6 +415,15 @@ public:
     Q_INVOKABLE void removePhoto(int index);
     Q_INVOKABLE void removePhoto(const QString &photoPath);
 
+    Q_PROPERTY(QString keyPhoto READ keyPhoto NOTIFY keyPhotoChanged)
+    QString keyPhoto() const { return m_keyPhoto; }
+    Q_SIGNAL void keyPhotoChanged();
+
+    Q_PROPERTY(int keyPhotoIndex READ keyPhotoIndex WRITE setKeyPhotoIndex NOTIFY keyPhotoIndexChanged)
+    void setKeyPhotoIndex(int val);
+    int keyPhotoIndex() const { return m_keyPhotoIndex; }
+    Q_SIGNAL void keyPhotoIndexChanged();
+
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
     void setType(const QString &val);
     QString type() const { return m_type; }
@@ -541,6 +550,7 @@ protected:
 private:
     bool isRelatedToImpl(Character *with, QStack<Character *> &stack) const;
     void onDfsAuction(const QString &filePath, int *claims);
+    void setKeyPhoto(const QString &val);
 
     static void staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr);
     static void staticClearRelationships(QQmlListProperty<Relationship> *list);
@@ -555,6 +565,8 @@ private:
     QString m_weight;
     QString m_height;
     QString m_gender;
+    QString m_keyPhoto;
+    int m_keyPhotoIndex = -1;
     QJsonValue m_summary;
     QString m_bodyType;
     int m_priority = 0;

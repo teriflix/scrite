@@ -1156,6 +1156,9 @@ Character::Character(QObject *parent)
     DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
     connect(dfs, &DocumentFileSystem::auction, this, &Character::onDfsAuction);
 
+    connect(this, &Character::photosChanged, this,
+            [=]() { this->setKeyPhotoIndex(qBound(-1, m_keyPhotoIndex, m_photos.size() - 1)); });
+
     if (m_structure) {
         connect(this, &Character::tagsChanged, m_structure,
                 &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
@@ -1289,6 +1292,18 @@ void Character::removePhoto(const QString &photoPath)
 
     const int index = m_photos.indexOf(photoPath);
     this->removePhoto(index);
+}
+
+void Character::setKeyPhotoIndex(int val)
+{
+    const int val2 = qBound(-1, val, m_photos.size() - 1);
+    if (m_keyPhotoIndex != val2) {
+        m_keyPhotoIndex = val2;
+        emit keyPhotoIndexChanged();
+    }
+
+    const QString kp = val2 >= 0 ? m_photos.at(val2) : QString();
+    this->setKeyPhoto(kp);
 }
 
 void Character::setType(const QString &val)
@@ -1742,6 +1757,15 @@ void Character::onDfsAuction(const QString &filePath, int *claims)
     const QString absPath = ScriteDocument::instance()->fileSystem()->absolutePath(filePath);
     if (m_photos.contains(absPath))
         *claims = *claims + 1;
+}
+
+void Character::setKeyPhoto(const QString &val)
+{
+    if (m_keyPhoto == val)
+        return;
+
+    m_keyPhoto = val;
+    emit keyPhotoChanged();
 }
 
 void Character::staticAppendRelationship(QQmlListProperty<Relationship> *list, Relationship *ptr)
