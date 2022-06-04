@@ -678,10 +678,15 @@ Item {
 
                             // Looks like this is the only way to get the flickable
                             // to realize that it is scrollable.
+                            property bool contentYAdjusted: false
                             onContentHeightChanged: {
+                                if(contentYAdjusted)
+                                    return
+
                                 const cy = contentY
                                 contentY = textDocumentView.height
                                 Qt.callLater( (cy) => { contentY = cy }, cy )
+                                contentYAdjusted = true
                             }
 
                             TextDocumentItem {
@@ -912,9 +917,9 @@ Item {
                     anchors.centerIn: parent
 
                     Text {
-                        text: "#Scrited"
+                        text: "Script » Screen"
                         color: "#f1be41"
-                        font.pointSize: closingFrameOverlay.height * 0.05
+                        font.pointSize: closingFrameOverlay.height * 0.025
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
@@ -1056,7 +1061,7 @@ Item {
                     height: width
                     anchors.centerIn: parent
                     mipmap: true
-                    source: "../images/scrited_closing_frame.jpeg"
+                    source: "../images/scrited_closing_frame.png"
                 }
             }
         }
