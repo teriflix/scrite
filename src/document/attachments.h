@@ -112,8 +112,7 @@ private:
     bool m_removeFileOnDelete = false;
 };
 
-class Attachments : public QObjectListModel<Attachment *>,
-                    public QObjectSerializer::Interface
+class Attachments : public QObjectListModel<Attachment *>, public QObjectSerializer::Interface
 {
     Q_OBJECT
     Q_INTERFACES(QObjectSerializer::Interface)
@@ -145,9 +144,7 @@ public:
     QStringList nameFilters() const { return m_nameFilters; }
     Q_SIGNAL void nameFiltersChanged();
 
-    // clang-format off
     Q_PROPERTY(Attachment *featuredAttachment READ featuredAttachment NOTIFY featuredAttachmentChanged STORED false)
-    // clang-format on
     Attachment *featuredAttachment() const { return m_featuredAttachment; }
     Q_SIGNAL void featuredAttachmentChanged();
 
@@ -210,8 +207,7 @@ public:
     int allowedType() const { return m_allowedType; }
     Q_SIGNAL void allowedTypeChanged();
 
-    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions
-                       NOTIFY allowedExtensionsChanged)
+    Q_PROPERTY(QStringList allowedExtensions READ allowedExtensions WRITE setAllowedExtensions NOTIFY allowedExtensionsChanged)
     void setAllowedExtensions(const QStringList &val);
     QStringList allowedExtensions() const { return m_allowedExtensions; }
     Q_SIGNAL void allowedExtensionsChanged();

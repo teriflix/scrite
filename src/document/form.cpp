@@ -363,8 +363,7 @@ Forms *Forms::global()
 
 Forms::Forms(QObject *parent) : QObjectListModel<Form *>(parent)
 {
-    connect(this, &QObjectListModel<Form *>::objectCountChanged, this,
-            &Forms::formCountChanged);
+    connect(this, &QObjectListModel<Form *>::objectCountChanged, this, &Forms::formCountChanged);
 }
 
 Forms::Forms(bool, QObject *parent) : QObjectListModel<Form *>(parent)

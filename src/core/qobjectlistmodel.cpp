@@ -15,8 +15,7 @@
 
 #include <QJSEngine>
 
-AbstractQObjectListModel::AbstractQObjectListModel(QObject *parent)
-    : QAbstractListModel(parent)
+AbstractQObjectListModel::AbstractQObjectListModel(QObject *parent) : QAbstractListModel(parent)
 {
     connect(this, &QAbstractListModel::rowsInserted, this,
             &AbstractQObjectListModel::objectCountChanged);
@@ -24,8 +23,7 @@ AbstractQObjectListModel::AbstractQObjectListModel(QObject *parent)
             &AbstractQObjectListModel::objectCountChanged);
     connect(this, &QAbstractListModel::modelReset, this,
             &AbstractQObjectListModel::objectCountChanged);
-    connect(this, &QAbstractListModel::dataChanged, this,
-            &AbstractQObjectListModel::dataChanged2);
+    connect(this, &QAbstractListModel::dataChanged, this, &AbstractQObjectListModel::dataChanged2);
 }
 
 QHash<int, QByteArray> AbstractQObjectListModel::roleNames() const

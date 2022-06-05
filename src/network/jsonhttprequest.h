@@ -95,7 +95,7 @@ public:
     Q_PROPERTY(QString responseCode READ responseCode NOTIFY responseChanged)
     QString responseCode() const;
 
-    Q_PROPERTY(QString responseText READ responseText NOTIFY responseChanged);
+    Q_PROPERTY(QString responseText READ responseText NOTIFY responseChanged)
     QString responseText() const;
 
     Q_PROPERTY(QJsonObject responseData READ responseData NOTIFY responseChanged)
@@ -111,7 +111,7 @@ public:
     Q_PROPERTY(QString errorCode READ errorCode NOTIFY errorChanged)
     QString errorCode() const;
 
-    Q_PROPERTY(QString errorText READ errorText NOTIFY errorChanged);
+    Q_PROPERTY(QString errorText READ errorText NOTIFY errorChanged)
     QString errorText() const;
 
     Q_PROPERTY(QJsonObject errorData READ errorData NOTIFY errorChanged)

@@ -63,11 +63,9 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
     this->addItem(nodesAndEdges);
 
     const QObjectListModel<CharacterRelationshipGraphNode *> *nodes =
-            dynamic_cast<QObjectListModel<CharacterRelationshipGraphNode *> *>(
-                    graph->nodes());
+            dynamic_cast<QObjectListModel<CharacterRelationshipGraphNode *> *>(graph->nodes());
     const QObjectListModel<CharacterRelationshipGraphEdge *> *edges =
-            dynamic_cast<QObjectListModel<CharacterRelationshipGraphEdge *> *>(
-                    graph->edges());
+            dynamic_cast<QObjectListModel<CharacterRelationshipGraphEdge *> *>(graph->edges());
 
     const int nrNodes = nodes->rowCount(QModelIndex());
     const int nrEdges = edges->rowCount(QModelIndex());

@@ -152,8 +152,9 @@ void CharacterRelationshipGraphNode::timerEvent(QTimerEvent *te)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-CharacterRelationshipGraphEdge::CharacterRelationshipGraphEdge(
-        CharacterRelationshipGraphNode *from, CharacterRelationshipGraphNode *to, QObject *parent)
+CharacterRelationshipGraphEdge::CharacterRelationshipGraphEdge(CharacterRelationshipGraphNode *from,
+                                                               CharacterRelationshipGraphNode *to,
+                                                               QObject *parent)
     : QObject(parent), m_relationship(this, "relationship")
 {
     m_fromNode = from;

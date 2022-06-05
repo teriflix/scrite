@@ -39,8 +39,7 @@ public:
     NotebookModel(QObject *parent = nullptr);
     ~NotebookModel();
 
-    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument RESET resetDocument NOTIFY
-                       documentChanged)
+    Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument RESET resetDocument NOTIFY documentChanged)
     void setDocument(ScriteDocument *val);
     ScriteDocument *document() const { return m_document; }
     Q_SIGNAL void documentChanged();

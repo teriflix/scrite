@@ -75,20 +75,17 @@ public:
     ScreenplayTextDocument(QTextDocument *document, QObject *parent = nullptr);
     ~ScreenplayTextDocument();
 
-    Q_PROPERTY(QTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
-                       textDocumentChanged RESET resetTextDocument)
+    Q_PROPERTY(QTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QTextDocument *val);
     QTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged
-                       RESET resetScreenplay)
+    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged RESET resetScreenplay)
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(ScreenplayFormat *formatting READ formatting WRITE setFormatting NOTIFY
-                       formattingChanged RESET resetFormatting)
+    Q_PROPERTY(ScreenplayFormat *formatting READ formatting WRITE setFormatting NOTIFY formattingChanged RESET resetFormatting)
     void setFormatting(ScreenplayFormat *val);
     ScreenplayFormat *formatting() const { return m_formatting; }
     Q_SIGNAL void formattingChanged();
@@ -114,26 +111,22 @@ public:
     bool isSyncEnabled() const { return m_syncEnabled; }
     Q_SIGNAL void syncEnabledChanged();
 
-    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters
-                       NOTIFY listSceneCharactersChanged)
+    Q_PROPERTY(bool listSceneCharacters READ isListSceneCharacters WRITE setListSceneCharacters NOTIFY listSceneCharactersChanged)
     void setListSceneCharacters(bool val);
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
-    Q_PROPERTY(QStringList highlightDialoguesOf READ highlightDialoguesOf WRITE
-                       setHighlightDialoguesOf NOTIFY highlightDialoguesOfChanged)
+    Q_PROPERTY(QStringList highlightDialoguesOf READ highlightDialoguesOf WRITE setHighlightDialoguesOf NOTIFY highlightDialoguesOfChanged)
     void setHighlightDialoguesOf(QStringList val);
     QStringList highlightDialoguesOf() const { return m_highlightDialoguesOf; }
     Q_SIGNAL void highlightDialoguesOfChanged();
 
-    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis
-                       NOTIFY includeSceneSynopsisChanged)
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
     void setIncludeSceneSynopsis(bool val);
     bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
     Q_SIGNAL void includeSceneSynopsisChanged();
 
-    Q_PROPERTY(bool includeSceneFeaturedImage READ isIncludeSceneFeaturedImage WRITE
-                       setIncludeSceneFeaturedImage NOTIFY includeSceneFeaturedImageChanged)
+    Q_PROPERTY(bool includeSceneFeaturedImage READ isIncludeSceneFeaturedImage WRITE setIncludeSceneFeaturedImage NOTIFY includeSceneFeaturedImageChanged)
     void setIncludeSceneFeaturedImage(bool val);
     bool isIncludeSceneFeaturedImage() const { return m_includeSceneFeaturedImage; }
     Q_SIGNAL void includeSceneFeaturedImageChanged();
@@ -145,26 +138,22 @@ public:
     Purpose purpose() const { return m_purpose; }
     Q_SIGNAL void purposeChanged();
 
-    Q_PROPERTY(bool printEachSceneOnANewPage READ isPrintEachSceneOnANewPage WRITE
-                       setPrintEachSceneOnANewPage NOTIFY printEachSceneOnANewPageChanged)
+    Q_PROPERTY(bool printEachSceneOnANewPage READ isPrintEachSceneOnANewPage WRITE setPrintEachSceneOnANewPage NOTIFY printEachSceneOnANewPageChanged)
     void setPrintEachSceneOnANewPage(bool val);
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
-    Q_PROPERTY(bool printEachActOnANewPage READ isPrintEachActOnANewPage WRITE
-                       setPrintEachActOnANewPage NOTIFY printEachActOnANewPageChanged)
+    Q_PROPERTY(bool printEachActOnANewPage READ isPrintEachActOnANewPage WRITE setPrintEachActOnANewPage NOTIFY printEachActOnANewPageChanged)
     void setPrintEachActOnANewPage(bool val);
     bool isPrintEachActOnANewPage() const { return m_printEachActOnANewPage; }
     Q_SIGNAL void printEachActOnANewPageChanged();
 
-    Q_PROPERTY(bool includeActBreaks READ isIncludeActBreaks WRITE setIncludeActBreaks NOTIFY
-                       includeActBreaksChanged)
+    Q_PROPERTY(bool includeActBreaks READ isIncludeActBreaks WRITE setIncludeActBreaks NOTIFY includeActBreaksChanged)
     void setIncludeActBreaks(bool val);
     bool isIncludeActBreaks() const { return m_includeActBreaks; }
     Q_SIGNAL void includeActBreaksChanged();
 
-    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered
-                       NOTIFY titlePageIsCenteredChanged)
+    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered NOTIFY titlePageIsCenteredChanged)
     void setTitlePageIsCentered(bool val);
     bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
     Q_SIGNAL void titlePageIsCenteredChanged();
@@ -185,8 +174,7 @@ public:
     qreal currentPosition() const { return m_currentPosition; }
     Q_SIGNAL void currentPositionChanged();
 
-    Q_PROPERTY(int secondsPerPage READ secondsPerPage WRITE setSecondsPerPage NOTIFY
-                       timePerPageChanged)
+    Q_PROPERTY(int secondsPerPage READ secondsPerPage WRITE setSecondsPerPage NOTIFY timePerPageChanged)
     void setSecondsPerPage(int val);
     int secondsPerPage() const;
 
@@ -224,8 +212,7 @@ public:
     Q_INVOKABLE qreal lengthInPixels(ScreenplayElement *from, ScreenplayElement *to) const;
     Q_INVOKABLE qreal lengthInPages(ScreenplayElement *from, ScreenplayElement *to) const;
 
-    Q_PROPERTY(QObject *injection READ injection WRITE setInjection NOTIFY injectionChanged RESET
-                       resetInjection)
+    Q_PROPERTY(QObject *injection READ injection WRITE setInjection NOTIFY injectionChanged RESET resetInjection)
     void setInjection(QObject *val);
     QObject *injection() const { return m_injection; }
     Q_SIGNAL void injectionChanged();
@@ -377,16 +364,12 @@ public:
     ScreenplayElementPageBreaks(QObject *parent = nullptr);
     ~ScreenplayElementPageBreaks();
 
-    Q_PROPERTY(ScreenplayTextDocument *screenplayDocument READ screenplayDocument WRITE
-                       setScreenplayDocument NOTIFY screenplayDocumentChanged RESET
-                               resetScreenplayDocument)
+    Q_PROPERTY(ScreenplayTextDocument *screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged RESET resetScreenplayDocument)
     void setScreenplayDocument(ScreenplayTextDocument *val);
     ScreenplayTextDocument *screenplayDocument() const { return m_screenplayDocument; }
     Q_SIGNAL void screenplayDocumentChanged();
 
-    Q_PROPERTY(
-            ScreenplayElement *screenplayElement READ screenplayElement WRITE setScreenplayElement
-                    NOTIFY screenplayElementChanged RESET resetScreenplayElement)
+    Q_PROPERTY( ScreenplayElement *screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged RESET resetScreenplayElement)
     void setScreenplayElement(ScreenplayElement *val);
     ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
     Q_SIGNAL void screenplayElementChanged();
