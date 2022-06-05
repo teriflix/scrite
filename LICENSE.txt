@@ -41,6 +41,10 @@ licenses compatible with GPLv3.
    package is provided under MIT License. Additional information can be found at:
    https://github.com/dragonman225/curved-arrows
 
+8. 3rdparty/quill: This package provides the HTML and JavaScript code we use for
+   powering the rich text editor in Notebook. The original code can be found
+   at https://github.com/quilljs/quill, under a BSD 3-Clause license.
+
 ===============================================================================
 
 Scrite is originally developed by TERIFLIX Entertainment Spaces Pvt. Ltd.
@@ -52,7 +56,7 @@ graphics artwork.
    images/teriflix_icon.png: All rights to this image rest with
    TERIFLIX Entertainment Spaces Pvt. Ltd. (https://www.teriflix.com)
 
-The development of Scrite is done using a commercial version of Qt 5.15.8
+The development of Scrite is done using a commercial version of Qt 5.15.9
 However the entire source code of Scrite is made available under GPLv3.
 The complete license text of GPLv3 is given below. TERIFLIX reserves the
 right to release the source code of Scrite, in parts or whole, under any

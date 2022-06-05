@@ -19,6 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 Item {
+    id: aboutBox
     readonly property real splashWidth: 1464
     readonly property real splashHeight: 978
     readonly property real iscale: (ui.width * 0.5)/splashWidth
@@ -101,86 +102,67 @@ Item {
                     height: 30
                 }
 
-                Row {
-                    anchors.horizontalCenter: parent.horizontalCenter
+                ListView {
+                    id: creditsView
+                    width: parent.width
+                    height: aboutBox.height * 0.25
                     spacing: 20
-
-                    Column {
-                        id: links1
-                        spacing: 20
-                        anchors.top: parent.top
-
-                        Text {
-                            text: "Using <strong>PhoneticTranslator</strong><br/><font color=\"blue\">https://sourceforge.net/projects/phtranslator/</font>"
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Qt.openUrlExternally("https://sourceforge.net/projects/phtranslator/")
-                            }
-                        }
-
-                        Text {
-                            text: "Using <strong>Sonnet</strong> from KDE Frameworks 5<br/><font color=\"blue\">https://api.kde.org/frameworks/sonnet/html/index.html</font>"
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Qt.openUrlExternally("https://api.kde.org/frameworks/sonnet/html/index.html")
-                            }
-                        }
-
-                        Text {
-                            text: "Using <strong>QuaZip</strong><br/><font color=\"blue\">https://github.com/stachenov/quazip</font>"
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Qt.openUrlExternally("https://github.com/stachenov/quazip")
-                            }
-                        }
-
+                    clip: true
+                    ScrollBar.vertical: ScrollBar2 {
+                        flickable: creditsView
                     }
-
-                    Column {
-                        id: links2
-                        spacing: 20
-                        anchors.top: parent.top
-
-                        Text {
-                            text: "Developed using <strong>Qt " + Scrite.app.qtVersion + "</strong><br/><font color=\"blue\">https://www.qt.io</font>"
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Qt.openUrlExternally("https://www.qt.io")
-                            }
+                    model: ListModel {
+                        ListElement {
+                            credits: "Using <strong>Phonetic Translator</strong> library for providing static transliteration."
+                            url: "https://sourceforge.net/projects/phtranslator/"
                         }
 
-                        Text {
-                            text: "Using <strong>SimpleCrypt</strong>.<br/><font color=\"blue\">Click here</font> to know more."
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
-
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Qt.openUrlExternally("https://wiki.qt.io/Simple_encryption_with_SimpleCrypt")
-                            }
+                        ListElement {
+                            credits: "Using <strong>Sonnet</strong> from KDE Frameworks for powering English spell check."
+                            url: "https://api.kde.org/frameworks/sonnet/html/index.html"
                         }
 
-                        Text {
-                            text: "Using <strong>Curved Arrows</strong>.<br/><font color=\"blue\">Click here</font> to know more."
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
+                        ListElement {
+                            credits: "Using <strong>QuaZip</strong> for (un)compressing Scrite documents."
+                            url: "https://github.com/stachenov/quazip"
+                        }
 
-                            MouseArea {
-                                anchors.fill: parent
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: Qt.openUrlExternally("https://github.com/dragonman225/curved-arrows")
-                            }
+                        ListElement {
+                            credits: "Using <strong>SimpleCrypt</strong> for encrypting Scrite documents."
+                            url: "https://wiki.qt.io/Simple_encryption_with_SimpleCrypt"
+                        }
+
+                        ListElement {
+                            credits: "Using <strong>Curved-Arrows</strong> library for evaluating curved arrow connectors."
+                            url: "https://github.com/dragonman225/curved-arrows"
+                        }
+
+                        ListElement {
+                            credits: "Using <strong>QuillJS</strong> for powering rich text editor in Notebook."
+                            url: "https://quilljs.com/"
+                        }
+
+                        ListElement {
+                            credits: "Using <strong>Qt</strong> 5.15 LTS for developing the entire app."
+                            url: "https://www.qt.io"
+                        }
+                    }
+                    delegate: Label {
+                        required property string credits
+                        required property url url
+
+                        id: creditLabel
+                        text: credits
+                        color: creditLabelMouseArea.containsMouse ? "blue" : "black"
+                        width: ListView.view.width - 20
+                        wrapMode: Text.WordWrap
+
+                        MouseArea {
+                            id: creditLabelMouseArea
+                            anchors.fill: parent
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: Qt.openUrlExternally(url)
+                            hoverEnabled: true
                         }
                     }
                 }
