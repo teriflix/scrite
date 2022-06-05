@@ -1977,8 +1977,8 @@ Rectangle {
                                         width: parent.height
                                         height: parent.height
                                         source: {
-                                            if(character.photos.length > 0)
-                                                return "file:///" + character.photos[0]
+                                            if(character.hasKeyPhoto > 0)
+                                                return "file:///" + character.keyPhoto
                                             return "../icons/content/character_icon.png"
                                         }
                                         fillMode: Image.PreserveAspectCrop
@@ -2230,10 +2230,14 @@ Rectangle {
                                 Connections {
                                     target: characterNotes
                                     function onCharacterChanged() {
-                                        Scrite.app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+                                        Scrite.app.execLater(this, 100, function() {
+                                            photoSlides.currentIndex = character.hasKeyPhoto ? character.keyPhotoIndex : 0
+                                        } )
                                     }
                                 }
-                                Component.onCompleted: Scrite.app.execLater(this, 100, function() { photoSlides.currentIndex = 0 } )
+                                Component.onCompleted: Scrite.app.execLater(this, 100, function() {
+                                    photoSlides.currentIndex = character.hasKeyPhoto ? character.keyPhotoIndex : 0
+                                } )
 
                                 FileDialog {
                                     id: fileDialog
@@ -2343,6 +2347,20 @@ Rectangle {
                                                     var ci = photoSlides.currentIndex
                                                     character.removePhoto(photoSlides.currentIndex)
                                                     Qt.callLater( function() { photoSlides.currentIndex = Math.min(ci,photoSlides.count-1) } )
+                                                }
+                                            }
+
+                                            ToolButton3 {
+                                                anchors.top: parent.top
+                                                anchors.left: parent.left
+                                                anchors.leftMargin: parent.fillWidth ? 0 : -width
+                                                iconSource: parent.fillWidth ? "../icons/action/pin_inverted.png" : "../icons/action/pin.png"
+                                                down: photoSlides.currentIndex === character.keyPhotoIndex
+                                                onClicked: {
+                                                    if(photoSlides.currentIndex === character.keyPhotoIndex)
+                                                        character.keyPhotoIndex = 0
+                                                    else
+                                                        character.keyPhotoIndex = photoSlides.currentIndex
                                                 }
                                             }
                                         }

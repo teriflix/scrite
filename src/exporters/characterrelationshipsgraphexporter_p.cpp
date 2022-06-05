@@ -174,10 +174,21 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
         painter->setOpacity(1.0);
     }
 
-    QImage image(hasPhotos ? photos.first() : QStringLiteral(":/icons/content/character_icon.png"));
+    QImage image(hasPhotos ? character->keyPhoto()
+                           : QStringLiteral(":/icons/content/character_icon.png"));
     image = image.scaled(rect.size().toSize(), Qt::KeepAspectRatioByExpanding,
                          Qt::SmoothTransformation);
-    painter->drawImage(rect, image);
+
+    auto imageSourceRect = [=]() -> QRectF {
+        QSizeF imageSize = image.size();
+        imageSize.scale(rect.size(), Qt::IgnoreAspectRatio);
+
+        QRectF imageRect(QPointF(0, 0), imageSize);
+        imageRect.moveCenter(image.rect().center());
+        return imageRect;
+    };
+
+    painter->drawImage(rect, image, imageSourceRect());
 
     painter->setBrush(Qt::NoBrush);
     painter->setPen(Qt::lightGray);

@@ -1151,13 +1151,16 @@ Character::Character(QObject *parent)
     connect(this, &Character::relationshipCountChanged, this, &Character::characterChanged);
     connect(this, &Character::characterRelationshipGraphChanged, this,
             &Character::characterChanged);
+    connect(this, &Character::keyPhotoChanged, this, &Character::characterChanged);
     connect(m_attachments, &Attachments::attachmentsModified, this, &Character::characterChanged);
 
     DocumentFileSystem *dfs = ScriteDocument::instance()->fileSystem();
     connect(dfs, &DocumentFileSystem::auction, this, &Character::onDfsAuction);
 
-    connect(this, &Character::photosChanged, this,
-            [=]() { this->setKeyPhotoIndex(qBound(-1, m_keyPhotoIndex, m_photos.size() - 1)); });
+    connect(this, &Character::photosChanged, this, [=]() {
+        const int min = m_photos.isEmpty() ? -1 : 0;
+        this->setKeyPhotoIndex(qBound(min, m_keyPhotoIndex, m_photos.size() - 1));
+    });
 
     if (m_structure) {
         connect(this, &Character::tagsChanged, m_structure,
@@ -1651,7 +1654,7 @@ void Character::serializeToJson(QJsonObject &json) const
 void Character::deserializeFromJson(const QJsonObject &json)
 {
     DocumentFileSystem *dfs = m_structure->scriteDocument()->fileSystem();
-    const QJsonArray array = json.value("photos").toArray();
+    const QJsonArray array = json.value(QStringLiteral("photos")).toArray();
 
     QStringList photoPaths;
     for (int i = 0; i < array.size(); i++) {
@@ -1673,6 +1676,12 @@ void Character::deserializeFromJson(const QJsonObject &json)
     if (m_photos != photoPaths) {
         m_photos = photoPaths;
         emit photosChanged();
+    }
+
+    const QString kpiAttr = QStringLiteral("keyPhotoIndex");
+    if (json.contains(kpiAttr)) {
+        const int kpi = json.value(kpiAttr).toInt();
+        this->setKeyPhotoIndex(kpi);
     }
 
     // Previously notes was an array, because the notes property used to be

@@ -418,6 +418,9 @@ public:
     int keyPhotoIndex() const { return m_keyPhotoIndex; }
     Q_SIGNAL void keyPhotoIndexChanged();
 
+    Q_PROPERTY(bool hasKeyPhoto READ hasKeyPhoto NOTIFY keyPhotoChanged)
+    bool hasKeyPhoto() const { return !m_keyPhoto.isEmpty(); }
+
     Q_PROPERTY(QString type READ type WRITE setType NOTIFY typeChanged)
     void setType(const QString &val);
     QString type() const { return m_type; }

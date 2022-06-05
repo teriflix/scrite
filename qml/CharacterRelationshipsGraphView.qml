@@ -485,8 +485,8 @@ Rectangle {
                             Image {
                                 anchors.fill: parent
                                 source: {
-                                    if(ofCharacter.photos.length > 0)
-                                        return "file:///" + ofCharacter.photos[0]
+                                    if(ofCharacter.hasKeyPhoto > 0)
+                                        return "file:///" + ofCharacter.keyPhoto
                                     return "../icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -535,8 +535,8 @@ Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 1
                                 source: {
-                                    if(withCharacter.photos.length > 0)
-                                        return "file:///" + withCharacter.photos[0]
+                                    if(withCharacter.hasKeyPhoto > 0)
+                                        return "file:///" + withCharacter.keyPhoto
                                     return "../icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -619,8 +619,8 @@ Rectangle {
             Image {
                 anchors.fill: parent
                 source: {
-                    if(character.photos.length > 0)
-                        return "file:///" + character.photos[0]
+                    if(character.hasKeyPhoto > 0)
+                        return "file:///" + character.keyPhoto
                     return "../icons/content/character_icon.png"
                 }
                 fillMode: Image.PreserveAspectCrop

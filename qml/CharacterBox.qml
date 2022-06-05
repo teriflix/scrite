@@ -46,8 +46,8 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 1
                 source: {
-                    if(character.photos.length > 0)
-                        return "file:///" + character.photos[0]
+                    if(character.hasKeyPhoto)
+                        return "file:///" + character.keyPhoto
                     return "../icons/content/character_icon.png"
                 }
                 fillMode: Image.PreserveAspectFit
