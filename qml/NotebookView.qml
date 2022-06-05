@@ -2274,6 +2274,15 @@ Rectangle {
                                     ScrollBar.vertical: characterQuickInfoViewScrollBar
                                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
+                                    function scrollIntoView(field) {
+                                        const fy = field.mapToItem(characterQuickInfoViewContent, 0, 0).y
+                                        const fh = field.height
+                                        if(fy < contentY)
+                                            contentY = fy
+                                        else if(fy+fh > contentY+height)
+                                            contentY = fy+fh-height
+                                    }
+
                                     Column {
                                         id: characterQuickInfoViewContent
                                         width: characterQuickInfoView.width
@@ -2386,6 +2395,7 @@ Rectangle {
                                             onTextEdited: character.designation = text
                                             enableTransliteration: true
                                             readOnly: Scrite.document.readOnly
+                                            onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(designationField)
                                         }
 
                                         Column {
@@ -2407,6 +2417,7 @@ Rectangle {
                                                 }
                                                 enableTransliteration: true
                                                 readOnly: Scrite.document.readOnly
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(newTagField)
                                             }
 
                                             Flow {
@@ -2468,6 +2479,7 @@ Rectangle {
                                             }
 
                                             Slider {
+                                                id: prioritySlider
                                                 width: parent.width-10
                                                 orientation: Qt.Horizontal
                                                 from: -10
@@ -2478,6 +2490,7 @@ Rectangle {
                                                 onValueChanged: character.priority = value
                                                 TabSequenceItem.sequence: 2
                                                 TabSequenceItem.manager: characterInfoTabSequence
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(prioritySlider)
                                             }
                                         }
 
@@ -2494,6 +2507,7 @@ Rectangle {
                                             onEditingComplete: character.aliases = text.split(",")
                                             enableTransliteration: true
                                             readOnly: Scrite.document.readOnly
+                                            onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(aliasesField)
                                         }
 
                                         Row {
@@ -2513,6 +2527,7 @@ Rectangle {
                                                 onTextEdited: character.type = text
                                                 enableTransliteration: true
                                                 readOnly: Scrite.document.readOnly
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(typeField)
                                             }
 
                                             TextField2 {
@@ -2528,6 +2543,7 @@ Rectangle {
                                                 onTextEdited: character.gender = text
                                                 enableTransliteration: true
                                                 readOnly: Scrite.document.readOnly
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(genderField)
                                             }
                                         }
 
@@ -2548,6 +2564,7 @@ Rectangle {
                                                 onTextEdited: character.age = text
                                                 enableTransliteration: true
                                                 readOnly: Scrite.document.readOnly
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(ageField)
                                             }
 
                                             TextField2 {
@@ -2563,6 +2580,7 @@ Rectangle {
                                                 onTextEdited: character.bodyType = text
                                                 enableTransliteration: true
                                                 readOnly: Scrite.document.readOnly
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(bodyTypeField)
                                             }
                                         }
 
@@ -2578,11 +2596,12 @@ Rectangle {
                                                 placeholderText: "<max 20 letters>"
                                                 maximumLength: 20
                                                 text: character.height
-                                                TabSequenceItem.sequence: 7
+                                                TabSequenceItem.sequence: 8
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.height = text
                                                 enableTransliteration: true
                                                 readOnly: Scrite.document.readOnly
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(heightField)
                                             }
 
                                             TextField2 {
@@ -2593,11 +2612,12 @@ Rectangle {
                                                 placeholderText: "<max 20 letters>"
                                                 maximumLength: 20
                                                 text: character.weight
-                                                TabSequenceItem.sequence: 8
+                                                TabSequenceItem.sequence: 9
                                                 TabSequenceItem.manager: characterInfoTabSequence
                                                 onTextEdited: character.weight = text
                                                 enableTransliteration: true
                                                 readOnly: Scrite.document.readOnly
+                                                onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(weightField)
                                             }
                                         }
                                     }
@@ -2641,7 +2661,7 @@ Rectangle {
                                     text: character.summary
                                     onTextChanged: character.summary = text
                                     placeholderText: "Character Summary"
-                                    tabSequenceIndex: 8
+                                    tabSequenceIndex: 10
                                     tabSequenceManager: characterInfoTabSequence
                                     background: Rectangle {
                                         color: primaryColors.windowColor
@@ -2649,15 +2669,6 @@ Rectangle {
                                     }
                                     adjustTextWidthBasedOnScrollBar: false
                                     ScrollBar.vertical: characterSummaryVScrollBar
-                                }
-
-                                ScrollBar2 {
-                                    id: characterSummaryVScrollBar
-                                    orientation: Qt.Vertical
-                                    flickable: characterSummaryField
-                                    anchors.top: parent.top
-                                    anchors.right: parent.right
-                                    anchors.bottom: parent.bottom
                                 }
                             }
                         }

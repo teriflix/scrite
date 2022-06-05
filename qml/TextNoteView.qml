@@ -89,15 +89,6 @@ Item {
         wrapAround: true
     }
 
-    ScrollBar2 {
-        id: noteVScrollBar
-        orientation: Qt.Vertical
-        flickable: contentField
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.bottom: attachmentsArea.top
-    }
-
     AttachmentsView {
         id: attachmentsArea
         attachments: note ? note.attachments : null
