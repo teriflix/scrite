@@ -46,14 +46,14 @@ JsonHttpRequest::JsonHttpRequest(QObject *parent) : QObject(parent)
             this->deleteLater();
     });
 
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "PA: ";
 #endif
 }
 
 JsonHttpRequest::~JsonHttpRequest()
 {
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "PA: " << m_type << m_api;
 #endif
 }
@@ -296,6 +296,11 @@ QString JsonHttpRequest::errorText() const
     return ::jsonFetch(m_error, QStringLiteral("text")).toString();
 }
 
+QString JsonHttpRequest::errorMessage() const
+{
+    return QStringLiteral("%1: %2").arg(this->errorCode(), this->errorText());
+}
+
 QJsonObject JsonHttpRequest::errorData() const
 {
     return ::jsonFetch(m_error, QStringLiteral("data")).toObject();
@@ -374,7 +379,7 @@ bool JsonHttpRequest::call()
     }
 
     if (m_reply) {
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
         qDebug() << "PA: Call Issued - " << m_type << m_api;
 #endif
 
@@ -418,7 +423,7 @@ void JsonHttpRequest::onNetworkReplyError()
             Application::instance()->enumerationKey(m_reply, "NetworkError", m_reply->error());
     const QString msg = m_reply->errorString();
 
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "PA: Network Error - " << m_type << m_api << code << msg;
 #endif
 
@@ -446,7 +451,7 @@ void JsonHttpRequest::onNetworkReplyFinished()
         const QString errorAttr = QStringLiteral("error");
         const QString responseAttr = QStringLiteral("response");
 
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
         qDebug() << "PA: Response Received - " << m_type << m_api;
 #endif
 

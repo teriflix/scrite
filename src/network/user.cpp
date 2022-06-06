@@ -15,6 +15,7 @@
 #include "scrite.h"
 #include "application.h"
 #include "timeprofiler.h"
+#include "peerapplookup.h"
 #include "scritedocument.h"
 #include "jsonhttprequest.h"
 
@@ -24,11 +25,12 @@
 #include <QJsonDocument>
 #include <QCoreApplication>
 
-static QString GetSessionExpiredErrorMessage()
+static QString GetSessionExpiredErrorMessage(const QString &context)
 {
-    return QStringLiteral("Your login session has expired and therefore your device is "
-                          "deactivated. Please connect to the Internet and "
-                          "login/reactivate your installation of Scrite.");
+    return context
+            + QStringLiteral(": Your login session has expired and therefore your device is "
+                             "deactivated. Please connect to the Internet and "
+                             "login/reactivate your installation of Scrite.");
 }
 
 User *User::instance()
@@ -213,7 +215,7 @@ void User::setInfo(const QJsonObject &val)
         const QJsonObject consentObj = m_info.value(QStringLiteral("consent")).toObject();
         m_analyticsConsent = consentObj.value(QStringLiteral("activity")).toBool(false);
 
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
         qDebug() << "PA: " << m_enabledFeatures << m_info;
 #endif
     }
@@ -254,6 +256,7 @@ void User::setInstallations(const QJsonArray &val)
     }
 
     int index = -1;
+    bool activationTimeout = false;
     for (const QJsonValue &item : qAsConst(m_installations)) {
         ++index;
         const QJsonObject installation = item.toObject();
@@ -268,8 +271,10 @@ void User::setInstallations(const QJsonArray &val)
                         dtFormat);
                 const int nrDaysFromLastActivation =
                         lastActivateDate.daysTo(QDateTime::currentDateTime());
-                if (nrDaysFromLastActivation > 28)
+                if (nrDaysFromLastActivation > 28) {
+                    activationTimeout = true;
                     break;
+                }
             }
 
             m_currentInstallationIndex = index;
@@ -278,7 +283,11 @@ void User::setInstallations(const QJsonArray &val)
     }
 
     if (m_currentInstallationIndex < 0 && !m_installations.isEmpty()) {
-        m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+        const QString errContext = m_currentInstallationIndex < 0
+                ? (activationTimeout ? QStringLiteral("E_ACT_TIMEOUT")
+                                     : QStringLiteral("E_INSTALL"))
+                : QStringLiteral("E_INSTALLS");
+        m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage(errContext));
         m_installations = QJsonArray();
         this->logout();
     }
@@ -405,7 +414,8 @@ void User::loadStoredUserInformation()
         if (parseError.error == QJsonParseError::NoError && !object.isEmpty())
             this->setInfo(object);
         else {
-            m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+            m_errorReport->setErrorMessage(
+                    GetSessionExpiredErrorMessage(QStringLiteral("E_STORED_USERINFO")));
             this->reset();
             return;
         }
@@ -422,7 +432,8 @@ void User::loadStoredUserInformation()
         if (parseError.error == QJsonParseError::NoError && !array.isEmpty())
             this->setInstallations(array);
         else {
-            m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage());
+            m_errorReport->setErrorMessage(
+                    GetSessionExpiredErrorMessage(QStringLiteral("E_STORED_INSTALLS")));
             this->reset();
         }
     }
@@ -449,7 +460,7 @@ void User::onCallDestroyed()
     m_call = nullptr;
     emit busyChanged();
 
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "PA: ";
 #endif
 }
@@ -465,7 +476,8 @@ void User::onLogActivityCallFinished()
                                        QStringLiteral("E_NO_SESSION"),
                                        QStringLiteral("E_NO_USER") });
         if (errorCodes.contains(call->errorCode())) {
-            m_errorReport->setErrorMessage(::GetSessionExpiredErrorMessage());
+            m_errorReport->setErrorMessage(
+                    ::GetSessionExpiredErrorMessage(QStringLiteral("E_LOG")));
             this->logout();
             return;
         }
@@ -520,6 +532,8 @@ void User::reload()
     }
 
     if (JsonHttpRequest::sessionToken().isEmpty()) {
+        const bool resetSessionToken = PeerAppLookup::instance()->peerCount() == 0;
+
         // Activate device to get session token
         m_call = this->newCall();
         connect(m_call, &JsonHttpRequest::finished, this, &User::activateCallDone);
@@ -532,7 +546,8 @@ void User::reload()
                   { QStringLiteral("loginToken"), JsonHttpRequest::loginToken() },
                   { QStringLiteral("platform"), JsonHttpRequest::platform() },
                   { QStringLiteral("platformType"), JsonHttpRequest::platformType() },
-                  { QStringLiteral("platformVersion"), JsonHttpRequest::platformVersion() } }));
+                  { QStringLiteral("platformVersion"), JsonHttpRequest::platformVersion() },
+                  { QStringLiteral("resetSessionToken"), QJsonValue(resetSessionToken) } }));
         m_call->call();
     } else {
         // Since we have session token, we can reload user information and
@@ -756,7 +771,7 @@ void AppFeature::reevaluate()
     } else
         this->setEnabled(false);
 
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "PA: " << m_featureName << "/" << m_feature << " = " << m_enabled;
 #endif
 }

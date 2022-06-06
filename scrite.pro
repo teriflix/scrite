@@ -56,6 +56,7 @@ HEADERS += \
     src/core/appwindow.h \
     src/core/filelocker.h \
     src/core/pdfexportablegraphicsscene.h \
+    src/core/peerapplookup.h \
     src/core/printerobject.h \
     src/core/qobjectlistmodel.h \
     src/core/qobjectproperty.h \
@@ -178,6 +179,7 @@ SOURCES += \
     src/core/appwindow.cpp \
     src/core/filelocker.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
+    src/core/peerapplookup.cpp \
     src/core/qobjectlistmodel.cpp \
     src/core/qobjectproperty.cpp \
     src/core/scrite.cpp \

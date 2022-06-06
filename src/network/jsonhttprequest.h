@@ -114,6 +114,9 @@ public:
     Q_PROPERTY(QString errorText READ errorText NOTIFY errorChanged)
     QString errorText() const;
 
+    Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY errorChanged)
+    QString errorMessage() const;
+
     Q_PROPERTY(QJsonObject errorData READ errorData NOTIFY errorChanged)
     QJsonObject errorData() const;
 

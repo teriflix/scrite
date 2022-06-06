@@ -134,7 +134,7 @@ void DocumentFileSystem::reset()
 
     d->folder.reset(new QTemporaryDir);
 
-#ifndef QT_NODEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "PA: " << d->folder->path();
 #endif
 }
