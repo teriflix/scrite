@@ -43,6 +43,8 @@ User *User::instance()
 
 User::User(QObject *parent) : QObject(parent)
 {
+    PeerAppLookup::instance();
+
     const QStringList appArgs = qApp->arguments();
     const QString starg = QStringLiteral("--sessionToken");
     const int stargPos = appArgs.indexOf(starg);
