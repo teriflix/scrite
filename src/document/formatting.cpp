@@ -1105,8 +1105,10 @@ void TextFormat::reset()
     this->setUnderline(false);
 }
 
-void TextFormat::updateFromFormat(const QTextCharFormat &format)
+void TextFormat::updateFromCharFormat(const QTextCharFormat &format)
 {
+    QScopedValueRollback<bool>(m_updatingFromFormat, true);
+
     if (format.hasProperty(QTextFormat::ForegroundBrush))
         this->setTextColor(format.foreground().color());
     else
@@ -1135,7 +1137,7 @@ void TextFormat::updateFromFormat(const QTextCharFormat &format)
     emit formatChanged();
 }
 
-QTextCharFormat TextFormat::toFormat() const
+QTextCharFormat TextFormat::toCharFormat() const
 {
     QTextCharFormat format;
 
@@ -1315,6 +1317,8 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
 {
     connect(this, &SceneDocumentBinder::currentElementChanged, this,
             &SceneDocumentBinder::nextTabFormatChanged);
+    connect(m_textFormat, &TextFormat::formatChanged, this,
+            &SceneDocumentBinder::onTextFormatChanged);
 }
 
 SceneDocumentBinder::~SceneDocumentBinder() { }
@@ -1523,11 +1527,38 @@ void SceneDocumentBinder::setCursorPosition(int val)
         this->setSpellingSuggestions(cursor.suggestions());
 
         const QTextCharFormat format = cursor.charFormat();
-        m_textFormat->updateFromFormat(format);
+        m_textFormat->updateFromCharFormat(format);
     }
 
     m_currentElementCursorPosition = m_cursorPosition - block.position();
     emit cursorPositionChanged();
+}
+
+void SceneDocumentBinder::setSelectionStartPosition(int val)
+{
+    if (m_selectionStartPosition == val)
+        return;
+
+    m_selectionStartPosition = val;
+    emit selectionStartPositionChanged();
+}
+
+void SceneDocumentBinder::setSelectionEndPosition(int val)
+{
+    if (m_selectionEndPosition == val)
+        return;
+
+    m_selectionEndPosition = val;
+    emit selectionEndPositionChanged();
+}
+
+void SceneDocumentBinder::setApplyTextFormat(bool val)
+{
+    if (m_applyTextFormat == val)
+        return;
+
+    m_applyTextFormat = val;
+    emit applyTextFormatChanged();
 }
 
 void SceneDocumentBinder::setCharacterNames(const QStringList &val)
@@ -2577,6 +2608,18 @@ void SceneDocumentBinder::rehighlightBlockLater(const QTextBlock &block)
 
 void SceneDocumentBinder::onTextFormatChanged()
 {
-    // TODO: here is where we can take changes made to text format
-    // and apply it to the text document at the current cursor.
+    if (!m_applyTextFormat || m_textFormat->isUpdatingFromCharFormat())
+        return;
+
+    QTextCursor cursor(this->document());
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0) {
+        cursor.setPosition(m_selectionStartPosition);
+        cursor.setPosition(m_selectionEndPosition, QTextCursor::KeepAnchor);
+    } else if (m_cursorPosition >= 0)
+        cursor.setPosition(m_cursorPosition);
+    else
+        return;
+
+    cursor.mergeCharFormat(m_textFormat->toCharFormat());
+    cursor.clearSelection();
 }

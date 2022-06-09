@@ -466,9 +466,11 @@ public:
 
     Q_INVOKABLE void resetBackgroundColor() { this->setBackgroundColor(Qt::transparent); }
 
-    void reset();
-    void updateFromFormat(const QTextCharFormat &format);
-    QTextCharFormat toFormat() const;
+    Q_INVOKABLE void reset();
+
+    void updateFromCharFormat(const QTextCharFormat &format);
+    bool isUpdatingFromCharFormat() const { return m_updatingFromFormat; }
+    QTextCharFormat toCharFormat() const;
 
     Q_SIGNAL void formatChanged();
 
@@ -476,6 +478,7 @@ private:
     bool m_bold = false;
     bool m_italic = false;
     bool m_underline = false;
+    bool m_updatingFromFormat = false;
     QColor m_textColor = Qt::transparent;
     QColor m_backgroundColor = Qt::transparent;
 };
@@ -524,6 +527,21 @@ public:
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
+
+    Q_PROPERTY(int selectionStartPosition READ selectionStartPosition WRITE setSelectionStartPosition NOTIFY selectionStartPositionChanged)
+    void setSelectionStartPosition(int val);
+    int selectionStartPosition() const { return m_selectionStartPosition; }
+    Q_SIGNAL void selectionStartPositionChanged();
+
+    Q_PROPERTY(int selectionEndPosition READ selectionEndPosition WRITE setSelectionEndPosition NOTIFY selectionEndPositionChanged)
+    void setSelectionEndPosition(int val);
+    int selectionEndPosition() const { return m_selectionEndPosition; }
+    Q_SIGNAL void selectionEndPositionChanged();
+
+    Q_PROPERTY(bool applyTextFormat READ isApplyTextFormat WRITE setApplyTextFormat NOTIFY applyTextFormatChanged)
+    void setApplyTextFormat(bool val);
+    bool isApplyTextFormat() const { return m_applyTextFormat; }
+    Q_SIGNAL void applyTextFormatChanged();
 
     Q_PROPERTY(TextFormat* textFormat READ textFormat CONSTANT)
     TextFormat *textFormat() const { return m_textFormat; }
@@ -684,6 +702,9 @@ private:
     friend class SpellCheckService;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
+    int m_selectionEndPosition = -1;
+    int m_selectionStartPosition = -1;
+    bool m_applyTextFormat = false;
     bool m_pastingContent = false;
     int m_documentLoadCount = 0;
     TextFormat *m_textFormat = new TextFormat(this);
