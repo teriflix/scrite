@@ -20,8 +20,8 @@ QString Application::buildTimestamp() const
 {
     static QString ret;
     if (ret.isEmpty()) {
-        const QString dateString = QString::fromLatin1(__DATE__).simplified();
-        const QString timeString = QString::fromLatin1(__TIME__).simplified();
+        const QString dateString = QString::fromUtf8(__DATE__).simplified();
+        const QString timeString = QString::fromUtf8(__TIME__).simplified();
         const QDate date = QDate::fromString(dateString, "MMM d yyyy");
         const QTime time = QTime::fromString(timeString, "hh:mm:ss");
         ret = date.toString(QStringLiteral("yyMMdd")) + "-"

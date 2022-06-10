@@ -544,13 +544,13 @@ QString QObjectSerializer::toJsonString(const QObject *object)
 {
     const QJsonObject json = QObjectSerializer::toJson(object);
     const QJsonDocument doc(json);
-    return QString::fromLatin1(doc.toJson());
+    return doc.toJson();
 }
 
 bool QObjectSerializer::fromJsonString(const QString &json, QObject *object,
                                        QObjectFactory *factory)
 {
-    const QJsonDocument doc = QJsonDocument::fromJson(json.toLatin1());
+    const QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8());
     const QJsonObject jsonObject = doc.object();
     return QObjectSerializer::fromJson(jsonObject, object, factory);
 }

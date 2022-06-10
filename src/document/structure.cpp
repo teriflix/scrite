@@ -4231,7 +4231,7 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
                                          .arg(imageBytes.constData())
                                          .arg(imageSize.height())
                                          .arg(imageSize.width());
-            data = QJsonDocument::fromJson(json.toLatin1()).object();
+            data = QJsonDocument::fromJson(json.toUtf8()).object();
             if (className)
                 *className = QLatin1String(Annotation::staticMetaObject.className());
         } else if (url.isValid()) {
@@ -4248,7 +4248,7 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
                                                 "    \"type\": \"url\""
                                                 "}")
                                          .arg(url.toString());
-            data = QJsonDocument::fromJson(json.toLatin1()).object();
+            data = QJsonDocument::fromJson(json.toUtf8()).object();
             if (className)
                 *className = QLatin1String(Annotation::staticMetaObject.className());
         } else if (mimeData->hasText()) {
@@ -4296,7 +4296,7 @@ static inline QJsonObject fetchPasteDataFromClipboard(QString *className = nullp
                                          .arg(mimeData->text())
                                          .arg(qCeil(textHeight))
                                          .arg(qCeil(textWidth));
-            data = QJsonDocument::fromJson(json.toLatin1()).object();
+            data = QJsonDocument::fromJson(json.toUtf8()).object();
             if (className)
                 *className = QLatin1String(Annotation::staticMetaObject.className());
         }

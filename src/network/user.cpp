@@ -412,7 +412,7 @@ void User::loadStoredUserInformation()
         QJsonParseError parseError;
         const QString cryptText = userInfoVariant.toString();
         const QString crypt = JsonHttpRequest::decrypt(cryptText);
-        const QJsonObject object = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).object();
+        const QJsonObject object = QJsonDocument::fromJson(crypt.toUtf8(), &parseError).object();
         if (parseError.error == QJsonParseError::NoError && !object.isEmpty())
             this->setInfo(object);
         else {
@@ -430,7 +430,7 @@ void User::loadStoredUserInformation()
         QJsonParseError parseError;
         const QString cryptText = devicesVariant.toString();
         const QString crypt = JsonHttpRequest::decrypt(cryptText);
-        const QJsonArray array = QJsonDocument::fromJson(crypt.toLatin1(), &parseError).array();
+        const QJsonArray array = QJsonDocument::fromJson(crypt.toUtf8(), &parseError).array();
         if (parseError.error == QJsonParseError::NoError && !array.isEmpty())
             this->setInstallations(array);
         else {
