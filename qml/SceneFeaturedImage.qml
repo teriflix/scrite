@@ -166,6 +166,7 @@ Item {
             nameFilters: sceneAttachments.nameFilters
             selectMultiple: false
             selectExisting: true
+            dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
             onAccepted: {
                 const attachment = sceneAttachments.includeAttachment( Scrite.app.urlToLocalFile(fileUrl) )
                 if(attachment)

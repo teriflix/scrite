@@ -172,21 +172,34 @@ public:
 
     Q_INVOKABLE QJsonArray find(const QString &text, int flags) const;
 
+    void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &obj);
+
+    // For use with SceneDocumentBinder, ScreenplayTextDocument
+    void setTextFormats(const QVector<QTextLayout::FormatRange> &formats);
+    QVector<QTextLayout::FormatRange> textFormats() const { return m_textFormats; }
+
+    static QJsonArray textFormatsToJson(const QVector<QTextLayout::FormatRange> &formats);
+    static QVector<QTextLayout::FormatRange> textFormatsFromJson(const QJsonArray &array);
 
 protected:
     bool event(QEvent *event);
+    void timerEvent(QTimerEvent *event);
 
 private:
     friend class Scene;
     void renameCharacter(const QString &from, const QString &to);
+    void reportSceneElementChanged(int type);
 
 private:
     mutable QString m_id;
     Type m_type = Action;
     QString m_text;
+    QVector<QTextLayout::FormatRange> m_textFormats;
     Scene *m_scene = nullptr;
     mutable SpellCheckService *m_spellCheck = nullptr;
+    QBasicTimer m_changeTimer;
+    QMap<int, int> m_changeCounters;
 };
 
 class DistinctElementValuesMap

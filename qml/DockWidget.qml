@@ -19,10 +19,12 @@ Item {
     property alias title: titleText.text
     property alias active: contentLoader.active
     property alias content: contentLoader.sourceComponent
+    property alias closable: closeButton.visible
     property real contentX
     property real contentY
     property real contentWidth
     property real contentHeight
+    property real contentPadding: 0
     property bool contentHasFocus: contentLoader.FocusTracker.hasFocus
     property Item sourceItem
 
@@ -58,6 +60,8 @@ Item {
     }
 
     TrackerPack {
+        TrackProperty { target: dockWidget; property: "x" }
+        TrackProperty { target: dockWidget; property: "y" }
         TrackProperty { target: dockWidget; property: "width" }
         TrackProperty { target: dockWidget; property: "height" }
         TrackProperty { target: dockWidget; property: "visible" }
@@ -86,12 +90,12 @@ Item {
         }
 
         function returnToBounds() {
-            var newX = dockWidget.contentX
-            var newY = dockWidget.contentY
-            if(dockWidget.contentX + dockWidget.contentWidth > dockWidget.width)
-                newX = dockWidget.width - dockWidget.contentWidth
-            if(dockWidget.contentY + dockWidget.contentHeight > dockWidget.height)
-                newY = dockWidget.height - dockWidget.contentHeight
+            var newX = Math.max(contentPadding,dockWidget.contentX)
+            var newY = Math.max(contentPadding,dockWidget.contentY)
+            if(dockWidget.contentX + dockWidget.contentWidth > dockWidget.width-dockWidget.contentPadding)
+                newX = dockWidget.width - dockWidget.contentPadding - dockWidget.contentWidth
+            if(dockWidget.contentY + dockWidget.contentHeight > dockWidget.height-dockWidget.contentPadding)
+                newY = dockWidget.height - dockWidget.contentPadding - dockWidget.contentHeight
             dockWidget.contentX = newX
             dockWidget.contentY = newY
         }
@@ -139,6 +143,7 @@ Item {
             }
 
             ToolButton3 {
+                id: closeButton
                 height: parent.height - 6
                 width: height
                 anchors.verticalCenter: parent.verticalCenter

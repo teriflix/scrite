@@ -60,7 +60,7 @@ bool QtApplicationEventNotificationCallback(void **cbdata);
 void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context,
                                  const QString &message)
 {
-#ifdef QT_NO_DEBUG
+#ifdef QT_NO_DEBUG_OUTPUT
     Q_UNUSED(type)
     Q_UNUSED(context)
     Q_UNUSED(message)
@@ -139,7 +139,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
             m_settings->setValue(QStringLiteral("Installation/path"), this->applicationFilePath());
     }
 
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     QInternal::registerCallback(QInternal::EventNotifyCallback,
                                 QtApplicationEventNotificationCallback);
 #endif
@@ -209,6 +209,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     if (useSoftwareRenderer)
         QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+
     QQuickStyle::setStyle(style);
 }
 
@@ -261,7 +262,7 @@ QVersionNumber Application::prepare()
 
 Application::~Application()
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     QInternal::unregisterCallback(QInternal::EventNotifyCallback,
                                   QtApplicationEventNotificationCallback);
 #endif
@@ -741,7 +742,7 @@ void Application::execLater(QObject *context, int howMuchLater, const QJSValue &
 {
     QObject *parent = context ? context : this;
 
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "Registering Exec Later for " << context << " after " << howMuchLater;
 #endif
 
@@ -873,7 +874,7 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object,
 
 bool QtApplicationEventNotificationCallback(void **cbdata)
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     QObject *object = reinterpret_cast<QObject *>(cbdata[0]);
     QEvent *event = reinterpret_cast<QEvent *>(cbdata[1]);
     bool *result = reinterpret_cast<bool *>(cbdata[2]);
@@ -958,19 +959,20 @@ bool Application::notify(QObject *object, QEvent *event)
 
 bool Application::notifyInternal(QObject *object, QEvent *event)
 {
-#ifndef QT_NO_DEBUG
-    static QMap<QObject *, QString> objectNameMap;
-    auto evaluateObjectName = [](QObject *object, QMap<QObject *, QString> &from) {
+#ifndef QT_NO_DEBUG_OUTPUT
+    static QHash<QObject *, QString> objectNameMap;
+    auto evaluateObjectName = [](QObject *object, QHash<QObject *, QString> &from) {
         QString objectName = from.value(object);
         if (objectName.isEmpty()) {
             QQuickItem *item = qobject_cast<QQuickItem *>(object);
             QObject *parent = item && item->parentItem() ? item->parentItem() : object->parent();
             QString parentName = parent ? from.value(parent) : "No Parent";
             if (parentName.isEmpty()) {
-                parentName = QString("%1 [%2] (%3)")
-                                     .arg(parent->metaObject()->className())
-                                     .arg((unsigned long)((void *)parent), 0, 16)
-                                     .arg(parent->objectName());
+                parentName =
+                        QString("%1 [%2] (%3)")
+                                .arg(parent ? parent->metaObject()->className() : "Unknown Parent")
+                                .arg((unsigned long)((void *)parent), 0, 16)
+                                .arg(parent->objectName());
             }
             objectName = QString("%1 [%2] (%3) under %4")
                                  .arg(object->metaObject()->className())
@@ -991,6 +993,10 @@ bool Application::notifyInternal(QObject *object, QEvent *event)
         ExecLaterTimer *timer = ExecLaterTimer::get(te->timerId());
         qDebug() << "TimerEventDespatch: " << te->timerId() << " on " << objectName << " is "
                  << (timer ? qPrintable(timer->name()) : "Qt Timer.");
+    } else if (event->type() == QEvent::Shortcut) {
+        const QString objectName = evaluateObjectName(object, objectNameMap);
+        QShortcutEvent *se = static_cast<QShortcutEvent *>(event);
+        qDebug() << "ShortcutEvent: " << objectName << "-" << se->key().toString();
     }
 #else
     Q_UNUSED(object)

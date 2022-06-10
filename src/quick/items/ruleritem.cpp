@@ -242,7 +242,7 @@ qreal RulerItem::Convert(qreal val, RulerItem::Unit from, RulerItem::Unit to,
 
 void RulerItem::paint(QPainter *painter)
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug("RulerItem is painting");
 #endif
 

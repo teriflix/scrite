@@ -52,6 +52,7 @@ Item {
         selectMultiple: false
         selectExisting: false
         onAccepted: fileInfo.absolutePath = Scrite.app.urlToLocalFile(fileUrl)
+        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
     }
 
     Column {

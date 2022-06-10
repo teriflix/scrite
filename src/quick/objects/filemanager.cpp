@@ -57,7 +57,7 @@ void FileManager::removeFilesInAutoDeleteList()
 
     while (!m_autoDeleteList.isEmpty()) {
         const QString filePath = m_autoDeleteList.takeFirst();
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
         qDebug() << "FileManager is removing: " << filePath;
 #endif
         QFile::remove(filePath);

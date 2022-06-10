@@ -133,7 +133,7 @@ void BoundingBoxEvaluator::evaluateNow()
 
 void BoundingBoxEvaluator::updatePreview()
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug("BoundingBoxEvaluator is updating preview picture");
 #endif
     if (!m_preview.isNull())
@@ -674,7 +674,7 @@ void BoundingBoxPreview::setEvaluator(BoundingBoxEvaluator *val)
 
 void BoundingBoxPreview::paint(QPainter *painter)
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug("BoundingBoxPreview is painting");
 #endif
 

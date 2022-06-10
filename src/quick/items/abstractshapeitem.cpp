@@ -135,7 +135,7 @@ bool AbstractShapeItem::updateShape()
 QSGNode *AbstractShapeItem::updatePaintNode(QSGNode *oldNode,
                                             QQuickItem::UpdatePaintNodeData *nodeData)
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug("AbstractShapeItem is painting.");
 #endif
 

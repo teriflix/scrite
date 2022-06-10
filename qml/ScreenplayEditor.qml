@@ -1238,7 +1238,10 @@ Rectangle {
                 id: sceneDocumentBinder
                 scene: contentItem.theScene
                 textDocument: sceneTextEditor.textDocument
+                applyTextFormat: true
                 cursorPosition: sceneTextEditor.activeFocus ? sceneTextEditor.cursorPosition : -1
+                selectionEndPosition: sceneTextEditor.activeFocus ? sceneTextEditor.selectionEnd : -1
+                selectionStartPosition: sceneTextEditor.activeFocus ? sceneTextEditor.selectionStart : -1
                 shots: Scrite.document.structure.shots
                 transitions: Scrite.document.structure.transitions
                 characterNames: Scrite.document.structure.characterNames
@@ -1600,9 +1603,14 @@ Rectangle {
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalScreenplayEditorToolbar.sceneEditor = contentItem
+                            textFormatTools.textFormat = sceneDocumentBinder.textFormat
                             justReceivedFocus = true
-                        } else if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
-                            globalScreenplayEditorToolbar.sceneEditor = null
+                        } else {
+                            if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
+                                globalScreenplayEditorToolbar.sceneEditor = null
+                            if(textFormatTools.textFormat === sceneDocumentBinder.textFormat)
+                                textFormatTools.textFormat = null
+                        }
                     }
 
                     function reload() {
@@ -3854,6 +3862,298 @@ Rectangle {
                     Profiler.active = false
             }
             */
+        }
+    }
+
+    DockWidget {
+        id: textFormatTools
+        property TextFormat textFormat
+        contentX: 20
+        contentY: 20
+        contentPadding: 20
+        contentWidth: 280
+        contentHeight: 84
+        title: "Text Formatting"
+        anchors.fill: parent
+        closable: true
+        visible: false
+        onCloseRequest: screenplayEditorSettings.textFormatDockVisible = false
+
+        function adjustCoordinates() {
+            const cx = textFormatToolsSettings.contentX
+            const cy = textFormatToolsSettings.contentY
+            contentX = Math.round(Math.min(Math.max(20, cx), parent.width-contentWidth-20))
+            contentY = Math.round(Math.min(Math.max(20, cy), parent.height-contentHeight-20))
+            visible = Qt.binding( () => { return screenplayEditorSettings.textFormatDockVisible } )
+        }
+
+        Component.onCompleted: Scrite.app.execLater(textFormatTools, 200, adjustCoordinates)
+        Component.onDestruction: {
+            textFormatToolsSettings.contentX = Math.round(contentX)
+            textFormatToolsSettings.contentY = Math.round(contentY)
+        }
+
+        Settings {
+            id: textFormatToolsSettings
+            fileName: Scrite.app.settingsFilePath
+            category: "Text Formatting Tools"
+            property real contentX: 20
+            property real contentY: 20
+        }
+
+        Shortcut {
+            sequence: "Ctrl+B"
+            context: Qt.ApplicationShortcut
+            enabled: textFormatTools.textFormat
+            ShortcutsModelItem.title: "Bold"
+            ShortcutsModelItem.shortcut: sequence
+            ShortcutsModelItem.group: "Text Formatting"
+            ShortcutsModelItem.enabled: enabled
+            onActivated: textFormatTools.textFormat.toggleBold()
+        }
+
+        Shortcut {
+            sequence: "Ctrl+I"
+            context: Qt.ApplicationShortcut
+            enabled: textFormatTools.textFormat
+            ShortcutsModelItem.title: "Italics"
+            ShortcutsModelItem.shortcut: sequence
+            ShortcutsModelItem.group: "Text Formatting"
+            ShortcutsModelItem.enabled: enabled
+            onActivated: textFormatTools.textFormat.toggleItalics()
+        }
+
+        Shortcut {
+            sequence: "Ctrl+U"
+            context: Qt.ApplicationShortcut
+            enabled: textFormatTools.textFormat
+            ShortcutsModelItem.title: "Underline"
+            ShortcutsModelItem.shortcut: sequence
+            ShortcutsModelItem.group: "Text Formatting"
+            ShortcutsModelItem.enabled: enabled
+            onActivated: textFormatTools.textFormat.toggleUnderline()
+        }
+
+        content: Rectangle {
+            id: toolsContainer
+
+            Row {
+                id: toolsLayout
+                anchors.centerIn: parent
+                enabled: textFormatTools.textFormat
+                opacity: enabled ? 1 : 0.5
+                spacing: 4
+                height: 55
+
+                SimpleToolButton {
+                    iconSource: "../icons/editor/format_bold.png"
+                    checked: textFormatTools.textFormat ? textFormatTools.textFormat.bold : false
+                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.toggleBold()
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                SimpleToolButton {
+                    iconSource: "../icons/editor/format_italics.png"
+                    checked: textFormatTools.textFormat ? textFormatTools.textFormat.italics : false
+                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.toggleItalics()
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                SimpleToolButton {
+                    iconSource: "../icons/editor/format_underline.png"
+                    checked: textFormatTools.textFormat ? textFormatTools.textFormat.underline : false
+                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.toggleUnderline()
+                    anchors.verticalCenter: parent.verticalCenter
+                }
+
+                ColorButton {
+                    id: textColorButton
+                    width: 42
+                    height: 30
+                    anchors.verticalCenter: parent.verticalCenter
+                    selectedColor: textFormatTools.textFormat ? textFormatTools.textFormat.textColor : transparent
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "Text Color"
+                    onColorPicked: (newColor) => {
+                                       if(textFormatTools.textFormat)
+                                            textFormatTools.textFormat.textColor = newColor
+                                   }
+
+                    Rectangle {
+                        color: "white"
+                        width: Math.min(parent.width,parent.height)
+                        height: width
+                        anchors.centerIn: parent
+
+                        Text {
+                            anchors.centerIn: parent
+                            font.pixelSize: parent.height * 0.85
+                            font.bold: true
+                            font.underline: true
+                            text: "A"
+                            color: textColorButton.selectedColor === transparent ? "black" : textColorButton.selectedColor
+                        }
+                    }
+                }
+
+                ColorButton {
+                    id: bgColorButton
+                    width: 42
+                    height: 30
+                    anchors.verticalCenter: parent.verticalCenter
+                    selectedColor: textFormatTools.textFormat ? textFormatTools.textFormat.backgroundColor : transparent
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "Background Color"
+                    onColorPicked: (newColor) => {
+                                       if(textFormatTools.textFormat)
+                                            textFormatTools.textFormat.backgroundColor = newColor
+                                   }
+
+                    Rectangle {
+                        border.width: 1
+                        border.color: "black"
+                        color: bgColorButton.selectedColor === transparent ? "white" : bgColorButton.selectedColor
+                        width: Math.min(parent.width,parent.height)
+                        height: width
+                        anchors.centerIn: parent
+
+                        Text {
+                            anchors.centerIn: parent
+                            font.pixelSize: parent.height * 0.85
+                            font.bold: true
+                            text: "A"
+                            color: "black"
+                        }
+                    }
+                }
+
+                SimpleToolButton {
+                    iconSource: "../icons/editor/format_clear.png"
+                    checked: false
+                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.reset()
+                    anchors.verticalCenter: parent.verticalCenter
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "Clear formatting"
+                }
+            }
+        }
+    }
+
+    readonly property color transparent: "transparent"
+
+    component SimpleToolButton : Rectangle {
+        width: 42
+        height: 42
+        radius: 6
+        color: tbMouseArea.pressed ? primaryColors.button.background : (checked ? primaryColors.highlight.background : Qt.rgba(0,0,0,0))
+
+        property bool checked: false
+        property alias hoverEnabled: tbMouseArea.hoverEnabled
+        property alias containsMouse: tbMouseArea.containsMouse
+        property alias iconSource: tbIcon.source
+        signal clicked()
+
+        Image {
+            id: tbIcon
+            anchors.fill: parent
+            anchors.margins: 4
+            mipmap: true
+        }
+
+        MouseArea {
+            id: tbMouseArea
+            anchors.fill: parent
+            onClicked: parent.clicked()
+        }
+    }
+
+    component ColorButton : Item {
+        id: colorButton
+        width: 42
+        height: 42
+        property var colors: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
+        property color selectedColor: transparent
+        opacity: enabled ? 1 : 0.5
+        property alias hoverEnabled: cbMouseArea.hoverEnabled
+        property alias containsMouse: cbMouseArea.containsMouse
+
+        signal colorPicked(color newColor)
+
+        MouseArea {
+            id: cbMouseArea
+            anchors.fill: parent
+            onClicked: colorsMenuLoader.active = true
+        }
+
+        Loader {
+            id: colorsMenuLoader
+            x: 0; y: parent.height
+            active: false
+            sourceComponent: Popup {
+                id: colorsMenu
+                x: 0; y: 0
+                width: 280
+                height: 200
+
+                Component.onCompleted: open()
+                onClosed: Qt.callLater(() => { colorsMenuLoader.active = false})
+
+                contentItem: Grid {
+                    id: colorsGrid
+                    property int cellSize: width/columns
+                    columns: 7
+
+                    Item {
+                        width: colorsGrid.cellSize
+                        height: colorsGrid.cellSize
+
+                        Image {
+                            source: "../icons/navigation/close.png"
+                            anchors.fill: parent
+                            anchors.margins: 5
+                            mipmap: true
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                colorPicked(transparent)
+                                colorsMenu.close()
+                            }
+                        }
+                    }
+
+                    Repeater {
+                        model: colorButton.colors
+
+                        Item {
+                            required property color modelData
+                            required property int index
+                            width: colorsGrid.cellSize
+                            height: colorsGrid.cellSize
+
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: 3
+                                border.width: colorButton.selectedColor === modelData ? 3 : 0.5
+                                border.color: "black"
+                                color: modelData
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    colorPicked(modelData)
+                                    colorsMenu.close()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

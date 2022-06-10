@@ -36,7 +36,7 @@ public:
 
     void add(const QMetaObject *mo)
     {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
         if (mo->constructorCount() == 0) {
             qDebug("QtFactory: Trying to register class '%s' with no invokable constructor.",
                    mo->className());

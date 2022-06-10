@@ -436,15 +436,21 @@ public:
     bool isBold() const { return m_bold; }
     Q_SIGNAL void boldChanged();
 
-    Q_PROPERTY(bool italic READ isItalic WRITE setItalic NOTIFY italicChanged)
-    void setItalic(bool val);
-    bool isItalic() const { return m_italic; }
-    Q_SIGNAL void italicChanged();
+    Q_INVOKABLE void toggleBold() { this->setBold(!m_bold); }
+
+    Q_PROPERTY(bool italics READ isItalics WRITE setItalics NOTIFY italicsChanged)
+    void setItalics(bool val);
+    bool isItalics() const { return m_italics; }
+    Q_SIGNAL void italicsChanged();
+
+    Q_INVOKABLE void toggleItalics() { this->setItalics(!m_italics); }
 
     Q_PROPERTY(bool underline READ isUnderline WRITE setUnderline NOTIFY underlineChanged)
     void setUnderline(bool val);
     bool isUnderline() const { return m_underline; }
     Q_SIGNAL void underlineChanged();
+
+    Q_INVOKABLE void toggleUnderline() { this->setUnderline(!m_underline); }
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     void setTextColor(const QColor &val);
@@ -470,13 +476,16 @@ public:
 
     void updateFromCharFormat(const QTextCharFormat &format);
     bool isUpdatingFromCharFormat() const { return m_updatingFromFormat; }
-    QTextCharFormat toCharFormat() const;
+    QTextCharFormat toCharFormat(const QList<int> &properties = allProperties()) const;
 
-    Q_SIGNAL void formatChanged();
+    static QList<int> allProperties();
+
+signals:
+    void formatChanged(const QList<int> &properties = allProperties());
 
 private:
     bool m_bold = false;
-    bool m_italic = false;
+    bool m_italics = false;
     bool m_underline = false;
     bool m_updatingFromFormat = false;
     QColor m_textColor = Qt::transparent;
@@ -696,7 +705,7 @@ private:
     void rehighlightLater();
     void rehighlightBlockLater(const QTextBlock &block);
 
-    void onTextFormatChanged();
+    void onTextFormatChanged(const QList<int> &properties);
 
 private:
     friend class SpellCheckService;
@@ -705,6 +714,7 @@ private:
     int m_selectionEndPosition = -1;
     int m_selectionStartPosition = -1;
     bool m_applyTextFormat = false;
+    bool m_acceptTextFormatChanges = true;
     bool m_pastingContent = false;
     int m_documentLoadCount = 0;
     TextFormat *m_textFormat = new TextFormat(this);

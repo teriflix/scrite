@@ -996,15 +996,18 @@ void ScriteDocument::saveAs(const QString &givenFileName)
         return;
     }
 
-#ifndef QT_NO_DEBUG
-    {
+#ifndef QT_NO_DEBUG_OUTPUT
+    const bool saveJson = true;
+#else
+    const bool saveJson = qgetenv("SCRITE_SAVE_JSON").toUpper() == QByteArrayLiteral("YES");
+#endif
+    if (saveJson) {
         const QFileInfo fi(fileName);
         const QString fileName2 = fi.absolutePath() + "/" + fi.baseName() + ".json";
         QFile file2(fileName2);
         file2.open(QFile::WriteOnly);
         file2.write(bytes);
     }
-#endif
 
     this->setFileName(fileName);
     this->setCreatedOnThisComputer(true);
@@ -1780,7 +1783,7 @@ bool ScriteDocument::load(const QString &fileName)
             ? QJsonDocument::fromJson(m_docFileSystem.header())
             : QJsonDocument::fromBinaryData(m_docFileSystem.header());
 
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     {
         const QFileInfo fi(fileName);
         const QString fileName2 = fi.absolutePath() + "/" + fi.baseName() + ".json";

@@ -164,6 +164,7 @@ Item {
         selectMultiple: false
         selectExisting: true
         onAccepted: loadMediaUrl(fileUrl)
+        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
     }
 
     SplitView {
@@ -257,7 +258,7 @@ Item {
                                     screenplayOffsetsView.currentIndex = offsetInfo.row
 
                                 var newY = screenplayOffsetsModel.evaluatePointAtTime(position, offsetInfo.row).y * textDocumentView.documentScale
-                                var maxNewY = hasScenePositions ? (sceneEndOffset-textDocumentFlick.height*0.75) : textDocumentView.height - textDocumentFlick.height
+                                var maxNewY = /*hasScenePositions ? (sceneEndOffset-textDocumentFlick.height*0.75) :*/ textDocumentView.height - textDocumentFlick.height
                                 textDocumentFlick.contentY = Math.min(newY, maxNewY)
                             }
                         }
@@ -894,7 +895,10 @@ Item {
                 }
 
                 ScriptAction {
-                    script: titleCardOverlay.visible = false
+                    script: {
+                        finalFrameImage.prepare()
+                        titleCardOverlay.visible = false
+                    }
                 }
             }
 
@@ -910,32 +914,34 @@ Item {
                     keyFrameImage.visible = true
                 }
 
-                Column {
+                ColumnLayout {
                     id: startingFrameOverlayContent
                     spacing: startingFrameOverlay.height * 0.025
                     width: parent.width * 0.8
+                    height: parent.height * 0.9
                     anchors.centerIn: parent
 
                     Text {
                         text: "Script » Screen"
                         color: "#f1be41"
                         font.pointSize: closingFrameOverlay.height * 0.025
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        Layout.alignment: Qt.AlignHCenter
                     }
 
                     Image {
                         id: filmPoster
                         source: "file:///" + Scrite.document.screenplay.coverPagePhoto
-                        width: parent.width
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
                         fillMode: Image.PreserveAspectFit
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        Layout.alignment: Qt.AlignHCenter
                     }
 
                     Text {
                         font.pointSize: closingFrameOverlay.height * 0.05
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
-                        width: parent.width
+                        Layout.fillWidth: true
                         wrapMode: Text.WordWrap
                         color: "white"
                         text: Scrite.document.screenplay.title
@@ -944,7 +950,7 @@ Item {
                     Text {
                         font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
-                        width: parent.width
+                        Layout.fillWidth: true
                         wrapMode: Text.WordWrap
                         color: "white"
                         opacity: 0.8
@@ -955,7 +961,7 @@ Item {
                     Text {
                         font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
-                        width: parent.width
+                        Layout.fillWidth: true
                         wrapMode: Text.WordWrap
                         color: "white"
                         opacity: 0.8
@@ -971,8 +977,8 @@ Item {
                     Image {
                         id: filmStudioLogo
                         anchors.horizontalCenter: parent.horizontalCenter
-                        width: Math.min(filmPoster.width, filmPoster.height)*0.25
-                        height: width
+                        Layout.preferredWidth: startingFrameOverlay.height*0.15
+                        Layout.preferredHeight: startingFrameOverlay.height*0.15
                         visible: imagePath !== ""
                         property string imagePath: StandardPaths.locateFile(StandardPaths.DownloadLocation, "scrited_logo_overlay.png")
                         source: imagePath === "" ? "" : "file:///" + imagePath
@@ -1005,6 +1011,8 @@ Item {
                         closingFrameOverlay.visible = true
                         closingFrameVideo.visible = true
                         closingFrameImage.visible = false
+                        finalFrameImage.opacity = 0
+                        finalFrameImage.visible = false
                     }
                 }
 
@@ -1024,12 +1032,35 @@ Item {
                     script: {
                         mediaPlayer.pause()
                         closingFrameVideo.visible = false
+                        closingFrameImage.opacity = 1
                         closingFrameImage.visible = true
+                        finalFrameImage.opacity = 0
+                        finalFrameImage.visible = true
                     }
                 }
 
                 PauseAnimation {
                     duration: 2000
+                }
+
+                ParallelAnimation {
+                    NumberAnimation {
+                        target: closingFrameImage
+                        property: "opacity"
+                        from: 1; to: 0
+                        duration: 750
+                    }
+
+                    NumberAnimation {
+                        target: finalFrameImage
+                        property: "opacity"
+                        from: 0; to: 1
+                        duration: 750
+                    }
+                }
+
+                PauseAnimation {
+                    duration: 1000
                 }
             }
 
@@ -1062,6 +1093,20 @@ Item {
                     anchors.centerIn: parent
                     mipmap: true
                     source: "../images/scrited_closing_frame.png"
+                }
+
+                Image {
+                    id: finalFrameImage
+                    function prepare() {
+                        startingFrameOverlay.grabToImage(function(result) {
+                            source = result.url
+                        }, Qt.size(startingFrameOverlay.width*2,startingFrameOverlay.height*2))
+                    }
+                    fillMode: Image.PreserveAspectFit
+                    width: Math.min(parent.width, parent.height)
+                    height: width
+                    anchors.centerIn: parent
+                    mipmap: true
                 }
             }
         }

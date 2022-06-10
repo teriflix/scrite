@@ -1040,14 +1040,7 @@ int ScreenplayFormat::staticElementFormatCount(QQmlListProperty<SceneElementForm
 
 ///////////////////////////////////////////////////////////////////////////////
 
-TextFormat::TextFormat(QObject *parent) : QObject(parent)
-{
-    connect(this, &TextFormat::boldChanged, this, &TextFormat::formatChanged);
-    connect(this, &TextFormat::italicChanged, this, &TextFormat::formatChanged);
-    connect(this, &TextFormat::underlineChanged, this, &TextFormat::formatChanged);
-    connect(this, &TextFormat::textColorChanged, this, &TextFormat::formatChanged);
-    connect(this, &TextFormat::backgroundColorChanged, this, &TextFormat::formatChanged);
-}
+TextFormat::TextFormat(QObject *parent) : QObject(parent) { }
 
 TextFormat::~TextFormat() { }
 
@@ -1058,15 +1051,21 @@ void TextFormat::setBold(bool val)
 
     m_bold = val;
     emit boldChanged();
+
+    if (!m_updatingFromFormat)
+        emit formatChanged({ QTextFormat::FontWeight });
 }
 
-void TextFormat::setItalic(bool val)
+void TextFormat::setItalics(bool val)
 {
-    if (m_italic == val)
+    if (m_italics == val)
         return;
 
-    m_italic = val;
-    emit italicChanged();
+    m_italics = val;
+    emit italicsChanged();
+
+    if (!m_updatingFromFormat)
+        emit formatChanged({ QTextFormat::FontItalic });
 }
 
 void TextFormat::setUnderline(bool val)
@@ -1076,6 +1075,9 @@ void TextFormat::setUnderline(bool val)
 
     m_underline = val;
     emit underlineChanged();
+
+    if (!m_updatingFromFormat)
+        emit formatChanged({ QTextFormat::FontUnderline, QTextFormat::TextUnderlineStyle });
 }
 
 void TextFormat::setTextColor(const QColor &val)
@@ -1085,6 +1087,9 @@ void TextFormat::setTextColor(const QColor &val)
 
     m_textColor = val;
     emit textColorChanged();
+
+    if (!m_updatingFromFormat)
+        emit formatChanged({ QTextFormat::ForegroundBrush });
 }
 
 void TextFormat::setBackgroundColor(const QColor &val)
@@ -1094,20 +1099,33 @@ void TextFormat::setBackgroundColor(const QColor &val)
 
     m_backgroundColor = val;
     emit backgroundColorChanged();
+
+    if (!m_updatingFromFormat)
+        emit formatChanged({ QTextFormat::BackgroundBrush });
 }
 
 void TextFormat::reset()
 {
+    m_updatingFromFormat = true;
+
     this->resetTextColor();
     this->resetBackgroundColor();
     this->setBold(false);
-    this->setItalic(false);
+    this->setItalics(false);
     this->setUnderline(false);
+
+    m_updatingFromFormat = false;
+
+    emit formatChanged(allProperties());
 }
 
 void TextFormat::updateFromCharFormat(const QTextCharFormat &format)
 {
-    QScopedValueRollback<bool>(m_updatingFromFormat, true);
+    if (m_updatingFromFormat)
+        return;
+
+    QScopedValueRollback<bool> rollback(m_updatingFromFormat);
+    m_updatingFromFormat = true;
 
     if (format.hasProperty(QTextFormat::ForegroundBrush))
         this->setTextColor(format.foreground().color());
@@ -1125,38 +1143,49 @@ void TextFormat::updateFromCharFormat(const QTextCharFormat &format)
         this->setBold(false);
 
     if (format.hasProperty(QTextFormat::FontItalic))
-        this->setItalic(format.fontItalic());
+        this->setItalics(format.fontItalic());
     else
-        this->setItalic(false);
+        this->setItalics(false);
 
-    if (format.hasProperty(QTextFormat::FontUnderline))
+    if (format.hasProperty(QTextFormat::TextUnderlineStyle))
         this->setUnderline(format.fontUnderline());
     else
         this->setUnderline(false);
-
-    emit formatChanged();
 }
 
-QTextCharFormat TextFormat::toCharFormat() const
+QTextCharFormat TextFormat::toCharFormat(const QList<int> &properties) const
 {
     QTextCharFormat format;
 
-    if (m_textColor.alpha() > 0)
-        format.setForeground(m_textColor);
+    if (properties.isEmpty() || properties.contains(QTextFormat::ForegroundBrush))
+        if (m_textColor != Qt::transparent)
+            format.setForeground(m_textColor);
 
-    if (m_backgroundColor.alpha() > 0)
-        format.setBackground(m_backgroundColor);
+    if (properties.isEmpty() || properties.contains(QTextFormat::BackgroundBrush))
+        if (m_backgroundColor != Qt::transparent)
+            format.setBackground(m_backgroundColor);
 
-    if (m_bold)
-        format.setFontWeight(QFont::Bold);
+    if (properties.isEmpty() || properties.contains(QTextFormat::FontWeight))
+        if (m_bold)
+            format.setFontWeight(QFont::Bold);
 
-    if (m_italic)
-        format.setFontItalic(true);
+    if (properties.isEmpty() || properties.contains(QTextFormat::FontItalic))
+        if (m_italics)
+            format.setFontItalic(m_italics);
 
-    if (m_underline)
-        format.setFontUnderline(true);
+    if (properties.isEmpty() || properties.contains(QTextFormat::FontUnderline)
+        || properties.contains(QTextFormat::TextUnderlineStyle))
+        if (m_underline)
+            format.setFontUnderline(m_underline);
 
     return format;
+}
+
+QList<int> TextFormat::allProperties()
+{
+    return { QTextFormat::ForegroundBrush, QTextFormat::BackgroundBrush,
+             QTextFormat::FontWeight,      QTextFormat::FontItalic,
+             QTextFormat::FontUnderline,   QTextFormat::TextUnderlineStyle };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1469,6 +1498,9 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if (m_initializingDocument || m_pastingContent || m_cursorPosition == val)
         return;
 
+    QScopedValueRollback<bool> rollbackAcceptTextFormatChanges(m_acceptTextFormatChanges);
+    m_acceptTextFormatChanges = false;
+
     if (m_textDocument == nullptr || this->document() == nullptr) {
         m_cursorPosition = -1;
         m_currentElementCursorPosition = -1;
@@ -1526,6 +1558,11 @@ void SceneDocumentBinder::setCursorPosition(int val)
         this->setWordUnderCursorIsMisspelled(cursor.isMisspelled());
         this->setSpellingSuggestions(cursor.suggestions());
 
+        if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0
+            && m_selectionStartPosition != m_selectionEndPosition) {
+            cursor.setPosition(m_selectionStartPosition);
+            cursor.setPosition(m_selectionEndPosition, QTextCursor::KeepAnchor);
+        }
         const QTextCharFormat format = cursor.charFormat();
         m_textFormat->updateFromCharFormat(format);
     }
@@ -1857,7 +1894,11 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         }
 
         const int bstart = block.position();
-        const int bend = block.position() + block.length() - 1;
+        const int bend = [=]() {
+            QTextCursor c(block);
+            c.movePosition(QTextCursor::EndOfBlock);
+            return c.position();
+        }();
         cursor.setPosition(qMax(fromPosition, bstart));
         cursor.setPosition(qMin(toPosition, bend), QTextCursor::KeepAnchor);
 
@@ -1866,6 +1907,24 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         QJsonObject para;
         para.insert(QStringLiteral("type"), element->type());
         para.insert(QStringLiteral("text"), cursor.selectedText());
+
+        const QVector<QTextLayout::FormatRange> blockFormats = block.textFormats();
+        QVector<QTextLayout::FormatRange> formatsToCopy;
+        formatsToCopy.reserve(blockFormats.size());
+        for (const QTextLayout::FormatRange &format : blockFormats) {
+            const int fstart = format.start - (fromPosition <= bstart ? 0 : fromPosition - bstart);
+            const int flength = format.length + qMin(fstart, 0);
+
+            QTextLayout::FormatRange fmt;
+            fmt.start = qMax(fstart, 0);
+            fmt.length = flength;
+            fmt.format = format.format;
+            formatsToCopy.append(fmt);
+        }
+
+        const QJsonArray jformats = SceneElement::textFormatsToJson(formatsToCopy);
+        para.insert(QStringLiteral("formats"), jformats);
+
         content.append(para);
 
         lines += cursor.selectedText();
@@ -1899,6 +1958,7 @@ int SceneDocumentBinder::paste(int fromPosition)
 
         QString text;
         SceneElement::Type type = SceneElement::Action;
+        QVector<QTextLayout::FormatRange> formats;
     };
 
     QVector<Paragraph> paragraphs;
@@ -1932,6 +1992,8 @@ int SceneDocumentBinder::paste(int fromPosition)
                     ? SceneElement::Action
                     : SceneElement::Type(type);
             paragraph.text = itemObject.value(QStringLiteral("text")).toString();
+            paragraph.formats = SceneElement::textFormatsFromJson(
+                    itemObject.value(QStringLiteral("formats")).toArray());
             paragraphs.append(paragraph);
         }
     }
@@ -1949,7 +2011,9 @@ int SceneDocumentBinder::paste(int fromPosition)
         if (i > 0)
             cursor.insertBlock();
 
+        const int bstart = cursor.position();
         cursor.insertText(paragraph.text);
+        const int bend = cursor.position();
 
         if (pasteFormatting) {
             lastPastedBlock = cursor.block();
@@ -1959,6 +2023,18 @@ int SceneDocumentBinder::paste(int fromPosition)
                     userData->sceneElement()->setType(paragraph.type);
                 userData->resetFormat();
             }
+        }
+
+        if (!paragraph.formats.isEmpty()) {
+            cursor.setPosition(bstart);
+            for (const QTextLayout::FormatRange &format : paragraph.formats) {
+                cursor.setPosition(bstart + format.start);
+                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                                    format.length);
+                cursor.setCharFormat(format.format);
+                cursor.clearSelection();
+            }
+            cursor.setPosition(bend);
         }
     }
 
@@ -2034,6 +2110,13 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     }
 
     this->setFormat(0, block.length(), userData->charFormat);
+
+    const QVector<QTextLayout::FormatRange> formatRanges = block.textFormats();
+    for (const QTextLayout::FormatRange &formatRange : formatRanges) {
+        QTextCharFormat format = userData->charFormat;
+        format.merge(formatRange.format);
+        this->setFormat(formatRange.start, formatRange.length, format);
+    }
 
     // Per-language fonts.
     if (m_applyLanguageFonts) {
@@ -2146,6 +2229,9 @@ void SceneDocumentBinder::initializeDocument()
     const int nrElements = m_scene->elementCount();
 
     QTextCursor cursor(document);
+    QList<QTextBlock> blocks;
+
+    // In the first pass, we simply insert text into the document.
     for (int i = 0; i < nrElements; i++) {
         SceneElement *element = m_scene->elementAt(i);
         if (i > 0)
@@ -2160,7 +2246,35 @@ void SceneDocumentBinder::initializeDocument()
         SceneDocumentBlockUserData *userData = new SceneDocumentBlockUserData(element, this);
         block.setUserData(userData);
         cursor.insertText(element->text());
+        blocks.append(block);
     }
+
+    // In the second pass, we apply formatting to inserted text. We have to do this in the second
+    // pass, because QTextDocument tends to pass character format at the last position of the
+    // previous block, into the next block also. So for instance, if we have a fully bold paragraph
+    // followed by a normal paragraph, QTextDocument will apply fully bold to both if we apply
+    // text-formats while inserting text.
+    for (QTextBlock &block : blocks) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        const QVector<QTextLayout::FormatRange> formatRanges =
+                userData->sceneElement()->textFormats();
+        if (formatRanges.isEmpty())
+            continue;
+
+        cursor = QTextCursor(block);
+        const int startPos = cursor.position();
+
+        for (const QTextLayout::FormatRange &formatRange : formatRanges) {
+            cursor.setPosition(startPos + formatRange.start);
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                                formatRange.length);
+            cursor.mergeCharFormat(formatRange.format);
+            cursor.clearSelection();
+        }
+
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
+    }
+
     document->blockSignals(false);
 
     if (m_cursorPosition <= 0 && m_currentElement == nullptr && nrElements == 1)
@@ -2374,7 +2488,7 @@ void SceneDocumentBinder::onSpellCheckUpdated()
 
 void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int charsAdded)
 {
-    if (m_initializingDocument || m_sceneIsBeingReset)
+    if (m_initializingDocument || m_sceneIsBeingReset || m_cursorPosition < 0)
         return;
 
     if (m_textDocument == nullptr || m_scene == nullptr || this->document() == nullptr)
@@ -2382,39 +2496,50 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
 
     m_tabHistory.clear();
 
+    if (m_scene->elementCount() != this->document()->blockCount()) {
+        /**
+          If the number of paragraphs in the document is differnet from the number of
+          paragraphs in our internal Scene data structure, then we better sync it once.
+          This can happen when user pastes more than 1 paragraphs at once or if the user
+          deletes more than 1 paragraphs at once.
+          */
+        this->syncSceneFromDocument();
+        return;
+    }
+
     QTextCursor cursor(this->document());
     cursor.setPosition(from);
 
-    QTextBlock block = cursor.block();
-    SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
-    if (userData == nullptr) {
-        this->syncSceneFromDocument();
-        return;
+    do {
+        QTextBlock block = cursor.block();
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData == nullptr) {
+            this->syncSceneFromDocument();
+            return;
+        }
+
+        SceneElement *sceneElement = userData->sceneElement();
+        if (sceneElement == nullptr) {
+            qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!",
+                     __LINE__, from);
+            return;
+        }
+
+        sceneElement->setText(block.text());
+        sceneElement->setTextFormats(block.textFormats());
+
+        if (m_spellCheckEnabled && m_liveSpellCheckEnabled
+            && ((charsAdded > 0 || charsRemoved > 0) && charsAdded != charsRemoved))
+            userData->scheduleSpellCheckUpdate();
+
+        if (!cursor.movePosition(QTextCursor::NextBlock))
+            break;
+    } while (!cursor.atEnd() && cursor.position() < from + charsAdded);
+
+    if (m_cursorPosition >= 0) {
+        cursor.setPosition(m_cursorPosition);
+        m_textFormat->updateFromCharFormat(cursor.charFormat());
     }
-
-    SceneElement *sceneElement = userData->sceneElement();
-    if (sceneElement == nullptr) {
-        qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!",
-                 __LINE__, from);
-        return;
-    }
-
-    /**
-      If the number of paragraphs in the document is differnet from the number of
-      paragraphs in our internal Scene data structure, then we better sync it once.
-      This can happen when user pastes more than 1 paragraphs at once or if the user
-      deletes more than 1 paragraphs at once.
-      */
-    if (sceneElement->scene() == nullptr
-        || this->document()->blockCount() != sceneElement->scene()->elementCount()) {
-        this->syncSceneFromDocument();
-        return;
-    }
-
-    sceneElement->setText(block.text());
-
-    if (m_spellCheckEnabled && m_liveSpellCheckEnabled && (charsAdded > 0 || charsRemoved > 0))
-        userData->scheduleSpellCheckUpdate();
 }
 
 void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
@@ -2490,6 +2615,7 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
         elementList.append(userData->sceneElement());
         userData->sceneElement()->setText(block.text());
+        userData->sceneElement()->setTextFormats(block.textFormats());
 
         previousBlock = block;
         block = block.next();
@@ -2606,20 +2732,103 @@ void SceneDocumentBinder::rehighlightBlockLater(const QTextBlock &block)
     this->rehighlightLater();
 }
 
-void SceneDocumentBinder::onTextFormatChanged()
+void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
 {
-    if (!m_applyTextFormat || m_textFormat->isUpdatingFromCharFormat())
+    if (!m_acceptTextFormatChanges || !m_applyTextFormat
+        || m_textFormat->isUpdatingFromCharFormat())
         return;
+
+    /**
+     * I wish this function was simpler. I wish we could simply apply the curent
+     * char format from m_textFormat to the selected text. But there are real-usage
+     * complexities to deal with.
+     *
+     * For instance, its possible that the user selects a text fragment that already
+     * has a few formatted sub-fragments. While applying a new format over this, it
+     * should append the new format on top of the existing ones. Ofcourse we can use
+     * mergeCharFormat() for this purpose, only when we are appending new format
+     * properties over existing ones. But we cannot use that for removing already set
+     * properties. For this reason, we will have to figure out all Fragments across
+     * various blocks of text and then rework existing formats in those blocks
+     * explicitly to match the new text format set by the user in the toolbar shown
+     * within ScreenplayEditor.
+     */
+
+    struct Fragment
+    {
+        int start = -1;
+        int end = -1;
+        QTextBlock block;
+    };
+    QList<Fragment> fragments;
 
     QTextCursor cursor(this->document());
-    if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0) {
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0
+        && m_selectionStartPosition != m_selectionEndPosition) {
+        cursor.setPosition(m_selectionStartPosition);
+        while (1) {
+            Fragment fragment;
+            fragment.block = cursor.block();
+            fragment.start = qMax(m_selectionStartPosition, fragment.block.position());
+            fragment.end = qMin(m_selectionEndPosition, [](const QTextBlock &block) {
+                QTextCursor c(block);
+                c.movePosition(QTextCursor::EndOfBlock);
+                return c.position();
+            }(fragment.block));
+            fragments.append(fragment);
+            if (!cursor.movePosition(QTextCursor::NextBlock))
+                break;
+            if (cursor.atEnd() || cursor.position() > m_selectionEndPosition)
+                break;
+        }
         cursor.setPosition(m_selectionStartPosition);
         cursor.setPosition(m_selectionEndPosition, QTextCursor::KeepAnchor);
-    } else if (m_cursorPosition >= 0)
+    } else if (m_cursorPosition >= 0) {
         cursor.setPosition(m_cursorPosition);
-    else
+        cursor.select(QTextCursor::WordUnderCursor);
+
+        Fragment fragment;
+        fragment.end = cursor.selectionEnd();
+        fragment.start = cursor.selectionStart();
+        fragment.block = cursor.block();
+        fragments.append(fragment);
+    } else
         return;
 
-    cursor.mergeCharFormat(m_textFormat->toCharFormat());
-    cursor.clearSelection();
+    const QTextCharFormat updatedFormat = m_textFormat->toCharFormat(properties);
+
+    for (const Fragment &fragment : fragments) {
+        const QVector<QTextLayout::FormatRange> textFormats = fragment.block.textFormats();
+        for (const QTextLayout::FormatRange &textFormat : textFormats) {
+            const int start = qMax(
+                    [=]() {
+                        QTextCursor c(fragment.block);
+                        c.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor,
+                                       textFormat.start);
+                        return c.position();
+                    }(),
+                    fragment.start);
+            const int end = qMin(
+                    [=]() {
+                        QTextCursor c(fragment.block);
+                        c.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor,
+                                       textFormat.start + textFormat.length);
+                        return c.position();
+                    }(),
+                    fragment.end);
+            if ((start >= fragment.start && start <= fragment.end)
+                || (end >= fragment.start && end <= fragment.end)
+                || (start < fragment.start && end > fragment.end)) {
+                cursor.setPosition(start);
+                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
+                                    end - start);
+
+                QTextCharFormat format = textFormat.format;
+                for (int prop : properties)
+                    format.clearProperty(prop);
+                format.merge(updatedFormat);
+                cursor.setCharFormat(format);
+            }
+        }
+    }
 }

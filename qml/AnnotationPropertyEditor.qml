@@ -500,6 +500,7 @@ Item {
                 selectMultiple: false
                 sidebarVisible: true
                 selectExisting: true
+                dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
                 onAccepted: {
                     if(fileUrl != "") {
                         if(propertyValue != "")

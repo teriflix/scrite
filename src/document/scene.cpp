@@ -37,6 +37,18 @@
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
 
+static QDataStream &operator<<(QDataStream &ds, const QTextLayout::FormatRange &formatRange)
+{
+    ds << formatRange.start << formatRange.length << formatRange.format;
+    return ds;
+}
+
+static QDataStream &operator>>(QDataStream &ds, QTextLayout::FormatRange &formatRange)
+{
+    ds >> formatRange.start >> formatRange.length >> formatRange.format;
+    return ds;
+}
+
 class PushSceneUndoCommand;
 class SceneUndoCommand : public QUndoCommand
 {
@@ -378,8 +390,7 @@ void SceneElement::setType(SceneElement::Type val)
     m_type = val;
     emit typeChanged();
 
-    if (m_scene != nullptr)
-        emit m_scene->sceneElementChanged(this, Scene::ElementTypeChange);
+    this->reportSceneElementChanged(Scene::ElementTypeChange);
 }
 
 QString SceneElement::typeAsString() const
@@ -419,8 +430,7 @@ void SceneElement::setText(const QString &val)
 
     emit textChanged(val);
 
-    if (m_scene != nullptr)
-        emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
+    this->reportSceneElementChanged(Scene::ElementTextChange);
 }
 
 void SceneElement::setCursorPosition(int val)
@@ -462,7 +472,14 @@ QJsonArray SceneElement::find(const QString &text, int flags) const
     return SearchEngine::indexesOf(text, m_text, flags);
 }
 
-void SceneElement::deserializeFromJson(const QJsonObject &)
+void SceneElement::serializeToJson(QJsonObject &json) const
+{
+    const QJsonArray jtextFormats = textFormatsToJson(m_textFormats);
+    if (!jtextFormats.isEmpty())
+        json.insert(QLatin1String("#textFormats"), jtextFormats);
+}
+
+void SceneElement::deserializeFromJson(const QJsonObject &json)
 {
     if (m_type == SceneElement::Character) {
         const int bo = m_text.indexOf(QStringLiteral("("));
@@ -470,10 +487,127 @@ void SceneElement::deserializeFromJson(const QJsonObject &)
             m_text.insert(bo, QChar(' '));
             emit textChanged(m_text);
 
-            if (m_scene != nullptr)
-                emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
+            this->reportSceneElementChanged(Scene::ElementTextChange);
         }
     }
+
+    const QJsonArray jtextFormats = json.value(QLatin1String("#textFormats")).toArray();
+    this->setTextFormats(textFormatsFromJson(jtextFormats));
+}
+
+void SceneElement::setTextFormats(const QVector<QTextLayout::FormatRange> &formats)
+{
+    if (m_textFormats == formats)
+        return;
+
+    PushSceneUndoCommand cmd(m_scene);
+
+    m_textFormats = formats;
+    emit elementChanged();
+
+    this->reportSceneElementChanged(Scene::ElementTextChange);
+}
+
+QJsonArray SceneElement::textFormatsToJson(const QVector<QTextLayout::FormatRange> &formats)
+{
+    QJsonArray jtextFormats;
+    for (const QTextLayout::FormatRange &formatRange : formats) {
+        const QTextCharFormat format = formatRange.format;
+
+        QJsonObject item;
+        item.insert(QLatin1String("start"), formatRange.start);
+        item.insert(QLatin1String("length"), formatRange.length);
+
+        QJsonObject attribs;
+        if (format.hasProperty(QTextFormat::FontWeight)) {
+            if (format.fontWeight() == QFont::Bold)
+                attribs.insert(QLatin1String("bold"), true);
+        }
+
+        if (format.hasProperty(QTextFormat::FontItalic)) {
+            if (format.fontItalic())
+                attribs.insert(QLatin1String("italics"), true);
+        }
+
+        if (format.hasProperty(QTextFormat::TextUnderlineStyle)) {
+            if (format.fontUnderline())
+                attribs.insert(QLatin1String("underline"), true);
+        }
+
+        if (format.hasProperty(QTextFormat::BackgroundBrush)) {
+            const QColor color = format.background().color();
+            if (!qFuzzyIsNull(color.alphaF()))
+                attribs.insert(QLatin1String("background"), color.name());
+        }
+
+        if (format.hasProperty(QTextFormat::ForegroundBrush)) {
+            const QColor color = format.foreground().color();
+            if (!qFuzzyIsNull(color.alphaF()))
+                attribs.insert(QLatin1String("foreground"), color.name());
+        }
+
+        if (attribs.isEmpty())
+            continue;
+
+        item.insert(QLatin1String("attribs"), attribs);
+        jtextFormats.append(item);
+    }
+
+    return jtextFormats;
+}
+
+QVector<QTextLayout::FormatRange> SceneElement::textFormatsFromJson(const QJsonArray &jtextFormats)
+{
+    QVector<QTextLayout::FormatRange> textFormats;
+
+    if (!jtextFormats.isEmpty()) {
+        textFormats.reserve(jtextFormats.size());
+
+        for (int i = 0; i < jtextFormats.size(); i++) {
+            const QJsonObject item = jtextFormats.at(i).toObject();
+
+            QTextLayout::FormatRange formatRange;
+
+            formatRange.start = item.value(QLatin1String("start")).toInt();
+            formatRange.length = item.value(QLatin1String("length")).toInt();
+
+            const QJsonObject attribs = item.value(QLatin1String("attribs")).toObject();
+
+            QTextCharFormat &format = formatRange.format;
+            if (attribs.value(QLatin1String("bold")).toBool())
+                format.setFontWeight(QFont::Bold);
+            if (attribs.value(QLatin1String("italics")).toBool())
+                format.setFontItalic(true);
+            if (attribs.value(QLatin1String("underline")).toBool())
+                format.setFontUnderline(true);
+
+            auto applyBrush = [&](int property, const QJsonValue &value) {
+                QColor color(Qt::transparent);
+
+                if (!value.isUndefined()) {
+                    const QString valueStr = value.toString();
+                    if (!valueStr.isEmpty()) {
+                        color = QColor(valueStr);
+                        if (!color.isValid())
+                            color = Qt::transparent;
+                    }
+                }
+
+                if (color != Qt::transparent)
+                    format.setProperty(property, QBrush(color));
+            };
+
+            applyBrush(QTextFormat::BackgroundBrush, attribs.value(QLatin1String("background")));
+            applyBrush(QTextFormat::ForegroundBrush, attribs.value(QLatin1String("foreground")));
+
+            if (format.isEmpty())
+                continue;
+
+            textFormats.append(formatRange);
+        }
+    }
+
+    return textFormats;
 }
 
 bool SceneElement::event(QEvent *event)
@@ -482,6 +616,21 @@ bool SceneElement::event(QEvent *event)
         m_scene = qobject_cast<Scene *>(this->parent());
 
     return QObject::event(event);
+}
+
+void SceneElement::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_changeTimer.timerId()) {
+        m_changeTimer.stop();
+        if (m_scene != nullptr) {
+            if (m_changeCounters.take(Scene::ElementTypeChange) > 0)
+                emit m_scene->sceneElementChanged(this, Scene::ElementTypeChange);
+            if (m_changeCounters.take(Scene::ElementTextChange) > 0)
+                emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
+        }
+        m_changeCounters.clear();
+    } else
+        QObject::timerEvent(event);
 }
 
 void SceneElement::renameCharacter(const QString &from, const QString &to)
@@ -509,7 +658,15 @@ void SceneElement::renameCharacter(const QString &from, const QString &to)
         }
 
         emit textChanged(m_text);
-        emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
+        this->reportSceneElementChanged(Scene::ElementTextChange);
+    }
+}
+
+void SceneElement::reportSceneElementChanged(int type)
+{
+    if (m_scene != nullptr) {
+        m_changeCounters[type]++;
+        m_changeTimer.start(0, this);
     }
 }
 
@@ -1511,6 +1668,7 @@ QByteArray Scene::toByteArray() const
         ds << element->id();
         ds << int(element->type());
         ds << element->text();
+        ds << element->textFormats();
     }
 
     return bytes;
@@ -1563,6 +1721,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         QString id;
         int type = SceneElement::Action;
         QString text;
+        QVector<QTextLayout::FormatRange> formats;
     };
     QVector<_Paragraph> paragraphs;
     QStringList paragraphIds;
@@ -1573,6 +1732,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         ds >> e.id;
         ds >> e.type;
         ds >> e.text;
+        ds >> e.formats;
         paragraphIds.append(e.id);
         paragraphs.append(e);
     }
@@ -1592,6 +1752,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         if (element && element->id() == para.id) {
             element->setType(SceneElement::Type(para.type));
             element->setText(para.text);
+            element->setTextFormats(para.formats);
             continue;
         }
 
@@ -1599,6 +1760,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         element->setId(para.id);
         element->setType(SceneElement::Type(para.type));
         element->setText(para.text);
+        element->setTextFormats(para.formats);
         this->insertElementAt(element, i);
     }
 

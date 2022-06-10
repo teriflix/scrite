@@ -131,9 +131,7 @@ Item {
         property bool allowTaggingOfScenes: false
         property real spaceBetweenScenes: 0
         property int commentsPanelTabIndex: 1
-
-        property real textFormatDockWidgetX: -1
-        property real textFormatDockWidgetY: -1
+        property bool textFormatDockVisible: true
 
         property bool pausePageAndTimeComputation: false
         property bool highlightCurrentLine: true
@@ -2464,6 +2462,8 @@ Item {
         nameFilters: modes[mode].nameFilters
         selectFolder: false
         selectMultiple: false
+        objectName: "Main File Dialog"
+        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
         onFolderChanged: {
             if(mode === "OPEN")
                 workspaceSettings.lastOpenFolderUrl = folder

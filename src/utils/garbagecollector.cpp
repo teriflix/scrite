@@ -47,7 +47,7 @@ void GarbageCollector::add(QObject *ptr)
     if (m_avoidList.contains(ptr->parent()))
         return;
 
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "Adding to Garbage Collector: " << ptr;
 #endif
 

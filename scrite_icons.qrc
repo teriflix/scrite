@@ -269,5 +269,7 @@
         <file>icons/content/stats_inverted.png</file>
         <file>icons/action/pin_inverted.png</file>
         <file>icons/action/pin.png</file>
+        <file>icons/editor/format_clear.png</file>
+        <file>icons/editor/format_clear_inverted.png</file>
     </qresource>
 </RCC>

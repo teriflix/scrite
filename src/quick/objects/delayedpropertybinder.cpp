@@ -19,7 +19,7 @@ DelayedPropertyBinder::DelayedPropertyBinder(QQuickItem *parent) : QQuickItem(pa
     this->setVisible(false);
     connect(this, &QQuickItem::enabledChanged, this, &DelayedPropertyBinder::schedule);
 
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     connect(this, &QQuickItem::parentChanged, this, &DelayedPropertyBinder::parentHasChanged);
     this->parentHasChanged();
 #else
@@ -36,7 +36,7 @@ void DelayedPropertyBinder::setName(const QString &val)
 
     m_name = val;
 
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     if (m_name.isEmpty()) {
         connect(this, &QQuickItem::parentChanged, this, &DelayedPropertyBinder::parentHasChanged);
         this->parentHasChanged();
@@ -117,7 +117,7 @@ void DelayedPropertyBinder::timerEvent(QTimerEvent *te)
 
 void DelayedPropertyBinder::parentHasChanged()
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     if (m_name.isEmpty()) {
         const QQuickItem *parentItem = this->parentItem();
         const QMetaObject *parentMO = parentItem ? parentItem->metaObject() : nullptr;

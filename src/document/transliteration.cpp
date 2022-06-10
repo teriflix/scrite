@@ -1417,7 +1417,7 @@ void TransliteratedText::setColor(const QColor &val)
 
 void TransliteratedText::paint(QPainter *painter)
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug("TransliteratedText is painting %s", qPrintable(m_text));
 #endif
 

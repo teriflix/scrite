@@ -160,7 +160,7 @@ void GridBackgroundItem::setBackgroundColor(const QColor &val)
 QSGNode *GridBackgroundItem::updatePaintNode(QSGNode *oldNode,
                                              QQuickItem::UpdatePaintNodeData *nodeData)
 {
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
     qDebug("GridBackgroundItem is painting.");
 #endif
 

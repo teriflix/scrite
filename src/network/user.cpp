@@ -217,7 +217,7 @@ void User::setInfo(const QJsonObject &val)
         const QJsonObject consentObj = m_info.value(QStringLiteral("consent")).toObject();
         m_analyticsConsent = consentObj.value(QStringLiteral("activity")).toBool(false);
 
-#ifndef QT_NO_DEBUG_OUTPUT
+#ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
         qDebug() << "PA: " << m_enabledFeatures << m_info;
 #endif
     }
@@ -462,7 +462,7 @@ void User::onCallDestroyed()
     m_call = nullptr;
     emit busyChanged();
 
-#ifndef QT_NO_DEBUG_OUTPUT
+#ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
     qDebug() << "PA: ";
 #endif
 }
@@ -773,7 +773,7 @@ void AppFeature::reevaluate()
     } else
         this->setEnabled(false);
 
-#ifndef QT_NO_DEBUG_OUTPUT
+#ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
     qDebug() << "PA: " << m_featureName << "/" << m_feature << " = " << m_enabled;
 #endif
 }

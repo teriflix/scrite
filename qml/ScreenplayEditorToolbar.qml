@@ -116,6 +116,7 @@ Row {
         ToolTip.text: "Screenplay View Options"
         down: screenplayViewOptionsMenu.visible
         onClicked: screenplayViewOptionsMenu.open()
+        objectName: "screenplayViewOptionsButton"
 
         Item {
             anchors.left: parent.left
@@ -138,6 +139,13 @@ Row {
                     property bool sceneBlocksVisible: screenplayEditorSettings.spaceBetweenScenes > 0
                     icon.source: sceneBlocksVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: screenplayEditorSettings.spaceBetweenScenes = sceneBlocksVisible ? 0 : 40
+                }
+
+                MenuItem2 {
+                    text: "Show Text Format Tools"
+                    property bool toolsVisible: screenplayEditorSettings.textFormatDockVisible
+                    icon.source: toolsVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.textFormatDockVisible = !toolsVisible
                 }
 
                 MenuItem2 {
@@ -172,7 +180,6 @@ Row {
                     onClicked: Scrite.document.structure.scanForMuteCharacters()
                     enabled: !Scrite.document.readOnly && screenplayEditorSettings.displaySceneCharacters
                 }
-
             }
         }
     }

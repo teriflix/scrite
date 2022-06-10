@@ -2247,6 +2247,7 @@ Rectangle {
                                     sidebarVisible: true
                                     selectExisting: true
                                     folder: workspaceSettings.lastOpenPhotosFolderUrl
+                                    dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
                                     onFolderChanged: workspaceSettings.lastOpenPhotosFolderUrl = folder
 
                                     onAccepted: {

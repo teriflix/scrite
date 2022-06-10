@@ -125,6 +125,7 @@ ListView {
         selectMultiple: false
         sidebarVisible: true
         selectExisting: true
+        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
         onAccepted: {
             if(attachments === null)
                 return

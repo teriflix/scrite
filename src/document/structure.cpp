@@ -4142,7 +4142,7 @@ void Structure::copy(QObject *elementOrAnnotation)
 
         QMimeData *mimeData = new QMimeData;
         mimeData->setData(QStringLiteral("scrite/structure"), clipboardText);
-#ifndef QT_NO_DEBUG
+#ifndef QT_NO_DEBUG_OUTPUT
         mimeData->setData(QStringLiteral("text/plain"), clipboardText);
 #endif
         clipboard->setMimeData(mimeData);

@@ -1070,10 +1070,28 @@ void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
     }
 }
 
-inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
+inline void polishFontsAndInsertTextAtCursor(
+        QTextCursor &cursor, const QString &text,
+        const QVector<QTextLayout::FormatRange> &formats = QVector<QTextLayout::FormatRange>())
 {
+    const int startPos = cursor.position();
     TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, text);
-};
+    const int endPos = cursor.position();
+
+    if (!formats.isEmpty()) {
+        cursor.setPosition(startPos);
+        for (const QTextLayout::FormatRange &formatRange : formats) {
+            const int length = qMin(startPos + formatRange.start + formatRange.length - 1, endPos)
+                    - (startPos + formatRange.start - 1);
+            cursor.setPosition(startPos + formatRange.start);
+            if (length > 0) {
+                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, length);
+                cursor.mergeCharFormat(formatRange.format);
+            }
+        }
+        cursor.setPosition(endPos);
+    }
+}
 
 #ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
 #include <QTextEdit>
@@ -1386,8 +1404,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         QTextCursor cursor(block);
         cursor.setPosition(block.position() + block.length() - 1, QTextCursor::KeepAnchor);
 
-        const QTextBlockFormat restoreBlockFormat = cursor.blockFormat();
-        const QTextCharFormat restoreCharFormat = cursor.charFormat();
+        // const QTextBlockFormat restoreBlockFormat = cursor.blockFormat();
+        // const QTextCharFormat restoreCharFormat = cursor.charFormat();
 
         QTextBlockFormat pageBreakFormat;
         pageBreakFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
@@ -1518,7 +1536,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart1);
                     else
-                        polishFontsAndInsertTextAtCursor(cursor, blockTextPart1);
+                        polishFontsAndInsertTextAtCursor(cursor, blockTextPart1,
+                                                         dialogElement->textFormats());
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
@@ -1526,7 +1545,28 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart2);
                     else
-                        polishFontsAndInsertTextAtCursor(cursor, blockTextPart2);
+                        polishFontsAndInsertTextAtCursor(
+                                cursor, blockTextPart2,
+                                [](const QVector<QTextLayout::FormatRange> &formats, int position) {
+                                    if (position == 0)
+                                        return formats;
+
+                                    QVector<QTextLayout::FormatRange> ret;
+                                    for (const QTextLayout::FormatRange &formatRange : formats) {
+                                        if (formatRange.start + formatRange.length - 1 < position)
+                                            continue;
+
+                                        QTextLayout::FormatRange newFormatRange;
+                                        newFormatRange.start = formatRange.start - position;
+                                        newFormatRange.length =
+                                                formatRange.length + qMin(newFormatRange.start, 0);
+                                        newFormatRange.start = qMax(0, newFormatRange.start);
+                                        newFormatRange.format = formatRange.format;
+                                        ret.append(newFormatRange);
+                                    }
+
+                                    return ret;
+                                }(dialogElement->textFormats(), blockTextPart1.length() + 1));
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
@@ -1749,7 +1789,7 @@ void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int inde
         return;
 
     QTextFrame *frame = this->findTextFrame(element);
-#ifdef QT_NO_DEBUG
+#ifdef QT_NO_DEBUG_OUTPUT
     if (frame == nullptr)
         return;
 #else
@@ -1803,7 +1843,7 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
 
         if (before != nullptr) {
             QTextFrame *beforeFrame = this->findTextFrame(before);
-#ifdef QT_NO_DEBUG
+#ifdef QT_NO_DEBUG_OUTPUT
             // This cannot be fixed in the next update cycle. The document will
             // be completely out of sync with the scenes. So we should take some
             // time now and deal with it.
@@ -1907,7 +1947,7 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para,
     QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
     for (ScreenplayElement *element : qAsConst(elements)) {
         QTextFrame *frame = this->findTextFrame(element);
-#ifdef QT_NO_DEBUG
+#ifdef QT_NO_DEBUG_OUTPUT
         // This will probably get updated in the next cycle. Trying to fix
         // this here & right now will likely lead to slow UI updates, which
         // is much worse than having to live with dirty text document.
@@ -2589,7 +2629,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             const QString text = para->text();
             if (m_purpose == ForPrinting)
-                polishFontsAndInsertTextAtCursor(cursor, text);
+                polishFontsAndInsertTextAtCursor(cursor, text, para->textFormats());
             else
                 cursor.insertText(text);
 
@@ -2742,7 +2782,7 @@ void ScreenplayTextDocument::processSceneResetList()
         const QList<ScreenplayElement *> elements = m_screenplay->sceneElements(scene);
         for (ScreenplayElement *element : elements) {
             QTextFrame *frame = this->findTextFrame(element);
-#ifdef QT_NO_DEBUG
+#ifdef QT_NO_DEBUG_OUTPUT
             // This will probably get updated in the next cycle. Trying to fix
             // this here & right now will likely lead to slow UI updates, which
             // is much worse than having to live with dirty text document.
