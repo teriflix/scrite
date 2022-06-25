@@ -1307,6 +1307,7 @@ public:
     {
         this->setPosition(position);
         this->select(QTextCursor::WordUnderCursor);
+        m_format = this->charFormat();
 
         m_blockData = SceneDocumentBlockUserData::get(this->block());
         if (m_blockData != nullptr) {
@@ -1327,7 +1328,13 @@ public:
             return;
 
         this->removeSelectedText();
+        const int start = this->position();
         this->insertText(word);
+        const int end = this->position();
+        this->setPosition(start);
+        this->setPosition(end, QTextCursor::KeepAnchor);
+        this->setCharFormat(m_format);
+        this->setPosition(end);
     }
 
     void resetCharFormat() { this->replace(this->word()); }
@@ -1335,6 +1342,7 @@ public:
 private:
     SceneDocumentBlockUserData *m_blockData = nullptr;
     TextFragment m_misspelledFragment;
+    QTextCharFormat m_format;
 };
 
 SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
