@@ -34,6 +34,8 @@
 #include <QTextBoundaryFinder>
 #include <QScopedValueRollback>
 
+Q_DECLARE_METATYPE(QTextCharFormat)
+
 struct ParagraphMetrics
 {
     // The following metrics are picked up from FinalDraft 12
@@ -2509,6 +2511,33 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
 
     QTextCursor cursor(this->document());
     cursor.setPosition(from);
+    if (charsAdded == 1 && charsRemoved == 0 && m_applyNextCharFormat) {
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 1);
+        if (cursor.selectedText() != QStringLiteral(" ")) {
+            m_applyNextCharFormat = false;
+            cursor.setCharFormat(m_nextCharFormat);
+
+            QTimer *timer = new QTimer(this->document());
+            timer->setProperty(
+                    "#data",
+                    QVariantList({ from, QVariant::fromValue<QTextCharFormat>(m_nextCharFormat) }));
+            timer->setInterval(0);
+            connect(timer, &QTimer::timeout, this, [timer]() {
+                const QVariantList data = timer->property("#data").toList();
+                const int from = data.first().toInt();
+                const QTextCharFormat format = data.last().value<QTextCharFormat>();
+                QTextDocument *doc = qobject_cast<QTextDocument *>(timer->parent());
+
+                QTextCursor cursor(doc);
+                cursor.setPosition(from);
+                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 1);
+                cursor.setCharFormat(format);
+
+                timer->deleteLater();
+            });
+            timer->start();
+        }
+    }
 
     do {
         QTextBlock block = cursor.block();
@@ -2738,6 +2767,8 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
         || m_textFormat->isUpdatingFromCharFormat())
         return;
 
+    const QTextCharFormat updatedFormat = m_textFormat->toCharFormat(properties);
+
     /**
      * I wish this function was simpler. I wish we could simply apply the curent
      * char format from m_textFormat to the selected text. But there are real-usage
@@ -2760,7 +2791,7 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
         int end = -1;
         QTextBlock block;
     };
-    QList<Fragment> fragments;
+    QVector<Fragment> fragments;
 
     QTextCursor cursor(this->document());
     if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0
@@ -2787,6 +2818,16 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
         cursor.setPosition(m_cursorPosition);
         cursor.select(QTextCursor::WordUnderCursor);
 
+        if (!cursor.hasSelection()) {
+            QTextCharFormat format = cursor.charFormat();
+            for (int prop : properties)
+                format.clearProperty(prop);
+            format.merge(updatedFormat);
+            m_nextCharFormat = format;
+            m_applyNextCharFormat = true;
+            return;
+        }
+
         Fragment fragment;
         fragment.end = cursor.selectionEnd();
         fragment.start = cursor.selectionStart();
@@ -2794,8 +2835,6 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
         fragments.append(fragment);
     } else
         return;
-
-    const QTextCharFormat updatedFormat = m_textFormat->toCharFormat(properties);
 
     for (const Fragment &fragment : fragments) {
         const QVector<QTextLayout::FormatRange> textFormats = fragment.block.textFormats();
