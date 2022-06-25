@@ -541,7 +541,7 @@ Item {
                             TabSequenceItem.sequence: 1
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
-                            completionStrings: ["Novice", "Learning", "Written Few, None Made", "Have Produced Credits", "Experienced"]
+                            completionStrings: ["Novice", "Learning", "Written Few, None Made", "Hobby Writer", "Working Writer", "Actively Pursuing a Writing Career", "Have Produced Credits", "Experienced"]
                             minimumCompletionPrefixLength: 0
                             maxCompletionItems: -1
                             maxVisibleItems: 6
