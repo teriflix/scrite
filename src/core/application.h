@@ -54,6 +54,8 @@ public:
 
     QString installationId() const;
     QDateTime installationTimestamp() const;
+
+    Q_PROPERTY(int launchCounter READ launchCounter CONSTANT)
     int launchCounter() const;
 
     Q_PROPERTY(QString buildTimestamp READ buildTimestamp CONSTANT)

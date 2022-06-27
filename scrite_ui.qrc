@@ -88,5 +88,6 @@
         <file>qml/DocumentVault.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
         <file>qml/RichTextEdit.qml</file>
+        <file>qml/HelpTipNotification.qml</file>
     </qresource>
 </RCC>

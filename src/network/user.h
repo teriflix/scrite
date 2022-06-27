@@ -68,6 +68,10 @@ public:
     QJsonArray installations() const { return m_installations; }
     Q_SIGNAL void installationsChanged();
 
+    Q_PROPERTY(QJsonObject helpTips READ helpTips NOTIFY helpTipsChanged)
+    QJsonObject helpTips() const { return m_helpTips; }
+    Q_SIGNAL void helpTipsChanged();
+
     Q_PROPERTY(QStringList locations READ locations CONSTANT)
     Q_INVOKABLE static QStringList locations();
 
@@ -103,9 +107,12 @@ private:
     User(QObject *parent = nullptr);
     void setInfo(const QJsonObject &val);
     void setInstallations(const QJsonArray &val);
+    void setHelpTips(const QJsonObject &val);
+    void loadStoredHelpTips();
 
     Q_SLOT void firstReload();
 
+    void fetchHelpTips();
     void reset();
     void activateCallDone();
     void userInfoCallDone();
@@ -124,6 +131,7 @@ private:
 private:
     bool m_busy = false;
     QJsonObject m_info;
+    QJsonObject m_helpTips;
     QTimer m_touchLogTimer;
     QList<int> m_enabledFeatures;
     QJsonArray m_installations;

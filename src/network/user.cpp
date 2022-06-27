@@ -297,10 +297,49 @@ void User::setInstallations(const QJsonArray &val)
     emit installationsChanged();
 }
 
+void User::setHelpTips(const QJsonObject &val)
+{
+    if (m_helpTips == val)
+        return;
+
+    m_helpTips = val;
+    emit helpTipsChanged();
+
+    const QByteArray json = QJsonDocument(val).toJson();
+    JsonHttpRequest::store(QStringLiteral("helpTips"), json.toBase64());
+}
+
+void User::loadStoredHelpTips()
+{
+    const QByteArray base64 = JsonHttpRequest::fetch(QStringLiteral("helpTips")).toByteArray();
+    const QByteArray json = QByteArray::fromBase64(base64);
+
+    m_helpTips = QJsonDocument::fromJson(json).object();
+    emit helpTipsChanged();
+}
+
 void User::firstReload()
 {
     this->loadStoredUserInformation();
+    this->fetchHelpTips();
     this->reload();
+}
+
+void User::fetchHelpTips()
+{
+    JsonHttpRequest *call = new JsonHttpRequest(this);
+    call->setAutoDelete(true);
+
+    call->setApi(QStringLiteral("user/helpTips"));
+    call->setType(JsonHttpRequest::GET);
+    connect(call, &JsonHttpRequest::finished, this, [=]() {
+        if (call->hasError() || !call->hasResponse()) {
+            this->loadStoredHelpTips();
+            return; // Use stored credentials
+        }
+        this->setHelpTips(call->responseData());
+    });
+    call->call();
 }
 
 void User::reset()

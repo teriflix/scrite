@@ -21,12 +21,20 @@ Menu2 {
 
     property SceneGroup sceneGroup: null
     signal toggled(int row, string name)
+    closePolicy: htn.Notification.active ? Popup.NoAutoClose : Popup.CloseOnEscape|Popup.CloseOnPressOutside
+    enabled: false
 
     title: "Tag Groups"
     property string innerTitle: ""
 
     width: 450
     height: 500
+
+    HelpTipNotification {
+        id: htn
+        tipName: "story_beat_tagging"
+        enabled: structureGroupsMenu.opened
+    }
 
     MenuItem2 {
         width: structureGroupsMenu.width

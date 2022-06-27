@@ -53,6 +53,14 @@ public:
     QColor textColor() const { return m_textColor; }
     Q_SIGNAL void textColorChanged();
 
+    Q_PROPERTY(QUrl image READ image WRITE setImage NOTIFY imageChanged)
+    void setImage(const QUrl &val);
+    QUrl image() const { return m_image; }
+    Q_SIGNAL void imageChanged();
+
+    Q_PROPERTY(bool hasImage READ hasImage NOTIFY imageChanged)
+    bool hasImage() const { return !m_image.isEmpty(); }
+
     Q_PROPERTY(bool active READ active WRITE setActive NOTIFY activeChanged)
     void setActive(bool val);
     bool active() const { return m_active; }
@@ -73,11 +81,16 @@ public:
     QStringList buttons() const { return m_buttons; }
     Q_SIGNAL void buttonsChanged();
 
+    Q_PROPERTY(bool hasButtons READ hasButtons NOTIFY buttonsChanged)
+    bool hasButtons() const { return !m_buttons.isEmpty(); }
+
     Q_INVOKABLE void notifyButtonClick(int index);
+    Q_INVOKABLE void notifyImageClick();
 
 signals:
     void dismissed();
     void buttonClicked(int index);
+    void imageClicked();
 
 private:
     void doAutoClose();
@@ -85,6 +98,7 @@ private:
 
 private:
     bool m_active = false;
+    QUrl m_image;
     QColor m_color = QColor(Qt::white);
     QString m_text;
     QString m_title;

@@ -69,6 +69,15 @@ void Notification::setTextColor(const QColor &val)
     emit textColorChanged();
 }
 
+void Notification::setImage(const QUrl &val)
+{
+    if (m_image == val)
+        return;
+
+    m_image = val;
+    emit imageChanged();
+}
+
 void Notification::setActive(bool val)
 {
     if (m_active == val)
@@ -134,6 +143,15 @@ void Notification::notifyButtonClick(int index)
     emit buttonClicked(index);
 
     this->setActive(false);
+}
+
+void Notification::notifyImageClick()
+{
+    if (!m_image.isEmpty()) {
+        emit imageClicked();
+
+        this->setActive(false);
+    }
 }
 
 void Notification::doAutoClose()

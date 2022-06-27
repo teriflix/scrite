@@ -358,6 +358,7 @@ bool JsonHttpRequest::call()
                 + JsonHttpRequest::platformType() + space + JsonHttpRequest::clientId();
         return ret;
     }();
+
     if (!userAgentString.isEmpty())
         req.setHeader(QNetworkRequest::UserAgentHeader, userAgentString);
 

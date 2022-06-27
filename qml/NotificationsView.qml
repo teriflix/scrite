@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
@@ -32,51 +33,84 @@ Flickable {
             model: Scrite.notifications.count
 
             Rectangle {
-                width: notificationsView.width-1
-                height: Math.max(100, ntextLayout.implicitHeight+20)
-                color: notification.color
-                border { width: 1; color: primaryColors.borderColor }
+                required property int index
                 property Notification notification: Scrite.notifications.notificationAt(index)
 
-                Column {
-                    id: ntextLayout
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.left: parent.left
-                    anchors.right: notification.autoClose ? parent.right : dismissButton.left
-                    anchors.margins: 20
-                    spacing: 10
+                width: notificationsView.width-1
+                height: Math.max(100, nLayout.implicitHeight+44)
+                color: notification.color
+                border { width: 1; color: primaryColors.borderColor }
 
-                    Text {
-                        width: parent.width
-                        text: notification.title
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 20
-                        font.bold: true
-                        visible: text !== ""
-                        color: notification.textColor
+                RowLayout {
+                    id: nLayout
+                    width: parent.width-44
+                    anchors.centerIn: parent
+                    spacing: 30
+
+                    Rectangle {
+                        visible: notification.hasImage
+                        Layout.preferredWidth: parent.width*0.25
+                        Layout.preferredHeight: {
+                            if(nimage.status === Image.Ready)
+                                return nimage.sourceSize.height * (Layout.preferredWidth/nimage.sourceSize.width)
+                            return Layout.preferredWidth*9/16
+                        }
+                        border.width: 1
+                        border.color: primaryColors.borderColor
+
+                        Image {
+                            id: nimage
+                            source: notification.image
+                            fillMode: Image.PreserveAspectFit
+                            anchors.fill: parent
+                            anchors.margins: 1
+                            mipmap: true
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: notification.notifyImageClick()
+                            }
+                        }
+
+                        BusyIndicator {
+                            anchors.centerIn: parent
+                            running: nimage.status !== Image.Ready
+                        }
                     }
 
-                    Text {
-                        width: parent.width
-                        text: notification.text
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 16
-                        color: notification.textColor
-                    }
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 20
 
-                    Row {
-                        spacing: parent.spacing * 3
-                        anchors.left: parent.left
-                        anchors.leftMargin: 40
+                        Label {
+                            Layout.fillWidth: true
+                            text: notification.title
+                            wrapMode: Text.WordWrap
+                            font.pointSize: Scrite.app.idealFontPointSize + 4
+                            font.bold: true
+                            visible: text !== ""
+                            color: notification.textColor
+                        }
 
-                        Repeater {
-                            model: notification.buttons
+                        Label {
+                            Layout.fillWidth: true
+                            font.pointSize: Scrite.app.idealFontPointSize
+                            text: notification.text
+                            wrapMode: Text.WordWrap
+                            color: notification.textColor
+                        }
 
-                            Item {
-                                width: button.width
-                                height: button.height * 2
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 20
+
+                            Repeater {
+                                model: notification.buttons
 
                                 Button2 {
+                                    required property string modelData
+                                    required property int index
+
                                     id: button
                                     anchors.verticalCenter: parent.verticalCenter
                                     width: Math.max(75, implicitWidth)
@@ -86,16 +120,13 @@ Flickable {
                             }
                         }
                     }
-                }
 
-                Button2 {
-                    id: dismissButton
-                    visible: notification.autoClose === false
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: parent.right
-                    anchors.rightMargin: 20
-                    text: "Dismiss"
-                    onClicked: Scrite.notifications.dismissNotification(index)
+                    Button2 {
+                        id: dismissButton
+                        visible: !notification.autoClose && !notification.hasButtons
+                        text: "Dismiss"
+                        onClicked: Scrite.notifications.dismissNotification(index)
+                    }
                 }
             }
         }

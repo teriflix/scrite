@@ -3134,4 +3134,8 @@ Rectangle {
             Component.onCompleted: Qt.callLater(generateStatsReport)
         }
     }
+
+    HelpTipNotification {
+        tipName: "notebook"
+    }
 }

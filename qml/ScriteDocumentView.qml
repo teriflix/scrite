@@ -162,6 +162,32 @@ Item {
         property bool showAllFormQuestions: true
     }
 
+    Settings {
+        id: helpNotificationSettings
+        fileName: Scrite.app.settingsFilePath
+        category: "Help"
+
+        property string dayZero
+        function daysSinceZero() {
+            const today = new Date()
+            const dzero = dayZero === "" ? today : new Date(dayZero + "Z")
+            const days = Math.floor((today.getTime() - dzero.getTime()) / (24*60*60*1000))
+            return days
+        }
+
+        property string tipsShown: ""
+        function isTipShown(val) {
+            const ts = tipsShown.split(",")
+            return ts.indexOf(val) >= 0
+        }
+        function markTipAsShown(val) {
+            var ts = tipsShown.length > 0 ? tipsShown.split(",") : []
+            if(ts.indexOf(val) < 0)
+                ts.push(val)
+            tipsShown = ts.join(",")
+        }
+    }
+
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+P"
@@ -1215,6 +1241,11 @@ Item {
                         ShortcutsModelItem.shortcut: "F10"
                     }
                 }
+
+                HelpTipNotification {
+                    tipName: Scrite.app.isWindowsPlatform ? "language_windows" : (Scrite.app.isMacOSPlatform ? "language_macos" : "language_linux")
+                    enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
+                }
             }
 
             ToolButton3 {
@@ -1931,6 +1962,10 @@ Item {
         id: screenplayEditorComponent
 
         ScreenplayEditor {
+            HelpTipNotification {
+                tipName: "screenplay"
+            }
+
             // zoomLevelModifier: mainTabBar.currentIndex > 0 ? -3 : 0
             Component.onCompleted: {
                 const evalZoomLevelModifierFn = () => {
@@ -2132,7 +2167,12 @@ Item {
                                 anchors.bottom: parent.bottom
                                 visible: !showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                 active: structureAppFeature.enabled
-                                sourceComponent: StructureView { }
+                                sourceComponent: StructureView {
+                                    HelpTipNotification {
+                                        tipName: "structure"
+                                        enabled: structureViewLoader.visible
+                                    }
+                                }
 
                                 DisabledFeatureNotice {
                                     anchors.fill: parent
@@ -2765,5 +2805,25 @@ Item {
         busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
         visible: refCount > 0
         property int refCount: 0
+    }
+
+    HelpTipNotification {
+        id: htNotification
+        enabled: tipName !== ""
+
+        Component.onCompleted: {
+            Qt.callLater( () => {
+                             if(helpNotificationSettings.dayZero === "")
+                                helpNotificationSettings.dayZero = new Date()
+
+                             const days = helpNotificationSettings.daysSinceZero()
+                             if(days >= 2) {
+                                 if(!helpNotificationSettings.isTipShown("discord"))
+                                     htNotification.tipName = "discord"
+                                 else if(!helpNotificationSettings.isTipShown("subscription") && days >= 5)
+                                     htNotification.tipName = "subscription"
+                             }
+                         })
+        }
     }
 }
