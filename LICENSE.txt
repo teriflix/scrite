@@ -47,14 +47,10 @@ licenses compatible with GPLv3.
 
 ===============================================================================
 
-Scrite is originally developed by TERIFLIX Entertainment Spaces Pvt. Ltd.
-Certain icons and graphics art work owned by TERIFLIX are used in the
-application. 3rd party builds of Scrite must not use the following icons and
-graphics artwork.
-
-1. images/teriflix_logo.png, images/teriflix_logo_inverted.png,
-   images/teriflix_icon.png: All rights to this image rest with
-   TERIFLIX Entertainment Spaces Pvt. Ltd. (https://www.teriflix.com)
+Scrite is originally developed by Prashanth under TERIFLIX Entertainment Spaces
+Pvt. Ltd. As of June 2022, further development, maintenance and monetization of
+Scrite will be done by VCreate Logic Pvt. Ltd, a software consulting company
+founded by Prashanth, who is the creator of Scrite.
 
 The development of Scrite is done using a commercial version of Qt 5.15.10
 However the entire source code of Scrite is made available under GPLv3.

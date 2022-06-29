@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
-** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+** Copyright (C) VCreate Logic Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth@scrite.io)
 **
 ** This code is distributed under GPL v3. Complete text of the license
 ** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
@@ -66,7 +66,7 @@ Item {
 
             Text {
                 font.pointSize: Scrite.app.idealFontPointSize-2
-                text: "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com."
+                text: "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please post a message on our Discord server."
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 width: parent.width
             }

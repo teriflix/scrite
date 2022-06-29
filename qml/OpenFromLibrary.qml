@@ -1,7 +1,7 @@
 /****************************************************************************
 **
-** Copyright (C) TERIFLIX Entertainment Spaces Pvt. Ltd. Bengaluru
-** Author: Prashanth N Udupa (prashanth.udupa@teriflix.com)
+** Copyright (C) VCreate Logic Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth@scrite.io)
 **
 ** This code is distributed under GPL v3. Complete text of the license
 ** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
@@ -108,7 +108,7 @@ Item {
 
         pagesArray: [
             { "kind": "Screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>.", appFeature: Scrite.ScriptalayFeature },
-            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please write to scrite@teriflix.com.", appFeature: Scrite.TemplateFeature }
+            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please post a message on our Discord server.", appFeature: Scrite.TemplateFeature }
         ]
 
         pageTitleRole: "title"

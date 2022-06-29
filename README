@@ -1,6 +1,6 @@
-Scrite is a free and open-source screenplay writing app from TERIFLIX.
+Scrite is an open-source screenwriting app.
+
 https://www.scrite.io
-https://www.teriflix.com
 
 FEATURES
 -----------
@@ -12,7 +12,7 @@ FEATURES
 
 Building from source
 ------------
-Scrite is developed using Qt 5.15.8. To build scrite, simply install
+Scrite is developed using Qt 5.15.10. To build scrite, simply install
 this version of Qt on your computer (Windows, macOS or Linux).
 
 Open scrite.pro in Qt Creator and build.
@@ -20,11 +20,11 @@ Open scrite.pro in Qt Creator and build.
 Reporting Issues
 ----------------
 If you run into bugs, crashes or find missing features OR features that
-are not working as expected, we recommend that you create a new topic on
-Forum first, discuss the issue there and then create a bug ticket on
-GitHub.
+are not working as expected, we recommend that you post a message on
+our Discord server, discuss it with us there before creating a bug
+ticket on GitHub.
 
-Here is a link to our discussion forum: https://www.scrite.io/index.php/forum/activity/
+Here is a link to our Discord server: https://discord.gg/bGHquFX5jK
 
 IMPORTANT
 ===============
