@@ -28,7 +28,7 @@ Item {
 
     Item {
         id: splashImageArea
-        width: Math.min(ui.width * 0.6, splashImage.sourceSize.width)
+        width: Math.min(ui.width * 0.7, splashImage.sourceSize.width)
         height: width / 2.35
         anchors.centerIn: parent
         clip: true
@@ -44,11 +44,11 @@ Item {
 
         Text {
             id: versionText
-            x: (1018 / splashImage.sourceSize.width) * parent.width
-            y: (187 / splashImage.sourceSize.height) * parent.height
-            font.pixelSize: Scrite.app.idealFontPointSize + 3
+            x: parent.width - width - ((35 / splashImage.sourceSize.height) * parent.height)
+            y: (750 / splashImage.sourceSize.height) * parent.height
+            font.pixelSize: Scrite.app.idealFontPointSize + 1
             text: Scrite.app.applicationVersion
-            color: "#4a4a4a"
+            color: "white"
         }
 
         SequentialAnimation {

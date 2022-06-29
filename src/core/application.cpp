@@ -213,6 +213,25 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     QQuickStyle::setStyle(style);
 }
 
+static void copyFilesRecursively(const QDir &from, const QDir &to)
+{
+    const QFileInfoList fromList =
+            from.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const QFileInfo &fromFile : fromList) {
+        if (fromFile.isFile())
+            QFile::copy(fromFile.absoluteFilePath(), to.absoluteFilePath(fromFile.fileName()));
+        else if (fromFile.isDir()) {
+            QDir fromDir = from;
+            fromDir.cd(fromFile.fileName());
+
+            QDir toDir = to;
+            toDir.mkdir(fromFile.fileName());
+            toDir.cd(fromFile.fileName());
+            copyFilesRecursively(fromDir, toDir);
+        }
+    }
+}
+
 QVersionNumber Application::prepare()
 {
     const QVersionNumber applicationVersion(0, 8, 9);
@@ -225,6 +244,19 @@ QVersionNumber Application::prepare()
     Application::setApplicationName(QStringLiteral("Scrite"));
     Application::setOrganizationName(QStringLiteral("TERIFLIX"));
     Application::setOrganizationDomain(QStringLiteral("teriflix.com"));
+
+    const QDir oldAppDataFolder =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
+
+    Application::setOrganizationName(QStringLiteral("Scrite"));
+    Application::setOrganizationDomain(QStringLiteral("scrite.io"));
+
+    if (oldAppDataFolder.exists()) {
+        const QString newAppDataPath =
+                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(newAppDataPath);
+        copyFilesRecursively(oldAppDataFolder, QDir(newAppDataPath));
+    }
 
 #ifdef Q_OS_MAC
     Application::setApplicationVersion(applicationVersion.toString() + QStringLiteral("-beta"));

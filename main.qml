@@ -280,7 +280,7 @@ Rectangle {
         category: "Structure Tab"
 
         property bool showGrid: true
-        property color gridColor: primaryColors.c400.background
+        property color gridColor: accentColors.c400.background
         property color canvasColor: accentColors.c50.background
         property bool showPreview: true
         property bool displayAnnotationProperties: true

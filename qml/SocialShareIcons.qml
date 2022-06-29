@@ -44,28 +44,28 @@ Item {
 
         ToolButton3 {
             iconSource: "../icons/action/share_on_facebook.png"
-            suggestedWidth: 50; suggestedHeight: 50
+            suggestedWidth: 40; suggestedHeight: 40
             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_facebook")
             ToolTip.text: "Post about Scrite on your Facebook page."
         }
 
         ToolButton3 {
             iconSource: "../icons/action/share_on_linkedin.png"
-            suggestedWidth: 50; suggestedHeight: 50
+            suggestedWidth: 40; suggestedHeight: 40
             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_linkedin")
             ToolTip.text: "Post about Scrite on your LinkedIn page."
         }
 
         ToolButton3 {
             iconSource: "../icons/action/share_on_twitter.png"
-            suggestedWidth: 50; suggestedHeight: 50
+            suggestedWidth: 40; suggestedHeight: 40
             onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_twitter")
             ToolTip.text: "Tweet about Scrite from your handle."
         }
 
         ToolButton3 {
             iconSource: "../icons/action/share_on_email.png"
-            suggestedWidth: 50; suggestedHeight: 50
+            suggestedWidth: 40; suggestedHeight: 40
             readonly property string url: "mailto:?Subject=Take a look at Scrite&Body=I am using Scrite and I thought you should check it out as well. Visit https://www.scrite.io"
             onClicked: Qt.openUrlExternally(url)
             ToolTip.text: "Send an email about Scrite."

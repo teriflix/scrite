@@ -1,17 +1,14 @@
 <RCC>
     <qresource prefix="/">
         <file>images/appicon.png</file>
-        <file>images/teriflix_logo.png</file>
         <file>images/splash.jpg</file>
         <file>images/aboutbox.jpg</file>
-        <file>images/teriflix_icon.png</file>
         <file>images/library.png</file>
         <file>images/library_inverted.png</file>
         <file>images/library_woicon.png</file>
         <file>images/library_woicon_inverted.png</file>
         <file>images/sample_scene.png</file>
         <file>images/blank_document.png</file>
-        <file>images/teriflix_logo_inverted.png</file>
         <file>images/white-paper-texture.jpg</file>
         <file>images/scrited_closing_frame.png</file>
         <file>images/scrite_logo_for_report_header.png</file>

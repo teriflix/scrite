@@ -1165,7 +1165,7 @@ Item {
                     y: modelData.geometry.y - 120 - topMarginForStacks
                     width: modelData.geometry.width + 80
                     height: modelData.geometry.height + 120 + topMarginForStacks + 40
-                    color: Scrite.app.translucent(accentColors.windowColor, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+                    color: Scrite.app.translucent(accentColors.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 2
                     border.color: accentColors.c600.background
                     enabled: !createItemMouseHandler.enabled && !currentElementItemShadow.visible && !annotationGripLoader.active
@@ -1185,7 +1185,7 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: episodeNameText.bottom
                         anchors.bottomMargin: -8
-                        color: accentColors.c600.background
+                        color: accentColors.c200.background
                     }
 
                     Text {
@@ -1195,7 +1195,7 @@ Item {
                         anchors.margins: 8
                         font.pointSize: Scrite.app.idealFontPointSize + 8
                         font.bold: true
-                        color: accentColors.c600.text
+                        color: accentColors.c200.text
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
                     }
                 }
@@ -1212,7 +1212,7 @@ Item {
                     width: modelData.geometry.width + 40
                     height: modelData.geometry.height + 40 + topMarginForStacks
                     radius: 0
-                    color: Scrite.app.translucent(accentColors.windowColor, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+                    color: Scrite.app.translucent(accentColors.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 1
                     border.color: accentColors.borderColor
                     enabled: !createItemMouseHandler.enabled && !annotationGripLoader.active
@@ -1297,7 +1297,7 @@ Item {
                         anchors.margins: -parent.radius
                         border.width: parent.border.width
                         border.color: parent.border.color
-                        color: Scrite.app.translucent(accentColors.windowColor, 0.4)
+                        color: Scrite.app.translucent(accentColors.c200.background, 0.4)
 
                         MouseArea {
                             id: canvasBeatLabelMouseArea
@@ -1332,7 +1332,7 @@ Item {
                         anchors.leftMargin: parent.radius*2
                         anchors.bottomMargin: parent.radius-parent.border.width
                         padding: 10
-                        color: "black"
+                        color: accentColors.c200.text
                     }
                 }
             }

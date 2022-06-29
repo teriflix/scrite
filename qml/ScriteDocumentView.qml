@@ -122,7 +122,7 @@ Item {
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
         property bool includeTitlePageInPreview: true
-        property bool enableSpellCheck: false // until we can fix https://github.com/teriflix/scrite/issues/138
+        property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
         property int lastLanguageRefreshNoticeBoxTimestamp: 0
         property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
         property bool showLanguageRefreshNoticeBox: true
@@ -2353,7 +2353,7 @@ Item {
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50
                 sourceComponent: Rectangle {
-                    color: FocusTracker.hasFocus ? accentColors.c300.background : accentColors.c200.background
+                    color: FocusTracker.hasFocus ? accentColors.c100.background : accentColors.c50.background
                     FocusTracker.window: Scrite.window
 
                     Behavior on color {
