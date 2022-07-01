@@ -50,8 +50,6 @@ void FlickScrollSpeedControl::setFlickable(QQuickItem *val)
     emit flickableChanged();
 
     this->computeValues();
-
-    Application::log("Flickable was set");
 }
 
 void FlickScrollSpeedControl::setDefaultFlickDeceleration(qreal val)
