@@ -37,7 +37,7 @@ Item {
 
         Repeater {
             id: tabRepeater
-            model: tabNames
+            model: tabBar.visible ? tabNames : 0
 
             TabBarTab {
                 tabFillColor: active ? tabColor : Qt.tint(tabColor, "#C0FFFFFF")
@@ -80,7 +80,7 @@ Item {
         Rectangle {
             anchors.fill: tabContentLoader
             border.width: 1
-            border.color: tabBar.visible ? (Scrite.app.isVeryLightColor(tabColor) ? "gray" : tabColor) : primaryColors.borderColor
+            border.color: Scrite.app.isVeryLightColor(tabColor) ? primaryColors.windowColor : tabColor
             color: Qt.rgba(0,0,0,0)
         }
     }

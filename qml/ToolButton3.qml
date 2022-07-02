@@ -34,6 +34,7 @@ Item {
     property alias shortcut: toolButtonShortcut.sequence
     property string shortcutText: toolButtonShortcut.portableText
     property bool down: toolButtonMouseArea.pressed
+    property alias downIndicatorColor: downIndicator.color
     property bool checkable: false
     property bool checked: false
     property alias hovered: toolButtonMouseArea.containsMouse

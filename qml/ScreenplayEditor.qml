@@ -1281,7 +1281,7 @@ Rectangle {
 
             SidePanel {
                 id: commentsSidePanel
-                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? "black" : contentItem.theScene.color
+                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? primaryColors.c500.background : contentItem.theScene.color
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
                 borderColor: expanded ? primaryColors.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
@@ -1293,6 +1293,38 @@ Rectangle {
                 property real screenY: screenplayEditor.mapFromItem(parent, 0, 0).y
                 property real maxTopMargin: contentItem.height-height-20
                 anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : -1
+
+                cornerComponent: expanded ? commentsSidePanelCornerComponent : null
+
+                Component {
+                    id: commentsSidePanelCornerComponent
+
+                    Column {
+                        spacing: 8
+
+                        ToolButton3 {
+                            iconSource: down ? "../icons/content/comments_panel_inverted.png" : "../icons/content/comments_panel.png"
+                            suggestedWidth: parent.width
+                            suggestedHeight: parent.width
+                            down: contentView.commentsPanelTabIndex === 0
+                            downIndicatorColor: commentsSidePanel.theSceneDarkColor
+                            onClicked: contentView.commentsPanelTabIndex = 0
+                            ToolTip.visible: hovered
+                            ToolTip.text: "View/edit scene comments."
+                        }
+
+                        ToolButton3 {
+                            iconSource: down ? "../icons/filetype/photo_inverted.png" : "../icons/filetype/photo.png"
+                            suggestedWidth: parent.width
+                            suggestedHeight: parent.width
+                            down: contentView.commentsPanelTabIndex === 1
+                            downIndicatorColor: commentsSidePanel.theSceneDarkColor
+                            onClicked: contentView.commentsPanelTabIndex = 1
+                            ToolTip.visible: hovered
+                            ToolTip.text: "View/edit scene featured image."
+                        }
+                    }
+                }
 
                 Connections {
                     target: contentView
@@ -1326,18 +1358,10 @@ Rectangle {
                 }
                 content: TabView3 {
                     id: commentsSidePanelTabView
-                    tabNames: ["Featured Photo", "Comments"]
-                    tabColor: contentItem.theScene.color
-                    currentTabContent: currentTabIndex === 0 ? featuredPhotoComponent : commentsEditComponent
+                    tabBarVisible: false
+                    tabColor: commentsSidePanel.theSceneDarkColor
+                    currentTabContent: currentTabIndex === 0 ? commentsEditComponent : featuredPhotoComponent
                     currentTabIndex: contentView.commentsPanelTabIndex
-                    onCurrentTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
-
-                    Connections {
-                        target: contentView
-                        function onCommentsPanelTabIndexChanged() {
-                            commentsSidePanelTabView.currentTabIndex = contentView.commentsPanelTabIndex
-                        }
-                    }
 
                     Component {
                         id: featuredPhotoComponent

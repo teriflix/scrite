@@ -30,6 +30,8 @@ Item {
     property alias content: contentLoader.sourceComponent
     property alias contentInstance: contentLoader.item
 
+    property alias cornerComponent: cornerLoader.sourceComponent
+
     width: expanded ? maxPanelWidth : minPanelWidth
 
     property real buttonSize: Math.min(100, height)
@@ -98,10 +100,11 @@ Item {
 
         Loader {
             id: contentLoader
-            anchors.topMargin: 2
+            anchors.topMargin: textLabel.visible ? 2 : 0
             anchors.top: textLabel.visible ? textLabel.bottom : parent.top
             anchors.bottom: parent.bottom
-            width: sidePanel.maxPanelWidth - expandCollapseButton.width
+            anchors.left: parent.left
+            anchors.right: parent.right
             visible: opacity > 0
             opacity: sidePanel.expanded ? 1 : 0
             property var contentData
@@ -143,11 +146,22 @@ Item {
                 source: sidePanel.expanded ? "../icons/navigation/arrow_left.png" : "../icons/navigation/arrow_right.png"
                 fillMode: Image.PreserveAspectFit
             }
-        }
 
-        MouseArea {
-            onClicked: sidePanel.expanded = !sidePanel.expanded
-            anchors.fill: parent
+            MouseArea {
+                onClicked: sidePanel.expanded = !sidePanel.expanded
+                anchors.fill: parent
+            }
+
+            Loader {
+                id: cornerLoader
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: iconImage.top
+                // anchors.topMargin: 2
+                anchors.bottomMargin: 2
+                anchors.leftMargin: -2
+            }
         }
 
         Rectangle {
