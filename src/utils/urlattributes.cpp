@@ -12,16 +12,18 @@
 ****************************************************************************/
 
 #include "hourglass.h"
+#include "application.h"
 #include "urlattributes.h"
 #include "garbagecollector.h"
+#include "networkaccessmanager.h"
 
 #include <QFile>
 #include <QTimer>
+#include <QUrlQuery>
+#include <QJsonDocument>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QNetworkAccessManager>
-#include <QUrlQuery>
-#include <QJsonDocument>
 
 UrlAttributes::UrlAttributes(QObject *parent) : QObject(parent) { }
 
@@ -35,7 +37,7 @@ void UrlAttributes::setUrl(const QUrl &val)
     m_url = val;
     emit urlChanged();
 
-    static QNetworkAccessManager nam;
+    NetworkAccessManager &nam = *NetworkAccessManager::instance();
     if (!m_reply.isNull())
         delete m_reply;
     m_reply = nullptr;
@@ -45,7 +47,7 @@ void UrlAttributes::setUrl(const QUrl &val)
         this->setStatus(Loading);
 
         static const QUrl url(
-                QStringLiteral("http://www.teriflix.in/scrite/urlattribs/urlattribs.php"));
+                QStringLiteral("https://www.scrite.io/helpers/urlattribs/urlattribs.php"));
         const QNetworkRequest request(url);
 
         QUrlQuery postData;

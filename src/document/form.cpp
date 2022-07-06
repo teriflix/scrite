@@ -13,14 +13,14 @@
 
 #include "form.h"
 #include "application.h"
+#include "jsonhttprequest.h"
 #include "networkaccessmanager.h"
 
 #include <QDir>
 #include <QUuid>
+#include <QStack>
 #include <QApplication>
 #include <QJsonDocument>
-#include <QNetworkReply>
-#include <QStack>
 
 FormQuestion::FormQuestion(QObject *parent) : QObject(parent) { }
 
@@ -530,38 +530,32 @@ void Forms::itemRemoveEvent(Form *ptr)
 
 void Forms::downloadForms()
 {
-    if (this->findChild<QNetworkReply *>() != nullptr)
+    if (this->findChild<JsonHttpRequest *>() != nullptr)
         return;
 
-    const QUrl url =
-            QUrl(QStringLiteral("http://www.teriflix.in/scrite/library/forms/forms.hexdb"));
+    JsonHttpRequest *call = new JsonHttpRequest(this);
+    call->setType(JsonHttpRequest::GET);
+    call->setApi(QLatin1String("scriptalay/forms"));
+    call->setAutoDelete(true);
+    connect(call, &JsonHttpRequest::finished, this, [=]() {
+        if (call->hasError()) {
+            m_errorReport->setErrorMessage(call->errorText(), call->errorData());
+            return;
+        }
 
-    QNetworkAccessManager *nam = NetworkAccessManager::instance();
-    QNetworkRequest request(url);
-    QNetworkReply *reply = nam->get(request);
-    reply->setParent(this);
-    connect(reply, &QNetworkReply::finished, this, [=]() {
-        const QByteArray bytes = reply->readAll();
-        reply->deleteLater();
-
-        const QByteArray bson = qUncompress(QByteArray::fromHex(bytes));
-
-        const QJsonDocument doc = QJsonDocument::fromBinaryData(bson);
-        if (doc.isNull())
+        if (!call->hasResponse())
             return;
 
-        QJsonArray records;
-        if (doc.isArray())
-            records = doc.array();
-        else
-            records.append(doc.object());
+        QList<Form *> forms = this->list();
+
+        const QJsonArray records = call->responseData().value(QLatin1String("records")).toArray();
+        if (records.isEmpty())
+            return;
 
         ErrorReport *actualErrorReport = m_errorReport;
         QStringList errors;
 
-        QList<Form *> forms = this->list();
-
-        for (const QJsonValue &record : qAsConst(records)) {
+        for (const QJsonValue &record : records) {
             ErrorReport tempErrorReport;
             m_errorReport = &tempErrorReport;
 
@@ -583,4 +577,5 @@ void Forms::downloadForms()
         if (!errors.isEmpty())
             m_errorReport->setErrorMessage(errors.join(QStringLiteral(", ")));
     });
+    call->call();
 }
