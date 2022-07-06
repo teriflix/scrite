@@ -26,14 +26,6 @@ public:
     Q_INVOKABLE CharacterScreenplayReport(QObject *parent = nullptr);
     ~CharacterScreenplayReport();
 
-    Q_CLASSINFO("includeNotes_FieldGroup", "Characters")
-    Q_CLASSINFO("includeNotes_FieldLabel", "Include character notes")
-    Q_CLASSINFO("includeNotes_FieldEditor", "CheckBox")
-    Q_PROPERTY(bool includeNotes READ includeNotes WRITE setIncludeNotes NOTIFY includeNotesChanged)
-    void setIncludeNotes(bool val);
-    bool includeNotes() const { return m_includeNotes; }
-    Q_SIGNAL void includeNotesChanged();
-
     Q_CLASSINFO("highlightDialogues_FieldGroup", "Characters")
     Q_CLASSINFO("highlightDialogues_FieldLabel", "Highlight dialogues in yellow background")
     Q_CLASSINFO("highlightDialogues_FieldEditor", "CheckBox")
@@ -55,9 +47,6 @@ protected:
     bool includeScreenplayElement(const ScreenplayElement *) const;
     QString screenplaySubtitle() const;
     void configureScreenplayTextDocument(ScreenplayTextDocument &stDoc);
-
-    // AbstractScreenplayTextDocumentInjectionInterface interface
-    void inject(QTextCursor &, InjectLocation);
 
 private:
     QString m_comment;

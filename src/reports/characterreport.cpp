@@ -150,7 +150,9 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
         cursor.insertText("NOTES:");
 
         const Structure *structure = this->document()->structure();
+        int characterNr = 0;
         for (const QString &characterName : qAsConst(m_characterNames)) {
+            ++characterNr;
             blockFormat = defaultBlockFormat;
             blockFormat.setIndent(1);
 
@@ -164,23 +166,142 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             charFormat.setFontWeight(QFont::Normal);
             cursor.setCharFormat(charFormat);
 
-            // TODO: Character summary???
-
             const Character *character = structure->findCharacter(characterName);
+
+            // TODO include character meta-data here.
+            QTextTableFormat tableFormat;
+            tableFormat.setCellPadding(1);
+            tableFormat.setCellSpacing(0);
+            tableFormat.setLeftMargin(80);
+            tableFormat.setTopMargin(10);
+
+            QTextFrame *frame = cursor.currentFrame();
+            QTextTable *table =
+                    cursor.insertTable(6, character->hasKeyPhoto() ? 3 : 2, tableFormat);
+            QTextTableCellFormat cellFormat; // = table->cellAt(0, 0).format();
+            cellFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+            for (int tr = 0; tr < table->rows(); tr++) {
+                for (int tc = 0; tc < table->columns(); tc++) {
+                    table->cellAt(tr, tc).setFormat(cellFormat);
+                }
+            }
+
+            if (character->hasKeyPhoto()) {
+                table->mergeCells(0, 0, 6, 1);
+
+                const QImage image(character->keyPhoto());
+                const qreal imageScale = 120.0 / image.width();
+                const QSizeF imageSize = image.size() * imageScale;
+                const QUrl imageName(QLatin1String("character://")
+                                     + characterName.toLatin1().toHex() + QLatin1String("/")
+                                     + QString::number(characterNr));
+                document.addResource(QTextDocument::ImageResource, imageName, image);
+
+                QTextImageFormat imageFormat;
+                imageFormat.setWidth(imageSize.width());
+                imageFormat.setHeight(imageSize.height());
+                imageFormat.setName(imageName.toString());
+
+                cursor = table->cellAt(0, 0).firstCursorPosition();
+                cursor.insertImage(imageFormat);
+            }
+
+            const int col = character->hasKeyPhoto() ? 1 : 0;
+
+            table->mergeCells(0, col, 1, 2);
+            cursor = table->cellAt(0, col).firstCursorPosition();
+            cursor.insertText(QLatin1String("Role: ") + character->designation());
+
+            table->mergeCells(1, col, 1, 2);
+            cursor = table->cellAt(1, col).firstCursorPosition();
+            cursor.insertText(QLatin1String("Tags: ")
+                              + character->tags().join(QLatin1String(", ")));
+
+            table->mergeCells(2, col, 1, 2);
+            cursor = table->cellAt(2, col).firstCursorPosition();
+            cursor.insertText(QLatin1String("Aliases: ")
+                              + character->aliases().join(QLatin1String(", ")));
+
+            cursor = table->cellAt(3, col).firstCursorPosition();
+            cursor.insertText(QLatin1String("Type: ") + character->type());
+
+            cursor = table->cellAt(3, col + 1).firstCursorPosition();
+            cursor.insertText(QLatin1String("Gender: ") + character->gender());
+
+            cursor = table->cellAt(4, col).firstCursorPosition();
+            cursor.insertText(QLatin1String("Age: ") + character->age());
+
+            cursor = table->cellAt(4, col + 1).firstCursorPosition();
+            cursor.insertText(QLatin1String("Body Type: ") + character->bodyType());
+
+            cursor = table->cellAt(5, col).firstCursorPosition();
+            cursor.insertText(QLatin1String("Height: ") + character->height());
+
+            cursor = table->cellAt(5, col + 1).firstCursorPosition();
+            cursor.insertText(QLatin1String("Weight: ") + character->weight());
+
+            cursor = frame->lastCursorPosition();
+
+            const QJsonValue summaryContent = character->summary();
+            if (summaryContent.isString() || summaryContent.isObject()) {
+                const QString summaryText = summaryContent.toString().trimmed();
+                const QJsonObject summaryDelta = summaryContent.toObject();
+                if (!summaryText.isEmpty() || !summaryDelta.isEmpty()) {
+                    const QString heading = QLatin1String("Character Summary:");
+
+                    blockFormat = defaultBlockFormat;
+                    blockFormat.setIndent(2);
+                    blockFormat.setTopMargin(10);
+
+                    charFormat = defaultCharFormat;
+                    charFormat.setFontPointSize(charFormat.fontPointSize() + 2);
+                    charFormat.setFontUnderline(true);
+                    charFormat.setFontWeight(QFont::Bold);
+
+                    cursor.insertBlock(blockFormat, charFormat);
+                    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor,
+                                                                                       heading);
+
+                    charFormat.setFontPointSize(charFormat.fontPointSize() - 2);
+                    charFormat.setFontUnderline(false);
+
+                    blockFormat.setTopMargin(0);
+                    blockFormat.setBottomMargin(0);
+                    blockFormat.setAlignment(Qt::AlignJustify);
+
+                    charFormat.setFontWeight(QFont::Normal);
+                    cursor.insertBlock(blockFormat, charFormat);
+
+                    if (summaryContent.isString())
+                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                                cursor, summaryContent.toString());
+                    else
+                        DeltaDocument::blockingResolveAndInsertHtml(summaryContent.toObject(),
+                                                                    cursor);
+                }
+            }
+
+            blockFormat = defaultBlockFormat;
+            blockFormat.setIndent(1);
+            blockFormat.setTopMargin(10);
+
+            cursor.insertBlock(blockFormat, defaultCharFormat);
+
             const Notes *characterNotes = character ? character->notes() : nullptr;
             if (characterNotes == nullptr || characterNotes->noteCount() == 0) {
-                cursor.insertText(": no notes available.");
+                cursor.insertText("No notes available.");
                 continue;
             }
 
-            cursor.insertText(": " + QString::number(characterNotes->noteCount())
-                              + " note(s) available.");
+            cursor.insertText(QString::number(characterNotes->noteCount()) + " note(s) available.");
 
             for (int i = 0; i < characterNotes->noteCount(); i++) {
                 const Note *note = characterNotes->noteAt(i);
                 QString heading = note->title().trimmed();
                 if (heading.isEmpty())
-                    heading = "Note #" + QString::number(i + 1);
+                    heading = QLatin1String("Note #") + QString::number(i + 1);
+                else
+                    heading = QString::number(i + 1) + QLatin1String(". ") + heading;
 
                 blockFormat = defaultBlockFormat;
                 blockFormat.setIndent(2);
@@ -192,7 +313,6 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 charFormat.setFontWeight(QFont::Bold);
 
                 cursor.insertBlock(blockFormat, charFormat);
-                // cursor.insertText(heading);
                 TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, heading);
 
                 charFormat.setFontPointSize(charFormat.fontPointSize() - 2);
@@ -214,23 +334,30 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                         DeltaDocument::blockingResolveAndInsertHtml(noteContent.toObject(), cursor);
                 }
 
-                // cursor.insertText(note->content().toString());
                 if (note->type() == Note::FormNoteType) {
                     Form *form = note->form();
                     if (form != nullptr) {
                         for (int i = 0; i < form->questionCount(); i++) {
                             FormQuestion *q = form->questionAt(i);
+                            QTextBlockFormat qBlockFormat = blockFormat;
+                            qBlockFormat.setIndent(blockFormat.indent() + q->indentation());
+
+                            const QString questionText =
+                                    q->number() + QStringLiteral(". ") + q->questionText();
                             charFormat.setFontWeight(QFont::Bold);
-                            cursor.insertBlock(blockFormat, charFormat);
+                            cursor.insertBlock(qBlockFormat, charFormat);
                             cursor.insertBlock();
                             TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                                    cursor, q->questionText());
-                            // cursor.insertText(q->questionText());
+                                    cursor, questionText);
+
+                            const QString answerText = [q, note]() {
+                                const QString ret = note->getFormData(q->id()).toString();
+                                return ret.isEmpty() ? QLatin1String("-NA-") : ret;
+                            }();
                             charFormat.setFontWeight(QFont::Normal);
-                            cursor.insertBlock(blockFormat, charFormat);
+                            cursor.insertBlock(qBlockFormat, charFormat);
                             TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                                    cursor, note->getFormData(q->id()).toString());
-                            // cursor.insertText(note->getFormData(q->id()).toString());
+                                    cursor, answerText);
                         }
                     }
                 }
@@ -239,6 +366,9 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             cursor.insertBlock();
         }
     }
+
+    if (!m_includeDialogues && !m_includeSceneHeadings)
+        return true;
 
     QMap<QString, int> dialogCount;
     QMap<QString, int> sceneCount;

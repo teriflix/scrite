@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "application.h"
 #include "deltadocument.h"
 #include "execlatertimer.h"
 
@@ -191,7 +192,6 @@ void DeltaDocument::blockingResolveAndInsertHtml(const QJsonObject &content, QTe
         htmlFrameFormat.setLeftMargin(cursor.document()->indentWidth() * frameIndent);
         cursor.insertFrame(htmlFrameFormat);
         cursor.insertHtml(result.htmlText);
-
         cursor = rootFrame->lastCursorPosition();
     }
 }
