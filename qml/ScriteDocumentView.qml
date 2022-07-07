@@ -1184,6 +1184,8 @@ Item {
                                 property string tabs: Scrite.app.isWindowsPlatform ? (modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t") : "\t\t"
                                 text: baseText + tabs + "" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
                                 font.bold: Scrite.app.transliterationEngine.language === modelData.value
+                                focusPolicy: Qt.NoFocus
+                                enabled: Scrite.app.transliterationEngine.enabledLanguages.indexOf(modelData.value) >= 0
                                 onClicked: {
                                     Scrite.app.transliterationEngine.language = modelData.value
                                     Scrite.document.formatting.defaultLanguage = modelData.value
@@ -1192,10 +1194,13 @@ Item {
                             }
                         }
 
-                        MenuSeparator { }
+                        MenuSeparator {
+                            focusPolicy: Qt.NoFocus
+                        }
 
                         MenuItem2 {
                             text: "Next-Language\tF10"
+                            focusPolicy: Qt.NoFocus
                             onClicked: {
                                 Scrite.app.transliterationEngine.cycleLanguage()
                                 Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
@@ -1217,8 +1222,10 @@ Item {
                                     Scrite.document.formatting.defaultLanguage = modelData.value
                                     paragraphLanguageSettings.defaultLanguage = modelData.key
                                 }
+                                enabled: Scrite.app.transliterationEngine.enabledLanguages.indexOf(modelData.value) >= 0
 
                                 ShortcutsModelItem.priority: 0
+                                ShortcutsModelItem.enabled: enabled
                                 ShortcutsModelItem.title: modelData.key
                                 ShortcutsModelItem.group: "Language"
                                 ShortcutsModelItem.shortcut: sequence

@@ -13,6 +13,7 @@
 
 #include "user.h"
 #include "hourglass.h"
+#include "appwindow.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "transliteration.h"
@@ -75,25 +76,26 @@ TransliterationEngine *TransliterationEngine::instance(QCoreApplication *app)
 
 TransliterationEngine::TransliterationEngine(QObject *parent) : QObject(parent)
 {
-    const QMetaObject *mo = this->metaObject();
-    const QMetaEnum metaEnum = mo->enumerator(mo->indexOfEnumerator("Language"));
+    const QMetaObject *mo = &TransliterationEngine::staticMetaObject;
+    const QMetaEnum languageEnum = mo->enumerator(mo->indexOfEnumerator("Language"));
     const QStringList customFontPaths = ::getCustomFontFilePaths();
     for (const QString &customFont : customFontPaths) {
         const int id = QFontDatabase::addApplicationFont(customFont);
         const QString language = customFont.split("/", Qt::SkipEmptyParts).at(2);
-        Language lang = Language(metaEnum.keyToValue(qPrintable(language)));
+        const QStringList appFontFamilies = QFontDatabase::applicationFontFamilies(id);
+        Language lang = Language(languageEnum.keyToValue(qPrintable(language)));
         m_languageBundledFontId[lang] = id;
-        m_languageFontFamily[lang] = QFontDatabase::applicationFontFamilies(id).first();
+        m_languageFontFamily[lang] = appFontFamilies.first();
         m_languageFontFilePaths[lang].append(customFont);
     }
 
     const QSettings *settings = Application::instance()->settings();
 
-    for (int i = 0; i < metaEnum.keyCount(); i++) {
-        Language lang = Language(metaEnum.value(i));
+    for (int i = 0; i < languageEnum.keyCount(); i++) {
+        Language lang = Language(languageEnum.value(i));
         m_activeLanguages[lang] = false;
 
-        const QString langStr = QString::fromLatin1(metaEnum.key(i));
+        const QString langStr = QString::fromLatin1(languageEnum.key(i));
 
         const QString sfontKey =
                 QStringLiteral("Transliteration/") + langStr + QStringLiteral("_Font");
@@ -117,7 +119,7 @@ TransliterationEngine::TransliterationEngine(QObject *parent) : QObject(parent)
     } else {
         for (const QString &lang : activeLanguages) {
             bool ok = false;
-            int val = metaEnum.keyToValue(qPrintable(lang.trimmed()), &ok);
+            int val = languageEnum.keyToValue(qPrintable(lang.trimmed()), &ok);
             m_activeLanguages[Language(val)] = true;
         }
     }
@@ -126,10 +128,57 @@ TransliterationEngine::TransliterationEngine(QObject *parent) : QObject(parent)
     Language lang = English;
     if (!currentLanguage.isEmpty()) {
         bool ok = false;
-        int val = metaEnum.keyToValue(qPrintable(currentLanguage), &ok);
+        int val = languageEnum.keyToValue(qPrintable(currentLanguage), &ok);
         lang = Language(val);
     }
     this->setLanguage(lang);
+}
+
+void TransliterationEngine::setEnabledLanguages(const QList<int> &val)
+{
+    if (m_enabledLanguages == val)
+        return;
+
+    m_enabledLanguages = val;
+    emit enabledLanguagesChanged();
+}
+
+void TransliterationEngine::determineEnabledLanguages()
+{
+    const QMetaObject *mo = &TransliterationEngine::staticMetaObject;
+    const QMetaEnum languageEnum = mo->enumerator(mo->indexOfEnumerator("Language"));
+
+    QQuickItem *focusItem =
+            AppWindow::instance() ? AppWindow::instance()->activeFocusItem() : nullptr;
+    TransliterationHints *hints = TransliterationHints::find(focusItem);
+    TransliterationHints::AllowedMechanisms mechanisms = TransliterationHints::AllMechanisms;
+    if (hints)
+        mechanisms = hints->allowedMechanisms();
+
+    QList<int> languages;
+    if (mechanisms == TransliterationHints::NoMechanism) {
+        this->setEnabledLanguages(languages);
+        return;
+    }
+
+    for (int i = 0; i < languageEnum.keyCount(); i++) {
+        Language lang = Language(languageEnum.value(i));
+        if (lang == TransliterationEngine::English
+            || mechanisms.testFlag(TransliterationHints::StaticMechanism))
+            languages.append(lang);
+        else if (mechanisms.testFlag(TransliterationHints::TextInputSourceMechanism)) {
+            const QString tisId = m_tisMap.value(lang);
+            const AbstractSystemTextInputSource *tis =
+                    SystemTextInputManager::instance()->findSourceById(tisId);
+            if (tis != nullptr)
+                languages.append(lang);
+        }
+    }
+
+    this->setEnabledLanguages(languages);
+
+    if (!languages.contains(m_language))
+        this->setLanguage(English);
 }
 
 TransliterationEngine::~TransliterationEngine() { }
@@ -1467,4 +1516,41 @@ void TransliteratedText::setContentHeight(qreal val)
 
     m_contentHeight = val;
     emit contentHeightChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+TransliterationHints::TransliterationHints(QObject *parent) : QObject(parent) { }
+
+TransliterationHints::~TransliterationHints() { }
+
+TransliterationHints *TransliterationHints::qmlAttachedProperties(QObject *object)
+{
+    return new TransliterationHints(object);
+}
+
+TransliterationHints *TransliterationHints::find(QQuickItem *item)
+{
+    if (item == nullptr)
+        return nullptr;
+
+    do {
+        TransliterationHints *ret =
+                item->findChild<TransliterationHints *>(QString(), Qt::FindDirectChildrenOnly);
+        if (ret)
+            return ret;
+
+        item = item->parentItem();
+    } while (item);
+
+    return nullptr;
+}
+
+void TransliterationHints::setAllowedMechanisms(AllowedMechanisms val)
+{
+    if (m_allowedMechanisms == val)
+        return;
+
+    m_allowedMechanisms = val;
+    emit allowedMechanismsChanged();
 }

@@ -30,6 +30,7 @@
 
 #include "qobjectproperty.h"
 
+class AppWindow;
 class QTextCursor;
 class QTextDocument;
 class QCoreApplication;
@@ -70,6 +71,10 @@ public:
     Q_PROPERTY(QString languageAsString READ languageAsString NOTIFY languageChanged)
     QString languageAsString() const;
     static QString languageAsString(Language language);
+
+    Q_PROPERTY(QList<int> enabledLanguages READ enabledLanguages NOTIFY enabledLanguagesChanged)
+    QList<int> enabledLanguages() const { return m_enabledLanguages; }
+    Q_SIGNAL void enabledLanguagesChanged();
 
     Q_PROPERTY(QJsonObject alphabetMappings READ alphabetMappings NOTIFY languageChanged)
     QJsonObject alphabetMappings() const { return this->alphabetMappingsFor(m_language); }
@@ -156,11 +161,15 @@ public:
     Q_INVOKABLE QString formattedHtmlOf(const QString &text) const;
 
 private:
+    friend class AppWindow;
     TransliterationEngine(QObject *parent = nullptr);
+    void setEnabledLanguages(const QList<int> &val);
+    void determineEnabledLanguages();
 
 private:
     void *m_transliterator = nullptr;
     Language m_language = English;
+    QList<int> m_enabledLanguages;
     QMap<Language, QString> m_tisMap;
     QMap<Language, bool> m_activeLanguages;
     QMap<Language, int> m_languageBundledFontId;
@@ -371,6 +380,40 @@ private:
     qreal m_contentHeight = 0;
     QStaticText m_staticText;
     ExecLaterTimer m_updateTimer;
+};
+
+class TransliterationHints : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_ATTACHED(TransliterationHints)
+
+public:
+    ~TransliterationHints();
+
+    static TransliterationHints *qmlAttachedProperties(QObject *object);
+
+    static TransliterationHints *find(QQuickItem *item);
+
+    enum AllowedMechanism {
+        NoMechanism = 0,
+        StaticMechanism = 1,
+        TextInputSourceMechanism = 2,
+        AllMechanisms = 3
+    };
+    Q_DECLARE_FLAGS(AllowedMechanisms, AllowedMechanism)
+    Q_FLAG(AllowedMechanisms)
+
+    Q_PROPERTY(AllowedMechanisms allowedMechanisms READ allowedMechanisms WRITE setAllowedMechanisms NOTIFY allowedMechanismsChanged)
+    void setAllowedMechanisms(AllowedMechanisms val);
+    AllowedMechanisms allowedMechanisms() const { return m_allowedMechanisms; }
+    Q_SIGNAL void allowedMechanismsChanged();
+
+private:
+    TransliterationHints(QObject *parent = nullptr);
+
+private:
+    AllowedMechanisms m_allowedMechanisms = AllMechanisms;
 };
 
 #endif // TRANSLITERATION_H

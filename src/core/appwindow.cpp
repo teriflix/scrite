@@ -108,6 +108,14 @@ AppWindow::~AppWindow()
     ::AppWindowInstance = nullptr;
 }
 
+void AppWindow::showEvent(QShowEvent *se)
+{
+    QQuickWindow::showEvent(se);
+    connect(this, &AppWindow::activeFocusItemChanged, TransliterationEngine::instance(),
+            &TransliterationEngine::determineEnabledLanguages);
+    TransliterationEngine::instance()->determineEnabledLanguages();
+}
+
 void AppWindow::initializeFileNameToOpen()
 {
     Application &scriteApp = *Application::instance();

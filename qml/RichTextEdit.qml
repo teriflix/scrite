@@ -17,6 +17,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtWebEngine 1.10
 import QtWebChannel 1.15
+import Qt.labs.settings 1.0
 
 import io.scrite.components 1.0
 
@@ -47,6 +48,8 @@ Item {
         backgroundColor: "transparent"
         url: "qrc:/richtexteditor.html"
         webChannel: scriteWebChannel
+
+        TransliterationHints.allowedMechanisms: TransliterationHints.TextInputSourceMechanism
 
         // Focus handling
         TabSequenceItem.manager: tabSequenceManager
@@ -141,5 +144,49 @@ Item {
     WebChannel {
         id: scriteWebChannel
         registeredObjects: [scriteWebChannelObject]
+    }
+
+    Settings {
+        id: richTextEditorSettings
+        fileName: Scrite.app.settingsFilePath
+        category: "Rich Text Editor"
+        property bool languageNoteShown: false
+    }
+
+    Loader {
+        anchors.fill: parent
+        active: richTextEditorSettings.languageNoteShown === false
+        sourceComponent: Item {
+            Rectangle {
+                anchors.fill: parent
+                color: primaryColors.c600.background
+                opacity: 0.7
+            }
+
+            MouseArea {
+                anchors.fill: parent
+            }
+
+            ColumnLayout {
+                anchors.centerIn: parent
+                width: Math.min(500, parent.width * 0.75)
+                spacing: 40
+
+                Label {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    text: "In here, you can only type in English or in languages for which you have configured a text input method from your OS in Scrite Settings."
+                    font.bold: true
+                    font.pointSize: Scrite.app.idealFontPointSize + 3
+                    color: primaryColors.c600.text
+                }
+
+                Button2 {
+                    text: "Got it!"
+                    Layout.alignment: Qt.AlignHCenter
+                    onClicked: richTextEditorSettings.languageNoteShown = true
+                }
+            }
+        }
     }
 }

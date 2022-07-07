@@ -28,6 +28,9 @@ public:
     AppWindow();
     ~AppWindow();
 
+protected:
+    void showEvent(QShowEvent *);
+
 private:
     void initializeFileNameToOpen();
 };
