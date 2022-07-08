@@ -223,6 +223,57 @@ QSGNode *AbstractShapeItem::constructSceneGraph() const
         trianglesNode->appendChildNode(fillNode);
     }
 
+    if (!(m_renderType & OutlineAlso) || qFuzzyIsNull(m_outlineWidth))
+        return rootNode;
+
+    auto createLineGeometry = [=](const QPolygonF &polygon) {
+        QSGGeometry *outlineGeometry =
+                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), polygon.size());
+        outlineGeometry->setDrawingMode(m_renderType == OutlineOnly ? QSGGeometry::DrawLineStrip
+                                                                    : QSGGeometry::DrawLineLoop);
+        QSGGeometry::Point2D *outlinePoints = outlineGeometry->vertexDataAsPoint2D();
+        for (int i = 0; i < polygon.size(); i++) {
+            outlinePoints[i].x = float(polygon.at(i).x());
+            outlinePoints[i].y = float(polygon.at(i).y());
+        }
+
+        return outlineGeometry;
+    };
+
+    auto createStrokeGeometry = [=](const QPolygonF &polygon) {
+        QPainterPath path;
+        for (int i = 0; i < polygon.size(); i++) {
+            if (i)
+                path.lineTo(polygon.at(i));
+            else
+                path.moveTo(polygon.at(i));
+        }
+        if (m_renderType & FillAlso)
+            path.lineTo(polygon.at(0));
+
+        QPainterPathStroker stroker;
+        stroker.setWidth(m_outlineWidth);
+        stroker.setJoinStyle(Qt::MiterJoin);
+        stroker.setCapStyle(Qt::SquareCap);
+
+        path = stroker.createStroke(path).simplified();
+        path.setFillRule(Qt::WindingFill);
+
+        const QVector<QPointF> triangles = PolygonTessellator::tessellate(path.toSubpathPolygons());
+
+        QSGGeometry *fillGeometry =
+                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), triangles.size());
+        fillGeometry->setDrawingMode(QSGGeometry::DrawTriangles);
+
+        QSGGeometry::Point2D *fillPoints = fillGeometry->vertexDataAsPoint2D();
+        for (int i = 0; i < triangles.size(); i++) {
+            fillPoints[i].x = float(triangles.at(i).x());
+            fillPoints[i].y = float(triangles.at(i).y());
+        }
+
+        return fillGeometry;
+    };
+
     // Construct one geometry node for each outline will outline color
     for (const QPolygonF &polygon : outlines) {
         if (polygon.isEmpty())
@@ -232,18 +283,11 @@ QSGNode *AbstractShapeItem::constructSceneGraph() const
         outlineNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial
                               | QSGNode::OwnedByParent);
 
-        QSGGeometry *outlineGeometry =
-                new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), polygon.size());
-        outlineGeometry->setDrawingMode(m_renderType == OutlineOnly ? QSGGeometry::DrawLineStrip
-                                                                    : QSGGeometry::DrawLineLoop);
-        outlineGeometry->setLineWidth(float(m_outlineWidth));
+        QSGGeometry *outlineGeometry = qFuzzyCompare(m_outlineWidth, 1)
+                ? createLineGeometry(polygon)
+                : createStrokeGeometry(polygon);
+        //        QSGGeometry *outlineGeometry = createLineGeometry(polygon);
         outlineNode->setGeometry(outlineGeometry);
-
-        QSGGeometry::Point2D *outlinePoints = outlineGeometry->vertexDataAsPoint2D();
-        for (int i = 0; i < polygon.size(); i++) {
-            outlinePoints[i].x = float(polygon.at(i).x());
-            outlinePoints[i].y = float(polygon.at(i).y());
-        }
 
         QSGFlatColorMaterial *outlineMaterial = new QSGFlatColorMaterial();
         outlineNode->setMaterial(outlineMaterial);

@@ -699,7 +699,7 @@ Rectangle {
         id: crGraphEdgeDelegate
 
         PainterPathItem {
-            outlineWidth: Scrite.app.devicePixelRatio*canvas.scale*structureCanvasSettings.connectorLineWidth
+            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * structureCanvasSettings.lineWidthOfConnectors
             outlineColor: primaryColors.c700.background
             renderType: PainterPathItem.OutlineOnly
             renderingMechanism: PainterPathItem.UseOpenGL

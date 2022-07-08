@@ -3276,7 +3276,7 @@ Item {
             fromElement: connectorFromElement
             toElement: connectorToElement
             arrowAndLabelSpacing: labelBg.width
-            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * structureCanvasSettings.connectorLineWidth
+            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * structureCanvasSettings.lineWidthOfConnectors
             visible: {
                 if(canBeVisible)
                     return intersects(canvasScroll.viewportRect)
