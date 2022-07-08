@@ -24,7 +24,7 @@ class ModelAggregator : public QObject
     Q_OBJECT
 
 public:
-    ModelAggregator(QObject *parent = nullptr);
+    explicit ModelAggregator(QObject *parent = nullptr);
     ~ModelAggregator();
 
     typedef std::function<void(const QModelIndex &, QVariant &)> AggregateFunction;

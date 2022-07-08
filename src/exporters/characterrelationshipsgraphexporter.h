@@ -25,7 +25,7 @@ class CharacterRelationshipsGraphExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:
-    CharacterRelationshipsGraphExporter(QObject *parent = nullptr);
+    explicit CharacterRelationshipsGraphExporter(QObject *parent = nullptr);
     ~CharacterRelationshipsGraphExporter();
 
     void setGraph(CharacterRelationshipGraph *val);

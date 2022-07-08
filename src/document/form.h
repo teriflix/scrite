@@ -31,7 +31,7 @@ class FormQuestion : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    FormQuestion(QObject *parent = nullptr);
+    explicit FormQuestion(QObject *parent = nullptr);
     ~FormQuestion();
     Q_SIGNAL void aboutToDelete(FormQuestion *ptr);
 
@@ -102,7 +102,7 @@ class Form : public QObject, public QObjectSerializer::Interface
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Form(QObject *parent = nullptr);
+    explicit Form(QObject *parent = nullptr);
     ~Form();
     Q_SIGNAL void aboutToDelete(Form *ptr);
 
@@ -199,7 +199,7 @@ class Forms : public QObjectListModel<Form *>, public QObjectSerializer::Interfa
 public:
     static Forms *global();
 
-    Forms(QObject *parent = nullptr);
+    explicit Forms(QObject *parent = nullptr);
     ~Forms();
 
     Q_PROPERTY(int formCount READ formCount NOTIFY formCountChanged)

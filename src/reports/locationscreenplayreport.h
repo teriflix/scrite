@@ -23,7 +23,7 @@ class LocationScreenplayReport : public AbstractScreenplaySubsetReport
     Q_CLASSINFO("Description", "Generate screenplay with only those scenes at one or more locations.")
 
 public:
-    Q_INVOKABLE LocationScreenplayReport(QObject *parent = nullptr);
+    Q_INVOKABLE explicit LocationScreenplayReport(QObject *parent = nullptr);
     ~LocationScreenplayReport();
 
     Q_CLASSINFO("locations_FieldGroup", "Locations")

@@ -25,7 +25,7 @@ class Announcement : public QObject
     QML_ATTACHED(Announcement)
 
 public:
-    Announcement(QObject *parent = nullptr);
+    explicit Announcement(QObject *parent = nullptr);
     ~Announcement();
 
     static Announcement *qmlAttachedProperties(QObject *object);

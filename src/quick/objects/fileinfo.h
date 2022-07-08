@@ -24,7 +24,7 @@ class FileInfo : public QObject
     QML_ELEMENT
 
 public:
-    FileInfo(QObject *parent = nullptr);
+    explicit FileInfo(QObject *parent = nullptr);
     ~FileInfo();
 
     Q_PROPERTY(QString absoluteFilePath READ absoluteFilePath WRITE setAbsoluteFilePath NOTIFY fileInfoChanged)
@@ -60,7 +60,7 @@ private:
 class FileIconProvider : public QQuickImageProvider
 {
 public:
-    FileIconProvider();
+    explicit FileIconProvider();
     ~FileIconProvider();
 
     // QQuickImageProvider interface

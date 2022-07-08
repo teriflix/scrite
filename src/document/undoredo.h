@@ -32,7 +32,7 @@ class UndoStack : public QUndoStack
     QML_ELEMENT
 
 public:
-    UndoStack(QObject *parent = nullptr);
+    explicit UndoStack(QObject *parent = nullptr);
     ~UndoStack();
 
     Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
@@ -188,9 +188,9 @@ class ObjectListCommand : public QUndoCommand
 {
     friend class PushObjectListCommand<ParentClass, ChildClass>;
 
-    ObjectListCommand(ChildClass *child, ParentClass *parent, const QByteArray &propertyName,
-                      ObjectList::Operation operation,
-                      const ObjectListPropertyMethods<ParentClass, ChildClass> &methods)
+    explicit ObjectListCommand(ChildClass *child, ParentClass *parent,
+                               const QByteArray &propertyName, ObjectList::Operation operation,
+                               const ObjectListPropertyMethods<ParentClass, ChildClass> &methods)
         : m_childIndex(-1),
           m_firstRedoDone(false),
           m_child(child),
@@ -346,7 +346,7 @@ class UndoResult : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    UndoResult(QObject *parent = nullptr);
+    explicit UndoResult(QObject *parent = nullptr);
     ~UndoResult();
 
     Q_PROPERTY(bool success READ isSuccess WRITE setSuccess NOTIFY successChanged)
@@ -368,7 +368,7 @@ public:
     static bool handleUndo();
     static bool handleRedo();
 
-    UndoHandler(QObject *parent = nullptr);
+    explicit UndoHandler(QObject *parent = nullptr);
     ~UndoHandler();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)

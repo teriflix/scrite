@@ -24,7 +24,7 @@ class AbstractShapeItem : public QQuickPaintedItem
     Q_OBJECT
 
 public:
-    AbstractShapeItem(QQuickItem *parent = nullptr);
+    explicit AbstractShapeItem(QQuickItem *parent = nullptr);
     ~AbstractShapeItem();
 
     enum RenderType {

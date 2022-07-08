@@ -71,8 +71,8 @@ class ScreenplayTextDocument : public QObject, public QQmlParserStatus
     QML_ELEMENT
 
 public:
-    ScreenplayTextDocument(QObject *parent = nullptr);
-    ScreenplayTextDocument(QTextDocument *document, QObject *parent = nullptr);
+    explicit ScreenplayTextDocument(QObject *parent = nullptr);
+    explicit ScreenplayTextDocument(QTextDocument *document, QObject *parent = nullptr);
     ~ScreenplayTextDocument();
 
     Q_PROPERTY(QTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
@@ -361,7 +361,7 @@ class ScreenplayElementPageBreaks : public QObject
     QML_ELEMENT
 
 public:
-    ScreenplayElementPageBreaks(QObject *parent = nullptr);
+    explicit ScreenplayElementPageBreaks(QObject *parent = nullptr);
     ~ScreenplayElementPageBreaks();
 
     Q_PROPERTY(ScreenplayTextDocument *screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged RESET resetScreenplayDocument)
@@ -396,7 +396,7 @@ class ScreenplayTitlePageObjectInterface : public QObject, public QTextObjectInt
     Q_INTERFACES(QTextObjectInterface)
 
 public:
-    ScreenplayTitlePageObjectInterface(QObject *parent = nullptr);
+    explicit ScreenplayTitlePageObjectInterface(QObject *parent = nullptr);
     ~ScreenplayTitlePageObjectInterface();
 
     enum { Kind = QTextFormat::UserObject + 2 };
@@ -413,7 +413,7 @@ class ScreenplayTextObjectInterface : public QObject, public QTextObjectInterfac
     Q_INTERFACES(QTextObjectInterface)
 
 public:
-    ScreenplayTextObjectInterface(QObject *parent = nullptr);
+    explicit ScreenplayTextObjectInterface(QObject *parent = nullptr);
     ~ScreenplayTextObjectInterface();
 
     enum { Kind = QTextFormat::UserObject + 1 };
@@ -442,7 +442,7 @@ class SceneElementBlockTextUpdater : public QObject
 public:
     static void completeOthers(SceneElementBlockTextUpdater *than);
 
-    SceneElementBlockTextUpdater(ScreenplayTextDocument *document, SceneElement *para);
+    explicit SceneElementBlockTextUpdater(ScreenplayTextDocument *document, SceneElement *para);
     ~SceneElementBlockTextUpdater();
 
     void schedule();

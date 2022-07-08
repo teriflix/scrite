@@ -23,7 +23,7 @@ class CompletionModel : public QAbstractListModel
     QML_ELEMENT
 
 public:
-    CompletionModel(QObject *parent = nullptr);
+    explicit CompletionModel(QObject *parent = nullptr);
     ~CompletionModel();
 
     Q_PROPERTY(QStringList strings READ strings WRITE setStrings NOTIFY stringsChanged)

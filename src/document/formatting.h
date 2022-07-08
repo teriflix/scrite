@@ -195,7 +195,7 @@ class ScreenplayPageLayout : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ScreenplayPageLayout(ScreenplayFormat *parent = nullptr);
+    explicit ScreenplayPageLayout(ScreenplayFormat *parent = nullptr);
     ~ScreenplayPageLayout();
 
     Q_PROPERTY(ScreenplayFormat *format READ format CONSTANT)
@@ -307,7 +307,7 @@ class ScreenplayFormat : public QAbstractListModel, public Modifiable
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ScreenplayFormat(QObject *parent = nullptr);
+    explicit ScreenplayFormat(QObject *parent = nullptr);
     ~ScreenplayFormat();
 
     Q_PROPERTY(ScriteDocument *scriteDocument READ scriteDocument CONSTANT STORED false)
@@ -442,7 +442,7 @@ class TextFormat : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    TextFormat(QObject *parent = nullptr);
+    explicit TextFormat(QObject *parent = nullptr);
     ~TextFormat();
 
     Q_PROPERTY(bool bold READ isBold WRITE setBold NOTIFY boldChanged)
@@ -514,7 +514,7 @@ class SceneDocumentBinder : public QSyntaxHighlighter, public QQmlParserStatus
     QML_ELEMENT
 
 public:
-    SceneDocumentBinder(QObject *parent = nullptr);
+    explicit SceneDocumentBinder(QObject *parent = nullptr);
     ~SceneDocumentBinder();
 
     Q_PROPERTY(ScreenplayFormat *screenplayFormat READ screenplayFormat WRITE setScreenplayFormat

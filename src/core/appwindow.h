@@ -25,7 +25,7 @@ class AppWindow : public QQuickView
 
 public:
     static AppWindow *instance();
-    AppWindow();
+    explicit AppWindow();
     ~AppWindow();
 
 protected:

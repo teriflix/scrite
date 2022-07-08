@@ -290,7 +290,8 @@ void Note::renameCharacter(const QString &from, const QString &to)
 class RemoveNoteUndoCommand : public QUndoCommand
 {
 public:
-    RemoveNoteUndoCommand(Notes *notes, Note *note) : QUndoCommand(), m_note(note), m_notes(notes)
+    explicit RemoveNoteUndoCommand(Notes *notes, Note *note)
+        : QUndoCommand(), m_note(note), m_notes(notes)
     {
         m_connection1 = QObject::connect(m_notes, &Notes::aboutToDelete, m_notes, [=]() {
             m_notes = nullptr;

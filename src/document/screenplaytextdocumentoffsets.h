@@ -28,7 +28,7 @@ class ScreenplayTextDocumentOffsets : public GenericArrayModel
     QML_ELEMENT
 
 public:
-    ScreenplayTextDocumentOffsets(QObject *parent = nullptr);
+    explicit ScreenplayTextDocumentOffsets(QObject *parent = nullptr);
     ~ScreenplayTextDocumentOffsets();
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)

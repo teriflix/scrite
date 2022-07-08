@@ -23,7 +23,7 @@ class PropertyAlias : public QObject
     QML_ELEMENT
 
 public:
-    PropertyAlias(QObject *parent = nullptr);
+    explicit PropertyAlias(QObject *parent = nullptr);
     ~PropertyAlias();
 
     Q_PROPERTY(QObject* sourceObject READ sourceObject WRITE setSourceObject NOTIFY sourceObjectChanged)

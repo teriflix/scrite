@@ -28,7 +28,7 @@ class FlickScrollSpeedControl : public QObject
     QML_UNCREATABLE("Use as attached property.")
 
 public:
-    FlickScrollSpeedControl(QObject *parent = nullptr);
+    explicit FlickScrollSpeedControl(QObject *parent = nullptr);
     ~FlickScrollSpeedControl();
 
     static FlickScrollSpeedControl *qmlAttachedProperties(QObject *object);

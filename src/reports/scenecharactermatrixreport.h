@@ -25,7 +25,7 @@ class SceneCharacterMatrixReport : public AbstractReportGenerator
     Q_CLASSINFO("Description", "Generate a table of scene names and characters.")
 
 public:
-    Q_INVOKABLE SceneCharacterMatrixReport(QObject *parent = nullptr);
+    Q_INVOKABLE explicit SceneCharacterMatrixReport(QObject *parent = nullptr);
     ~SceneCharacterMatrixReport();
 
     bool requiresConfiguration() const { return true; }

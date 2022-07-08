@@ -183,7 +183,7 @@ class FontSyntaxHighlighter : public QSyntaxHighlighter
     Q_OBJECT
 
 public:
-    FontSyntaxHighlighter(QObject *parent = nullptr);
+    explicit FontSyntaxHighlighter(QObject *parent = nullptr);
     ~FontSyntaxHighlighter();
 
     Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY enforceDefaultFontChanged)
@@ -310,8 +310,9 @@ class TransliterationEvent : public QEvent
 public:
     static QEvent::Type EventType();
 
-    TransliterationEvent(int start, int end, const QString &original,
-                         TransliterationEngine::Language language, const QString &replacement);
+    explicit TransliterationEvent(int start, int end, const QString &original,
+                                  TransliterationEngine::Language language,
+                                  const QString &replacement);
     ~TransliterationEvent();
 
     int start() const { return m_start; }
@@ -334,7 +335,7 @@ class TransliteratedText : public QQuickPaintedItem
     QML_ELEMENT
 
 public:
-    TransliteratedText(QQuickItem *parent = nullptr);
+    explicit TransliteratedText(QQuickItem *parent = nullptr);
     ~TransliteratedText();
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)

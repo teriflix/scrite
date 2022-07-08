@@ -29,7 +29,7 @@ class NotificationManager : public QAbstractListModel
 public:
     static NotificationManager *instance();
 
-    NotificationManager(QObject *parent = nullptr);
+    explicit NotificationManager(QObject *parent = nullptr);
     ~NotificationManager();
 
     Q_PROPERTY(int count READ count NOTIFY countChanged)

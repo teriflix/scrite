@@ -31,7 +31,7 @@ class Scrite : public QObject
     QML_SINGLETON
 
 public:
-    Scrite(QObject *parent = nullptr);
+    explicit Scrite(QObject *parent = nullptr);
     ~Scrite();
 
     enum AppFeature {

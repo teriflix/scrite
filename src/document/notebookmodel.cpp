@@ -32,7 +32,7 @@ static int nextItemId()
 class StandardItemWithId : public QStandardItem
 {
 public:
-    StandardItemWithId(int id = -1) : QStandardItem()
+    explicit StandardItemWithId(int id = -1) : QStandardItem()
     {
         this->setData(id >= 0 ? id : ::nextItemId(), NotebookModel::IdRole);
     }
@@ -42,7 +42,7 @@ public:
 class BookmarksItem : public StandardItemWithId
 {
 public:
-    BookmarksItem();
+    explicit BookmarksItem();
     ~BookmarksItem();
 
 private:
@@ -55,7 +55,7 @@ private:
 class ObjectItem : public StandardItemWithId
 {
 public:
-    ObjectItem(QObject *object);
+    explicit ObjectItem(QObject *object);
     ~ObjectItem();
 
 private:
@@ -72,7 +72,7 @@ protected:
 class NoteItem : public ObjectItem
 {
 public:
-    NoteItem(Note *note);
+    explicit NoteItem(Note *note);
     ~NoteItem();
 
 private:
@@ -85,7 +85,7 @@ private:
 class NotesItem : public ObjectItem
 {
 public:
-    NotesItem(Notes *notes);
+    explicit NotesItem(Notes *notes);
     ~NotesItem();
 
     void sync();
@@ -99,7 +99,7 @@ private:
 class ActItem : public ObjectItem
 {
 public:
-    ActItem(ScreenplayElement *element);
+    explicit ActItem(ScreenplayElement *element);
     ~ActItem();
 
     void updateText();
@@ -111,7 +111,7 @@ private:
 class EpisodeItem : public ObjectItem
 {
 public:
-    EpisodeItem(ScreenplayElement *element);
+    explicit EpisodeItem(ScreenplayElement *element);
     ~EpisodeItem();
 
     void updateText();

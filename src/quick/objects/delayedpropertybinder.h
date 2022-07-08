@@ -24,7 +24,7 @@ class DelayedPropertyBinder : public QQuickItem
     QML_ELEMENT
 
 public:
-    DelayedPropertyBinder(QQuickItem *parent = nullptr);
+    explicit DelayedPropertyBinder(QQuickItem *parent = nullptr);
     ~DelayedPropertyBinder();
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)

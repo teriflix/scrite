@@ -32,7 +32,7 @@ class StatisticsReport : public AbstractReportGenerator
     Q_CLASSINFO("Description", "Generate a report with key statistics of the screenplay.")
 
 public:
-    Q_INVOKABLE StatisticsReport(QObject *parent = nullptr);
+    Q_INVOKABLE explicit StatisticsReport(QObject *parent = nullptr);
     ~StatisticsReport();
 
     enum ColorGroup { Character, Location, Beat };

@@ -28,7 +28,7 @@ class Notification : public QObject
     QML_ATTACHED(Notification)
 
 public:
-    Notification(QObject *parent = nullptr);
+    explicit Notification(QObject *parent = nullptr);
     ~Notification();
 
     static Notification *qmlAttachedProperties(QObject *object);

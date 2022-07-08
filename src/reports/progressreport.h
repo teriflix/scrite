@@ -25,7 +25,7 @@ class ProgressReport : public QObject
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ProgressReport(QObject *parent = nullptr);
+    explicit ProgressReport(QObject *parent = nullptr);
     ~ProgressReport();
     Q_SIGNAL void aboutToDelete(ProgressReport *val);
 

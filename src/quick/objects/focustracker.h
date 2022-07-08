@@ -74,7 +74,7 @@ class FocusTracker : public QObject
     QML_ATTACHED(FocusTracker)
 
 public:
-    FocusTracker(QObject *parent = nullptr);
+    explicit FocusTracker(QObject *parent = nullptr);
     ~FocusTracker();
 
     static FocusTracker *qmlAttachedProperties(QObject *object);

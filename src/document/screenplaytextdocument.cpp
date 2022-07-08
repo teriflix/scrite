@@ -64,7 +64,7 @@ inline QString timeToString(const QTime &t)
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
 public:
-    ScreenplayParagraphBlockData(const SceneElement *element);
+    explicit ScreenplayParagraphBlockData(const SceneElement *element);
     ~ScreenplayParagraphBlockData();
 
     bool contains(const SceneElement *other) const;

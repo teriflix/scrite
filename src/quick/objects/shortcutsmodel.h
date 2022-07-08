@@ -62,7 +62,7 @@ class ShortcutsModelItem : public QObject
     QML_ATTACHED(ShortcutsModelItem)
 
 public:
-    ShortcutsModelItem(QObject *parent = nullptr);
+    explicit ShortcutsModelItem(QObject *parent = nullptr);
     ~ShortcutsModelItem();
 
     static ShortcutsModelItem *qmlAttachedProperties(QObject *object);

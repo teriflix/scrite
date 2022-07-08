@@ -23,7 +23,7 @@ class ResetOnChange : public QQuickItem
     QML_ELEMENT
 
 public:
-    ResetOnChange(QQuickItem *parent = nullptr);
+    explicit ResetOnChange(QQuickItem *parent = nullptr);
     ~ResetOnChange();
 
     Q_PROPERTY(QVariant trackChangesOn READ trackChangesOn WRITE setTrackChangesOn NOTIFY trackChangesOnChanged)

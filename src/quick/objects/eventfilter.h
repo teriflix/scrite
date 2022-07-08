@@ -59,7 +59,7 @@ class EventFilter : public QObject
     QML_ATTACHED(EventFilter)
 
 public:
-    EventFilter(QObject *parent = nullptr);
+    explicit EventFilter(QObject *parent = nullptr);
     ~EventFilter();
 
     static EventFilter *qmlAttachedProperties(QObject *object);

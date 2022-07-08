@@ -50,7 +50,7 @@ class StructureElement : public QObject, public QObjectSerializer::Interface
     QML_ELEMENT
 
 public:
-    Q_INVOKABLE StructureElement(QObject *parent = nullptr);
+    Q_INVOKABLE explicit StructureElement(QObject *parent = nullptr);
     ~StructureElement();
     Q_SIGNAL void aboutToDelete(StructureElement *element);
 
@@ -270,7 +270,7 @@ class StructureElementStacks : public QObjectListModel<StructureElementStack *>
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    StructureElementStacks(QObject *parent = nullptr);
+    explicit StructureElementStacks(QObject *parent = nullptr);
     ~StructureElementStacks();
 
     Q_PROPERTY(Structure *structure READ structure CONSTANT)
@@ -304,7 +304,7 @@ class Relationship : public QObject, public QObjectSerializer::Interface
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_INVOKABLE Relationship(QObject *parent = nullptr);
+    Q_INVOKABLE explicit Relationship(QObject *parent = nullptr);
     ~Relationship();
     Q_SIGNAL void aboutToDelete(Relationship *ptr);
 
@@ -368,7 +368,7 @@ class Character : public QObject, public QObjectSerializer::Interface
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Q_INVOKABLE Character(QObject *parent = nullptr);
+    Q_INVOKABLE explicit Character(QObject *parent = nullptr);
     ~Character();
     Q_SIGNAL void aboutToDelete(Character *ptr);
 
@@ -584,7 +584,7 @@ class CharacterNamesModel : public QStringListModel
     QML_ELEMENT
 
 public:
-    CharacterNamesModel(QObject *parent = nullptr);
+    explicit CharacterNamesModel(QObject *parent = nullptr);
     ~CharacterNamesModel();
 
     Q_INVOKABLE Character *findCharacter(const QString &name) const;
@@ -648,7 +648,7 @@ class Annotation : public QObject
     QML_ELEMENT
 
 public:
-    Q_INVOKABLE Annotation(QObject *parent = nullptr);
+    Q_INVOKABLE explicit Annotation(QObject *parent = nullptr);
     ~Annotation();
     Q_SIGNAL void aboutToDelete(Annotation *ptr);
 
@@ -737,7 +737,7 @@ class Structure : public QObject, public QObjectSerializer::Interface
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Structure(QObject *parent = nullptr);
+    explicit Structure(QObject *parent = nullptr);
     ~Structure();
     Q_SIGNAL void aboutToDelete(Structure *ptr);
 
@@ -1079,7 +1079,7 @@ class StructureElementConnector : public AbstractShapeItem
     QML_ELEMENT
 
 public:
-    StructureElementConnector(QQuickItem *parent = nullptr);
+    explicit StructureElementConnector(QQuickItem *parent = nullptr);
     ~StructureElementConnector();
 
     enum LineType { StraightLine, CurvedLine };
@@ -1158,7 +1158,7 @@ class StructureCanvasViewportFilterModel : public QSortFilterProxyModel
     QML_ELEMENT
 
 public:
-    StructureCanvasViewportFilterModel(QObject *parent = nullptr);
+    explicit StructureCanvasViewportFilterModel(QObject *parent = nullptr);
     ~StructureCanvasViewportFilterModel();
 
     Q_PROPERTY(Structure *structure READ structure WRITE setStructure RESET resetStructure NOTIFY structureChanged)

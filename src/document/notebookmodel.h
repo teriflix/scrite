@@ -36,7 +36,7 @@ class NotebookModel : public QStandardItemModel
     QML_ELEMENT
 
 public:
-    NotebookModel(QObject *parent = nullptr);
+    explicit NotebookModel(QObject *parent = nullptr);
     ~NotebookModel();
 
     Q_PROPERTY(ScriteDocument *document READ document WRITE setDocument RESET resetDocument NOTIFY documentChanged)
@@ -127,7 +127,7 @@ class BookmarkedNotes : public QObjectListModel<QObject *>
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    BookmarkedNotes(QObject *parent = nullptr);
+    explicit BookmarkedNotes(QObject *parent = nullptr);
     ~BookmarkedNotes();
 
     Q_INVOKABLE bool toggleBookmark(QObject *object);

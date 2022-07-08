@@ -25,7 +25,7 @@ class DeltaDocument : public QObject
     QML_ELEMENT
 
 public:
-    DeltaDocument(QObject *parent = nullptr);
+    explicit DeltaDocument(QObject *parent = nullptr);
     ~DeltaDocument();
 
     Q_PROPERTY(QJsonValue content READ content WRITE setContent NOTIFY contentChanged)

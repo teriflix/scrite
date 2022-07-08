@@ -23,7 +23,7 @@ class FountainExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "Fountain (*.fountain)")
 
 public:
-    Q_INVOKABLE FountainExporter(QObject *parent = nullptr);
+    Q_INVOKABLE explicit FountainExporter(QObject *parent = nullptr);
     ~FountainExporter();
 
     bool canBundleFonts() const { return false; }

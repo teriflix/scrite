@@ -25,7 +25,7 @@ class PauseStep : public AbstractAutomationStep
     Q_OBJECT
 
 public:
-    PauseStep(QObject *parent = nullptr);
+    explicit PauseStep(QObject *parent = nullptr);
     ~PauseStep();
 
     enum DurationType { Milliseconds = 0, Seconds };

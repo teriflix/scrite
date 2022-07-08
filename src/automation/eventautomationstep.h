@@ -26,7 +26,7 @@ class EventAutomationStep : public AbstractAutomationStep
     Q_OBJECT
 
 public:
-    EventAutomationStep(QObject *parent = nullptr);
+    explicit EventAutomationStep(QObject *parent = nullptr);
     ~EventAutomationStep();
 
     Q_PROPERTY(QWindow* window READ window WRITE setWindow RESET resetWindow NOTIFY windowChanged)

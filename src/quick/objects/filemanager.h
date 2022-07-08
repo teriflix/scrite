@@ -22,7 +22,7 @@ class FileManager : public QObject
     QML_ELEMENT
 
 public:
-    FileManager(QObject *parent = nullptr);
+    explicit FileManager(QObject *parent = nullptr);
     ~FileManager();
 
     Q_INVOKABLE static QString generateUniqueTemporaryFileName(const QString &ext);

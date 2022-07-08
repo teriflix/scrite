@@ -28,7 +28,7 @@ class GenericArrayModel : public QAbstractListModel
     QML_ELEMENT
 
 public:
-    GenericArrayModel(QObject *parent = nullptr);
+    explicit GenericArrayModel(QObject *parent = nullptr);
     ~GenericArrayModel();
 
     Q_PROPERTY(QJsonArray array READ array WRITE setArray NOTIFY arrayChanged)
@@ -79,7 +79,7 @@ class GenericArraySortFilterProxyModel : public QSortFilterProxyModel
     QML_ELEMENT
 
 public:
-    GenericArraySortFilterProxyModel(QObject *parent = nullptr);
+    explicit GenericArraySortFilterProxyModel(QObject *parent = nullptr);
     ~GenericArraySortFilterProxyModel();
 
     Q_PROPERTY(GenericArrayModel* arrayModel READ arrayModel WRITE setArrayModel NOTIFY arrayModelChanged RESET resetArrayModel)

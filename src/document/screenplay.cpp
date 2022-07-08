@@ -785,7 +785,7 @@ void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
 class ScreenplayElementsMoveCommand : public QUndoCommand
 {
 public:
-    ScreenplayElementsMoveCommand(Screenplay *screenplay);
+    explicit ScreenplayElementsMoveCommand(Screenplay *screenplay);
     ~ScreenplayElementsMoveCommand();
 
     void setMovement(const QHash<ScreenplayElement *, QPair<int, int>> &movement)
@@ -1040,7 +1040,7 @@ void Screenplay::moveSelectedElements(int toRow)
 class ScreenplayRemoveElementsUndoCommand : public QUndoCommand
 {
 public:
-    ScreenplayRemoveElementsUndoCommand(Screenplay *screenplay);
+    explicit ScreenplayRemoveElementsUndoCommand(Screenplay *screenplay);
     ~ScreenplayRemoveElementsUndoCommand() { }
 
     int id() const { return -1; }
@@ -1225,7 +1225,7 @@ int Screenplay::elementCount() const
 class UndoClearScreenplayCommand : public QUndoCommand
 {
 public:
-    UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds);
+    explicit UndoClearScreenplayCommand(Screenplay *screenplay, const QStringList &sceneIds);
     ~UndoClearScreenplayCommand();
 
     // QUndoCommand interface
@@ -1352,7 +1352,7 @@ void Screenplay::gatherSelectedScenes(SceneGroup *into)
 class SplitElementUndoCommand : public QUndoCommand
 {
 public:
-    SplitElementUndoCommand(ScreenplayElement *ptr);
+    explicit SplitElementUndoCommand(ScreenplayElement *ptr);
     ~SplitElementUndoCommand();
 
     void prepare();

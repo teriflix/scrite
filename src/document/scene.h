@@ -52,7 +52,7 @@ class SceneHeading : public QObject, public Modifiable
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    SceneHeading(QObject *parent = nullptr);
+    explicit SceneHeading(QObject *parent = nullptr);
     ~SceneHeading();
 
     Q_PROPERTY(Scene* scene READ scene CONSTANT STORED false)
@@ -114,7 +114,7 @@ class SceneElement : public QObject, public Modifiable, public QObjectSerializer
     QML_ELEMENT
 
 public:
-    Q_INVOKABLE SceneElement(QObject *parent = nullptr);
+    Q_INVOKABLE explicit SceneElement(QObject *parent = nullptr);
     ~SceneElement();
     Q_SIGNAL void aboutToDelete(SceneElement *element);
 
@@ -231,7 +231,7 @@ private:
 class CharacterElementMap : public DistinctElementValuesMap
 {
 public:
-    CharacterElementMap() : DistinctElementValuesMap(SceneElement::Character) { }
+    explicit CharacterElementMap() : DistinctElementValuesMap(SceneElement::Character) { }
     ~CharacterElementMap() { }
 
     QStringList characterNames() const { return this->distinctValues(); }
@@ -246,7 +246,7 @@ public:
 class TransitionElementMap : public DistinctElementValuesMap
 {
 public:
-    TransitionElementMap() : DistinctElementValuesMap(SceneElement::Transition) { }
+    explicit TransitionElementMap() : DistinctElementValuesMap(SceneElement::Transition) { }
     ~TransitionElementMap() { }
 
     QStringList transitions() const { return this->distinctValues(); }
@@ -261,7 +261,7 @@ public:
 class ShotElementMap : public DistinctElementValuesMap
 {
 public:
-    ShotElementMap() : DistinctElementValuesMap(SceneElement::Shot) { }
+    explicit ShotElementMap() : DistinctElementValuesMap(SceneElement::Shot) { }
     ~ShotElementMap() { }
 
     QStringList shots() const { return this->distinctValues(); }
@@ -277,7 +277,7 @@ class Scene : public QAbstractListModel, public QObjectSerializer::Interface, pu
     QML_ELEMENT
 
 public:
-    Q_INVOKABLE Scene(QObject *parent = nullptr);
+    Q_INVOKABLE explicit Scene(QObject *parent = nullptr);
     ~Scene();
     Q_SIGNAL void aboutToDelete(Scene *scene);
 
@@ -556,7 +556,7 @@ class SceneSizeHintItem : public QQuickItem
     QML_ELEMENT
 
 public:
-    SceneSizeHintItem(QQuickItem *parent = nullptr);
+    explicit SceneSizeHintItem(QQuickItem *parent = nullptr);
     ~SceneSizeHintItem();
 
     Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET sceneReset)
@@ -655,7 +655,7 @@ class SceneGroup : public GenericArrayModel
     QML_ELEMENT
 
 public:
-    SceneGroup(QObject *parent = nullptr);
+    explicit SceneGroup(QObject *parent = nullptr);
     ~SceneGroup();
 
     Q_INVOKABLE void toggle(int row);

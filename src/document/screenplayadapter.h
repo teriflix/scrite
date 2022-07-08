@@ -34,7 +34,7 @@ class ScreenplayAdapter : public QIdentityProxyModel
     QML_ELEMENT
 
 public:
-    ScreenplayAdapter(QObject *parent = nullptr);
+    explicit ScreenplayAdapter(QObject *parent = nullptr);
     ~ScreenplayAdapter();
 
     Q_PROPERTY(QObject* source READ source WRITE setSource NOTIFY sourceChanged RESET resetSource)

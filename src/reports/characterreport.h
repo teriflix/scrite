@@ -23,7 +23,7 @@ class CharacterReport : public AbstractReportGenerator
     Q_CLASSINFO("Description", "Generate a report with dialogues and notes for one or more selected characters.")
 
 public:
-    Q_INVOKABLE CharacterReport(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CharacterReport(QObject *parent = nullptr);
     ~CharacterReport();
 
     bool requiresConfiguration() const { return true; }

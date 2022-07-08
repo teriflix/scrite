@@ -27,7 +27,7 @@ class SimpleTabBarItem : public QQuickPaintedItem
     QML_ELEMENT
 
 public:
-    SimpleTabBarItem(QQuickItem *parent = nullptr);
+    explicit SimpleTabBarItem(QQuickItem *parent = nullptr);
     ~SimpleTabBarItem();
 
     Q_PROPERTY(int tabCount READ tabCount WRITE setTabCount NOTIFY tabCountChanged)

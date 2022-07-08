@@ -26,7 +26,7 @@ class ItemPositionMapper : public QObject
     QML_ELEMENT
 
 public:
-    ItemPositionMapper(QObject *parent = nullptr);
+    explicit ItemPositionMapper(QObject *parent = nullptr);
     ~ItemPositionMapper();
 
     Q_PROPERTY(QPointF position READ position WRITE setPosition NOTIFY positionChanged)

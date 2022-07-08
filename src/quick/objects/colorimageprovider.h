@@ -19,7 +19,7 @@
 class ColorImageProvider : public QQuickImageProvider
 {
 public:
-    ColorImageProvider();
+    explicit ColorImageProvider();
     ~ColorImageProvider();
 
     // QQuickImageProvider interface

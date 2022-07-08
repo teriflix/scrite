@@ -31,7 +31,7 @@ class Attachment : public QObject, public QObjectSerializer::Interface
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Attachment(QObject *parent = nullptr);
+    explicit Attachment(QObject *parent = nullptr);
     ~Attachment();
     Q_SIGNAL void aboutToDelete(Attachment *ptr);
 
@@ -120,7 +120,7 @@ class Attachments : public QObjectListModel<Attachment *>, public QObjectSeriali
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Attachments(QObject *parent = nullptr);
+    explicit Attachments(QObject *parent = nullptr);
     ~Attachments();
 
     enum AllowedType {
@@ -194,7 +194,7 @@ class AttachmentsDropArea : public QQuickItem
     QML_ELEMENT
 
 public:
-    AttachmentsDropArea(QQuickItem *parent = nullptr);
+    explicit AttachmentsDropArea(QQuickItem *parent = nullptr);
     ~AttachmentsDropArea();
 
     Q_PROPERTY(Attachments *target READ target WRITE setTarget NOTIFY targetChanged)

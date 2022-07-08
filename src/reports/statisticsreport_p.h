@@ -24,22 +24,23 @@ class ScreenplayTextDocument;
 class StatisticsReportPage : public PdfExportableGraphicsScene
 {
 public:
-    StatisticsReportPage(StatisticsReport *parent = nullptr);
+    explicit StatisticsReportPage(StatisticsReport *parent = nullptr);
     ~StatisticsReportPage();
 };
 
 class StatisticsReportKeyNumbers : public QGraphicsRectItem
 {
 public:
-    StatisticsReportKeyNumbers(const StatisticsReport *report, QGraphicsItem *parent = nullptr);
+    explicit StatisticsReportKeyNumbers(const StatisticsReport *report,
+                                        QGraphicsItem *parent = nullptr);
     ~StatisticsReportKeyNumbers();
 };
 
 class StatisticsReportTimeline : public QGraphicsRectItem
 {
 public:
-    StatisticsReportTimeline(qreal suggestedWidth, const StatisticsReport *report,
-                             QGraphicsItem *parent = nullptr);
+    explicit StatisticsReportTimeline(qreal suggestedWidth, const StatisticsReport *report,
+                                      QGraphicsItem *parent = nullptr);
     ~StatisticsReportTimeline();
 
 private:
@@ -83,23 +84,23 @@ private:
 class StatisticsReportDialogueActionRatio : public QGraphicsRectItem
 {
 public:
-    StatisticsReportDialogueActionRatio(const StatisticsReport *report,
-                                        QGraphicsItem *parent = nullptr);
+    explicit StatisticsReportDialogueActionRatio(const StatisticsReport *report,
+                                                 QGraphicsItem *parent = nullptr);
     ~StatisticsReportDialogueActionRatio();
 };
 
 class StatisticsReportSceneHeadingStats : public QGraphicsRectItem
 {
 public:
-    StatisticsReportSceneHeadingStats(const StatisticsReport *report,
-                                      QGraphicsItem *parent = nullptr);
+    explicit StatisticsReportSceneHeadingStats(const StatisticsReport *report,
+                                               QGraphicsItem *parent = nullptr);
     ~StatisticsReportSceneHeadingStats();
 };
 
 class StatisticsReportGraphVLegend : public QGraphicsRectItem
 {
 public:
-    StatisticsReportGraphVLegend(QGraphicsItem *parent = nullptr);
+    explicit StatisticsReportGraphVLegend(QGraphicsItem *parent = nullptr);
     ~StatisticsReportGraphVLegend();
 
     void setFont(const QFont &val) { m_font = val; }

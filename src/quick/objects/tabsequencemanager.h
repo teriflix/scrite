@@ -28,7 +28,7 @@ class TabSequenceManager : public QObject
     QML_ELEMENT
 
 public:
-    TabSequenceManager(QObject *parent = nullptr);
+    explicit TabSequenceManager(QObject *parent = nullptr);
     ~TabSequenceManager();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)

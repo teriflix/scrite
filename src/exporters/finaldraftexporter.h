@@ -23,7 +23,7 @@ class FinalDraftExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "Final Draft (*.fdx)")
 
 public:
-    Q_INVOKABLE FinalDraftExporter(QObject *parent = nullptr);
+    Q_INVOKABLE explicit FinalDraftExporter(QObject *parent = nullptr);
     ~FinalDraftExporter();
 
     Q_CLASSINFO("markLanguagesExplicitly_FieldLabel", "Explicity mark text-fragments of different languages.")

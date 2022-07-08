@@ -53,7 +53,7 @@ class GridBackgroundItem : public QQuickItem
     QML_NAMED_ELEMENT(GridBackground)
 
 public:
-    GridBackgroundItem(QQuickItem *parent = nullptr);
+    explicit GridBackgroundItem(QQuickItem *parent = nullptr);
     ~GridBackgroundItem();
 
     Q_PROPERTY(qreal tickDistance READ tickDistance WRITE setTickDistance NOTIFY tickDistanceChanged)

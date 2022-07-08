@@ -39,7 +39,7 @@
 class QMarginsFHelper : public QObjectSerializer::Helper
 {
 public:
-    QMarginsFHelper();
+    explicit QMarginsFHelper();
     ~QMarginsFHelper() override;
 
     bool canHandle(int type) const override;
@@ -54,7 +54,7 @@ private:
 class QListHelper : public QObjectSerializer::Helper
 {
 public:
-    QListHelper();
+    explicit QListHelper();
     ~QListHelper() override;
 
     bool canHandle(int type) const override;
@@ -71,7 +71,7 @@ private:
 class QRealHelper : public QObjectSerializer::Helper
 {
 public:
-    QRealHelper();
+    explicit QRealHelper();
     ~QRealHelper() override;
 
     bool canHandle(int type) const override;
@@ -82,7 +82,7 @@ public:
 class QFontHelper : public QObjectSerializer::Helper
 {
 public:
-    QFontHelper();
+    explicit QFontHelper();
     ~QFontHelper() override;
 
     bool canHandle(int type) const override;
@@ -93,7 +93,7 @@ public:
 class QRectFHelper : public QObjectSerializer::Helper
 {
 public:
-    QRectFHelper();
+    explicit QRectFHelper();
     ~QRectFHelper() override;
 
     bool canHandle(int type) const override;
@@ -104,7 +104,7 @@ public:
 class ObjectSerializerHelperRegistry : public QList<QObjectSerializer::Helper *>
 {
 public:
-    ObjectSerializerHelperRegistry();
+    explicit ObjectSerializerHelperRegistry();
     ~ObjectSerializerHelperRegistry();
 
     const QObjectSerializer::Helper *findHelper(int type) const;

@@ -26,7 +26,7 @@ class UrlAttributes : public QObject
     QML_ELEMENT
 
 public:
-    UrlAttributes(QObject *parent = nullptr);
+    explicit UrlAttributes(QObject *parent = nullptr);
     ~UrlAttributes();
 
     enum Status {

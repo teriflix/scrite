@@ -54,7 +54,7 @@ class FileLocker : public QObject
     Q_OBJECT
 
 public:
-    FileLocker(QObject *parent = nullptr);
+    explicit FileLocker(QObject *parent = nullptr);
     ~FileLocker();
 
     Q_PROPERTY(QString filePath READ filePath WRITE setFilePath NOTIFY filePathChanged)

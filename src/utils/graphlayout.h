@@ -87,7 +87,7 @@ private:
 class ForceDirectedLayout : public AbstractLayout
 {
 public:
-    ForceDirectedLayout();
+    explicit ForceDirectedLayout();
     ~ForceDirectedLayout();
 
     // AbstractGraphLayout interface

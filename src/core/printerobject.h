@@ -21,7 +21,7 @@ class PrinterObject : public QObject, public QPrinter
     Q_OBJECT
 
 public:
-    PrinterObject(QObject *parent = nullptr) : QObject(parent) { }
+    explicit PrinterObject(QObject *parent = nullptr) : QObject(parent) { }
     ~PrinterObject() { }
 };
 

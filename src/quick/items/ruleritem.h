@@ -22,7 +22,7 @@ class RulerItem : public QQuickPaintedItem
     QML_ELEMENT
 
 public:
-    RulerItem(QQuickItem *parent = nullptr);
+    explicit RulerItem(QQuickItem *parent = nullptr);
     ~RulerItem();
 
     enum Unit { Inch, Centimeter, Pixels };

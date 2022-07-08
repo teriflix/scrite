@@ -29,7 +29,7 @@ class PainterPathItem : public AbstractShapeItem
     QML_ELEMENT
 
 public:
-    PainterPathItem(QQuickItem *parent = nullptr);
+    explicit PainterPathItem(QQuickItem *parent = nullptr);
     ~PainterPathItem();
 
     Q_PROPERTY(PainterPath* painterPath READ painterPath WRITE setPainterPath NOTIFY painterPathChanged RESET resetPainterPath)
@@ -61,7 +61,7 @@ class AbstractPathElement : public QObject
     QML_UNCREATABLE("Use subclasses of AbstractPathElement.")
 
 public:
-    AbstractPathElement(QObject *parent = nullptr);
+    explicit AbstractPathElement(QObject *parent = nullptr);
     ~AbstractPathElement();
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
@@ -84,7 +84,7 @@ class PainterPath : public QObject
     QML_ELEMENT
 
 public:
-    PainterPath(QObject *parent = nullptr);
+    explicit PainterPath(QObject *parent = nullptr);
     ~PainterPath();
 
     Q_CLASSINFO("DefaultProperty", "elements")
@@ -136,7 +136,7 @@ class MoveToElement : public AbstractPathElement
     QML_NAMED_ELEMENT(MoveTo)
 
 public:
-    MoveToElement(QObject *parent = nullptr);
+    explicit MoveToElement(QObject *parent = nullptr);
     ~MoveToElement();
 
     Q_PROPERTY(qreal x READ x WRITE setX NOTIFY xChanged)
@@ -163,7 +163,7 @@ class LineToElement : public MoveToElement
     QML_NAMED_ELEMENT(LineTo)
 
 public:
-    LineToElement(QObject *parent = nullptr);
+    explicit LineToElement(QObject *parent = nullptr);
     ~LineToElement();
 
     void apply(QPainterPath &path);
@@ -175,7 +175,7 @@ class CloseSubpathElement : public AbstractPathElement
     QML_NAMED_ELEMENT(CloseSubpath)
 
 public:
-    CloseSubpathElement(QObject *parent = nullptr);
+    explicit CloseSubpathElement(QObject *parent = nullptr);
     ~CloseSubpathElement();
 
     void apply(QPainterPath &path);
@@ -188,7 +188,7 @@ class CubicToElement : public AbstractPathElement
     QML_NAMED_ELEMENT(CubicTo)
 
 public:
-    CubicToElement(QObject *parent = nullptr);
+    explicit CubicToElement(QObject *parent = nullptr);
     ~CubicToElement();
 
     Q_PROPERTY(QPointF controlPoint1 READ controlPoint1 WRITE setControlPoint1 NOTIFY controlPoint1Changed)
@@ -221,7 +221,7 @@ class QuadToElement : public AbstractPathElement
     QML_NAMED_ELEMENT(QuadTo)
 
 public:
-    QuadToElement(QObject *parent = nullptr);
+    explicit QuadToElement(QObject *parent = nullptr);
     ~QuadToElement();
 
     Q_PROPERTY(QPointF controlPoint READ controlPoint WRITE setControlPoint NOTIFY controlPointChanged)
@@ -248,7 +248,7 @@ class ArcToElement : public AbstractPathElement
     QML_NAMED_ELEMENT(ArcTo)
 
 public:
-    ArcToElement(QObject *parent = nullptr);
+    explicit ArcToElement(QObject *parent = nullptr);
     ~ArcToElement();
 
     Q_PROPERTY(QRectF rectangle READ rectangle WRITE setRectangle NOTIFY rectangleChanged)

@@ -24,7 +24,7 @@ class FinalDraftImporter : public AbstractImporter
     Q_CLASSINFO("NameFilters", "Final Draft (*.fdx)")
 
 public:
-    Q_INVOKABLE FinalDraftImporter(QObject *parent = nullptr);
+    Q_INVOKABLE explicit FinalDraftImporter(QObject *parent = nullptr);
     ~FinalDraftImporter();
 
     bool canImport(const QString &fileName) const;

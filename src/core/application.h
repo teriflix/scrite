@@ -49,7 +49,7 @@ public:
     static QVersionNumber prepare();
     static Application *instance();
 
-    Application(int &argc, char **argv, const QVersionNumber &version);
+    explicit Application(int &argc, char **argv, const QVersionNumber &version);
     ~Application();
 
     QString installationId() const;

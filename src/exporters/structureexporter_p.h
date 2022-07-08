@@ -27,43 +27,43 @@ class StructureExporterScene : public PdfExportableGraphicsScene
     Q_OBJECT
 
 public:
-    StructureExporterScene(const StructureExporter *exporter, QObject *parent = nullptr);
+    explicit StructureExporterScene(const StructureExporter *exporter, QObject *parent = nullptr);
     ~StructureExporterScene();
 };
 
 class StructureIndexCard : public QGraphicsRectItem
 {
 public:
-    StructureIndexCard(const StructureExporter *exporter, const StructureElement *element);
+    explicit StructureIndexCard(const StructureExporter *exporter, const StructureElement *element);
     ~StructureIndexCard();
 };
 
 class StructureIndexCardConnector : public QGraphicsPathItem
 {
 public:
-    StructureIndexCardConnector(const StructureIndexCard *from, const StructureIndexCard *to,
-                                const QString &label);
+    explicit StructureIndexCardConnector(const StructureIndexCard *from,
+                                         const StructureIndexCard *to, const QString &label);
     ~StructureIndexCardConnector();
 };
 
 class StructureEpisodeBox : public QGraphicsRectItem
 {
 public:
-    StructureEpisodeBox(const QJsonObject &data, const Structure *structure);
+    explicit StructureEpisodeBox(const QJsonObject &data, const Structure *structure);
     ~StructureEpisodeBox();
 };
 
 class StructureIndexCardGroup : public QGraphicsRectItem
 {
 public:
-    StructureIndexCardGroup(const QJsonObject &data, const Structure *structure);
+    explicit StructureIndexCardGroup(const QJsonObject &data, const Structure *structure);
     ~StructureIndexCardGroup();
 };
 
 class StructureIndexCardStack : public QGraphicsItem
 {
 public:
-    StructureIndexCardStack(const StructureElementStack *stack);
+    explicit StructureIndexCardStack(const StructureElementStack *stack);
     ~StructureIndexCardStack();
 
     // QGraphicsItem interface
@@ -74,57 +74,57 @@ public:
 class StructureRectAnnotation : public QGraphicsRectItem
 {
 public:
-    StructureRectAnnotation(const Annotation *annotation,
-                            const QString &bgColorAttr = QStringLiteral("color"));
+    explicit StructureRectAnnotation(const Annotation *annotation,
+                                     const QString &bgColorAttr = QStringLiteral("color"));
     ~StructureRectAnnotation();
 };
 
 class StructureTextAnnotation : public StructureRectAnnotation
 {
 public:
-    StructureTextAnnotation(const Annotation *annotation);
+    explicit StructureTextAnnotation(const Annotation *annotation);
     ~StructureTextAnnotation();
 };
 
 class StructureUrlAnnotation : public QGraphicsRectItem
 {
 public:
-    StructureUrlAnnotation(const Annotation *annotation);
+    explicit StructureUrlAnnotation(const Annotation *annotation);
     ~StructureUrlAnnotation();
 };
 
 class StructureImageAnnotation : public StructureRectAnnotation
 {
 public:
-    StructureImageAnnotation(const Annotation *annotation);
+    explicit StructureImageAnnotation(const Annotation *annotation);
     ~StructureImageAnnotation();
 };
 
 class StructureLineAnnotation : public QGraphicsLineItem
 {
 public:
-    StructureLineAnnotation(const Annotation *annotation);
+    explicit StructureLineAnnotation(const Annotation *annotation);
     ~StructureLineAnnotation();
 };
 
 class StructureOvalAnnotation : public QGraphicsEllipseItem
 {
 public:
-    StructureOvalAnnotation(const Annotation *annotation);
+    explicit StructureOvalAnnotation(const Annotation *annotation);
     ~StructureOvalAnnotation();
 };
 
 class StructureUnknownAnnotation : public QGraphicsRectItem
 {
 public:
-    StructureUnknownAnnotation(const Annotation *annotation);
+    explicit StructureUnknownAnnotation(const Annotation *annotation);
     ~StructureUnknownAnnotation();
 };
 
 class StructureTitleCard : public QGraphicsRectItem
 {
 public:
-    StructureTitleCard(const Structure *structure, const QString &comment);
+    explicit StructureTitleCard(const Structure *structure, const QString &comment);
     ~StructureTitleCard();
 };
 

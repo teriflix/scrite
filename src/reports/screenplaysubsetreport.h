@@ -23,7 +23,7 @@ class ScreenplaySubsetReport : public AbstractScreenplaySubsetReport
     Q_CLASSINFO("Description", "Generate screenplay with only a subset of scenes selected by you.")
 
 public:
-    Q_INVOKABLE ScreenplaySubsetReport(QObject *parent = nullptr);
+    Q_INVOKABLE explicit ScreenplaySubsetReport(QObject *parent = nullptr);
     ~ScreenplaySubsetReport();
 
     Q_CLASSINFO("sceneNumbers_FieldGroup", "Scenes")

@@ -27,7 +27,7 @@ class AbstractQObjectListModel : public QAbstractListModel
     Q_OBJECT
 
 public:
-    AbstractQObjectListModel(QObject *parent = nullptr);
+    explicit AbstractQObjectListModel(QObject *parent = nullptr);
     ~AbstractQObjectListModel() { }
 
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)
@@ -51,7 +51,7 @@ template<class T>
 class QObjectListModel : public AbstractQObjectListModel
 {
 public:
-    QObjectListModel(QObject *parent = nullptr) : AbstractQObjectListModel(parent) { }
+    explicit QObjectListModel(QObject *parent = nullptr) : AbstractQObjectListModel(parent) { }
     ~QObjectListModel() { }
 
     operator QList<T>() { return m_list; }
@@ -256,7 +256,7 @@ class SortFilterObjectListModel : public QSortFilterProxyModel
     QML_ELEMENT
 
 public:
-    SortFilterObjectListModel(QObject *parent = nullptr);
+    explicit SortFilterObjectListModel(QObject *parent = nullptr);
     ~SortFilterObjectListModel() { }
 
     Q_PROPERTY(int objectCount READ objectCount NOTIFY objectCountChanged)

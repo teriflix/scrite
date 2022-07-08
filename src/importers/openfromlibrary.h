@@ -32,7 +32,7 @@ class LibraryService : public AbstractImporter
     QML_ELEMENT
 
 public:
-    LibraryService(QObject *parent = nullptr);
+    explicit LibraryService(QObject *parent = nullptr);
     ~LibraryService();
 
     // This this class cannot be used to import anything from a local file system

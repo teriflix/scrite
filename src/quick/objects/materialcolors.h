@@ -26,8 +26,8 @@ class MaterialColors : public QObject
     QML_ELEMENT
 
 public:
-    MaterialColors(QObject *parent = nullptr);
-    MaterialColors(const QString &name, QObject *parent = nullptr);
+    explicit MaterialColors(QObject *parent = nullptr);
+    explicit MaterialColors(const QString &name, QObject *parent = nullptr);
     ~MaterialColors();
 
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)

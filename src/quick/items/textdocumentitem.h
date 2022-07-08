@@ -24,7 +24,7 @@ class TextDocumentItem : public QQuickItem
     QML_ELEMENT
 
 public:
-    TextDocumentItem(QQuickItem *parent = nullptr);
+    explicit TextDocumentItem(QQuickItem *parent = nullptr);
     ~TextDocumentItem();
 
     Q_PROPERTY(QTextDocument* document READ document WRITE setDocument NOTIFY documentChanged)

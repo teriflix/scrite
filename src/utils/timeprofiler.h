@@ -162,7 +162,7 @@ class ProfilerItem : public QObject
     QML_UNCREATABLE("Use as attached property.")
 
 public:
-    ProfilerItem(QObject *parent = nullptr);
+    explicit ProfilerItem(QObject *parent = nullptr);
     ~ProfilerItem();
 
     static ProfilerItem *qmlAttachedProperties(QObject *object);

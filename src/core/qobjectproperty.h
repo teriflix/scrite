@@ -23,7 +23,7 @@ class QObjectPropertyBase : public QObject
     Q_OBJECT
 
 protected:
-    QObjectPropertyBase(QObject *notify, const char *resettablePropertyName);
+    explicit QObjectPropertyBase(QObject *notify, const char *resettablePropertyName);
     ~QObjectPropertyBase();
 
     void setPointer(QObject *pointer);
@@ -42,7 +42,7 @@ template<class T>
 class QObjectProperty : public QObjectPropertyBase
 {
 public:
-    QObjectProperty(QObject *notify, const char *resettablePropertyName)
+    explicit QObjectProperty(QObject *notify, const char *resettablePropertyName)
         : QObjectPropertyBase(notify, resettablePropertyName)
     {
     }

@@ -734,8 +734,8 @@ bool Application::isMouseOverItem(QQuickItem *item) const
 class ExecLater : public QObject
 {
 public:
-    ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &arg,
-              QObject *parent = nullptr);
+    explicit ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &arg,
+                       QObject *parent = nullptr);
     ~ExecLater();
 
     void timerEvent(QTimerEvent *event);

@@ -24,7 +24,7 @@
 class TextDocumentViewportItem : public QQuickPaintedItem
 {
 public:
-    TextDocumentViewportItem(TextDocumentItem *parent);
+    explicit TextDocumentViewportItem(TextDocumentItem *parent);
     ~TextDocumentViewportItem();
 
     void setViewportImage(const QImage &image)

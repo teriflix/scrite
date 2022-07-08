@@ -26,7 +26,7 @@ class WindowCapture : public AbstractAutomationStep
     QML_ELEMENT
 
 public:
-    WindowCapture(QObject *parent = nullptr);
+    explicit WindowCapture(QObject *parent = nullptr);
     ~WindowCapture();
 
     Q_PROPERTY(QWindow* window READ window WRITE setWindow RESET resetWindow NOTIFY windowChanged)

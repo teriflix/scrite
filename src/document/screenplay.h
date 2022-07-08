@@ -36,7 +36,7 @@ class ScreenplayElement : public QObject, public Modifiable, public QObjectSeria
     QML_ELEMENT
 
 public:
-    Q_INVOKABLE ScreenplayElement(QObject *parent = nullptr);
+    Q_INVOKABLE explicit ScreenplayElement(QObject *parent = nullptr);
     ~ScreenplayElement();
     Q_SIGNAL void aboutToDelete(ScreenplayElement *element);
 
@@ -206,7 +206,7 @@ class Screenplay : public QAbstractListModel, public Modifiable, public QObjectS
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    Screenplay(QObject *parent = nullptr);
+    explicit Screenplay(QObject *parent = nullptr);
     ~Screenplay();
     Q_SIGNAL void aboutToDelete(Screenplay *ptr);
 
@@ -496,7 +496,7 @@ class ScreenplayTracks : public QAbstractListModel
     QML_ELEMENT
 
 public:
-    ScreenplayTracks(QObject *parent = nullptr);
+    explicit ScreenplayTracks(QObject *parent = nullptr);
     ~ScreenplayTracks();
 
     Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)

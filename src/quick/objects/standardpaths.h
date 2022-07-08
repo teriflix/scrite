@@ -26,7 +26,7 @@ class StandardPaths : public QObject
     QML_SINGLETON
 
 public:
-    StandardPaths(QObject *parent = nullptr);
+    explicit StandardPaths(QObject *parent = nullptr);
     ~StandardPaths();
 
     // Copied from QStandardPaths

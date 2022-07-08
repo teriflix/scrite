@@ -161,7 +161,7 @@ class CharacterRelationshipGraph : public QObject, public QQmlParserStatus
     QML_ELEMENT
 
 public:
-    CharacterRelationshipGraph(QObject *parent = nullptr);
+    explicit CharacterRelationshipGraph(QObject *parent = nullptr);
     ~CharacterRelationshipGraph();
 
     Q_PROPERTY(QAbstractListModel *nodes READ nodes CONSTANT STORED false)

@@ -27,7 +27,7 @@ class ErrorReport : public QAbstractListModel
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    ErrorReport(QObject *parent = nullptr);
+    explicit ErrorReport(QObject *parent = nullptr);
     ~ErrorReport();
     Q_SIGNAL void aboutToDelete(ErrorReport *val);
 

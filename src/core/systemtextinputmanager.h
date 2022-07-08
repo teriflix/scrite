@@ -94,7 +94,7 @@ class AbstractSystemTextInputSource : public QObject
     Q_OBJECT
 
 public:
-    AbstractSystemTextInputSource(SystemTextInputManager *parent = nullptr);
+    explicit AbstractSystemTextInputSource(SystemTextInputManager *parent = nullptr);
     ~AbstractSystemTextInputSource();
     Q_SIGNAL void aboutToDelete(AbstractSystemTextInputSource *source);
 
@@ -135,7 +135,7 @@ private:
 class AbstractSystemTextInputManagerBackend : public QObject
 {
 public:
-    AbstractSystemTextInputManagerBackend(SystemTextInputManager *parent = nullptr);
+    explicit AbstractSystemTextInputManagerBackend(SystemTextInputManager *parent = nullptr);
     ~AbstractSystemTextInputManagerBackend();
 
     SystemTextInputManager *inputManager() const { return m_inputManager; }

@@ -23,7 +23,7 @@ class StructureExporter : public AbstractExporter
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
 
 public:
-    Q_INVOKABLE StructureExporter(QObject *parent = nullptr);
+    Q_INVOKABLE explicit StructureExporter(QObject *parent = nullptr);
     ~StructureExporter();
 
     // AbstractExporter interface

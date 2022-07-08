@@ -31,7 +31,7 @@ class DocumentFileSystem : public QObject
 public:
     static void setMarker(const QByteArray &marker);
 
-    DocumentFileSystem(QObject *parent = nullptr);
+    explicit DocumentFileSystem(QObject *parent = nullptr);
     ~DocumentFileSystem();
 
     enum Format { UnknownFormat, ScriteFormat, ZipFormat };
@@ -85,7 +85,7 @@ public:
     ~DocumentFile();
 
 private:
-    DocumentFile(const QString &filePath, DocumentFileSystem *parent = nullptr);
+    explicit DocumentFile(const QString &filePath, DocumentFileSystem *parent = nullptr);
     void onAboutToClose();
 
 private:

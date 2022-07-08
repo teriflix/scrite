@@ -1195,7 +1195,7 @@ QList<int> TextFormat::allProperties()
 class SceneDocumentBlockUserData : public QTextBlockUserData
 {
 public:
-    SceneDocumentBlockUserData(SceneElement *element, SceneDocumentBinder *binder);
+    explicit SceneDocumentBlockUserData(SceneElement *element, SceneDocumentBinder *binder);
     ~SceneDocumentBlockUserData();
 
     QTextBlockFormat blockFormat;
@@ -1303,7 +1303,7 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 class SpellCheckCursor : public QTextCursor
 {
 public:
-    SpellCheckCursor(QTextDocument *document, int position) : QTextCursor(document)
+    explicit SpellCheckCursor(QTextDocument *document, int position) : QTextCursor(document)
     {
         this->setPosition(position);
         this->select(QTextCursor::WordUnderCursor);
@@ -2358,7 +2358,7 @@ void SceneDocumentBinder::resetCurrentElement()
 class ForceCursorPositionHack : public QObject
 {
 public:
-    ForceCursorPositionHack(const QTextBlock &block, int cp, SceneDocumentBinder *binder);
+    explicit ForceCursorPositionHack(const QTextBlock &block, int cp, SceneDocumentBinder *binder);
     ~ForceCursorPositionHack();
 
     void timerEvent(QTimerEvent *event);

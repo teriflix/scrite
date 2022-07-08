@@ -55,7 +55,7 @@ class SceneUndoCommand : public QUndoCommand
 public:
     static SceneUndoCommand *current;
 
-    SceneUndoCommand(Scene *scene, bool allowMerging = true);
+    explicit SceneUndoCommand(Scene *scene, bool allowMerging = true);
     ~SceneUndoCommand();
 
     // QUndoCommand interface
@@ -1814,7 +1814,7 @@ void Scene::serializeToJson(QJsonObject &json) const
 class AddInvisibleCharactersTimer : public QTimer
 {
 public:
-    AddInvisibleCharactersTimer(const QJsonArray &chars, Scene *parent)
+    explicit AddInvisibleCharactersTimer(const QJsonArray &chars, Scene *parent)
         : QTimer(parent), m_scene(parent), m_characters(chars)
     {
         this->setInterval(100);

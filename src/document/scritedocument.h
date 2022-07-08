@@ -144,7 +144,7 @@ class ScriteDocumentCollaborators : public QAbstractListModel
     QML_ELEMENT
 
 public:
-    ScriteDocumentCollaborators(QObject *parent = nullptr);
+    explicit ScriteDocumentCollaborators(QObject *parent = nullptr);
     ~ScriteDocumentCollaborators();
 
     Q_PROPERTY(ScriteDocument* document READ document WRITE setDocument NOTIFY documentChanged)

@@ -71,7 +71,7 @@ class TrackProperty : public AbstractObjectTracker
     QML_ELEMENT
 
 public:
-    TrackProperty(QObject *parent = nullptr);
+    explicit TrackProperty(QObject *parent = nullptr);
     ~TrackProperty();
 
     Q_PROPERTY(QString property READ property WRITE setProperty NOTIFY propertyChanged)
@@ -92,7 +92,7 @@ class TrackModelRow : public AbstractObjectTracker
     QML_ELEMENT
 
 public:
-    TrackModelRow(QObject *parent = nullptr);
+    explicit TrackModelRow(QObject *parent = nullptr);
     ~TrackModelRow();
 
     Q_PROPERTY(int row READ row WRITE setRow NOTIFY rowChanged)
@@ -144,7 +144,7 @@ class TrackSignal : public AbstractObjectTracker
     QML_ELEMENT
 
 public:
-    TrackSignal(QObject *parent = nullptr);
+    explicit TrackSignal(QObject *parent = nullptr);
     ~TrackSignal();
 
     Q_PROPERTY(QString signal READ signal WRITE setSignal NOTIFY signalChanged)
@@ -165,7 +165,7 @@ class TrackerPack : public QObject
     QML_ELEMENT
 
 public:
-    TrackerPack(QObject *parent = nullptr);
+    explicit TrackerPack(QObject *parent = nullptr);
     ~TrackerPack();
 
     Q_PROPERTY(int delay READ delay WRITE setDelay NOTIFY delayChanged)

@@ -102,7 +102,7 @@ class SearchEngine : public QObject
     QML_ELEMENT
 
 public:
-    SearchEngine(QObject *parent = nullptr);
+    explicit SearchEngine(QObject *parent = nullptr);
     ~SearchEngine();
 
     Q_PROPERTY(QQmlListProperty<SearchAgent> searchAgents READ searchAgents NOTIFY searchAgentsChanged)
@@ -192,7 +192,7 @@ class TextDocumentSearch : public QObject
     QML_ELEMENT
 
 public:
-    TextDocumentSearch(QObject *parent = nullptr);
+    explicit TextDocumentSearch(QObject *parent = nullptr);
     ~TextDocumentSearch();
 
     Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)

@@ -23,7 +23,7 @@ class CharacterScreenplayReport : public AbstractScreenplaySubsetReport
     Q_CLASSINFO("Description", "Generate screenplay with only those scenes where one or more characters are present.")
 
 public:
-    Q_INVOKABLE CharacterScreenplayReport(QObject *parent = nullptr);
+    Q_INVOKABLE explicit CharacterScreenplayReport(QObject *parent = nullptr);
     ~CharacterScreenplayReport();
 
     Q_CLASSINFO("highlightDialogues_FieldGroup", "Characters")

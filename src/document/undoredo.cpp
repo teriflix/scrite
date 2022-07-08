@@ -69,7 +69,7 @@ static QByteArray objectUndoRedoLockProperty()
 class ObjectPropertyInfoList : public QObject, public QList<ObjectPropertyInfo *>
 {
 public:
-    ObjectPropertyInfoList() : QObject() { qApp->installEventFilter(this); }
+    explicit ObjectPropertyInfoList() : QObject() { qApp->installEventFilter(this); }
     ~ObjectPropertyInfoList()
     {
         qDeleteAll(*this);

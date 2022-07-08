@@ -43,7 +43,7 @@ class Note : public QObject, public QObjectSerializer::Interface
 public:
     static Note *findById(const QString &id);
 
-    Note(QObject *parent = nullptr);
+    explicit Note(QObject *parent = nullptr);
     ~Note();
     Q_SIGNAL void aboutToDelete(Note *ptr);
 
@@ -140,7 +140,7 @@ class Notes : public QObjectListModel<Note *>, public QObjectSerializer::Interfa
 public:
     static Notes *findById(const QString &id);
 
-    Notes(QObject *parent = nullptr);
+    explicit Notes(QObject *parent = nullptr);
     ~Notes();
     Q_SIGNAL void aboutToDelete(Notes *ptr);
 

@@ -27,7 +27,7 @@ class Aggregation : public QObject
     QML_SINGLETON
 
 public:
-    Aggregation(QObject *parent = nullptr);
+    explicit Aggregation(QObject *parent = nullptr);
     ~Aggregation();
 
     Q_INVOKABLE static QObject *find(QObject *object, const QString &className,

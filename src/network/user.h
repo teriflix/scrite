@@ -144,7 +144,7 @@ private:
 class UserIconProvider : public QQuickImageProvider
 {
 public:
-    UserIconProvider();
+    explicit UserIconProvider();
     ~UserIconProvider();
 
     // QQuickImageProvider interface
@@ -157,7 +157,7 @@ class AppFeature : public QObject
     QML_ELEMENT
 
 public:
-    AppFeature(QObject *parent = nullptr);
+    explicit AppFeature(QObject *parent = nullptr);
     ~AppFeature();
 
     Q_PROPERTY(QString featureName READ featureName WRITE setFeatureName NOTIFY featureNameChanged)

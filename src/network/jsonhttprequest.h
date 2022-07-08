@@ -31,7 +31,7 @@ class JsonHttpRequest : public QObject, public QQmlParserStatus
     QML_ELEMENT
 
 public:
-    JsonHttpRequest(QObject *parent = nullptr);
+    explicit JsonHttpRequest(QObject *parent = nullptr);
     ~JsonHttpRequest();
 
     enum Type { GET, POST };

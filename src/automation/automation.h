@@ -27,7 +27,7 @@ class AbstractAutomationStep : public QObject
     Q_OBJECT
 
 public:
-    AbstractAutomationStep(QObject *parent = nullptr);
+    explicit AbstractAutomationStep(QObject *parent = nullptr);
     ~AbstractAutomationStep();
 
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)
@@ -71,7 +71,7 @@ class Automation : public QObject, public QQmlParserStatus
 public:
     static void init(QQuickView *qmlWindow);
 
-    Automation(QObject *parent = nullptr);
+    explicit Automation(QObject *parent = nullptr);
     ~Automation();
 
     Q_PROPERTY(bool running READ isRunning NOTIFY runningChanged)

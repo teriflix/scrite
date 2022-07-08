@@ -22,7 +22,7 @@ class TextShapeItem : public AbstractShapeItem
     QML_ELEMENT
 
 public:
-    TextShapeItem(QQuickItem *parent = nullptr);
+    explicit TextShapeItem(QQuickItem *parent = nullptr);
     ~TextShapeItem();
 
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)

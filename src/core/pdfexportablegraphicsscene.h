@@ -26,7 +26,7 @@ class PdfExportableGraphicsScene : public QGraphicsScene
     Q_OBJECT
 
 public:
-    PdfExportableGraphicsScene(QObject *parent = nullptr);
+    explicit PdfExportableGraphicsScene(QObject *parent = nullptr);
     ~PdfExportableGraphicsScene();
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -69,8 +69,8 @@ private:
 class GraphicsHeaderFooterItem : public QGraphicsItem
 {
 public:
-    GraphicsHeaderFooterItem(HeaderFooter *headerFooter,
-                             const QMap<HeaderFooter::Field, QString> &fields);
+    explicit GraphicsHeaderFooterItem(HeaderFooter *headerFooter,
+                                      const QMap<HeaderFooter::Field, QString> &fields);
     ~GraphicsHeaderFooterItem();
 
     void setRect(const QRectF &rect);
@@ -89,7 +89,7 @@ private:
 class GraphicsWatermarkItem : public QGraphicsItem
 {
 public:
-    GraphicsWatermarkItem(Watermark *watermark);
+    explicit GraphicsWatermarkItem(Watermark *watermark);
     ~GraphicsWatermarkItem();
 
     void setRect(const QRectF &rect);
@@ -107,7 +107,8 @@ private:
 class GraphicsHeaderItem : public QGraphicsRectItem
 {
 public:
-    GraphicsHeaderItem(const QString &title, const QString &subtitle, qreal containerWidth);
+    explicit GraphicsHeaderItem(const QString &title, const QString &subtitle,
+                                qreal containerWidth);
     ~GraphicsHeaderItem();
 
     static qreal idealContainerWidth(const QString &title);
@@ -116,7 +117,7 @@ public:
 class GraphicsImageRectItem : public QGraphicsRectItem
 {
 public:
-    GraphicsImageRectItem(QGraphicsItem *parent = nullptr);
+    explicit GraphicsImageRectItem(QGraphicsItem *parent = nullptr);
     ~GraphicsImageRectItem();
 
     enum FillMode { Stretch, PreserveAspectFit, PreserveAspectCrop };
