@@ -296,8 +296,10 @@ Rectangle {
         property string textMode: "HeadingOrTitle"
     }
 
-    QtObject {
+    Settings {
         id: instanceSettings
+        fileName: Scrite.app.settingsFilePath
+        category: "Screenplay Editor"
 
         property bool screenplayEditorAddButtonsAnimationShown: false
         property bool refreshButtonInStatsReportAnimationDone: false
