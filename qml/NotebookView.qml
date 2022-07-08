@@ -744,7 +744,10 @@ Rectangle {
                             Button2 {
                                 text: "Yes"
                                 focusPolicy: Qt.NoFocus
-                                onClicked: notebookContentLoader.item.deleteSelf()
+                                onClicked: {
+                                    notebookContentLoader.item.deleteSelf()
+                                    deleteConfirmationBox.active = false
+                                }
                                 visible: notebookTree.currentNote || notebookTree.currentCharacter
                             }
 
