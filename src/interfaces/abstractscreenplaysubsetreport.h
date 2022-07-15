@@ -52,6 +52,14 @@ public:
     bool isIncludeSceneFeaturedImage() const { return m_includeSceneFeaturedImage; }
     Q_SIGNAL void includeSceneFeaturedImageChanged();
 
+    Q_CLASSINFO("includeSceneComments_FieldGroup", "Options")
+    Q_CLASSINFO("includeSceneComments_FieldLabel", "Include scene comments, if available.")
+    Q_CLASSINFO("includeSceneComments_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneComments READ isIncludeSceneComments WRITE setIncludeSceneComments NOTIFY includeSceneCommentsChanged)
+    void setIncludeSceneComments(bool val);
+    bool isIncludeSceneComments() const { return m_includeSceneComments; }
+    Q_SIGNAL void includeSceneCommentsChanged();
+
     Q_CLASSINFO("includeSceneContents_FieldGroup", "Options")
     Q_CLASSINFO("includeSceneContents_FieldLabel", "Include scene content.")
     Q_CLASSINFO("includeSceneContents_FieldEditor", "CheckBox")
@@ -140,6 +148,7 @@ private:
     bool m_includeSceneContents = true;
     bool m_includeSceneSynopsis = false;
     bool m_includeSceneFeaturedImage = false;
+    bool m_includeSceneComments = false;
     QList<int> m_episodeNumbers;
     Screenplay *m_screenplaySubset = nullptr;
     bool m_printEachSceneOnANewPage = false;

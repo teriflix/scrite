@@ -60,6 +60,15 @@ void AbstractScreenplaySubsetReport::setIncludeSceneFeaturedImage(bool val)
     emit includeSceneFeaturedImageChanged();
 }
 
+void AbstractScreenplaySubsetReport::setIncludeSceneComments(bool val)
+{
+    if (m_includeSceneComments == val)
+        return;
+
+    m_includeSceneComments = val;
+    emit includeSceneCommentsChanged();
+}
+
 void AbstractScreenplaySubsetReport::setIncludeSceneContents(bool val)
 {
     if (m_includeSceneContents == val)
@@ -234,6 +243,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     stDoc.setTextDocument(textDocument);
     stDoc.setIncludeSceneSynopsis(m_includeSceneSynopsis);
     stDoc.setIncludeSceneFeaturedImage(m_includeSceneFeaturedImage);
+    stDoc.setIncludeSceneComments(m_includeSceneComments);
     stDoc.setInjection(this);
     this->configureScreenplayTextDocument(stDoc);
     stDoc.syncNow();

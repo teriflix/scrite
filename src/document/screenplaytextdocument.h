@@ -131,6 +131,11 @@ public:
     bool isIncludeSceneFeaturedImage() const { return m_includeSceneFeaturedImage; }
     Q_SIGNAL void includeSceneFeaturedImageChanged();
 
+    Q_PROPERTY(bool includeSceneComments READ isIncludeSceneComments WRITE setIncludeSceneComments NOTIFY includeSceneCommentsChanged)
+    void setIncludeSceneComments(bool val);
+    bool isIncludeSceneComments() const { return m_includeSceneComments; }
+    Q_SIGNAL void includeSceneCommentsChanged();
+
     enum Purpose { ForDisplay, ForPrinting };
     Q_ENUM(Purpose)
     Q_PROPERTY(Purpose purpose READ purpose WRITE setPurpose NOTIFY purposeChanged)
@@ -329,6 +334,7 @@ private:
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
     bool m_includeSceneFeaturedImage = false;
+    bool m_includeSceneComments = false;
     bool m_screenplayIsBeingReset = false;
     QList<Scene *> m_sceneResetList;
     ExecLaterTimer m_sceneResetTimer;

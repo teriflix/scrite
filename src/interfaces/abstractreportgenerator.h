@@ -70,7 +70,7 @@ public:
     QString comment() const { return m_comment; }
     Q_SIGNAL void commentChanged();
 
-    Q_INVOKABLE virtual bool supportsFormat(Format) const { return true; }
+    Q_INVOKABLE virtual bool supportsFormat(AbstractReportGenerator::Format) const { return true; }
 
     Q_PROPERTY(QString name READ name CONSTANT)
     QString name() const;

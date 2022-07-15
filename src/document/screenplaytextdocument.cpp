@@ -413,6 +413,15 @@ void ScreenplayTextDocument::setIncludeSceneFeaturedImage(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setIncludeSceneComments(bool val)
+{
+    if (m_includeSceneComments == val)
+        return;
+
+    m_includeSceneComments = val;
+    emit includeSceneCommentsChanged();
+}
+
 void ScreenplayTextDocument::setPurpose(ScreenplayTextDocument::Purpose val)
 {
     if (m_purpose == val)
@@ -2366,6 +2375,9 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
 void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *element,
                                                    QTextCursor &cursor)
 {
+    static const QRegularExpression newlinesRegEx("\n+");
+    static const QString newline = QStringLiteral("\n");
+
     Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element), "ScreenplayTextDocument",
                "Screenplay element can be loaded only after a frame for it has been created");
 
@@ -2580,15 +2592,46 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             blockFormat.setBackground(sceneColor);
 
             QTextCharFormat charFormat;
-            charFormat.setFont(Application::instance()->font());
+            charFormat.setFont(cursor.document()->defaultFont());
 
             QString synopsis = scene->title();
-            synopsis.replace(QRegularExpression("\n+"), QStringLiteral("\n"));
+            synopsis.replace(newlinesRegEx, newline);
 
             cursor.insertBlock(blockFormat, charFormat);
-            cursor.insertText(synopsis);
+            // cursor.insertText(synopsis);
+            polishFontsAndInsertTextAtCursor(cursor, synopsis);
 
             insertBlock = true;
+        }
+
+        if (m_includeSceneComments) {
+            QString comments = scene->comments().trimmed();
+            if (!comments.isEmpty()) {
+                comments.replace(newlinesRegEx, newline);
+
+                comments = QLatin1String("Comments: ") + comments;
+
+                QColor sceneColor = scene->color().lighter(175);
+                sceneColor.setAlphaF(0.5);
+
+                QTextBlockFormat blockFormat;
+                blockFormat.setTopMargin(10);
+                blockFormat.setLeftMargin(15);
+                blockFormat.setRightMargin(15);
+                blockFormat.setBackground(sceneColor);
+
+                QTextCharFormat charFormat;
+                charFormat.setFont(cursor.document()->defaultFont());
+
+                QString synopsis = scene->title();
+                synopsis.replace(newlinesRegEx, newline);
+
+                cursor.insertBlock(blockFormat, charFormat);
+                // cursor.insertText(synopsis);
+                polishFontsAndInsertTextAtCursor(cursor, comments);
+
+                insertBlock = true;
+            }
         }
 
         bool highlightParagraph = false;

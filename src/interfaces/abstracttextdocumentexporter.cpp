@@ -48,6 +48,15 @@ void AbstractTextDocumentExporter::setIncludeSceneFeaturedImage(bool val)
     emit includeSceneFeaturedImageChanged();
 }
 
+void AbstractTextDocumentExporter::setIncludeSceneComments(bool val)
+{
+    if (m_includeSceneComments == val)
+        return;
+
+    m_includeSceneComments = val;
+    emit includeSceneCommentsChanged();
+}
+
 void AbstractTextDocumentExporter::setIncludeSceneContents(bool val)
 {
     if (m_includeSceneContents == val)
@@ -68,6 +77,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setListSceneCharacters(m_listSceneCharacters);
     stDoc.setIncludeSceneSynopsis(m_includeSceneSynopsis);
     stDoc.setIncludeSceneFeaturedImage(m_includeSceneFeaturedImage);
+    stDoc.setIncludeSceneComments(m_includeSceneComments);
     stDoc.setPrintEachSceneOnANewPage(this->isPrintEachSceneOnANewPage());
     stDoc.setPrintEachActOnANewPage(this->isPrintEachActOnANewPage());
     stDoc.setIncludeActBreaks(this->isIncludeActBreaks());
