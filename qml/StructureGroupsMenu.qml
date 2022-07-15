@@ -22,7 +22,7 @@ Menu2 {
     property SceneGroup sceneGroup: null
     signal toggled(int row, string name)
     closePolicy: htn.Notification.active ? Popup.NoAutoClose : Popup.CloseOnEscape|Popup.CloseOnPressOutside
-    enabled: false
+    enabled: !Scrite.document.readOnly
 
     title: "Tag Groups"
     property string innerTitle: ""
