@@ -3130,7 +3130,7 @@ Rectangle {
                         id: delegateItem
                         width: sceneListView.width-1
                         height: 40
-                        color: scene ? screenplayAdapter.currentIndex === index ? selectedColor : normalColor
+                        color: scene ? (screenplayAdapter.currentIndex === index || screenplayElement.selected) ? selectedColor : normalColor
                                      : screenplayAdapter.currentIndex === index ? Scrite.app.translucent(accentColors.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
                         property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(primaryColors.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")

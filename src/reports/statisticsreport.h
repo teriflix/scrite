@@ -79,6 +79,14 @@ public:
     bool isIncludeLocationPresenceGraphs() const { return m_includeLocationPresenceGraphs; }
     Q_SIGNAL void includeLocationPresenceGraphsChanged();
 
+    Q_CLASSINFO("considerPreferredGroupCategoryOnly_FieldGroup", "Basic")
+    Q_CLASSINFO("considerPreferredGroupCategoryOnly_FieldLabel", "Consider Preferred Group Category Only.")
+    Q_CLASSINFO("considerPreferredGroupCategoryOnly_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool considerPreferredGroupCategoryOnly READ isConsiderPreferredGroupCategoryOnly WRITE setConsiderPreferredGroupCategoryOnly NOTIFY considerPreferredGroupCategoryOnlyChanged)
+    void setConsiderPreferredGroupCategoryOnly(bool val);
+    bool isConsiderPreferredGroupCategoryOnly() const;
+    Q_SIGNAL void considerPreferredGroupCategoryOnlyChanged();
+
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldGroup", "Locations")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldLabel", "Maximum Number Of Locations")
     Q_CLASSINFO("maxLocationPresenceGraphs_FieldNote", "Value of ZERO, means you need all location's graphs plotted. If one or more locations are explicitly picked, then preference is given to them.")
@@ -228,6 +236,7 @@ private:
     QStringList m_characterNames;
     bool m_includeLocationPresenceGraphs = true;
     bool m_includeCharacterPresenceGraphs = true;
+    bool m_considerPreferredGroupCategoryOnly = true;
 };
 
 #endif // STATISTICSREPORT_H

@@ -88,6 +88,20 @@ void StatisticsReport::setIncludeLocationPresenceGraphs(bool val)
     emit includeLocationPresenceGraphsChanged();
 }
 
+void StatisticsReport::setConsiderPreferredGroupCategoryOnly(bool val)
+{
+    if (m_considerPreferredGroupCategoryOnly == val)
+        return;
+
+    m_considerPreferredGroupCategoryOnly = val;
+    emit considerPreferredGroupCategoryOnlyChanged();
+}
+
+bool StatisticsReport::isConsiderPreferredGroupCategoryOnly() const
+{
+    return m_considerPreferredGroupCategoryOnly;
+}
+
 void StatisticsReport::setMaxLocationPresenceGraphs(int val)
 {
     if (m_maxLocationPresenceGraphs == val)
