@@ -3075,6 +3075,9 @@ Rectangle {
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0
                     keyNavigationEnabled: false
+                    preferredHighlightEnd: height*0.8
+                    preferredHighlightBegin: height*0.2
+                    highlightRangeMode: ListView.ApplyRange
                     property bool hasEpisodes: screenplayAdapter.isSourceScreenplay ? screenplayAdapter.screenplay.episodeCount > 0 : false
 
                     FocusTracker.window: Scrite.window
@@ -3127,7 +3130,7 @@ Rectangle {
                         id: delegateItem
                         width: sceneListView.width-1
                         height: 40
-                        color: scene ? screenplayElement.selected ? selectedColor : normalColor
+                        color: scene ? screenplayAdapter.currentIndex === index ? selectedColor : normalColor
                                      : screenplayAdapter.currentIndex === index ? Scrite.app.translucent(accentColors.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
                         property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(primaryColors.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
@@ -3140,8 +3143,8 @@ Rectangle {
                             anchors.top: parent.top
                             anchors.left: parent.left
                             anchors.bottom: parent.bottom
-                            visible: screenplayElement.selected
-                            width: 5
+                            visible: screenplayAdapter.currentIndex === index
+                            width: 8
                             color: accentColors.windowColor
                         }
 
