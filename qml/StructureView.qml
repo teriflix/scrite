@@ -2458,6 +2458,7 @@ Item {
                 opacity: 0.5
                 showTooltip: false
                 sceneType: elementItem.element.scene.type
+                lightBackground: Scrite.app.isLightColor(background.color)
             }
 
             Image {
@@ -3006,24 +3007,24 @@ Item {
                     readonly property real spacing: 5
                     property bool lightBackground: Scrite.app.isLightColor(footerBackgrund.color)
 
-                    SceneTypeImage {
-                        id: sceneTypeImage
-                        width: 24; height: 24
-                        opacity: 0.5
-                        showTooltip: false
-                        sceneType: element.scene.type
-                        anchors.left: parent.left
-                        anchors.bottom: parent.bottom
-                        visible: sceneType !== Scene.Standard
-                        lightBackground: parent.lightBackground
-                    }
-
                     Rectangle {
                         id: footerBackgrund
                         anchors.fill: parent
                         anchors.margins: -5
                         property color baseColor: background.border.color
                         color: Qt.tint(baseColor, elementItem.selected ? "#70FFFFFF" : "#A0FFFFFF")
+                    }
+
+                    SceneTypeImage {
+                        id: sceneTypeImage
+                        width: 24; height: 24
+                        opacity: 0.5
+                        showTooltip: false
+                        sceneType: elementItem.element.scene.type
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        visible: sceneType !== Scene.Standard
+                        lightBackground: parent.lightBackground
                     }
 
                     Column {

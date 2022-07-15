@@ -2526,6 +2526,7 @@ Rectangle {
                     SceneTypeImage {
                         width: headingFontMetrics.height
                         height: width
+                        lightBackground: Scrite.app.isLightColor(headingItem.color)
                         anchors.verticalCenter: sceneNumberField.verticalCenter
                         anchors.verticalCenterOffset: -headingFontMetrics.descent
                         sceneType: headingItem.theScene.type
@@ -3155,6 +3156,7 @@ Rectangle {
                             sceneType: scene ? scene.type : Scene.Standard
                             opacity: (screenplayAdapter.currentIndex === index ? 1 : 0.5) * t
                             visible: t > 0
+                            lightBackground: Scrite.app.isLightColor(delegateItem.color)
                             property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
                             Behavior on t {
                                 enabled: applicationSettings.enableAnimations

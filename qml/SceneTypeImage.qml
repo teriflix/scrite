@@ -18,7 +18,7 @@ import QtQuick.Controls 2.15
 Image {
     property bool showTooltip: true
     property int sceneType: Scene.Standard
-    property bool lightBackground: false
+    property bool lightBackground: true
 
     width: 32; height: 32
     fillMode: Image.PreserveAspectFit
@@ -26,8 +26,8 @@ Image {
     source: {
         switch(sceneType) {
         case Scene.Song: return lightBackground ? "../icons/content/queue_mus24px.png" : "../icons/content/queue_mus24px_inverted.png"
-        case Scene.Action: return lightBackground ? "../icons/content/queue_mus24px.png" : "../icons/content/fight_scene_inverted.png"
-        case Scene.Montage: return lightBackground ? "../icons/content/queue_mus24px.png" : "../icons/content/camera_alt_inverted.png"
+        case Scene.Action: return lightBackground ? "../icons/content/fight_scene.png" : "../icons/content/fight_scene_inverted.png"
+        case Scene.Montage: return lightBackground ? "../icons/content/camera_alt.png" : "../icons/content/camera_alt_inverted.png"
         default: break
         }
         return ""

@@ -747,6 +747,7 @@ Item {
                         showTooltip: false
                         visible: !isBreakElement && parent.width > screenplayElementList.minimumDelegateWidthForTextVisibility
                         sceneType: elementItemDelegate.element.scene ? elementItemDelegate.element.scene.type : Scene.Standard
+                        lightBackground: Scrite.app.isLightColor(parent.color)
                     }
 
                     Image {
