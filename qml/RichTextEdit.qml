@@ -37,6 +37,7 @@ Item {
     property Item background
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
+    property bool editorHasFocus: scriteWebChannelObject.focus && webEngineView.activeFocus
     clip: true
 
     onBackgroundChanged: if(background) background.visible = false
@@ -48,6 +49,14 @@ Item {
         backgroundColor: "transparent"
         url: "qrc:/richtexteditor.html"
         webChannel: scriteWebChannel
+
+        UndoHandler {
+            enabled: !webEngineView.readOnly && scriteWebChannelObject.focus && webEngineView.activeFocus
+            canUndo: true
+            canRedo: true
+            onUndoRequest: scriteWebChannelObject.requestUndo()
+            onRedoRequest: scriteWebChannelObject.requestRedo()
+        }
 
         TransliterationHints.allowedMechanisms: TransliterationHints.TextInputSourceMechanism
 
@@ -108,6 +117,7 @@ Item {
         WebChannel.id: "scrite"
 
         readonly property string fontSizeUint: Scrite.app.isMacOSPlatform ? "px" : "pt"
+        property bool focus: false
 
         function contentUpdated(content) {
             webEngineView.contentUpdatedFromQuill = true
@@ -139,6 +149,8 @@ Item {
         signal requestContent(var content)
         signal requestReadOnly(bool readOnly)
         signal requestFocus(bool focus)
+        signal requestUndo()
+        signal requestRedo()
     }
 
     WebChannel {

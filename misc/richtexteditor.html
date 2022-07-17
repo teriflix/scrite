@@ -68,7 +68,12 @@
     <script>
     var quill = new Quill('#snow-container', {
         modules: {
-            toolbar: '#toolbar-container'
+            toolbar: '#toolbar-container',
+            history: {
+                delay: 2000,
+                maxStack: 500,
+                userOnly: true
+            }
         },
         placeholder: 'Type something here...',
         theme: 'snow'
@@ -80,6 +85,11 @@
             scrite = channel.objects.scrite
 
             const fontSizeUnit = scrite.fontSizeUint
+
+            window.setInterval( () => {
+                const focus = quill.hasFocus()
+                scrite.focus = focus
+            }, 500)
 
             quill.on('text-change', function(delta, oldDelta, source) {
                 if(source === "user") {
@@ -122,6 +132,14 @@
             scrite.requestFocus.connect( function(focus) {
                 if(focus)
                     quill.focus()
+            })
+
+            scrite.requestUndo.connect( function() {
+                quill.history.undo()
+            })
+
+            scrite.requestRedo.connect( function() {
+                quill.history.redo()
             })
 
             scrite.getInitialParameters( function(result) {
