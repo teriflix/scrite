@@ -285,7 +285,7 @@ Rectangle {
         property bool showPreview: true
         property bool displayAnnotationProperties: true
         property bool showPullHandleAnimation: true
-        property real lineWidthOfConnectors: 1
+        property real lineWidthOfConnectors: 1.5
     }
 
     Settings {
