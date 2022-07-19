@@ -531,6 +531,17 @@ Item {
         animatePanAndZoom: false
         property bool updateScriteDocumentUserDataEnabled: false
 
+        function enablePanAndZoomAnimation(delay) {
+            if(animatePanAndZoom === true)
+                return
+            if(delay === undefined || delay === null)
+                animatePanAndZoom = true;
+            else
+                Scrite.app.execLater(canvasScroll, delay, () => {
+                                        canvasScroll.animatePanAndZoom = true
+                                     })
+        }
+
         function updateScriteDocumentUserData() {
             if(!updateScriteDocumentUserDataEnabled || Scrite.document.readOnly || animatingPanOrZoom)
                 return
@@ -563,7 +574,7 @@ Item {
                     Scrite.app.execLater(canvasScroll, 500, function() {
                         var area = canvasItemsBoundingBox.boundingBox
                         canvasScroll.zoomFit(area)
-                        canvasScroll.animatePanAndZoom = true
+                        canvasScroll.enablePanAndZoomAnimation(2000)
                     })
                 }
             } else {
@@ -577,8 +588,7 @@ Item {
                         canvasScroll.ensureItemVisible(item, canvas.scale)
                 } else
                     canvasScroll.zoomOneMiddleArea()
-
-                Qt.callLater( function() { canvasScroll.animatePanAndZoom = true } )
+                canvasScroll.enablePanAndZoomAnimation(2000)
             }
 
             if(Scrite.document.structure.forceBeatBoardLayout)
