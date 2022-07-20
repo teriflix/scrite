@@ -74,7 +74,7 @@ Column {
         border.width: 1
         border.color: Scrite.app.translucent(primaryColors.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
-        property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength === FormQuestion.ShortParagraph ? 1 : 3)
+        property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1 : 3)
 
         MouseArea {
             anchors.fill: parent

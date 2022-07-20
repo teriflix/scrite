@@ -95,8 +95,10 @@ void Note::setForm(Form *val)
     m_form = val;
 
     if (!m_form.isNull()) {
-        this->setTitle(m_form->title());
-        this->setSummary(m_form->subtitle());
+        if (m_title.isEmpty())
+            this->setTitle(m_form->title());
+        if (m_summary.isEmpty())
+            this->setSummary(m_form->subtitle());
 
         if (m_formData.isEmpty()) {
             m_formData = m_form->formDataTemplate();
