@@ -20,6 +20,7 @@
 #include "application.h"
 #include "focustracker.h"
 #include "timeprofiler.h"
+#include "deltadocument.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "structureexporter.h"
@@ -32,6 +33,8 @@
 #include <QMimeData>
 #include <QDateTime>
 #include <QJSEngine>
+#include <QTextTable>
+#include <QTextFrame>
 #include <QClipboard>
 #include <QScopeGuard>
 #include <QQuickWindow>
@@ -1715,6 +1718,155 @@ void Character::resolveRelationships()
         rel->resolveRelationship();
 }
 
+void Character::write(QTextCursor &cursor, const WriteOptions &options) const
+{
+    QTextDocument &document = *cursor.document();
+
+    // Character name
+    QTextBlockFormat characaterNameBlockFormat;
+    characaterNameBlockFormat.setTopMargin(10);
+    characaterNameBlockFormat.setHeadingLevel(options.headingLevel);
+
+    QTextCharFormat characterNameCharFormat;
+    characterNameCharFormat.setFontWeight(QFont::Bold);
+    characterNameCharFormat.setFontPointSize(
+            QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
+    characaterNameBlockFormat.setTopMargin(characterNameCharFormat.fontPointSize() / 2);
+
+    if (cursor.block().text().isEmpty()) {
+        cursor.setBlockCharFormat(characterNameCharFormat);
+        cursor.setBlockFormat(characaterNameBlockFormat);
+    } else
+        cursor.insertBlock(characaterNameBlockFormat, characterNameCharFormat);
+
+    cursor.insertText(m_name);
+
+    // Character meta-data table
+    QTextTableFormat tableFormat;
+    tableFormat.setCellPadding(1);
+    tableFormat.setCellSpacing(0);
+    tableFormat.setLeftMargin(10);
+    tableFormat.setTopMargin(10);
+
+    QTextFrame *frame = cursor.currentFrame();
+    QTextTable *table = cursor.insertTable(6, this->hasKeyPhoto() ? 3 : 2, tableFormat);
+    QTextTableCellFormat cellFormat; // = table->cellAt(0, 0).format();
+    cellFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+    for (int tr = 0; tr < table->rows(); tr++) {
+        for (int tc = 0; tc < table->columns(); tc++) {
+            table->cellAt(tr, tc).setFormat(cellFormat);
+        }
+    }
+
+    if (this->hasKeyPhoto()) {
+        table->mergeCells(0, 0, 6, 1);
+
+        const QImage image(this->keyPhoto());
+        const qreal imageScale = 120.0 / image.width();
+        const QSizeF imageSize = image.size() * imageScale;
+        const QUrl imageName(
+                QLatin1String("character://") + m_name.toLatin1().toHex() + QLatin1String("/")
+                + QString::number(m_structure->indexOfCharacter(const_cast<Character *>(this))));
+        document.addResource(QTextDocument::ImageResource, imageName, image);
+
+        QTextImageFormat imageFormat;
+        imageFormat.setWidth(imageSize.width());
+        imageFormat.setHeight(imageSize.height());
+        imageFormat.setName(imageName.toString());
+
+        cursor = table->cellAt(0, 0).firstCursorPosition();
+        cursor.insertImage(imageFormat);
+    }
+
+    const int col = this->hasKeyPhoto() ? 1 : 0;
+
+    table->mergeCells(0, col, 1, 2);
+    cursor = table->cellAt(0, col).firstCursorPosition();
+    cursor.insertText(QLatin1String("Role: ") + this->designation());
+
+    table->mergeCells(1, col, 1, 2);
+    cursor = table->cellAt(1, col).firstCursorPosition();
+    cursor.insertText(QLatin1String("Tags: ") + this->tags().join(QLatin1String(", ")));
+
+    table->mergeCells(2, col, 1, 2);
+    cursor = table->cellAt(2, col).firstCursorPosition();
+    cursor.insertText(QLatin1String("Aliases: ") + this->aliases().join(QLatin1String(", ")));
+
+    cursor = table->cellAt(3, col).firstCursorPosition();
+    cursor.insertText(QLatin1String("Type: ") + this->type());
+
+    cursor = table->cellAt(3, col + 1).firstCursorPosition();
+    cursor.insertText(QLatin1String("Gender: ") + this->gender());
+
+    cursor = table->cellAt(4, col).firstCursorPosition();
+    cursor.insertText(QLatin1String("Age: ") + this->age());
+
+    cursor = table->cellAt(4, col + 1).firstCursorPosition();
+    cursor.insertText(QLatin1String("Body Type: ") + this->bodyType());
+
+    cursor = table->cellAt(5, col).firstCursorPosition();
+    cursor.insertText(QLatin1String("Height: ") + this->height());
+
+    cursor = table->cellAt(5, col + 1).firstCursorPosition();
+    cursor.insertText(QLatin1String("Weight: ") + this->weight());
+
+    cursor = frame->lastCursorPosition();
+
+    // Character Summary
+    auto addSection = [&cursor, options](const QString &sectionName) {
+        QTextBlockFormat sectionBlockFormat;
+        sectionBlockFormat.setHeadingLevel(options.headingLevel + 1);
+
+        QTextCharFormat sectionCharFormat;
+        sectionCharFormat.setFontWeight(QFont::Bold);
+        sectionCharFormat.setFontPointSize(
+                QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
+        sectionBlockFormat.setTopMargin(sectionCharFormat.fontPointSize() / 2);
+
+        cursor.insertBlock(sectionBlockFormat, sectionCharFormat);
+        cursor.insertText(sectionName);
+
+        QTextBlockFormat nextBlockFormat;
+        nextBlockFormat.setHeadingLevel(0);
+
+        QTextCharFormat nextCharFormat;
+        nextCharFormat.setFontWeight(QFont::Normal);
+        nextCharFormat.setFontPointSize(cursor.document()->defaultFont().pointSizeF());
+        nextBlockFormat.setTopMargin(nextCharFormat.fontPointSize() / 2);
+
+        cursor.insertBlock(nextBlockFormat, nextCharFormat);
+    };
+
+    if (options.includeSummary) {
+        if (m_summary.isString()) {
+            const QString summary = m_summary.toString();
+            if (!summary.isEmpty()) {
+                addSection(QLatin1String("Summary"));
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, summary);
+            }
+        } else {
+            const QJsonObject summary = m_summary.toObject();
+            if (!summary.isEmpty()) {
+                const DeltaDocument::ResolveResult result = DeltaDocument::blockingResolve(summary);
+                if (!result.htmlText.isEmpty()) {
+                    addSection(QLatin1String("Summary"));
+                    cursor.insertHtml(result.htmlText);
+                }
+            }
+        }
+    }
+
+    // Character notes
+    if (options.includeTextNotes || options.includeFormNotes) {
+        if (m_notes) {
+            Notes::WriteOptions notesOptions;
+            notesOptions.includeFormNotes = options.includeFormNotes;
+            notesOptions.includeTextNotes = options.includeTextNotes;
+            m_notes->write(cursor, notesOptions);
+        }
+    }
+}
+
 bool Character::event(QEvent *event)
 {
     if (event->type() == QEvent::ParentChange) {
@@ -2593,6 +2745,11 @@ void Structure::removeCharacter(Character *ptr)
 Character *Structure::characterAt(int index) const
 {
     return index < 0 || index >= m_characters.size() ? nullptr : m_characters.at(index);
+}
+
+int Structure::indexOfCharacter(Character *ptr) const
+{
+    return ptr == nullptr ? -1 : m_characters.indexOf(ptr);
 }
 
 void Structure::setCharacters(const QList<Character *> &list)
@@ -4492,6 +4649,18 @@ QStringList Structure::sortCharacterNames(const QStringList &givenNames) const
     });
 
     return names;
+}
+
+void Structure::write(QTextCursor &cursor, const WriteOptions &options) const
+{
+    if (options.includeTextNotes || options.includeFormNotes) {
+        if (m_notes) {
+            Notes::WriteOptions notesOptions;
+            notesOptions.includeFormNotes = options.includeFormNotes;
+            notesOptions.includeTextNotes = options.includeTextNotes;
+            m_notes->write(cursor, notesOptions);
+        }
+    }
 }
 
 bool Structure::event(QEvent *event)

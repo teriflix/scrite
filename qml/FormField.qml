@@ -74,7 +74,7 @@ Column {
         border.width: 1
         border.color: Scrite.app.translucent(primaryColors.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
-        property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1 : 3)
+        property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 
         MouseArea {
             anchors.fill: parent
@@ -96,7 +96,8 @@ Column {
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 text: formField.answer === "" ? formField.placeholderText : formField.answer
                 opacity: formField.answer === "" ? 0.5 : 1
-                padding: 5
+                leftPadding: 5; rightPadding: 5
+                topPadding: 5; bottomPadding: 5
                 Transliterator.textDocument: textDocument
                 Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 readOnly: true

@@ -107,7 +107,8 @@ public:
     Q_INVOKABLE QString
     textInputSourceIdForLanguage(TransliterationEngine::Language language) const;
 
-    Q_PROPERTY(QJsonObject languageTextInputSourceMap READ languageTextInputSourceMap NOTIFY languageTextInputSourceMapChanged)
+    Q_PROPERTY(QJsonObject languageTextInputSourceMap READ languageTextInputSourceMap NOTIFY
+                       languageTextInputSourceMapChanged)
     QJsonObject languageTextInputSourceMap() const;
     Q_SIGNAL void languageTextInputSourceMapChanged();
 
@@ -186,12 +187,14 @@ public:
     explicit FontSyntaxHighlighter(QObject *parent = nullptr);
     ~FontSyntaxHighlighter();
 
-    Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY enforceDefaultFontChanged)
+    Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY
+                       enforceDefaultFontChanged)
     void setEnforceDefaultFont(bool val);
     bool isEnforceDefaultFont() const { return m_enforceDefaultFont; }
     Q_SIGNAL void enforceDefaultFontChanged();
 
-    Q_PROPERTY(bool enforceHeadingFontSize READ isEnforceHeadingFontSize WRITE setEnforceHeadingFontSize NOTIFY enforceHeadingFontSizeChanged)
+    Q_PROPERTY(bool enforceHeadingFontSize READ isEnforceHeadingFontSize WRITE
+                       setEnforceHeadingFontSize NOTIFY enforceHeadingFontSizeChanged)
     void setEnforceHeadingFontSize(bool val);
     bool isEnforceHeadingFontSize() const { return m_enforceHeadingFontSize; }
     Q_SIGNAL void enforceHeadingFontSizeChanged();
@@ -222,42 +225,50 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(QQuickTextDocument* textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
+    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
+                       textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QQuickTextDocument *val);
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
-    Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
+    Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE
+                       setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
     void setTextDocumentUndoRedoEnabled(bool val);
     bool isTextDocumentUndoRedoEnabled() const { return m_textDocumentUndoRedoEnabled; }
     Q_SIGNAL void textDocumentUndoRedoEnabledChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(bool hasActiveFocus READ hasActiveFocus WRITE setHasActiveFocus NOTIFY hasActiveFocusChanged)
+    Q_PROPERTY(bool hasActiveFocus READ hasActiveFocus WRITE setHasActiveFocus NOTIFY
+                       hasActiveFocusChanged)
     void setHasActiveFocus(bool val);
     bool hasActiveFocus() const { return m_hasActiveFocus; }
     Q_SIGNAL void hasActiveFocusChanged();
 
-    Q_PROPERTY(bool applyLanguageFonts READ isApplyLanguageFonts WRITE setApplyLanguageFonts NOTIFY applyLanguageFontsChanged)
+    Q_PROPERTY(bool applyLanguageFonts READ isApplyLanguageFonts WRITE setApplyLanguageFonts NOTIFY
+                       applyLanguageFontsChanged)
     void setApplyLanguageFonts(bool val);
     bool isApplyLanguageFonts() const { return m_applyLanguageFonts; }
     Q_SIGNAL void applyLanguageFontsChanged();
 
-    Q_PROPERTY(bool enforeDefaultFont READ isEnforeDefaultFont WRITE setEnforeDefaultFont NOTIFY enforeDefaultFontChanged)
+    Q_PROPERTY(bool enforeDefaultFont READ isEnforeDefaultFont WRITE setEnforeDefaultFont NOTIFY
+                       enforeDefaultFontChanged)
     void setEnforeDefaultFont(bool val);
     bool isEnforeDefaultFont() const { return m_enforeDefaultFont; }
     Q_SIGNAL void enforeDefaultFontChanged();
 
-    Q_PROPERTY(bool enforceHeadingFontSize READ isEnforceHeadingFontSize WRITE setEnforceHeadingFontSize NOTIFY enforceHeadingFontSizeChanged)
+    Q_PROPERTY(bool enforceHeadingFontSize READ isEnforceHeadingFontSize WRITE
+                       setEnforceHeadingFontSize NOTIFY enforceHeadingFontSizeChanged)
     void setEnforceHeadingFontSize(bool val);
     bool isEnforceHeadingFontSize() const { return m_enforceHeadingFontSize; }
     Q_SIGNAL void enforceHeadingFontSizeChanged();
 
-    Q_PROPERTY(bool transliterateCurrentWordOnly READ isTransliterateCurrentWordOnly WRITE setTransliterateCurrentWordOnly NOTIFY transliterateCurrentWordOnlyChanged)
+    Q_PROPERTY(bool transliterateCurrentWordOnly READ isTransliterateCurrentWordOnly WRITE
+                       setTransliterateCurrentWordOnly NOTIFY transliterateCurrentWordOnlyChanged)
     void setTransliterateCurrentWordOnly(bool val);
     bool isTransliterateCurrentWordOnly() const { return m_transliterateCurrentWordOnly; }
     Q_SIGNAL void transliterateCurrentWordOnlyChanged();
@@ -405,7 +416,8 @@ public:
     Q_DECLARE_FLAGS(AllowedMechanisms, AllowedMechanism)
     Q_FLAG(AllowedMechanisms)
 
-    Q_PROPERTY(AllowedMechanisms allowedMechanisms READ allowedMechanisms WRITE setAllowedMechanisms NOTIFY allowedMechanismsChanged)
+    Q_PROPERTY(AllowedMechanisms allowedMechanisms READ allowedMechanisms WRITE setAllowedMechanisms
+                       NOTIFY allowedMechanismsChanged)
     void setAllowedMechanisms(AllowedMechanisms val);
     AllowedMechanisms allowedMechanisms() const { return m_allowedMechanisms; }
     Q_SIGNAL void allowedMechanismsChanged();
@@ -415,6 +427,14 @@ private:
 
 private:
     AllowedMechanisms m_allowedMechanisms = AllMechanisms;
+};
+
+class TransliterationUtils
+{
+public:
+    static void polishFontsAndInsertTextAtCursor(
+            QTextCursor &cursor, const QString &text,
+            const QVector<QTextLayout::FormatRange> &formats = QVector<QTextLayout::FormatRange>());
 };
 
 #endif // TRANSLITERATION_H

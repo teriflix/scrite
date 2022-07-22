@@ -27,6 +27,7 @@
 #include "notification.h"
 #include "htmlimporter.h"
 #include "timeprofiler.h"
+#include "notebookreport.h"
 #include "qobjectfactory.h"
 #include "locationreport.h"
 #include "characterreport.h"
@@ -332,6 +333,7 @@ DeviceIOFactories::DeviceIOFactories()
     ReportsFactory.addClass<CharacterScreenplayReport>();
     ReportsFactory.addClass<SceneCharacterMatrixReport>();
     ReportsFactory.addClass<StatisticsReport>();
+    ReportsFactory.addClass<NotebookReport>();
 }
 
 DeviceIOFactories::~DeviceIOFactories() { }

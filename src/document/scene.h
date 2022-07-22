@@ -55,7 +55,7 @@ public:
     explicit SceneHeading(QObject *parent = nullptr);
     ~SceneHeading();
 
-    Q_PROPERTY(Scene* scene READ scene CONSTANT STORED false)
+    Q_PROPERTY(Scene *scene READ scene CONSTANT STORED false)
     Scene *scene() const { return m_scene; }
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
@@ -63,7 +63,8 @@ public:
     bool isEnabled() const { return m_enabled; }
     Q_SIGNAL void enabledChanged();
 
-    Q_PROPERTY(QString locationType READ locationType WRITE setLocationType NOTIFY locationTypeChanged)
+    Q_PROPERTY(
+            QString locationType READ locationType WRITE setLocationType NOTIFY locationTypeChanged)
     void setLocationType(const QString &val);
     QString locationType() const { return m_locationType; }
     Q_SIGNAL void locationTypeChanged();
@@ -118,10 +119,10 @@ public:
     ~SceneElement();
     Q_SIGNAL void aboutToDelete(SceneElement *element);
 
-    Q_PROPERTY(Scene* scene READ scene CONSTANT STORED false)
+    Q_PROPERTY(Scene *scene READ scene CONSTANT STORED false)
     Scene *scene() const { return m_scene; }
 
-    Q_PROPERTY(SpellCheckService* spellCheck READ spellCheck CONSTANT STORED false)
+    Q_PROPERTY(SpellCheckService *spellCheck READ spellCheck CONSTANT STORED false)
     SpellCheckService *spellCheck() const;
 
     /*
@@ -161,7 +162,8 @@ public:
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged(const QString &val);
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged STORED false)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged STORED false)
     void setCursorPosition(int val);
     int cursorPosition() const;
     Q_SIGNAL void cursorPositionChanged();
@@ -283,7 +285,8 @@ public:
 
     Scene *clone(QObject *parent) const;
 
-    Q_PROPERTY(StructureElement* structureElement READ structureElement NOTIFY structureElementChanged STORED false)
+    Q_PROPERTY(StructureElement *structureElement READ structureElement NOTIFY
+                       structureElementChanged STORED false)
     StructureElement *structureElement() const { return m_structureElement; }
     Q_SIGNAL void structureElementChanged();
 
@@ -312,12 +315,14 @@ public:
 
     Q_INVOKABLE void trimTitle();
 
-    Q_PROPERTY(QString emotionalChange READ emotionalChange WRITE setEmotionalChange NOTIFY emotionalChangeChanged)
+    Q_PROPERTY(QString emotionalChange READ emotionalChange WRITE setEmotionalChange NOTIFY
+                       emotionalChangeChanged)
     void setEmotionalChange(const QString &val);
     QString emotionalChange() const { return m_emotionalChange; }
     Q_SIGNAL void emotionalChangeChanged();
 
-    Q_PROPERTY(QString charactersInConflict READ charactersInConflict WRITE setCharactersInConflict NOTIFY charactersInConflictChanged)
+    Q_PROPERTY(QString charactersInConflict READ charactersInConflict WRITE setCharactersInConflict
+                       NOTIFY charactersInConflictChanged)
     void setCharactersInConflict(const QString &val);
     QString charactersInConflict() const { return m_charactersInConflict; }
     Q_SIGNAL void charactersInConflictChanged();
@@ -363,17 +368,19 @@ public:
     bool isBeingReset() const { return m_isBeingReset; }
     Q_SIGNAL void resetStateChanged();
 
-    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY undoRedoEnabledChanged STORED false)
+    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY
+                       undoRedoEnabledChanged STORED false)
     void setUndoRedoEnabled(bool val);
     bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
     Q_SIGNAL void undoRedoEnabledChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged STORED false)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged STORED false)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(SceneHeading* heading READ heading CONSTANT)
+    Q_PROPERTY(SceneHeading *heading READ heading CONSTANT)
     SceneHeading *heading() const { return m_heading; }
 
     Q_PROPERTY(bool hasCharacters READ hasCharacters NOTIFY characterNamesChanged)
@@ -410,7 +417,8 @@ public:
     QString episode() const { return m_episode; }
     Q_SIGNAL void episodeChanged();
 
-    Q_PROPERTY(QList<int> screenplayElementIndexList READ screenplayElementIndexList NOTIFY screenplayElementIndexListChanged STORED false)
+    Q_PROPERTY(QList<int> screenplayElementIndexList READ screenplayElementIndexList NOTIFY
+                       screenplayElementIndexListChanged STORED false)
     void setScreenplayElementIndexList(const QList<int> &val);
     QList<int> screenplayElementIndexList() const { return m_screenplayElementIndexList; }
     Q_SIGNAL void screenplayElementIndexListChanged();
@@ -455,7 +463,7 @@ public:
     Q_SIGNAL void sceneAboutToReset();
     Q_SIGNAL void sceneReset(int elementIndex);
 
-    Q_PROPERTY(Notes* notes READ notes CONSTANT)
+    Q_PROPERTY(Notes *notes READ notes CONSTANT)
     Notes *notes() const { return m_notes; }
 
     Q_INVOKABLE void beginUndoCapture(bool allowMerging = true);
@@ -478,12 +486,13 @@ public:
     bool resetFromByteArray(const QByteArray &bytes);
     static Scene *fromByteArray(const QByteArray &bytes);
 
-    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
+    Q_PROPERTY(QJsonObject characterRelationshipGraph READ characterRelationshipGraph WRITE
+                       setCharacterRelationshipGraph NOTIFY characterRelationshipGraphChanged)
     void setCharacterRelationshipGraph(const QJsonObject &val);
     QJsonObject characterRelationshipGraph() const { return m_characterRelationshipGraph; }
     Q_SIGNAL void characterRelationshipGraphChanged();
 
-    Q_PROPERTY(Attachments* attachments READ attachments CONSTANT)
+    Q_PROPERTY(Attachments *attachments READ attachments CONSTANT)
     Attachments *attachments() const { return m_attachments; }
 
     // QObjectSerializer::Interface interface
@@ -491,6 +500,20 @@ public:
     void deserializeFromJson(const QJsonObject &json);
     bool canSetPropertyFromObjectList(const QString &propName) const;
     void setPropertyFromObjectList(const QString &propName, const QList<QObject *> &objects);
+
+    // Text Document Export Support
+    struct WriteOptions
+    {
+        int headingLevel = 3;
+        bool includeFeaturedPhoto = true;
+        bool includeSynopsis = true;
+        bool includeComments = true;
+        bool includeContent = false;
+        bool includeTextNotes = true;
+        bool includeFormNotes = true;
+        bool includeHeading = true;
+    };
+    void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
 protected:
     bool event(QEvent *event);
@@ -559,22 +582,24 @@ public:
     explicit SceneSizeHintItem(QQuickItem *parent = nullptr);
     ~SceneSizeHintItem();
 
-    Q_PROPERTY(Scene* scene READ scene WRITE setScene NOTIFY sceneChanged RESET sceneReset)
+    Q_PROPERTY(Scene *scene READ scene WRITE setScene NOTIFY sceneChanged RESET sceneReset)
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
-    Q_PROPERTY(bool trackSceneChanges READ trackSceneChanges WRITE setTrackSceneChanges NOTIFY trackSceneChangesChanged)
+    Q_PROPERTY(bool trackSceneChanges READ trackSceneChanges WRITE setTrackSceneChanges NOTIFY
+                       trackSceneChangesChanged)
     void setTrackSceneChanges(bool val);
     bool trackSceneChanges() const { return m_trackSceneChanges; }
     Q_SIGNAL void trackSceneChangesChanged();
 
-    Q_PROPERTY(ScreenplayFormat* format READ format WRITE setFormat NOTIFY formatChanged)
+    Q_PROPERTY(ScreenplayFormat *format READ format WRITE setFormat NOTIFY formatChanged)
     void setFormat(ScreenplayFormat *val);
     ScreenplayFormat *format() const { return m_format; }
     Q_SIGNAL void formatChanged();
 
-    Q_PROPERTY(bool trackFormatChanges READ trackFormatChanges WRITE setTrackFormatChanges NOTIFY trackFormatChangesChanged)
+    Q_PROPERTY(bool trackFormatChanges READ trackFormatChanges WRITE setTrackFormatChanges NOTIFY
+                       trackFormatChangesChanged)
     void setTrackFormatChanges(bool val);
     bool trackFormatChanges() const { return m_trackFormatChanges; }
     Q_SIGNAL void trackFormatChangesChanged();
@@ -594,7 +619,8 @@ public:
     qreal topMargin() const { return m_topMargin; }
     Q_SIGNAL void topMarginChanged();
 
-    Q_PROPERTY(qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
+    Q_PROPERTY(
+            qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
     void setBottomMargin(qreal val);
     qreal bottomMargin() const { return m_bottomMargin; }
     Q_SIGNAL void bottomMarginChanged();
@@ -607,7 +633,8 @@ public:
     qreal contentHeight() const { return m_contentHeight; }
     Q_SIGNAL void contentHeightChanged();
 
-    Q_PROPERTY(bool hasPendingComputeSize READ hasPendingComputeSize NOTIFY hasPendingComputeSizeChanged)
+    Q_PROPERTY(bool hasPendingComputeSize READ hasPendingComputeSize NOTIFY
+                       hasPendingComputeSizeChanged)
     bool hasPendingComputeSize() const { return m_hasPendingComputeSize; }
     Q_SIGNAL void hasPendingComputeSizeChanged();
 
@@ -683,7 +710,7 @@ public:
     bool hasSceneActs() const { return !m_sceneActs.isEmpty(); }
 
     // Custom properties
-    Q_PROPERTY(Structure* structure READ structure WRITE setStructure NOTIFY structureChanged)
+    Q_PROPERTY(Structure *structure READ structure WRITE setStructure NOTIFY structureChanged)
     void setStructure(Structure *val);
     Structure *structure() const { return m_structure; }
     Q_SIGNAL void structureChanged();

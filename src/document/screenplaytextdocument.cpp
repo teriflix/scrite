@@ -1079,29 +1079,6 @@ void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
     }
 }
 
-inline void polishFontsAndInsertTextAtCursor(
-        QTextCursor &cursor, const QString &text,
-        const QVector<QTextLayout::FormatRange> &formats = QVector<QTextLayout::FormatRange>())
-{
-    const int startPos = cursor.position();
-    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, text);
-    const int endPos = cursor.position();
-
-    if (!formats.isEmpty()) {
-        cursor.setPosition(startPos);
-        for (const QTextLayout::FormatRange &formatRange : formats) {
-            const int length = qMin(startPos + formatRange.start + formatRange.length - 1, endPos)
-                    - (startPos + formatRange.start - 1);
-            cursor.setPosition(startPos + formatRange.start);
-            if (length > 0) {
-                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, length);
-                cursor.mergeCharFormat(formatRange.format);
-            }
-        }
-        cursor.setPosition(endPos);
-    }
-}
-
 #ifdef DISPLAY_DOCUMENT_IN_TEXTEDIT
 #include <QTextEdit>
 #endif // DISPLAY_DOCUMENT_IN_TEXTEDIT
@@ -1439,7 +1416,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         if (m_purpose == ForDisplay)
             cursor.insertText(characterName);
         else
-            polishFontsAndInsertTextAtCursor(cursor, characterName);
+            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, characterName);
 
         QTextCharFormat contdMarkerFormat;
         contdMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
@@ -1545,8 +1522,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart1);
                     else
-                        polishFontsAndInsertTextAtCursor(cursor, blockTextPart1,
-                                                         dialogElement->textFormats());
+                        TransliterationUtils::polishFontsAndInsertTextAtCursor(
+                                cursor, blockTextPart1, dialogElement->textFormats());
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
 
@@ -1554,7 +1531,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart2);
                     else
-                        polishFontsAndInsertTextAtCursor(
+                        TransliterationUtils::polishFontsAndInsertTextAtCursor(
                                 cursor, blockTextPart2,
                                 [](const QVector<QTextLayout::FormatRange> &formats, int position) {
                                     if (position == 0)
@@ -2438,11 +2415,12 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             prepareCursor(cursor, SceneElement::Heading, !insertBlock);
 
             if (m_purpose == ForPrinting) {
-                polishFontsAndInsertTextAtCursor(cursor, heading->locationType());
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
+                                                                       heading->locationType());
                 cursor.insertText(QStringLiteral(". "));
-                polishFontsAndInsertTextAtCursor(cursor, heading->location());
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, heading->location());
                 cursor.insertText(QStringLiteral(" - "));
-                polishFontsAndInsertTextAtCursor(cursor, heading->moment());
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, heading->moment());
             } else {
                 if (m_sceneNumbers)
                     cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
@@ -2599,7 +2577,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             cursor.insertBlock(blockFormat, charFormat);
             // cursor.insertText(synopsis);
-            polishFontsAndInsertTextAtCursor(cursor, synopsis);
+            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
 
             insertBlock = true;
         }
@@ -2628,7 +2606,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
                 cursor.insertBlock(blockFormat, charFormat);
                 // cursor.insertText(synopsis);
-                polishFontsAndInsertTextAtCursor(cursor, comments);
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, comments);
 
                 insertBlock = true;
             }
@@ -2672,7 +2650,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             const QString text = para->text();
             if (m_purpose == ForPrinting)
-                polishFontsAndInsertTextAtCursor(cursor, text, para->textFormats());
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, text,
+                                                                       para->textFormats());
             else
                 cursor.insertText(text);
 

@@ -2249,6 +2249,56 @@ QHash<int, QByteArray> Screenplay::roleNames() const
     return roles;
 }
 
+void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
+{
+    if (options.includeTextNotes || options.includeFormNotes) {
+        auto addSection = [&cursor, options](const QString &sectionName) {
+            QTextBlockFormat sectionBlockFormat;
+            sectionBlockFormat.setHeadingLevel(3);
+
+            QTextCharFormat sectionCharFormat;
+            sectionCharFormat.setFontWeight(QFont::Bold);
+            sectionCharFormat.setFontPointSize(16);
+            sectionBlockFormat.setTopMargin(sectionCharFormat.fontPointSize() / 2);
+
+            cursor.insertBlock(sectionBlockFormat, sectionCharFormat);
+            cursor.insertText(sectionName);
+
+            QTextBlockFormat nextBlockFormat;
+            nextBlockFormat.setHeadingLevel(0);
+
+            QTextCharFormat nextCharFormat;
+            nextCharFormat.setFontWeight(QFont::Normal);
+            nextCharFormat.setFontPointSize(cursor.document()->defaultFont().pointSizeF());
+            nextBlockFormat.setTopMargin(nextCharFormat.fontPointSize() / 2);
+
+            cursor.insertBlock(nextBlockFormat, nextCharFormat);
+        };
+
+        for (ScreenplayElement *element : m_elements) {
+            switch (element->elementType()) {
+            case ScreenplayElement::SceneElementType: {
+                const Scene *scene = element->scene();
+                QString heading = scene->heading() && scene->heading()->isEnabled()
+                        ? scene->heading()->text()
+                        : scene->structureElement()->title();
+                if (scene->heading() && scene->heading()->isEnabled())
+                    heading = element->resolvedSceneNumber() + QLatin1String(". ") + heading;
+                addSection(heading);
+
+                Scene::WriteOptions options;
+                options.headingLevel = 4;
+                options.includeHeading = false;
+                scene->write(cursor, options);
+            } break;
+            case ScreenplayElement::BreakElementType: {
+                addSection(element->breakTitle() + QLatin1String(" - ") + element->breakSubtitle());
+            } break;
+            }
+        }
+    }
+}
+
 bool Screenplay::event(QEvent *event)
 {
     if (event->type() == QEvent::ParentChange)

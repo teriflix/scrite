@@ -263,17 +263,20 @@ public:
     int objectCount() const { return this->rowCount(QModelIndex()); }
     Q_SIGNAL void objectCountChanged();
 
-    Q_PROPERTY(QByteArray sortByProperty READ sortByProperty WRITE setSortByProperty NOTIFY sortByPropertyChanged)
+    Q_PROPERTY(QByteArray sortByProperty READ sortByProperty WRITE setSortByProperty NOTIFY
+                       sortByPropertyChanged)
     void setSortByProperty(const QByteArray &val);
     QByteArray sortByProperty() const { return m_sortByProperty; }
     Q_SIGNAL void sortByPropertyChanged();
 
-    Q_PROPERTY(QByteArray filterByProperty READ filterByProperty WRITE setFilterByProperty NOTIFY filterByPropertyChanged)
+    Q_PROPERTY(QByteArray filterByProperty READ filterByProperty WRITE setFilterByProperty NOTIFY
+                       filterByPropertyChanged)
     void setFilterByProperty(const QByteArray &val);
     QByteArray filterByProperty() const { return m_filterByProperty; }
     Q_SIGNAL void filterByPropertyChanged();
 
-    Q_PROPERTY(QVariantList filterValues READ filterValues WRITE setFilterValues NOTIFY filterValuesChanged)
+    Q_PROPERTY(QVariantList filterValues READ filterValues WRITE setFilterValues NOTIFY
+                       filterValuesChanged)
     void setFilterValues(const QVariantList &val);
     QVariantList filterValues() const { return m_filterValues; }
     Q_SIGNAL void filterValuesChanged();
@@ -285,12 +288,14 @@ public:
     FilterMode filterMode() const { return m_filterMode; }
     Q_SIGNAL void filterModeChanged();
 
-    Q_PROPERTY(QJSValue sortFunction READ sortFunction WRITE setSortFunction NOTIFY sortFunctionChanged)
+    Q_PROPERTY(QJSValue sortFunction READ sortFunction WRITE setSortFunction NOTIFY
+                       sortFunctionChanged)
     void setSortFunction(const QJSValue &val);
     QJSValue sortFunction() const { return m_sortFunction; }
     Q_SIGNAL void sortFunctionChanged();
 
-    Q_PROPERTY(QJSValue filterFunction READ filterFunction WRITE setFilterFunction NOTIFY filterFunctionChanged)
+    Q_PROPERTY(QJSValue filterFunction READ filterFunction WRITE setFilterFunction NOTIFY
+                       filterFunctionChanged)
     void setFilterFunction(const QJSValue &val);
     QJSValue filterFunction() const { return m_filterFunction; }
     Q_SIGNAL void filterFunctionChanged();

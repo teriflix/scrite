@@ -43,6 +43,7 @@ public:
 
     struct ResolveResult
     {
+        ResolveResult() { }
         ResolveResult(int _callId, const QString &_plainText, const QString &_htmlText)
             : callId(_callId), plainText(_plainText), htmlText(_htmlText)
         {

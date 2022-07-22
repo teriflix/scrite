@@ -112,6 +112,7 @@ HEADERS += \
     src/quick/items/painterpathitem.h \
     src/reports/characterreport.h \
     src/reports/locationreport.h \
+    src/reports/notebookreport.h \
     src/reports/scenecharactermatrixreport.h \
     src/reports/statisticsreport.h \
     src/reports/statisticsreport_p.h \
@@ -234,6 +235,7 @@ SOURCES += \
     src/quick/items/ruleritem.cpp \
     src/reports/characterreport.cpp \
     src/reports/locationreport.cpp \
+    src/reports/notebookreport.cpp \
     src/reports/scenecharactermatrixreport.cpp \
     src/reports/statisticsreport.cpp \
     src/reports/statisticsreport_p.cpp \

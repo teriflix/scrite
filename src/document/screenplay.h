@@ -54,7 +54,8 @@ public:
 
     enum ElementType { SceneElementType, BreakElementType };
     Q_ENUM(ElementType)
-    Q_PROPERTY(ElementType elementType READ elementType WRITE setElementType NOTIFY elementTypeChanged)
+    Q_PROPERTY(
+            ElementType elementType READ elementType WRITE setElementType NOTIFY elementTypeChanged)
     void setElementType(ElementType val);
     ElementType elementType() const { return m_elementType; }
     Q_SIGNAL void elementTypeChanged();
@@ -68,12 +69,14 @@ public:
     QString breakTitle() const { return m_breakTitle.isEmpty() ? this->sceneID() : m_breakTitle; }
     Q_SIGNAL void breakTitleChanged();
 
-    Q_PROPERTY(QString breakSubtitle READ breakSubtitle WRITE setBreakSubtitle NOTIFY breakSubtitleChanged)
+    Q_PROPERTY(QString breakSubtitle READ breakSubtitle WRITE setBreakSubtitle NOTIFY
+                       breakSubtitleChanged)
     void setBreakSubtitle(const QString &val);
     QString breakSubtitle() const { return m_breakSubtitle; }
     Q_SIGNAL void breakSubtitleChanged();
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged STORED false RESET resetScreenplay)
+    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged
+                       STORED false RESET resetScreenplay)
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();
@@ -89,7 +92,8 @@ public:
     }
     Q_SIGNAL void sceneNumberChanged();
 
-    Q_PROPERTY(QString userSceneNumber READ userSceneNumber WRITE setUserSceneNumber NOTIFY userSceneNumberChanged)
+    Q_PROPERTY(QString userSceneNumber READ userSceneNumber WRITE setUserSceneNumber NOTIFY
+                       userSceneNumberChanged)
     void setUserSceneNumber(const QString &val);
     QString userSceneNumber() const { return m_userSceneNumber; }
     Q_SIGNAL void userSceneNumberChanged();
@@ -97,11 +101,12 @@ public:
     Q_PROPERTY(bool hasUserSceneNumber READ hasUserSceneNumber NOTIFY userSceneNumberChanged)
     bool hasUserSceneNumber() const { return !m_userSceneNumber.isEmpty(); }
 
-    Q_PROPERTY(QString resolvedSceneNumber READ resolvedSceneNumber NOTIFY resolvedSceneNumberChanged)
+    Q_PROPERTY(
+            QString resolvedSceneNumber READ resolvedSceneNumber NOTIFY resolvedSceneNumberChanged)
     QString resolvedSceneNumber() const;
     Q_SIGNAL void resolvedSceneNumberChanged();
 
-    Q_PROPERTY(Scene* scene READ scene NOTIFY sceneChanged STORED false RESET resetScene)
+    Q_PROPERTY(Scene *scene READ scene NOTIFY sceneChanged STORED false RESET resetScene)
     void setScene(Scene *val);
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
@@ -111,12 +116,14 @@ public:
     bool isExpanded() const { return m_expanded; }
     Q_SIGNAL void expandedChanged();
 
-    Q_PROPERTY(QJsonValue userData READ userData WRITE setUserData NOTIFY userDataChanged STORED false)
+    Q_PROPERTY(
+            QJsonValue userData READ userData WRITE setUserData NOTIFY userDataChanged STORED false)
     void setUserData(const QJsonValue &val);
     QJsonValue userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
-    Q_PROPERTY(QJsonValue editorHints READ editorHints WRITE setEditorHints NOTIFY editorHintsChanged)
+    Q_PROPERTY(
+            QJsonValue editorHints READ editorHints WRITE setEditorHints NOTIFY editorHintsChanged)
     void setEditorHints(const QJsonValue &val);
     QJsonValue editorHints() const { return m_editorHints; }
     Q_SIGNAL void editorHintsChanged();
@@ -126,16 +133,17 @@ public:
     bool isSelected() const { return m_selected; }
     Q_SIGNAL void selectedChanged();
 
-    Q_PROPERTY(QString breakSummary READ breakSummary WRITE setBreakSummary NOTIFY breakSummaryChanged)
+    Q_PROPERTY(
+            QString breakSummary READ breakSummary WRITE setBreakSummary NOTIFY breakSummaryChanged)
     void setBreakSummary(const QString &val);
     QString breakSummary() const { return m_breakSummary; }
     Q_SIGNAL void breakSummaryChanged();
 
-    Q_PROPERTY(Notes* notes READ notes NOTIFY notesChanged)
+    Q_PROPERTY(Notes *notes READ notes NOTIFY notesChanged)
     Notes *notes() const { return m_notes ? m_notes : (m_scene ? m_scene->notes() : nullptr); }
     Q_SIGNAL void notesChanged();
 
-    Q_PROPERTY(Attachments* attachments READ attachments NOTIFY attachmentsChanged)
+    Q_PROPERTY(Attachments *attachments READ attachments NOTIFY attachmentsChanged)
     Attachments *attachments() const
     {
         return m_attachments ? m_attachments : (m_scene ? m_scene->attachments() : nullptr);
@@ -210,7 +218,7 @@ public:
     ~Screenplay();
     Q_SIGNAL void aboutToDelete(Screenplay *ptr);
 
-    Q_PROPERTY(ScriteDocument* scriteDocument READ scriteDocument CONSTANT STORED false)
+    Q_PROPERTY(ScriteDocument *scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
@@ -280,21 +288,25 @@ public:
 
     enum CoverPagePhotoSize { SmallCoverPhoto, MediumCoverPhoto, LargeCoverPhoto };
     Q_ENUM(CoverPagePhotoSize)
-    Q_PROPERTY(CoverPagePhotoSize coverPagePhotoSize READ coverPagePhotoSize WRITE setCoverPagePhotoSize NOTIFY coverPagePhotoSizeChanged)
+    Q_PROPERTY(CoverPagePhotoSize coverPagePhotoSize READ coverPagePhotoSize WRITE
+                       setCoverPagePhotoSize NOTIFY coverPagePhotoSizeChanged)
     void setCoverPagePhotoSize(CoverPagePhotoSize val);
     CoverPagePhotoSize coverPagePhotoSize() const { return m_coverPagePhotoSize; }
     Q_SIGNAL void coverPagePhotoSizeChanged();
 
-    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered NOTIFY titlePageIsCenteredChanged)
+    Q_PROPERTY(bool titlePageIsCentered READ isTitlePageIsCentered WRITE setTitlePageIsCentered
+                       NOTIFY titlePageIsCenteredChanged)
     void setTitlePageIsCentered(bool val);
     bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
     Q_SIGNAL void titlePageIsCenteredChanged();
 
-    Q_PROPERTY(bool hasTitlePageAttributes READ hasTitlePageAttributes NOTIFY hasTitlePageAttributesChanged)
+    Q_PROPERTY(bool hasTitlePageAttributes READ hasTitlePageAttributes NOTIFY
+                       hasTitlePageAttributesChanged)
     bool hasTitlePageAttributes() const { return m_hasTitlePageAttributes; }
     Q_SIGNAL void hasTitlePageAttributesChanged();
 
-    Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    Q_PROPERTY(
+            bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
     bool hasNonStandardScenes() const { return m_hasNonStandardScenes; }
     Q_SIGNAL void hasNonStandardScenesChanged();
 
@@ -374,7 +386,8 @@ public:
 
     Q_SIGNAL void screenplayChanged();
 
-    Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY currentElementIndexChanged)
+    Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY
+                       currentElementIndexChanged)
     void setCurrentElementIndex(int val);
     int currentElementIndex() const { return m_currentElementIndex; }
     Q_SIGNAL void currentElementIndexChanged(int val);
@@ -384,7 +397,8 @@ public:
     Q_INVOKABLE int previousSceneElementIndex();
     Q_INVOKABLE int nextSceneElementIndex();
 
-    Q_PROPERTY(Scene* activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged STORED false RESET resetActiveScene)
+    Q_PROPERTY(Scene *activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged
+                       STORED false RESET resetActiveScene)
     void setActiveScene(Scene *val);
     Scene *activeScene() const { return m_activeScene; }
     Q_SIGNAL void activeSceneChanged();
@@ -422,6 +436,14 @@ public:
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
+
+    // Text Document Export Support
+    struct WriteOptions
+    {
+        bool includeTextNotes = true;
+        bool includeFormNotes = true;
+    };
+    void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
 protected:
     bool event(QEvent *event);
@@ -499,7 +521,7 @@ public:
     explicit ScreenplayTracks(QObject *parent = nullptr);
     ~ScreenplayTracks();
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
+    Q_PROPERTY(Screenplay *screenplay READ screenplay WRITE setScreenplay NOTIFY screenplayChanged)
     void setScreenplay(Screenplay *val);
     Screenplay *screenplay() const { return m_screenplay; }
     Q_SIGNAL void screenplayChanged();

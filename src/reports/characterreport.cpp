@@ -168,7 +168,6 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
 
             const Character *character = structure->findCharacter(characterName);
 
-            // TODO include character meta-data here.
             QTextTableFormat tableFormat;
             tableFormat.setCellPadding(1);
             tableFormat.setCellSpacing(0);

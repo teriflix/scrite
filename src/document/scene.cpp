@@ -14,6 +14,7 @@
 #include "scene.h"
 #include "undoredo.h"
 #include "hourglass.h"
+#include "formatting.h"
 #include "application.h"
 #include "searchengine.h"
 #include "timeprofiler.h"
@@ -1867,6 +1868,169 @@ void Scene::setPropertyFromObjectList(const QString &propName, const QList<QObje
     if (propName == QStringLiteral("elements")) {
         this->setElements(qobject_list_cast<SceneElement *>(objects));
         return;
+    }
+}
+
+void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
+{
+    /**
+     * Although much of the code below is similar to what ScreenplayTextDocument does,
+     * I want for this to be distinct - even at the cost of code duplication.
+     *
+     * The purpose of this method is to participate in the notebook report. So, we don't
+     * need this to fit screenplay formatting as much as ScreenplayTextDocument does.
+     */
+
+    static const QRegularExpression newlinesRegEx("\n+");
+    static const QString newline = QStringLiteral("\n");
+    QTextDocument *textDocument = cursor.document();
+
+    if (m_title.isEmpty() && m_comments.isEmpty() && (m_notes == nullptr || m_notes->isEmpty()))
+        return;
+
+    // Scene number: heading
+    if (options.includeHeading) {
+        QTextBlockFormat headingBlockFormat;
+        headingBlockFormat.setHeadingLevel(options.headingLevel);
+        QTextCharFormat headingCharFormat;
+        headingCharFormat.setFontWeight(QFont::Bold);
+        headingCharFormat.setFontPointSize(
+                QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
+        headingBlockFormat.setTopMargin(headingCharFormat.fontPointSize() / 2);
+        if (cursor.block().text().isEmpty()) {
+            cursor.setBlockFormat(headingBlockFormat);
+            cursor.setBlockCharFormat(headingCharFormat);
+        } else
+            cursor.insertBlock(headingBlockFormat, headingCharFormat);
+        cursor.insertText(m_structureElement->title());
+    }
+
+    // Featured Photo
+    if (options.includeFeaturedPhoto) {
+        const Attachments *sceneAttachments = m_attachments;
+        const Attachment *featuredAttachment =
+                sceneAttachments ? sceneAttachments->featuredAttachment() : nullptr;
+        const Attachment *featuredImage =
+                featuredAttachment && featuredAttachment->type() == Attachment::Photo
+                ? featuredAttachment
+                : nullptr;
+
+        if (featuredImage) {
+            const QUrl url(QStringLiteral("scrite://") + featuredImage->filePath());
+            const QImage image(featuredImage->fileSource().toLocalFile());
+
+            textDocument->addResource(QTextDocument::ImageResource, url,
+                                      QVariant::fromValue<QImage>(image));
+
+            const QSizeF imageSize = image.size().scaled(QSize(320, 240), Qt::KeepAspectRatio);
+
+            QTextBlockFormat blockFormat;
+            blockFormat.setTopMargin(10);
+            cursor.insertBlock(blockFormat);
+
+            QTextImageFormat imageFormat;
+            imageFormat.setName(url.toString());
+            imageFormat.setWidth(imageSize.width());
+            imageFormat.setHeight(imageSize.height());
+            cursor.insertImage(imageFormat);
+        }
+    }
+
+    // Synopsis
+    if (options.includeSynopsis) {
+        QString synopsis = this->title();
+        synopsis.replace(newlinesRegEx, newline);
+
+        if (!synopsis.isEmpty()) {
+            QColor sceneColor = this->color().lighter(175);
+            sceneColor.setAlphaF(0.5);
+
+            QTextBlockFormat blockFormat;
+            blockFormat.setTopMargin(10);
+            blockFormat.setBackground(sceneColor);
+
+            QTextCharFormat charFormat;
+            charFormat.setFont(cursor.document()->defaultFont());
+
+            cursor.insertBlock(blockFormat, charFormat);
+            // cursor.insertText(synopsis);
+            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+        }
+    }
+
+    // Comments
+    if (options.includeComments) {
+        QString comments = this->comments().trimmed();
+        if (!comments.isEmpty()) {
+            comments.replace(newlinesRegEx, newline);
+
+            comments = QLatin1String("Comments: ") + comments;
+
+            QColor sceneColor = this->color().lighter(175);
+            sceneColor.setAlphaF(0.5);
+
+            QTextBlockFormat blockFormat;
+            blockFormat.setTopMargin(10);
+            blockFormat.setLeftMargin(15);
+            blockFormat.setRightMargin(15);
+            blockFormat.setBackground(sceneColor);
+
+            QTextCharFormat charFormat;
+            charFormat.setFont(cursor.document()->defaultFont());
+
+            QString synopsis = this->title();
+            synopsis.replace(newlinesRegEx, newline);
+
+            cursor.insertBlock(blockFormat, charFormat);
+            // cursor.insertText(synopsis);
+            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, comments);
+        }
+    }
+
+    // Heading + Content
+    if (options.includeContent) {
+        QTextFrame *rootFrame = cursor.currentFrame();
+        ScreenplayFormat *printFormat = ScriteDocument::instance()->printFormat();
+
+        QTextFrameFormat sceneFrameFormat;
+        sceneFrameFormat.setBorder(1);
+        sceneFrameFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
+        cursor.insertFrame(sceneFrameFormat);
+
+        if (m_heading && m_heading->isEnabled()) {
+            SceneElementFormat *headingParaFormat =
+                    printFormat->elementFormat(SceneElement::Heading);
+            const QTextBlockFormat headingParaBlockFormat = headingParaFormat->createBlockFormat();
+            const QTextCharFormat headingParaCharFormat = headingParaFormat->createCharFormat();
+            cursor.setBlockFormat(headingParaBlockFormat);
+            cursor.setBlockCharFormat(headingParaCharFormat);
+            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, m_heading->text());
+            cursor.insertBlock();
+        }
+
+        for (SceneElement *para : m_elements) {
+            SceneElementFormat *paraFormat = printFormat->elementFormat(para->type());
+            const QTextBlockFormat paraBlockFormat = paraFormat->createBlockFormat();
+            const QTextCharFormat paraCharFormat = paraFormat->createCharFormat();
+            cursor.setBlockFormat(paraBlockFormat);
+            cursor.setBlockCharFormat(paraCharFormat);
+            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, para->text(),
+                                                                   para->textFormats());
+            if (para != m_elements.last())
+                cursor.insertBlock();
+        }
+
+        cursor = rootFrame->lastCursorPosition();
+    }
+
+    // Text and Form Notes
+    if (options.includeTextNotes || options.includeFormNotes) {
+        if (m_notes) {
+            Notes::WriteOptions notesOptions;
+            notesOptions.includeFormNotes = options.includeFormNotes;
+            notesOptions.includeTextNotes = options.includeTextNotes;
+            m_notes->write(cursor, notesOptions);
+        }
     }
 }
 

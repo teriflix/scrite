@@ -20,6 +20,7 @@
 #include "screenplay.h"
 #include "application.h"
 #include "timeprofiler.h"
+#include "deltadocument.h"
 #include "scritedocument.h"
 
 #include <QSet>
@@ -114,6 +115,7 @@ void Note::setForm(Form *val)
             m_summary = QStringLiteral("Form with ") + QString::number(questions.size())
                     + QStringLiteral(" question(s). ");
             m_summary += questions.join(QStringLiteral(", "));
+            m_autoSummaryText = true;
             emit summaryChanged();
         }
 
@@ -152,6 +154,7 @@ void Note::setSummary(const QString &val)
         return;
 
     m_summary = val;
+    m_autoSummaryText = false;
     emit summaryChanged();
 }
 
@@ -242,6 +245,117 @@ void Note::deserializeFromJson(const QJsonObject &json)
     else if (type == QStringLiteral("Form")) {
         this->setType(FormNoteType);
         this->setFormId(json.value(QStringLiteral("formId")).toString());
+    }
+}
+
+void Note::write(QTextCursor &cursor, const WriteOptions &options) const
+{
+    bool insertBlock = !cursor.block().text().isEmpty();
+
+    if (options.includeTitle) {
+        QTextBlockFormat headingBlockFormat;
+        headingBlockFormat.setTopMargin(10);
+        headingBlockFormat.setHeadingLevel(options.titleHeadingLevel);
+
+        QTextCharFormat headingCharFormat;
+        headingCharFormat.setFontWeight(QFont::Bold);
+        headingCharFormat.setFontPointSize(
+                QList<int>({ 20, 18, 16, 14 })[qBound(0, options.titleHeadingLevel - 1, 4)]);
+        headingBlockFormat.setTopMargin(headingCharFormat.fontPointSize() / 2);
+
+        if (insertBlock) {
+            cursor.insertBlock(headingBlockFormat, headingCharFormat);
+        } else {
+            cursor.setBlockFormat(headingBlockFormat);
+            cursor.setBlockCharFormat(headingCharFormat);
+        }
+
+        cursor.insertText(m_title);
+        insertBlock = true;
+    }
+
+    if (options.includeSummary && !m_autoSummaryText) {
+        QTextBlockFormat summaryBlockFormat;
+        summaryBlockFormat.setIndent(1);
+
+        QTextCharFormat summaryCharFormat;
+        summaryCharFormat.setFontWeight(QFont::Normal);
+
+        if (insertBlock) {
+            cursor.insertBlock(summaryBlockFormat, summaryCharFormat);
+        } else {
+            cursor.setBlockFormat(summaryBlockFormat);
+            cursor.setBlockCharFormat(summaryCharFormat);
+        }
+
+        cursor.insertText(m_summary);
+        insertBlock = true;
+    }
+
+    if (m_type == TextNoteType) {
+        QTextBlockFormat contentBlockFormat;
+        contentBlockFormat.setIndent(0);
+
+        QTextCharFormat contentCharFormat;
+        contentCharFormat.setFontWeight(QFont::Normal);
+
+        if (insertBlock) {
+            cursor.insertBlock(contentBlockFormat, contentCharFormat);
+        } else {
+            cursor.setBlockFormat(contentBlockFormat);
+            cursor.setBlockCharFormat(contentCharFormat);
+        }
+
+        if (m_content.isString())
+            cursor.insertText(m_content.toString());
+        else {
+            const DeltaDocument::ResolveResult result =
+                    DeltaDocument::blockingResolve(m_content.toObject());
+            if (!result.htmlText.isEmpty())
+                cursor.insertHtml(result.htmlText);
+        }
+    } else if (m_type == FormNoteType) {
+        if (m_form != nullptr) {
+            for (int i = 0; i < m_form->questionCount(); i++) {
+                const FormQuestion *question = m_form->questionAt(i);
+                const QString answer = m_formData.value(question->id()).toString();
+
+                if (options.includeAnsweredFormQuestionsOnly && answer.isEmpty())
+                    continue;
+
+                QTextDocument qdoc;
+                qdoc.setHtml(question->questionText());
+
+                QTextBlockFormat questionBlockFormat;
+                questionBlockFormat.setTopMargin(8);
+
+                QTextCharFormat questionCharFormat;
+                questionCharFormat.setFontWeight(QFont::Bold);
+                cursor.insertBlock(questionBlockFormat, questionCharFormat);
+                cursor.insertText(question->number() + QLatin1String(". ")
+                                  + qdoc.toPlainText().trimmed());
+
+                if (options.includeFormAnswerHints) {
+                    QTextBlockFormat answerHintBlockFormat;
+                    answerHintBlockFormat.setTopMargin(5);
+                    answerHintBlockFormat.setIndent(2);
+                    QTextCharFormat answerHintCharFormat;
+                    answerHintCharFormat.setFontWeight(QFont::Normal);
+                    answerHintCharFormat.setFontItalic(true);
+                    cursor.insertBlock(answerHintBlockFormat, answerHintCharFormat);
+                    cursor.insertText(question->answerHint());
+                }
+
+                QTextBlockFormat answerBlockFormat;
+                answerBlockFormat.setTopMargin(5);
+                answerBlockFormat.setIndent(1);
+                QTextCharFormat answerCharFormat;
+                answerCharFormat.setFontWeight(QFont::Normal);
+                answerCharFormat.setFontItalic(false);
+                cursor.insertBlock(answerBlockFormat, answerCharFormat);
+                cursor.insertText(answer);
+            }
+        }
     }
 }
 
@@ -684,6 +798,15 @@ void Notes::loadOldNotes(const QJsonArray &jsNotes)
     }
 
     this->setNotes(notes);
+}
+
+void Notes::write(QTextCursor &cursor, const WriteOptions &options) const
+{
+    for (Note *note : this->constList()) {
+        if ((options.includeTextNotes && note->type() == Note::TextNoteType)
+            || (options.includeFormNotes && note->type() == Note::FormNoteType))
+            note->write(cursor);
+    }
 }
 
 void Notes::renameCharacter(const QString &from, const QString &to)

@@ -1554,3 +1554,25 @@ void TransliterationHints::setAllowedMechanisms(AllowedMechanisms val)
     m_allowedMechanisms = val;
     emit allowedMechanismsChanged();
 }
+
+void TransliterationUtils::polishFontsAndInsertTextAtCursor(
+        QTextCursor &cursor, const QString &text, const QVector<QTextLayout::FormatRange> &formats)
+{
+    const int startPos = cursor.position();
+    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, text);
+    const int endPos = cursor.position();
+
+    if (!formats.isEmpty()) {
+        cursor.setPosition(startPos);
+        for (const QTextLayout::FormatRange &formatRange : formats) {
+            const int length = qMin(startPos + formatRange.start + formatRange.length - 1, endPos)
+                    - (startPos + formatRange.start - 1);
+            cursor.setPosition(startPos + formatRange.start);
+            if (length > 0) {
+                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, length);
+                cursor.mergeCharFormat(formatRange.format);
+            }
+        }
+        cursor.setPosition(endPos);
+    }
+}
