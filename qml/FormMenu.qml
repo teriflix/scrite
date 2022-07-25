@@ -18,6 +18,7 @@ import io.scrite.components 1.0
 
 Menu2 {
     title: "Forms"
+    width: 325
 
     property Notes notes
     property alias formTypes: formFilterModel.filterValues
