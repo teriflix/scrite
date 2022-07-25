@@ -234,7 +234,7 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
 
 QVersionNumber Application::prepare()
 {
-    const QVersionNumber applicationVersion(0, 8, 9);
+    const QVersionNumber applicationVersion(0, 9, 0);
 
     if (qApp != nullptr)
         return applicationVersion;

@@ -551,6 +551,7 @@ public:
     // Text Document Export Support
     struct WriteOptions
     {
+        WriteOptions() { }
         int headingLevel = 2;
         bool includeSummary = true;
         bool includeTextNotes = true;
@@ -1021,6 +1022,7 @@ public:
     // Text Document Export Support
     struct WriteOptions
     {
+        WriteOptions() { }
         bool includeTextNotes = true;
         bool includeFormNotes = true;
     };

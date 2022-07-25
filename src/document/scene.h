@@ -504,6 +504,7 @@ public:
     // Text Document Export Support
     struct WriteOptions
     {
+        WriteOptions() { }
         int headingLevel = 3;
         bool includeFeaturedPhoto = true;
         bool includeSynopsis = true;

@@ -109,6 +109,7 @@ public:
     // Text Document Export Support
     struct WriteOptions
     {
+        WriteOptions() { }
         int titleHeadingLevel = 2;
         bool includeTitle = true;
         bool includeSummary = true;
@@ -236,6 +237,7 @@ public:
     // Text Document Export Support
     struct WriteOptions
     {
+        WriteOptions() { }
         bool includeTextNotes = true;
         bool includeFormNotes = true;
     };

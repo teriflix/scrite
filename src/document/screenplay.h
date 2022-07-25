@@ -440,6 +440,7 @@ public:
     // Text Document Export Support
     struct WriteOptions
     {
+        WriteOptions() { }
         bool includeTextNotes = true;
         bool includeFormNotes = true;
     };
