@@ -163,7 +163,6 @@ Rectangle {
 
             Item {
                 id: edgeItems
-                z: removeRelationshipConfirmation.active ? 0 : 1
 
                 Repeater {
                     id: edgeItemsRepeater
@@ -174,7 +173,12 @@ Rectangle {
 
             Item {
                 id: nodeItems
-                z: 0
+
+                Repeater {
+                    id: nodeItemsRepeater
+                    model: crGraph.nodes
+                    delegate: crGraphNodeDelegate
+                }
 
                 Item {
                     anchors.fill: canvas.selectedNodeItem
@@ -252,13 +256,6 @@ Rectangle {
                         }
                     }
                 }
-
-                Repeater {
-                    id: nodeItemsRepeater
-                    model: crGraph.nodes
-                    delegate: crGraphNodeDelegate
-                }
-
                 Item {
                     anchors.fill: canvas.selectedNodeItem
                     visible: canvas.selectedNodeItem
@@ -607,6 +604,7 @@ Rectangle {
             property Character character: node.character
             x: node.rect.x
             y: node.rect.y
+            z: canvas.selectedNodeItem == nodeItem ? 1 : 0
             width: node.rect.width
             height: node.rect.height
             color: character.photos.length === 0 ? Qt.tint(character.color, "#C0FFFFFF") : Qt.rgba(0,0,0,0)
@@ -702,7 +700,7 @@ Rectangle {
                               "Double click to add a relationship to this character." :
                               "Double click to switch to " + character.name + "'s notes."
                 ToolTip.delay: 1500
-                ToolTip.visible: containsMouse && !removeRelationshipConfirmation.active
+                ToolTip.visible: containsMouse && !removeRelationshipConfirmation.active && !pressed
             }
         }
     }
