@@ -28,7 +28,7 @@ public:
 
     // Can be Scene, Structure, Screenplay, Character, Notes or Note
     // Otherwise it generates a dump of all notes in the Notebook
-    Q_PROPERTY(QObject *section READ section WRITE setSection NOTIFY sectionChanged)
+    Q_PROPERTY(QObject *section READ section WRITE setSection NOTIFY sectionChanged STORED false)
     void setSection(QObject *val);
     QObject *section() const { return m_section; }
     Q_SIGNAL void sectionChanged();
@@ -40,6 +40,7 @@ protected:
 public:
     // AbstractReportGenerator interface
     bool requiresConfiguration() const { return false; }
+    void polishFormInfo(QJsonObject &) const;
 
 protected:
     bool doGenerate(QTextDocument *);

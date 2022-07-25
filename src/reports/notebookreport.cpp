@@ -185,11 +185,20 @@ void NotebookReport::evaluateTitleAndSubtitle()
     else if (m_sceneSection)
         m_subtitle = m_sceneSection->title();
     else if (m_characterSection)
-        m_subtitle = m_characterSection->name();
+        m_subtitle = QLatin1String("Character");
     else if (m_storySection)
         m_subtitle = QLatin1String("Story");
     else if (m_screenplaySection)
         m_subtitle = QLatin1String("Scene");
 
     m_subtitle += QLatin1String(" Notes");
+}
+
+void NotebookReport::polishFormInfo(QJsonObject &formInfo) const
+{
+    if (m_section != nullptr) {
+        formInfo.insert(QLatin1String("description"),
+                        QLatin1String("Exports '") + m_subtitle
+                                + QLatin1String("' into PDF or ODT."));
+    }
 }

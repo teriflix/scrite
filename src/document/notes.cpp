@@ -335,7 +335,7 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
                 cursor.insertText(question->number() + QLatin1String(". ")
                                   + qdoc.toPlainText().trimmed());
 
-                if (options.includeFormAnswerHints) {
+                if (options.includeFormAnswerHints && !question->answerHint().isEmpty()) {
                     QTextBlockFormat answerHintBlockFormat;
                     answerHintBlockFormat.setTopMargin(5);
                     answerHintBlockFormat.setIndent(2);
@@ -343,7 +343,7 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
                     answerHintCharFormat.setFontWeight(QFont::Normal);
                     answerHintCharFormat.setFontItalic(true);
                     cursor.insertBlock(answerHintBlockFormat, answerHintCharFormat);
-                    cursor.insertText(question->answerHint());
+                    cursor.insertText(question->answerHint().trimmed());
                 }
 
                 QTextBlockFormat answerBlockFormat;
@@ -353,7 +353,7 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
                 answerCharFormat.setFontWeight(QFont::Normal);
                 answerCharFormat.setFontItalic(false);
                 cursor.insertBlock(answerBlockFormat, answerCharFormat);
-                cursor.insertText(answer);
+                cursor.insertText(answer.trimmed());
             }
         }
     }

@@ -179,16 +179,8 @@ Rectangle {
             ToolButton3 {
                 id: refreshButton
                 iconSource: "../icons/navigation/refresh.png"
-                ToolTip.text: "Reloads the current character relationships graph and the notebook tree."
-                property bool refreshAck: false
-                onClicked: {
-                    refreshAck = false
-                    Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "refresh")
-                    if(refreshAck)
-                        Scrite.app.execLater(refreshButton, 250, function() { notebookModel.refresh() })
-                    else
-                        notebookModel.refresh()
-                }
+                ToolTip.text: "Reloads the the notebook tree."
+                onClicked: notebookModel.refresh()
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
             }
@@ -196,18 +188,11 @@ Rectangle {
             ToolButton3 {
                 id: pdfExportButton
                 iconSource: "../icons/file/generate_pdf.png"
-                ToolTip.text: "Export the current character relationship graph to PDF."
-                onClicked: Announcement.shout("3F96A262-A083-478C-876E-E3AFC26A0507", "pdfexport")
+                ToolTip.text: notebookContentLoader.reportDescription
+                onClicked: notebookContentLoader.generateReport()
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
-                property int crGraphViewCount: 0
-                enabled: crGraphViewCount > 0
-                Announcement.onIncoming: (type,data) => {
-                    const stype = ""+type
-                    const idata = 0+data
-                    if(stype === "4D37E093-1F58-4978-8060-CD6B9AD4E03C")
-                        crGraphViewCount += idata
-                }
+                enabled: notebookContentLoader.hasReport
             }
 
             Rectangle {
@@ -634,6 +619,22 @@ Rectangle {
                 active: opacity > 0
 
                 property int currentNotebookItemId: notebookTree.currentData ? notebookTree.currentData.notebookItemId : -1
+
+                property bool hasReport: item && item.hasReport && item.hasReport === true
+                property string reportDescription: hasReport ? item.reportDescription : ""
+                function generateReport() {
+                    if(hasReport) {
+                        var rgen = item.createReportGenerator()
+                        if(!rgen)
+                            return
+
+                        modalDialog.closeable = false
+                        modalDialog.arguments = rgen
+                        modalDialog.sourceComponent = reportGeneratorConfigurationComponent
+                        modalDialog.popupSource = pdfExportButton
+                        modalDialog.active = true
+                    }
+                }
 
                 ResetOnChange {
                     id: notebookContentActiveProperty
@@ -1280,6 +1281,25 @@ Rectangle {
             border.width: 1
             border.color: primaryColors.borderColor
 
+            // Report support
+            property bool hasReport: {
+                return notes.ownerType === Notes.StructureOwner || notes.ownerType === Notes.SceneOwner
+            }
+            property string reportDescription: {
+                switch(notes.ownerType) {
+                case Notes.StructureOwner:
+                    return "Exports all story notes into a PDF or ODT."
+                case Notes.SceneOwner:
+                    return "Exports all scene notes into a PDF or ODT."
+                }
+                return ""
+            }
+            function createReportGenerator() {
+                var generator = Scrite.document.createReportGenerator("Notebook Report")
+                generator.section = notes.owner
+                return generator
+            }
+
             Flickable {
                 id: notesFlick
                 anchors.fill: parent
@@ -1425,6 +1445,15 @@ Rectangle {
             property Note note: componentData ? componentData.notebookItemObject : null
             color: Qt.tint(note.color, "#E7FFFFFF")
 
+            // Report support
+            property bool hasReport: true
+            property string reportDescription: "Export this text note as a PDF or ODT."
+            function createReportGenerator() {
+                var generator = Scrite.document.createReportGenerator("Notebook Report")
+                generator.section = note
+                return generator
+            }
+
             function deleteSelf() {
                 var notes = note.notes
                 notes.removeNote(note)
@@ -1446,6 +1475,15 @@ Rectangle {
             property var componentData
             property Note note: componentData.notebookItemObject
             color: Qt.tint(note.color, "#E7FFFFFF")
+
+            // Report support
+            property bool hasReport: true
+            property string reportDescription: "Export this form as a PDF or ODT."
+            function createReportGenerator() {
+                var generator = Scrite.document.createReportGenerator("Notebook Report")
+                generator.section = note
+                return generator
+            }
 
             function deleteSelf() {
                 var notes = note.notes
@@ -1578,6 +1616,15 @@ Rectangle {
         Rectangle {
             property var componentData
             property Screenplay screenplay: Scrite.document.screenplay
+
+            // Report support
+            property bool hasReport: true
+            property string reportDescription: "Export notes of all scenes in the screenplay into a PDF or ODT."
+            function createReportGenerator() {
+                var generator = Scrite.document.createReportGenerator("Notebook Report")
+                generator.section = screenplay
+                return generator
+            }
 
             FontMetrics {
                 id: screenplayFontMetrics
@@ -2170,6 +2217,15 @@ Rectangle {
 
             signal characterDoubleClicked(string characterName)
 
+            // Report support
+            property bool hasReport: true
+            property string reportDescription: "Export character summary & notes into a PDF or ODT."
+            function createReportGenerator() {
+                var generator = Scrite.document.createReportGenerator("Notebook Report")
+                generator.section = character
+                return generator
+            }
+
             function deleteSelf() {
                 notebookModel.preferredItem = "Characters"
                 Scrite.document.structure.removeCharacter(character)
@@ -2739,22 +2795,6 @@ Rectangle {
                         }
                         Component.onCompleted: Scrite.app.execLater(characterTabContentArea, 100, prepare)
                         onVisibleChanged: Scrite.app.execLater(characterTabContentArea, 100, prepare)
-
-                        property bool pdfExportPossible: !graphIsEmpty && visible
-                        onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
-                        Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
-
-                        Announcement.onIncoming: (type,data) => {
-                            const stype = "" + type
-                            const sdata = "" + data
-                            if(stype === "3F96A262-A083-478C-876E-E3AFC26A0507") {
-                                if(sdata === "refresh") {
-                                    crGraphView.resetGraph()
-                                    refreshButton.refreshAck = true
-                                } else if(sdata == "pdfexport")
-                                    crGraphView.exportToPdf(pdfExportButton)
-                            }
-                        }
                     }
 
                     DisabledFeatureNotice {

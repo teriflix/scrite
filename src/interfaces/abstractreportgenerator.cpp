@@ -291,8 +291,10 @@ QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) con
 
 QJsonObject AbstractReportGenerator::configurationFormInfo() const
 {
-    return Application::instance()->objectConfigurationFormInfo(
+    QJsonObject formInfo = Application::instance()->objectConfigurationFormInfo(
             this, &AbstractReportGenerator::staticMetaObject);
+    this->polishFormInfo(formInfo);
+    return formInfo;
 }
 
 QString AbstractReportGenerator::polishFileName(const QString &fileName) const

@@ -18,6 +18,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 Rectangle {
+    id: crGraphView
     property alias scene: crGraph.scene
     property alias character: crGraph.character
     property alias structure: crGraph.structure
@@ -209,6 +210,17 @@ Rectangle {
                                 iconSource: "../icons/navigation/refresh.png"
                                 autoRepeat: true
                                 ToolTip.text: "Refresh"
+                                visible: !Scrite.document.readOnly && (crGraph.character ? crGraph.character === canvas.activeCharacter : true)
+                                suggestedWidth: parent.height
+                                suggestedHeight: parent.height
+                            }
+
+                            ToolButton3 {
+                                id: floatingPdfExportButton
+                                onClicked: crGraphView.exportToPdf(floatingPdfExportButton)
+                                iconSource: "../icons/file/generate_pdf.png"
+                                autoRepeat: true
+                                ToolTip.text: "Export to PDF"
                                 visible: !Scrite.document.readOnly && (crGraph.character ? crGraph.character === canvas.activeCharacter : true)
                                 suggestedWidth: parent.height
                                 suggestedHeight: parent.height

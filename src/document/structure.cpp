@@ -1743,10 +1743,11 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
 
     // Character meta-data table
     QTextTableFormat tableFormat;
-    tableFormat.setCellPadding(1);
+    tableFormat.setCellPadding(2);
     tableFormat.setCellSpacing(0);
     tableFormat.setLeftMargin(10);
     tableFormat.setTopMargin(10);
+    tableFormat.setBottomMargin(10);
 
     QTextFrame *frame = cursor.currentFrame();
     QTextTable *table = cursor.insertTable(6, this->hasKeyPhoto() ? 3 : 2, tableFormat);

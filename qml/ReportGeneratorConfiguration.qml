@@ -33,15 +33,23 @@ Item {
     Component.onCompleted: {
         modalDialog.closeOnEscape = false
 
-        var reportName = typeof modalDialog.arguments === "string" ? modalDialog.arguments : modalDialog.arguments.reportName
-        generator = Scrite.document.createReportGenerator(reportName)
-        if(generator === null) {
-            modalDialog.closeable = true
-            notice.text = "Report generator for '" + JSON.stringify(modalDialog.arguments) + "' could not be created."
-        } else if(typeof modalDialog.arguments !== "string") {
-            var config = modalDialog.arguments.configuration
-            for(var member in config)
-                generator.setConfigurationValue(member, config[member])
+        if(Scrite.app.verifyType(modalDialog.arguments, "AbstractReportGenerator")) {
+            generator = modalDialog.arguments
+            if(generator === null) {
+                modalDialog.closeable = true
+                notice.text = "Invalid report generator was supplied."
+            }
+        } else {
+            var reportName = typeof modalDialog.arguments === "string" ? modalDialog.arguments : modalDialog.arguments.reportName
+            generator = Scrite.document.createReportGenerator(reportName)
+            if(generator === null) {
+                modalDialog.closeable = true
+                notice.text = "Report generator for '" + JSON.stringify(modalDialog.arguments) + "' could not be created."
+            } else if(typeof modalDialog.arguments !== "string") {
+                var config = modalDialog.arguments.configuration
+                for(var member in config)
+                    generator.setConfigurationValue(member, config[member])
+            }
         }
 
         if(generator !== null)

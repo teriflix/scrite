@@ -105,6 +105,7 @@ protected:
 
     virtual bool canDirectExportToOdf() const { return false; }
     virtual bool directExportToOdf(QIODevice *) { return false; }
+    virtual void polishFormInfo(QJsonObject &) const { return; }
 
 private:
     Format m_format = AdobePDF;
