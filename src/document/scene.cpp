@@ -1890,19 +1890,23 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
     // Scene number: heading
     if (options.includeHeading) {
-        QTextBlockFormat headingBlockFormat;
-        headingBlockFormat.setHeadingLevel(options.headingLevel);
-        QTextCharFormat headingCharFormat;
-        headingCharFormat.setFontWeight(QFont::Bold);
-        headingCharFormat.setFontPointSize(
-                QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
-        headingBlockFormat.setTopMargin(headingCharFormat.fontPointSize() / 2);
-        if (cursor.block().text().isEmpty()) {
-            cursor.setBlockFormat(headingBlockFormat);
-            cursor.setBlockCharFormat(headingCharFormat);
-        } else
-            cursor.insertBlock(headingBlockFormat, headingCharFormat);
-        cursor.insertText(m_structureElement->title());
+        const QString heading = m_structureElement->title().trimmed();
+
+        if (!heading.isEmpty()) {
+            QTextBlockFormat headingBlockFormat;
+            headingBlockFormat.setHeadingLevel(options.headingLevel);
+            QTextCharFormat headingCharFormat;
+            headingCharFormat.setFontWeight(QFont::Bold);
+            headingCharFormat.setFontPointSize(
+                    QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
+            headingBlockFormat.setTopMargin(headingCharFormat.fontPointSize() / 2);
+            if (cursor.block().text().isEmpty()) {
+                cursor.setBlockFormat(headingBlockFormat);
+                cursor.setBlockCharFormat(headingCharFormat);
+            } else
+                cursor.insertBlock(headingBlockFormat, headingCharFormat);
+            cursor.insertText(m_structureElement->title());
+        }
     }
 
     // Featured Photo
@@ -1925,7 +1929,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             const QSizeF imageSize = image.size().scaled(QSize(320, 240), Qt::KeepAspectRatio);
 
             QTextBlockFormat blockFormat;
-            blockFormat.setTopMargin(10);
+            blockFormat.setTopMargin(5);
             cursor.insertBlock(blockFormat);
 
             QTextImageFormat imageFormat;
@@ -1938,7 +1942,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
     // Synopsis
     if (options.includeSynopsis) {
-        QString synopsis = this->title();
+        QString synopsis = this->title().trimmed();
         synopsis.replace(newlinesRegEx, newline);
 
         if (!synopsis.isEmpty()) {
@@ -1946,14 +1950,15 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             sceneColor.setAlphaF(0.5);
 
             QTextBlockFormat blockFormat;
-            blockFormat.setTopMargin(10);
+            blockFormat.setTopMargin(5);
+            blockFormat.setIndent(2);
             blockFormat.setBackground(sceneColor);
 
             QTextCharFormat charFormat;
-            charFormat.setFont(cursor.document()->defaultFont());
+            charFormat.setFont(textDocument->defaultFont());
 
             cursor.insertBlock(blockFormat, charFormat);
-            // cursor.insertText(synopsis);
+
             TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
         }
     }
@@ -1970,19 +1975,15 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             sceneColor.setAlphaF(0.5);
 
             QTextBlockFormat blockFormat;
-            blockFormat.setTopMargin(10);
+            blockFormat.setTopMargin(5);
             blockFormat.setLeftMargin(15);
             blockFormat.setRightMargin(15);
             blockFormat.setBackground(sceneColor);
 
             QTextCharFormat charFormat;
-            charFormat.setFont(cursor.document()->defaultFont());
-
-            QString synopsis = this->title();
-            synopsis.replace(newlinesRegEx, newline);
+            charFormat.setFont(textDocument->defaultFont());
 
             cursor.insertBlock(blockFormat, charFormat);
-            // cursor.insertText(synopsis);
             TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, comments);
         }
     }

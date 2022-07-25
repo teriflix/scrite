@@ -965,7 +965,10 @@ void TransliterationEngine::evaluateBoundariesAndInsertText(QTextCursor &cursor,
             continue;
 
         QTextCharFormat format = defaultFormat;
-        format.setFontFamily(item.font.family());
+        if (item.language == TransliterationEngine::English)
+            format.setFontFamily(cursor.document()->defaultFont().family());
+        else
+            format.setFontFamily(item.font.family());
         cursor.insertText(item.string, format);
     }
 #endif

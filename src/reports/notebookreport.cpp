@@ -82,6 +82,7 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
 
     doc->setDefaultFont(qApp->font());
     doc->setUseDesignMetrics(true);
+    doc->clear();
 
     QTextCursor cursor(doc);
 

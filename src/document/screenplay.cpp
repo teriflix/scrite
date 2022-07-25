@@ -2259,20 +2259,10 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
             QTextCharFormat sectionCharFormat;
             sectionCharFormat.setFontWeight(QFont::Bold);
             sectionCharFormat.setFontPointSize(16);
-            sectionBlockFormat.setTopMargin(sectionCharFormat.fontPointSize() / 2);
+            sectionBlockFormat.setTopMargin(10);
 
             cursor.insertBlock(sectionBlockFormat, sectionCharFormat);
             cursor.insertText(sectionName);
-
-            QTextBlockFormat nextBlockFormat;
-            nextBlockFormat.setHeadingLevel(0);
-
-            QTextCharFormat nextCharFormat;
-            nextCharFormat.setFontWeight(QFont::Normal);
-            nextCharFormat.setFontPointSize(cursor.document()->defaultFont().pointSizeF());
-            nextBlockFormat.setTopMargin(nextCharFormat.fontPointSize() / 2);
-
-            cursor.insertBlock(nextBlockFormat, nextCharFormat);
         };
 
         for (ScreenplayElement *element : m_elements) {
