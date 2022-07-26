@@ -310,25 +310,26 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
     // doesnt actually do all of the below.
     // So, we will have to do it explicitly
     format.setFontFamily(font.family());
-    format.setFontItalic(font.italic());
-    format.setFontWeight(font.weight());
-    // format.setFontKerning(font.kerning());
     format.setFontStretch(font.stretch());
     format.setFontOverline(font.overline());
     format.setFontPointSize(font.pointSize());
     format.setFontStrikeOut(font.strikeOut());
-    // format.setFontStyleHint(font.styleHint());
-    // format.setFontStyleName(font.styleName());
-    format.setFontUnderline(font.underline());
-    // format.setFontFixedPitch(font.fixedPitch());
     format.setFontWordSpacing(font.wordSpacing());
     format.setFontLetterSpacing(font.letterSpacing());
-    // format.setFontStyleStrategy(font.styleStrategy());
     format.setFontCapitalization(font.capitalization());
-    // format.setFontHintingPreference(font.hintingPreference());
     format.setFontLetterSpacingType(font.letterSpacingType());
 
-    format.setForeground(QBrush(m_textColor));
+    // Following properties clash with custom text-formatting that user can
+    // apply to selected text fragments. So, we insert these font properties
+    // only if they are not default.
+    if (font.italic())
+        format.setFontItalic(font.italic());
+    if (font.weight() != format.fontWeight())
+        format.setFontWeight(font.weight());
+    if (font.underline() != font.underline())
+        format.setFontUnderline(font.underline());
+    if (m_textColor != Qt::black)
+        format.setForeground(QBrush(m_textColor));
 
     if (givenPageWidth) {
         m_lastCreatedCharFormatPageWidth = *givenPageWidth;
@@ -2039,8 +2040,7 @@ int SceneDocumentBinder::paste(int fromPosition)
             cursor.setPosition(bstart);
             for (const QTextLayout::FormatRange &format : paragraph.formats) {
                 cursor.setPosition(bstart + format.start);
-                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
-                                    format.length);
+                cursor.setPosition(bstart + format.start + format.length, QTextCursor::KeepAnchor);
                 cursor.setCharFormat(format.format);
                 cursor.clearSelection();
             }
@@ -2120,13 +2120,6 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     }
 
     this->setFormat(0, block.length(), userData->charFormat);
-
-    const QVector<QTextLayout::FormatRange> formatRanges = block.textFormats();
-    for (const QTextLayout::FormatRange &formatRange : formatRanges) {
-        QTextCharFormat format = userData->charFormat;
-        format.merge(formatRange.format);
-        this->setFormat(formatRange.start, formatRange.length, format);
-    }
 
     // Per-language fonts.
     if (m_applyLanguageFonts) {
@@ -2276,8 +2269,8 @@ void SceneDocumentBinder::initializeDocument()
 
         for (const QTextLayout::FormatRange &formatRange : formatRanges) {
             cursor.setPosition(startPos + formatRange.start);
-            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
-                                formatRange.length);
+            cursor.setPosition(startPos + formatRange.start + formatRange.length,
+                               QTextCursor::KeepAnchor);
             cursor.mergeCharFormat(formatRange.format);
             cursor.clearSelection();
         }
@@ -2847,28 +2840,18 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
     for (const Fragment &fragment : fragments) {
         const QVector<QTextLayout::FormatRange> textFormats = fragment.block.textFormats();
         for (const QTextLayout::FormatRange &textFormat : textFormats) {
-            const int start = qMax(
-                    [=]() {
-                        QTextCursor c(fragment.block);
-                        c.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor,
-                                       textFormat.start);
-                        return c.position();
-                    }(),
-                    fragment.start);
-            const int end = qMin(
-                    [=]() {
-                        QTextCursor c(fragment.block);
-                        c.movePosition(QTextCursor::NextCharacter, QTextCursor::MoveAnchor,
-                                       textFormat.start + textFormat.length);
-                        return c.position();
-                    }(),
-                    fragment.end);
+            int start = fragment.block.position() + textFormat.start;
+            int end = fragment.block.position() + textFormat.start + textFormat.length;
+
             if ((start >= fragment.start && start <= fragment.end)
                 || (end >= fragment.start && end <= fragment.end)
                 || (start < fragment.start && end > fragment.end)) {
+
+                start = qMax(start, fragment.start);
+                end = qMin(end, fragment.end);
+
                 cursor.setPosition(start);
-                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor,
-                                    end - start);
+                cursor.setPosition(end, QTextCursor::KeepAnchor);
 
                 QTextCharFormat format = textFormat.format;
                 for (int prop : properties)

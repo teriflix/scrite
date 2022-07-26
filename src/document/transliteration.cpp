@@ -1568,11 +1568,11 @@ void TransliterationUtils::polishFontsAndInsertTextAtCursor(
     if (!formats.isEmpty()) {
         cursor.setPosition(startPos);
         for (const QTextLayout::FormatRange &formatRange : formats) {
-            const int length = qMin(startPos + formatRange.start + formatRange.length - 1, endPos)
-                    - (startPos + formatRange.start - 1);
+            const int length = qMin(startPos + formatRange.start + formatRange.length, endPos)
+                    - (startPos + formatRange.start);
             cursor.setPosition(startPos + formatRange.start);
             if (length > 0) {
-                cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, length);
+                cursor.setPosition(startPos + formatRange.start + length, QTextCursor::KeepAnchor);
                 cursor.mergeCharFormat(formatRange.format);
             }
         }
