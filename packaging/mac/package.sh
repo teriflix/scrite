@@ -4,6 +4,7 @@ cp -vaf ../../Info.plist Scrite.app/Contents
 mkdir Scrite-0.9.0-beta
 mv Scrite.app Scrite-0.9.0-beta
 cp ../../images/dmgbackdrop.png dmgbackdrop.png
+cp ../../appicon.icns Scrite.icns
 sed "s/{{VERSION}}/Version 0.9.0 Beta/" dmgbackdrop.qml > dmgbackdropgen.qml
 ~/Qt/5.15.10/clang_64/bin/qmlscene dmgbackdropgen.qml
 rm -f dmgbackdropgen.qml
@@ -13,6 +14,7 @@ sips -s dpiWidth 144 -s dpiHeight 144 background.png
 
 # https://github.com/create-dmg/create-dmg
 ~/Utils/create-dmg/create-dmg \
+  --volicon "Scrite.icns" \
   --volname "Scrite-0.9.0-beta" \
   --background "background.png" \
   --window-pos 272 136 \
@@ -26,5 +28,6 @@ sips -s dpiWidth 144 -s dpiHeight 144 background.png
   "Scrite-0.9.0-beta/"
 rm -f background.png
 rm -f dmgbackdrop.png
+rm -f Scrite.icns
 mv Scrite-0.9.0-beta/Scrite.app .
 rm -fr Scrite-0.9.0-beta

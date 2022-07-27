@@ -39,7 +39,7 @@ Item {
     }
 
     Text {
-        text: "You're so close to writing your next blockbuster on Scrite!\nTo install Scrite, drag the icon to the Applications folder."
+        text: "You're so close to writing your next blockbuster on Scrite!\nDrag the Scrite icon to the Applications folder."
         horizontalAlignment: Text.AlignHCenter
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.verticalCenter
@@ -53,13 +53,13 @@ Item {
         text: "{{VERSION}}"
         font.pixelSize: 18
         font.family: "Rubik"
-        color: "white"
-        x: parent.width * 0.045
-        y: parent.height * 0.145
+        color: "black"
+        x: parent.width - width - 30
+        y: 55 - height/2
     }
 
     Timer {
-        running: backdropImage.status === Image.Ready
+        running: backdropImage.stat7us === Image.Ready
         interval: 250
         repeat: false
         onTriggered: {
