@@ -2269,9 +2269,7 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
             switch (element->elementType()) {
             case ScreenplayElement::SceneElementType: {
                 const Scene *scene = element->scene();
-                QString heading = scene->heading() && scene->heading()->isEnabled()
-                        ? scene->heading()->text()
-                        : scene->structureElement()->title();
+                QString heading = scene->structureElement()->title();
                 if (scene->heading() && scene->heading()->isEnabled())
                     heading = element->resolvedSceneNumber() + QLatin1String(". ") + heading;
                 addSection(heading);
