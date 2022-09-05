@@ -1249,7 +1249,13 @@ Rectangle {
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 spellCheckEnabled: !Scrite.document.readOnly && spellCheckEnabledFlag.value
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
-                onDocumentInitialized: sceneTextEditor.cursorPosition = 0
+                property bool firstInitializationDone: false
+                onDocumentInitialized: {
+                    if(!firstInitializationDone) {
+                        sceneTextEditor.cursorPosition = 0
+                        firstInitializationDone = true
+                    }
+                }
                 onRequestCursorPosition: Scrite.app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
                 applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
