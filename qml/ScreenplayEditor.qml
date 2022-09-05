@@ -307,6 +307,7 @@ Rectangle {
                     spacing: screenplayAdapter.elementCount > 0 ? screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
+                    property bool scrollingBetweenScenes: false
                     property real spaceForComments: {
                         if(screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
                             return Math.round(screenplayEditorWorkspace.width - pageRulerArea.width - pageRulerArea.minLeftMargin - 20)
@@ -1251,10 +1252,9 @@ Rectangle {
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 property bool firstInitializationDone: false
                 onDocumentInitialized: {
-                    if(!firstInitializationDone) {
+                    if(!firstInitializationDone && !contentView.scrollingBetweenScenes)
                         sceneTextEditor.cursorPosition = 0
-                        firstInitializationDone = true
-                    }
+                    firstInitializationDone = true
                 }
                 onRequestCursorPosition: Scrite.app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
@@ -2455,10 +2455,12 @@ Rectangle {
             }
 
             function scrollToPreviousScene() {
+                contentView.scrollingBetweenScenes = true
                 var idx = screenplayAdapter.previousSceneElementIndex()
                 if(idx === 0 && idx === theIndex) {
                     contentView.scrollToFirstScene()
                     assumeFocusAt(0)
+                    contentView.scrollingBetweenScenes = false
                     return
                 }
 
@@ -2467,14 +2469,17 @@ Rectangle {
                     //contentView.positionViewAtIndex(iidx, ListView.Contain)
                     var item = contentView.loadedItemAtIndex(iidx)
                     item.assumeFocusAt(-1)
+                    contentView.scrollingBetweenScenes = false
                 }, idx)
             }
 
             function scrollToNextScene() {
+                contentView.scrollingBetweenScenes = true
                 var idx = screenplayAdapter.nextSceneElementIndex()
                 if(idx === screenplayAdapter.elementCount-1 && idx === theIndex) {
                     contentView.positionViewAtEnd()
                     assumeFocusAt(-1)
+                    contentView.scrollingBetweenScenes = false
                     return
                 }
 
@@ -2483,6 +2488,7 @@ Rectangle {
                     //contentView.positionViewAtIndex(iidx, ListView.Contain)
                     var item = contentView.loadedItemAtIndex(iidx)
                     item.assumeFocusAt(0)
+                    contentView.scrollingBetweenScenes = false
                 }, idx)
             }
         }
