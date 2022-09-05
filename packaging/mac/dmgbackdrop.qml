@@ -59,7 +59,7 @@ Item {
     }
 
     Timer {
-        running: backdropImage.stat7us === Image.Ready
+        running: backdropImage.status === Image.Ready
         interval: 250
         repeat: false
         onTriggered: {
