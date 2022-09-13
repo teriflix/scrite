@@ -1256,7 +1256,10 @@ Rectangle {
                         sceneTextEditor.cursorPosition = 0
                     firstInitializationDone = true
                 }
-                onRequestCursorPosition: Scrite.app.execLater(contentItem, 100, function() { contentItem.assumeFocusAt(position) })
+                onRequestCursorPosition: (position) => {
+                                             if(position >= 0)
+                                                contentItem.assumeFocusLater(position, 100)
+                                         }
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
                 applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 onCurrentParagraphTypeChanged: {
@@ -1627,6 +1630,7 @@ Rectangle {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     font: screenplayFormat.defaultFont2
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
+                    onCursorPositionChanged: Scrite.app.log("[" + contentItem.theIndex + "]: cursorPosition = " + cursorPosition)
                     onActiveFocusChanged: {
                         if(activeFocus) {
                             completionModel.allowEnable = true
@@ -2357,6 +2361,20 @@ Rectangle {
                         ignoreUnknownSignals: true
                         enabled: sceneTextEditor.activeFocus && !sceneTextEditor.readOnly
                         function onSceneRefreshed() { sceneTextEditor.justReceivedFocus = true }
+
+                        //
+                        property int preResetCursorPosition: -1
+                        function onModelAboutToBeReset() {
+                            if(sceneTextEditor.activeFocus)
+                                preResetCursorPosition = sceneTextEditor.cursorPosition
+                        }
+
+                        function onModelReset() {
+                            if(preResetCursorPosition >= 0) {
+                                contentItem.assumeFocusLater(preResetCursorPosition, 100)
+                                preResetCursorPosition = -1
+                            }
+                        }
                     }
 
                     Connections {
@@ -2452,6 +2470,13 @@ Rectangle {
                     sceneTextEditor.cursorPosition = sceneDocumentBinder.lastCursorPosition()
                 else
                     sceneTextEditor.cursorPosition = pos
+            }
+
+            function assumeFocusLater(pos, delay) {
+                if(delay === 0)
+                    Qt.callLater( assumeFocusAt, pos )
+                else
+                    Scrite.app.execLater(contentItem, delay, function() { contentItem.assumeFocusAt(pos) })
             }
 
             function scrollToPreviousScene() {
