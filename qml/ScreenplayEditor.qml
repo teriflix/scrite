@@ -1630,7 +1630,6 @@ Rectangle {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     font: screenplayFormat.defaultFont2
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
-                    onCursorPositionChanged: Scrite.app.log("[" + contentItem.theIndex + "]: cursorPosition = " + cursorPosition)
                     onActiveFocusChanged: {
                         if(activeFocus) {
                             completionModel.allowEnable = true
@@ -1656,12 +1655,24 @@ Rectangle {
                     Connections {
                         target: contentItem.theScene
 
+                        property int cursorPositionBeforeReset: -1
+
                         function onSceneAboutToReset() {
+                            if(sceneTextEditor.activeFocus)
+                                cursorPositionBeforeReset = sceneTextEditor.cursorPosition
+                            else
+                                cursorPositionBeforeReset = -1
                             sceneTextEditor.keepCursorInView = false
                         }
 
                         function onSceneReset(cp) {
-                            Scrite.app.execLater(sceneTextEditor, 100, () => { sceneTextEditor.keepCursorInView = true } )
+                            Scrite.app.execLater(sceneTextEditor, 50, () => { sceneTextEditor.keepCursorInView = true } )
+                            if(cursorPositionBeforeReset >= 0) {
+                                contentItem.assumeFocusLater(cursorPositionBeforeReset, 250)
+                                if(cp >= 0)
+                                    contentItem.assumeFocusLater(cp, 500)
+                            }
+                            cursorPositionBeforeReset = -1
                         }
                     }
 

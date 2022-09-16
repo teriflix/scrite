@@ -2404,9 +2404,9 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
                     cursor.insertText(bc);
                 }
             }
-
-            emit m_binder->requestCursorPosition(m_block.position() + m_cursorPosition);
         }
+
+        emit m_binder->requestCursorPosition(m_block.position() + m_cursorPosition);
 
         GarbageCollector::instance()->add(this);
     }
@@ -2441,8 +2441,7 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
         if (userData != nullptr && userData->sceneElement() == element) {
             // Text changes from scene element to block are not applied
             // Only element type changes can be applied.
-            if (element->type() == SceneElement::Parenthetical)
-                new ForceCursorPositionHack(block, m_cursorPosition - block.position(), this);
+            new ForceCursorPositionHack(block, m_cursorPosition - block.position(), this);
             userData->resetFormat();
             this->rehighlightBlock(block);
             return true;
