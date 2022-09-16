@@ -3073,7 +3073,17 @@ Rectangle {
 
         MenuItem2 {
             text: "Delete Note"
-            onClicked: notebookContentLoader.confirmAndDelete()
+            onClicked: {
+                if(notebookTree.currentNote == noteContextMenu.note)
+                    notebookContentLoader.confirmAndDelete()
+                else {
+                    notebookView.switchTo(noteContextMenu.note)
+                    Scrite.app.execLater( notebookContentLoader, 500, () => {
+                                     notebookContentLoader.confirmAndDelete()
+                                 } )
+                }
+                noteContextMenu.close()
+            }
         }
     }
 
@@ -3108,7 +3118,17 @@ Rectangle {
 
         MenuItem2 {
             text: "Delete Character"
-            onClicked: notebookContentLoader.confirmAndDelete()
+            onClicked: {
+                if(notebookTree.currentCharacter == characterContextMenu.character)
+                    notebookContentLoader.confirmAndDelete()
+                else {
+                    notebookView.switchTo(characterContextMenu.character.notes)
+                    Scrite.app.execLater( notebookContentLoader, 100, () => {
+                                     notebookContentLoader.confirmAndDelete()
+                                 } )
+                }
+                characterContextMenu.close()
+            }
         }
     }
 
