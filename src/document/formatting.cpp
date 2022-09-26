@@ -1196,6 +1196,9 @@ QList<int> TextFormat::allProperties()
 class SceneDocumentBlockUserData : public QTextBlockUserData
 {
 public:
+    enum { Type = 1001 };
+    const int type = Type;
+
     explicit SceneDocumentBlockUserData(SceneElement *element, SceneDocumentBinder *binder);
     ~SceneDocumentBlockUserData();
 
@@ -1298,7 +1301,7 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 
     SceneDocumentBlockUserData *userData2 =
             reinterpret_cast<SceneDocumentBlockUserData *>(userData);
-    return userData2;
+    return userData2->type == SceneDocumentBlockUserData::Type ? userData2 : nullptr;
 }
 
 class SpellCheckCursor : public QTextCursor

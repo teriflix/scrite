@@ -1411,6 +1411,7 @@ Rectangle {
                             Transliterator.cursorPosition: cursorPosition
                             Transliterator.hasActiveFocus: activeFocus
                             Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                            Transliterator.spellCheckEnabled: true
 
                             SpecialSymbolsSupport {
                                 anchors.top: parent.bottom
@@ -1419,6 +1420,8 @@ Rectangle {
                                 textEditorHasCursorInterface: true
                                 enabled: !Scrite.document.readOnly
                             }
+
+                            SpellingSuggestionsMenu2 { }
 
                             Item {
                                 x: parent.cursorRectangle.x
@@ -1519,10 +1522,14 @@ Rectangle {
                             Transliterator.cursorPosition: cursorPosition
                             Transliterator.hasActiveFocus: activeFocus
                             Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                            Transliterator.spellCheckEnabled: true
                             onTextChanged: contentItem.theScene.title = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
                             background: Item { }
+
+                            SpellingSuggestionsMenu2 { }
+
                             onActiveFocusChanged: {
                                 if(activeFocus) {
                                     contentView.ensureVisible(synopsisEditorField, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
@@ -1806,7 +1813,8 @@ Rectangle {
                     Transliterator.textDocument: textDocument
                     Transliterator.cursorPosition: cursorPosition
                     Transliterator.hasActiveFocus: activeFocus
-                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                    Transliterator.applyLanguageFonts: false // SceneDocumentBinder handles it separately.
+                    Transliterator.spellCheckEnabled: false // SceneDocumentBinder handles it separately.
                     Transliterator.onAboutToTransliterate: {
                         contentItem.theScene.beginUndoCapture(false)
                         contentItem.theScene.undoRedoEnabled = false
@@ -1897,66 +1905,40 @@ Rectangle {
 
                         // Context menus must ideally show up directly below the cursor
                         // So, we keep the menu loaders inside the cursorOverlay
-                        MenuLoader {
+                        SpellingSuggestionsMenu {
                             id: spellingSuggestionsMenuLoader
                             anchors.bottom: parent.bottom
-                            enabled: !Scrite.document.readOnly
+                            spellingSuggestions: sceneDocumentBinder.spellingSuggestions
 
-                            function replace(cursorPosition, suggestion) {
-                                sceneDocumentBinder.replaceWordAt(cursorPosition, suggestion)
-                                // sceneDocumentBinder.preserveScrollAndReload()
-                                if(cursorPosition >= 0)
-                                    sceneTextEditor.cursorPosition = cursorPosition
-                            }
+                            property int cursorPosition: -1
 
-                            menu: Menu2 {
-                                id: spellingSuggestionsMenu
-                                property int cursorPosition: -1
-                                onAboutToShow: {
-                                    cursorPosition = sceneTextEditor.cursorPosition
-                                    sceneTextEditor.persistentSelection = true
-                                }
-                                onAboutToHide: {
-                                    sceneTextEditor.persistentSelection = false
-                                    sceneTextEditor.forceActiveFocus()
-                                    sceneTextEditor.cursorPosition = cursorPosition
-                                }
+                            onReplaceRequest: (suggestion) => {
+                                                  if(cursorPosition >= 0) {
+                                                      sceneDocumentBinder.replaceWordAt(cursorPosition, suggestion)
+                                                      sceneTextEditor.cursorPosition = cursorPosition
+                                                  }
+                                              }
 
-                                Repeater {
-                                    model: sceneDocumentBinder.spellingSuggestions
+                            onMenuAboutToShow: () => {
+                                                   cursorPosition = sceneTextEditor.cursorPosition
+                                                   sceneTextEditor.persistentSelection = true
+                                               }
 
-                                    MenuItem2 {
-                                        text: modelData
-                                        focusPolicy: Qt.NoFocus
-                                        onClicked: {
-                                            Qt.callLater(spellingSuggestionsMenuLoader.replace, spellingSuggestionsMenu.cursorPosition, modelData)
-                                            spellingSuggestionsMenuLoader.close()
-                                        }
-                                    }
-                                }
+                            onMenuAboutToHide: () => {
+                                                   sceneTextEditor.persistentSelection = false
+                                                   sceneTextEditor.forceActiveFocus()
+                                                   sceneTextEditor.cursorPosition = cursorPosition
+                                               }
 
-                                MenuSeparator { }
+                            onAddToDictionaryRequest: () => {
+                                                          sceneDocumentBinder.addWordUnderCursorToDictionary()
+                                                          ++contentView.numberOfWordsAddedToDict
+                                                      }
 
-                                MenuItem2 {
-                                    text: "Add to dictionary"
-                                    focusPolicy: Qt.NoFocus
-                                    onClicked: {
-                                        spellingSuggestionsMenuLoader.close()
-                                        sceneDocumentBinder.addWordUnderCursorToDictionary()
-                                        ++contentView.numberOfWordsAddedToDict
-                                    }
-                                }
-
-                                MenuItem2 {
-                                    text: "Ignore"
-                                    focusPolicy: Qt.NoFocus
-                                    onClicked: {
-                                        spellingSuggestionsMenuLoader.close()
-                                        sceneDocumentBinder.addWordUnderCursorToIgnoreList()
-                                        ++contentView.numberOfWordsAddedToDict
-                                    }
-                                }
-                            }
+                            onAddToIgnoreListRequest: () => {
+                                                          sceneDocumentBinder.addWordUnderCursorToIgnoreList()
+                                                          ++contentView.numberOfWordsAddedToDict
+                                                      }
                         }
 
                         MenuLoader {
@@ -2157,7 +2139,7 @@ Rectangle {
                         enabled: !Scrite.document.readOnly && contextMenuEnableBinder.get
                         cursorShape: Qt.IBeamCursor
                         onClicked: {
-                            mouse.accept = true
+                            mouse.accepted = true
                             sceneTextEditor.persistentSelection = true
                             if(!sceneTextEditor.hasSelection && sceneDocumentBinder.spellCheckEnabled) {
                                 sceneTextEditor.cursorPosition = sceneTextEditor.positionAt(mouse.x, mouse.y)
@@ -2166,6 +2148,7 @@ Rectangle {
                                     return
                                 }
                             }
+                            sceneTextEditor.persistentSelection = false
                             editorContextMenu.popup()
                         }
 

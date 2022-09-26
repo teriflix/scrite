@@ -89,5 +89,7 @@
         <file>qml/SceneFeaturedImage.qml</file>
         <file>qml/RichTextEdit.qml</file>
         <file>qml/HelpTipNotification.qml</file>
+        <file>qml/SpellingSuggestionsMenu.qml</file>
+        <file>qml/SpellingSuggestionsMenu2.qml</file>
     </qresource>
 </RCC>

@@ -2818,6 +2818,7 @@ Item {
                             selectByMouse: false
                             Transliterator.textDocument: textDocument
                             Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                            Transliterator.spellCheckEnabled: true
                             font.pointSize: Scrite.app.idealFontPointSize
                             color: element.scene.hasTitle ? "black" : "gray"
                             // maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
@@ -2827,6 +2828,8 @@ Item {
                                                       result.filter = true
                                                       result.accepted = false
                                                   }
+
+                            SpellingSuggestionsMenu2 { }
                         }
 
                         Component.onCompleted: synopsisFieldLoader.hasFocus = false
@@ -2864,6 +2867,7 @@ Item {
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus
                                 Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                Transliterator.spellCheckEnabled: true
                                 placeholderText: "Describe what happens in this scene."
                                 font.pointSize: Scrite.app.idealFontPointSize
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -2887,6 +2891,7 @@ Item {
                                     textEditorHasCursorInterface: true
                                     enabled: !Scrite.document.readOnly
                                 }
+                                SpellingSuggestionsMenu2 { }
                                 onCursorRectangleChanged: {
                                     var y1 = cursorRectangle.y
                                     var y2 = cursorRectangle.y + cursorRectangle.height

@@ -32,6 +32,7 @@ Flickable {
     property alias background: __textArea.background
     property bool enforceDefaultFont: true
     property bool enforceHeadingFontSize: false
+    property bool spellCheckEnabled: true
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
@@ -57,6 +58,7 @@ Flickable {
         Transliterator.hasActiveFocus: activeFocus
         Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
+        Transliterator.spellCheckEnabled: textAreaFlickable.spellCheckEnabled
         Transliterator.enforeDefaultFont: textAreaFlickable.enforceDefaultFont
         Transliterator.enforceHeadingFontSize: textAreaFlickable.enforceHeadingFontSize
         readOnly: Scrite.document.readOnly
@@ -78,6 +80,7 @@ Flickable {
             onUndoRequest: __textArea.undo()
             onRedoRequest: __textArea.redo()
         }
+        SpellingSuggestionsMenu2 { }
         onCursorRectangleChanged: {
             var cr = cursorRectangle
             cr = Qt.rect(cr.x, cr.y-4, cr.width, cr.height+8)

@@ -64,6 +64,9 @@ inline QString timeToString(const QTime &t)
 class ScreenplayParagraphBlockData : public QTextBlockUserData
 {
 public:
+    enum { Type = 1002 };
+    const int type = Type;
+
     explicit ScreenplayParagraphBlockData(const SceneElement *element);
     ~ScreenplayParagraphBlockData();
 
@@ -182,7 +185,7 @@ ScreenplayParagraphBlockData *ScreenplayParagraphBlockData::get(QTextBlockUserDa
 
     ScreenplayParagraphBlockData *userData2 =
             reinterpret_cast<ScreenplayParagraphBlockData *>(userData);
-    return userData2;
+    return (userData2->type == ScreenplayParagraphBlockData::Type) ? userData2 : nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

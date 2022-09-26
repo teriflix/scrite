@@ -115,6 +115,7 @@ Column {
                 topPadding: 5; bottomPadding: 5
                 Transliterator.textDocument: textDocument
                 Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                Transliterator.spellCheckEnabled: formField.answer !== ""
                 readOnly: true
                 selectByMouse: false
                 selectByKeyboard: false
@@ -135,6 +136,7 @@ Column {
                 Transliterator.hasActiveFocus: activeFocus
                 Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
+                Transliterator.spellCheckEnabled: true
                 readOnly: Scrite.document.readOnly
                 background: Item { }
                 SpecialSymbolsSupport {
@@ -151,15 +153,18 @@ Column {
                     onUndoRequest: answerText.undo()
                     onRedoRequest: answerText.redo()
                 }
-
+                SpellingSuggestionsMenu2 { }
                 onActiveFocusChanged: {
-                    if(!activeFocus) {
+                    if(!activeFocus && !persistentSelection) {
                         if(dialogUnderlay.visible)
                             return
                         answerItemLoader.lod = answerItemLoader.eLOW
                     }
                 }
-                Component.onCompleted: forceActiveFocus()
+                Component.onCompleted: {
+                    forceActiveFocus()
+                    enableSpellCheck()
+                }
                 text: formField.answer
                 onTextChanged: formField.answer = text
 
