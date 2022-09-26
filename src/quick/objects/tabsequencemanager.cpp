@@ -116,6 +116,11 @@ void TabSequenceManager::setWrapAround(bool val)
     this->reworkSequenceLater();
 }
 
+QObject *TabSequenceManager::currentItemObject() const
+{
+    return m_currentItem;
+}
+
 void TabSequenceManager::assumeFocusAt(int index)
 {
     if (index < 0 || index >= m_tabSequenceItems.size())
@@ -193,6 +198,15 @@ int TabSequenceManager::fetchItemIndex(int from, int direction, bool enabledOnly
             break;
     }
     return idx;
+}
+
+void TabSequenceManager::setCurrentItem(TabSequenceItem *val)
+{
+    if (m_currentItem == val)
+        return;
+
+    m_currentItem = val;
+    emit currentItemChanged();
 }
 
 void TabSequenceManager::timerEvent(QTimerEvent *te)
@@ -321,7 +335,7 @@ TabSequenceItem::TabSequenceItem(QObject *parent) : QObject(parent), m_manager(t
 {
     QQuickItem *qmlItem = qobject_cast<QQuickItem *>(parent);
     if (qmlItem != nullptr)
-        connect(qmlItem, &QQuickItem::focusChanged, this, &TabSequenceItem::hasFocusChanged);
+        connect(qmlItem, &QQuickItem::focusChanged, this, &TabSequenceItem::onQmlItemFocusChanged);
 }
 
 TabSequenceItem::~TabSequenceItem()
@@ -426,4 +440,16 @@ void TabSequenceItem::resetManager()
 {
     m_manager = nullptr;
     emit managerChanged();
+}
+
+void TabSequenceItem::onQmlItemFocusChanged()
+{
+    emit hasFocusChanged();
+
+    if (!m_manager.isNull()) {
+        if (this->hasFocus())
+            m_manager->setCurrentItem(this);
+        else if (m_manager->m_currentItem == this)
+            m_manager->setCurrentItem(nullptr);
+    }
 }

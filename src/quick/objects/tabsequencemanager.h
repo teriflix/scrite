@@ -76,6 +76,11 @@ public:
     bool isWrapAround() const { return m_wrapAround; }
     Q_SIGNAL void wrapAroundChanged();
 
+    Q_PROPERTY(QObject* currentItem READ currentItemObject NOTIFY currentItemChanged)
+    TabSequenceItem *currentItem() const { return m_currentItem; }
+    QObject *currentItemObject() const;
+    Q_SIGNAL void currentItemChanged();
+
     Q_INVOKABLE void assumeFocus() { this->assumeFocusAt(0); }
     Q_INVOKABLE void assumeFocusAt(int index);
     Q_INVOKABLE void releaseFocus();
@@ -89,6 +94,7 @@ private:
     bool switchFocus(int by = 1);
     bool switchFocusFrom(int fromItemIndex, int by = 1);
     int fetchItemIndex(int from, int direction, bool enabledOnly = true) const;
+    void setCurrentItem(TabSequenceItem *val);
 
 protected:
     void timerEvent(QTimerEvent *te);
@@ -116,6 +122,7 @@ private:
     QList<TabSequenceItem *> m_tabSequenceItems;
     int m_releaseFocusKey = Qt::Key_Escape;
     bool m_releaseFocusEnabled = false;
+    TabSequenceItem *m_currentItem = nullptr;
 };
 
 class TabSequenceItem : public QObject
@@ -159,6 +166,7 @@ protected:
     TabSequenceItem(QObject *parent = nullptr);
     void resetManager();
     void resetKeyNavigationObject();
+    void onQmlItemFocusChanged();
 
 private:
     void setInsertIndex(int index) { m_insertIndex = index; }

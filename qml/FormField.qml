@@ -42,6 +42,13 @@ Column {
     property int indentation: 0
     property int answerLength: FormQuestion.LongParagraph
 
+    signal focusNextRequest()
+    signal focusPreviousRequest()
+
+    function assumeFocus(pos) {
+        answerItemLoader.assumeFocus(pos)
+    }
+
     Row {
         id: questionRow
         width: parent.width-indentation
@@ -52,6 +59,7 @@ Column {
         Label {
             id: questionNumberText
             font.bold: true
+            font.pointSize: Scrite.app.idealFontPointSize + 2
             horizontalAlignment: Text.AlignRight
             width: idealAppFontMetrics.averageCharacterWidth * nrQuestionDigits
             anchors.top: parent.top
@@ -60,6 +68,7 @@ Column {
         Label {
             id: questionText
             font.bold: true
+            font.pointSize: Scrite.app.idealFontPointSize + 2
             width: parent.width - questionNumberText.width - parent.spacing
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.top: parent.top
@@ -90,6 +99,12 @@ Column {
             TabSequenceItem.manager: tabSequenceManager
             TabSequenceItem.sequence: tabSequenceIndex
             TabSequenceItem.onAboutToReceiveFocus: lod = eHIGH
+
+            function assumeFocus(position) {
+                if(lod === eLOW)
+                    lod = eHIGH
+                Qt.callLater( (pos) => { item.assumeFocus(pos) }, position )
+            }
 
             lowDetailComponent: TextArea {
                 font.pointSize: Scrite.app.idealFontPointSize
@@ -147,6 +162,29 @@ Column {
                 Component.onCompleted: forceActiveFocus()
                 text: formField.answer
                 onTextChanged: formField.answer = text
+
+                Keys.onUpPressed: (event) => {
+                                      if(TextDocument.canGoUp())
+                                          event.accepted = false
+                                      else {
+                                          event.accepted = true
+                                          Qt.callLater(focusPreviousRequest)
+                                      }
+                                  }
+
+                Keys.onDownPressed: (event) => {
+                                        if(TextDocument.canGoDown())
+                                            event.accepted = false
+                                        else {
+                                            event.accepted = true
+                                            Qt.callLater(focusNextRequest)
+                                        }
+                                    }
+
+                function assumeFocus(pos) {
+                    forceActiveFocus()
+                    cursorPosition = pos < 0 ? TextDocument.lastCursorPosition() : pos
+                }
             }
         }
     }
