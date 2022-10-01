@@ -1232,8 +1232,11 @@ void ScreenplayTextDocument::loadScreenplay()
                 || lastPrintedElement->elementType() != ScreenplayElement::BreakElementType))
             cursor.insertText(QStringLiteral("Episode ")
                               + QString::number(element->episodeIndex() + 1)
-                              + QStringLiteral(": "));
+                              + QStringLiteral(", "));
         cursor.insertText(element->breakTitle());
+
+        if (!element->breakSubtitle().isEmpty())
+            cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
     };
 
     const int fsi = m_screenplay->firstSceneIndex();

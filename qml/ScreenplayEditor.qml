@@ -1047,6 +1047,7 @@ Rectangle {
                 anchors.right: episodeBreakSubtitle.left
                 anchors.rightMargin: ruler.leftMarginPx * 0.075
                 anchors.bottom: parent.bottom
+                horizontalAlignment: Text.AlignRight
                 text: "Ep " + (theElement.episodeIndex+1)
                 readOnly: true
                 visible: episodeBreakSubtitle.length > 0
@@ -1065,7 +1066,6 @@ Rectangle {
                 placeholderText: theElement.breakTitle
                 font.family: headingFontMetrics.font.family
                 font.bold: true
-                font.capitalization: Font.AllUppercase
                 font.pointSize: headingFontMetrics.font.pointSize+2
                 text: theElement.breakSubtitle
                 enableTransliteration: true
@@ -1098,33 +1098,37 @@ Rectangle {
             height: actBreakTitle.height
             color: primaryColors.c10.background
 
-            Text {
-                id: actBreakPrefix
-                font: actBreakTitle.font
-                anchors.right: actBreakTitle.left
-                anchors.rightMargin: ruler.leftMarginPx * 0.075
-                anchors.verticalCenter: actBreakTitle.verticalCenter
+            TextField {
+                id: actBreakTitle
+                maximumLength: 7
                 width: headingFontMetrics.averageCharacterWidth*maximumLength
-                visible: parent.theElement.breakType === Screenplay.Act && screenplayAdapter.isSourceScreenplay && screenplayAdapter.screenplay.episodeCount > 0
-                text: "Ep " + (parent.theElement.episodeIndex+1)
-                color: actBreakTitle.color
-                readonly property int maximumLength: 5
+                anchors.right: actBreakSubtitle.left
+                anchors.rightMargin: ruler.leftMarginPx * 0.075
+                anchors.bottom: parent.bottom
+                horizontalAlignment: Text.AlignRight
+                text: theElement.breakTitle
+                readOnly: true
+                visible: actBreakSubtitle.length > 0
+                font: actBreakSubtitle.font
+                background: Item { }
             }
 
-            Text {
-                id: actBreakTitle
-                font.family: headingFontMetrics.font.family
-                font.bold: true
-                font.capitalization: Font.AllUppercase
-                font.pointSize: headingFontMetrics.font.pointSize
+            TextField2 {
+                id: actBreakSubtitle
+                label: ""
                 anchors.left: parent.left
                 anchors.right: deleteBreakButton.left
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: 5
-                topPadding: headingFontMetrics.lineSpacing*0.15
-                bottomPadding: topPadding
-                color:  primaryColors.c10.text
-                text: parent.theElement.breakTitle
+                anchors.bottom: parent.bottom
+                placeholderText: theElement.breakTitle
+                font.family: headingFontMetrics.font.family
+                font.bold: true
+                font.pointSize: headingFontMetrics.font.pointSize+2
+                text: theElement.breakSubtitle
+                enableTransliteration: true
+                onTextEdited: theElement.breakSubtitle = text
+                onEditingComplete: theElement.breakSubtitle = text
             }
 
             ToolButton3 {
@@ -3138,7 +3142,6 @@ Rectangle {
                             font.family: "Courier Prime"
                             font.pixelSize: Math.ceil(Scrite.app.idealFontPointSize * 1.2)
                             font.bold: true
-                            font.capitalization: Font.AllUppercase
                             text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
                         }
 
@@ -3209,18 +3212,22 @@ Rectangle {
                             font.family: "Courier Prime"
                             font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
                             font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*(parent.elementIsBreak ? 1.2 : 1))
-                            horizontalAlignment: parent.elementIsBreak & !sceneListView.hasEpisodes ? Qt.AlignHCenter : Qt.AlignLeft
+                            horizontalAlignment: Qt.AlignLeft
                             color: primaryColors.c10.text
-                            font.capitalization: Font.AllUppercase
+                            font.capitalization: parent.elementIsBreak ? Font.MixedCase : Font.AllUppercase
                             text: {
                                 if(scene && scene.heading.enabled)
                                     return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
                                 if(parent.elementIsBreak) {
+                                    var ret = ""
                                     if(parent.elementIsEpisodeBreak)
-                                        return screenplayElement.breakTitle + ": " + screenplayElement.breakSubtitle
-                                    if(sceneListView.hasEpisodes)
-                                        return "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
-                                    return screenplayElement.breakTitle
+                                        ret = screenplayElement.breakTitle
+                                    else if(sceneListView.hasEpisodes)
+                                        ret = "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
+                                    else
+                                        ret = screenplayElement.breakTitle
+                                    ret +=  ": " + screenplayElement.breakSubtitle
+                                    return ret
                                 }
                                 return "NO SCENE HEADING"
                             }

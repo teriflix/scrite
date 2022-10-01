@@ -758,6 +758,8 @@ ActItem::ActItem(ScreenplayElement *element) : ObjectItem(element), m_element(el
     auto callUpdateText = [=]() { this->updateText(); };
     m_connections << QObject::connect(element, &ScreenplayElement::breakTitleChanged,
                                       callUpdateText);
+    m_connections << QObject::connect(element, &ScreenplayElement::breakSubtitleChanged,
+                                      callUpdateText);
     this->setData(NotebookModel::ActBreakType, NotebookModel::TypeRole);
     this->setData(QVariant::fromValue<QObject *>(element), NotebookModel::ObjectRole);
 }
@@ -766,7 +768,10 @@ ActItem::~ActItem() { }
 
 void ActItem::updateText()
 {
-    this->setText(m_element->breakTitle());
+    if (m_element->breakSubtitle().isEmpty())
+        this->setText(m_element->breakTitle());
+    else
+        this->setText(m_element->breakTitle() + QStringLiteral(": ") + m_element->breakSubtitle());
 }
 
 EpisodeItem::EpisodeItem(ScreenplayElement *element) : ObjectItem(element), m_element(element)
@@ -845,6 +850,8 @@ StoryNode *StoryNode::create(ScriteDocument *document)
                 StoryNode *parentNode = episodeNode ? episodeNode : screenplayNode;
 
                 if (actNode == nullptr && !parentNode->childNodes.isEmpty()) {
+                    // User has not created an Act 1, so we are going to create Act 1
+                    // node just for the sake of the notebook model.
                     actNode = new StoryNode;
                     actNode->actName = QStringLiteral("ACT 1");
                     actNode->childNodes = parentNode->childNodes;
