@@ -85,12 +85,6 @@ Column {
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
         property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 
-        MouseArea {
-            anchors.fill: parent
-            enabled: answerItemLoader.lod === answerItemLoader.eLOW
-            onClicked: answerItemLoader.TabSequenceItem.assumeFocus()
-        }
-
         LodLoader {
             id: answerItemLoader
             width: answerArea.width
@@ -120,7 +114,10 @@ Column {
                 selectByMouse: false
                 selectByKeyboard: false
                 background: Item { }
-                onPressed: Qt.callLater( () => { answerItemLoader.TabSequenceItem.assumeFocus() } )
+                onPressed:  (mouse) => {
+                                const position = answerItemLoader.item.positionAt(mouse.x, mouse.y)
+                                answerItemLoader.assumeFocus(position)
+                            }
             }
 
             highDetailComponent: TextArea {
