@@ -2567,25 +2567,50 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             }
         }
 
-        if (m_includeSceneSynopsis && !scene->title().isEmpty()) {
-            QColor sceneColor = scene->color().lighter(175);
-            sceneColor.setAlphaF(0.5);
-
-            QTextBlockFormat blockFormat;
-            blockFormat.setTopMargin(10);
-            blockFormat.setBackground(sceneColor);
-
-            QTextCharFormat charFormat;
-            charFormat.setFont(cursor.document()->defaultFont());
+        if (m_includeSceneSynopsis) {
+            const StructureElement *structureElement = scene->structureElement();
+            const QString title = structureElement ? structureElement->nativeTitle() : QString();
 
             QString synopsis = scene->title();
-            synopsis.replace(newlinesRegEx, newline);
+            synopsis = synopsis.replace(newlinesRegEx, newline);
 
-            cursor.insertBlock(blockFormat, charFormat);
-            // cursor.insertText(synopsis);
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+            const bool includingSomething = !title.isEmpty() || !synopsis.isEmpty();
 
-            insertBlock = true;
+            QTextFrame *frame = cursor.currentFrame();
+
+            if (includingSomething) {
+                if (insertBlock)
+                    cursor.insertBlock();
+
+                QColor sceneColor = scene->color().lighter(175);
+                sceneColor.setAlphaF(0.5);
+
+                QTextFrameFormat format;
+                format.setBackground(sceneColor);
+                format.setPadding(5);
+                format.setBottomMargin(10);
+                format.setBorder(1);
+                format.setBorderBrush(scene->color().darker());
+
+                cursor.insertFrame(format);
+            }
+
+            if (!title.isEmpty()) {
+                prepareCursor(cursor, SceneElement::Heading, false);
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, title);
+                cursor.insertBlock();
+            }
+
+            if (!synopsis.isEmpty()) {
+                prepareCursor(cursor, SceneElement::Action, false);
+                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+            }
+
+            if (includingSomething) {
+                cursor = frame->lastCursorPosition();
+                insertBlock = false;
+            } else
+                insertBlock = true;
         }
 
         if (m_includeSceneComments) {

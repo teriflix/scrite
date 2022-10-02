@@ -33,7 +33,7 @@ public:
     bool isListSceneCharacters() const { return m_listSceneCharacters; }
     Q_SIGNAL void listSceneCharactersChanged();
 
-    Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include synopsis of each scene.")
+    Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include title & synopsis of each scene, if available.")
     Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
     void setIncludeSceneSynopsis(bool val);
