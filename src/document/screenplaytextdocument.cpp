@@ -2582,13 +2582,9 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 if (insertBlock)
                     cursor.insertBlock();
 
-                QColor sceneColor = scene->color().lighter(175);
-                sceneColor.setAlphaF(0.5);
-
                 QTextFrameFormat format;
-                format.setBackground(sceneColor);
                 format.setPadding(5);
-                format.setBottomMargin(10);
+                format.setBottomMargin(5);
                 format.setBorder(1);
                 format.setBorderBrush(scene->color().darker());
 
@@ -2596,8 +2592,17 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             }
 
             if (!title.isEmpty()) {
+                QColor sceneColor = scene->color().lighter(175);
+                sceneColor.setAlphaF(0.5);
+
                 prepareCursor(cursor, SceneElement::Heading, false);
+
+                QTextBlockFormat format;
+                format.setBackground(sceneColor);
+                cursor.mergeBlockFormat(format);
+
                 TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, title);
+
                 cursor.insertBlock();
             }
 
@@ -2624,7 +2629,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 sceneColor.setAlphaF(0.5);
 
                 QTextBlockFormat blockFormat;
-                blockFormat.setTopMargin(10);
+                blockFormat.setTopMargin(m_includeSceneSynopsis ? 0 : 10);
                 blockFormat.setLeftMargin(15);
                 blockFormat.setRightMargin(15);
                 blockFormat.setBackground(sceneColor);
