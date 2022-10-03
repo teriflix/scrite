@@ -234,7 +234,30 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
 
 QVersionNumber Application::prepare()
 {
-    const QVersionNumber applicationVersion(0, 9, 2);
+    const QVersionNumber applicationVersion = QVersionNumber::fromString(QStringLiteral("0.9.2.3"));
+    const QString applicationVersionString = [applicationVersion]() -> QString {
+        const QVector<int> segments = applicationVersion.segments();
+
+        QStringList ret;
+
+        for (int i = 0; i < qMin(segments.size(), 3); i++)
+            ret << QString::number(segments.at(i));
+
+        for (int i = ret.size(); i < 3; i++)
+            ret << QStringLiteral("0");
+
+        for (int i = 3; i < segments.size(); i++) {
+            QString field;
+            int segment = qMax(0, segments.at(i) - 1);
+            while (segment >= 0) {
+                field += QChar('a' + segment % 26);
+                segment -= 26;
+            }
+            ret.last() += field;
+        }
+
+        return ret.join('.');
+    }();
 
     if (qApp != nullptr)
         return applicationVersion;
@@ -259,14 +282,14 @@ QVersionNumber Application::prepare()
     }
 
 #ifdef Q_OS_MAC
-    Application::setApplicationVersion(applicationVersion.toString() + QStringLiteral("-beta"));
+    Application::setApplicationVersion(applicationVersionString + QStringLiteral("-beta"));
     if (QOperatingSystemVersion::current() > QOperatingSystemVersion::MacOSCatalina)
         qputenv("QT_MAC_WANTS_LAYER", QByteArrayLiteral("1"));
 #else
     if (QSysInfo::WordSize == 32)
-        Application::setApplicationVersion(applicationVersion.toString() + "-beta-x86");
+        Application::setApplicationVersion(applicationVersionString + "-beta-x86");
     else
-        Application::setApplicationVersion(applicationVersion.toString() + "-beta-x64");
+        Application::setApplicationVersion(applicationVersionString + "-beta-x64");
 #endif
 
 #ifdef Q_OS_WIN
