@@ -238,7 +238,7 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
 
 QVersionNumber Application::prepare()
 {
-    const QVersionNumber applicationVersion = QVersionNumber::fromString(QStringLiteral("0.9.2.3"));
+    const QVersionNumber applicationVersion = QVersionNumber::fromString(QStringLiteral("0.9.2.4"));
     const QString applicationVersionString = [applicationVersion]() -> QString {
         const QVector<int> segments = applicationVersion.segments();
 
@@ -1567,9 +1567,15 @@ void Application::changeWindowsEnvironmentVariable(const QString &name, const QS
 #else
 QString Application::getWindowsEnvironmentVariable(const QString &name, const QString &defaultValue)
 {
-    return QString();
+    Q_UNUSED(name)
+
+    return defaultValue;
 }
-void Application::changeWindowsEnvironmentVariable(const QString &name, const QString &value) { }
+void Application::changeWindowsEnvironmentVariable(const QString &name, const QString &value)
+{
+    Q_UNUSED(name)
+    Q_UNUSED(value)
+}
 #endif
 
 QPointF Application::globalMousePosition() const
