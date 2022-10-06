@@ -779,27 +779,63 @@ Item {
                 GroupBox {
                     label: Text { text: "Page Layout (Display)" }
                     width: (parent.width - parent.spacing)/2
+                    clip: true
 
                     Column {
                         width: parent.width
                         spacing: 10
 
-                        Text {
+                        Row {
                             width: parent.width
-                            wrapMode: Text.WordWrap
-                            text: "Default Resolution: <strong>" + Math.round(Scrite.document.displayFormat.pageLayout.defaultResolution) + "</strong>"
+
+                            Text {
+                                width: parent.width * 0.2
+                                wrapMode: Text.WordWrap
+                                padding: 5
+                                text: "DPI:"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            TextField2 {
+                                width: parent.width * 0.8
+                                placeholderText: "leave empty for default (" + Math.round(Scrite.document.displayFormat.pageLayout.defaultResolution) + "), or enter a custom value."
+                                text: Scrite.document.displayFormat.pageLayout.customResolution > 0 ? Scrite.document.displayFormat.pageLayout.customResolution : ""
+                                onEditingComplete: {
+                                    var value = parseFloat(text)
+                                    if(isNaN(value))
+                                        Scrite.document.displayFormat.pageLayout.customResolution = 0
+                                    else
+                                        Scrite.document.displayFormat.pageLayout.customResolution = value
+                                }
+                            }
                         }
 
-                        TextField2 {
+                        Row {
                             width: parent.width
-                            placeholderText: "leave empty for default, or enter a custom value."
-                            text: Scrite.document.displayFormat.pageLayout.customResolution > 0 ? Scrite.document.displayFormat.pageLayout.customResolution : ""
-                            onEditingComplete: {
-                                var value = parseFloat(text)
-                                if(isNaN(value))
-                                    Scrite.document.displayFormat.pageLayout.customResolution = 0
-                                else
-                                    Scrite.document.displayFormat.pageLayout.customResolution = value
+                            enabled: Scrite.app.isWindowsPlatform
+
+                            Text {
+                                width: parent.width * 0.2
+                                wrapMode: Text.WordWrap
+                                padding: 5
+                                text: "Scale:"
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+
+                            TextField2 {
+                                width: parent.width * 0.8
+                                placeholderText: "Default: 1.0. Requires restart if changed."
+                                text: Scrite.app.isWindowsPlatform ? Scrite.app.getWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
+                                onEditingComplete: {
+                                    var value = parseFloat(text)
+                                    if(isNaN(value))
+                                        value = 1.0
+
+                                    value = Math.min(Math.max(0.25,value),5)
+                                    value = Math.round(value*100)/100
+
+                                    Scrite.app.changeWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR", ""+value)
+                                }
                             }
                         }
                     }

@@ -22,6 +22,10 @@
 #include "scritedocument.h"
 #include "jsonhttprequest.h"
 
+#ifdef Q_OS_WIN
+#include "Windows.h"
+#endif
+
 #include <QDir>
 #include <QUuid>
 #include <QtMath>
@@ -304,6 +308,14 @@ QVersionNumber Application::prepare()
     } else
         Application::setAttribute(Qt::AA_Use96Dpi);
     Application::setAttribute(Qt::AA_UseDesktopOpenGL);
+
+    const qreal uiScaleFactor =
+            getWindowsEnvironmentVariable(QLatin1String("SCRITE_UI_SCALE_FACTOR"),
+                                          QLatin1String("1.0"))
+                    .toDouble();
+    const QByteArray qtScaleFactor =
+            QByteArray::number(qRound(qBound(0.25, uiScaleFactor, 5.0) * 100) / 100.0);
+    qputenv("QT_SCALE_FACTOR", qtScaleFactor);
 #endif
 
     QPalette palette = Application::palette();
@@ -1522,10 +1534,43 @@ QScreen *Application::windowScreen(QObject *window) const
     return nullptr;
 }
 
-QString Application::getEnvironmentVariable(const QString &name) const
+QString Application::getEnvironmentVariable(const QString &name)
 {
     return QProcessEnvironment::systemEnvironment().value(name);
 }
+
+#ifdef Q_OS_WIN
+static QString windowsEnvironmentRegistryGroup()
+{
+    static const QString ret = QLatin1String("HKEY_CURRENT_USER\\Environment\\");
+    return ret;
+}
+
+QString Application::getWindowsEnvironmentVariable(const QString &name, const QString &defaultValue)
+{
+    QSettings settings(::windowsEnvironmentRegistryGroup(), QSettings::NativeFormat);
+    if (settings.contains(name))
+        return settings.value(name).toString();
+    return defaultValue;
+}
+
+void Application::changeWindowsEnvironmentVariable(const QString &name, const QString &value)
+{
+    QSettings settings(::windowsEnvironmentRegistryGroup(), QSettings::NativeFormat);
+    settings.setValue(name, value);
+
+    DWORD_PTR res;
+    std::wstring namestr = name.toStdWString();
+    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)namestr.c_str(),
+                       SMTO_ABORTIFHUNG, 1000, &res);
+}
+#else
+QString Application::getWindowsEnvironmentVariable(const QString &name, const QString &defaultValue)
+{
+    return QString();
+}
+void Application::changeWindowsEnvironmentVariable(const QString &name, const QString &value) { }
+#endif
 
 QPointF Application::globalMousePosition() const
 {
