@@ -22,10 +22,6 @@
 #include "scritedocument.h"
 #include "jsonhttprequest.h"
 
-#ifdef Q_OS_WIN
-#include "Windows.h"
-#endif
-
 #include <QDir>
 #include <QUuid>
 #include <QtMath>
@@ -297,9 +293,21 @@ QVersionNumber Application::prepare()
 #endif
 
 #ifdef Q_OS_WIN
+    Application::setAttribute(Qt::AA_UseDesktopOpenGL);
+
     // Maybe helps address https://www.github.com/teriflix/scrite/issues/247
-    const QByteArray dpiMode = qgetenv("SCRITE_DPI_MODE");
-    if (!dpiMode.isEmpty()) {
+    const QByteArray dpiMode = qgetenv("SCRITE_DPI_MODE").trimmed();
+    if (dpiMode.isEmpty()) {
+        const qreal uiScaleFactor =
+                getWindowsEnvironmentVariable(QLatin1String("SCRITE_UI_SCALE_FACTOR"),
+                                              QLatin1String("1.0"))
+                        .toDouble();
+        const QByteArray qtScaleFactor =
+                QByteArray::number(qRound(qBound(0.1, uiScaleFactor, 10.0) * 100) / 100.0);
+        Application::setAttribute(Qt::AA_EnableHighDpiScaling);
+        Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
+        qputenv("QT_SCALE_FACTOR", qtScaleFactor);
+    } else {
         if (dpiMode == QByteArrayLiteral("HIGH_DPI")) {
             Application::setAttribute(Qt::AA_EnableHighDpiScaling);
             Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -307,18 +315,6 @@ QVersionNumber Application::prepare()
             Application::setAttribute(Qt::AA_Use96Dpi);
             Application::setAttribute(Qt::AA_DisableHighDpiScaling);
         }
-    }
-
-    Application::setAttribute(Qt::AA_UseDesktopOpenGL);
-
-    if (dpiMode.isEmpty()) {
-        const qreal uiScaleFactor =
-                getWindowsEnvironmentVariable(QLatin1String("SCRITE_UI_SCALE_FACTOR"),
-                                              QLatin1String("1.0"))
-                        .toDouble();
-        const QByteArray qtScaleFactor =
-                QByteArray::number(qRound(qBound(0.25, uiScaleFactor, 5.0) * 100) / 100.0);
-        qputenv("QT_SCALE_FACTOR", qtScaleFactor);
     }
 #endif
 
@@ -1563,10 +1559,7 @@ void Application::changeWindowsEnvironmentVariable(const QString &name, const QS
     QSettings settings(::windowsEnvironmentRegistryGroup(), QSettings::NativeFormat);
     settings.setValue(name, value);
 
-    DWORD_PTR res;
-    std::wstring namestr = name.toStdWString();
-    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)namestr.c_str(),
-                       SMTO_ABORTIFHUNG, 1000, &res);
+    QProcessEnvironment::systemEnvironment().insert(name, value);
 }
 
 void Application::removeWindowsEnvironmentVariable(const QString &name)
@@ -1574,10 +1567,7 @@ void Application::removeWindowsEnvironmentVariable(const QString &name)
     QSettings settings(::windowsEnvironmentRegistryGroup(), QSettings::NativeFormat);
     settings.remove(name);
 
-    DWORD_PTR res;
-    std::wstring namestr = name.toStdWString();
-    SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM)namestr.c_str(),
-                       SMTO_ABORTIFHUNG, 1000, &res);
+    QProcessEnvironment::systemEnvironment().remove(name);
 }
 #else
 QString Application::getWindowsEnvironmentVariable(const QString &name, const QString &defaultValue)

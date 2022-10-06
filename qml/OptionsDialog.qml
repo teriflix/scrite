@@ -831,7 +831,7 @@ Item {
                                     if(isNaN(value))
                                         value = 1.0
 
-                                    value = Math.min(Math.max(0.25,value),5)
+                                    value = Math.min(Math.max(0.1,value),10)
                                     value = Math.round(value*100)/100
 
                                     Scrite.app.removeWindowsEnvironmentVariable("SCRITE_DPI_MODE")
