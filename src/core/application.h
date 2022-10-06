@@ -91,57 +91,33 @@ public:
 
     Q_PROPERTY(bool isMacOSPlatform READ isMacOSPlatform CONSTANT)
 #ifdef Q_OS_MAC
-    bool isMacOSPlatform() const
-    {
-        return true;
-    }
+    bool isMacOSPlatform() const { return true; }
 #else
-    bool isMacOSPlatform() const
-    {
-        return false;
-    }
+    bool isMacOSPlatform() const { return false; }
 #endif
 
     Q_PROPERTY(bool isWindowsPlatform READ isWindowsPlatform CONSTANT)
 #ifdef Q_OS_WIN
-    bool isWindowsPlatform() const
-    {
-        return true;
-    }
+    bool isWindowsPlatform() const { return true; }
 #else
-    bool isWindowsPlatform() const
-    {
-        return false;
-    }
+    bool isWindowsPlatform() const { return false; }
 #endif
 
     Q_PROPERTY(bool isNotWindows10 READ isNotWindows10 CONSTANT)
 #ifdef Q_OS_WIN
     bool isNotWindows10() const;
 #else
-    bool isNotWindows10() const
-    {
-        return true;
-    }
+    bool isNotWindows10() const { return true; }
 #endif
 
     Q_PROPERTY(bool isLinuxPlatform READ isLinuxPlatform CONSTANT)
 #ifdef Q_OS_MAC
-    bool isLinuxPlatform() const
-    {
-        return false;
-    }
+    bool isLinuxPlatform() const { return false; }
 #else
 #ifdef Q_OS_UNIX
-    bool isLinuxPlatform() const
-    {
-        return true;
-    }
+    bool isLinuxPlatform() const { return true; }
 #else
-    bool isLinuxPlatform() const
-    {
-        return false;
-    }
+    bool isLinuxPlatform() const { return false; }
 #endif
 #endif
 
@@ -167,72 +143,45 @@ public:
     Q_PROPERTY(QString baseWindowTitle READ baseWindowTitle WRITE setBaseWindowTitle NOTIFY
                        baseWindowTitleChanged)
     void setBaseWindowTitle(const QString &val);
-    QString baseWindowTitle() const
-    {
-        return m_baseWindowTitle;
-    }
+    QString baseWindowTitle() const { return m_baseWindowTitle; }
     Q_SIGNAL void baseWindowTitleChanged();
 
     Q_PROPERTY(QString qtVersion READ qtVersion CONSTANT)
-    QString qtVersion() const
-    {
-        return QString::fromLatin1(QT_VERSION_STR);
-    }
+    QString qtVersion() const { return QString::fromLatin1(QT_VERSION_STR); }
 
     Q_INVOKABLE QString typeName(QObject *object) const;
     Q_INVOKABLE bool verifyType(QObject *object, const QString &name) const;
     Q_INVOKABLE bool isTextInputItem(QQuickItem *item) const;
 
     Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
-    QVersionNumber versionNumber() const
-    {
-        return m_versionNumber;
-    }
+    QVersionNumber versionNumber() const { return m_versionNumber; }
 
     Q_PROPERTY(QUndoGroup *undoGroup READ undoGroup CONSTANT)
-    QUndoGroup *undoGroup() const
-    {
-        return m_undoGroup;
-    }
+    QUndoGroup *undoGroup() const { return m_undoGroup; }
 
     Q_INVOKABLE UndoStack *findUndoStack(const QString &objectName) const;
 
     Q_PROPERTY(bool canUndo READ canUndo NOTIFY canUndoChanged)
-    bool canUndo() const
-    {
-        return m_undoGroup->canUndo();
-    }
+    bool canUndo() const { return m_undoGroup->canUndo(); }
     Q_SIGNAL void canUndoChanged();
 
     Q_PROPERTY(bool canRedo READ canRedo NOTIFY canRedoChanged)
-    bool canRedo() const
-    {
-        return m_undoGroup->canRedo();
-    }
+    bool canRedo() const { return m_undoGroup->canRedo(); }
     Q_SIGNAL void canRedoChanged();
 
     Q_PROPERTY(QString undoText READ undoText NOTIFY undoTextChanged)
-    QString undoText() const
-    {
-        return m_undoGroup->undoText();
-    }
+    QString undoText() const { return m_undoGroup->undoText(); }
     Q_SIGNAL void undoTextChanged();
 
     Q_PROPERTY(QString redoText READ redoText NOTIFY redoTextChanged)
-    QString redoText() const
-    {
-        return m_undoGroup->redoText();
-    }
+    QString redoText() const { return m_undoGroup->redoText(); }
     Q_SIGNAL void redoTextChanged();
 
     static QFontDatabase &fontDatabase();
 
     Q_INVOKABLE static QJsonObject systemFontInfo();
     Q_INVOKABLE QColor pickColor(const QColor &initial) const;
-    Q_INVOKABLE QString colorName(const QColor &color) const
-    {
-        return color.name();
-    }
+    Q_INVOKABLE QString colorName(const QColor &color) const { return color.name(); }
     Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
     Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
     Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;
@@ -253,10 +202,7 @@ public:
     }
 
     Q_PROPERTY(SystemTextInputManager *textInputManager READ textInputManager CONSTANT)
-    SystemTextInputManager *textInputManager() const
-    {
-        return SystemTextInputManager::instance();
-    }
+    SystemTextInputManager *textInputManager() const { return SystemTextInputManager::instance(); }
 
     Q_INVOKABLE QPointF cursorPosition() const;
     Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;
@@ -267,10 +213,7 @@ public:
 
     Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha = 0.5);
 
-    QSettings *settings() const
-    {
-        return m_settings;
-    }
+    QSettings *settings() const { return m_settings; }
 
     Q_PROPERTY(AutoUpdate *autoUpdate READ autoUpdate CONSTANT)
     AutoUpdate *autoUpdate() const;
@@ -280,20 +223,14 @@ public:
 
     Q_PROPERTY(QVariantList standardColors READ standardColorsVariantList NOTIFY
                        standardColorsChanged STORED false)
-    QVariantList standardColorsVariantList() const
-    {
-        return m_standardColors;
-    }
+    QVariantList standardColorsVariantList() const { return m_standardColors; }
     Q_SIGNAL void standardColorsChanged();
 
     Q_INVOKABLE QColor pickStandardColor(int counter) const;
     Q_INVOKABLE static bool isLightColor(const QColor &color);
     Q_INVOKABLE static bool isVeryLightColor(const QColor &color);
     Q_INVOKABLE static QColor textColorFor(const QColor &bgColor);
-    const QVector<QColor> standardColors() const
-    {
-        return standardColors(QVersionNumber());
-    }
+    const QVector<QColor> standardColors() const { return standardColors(QVersionNumber()); }
 
     Q_INVOKABLE QRectF largestBoundingRect(const QStringList &text, const QFont &font) const;
     Q_INVOKABLE QRectF boundingRect(const QString &text, const QFont &font) const;
@@ -310,14 +247,8 @@ public:
     Q_INVOKABLE QRectF querySubRectangle(const QRectF &in, const QRectF &around,
                                          const QSizeF &atBest) const;
 
-    Q_INVOKABLE QPoint mouseCursorPosition() const
-    {
-        return QCursor::pos();
-    }
-    Q_INVOKABLE void moveMouseCursor(const QPoint &pos)
-    {
-        QCursor::setPos(pos);
-    }
+    Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
+    Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
 
     Q_INVOKABLE static QString copyFile(const QString &fromFilePath, const QString &toFolder);
     Q_INVOKABLE static bool writeToFile(const QString &fileName, const QString &fileContent);
@@ -335,6 +266,7 @@ public:
                                                              const QString &defaultValue);
     Q_INVOKABLE static void changeWindowsEnvironmentVariable(const QString &name,
                                                              const QString &value);
+    Q_INVOKABLE static void removeWindowsEnvironmentVariable(const QString &name);
 
     Q_INVOKABLE QPointF globalMousePosition() const;
 
@@ -375,14 +307,8 @@ public:
     void computeIdealFontPointSize();
 
 #ifdef Q_OS_MAC
-    QString fileToOpen() const
-    {
-        return m_fileToOpen;
-    }
-    void setHandleFileOpenEvents(bool val = true)
-    {
-        m_handleFileOpenEvents = val;
-    }
+    QString fileToOpen() const { return m_fileToOpen; }
+    void setHandleFileOpenEvents(bool val = true) { m_handleFileOpenEvents = val; }
 #endif
 
     static QString painterPathToString(const QPainterPath &val);
