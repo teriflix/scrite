@@ -304,8 +304,9 @@ QVersionNumber Application::prepare()
                         .toDouble();
         const QByteArray qtScaleFactor =
                 QByteArray::number(qRound(qBound(0.1, uiScaleFactor, 10.0) * 100) / 100.0);
-        Application::setAttribute(Qt::AA_EnableHighDpiScaling);
         Application::setAttribute(Qt::AA_UseHighDpiPixmaps);
+        Application::setAttribute(Qt::AA_Use96Dpi);
+        Application::setAttribute(Qt::AA_DisableHighDpiScaling);
         qputenv("QT_SCALE_FACTOR", qtScaleFactor);
     } else {
         if (dpiMode == QByteArrayLiteral("HIGH_DPI")) {
