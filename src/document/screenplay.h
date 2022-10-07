@@ -165,7 +165,7 @@ public:
 
 protected:
     bool event(QEvent *event);
-    void evaluateSceneNumber(int &number);
+    void evaluateSceneNumber(int &number, bool updateUserSceneNumber = true);
     void resetScene();
     void resetScreenplay();
     void setActIndex(int val);

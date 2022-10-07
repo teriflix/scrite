@@ -306,21 +306,36 @@ bool ScreenplayElement::event(QEvent *event)
     return QObject::event(event);
 }
 
-void ScreenplayElement::evaluateSceneNumber(int &number)
+void ScreenplayElement::evaluateSceneNumber(int &number, bool updateUserSceneNumber)
 {
-    int sn = -1;
-    if (!m_userSceneNumber.isEmpty())
-        return;
+    if (m_userSceneNumber.isEmpty()) {
+        int sn = -1;
+        if (m_scene != nullptr && m_scene->heading()->isEnabled()) {
+            if (number <= 0)
+                number = 1;
+            sn = number++;
+        }
 
-    if (m_scene != nullptr && m_scene->heading()->isEnabled()) {
-        if (number <= 0)
-            number = 1;
-        sn = number++;
-    }
+        if (m_sceneNumber != sn) {
+            m_sceneNumber = sn;
+            emit sceneNumberChanged();
+        }
+    } else if (updateUserSceneNumber) {
+        QString newUserSceneNumber = m_userSceneNumber;
+        bool hadDigits = false;
+        while (!newUserSceneNumber.isEmpty() && newUserSceneNumber.at(0).isDigit()) {
+            newUserSceneNumber.remove(0, 1);
+            hadDigits = true;
+        }
 
-    if (m_sceneNumber != sn) {
-        m_sceneNumber = sn;
-        emit sceneNumberChanged();
+        if (hadDigits) {
+            newUserSceneNumber = QString::number(qMax(1, number - 1)) + newUserSceneNumber;
+
+            if (newUserSceneNumber != m_userSceneNumber) {
+                m_userSceneNumber = newUserSceneNumber;
+                emit userSceneNumberChanged();
+            }
+        }
     }
 }
 
