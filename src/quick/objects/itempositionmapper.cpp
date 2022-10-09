@@ -13,6 +13,7 @@
 
 #include "itempositionmapper.h"
 #include "timeprofiler.h"
+#include "application.h"
 
 /**
  This class helps in aligning items with each other when they dont share

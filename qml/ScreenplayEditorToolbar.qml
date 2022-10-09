@@ -113,7 +113,7 @@ Row {
     ToolButton3 {
         id: screenplayViewOptions
         iconSource: "../icons/content/view_options.png"
-        ToolTip.text: "Screenplay View Options"
+        ToolTip.text: "Screenplay Editor Options"
         down: screenplayViewOptionsMenu.visible
         onClicked: screenplayViewOptionsMenu.open()
         objectName: "screenplayViewOptionsButton"
@@ -179,6 +179,13 @@ Row {
                     text: "Scan For Mute Characters"
                     onClicked: Scrite.document.structure.scanForMuteCharacters()
                     enabled: !Scrite.document.readOnly && screenplayEditorSettings.displaySceneCharacters
+                }
+
+                MenuItem2 {
+                    icon.source: "../icons/content/blank.png"
+                    text: "Reset Scene Numbers"
+                    onClicked: Scrite.document.screenplay.resetSceneNumbers()
+                    enabled: !Scrite.document.readOnly
                 }
             }
         }

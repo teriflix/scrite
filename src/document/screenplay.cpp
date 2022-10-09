@@ -191,7 +191,7 @@ void ScreenplayElement::setUserSceneNumber(const QString &val)
     if (m_userSceneNumber == val)
         return;
 
-    m_userSceneNumber = val.toUpper();
+    m_userSceneNumber = val.toUpper().trimmed();
     emit userSceneNumberChanged();
 }
 
@@ -306,33 +306,39 @@ bool ScreenplayElement::event(QEvent *event)
     return QObject::event(event);
 }
 
-void ScreenplayElement::evaluateSceneNumber(int &number, bool updateUserSceneNumber)
+void ScreenplayElement::evaluateSceneNumber(SceneNumber &number, bool minorAlso)
 {
+    if (minorAlso && !m_userSceneNumber.isEmpty()) {
+        bool hasLetter = false;
+        for (int i = m_userSceneNumber.length() - 1; i >= 0; i--) {
+            if (!m_userSceneNumber.at(i).isDigit()) {
+                hasLetter = true;
+                break;
+            }
+        }
+
+        if (!hasLetter) {
+            m_userSceneNumber.clear();
+            emit userSceneNumberChanged();
+        }
+    }
+
     if (m_userSceneNumber.isEmpty()) {
         int sn = -1;
-        if (m_scene != nullptr && m_scene->heading()->isEnabled()) {
-            if (number <= 0)
-                number = 1;
-            sn = number++;
-        }
+        if (m_scene != nullptr && m_scene->heading()->isEnabled())
+            sn = number.nextMajor();
 
         if (m_sceneNumber != sn) {
             m_sceneNumber = sn;
             emit sceneNumberChanged();
         }
-    } else if (updateUserSceneNumber) {
-        QString newUserSceneNumber = m_userSceneNumber;
-        bool hadDigits = false;
-        while (!newUserSceneNumber.isEmpty() && newUserSceneNumber.at(0).isDigit()) {
-            newUserSceneNumber.remove(0, 1);
-            hadDigits = true;
-        }
+    } else {
+        number.nextMinor();
 
-        if (hadDigits) {
-            newUserSceneNumber = QString::number(qMax(1, number - 1)) + newUserSceneNumber;
-
-            if (newUserSceneNumber != m_userSceneNumber) {
-                m_userSceneNumber = newUserSceneNumber;
+        if (minorAlso) {
+            const QString sn = number.toString();
+            if (sn != m_userSceneNumber) {
+                m_userSceneNumber = sn;
                 emit userSceneNumberChanged();
             }
         }
@@ -2162,6 +2168,11 @@ int Screenplay::replace(const QString &text, const QString &replacementText, int
     return counter;
 }
 
+void Screenplay::resetSceneNumbers()
+{
+    this->evaluateSceneNumbers(true);
+}
+
 void Screenplay::serializeToJson(QJsonObject &json) const
 {
     json.insert("hasCoverPagePhoto", !m_coverPagePhoto.isEmpty());
@@ -2349,14 +2360,13 @@ void Screenplay::updateBreakTitlesLater()
     m_updateBreakTitlesTimer.start(0, this);
 }
 
-void Screenplay::evaluateSceneNumbers()
+void Screenplay::evaluateSceneNumbers(bool minorAlso)
 {
     // Sometimes Screenplay is used by ScreenplayAdapter to house a single
     // scene. In such cases, we must not evaluate numbers.
     if (m_scriteDocument == nullptr)
         return;
 
-    int number = 1;
     int actIndex = -1, totalActIndex = -1;
     int episodeIndex = -1;
     int elementIndex = -1;
@@ -2373,6 +2383,7 @@ void Screenplay::evaluateSceneNumbers()
             indexListMap[element->scene()] = QList<int>();
 
     int index = -1;
+    ScreenplayElement::SceneNumber sceneNumber;
     for (ScreenplayElement *element : qAsConst(m_elements)) {
         ++index;
 
@@ -2394,8 +2405,10 @@ void Screenplay::evaluateSceneNumbers()
             scene->setEpisodeIndex(episodeIndex);
             indexListMap[scene].append(index);
 
-            if (scene->heading()->isEnabled())
+            if (scene->heading()->isEnabled()) {
                 ++nrScenes;
+                element->evaluateSceneNumber(sceneNumber, minorAlso);
+            }
         } else {
             element->setElementIndex(-1);
             if (element->breakType() == Screenplay::Act) {
@@ -2417,8 +2430,6 @@ void Screenplay::evaluateSceneNumbers()
             element->setActIndex(actIndex);
             element->setEpisodeIndex(episodeIndex);
         }
-
-        element->evaluateSceneNumber(number);
 
         if (!containsNonStandardScenes && element->scene()
             && element->scene()->type() != Scene::Standard)

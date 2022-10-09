@@ -2550,10 +2550,9 @@ Rectangle {
                 height: parent.height
 
                 Row {
+                    id: sceneNumberFieldRow
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
-                    anchors.top: parent.top
-                    anchors.topMargin: parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
                     spacing: 20
 //                    property bool headingFieldOnly: !screenplayEditorSettings.displaySceneCharacters && !screenplayEditorSettings.displaySceneSynopsis
 //                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
@@ -2582,8 +2581,16 @@ Rectangle {
                         visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType &&
                                  headingItem.theScene.heading.enabled &&
                                  screenplayAdapter.isSourceScreenplay
-                        onActiveFocusChanged: screenplayAdapter.currentIndex = headingItem.theElementIndex
+                        onActiveFocusChanged: if(activeFocus) screenplayAdapter.currentIndex = headingItem.theElementIndex
                         tabItem: headingItem.sceneTextEditor
+                    }
+
+                    Component.onCompleted: {
+                        Qt.callLater( () => {
+                                       y = Qt.binding( () => {
+                                                return parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
+                                            } )
+                                     })
                     }
                 }
             }

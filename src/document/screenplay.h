@@ -164,8 +164,38 @@ public:
     bool canSerialize(const QMetaObject *, const QMetaProperty &) const;
 
 protected:
+    struct SceneNumber
+    {
+        int major = 0; // 0 means no major, 1 means 1
+        int minor = -1; // -1 means no minor, 0 means A
+
+        int nextMajor()
+        {
+            minor = -1;
+            return ++major;
+        }
+
+        int nextMinor()
+        {
+            major = qMax(major, 1);
+            minor = qMax(minor, 0) + 1;
+            return minor;
+        }
+
+        QString toString() const
+        {
+            QString ret;
+            int _minor = minor;
+            while (--_minor >= 0) {
+                ret = QChar('A' + _minor % 26) + ret;
+                _minor /= 26;
+            }
+            ret = QString::number(qMax(major, 1)) + ret;
+            return ret;
+        }
+    };
     bool event(QEvent *event);
-    void evaluateSceneNumber(int &number, bool updateUserSceneNumber = true);
+    void evaluateSceneNumber(SceneNumber &number, bool minorAlso = false);
     void resetScene();
     void resetScreenplay();
     void setActIndex(int val);
@@ -419,6 +449,8 @@ public:
 
     Q_SIGNAL void paragraphCountChanged();
 
+    Q_INVOKABLE void resetSceneNumbers();
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
@@ -451,7 +483,7 @@ protected:
     void timerEvent(QTimerEvent *te);
     void resetActiveScene();
     void onSceneReset(int elementIndex);
-    void evaluateSceneNumbers();
+    void evaluateSceneNumbers(bool minorAlso = false);
     void evaluateSceneNumbersLater();
     void validateCurrentElementIndex();
     void evaluateParagraphCounts();
