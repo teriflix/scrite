@@ -1176,8 +1176,8 @@ void Scene::scanMuteCharacters(const QStringList &characterNames)
                     }
                 }
 
-                bool found = (pos + name.length() >= text.length());
-                if (!found) {
+                bool found = false;
+                if (text.length() >= pos + name.length()) {
                     const QChar ch = text.at(pos + name.length());
                     found = ch.isPunct() || ch.isSpace();
                 }
