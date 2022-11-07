@@ -22,6 +22,7 @@
 #include "timeprofiler.h"
 #include "deltadocument.h"
 #include "scritedocument.h"
+#include "screenplaytextdocument.h"
 
 #include <QSet>
 #include <QUuid>
@@ -260,7 +261,7 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
         QTextCharFormat headingCharFormat;
         headingCharFormat.setFontWeight(QFont::Bold);
         headingCharFormat.setFontPointSize(
-                QList<int>({ 20, 18, 16, 14 })[qBound(0, options.titleHeadingLevel - 1, 4)]);
+                ScreenplayTextDocument::headingFontPointSize(options.titleHeadingLevel));
         headingBlockFormat.setTopMargin(headingCharFormat.fontPointSize() / 2);
 
         if (insertBlock) {

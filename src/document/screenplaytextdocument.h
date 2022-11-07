@@ -75,6 +75,11 @@ public:
     explicit ScreenplayTextDocument(QTextDocument *document, QObject *parent = nullptr);
     ~ScreenplayTextDocument();
 
+    static int headingFontPointSize(int headingLevel)
+    {
+        QList<int>({ 22, 20, 18, 16, 14 })[qBound(0, headingLevel, 4)];
+    }
+
     Q_PROPERTY(QTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
                        textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QTextDocument *val);

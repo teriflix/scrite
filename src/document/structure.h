@@ -1025,6 +1025,7 @@ public:
         WriteOptions() { }
         bool includeTextNotes = true;
         bool includeFormNotes = true;
+        bool charactersOnly = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 

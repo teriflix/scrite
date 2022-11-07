@@ -248,10 +248,10 @@ QVersionNumber Application::prepare()
 
         for (int i = 3; i < segments.size(); i++) {
             QString field;
-            int segment = qMax(0, segments.at(i) - 1);
-            while (segment >= 0) {
-                field += QChar('a' + segment % 26);
-                segment -= 26;
+            int segment = qMax(0, segments.at(i));
+            while (--segment >= 0) {
+                field = QChar('a' + segment % 26) + field;
+                segment /= 26;
             }
             ret.last() += field;
         }

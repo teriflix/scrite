@@ -24,6 +24,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "structureexporter.h"
+#include "screenplaytextdocument.h"
 
 #include <QDir>
 #include <QtMath>
@@ -33,6 +34,7 @@
 #include <QMimeData>
 #include <QDateTime>
 #include <QJSEngine>
+#include <QTextList>
 #include <QTextTable>
 #include <QTextFrame>
 #include <QClipboard>
@@ -1730,7 +1732,7 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
     QTextCharFormat characterNameCharFormat;
     characterNameCharFormat.setFontWeight(QFont::Bold);
     characterNameCharFormat.setFontPointSize(
-            QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
+            ScreenplayTextDocument::headingFontPointSize(options.headingLevel));
     characaterNameBlockFormat.setTopMargin(characterNameCharFormat.fontPointSize() / 2);
 
     if (cursor.block().text().isEmpty()) {
@@ -1821,7 +1823,7 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
         QTextCharFormat sectionCharFormat;
         sectionCharFormat.setFontWeight(QFont::Bold);
         sectionCharFormat.setFontPointSize(
-                QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
+                ScreenplayTextDocument::headingFontPointSize(options.headingLevel));
         sectionBlockFormat.setTopMargin(sectionCharFormat.fontPointSize() / 2);
 
         cursor.insertBlock(sectionBlockFormat, sectionCharFormat);
@@ -4655,7 +4657,68 @@ QStringList Structure::sortCharacterNames(const QStringList &givenNames) const
 void Structure::write(QTextCursor &cursor, const WriteOptions &options) const
 {
     if (options.includeTextNotes || options.includeFormNotes) {
-        if (m_notes) {
+        if (options.charactersOnly) {
+            const QList<Character *> characters = m_characters.list();
+            const QStringList allCharacterNames = m_characterNames;
+            const QStringList infoLessCharacterNames = [=]() -> QStringList {
+                QStringList ret = allCharacterNames;
+                for (const Character *character : characters)
+                    ret.removeOne(character->name());
+                return ret;
+            }();
+            const QString title = [=]() -> QString {
+                QString ret = m_scriteDocument->screenplay()->title();
+                if (ret.isEmpty())
+                    ret = QLatin1String("Untitled Screenplay");
+                return ret;
+            }();
+
+            if (allCharacterNames.isEmpty()) {
+                cursor.insertText(QLatin1String("No characters found in this screenplay."));
+            } else {
+                // First, export all character names and known meta-data in one table.
+                cursor.insertText(QLatin1String("Names of all characters:"));
+                cursor.insertBlock();
+
+                QTextFrame *frame = cursor.currentFrame();
+                QTextListFormat charactersListFormat;
+                charactersListFormat.setStyle(QTextListFormat::ListDecimal);
+                charactersListFormat.setNumberSuffix(QLatin1String(".  "));
+                QTextList *charactersList = cursor.insertList(charactersListFormat);
+
+                for (int i = 0; i < allCharacterNames.size(); i++) {
+                    const QString characterName = allCharacterNames.at(i);
+                    cursor.insertText(characterName);
+                    if (i != allCharacterNames.size() - 1)
+                        cursor.insertBlock();
+                }
+
+                cursor = frame->lastCursorPosition();
+                cursor.insertBlock();
+                charactersList->remove(cursor.block());
+
+                QTextBlockFormat pageBreakFormat;
+                pageBreakFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
+                cursor.insertBlock(pageBreakFormat);
+                cursor.insertText(QLatin1String("  "));
+
+                // Then export one character per page.
+                for (int i = 0; i < characters.size(); i++) {
+                    Character *character = characters.at(i);
+
+                    Character::WriteOptions options;
+                    options.headingLevel = 2;
+                    character->write(cursor, options);
+
+                    if (i != characters.size() - 1) {
+                        QTextBlockFormat pageBreakFormat;
+                        pageBreakFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysAfter);
+                        cursor.insertBlock(pageBreakFormat);
+                        cursor.insertText(QLatin1String("  "));
+                    }
+                }
+            }
+        } else if (m_notes) {
             Notes::WriteOptions notesOptions;
             notesOptions.includeFormNotes = options.includeFormNotes;
             notesOptions.includeTextNotes = options.includeTextNotes;

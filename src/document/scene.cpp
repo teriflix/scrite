@@ -21,6 +21,7 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "qobjectserializer.h"
+#include "screenplaytextdocument.h"
 
 #include <QUuid>
 #include <QFuture>
@@ -1898,7 +1899,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             QTextCharFormat headingCharFormat;
             headingCharFormat.setFontWeight(QFont::Bold);
             headingCharFormat.setFontPointSize(
-                    QList<int>({ 20, 18, 16, 14 })[qBound(0, options.headingLevel - 1, 4)]);
+                    ScreenplayTextDocument::headingFontPointSize(options.headingLevel));
             headingBlockFormat.setTopMargin(headingCharFormat.fontPointSize() / 2);
             if (cursor.block().text().isEmpty()) {
                 cursor.setBlockFormat(headingBlockFormat);

@@ -18,6 +18,9 @@
 #include "structure.h"
 #include "screenplay.h"
 #include "application.h"
+#include "screenplaytextdocument.h"
+
+#include <QJsonDocument>
 
 NotebookReport::NotebookReport(QObject *parent) : AbstractReportGenerator(parent)
 {
@@ -62,6 +65,18 @@ void NotebookReport::setSection(QObject *val)
     emit sectionChanged();
 }
 
+void NotebookReport::setOptions(const QJsonValue &val)
+{
+    if (m_options == val)
+        return;
+
+    m_options = val;
+
+    this->evaluateTitleAndSubtitle();
+
+    emit optionsChanged();
+}
+
 QString NotebookReport::polishFileName(const QString &fileName) const
 {
     if (m_section == nullptr)
@@ -79,6 +94,9 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
     ScriteDocument *scriteDocument = this->document();
     Screenplay *screenplay = scriteDocument->screenplay();
     Structure *structure = scriteDocument->structure();
+    const QJsonObject options = m_options.toObject();
+    const QString intent = options.value("intent").toString();
+    const bool charactersIntent = intent == "characters";
 
     doc->setDefaultFont(qApp->font());
     doc->setUseDesignMetrics(true);
@@ -132,9 +150,11 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
         m_characterSection->write(cursor);
     else if (m_screenplaySection)
         m_screenplaySection->write(cursor);
-    else if (m_storySection)
-        m_storySection->write(cursor);
-    else {
+    else if (m_storySection) {
+        Structure::WriteOptions options;
+        options.charactersOnly = charactersIntent;
+        m_storySection->write(cursor, options);
+    } else {
         auto addSection = [&cursor](const QString &title, int headingLevel = 2) {
             QTextBlockFormat sectionBlockFormat;
             sectionBlockFormat.setHeadingLevel(headingLevel);
@@ -144,7 +164,7 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
             QTextCharFormat sectionCharFormat;
             sectionCharFormat.setFontWeight(QFont::Bold);
             sectionCharFormat.setFontPointSize(
-                    QList<int>({ 20, 18, 16, 14 })[qBound(0, headingLevel - 1, 4)]);
+                    ScreenplayTextDocument::headingFontPointSize(headingLevel - 1));
             sectionBlockFormat.setTopMargin(sectionCharFormat.fontPointSize() / 2);
 
             cursor.insertBlock(sectionBlockFormat, sectionCharFormat);
@@ -187,9 +207,12 @@ void NotebookReport::evaluateTitleAndSubtitle()
         m_subtitle = m_sceneSection->title();
     else if (m_characterSection)
         m_subtitle = QLatin1String("Character");
-    else if (m_storySection)
-        m_subtitle = QLatin1String("Story");
-    else if (m_screenplaySection)
+    else if (m_storySection) {
+        if (m_options.isUndefined() || m_options.isNull())
+            m_subtitle = QLatin1String("Story");
+        else
+            m_subtitle = QLatin1String("All Character");
+    } else if (m_screenplaySection)
         m_subtitle = QLatin1String("Scene");
 
     m_subtitle += QLatin1String(" Notes");

@@ -1949,6 +1949,16 @@ Rectangle {
         Item {
             property var componentData
 
+            // Report support
+            property bool hasReport: true
+            property string reportDescription: "Export information about all characters."
+            function createReportGenerator() {
+                var generator = Scrite.document.createReportGenerator("Notebook Report")
+                generator.section = Scrite.document.structure
+                generator.options = { "intent": "characters" }
+                return generator
+            }
+
             TextTabBar {
                 id: charactersTabBar
                 anchors.top: parent.top

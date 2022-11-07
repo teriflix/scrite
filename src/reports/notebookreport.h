@@ -16,6 +16,8 @@
 
 #include "abstractreportgenerator.h"
 
+#include <QJsonValue>
+
 class NotebookReport : public AbstractReportGenerator
 {
     Q_OBJECT
@@ -32,6 +34,11 @@ public:
     void setSection(QObject *val);
     QObject *section() const { return m_section; }
     Q_SIGNAL void sectionChanged();
+
+    Q_PROPERTY(QJsonValue options READ options WRITE setOptions NOTIFY optionsChanged STORED false)
+    void setOptions(const QJsonValue &val);
+    QJsonValue options() const { return m_options; }
+    Q_SIGNAL void optionsChanged();
 
 protected:
     // AbstractDeviceIO interface
@@ -60,6 +67,7 @@ private:
     Screenplay *m_screenplaySection = nullptr;
 
     QObject *m_section = nullptr;
+    QJsonValue m_options;
 
     QString m_title;
     QString m_subtitle;
