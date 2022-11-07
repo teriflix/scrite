@@ -242,6 +242,12 @@ ScreenplayTextDocument::~ScreenplayTextDocument()
         m_textDocument->setUndoRedoEnabled(true);
 }
 
+int ScreenplayTextDocument::headingFontPointSize(int headingLevel)
+{
+    static QList<int> fontSizes({ 22, 20, 18, 16, 14 });
+    return fontSizes[qBound(0, headingLevel, fontSizes.size() - 1)];
+}
+
 void ScreenplayTextDocument::setTextDocument(QTextDocument *val)
 {
     if (m_textDocument != nullptr && m_textDocument == val)

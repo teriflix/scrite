@@ -49,11 +49,20 @@ bool ScreenplaySubsetReport::includeScreenplayElement(const ScreenplayElement *e
 
 QString ScreenplaySubsetReport::screenplaySubtitle() const
 {
-    if (m_sceneNumbers.isEmpty())
+    auto episodeNumbers = this->episodeNumbers();
+    auto tags = this->tags();
+    if (m_sceneNumbers.isEmpty() && episodeNumbers.isEmpty() && tags.isEmpty())
         return QStringLiteral("All scenes of the screenplay.");
 
-    return QStringLiteral("Snapshot of ") + QString::number(m_sceneNumbers.size())
-            + QStringLiteral(" scene(s).");
+    QString ret = QStringLiteral("Snapshot of ");
+    if (!episodeNumbers.isEmpty())
+        ret += QString::number(episodeNumbers.size()) + QStringLiteral(" episode(s).");
+    else if (!tags.isEmpty())
+        ret += QString::number(tags.size()) + QStringLiteral(" tag(s).");
+    else
+        ret += QString::number(m_sceneNumbers.size()) + QStringLiteral(" scene(s).");
+
+    return ret;
 }
 
 void ScreenplaySubsetReport::configureScreenplayTextDocument(ScreenplayTextDocument &stDoc)

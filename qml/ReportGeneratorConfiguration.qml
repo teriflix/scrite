@@ -237,12 +237,18 @@ Item {
                                 implicitWidth: contentPanel.width
                                 implicitHeight: contentPanel.height
 
-                                ScrollView {
+                                Flickable {
                                     id: subsequenTabScrollView
                                     anchors.fill: parent
                                     anchors.leftMargin: 20
+                                    contentWidth: subsequenTabScrollViewContent.width
+                                    contentHeight: subsequenTabScrollViewContent.height
+                                    ScrollBar.vertical: ScrollBar2 {
+                                        flickable: subsequenTabScrollView
+                                    }
 
                                     Column {
+                                        id: subsequenTabScrollViewContent
                                         spacing: 5
                                         width: subsequenTabScrollView.width
 
