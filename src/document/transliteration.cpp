@@ -1010,13 +1010,13 @@ QString TransliterationEngine::formattedHtmlOf(const QString &text) const
 
 int TransliterationEngine::wordCount(const QString &text)
 {
-    PROFILE_THIS_FUNCTION;
-
     int wordCount = 0;
 
     QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Word, text);
     while (boundaryFinder.position() < text.length()) {
-        if (!(boundaryFinder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem))) {
+        QTextBoundaryFinder::BoundaryReasons reasons = boundaryFinder.boundaryReasons();
+        if (!(reasons.testFlag(QTextBoundaryFinder::StartOfItem))
+            || reasons.testFlag(QTextBoundaryFinder::SoftHyphen)) {
             if (boundaryFinder.toNextBoundary() == -1)
                 break;
             continue;

@@ -404,11 +404,11 @@ Item {
         target: Scrite.document
         function onJustReset() {
             instanceSettings.firstSwitchToStructureTab = true
-            appBusyOverlay.refCount = appBusyOverlay.refCount+1
+            appBusyOverlay.ref()
             screenplayAdapter.initialLoadTreshold = 25
             Scrite.app.execLater(screenplayAdapter, 250, function() {
                 screenplayAdapter.sessionId = Scrite.document.sessionId
-                appBusyOverlay.refCount = appBusyOverlay.refCount-1
+                appBusyOverlay.deref()
             })
         }
         function onJustLoaded() {
@@ -472,13 +472,13 @@ Item {
         property bool overlayRefCountModified: false
         onUpdateScheduled: {
             if(mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive) {
-                appBusyOverlay.refCount = appBusyOverlay.refCount+1
+                appBusyOverlay.ref()
                 overlayRefCountModified = true
             }
         }
         onUpdateFinished: {
             if(overlayRefCountModified)
-                appBusyOverlay.refCount = appBusyOverlay.refCount-1
+                appBusyOverlay.deref()
             overlayRefCountModified = false
         }
         Component.onCompleted: Scrite.app.registerObject(screenplayTextDocument, "screenplayTextDocument")
@@ -2811,14 +2811,9 @@ Item {
         anchors.fill: parent
         busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
         visible: refCount > 0
+        function ref() { refCount = refCount+1 }
+        function deref() { refCount = Math.max(refCount-1,0) }
         property int refCount: 0
-        onRefCountChanged: {
-            if(refCount < 0)
-                Qt.callLater(resetRefCount)
-        }
-        function resetRefCount() {
-            appBusyOverlay.refCount = 0
-        }
     }
 
     HelpTipNotification {
