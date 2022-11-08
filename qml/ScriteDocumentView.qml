@@ -407,8 +407,8 @@ Item {
             appBusyOverlay.ref()
             screenplayAdapter.initialLoadTreshold = 25
             Scrite.app.execLater(screenplayAdapter, 250, function() {
-                screenplayAdapter.sessionId = Scrite.document.sessionId
                 appBusyOverlay.deref()
+                screenplayAdapter.sessionId = Scrite.document.sessionId
             })
         }
         function onJustLoaded() {
