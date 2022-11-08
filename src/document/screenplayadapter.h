@@ -37,7 +37,7 @@ public:
     explicit ScreenplayAdapter(QObject *parent = nullptr);
     ~ScreenplayAdapter();
 
-    Q_PROPERTY(QObject* source READ source WRITE setSource NOTIFY sourceChanged RESET resetSource)
+    Q_PROPERTY(QObject *source READ source WRITE setSource NOTIFY sourceChanged RESET resetSource)
     void setSource(QObject *val);
     QObject *source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
@@ -48,7 +48,7 @@ public:
     Q_PROPERTY(bool isSourceScreenplay READ isSourceScreenplay NOTIFY sourceChanged)
     bool isSourceScreenplay() const;
 
-    Q_PROPERTY(Screenplay* screenplay READ screenplay NOTIFY sourceChanged)
+    Q_PROPERTY(Screenplay *screenplay READ screenplay NOTIFY sourceChanged)
     Screenplay *screenplay() const;
 
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
@@ -56,22 +56,28 @@ public:
     int currentIndex() const { return m_currentIndex; }
     Q_SIGNAL void currentIndexChanged(int val);
 
-    Q_PROPERTY(ScreenplayElement* currentElement READ currentElement NOTIFY currentElementChanged)
+    Q_PROPERTY(ScreenplayElement *currentElement READ currentElement NOTIFY currentElementChanged)
     ScreenplayElement *currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
-    Q_PROPERTY(Scene* currentScene READ currentScene NOTIFY currentElementChanged)
+    Q_PROPERTY(Scene *currentScene READ currentScene NOTIFY currentElementChanged)
     Scene *currentScene() const;
 
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
     int elementCount() const;
     Q_SIGNAL void elementCountChanged();
 
-    Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    Q_PROPERTY(
+            bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
     bool hasNonStandardScenes() const;
     Q_SIGNAL void hasNonStandardScenesChanged();
 
-    Q_PROPERTY(int initialLoadTreshold READ initialLoadTreshold WRITE setInitialLoadTreshold NOTIFY initialLoadTresholdChanged)
+    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    int wordCount() const;
+    Q_SIGNAL void wordCountChanged();
+
+    Q_PROPERTY(int initialLoadTreshold READ initialLoadTreshold WRITE setInitialLoadTreshold NOTIFY
+                       initialLoadTresholdChanged)
     void setInitialLoadTreshold(int val);
     int initialLoadTreshold() const { return m_initialLoadTreshold; }
     Q_SIGNAL void initialLoadTresholdChanged();

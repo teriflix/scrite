@@ -1008,6 +1008,27 @@ QString TransliterationEngine::formattedHtmlOf(const QString &text) const
     return html;
 }
 
+int TransliterationEngine::wordCount(const QString &text)
+{
+    PROFILE_THIS_FUNCTION;
+
+    int wordCount = 0;
+
+    QTextBoundaryFinder boundaryFinder(QTextBoundaryFinder::Word, text);
+    while (boundaryFinder.position() < text.length()) {
+        if (!(boundaryFinder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem))) {
+            if (boundaryFinder.toNextBoundary() == -1)
+                break;
+            continue;
+        }
+
+        ++wordCount;
+        boundaryFinder.toNextBoundary();
+    }
+
+    return wordCount;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 class FontSyntaxHighlighterUserData : public QTextBlockUserData

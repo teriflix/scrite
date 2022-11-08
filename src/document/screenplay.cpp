@@ -26,7 +26,7 @@
 ScreenplayElement::ScreenplayElement(QObject *parent)
     : QObject(parent), m_scene(this, "scene"), m_screenplay(this, "screenplay")
 {
-    m_screenplay = qobject_cast<Screenplay *>(parent);
+    this->setScreenplay(qobject_cast<Screenplay *>(parent));
 
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
@@ -51,6 +51,9 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
             &ScreenplayElement::resolvedSceneNumberChanged);
     connect(this, &ScreenplayElement::userSceneNumberChanged, this,
             &ScreenplayElement::evaluateSceneNumberRequest);
+    connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::wordCountChanged);
+    connect(this, &ScreenplayElement::screenplayChanged, this,
+            &ScreenplayElement::wordCountChanged);
 }
 
 ScreenplayElement::~ScreenplayElement()
@@ -133,6 +136,11 @@ void ScreenplayElement::setScreenplay(Screenplay *val)
         return;
 
     m_screenplay = val;
+
+    if (m_screenplay != nullptr)
+        connect(this, &ScreenplayElement::wordCountChanged, m_screenplay,
+                &Screenplay::evaluateWordCountLater, Qt::UniqueConnection);
+
     emit screenplayChanged();
 }
 
@@ -212,6 +220,7 @@ void ScreenplayElement::setScene(Scene *val)
     connect(m_scene, &Scene::sceneReset, this, &ScreenplayElement::sceneReset);
     connect(m_scene, &Scene::typeChanged, this, &ScreenplayElement::sceneTypeChanged);
     connect(m_scene, &Scene::groupsChanged, this, &ScreenplayElement::onSceneGroupsChanged);
+    connect(m_scene, &Scene::wordCountChanged, this, &ScreenplayElement::wordCountChanged);
 
     if (m_screenplay)
         connect(m_scene->heading(), &SceneHeading::enabledChanged, this,
@@ -263,6 +272,11 @@ void ScreenplayElement::setBreakSummary(const QString &val)
 
     m_breakSummary = val;
     emit breakSummaryChanged();
+}
+
+int ScreenplayElement::wordCount() const
+{
+    return m_scene.isNull() ? 0 : m_scene->wordCount();
 }
 
 bool ScreenplayElement::canSerialize(const QMetaObject *mo, const QMetaProperty &prop) const
@@ -359,6 +373,11 @@ void ScreenplayElement::resetScene()
 
 void ScreenplayElement::resetScreenplay()
 {
+    if (m_screenplay != nullptr) {
+        disconnect(this, &ScreenplayElement::wordCountChanged, m_screenplay,
+                   &Screenplay::evaluateWordCountLater);
+        m_screenplay->evaluateWordCountLater();
+    }
     m_screenplay = nullptr;
     emit screenplayChanged();
 
@@ -422,6 +441,7 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::titlePageIsCenteredChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::screenplayChanged, [=]() {
         this->evaluateParagraphCountsLater();
+        this->evaluateWordCountLater();
         this->markAsModified();
     });
 
@@ -1994,6 +2014,35 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
                &Screenplay::hasSelectedElementsChanged);
 }
 
+void Screenplay::setWordCount(int val)
+{
+    if (m_wordCount == val)
+        return;
+
+    m_wordCount = val;
+    emit wordCountChanged();
+}
+
+void Screenplay::evaluateWordCount()
+{
+    int wordCount = 0;
+
+    for (const ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->elementType() == ScreenplayElement::SceneElementType) {
+            const Scene *scene = element->scene();
+            if (scene)
+                wordCount += scene->wordCount();
+        }
+    }
+
+    this->setWordCount(wordCount);
+}
+
+void Screenplay::evaluateWordCountLater()
+{
+    m_wordCountTimer.start(100, this);
+}
+
 void Screenplay::setCurrentElementIndex(int val)
 {
     val = qBound(-1, val, m_elements.size() - 1);
@@ -2194,6 +2243,8 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
 
         this->setCurrentElementIndex(-1);
     }
+
+    this->evaluateWordCountLater();
 }
 
 bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const
@@ -2332,6 +2383,9 @@ void Screenplay::timerEvent(QTimerEvent *te)
     } else if (te->timerId() == m_paragraphCountEvaluationTimer.timerId()) {
         m_paragraphCountEvaluationTimer.stop();
         this->evaluateParagraphCounts();
+    } else if (te->timerId() == m_wordCountTimer.timerId()) {
+        m_wordCountTimer.stop();
+        this->evaluateWordCount();
     }
 }
 

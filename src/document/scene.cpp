@@ -196,7 +196,12 @@ SceneHeading::SceneHeading(QObject *parent)
     connect(this, &SceneHeading::enabledChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationTypeChanged, this, &SceneHeading::textChanged);
-    connect(this, &SceneHeading::textChanged, [=]() { this->markAsModified(); });
+    connect(this, &SceneHeading::textChanged, [=]() {
+        this->markAsModified();
+        this->evaluateWordCountLater();
+    });
+    connect(this, &SceneHeading::wordCountChanged, m_scene, &Scene::evaluateWordCountLater,
+            Qt::UniqueConnection);
 }
 
 SceneHeading::~SceneHeading() { }
@@ -309,6 +314,15 @@ void SceneHeading::parseFrom(const QString &text)
     this->setMoment(_moment);
 }
 
+void SceneHeading::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_wordCountTimer.timerId()) {
+        m_wordCountTimer.stop();
+        this->evaluateWordCount();
+    } else
+        QObject::timerEvent(event);
+}
+
 void SceneHeading::renameCharacter(const QString &from, const QString &to)
 {
     int nrReplacements = 0;
@@ -338,6 +352,26 @@ QString SceneHeading::toString(Mode mode) const
     return QString();
 }
 
+void SceneHeading::setWordCount(int val)
+{
+    if (m_wordCount == val)
+        return;
+
+    m_wordCount = val;
+    emit wordCountChanged();
+}
+
+void SceneHeading::evaluateWordCount()
+{
+    const QString text = this->toString(DisplayMode);
+    this->setWordCount(TransliterationEngine::wordCount(text));
+}
+
+void SceneHeading::evaluateWordCountLater()
+{
+    m_wordCountTimer.start(100, this);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 SceneElement::SceneElement(QObject *parent)
@@ -346,6 +380,10 @@ SceneElement::SceneElement(QObject *parent)
     connect(this, &SceneElement::typeChanged, this, &SceneElement::elementChanged);
     connect(this, &SceneElement::textChanged, this, &SceneElement::elementChanged);
     connect(this, &SceneElement::elementChanged, [=]() { this->markAsModified(); });
+
+    if (m_scene != nullptr)
+        connect(this, &SceneElement::wordCountChanged, m_scene, &Scene::evaluateWordCountLater,
+                Qt::UniqueConnection);
 }
 
 SceneElement::~SceneElement()
@@ -433,6 +471,7 @@ void SceneElement::setText(const QString &val)
     emit textChanged(val);
 
     this->reportSceneElementChanged(Scene::ElementTextChange);
+    this->evaluateWordCountLater();
 }
 
 void SceneElement::setCursorPosition(int val)
@@ -495,6 +534,8 @@ void SceneElement::deserializeFromJson(const QJsonObject &json)
 
     const QJsonArray jtextFormats = json.value(QLatin1String("#textFormats")).toArray();
     this->setTextFormats(textFormatsFromJson(jtextFormats));
+
+    this->evaluateWordCountLater();
 }
 
 void SceneElement::setTextFormats(const QVector<QTextLayout::FormatRange> &formats)
@@ -614,8 +655,15 @@ QVector<QTextLayout::FormatRange> SceneElement::textFormatsFromJson(const QJsonA
 
 bool SceneElement::event(QEvent *event)
 {
-    if (event->type() == QEvent::ParentChange)
+    if (event->type() == QEvent::ParentChange) {
+        if (m_scene != nullptr)
+            disconnect(this, &SceneElement::wordCountChanged, m_scene,
+                       &Scene::evaluateWordCountLater);
         m_scene = qobject_cast<Scene *>(this->parent());
+        if (m_scene != nullptr)
+            connect(this, &SceneElement::wordCountChanged, m_scene, &Scene::evaluateWordCountLater,
+                    Qt::UniqueConnection);
+    }
 
     return QObject::event(event);
 }
@@ -631,6 +679,9 @@ void SceneElement::timerEvent(QTimerEvent *event)
                 emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
         }
         m_changeCounters.clear();
+    } else if (event->timerId() == m_wordCountTimer.timerId()) {
+        m_wordCountTimer.stop();
+        this->evaluateWordCount();
     } else
         QObject::timerEvent(event);
 }
@@ -670,6 +721,25 @@ void SceneElement::reportSceneElementChanged(int type)
         m_changeCounters[type]++;
         m_changeTimer.start(0, this);
     }
+}
+
+void SceneElement::setWordCount(int val)
+{
+    if (m_wordCount == val)
+        return;
+
+    m_wordCount = val;
+    emit wordCountChanged();
+}
+
+void SceneElement::evaluateWordCount()
+{
+    this->setWordCount(TransliterationEngine::wordCount(m_text));
+}
+
+void SceneElement::evaluateWordCountLater()
+{
+    m_wordCountTimer.start(100, this);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -802,6 +872,7 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
     });
 
     connect(m_attachments, &Attachments::attachmentsModified, this, &Scene::sceneChanged);
+    this->evaluateWordCountLater();
 }
 
 Scene::~Scene()
@@ -1854,6 +1925,8 @@ void Scene::deserializeFromJson(const QJsonObject &json)
     const QJsonValue notes = json.value(QStringLiteral("notes"));
     if (notes.isArray())
         m_notes->loadOldNotes(notes.toArray());
+
+    this->evaluateWordCountLater();
 }
 
 bool Scene::canSetPropertyFromObjectList(const QString &propName) const
@@ -2046,6 +2119,15 @@ bool Scene::event(QEvent *event)
     return QObject::event(event);
 }
 
+void Scene::timerEvent(QTimerEvent *event)
+{
+    if (event->timerId() == m_wordCountTimer.timerId()) {
+        m_wordCountTimer.stop();
+        this->evaluateWordCount();
+    } else
+        QObject::timerEvent(event);
+}
+
 void Scene::setStructureElement(StructureElement *ptr)
 {
     if (m_structureElement == ptr)
@@ -2185,6 +2267,33 @@ void Scene::evaluateSortedCharacterNames()
         m_sortedCharacterNames = names;
 
     emit characterNamesChanged();
+}
+
+void Scene::setWordCount(int val)
+{
+    if (m_wordCount == val)
+        return;
+
+    m_wordCount = val;
+    emit wordCountChanged();
+}
+
+void Scene::evaluateWordCount()
+{
+    int wordCount = 0;
+
+    if (m_heading->isEnabled())
+        wordCount += m_heading->wordCount();
+
+    for (const SceneElement *element : qAsConst(m_elements))
+        wordCount += element->wordCount();
+
+    this->setWordCount(wordCount);
+}
+
+void Scene::evaluateWordCountLater()
+{
+    m_wordCountTimer.start(100, this);
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)

@@ -152,6 +152,10 @@ public:
 
     Q_INVOKABLE void toggleSelection() { this->setSelected(!m_selected); }
 
+    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    int wordCount() const;
+    Q_SIGNAL void wordCountChanged();
+
     Q_SIGNAL void elementChanged();
 
     Q_SIGNAL void sceneAboutToReset();
@@ -451,6 +455,10 @@ public:
 
     Q_INVOKABLE void resetSceneNumbers();
 
+    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    int wordCount() const { return m_wordCount; }
+    Q_SIGNAL void wordCountChanged();
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
@@ -498,6 +506,9 @@ protected:
     void onDfsAuction(const QString &filePath, int *claims);
     void connectToScreenplayElementSignals(ScreenplayElement *ptr);
     void disconnectFromScreenplayElementSignals(ScreenplayElement *ptr);
+    void setWordCount(int val);
+    void evaluateWordCount();
+    void evaluateWordCountLater();
 
 private:
     QString m_title;
@@ -520,6 +531,7 @@ private:
     ScriteDocument *m_scriteDocument = nullptr;
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
     friend class ScreenplayTextDocument;
+    friend class ScreenplayElement;
 
     static void staticAppendElement(QQmlListProperty<ScreenplayElement> *list,
                                     ScreenplayElement *ptr);
@@ -535,7 +547,9 @@ private:
     int m_episodeCount = 0;
     int m_actCount = 0;
     int m_sceneCount = 0;
+    int m_wordCount = 0;
 
+    ExecLaterTimer m_wordCountTimer;
     ExecLaterTimer m_updateBreakTitlesTimer;
     ExecLaterTimer m_sceneNumberEvaluationTimer;
     ExecLaterTimer m_paragraphCountEvaluationTimer;

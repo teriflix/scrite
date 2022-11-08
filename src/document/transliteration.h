@@ -161,6 +161,8 @@ public:
 
     Q_INVOKABLE QString formattedHtmlOf(const QString &text) const;
 
+    Q_INVOKABLE static int wordCount(const QString &text);
+
 private:
     friend class AppWindow;
     TransliterationEngine(QObject *parent = nullptr);
@@ -204,21 +206,26 @@ public:
     bool isEnforceHeadingFontSize() const { return m_enforceHeadingFontSize; }
     Q_SIGNAL void enforceHeadingFontSizeChanged();
 
-    Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY spellCheckEnabledChanged)
+    Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY
+                       spellCheckEnabledChanged)
     void setSpellCheckEnabled(bool val);
     bool isSpellCheckEnabled() const { return m_spellCheckEnabled; }
     Q_SIGNAL void spellCheckEnabledChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
+                       cursorPositionChanged)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY wordUnderCursorIsMisspelledChanged)
+    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY
+                       wordUnderCursorIsMisspelledChanged)
     bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
     Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
 
-    Q_PROPERTY(QStringList spellingSuggestionsForWordUnderCursor READ spellingSuggestionsForWordUnderCursor NOTIFY spellingSuggestionsForWordUnderCursorChanged)
+    Q_PROPERTY(QStringList spellingSuggestionsForWordUnderCursor READ
+                       spellingSuggestionsForWordUnderCursor NOTIFY
+                               spellingSuggestionsForWordUnderCursorChanged)
     QStringList spellingSuggestionsForWordUnderCursor() const { return m_spellingSuggestions; }
     Q_SIGNAL void spellingSuggestionsForWordUnderCursorChanged();
 
@@ -332,7 +339,8 @@ public:
     bool isEnforceHeadingFontSize() const { return m_enforceHeadingFontSize; }
     Q_SIGNAL void enforceHeadingFontSizeChanged();
 
-    Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY spellCheckEnabledChanged)
+    Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY
+                       spellCheckEnabledChanged)
     void setSpellCheckEnabled(bool val);
     bool isSpellCheckEnabled() const { return m_spellCheckEnabled; }
     Q_SIGNAL void spellCheckEnabledChanged();
@@ -343,7 +351,7 @@ public:
     bool isTransliterateCurrentWordOnly() const { return m_transliterateCurrentWordOnly; }
     Q_SIGNAL void transliterateCurrentWordOnlyChanged();
 
-    Q_PROPERTY(FontSyntaxHighlighter* highlighter READ highlighter NOTIFY highlighterChanged)
+    Q_PROPERTY(FontSyntaxHighlighter *highlighter READ highlighter NOTIFY highlighterChanged)
     FontSyntaxHighlighter *highlighter() const { return m_fontHighlighter; }
     Q_SIGNAL void highlighterChanged();
 

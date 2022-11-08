@@ -92,12 +92,22 @@ public:
 
     Q_INVOKABLE void parseFrom(const QString &text);
 
+    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    int wordCount() const { return m_wordCount; }
+    Q_SIGNAL void wordCountChanged();
+
+protected:
+    void timerEvent(QTimerEvent *event);
+
 private:
     friend class Scene;
     void renameCharacter(const QString &from, const QString &to);
 
     enum Mode { DisplayMode, EditMode };
     QString toString(Mode mode) const;
+    void setWordCount(int val);
+    void evaluateWordCount();
+    void evaluateWordCountLater();
 
 private:
     bool m_enabled = true;
@@ -106,6 +116,8 @@ private:
     QString m_moment = "DAY";
     QString m_location = "Somewhere";
     QString m_locationType = "EXT";
+    int m_wordCount = 0;
+    QBasicTimer m_wordCountTimer;
 };
 
 class SceneElement : public QObject, public Modifiable, public QObjectSerializer::Interface
@@ -170,6 +182,10 @@ public:
 
     QString formattedText() const;
 
+    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    int wordCount() const { return m_wordCount; }
+    Q_SIGNAL void wordCountChanged();
+
     Q_SIGNAL void elementChanged();
 
     Q_INVOKABLE QJsonArray find(const QString &text, int flags) const;
@@ -192,6 +208,9 @@ private:
     friend class Scene;
     void renameCharacter(const QString &from, const QString &to);
     void reportSceneElementChanged(int type);
+    void setWordCount(int val);
+    void evaluateWordCount();
+    void evaluateWordCountLater();
 
 private:
     mutable QString m_id;
@@ -199,8 +218,10 @@ private:
     QString m_text;
     QVector<QTextLayout::FormatRange> m_textFormats;
     Scene *m_scene = nullptr;
+    int m_wordCount = 0;
     mutable SpellCheckService *m_spellCheck = nullptr;
     QBasicTimer m_changeTimer;
+    QBasicTimer m_wordCountTimer;
     QMap<int, int> m_changeCounters;
 };
 
@@ -437,6 +458,10 @@ public:
     Q_INVOKABLE bool isInGroup(const QString &group) const;
     void verifyGroups(const QJsonArray &groupsModel);
 
+    Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
+    int wordCount() const { return m_wordCount; }
+    Q_SIGNAL void wordCountChanged();
+
     Q_PROPERTY(QQmlListProperty<SceneElement> elements READ elements NOTIFY elementCountChanged)
     QQmlListProperty<SceneElement> elements();
     Q_INVOKABLE SceneElement *appendElement(const QString &text, int type = SceneElement::Action);
@@ -518,6 +543,7 @@ public:
 
 protected:
     bool event(QEvent *event);
+    void timerEvent(QTimerEvent *event);
 
 private:
     void setStructureElement(StructureElement *ptr);
@@ -528,11 +554,15 @@ private:
     const CharacterElementMap &characterElementMap() const { return m_characterElementMap; }
     void renameCharacter(const QString &from, const QString &to);
     void evaluateSortedCharacterNames();
+    void setWordCount(int val);
+    void evaluateWordCount();
+    void evaluateWordCountLater();
 
 private:
     friend class Structure;
     friend class StructureElement;
     friend class SceneElement;
+    friend class SceneHeading;
     friend class SceneDocumentBinder;
 
     QString m_act;
@@ -546,6 +576,8 @@ private:
     QString m_pageTarget;
     int m_actIndex = -1;
     int m_episodeIndex = -1;
+    int m_wordCount = 0;
+    QBasicTimer m_wordCountTimer;
     QString m_episode;
     StructureElement *m_structureElement = nullptr;
 

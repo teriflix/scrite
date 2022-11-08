@@ -35,6 +35,8 @@ ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
             &ScreenplayAdapter::clearCurrentIndex);
     connect(this, &ScreenplayAdapter::rowsAboutToBeInserted, this,
             &ScreenplayAdapter::clearCurrentIndex);
+
+    connect(this, &ScreenplayAdapter::sourceChanged, this, &ScreenplayAdapter::wordCountChanged);
 }
 
 ScreenplayAdapter::~ScreenplayAdapter() { }
@@ -57,6 +59,8 @@ void ScreenplayAdapter::setSource(QObject *val)
                            &ScreenplayAdapter::setCurrentIndex);
                 disconnect(screenplay, &Screenplay::hasNonStandardScenesChanged, this,
                            &ScreenplayAdapter::hasNonStandardScenesChanged);
+                disconnect(screenplay, &Screenplay::wordCountChanged, this,
+                           &ScreenplayAdapter::wordCountChanged);
             }
         }
     }
@@ -82,6 +86,8 @@ void ScreenplayAdapter::setSource(QObject *val)
                     &ScreenplayAdapter::setCurrentIndex);
             connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this,
                     &ScreenplayAdapter::hasNonStandardScenesChanged);
+            connect(screenplay, &Screenplay::wordCountChanged, this,
+                    &ScreenplayAdapter::wordCountChanged);
 
             this->setSourceModel(screenplay);
         } else {
@@ -109,6 +115,8 @@ void ScreenplayAdapter::setSource(QObject *val)
 
                 connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this,
                         &ScreenplayAdapter::hasNonStandardScenesChanged);
+                connect(screenplay, &Screenplay::wordCountChanged, this,
+                        &ScreenplayAdapter::wordCountChanged);
 
                 this->setSourceModel(screenplay);
             } else
@@ -165,6 +173,12 @@ bool ScreenplayAdapter::hasNonStandardScenes() const
         return screenplay->hasNonStandardScenes();
 
     return false;
+}
+
+int ScreenplayAdapter::wordCount() const
+{
+    Screenplay *screenplay = this->screenplay();
+    return screenplay == nullptr ? 0 : screenplay->wordCount();
 }
 
 void ScreenplayAdapter::setInitialLoadTreshold(int val)

@@ -846,6 +846,28 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: screenplayTextDocument.paused ? 0.5 : 1
             }
+
+            Rectangle {
+                width: 1
+                height: parent.height
+                color: primaryColors.borderColor
+                visible: wordCountLabel.visible
+            }
+
+            Text {
+                id: wordCountLabel
+                font.pixelSize: statusBar.height * 0.5
+                text: screenplayAdapter.wordCount + (screenplayAdapter.wordCount !== 1 ? " words" : " word")
+                anchors.verticalCenter: parent.verticalCenter
+                visible: taggingOptionsPosMapper.mappedPosition.x > width
+
+                ItemPositionMapper {
+                    id: taggingOptionsPosMapper
+                    from: taggingOptions
+                    position: Qt.point(0,0)
+                    to: wordCountLabel
+                }
+            }
         }
 
         Item {
