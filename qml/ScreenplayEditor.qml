@@ -857,7 +857,12 @@ Rectangle {
             Text {
                 id: wordCountLabel
                 font.pixelSize: statusBar.height * 0.5
-                text: screenplayAdapter.wordCount + (screenplayAdapter.wordCount !== 1 ? " words" : " word")
+                text: {
+                    const currentScene = screenplayAdapter.currentScene
+                    const currentSceneWordCount = currentScene ? currentScene.wordCount + " / " : ""
+                    const totalWordCount = screenplayAdapter.wordCount + (screenplayAdapter.wordCount !== 1 ? " words" : " word")
+                    return currentSceneWordCount + totalWordCount
+                }
                 anchors.verticalCenter: parent.verticalCenter
                 visible: taggingOptionsPosMapper.mappedPosition.x > width
 
@@ -866,6 +871,14 @@ Rectangle {
                     from: taggingOptions
                     position: Qt.point(0,0)
                     to: wordCountLabel
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "Displays 'current scene word count' / 'whole screenplay word count'."
+                    ToolTip.delay: 1000
                 }
             }
         }
