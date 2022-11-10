@@ -374,6 +374,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
 
     // Report Detail
     {
+        QTextFrame *detailFrame = cursor.currentFrame();
+
         QTextBlockFormat blockFormat = defaultBlockFormat;
         blockFormat.setAlignment(Qt::AlignLeft);
         blockFormat.setTopMargin(20);
@@ -508,22 +510,45 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 }
             }
 
+            cursor = detailFrame->lastCursorPosition();
+
+            QStringList muteCharacters;
             for (const QString &characterName : qAsConst(m_characterNames)) {
-                if (characterHasDialogue.value(characterName, false) == false) {
-                    QTextBlockFormat blockFormat = defaultBlockFormat;
-                    blockFormat.setIndent(1);
-                    blockFormat.setBottomMargin(20);
-
-                    QTextCharFormat charFormat = defaultCharFormat;
-
-                    cursor.insertBlock(blockFormat, charFormat);
-                    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                            cursor, characterName + " is in this scene.");
-                    // cursor.insertText(characterName + " is in this scene.");
+                if (characterHasDialogue.value(characterName, false) == false
+                    && scene->characterNames().contains(characterName)) {
+                    muteCharacters << characterName;
                 }
             }
 
-            cursor.movePosition(QTextCursor::End);
+            if (!muteCharacters.isEmpty()) {
+                const QString isare =
+                        muteCharacters.size() == 1 ? QLatin1String(" is ") : QLatin1String(" are ");
+                const QString names = [&muteCharacters]() -> QString {
+                    if (muteCharacters.size() == 1)
+                        return muteCharacters.first();
+
+                    QString lastName = muteCharacters.takeLast();
+                    QString ret = muteCharacters.join(QLatin1String(", "));
+                    ret += QLatin1String(" and ") + lastName;
+                    muteCharacters.append(lastName);
+                    return ret;
+                }();
+
+                QTextBlockFormat blockFormat = defaultBlockFormat;
+                blockFormat.setBottomMargin(20);
+
+                QTextCharFormat charFormat = defaultCharFormat;
+
+                cursor.insertBlock(blockFormat, charFormat);
+
+                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                        cursor,
+                        names + isare + QLatin1String("present in this scene and") + isare
+                                + QLatin1String("mute."));
+            }
+
+            cursor = detailFrame->lastCursorPosition();
+
             this->progress()->tick();
         }
     }
