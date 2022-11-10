@@ -2810,10 +2810,9 @@ Item {
         id: appBusyOverlay
         anchors.fill: parent
         busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
-        visible: refCount > 0
-        function ref() { refCount = refCount+1 }
-        function deref() { refCount = Math.max(refCount-1,0) }
-        property int refCount: 0
+        visible: RefCounter.isReffed
+        function ref() { RefCounter.ref() }
+        function deref() { RefCounter.deref() }
     }
 
     HelpTipNotification {

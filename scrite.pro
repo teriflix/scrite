@@ -89,6 +89,7 @@ HEADERS += \
     src/quick/objects/itempositionmapper.h \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/propertyalias.h \
+    src/quick/objects/refcounter.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
     src/quick/objects/notification.h \
