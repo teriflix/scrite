@@ -74,6 +74,19 @@ Menu2 {
     MenuSeparator { }
 
     MenuItem2 {
+        text: "Copy"
+        onClicked: Scrite.document.screenplay.copySelection()
+    }
+
+    MenuItem2 {
+        text: "Paste After"
+        enabled: Scrite.document.screenplay.canPaste
+        onClicked: Scrite.document.screenplay.pasteAfter( Scrite.document.screenplay.indexOfElement(element) )
+    }
+
+    MenuSeparator { }
+
+    MenuItem2 {
         text: "Remove"
         enabled: !Scrite.document.readOnly
         onClicked: {

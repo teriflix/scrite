@@ -2937,6 +2937,15 @@ void Structure::removeElement(StructureElement *ptr)
         GarbageCollector::instance()->add(ptr);
 }
 
+void Structure::removeElements(const QList<StructureElement *> &elements)
+{
+    if (elements.isEmpty())
+        return;
+
+    for (StructureElement *element : elements)
+        this->removeElement(element);
+}
+
 void Structure::insertElement(StructureElement *ptr, int index)
 {
     if (ptr == nullptr || m_elements.indexOf(ptr) >= 0)

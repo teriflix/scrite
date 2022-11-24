@@ -91,5 +91,6 @@
         <file>qml/HelpTipNotification.qml</file>
         <file>qml/SpellingSuggestionsMenu.qml</file>
         <file>qml/SpellingSuggestionsMenu2.qml</file>
+        <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
     </qresource>
 </RCC>

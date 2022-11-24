@@ -51,6 +51,7 @@ public:
 private:
     void setRefCount(int val)
     {
+        QMutexLocker lock(&m_refCountMutex);
         if (m_refCount == val)
             return;
         m_refCount = qMax(0, val);
@@ -59,6 +60,7 @@ private:
 
 private:
     int m_refCount = 0;
+    QMutex m_refCountMutex;
 };
 
 #endif

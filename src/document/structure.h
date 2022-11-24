@@ -859,6 +859,7 @@ public:
     QQmlListProperty<StructureElement> elements();
     Q_INVOKABLE void addElement(StructureElement *ptr);
     Q_INVOKABLE void removeElement(StructureElement *ptr);
+    void removeElements(const QList<StructureElement *> &elements);
     Q_INVOKABLE void insertElement(StructureElement *ptr, int index);
     Q_INVOKABLE void moveElement(StructureElement *ptr, int toRow);
     void setElements(const QList<StructureElement *> &list);

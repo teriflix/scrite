@@ -3468,19 +3468,8 @@ Rectangle {
                     }
                 }
 
-                Menu2 {
+                ScreenplayBreakElementsContextMenu {
                     id: breakElementContextMenu
-                    property ScreenplayElement element
-                    onClosed: element = null
-
-                    MenuItem2 {
-                        text: "Remove"
-                        enabled: !Scrite.document.readOnly
-                        onClicked: {
-                            Scrite.document.screenplay.removeElement(breakElementContextMenu.element)
-                            breakElementContextMenu.close()
-                        }
-                    }
                 }
 
                 ScreenplaySceneElementsContextMenu {

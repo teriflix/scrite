@@ -101,6 +101,8 @@ FocusTracker::FocusTracker(QObject *parent)
     : QObject(parent), m_item(qobject_cast<QQuickItem *>(parent)), m_window(this, "window")
 {
     ::GlobalFocusTrackerList->append(this);
+
+    connect(this, &FocusTracker::windowChanged, this, &FocusTracker::evaluateHasFocus);
 }
 
 FocusTracker::~FocusTracker()

@@ -353,11 +353,14 @@ public:
     Q_INVOKABLE void addElement(ScreenplayElement *ptr);
     Q_INVOKABLE void addScene(Scene *scene);
     Q_INVOKABLE void insertElementAt(ScreenplayElement *ptr, int index);
+    void insertElementsAt(const QList<ScreenplayElement *> &elements, int index);
     Q_INVOKABLE void removeElement(ScreenplayElement *ptr);
+    void removeElements(const QList<ScreenplayElement *> &elements);
     Q_INVOKABLE void moveElement(ScreenplayElement *ptr, int toRow);
     Q_INVOKABLE void moveSelectedElements(int toRow);
     Q_INVOKABLE void removeSelectedElements();
     Q_INVOKABLE void clearSelection();
+    void setSelection(const QList<ScreenplayElement *> &elements);
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
     Q_INVOKABLE ScreenplayElement *elementWithIndex(int index) const;
     Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
@@ -459,6 +462,13 @@ public:
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
 
+    Q_PROPERTY(bool canPaste READ canPaste NOTIFY canPasteChanged)
+    bool canPaste() const;
+    Q_SIGNAL void canPasteChanged();
+
+    Q_INVOKABLE void copySelection();
+    Q_INVOKABLE void pasteAfter(int index);
+
     // QObjectSerializer::Interface interface
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
@@ -509,6 +519,7 @@ protected:
     void setWordCount(int val);
     void evaluateWordCount();
     void evaluateWordCountLater();
+    bool getPasteDataFromClipboard(QJsonObject &clipboardJson) const;
 
 private:
     QString m_title;

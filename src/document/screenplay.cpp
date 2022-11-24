@@ -19,9 +19,11 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
+#include <QMimeData>
+#include <QSettings>
+#include <QClipboard>
 #include <QJsonDocument>
 #include <QScopedValueRollback>
-#include <QSettings>
 
 ScreenplayElement::ScreenplayElement(QObject *parent)
     : QObject(parent), m_scene(this, "scene"), m_screenplay(this, "screenplay")
@@ -466,6 +468,9 @@ Screenplay::Screenplay(QObject *parent)
         DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
         connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
     }
+
+    QClipboard *clipboard = qApp->clipboard();
+    connect(clipboard, &QClipboard::dataChanged, this, &Screenplay::canPasteChanged);
 }
 
 Screenplay::~Screenplay()
@@ -760,6 +765,27 @@ void Screenplay::insertElementAt(ScreenplayElement *ptr, int index)
         this->updateBreakTitlesLater();
 }
 
+void Screenplay::insertElementsAt(const QList<ScreenplayElement *> &elements, int index)
+{
+    const int startIndex = qMin(qMax(index, 0), m_elements.size());
+    const int endIndex = startIndex + elements.size() - 1;
+
+    this->beginInsertRows(QModelIndex(), startIndex, endIndex);
+
+    int insertIndex = startIndex;
+    for (ScreenplayElement *ptr : elements) {
+        ptr->setParent(this);
+        this->connectToScreenplayElementSignals(ptr);
+        m_elements.insert(insertIndex, ptr);
+        emit elementInserted(ptr, insertIndex);
+        ++insertIndex;
+    }
+
+    this->endInsertRows();
+    emit elementCountChanged();
+    emit elementsChanged();
+}
+
 void Screenplay::removeElement(ScreenplayElement *ptr)
 {
     HourGlass hourGlass;
@@ -809,6 +835,91 @@ void Screenplay::removeElement(ScreenplayElement *ptr)
 
     if (ptr->parent() == this)
         GarbageCollector::instance()->add(ptr);
+}
+
+void Screenplay::removeElements(const QList<ScreenplayElement *> &givenElements)
+{
+    QList<ScreenplayElement *> elements;
+    std::copy_if(givenElements.begin(), givenElements.end(), std::back_inserter(elements),
+                 [=](ScreenplayElement *element) { return m_elements.contains(element); });
+    if (elements.isEmpty())
+        return;
+
+    if (elements.size() == 1) {
+        this->removeElement(elements.first());
+        return;
+    }
+
+    struct Batch
+    {
+        int startIndex = 0;
+        int endIndex = -1;
+        QList<ScreenplayElement *> elements;
+        bool isValid() const
+        {
+            return startIndex >= 0 && endIndex >= 0 && endIndex >= startIndex
+                    && elements.size() == (endIndex - startIndex + 1);
+        }
+    };
+
+    QList<Batch> batches = QList<Batch>() << Batch();
+    int leastIndex = INT_MAX;
+
+    std::sort(elements.begin(), elements.end(), [=](ScreenplayElement *e1, ScreenplayElement *e2) {
+        return m_elements.indexOf(e1) < m_elements.indexOf(e2);
+    });
+    for (ScreenplayElement *element : qAsConst(elements)) {
+        const int elementIndex = m_elements.indexOf(element);
+        leastIndex = qMin(elementIndex, leastIndex);
+        Batch &lastBatch = batches.last();
+        if (!lastBatch.isValid()) {
+            lastBatch.startIndex = elementIndex;
+            lastBatch.endIndex = elementIndex;
+            lastBatch.elements.append(element);
+        } else if (elementIndex - lastBatch.endIndex == 1) {
+            lastBatch.endIndex = elementIndex;
+            lastBatch.elements.append(element);
+        } else {
+            Batch newBatch;
+            newBatch.startIndex = elementIndex;
+            newBatch.endIndex = elementIndex;
+            newBatch.elements.append(element);
+            batches.prepend(newBatch); // we need batches to be saved in reverse order only!
+        }
+    }
+
+    for (const Batch &batch : qAsConst(batches)) {
+        if (!batch.isValid())
+            continue;
+        this->beginRemoveRows(QModelIndex(), batch.startIndex, batch.endIndex);
+        for (int row = batch.endIndex; row >= batch.startIndex; row--) {
+            ScreenplayElement *ptr = m_elements.takeAt(row);
+
+            Scene *scene = ptr->scene();
+            if (scene != nullptr) {
+                scene->setAct(QString());
+                scene->setActIndex(-1);
+                scene->setEpisode(QString());
+                scene->setEpisodeIndex(-1);
+                scene->setScreenplayElementIndexList(QList<int>());
+            }
+
+            this->disconnectFromScreenplayElementSignals(ptr);
+            emit elementRemoved(ptr, row);
+
+            GarbageCollector::instance()->add(ptr);
+        }
+        this->endRemoveRows();
+
+        leastIndex = batch.startIndex;
+    }
+
+    emit elementCountChanged();
+    emit elementsChanged();
+    this->validateCurrentElementIndex();
+
+    if (leastIndex >= 0)
+        this->setCurrentElementIndex(qMax(0, leastIndex - 1));
 }
 
 void Screenplay::moveElement(ScreenplayElement *ptr, int toRow)
@@ -1001,12 +1112,12 @@ void Screenplay::moveSelectedElements(int toRow)
      * Why are we resetting the models while moving multiple elements, instead of removing and *
      * inserting them? Or better yet, moving them?
      *
-     * The ScreenplayTextDocument class was built with the assumption that elements will be added,
-     * removed or moved one at a time. So, if we removed all selected elements and reinserted them
-     * elsewhere; the text document wont get updated properly.
+     * The ScreenplayTextDocument class was built with the assumption that elements will be
+     * added, removed or moved one at a time. So, if we removed all selected elements and
+     * reinserted them elsewhere; the text document wont get updated properly.
      *
-     * But when we reset the model, it will simply update the whole screenplay at once. This could
-     * be a bit slow, but is still far better than moving one scene at a time.
+     * But when we reset the model, it will simply update the whole screenplay at once. This
+     * could be a bit slow, but is still far better than moving one scene at a time.
      */
     ScreenplayElementsMoveCommand *cmd = nullptr;
 
@@ -1213,10 +1324,14 @@ void Screenplay::removeSelectedElements()
 {
     HourGlass hourGlass;
 
+    int firstSelectedIndex = -1;
     QList<ScreenplayElement *> selectedElements;
     for (ScreenplayElement *element : qAsConst(m_elements)) {
-        if (element->isSelected())
+        if (element->isSelected()) {
             selectedElements.append(element);
+            if (firstSelectedIndex < 0)
+                firstSelectedIndex = m_elements.indexOf(element);
+        }
     }
 
     ObjectPropertyInfo *info =
@@ -1235,12 +1350,29 @@ void Screenplay::removeSelectedElements()
 
     if (info)
         info->unlock();
+
+    if (firstSelectedIndex >= 0)
+        this->setCurrentElementIndex(qMax(0, firstSelectedIndex - 1));
 }
 
 void Screenplay::clearSelection()
 {
     for (ScreenplayElement *element : qAsConst(m_elements))
         element->setSelected(false);
+}
+
+void Screenplay::setSelection(const QList<ScreenplayElement *> &elements)
+{
+    this->clearSelection();
+    if (elements.isEmpty())
+        return;
+
+    for (ScreenplayElement *ptr : elements)
+        ptr->setSelected(true);
+
+    const int index = m_elements.indexOf(elements.first());
+    if (index >= 0)
+        this->setCurrentElementIndex(index);
 }
 
 ScreenplayElement *Screenplay::elementAt(int index) const
@@ -2043,6 +2175,48 @@ void Screenplay::evaluateWordCountLater()
     m_wordCountTimer.start(100, this);
 }
 
+bool Screenplay::getPasteDataFromClipboard(QJsonObject &clipboardJson) const
+{
+    clipboardJson = QJsonObject();
+
+    ScriteDocument *sdoc = ScriteDocument::instance();
+    if (sdoc->isReadOnly())
+        return false;
+
+    QClipboard *clipboard = qApp->clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    if (mimeData == nullptr)
+        return false;
+
+    const QString screenplayMimeType = QLatin1String("scrite/screenplay");
+    if (!mimeData->hasFormat(screenplayMimeType))
+        return false;
+
+    const QByteArray clipboardText = mimeData->data(screenplayMimeType);
+    if (clipboardText.isEmpty())
+        return false;
+
+    QJsonParseError parseError;
+    const QJsonDocument jsonDoc = QJsonDocument::fromJson(clipboardText, &parseError);
+    if (parseError.error != QJsonParseError::NoError)
+        return false;
+
+    const QString appString =
+            qApp->applicationName() + QLatin1String("-") + qApp->applicationVersion();
+
+    const QJsonObject jsonObj = jsonDoc.object();
+    if (jsonObj.value(QLatin1String("app")).toString() != appString)
+        return false; // We dont want to support copy/paste between different versions of
+                      // Scrite.
+
+    if (jsonObj.value(QLatin1String("source")).toString() != QLatin1String("Screenplay"))
+        return false;
+
+    clipboardJson = jsonObj;
+
+    return true;
+}
+
 void Screenplay::setCurrentElementIndex(int val)
 {
     val = qBound(-1, val, m_elements.size() - 1);
@@ -2222,6 +2396,159 @@ void Screenplay::resetSceneNumbers()
     this->evaluateSceneNumbers(true);
 }
 
+bool Screenplay::canPaste() const
+{
+    QJsonObject clipboardJson;
+    return this->getPasteDataFromClipboard(clipboardJson);
+}
+
+void Screenplay::copySelection()
+{
+    QJsonObject clipboardJson;
+    clipboardJson.insert(QLatin1String("app"),
+                         qApp->applicationName() + QLatin1String("-") + qApp->applicationVersion());
+    clipboardJson.insert(QLatin1String("source"), QLatin1String("Screenplay"));
+
+    QJsonArray data;
+    QJsonObject scenes;
+
+    for (const ScreenplayElement *element : qAsConst(m_elements)) {
+        if (!element->isSelected())
+            continue;
+
+        const QJsonObject elementJson = QObjectSerializer::toJson(element);
+        data.append(elementJson);
+
+        if (!scenes.contains(element->sceneID())) {
+            const QJsonObject sceneJson = QObjectSerializer::toJson(element->scene());
+            scenes.insert(element->sceneID(), sceneJson);
+        }
+    }
+    clipboardJson.insert(QLatin1String("data"), data);
+    clipboardJson.insert(QLatin1String("scenes"), scenes);
+
+    const QByteArray clipboardText = QJsonDocument(clipboardJson).toJson();
+
+    QMimeData *mimeData = new QMimeData;
+    mimeData->setData(QLatin1String("scrite/screenplay"), clipboardText);
+#ifndef QT_NO_DEBUG_OUTPUT
+    mimeData->setData(QLatin1String("text/plain"), clipboardText);
+#endif
+
+    QClipboard *clipboard = qApp->clipboard();
+    clipboard->setMimeData(mimeData);
+}
+
+class ScreenplayPasteUndoCommand : public QUndoCommand
+{
+public:
+    explicit ScreenplayPasteUndoCommand(Screenplay *screenplay, Structure *structure,
+                                        const QJsonArray &elements, const QJsonObject &scenes,
+                                        int pasteAfter);
+    ~ScreenplayPasteUndoCommand();
+
+    void redo();
+    void undo();
+
+private:
+    Structure *m_structure = nullptr;
+    Screenplay *m_screenplay = nullptr;
+    int m_pasteAfter = -1;
+    QJsonObject m_scenesData;
+    QJsonArray m_screenplayElementsData;
+    QList<Scene *> m_scenes;
+    QList<ScreenplayElement *> m_screenplayElements;
+};
+
+ScreenplayPasteUndoCommand::ScreenplayPasteUndoCommand(Screenplay *screenplay, Structure *structure,
+                                                       const QJsonArray &elements,
+                                                       const QJsonObject &scenes, int pasteAfter)
+    : m_structure(structure),
+      m_screenplay(screenplay),
+      m_pasteAfter(pasteAfter),
+      m_scenesData(scenes),
+      m_screenplayElementsData(elements)
+{
+}
+
+ScreenplayPasteUndoCommand::~ScreenplayPasteUndoCommand() { }
+
+void ScreenplayPasteUndoCommand::redo()
+{
+    for (int i = 0; i < m_screenplayElementsData.size(); i++) {
+        const QJsonObject elementJson = m_screenplayElementsData.at(i).toObject();
+        const QString sceneId = elementJson.value(QLatin1String("sceneID")).toString();
+        if (!m_structure->findElementBySceneID(sceneId)) {
+            const QJsonObject sceneJson = m_scenesData.value(sceneId).toObject();
+            if (sceneJson.isEmpty())
+                continue;
+
+            QObjectFactory factory;
+            factory.addClass<SceneElement>();
+
+            StructureElement *structureElement = new StructureElement(m_structure);
+            Scene *scene = new Scene(structureElement);
+            if (!QObjectSerializer::fromJson(sceneJson, scene, &factory)) {
+                delete scene;
+                delete structureElement;
+                continue;
+            }
+
+            structureElement->setScene(scene);
+            m_structure->addElement(structureElement);
+        }
+
+        ScreenplayElement *screenplayElement = new ScreenplayElement(m_screenplay);
+        if (!QObjectSerializer::fromJson(elementJson, screenplayElement)) {
+            delete screenplayElement;
+            continue;
+        }
+
+        m_screenplayElements.append(screenplayElement);
+    }
+
+    if (m_screenplayElements.isEmpty())
+        return;
+
+    m_screenplay->insertElementsAt(m_screenplayElements, m_pasteAfter + 1);
+    m_screenplay->setSelection(m_screenplayElements);
+}
+
+void ScreenplayPasteUndoCommand::undo()
+{
+    m_screenplay->removeElements(m_screenplayElements);
+    m_screenplayElements.clear();
+
+    QList<StructureElement *> structureElements;
+    for (Scene *scene : qAsConst(m_scenes))
+        structureElements.append(scene->structureElement());
+    m_structure->removeElements(structureElements);
+    m_scenes.clear();
+}
+
+void Screenplay::pasteAfter(int index)
+{
+    ScriteDocument *sdoc = ScriteDocument::instance();
+    Structure *structure = sdoc->structure();
+    QJsonObject clipboardJson;
+    if (!this->getPasteDataFromClipboard(clipboardJson))
+        return;
+
+    const QJsonObject scenes = clipboardJson.value(QLatin1String("scenes")).toObject();
+    const QJsonArray elements = clipboardJson.value(QLatin1String("data")).toArray();
+    ScreenplayPasteUndoCommand *cmd =
+            new ScreenplayPasteUndoCommand(this, structure, elements, scenes, index);
+
+    if (UndoStack::active()) {
+        UndoStack::active()->push(cmd);
+        Application::log("Undo stack was active.");
+    } else {
+        Application::log("Undo stack was NOT active.");
+        cmd->redo();
+        delete cmd;
+    }
+}
+
 void Screenplay::serializeToJson(QJsonObject &json) const
 {
     json.insert("hasCoverPagePhoto", !m_coverPagePhoto.isEmpty());
@@ -2270,6 +2597,7 @@ void Screenplay::setPropertyFromObjectList(const QString &propName, const QList<
             ptr->setParent(this);
             this->connectToScreenplayElementSignals(ptr);
             m_elements.append(ptr);
+            emit elementInserted(ptr, m_elements.size() - 1);
         }
 
         this->endResetModel();
