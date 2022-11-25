@@ -2541,9 +2541,7 @@ void Screenplay::pasteAfter(int index)
 
     if (UndoStack::active()) {
         UndoStack::active()->push(cmd);
-        Application::log("Undo stack was active.");
     } else {
-        Application::log("Undo stack was NOT active.");
         cmd->redo();
         delete cmd;
     }

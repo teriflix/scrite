@@ -2707,7 +2707,7 @@ Rectangle {
                                 if(editingLocationPart)
                                     return text.substring(dotPosition+1, dashPosition < 0 ? text.length : dashPosition).trim()
                                 if(editingLocationTypePart)
-                                    return text.substring(0, dotPosition).trim()
+                                    return dotPosition < 0 ? text : text.substring(0, dotPosition).trim()
                                 if(editingMomentPart)
                                     return text.substring(dashPosition+1).trim()
                                 return ""
