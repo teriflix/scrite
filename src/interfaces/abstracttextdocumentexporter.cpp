@@ -82,9 +82,10 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setPrintEachActOnANewPage(this->isPrintEachActOnANewPage());
     stDoc.setIncludeActBreaks(this->isIncludeActBreaks());
     stDoc.setSyncEnabled(false);
-    if (this->isExportForPrintingPurpose() || (this->usePageBreaks() && m_includeSceneContents))
+    if (this->isExportForPrintingPurpose() || (this->usePageBreaks() && m_includeSceneContents)) {
         stDoc.setPurpose(ScreenplayTextDocument::ForPrinting);
-    else
+        stDoc.setIncludeMoreAndContdMarkers(this->usePageBreaks());
+    } else
         stDoc.setPurpose(ScreenplayTextDocument::ForDisplay);
     stDoc.setScreenplay(this->document()->screenplay());
     stDoc.setFormatting(this->document()->printFormat());

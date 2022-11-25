@@ -177,6 +177,12 @@ public:
     bool isTitlePageIsCentered() const { return m_titlePageIsCentered; }
     Q_SIGNAL void titlePageIsCenteredChanged();
 
+    // NOTE: this property is referred only if this->purpose() == ForPrinting
+    Q_PROPERTY(bool includeMoreAndContdMarkers READ isIncludeMoreAndContdMarkers WRITE setIncludeMoreAndContdMarkers NOTIFY includeMoreAndContdMarkersChanged)
+    void setIncludeMoreAndContdMarkers(bool val);
+    bool isIncludeMoreAndContdMarkers() const { return m_includeMoreAndContdMarkers; }
+    Q_SIGNAL void includeMoreAndContdMarkersChanged();
+
     Q_PROPERTY(bool updating READ isUpdating NOTIFY updatingChanged)
     bool isUpdating() const { return m_updating; }
     Q_SIGNAL void updatingChanged();
@@ -352,6 +358,7 @@ private:
     bool m_includeSceneFeaturedImage = false;
     bool m_includeSceneComments = false;
     bool m_screenplayIsBeingReset = false;
+    bool m_includeMoreAndContdMarkers = true;
     QList<Scene *> m_sceneResetList;
     ExecLaterTimer m_sceneResetTimer;
     bool m_sceneResetHasTriggeredUpdateScheduled = false;

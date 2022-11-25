@@ -482,6 +482,17 @@ void ScreenplayTextDocument::setTitlePageIsCentered(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setIncludeMoreAndContdMarkers(bool val)
+{
+    if (m_includeMoreAndContdMarkers == val)
+        return;
+
+    m_includeMoreAndContdMarkers = val;
+    emit includeMoreAndContdMarkersChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setSecondsPerPage(int val)
 {
     val = qBound(15, val, 300);
@@ -1327,13 +1338,15 @@ void ScreenplayTextDocument::loadScreenplay()
     if (injection != nullptr)
         injection->inject(cursor, AbstractScreenplayTextDocumentInjectionInterface::AfterLastScene);
 
-    this->includeMoreAndContdMarkers();
+    if (m_includeMoreAndContdMarkers)
+        this->includeMoreAndContdMarkers();
+
     this->evaluatePageBoundariesLater();
 }
 
 void ScreenplayTextDocument::includeMoreAndContdMarkers()
 {
-    if (m_purpose != ForPrinting /* || m_syncEnabled*/)
+    if (m_purpose != ForPrinting || !m_includeMoreAndContdMarkers /* || m_syncEnabled*/)
         return;
 
     /**
