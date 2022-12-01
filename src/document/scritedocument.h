@@ -26,6 +26,7 @@
 #include "qobjectproperty.h"
 #include "qobjectserializer.h"
 #include "documentfilesystem.h"
+#include "qtextdocumentpagedprinter.h"
 
 class Forms;
 class FileLocker;
@@ -171,6 +172,133 @@ private:
     QList<QPair<QString, QString>> m_otherCollaborators;
 };
 
+class PageSetup : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+    PageSetup(QObject *parent = nullptr);
+
+public:
+    ~PageSetup();
+
+    // must be in one of ScreenplayPageLayout::PageSize
+    Q_PROPERTY(int paperSize READ paperSize WRITE setPaperSize NOTIFY paperSizeChanged)
+    void setPaperSize(int val);
+    int paperSize() const { return m_paperSize; }
+    Q_SIGNAL void paperSizeChanged();
+
+    // Must be one of HeaderFooter::Field
+    Q_PROPERTY(int headerLeft READ headerLeft WRITE setHeaderLeft NOTIFY headerLeftChanged)
+    void setHeaderLeft(int val);
+    int headerLeft() const { return m_headerLeft; }
+    Q_SIGNAL void headerLeftChanged();
+
+    Q_PROPERTY(int headerCenter READ headerCenter WRITE setHeaderCenter NOTIFY headerCenterChanged)
+    void setHeaderCenter(int val);
+    int headerCenter() const { return m_headerCenter; }
+    Q_SIGNAL void headerCenterChanged();
+
+    Q_PROPERTY(int headerRight READ headerRight WRITE setHeaderRight NOTIFY headerRightChanged)
+    void setHeaderRight(int val);
+    int headerRight() const { return m_headerRight; }
+    Q_SIGNAL void headerRightChanged();
+
+    Q_PROPERTY(qreal headerOpacity READ headerOpacity WRITE setHeaderOpacity NOTIFY headerOpacityChanged)
+    void setHeaderOpacity(qreal val);
+    qreal headerOpacity() const { return m_headerOpacity; }
+    Q_SIGNAL void headerOpacityChanged();
+
+    Q_PROPERTY(int footerLeft READ footerLeft WRITE setFooterLeft NOTIFY footerLeftChanged)
+    void setFooterLeft(int val);
+    int footerLeft() const { return m_footerLeft; }
+    Q_SIGNAL void footerLeftChanged();
+
+    Q_PROPERTY(int footerCenter READ footerCenter WRITE setFooterCenter NOTIFY footerCenterChanged)
+    void setFooterCenter(int val);
+    int footerCenter() const { return m_footerCenter; }
+    Q_SIGNAL void footerCenterChanged();
+
+    Q_PROPERTY(int footerRight READ footerRight WRITE setFooterRight NOTIFY footerRightChanged)
+    void setFooterRight(int val);
+    int footerRight() const { return m_footerRight; }
+    Q_SIGNAL void footerRightChanged();
+
+    Q_PROPERTY(qreal footerOpacity READ footerOpacity WRITE setFooterOpacity NOTIFY footerOpacityChanged)
+    void setFooterOpacity(qreal val);
+    qreal footerOpacity() const { return m_footerOpacity; }
+    Q_SIGNAL void footerOpacityChanged();
+
+    Q_PROPERTY(bool watermarkEnabled READ isWatermarkEnabled WRITE setWatermarkEnabled NOTIFY watermarkEnabledChanged)
+    void setWatermarkEnabled(bool val);
+    bool isWatermarkEnabled() const { return m_watermarkEnabled; }
+    Q_SIGNAL void watermarkEnabledChanged();
+
+    Q_PROPERTY(QString watermarkText READ watermarkText WRITE setWatermarkText NOTIFY watermarkTextChanged)
+    void setWatermarkText(const QString &val);
+    QString watermarkText() const { return m_watermarkText; }
+    Q_SIGNAL void watermarkTextChanged();
+
+    Q_PROPERTY(QString watermarkFont READ watermarkFont WRITE setWatermarkFont NOTIFY watermarkFontChanged)
+    void setWatermarkFont(const QString &val);
+    QString watermarkFont() const { return m_watermarkFont; }
+    Q_SIGNAL void watermarkFontChanged();
+
+    Q_PROPERTY(int watermarkFontSize READ watermarkFontSize WRITE setWatermarkFontSize NOTIFY watermarkFontSizeChanged)
+    void setWatermarkFontSize(int val);
+    int watermarkFontSize() const { return m_watermarkFontSize; }
+    Q_SIGNAL void watermarkFontSizeChanged();
+
+    Q_PROPERTY(QColor watermarkColor READ watermarkColor WRITE setWatermarkColor NOTIFY watermarkColorChanged)
+    void setWatermarkColor(const QColor &val);
+    QColor watermarkColor() const { return m_watermarkColor; }
+    Q_SIGNAL void watermarkColorChanged();
+
+    Q_PROPERTY(qreal watermarkOpacity READ watermarkOpacity WRITE setWatermarkOpacity NOTIFY watermarkOpacityChanged)
+    void setWatermarkOpacity(qreal val);
+    qreal watermarkOpacity() const { return m_watermarkOpacity; }
+    Q_SIGNAL void watermarkOpacityChanged();
+
+    Q_PROPERTY(int watermarkRotation READ watermarkRotation WRITE setWatermarkRotation NOTIFY watermarkRotationChanged)
+    void setWatermarkRotation(int val);
+    int watermarkRotation() const { return m_watermarkRotation; }
+    Q_SIGNAL void watermarkRotationChanged();
+
+    Q_PROPERTY(int watermarkAlignment READ watermarkAlignment WRITE setWatermarkAlignment NOTIFY watermarkAlignmentChanged)
+    void setWatermarkAlignment(int val);
+    int watermarkAlignment() const { return m_watermarkAlignment; }
+    Q_SIGNAL void watermarkAlignmentChanged();
+
+public slots:
+    void useFactoryDefaults();
+    void saveAsDefaults();
+    void useSavedDefaults();
+
+signals:
+    void pageSetupChanged();
+
+private:
+    friend class ScriteDocument;
+    int m_headerLeft;
+    int m_headerCenter;
+    int m_headerRight;
+    qreal m_headerOpacity;
+    int m_footerLeft;
+    int m_footerCenter;
+    int m_footerRight;
+    int m_paperSize;
+    qreal m_footerOpacity;
+    bool m_watermarkEnabled;
+    QString m_watermarkText;
+    QString m_watermarkFont;
+    int m_watermarkFontSize;
+    QColor m_watermarkColor;
+    qreal m_watermarkOpacity;
+    int m_watermarkRotation;
+    int m_watermarkAlignment;
+};
+
 class ScriteDocument : public QObject, public QObjectSerializer::Interface
 {
     Q_OBJECT
@@ -303,6 +431,10 @@ public:
     Form *requestForm(const QString &id);
     void releaseForm(Form *form);
 
+    Q_PROPERTY(PageSetup* pageSetup READ pageSetup NOTIFY pageSetupChanged)
+    PageSetup *pageSetup() const { return m_pageSetup; }
+    Q_SIGNAL void pageSetupChanged();
+
     // This function adds a new scene to both structure and screenplay
     // and inserts it right after the current element in both.
     Q_INVOKABLE Scene *createNewScene(bool fuzzyScreenplayInsert = true);
@@ -411,6 +543,7 @@ private:
     void setFormatting(ScreenplayFormat *val);
     void setPrintFormat(ScreenplayFormat *val);
     void setForms(Forms *val);
+    void setPageSetup(PageSetup *val);
     void evaluateStructureElementSequence();
     void evaluateStructureElementSequenceLater();
     void markAsModified();
@@ -474,6 +607,7 @@ private:
     QObjectProperty<ScreenplayFormat> m_formatting;
     QObjectProperty<ScreenplayFormat> m_printFormat;
     QObjectProperty<Forms> m_forms;
+    QObjectProperty<PageSetup> m_pageSetup;
     ExecLaterTimer m_evaluateStructureElementSequenceTimer;
     bool m_syncingStructureScreenplayCurrentIndex = false;
 

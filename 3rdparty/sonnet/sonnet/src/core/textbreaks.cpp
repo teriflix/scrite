@@ -28,15 +28,12 @@ namespace Sonnet {
 class TextBreaksPrivate
 {
 public:
-    TextBreaksPrivate()
-    {
-    }
+    TextBreaksPrivate() { }
 
     QString text;
 };
 
-TextBreaks::TextBreaks(const QString &text)
-    : d(new TextBreaksPrivate())
+TextBreaks::TextBreaks(const QString &text) : d(new TextBreaksPrivate())
 {
     setText(text);
 }

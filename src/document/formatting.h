@@ -546,6 +546,11 @@ public:
     bool isLiveSpellCheckEnabled() const { return m_liveSpellCheckEnabled; }
     Q_SIGNAL void liveSpellCheckEnabledChanged();
 
+    Q_PROPERTY(bool autoCapitalizeSentences READ isAutoCapitalizeSentences WRITE setAutoCapitalizeSentences NOTIFY autoCapitalizeSentencesChanged)
+    void setAutoCapitalizeSentences(bool val);
+    bool isAutoCapitalizeSentences() const { return m_autoCapitalizeSentences; }
+    Q_SIGNAL void autoCapitalizeSentencesChanged();
+
     Q_PROPERTY(qreal textWidth READ textWidth WRITE setTextWidth NOTIFY textWidthChanged)
     void setTextWidth(qreal val);
     qreal textWidth() const { return m_textWidth; }
@@ -762,6 +767,7 @@ private:
     QStringList m_transitions;
     QStringList m_characterNames;
     bool m_liveSpellCheckEnabled = true;
+    bool m_autoCapitalizeSentences = true;
     QObjectProperty<Scene> m_scene;
     bool m_applyNextCharFormat = false;
     QTextCharFormat m_nextCharFormat;

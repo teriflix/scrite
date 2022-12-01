@@ -300,6 +300,319 @@ void ScriteDocumentBackups::clear()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+PageSetup::PageSetup(QObject *parent) : QObject(parent)
+{
+    connect(this, &PageSetup::paperSizeChanged, this, &PageSetup::pageSetupChanged);
+
+    connect(this, &PageSetup::headerLeftChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::headerCenterChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::headerRightChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::headerOpacityChanged, this, &PageSetup::pageSetupChanged);
+
+    connect(this, &PageSetup::footerLeftChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::footerCenterChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::footerRightChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::footerOpacityChanged, this, &PageSetup::pageSetupChanged);
+
+    connect(this, &PageSetup::watermarkAlignmentChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::watermarkColorChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::watermarkEnabledChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::watermarkFontChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::watermarkFontSizeChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::watermarkOpacityChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::watermarkRotationChanged, this, &PageSetup::pageSetupChanged);
+    connect(this, &PageSetup::watermarkTextChanged, this, &PageSetup::pageSetupChanged);
+
+    QSignalBlocker signalBlocker(this);
+    this->useSavedDefaults();
+}
+
+PageSetup::~PageSetup() { }
+
+void PageSetup::setPaperSize(int val)
+{
+    if (m_paperSize == val)
+        return;
+
+    m_paperSize = val;
+    emit paperSizeChanged();
+}
+
+void PageSetup::setHeaderLeft(int val)
+{
+    if (m_headerLeft == val)
+        return;
+
+    m_headerLeft = val;
+    emit headerLeftChanged();
+}
+
+void PageSetup::setHeaderCenter(int val)
+{
+    if (m_headerCenter == val)
+        return;
+
+    m_headerCenter = val;
+    emit headerCenterChanged();
+}
+
+void PageSetup::setHeaderRight(int val)
+{
+    if (m_headerRight == val)
+        return;
+
+    m_headerRight = val;
+    emit headerRightChanged();
+}
+
+void PageSetup::setHeaderOpacity(qreal val)
+{
+    if (qFuzzyCompare(m_headerOpacity, val))
+        return;
+
+    m_headerOpacity = val;
+    emit headerOpacityChanged();
+}
+
+void PageSetup::setFooterLeft(int val)
+{
+    if (m_footerLeft == val)
+        return;
+
+    m_footerLeft = val;
+    emit footerLeftChanged();
+}
+
+void PageSetup::setFooterCenter(int val)
+{
+    if (m_footerCenter == val)
+        return;
+
+    m_footerCenter = val;
+    emit footerCenterChanged();
+}
+
+void PageSetup::setFooterRight(int val)
+{
+    if (m_footerRight == val)
+        return;
+
+    m_footerRight = val;
+    emit footerRightChanged();
+}
+
+void PageSetup::setFooterOpacity(qreal val)
+{
+    if (qFuzzyCompare(m_footerOpacity, val))
+        return;
+
+    m_footerOpacity = val;
+    emit footerOpacityChanged();
+}
+
+void PageSetup::setWatermarkEnabled(bool val)
+{
+    if (m_watermarkEnabled == val)
+        return;
+
+    m_watermarkEnabled = val;
+    emit watermarkEnabledChanged();
+}
+
+void PageSetup::setWatermarkText(const QString &val)
+{
+    if (m_watermarkText == val)
+        return;
+
+    m_watermarkText = val;
+    emit watermarkTextChanged();
+}
+
+void PageSetup::setWatermarkFont(const QString &val)
+{
+    if (m_watermarkFont == val)
+        return;
+
+    m_watermarkFont = val;
+    emit watermarkFontChanged();
+}
+
+void PageSetup::setWatermarkFontSize(int val)
+{
+    if (m_watermarkFontSize == val)
+        return;
+
+    m_watermarkFontSize = val;
+    emit watermarkFontSizeChanged();
+}
+
+void PageSetup::setWatermarkColor(const QColor &val)
+{
+    if (m_watermarkColor == val)
+        return;
+
+    m_watermarkColor = val;
+    emit watermarkColorChanged();
+}
+
+void PageSetup::setWatermarkOpacity(qreal val)
+{
+    if (qFuzzyCompare(m_watermarkOpacity, val))
+        return;
+
+    m_watermarkOpacity = val;
+    emit watermarkOpacityChanged();
+}
+
+void PageSetup::setWatermarkRotation(int val)
+{
+    if (m_watermarkRotation == val)
+        return;
+
+    m_watermarkRotation = val;
+    emit watermarkRotationChanged();
+}
+
+void PageSetup::setWatermarkAlignment(int val)
+{
+    if (m_watermarkAlignment == val)
+        return;
+
+    m_watermarkAlignment = val;
+    emit watermarkAlignmentChanged();
+}
+
+void PageSetup::useFactoryDefaults()
+{
+    m_headerLeft = HeaderFooter::Title;
+    emit headerLeftChanged();
+
+    m_headerCenter = HeaderFooter::Subtitle;
+    emit headerCenterChanged();
+
+    m_headerRight = HeaderFooter::PageNumber;
+    emit headerRightChanged();
+
+    m_headerOpacity = 0.5;
+    emit headerOpacityChanged();
+
+    m_footerLeft = HeaderFooter::Author;
+    emit footerLeftChanged();
+
+    m_footerCenter = HeaderFooter::Version;
+    emit footerCenterChanged();
+
+    m_footerRight = HeaderFooter::Contact;
+    emit footerRightChanged();
+
+    m_footerOpacity = 0.5;
+    emit footerOpacityChanged();
+
+    m_paperSize = ScreenplayPageLayout::Letter;
+    emit paperSizeChanged();
+
+    m_watermarkEnabled = true;
+    emit watermarkEnabledChanged();
+
+    m_watermarkText = QLatin1String("Scrite");
+    emit watermarkTextChanged();
+
+    m_watermarkFont = QLatin1String("Courier Prime");
+    emit watermarkFontChanged();
+
+    m_watermarkFontSize = 120;
+    emit watermarkFontSizeChanged();
+
+    m_watermarkColor = QColor(Qt::lightGray);
+    emit watermarkColorChanged();
+
+    m_watermarkOpacity = 0.5;
+    emit watermarkOpacityChanged();
+
+    m_watermarkRotation = -45;
+    emit watermarkRotationChanged();
+
+    m_watermarkAlignment = Qt::AlignCenter;
+    emit watermarkAlignmentChanged();
+}
+
+void PageSetup::saveAsDefaults()
+{
+    const QString group = QLatin1String("PageSetup/");
+    QSettings *settings = Application::instance()->settings();
+
+    settings->setValue(group + QLatin1String("paperSize"), m_paperSize);
+
+    settings->setValue(group + QLatin1String("headerLeft"), m_headerLeft);
+    settings->setValue(group + QLatin1String("headerCenter"), m_headerCenter);
+    settings->setValue(group + QLatin1String("headerRight"), m_headerRight);
+    settings->setValue(group + QLatin1String("headerOpacity"), m_headerOpacity);
+
+    settings->setValue(group + QLatin1String("footerLeft"), m_footerLeft);
+    settings->setValue(group + QLatin1String("footerCenter"), m_footerCenter);
+    settings->setValue(group + QLatin1String("footerRight"), m_footerRight);
+    settings->setValue(group + QLatin1String("footerOpacity"), m_footerOpacity);
+
+    settings->setValue(group + QLatin1String("watermarkEnabled"), m_watermarkEnabled);
+    settings->setValue(group + QLatin1String("watermarkText"), m_watermarkText);
+    settings->setValue(group + QLatin1String("watermarkFont"), m_watermarkFont);
+    settings->setValue(group + QLatin1String("watermarkFontSize"), m_watermarkFontSize);
+    settings->setValue(group + QLatin1String("watermarkColor"), m_watermarkColor);
+    settings->setValue(group + QLatin1String("watermarkOpacity"), m_watermarkOpacity);
+    settings->setValue(group + QLatin1String("watermarkRotation"), m_watermarkRotation);
+    settings->setValue(group + QLatin1String("watermarkAlignment"), m_watermarkAlignment);
+}
+
+void PageSetup::useSavedDefaults()
+{
+    const QString group = QLatin1String("PageSetup/");
+    const QSettings *settings = Application::instance()->settings();
+
+    this->useFactoryDefaults();
+
+    this->setPaperSize(settings->value(group + QLatin1String("paperSize"), m_paperSize).toInt());
+
+    this->setHeaderLeft(settings->value(group + QLatin1String("headerLeft"), m_headerLeft).toInt());
+    this->setHeaderCenter(
+            settings->value(group + QLatin1String("headerCenter"), m_headerCenter).toInt());
+    this->setHeaderRight(
+            settings->value(group + QLatin1String("headerRight"), m_headerRight).toInt());
+    this->setHeaderOpacity(
+            settings->value(group + QLatin1String("headerOpacity"), m_headerOpacity).toReal());
+
+    this->setFooterLeft(settings->value(group + QLatin1String("footerLeft"), m_footerLeft).toInt());
+    this->setFooterCenter(
+            settings->value(group + QLatin1String("footerCenter"), m_footerCenter).toInt());
+    this->setFooterRight(
+            settings->value(group + QLatin1String("footerRight"), m_footerRight).toInt());
+    this->setFooterOpacity(
+            settings->value(group + QLatin1String("footerOpacity"), m_footerOpacity).toReal());
+
+    this->setWatermarkEnabled(
+            settings->value(group + QLatin1String("watermarkEnabled"), m_watermarkEnabled)
+                    .toBool());
+    this->setWatermarkText(
+            settings->value(group + QLatin1String("watermarkText"), m_watermarkText).toString());
+    this->setWatermarkFont(
+            settings->value(group + QLatin1String("watermarkFont"), m_watermarkFont).toString());
+    this->setWatermarkFontSize(
+            settings->value(group + QLatin1String("watermarkFontSize"), m_watermarkFontSize)
+                    .toInt());
+    this->setWatermarkColor(
+            settings->value(group + QLatin1String("watermarkColor")).value<QColor>());
+    this->setWatermarkOpacity(
+            settings->value(group + QLatin1String("watermarkOpacity"), m_watermarkOpacity)
+                    .toReal());
+    this->setWatermarkRotation(
+            settings->value(group + QLatin1String("watermarkRotation"), m_watermarkRotation)
+                    .toInt());
+    this->setWatermarkAlignment(
+            settings->value(group + QLatin1String("watermarkAlignment"), m_watermarkAlignment)
+                    .toInt());
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 class DeviceIOFactories
 {
 public:
@@ -356,6 +669,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
       m_formatting(this, "formatting"),
       m_printFormat(this, "printFormat"),
       m_forms(this, "forms"),
+      m_pageSetup(this, "pageSetup"),
       m_evaluateStructureElementSequenceTimer(
               "ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
@@ -838,6 +1152,7 @@ void ScriteDocument::reset()
     else
         m_printFormat->resetToUserDefaults();
 
+    this->setPageSetup(new PageSetup(this));
     this->setForms(new Forms(this));
     this->setScreenplay(new Screenplay(this));
     this->setStructure(new Structure(this));
@@ -1664,15 +1979,40 @@ void ScriteDocument::setForms(Forms *val)
     if (m_forms == val)
         return;
 
-    if (m_forms != nullptr)
+    if (m_forms != nullptr) {
         GarbageCollector::instance()->add(m_forms);
+        disconnect(m_forms, &Forms::formCountChanged, this, &ScriteDocument::markAsModified);
+    }
 
     m_forms = val;
 
-    if (m_forms != nullptr)
+    if (m_forms != nullptr) {
         m_forms->setParent(this);
+        connect(m_forms, &Forms::formCountChanged, this, &ScriteDocument::markAsModified);
+    }
 
     emit formsChanged();
+}
+
+void ScriteDocument::setPageSetup(PageSetup *val)
+{
+    if (m_pageSetup == val)
+        return;
+
+    if (m_pageSetup != nullptr) {
+        disconnect(m_pageSetup, &PageSetup::pageSetupChanged, this,
+                   &ScriteDocument::markAsModified);
+        GarbageCollector::instance()->add(m_pageSetup);
+    }
+
+    m_pageSetup = val;
+
+    if (m_pageSetup != nullptr) {
+        m_pageSetup->setParent(this);
+        connect(m_pageSetup, &PageSetup::pageSetupChanged, this, &ScriteDocument::markAsModified);
+    }
+
+    emit pageSetupChanged();
 }
 
 void ScriteDocument::evaluateStructureElementSequence()

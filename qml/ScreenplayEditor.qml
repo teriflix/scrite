@@ -1288,6 +1288,7 @@ Rectangle {
                 screenplayFormat: screenplayEditor.screenplayFormat
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 spellCheckEnabled: !Scrite.document.readOnly && spellCheckEnabledFlag.value
+                autoCapitalizeSentences: !Scrite.document.readOnly && screenplayEditorSettings.enableAutoCapitalizeSentences
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 property bool firstInitializationDone: false
                 onDocumentInitialized: {

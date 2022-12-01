@@ -1493,6 +1493,15 @@ void SceneDocumentBinder::setLiveSpellCheckEnabled(bool val)
     emit liveSpellCheckEnabledChanged();
 }
 
+void SceneDocumentBinder::setAutoCapitalizeSentences(bool val)
+{
+    if (m_autoCapitalizeSentences == val)
+        return;
+
+    m_autoCapitalizeSentences = val;
+    emit autoCapitalizeSentencesChanged();
+}
+
 void SceneDocumentBinder::setTextWidth(qreal val)
 {
     if (qFuzzyCompare(m_textWidth, val))
@@ -2515,6 +2524,83 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
 
     QTextCursor cursor(this->document());
     cursor.setPosition(from);
+
+    // Auto-capitalize first letter of each sentence.
+    if (m_autoCapitalizeSentences && charsRemoved == 0) {
+        QScopedValueRollback<bool> rollback(m_autoCapitalizeSentences, false);
+
+        static QList<QChar> sentenceBreaks(
+                { '.', '!', '?' }); // I want to use QChar::isPunct(), but it
+                                    // returns true for non-sentence breaking
+                                    // punctuations also, which we don't want.
+
+        auto selectLetterAt = [](QTextCursor &cursor, int pos) -> QString {
+            cursor.setPosition(pos);
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+            return cursor.selectedText();
+        };
+
+        auto capitalizeLetterAt = [](QTextCursor &cursor, int pos) {
+            cursor.setPosition(pos);
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+            cursor.insertText(cursor.selectedText().toUpper());
+            cursor.clearSelection();
+            cursor.setPosition(pos);
+        };
+
+        const QTextBlock block = cursor.block();
+        if (from == block.position()) {
+            // if this is the first letter in the block, then it must be
+            // capitaized.
+            capitalizeLetterAt(cursor, from);
+        } else {
+            // Keep going back until a non-space character is found.
+            int _pos = from - 1;
+            QString letter;
+            while (_pos >= block.position()) {
+                letter = selectLetterAt(cursor, _pos);
+                if (letter.isEmpty() || letter.at(0).isSpace()) {
+                    --_pos;
+                    continue;
+                }
+                break;
+            }
+
+            // If letter is one of sentence separators or we have reached the
+            // beginning of the block, then character at 'from' must be capitalized.
+            if ((_pos < block.position() && !letter.isEmpty() && letter.at(0).isSpace())
+                || sentenceBreaks.contains(letter.at(0)))
+                capitalizeLetterAt(cursor, from);
+        }
+
+        // starting at 'from' and until 'charsAdded', we examine each letter
+        // if we encounter a sentence-break, then we capitalize the next letter.
+        int _pos = from + 1;
+        int _charsLeft = charsAdded - 1;
+        bool _doCaps = false;
+        QString letter;
+        while (_charsLeft) {
+            letter = selectLetterAt(cursor, _pos);
+            if (letter.isEmpty() || letter.at(0).isSpace()) {
+                ++_pos;
+                --_charsLeft;
+                continue;
+            }
+
+            if (sentenceBreaks.contains(letter.at(0)))
+                _doCaps = true;
+            else if (_doCaps) {
+                capitalizeLetterAt(cursor, _pos);
+                _doCaps = false;
+            }
+
+            ++_pos;
+            --_charsLeft;
+        }
+    }
+
+    // Fixed an issue that caused formatting to not get applied on the next
+    // character, when there is no selection or word under the cursor.
     if (charsAdded == 1 && charsRemoved == 0 && m_applyNextCharFormat) {
         cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 1);
         if (cursor.selectedText() != QStringLiteral(" ")) {

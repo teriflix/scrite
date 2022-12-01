@@ -13,6 +13,7 @@
 
 #include "ruleritem.h"
 #include "application.h"
+#include "scritedocument.h"
 #include "qtextdocumentpagedprinter.h"
 
 #include <QDate>
@@ -559,56 +560,35 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
 void QTextDocumentPagedPrinter::loadSettings(HeaderFooter *header, HeaderFooter *footer,
                                              Watermark *watermark)
 {
-    const QSettings *settings = Application::instance()->settings();
-    auto fetchField = [settings](const QString &key, HeaderFooter::Field defaultValue) {
-        const QString settingsKey = "PageSetup/" + key;
-        const QVariant val = settings->value(settingsKey);
-        const int min = HeaderFooter::Nothing;
-        const int max = HeaderFooter::PageNumberOfCount;
-        if (!val.isValid() || val.toInt() < min || val.toInt() > max)
-            return defaultValue;
-        return HeaderFooter::Field(val.toInt());
-    };
+    const PageSetup *pageSetup = ScriteDocument::instance()->pageSetup();
 
     if (header != nullptr) {
-        header->setLeft(fetchField("headerLeft", HeaderFooter::Title));
-        header->setCenter(fetchField("headerCenter", HeaderFooter::Subtitle));
-        header->setRight(fetchField("headerRight", HeaderFooter::PageNumber));
-
-        const QVariant val = settings->value("PageSetup/headerOpacity");
-        if (val.isValid())
-            header->setOpacity(qBound(0.0, val.toDouble(), 1.0));
+        header->setLeft(HeaderFooter::Field(pageSetup->headerLeft()));
+        header->setCenter(HeaderFooter::Field(pageSetup->headerCenter()));
+        header->setRight(HeaderFooter::Field(pageSetup->headerRight()));
+        header->setOpacity(pageSetup->headerOpacity());
     }
 
     if (footer != nullptr) {
-        footer->setLeft(fetchField("footerLeft", HeaderFooter::Author));
-        footer->setCenter(fetchField("footerCenter", HeaderFooter::Version));
-        footer->setRight(fetchField("footerRight", HeaderFooter::Contact));
-
-        const QVariant val = settings->value("PageSetup/footerOpacity");
-        if (val.isValid())
-            footer->setOpacity(qBound(0.0, val.toDouble(), 1.0));
+        footer->setLeft(HeaderFooter::Field(pageSetup->footerLeft()));
+        footer->setCenter(HeaderFooter::Field(pageSetup->footerCenter()));
+        footer->setRight(HeaderFooter::Field(pageSetup->footerRight()));
+        footer->setOpacity(pageSetup->footerOpacity());
     }
 
-    auto fetchSetting = [settings](const QString &key, const QVariant &defaultValue) {
-        const QVariant val = settings->value("PageSetup/" + key);
-        return val.isValid() ? val : defaultValue;
-    };
-
     if (watermark != nullptr) {
-        watermark->setEnabled(fetchSetting("watermarkEnabled", watermark->isEnabled()).toBool());
-        watermark->setText(fetchSetting("watermarkText", watermark->text()).toString());
+        watermark->setEnabled(pageSetup->isWatermarkEnabled());
+        watermark->setText(pageSetup->watermarkText());
 
         QFont watermarkFont;
-        watermarkFont.setFamily(fetchSetting("watermarkFont", "Courier Prime").toString());
-        watermarkFont.setPointSize(fetchSetting("watermarkFontSize", 120).toInt());
+        watermarkFont.setFamily(pageSetup->watermarkFont());
+        watermarkFont.setPointSize(pageSetup->watermarkFontSize());
         watermark->setFont(watermarkFont);
 
-        watermark->setColor(QColor(fetchSetting("watermarkColor", "lightgray").toString()));
-        watermark->setOpacity(fetchSetting("watermarkOpacity", 0.5).toDouble());
-        watermark->setRotation(fetchSetting("watermarkRotation", 0.5).toDouble());
-        watermark->setAlignment(
-                Qt::Alignment(fetchSetting("watermarkAlignment", Qt::AlignCenter).toInt()));
+        watermark->setColor(pageSetup->watermarkColor());
+        watermark->setOpacity(pageSetup->watermarkOpacity());
+        watermark->setRotation(watermark->rotation());
+        watermark->setAlignment(watermark->alignment());
     }
 }
 

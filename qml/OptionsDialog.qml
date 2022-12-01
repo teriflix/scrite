@@ -235,6 +235,16 @@ Item {
                         }
 
                         CheckBox2 {
+                            checked: screenplayEditorSettings.enableAutoCapitalizeSentences
+                            text: "Capitalize Sentences"
+                            ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
+                            ToolTip.visible: hovered
+                            hoverEnabled: true
+                            width: parent.width/2
+                            onToggled: screenplayEditorSettings.enableAutoCapitalizeSentences = checked
+                        }
+
+                        CheckBox2 {
                             checked: screenplayEditorSettings.displayRuler
                             text: "Ruler"
                             width: parent.width/2
@@ -1049,29 +1059,7 @@ Item {
         Item {
             property real labelWidth: 60
             property var fieldsModel: Scrite.app.enumerationModelForType("HeaderFooter", "Field")
-
-            Settings {
-                id: pageSetupSettings
-                fileName: Scrite.app.settingsFilePath
-                category: "PageSetup"
-                property var paperSize: ScreenplayPageLayout.Letter
-                property var headerLeft: HeaderFooter.Title
-                property var headerCenter: HeaderFooter.Subtitle
-                property var headerRight: HeaderFooter.PageNumber
-                property real headerOpacity: 0.5
-                property var footerLeft: HeaderFooter.Author
-                property var footerCenter: HeaderFooter.Version
-                property var footerRight: HeaderFooter.Contact
-                property real footerOpacity: 0.5
-                property bool watermarkEnabled: false
-                property string watermarkText: "Scrite"
-                property string watermarkFont: "Courier Prime"
-                property int watermarkFontSize: 120
-                property color watermarkColor: "lightgray"
-                property real watermarkOpacity: 0.5
-                property real watermarkRotation: -45
-                property int watermarkAlignment: Qt.AlignCenter
-            }
+            property PageSetup pageSetupSettings: Scrite.document.pageSetup
 
             Column {
                 width: parent.width - 60
@@ -1414,24 +1402,23 @@ Item {
                     }
                 }
 
-                Button2 {
+                Row {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "Restore Defaults"
-                    onClicked: {
-                        pageSetupSettings.headerLeft = HeaderFooter.Title
-                        pageSetupSettings.headerCenter = HeaderFooter.Subtitle
-                        pageSetupSettings.headerRight = HeaderFooter.PageNumber
-                        pageSetupSettings.footerLeft = HeaderFooter.Author
-                        pageSetupSettings.footerCenter = HeaderFooter.Version
-                        pageSetupSettings.footerRight = HeaderFooter.Contact
-                        pageSetupSettings.watermarkEnabled = false
-                        pageSetupSettings.watermarkText = "Scrite"
-                        pageSetupSettings.watermarkFont = "Courier Prime"
-                        pageSetupSettings.watermarkFontSize = 120
-                        pageSetupSettings.watermarkColor = "lightgray"
-                        pageSetupSettings.watermarkOpacity = 0.5
-                        pageSetupSettings.watermarkRotation = -45
-                        pageSetupSettings.watermarkAlignment = Qt.AlignCenter
+                    spacing: 20
+
+                    Button2 {
+                        text: "Save As Defaults"
+                        onClicked: pageSetupSettings.saveAsDefaults()
+                    }
+
+                    Button2 {
+                        text: "Use Saved Defaults"
+                        onClicked: pageSetupSettings.useSavedDefaults()
+                    }
+
+                    Button2 {
+                        text: "Use Factory Defaults"
+                        onClicked: pageSetupSettings.useFactoryDefaults()
                     }
                 }
             }

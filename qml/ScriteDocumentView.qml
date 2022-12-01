@@ -123,6 +123,7 @@ Item {
         property int embeddedEditorZoomValue: -1
         property bool includeTitlePageInPreview: true
         property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
+        property bool enableAutoCapitalizeSentences: true
         property int lastLanguageRefreshNoticeBoxTimestamp: 0
         property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
         property bool showLanguageRefreshNoticeBox: true
