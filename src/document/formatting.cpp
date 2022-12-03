@@ -1521,36 +1521,31 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if (m_initializingDocument || m_pastingContent || m_cursorPosition == val)
         return;
 
-    QScopedValueRollback<bool> rollbackAcceptTextFormatChanges(m_acceptTextFormatChanges);
-    m_acceptTextFormatChanges = false;
+    QScopedValueRollback<bool> rollbackAcceptTextFormatChanges(m_acceptTextFormatChanges, false);
+
+    m_cursorPosition = val;
+    m_currentElementCursorPosition = -1;
+    this->setWordUnderCursorIsMisspelled(false);
+    this->setSpellingSuggestions(QStringList());
 
     if (m_textDocument == nullptr || this->document() == nullptr) {
         m_cursorPosition = -1;
         m_currentElementCursorPosition = -1;
         m_textFormat->reset();
+        this->setCurrentElement(nullptr);
         emit cursorPositionChanged();
         return;
     }
 
-    m_cursorPosition = val;
-    m_currentElementCursorPosition = -1;
     if (m_scene != nullptr)
         m_scene->setCursorPosition(m_cursorPosition);
 
-    if (m_cursorPosition < 0) {
+    if (m_cursorPosition < 0 || this->document()->isEmpty()
+        || m_cursorPosition > this->document()->characterCount()) {
         m_textFormat->reset();
         emit cursorPositionChanged();
         return;
     }
-
-    if (this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount()) {
-        m_textFormat->reset();
-        emit cursorPositionChanged();
-        return;
-    }
-
-    this->setWordUnderCursorIsMisspelled(false);
-    this->setSpellingSuggestions(QStringList());
 
     SpellCheckCursor cursor(this->document(), val);
 
