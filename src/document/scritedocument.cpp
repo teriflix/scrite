@@ -300,6 +300,8 @@ void ScriteDocumentBackups::clear()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+QJsonObject PageSetup::m_factoryDefaults;
+
 PageSetup::PageSetup(QObject *parent) : QObject(parent)
 {
     connect(this, &PageSetup::paperSizeChanged, this, &PageSetup::pageSetupChanged);
@@ -325,6 +327,11 @@ PageSetup::PageSetup(QObject *parent) : QObject(parent)
 
     QSignalBlocker signalBlocker(this);
     this->useSavedDefaults();
+    m_savedDefaults = QObjectSerializer::toJson(this);
+
+    this->evaluateDefaultsFlags();
+
+    connect(this, &PageSetup::pageSetupChanged, this, &PageSetup::evaluateDefaultsFlags);
 }
 
 PageSetup::~PageSetup() { }
@@ -534,6 +541,9 @@ void PageSetup::useFactoryDefaults()
 
     m_watermarkAlignment = Qt::AlignCenter;
     emit watermarkAlignmentChanged();
+
+    if (m_factoryDefaults.isEmpty())
+        m_factoryDefaults = QObjectSerializer::toJson(this);
 }
 
 void PageSetup::saveAsDefaults()
@@ -561,6 +571,10 @@ void PageSetup::saveAsDefaults()
     settings->setValue(group + QLatin1String("watermarkOpacity"), m_watermarkOpacity);
     settings->setValue(group + QLatin1String("watermarkRotation"), m_watermarkRotation);
     settings->setValue(group + QLatin1String("watermarkAlignment"), m_watermarkAlignment);
+
+    m_savedDefaults = QObjectSerializer::toJson(this);
+
+    this->evaluateDefaultsFlags();
 }
 
 void PageSetup::useSavedDefaults()
@@ -609,6 +623,31 @@ void PageSetup::useSavedDefaults()
     this->setWatermarkAlignment(
             settings->value(group + QLatin1String("watermarkAlignment"), m_watermarkAlignment)
                     .toInt());
+}
+
+void PageSetup::setUsingFactoryDefaults(bool val)
+{
+    if (m_isFactoryDefaults == val)
+        return;
+
+    m_isFactoryDefaults = val;
+    emit usingFactoryDefaultsChanged();
+}
+
+void PageSetup::setUsingSavedDefaults(bool val)
+{
+    if (m_isSavedDefaults == val)
+        return;
+
+    m_isSavedDefaults = val;
+    emit usingSavedDefaultsChanged();
+}
+
+void PageSetup::evaluateDefaultsFlags()
+{
+    const QJsonObject json = QObjectSerializer::toJson(this);
+    this->setUsingFactoryDefaults(json == m_factoryDefaults);
+    this->setUsingSavedDefaults(json == m_savedDefaults);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

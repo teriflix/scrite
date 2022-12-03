@@ -183,6 +183,14 @@ class PageSetup : public QObject
 public:
     ~PageSetup();
 
+    Q_PROPERTY(bool usingFactoryDefaults READ usingFactoryDefaults NOTIFY usingFactoryDefaultsChanged)
+    bool usingFactoryDefaults() const { return m_isFactoryDefaults; }
+    Q_SIGNAL void usingFactoryDefaultsChanged();
+
+    Q_PROPERTY(bool usingSavedDefaults READ usingSavedDefaults NOTIFY usingSavedDefaultsChanged)
+    bool usingSavedDefaults() const { return m_isSavedDefaults; }
+    Q_SIGNAL void usingSavedDefaultsChanged();
+
     // must be in one of ScreenplayPageLayout::PageSize
     Q_PROPERTY(int paperSize READ paperSize WRITE setPaperSize NOTIFY paperSizeChanged)
     void setPaperSize(int val);
@@ -279,6 +287,11 @@ signals:
     void pageSetupChanged();
 
 private:
+    void setUsingFactoryDefaults(bool val);
+    void setUsingSavedDefaults(bool val);
+    void evaluateDefaultsFlags();
+
+private:
     friend class ScriteDocument;
     int m_headerLeft;
     int m_headerCenter;
@@ -297,6 +310,11 @@ private:
     qreal m_watermarkOpacity;
     int m_watermarkRotation;
     int m_watermarkAlignment;
+
+    bool m_isFactoryDefaults = false;
+    bool m_isSavedDefaults = false;
+    static QJsonObject m_factoryDefaults;
+    QJsonObject m_savedDefaults;
 };
 
 class ScriteDocument : public QObject, public QObjectSerializer::Interface

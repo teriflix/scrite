@@ -1407,18 +1407,21 @@ Item {
                     spacing: 20
 
                     Button2 {
-                        text: "Save As Defaults"
+                        text: "Save As Default"
                         onClicked: pageSetupSettings.saveAsDefaults()
+                        enabled: !pageSetupSettings.usingSavedDefaults
                     }
 
                     Button2 {
                         text: "Use Saved Defaults"
                         onClicked: pageSetupSettings.useSavedDefaults()
+                        enabled: !pageSetupSettings.usingSavedDefaults
                     }
 
                     Button2 {
                         text: "Use Factory Defaults"
                         onClicked: pageSetupSettings.useFactoryDefaults()
+                        enabled: !pageSetupSettings.usingFactoryDefaults
                     }
                 }
             }
