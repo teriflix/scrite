@@ -15,6 +15,7 @@
 #define REFCOUNTER_H
 
 #include <QQmlEngine>
+#include <QReadWriteLock>
 
 class RefCounter : public QObject
 {
@@ -29,7 +30,11 @@ public:
     static RefCounter *qmlAttachedProperties(QObject *object) { return new RefCounter(object); }
 
     Q_PROPERTY(int refCount READ refCount WRITE setRefCount NOTIFY refCountChanged)
-    int refCount() const { return m_refCount; }
+    int refCount() const
+    {
+        QReadLocker locker(&m_refCountLock);
+        return m_refCount;
+    }
     Q_SIGNAL void refCountChanged();
 
     Q_PROPERTY(bool isReffed READ isReffed NOTIFY refCountChanged)
@@ -51,16 +56,23 @@ public:
 private:
     void setRefCount(int val)
     {
-        QMutexLocker lock(&m_refCountMutex);
-        if (m_refCount == val)
-            return;
-        m_refCount = qMax(0, val);
+        {
+            QReadLocker locker(&m_refCountLock);
+            if (m_refCount == val)
+                return;
+        }
+
+        {
+            QWriteLocker locker(&m_refCountLock);
+            m_refCount = qMax(0, val);
+        }
+
         emit refCountChanged();
     }
 
 private:
     int m_refCount = 0;
-    QMutex m_refCountMutex;
+    mutable QReadWriteLock m_refCountLock;
 };
 
 #endif
