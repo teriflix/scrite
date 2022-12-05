@@ -336,6 +336,17 @@ void ScreenplayTextDocument::setTitlePage(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setIncludeLoglineInTitlePage(bool val)
+{
+    if (m_includeLoglineInTitlePage == val)
+        return;
+
+    m_includeLoglineInTitlePage = val;
+    emit includeLoglineInTitlePageChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setSceneNumbers(bool val)
 {
     if (m_sceneNumbers == val)
@@ -1173,6 +1184,7 @@ void ScreenplayTextDocument::loadScreenplay()
     m_textDocument->setProperty("#phone", m_screenplay->phoneNumber());
     m_textDocument->setProperty("#email", m_screenplay->email());
     m_textDocument->setProperty("#website", m_screenplay->website());
+    m_textDocument->setProperty("#includeLoglineInTitlePage", m_includeLoglineInTitlePage);
 
     QTextBlockFormat frameBoundaryBlockFormat;
     frameBoundaryBlockFormat.setLineHeight(0, QTextBlockFormat::FixedHeight);
@@ -3069,6 +3081,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     const QString phoneNumber = screenplay->phoneNumber();
     const QString email = screenplay->email();
     const QString website = screenplay->website();
+    const QString logline = screenplay->logline();
     const QFont normalFont = doc->defaultFont();
 
     auto itemRect = [](const QGraphicsItem *item) {
@@ -3148,13 +3161,14 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
 
     // Place contact, address, phoneNumber, email, website, marketing in a card
     // and place them on the bottom left corner
+    QGraphicsTextItem *contactCardItem = nullptr;
     QStringList contactCardFields({ contact, address, phoneNumber, email, website });
     contactCardFields.removeAll(QString());
     if (!contactCardFields.isEmpty()) {
         QString contactHtml;
         contactCardFields.prepend(QStringLiteral("Contact:"));
         contactHtml = contactCardFields.join(QStringLiteral("<br/>"));
-        QGraphicsTextItem *contactCardItem = new QGraphicsTextItem;
+        contactCardItem = new QGraphicsTextItem;
         scene.addItem(contactCardItem);
         contactCardItem->setTextWidth(sceneRect.width());
         contactCardItem->setFont(normalFont);
@@ -3163,6 +3177,61 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         QRectF contactCardRect = contactCardItem->boundingRect();
         contactCardRect.moveBottomLeft(sceneRect.bottomLeft());
         contactCardItem->setPos(contactCardRect.topLeft());
+    }
+
+    // Place logline, on the title page if asked for.
+    if (!logline.isEmpty() && doc->property("#includeLoglineInTitlePage").toBool()) {
+        const qreal textWidth = sceneRect.width() * 0.9;
+        const qreal ymin = titleCardRect.bottom();
+        const qreal ymax = contactCardItem ? contactCardItem->pos().y() : sceneRect.bottom();
+        const qreal margin = (ymax - ymin) * 0.1;
+
+        QRectF loglineCardRect(0, 0, textWidth, 1);
+        loglineCardRect.moveTop(ymin + margin);
+        loglineCardRect.setBottom(ymax - margin);
+        loglineCardRect.moveCenter(QPointF(sceneRect.center().x(), (ymin + ymax) / 2));
+
+        QGraphicsRectItem *loglineCardContainer = new QGraphicsRectItem;
+        scene.addItem(loglineCardContainer);
+        loglineCardContainer->setPen(Qt::NoPen);
+        loglineCardContainer->setBrush(Qt::lightGray);
+        loglineCardContainer->setOpacity(0.1);
+        loglineCardContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
+        loglineCardContainer->setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);
+
+        QGraphicsTextItem *loglineCard = new QGraphicsTextItem(loglineCardContainer);
+        loglineCard->setFont(normalFont);
+        loglineCard->setTextWidth(textWidth);
+        loglineCardContainer->setPos(0, 0);
+
+        const QStringList loglineParas = logline.split(QLatin1String("\n"));
+        QString loglineHtml;
+        const QString openP = QLatin1String("<p>");
+        const QString closeP = QLatin1String("</p>");
+        for (const QString &loglinePara : qAsConst(loglineParas)) {
+            if (loglineHtml.isEmpty())
+                loglineHtml =
+                        openP + QLatin1String("<strong>Logline:</strong> ") + loglinePara + closeP;
+            else
+                loglineHtml += openP + loglinePara + closeP;
+        }
+        loglineCard->setHtml(loglineHtml);
+
+        QTextDocument *loglineDoc = loglineCard->document();
+        QTextCursor cursor(loglineDoc);
+        while (!cursor.atEnd()) {
+            QTextBlockFormat format;
+            format.setAlignment(Qt::AlignJustify);
+            cursor.mergeBlockFormat(format);
+            if (!cursor.movePosition(QTextCursor::NextBlock))
+                break;
+        }
+
+        loglineCardRect.setHeight(
+                qMin(loglineCard->boundingRect().height(), loglineCardRect.height()));
+        loglineCardContainer->setRect(
+                QRectF(0, 0, loglineCardRect.width(), loglineCardRect.height()));
+        loglineCardContainer->setPos(loglineCardRect.topLeft());
     }
 
     scene.render(painter, rectOnPage, sceneRect, Qt::IgnoreAspectRatio);

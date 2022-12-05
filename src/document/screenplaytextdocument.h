@@ -100,8 +100,12 @@ public:
     bool hasTitlePage() const { return m_titlePage; }
     Q_SIGNAL void titlePageChanged();
 
-    Q_PROPERTY(
-            bool sceneNumbers READ hasSceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
+    Q_PROPERTY(bool includeLoglineInTitlePage READ isIncludeLoglineInTitlePage WRITE setIncludeLoglineInTitlePage NOTIFY includeLoglineInTitlePageChanged)
+    void setIncludeLoglineInTitlePage(bool val);
+    bool isIncludeLoglineInTitlePage() const { return m_includeLoglineInTitlePage; }
+    Q_SIGNAL void includeLoglineInTitlePageChanged();
+
+    Q_PROPERTY(bool sceneNumbers READ hasSceneNumbers WRITE setSceneNumbers NOTIFY sceneNumbersChanged)
     void setSceneNumbers(bool val);
     bool hasSceneNumbers() const { return m_sceneNumbers; }
     Q_SIGNAL void sceneNumbersChanged();
@@ -341,6 +345,7 @@ private:
     int m_pageCount = 0;
     bool m_updating = false;
     bool m_titlePage = false;
+    bool m_includeLoglineInTitlePage = true;
     int m_currentPage = 0;
     bool m_sceneIcons = true;
     Purpose m_purpose = ForDisplay;
