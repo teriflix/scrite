@@ -507,6 +507,7 @@ private:
     QColor m_backgroundColor = Qt::transparent;
 };
 
+class SceneDocumentBlockUserData;
 class SceneDocumentBinder : public QSyntaxHighlighter, public QQmlParserStatus
 {
     Q_OBJECT
@@ -550,6 +551,12 @@ public:
     void setAutoCapitalizeSentences(bool val);
     bool isAutoCapitalizeSentences() const { return m_autoCapitalizeSentences; }
     Q_SIGNAL void autoCapitalizeSentencesChanged();
+
+    // Adds : at end of shots & transitions, CONT'D for characters where applicable.
+    Q_PROPERTY(bool autoPolishParagraphs READ autoPolishParagraphs WRITE setAutoPolishParagraphs NOTIFY autoPolishParagraphsChanged)
+    void setAutoPolishParagraphs(bool val);
+    bool autoPolishParagraphs() const { return m_autoPolishParagraphs; }
+    Q_SIGNAL void autoPolishParagraphsChanged();
 
     Q_PROPERTY(qreal textWidth READ textWidth WRITE setTextWidth NOTIFY textWidthChanged)
     void setTextWidth(qreal val);
@@ -746,8 +753,14 @@ private:
 
     void onTextFormatChanged(const QList<int> &properties);
 
+    void polishAllSceneElements();
+    void polishSceneElement(SceneElement *element);
+
+    void performAllSceneElementTasks();
+
 private:
     friend class SpellCheckService;
+    friend class SceneDocumentBlockUserData;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
     int m_selectionEndPosition = -1;
@@ -758,6 +771,7 @@ private:
     int m_documentLoadCount = 0;
     TextFormat *m_textFormat = new TextFormat(this);
     bool m_sceneIsBeingReset = false;
+    bool m_sceneElementTaskIsRunning = false;
     bool m_forceSyncDocument = false;
     bool m_spellCheckEnabled = true;
     bool m_applyLanguageFonts = false;
@@ -768,6 +782,7 @@ private:
     QStringList m_characterNames;
     bool m_liveSpellCheckEnabled = true;
     bool m_autoCapitalizeSentences = true;
+    bool m_autoPolishParagraphs = true;
     QObjectProperty<Scene> m_scene;
     bool m_applyNextCharFormat = false;
     QTextCharFormat m_nextCharFormat;
@@ -777,6 +792,7 @@ private:
     int m_currentElementCursorPosition = -1;
     bool m_wordUnderCursorIsMisspelled = false;
     ExecLaterTimer m_initializeDocumentTimer;
+    ExecLaterTimer m_sceneElementTaskTimer;
     QList<SceneElement::Type> m_tabHistory;
     bool m_applyFormattingEvenInTransaction = false;
     QList<QTextBlock> m_rehighlightBlockQueue;

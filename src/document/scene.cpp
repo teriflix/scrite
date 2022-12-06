@@ -154,6 +154,7 @@ Scene *SceneUndoCommand::fromByteArray(const QByteArray &bytes) const
 
 class PushSceneUndoCommand
 {
+    friend class SceneElement;
     static UndoStack *allowedStack;
 
 public:
@@ -506,6 +507,79 @@ QString SceneElement::formattedText() const
     }
 
     return m_text;
+}
+
+bool SceneElement::polishText()
+{
+    /**
+     * This function is called when the user is done editing a scene element and goes on to another
+     * paragraph. At this point, we can polish the text. What does polish mean?
+     *
+     * For instance, if we have two character paragraphs one after the other, except for the first
+     * one the subsequent ones can have (CONT'D) suffix, if it doesn't already have. And if there
+     * is a CONT'D added by mistake, we can remove it.
+     *
+     * Another instance, transition paragraphs must end with :. If they don't then we can append
+     * one.
+     */
+    QString polishedText = m_text;
+
+    if (m_type == SceneElement::Shot || m_type == SceneElement::Transition) {
+        const QString colon = QLatin1String(":");
+        polishedText = polishedText.trimmed().toUpper();
+        if (!polishedText.endsWith(colon))
+            polishedText += colon;
+    }
+
+    if (m_type == SceneElement::Character) {
+        polishedText = polishedText.trimmed().toUpper();
+
+        const SceneElement *prevCharElement = [&]() -> SceneElement * {
+            const int myIndex = m_scene->indexOfElement(this);
+            for (int i = myIndex - 1; i >= 0; i--) {
+                SceneElement *prevElement = m_scene->elementAt(i);
+                if (prevElement->type() == SceneElement::Character)
+                    return prevElement;
+            }
+            return nullptr;
+        }();
+
+        if (prevCharElement != nullptr) {
+            const QString myCharacterName = polishedText.section('(', 0, 0).trimmed();
+            const QString prevCharacterName = prevCharElement->text().section('(', 0, 0).trimmed();
+            const QString contd = QLatin1String("CONT'D");
+            const QString openB = QLatin1String(" (");
+            const QString closeB = QLatin1String(")");
+            if (myCharacterName.compare(prevCharacterName, Qt::CaseInsensitive) == 0) {
+                // Include CONT'D if not already done.
+                QString suffix = polishedText.section('(', 1, -1).trimmed();
+                if (suffix.isEmpty())
+                    polishedText += openB + contd + closeB;
+            } else {
+                // Remove CONT'D if its there.
+                const QString comma = QLatin1String(",");
+                QString suffix = polishedText.section('(', 1, -1).trimmed();
+                if (suffix.endsWith(closeB))
+                    suffix = suffix.left(suffix.length() - 1);
+                suffix.remove(contd, Qt::CaseInsensitive);
+                suffix = suffix.simplified();
+                if (!suffix.isEmpty()) {
+                    suffix.replace(QLatin1String(",,"), comma);
+                    suffix.replace(QLatin1String(", ,"), comma);
+                }
+                if (suffix.isEmpty() || suffix == comma)
+                    polishedText = myCharacterName;
+                else
+                    polishedText = myCharacterName + openB + suffix + closeB;
+            }
+        }
+    }
+
+    QScopedValueRollback<UndoStack *> undoStackRollback(PushSceneUndoCommand::allowedStack,
+                                                        nullptr);
+    const QString oldText = m_text;
+    this->setText(polishedText);
+    return oldText != m_text;
 }
 
 QJsonArray SceneElement::find(const QString &text, int flags) const

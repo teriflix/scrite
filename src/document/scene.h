@@ -182,6 +182,8 @@ public:
 
     QString formattedText() const;
 
+    bool polishText();
+
     Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();

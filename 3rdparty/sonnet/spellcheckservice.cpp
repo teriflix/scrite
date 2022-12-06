@@ -134,13 +134,7 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
             break;
         }
 
-        // TODO: Expand this to include all sorts of special words.
-        // https://www.thesaurus.com/e/grammar/when-to-capitalize-words/
-        static const QHash<QString, QStringList> specialWords = {
-            { QLatin1String("i"), QStringList({ QLatin1String("I") }) }
-        };
-
-        const bool misspelled = specialWords.contains(word) || speller.isMisspelled(word);
+        const bool misspelled = speller.isMisspelled(word);
         if (misspelled) {
             if (request.ignoreList.contains(word))
                 continue;
@@ -154,9 +148,7 @@ SpellCheckServiceResult CheckSpellings(const SpellCheckServiceRequest &request)
                     continue;
             }
 
-            const QStringList suggestions =
-                    specialWords.contains(word) ? specialWords.value(word) : speller.suggest(word);
-
+            const QStringList suggestions = speller.suggest(word);
             TextFragment fragment(wordPosition.start, wordPosition.length, suggestions);
             if (fragment.isValid())
                 result.misspelledFragments << fragment;

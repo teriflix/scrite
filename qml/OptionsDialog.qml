@@ -221,48 +221,56 @@ Item {
                         text: "Screenplay Editor"
                     }
 
-                    Grid {
-                        id: screenplayEditorSettingsGrid
+                    Row {
+                        id: screenplayEditorSettingsLayout
                         width: parent.width
-                        columns: 2
                         anchors.centerIn: parent
 
-                        CheckBox2 {
-                            checked: screenplayEditorSettings.enableSpellCheck
-                            text: "Spell Check"
-                            width: parent.width/2
-                            onToggled: screenplayEditorSettings.enableSpellCheck = checked
+                        Column {
+                            CheckBox2 {
+                                checked: screenplayEditorSettings.enableSpellCheck
+                                text: "Spell Check"
+                                onToggled: screenplayEditorSettings.enableSpellCheck = checked
+                            }
+
+                            CheckBox2 {
+                                checked: screenplayEditorSettings.displayRuler
+                                text: "Ruler"
+                                onToggled: screenplayEditorSettings.displayRuler = checked
+                            }
+
+                            CheckBox2 {
+                                checked: screenplayEditorSettings.spaceBetweenScenes > 0
+                                text: "Scene Blocks"
+                                onToggled: screenplayEditorSettings.spaceBetweenScenes = checked ? 40 : 0
+                            }
                         }
 
-                        CheckBox2 {
-                            checked: screenplayEditorSettings.enableAutoCapitalizeSentences
-                            text: "Capitalize Sentences"
-                            ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
-                            ToolTip.visible: hovered
-                            hoverEnabled: true
-                            width: parent.width/2
-                            onToggled: screenplayEditorSettings.enableAutoCapitalizeSentences = checked
-                        }
+                        Column {
+                            CheckBox2 {
+                                checked: screenplayEditorSettings.enableAutoCapitalizeSentences
+                                text: "Capitalize Sentences"
+                                ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
+                                ToolTip.visible: hovered
+                                hoverEnabled: true
+                                onToggled: screenplayEditorSettings.enableAutoCapitalizeSentences = checked
+                            }
 
-                        CheckBox2 {
-                            checked: screenplayEditorSettings.displayRuler
-                            text: "Ruler"
-                            width: parent.width/2
-                            onToggled: screenplayEditorSettings.displayRuler = checked
-                        }
 
-                        CheckBox2 {
-                            checked: screenplayEditorSettings.showLoglineEditor
-                            text: "Logline Editor"
-                            width: parent.width/2
-                            onToggled: screenplayEditorSettings.showLoglineEditor = checked
-                        }
+                            CheckBox2 {
+                                checked: screenplayEditorSettings.enableAutoPolishParagraphs
+                                text: "Add/Remove CONT'D"
+                                ToolTip.text: "If checked, CONT'D will be automatically added/removed appropriately."
+                                ToolTip.visible: hovered
+                                hoverEnabled: true
+                                onToggled: screenplayEditorSettings.enableAutoPolishParagraphs = checked
+                            }
 
-                        CheckBox2 {
-                            checked: screenplayEditorSettings.spaceBetweenScenes > 0
-                            text: "Scene Blocks"
-                            width: parent.width/2
-                            onToggled: screenplayEditorSettings.spaceBetweenScenes = checked ? 40 : 0
+                            CheckBox2 {
+                                checked: screenplayEditorSettings.showLoglineEditor
+                                text: "Logline Editor"
+                                onToggled: screenplayEditorSettings.showLoglineEditor = checked
+                            }
                         }
                     }
                 }

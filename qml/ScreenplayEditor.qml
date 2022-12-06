@@ -1297,6 +1297,7 @@ Rectangle {
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 spellCheckEnabled: !Scrite.document.readOnly && spellCheckEnabledFlag.value
                 autoCapitalizeSentences: !Scrite.document.readOnly && screenplayEditorSettings.enableAutoCapitalizeSentences
+                autoPolishParagraphs: !Scrite.document.readOnly && screenplayEditorSettings.enableAutoPolishParagraphs
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 property bool firstInitializationDone: false
                 onDocumentInitialized: {

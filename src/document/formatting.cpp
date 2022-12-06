@@ -33,6 +33,7 @@
 #include <QTextBlockUserData>
 #include <QTextBoundaryFinder>
 #include <QScopedValueRollback>
+#include <QTextDocumentFragment>
 
 Q_DECLARE_METATYPE(QTextCharFormat)
 
@@ -1199,7 +1200,8 @@ public:
     enum { Type = 1001 };
     const int type = Type;
 
-    explicit SceneDocumentBlockUserData(SceneElement *element, SceneDocumentBinder *binder);
+    explicit SceneDocumentBlockUserData(const QTextBlock &block, SceneElement *element,
+                                        SceneDocumentBinder *binder);
     ~SceneDocumentBlockUserData();
 
     QTextBlockFormat blockFormat;
@@ -1208,68 +1210,67 @@ public:
     SceneElement *sceneElement() const { return m_sceneElement; }
 
     void resetFormat() { m_formatMTime = -1; }
-    bool shouldUpdateFromFormat(const SceneElementFormat *format)
-    {
-        return format->isModified(&m_formatMTime);
-    }
+    bool shouldUpdateFromFormat(const SceneElementFormat *format);
 
     void initializeSpellCheck(SceneDocumentBinder *binder);
-    bool shouldUpdateFromSpellCheck()
-    {
-        return !m_spellCheck.isNull() && m_spellCheck->isModified(&m_spellCheckMTime);
-    }
-    void scheduleSpellCheckUpdate()
-    {
-        if (!m_spellCheck.isNull())
-            m_spellCheck->scheduleUpdate();
-    }
-    QList<TextFragment> misspelledFragments() const
-    {
-        if (!m_spellCheck.isNull())
-            return m_spellCheck->misspelledFragments();
-        return QList<TextFragment>();
-    }
+    bool shouldUpdateFromSpellCheck();
+    void scheduleSpellCheckUpdate();
+    QList<TextFragment> misspelledFragments() const;
+    TextFragment findMisspelledFragment(int start, int end) const;
 
-    TextFragment findMisspelledFragment(int start, int end) const
-    {
-        const QList<TextFragment> fragments = this->misspelledFragments();
-        for (const TextFragment &fragment : fragments) {
-            if ((fragment.start() >= start && fragment.start() < end)
-                || (fragment.end() > start && fragment.end() <= end))
-                return fragment;
-        }
-        return TextFragment();
-    }
+    void polishTextLater();
+    void autoCapitalizeLater();
 
     static SceneDocumentBlockUserData *get(const QTextBlock &block);
     static SceneDocumentBlockUserData *get(QTextBlockUserData *userData);
 
 private:
+    enum Tasks { PolishTextTask, AutoCapitalizeTask };
+    void polishTextNow();
+    void autoCapitalizeNow();
+    void performPendingTasks();
+    bool markCursorPosition();
+    int markedCursorPosiiton(bool removeMarker = true);
+
+private:
+    friend class SceneDocumentBinder;
+    QTextBlock m_textBlock;
+    QSet<int> m_pendingTasks;
     QPointer<SpellCheckService> m_spellCheck;
     QPointer<SceneElement> m_sceneElement;
+    QPointer<SceneDocumentBinder> m_binder;
     QString m_highlightedText;
     int m_formatMTime = -1;
     int m_spellCheckMTime = -1;
     QMetaObject::Connection m_spellCheckConnection;
 };
 
-SceneDocumentBlockUserData::SceneDocumentBlockUserData(SceneElement *element,
+SceneDocumentBlockUserData::SceneDocumentBlockUserData(const QTextBlock &textBlock,
+                                                       SceneElement *element,
                                                        SceneDocumentBinder *binder)
-    : m_sceneElement(element)
+    : m_textBlock(textBlock), m_sceneElement(element), m_binder(binder)
 {
-    if (binder->isSpellCheckEnabled()) {
+    if (m_binder->isSpellCheckEnabled()) {
         m_spellCheck = element->spellCheck();
         m_spellCheckConnection =
-                QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), binder,
+                QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), m_binder,
                                  SLOT(onSpellCheckUpdated()), Qt::UniqueConnection);
         m_spellCheck->scheduleUpdate();
     }
+
+    if (m_textBlock.isValid())
+        m_textBlock.setUserData(this);
 }
 
 SceneDocumentBlockUserData::~SceneDocumentBlockUserData()
 {
     if (m_spellCheckConnection)
         QObject::disconnect(m_spellCheckConnection);
+}
+
+bool SceneDocumentBlockUserData::shouldUpdateFromFormat(const SceneElementFormat *format)
+{
+    return format->isModified(&m_formatMTime);
 }
 
 void SceneDocumentBlockUserData::initializeSpellCheck(SceneDocumentBinder *binder)
@@ -1289,9 +1290,58 @@ void SceneDocumentBlockUserData::initializeSpellCheck(SceneDocumentBinder *binde
     }
 }
 
+bool SceneDocumentBlockUserData::shouldUpdateFromSpellCheck()
+{
+    return !m_spellCheck.isNull() && m_spellCheck->isModified(&m_spellCheckMTime);
+}
+
+void SceneDocumentBlockUserData::scheduleSpellCheckUpdate()
+{
+    if (!m_spellCheck.isNull())
+        m_spellCheck->scheduleUpdate();
+}
+
+QList<TextFragment> SceneDocumentBlockUserData::misspelledFragments() const
+{
+    if (!m_spellCheck.isNull())
+        return m_spellCheck->misspelledFragments();
+    return QList<TextFragment>();
+}
+
+TextFragment SceneDocumentBlockUserData::findMisspelledFragment(int start, int end) const
+{
+    const QList<TextFragment> fragments = this->misspelledFragments();
+    for (const TextFragment &fragment : fragments) {
+        if ((fragment.start() >= start && fragment.start() < end)
+            || (fragment.end() > start && fragment.end() <= end))
+            return fragment;
+    }
+    return TextFragment();
+}
+
+void SceneDocumentBlockUserData::polishTextLater()
+{
+    if (m_binder->m_autoPolishParagraphs) {
+        m_pendingTasks += PolishTextTask;
+        m_binder->m_sceneElementTaskTimer.start(250, m_binder);
+    }
+}
+
+void SceneDocumentBlockUserData::autoCapitalizeLater()
+{
+    if (m_binder->m_autoCapitalizeSentences) {
+        m_pendingTasks += AutoCapitalizeTask;
+        m_binder->m_sceneElementTaskTimer.start(250, m_binder);
+    }
+}
+
 SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(const QTextBlock &block)
 {
-    return get(block.userData());
+    SceneDocumentBlockUserData *ret = get(block.userData());
+    if (ret && ret->m_textBlock != block)
+        ret->m_textBlock = block;
+
+    return ret;
 }
 
 SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *userData)
@@ -1302,6 +1352,198 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
     SceneDocumentBlockUserData *userData2 =
             reinterpret_cast<SceneDocumentBlockUserData *>(userData);
     return userData2->type == SceneDocumentBlockUserData::Type ? userData2 : nullptr;
+}
+
+void SceneDocumentBlockUserData::polishTextNow()
+{
+    if (m_binder.isNull() || !m_textBlock.isValid())
+        return;
+
+    if (!m_binder->m_autoPolishParagraphs)
+        return;
+
+    // If the block that this object represents is currently being edited by the user
+    // then lets not polish it right now.
+    if (m_binder->m_cursorPosition >= 0) {
+        QTextCursor cursor(m_textBlock);
+        cursor.setPosition(m_binder->m_cursorPosition);
+        if (cursor.block() == m_textBlock)
+            return;
+    }
+
+    // This is to avoid recursive edits
+    QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
+
+    // If the block has no text, then there is no point in polishing text
+    if (m_textBlock.text().isEmpty())
+        return;
+
+    // If the scene element that this object represents has no polish to apply, then
+    // we can simply quit. Polishing means adding/removing CONT'D, : etc..
+    if (m_sceneElement == nullptr || !m_sceneElement->polishText())
+        return;
+
+    // Mark current cursor position if required, so that we can get back to it
+    // once we are done applying all edits done as a part of the polish operation.
+    bool cursorPositionMarked = false;
+    if (m_binder->m_cursorPosition > m_textBlock.position())
+        cursorPositionMarked = this->markCursorPosition();
+
+    // Apply the polished text
+    QTextCursor cursor(m_textBlock);
+    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+    const QString text = m_sceneElement->text();
+    if (text.isEmpty())
+        cursor.removeSelectedText();
+    else
+        cursor.insertText(text);
+
+    // Restore cursor position
+    if (cursorPositionMarked) {
+        const int cp = this->markedCursorPosiiton(true);
+        emit m_binder->requestCursorPosition(cp);
+    }
+
+    // Rehighlight the block, so that formatting can be reapplied to this block.
+    m_binder->rehighlightBlock(m_textBlock);
+}
+
+void SceneDocumentBlockUserData::autoCapitalizeNow()
+{
+    // If the block has no text, then there is no point in polishing text
+    if (m_textBlock.text().isEmpty() || m_sceneElement == nullptr)
+        return;
+
+    if (!m_binder->m_autoCapitalizeSentences)
+        return;
+
+    // Auto-capitalize needs to be done only on action and dialogue paragraphs.
+    if (!QList<SceneElement::Type>({ SceneElement::Action, SceneElement::Dialogue })
+                 .contains(m_sceneElement->type()))
+        return;
+
+    static QList<QChar> sentenceBreaks(
+            { '.', '!', '?' }); // I want to use QChar::isPunct(), but it
+                                // returns true for non-sentence breaking
+                                // punctuations also, which we don't want.
+    const QList<int> capitalizePositions = [](const QString &text) {
+        QList<int> ret;
+        bool needsCapping = true;
+        for (int i = 0; i < text.length(); i++) {
+            const QChar ch = text.at(i);
+            if (ch.isSpace())
+                continue;
+
+            if (needsCapping) {
+                needsCapping = false;
+                const QChar uch = ch.toUpper();
+                if (uch != ch)
+                    ret.append(i);
+            } else if (sentenceBreaks.contains(ch))
+                needsCapping = true;
+        }
+
+        // Capitalize I if found anywhere in the text, except at the very end.
+        QTextBoundaryFinder finder(QTextBoundaryFinder::Word, text);
+        while (finder.position() < text.length()) {
+            if (finder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem)) {
+                const int startPos = finder.position();
+                if (startPos == text.length() - 1)
+                    break; // we don't want to capitalize i if its the last letter, because
+                           // the user maybe typing something else after that.
+                const int endPos = finder.toNextBoundary();
+                if (endPos < 0)
+                    break;
+                const int length = endPos - startPos;
+                if (length == 1) {
+                    const QString word = text.mid(startPos, endPos - startPos);
+                    if (word == QLatin1String("i"))
+                        ret.append(startPos);
+                }
+            } else if (finder.toNextBoundary() < 0)
+                break;
+        }
+
+        return ret;
+    }(m_textBlock.text());
+
+    if (capitalizePositions.isEmpty())
+        return;
+
+    // This is to avoid recursive edits
+    QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
+
+    // Mark current cursor position if required, so that we can get back to it
+    // once we are done applying all edits done as a part of the capitalize
+    // operation
+    bool cursorPositionMarked = false;
+    if (m_binder->m_cursorPosition > m_textBlock.position())
+        cursorPositionMarked = this->markCursorPosition();
+
+    // Capitalize letters as determined.
+    QTextCursor cursor(m_textBlock);
+    for (int pos : capitalizePositions) {
+        cursor.setPosition(m_textBlock.position() + pos);
+        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+        cursor.insertText(cursor.selectedText().toUpper());
+        cursor.clearSelection();
+        cursor.setPosition(m_textBlock.position() + pos);
+    }
+
+    // Restore cursor position
+    if (cursorPositionMarked) {
+        const int cp = this->markedCursorPosiiton(true);
+        emit m_binder->requestCursorPosition(cp);
+    }
+
+    // Rehighlight the block, so that formatting can be reapplied to this block.
+    m_binder->rehighlightBlock(m_textBlock);
+
+    // Store changes into the element.
+    m_sceneElement->setText(m_textBlock.text());
+    m_sceneElement->setTextFormats(m_textBlock.textFormats());
+}
+
+void SceneDocumentBlockUserData::performPendingTasks()
+{
+    for (int task : qAsConst(m_pendingTasks)) {
+        if (task == PolishTextTask)
+            this->polishTextNow();
+        else if (task == AutoCapitalizeTask)
+            this->autoCapitalizeNow();
+    }
+
+    m_pendingTasks.clear();
+}
+
+bool SceneDocumentBlockUserData::markCursorPosition()
+{
+    if (m_binder.isNull() || !m_textBlock.isValid())
+        return false;
+
+    if (m_binder->m_cursorPosition < 0
+        || m_binder->m_cursorPosition > m_textBlock.document()->characterCount())
+        return false;
+
+    QTextCursor cursor(m_textBlock);
+    cursor.setPosition(m_binder->m_cursorPosition);
+    cursor.insertText(QString(QChar::LastValidCodePoint));
+    return true;
+}
+
+int SceneDocumentBlockUserData::markedCursorPosiiton(bool removeMarker)
+{
+    if (m_binder.isNull() || !m_textBlock.isValid())
+        return 0;
+
+    QTextCursor cursor = m_textBlock.document()->find(QString(QChar::LastValidCodePoint));
+    if (cursor.isNull())
+        return 0;
+
+    const int cp = cursor.position();
+    if (removeMarker)
+        cursor.deleteChar();
+    return cp;
 }
 
 class SpellCheckCursor : public QTextCursor
@@ -1354,6 +1596,7 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
       m_scene(this, "scene"),
       m_rehighlightTimer("SceneDocumentBinder.m_rehighlightTimer"),
       m_initializeDocumentTimer("SceneDocumentBinder.m_initializeDocumentTimer"),
+      m_sceneElementTaskTimer("SceneDocumentBinder.m_sceneElementTaskTimer"),
       m_currentElement(this, "currentElement"),
       m_textDocument(this, "textDocument"),
       m_screenplayFormat(this, "screenplayFormat")
@@ -1502,6 +1745,15 @@ void SceneDocumentBinder::setAutoCapitalizeSentences(bool val)
     emit autoCapitalizeSentencesChanged();
 }
 
+void SceneDocumentBinder::setAutoPolishParagraphs(bool val)
+{
+    if (m_autoPolishParagraphs == val)
+        return;
+
+    m_autoPolishParagraphs = val;
+    emit autoPolishParagraphsChanged();
+}
+
 void SceneDocumentBinder::setTextWidth(qreal val)
 {
     if (qFuzzyCompare(m_textWidth, val))
@@ -1523,29 +1775,33 @@ void SceneDocumentBinder::setCursorPosition(int val)
 
     QScopedValueRollback<bool> rollbackAcceptTextFormatChanges(m_acceptTextFormatChanges, false);
 
-    m_cursorPosition = val;
-    m_currentElementCursorPosition = -1;
-    this->setWordUnderCursorIsMisspelled(false);
-    this->setSpellingSuggestions(QStringList());
-
     if (m_textDocument == nullptr || this->document() == nullptr) {
         m_cursorPosition = -1;
         m_currentElementCursorPosition = -1;
         m_textFormat->reset();
-        this->setCurrentElement(nullptr);
         emit cursorPositionChanged();
         return;
     }
 
+    m_cursorPosition = val;
+    m_currentElementCursorPosition = -1;
     if (m_scene != nullptr)
         m_scene->setCursorPosition(m_cursorPosition);
 
-    if (m_cursorPosition < 0 || this->document()->isEmpty()
-        || m_cursorPosition > this->document()->characterCount()) {
+    if (m_cursorPosition < 0) {
         m_textFormat->reset();
         emit cursorPositionChanged();
         return;
     }
+
+    if (this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount()) {
+        m_textFormat->reset();
+        emit cursorPositionChanged();
+        return;
+    }
+
+    this->setWordUnderCursorIsMisspelled(false);
+    this->setSpellingSuggestions(QStringList());
 
     SpellCheckCursor cursor(this->document(), val);
 
@@ -2092,7 +2348,7 @@ void SceneDocumentBinder::componentComplete()
 
 void SceneDocumentBinder::highlightBlock(const QString &text)
 {
-    if (m_initializingDocument)
+    if (m_initializingDocument || m_sceneElementTaskIsRunning)
         return;
 
     if (m_screenplayFormat == nullptr)
@@ -2191,6 +2447,9 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
         }
 
         m_rehighlightBlockQueue.clear();
+    } else if (te->timerId() == m_sceneElementTaskTimer.timerId()) {
+        m_sceneElementTaskTimer.stop();
+        this->performAllSceneElementTasks();
     }
 }
 
@@ -2253,7 +2512,7 @@ void SceneDocumentBinder::initializeDocument()
             block = cursor.block();
         }
 
-        SceneDocumentBlockUserData *userData = new SceneDocumentBlockUserData(element, this);
+        SceneDocumentBlockUserData *userData = new SceneDocumentBlockUserData(block, element, this);
         block.setUserData(userData);
         cursor.insertText(element->text());
         blocks.append(block);
@@ -2293,6 +2552,7 @@ void SceneDocumentBinder::initializeDocument()
     this->setDocumentLoadCount(m_documentLoadCount + 1);
     m_initializingDocument = false;
     this->QSyntaxHighlighter::rehighlight();
+    this->polishAllSceneElements();
 
     emit documentInitialized();
 }
@@ -2340,6 +2600,7 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
 
     m_tabHistory.clear();
     this->evaluateAutoCompleteHints();
+    this->polishAllSceneElements();
 
     emit currentFontChanged();
 }
@@ -2498,13 +2759,17 @@ void SceneDocumentBinder::onSpellCheckUpdated()
 
 void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int charsAdded)
 {
-    if (m_initializingDocument || m_sceneIsBeingReset || m_cursorPosition < 0)
+    if (m_initializingDocument || m_sceneIsBeingReset || m_sceneElementTaskIsRunning
+        || m_cursorPosition < 0)
         return;
 
     if (m_textDocument == nullptr || m_scene == nullptr || this->document() == nullptr)
         return;
 
     m_tabHistory.clear();
+
+    if (m_sceneElementTaskTimer.isActive())
+        m_sceneElementTaskTimer.start(250, this);
 
     if (m_scene->elementCount() != this->document()->blockCount()) {
         /**
@@ -2522,76 +2787,10 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
 
     // Auto-capitalize first letter of each sentence.
     if (m_autoCapitalizeSentences && charsRemoved == 0) {
-        QScopedValueRollback<bool> rollback(m_autoCapitalizeSentences, false);
-
-        static QList<QChar> sentenceBreaks(
-                { '.', '!', '?' }); // I want to use QChar::isPunct(), but it
-                                    // returns true for non-sentence breaking
-                                    // punctuations also, which we don't want.
-
-        auto selectLetterAt = [](QTextCursor &cursor, int pos) -> QString {
-            cursor.setPosition(pos);
-            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
-            return cursor.selectedText();
-        };
-
-        auto capitalizeLetterAt = [](QTextCursor &cursor, int pos) {
-            cursor.setPosition(pos);
-            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
-            cursor.insertText(cursor.selectedText().toUpper());
-            cursor.clearSelection();
-            cursor.setPosition(pos);
-        };
-
-        const QTextBlock block = cursor.block();
-        if (from == block.position()) {
-            // if this is the first letter in the block, then it must be
-            // capitaized.
-            capitalizeLetterAt(cursor, from);
-        } else {
-            // Keep going back until a non-space character is found.
-            int _pos = from - 1;
-            QString letter;
-            while (_pos >= block.position()) {
-                letter = selectLetterAt(cursor, _pos);
-                if (letter.isEmpty() || letter.at(0).isSpace()) {
-                    --_pos;
-                    continue;
-                }
-                break;
-            }
-
-            // If letter is one of sentence separators or we have reached the
-            // beginning of the block, then character at 'from' must be capitalized.
-            if ((_pos < block.position() && !letter.isEmpty() && letter.at(0).isSpace())
-                || sentenceBreaks.contains(letter.at(0)))
-                capitalizeLetterAt(cursor, from);
-        }
-
-        // starting at 'from' and until 'charsAdded', we examine each letter
-        // if we encounter a sentence-break, then we capitalize the next letter.
-        int _pos = from + 1;
-        int _charsLeft = charsAdded - 1;
-        bool _doCaps = false;
-        QString letter;
-        while (_charsLeft) {
-            letter = selectLetterAt(cursor, _pos);
-            if (letter.isEmpty() || letter.at(0).isSpace()) {
-                ++_pos;
-                --_charsLeft;
-                continue;
-            }
-
-            if (sentenceBreaks.contains(letter.at(0)))
-                _doCaps = true;
-            else if (_doCaps) {
-                capitalizeLetterAt(cursor, _pos);
-                _doCaps = false;
-            }
-
-            ++_pos;
-            --_charsLeft;
-        }
+        QTextBlock block = cursor.block();
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData)
+            userData->autoCapitalizeLater();
     }
 
     // Fixed an issue that caused formatting to not get applied on the next
@@ -2677,6 +2876,8 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
      * So its better we sync it like this.
      */
 
+    bool doPolishElements = false;
+
     m_scene->beginUndoCapture();
 
     QList<SceneElement *> elementList;
@@ -2723,8 +2924,9 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
                 m_scene->insertElementAt(newElement, 0);
             }
 
-            userData = new SceneDocumentBlockUserData(newElement, this);
+            userData = new SceneDocumentBlockUserData(block, newElement, this);
             block.setUserData(userData);
+            doPolishElements = true;
         }
 
         elementList.append(userData->sceneElement());
@@ -2737,6 +2939,9 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 
     m_scene->setElementsList(elementList);
     m_scene->endUndoCapture();
+
+    if (doPolishElements)
+        this->polishAllSceneElements();
 }
 
 void SceneDocumentBinder::evaluateAutoCompleteHints()
@@ -2944,5 +3149,51 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
                 cursor.setCharFormat(format);
             }
         }
+    }
+}
+
+void SceneDocumentBinder::polishAllSceneElements()
+{
+    QTextBlock block = this->document()->firstBlock();
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData)
+            userData->polishTextLater();
+        block = block.next();
+    }
+}
+
+void SceneDocumentBinder::polishSceneElement(SceneElement *element)
+{
+    const int blockNr = m_scene->indexOfElement(element);
+    if (blockNr < 0)
+        return;
+
+    QTextBlock block = this->document()->findBlockByNumber(blockNr);
+    SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+    if (userData && userData->sceneElement() == element) {
+        userData->polishTextLater();
+        return;
+    }
+
+    block = this->document()->firstBlock();
+    while (block.isValid()) {
+        userData = SceneDocumentBlockUserData::get(block);
+        if (userData && userData->sceneElement() == element) {
+            userData->polishTextLater();
+            return;
+        }
+        block = block.next();
+    }
+}
+
+void SceneDocumentBinder::performAllSceneElementTasks()
+{
+    QTextBlock block = this->document()->firstBlock();
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData)
+            userData->performPendingTasks();
+        block = block.next();
     }
 }
