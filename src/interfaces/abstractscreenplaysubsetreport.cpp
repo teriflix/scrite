@@ -33,6 +33,15 @@ void AbstractScreenplaySubsetReport::setGenerateTitlePage(bool val)
     emit generateTitlePageChanged();
 }
 
+void AbstractScreenplaySubsetReport::setIncludeLogline(bool val)
+{
+    if (m_includeLogline == val)
+        return;
+
+    m_includeLogline = val;
+    emit includeLoglineChanged();
+}
+
 void AbstractScreenplaySubsetReport::setListSceneCharacters(bool val)
 {
     if (m_listSceneCharacters == val)
@@ -169,6 +178,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     m_screenplaySubset->setBasedOn(screenplay->basedOn());
     m_screenplaySubset->setContact(screenplay->contact());
     m_screenplaySubset->setVersion(screenplay->version());
+    m_screenplaySubset->setLogline(screenplay->logline());
     m_screenplaySubset->setSubtitle(subtitle);
     m_screenplaySubset->setPhoneNumber(screenplay->phoneNumber());
     m_screenplaySubset->setProperty("#useDocumentScreenplayForCoverPagePhoto", true);
@@ -242,6 +252,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 
     ScreenplayTextDocument stDoc;
     stDoc.setTitlePage(this->format() == AdobePDF ? m_generateTitlePage : false);
+    stDoc.setIncludeLoglineInTitlePage(stDoc.hasTitlePage() ? m_includeLogline : false);
     stDoc.setSceneNumbers(m_includeSceneNumbers);
     stDoc.setSceneIcons(this->format() == AdobePDF ? m_includeSceneIcons : false);
     stDoc.setListSceneCharacters(m_listSceneCharacters);

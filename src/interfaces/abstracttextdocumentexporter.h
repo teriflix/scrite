@@ -62,6 +62,7 @@ public:
     Q_SIGNAL void includeSceneContentsChanged();
 
     virtual bool generateTitlePage() const { return true; }
+    virtual bool isIncludeLogline() const { return false; }
     virtual bool usePageBreaks() const { return false; }
     virtual bool isIncludeSceneNumbers() const { return false; }
     virtual bool isIncludeSceneIcons() const { return false; }

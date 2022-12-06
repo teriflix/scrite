@@ -39,6 +39,15 @@ void PdfExporter::setGenerateTitlePage(bool val)
     emit generateTitlePageChanged();
 }
 
+void PdfExporter::setIncludeLogline(bool val)
+{
+    if (m_includeLogline == val)
+        return;
+
+    m_includeLogline = val;
+    emit includeLoglineChanged();
+}
+
 void PdfExporter::setIncludeSceneNumbers(bool val)
 {
     if (m_includeSceneNumbers == val)

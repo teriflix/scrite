@@ -345,7 +345,7 @@ private:
     int m_pageCount = 0;
     bool m_updating = false;
     bool m_titlePage = false;
-    bool m_includeLoglineInTitlePage = true;
+    bool m_includeLoglineInTitlePage = false;
     int m_currentPage = 0;
     bool m_sceneIcons = true;
     Purpose m_purpose = ForDisplay;

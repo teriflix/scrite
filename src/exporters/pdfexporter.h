@@ -33,6 +33,13 @@ public:
     bool isGenerateTitlePage() const { return m_generateTitlePage; }
     Q_SIGNAL void generateTitlePageChanged();
 
+    Q_CLASSINFO("includeLogline_FieldLabel", "Include logline in title page.")
+    Q_CLASSINFO("includeLogline_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeLogline READ isIncludeLogline WRITE setIncludeLogline NOTIFY includeLoglineChanged)
+    void setIncludeLogline(bool val);
+    bool isIncludeLogline() const { return m_includeLogline; }
+    Q_SIGNAL void includeLoglineChanged();
+
     Q_CLASSINFO("usePageBreaks_FieldLabel", "Use (MORE) and (CONT'D) breaks where appropriate. [May increase page count]")
     Q_CLASSINFO("usePageBreaks_FieldEditor", "CheckBox")
     Q_PROPERTY(bool usePageBreaks READ usePageBreaks WRITE setUsePageBreaks NOTIFY usePageBreaksChanged)
@@ -103,6 +110,7 @@ private:
     QString m_comment;
     QString m_watermark;
     bool m_usePageBreaks = true;
+    bool m_includeLogline = false;
     bool m_generateTitlePage = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;

@@ -3194,7 +3194,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         QGraphicsRectItem *loglineCardContainer = new QGraphicsRectItem;
         scene.addItem(loglineCardContainer);
         loglineCardContainer->setPen(Qt::NoPen);
-        loglineCardContainer->setBrush(Qt::lightGray);
+        loglineCardContainer->setBrush(Qt::NoBrush);
         loglineCardContainer->setOpacity(0.1);
         loglineCardContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
         loglineCardContainer->setFlag(QGraphicsItem::ItemDoesntPropagateOpacityToChildren, true);

@@ -72,6 +72,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
 
     ScreenplayTextDocument stDoc;
     stDoc.setTitlePage(this->generateTitlePage());
+    stDoc.setIncludeLoglineInTitlePage(this->isIncludeLogline());
     stDoc.setSceneNumbers(this->isIncludeSceneNumbers());
     stDoc.setSceneIcons(this->isIncludeSceneIcons());
     stDoc.setListSceneCharacters(m_listSceneCharacters);

@@ -92,6 +92,14 @@ public:
     bool isGenerateTitlePage() const { return m_generateTitlePage; }
     Q_SIGNAL void generateTitlePageChanged();
 
+    Q_CLASSINFO("includeLogline_FieldGroup", "Options")
+    Q_CLASSINFO("includeLogline_FieldLabel", "Include logline in title page. (PDF Only)")
+    Q_CLASSINFO("includeLogline_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeLogline READ isIncludeLogline WRITE setIncludeLogline NOTIFY includeLoglineChanged)
+    void setIncludeLogline(bool val);
+    bool isIncludeLogline() const { return m_includeLogline; }
+    Q_SIGNAL void includeLoglineChanged();
+
     Q_CLASSINFO("includeSceneIcons_FieldGroup", "Options")
     Q_CLASSINFO("includeSceneIcons_FieldLabel",
                 "Include scene icons in the generated PDF. (PDF Only)")
@@ -166,6 +174,7 @@ protected:
 private:
     QStringList m_tags;
     bool m_generateTitlePage = true;
+    bool m_includeLogline = false;
     bool m_printSceneContent = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
