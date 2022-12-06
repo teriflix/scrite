@@ -1870,25 +1870,64 @@ Rectangle {
                     }
 
                     Item {
+                        id: loglineForm
                         anchors.fill: parent
                         anchors.leftMargin: 10
                         anchors.rightMargin: 10
 
-                        FlickableTextArea {
-                            id: loglineFieldArea
-                            text: Scrite.document.screenplay.logline
-                            onTextChanged: Scrite.document.screenplay.logline = text
-                            placeholderText: "Logline: a one-sentence summary or description."
-                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
-                            height: parent.height
-                            readOnly: Scrite.document.readOnly
-                            undoRedoEnabled: true
-                            ScrollBar.vertical: loglineVScrollBar
-                            adjustTextWidthBasedOnScrollBar: false
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            background: Rectangle {
-                                color: primaryColors.windowColor
-                                opacity: 0.15
+                        TextLimiter {
+                            id: textLimiter
+                            maxWordCount: 50
+                            maxLetterCount: 240
+                            text: loglineFieldArea.text
+                            onLimitedTextChanged: Scrite.document.screenplay.logline = text
+                        }
+
+                        Column {
+                            spacing: 0
+                            x: Math.max(0, (parent.width-width)/2)
+                            width: Math.min(idealAppFontMetrics.averageCharacterWidth*50, parent.width-20)
+
+                            Label {
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                font.pointSize: Scrite.app.idealFontPointSize
+                                topPadding: 20
+                                bottomPadding: 10
+                                text: "A logline should swiftly convey what a screenplay is about, including the main character, central conflict, setup and antagonist."
+                            }
+
+                            Link {
+                                width: parent.width
+                                elide: Text.ElideMiddle
+                                text: "https://online.pointpark.edu/screenwriting/loglines/"
+                                onClicked: Qt.openUrlExternally(text)
+                                bottomPadding: 20
+                            }
+
+                            FlickableTextArea {
+                                id: loglineFieldArea
+                                text: Scrite.document.screenplay.logline
+                                placeholderText: "Type the logline here ..."
+                                width: parent.width
+                                height: Math.max(idealAppFontMetrics.lineSpacing*10, contentHeight+10)
+                                readOnly: Scrite.document.readOnly
+                                undoRedoEnabled: true
+                                ScrollBar.vertical: loglineVScrollBar
+                                adjustTextWidthBasedOnScrollBar: false
+                                background: Rectangle {
+                                    color: primaryColors.windowColor
+                                    opacity: 0.15
+                                }
+                            }
+
+                            Label {
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                font.pointSize: Scrite.app.idealFontPointSize
+                                topPadding: 5
+                                text: "Words: " + textLimiter.wordCount + "/" + textLimiter.maxWordCount +
+                                    ", Letters: " + textLimiter.letterCount + "/" + textLimiter.maxLetterCount
                             }
                         }
                     }

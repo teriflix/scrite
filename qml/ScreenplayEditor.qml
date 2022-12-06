@@ -405,6 +405,14 @@ Rectangle {
                             height: logLineEditorLayout.height
                             visible: screenplayEditorSettings.showLoglineEditor && screenplayAdapter.isSourceScreenplay && (Scrite.document.readOnly ? logLineField.text !== "" : true)
 
+                            TextLimiter {
+                                id: loglineLimiter
+                                maxWordCount: 50
+                                maxLetterCount: 240
+                                text: logLineField.text
+                                onLimitedTextChanged: Scrite.document.screenplay.logline = text
+                            }
+
                             Column {
                                 id: logLineEditorLayout
                                 width: parent.width
@@ -413,7 +421,8 @@ Rectangle {
 
                                 Text {
                                     id: logLineFieldHeading
-                                    text: "Logline:"
+                                    text: "Logline: (" + loglineLimiter.wordCount + "/" + loglineLimiter.maxWordCount + " words, " +
+                                          loglineLimiter.letterCount + "/" + loglineLimiter.maxLetterCount + " letters)"
                                     font.family: screenplayFormat.defaultFont2.family
                                     font.pointSize: screenplayFormat.defaultFont2.pointSize-2
                                     visible: logLineField.length > 0
@@ -433,9 +442,8 @@ Rectangle {
                                     Transliterator.cursorPosition: cursorPosition
                                     Transliterator.hasActiveFocus: activeFocus
                                     Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
-                                    onTextChanged: Scrite.document.screenplay.logline = text
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                    placeholderText: "Enter the logline of your screenplay here.."
+                                    placeholderText: "Type your logline here, max " + loglineLimiter.maxWordCount + " words ..."
                                 }
                             }
                         }

@@ -99,6 +99,7 @@ HEADERS += \
     src/quick/objects/polygontesselator.h \
     src/quick/objects/shortcutsmodel.h \
     src/quick/objects/textdocument.h \
+    src/quick/objects/textlimiter.h \
     src/quick/objects/trackobject.h \
     src/quick/objects/notificationmanager.h \
     src/quick/objects/materialcolors.h \
@@ -225,6 +226,7 @@ SOURCES += \
     src/quick/objects/aggregation.cpp \
     src/quick/objects/shortcutsmodel.cpp \
     src/quick/objects/textdocument.cpp \
+    src/quick/objects/textlimiter.cpp \
     src/quick/objects/trackobject.cpp \
     src/quick/objects/materialcolors.cpp \
     src/quick/objects/errorreport.cpp \

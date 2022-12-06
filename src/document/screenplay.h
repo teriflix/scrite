@@ -270,6 +270,11 @@ public:
     QString logline() const { return m_logline; }
     Q_SIGNAL void loglineChanged();
 
+    Q_PROPERTY(QString loglineComments READ loglineComments WRITE setLoglineComments NOTIFY loglineCommentsChanged)
+    void setLoglineComments(const QString &val);
+    QString loglineComments() const { return m_loglineComments; }
+    Q_SIGNAL void loglineCommentsChanged();
+
     Q_PROPERTY(QString basedOn READ basedOn WRITE setBasedOn NOTIFY basedOnChanged)
     void setBasedOn(const QString &val);
     QString basedOn() const { return m_basedOn; }
@@ -520,6 +525,8 @@ protected:
     void evaluateWordCount();
     void evaluateWordCountLater();
     bool getPasteDataFromClipboard(QJsonObject &clipboardJson) const;
+    static void polishLogline(const QString &givenLogline, QString &polishedLogline, int &polishedWordCount,
+                              int &polishedLetterCount);
 
 private:
     QString m_title;
@@ -534,6 +541,7 @@ private:
     QString m_subtitle;
     QString m_phoneNumber;
     QString m_coverPagePhoto;
+    QString m_loglineComments;
     bool m_titlePageIsCentered = true;
     int m_minimumParagraphCount = 0;
     int m_maximumParagraphCount = 0;
