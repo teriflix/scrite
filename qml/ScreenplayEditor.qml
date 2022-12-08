@@ -2688,11 +2688,17 @@ Rectangle {
                             readOnly: Scrite.document.readOnly
                             background: Item { }
                             onEditingComplete: sceneHeading.parseFrom(text)
+                            property int previouslyActiveLanguage: TransliterationEngine.English
                             onActiveFocusChanged: {
-                                if(activeFocus)
+                                if(activeFocus) {
                                     screenplayAdapter.currentIndex = headingItem.theElementIndex
-                                else
+                                    previouslyActiveLanguage = Scrite.app.transliterationEngine.language
+                                    const headingFormat = Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
+                                    headingFormat.activateDefaultLanguage()
+                                } else {
                                     sceneHeading.parseFrom(text)
+                                    Scrite.app.transliterationEngine.language = previouslyActiveLanguage
+                                }
                             }
                             tabItem: headingItem.sceneTextEditor
 

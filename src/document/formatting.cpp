@@ -384,7 +384,7 @@ void SceneElementFormat::resetToFactoryDefaults()
     this->setTextColor(Qt::black);
     this->setBackgroundColor(Qt::transparent);
     this->setTextAlignment(Qt::AlignLeft);
-    this->setDefaultLanguage(Default);
+    this->setDefaultLanguage(m_elementType == SceneElement::Heading ? English : Default);
 
     QSettings *settings = Application::instance()->settings();
     QString defaultLanguage = QStringLiteral("Default");
@@ -408,6 +408,9 @@ void SceneElementFormat::resetToFactoryDefaults()
     case SceneElement::Transition:
         settings->setValue(QStringLiteral("Paragraph Language/transitionLanguage"),
                            defaultLanguage);
+        break;
+    case SceneElement::Heading:
+        settings->setValue(QStringLiteral("Paragraph Language/headingLanguage"), defaultLanguage);
         break;
     default:
         break;
@@ -938,6 +941,13 @@ void ScreenplayFormat::useUserSpecifiedFonts()
         }
         this->setDefaultFont(defFont);
     }
+}
+
+void ScreenplayFormat::deserializeFromJson(const QJsonObject &)
+{
+    SceneElementFormat *headingFormat = this->elementFormat(SceneElement::Heading);
+    if (headingFormat && headingFormat->defaultLanguage() == SceneElementFormat::Default)
+        headingFormat->setDefaultLanguage(SceneElementFormat::English);
 }
 
 void ScreenplayFormat::resetScreen()
@@ -1808,8 +1818,10 @@ void SceneDocumentBinder::setCursorPosition(int val)
         m_scene->setCursorPosition(m_cursorPosition);
 
     if (m_cursorPosition < 0) {
+        m_currentElementCursorPosition = -1;
         m_textFormat->reset();
         emit cursorPositionChanged();
+        this->setCurrentElement(nullptr);
         return;
     }
 

@@ -511,6 +511,9 @@ QString SceneElement::formattedText() const
 
 bool SceneElement::polishText()
 {
+    if (m_scene == nullptr)
+        return false;
+
     /**
      * This function is called when the user is done editing a scene element and goes on to another
      * paragraph. At this point, we can polish the text. What does polish mean?

@@ -300,10 +300,13 @@ private:
     ExecLaterTimer m_evaluateRectsTimer;
 };
 
-class ScreenplayFormat : public QAbstractListModel, public Modifiable
+class ScreenplayFormat : public QAbstractListModel,
+                         public Modifiable,
+                         public QObjectSerializer::Interface
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_INTERFACES(QObjectSerializer::Interface)
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
@@ -403,6 +406,9 @@ public:
     Q_SIGNAL void inTransactionChanged();
 
     void useUserSpecifiedFonts();
+
+    // Interface interface
+    void deserializeFromJson(const QJsonObject &);
 
 private:
     void resetScreen();
