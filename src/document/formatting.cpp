@@ -1209,7 +1209,7 @@ public:
 
     SceneElement *sceneElement() const { return m_sceneElement; }
 
-    void resetFormat() { m_formatMTime = -1; }
+    void resetFormat();
     bool shouldUpdateFromFormat(const SceneElementFormat *format);
 
     void initializeSpellCheck(SceneDocumentBinder *binder);
@@ -1266,6 +1266,13 @@ SceneDocumentBlockUserData::~SceneDocumentBlockUserData()
 {
     if (m_spellCheckConnection)
         QObject::disconnect(m_spellCheckConnection);
+}
+
+void SceneDocumentBlockUserData::resetFormat()
+{
+    m_formatMTime = -1;
+    blockFormat = QTextBlockFormat();
+    charFormat = QTextCharFormat();
 }
 
 bool SceneDocumentBlockUserData::shouldUpdateFromFormat(const SceneElementFormat *format)
@@ -1371,40 +1378,45 @@ void SceneDocumentBlockUserData::polishTextNow()
             return;
     }
 
-    // This is to avoid recursive edits
-    QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
+    {
+        // This is to avoid recursive edits
+        QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
 
-    // If the block has no text, then there is no point in polishing text
-    if (m_textBlock.text().isEmpty())
-        return;
+        // If the block has no text, then there is no point in polishing text
+        if (m_textBlock.text().isEmpty())
+            return;
 
-    // If the scene element that this object represents has no polish to apply, then
-    // we can simply quit. Polishing means adding/removing CONT'D, : etc..
-    if (m_sceneElement == nullptr || !m_sceneElement->polishText())
-        return;
+        // If the scene element that this object represents has no polish to apply, then
+        // we can simply quit. Polishing means adding/removing CONT'D, : etc..
+        if (m_sceneElement == nullptr || !m_sceneElement->polishText())
+            return;
 
-    // Mark current cursor position if required, so that we can get back to it
-    // once we are done applying all edits done as a part of the polish operation.
-    bool cursorPositionMarked = false;
-    if (m_binder->m_cursorPosition > m_textBlock.position())
-        cursorPositionMarked = this->markCursorPosition();
+        // Mark current cursor position if required, so that we can get back to it
+        // once we are done applying all edits done as a part of the polish operation.
+        bool cursorPositionMarked = false;
+        if (m_binder->m_cursorPosition > m_textBlock.position())
+            cursorPositionMarked = this->markCursorPosition();
 
-    // Apply the polished text
-    QTextCursor cursor(m_textBlock);
-    cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-    const QString text = m_sceneElement->text();
-    if (text.isEmpty())
-        cursor.removeSelectedText();
-    else
-        cursor.insertText(text);
+        // Reset format so that its applied by the highlighter again
+        this->resetFormat();
 
-    // Restore cursor position
-    if (cursorPositionMarked) {
-        const int cp = this->markedCursorPosiiton(true);
-        emit m_binder->requestCursorPosition(cp);
+        // Apply the polished text
+        QTextCursor cursor(m_textBlock);
+        cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+        const QString text = m_sceneElement->text();
+        if (text.isEmpty())
+            cursor.removeSelectedText();
+        else
+            cursor.insertText(text);
+
+        // Restore cursor position
+        if (cursorPositionMarked) {
+            const int cp = this->markedCursorPosiiton(true);
+            emit m_binder->requestCursorPosition(cp);
+        }
     }
 
-    // Rehighlight the block, so that formatting can be reapplied to this block.
+    // Rehighlight the block
     m_binder->rehighlightBlock(m_textBlock);
 }
 
@@ -1439,7 +1451,9 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
                 const QChar uch = ch.toUpper();
                 if (uch != ch)
                     ret.append(i);
-            } else if (sentenceBreaks.contains(ch))
+            }
+
+            if (sentenceBreaks.contains(ch))
                 needsCapping = true;
         }
 
@@ -1470,38 +1484,43 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
     if (capitalizePositions.isEmpty())
         return;
 
-    // This is to avoid recursive edits
-    QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
+    {
+        // This is to avoid recursive edits
+        QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
 
-    // Mark current cursor position if required, so that we can get back to it
-    // once we are done applying all edits done as a part of the capitalize
-    // operation
-    bool cursorPositionMarked = false;
-    if (m_binder->m_cursorPosition > m_textBlock.position())
-        cursorPositionMarked = this->markCursorPosition();
+        // Mark current cursor position if required, so that we can get back to it
+        // once we are done applying all edits done as a part of the capitalize
+        // operation
+        bool cursorPositionMarked = false;
+        if (m_binder->m_cursorPosition > m_textBlock.position())
+            cursorPositionMarked = this->markCursorPosition();
 
-    // Capitalize letters as determined.
-    QTextCursor cursor(m_textBlock);
-    for (int pos : capitalizePositions) {
-        cursor.setPosition(m_textBlock.position() + pos);
-        cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
-        cursor.insertText(cursor.selectedText().toUpper());
-        cursor.clearSelection();
-        cursor.setPosition(m_textBlock.position() + pos);
+        // Reset format so that its applied by the highlighter again
+        this->resetFormat();
+
+        // Capitalize letters as determined.
+        QTextCursor cursor(m_textBlock);
+        for (int pos : capitalizePositions) {
+            cursor.setPosition(m_textBlock.position() + pos);
+            cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor);
+            cursor.insertText(cursor.selectedText().toUpper());
+            cursor.clearSelection();
+            cursor.setPosition(m_textBlock.position() + pos);
+        }
+
+        // Restore cursor position
+        if (cursorPositionMarked) {
+            const int cp = this->markedCursorPosiiton(true);
+            emit m_binder->requestCursorPosition(cp);
+        }
+
+        // Store changes into the element.
+        m_sceneElement->setText(m_textBlock.text());
+        m_sceneElement->setTextFormats(m_textBlock.textFormats());
     }
 
-    // Restore cursor position
-    if (cursorPositionMarked) {
-        const int cp = this->markedCursorPosiiton(true);
-        emit m_binder->requestCursorPosition(cp);
-    }
-
-    // Rehighlight the block, so that formatting can be reapplied to this block.
+    // Rehighlight the block
     m_binder->rehighlightBlock(m_textBlock);
-
-    // Store changes into the element.
-    m_sceneElement->setText(m_textBlock.text());
-    m_sceneElement->setTextFormats(m_textBlock.textFormats());
 }
 
 void SceneDocumentBlockUserData::performPendingTasks()
@@ -2032,6 +2051,8 @@ void SceneDocumentBinder::refresh()
             if (userData) {
                 userData->resetFormat();
                 userData->initializeSpellCheck(this);
+                userData->autoCapitalizeLater();
+                userData->polishTextLater();
             }
 
             block = block.next();
@@ -2280,6 +2301,8 @@ int SceneDocumentBinder::paste(int fromPosition)
     const bool pasteFormatting = paragraphs.size() > 1;
     QTextBlock lastPastedBlock;
 
+    int finalCursorPos = fromPosition;
+
     for (int i = 0; i < paragraphs.size(); i++) {
         const Paragraph paragraph = paragraphs.at(i);
         if (i > 0)
@@ -2288,6 +2311,7 @@ int SceneDocumentBinder::paste(int fromPosition)
         const int bstart = cursor.position();
         cursor.insertText(paragraph.text);
         const int bend = cursor.position();
+        finalCursorPos = bend;
 
         if (pasteFormatting) {
             lastPastedBlock = cursor.block();
@@ -2311,22 +2335,22 @@ int SceneDocumentBinder::paste(int fromPosition)
         }
     }
 
-    this->refresh();
+    const int cp = finalCursorPos;
+    emit requestCursorPosition(cp);
 
-    int ret = cursor.position();
+    m_sceneElementTaskTimer.stop();
+    this->performAllSceneElementTasks();
 
-    if (pasteFormatting && lastPastedBlock.isValid()) {
-        m_rehighlightTimer.stop();
-        this->rehighlight();
+    QTimer *refreshLaterTimer = new QTimer(this);
+    refreshLaterTimer->setInterval(50);
+    refreshLaterTimer->setSingleShot(true);
+    connect(refreshLaterTimer, &QTimer::timeout, this, &SceneDocumentBinder::refresh);
+    connect(refreshLaterTimer, &QTimer::timeout, this,
+            [this, cp]() { emit requestCursorPosition(cp); });
+    connect(refreshLaterTimer, &QTimer::timeout, refreshLaterTimer, &QTimer::deleteLater);
+    refreshLaterTimer->start();
 
-        cursor = QTextCursor(lastPastedBlock);
-        cursor.movePosition(QTextCursor::EndOfBlock);
-        ret = cursor.position();
-    }
-
-    ret = qMin(this->document()->characterCount(), ret);
-
-    return ret;
+    return cp;
 }
 
 void SceneDocumentBinder::setApplyFormattingEvenInTransaction(bool val)
@@ -2626,21 +2650,19 @@ public:
 
 private:
     QTextBlock m_block;
-    int m_cursorPosition = 0; // within m_block
+    int m_cursorBlockPosition = 0; // within m_block
     ExecLaterTimer m_timer;
     SceneDocumentBinder *m_binder = nullptr;
 };
 
-ForceCursorPositionHack::ForceCursorPositionHack(const QTextBlock &block, int cp,
+ForceCursorPositionHack::ForceCursorPositionHack(const QTextBlock &block, int cbp,
                                                  SceneDocumentBinder *binder)
     : QObject(const_cast<QTextDocument *>(block.document())),
       m_block(block),
-      m_cursorPosition(cp),
+      m_cursorBlockPosition(cbp),
       m_timer("ForceCursorPositionHack.m_timer"),
       m_binder(binder)
 {
-    QTextCursor cursor(m_block);
-    cursor.insertText(QStringLiteral("("));
     m_timer.start(0, this);
 }
 
@@ -2650,8 +2672,12 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_timer.timerId()) {
         m_timer.stop();
+
+        QScopedValueRollback<bool> rollback(m_binder->m_sceneElementTaskIsRunning, true);
+
         QTextCursor cursor(m_block);
-        cursor.deleteChar();
+        cursor.insertText(QStringLiteral("("));
+        cursor.deletePreviousChar();
 
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(m_block);
         if (userData && userData->sceneElement()->type() == SceneElement::Parenthetical) {
@@ -2660,12 +2686,12 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
 
             if (m_block.text().isEmpty()) {
                 cursor.insertText(QStringLiteral("()"));
-                m_cursorPosition = 1;
+                m_cursorBlockPosition = 1;
             } else {
                 const QString blockText = m_block.text();
                 if (!blockText.startsWith(bo)) {
                     cursor.insertText(bo);
-                    m_cursorPosition += 1;
+                    m_cursorBlockPosition += 1;
                 }
                 if (!blockText.endsWith(bc)) {
                     cursor.movePosition(QTextCursor::EndOfBlock);
@@ -2674,7 +2700,7 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
             }
         }
 
-        emit m_binder->requestCursorPosition(m_block.position() + m_cursorPosition);
+        emit m_binder->requestCursorPosition(m_block.position() + m_cursorBlockPosition);
 
         GarbageCollector::instance()->add(this);
     }
@@ -2932,6 +2958,7 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
         elementList.append(userData->sceneElement());
         userData->sceneElement()->setText(block.text());
         userData->sceneElement()->setTextFormats(block.textFormats());
+        userData->autoCapitalizeLater();
 
         previousBlock = block;
         block = block.next();

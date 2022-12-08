@@ -760,6 +760,7 @@ private:
 
 private:
     friend class SpellCheckService;
+    friend class ForceCursorPositionHack;
     friend class SceneDocumentBlockUserData;
     qreal m_textWidth = 0;
     int m_cursorPosition = -1;
