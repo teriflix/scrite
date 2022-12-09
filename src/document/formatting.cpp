@@ -2557,6 +2557,12 @@ void SceneDocumentBinder::resetScreenplayFormat()
 
 void SceneDocumentBinder::resetScreenplayElement()
 {
+    if (m_screenplayElement != nullptr) {
+        Screenplay *screenplay = m_screenplayElement->screenplay();
+        disconnect(screenplay, &Screenplay::elementMoved, this,
+                   &SceneDocumentBinder::polishAllSceneElements);
+    }
+
     m_screenplayElement = nullptr;
     emit screenplayElementChanged();
 }
