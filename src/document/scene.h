@@ -182,7 +182,7 @@ public:
 
     QString formattedText() const;
 
-    bool polishText();
+    bool polishText(Scene *previousScene = nullptr);
 
     Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
     int wordCount() const { return m_wordCount; }

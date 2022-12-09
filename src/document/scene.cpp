@@ -509,7 +509,7 @@ QString SceneElement::formattedText() const
     return m_text;
 }
 
-bool SceneElement::polishText()
+bool SceneElement::polishText(Scene *previousScene)
 {
     if (m_scene == nullptr)
         return false;
@@ -544,15 +544,42 @@ bool SceneElement::polishText()
                 if (prevElement->type() == SceneElement::Character)
                     return prevElement;
             }
+
+            if (previousScene != nullptr) {
+                for (int i = previousScene->elementCount() - 1; i >= 0; i--) {
+                    SceneElement *prevElement = previousScene->elementAt(i);
+                    if (prevElement->type() == SceneElement::Character)
+                        return prevElement;
+                }
+            }
+
             return nullptr;
         }();
 
+        const QString myCharacterName = polishedText.section('(', 0, 0).trimmed();
+        const QString contd = QLatin1String("CONT'D");
+        const QString openB = QLatin1String(" (");
+        const QString closeB = QLatin1String(")");
+
+        auto removeContd = [&]() {
+            const QString comma = QLatin1String(",");
+            QString suffix = polishedText.section('(', 1, -1).trimmed();
+            if (suffix.endsWith(closeB))
+                suffix = suffix.left(suffix.length() - 1);
+            suffix.remove(contd, Qt::CaseInsensitive);
+            suffix = suffix.simplified();
+            if (!suffix.isEmpty()) {
+                suffix.replace(QLatin1String(",,"), comma);
+                suffix.replace(QLatin1String(", ,"), comma);
+            }
+            if (suffix.isEmpty() || suffix == comma)
+                polishedText = myCharacterName;
+            else
+                polishedText = myCharacterName + openB + suffix + closeB;
+        };
+
         if (prevCharElement != nullptr) {
-            const QString myCharacterName = polishedText.section('(', 0, 0).trimmed();
             const QString prevCharacterName = prevCharElement->text().section('(', 0, 0).trimmed();
-            const QString contd = QLatin1String("CONT'D");
-            const QString openB = QLatin1String(" (");
-            const QString closeB = QLatin1String(")");
             if (myCharacterName.compare(prevCharacterName, Qt::CaseInsensitive) == 0) {
                 // Include CONT'D if not already done.
                 QString suffix = polishedText.section('(', 1, -1).trimmed();
@@ -560,22 +587,10 @@ bool SceneElement::polishText()
                     polishedText += openB + contd + closeB;
             } else {
                 // Remove CONT'D if its there.
-                const QString comma = QLatin1String(",");
-                QString suffix = polishedText.section('(', 1, -1).trimmed();
-                if (suffix.endsWith(closeB))
-                    suffix = suffix.left(suffix.length() - 1);
-                suffix.remove(contd, Qt::CaseInsensitive);
-                suffix = suffix.simplified();
-                if (!suffix.isEmpty()) {
-                    suffix.replace(QLatin1String(",,"), comma);
-                    suffix.replace(QLatin1String(", ,"), comma);
-                }
-                if (suffix.isEmpty() || suffix == comma)
-                    polishedText = myCharacterName;
-                else
-                    polishedText = myCharacterName + openB + suffix + closeB;
+                removeContd();
             }
-        }
+        } else
+            removeContd();
     }
 
     QScopedValueRollback<UndoStack *> undoStackRollback(PushSceneUndoCommand::allowedStack,

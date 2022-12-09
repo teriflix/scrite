@@ -1294,6 +1294,7 @@ Rectangle {
                 transitions: Scrite.document.structure.transitions
                 characterNames: Scrite.document.structure.characterNames
                 screenplayFormat: screenplayEditor.screenplayFormat
+                screenplayElement: contentItem.theElement
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 spellCheckEnabled: !Scrite.document.readOnly && spellCheckEnabledFlag.value
                 autoCapitalizeSentences: !Scrite.document.readOnly && screenplayEditorSettings.enableAutoCapitalizeSentences

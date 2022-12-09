@@ -1396,9 +1396,26 @@ void SceneDocumentBlockUserData::polishTextNow()
         if (m_textBlock.text().isEmpty())
             return;
 
+        // Find out the previous scene, so that polishing of text may be done keeping
+        // previous scene element in context.
+        ScreenplayElement *spElement = m_binder->m_screenplayElement;
+        ScreenplayElement *prevSpElement = nullptr;
+        if (spElement) {
+            const Screenplay *screenplay = spElement->screenplay();
+            const int spElementIndex = screenplay->indexOfElement(spElement);
+            for (int i = spElementIndex - 1; i >= 0; i--) {
+                ScreenplayElement *spe = screenplay->elementAt(i);
+                if (spe->elementType() == ScreenplayElement::SceneElementType) {
+                    prevSpElement = spe;
+                    break;
+                }
+            }
+        }
+        Scene *previousScene = prevSpElement ? prevSpElement->scene() : nullptr;
+
         // If the scene element that this object represents has no polish to apply, then
         // we can simply quit. Polishing means adding/removing CONT'D, : etc..
-        if (m_sceneElement == nullptr || !m_sceneElement->polishText())
+        if (m_sceneElement == nullptr || !m_sceneElement->polishText(previousScene))
             return;
 
         // Mark current cursor position if required, so that we can get back to it
@@ -1628,7 +1645,8 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
       m_sceneElementTaskTimer("SceneDocumentBinder.m_sceneElementTaskTimer"),
       m_currentElement(this, "currentElement"),
       m_textDocument(this, "textDocument"),
-      m_screenplayFormat(this, "screenplayFormat")
+      m_screenplayFormat(this, "screenplayFormat"),
+      m_screenplayElement(this, "screenplayElement")
 {
     connect(this, &SceneDocumentBinder::currentElementChanged, this,
             &SceneDocumentBinder::nextTabFormatChanged);
@@ -1688,6 +1706,30 @@ void SceneDocumentBinder::setScene(Scene *val)
     emit sceneChanged();
 
     this->initializeDocumentLater();
+}
+
+void SceneDocumentBinder::setScreenplayElement(ScreenplayElement *val)
+{
+    if (m_screenplayElement == val)
+        return;
+
+    if (m_screenplayElement != nullptr) {
+        Screenplay *screenplay = m_screenplayElement->screenplay();
+        disconnect(screenplay, &Screenplay::elementMoved, this,
+                   &SceneDocumentBinder::polishAllSceneElements);
+    }
+
+    m_screenplayElement = val;
+
+    if (m_screenplayElement != nullptr) {
+        Screenplay *screenplay = m_screenplayElement->screenplay();
+        connect(screenplay, &Screenplay::elementMoved, this,
+                &SceneDocumentBinder::polishAllSceneElements, Qt::UniqueConnection);
+    }
+
+    emit screenplayElementChanged();
+
+    this->polishAllSceneElements();
 }
 
 void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
@@ -2511,6 +2553,12 @@ void SceneDocumentBinder::resetScreenplayFormat()
 {
     m_screenplayFormat = nullptr;
     emit screenplayFormatChanged();
+}
+
+void SceneDocumentBinder::resetScreenplayElement()
+{
+    m_screenplayElement = nullptr;
+    emit screenplayElementChanged();
 }
 
 void SceneDocumentBinder::initializeDocument()

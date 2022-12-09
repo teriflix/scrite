@@ -535,6 +535,11 @@ public:
     Scene *scene() const { return m_scene; }
     Q_SIGNAL void sceneChanged();
 
+    Q_PROPERTY(ScreenplayElement* screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged RESET resetScreenplayElement)
+    void setScreenplayElement(ScreenplayElement *val);
+    ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
+    Q_SIGNAL void screenplayElementChanged();
+
     Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
                        textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QQuickTextDocument *val);
@@ -733,6 +738,7 @@ private:
     void resetScene();
     void resetTextDocument();
     void resetScreenplayFormat();
+    void resetScreenplayElement();
 
     void initializeDocument();
     void initializeDocumentLater();
@@ -806,6 +812,7 @@ private:
     QObjectProperty<SceneElement> m_currentElement;
     QObjectProperty<QQuickTextDocument> m_textDocument;
     QObjectProperty<ScreenplayFormat> m_screenplayFormat;
+    QObjectProperty<ScreenplayElement> m_screenplayElement;
     SceneElement::Type m_autoCompleteHintsFor = SceneElement::Action;
 };
 
