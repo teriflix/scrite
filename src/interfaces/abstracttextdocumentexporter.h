@@ -61,6 +61,20 @@ public:
     bool isIncludeSceneContents() const { return m_includeSceneContents; }
     Q_SIGNAL void includeSceneContentsChanged();
 
+    // This property is not presented to the user, because it will be consistent with
+    // options configured in Settings.
+    Q_PROPERTY(bool capitalizeSentences READ isCapitalizeSentences WRITE setCapitalizeSentences NOTIFY capitalizeSentencesChanged DESIGNABLE false)
+    void setCapitalizeSentences(bool val);
+    bool isCapitalizeSentences() const { return m_capitalizeSentences; }
+    Q_SIGNAL void capitalizeSentencesChanged();
+
+    // This property is not presented to the user, because it will be consistent with
+    // options configured in Settings.
+    Q_PROPERTY(bool polishParagraphs READ isPolishParagraphs WRITE setPolishParagraphs NOTIFY polishParagraphsChanged DESIGNABLE false)
+    void setPolishParagraphs(bool val);
+    bool isPolishParagraphs() const { return m_polishParagraphs; }
+    Q_SIGNAL void polishParagraphsChanged();
+
     virtual bool generateTitlePage() const { return true; }
     virtual bool isIncludeLogline() const { return false; }
     virtual bool usePageBreaks() const { return false; }
@@ -86,6 +100,8 @@ private:
     bool m_includeSceneContents = true;
     bool m_includeSceneFeaturedImage = false;
     bool m_includeSceneComments = false;
+    bool m_polishParagraphs = false;
+    bool m_capitalizeSentences = false;
 };
 
 #endif // ABSTRACTTEXTDOCUMENTEXPORTER_H

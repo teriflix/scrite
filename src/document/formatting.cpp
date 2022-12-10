@@ -1457,57 +1457,7 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
         return;
 
     // Auto-capitalize needs to be done only on action and dialogue paragraphs.
-    if (!QList<SceneElement::Type>({ SceneElement::Action, SceneElement::Dialogue })
-                 .contains(m_sceneElement->type()))
-        return;
-
-    static QList<QChar> sentenceBreaks(
-            { '.', '!', '?' }); // I want to use QChar::isPunct(), but it
-                                // returns true for non-sentence breaking
-                                // punctuations also, which we don't want.
-    const QList<int> capitalizePositions = [](const QString &text) {
-        QList<int> ret;
-        bool needsCapping = true;
-        for (int i = 0; i < text.length(); i++) {
-            const QChar ch = text.at(i);
-            if (ch.isSpace())
-                continue;
-
-            if (needsCapping) {
-                needsCapping = false;
-                const QChar uch = ch.toUpper();
-                if (uch != ch)
-                    ret.append(i);
-            }
-
-            if (sentenceBreaks.contains(ch))
-                needsCapping = true;
-        }
-
-        // Capitalize I if found anywhere in the text, except at the very end.
-        QTextBoundaryFinder finder(QTextBoundaryFinder::Word, text);
-        while (finder.position() < text.length()) {
-            if (finder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem)) {
-                const int startPos = finder.position();
-                if (startPos == text.length() - 1)
-                    break; // we don't want to capitalize i if its the last letter, because
-                           // the user maybe typing something else after that.
-                const int endPos = finder.toNextBoundary();
-                if (endPos < 0)
-                    break;
-                const int length = endPos - startPos;
-                if (length == 1) {
-                    const QString word = text.mid(startPos, endPos - startPos);
-                    if (word == QLatin1String("i"))
-                        ret.append(startPos);
-                }
-            } else if (finder.toNextBoundary() < 0)
-                break;
-        }
-
-        return ret;
-    }(m_textBlock.text());
-
+    const QList<int> capitalizePositions = m_sceneElement->autoCapitalizePositions();
     if (capitalizePositions.isEmpty())
         return;
 
@@ -1691,6 +1641,7 @@ void SceneDocumentBinder::setScene(Scene *val)
         disconnect(m_scene, &Scene::sceneAboutToReset, this,
                    &SceneDocumentBinder::onSceneAboutToReset);
         disconnect(m_scene, &Scene::sceneReset, this, &SceneDocumentBinder::onSceneReset);
+        disconnect(m_scene, &Scene::sceneRefreshed, this, &SceneDocumentBinder::onSceneRefreshed);
     }
 
     m_scene = val;
@@ -1701,6 +1652,7 @@ void SceneDocumentBinder::setScene(Scene *val)
         connect(m_scene, &Scene::sceneAboutToReset, this,
                 &SceneDocumentBinder::onSceneAboutToReset);
         connect(m_scene, &Scene::sceneReset, this, &SceneDocumentBinder::onSceneReset);
+        connect(m_scene, &Scene::sceneRefreshed, this, &SceneDocumentBinder::onSceneRefreshed);
     }
 
     emit sceneChanged();
@@ -3126,6 +3078,17 @@ void SceneDocumentBinder::onSceneReset(int position)
     }
 
     m_sceneIsBeingReset = false;
+}
+
+void SceneDocumentBinder::onSceneRefreshed()
+{
+    QScopedValueRollback<bool> rollback(m_sceneIsBeingReset, true);
+
+    const int cp = m_cursorPosition;
+    this->setCursorPosition(-1);
+    this->initializeDocument();
+    if (cp >= 0)
+        emit requestCursorPosition(cp);
 }
 
 void SceneDocumentBinder::rehighlightLater()

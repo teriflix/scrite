@@ -759,6 +759,7 @@ private:
 
     void onSceneAboutToReset();
     void onSceneReset(int position);
+    void onSceneRefreshed();
 
     void rehighlightLater();
     void rehighlightBlockLater(const QTextBlock &block);

@@ -52,8 +52,14 @@ Item {
             }
         }
 
-        if(generator !== null)
+        if(generator !== null) {
             formInfo = generator.configurationFormInfo()
+
+            if(Scrite.app.verifyType(generator, "AbstractScreenplaySubsetReport")) {
+                generator.capitalizeSentences = screenplayEditorSettings.enableAutoCapitalizeSentences
+                generator.polishParagraphs = screenplayEditorSettings.enableAutoPolishParagraphs
+            }
+        }
 
         modalDialog.arguments = undefined
     }

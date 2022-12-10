@@ -66,9 +66,33 @@ void AbstractTextDocumentExporter::setIncludeSceneContents(bool val)
     emit includeSceneContentsChanged();
 }
 
+void AbstractTextDocumentExporter::setCapitalizeSentences(bool val)
+{
+    if (m_capitalizeSentences == val)
+        return;
+
+    m_capitalizeSentences = val;
+    emit capitalizeSentencesChanged();
+}
+
+void AbstractTextDocumentExporter::setPolishParagraphs(bool val)
+{
+    if (m_polishParagraphs == val)
+        return;
+
+    m_polishParagraphs = val;
+    emit polishParagraphsChanged();
+}
+
 void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal pageWidth)
 {
     Q_UNUSED(pageWidth)
+
+    Screenplay *screenplay = this->document()->screenplay();
+    if (m_capitalizeSentences)
+        screenplay->capitalizeSentences();
+    if (m_polishParagraphs)
+        screenplay->polishText();
 
     ScreenplayTextDocument stDoc;
     stDoc.setTitlePage(this->generateTitlePage());

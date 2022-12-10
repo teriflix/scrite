@@ -123,6 +123,24 @@ void AbstractScreenplaySubsetReport::setIncludeActBreaks(bool val)
     emit includeActBreaksChanged();
 }
 
+void AbstractScreenplaySubsetReport::setCapitalizeSentences(bool val)
+{
+    if (m_capitalizeSentences == val)
+        return;
+
+    m_capitalizeSentences = val;
+    emit capitalizeSentencesChanged();
+}
+
+void AbstractScreenplaySubsetReport::setPolishParagraphs(bool val)
+{
+    if (m_polishParagraphs == val)
+        return;
+
+    m_polishParagraphs = val;
+    emit polishParagraphsChanged();
+}
+
 void AbstractScreenplaySubsetReport::setEpisodeNumbers(const QList<int> &val)
 {
     if (m_episodeNumbers == val)
@@ -145,6 +163,11 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 {
     ScriteDocument *document = this->document();
     Screenplay *screenplay = document->screenplay();
+
+    if (m_capitalizeSentences)
+        screenplay->capitalizeSentences();
+    if (m_polishParagraphs)
+        screenplay->polishText();
 
     if (m_screenplaySubset)
         delete m_screenplaySubset;

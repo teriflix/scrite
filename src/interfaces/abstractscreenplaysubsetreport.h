@@ -128,6 +128,20 @@ public:
     bool isIncludeActBreaks() const { return m_includeActBreaks; }
     Q_SIGNAL void includeActBreaksChanged();
 
+    // This property is not presented to the user, because it will be consistent with
+    // options configured in Settings.
+    Q_PROPERTY(bool capitalizeSentences READ isCapitalizeSentences WRITE setCapitalizeSentences NOTIFY capitalizeSentencesChanged DESIGNABLE false)
+    void setCapitalizeSentences(bool val);
+    bool isCapitalizeSentences() const { return m_capitalizeSentences; }
+    Q_SIGNAL void capitalizeSentencesChanged();
+
+    // This property is not presented to the user, because it will be consistent with
+    // options configured in Settings.
+    Q_PROPERTY(bool polishParagraphs READ isPolishParagraphs WRITE setPolishParagraphs NOTIFY polishParagraphsChanged DESIGNABLE false)
+    void setPolishParagraphs(bool val);
+    bool isPolishParagraphs() const { return m_polishParagraphs; }
+    Q_SIGNAL void polishParagraphsChanged();
+
     Q_CLASSINFO("episodeNumbers_FieldGroup", "Episodes")
     Q_CLASSINFO("episodeNumbers_FieldLabel", "Episodes to include in the report")
     Q_CLASSINFO("episodeNumbers_FieldEditor", "MultipleEpisodeSelector")
@@ -184,6 +198,8 @@ private:
     bool m_includeSceneFeaturedImage = false;
     bool m_includeSceneComments = false;
     bool m_includeActBreaks = false;
+    bool m_polishParagraphs = false;
+    bool m_capitalizeSentences = false;
     QList<int> m_episodeNumbers;
     Screenplay *m_screenplaySubset = nullptr;
     bool m_printEachSceneOnANewPage = false;

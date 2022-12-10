@@ -183,6 +183,9 @@ public:
     QString formattedText() const;
 
     bool polishText(Scene *previousScene = nullptr);
+    bool capitalizeSentences();
+    QList<int> autoCapitalizePositions() const;
+    static QList<int> autoCapitalizePositions(const QString &text);
 
     Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
     int wordCount() const { return m_wordCount; }
@@ -495,6 +498,9 @@ public:
 
     Q_INVOKABLE void beginUndoCapture(bool allowMerging = true);
     Q_INVOKABLE void endUndoCapture();
+
+    Q_INVOKABLE bool polishText(Scene *previousScene = nullptr);
+    Q_INVOKABLE bool capitalizeSentences();
 
     // Used by stats report generator code.
     QHash<QString, QList<SceneElement *>> dialogueElements() const;

@@ -894,7 +894,7 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object,
 
     for (int i = from->propertyOffset(); i < mo->propertyCount(); i++) {
         const QMetaProperty prop = mo->property(i);
-        if (!prop.isWritable() || !prop.isStored())
+        if (!prop.isWritable() || !prop.isStored() || !prop.isDesignable())
             continue;
 
         QJsonObject field;

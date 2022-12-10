@@ -2428,6 +2428,40 @@ void Screenplay::resetSceneNumbers()
     this->evaluateSceneNumbers(true);
 }
 
+bool Screenplay::polishText()
+{
+    bool ret = false;
+
+    Scene *previousScene = nullptr;
+
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->elementType() == ScreenplayElement::SceneElementType) {
+            Scene *scene = element->scene();
+            if (scene) {
+                ret |= scene->polishText(previousScene);
+                previousScene = scene;
+            }
+        }
+    }
+
+    return ret;
+}
+
+bool Screenplay::capitalizeSentences()
+{
+    bool ret = false;
+
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->elementType() == ScreenplayElement::SceneElementType) {
+            Scene *scene = element->scene();
+            if (scene)
+                ret |= scene->capitalizeSentences();
+        }
+    }
+
+    return ret;
+}
+
 bool Screenplay::canPaste() const
 {
     QJsonObject clipboardJson;

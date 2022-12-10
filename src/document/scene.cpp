@@ -600,6 +600,79 @@ bool SceneElement::polishText(Scene *previousScene)
     return oldText != m_text;
 }
 
+bool SceneElement::capitalizeSentences()
+{
+    const QList<int> autoCapPositions = this->autoCapitalizePositions();
+    if (autoCapPositions.isEmpty())
+        return false;
+
+    for (int autoCapPosition : autoCapPositions) {
+        const QChar ch = m_text.at(autoCapPosition);
+        m_text[autoCapPosition] = ch.toUpper();
+    }
+
+    return true;
+}
+
+QList<int> SceneElement::autoCapitalizePositions() const
+{
+    // Auto-capitalize needs to be done only on action and dialogue paragraphs.
+    if (!QList<SceneElement::Type>({ SceneElement::Action, SceneElement::Dialogue })
+                 .contains(m_type))
+        return QList<int>();
+
+    return SceneElement::autoCapitalizePositions(m_text);
+}
+
+QList<int> SceneElement::autoCapitalizePositions(const QString &text)
+{
+    QList<int> ret;
+
+    static QList<QChar> sentenceBreaks(
+            { '.', '!', '?' }); // I want to use QChar::isPunct(), but it
+                                // returns true for non-sentence breaking
+                                // punctuations also, which we don't want.
+    bool needsCapping = true;
+    for (int i = 0; i < text.length(); i++) {
+        const QChar ch = text.at(i);
+        if (ch.isSpace())
+            continue;
+
+        if (needsCapping) {
+            needsCapping = false;
+            const QChar uch = ch.toUpper();
+            if (uch != ch)
+                ret.append(i);
+        }
+
+        if (sentenceBreaks.contains(ch))
+            needsCapping = true;
+    }
+
+    // Capitalize I if found anywhere in the text, except at the very end.
+    QTextBoundaryFinder finder(QTextBoundaryFinder::Word, text);
+    while (finder.position() < text.length()) {
+        if (finder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem)) {
+            const int startPos = finder.position();
+            if (startPos == text.length() - 1)
+                break; // we don't want to capitalize i if its the last letter, because
+                       // the user maybe typing something else after that.
+            const int endPos = finder.toNextBoundary();
+            if (endPos < 0)
+                break;
+            const int length = endPos - startPos;
+            if (length == 1) {
+                const QString word = text.mid(startPos, endPos - startPos);
+                if (word == QLatin1String("i"))
+                    ret.append(startPos);
+            }
+        } else if (finder.toNextBoundary() < 0)
+            break;
+    }
+
+    return ret;
+}
+
 QJsonArray SceneElement::find(const QString &text, int flags) const
 {
     return SearchEngine::indexesOf(text, m_text, flags);
@@ -1661,6 +1734,32 @@ void Scene::endUndoCapture()
 
     delete m_pushUndoCommand;
     m_pushUndoCommand = nullptr;
+}
+
+bool Scene::polishText(Scene *previousScene)
+{
+    bool ret = false;
+
+    for (SceneElement *para : qAsConst(m_elements))
+        ret |= para->polishText(previousScene);
+
+    if (ret)
+        emit sceneRefreshed();
+
+    return ret;
+}
+
+bool Scene::capitalizeSentences()
+{
+    bool ret = false;
+
+    for (SceneElement *para : qAsConst(m_elements))
+        ret |= para->capitalizeSentences();
+
+    if (ret)
+        emit sceneRefreshed();
+
+    return ret;
 }
 
 QHash<QString, QList<SceneElement *>> Scene::dialogueElements() const

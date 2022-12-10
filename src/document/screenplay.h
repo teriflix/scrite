@@ -463,6 +463,9 @@ public:
 
     Q_INVOKABLE void resetSceneNumbers();
 
+    Q_INVOKABLE bool polishText();
+    Q_INVOKABLE bool capitalizeSentences();
+
     Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
@@ -525,8 +528,8 @@ protected:
     void evaluateWordCount();
     void evaluateWordCountLater();
     bool getPasteDataFromClipboard(QJsonObject &clipboardJson) const;
-    static void polishLogline(const QString &givenLogline, QString &polishedLogline, int &polishedWordCount,
-                              int &polishedLetterCount);
+    static void polishLogline(const QString &givenLogline, QString &polishedLogline,
+                              int &polishedWordCount, int &polishedLetterCount);
 
 private:
     QString m_title;
