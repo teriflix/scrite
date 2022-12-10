@@ -167,6 +167,10 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             cursor.setCharFormat(charFormat);
 
             const Character *character = structure->findCharacter(characterName);
+            if (character == nullptr) {
+                cursor.insertText(QLatin1String(": No notes available."));
+                continue;
+            }
 
             QTextTableFormat tableFormat;
             tableFormat.setCellPadding(1);
