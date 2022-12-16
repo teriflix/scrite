@@ -31,6 +31,11 @@ public:
     QStringList strings() const { return m_strings; }
     Q_SIGNAL void stringsChanged();
 
+    Q_PROPERTY(QStringList priorityStrings READ priorityStrings WRITE setPriorityStrings NOTIFY priorityStringsChanged)
+    void setPriorityStrings(QStringList val);
+    QStringList priorityStrings() const { return m_priorityStrings; }
+    Q_SIGNAL void priorityStringsChanged();
+
     Q_PROPERTY(bool acceptEnglishStringsOnly READ isAcceptEnglishStringsOnly WRITE setAcceptEnglishStringsOnly NOTIFY acceptEnglishStringsOnlyChanged)
     void setAcceptEnglishStringsOnly(bool val);
     bool isAcceptEnglishStringsOnly() const { return m_acceptEnglishStringsOnly; }
@@ -90,15 +95,19 @@ protected:
 
 private:
     void filterStrings();
+    void prepareStrings();
 
 private:
     int m_currentRow = -1;
     QString m_prefix;
     bool m_enabled = true;
     QStringList m_strings;
+    QStringList m_priorityStrings;
     bool m_sortStrings = true;
     int m_maxVisibleItems = 7;
     QString m_completionPrefix;
+    QStringList m_strings2;
+    QStringList m_priorityStrings2;
     QStringList m_filteredStrings;
     bool m_filterKeyStrokes = false;
     bool m_acceptEnglishStringsOnly = true;

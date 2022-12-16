@@ -693,6 +693,9 @@ public:
     QStringList autoCompleteHints() const { return m_autoCompleteHints; }
     Q_SIGNAL void autoCompleteHintsChanged();
 
+    Q_PROPERTY(QStringList priorityAutoCompleteHints READ priorityAutoCompleteHints NOTIFY autoCompleteHintsChanged)
+    QStringList priorityAutoCompleteHints() const { return m_priorityAutoCompleteHints; }
+
     Q_PROPERTY(SceneElement::Type autoCompleteHintsFor READ autoCompleteHintsFor NOTIFY
                        autoCompleteHintsForChanged)
     SceneElement::Type autoCompleteHintsFor() const { return m_autoCompleteHintsFor; }
@@ -752,7 +755,8 @@ private:
 
     void evaluateAutoCompleteHints();
     void setAutoCompleteHintsFor(SceneElement::Type val);
-    void setAutoCompleteHints(const QStringList &val);
+    void setAutoCompleteHints(const QStringList &hints,
+                              const QStringList &priorityHints = QStringList());
     void setCompletionPrefix(const QString &val);
     void setSpellingSuggestions(const QStringList &val);
     void setWordUnderCursorIsMisspelled(bool val);
@@ -785,6 +789,7 @@ private:
     int m_documentLoadCount = 0;
     TextFormat *m_textFormat = new TextFormat(this);
     bool m_sceneIsBeingReset = false;
+    bool m_sceneIsBeingRefreshed = false;
     bool m_sceneElementTaskIsRunning = false;
     bool m_forceSyncDocument = false;
     bool m_spellCheckEnabled = true;
@@ -802,6 +807,7 @@ private:
     QTextCharFormat m_nextCharFormat;
     ExecLaterTimer m_rehighlightTimer;
     QStringList m_autoCompleteHints;
+    QStringList m_priorityAutoCompleteHints;
     QStringList m_spellingSuggestions;
     int m_currentElementCursorPosition = -1;
     bool m_wordUnderCursorIsMisspelled = false;

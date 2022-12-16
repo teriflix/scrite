@@ -1689,7 +1689,7 @@ Rectangle {
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
                     onActiveFocusChanged: {
                         if(activeFocus) {
-                            completionModel.allowEnable = true
+                            completionModel.actuallyEnable = true
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalScreenplayEditorToolbar.sceneEditor = contentItem
@@ -1848,7 +1848,7 @@ Rectangle {
                             // Enter, Tab and other keys must not trigger
                             // Transliteration. Only space should.
                             sceneTextEditor.userIsTyping = event.hasText
-                            completionModel.allowEnable = event.hasText
+                            completionModel.actuallyEnable = event.hasText
                             result.filter = event.controlModifier && (event.key === Qt.Key_Z || event.key === Qt.Key_Y)
                         } else if(event.key === Qt.Key_PageUp || event.key === Qt.Key_PageDown) {
                             if(event.key === Qt.Key_PageUp)
@@ -1903,22 +1903,24 @@ Rectangle {
 
                         CompletionModel {
                             id: completionModel
-                            property bool allowEnable: true
+                            property bool actuallyEnable: true
                             property string suggestion: currentCompletion
                             property bool hasSuggestion: count > 0
-                            enabled: allowEnable && sceneTextEditor.activeFocus
+                            enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus
                             strings: sceneDocumentBinder.autoCompleteHints
-                            sortStrings: false
+                            priorityStrings: contentItem.theScene.characterNames
+                            sortStrings: true
+                            acceptEnglishStringsOnly: false
                             completionPrefix: sceneDocumentBinder.completionPrefix
                             filterKeyStrokes: sceneTextEditor.activeFocus
+                            maxVisibleItems: -1
                             onRequestCompletion: {
                                 sceneTextEditor.acceptCompletionSuggestion()
                                 Announcement.shout("E69D2EA0-D26D-4C60-B551-FD3B45C5BE60", contentItem.theScene.id)
                             }
                             minimumCompletionPrefixLength: 0
-                            property bool hasItems: count > 0
-                            onHasItemsChanged: {
-                                if(hasItems)
+                            onHasSuggestionChanged: {
+                                if(hasSuggestion)
                                     completionViewPopup.open()
                                 else
                                     completionViewPopup.close()
@@ -1929,27 +1931,43 @@ Rectangle {
                             id: completionViewPopup
                             x: -Scrite.app.boundingRect(completionModel.completionPrefix, defaultFontMetrics.font).width
                             y: parent.height
-                            width: Scrite.app.largestBoundingRect(completionModel.strings, defaultFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
-                            height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
+                            width: Scrite.app.largestBoundingRect(completionModel.strings, defaultFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 30
+                            height: completionView.height + topInset + bottomInset + topPadding + bottomPadding
                             focus: false
                             closePolicy: Popup.NoAutoClose
                             contentItem: ListView {
                                 id: completionView
                                 model: completionModel
+                                clip: true
                                 FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
-                                interactive: false
+                                height: Math.min(contentHeight, 7*(defaultFontMetrics.lineSpacing+2*5))
+                                interactive: true
+                                ScrollBar.vertical: ScrollBar2 {
+                                    flickable: completionView
+                                }
                                 delegate: Text {
-                                    width: completionView.width-1
+                                    width: completionView.width-(completionView.contentHeight > completionView.height ? 20 : 1)
                                     text: string
                                     padding: 5
                                     font: defaultFontMetrics.font
                                     color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            if(completionModel.currentRow === index)
+                                                completionModel.requestCompletion( completionModel.currentCompletion )
+                                            else
+                                                completionModel.currentRow = index
+                                        }
+                                        onDoubleClicked: completionModel.requestCompletion( completionModel.currentCompletion )
+                                    }
                                 }
+                                highlightMoveDuration: 0
+                                highlightResizeDuration: 0
                                 highlight: Rectangle {
                                     color: primaryColors.highlight.background
                                 }
                                 currentIndex: completionModel.currentRow
-                                height: contentHeight
                             }
                         }
 
@@ -2145,7 +2163,7 @@ Rectangle {
                             insert(cursorPosition, suggestion)
                             userIsTyping = true
                             Transliterator.enableFromNextWord()
-                            completionModel.allowEnable = false
+                            completionModel.actuallyEnable = false
                             return true
                         }
                         return false

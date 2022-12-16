@@ -1340,7 +1340,7 @@ void SceneDocumentBlockUserData::polishTextLater()
 {
     if (m_binder->m_autoPolishParagraphs) {
         m_pendingTasks += PolishTextTask;
-        m_binder->m_sceneElementTaskTimer.start(250, m_binder);
+        m_binder->m_sceneElementTaskTimer.start(500, m_binder);
     }
 }
 
@@ -1348,7 +1348,7 @@ void SceneDocumentBlockUserData::autoCapitalizeLater()
 {
     if (m_binder->m_autoCapitalizeSentences) {
         m_pendingTasks += AutoCapitalizeTask;
-        m_binder->m_sceneElementTaskTimer.start(250, m_binder);
+        m_binder->m_sceneElementTaskTimer.start(500, m_binder);
     }
 }
 
@@ -1536,9 +1536,13 @@ int SceneDocumentBlockUserData::markedCursorPosiiton(bool removeMarker)
     if (cursor.isNull())
         return 0;
 
-    const int cp = cursor.position();
-    if (removeMarker)
-        cursor.deleteChar();
+    const int cp = cursor.hasSelection() ? cursor.selectionStart() : cursor.position();
+    if (removeMarker) {
+        if (cursor.hasSelection())
+            cursor.removeSelectedText();
+        else
+            cursor.deleteChar();
+    }
     return cp;
 }
 
@@ -2718,6 +2722,12 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
             }
         }
 
+        if (!m_binder->m_autoCompleteHints.isEmpty()) {
+            const QString blockText = m_block.text();
+            m_binder->setCompletionPrefix(
+                    m_cursorBlockPosition > 0 ? blockText.left(m_cursorBlockPosition) : blockText);
+        }
+
         emit m_binder->requestCursorPosition(m_block.position() + m_cursorBlockPosition);
 
         GarbageCollector::instance()->add(this);
@@ -2813,7 +2823,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
     m_tabHistory.clear();
 
     if (m_sceneElementTaskTimer.isActive())
-        m_sceneElementTaskTimer.start(250, this);
+        m_sceneElementTaskTimer.start(500, this);
 
     if (m_scene->elementCount() != this->document()->blockCount()) {
         /**
@@ -2907,6 +2917,12 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
     if (m_textDocument == nullptr || m_scene == nullptr)
         return;
 
+    // Ofcourse we are refreshing the scene because the document changed.
+    // But when we refresh the scene, the scene emits sceneRefreshed() signal
+    // which will cause SceneDocumentBinder::onSceneRefreshed() to be called,
+    // which is entirely unnecessary. We use this boolean to avoid that.
+    QScopedValueRollback<bool> rollback(m_sceneIsBeingRefreshed, true);
+
     if (nrBlocks < 0)
         nrBlocks = this->document()->blockCount();
 
@@ -2992,15 +3008,17 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
 void SceneDocumentBinder::evaluateAutoCompleteHints()
 {
     QStringList hints;
+    QStringList priorityHints;
 
     if (m_currentElement == nullptr) {
-        this->setAutoCompleteHints(hints);
+        this->setAutoCompleteHints(hints, priorityHints);
         return;
     }
 
     switch (m_currentElement->type()) {
     case SceneElement::Character:
         hints = m_characterNames;
+        priorityHints = m_scene->characterNames();
         break;
     case SceneElement::Transition:
         hints = m_transitions;
@@ -3013,7 +3031,7 @@ void SceneDocumentBinder::evaluateAutoCompleteHints()
     }
 
     this->setAutoCompleteHintsFor(m_currentElement->type());
-    this->setAutoCompleteHints(hints);
+    this->setAutoCompleteHints(hints, priorityHints);
 }
 
 void SceneDocumentBinder::setAutoCompleteHintsFor(SceneElement::Type val)
@@ -3025,13 +3043,18 @@ void SceneDocumentBinder::setAutoCompleteHintsFor(SceneElement::Type val)
     emit autoCompleteHintsForChanged();
 }
 
-void SceneDocumentBinder::setAutoCompleteHints(const QStringList &val)
+void SceneDocumentBinder::setAutoCompleteHints(const QStringList &hints,
+                                               const QStringList &priorityHints)
 {
-    if (m_autoCompleteHints == val)
+    if (m_autoCompleteHints == hints)
         return;
 
-    m_autoCompleteHints = val;
+    m_autoCompleteHints = hints;
+    m_priorityAutoCompleteHints = priorityHints;
     emit autoCompleteHintsChanged();
+
+    if (m_autoCompleteHints.isEmpty())
+        this->setCompletionPrefix(QString());
 }
 
 void SceneDocumentBinder::setCompletionPrefix(const QString &val)
@@ -3082,7 +3105,11 @@ void SceneDocumentBinder::onSceneReset(int position)
 
 void SceneDocumentBinder::onSceneRefreshed()
 {
-    QScopedValueRollback<bool> rollback(m_sceneIsBeingReset, true);
+    if (m_sceneIsBeingRefreshed)
+        return;
+
+    QScopedValueRollback<bool> rollback1(m_sceneIsBeingRefreshed, true);
+    QScopedValueRollback<bool> rollback2(m_sceneIsBeingReset, true);
 
     const int cp = m_cursorPosition;
     this->setCursorPosition(-1);
