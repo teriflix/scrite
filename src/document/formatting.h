@@ -705,6 +705,18 @@ public:
     QString completionPrefix() const { return m_completionPrefix; }
     Q_SIGNAL void completionPrefixChanged();
 
+    Q_PROPERTY(int completionPrefixStart READ completionPrefixStart NOTIFY completionPrefixChanged)
+    int completionPrefixStart() const { return m_completionPrefixStart; }
+
+    Q_PROPERTY(int completionPrefixEnd READ completionPrefixEnd NOTIFY completionPrefixChanged)
+    int completionPrefixEnd() const { return m_completionPrefixEnd; }
+
+    Q_PROPERTY(bool hasCompletionPrefixBoundary READ hasCompletionPrefixBoundary NOTIFY completionPrefixChanged)
+    bool hasCompletionPrefixBoundary() const
+    {
+        return m_completionPrefixStart >= 0 && m_completionPrefixEnd >= 0;
+    }
+
     Q_PROPERTY(QFont currentFont READ currentFont NOTIFY currentFontChanged)
     QFont currentFont() const;
     Q_SIGNAL void currentFontChanged();
@@ -753,11 +765,11 @@ private:
     void onContentsChange(int from, int charsRemoved, int charsAdded);
     void syncSceneFromDocument(int nrBlocks = -1);
 
-    void evaluateAutoCompleteHints();
+    void evaluateAutoCompleteHintsAndCompletionPrefix();
     void setAutoCompleteHintsFor(SceneElement::Type val);
     void setAutoCompleteHints(const QStringList &hints,
                               const QStringList &priorityHints = QStringList());
-    void setCompletionPrefix(const QString &val);
+    void setCompletionPrefix(const QString &prefix, int start = -1, int end = -1);
     void setSpellingSuggestions(const QStringList &val);
     void setWordUnderCursorIsMisspelled(bool val);
 
@@ -795,6 +807,8 @@ private:
     bool m_spellCheckEnabled = true;
     bool m_applyLanguageFonts = false;
     QString m_completionPrefix;
+    int m_completionPrefixEnd = -1;
+    int m_completionPrefixStart = -1;
     bool m_initializingDocument = false;
     QStringList m_shots;
     QStringList m_transitions;

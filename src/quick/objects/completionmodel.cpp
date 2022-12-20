@@ -278,31 +278,32 @@ void CompletionModel::prepareStrings()
                          return m_strings2.contains(item, Qt::CaseInsensitive);
                      });
 
-    if (m_sortStrings) {
-        auto findPriorityIndex = [=](const QString &item) -> int {
-            for (int i = 0; i < m_priorityStrings2.size(); i++) {
-                const QString pstring = m_priorityStrings2.at(i);
-                if (pstring.compare(item, Qt::CaseInsensitive) == 0)
-                    return i;
-            }
-            return -1;
-        };
+    auto findCaseInsensitiveIndex = [=](const QStringList &list, const QString &item) -> int {
+        for (int i = 0; i < list.size(); i++) {
+            const QString litem = list.at(i);
+            if (litem.compare(item, Qt::CaseInsensitive) == 0)
+                return i;
+        }
+        return -1;
+    };
 
-        std::sort(m_strings2.begin(), m_strings2.end(), [=](const QString &a, const QString &b) {
-            const int a_index = findPriorityIndex(a);
-            const int b_index = findPriorityIndex(b);
-            if (a_index >= 0 && b_index >= 0)
-                return a_index < b_index;
+    std::sort(m_strings2.begin(), m_strings2.end(), [=](const QString &a, const QString &b) {
+        const int a_index = findCaseInsensitiveIndex(m_priorityStrings2, a);
+        const int b_index = findCaseInsensitiveIndex(m_priorityStrings2, b);
+        if (a_index >= 0 && b_index >= 0)
+            return a_index < b_index;
 
-            if (a_index >= 0)
-                return true;
+        if (a_index >= 0)
+            return true;
 
-            if (b_index >= 0)
-                return false;
+        if (b_index >= 0)
+            return false;
 
+        if (m_sortStrings)
             return a.compare(b, Qt::CaseInsensitive) < 0;
-        });
-    }
+
+        return findCaseInsensitiveIndex(m_strings, a) < findCaseInsensitiveIndex(m_strings, b);
+    });
 
     this->filterStrings();
 }

@@ -1716,7 +1716,7 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
         this->QSyntaxHighlighter::setDocument(nullptr);
     this->setDocumentLoadCount(0);
 
-    this->evaluateAutoCompleteHints();
+    this->evaluateAutoCompleteHintsAndCompletionPrefix();
 
     emit textDocumentChanged();
 
@@ -1801,6 +1801,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
         return;
 
     QScopedValueRollback<bool> rollbackAcceptTextFormatChanges(m_acceptTextFormatChanges, false);
+    auto cleanup = qScopeGuard([=]() { this->evaluateAutoCompleteHintsAndCompletionPrefix(); });
 
     if (m_textDocument == nullptr || this->document() == nullptr) {
         m_cursorPosition = -1;
@@ -1855,9 +1856,6 @@ void SceneDocumentBinder::setCursorPosition(int val)
                  __LINE__, val);
     } else {
         this->setCurrentElement(userData->sceneElement());
-        if (!m_autoCompleteHints.isEmpty())
-            this->setCompletionPrefix(block.text());
-
         this->setWordUnderCursorIsMisspelled(cursor.isMisspelled());
         this->setSpellingSuggestions(cursor.suggestions());
 
@@ -2500,7 +2498,7 @@ void SceneDocumentBinder::resetTextDocument()
     m_textDocument = nullptr;
     this->QSyntaxHighlighter::setDocument(nullptr);
     this->setDocumentLoadCount(0);
-    this->evaluateAutoCompleteHints();
+    this->evaluateAutoCompleteHintsAndCompletionPrefix();
     emit textDocumentChanged();
     this->setCursorPosition(-1);
 }
@@ -2645,7 +2643,6 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
     emit currentElementChanged();
 
     m_tabHistory.clear();
-    this->evaluateAutoCompleteHints();
     this->polishAllSceneElements();
 
     emit currentFontChanged();
@@ -2657,7 +2654,7 @@ void SceneDocumentBinder::resetCurrentElement()
     emit currentElementChanged();
 
     m_tabHistory.clear();
-    this->evaluateAutoCompleteHints();
+    this->evaluateAutoCompleteHintsAndCompletionPrefix();
 
     emit currentFontChanged();
 }
@@ -2722,11 +2719,8 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
             }
         }
 
-        if (!m_binder->m_autoCompleteHints.isEmpty()) {
-            const QString blockText = m_block.text();
-            m_binder->setCompletionPrefix(
-                    m_cursorBlockPosition > 0 ? blockText.left(m_cursorBlockPosition) : blockText);
-        }
+        if (!m_binder->m_autoCompleteHints.isEmpty())
+            m_binder->evaluateAutoCompleteHintsAndCompletionPrefix();
 
         emit m_binder->requestCursorPosition(m_block.position() + m_cursorBlockPosition);
 
@@ -2756,7 +2750,7 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
             format->activateDefaultLanguage();
     }
 
-    this->evaluateAutoCompleteHints();
+    this->evaluateAutoCompleteHintsAndCompletionPrefix();
 
     auto updateBlock = [=](const QTextBlock &block) {
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
@@ -3005,33 +2999,115 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
         this->polishAllSceneElements();
 }
 
-void SceneDocumentBinder::evaluateAutoCompleteHints()
+void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
 {
     QStringList hints;
     QStringList priorityHints;
+    QString completionPrefix;
+    int completionStart = -1;
+    int completionEnd = -1;
 
-    if (m_currentElement == nullptr) {
+    if (m_currentElement == nullptr || m_cursorPosition < 0) {
         this->setAutoCompleteHints(hints, priorityHints);
+        this->setCompletionPrefix(completionPrefix, completionStart, completionEnd);
         return;
     }
 
+    QTextCursor cursor(m_textDocument->textDocument());
+    cursor.setPosition(m_cursorPosition);
+
+    const QTextBlock block = cursor.block();
+    completionStart = block.position();
+    completionEnd = m_cursorPosition;
+
     switch (m_currentElement->type()) {
-    case SceneElement::Character:
-        hints = m_characterNames;
-        priorityHints = m_scene->characterNames();
-        break;
+    case SceneElement::Character: {
+        const QString bracketOpen = QLatin1String(" (");
+        const QString blockText = block.text();
+        if (blockText != bracketOpen && blockText.contains(bracketOpen)) {
+            const QTextCursor bracketCursor =
+                    m_textDocument->textDocument()->find(bracketOpen, block.position());
+            if (m_cursorPosition > bracketCursor.selectionStart()) {
+                /*
+                There are several common notations that can be used in brackets after a character's
+                name in a screenplay. Here are a few examples:
+
+                - (V.O.) - This stands for "voiceover" and indicates that the character's dialogue
+                is being heard on the soundtrack, but they are not physically present in the scene.
+                - (O.S.) - This stands for "off-screen" and indicates that the character is speaking
+                from outside the frame or from a location that is not visible to the audience.
+                - (O.C.) - This stands for "off-camera" and indicates that the character is speaking
+                from a location that is not within the frame of the camera, but they are physically
+                present in the scene.
+                - (CONT'D) - This indicates that the character's dialogue continues from the
+                previous page or shot.
+                - (PHONE) - This indicates that the character is speaking on the phone.
+                - (INTO PHONE) - This indicates that the character is speaking into a phone or other
+                communication device.
+                - (FILTERED) - This indicates that the character's voice is being filtered or
+                altered in some way.
+                - (SUBTITLED) - This indicates that the character's dialogue is being presented as
+                subtitles on the screen.
+                - (THROUGH TRANSLATOR) - This indicates that the character is speaking through a
+                translator or interpreter.
+                - (OVER RADIO) - This indicates that the character is speaking over a radio or other
+                communication device.
+                - (ON TV) - This indicates that the character is speaking on a television or other
+                video device.
+                - (ON COMPUTER) - This indicates that the character is speaking through a computer
+                or other electronic device.
+                - (ON SPEAKERPHONE) - This indicates that the character is speaking on a
+                speakerphone or other device that allows multiple people to hear the conversation.
+                - (OVER INTERCOM) - This indicates that the character is speaking over an intercom
+                or other public address system.
+
+                In Scrite, CONT'D is automatically generated, so we don't really have to list it.
+                But we will list it anyway because users will flapg it as a bug.
+                 */
+                static QStringList commonBracketNotations(
+                        { QLatin1String("V.O."), QLatin1String("O.S."), QLatin1String("O.C."),
+                          QLatin1String("CONT'D"), QLatin1String("PHONE"),
+                          QLatin1String("INTO PHONE"), QLatin1String("FILTERED"),
+                          QLatin1String("SUBTITLED"), QLatin1String("THROUGH TRANSLATOR"),
+                          QLatin1String("OVER RADIO"), QLatin1String("ON TV"),
+                          QLatin1String("ON COMPUTER"), QLatin1String("ON SPEAKERPHONE"),
+                          QLatin1String("OVER INTERCOM") });
+                hints = commonBracketNotations;
+                priorityHints = commonBracketNotations;
+                completionStart = bracketCursor.position();
+
+                cursor.setPosition(bracketCursor.position());
+                cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
+                completionPrefix = cursor.selectedText().simplified();
+            } else {
+                cursor.setPosition(block.position());
+                cursor.setPosition(m_cursorPosition, QTextCursor::KeepAnchor);
+                hints = m_characterNames;
+                priorityHints = m_scene->characterNames();
+                completionPrefix = cursor.selectedText().trimmed();
+                completionStart = block.position();
+                completionEnd = bracketCursor.selectionStart();
+            }
+        } else {
+            hints = m_characterNames;
+            priorityHints = m_scene->characterNames();
+            completionPrefix = blockText;
+        }
+    } break;
     case SceneElement::Transition:
         hints = m_transitions;
+        completionPrefix = block.text();
         break;
     case SceneElement::Shot:
         hints = m_shots;
+        completionPrefix = block.text();
         break;
     default:
         break;
     }
 
-    this->setAutoCompleteHintsFor(m_currentElement->type());
     this->setAutoCompleteHints(hints, priorityHints);
+    this->setCompletionPrefix(completionPrefix, completionStart, completionEnd);
 }
 
 void SceneDocumentBinder::setAutoCompleteHintsFor(SceneElement::Type val)
@@ -3046,23 +3122,25 @@ void SceneDocumentBinder::setAutoCompleteHintsFor(SceneElement::Type val)
 void SceneDocumentBinder::setAutoCompleteHints(const QStringList &hints,
                                                const QStringList &priorityHints)
 {
-    if (m_autoCompleteHints == hints)
+    if (m_autoCompleteHints == hints && m_priorityAutoCompleteHints == priorityHints)
         return;
 
     m_autoCompleteHints = hints;
-    m_priorityAutoCompleteHints = priorityHints;
+    m_priorityAutoCompleteHints = hints.isEmpty() ? QStringList() : priorityHints;
     emit autoCompleteHintsChanged();
 
     if (m_autoCompleteHints.isEmpty())
         this->setCompletionPrefix(QString());
 }
 
-void SceneDocumentBinder::setCompletionPrefix(const QString &val)
+void SceneDocumentBinder::setCompletionPrefix(const QString &prefix, int start, int end)
 {
-    if (m_completionPrefix == val)
+    if (m_completionPrefix == prefix)
         return;
 
-    m_completionPrefix = val;
+    m_completionPrefix = prefix;
+    m_completionPrefixStart = start;
+    m_completionPrefixEnd = end;
     emit completionPrefixChanged();
 }
 

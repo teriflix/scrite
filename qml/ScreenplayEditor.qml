@@ -1909,7 +1909,7 @@ Rectangle {
                             enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus
                             strings: sceneDocumentBinder.autoCompleteHints
                             priorityStrings: contentItem.theScene.characterNames
-                            sortStrings: true
+                            sortStrings: false
                             acceptEnglishStringsOnly: false
                             completionPrefix: sceneDocumentBinder.completionPrefix
                             filterKeyStrokes: sceneTextEditor.activeFocus
@@ -2159,7 +2159,10 @@ Rectangle {
                         if(completionModel.suggestion !== "") {
                             var suggestion = completionModel.suggestion
                             userIsTyping = false
-                            remove(sceneDocumentBinder.currentBlockPosition(), cursorPosition)
+                            if(sceneDocumentBinder.hasCompletionPrefixBoundary)
+                                remove(sceneDocumentBinder.completionPrefixStart, sceneDocumentBinder.completionPrefixEnd)
+                            else
+                                remove(sceneDocumentBinder.currentBlockPosition(), cursorPosition)
                             insert(cursorPosition, suggestion)
                             userIsTyping = true
                             Transliterator.enableFromNextWord()
