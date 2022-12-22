@@ -221,56 +221,47 @@ Item {
                         text: "Screenplay Editor"
                     }
 
-                    Row {
+                    Column {
                         id: screenplayEditorSettingsLayout
-                        width: parent.width
+                        width: parent.width-20
                         anchors.centerIn: parent
+                        readonly property int _padding: 4
 
-                        Column {
-                            CheckBox2 {
-                                checked: screenplayEditorSettings.enableSpellCheck
-                                text: "Spell Check"
-                                onToggled: screenplayEditorSettings.enableSpellCheck = checked
-                            }
-
-                            CheckBox2 {
-                                checked: screenplayEditorSettings.displayRuler
-                                text: "Ruler"
-                                onToggled: screenplayEditorSettings.displayRuler = checked
-                            }
-
-                            CheckBox2 {
-                                checked: screenplayEditorSettings.spaceBetweenScenes > 0
-                                text: "Scene Blocks"
-                                onToggled: screenplayEditorSettings.spaceBetweenScenes = checked ? 40 : 0
-                            }
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.enableSpellCheck
+                            text: "Spell Check"
+                            onToggled: screenplayEditorSettings.enableSpellCheck = checked
+                            padding: parent._padding
                         }
 
-                        Column {
-                            CheckBox2 {
-                                checked: screenplayEditorSettings.enableAutoCapitalizeSentences
-                                text: "Capitalize Sentences"
-                                ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
-                                ToolTip.visible: hovered
-                                hoverEnabled: true
-                                onToggled: screenplayEditorSettings.enableAutoCapitalizeSentences = checked
-                            }
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.singleClickAutoComplete
+                            text: "Auto Complete on Single Click"
+                            onToggled: screenplayEditorSettings.singleClickAutoComplete = checked
+                            padding: parent._padding
+                            ToolTip.text: "If checked, single click on an option in auto-complete popup will apply it in the screenplay editor."
+                            ToolTip.visible: hovered
+                        }
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.enableAutoCapitalizeSentences
+                            text: "Capitalize Sentences"
+                            ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
+                            ToolTip.visible: hovered
+                            hoverEnabled: true
+                            onToggled: screenplayEditorSettings.enableAutoCapitalizeSentences = checked
+                            padding: parent._padding
+                        }
 
 
-                            CheckBox2 {
-                                checked: screenplayEditorSettings.enableAutoPolishParagraphs
-                                text: "Add/Remove CONT'D"
-                                ToolTip.text: "If checked, CONT'D will be automatically added/removed appropriately."
-                                ToolTip.visible: hovered
-                                hoverEnabled: true
-                                onToggled: screenplayEditorSettings.enableAutoPolishParagraphs = checked
-                            }
-
-                            CheckBox2 {
-                                checked: screenplayEditorSettings.showLoglineEditor
-                                text: "Logline Editor"
-                                onToggled: screenplayEditorSettings.showLoglineEditor = checked
-                            }
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.enableAutoPolishParagraphs
+                            text: "Add/Remove CONT'D"
+                            ToolTip.text: "If checked, CONT'D will be automatically added/removed appropriately."
+                            ToolTip.visible: hovered
+                            hoverEnabled: true
+                            onToggled: screenplayEditorSettings.enableAutoPolishParagraphs = checked
+                            padding: parent._padding
                         }
                     }
                 }

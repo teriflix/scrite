@@ -135,6 +135,13 @@ Row {
                 }
 
                 MenuItem2 {
+                    text: "Show Ruler"
+                    property bool sceneBlocksVisible: screenplayEditorSettings.spaceBetweenScenes > 0
+                    icon.source: screenplayEditorSettings.displayRuler ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: screenplayEditorSettings.displayRuler = !screenplayEditorSettings.displayRuler
+                }
+
+                MenuItem2 {
                     text: "Show Scene Blocks"
                     property bool sceneBlocksVisible: screenplayEditorSettings.spaceBetweenScenes > 0
                     icon.source: sceneBlocksVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"

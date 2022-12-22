@@ -24,6 +24,7 @@ TextField {
     property alias maxCompletionItems: completionModel.maxVisibleItems
     property int maxVisibleItems: maxCompletionItems
     property int minimumCompletionPrefixLength: 1
+    property bool singleClickAutoComplete: true
     signal requestCompletion(string string)
 
     property Item tabItem
@@ -192,10 +193,16 @@ TextField {
                 MouseArea {
                     id: textMouseArea
                     anchors.fill: parent
-                    hoverEnabled: true
-                    onContainsMouseChanged: completionModel.currentRow = index
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: completionModel.requestCompletion(parent.text)
+                    hoverEnabled: singleClickAutoComplete
+                    onContainsMouseChanged: if(singleClickAutoComplete) completionModel.currentRow = index
+                    cursorShape: singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
+                    onClicked: {
+                        if(singleClickAutoComplete || completionModel.currentRow === index)
+                            completionModel.requestCompletion(parent.text)
+                        else
+                            completionModel.currentRow = index
+                    }
+                    onDoubleClicked: completionModel.requestCompletion(parent.text)
                 }
             }
             highlight: Rectangle {

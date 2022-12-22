@@ -534,24 +534,25 @@ bool SceneElement::polishText(Scene *previousScene)
             polishedText += colon;
     }
 
+    const QString openB = QLatin1String("(");
+    const QString closeB = QLatin1String(")");
+
     if (m_type == SceneElement::Character) {
         polishedText = polishedText.simplified().toUpper();
 
-        const QString loneOpenB = QLatin1String("(");
         const QString contd = QLatin1String("CONT'D");
-        const QString openB = QLatin1String(" (");
-        const QString closeB = QLatin1String(")");
-        const int loneOpenBIndex = polishedText.indexOf(loneOpenB);
+        const QString openB2 = QLatin1String(" (");
+        const int openBIndex = polishedText.indexOf(openB);
 
         // There should be a space before (
-        if (loneOpenBIndex > 0) {
-            const QChar ch = polishedText.at(loneOpenBIndex - 1);
+        if (openBIndex > 0) {
+            const QChar ch = polishedText.at(openBIndex - 1);
             if (ch.category() != QChar::Separator_Space)
-                polishedText = polishedText.insert(loneOpenBIndex, QChar(' '));
+                polishedText = polishedText.insert(openBIndex, QChar(' '));
         }
 
         // If there is ( then there must be a )
-        if (loneOpenBIndex >= 0) {
+        if (openBIndex >= 0) {
             if (!polishedText.endsWith(closeB))
                 polishedText += closeB;
         }
@@ -593,7 +594,7 @@ bool SceneElement::polishText(Scene *previousScene)
             if (suffix.isEmpty() || suffix == comma)
                 polishedText = myCharacterName;
             else
-                polishedText = myCharacterName + openB + suffix + closeB;
+                polishedText = myCharacterName + openB2 + suffix + closeB;
         };
 
         if (prevCharElement != nullptr) {
@@ -602,13 +603,24 @@ bool SceneElement::polishText(Scene *previousScene)
                 // Include CONT'D if not already done.
                 QString suffix = polishedText.section('(', 1, -1).trimmed();
                 if (suffix.isEmpty())
-                    polishedText += openB + contd + closeB;
+                    polishedText += openB2 + contd + closeB;
             } else {
                 // Remove CONT'D if its there.
                 removeContd();
             }
         } else
             removeContd();
+    }
+
+    if (m_type == SceneElement::Parenthetical) {
+        // Parentheticals must have brackets on either end.
+        polishedText = polishedText.trimmed();
+
+        if (!polishedText.startsWith(openB))
+            polishedText.prepend(openB);
+
+        if (!polishedText.endsWith(closeB))
+            polishedText += closeB;
     }
 
     QScopedValueRollback<UndoStack *> undoStackRollback(PushSceneUndoCommand::allowedStack,

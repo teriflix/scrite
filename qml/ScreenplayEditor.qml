@@ -1952,9 +1952,13 @@ Rectangle {
                                     font: defaultFontMetrics.font
                                     color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
                                     MouseArea {
+                                        property bool singleClickAutoComplete: screenplayEditorSettings.singleClickAutoComplete
                                         anchors.fill: parent
+                                        hoverEnabled: singleClickAutoComplete
+                                        onContainsMouseChanged: if(singleClickAutoComplete) completionModel.currentRow = index
+                                        cursorShape: singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
                                         onClicked: {
-                                            if(completionModel.currentRow === index)
+                                            if(singleClickAutoComplete || completionModel.currentRow === index)
                                                 completionModel.requestCompletion( completionModel.currentCompletion )
                                             else
                                                 completionModel.currentRow = index
@@ -2732,6 +2736,7 @@ Rectangle {
                             property bool editingLocationTypePart: dotPosition < 0 || cursorPosition < dotPosition
                             property bool editingMomentPart: dashPosition > 0 && cursorPosition >= dashPosition
                             property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
+                            singleClickAutoComplete: screenplayEditorSettings.singleClickAutoComplete
                             completionStrings: {
                                 if(editingLocationPart)
                                     return Scrite.document.structure.allLocations()
