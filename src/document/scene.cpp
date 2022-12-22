@@ -535,8 +535,29 @@ bool SceneElement::polishText(Scene *previousScene)
     }
 
     if (m_type == SceneElement::Character) {
-        polishedText = polishedText.trimmed().toUpper();
+        polishedText = polishedText.simplified().toUpper();
 
+        const QString loneOpenB = QLatin1String("(");
+        const QString contd = QLatin1String("CONT'D");
+        const QString openB = QLatin1String(" (");
+        const QString closeB = QLatin1String(")");
+        const int loneOpenBIndex = polishedText.indexOf(loneOpenB);
+
+        // There should be a space before (
+        if (loneOpenBIndex > 0) {
+            const QChar ch = polishedText.at(loneOpenBIndex - 1);
+            if (ch.category() != QChar::Separator_Space)
+                polishedText = polishedText.insert(loneOpenBIndex, QChar(' '));
+        }
+
+        // If there is ( then there must be a )
+        if (loneOpenBIndex >= 0) {
+            if (!polishedText.endsWith(closeB))
+                polishedText += closeB;
+        }
+
+        // If previous character name is same as current one then add CONT'D
+        // Otherwise, remove CONT'D if present.
         const SceneElement *prevCharElement = [&]() -> SceneElement * {
             const int myIndex = m_scene->indexOfElement(this);
             for (int i = myIndex - 1; i >= 0; i--) {
@@ -557,9 +578,6 @@ bool SceneElement::polishText(Scene *previousScene)
         }();
 
         const QString myCharacterName = polishedText.section('(', 0, 0).trimmed();
-        const QString contd = QLatin1String("CONT'D");
-        const QString openB = QLatin1String(" (");
-        const QString closeB = QLatin1String(")");
 
         auto removeContd = [&]() {
             const QString comma = QLatin1String(",");
