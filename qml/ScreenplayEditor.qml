@@ -410,7 +410,7 @@ Rectangle {
                                 maxWordCount: 50
                                 maxLetterCount: 240
                                 text: logLineField.text
-                                onLimitedTextChanged: Scrite.document.screenplay.logline = text
+                                countMode: TextLimiter.CountInText
                             }
 
                             Column {
@@ -421,12 +421,12 @@ Rectangle {
 
                                 Text {
                                     id: logLineFieldHeading
-                                    text: "Logline: (" + loglineLimiter.wordCount + "/" + loglineLimiter.maxWordCount + " words, " +
+                                    text: "Logline: (" + (loglineLimiter.limitReached ? "WARNING: " : "") + loglineLimiter.wordCount + "/" + loglineLimiter.maxWordCount + " words, " +
                                           loglineLimiter.letterCount + "/" + loglineLimiter.maxLetterCount + " letters)"
                                     font.family: screenplayFormat.defaultFont2.family
                                     font.pointSize: screenplayFormat.defaultFont2.pointSize-2
                                     visible: logLineField.length > 0
-                                    color: primaryColors.a700.background
+                                    color: loglineLimiter.limitReached ? Qt.lighter("red") : primaryColors.a700.background
                                 }
 
                                 TextArea {
@@ -438,6 +438,7 @@ Rectangle {
                                     selectByMouse: true
                                     selectByKeyboard: true
                                     text: Scrite.document.screenplay.logline
+                                    onTextChanged: Scrite.document.screenplay.logline = text
                                     Transliterator.textDocument: textDocument
                                     Transliterator.cursorPosition: cursorPosition
                                     Transliterator.hasActiveFocus: activeFocus

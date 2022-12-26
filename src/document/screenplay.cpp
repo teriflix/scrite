@@ -502,11 +502,7 @@ void Screenplay::setSubtitle(const QString &val)
 
 void Screenplay::setLogline(const QString &val)
 {
-    QString polishedVal;
-    int wordCount = 0, letterCount = 0;
-    Screenplay::polishLogline(val, polishedVal, wordCount, letterCount);
-
-    if (m_logline == polishedVal)
+    if (m_logline == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "logline");
@@ -514,7 +510,7 @@ void Screenplay::setLogline(const QString &val)
     if (!info->isLocked())
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
-    m_logline = polishedVal;
+    m_logline = val;
     emit loglineChanged();
 }
 
@@ -2236,19 +2232,6 @@ bool Screenplay::getPasteDataFromClipboard(QJsonObject &clipboardJson) const
     return true;
 }
 
-void Screenplay::polishLogline(const QString &givenLogline, QString &polishedLogline,
-                               int &polishedWordCount, int &polishedLetterCount)
-{
-    TextLimiter textLimiter;
-    textLimiter.setMaxWordCount(50);
-    textLimiter.setMaxLetterCount(240);
-    textLimiter.setText(givenLogline);
-
-    polishedLogline = textLimiter.limitedText();
-    polishedWordCount = textLimiter.wordCount();
-    polishedLetterCount = textLimiter.letterCount();
-}
-
 void Screenplay::setCurrentElementIndex(int val)
 {
     val = qBound(-1, val, m_elements.size() - 1);
@@ -2636,27 +2619,6 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
     }
 
     this->evaluateWordCountLater();
-
-    /**
-     * Starting with 0.9.2i, logline can only be 50 words or 240 characters, whichever
-     * is less. If older files have a longer logline, then we will have to split them
-     * into logline and loglineComments.
-     */
-    if (!m_logline.isEmpty()) {
-        QString polishedLogline;
-        int polishedWordCount = 0, polishedLetterCount = 0;
-        Screenplay::polishLogline(m_logline, polishedLogline, polishedWordCount,
-                                  polishedLetterCount);
-        if (m_logline != polishedLogline) {
-            const QString loglineComments = QLatin1String("Old (long) logline: ") + m_logline
-                    + QLatin1String("\n\n") + m_loglineComments;
-
-            m_logline = polishedLogline;
-            emit loglineChanged();
-
-            this->setLoglineComments(loglineComments);
-        }
-    }
 }
 
 bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const

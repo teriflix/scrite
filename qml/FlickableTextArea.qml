@@ -37,6 +37,8 @@ Flickable {
     property int tabSequenceIndex: 0
     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
+    signal editingFinished()
+
     id: textAreaFlickable
     clip: true
     contentWidth: __textArea.width
@@ -95,6 +97,7 @@ Flickable {
                 return
             textAreaFlickable.contentY = cy
         }
+        onEditingFinished: textAreaFlickable.editingFinished()
         TabSequenceItem.manager: tabSequenceManager
         TabSequenceItem.sequence: tabSequenceIndex
     }

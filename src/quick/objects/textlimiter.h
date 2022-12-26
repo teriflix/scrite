@@ -49,6 +49,14 @@ public:
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged();
 
+    enum CountMode { CountInText, CountInLimitedText };
+    Q_ENUM(CountMode)
+
+    Q_PROPERTY(CountMode countMode READ countMode WRITE setCountMode NOTIFY countModeChanged)
+    void setCountMode(CountMode val);
+    CountMode countMode() const { return m_countMode; }
+    Q_SIGNAL void countModeChanged();
+
     Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
@@ -78,6 +86,7 @@ private:
     int m_wordCount = 0;
     int m_letterCount = 0;
     bool m_limitReached = false;
+    CountMode m_countMode = CountInLimitedText;
 
     Mode m_mode = LowerOfWordAndLetterCount;
     int m_maxWordCount = 0;

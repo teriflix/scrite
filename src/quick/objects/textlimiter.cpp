@@ -20,6 +20,7 @@ TextLimiter::TextLimiter(QObject *parent) : QObject { parent }
     connect(this, &TextLimiter::maxWordCountChanged, this, &TextLimiter::limitText);
     connect(this, &TextLimiter::maxLetterCountChanged, this, &TextLimiter::limitText);
     connect(this, &TextLimiter::textChanged, this, &TextLimiter::limitText);
+    connect(this, &TextLimiter::countModeChanged, this, &TextLimiter::limitText);
 }
 
 TextLimiter::~TextLimiter() { }
@@ -58,6 +59,15 @@ void TextLimiter::setText(const QString &val)
 
     m_text = val;
     emit textChanged();
+}
+
+void TextLimiter::setCountMode(CountMode val)
+{
+    if (m_countMode == val)
+        return;
+
+    m_countMode = val;
+    emit countModeChanged();
 }
 
 void TextLimiter::setWordCount(int val)
@@ -144,11 +154,13 @@ void TextLimiter::limitText()
         ltext = ltext.left(
                 finishingIndexOfBoundary(QTextBoundaryFinder::Grapheme, ltext, m_maxLetterCount));
 
-    const int wcount = boundaryCount(QTextBoundaryFinder::Word, ltext);
-    const int lcount = boundaryCount(QTextBoundaryFinder::Grapheme, ltext);
+    const int wcount = boundaryCount(QTextBoundaryFinder::Word,
+                                     m_countMode == CountInLimitedText ? ltext : simplifiedText);
+    const int lcount = boundaryCount(QTextBoundaryFinder::Grapheme,
+                                     m_countMode == CountInLimitedText ? ltext : simplifiedText);
 
     this->setLimitedText(ltext);
     this->setWordCount(wcount);
     this->setLetterCount(lcount);
-    this->setLimitReached(simplifiedText != m_text);
+    this->setLimitReached(simplifiedText != ltext);
 }

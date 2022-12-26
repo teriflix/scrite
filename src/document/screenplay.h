@@ -528,8 +528,6 @@ protected:
     void evaluateWordCount();
     void evaluateWordCountLater();
     bool getPasteDataFromClipboard(QJsonObject &clipboardJson) const;
-    static void polishLogline(const QString &givenLogline, QString &polishedLogline,
-                              int &polishedWordCount, int &polishedLetterCount);
 
 private:
     QString m_title;
