@@ -15,8 +15,9 @@
 #include "timeprofiler.h"
 #include "application.h"
 
-#include <QGuiApplication>
 #include <QKeyEvent>
+#include <QtConcurrentRun>
+#include <QGuiApplication>
 
 static bool isEnglishString(const QString &item)
 {
@@ -269,81 +270,32 @@ void CompletionModel::filterStrings()
         this->setCurrentRow(0);
 }
 
-class CaseInsensitiveFinder
-{
-public:
-    CaseInsensitiveFinder(const QStringList &list) : m_list(list) { }
-    ~CaseInsensitiveFinder() { }
-
-    int indexOf(const QString &item) const
-    {
-        if (m_list.isEmpty() || item.isEmpty())
-            return -1;
-
-        if (m_indexMap.isEmpty()) {
-            int index = 0;
-            for (const QString &litem : qAsConst(m_list))
-                m_indexMap[litem.toUpper()] = index++;
-        }
-
-        return m_indexMap.value(item.toUpper(), -1);
-    }
-
-private:
-    QStringList m_list;
-    mutable QHash<QString, int> m_indexMap;
-};
-
 void CompletionModel::prepareStrings()
 {
     m_strings2.clear();
+    m_priorityStrings2.clear();
 
-    if (m_acceptEnglishStringsOnly) {
-        if (!m_strings.isEmpty()) {
-            std::copy_if(m_strings.begin(), m_strings.end(), std::back_inserter(m_strings2),
-                         isEnglishString);
-        }
-    } else
+    if (m_acceptEnglishStringsOnly)
+        std::copy_if(m_strings.begin(), m_strings.end(), std::back_inserter(m_strings2),
+                     isEnglishString);
+    else
         m_strings2 = m_strings;
+    m_strings2.removeDuplicates();
 
-    if (!m_priorityStrings.isEmpty())
-        std::copy_if(m_priorityStrings.begin(), m_priorityStrings.end(),
-                     std::back_inserter(m_priorityStrings2), [=](const QString &item) {
-                         return m_strings2.contains(item, Qt::CaseInsensitive);
-                     });
+    std::copy_if(m_priorityStrings.begin(), m_priorityStrings.end(),
+                 std::back_inserter(m_priorityStrings2), [=](const QString &item) {
+                     return m_strings2.contains(item, Qt::CaseInsensitive);
+                 });
+    m_priorityStrings2.removeDuplicates();
 
-    CaseInsensitiveFinder priorityStrings2Finder(m_priorityStrings2);
-    CaseInsensitiveFinder strings2Finder(m_strings2);
+    if (m_sortStrings)
+        std::sort(m_strings2.begin(), m_strings2.end());
 
-    std::sort(m_strings2.begin(), m_strings2.end(), [=](const QString &a, const QString &b) {
-        const int a_index = m_priorityStrings2.isEmpty()
-                ? -1
-                : (m_sortMode == CaseInsensitiveSort ? priorityStrings2Finder.indexOf(a)
-                                                     : m_priorityStrings2.indexOf(a));
-        const int b_index = m_priorityStrings2.isEmpty()
-                ? -1
-                : (m_sortMode == CaseInsensitiveSort ? priorityStrings2Finder.indexOf(b)
-                                                     : m_priorityStrings2.indexOf(b));
-        if (a_index >= 0 && b_index >= 0)
-            return a_index < b_index;
-
-        if (a_index >= 0)
-            return true;
-
-        if (b_index >= 0)
-            return false;
-
-        if (m_sortStrings)
-            return a.compare(b,
-                             m_sortMode == CaseInsensitiveSort ? Qt::CaseInsensitive
-                                                               : Qt::CaseSensitive)
-                    < 0;
-
-        if (m_sortMode == CaseInsensitiveSort)
-            return strings2Finder.indexOf(a) < strings2Finder.indexOf(b);
-
-        return m_strings2.indexOf(a) < m_strings2.indexOf(b);
-    });
+    for (int i = m_priorityStrings2.size() - 1; i >= 0; i--) {
+        const QString priorityString2 = m_priorityStrings2.at(i);
+        m_strings2.removeOne(priorityString2);
+        m_strings2.prepend(priorityString2);
+    }
 
     this->filterStrings();
 }
