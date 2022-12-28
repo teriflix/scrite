@@ -430,8 +430,8 @@ Rectangle {
 
                                 Text {
                                     id: logLineFieldHeading
-                                    text: "Logline: (" + (loglineLimiter.limitReached ? "WARNING: " : "") + loglineLimiter.wordCount + "/" + loglineLimiter.maxWordCount + " words, " +
-                                          loglineLimiter.letterCount + "/" + loglineLimiter.maxLetterCount + " letters)"
+                                    text: logLineField.activeFocus ? ("Logline: (" + (loglineLimiter.limitReached ? "WARNING: " : "") + loglineLimiter.wordCount + "/" + loglineLimiter.maxWordCount + " words, " +
+                                          loglineLimiter.letterCount + "/" + loglineLimiter.maxLetterCount + " letters)") : "Logline: "
                                     font.family: screenplayFormat.defaultFont2.family
                                     font.pointSize: screenplayFormat.defaultFont2.pointSize-2
                                     visible: logLineField.length > 0
@@ -453,7 +453,7 @@ Rectangle {
                                     Transliterator.hasActiveFocus: activeFocus
                                     Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                    placeholderText: "Type your logline here, max " + loglineLimiter.maxWordCount + " words ..."
+                                    placeholderText: "Type your logline here, max " + loglineLimiter.maxWordCount + " words or " + loglineLimiter.maxLetterCount + " letters."
                                 }
                             }
                         }

@@ -1909,7 +1909,9 @@ Rectangle {
                                 id: loglineFieldArea
                                 text: Scrite.document.screenplay.logline
                                 onTextChanged: Scrite.document.screenplay.logline = text
-                                placeholderText: "Type the logline here ..."
+                                placeholderText: "Type your logline here."
+                                font.family: Scrite.document.displayFormat.defaultFont2.family
+                                font.pointSize: Scrite.app.idealFontPointSize + 2
                                 width: parent.width
                                 height: Math.max(idealAppFontMetrics.lineSpacing*10, contentHeight+10)
                                 readOnly: Scrite.document.readOnly
