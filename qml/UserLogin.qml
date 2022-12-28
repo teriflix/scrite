@@ -558,6 +558,7 @@ Item {
                             TabSequenceItem.sequence: 2
                             maximumLength: 128
                             onTextEdited: allowHighlightSaveAnimation = true
+                            completionAcceptsEnglishStringsOnly: false
                             completionStrings: Scrite.user.locations
                             minimumCompletionPrefixLength: 0
                             onReturnPressed: if(needsSaving) saveRefreshLink.click()

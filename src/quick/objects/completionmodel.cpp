@@ -81,6 +81,15 @@ void CompletionModel::setSortStrings(bool val)
     this->prepareStrings();
 }
 
+void CompletionModel::setSortMode(SortMode val)
+{
+    if (m_sortMode == val)
+        return;
+
+    m_sortMode = val;
+    emit sortModeChanged();
+}
+
 void CompletionModel::setMaxVisibleItems(int val)
 {
     if (m_maxVisibleItems == val)
@@ -260,6 +269,31 @@ void CompletionModel::filterStrings()
         this->setCurrentRow(0);
 }
 
+class CaseInsensitiveFinder
+{
+public:
+    CaseInsensitiveFinder(const QStringList &list) : m_list(list) { }
+    ~CaseInsensitiveFinder() { }
+
+    int indexOf(const QString &item) const
+    {
+        if (m_list.isEmpty() || item.isEmpty())
+            return -1;
+
+        if (m_indexMap.isEmpty()) {
+            int index = 0;
+            for (const QString &litem : qAsConst(m_list))
+                m_indexMap[litem.toUpper()] = index++;
+        }
+
+        return m_indexMap.value(item.toUpper(), -1);
+    }
+
+private:
+    QStringList m_list;
+    mutable QHash<QString, int> m_indexMap;
+};
+
 void CompletionModel::prepareStrings()
 {
     m_strings2.clear();
@@ -278,18 +312,18 @@ void CompletionModel::prepareStrings()
                          return m_strings2.contains(item, Qt::CaseInsensitive);
                      });
 
-    auto findCaseInsensitiveIndex = [=](const QStringList &list, const QString &item) -> int {
-        for (int i = 0; i < list.size(); i++) {
-            const QString litem = list.at(i);
-            if (litem.compare(item, Qt::CaseInsensitive) == 0)
-                return i;
-        }
-        return -1;
-    };
+    CaseInsensitiveFinder priorityStrings2Finder(m_priorityStrings2);
+    CaseInsensitiveFinder strings2Finder(m_strings2);
 
     std::sort(m_strings2.begin(), m_strings2.end(), [=](const QString &a, const QString &b) {
-        const int a_index = findCaseInsensitiveIndex(m_priorityStrings2, a);
-        const int b_index = findCaseInsensitiveIndex(m_priorityStrings2, b);
+        const int a_index = m_priorityStrings2.isEmpty()
+                ? -1
+                : (m_sortMode == CaseInsensitiveSort ? priorityStrings2Finder.indexOf(a)
+                                                     : m_priorityStrings2.indexOf(a));
+        const int b_index = m_priorityStrings2.isEmpty()
+                ? -1
+                : (m_sortMode == CaseInsensitiveSort ? priorityStrings2Finder.indexOf(b)
+                                                     : m_priorityStrings2.indexOf(b));
         if (a_index >= 0 && b_index >= 0)
             return a_index < b_index;
 
@@ -300,9 +334,15 @@ void CompletionModel::prepareStrings()
             return false;
 
         if (m_sortStrings)
-            return a.compare(b, Qt::CaseInsensitive) < 0;
+            return a.compare(b,
+                             m_sortMode == CaseInsensitiveSort ? Qt::CaseInsensitive
+                                                               : Qt::CaseSensitive)
+                    < 0;
 
-        return findCaseInsensitiveIndex(m_strings, a) < findCaseInsensitiveIndex(m_strings, b);
+        if (m_sortMode == CaseInsensitiveSort)
+            return strings2Finder.indexOf(a) < strings2Finder.indexOf(b);
+
+        return m_strings2.indexOf(a) < m_strings2.indexOf(b);
     });
 
     this->filterStrings();

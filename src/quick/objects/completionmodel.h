@@ -46,6 +46,14 @@ public:
     bool sortStrings() const { return m_sortStrings; }
     Q_SIGNAL void sortStringsChanged();
 
+    enum SortMode { CaseSensitiveSort, CaseInsensitiveSort };
+    Q_ENUM(SortMode)
+
+    Q_PROPERTY(SortMode sortMode READ sortMode WRITE setSortMode NOTIFY sortModeChanged)
+    void setSortMode(SortMode val);
+    SortMode sortMode() const { return m_sortMode; }
+    Q_SIGNAL void sortModeChanged();
+
     Q_PROPERTY(int maxVisibleItems READ maxVisibleItems WRITE setMaxVisibleItems NOTIFY maxVisibleItemsChanged)
     void setMaxVisibleItems(int val);
     int maxVisibleItems() const { return m_maxVisibleItems; }
@@ -112,6 +120,7 @@ private:
     bool m_filterKeyStrokes = false;
     bool m_acceptEnglishStringsOnly = true;
     int m_minimumCompletionPrefixLength = 0;
+    SortMode m_sortMode = CaseInsensitiveSort;
 };
 
 #endif // COMPLETIONMODEL_H

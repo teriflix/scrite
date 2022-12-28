@@ -19,6 +19,8 @@ import io.scrite.components 1.0
 
 TextField {
     id: textField
+    property alias completionAcceptsEnglishStringsOnly: completionModel.acceptEnglishStringsOnly
+    property alias completionSortMode: completionModel.sortMode
     property alias completionStrings: completionModel.strings
     property alias completionPrefix: completionModel.completionPrefix
     property alias maxCompletionItems: completionModel.maxVisibleItems
