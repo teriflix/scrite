@@ -24,6 +24,7 @@ Flickable {
     property bool undoRedoEnabled: true
     property alias text: __textArea.text
     property alias font: __textArea.font
+    property alias textDocument: __textArea.textDocument
     property Item tabItem
     property Item backTabItem
     property alias readonly: __textArea.readOnly

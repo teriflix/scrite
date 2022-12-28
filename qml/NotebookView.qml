@@ -1875,11 +1875,11 @@ Rectangle {
                         anchors.leftMargin: 10
                         anchors.rightMargin: 10
 
-                        TextLimiter {
+                        TextDocumentLimiter {
                             id: textLimiter
                             maxWordCount: 50
                             maxLetterCount: 240
-                            text: loglineFieldArea.text
+                            textDocument: loglineFieldArea.textDocument
                             countMode: TextLimiter.CountInText
                         }
 

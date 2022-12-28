@@ -414,11 +414,11 @@ Rectangle {
                             height: logLineEditorLayout.height
                             visible: screenplayEditorSettings.showLoglineEditor && screenplayAdapter.isSourceScreenplay && (Scrite.document.readOnly ? logLineField.text !== "" : true)
 
-                            TextLimiter {
+                            TextDocumentLimiter {
                                 id: loglineLimiter
                                 maxWordCount: 50
                                 maxLetterCount: 240
-                                text: logLineField.text
+                                textDocument: logLineField.textDocument
                                 countMode: TextLimiter.CountInText
                             }
 
