@@ -334,6 +334,7 @@ Rectangle {
                     ScrollBar.vertical: verticalScrollBar
                     property int numberOfWordsAddedToDict : 0
                     header: Item {
+                        id: contentViewHeaderItem
                         width: contentView.width
                         height: {
                             if(!screenplayAdapter.isSourceScreenplay)
@@ -358,9 +359,17 @@ Rectangle {
                             modalDialog.active = true
                         }
 
+                        Connections {
+                            target: titleCardLoader.item
+
+                            function onEditTitlePageRequest(sourceItem) {
+                                contentViewHeaderItem.editTitlePage(sourceItem)
+                            }
+                        }
+
                         Loader {
                             id: titleCardLoader
-                            active: screenplayAdapter.isSourceScreenplay && Scrite.document.screenplay.hasTitlePageAttributes
+                            active: screenplayAdapter.isSourceScreenplay && (Scrite.document.screenplay.hasTitlePageAttributes || logLineEditor.visible)
                             sourceComponent: titleCardComponent
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -3676,6 +3685,8 @@ Rectangle {
             readonly property real rightPadding: leftPadding
             height: titleCardContents.height
 
+            signal editTitlePageRequest(Item sourceItem)
+
             Column {
                 id: titleCardContents
                 spacing: 10 * zoomLevel
@@ -3687,6 +3698,8 @@ Rectangle {
                 Item { width: parent.width; height: 35 * zoomLevel }
 
                 Image {
+                    id: coverPicImage
+
                     width: {
                         switch(Scrite.document.screenplay.coverPagePhotoSize) {
                         case Screenplay.SmallCoverPhoto:
@@ -3702,28 +3715,50 @@ Rectangle {
                     smooth: true; mipmap: true
                     fillMode: Image.PreserveAspectFit
                     anchors.horizontalCenter: parent.horizontalCenter
+
+                    Rectangle {
+                        anchors.fill: parent
+                        anchors.margins: -border.width - 4
+                        color: Qt.rgba(1,1,1,0.1)
+                        border { width: 2; color: titleLink.hoverColor }
+                        visible: coverPicMouseArea.containsMouse
+                    }
+
+                    MouseArea {
+                        id: coverPicMouseArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: editTitlePageRequest(coverPicMouseArea)
+                    }
                 }
 
                 Item { width: parent.width; height: Scrite.document.screenplay.coverPagePhoto !== "" ? 20 * zoomLevel : 0 }
 
-                Text {
+                Link {
+                    id: titleLink
                     font.family: Scrite.document.formatting.defaultFont.family
                     font.pointSize: defaultFontSize + 2
+                    font.underline: containsMouse
                     font.bold: true
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     horizontalAlignment: Text.AlignHCenter
                     text: Scrite.document.screenplay.title === "" ? "<untitled>" : Scrite.document.screenplay.title
+                    onClicked: editTitlePageRequest(titleLink)
                 }
 
-                Text {
+                Link {
+                    id: subtitleLink
                     font.family: Scrite.document.formatting.defaultFont.family
                     font.pointSize: defaultFontSize
+                    font.underline: containsMouse
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     horizontalAlignment: Text.AlignHCenter
                     text: Scrite.document.screenplay.subtitle
                     visible: Scrite.document.screenplay.subtitle !== ""
+                    onClicked: editTitlePageRequest(subtitleLink)
                 }
 
                 Column {
@@ -3739,33 +3774,42 @@ Rectangle {
                         text: "Written By"
                     }
 
-                    Text {
+                    Link {
+                        id: authorsLink
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize
+                        font.underline: containsMouse
                         width: parent.width
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         horizontalAlignment: Text.AlignHCenter
                         text: (Scrite.document.screenplay.author === "" ? "<unknown author>" : Scrite.document.screenplay.author)
+                        onClicked: editTitlePageRequest(authorsLink)
                     }
                 }
 
-                Text {
+                Link {
+                    id: versionLink
                     font.family: Scrite.document.formatting.defaultFont.family
                     font.pointSize: defaultFontSize
+                    font.underline: containsMouse
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     horizontalAlignment: Text.AlignHCenter
                     text: Scrite.document.screenplay.version
+                    onClicked: editTitlePageRequest(versionLink)
                 }
 
-                Text {
+                Link {
+                    id: basedOnLink
                     font.family: Scrite.document.formatting.defaultFont.family
                     font.pointSize: defaultFontSize
+                    font.underline: containsMouse
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     horizontalAlignment: Text.AlignHCenter
                     text: Scrite.document.screenplay.basedOn
                     visible: Scrite.document.screenplay.basedOn !== ""
+                    onClicked: editTitlePageRequest(basedOnLink)
                 }
 
                 Column {
@@ -3778,65 +3822,64 @@ Rectangle {
                         height: 20 * zoomLevel
                     }
 
-                    Text {
+                    Link {
+                        id: contactLink
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize - 2
+                        font.underline: containsMouse
                         width: parent.width
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         text: Scrite.document.screenplay.contact
                         visible: text !== ""
+                        onClicked: editTitlePageRequest(contactLink)
                     }
 
-                    Text {
+                    Link {
+                        id: addressLink
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize - 2
+                        font.underline: containsMouse
                         width: parent.width
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         text: Scrite.document.screenplay.address
                         visible: text !== ""
+                        onClicked: editTitlePageRequest(addressLink)
                     }
 
-                    Text {
+                    Link {
+                        id: phoneNumberLink
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize - 2
+                        font.underline: containsMouse
                         width: parent.width
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         text: Scrite.document.screenplay.phoneNumber
                         visible: text !== ""
+                        onClicked: editTitlePageRequest(phoneNumberLink)
                     }
 
-                    Text {
+                    Link {
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize - 2
-                        font.underline: true
+                        font.underline: containsMouse
                         color: "blue"
                         width: parent.width
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         text: Scrite.document.screenplay.email
                         visible: text !== ""
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: Qt.openUrlExternally("mailto:" + parent.text)
-                            cursorShape: Qt.PointingHandCursor
-                        }
+                        onClicked: Qt.openUrlExternally("mailto:" + text)
                     }
 
-                    Text {
+                    Link {
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize - 2
-                        font.underline: true
+                        font.underline: containsMouse
                         color: "blue"
                         width: parent.width
                         elide: Text.ElideRight
                         text: Scrite.document.screenplay.website
                         visible: text !== ""
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: Qt.openUrlExternally(parent.text)
-                            cursorShape: Qt.PointingHandCursor
-                        }
+                        onClicked: Qt.openUrlExternally(text)
                     }
                 }
 
