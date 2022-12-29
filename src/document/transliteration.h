@@ -29,6 +29,7 @@
 #include <QSyntaxHighlighter>
 
 #include "qobjectproperty.h"
+#include "syntaxhighlighter.h"
 
 class AppWindow;
 class QTextCursor;
@@ -181,105 +182,6 @@ private:
     mutable QMap<Language, QStringList> m_availableLanguageFontFamilies;
 };
 
-struct TextFragment;
-class SpellCheckService;
-class FontSyntaxHighlighterUserData;
-class FontSyntaxHighlighter : public QSyntaxHighlighter
-{
-    Q_OBJECT
-    QML_ELEMENT
-    QML_UNCREATABLE("Use Transliterator.highlighter")
-
-public:
-    explicit FontSyntaxHighlighter(QObject *parent = nullptr);
-    ~FontSyntaxHighlighter();
-
-    Q_PROPERTY(bool enforceDefaultFont READ isEnforceDefaultFont WRITE setEnforceDefaultFont NOTIFY
-                       enforceDefaultFontChanged)
-    void setEnforceDefaultFont(bool val);
-    bool isEnforceDefaultFont() const { return m_enforceDefaultFont; }
-    Q_SIGNAL void enforceDefaultFontChanged();
-
-    Q_PROPERTY(bool enforceHeadingFontSize READ isEnforceHeadingFontSize WRITE
-                       setEnforceHeadingFontSize NOTIFY enforceHeadingFontSizeChanged)
-    void setEnforceHeadingFontSize(bool val);
-    bool isEnforceHeadingFontSize() const { return m_enforceHeadingFontSize; }
-    Q_SIGNAL void enforceHeadingFontSizeChanged();
-
-    Q_PROPERTY(bool spellCheckEnabled READ isSpellCheckEnabled WRITE setSpellCheckEnabled NOTIFY
-                       spellCheckEnabledChanged)
-    void setSpellCheckEnabled(bool val);
-    bool isSpellCheckEnabled() const { return m_spellCheckEnabled; }
-    Q_SIGNAL void spellCheckEnabledChanged();
-
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged)
-    void setCursorPosition(int val);
-    int cursorPosition() const { return m_cursorPosition; }
-    Q_SIGNAL void cursorPositionChanged();
-
-    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY
-                       wordUnderCursorIsMisspelledChanged)
-    bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
-    Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
-
-    Q_PROPERTY(QStringList spellingSuggestionsForWordUnderCursor READ
-                       spellingSuggestionsForWordUnderCursor NOTIFY
-                               spellingSuggestionsForWordUnderCursorChanged)
-    QStringList spellingSuggestionsForWordUnderCursor() const { return m_spellingSuggestions; }
-    Q_SIGNAL void spellingSuggestionsForWordUnderCursorChanged();
-
-    Q_INVOKABLE QStringList spellingSuggestionsForWordAt(int cursorPosition) const;
-
-    Q_INVOKABLE void replaceWordAt(int position, const QString &with);
-    Q_INVOKABLE void replaceWordUnderCursor(const QString &with)
-    {
-        this->replaceWordAt(m_cursorPosition, with);
-    }
-
-    Q_INVOKABLE void addWordAtPositionToDictionary(int position);
-    Q_INVOKABLE void addWordUnderCursorToDictionary()
-    {
-        this->addWordAtPositionToDictionary(m_cursorPosition);
-    }
-
-    Q_INVOKABLE void addWordAtPositionToIgnoreList(int position);
-    Q_INVOKABLE void addWordUnderCursorToIgnoreList()
-    {
-        this->addWordAtPositionToIgnoreList(m_cursorPosition);
-    }
-
-    // show spelling suggestions in SpellingSuggestionsMenu { }
-    // Apply spelling corrections from the menu
-    // Insert this functionality in all index cards and synopsis editors in Notebook.
-
-signals:
-    void spellingMistakesDetected();
-
-protected:
-    // QSyntaxHighlighter interface
-    void highlightBlock(const QString &text);
-
-private:
-    void onContentsChange(int position, int charsRemoved, int charsAdded);
-    void setWordUnderCursorIsMisspelled(bool val);
-    void setSpellingSuggestionsForWordUnderCursor(const QStringList &val);
-
-    bool wordCursor(int cursorPosition, QTextCursor &cursor,
-                    FontSyntaxHighlighterUserData *&ud) const;
-    bool findMisspelledTextFragment(int cursorPosition, TextFragment &fragment) const;
-    void checkForSpellingMistakeInCurrentWord();
-
-private:
-    friend class FontSyntaxHighlighterUserData;
-    int m_cursorPosition = -1;
-    bool m_spellCheckEnabled = false;
-    bool m_enforceDefaultFont = true;
-    bool m_enforceHeadingFontSize = false;
-    QStringList m_spellingSuggestions;
-    bool m_wordUnderCursorIsMisspelled = false;
-};
-
 class Transliterator : public QObject
 {
     Q_OBJECT
@@ -327,6 +229,11 @@ public:
     bool isApplyLanguageFonts() const { return m_applyLanguageFonts; }
     Q_SIGNAL void applyLanguageFontsChanged();
 
+    Q_PROPERTY(QFont defaultFont READ defaultFont WRITE setDefaultFont NOTIFY defaultFontChanged)
+    void setDefaultFont(const QFont &val);
+    QFont defaultFont() const { return m_defaultFont; }
+    Q_SIGNAL void defaultFontChanged();
+
     Q_PROPERTY(bool enforeDefaultFont READ isEnforeDefaultFont WRITE setEnforeDefaultFont NOTIFY
                        enforeDefaultFontChanged)
     void setEnforeDefaultFont(bool val);
@@ -351,8 +258,8 @@ public:
     bool isTransliterateCurrentWordOnly() const { return m_transliterateCurrentWordOnly; }
     Q_SIGNAL void transliterateCurrentWordOnlyChanged();
 
-    Q_PROPERTY(FontSyntaxHighlighter *highlighter READ highlighter NOTIFY highlighterChanged)
-    FontSyntaxHighlighter *highlighter() const { return m_fontHighlighter; }
+    Q_PROPERTY(SyntaxHighlighter *highlighter READ highlighter NOTIFY highlighterChanged)
+    SyntaxHighlighter *highlighter() const { return m_highlighter; }
     Q_SIGNAL void highlighterChanged();
 
     Q_INVOKABLE void enableFromNextWord() { m_enableFromNextWord = true; }
@@ -382,9 +289,11 @@ private:
     void resetTextDocument();
     void processTransliteration(int from, int charsRemoved, int charsAdded);
     void transliterate(QTextCursor &cursor, void *transliterator = nullptr, bool force = false);
+    void createSyntaxHighlighter();
 
 private:
     bool m_enabled = true;
+    QFont m_defaultFont;
     bool m_enforeDefaultFont = true;
     bool m_enforceHeadingFontSize = false;
     bool m_enableFromNextWord = false;
@@ -395,7 +304,7 @@ private:
     bool m_spellCheckEnabled = false;
     bool m_transliterateCurrentWordOnly = true;
     bool m_textDocumentUndoRedoEnabled = false;
-    QPointer<FontSyntaxHighlighter> m_fontHighlighter;
+    QPointer<SyntaxHighlighter> m_highlighter;
     QObjectProperty<QQuickTextDocument> m_textDocument;
 };
 

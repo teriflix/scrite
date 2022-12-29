@@ -414,12 +414,14 @@ Rectangle {
                             height: logLineEditorLayout.height
                             visible: screenplayEditorSettings.showLoglineEditor && screenplayAdapter.isSourceScreenplay && (Scrite.document.readOnly ? logLineField.text !== "" : true)
 
-                            TextDocumentLimiter {
-                                id: loglineLimiter
-                                maxWordCount: 50
-                                maxLetterCount: 240
-                                textDocument: logLineField.textDocument
-                                countMode: TextLimiter.CountInText
+                            TextLimiterSyntaxHighlighterDelegate {
+                                id: loglineLimitHighlighter
+                                textLimiter: TextLimiter {
+                                    id: loglineLimiter
+                                    maxWordCount: 50
+                                    maxLetterCount: 240
+                                    countMode: TextLimiter.CountInText
+                                }
                             }
 
                             Column {
@@ -448,12 +450,14 @@ Rectangle {
                                     selectByKeyboard: true
                                     text: Scrite.document.screenplay.logline
                                     onTextChanged: Scrite.document.screenplay.logline = text
+                                    Transliterator.defaultFont: font
                                     Transliterator.textDocument: textDocument
                                     Transliterator.cursorPosition: cursorPosition
                                     Transliterator.hasActiveFocus: activeFocus
                                     Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     placeholderText: "Type your logline here, max " + loglineLimiter.maxWordCount + " words or " + loglineLimiter.maxLetterCount + " letters."
+                                    Component.onCompleted: Transliterator.highlighter.addDelegate(loglineLimitHighlighter)
                                 }
                             }
                         }

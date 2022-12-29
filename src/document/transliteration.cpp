@@ -1031,389 +1031,6 @@ int TransliterationEngine::wordCount(const QString &text)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class FontSyntaxHighlighterUserData : public QTextBlockUserData
-{
-public:
-    enum { Type = 1003 };
-    const int type = Type;
-
-    static FontSyntaxHighlighterUserData *create(QTextBlock &block,
-                                                 FontSyntaxHighlighter *highlighter);
-    static FontSyntaxHighlighterUserData *get(const QTextBlock &block);
-    explicit FontSyntaxHighlighterUserData(const QTextBlock &block,
-                                           FontSyntaxHighlighter *highlighter)
-        : m_block(block), m_highlighter(highlighter)
-    {
-    }
-
-    ~FontSyntaxHighlighterUserData() { delete m_spellCheck; }
-
-    void scheduleSpellCheckIfRequired(const QString &text)
-    {
-        if (!m_spellCheck || m_spellCheck->text() != text)
-            this->scheduleSpellCheck();
-    }
-
-    void scheduleSpellCheck()
-    {
-        if (m_spellCheck == nullptr) {
-            m_spellCheck = new SpellCheckService;
-            QObject::connect(m_spellCheck, &SpellCheckService::misspelledFragmentsChanged,
-                             m_highlighter, [=]() {
-                                 m_highlighter->rehighlightBlock(m_block);
-                                 m_highlighter->checkForSpellingMistakeInCurrentWord();
-                             });
-        }
-
-        m_spellCheck->setText(m_block.text());
-        m_spellCheck->scheduleUpdate();
-    }
-
-    QString spellCheckedText() const { return m_spellCheck->text(); }
-
-    QList<TextFragment> misspelledFragments() const
-    {
-        return m_spellCheck ? m_spellCheck->misspelledFragments() : QList<TextFragment>();
-    }
-
-private:
-    QTextBlock m_block;
-    FontSyntaxHighlighter *m_highlighter = nullptr;
-    SpellCheckService *m_spellCheck = nullptr;
-};
-
-FontSyntaxHighlighterUserData *
-FontSyntaxHighlighterUserData::create(QTextBlock &block, FontSyntaxHighlighter *highlighter)
-{
-    QTextBlockUserData *userData = block.userData();
-    if (userData == nullptr) {
-        userData = new FontSyntaxHighlighterUserData(block, highlighter);
-        block.setUserData(userData);
-    }
-
-    FontSyntaxHighlighterUserData *ret =
-            reinterpret_cast<FontSyntaxHighlighterUserData *>(userData);
-    if (ret->type != FontSyntaxHighlighterUserData::Type) {
-        qDebug() << "PA: Trouble!!!";
-    }
-    return ret;
-}
-
-FontSyntaxHighlighterUserData *FontSyntaxHighlighterUserData::get(const QTextBlock &block)
-{
-    QTextBlockUserData *userData = block.userData();
-    if (userData == nullptr)
-        return nullptr;
-
-    FontSyntaxHighlighterUserData *ret =
-            reinterpret_cast<FontSyntaxHighlighterUserData *>(userData);
-    return (ret->type == FontSyntaxHighlighterUserData::Type) ? ret : nullptr;
-}
-
-FontSyntaxHighlighter::FontSyntaxHighlighter(QObject *parent) : QSyntaxHighlighter(parent)
-{
-    connect(TransliterationEngine::instance(),
-            &TransliterationEngine::preferredFontFamilyForLanguageChanged, this,
-            &FontSyntaxHighlighter::rehighlight);
-
-    if (parent != nullptr) {
-        QQuickItem *qmlItem = qobject_cast<QQuickItem *>(parent->parent());
-
-        if (qmlItem->inherits("QQuickTextEdit")) {
-            connect(qmlItem, SIGNAL(fontChanged(QFont)), this, SLOT(rehighlight()));
-        } else {
-            connect(qmlItem, &QQuickItem::widthChanged, this, &FontSyntaxHighlighter::rehighlight);
-            connect(qmlItem, &QQuickItem::heightChanged, this, &FontSyntaxHighlighter::rehighlight);
-        }
-    }
-}
-
-FontSyntaxHighlighter::~FontSyntaxHighlighter() { }
-
-void FontSyntaxHighlighter::setEnforceDefaultFont(bool val)
-{
-    if (m_enforceDefaultFont == val)
-        return;
-
-    m_enforceDefaultFont = val;
-    emit enforceDefaultFontChanged();
-
-    this->rehighlight();
-}
-
-void FontSyntaxHighlighter::setEnforceHeadingFontSize(bool val)
-{
-    if (m_enforceHeadingFontSize == val)
-        return;
-
-    m_enforceHeadingFontSize = val;
-    emit enforceHeadingFontSizeChanged();
-}
-
-void FontSyntaxHighlighter::setSpellCheckEnabled(bool val)
-{
-    if (m_spellCheckEnabled == val)
-        return;
-
-    m_spellCheckEnabled = val;
-    emit spellCheckEnabledChanged();
-
-    QTextBlock block = this->document()->firstBlock();
-
-    while (block.isValid()) {
-        if (m_spellCheckEnabled) {
-            FontSyntaxHighlighterUserData *ud = FontSyntaxHighlighterUserData::create(block, this);
-            ud->scheduleSpellCheck();
-        } else {
-            FontSyntaxHighlighterUserData *ud = FontSyntaxHighlighterUserData::get(block);
-            if (ud) {
-                block.setUserData(nullptr);
-                delete ud;
-            }
-        }
-
-        block = block.next();
-    }
-
-    if (m_spellCheckEnabled)
-        connect(this->document(), &QTextDocument::contentsChange, this,
-                &FontSyntaxHighlighter::onContentsChange);
-    else
-        disconnect(this->document(), &QTextDocument::contentsChange, this,
-                   &FontSyntaxHighlighter::onContentsChange);
-}
-
-void FontSyntaxHighlighter::setCursorPosition(int val)
-{
-    if (m_cursorPosition == val)
-        return;
-
-    m_cursorPosition = val;
-    emit cursorPositionChanged();
-
-    this->checkForSpellingMistakeInCurrentWord();
-}
-
-QStringList FontSyntaxHighlighter::spellingSuggestionsForWordAt(int cursorPosition) const
-{
-    TextFragment fragment;
-    if (!this->findMisspelledTextFragment(cursorPosition, fragment))
-        return QStringList();
-
-    return fragment.suggestions();
-}
-
-void FontSyntaxHighlighter::replaceWordAt(int cursorPosition, const QString &with)
-{
-    QTextCursor cursor(this->document());
-    FontSyntaxHighlighterUserData *ud = nullptr;
-
-    if (!this->wordCursor(cursorPosition, cursor, ud))
-        return;
-
-    cursor.insertText(with);
-    ud->scheduleSpellCheck();
-}
-
-void FontSyntaxHighlighter::addWordAtPositionToDictionary(int cursorPosition)
-{
-    QTextCursor cursor(this->document());
-    FontSyntaxHighlighterUserData *ud = nullptr;
-
-    if (!this->wordCursor(cursorPosition, cursor, ud))
-        return;
-
-    const QString word = cursor.selectedText();
-
-    if (SpellCheckService::addToDictionary(word))
-        ud->scheduleSpellCheck();
-}
-
-void FontSyntaxHighlighter::addWordAtPositionToIgnoreList(int cursorPosition)
-{
-    QTextCursor cursor(this->document());
-    FontSyntaxHighlighterUserData *ud = nullptr;
-
-    if (!this->wordCursor(cursorPosition, cursor, ud))
-        return;
-
-    const QString word = cursor.selectedText();
-    ScriteDocument::instance()->addToSpellCheckIgnoreList(word);
-
-    ud->scheduleSpellCheck();
-}
-
-void FontSyntaxHighlighter::highlightBlock(const QString &text)
-{
-    if (m_enforceDefaultFont) {
-        const QTextDocument *doc = this->document();
-        const QFont defaultFont = doc->defaultFont();
-        const QTextBlock block = this->QSyntaxHighlighter::currentBlock();
-
-        QTextCharFormat defaultFormat;
-        defaultFormat.setFont(defaultFont);
-        this->setFormat(0, block.length(), defaultFormat);
-    }
-
-    // Per-language fonts.
-    const QList<TransliterationEngine::Boundary> boundaries =
-            TransliterationEngine::instance()->evaluateBoundaries(text);
-
-    for (const TransliterationEngine::Boundary &boundary : boundaries) {
-        if (boundary.isEmpty() || boundary.language == TransliterationEngine::English)
-            continue;
-
-        QTextCharFormat format = this->QSyntaxHighlighter::format(boundary.start);
-        format.setFontFamily(boundary.font.family());
-        this->setFormat(boundary.start, boundary.end - boundary.start + 1, format);
-    }
-
-    if (m_enforceHeadingFontSize) {
-        const QTextBlock block = this->currentBlock();
-        const int headingLevel = block.blockFormat().headingLevel();
-
-        const QFont font = this->document()->defaultFont();
-        const int fontSize = headingLevel == 0 ? font.pointSize()
-                                               : font.pointSize() + qMax(0, 8 - 2 * headingLevel);
-        for (int i = 0; i < block.length(); i++) {
-            QTextCharFormat charFormat = this->format(i);
-            charFormat.setFontPointSize(fontSize);
-            charFormat.setFontWeight(headingLevel == 0 ? QFont::Normal : QFont::Bold);
-            this->setFormat(i, 1, charFormat);
-        }
-    }
-
-    // Spelling mistakes.
-    if (m_spellCheckEnabled) {
-        const QTextBlock block = this->QSyntaxHighlighter::currentBlock();
-        const FontSyntaxHighlighterUserData *ud = FontSyntaxHighlighterUserData::get(block);
-        const QList<TextFragment> fragments =
-                ud ? ud->misspelledFragments() : QList<TextFragment>();
-        if (!fragments.isEmpty()) {
-            for (const TextFragment &fragment : fragments) {
-                if (!fragment.isValid())
-                    continue;
-
-                const QString word = text.mid(fragment.start(), fragment.length());
-                const QChar::Script script = TransliterationEngine::determineScript(word);
-                if (script != QChar::Script_Latin)
-                    continue;
-
-                QTextCharFormat spellingErrorFormat = this->format(fragment.start());
-#if 0
-                spellingErrorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
-                spellingErrorFormat.setUnderlineColor(Qt::red);
-                spellingErrorFormat.setFontUnderline(true);
-#else
-                spellingErrorFormat.setBackground(QColor(255, 0, 0, 32));
-#endif
-                this->setFormat(fragment.start(), fragment.length(), spellingErrorFormat);
-            }
-
-            emit spellingMistakesDetected();
-        }
-    }
-}
-
-void FontSyntaxHighlighter::onContentsChange(int position, int charsRemoved, int charsAdded)
-{
-    Q_UNUSED(position)
-    Q_UNUSED(charsRemoved)
-    Q_UNUSED(charsAdded)
-
-    if (m_spellCheckEnabled) {
-        QTextBlock block = this->document()->firstBlock();
-        while (block.isValid()) {
-            FontSyntaxHighlighterUserData *ud = FontSyntaxHighlighterUserData::create(block, this);
-            ud->scheduleSpellCheckIfRequired(block.text());
-            block = block.next();
-        }
-    }
-}
-
-void FontSyntaxHighlighter::setWordUnderCursorIsMisspelled(bool val)
-{
-    if (m_wordUnderCursorIsMisspelled == val)
-        return;
-
-    m_wordUnderCursorIsMisspelled = val;
-    emit wordUnderCursorIsMisspelledChanged();
-}
-
-void FontSyntaxHighlighter::setSpellingSuggestionsForWordUnderCursor(const QStringList &val)
-{
-    if (m_spellingSuggestions == val)
-        return;
-
-    m_spellingSuggestions = val;
-    emit spellingSuggestionsForWordUnderCursorChanged();
-}
-
-bool FontSyntaxHighlighter::wordCursor(int cursorPosition, QTextCursor &cursor,
-                                       FontSyntaxHighlighterUserData *&ud) const
-{
-    ud = nullptr;
-
-    if (cursorPosition < 0)
-        return false;
-
-    cursor = QTextCursor(this->document());
-    cursor.movePosition(QTextCursor::End);
-    if (cursorPosition > cursor.position())
-        return false;
-
-    FontSyntaxHighlighter *that = const_cast<FontSyntaxHighlighter *>(this);
-
-    cursor.setPosition(cursorPosition);
-
-    QTextBlock block = cursor.block();
-    ud = FontSyntaxHighlighterUserData::create(block, that);
-    if (ud == nullptr)
-        return false;
-
-    cursor.select(QTextCursor::WordUnderCursor);
-    return true;
-}
-
-bool FontSyntaxHighlighter::findMisspelledTextFragment(int cursorPosition,
-                                                       TextFragment &msfragment) const
-{
-    QTextCursor cursor(this->document());
-    FontSyntaxHighlighterUserData *ud = nullptr;
-    if (!this->wordCursor(cursorPosition, cursor, ud))
-        return false;
-
-    // We don't want the whole word selected
-    cursor.setPosition(cursorPosition);
-
-    const QTextBlock block = cursor.block();
-
-    const QList<TextFragment> mispelledFragments = ud->misspelledFragments();
-    const int blockCursorPosition = cursorPosition - block.position();
-    for (const TextFragment &fragment : mispelledFragments) {
-        if (fragment.start() <= blockCursorPosition && fragment.end() >= blockCursorPosition) {
-            msfragment = fragment;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void FontSyntaxHighlighter::checkForSpellingMistakeInCurrentWord()
-{
-    TextFragment fragment;
-    if (m_cursorPosition >= 0 && this->findMisspelledTextFragment(m_cursorPosition, fragment)) {
-        this->setWordUnderCursorIsMisspelled(true);
-        this->setSpellingSuggestionsForWordUnderCursor(fragment.suggestions());
-    } else {
-        this->setWordUnderCursorIsMisspelled(false);
-        this->setSpellingSuggestionsForWordUnderCursor(QStringList());
-    }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 Transliterator::Transliterator(QObject *parent)
     : QObject(parent), m_textDocument(this, "textDocument")
 {
@@ -1452,8 +1069,8 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
                        &Transliterator::processTransliteration);
         }
 
-        if (!m_fontHighlighter.isNull())
-            m_fontHighlighter->setDocument(nullptr);
+        if (!m_highlighter.isNull())
+            m_highlighter->setDocument(nullptr);
 
         this->setCursorPosition(-1);
         this->setHasActiveFocus(false);
@@ -1468,8 +1085,8 @@ void Transliterator::setTextDocument(QQuickTextDocument *val)
             doc->setUndoRedoEnabled(m_textDocumentUndoRedoEnabled);
             connect(doc, &QTextDocument::contentsChange, this,
                     &Transliterator::processTransliteration);
-            if (!m_fontHighlighter.isNull())
-                m_fontHighlighter->setDocument(doc);
+            if (!m_highlighter.isNull())
+                m_highlighter->setDocument(doc);
         }
     }
 
@@ -1500,8 +1117,12 @@ void Transliterator::setCursorPosition(int val)
     m_cursorPosition = val;
     emit cursorPositionChanged();
 
-    if (!m_fontHighlighter.isNull())
-        m_fontHighlighter->setCursorPosition(m_cursorPosition);
+    if (!m_highlighter.isNull()) {
+        SpellCheckSyntaxHighlighterDelegate *spellCheckHighlighter =
+                m_highlighter->findChild<SpellCheckSyntaxHighlighterDelegate *>();
+        if (spellCheckHighlighter)
+            spellCheckHighlighter->setCursorPosition(m_cursorPosition);
+    }
 }
 
 void Transliterator::setHasActiveFocus(bool val)
@@ -1528,20 +1149,29 @@ void Transliterator::setApplyLanguageFonts(bool val)
     m_applyLanguageFonts = val;
 
     if (m_applyLanguageFonts) {
-        if (m_fontHighlighter.isNull())
-            m_fontHighlighter = new FontSyntaxHighlighter(this);
-        m_fontHighlighter->setDocument(this->document());
-        m_fontHighlighter->setEnforceDefaultFont(m_enforeDefaultFont);
-        m_fontHighlighter->setEnforceHeadingFontSize(m_enforceHeadingFontSize);
-        m_fontHighlighter->setSpellCheckEnabled(m_spellCheckEnabled);
-        m_fontHighlighter->setCursorPosition(m_cursorPosition);
+        this->createSyntaxHighlighter();
     } else {
-        m_fontHighlighter->setDocument(nullptr);
-        delete m_fontHighlighter;
+        m_highlighter->setDocument(nullptr);
+        delete m_highlighter;
     }
 
     emit applyLanguageFontsChanged();
     emit highlighterChanged();
+}
+
+void Transliterator::setDefaultFont(const QFont &val)
+{
+    if (m_defaultFont == val)
+        return;
+
+    m_defaultFont = val;
+    emit defaultFontChanged();
+
+    if (!m_highlighter.isNull()) {
+        LanguageFontSyntaxHighlighterDelegate *fontHighlighter =
+                m_highlighter->findChild<LanguageFontSyntaxHighlighterDelegate *>();
+        fontHighlighter->setDefaultFont(m_defaultFont);
+    }
 }
 
 void Transliterator::setEnforeDefaultFont(bool val)
@@ -1551,8 +1181,12 @@ void Transliterator::setEnforeDefaultFont(bool val)
 
     m_enforeDefaultFont = val;
 
-    if (!m_fontHighlighter.isNull())
-        m_fontHighlighter->setEnforceDefaultFont(val);
+    if (!m_highlighter.isNull()) {
+        LanguageFontSyntaxHighlighterDelegate *fontHighlighter =
+                m_highlighter->findChild<LanguageFontSyntaxHighlighterDelegate *>();
+        if (fontHighlighter)
+            fontHighlighter->setEnforceDefaultFont(val);
+    }
 
     emit enforeDefaultFontChanged();
 }
@@ -1564,8 +1198,12 @@ void Transliterator::setEnforceHeadingFontSize(bool val)
 
     m_enforceHeadingFontSize = val;
 
-    if (!m_fontHighlighter.isNull())
-        m_fontHighlighter->setEnforceHeadingFontSize(val);
+    if (!m_highlighter.isNull()) {
+        HeadingFontSyntaxHighlighterDelegate *headingHighlighter =
+                m_highlighter->findChild<HeadingFontSyntaxHighlighterDelegate *>();
+        if (headingHighlighter)
+            headingHighlighter->setEnabled(val);
+    }
 
     emit enforceHeadingFontSizeChanged();
 }
@@ -1577,8 +1215,12 @@ void Transliterator::setSpellCheckEnabled(bool val)
 
     m_spellCheckEnabled = val;
 
-    if (!m_fontHighlighter.isNull())
-        m_fontHighlighter->setSpellCheckEnabled(true);
+    if (!m_highlighter.isNull()) {
+        SpellCheckSyntaxHighlighterDelegate *spellCheckHighlighter =
+                m_highlighter->findChild<SpellCheckSyntaxHighlighterDelegate *>();
+        if (spellCheckHighlighter)
+            spellCheckHighlighter->setEnabled(val);
+    }
 
     emit spellCheckEnabledChanged();
 }
@@ -1744,6 +1386,32 @@ void Transliterator::transliterate(QTextCursor &cursor, void *transliterator, bo
     } else
         emit transliterationSuggestion(cursor.selectionStart(), cursor.selectionEnd(), replacement,
                                        original);
+}
+
+void Transliterator::createSyntaxHighlighter()
+{
+    if (m_highlighter.isNull())
+        m_highlighter = new SyntaxHighlighter(this);
+
+    m_highlighter->setTextDocument(this->textDocument());
+
+    LanguageFontSyntaxHighlighterDelegate *fontHighlighter =
+            new LanguageFontSyntaxHighlighterDelegate(m_highlighter);
+    fontHighlighter->setDefaultFont(m_defaultFont);
+    fontHighlighter->setEnforceDefaultFont(m_enforeDefaultFont);
+    m_highlighter->addDelegate(fontHighlighter);
+
+    HeadingFontSyntaxHighlighterDelegate *headingHighlighter =
+            new HeadingFontSyntaxHighlighterDelegate(m_highlighter);
+    headingHighlighter->setEnabled(m_enforceHeadingFontSize);
+    headingHighlighter->initializeWithNormalFontAs(m_defaultFont);
+    m_highlighter->addDelegate(headingHighlighter);
+
+    SpellCheckSyntaxHighlighterDelegate *spellCheckHighlighter =
+            new SpellCheckSyntaxHighlighterDelegate(m_highlighter);
+    spellCheckHighlighter->setEnabled(m_spellCheckEnabled);
+    spellCheckHighlighter->setCursorPosition(m_cursorPosition);
+    m_highlighter->addDelegate(spellCheckHighlighter);
 }
 
 QEvent::Type TransliterationEvent::EventType()

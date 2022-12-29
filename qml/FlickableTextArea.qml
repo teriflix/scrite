@@ -36,6 +36,7 @@ Flickable {
     property bool spellCheckEnabled: true
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
+    property alias syntaxHighlighter: __textArea.syntaxHighlighter
     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
     signal editingFinished()
@@ -48,6 +49,7 @@ Flickable {
 
     TextArea {
         id: __textArea
+        property SyntaxHighlighter syntaxHighlighter: Transliterator.highlighter
         width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired && textAreaFlickable.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(textAreaFlickable.height-topPadding-bottomPadding, contentHeight+20)
         font.pointSize: Scrite.app.idealFontPointSize
@@ -56,6 +58,7 @@ Flickable {
         selectByKeyboard: true
         leftPadding: 5; rightPadding: 5
         topPadding: 5; bottomPadding: 5
+        Transliterator.defaultFont: font
         Transliterator.textDocument: textDocument
         Transliterator.cursorPosition: cursorPosition
         Transliterator.hasActiveFocus: activeFocus

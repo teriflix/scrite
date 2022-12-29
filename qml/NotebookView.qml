@@ -1875,12 +1875,15 @@ Rectangle {
                         anchors.leftMargin: 10
                         anchors.rightMargin: 10
 
-                        TextDocumentLimiter {
-                            id: textLimiter
-                            maxWordCount: 50
-                            maxLetterCount: 240
-                            textDocument: loglineFieldArea.textDocument
-                            countMode: TextLimiter.CountInText
+                        TextLimiterSyntaxHighlighterDelegate {
+                            id: textLimitHighlighter
+                            textLimiter: TextLimiter {
+                                id: textLimiter
+                                maxWordCount: 50
+                                maxLetterCount: 240
+                                countMode: TextLimiter.CountInText
+                            }
+                            textColor: "darkred"
                         }
 
                         Column {
@@ -1922,6 +1925,7 @@ Rectangle {
                                     color: primaryColors.windowColor
                                     opacity: 0.15
                                 }
+                                Component.onCompleted: syntaxHighlighter.addDelegate(textLimitHighlighter)
                             }
 
                             Label {

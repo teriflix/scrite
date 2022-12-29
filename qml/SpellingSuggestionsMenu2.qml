@@ -31,13 +31,14 @@ SpellingSuggestionsMenu {
     // These are implied from textArea
     QtObject {
         id: _private
-        property var transliterator // of type Transliterator (see notes below)
-        property var highlighter    // of type FontSyntaxHighlighter
+        property var transliterator // of type Transliterator
+        property var highlighter    // of type SpellCheckSyntaxHighlighterDelegate
         property int cursorPosition: -1
 
         function update() {
             transliterator = root.textArea ? root.textArea.Transliterator : null
-            highlighter = transliterator ? transliterator.highlighter : null
+            if(transliterator)
+                highlighter = transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
             cursorPosition = -1
         }
     }
@@ -107,7 +108,7 @@ SpellingSuggestionsMenu {
     In _private data, I am unable to specify type of 'transliterator' as Transliterator, because
     textArea.Transliterator is a QObject* and it wont automatically typcast to Transliterator.
 
-    Although I can specify type of 'highlighter' as 'FontSyntaxHighlighter', I did not want to
+    Although I can specify type of 'highlighter' as 'SpellCheckSyntaxHighlighterDelegate', I did not want to
     do that because it would spoil the consistency of types in _private data object. Somehow it
     wouldn't look visually pleasent to me.
 
