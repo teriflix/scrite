@@ -1883,7 +1883,6 @@ Rectangle {
                                 maxLetterCount: 240
                                 countMode: TextLimiter.CountInText
                             }
-                            textColor: "darkred"
                         }
 
                         Column {
@@ -1935,7 +1934,7 @@ Rectangle {
                                 topPadding: 5
                                 text: (textLimiter.limitReached ? "WARNING: " : "") + "Words: " + textLimiter.wordCount + "/" + textLimiter.maxWordCount +
                                     ", Letters: " + textLimiter.letterCount + "/" + textLimiter.maxLetterCount
-                                color: textLimiter.limitReached ? "red" : "black"
+                                color: textLimiter.limitReached ? "darkred" : primaryColors.a700.background
                             }
                         }
                     }

@@ -437,7 +437,7 @@ Rectangle {
                                     font.family: screenplayFormat.defaultFont2.family
                                     font.pointSize: screenplayFormat.defaultFont2.pointSize-2
                                     visible: logLineField.length > 0
-                                    color: loglineLimiter.limitReached ? Qt.lighter("red") : primaryColors.a700.background
+                                    color: loglineLimiter.limitReached ? "darkred" : primaryColors.a700.background
                                 }
 
                                 TextArea {
@@ -4062,7 +4062,7 @@ Rectangle {
         contentPadding: 20
         contentWidth: 280
         contentHeight: 84
-        title: "Text Formatting"
+        title: "Text Format Tools"
         anchors.fill: parent
         closable: true
         visible: false
