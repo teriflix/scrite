@@ -178,11 +178,6 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
         if (title.isEmpty())
             title = "Untitled Screenplay";
         cursor.insertText(title);
-        if (!screenplay->subtitle().isEmpty()) {
-            cursor.insertBlock();
-            cursor.insertText(screenplay->subtitle());
-        }
-
         blockFormat.setBottomMargin(20);
 
         const QString reportType = (m_type == SceneVsCharacter)

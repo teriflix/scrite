@@ -54,11 +54,6 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
         if (title.isEmpty())
             title = "Untitled Screenplay";
         cursor.insertText(title);
-        if (!screenplay->subtitle().isEmpty()) {
-            cursor.insertBlock();
-            cursor.insertText(screenplay->subtitle());
-        }
-
         cursor.insertBlock();
         cursor.insertText("Location Report");
 
