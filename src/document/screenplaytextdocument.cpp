@@ -3139,10 +3139,8 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
             ts << "<br/>" << subtitle;
         if (!authors.isEmpty())
             ts << "<br/><br/>" << writtenBy << "<br/>" << authors;
-
         if (!basedOn.isEmpty())
             ts << "<br/><br/>" << basedOn;
-
         if (!version.isEmpty())
             ts << "<br/><br/>" << version;
 
