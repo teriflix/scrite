@@ -122,7 +122,7 @@ Item {
                 id: titleText
                 anchors.centerIn: parent
                 font.pointSize: Scrite.app.idealFontPointSize
-                text: primaryColors.c300.text
+                color: primaryColors.c300.text
             }
 
             MouseArea {
