@@ -680,20 +680,34 @@ QList<int> SceneElement::autoCapitalizePositions(const QString &text)
     }
 
     // Capitalize I if found anywhere in the text, except at the very end.
+    // Capitalize character names, except at the very end.
+
+    const Structure *structure = ScriteDocument::instance()->structure();
+    const QStringList characterNames = structure->characterNames();
+
     QTextBoundaryFinder finder(QTextBoundaryFinder::Word, text);
     while (finder.position() < text.length()) {
         if (finder.boundaryReasons().testFlag(QTextBoundaryFinder::StartOfItem)) {
             const int startPos = finder.position();
-            if (startPos == text.length() - 1)
-                break; // we don't want to capitalize i if its the last letter, because
-                       // the user maybe typing something else after that.
             const int endPos = finder.toNextBoundary();
             if (endPos < 0)
                 break;
+
             const int length = endPos - startPos;
+            if (length == 0)
+                continue;
+
+            if (startPos == text.length() - length)
+                break; // we don't want to capitalize i if its the last word, because
+                       // the user maybe typing something else after that.
+
+            const QString word = text.mid(startPos, endPos - startPos).section('\'', 0, 0);
+
             if (length == 1) {
-                const QString word = text.mid(startPos, endPos - startPos);
                 if (word == QLatin1String("i"))
+                    ret.append(startPos);
+            } else {
+                if (word.at(0).isLower() && characterNames.contains(word, Qt::CaseInsensitive))
                     ret.append(startPos);
             }
         } else if (finder.toNextBoundary() < 0)
