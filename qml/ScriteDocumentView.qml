@@ -121,6 +121,8 @@ Item {
         property bool displaySceneComments: false
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
+        property bool autoAdjustEditorWidthInScreenplayTab: true
+        property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
         property bool includeTitlePageInPreview: true
         property bool singleClickAutoComplete: true
         property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
@@ -1972,6 +1974,8 @@ Item {
         id: screenplayEditorComponent
 
         ScreenplayEditor {
+            id: screenplayEditor
+
             HelpTipNotification {
                 tipName: "screenplay"
             }
@@ -2020,8 +2024,28 @@ Item {
                     return _value - _oneValue
                 }
 
-                zoomLevelModifier = evalZoomLevelModifierFn()
-            }            
+                if(screenplayEditorSettings.autoAdjustEditorWidthInScreenplayTab)
+                    zoomLevelModifier = evalZoomLevelModifierFn()
+                else {
+                    const zlms = screenplayEditorSettings.zoomLevelModifiers
+                    const zlm = zlms["tab"+mainTabBar.currentIndex]
+                    if(zlm !== undefined)
+                        zoomLevelModifier = zlm
+                }
+
+                trackZoomLevelChanges.enabled = true
+            }
+
+            Connections {
+                id: trackZoomLevelChanges
+                enabled: false
+                target: screenplayEditor
+                function onZoomLevelChanged() {
+                    var zlms = screenplayEditorSettings.zoomLevelModifiers
+                    zlms["tab"+mainTabBar.currentIndex] = zoomLevelModifierToApply()
+                    screenplayEditorSettings.zoomLevelModifiers = zlms
+                }
+            }
 
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {

@@ -225,7 +225,7 @@ Item {
                         id: screenplayEditorSettingsLayout
                         width: parent.width-20
                         anchors.centerIn: parent
-                        readonly property int _padding: 4
+                        readonly property int _padding: 2
 
                         CheckBox2 {
                             checked: screenplayEditorSettings.enableSpellCheck
@@ -253,7 +253,6 @@ Item {
                             padding: parent._padding
                         }
 
-
                         CheckBox2 {
                             checked: screenplayEditorSettings.enableAutoPolishParagraphs
                             text: "Add/Remove CONT'D"
@@ -261,6 +260,16 @@ Item {
                             ToolTip.visible: hovered
                             hoverEnabled: true
                             onToggled: screenplayEditorSettings.enableAutoPolishParagraphs = checked
+                            padding: parent._padding
+                        }
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.autoAdjustEditorWidthInScreenplayTab
+                            text: "Auto Adjust Editor Width"
+                            ToolTip.text: "If checked, the editor width is automatically adjusted when you first launch Scrite or switch back to the screenplay tab."
+                            ToolTip.visible: hovered
+                            hoverEnabled: true
+                            onToggled: screenplayEditorSettings.autoAdjustEditorWidthInScreenplayTab = checked
                             padding: parent._padding
                         }
                     }

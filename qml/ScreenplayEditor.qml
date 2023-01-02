@@ -42,6 +42,11 @@ Rectangle {
 
     property alias zoomLevel: zoomSlider.zoomLevel
     property int zoomLevelModifier: 0
+
+    function zoomLevelModifierToApply() {
+        return zoomSlider.zoomLevelModifierToApply()
+    }
+
     color: primaryColors.windowColor
     clip: true
 
@@ -1048,6 +1053,18 @@ Rectangle {
                 reset()
                 value = value + zoomLevelModifier
                 screenplayFormat.fontZoomLevelIndex = value
+            }
+
+            function zoomLevelModifierToApply() {
+                var zls = zoomLevels
+                var oneLevel = value
+                for(var i=0; i<zls.length; i++) {
+                    if(zls[i] === 1) {
+                        oneLevel = i
+                        break
+                    }
+                }
+                return value - oneLevel
             }
 
             Connections {
