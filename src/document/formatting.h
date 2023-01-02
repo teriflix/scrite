@@ -748,6 +748,7 @@ protected:
 
     // QObject interface
     void timerEvent(QTimerEvent *te);
+    bool eventFilter(QObject *watched, QEvent *event);
 
 private:
     void resetScene();

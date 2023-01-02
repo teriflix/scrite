@@ -1801,7 +1801,13 @@ void SceneDocumentBinder::setCursorPosition(int val)
         return;
 
     QScopedValueRollback<bool> rollbackAcceptTextFormatChanges(m_acceptTextFormatChanges, false);
-    auto cleanup = qScopeGuard([=]() { this->evaluateAutoCompleteHintsAndCompletionPrefix(); });
+    auto cleanup = qScopeGuard([=]() {
+        this->evaluateAutoCompleteHintsAndCompletionPrefix();
+        if (m_cursorPosition >= 0)
+            qApp->installEventFilter(this);
+        else
+            qApp->removeEventFilter(this);
+    });
 
     if (m_textDocument == nullptr || this->document() == nullptr) {
         m_cursorPosition = -1;
@@ -2483,6 +2489,21 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
         m_sceneElementTaskTimer.stop();
         this->performAllSceneElementTasks();
     }
+}
+
+bool SceneDocumentBinder::eventFilter(QObject *watched, QEvent *event)
+{
+    Q_UNUSED(watched)
+
+    if (m_cursorPosition >= 0
+        && QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::Shortcut,
+                        QEvent::ShortcutOverride })
+                   .contains(event->type())) {
+        if (m_sceneElementTaskTimer.isActive())
+            m_sceneElementTaskTimer.start(500, this);
+    }
+
+    return false;
 }
 
 void SceneDocumentBinder::resetScene()
