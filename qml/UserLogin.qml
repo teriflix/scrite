@@ -65,7 +65,6 @@ Item {
         id: privateData
         property bool showLoginWizardOnForceLoginRequest: true
         property bool receivedForceLoginRequest: true
-        property bool loginPageShownForTheFirstTime: true
     }
 
     Connections {
@@ -185,9 +184,8 @@ Item {
         id: loginWizardEmailPage
 
         Item {
-            property string pageTitle: privateData.loginPageShownForTheFirstTime ? "Something's New! Please Login to Continue" : "Sign Up / Login"
+            property string pageTitle: "Sign Up / Login"
             Component.onCompleted: modalDialog.closeable = false
-            Component.onDestruction: privateData.loginPageShownForTheFirstTime = false
 
             Item {
                 anchors.top: parent.top
@@ -273,26 +271,11 @@ Item {
                 id: releaseNotesLink
                 font.underline: false
                 text: "Wondering why you are being asked to login? <u>Click here</u> ..."
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/login-and-activation/")
-                width: parent.width*0.35
+                horizontalAlignment: Text.AlignHCenter
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/signup-login/")
+                width: parent.width*0.8
                 wrapMode: Text.WordWrap
-                anchors.left: parent.left
-                anchors.bottom: parent.bottom
-                anchors.margins: 30
-                enabled: !sendActivationCodeCall.busy
-                defaultColor: "#65318f"
-                hoverColor: Qt.darker(defaultColor)
-            }
-
-            Link {
-                id: noLoginContinueLink
-                font.underline: false
-                text: "Or <u>Continue Without Logging In</u> »"
-                horizontalAlignment: Text.AlignRight
-                width: parent.width*0.25
-                wrapMode: Text.WordWrap
-                onClicked: modalDialog.close()
-                anchors.right: parent.right
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.margins: 30
                 enabled: !sendActivationCodeCall.busy
@@ -329,7 +312,7 @@ Item {
 
         Item {
             property string pageTitle: "Activate"
-            Component.onCompleted: modalDialog.closeable = true
+            Component.onCompleted: modalDialog.closeable = false
 
             Item {
                 anchors.top: parent.top
@@ -346,7 +329,7 @@ Item {
                         id: activationCodeField
                         width: parent.width
                         placeholderText: "Paste the activation code here..."
-                        font.pointSize: Scrite.app.idealFontPointSize + 2
+                        font.pixelSize: modalDialog.height * 0.035
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
                         Keys.onReturnPressed: nextButton.click()
