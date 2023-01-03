@@ -2908,6 +2908,12 @@ void Structure::removeElement(StructureElement *ptr)
                 ptr, this, "elements", ObjectList::RemoveOperation, methods));
     }
 
+    const Scene *scene = ptr->scene();
+    const QList<SceneElement *> sceneElements = scene->findChildren<SceneElement *>();
+    for (SceneElement *sceneElement : sceneElements)
+        this->onAboutToRemoveSceneElement(sceneElement);
+    this->updateCharacterNamesShotsTransitionsAndTagsLater();
+
     m_elements.removeAt(index);
 
     disconnect(ptr, &StructureElement::elementChanged, this, &Structure::structureChanged);
