@@ -123,6 +123,15 @@ void Notification::setAutoCloseDelay(int val)
     emit autoCloseDelayChanged();
 }
 
+void Notification::setCloseOnButtonClick(bool val)
+{
+    if (m_closeOnButtonClick == val)
+        return;
+
+    m_closeOnButtonClick = val;
+    emit closeOnButtonClickChanged();
+}
+
 void Notification::setButtons(const QStringList &val)
 {
     if (m_buttons == val)
@@ -142,7 +151,8 @@ void Notification::notifyButtonClick(int index)
 
     emit buttonClicked(index);
 
-    this->setActive(false);
+    if (m_closeOnButtonClick)
+        this->setActive(false);
 }
 
 void Notification::notifyImageClick()
@@ -150,7 +160,8 @@ void Notification::notifyImageClick()
     if (!m_image.isEmpty()) {
         emit imageClicked();
 
-        this->setActive(false);
+        if (m_closeOnButtonClick)
+            this->setActive(false);
     }
 }
 

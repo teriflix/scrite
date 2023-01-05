@@ -76,6 +76,11 @@ public:
     int autoCloseDelay() const { return m_autoCloseDelay; }
     Q_SIGNAL void autoCloseDelayChanged();
 
+    Q_PROPERTY(bool closeOnButtonClick READ isCloseOnButtonClick WRITE setCloseOnButtonClick NOTIFY closeOnButtonClickChanged)
+    void setCloseOnButtonClick(bool val);
+    bool isCloseOnButtonClick() const { return m_closeOnButtonClick; }
+    Q_SIGNAL void closeOnButtonClickChanged();
+
     Q_PROPERTY(QStringList buttons READ buttons WRITE setButtons NOTIFY buttonsChanged)
     void setButtons(const QStringList &val);
     QStringList buttons() const { return m_buttons; }
@@ -106,6 +111,7 @@ private:
     QColor m_textColor = QColor(Qt::black);
     int m_autoCloseDelay = 2000;
     QStringList m_buttons;
+    bool m_closeOnButtonClick = true;
     ExecLaterTimer m_autoCloseTimer;
 };
 

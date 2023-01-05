@@ -25,6 +25,7 @@ QtObject {
     Notification.active: enabled && helpTip && !tipShown
     Notification.text: helpTip ? helpTip.text : ""
     Notification.autoClose: false
+    Notification.closeOnButtonClick: false
     Notification.buttons: {
         var ret = []
         if(helpTip)
@@ -35,20 +36,22 @@ QtObject {
     }
     Notification.onImageClicked: {
         if(helpTip) {
-            if(helpTip.image.action !== "$dismiss")
+            if(helpTip.image.action === "$dismiss")
+                markTipAsShown()
+            else
                 Qt.openUrlExternally(helpTip.image.action)
-            markTipAsShown()
         }
     }
 
     Notification.onButtonClicked: (buttonIndex) => {
                                       if(helpTip) {
                                           const button = helpTip.buttons[buttonIndex]
-                                          if(button.action !== "$dismiss")
+                                          if(button.action === "$dismiss")
+                                            markTipAsShown()
+                                          else
                                             Qt.openUrlExternally(button.action)
-                                      }
-
-                                      markTipAsShown()
+                                      } else
+                                        markTipAsShown()
                                   }
 
     function markTipAsShown() {
