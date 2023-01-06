@@ -34,6 +34,15 @@ CompletionModel::CompletionModel(QObject *parent) : QAbstractListModel(parent)
     connect(this, &QAbstractListModel::rowsInserted, this, &CompletionModel::countChanged);
     connect(this, &QAbstractListModel::rowsRemoved, this, &CompletionModel::countChanged);
     connect(this, &QAbstractListModel::modelReset, this, &CompletionModel::countChanged);
+
+    connect(this, &CompletionModel::currentRowChanged, this,
+            &CompletionModel::currentCompletionChanged);
+    connect(this, &QAbstractListModel::rowsInserted, this,
+            &CompletionModel::currentCompletionChanged);
+    connect(this, &QAbstractListModel::rowsRemoved, this,
+            &CompletionModel::currentCompletionChanged);
+    connect(this, &QAbstractListModel::modelReset, this,
+            &CompletionModel::currentCompletionChanged);
 }
 
 CompletionModel::~CompletionModel() { }

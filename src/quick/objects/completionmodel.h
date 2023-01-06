@@ -74,8 +74,9 @@ public:
     int currentRow() const { return m_currentRow; }
     Q_SIGNAL void currentRowChanged();
 
-    Q_PROPERTY(QString currentCompletion READ currentCompletion NOTIFY currentRowChanged)
+    Q_PROPERTY(QString currentCompletion READ currentCompletion NOTIFY currentCompletionChanged)
     QString currentCompletion() const;
+    Q_SIGNAL void currentCompletionChanged();
 
     Q_PROPERTY(int count READ count NOTIFY countChanged)
     int count() const { return m_filteredStrings.size(); }
