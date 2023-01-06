@@ -984,8 +984,23 @@ void ScreenplayFormat::evaluateFontPointSizeDelta()
 
 void ScreenplayFormat::evaluateFontZoomLevels()
 {
+    const QList<int> defaultFontPointSizes = QFontDatabase().pointSizes(m_defaultFont.family());
+
     QFont font2 = m_defaultFont;
-    font2.setPointSize(int(font2.pointSize() * this->screenDevicePixelRatio()));
+    font2.setPointSize([=]() {
+        const int ps = int(font2.pointSize() * this->screenDevicePixelRatio());
+        int i = 0;
+        for (i = 0; i < defaultFontPointSizes.size(); i++) {
+            const int dps = defaultFontPointSizes.at(i);
+            if (dps == ps)
+                break;
+            if (dps > ps) {
+                --i;
+                break;
+            }
+        }
+        return defaultFontPointSizes.at(i);
+    }());
 
     QFontInfo defaultFontInfo(font2);
     font2.setPointSize(defaultFontInfo.pointSize());
@@ -997,11 +1012,10 @@ void ScreenplayFormat::evaluateFontZoomLevels()
 
     QVariantList zoomLevels = QVariantList() << QVariant(1.0);
     QList<int> selectedPointSizes = QList<int>() << defaultFontInfo.pointSize();
-    const QList<int> stdSizes = QFontDatabase().pointSizes(m_defaultFont.family());
 
-    const int start = stdSizes.indexOf(defaultFontInfo.pointSize());
-    for (int i = start + 1; i < stdSizes.size(); i++) {
-        const int fontSize = stdSizes.at(i);
+    const int start = defaultFontPointSizes.indexOf(defaultFontInfo.pointSize());
+    for (int i = start + 1; i < defaultFontPointSizes.size(); i++) {
+        const int fontSize = defaultFontPointSizes.at(i);
         if (fontSize > maxPointSize)
             break;
 
@@ -1017,7 +1031,7 @@ void ScreenplayFormat::evaluateFontZoomLevels()
     }
 
     for (int i = start - 1; i >= 0; i--) {
-        const int fontSize = stdSizes.at(i);
+        const int fontSize = defaultFontPointSizes.at(i);
         if (fontSize <= minPointSize)
             break;
 

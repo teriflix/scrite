@@ -121,7 +121,7 @@ Item {
         property bool displaySceneComments: false
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
-        property bool autoAdjustEditorWidthInScreenplayTab: true
+        property bool autoAdjustEditorWidthInScreenplayEditor: true
         property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
         property bool includeTitlePageInPreview: true
         property bool singleClickAutoComplete: true
@@ -2024,7 +2024,7 @@ Item {
                     return _value - _oneValue
                 }
 
-                if(screenplayEditorSettings.autoAdjustEditorWidthInScreenplayTab)
+                if(screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor)
                     zoomLevelModifier = evalZoomLevelModifierFn()
                 else {
                     const zlms = screenplayEditorSettings.zoomLevelModifiers
