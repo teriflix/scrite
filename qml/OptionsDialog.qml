@@ -264,12 +264,12 @@ Item {
                         }
 
                         CheckBox2 {
-                            checked: screenplayEditorSettings.autoAdjustEditorWidthInScreenplayTab
+                            checked: screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor
                             text: "Auto Adjust Editor Width"
                             ToolTip.text: "If checked, the editor width is automatically adjusted when you first launch Scrite or switch back to the screenplay tab."
                             ToolTip.visible: hovered
                             hoverEnabled: true
-                            onToggled: screenplayEditorSettings.autoAdjustEditorWidthInScreenplayTab = checked
+                            onToggled: screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor = checked
                             padding: parent._padding
                         }
                     }
