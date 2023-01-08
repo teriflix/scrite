@@ -105,6 +105,7 @@ protected:
 private:
     void filterStrings();
     void prepareStrings();
+    void clearFilterStrings();
 
 private:
     int m_currentRow = -1;

@@ -211,15 +211,20 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
             }
             break;
         case Qt::Key_Escape:
-            this->beginResetModel();
-            m_filteredStrings.clear();
-            this->endResetModel();
+            this->clearFilterStrings();
             return true;
         case Qt::Key_Enter:
         case Qt::Key_Return: {
             const QString cc = this->currentCompletion();
             if (!cc.isEmpty()) {
                 emit requestCompletion(cc);
+
+                QTimer *timer = new QTimer(this);
+                timer->setInterval(100);
+                timer->setSingleShot(true);
+                connect(timer, &QTimer::timeout, this, &CompletionModel::clearFilterStrings);
+                connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
+                timer->start();
                 return true;
             }
         } break;
@@ -307,4 +312,11 @@ void CompletionModel::prepareStrings()
     }
 
     this->filterStrings();
+}
+
+void CompletionModel::clearFilterStrings()
+{
+    this->beginResetModel();
+    m_filteredStrings.clear();
+    this->endResetModel();
 }
