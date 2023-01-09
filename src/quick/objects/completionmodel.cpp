@@ -220,7 +220,7 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
                 emit requestCompletion(cc);
 
                 QTimer *timer = new QTimer(this);
-                timer->setInterval(100);
+                timer->setInterval(0);
                 timer->setSingleShot(true);
                 connect(timer, &QTimer::timeout, this, &CompletionModel::clearFilterStrings);
                 connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
