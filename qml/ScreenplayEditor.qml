@@ -319,6 +319,7 @@ Rectangle {
                         return 0
                     }
                     property int commentsPanelTabIndex: screenplayEditorSettings.commentsPanelTabIndex
+                    onCommentsPanelTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = commentsPanelTabIndex
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
@@ -1384,10 +1385,39 @@ Rectangle {
                 property real maxTopMargin: contentItem.height-height-20
                 anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : -1
 
-                cornerComponent: expanded ? commentsSidePanelCornerComponent : null
+                cornerComponent: expanded ? commentsExpandedSidePanelCornerComponent : commentsCollapsedSidePanelCornerComponent
 
                 Component {
-                    id: commentsSidePanelCornerComponent
+                    id: commentsCollapsedSidePanelCornerComponent
+
+                    Item {
+                        Image {
+                            property Attachments sceneAttachments: contentItem.theScene.attachments
+                            property Attachment sceneFeaturedAttachment: sceneAttachments.featuredAttachment
+                            property Attachment sceneFeaturedImage: sceneFeaturedAttachment && sceneFeaturedAttachment.type === Attachment.Photo ? sceneFeaturedAttachment : null
+                            property string sceneComments: contentItem.theScene.comments
+                            width: parent.width-6
+                            height: width
+                            x: parent.width - width - 2
+                            y: 2
+                            opacity: 0.75
+
+                            mipmap: true
+                            source: {
+                                if(sceneComments !== "")
+                                    return "../icons/content/note.png"
+
+                                if(sceneFeaturedImage)
+                                    return "../icons/filetype/photo.png"
+
+                                return ""
+                            }
+                        }
+                    }
+                }
+
+                Component {
+                    id: commentsExpandedSidePanelCornerComponent
 
                     Column {
                         spacing: 8
