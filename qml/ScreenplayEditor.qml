@@ -1396,15 +1396,17 @@ Rectangle {
                             property Attachment sceneFeaturedAttachment: sceneAttachments.featuredAttachment
                             property Attachment sceneFeaturedImage: sceneFeaturedAttachment && sceneFeaturedAttachment.type === Attachment.Photo ? sceneFeaturedAttachment : null
                             property string sceneComments: contentItem.theScene.comments
-                            width: parent.width-6
+                            property bool hasSceneComments: sceneComments !== ""
+                            width: Math.max((hasSceneComments ? 14 : 12), Math.min(parent.width,parent.height)-(hasSceneComments ? 6 : 10))
                             height: width
-                            x: parent.width - width - 2
                             y: 2
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.horizontalCenterOffset: 1.5
                             opacity: 0.75
-
+                            smooth: true
                             mipmap: true
                             source: {
-                                if(sceneComments !== "")
+                                if(hasSceneComments)
                                     return "../icons/content/note.png"
 
                                 if(sceneFeaturedImage)
@@ -1461,7 +1463,7 @@ Rectangle {
                             return contentInstance ? Math.min(contentItem.height, Math.max(contentInstance.contentHeight+60, 350)) : 300
                         return Math.min(300, parent.height)
                     }
-                    return sceneHeadingAreaLoader.height
+                    return sceneHeadingAreaLoader.height + (synopsisEditorArea.visible ? synopsisEditorArea.height : 0)
                 }
                 property bool commentsExpanded: contentView.commentsExpanded
                 expanded: commentsExpanded
