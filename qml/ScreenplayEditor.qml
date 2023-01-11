@@ -305,41 +305,10 @@ Rectangle {
                     }
                 }
 
-                ListView {
-                    id: contentView
-                    anchors.fill: parent
-                    model: contentViewModel.value
-                    spacing: screenplayAdapter.elementCount > 0 ? screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
-                    property int commentsExpandCounter: 0
-                    property bool commentsExpanded: false
-                    property bool scrollingBetweenScenes: false
-                    property real spaceForComments: {
-                        if(screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
-                            return Math.round(screenplayEditorWorkspace.width - pageRulerArea.width - pageRulerArea.minLeftMargin - 20)
-                        return 0
-                    }
-                    property int commentsPanelTabIndex: screenplayEditorSettings.commentsPanelTabIndex
-                    onCommentsPanelTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = commentsPanelTabIndex
-                    onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                Component {
+                    id: contentViewHeaderComponent
 
-                    property bool allowContentYAnimation
-                    Behavior on contentY {
-                        enabled: applicationSettings.enableAnimations && contentView.allowContentYAnimation
-                        NumberAnimation {
-                            duration: 100
-                            onFinished: contentView.allowContentYAnimation = false
-                        }
-                    }
-
-                    delegate: contentViewDelegateComponent
-                    snapMode: ListView.NoSnap
-                    boundsBehavior: Flickable.StopAtBounds
-                    boundsMovement: Flickable.StopAtBounds
-                    keyNavigationEnabled: false
-                    ScrollBar.vertical: verticalScrollBar
-                    property int numberOfWordsAddedToDict : 0
-                    header: Item {
+                    Item {
                         id: contentViewHeaderItem
                         width: contentView.width
                         height: {
@@ -468,7 +437,21 @@ Rectangle {
                             }
                         }
                     }
-                    footer: Item {
+                }
+
+                Component {
+                    id: contentViewDummyHeaderComponent
+
+                    Item {
+                        width: contentView.width
+                        height: 10 * zoomSlider.zoomLevel
+                    }
+                }
+
+                Component {
+                    id: contentViewFooterComponent
+
+                    Item {
                         width: contentView.width
                         z: 10 // So that the UiElementHightlight doesnt get clipped at the top-edge of the footer.
                         height: {
@@ -544,6 +527,65 @@ Rectangle {
                             }
                         }
                     }
+                }
+
+                Component {
+                    id: contentViewDummyFooterComponent
+
+                    Item {
+                        width: contentView.width
+                        height: 10 * zoomSlider.zoomLevel
+                    }
+                }
+
+                ListView {
+                    id: contentView
+                    anchors.fill: parent
+                    model: contentViewModel.value
+                    spacing: screenplayAdapter.elementCount > 0 ? screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
+                    property int commentsExpandCounter: 0
+                    property bool commentsExpanded: false
+                    property bool scrollingBetweenScenes: false
+                    property real spaceForComments: {
+                        if(screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
+                            return Math.round(screenplayEditorWorkspace.width - pageRulerArea.width - pageRulerArea.minLeftMargin - 20)
+                        return 0
+                    }
+                    property int commentsPanelTabIndex: screenplayEditorSettings.commentsPanelTabIndex
+                    onCommentsPanelTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = commentsPanelTabIndex
+                    onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+
+                    property bool allowContentYAnimation
+                    Behavior on contentY {
+                        enabled: applicationSettings.enableAnimations && contentView.allowContentYAnimation
+                        NumberAnimation {
+                            duration: 100
+                            onFinished: contentView.allowContentYAnimation = false
+                        }
+                    }
+
+                    header: {
+                        if(screenplayEditorSettings.displayEmptyTitleCard)
+                            return contentViewHeaderComponent
+                        if(screenplayAdapter.isSourceScreenplay) {
+                            const logLineEditorVisible = screenplayEditorSettings.showLoglineEditor && (Scrite.document.readOnly ? screenplayAdapter.screenplay.logline !== "" : true)
+                            if (screenplayAdapter.screenplay.hasTitlePageAttributes || logLineEditorVisible)
+                                return contentViewHeaderComponent
+                        }
+                        return contentViewDummyHeaderComponent
+                    }
+
+                    footer: screenplayEditorSettings.displayAddSceneBreakButtons ? contentViewFooterComponent : contentViewDummyFooterComponent
+
+                    delegate: contentViewDelegateComponent
+
+                    snapMode: ListView.NoSnap
+                    boundsBehavior: Flickable.StopAtBounds
+                    boundsMovement: Flickable.StopAtBounds
+                    keyNavigationEnabled: false
+                    ScrollBar.vertical: verticalScrollBar
+                    property int numberOfWordsAddedToDict : 0
 
                     FocusTracker.window: Scrite.window
                     FocusTracker.indicator.target: mainUndoStack

@@ -290,7 +290,7 @@ private:
     void processTransliteration(int from, int charsRemoved, int charsAdded);
     void transliterate(QTextCursor &cursor, void *transliterator = nullptr, bool force = false);
     void createSyntaxHighlighter();
-    void syncDefaultFontWithParent();
+    Q_SLOT void syncDefaultFontWithParent();
 
 private:
     bool m_enabled = true;

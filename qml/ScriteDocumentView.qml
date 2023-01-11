@@ -119,6 +119,8 @@ Item {
         property bool displaySceneCharacters: true
         property bool displaySceneSynopsis: true
         property bool displaySceneComments: false
+        property bool displayEmptyTitleCard: true
+        property bool displayAddSceneBreakButtons: true
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
         property bool autoAdjustEditorWidthInScreenplayEditor: true
