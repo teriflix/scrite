@@ -39,6 +39,7 @@ TextArea {
         }
     }
     Keys.onReturnPressed: Transliterator.transliterateLastWord()
+    Transliterator.defaultFont: font
     Transliterator.textDocument: textDocument
     Transliterator.cursorPosition: cursorPosition
     Transliterator.hasActiveFocus: activeFocus

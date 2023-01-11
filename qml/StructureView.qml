@@ -2716,6 +2716,7 @@ Item {
                         readOnly: true
                         selectByKeyboard: false
                         selectByMouse: false
+                        Transliterator.defaultFont: font
                         Transliterator.textDocument: textDocument
                         Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                         font.bold: true
@@ -2816,6 +2817,7 @@ Item {
                             readOnly: true
                             selectByKeyboard: false
                             selectByMouse: false
+                            Transliterator.defaultFont: font
                             Transliterator.textDocument: textDocument
                             Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                             Transliterator.spellCheckEnabled: true
@@ -2863,6 +2865,7 @@ Item {
                                 background: Item { }
                                 selectByMouse: true
                                 selectByKeyboard: true
+                                Transliterator.defaultFont: font
                                 Transliterator.textDocument: textDocument
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus

@@ -125,6 +125,7 @@ Loader {
                 textViewEdit.editingFinished()
             }
 
+            Transliterator.defaultFont: font
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus

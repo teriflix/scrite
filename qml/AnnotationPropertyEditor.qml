@@ -268,6 +268,7 @@ Item {
             selectByMouse: true
             wrapMode: Text.WordWrap
             placeholderText: propertyInfo.placeHolderText
+            Transliterator.defaultFont: font
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus

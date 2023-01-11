@@ -1600,6 +1600,7 @@ Rectangle {
                             selectByMouse: true
                             selectByKeyboard: true
                             text: contentItem.theScene.title
+                            Transliterator.defaultFont: font
                             Transliterator.textDocument: textDocument
                             Transliterator.cursorPosition: cursorPosition
                             Transliterator.hasActiveFocus: activeFocus

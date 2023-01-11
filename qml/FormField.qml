@@ -107,6 +107,7 @@ Column {
                 opacity: formField.answer === "" ? 0.5 : 1
                 leftPadding: 5; rightPadding: 5
                 topPadding: 5; bottomPadding: 5
+                Transliterator.defaultFont: font
                 Transliterator.textDocument: textDocument
                 Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.spellCheckEnabled: formField.answer !== ""
@@ -128,6 +129,7 @@ Column {
                 selectByKeyboard: true
                 leftPadding: 5; rightPadding: 5
                 topPadding: 5; bottomPadding: 5
+                Transliterator.defaultFont: font
                 Transliterator.textDocument: textDocument
                 Transliterator.cursorPosition: cursorPosition
                 Transliterator.hasActiveFocus: activeFocus
