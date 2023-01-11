@@ -1488,6 +1488,7 @@ Rectangle {
                                     screenplayAdapter.currentIndex = contentItem.theIndex
                             }
 
+                            Transliterator.defaultFont: font
                             Transliterator.textDocument: textDocument
                             Transliterator.cursorPosition: cursorPosition
                             Transliterator.hasActiveFocus: activeFocus

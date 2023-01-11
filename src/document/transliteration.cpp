@@ -1034,6 +1034,8 @@ int TransliterationEngine::wordCount(const QString &text)
 Transliterator::Transliterator(QObject *parent)
     : QObject(parent), m_textDocument(this, "textDocument")
 {
+    if (parent->inherits("QQuickTextEdit"))
+        this->syncDefaultFontWithParent();
 }
 
 Transliterator::~Transliterator()
@@ -1172,6 +1174,8 @@ void Transliterator::setDefaultFont(const QFont &val)
                 m_highlighter->findChild<LanguageFontSyntaxHighlighterDelegate *>();
         fontHighlighter->setDefaultFont(m_defaultFont);
     }
+
+    disconnect(this->parent(), SIGNAL(fontChanged(QFont)), this, SLOT(syncDefaultFontWithParent()));
 }
 
 void Transliterator::setEnforeDefaultFont(bool val)
@@ -1412,6 +1416,19 @@ void Transliterator::createSyntaxHighlighter()
     spellCheckHighlighter->setEnabled(m_spellCheckEnabled);
     spellCheckHighlighter->setCursorPosition(m_cursorPosition);
     m_highlighter->addDelegate(spellCheckHighlighter);
+}
+
+void Transliterator::syncDefaultFontWithParent()
+{
+    if (!this->parent() || !this->parent()->inherits("QQuickTextEdit"))
+        return;
+
+    const QFont font = this->parent()->property("font").value<QFont>();
+    this->setDefaultFont(font);
+
+    // setDefaultFont() would have disconnected the following singal, so we
+    // reconnect it now.
+    connect(this->parent(), SIGNAL(fontChanged(QFont)), this, SLOT(syncDefaultFontWithParent()));
 }
 
 QEvent::Type TransliterationEvent::EventType()
