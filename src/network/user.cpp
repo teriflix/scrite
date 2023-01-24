@@ -187,7 +187,8 @@ void User::setInfo(const QJsonObject &val)
             QStringLiteral("notebook"),   QStringLiteral("relationshipgraph"),
             QStringLiteral("scriptalay"), QStringLiteral("template"),
             QStringLiteral("report"),     QStringLiteral("import"),
-            QStringLiteral("export"),     QStringLiteral("scrited")
+            QStringLiteral("export"),     QStringLiteral("scrited"),
+            QStringLiteral("watermark")
         };
         const QJsonArray features = m_info.value(QStringLiteral("enabledAppFeatures")).toArray();
         QSet<int> ifeatures;

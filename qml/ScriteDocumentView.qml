@@ -70,6 +70,11 @@ Item {
         feature: Scrite.RelationshipGraphFeature
     }
 
+    AppFeature {
+        id: watermarkFeature
+        feature: Scrite.WatermarkFeature
+    }
+
     Settings {
         id: applicationSettings
         fileName: Scrite.app.settingsFilePath

@@ -45,8 +45,9 @@ public:
         ImportFeature,
         ExportFeature,
         ScritedFeature,
+        WatermarkFeature,
         MinFeature = ScreenplayFeature,
-        MaxFeature = ScritedFeature
+        MaxFeature = WatermarkFeature
     };
     Q_ENUM(AppFeature)
 

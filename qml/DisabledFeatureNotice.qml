@@ -45,6 +45,12 @@ Rectangle {
         contentWidth: width
         contentHeight: contents.height
         ScrollBar.vertical: vscrollBar
+        Component.onCompleted: {
+            Qt.callLater( () => {
+                             if(contentsFlick.height < contentsFlick.contentHeight)
+                                contentsFlick.contentY = 45
+                         })
+        }
 
         Column {
             id: contents

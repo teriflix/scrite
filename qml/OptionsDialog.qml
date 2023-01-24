@@ -1293,11 +1293,14 @@ Item {
 
                 GroupBox {
                     width: parent.width
+                    height: watermarkSettingsLayout.height + 40
                     label: Text { text: "Watermark" }
 
                     Row {
+                        id: watermarkSettingsLayout
                         spacing: 30
                         anchors.horizontalCenter: parent.horizontalCenter
+                        enabled: watermarkFeature.enabled
 
                         Grid {
                             columns: 2
@@ -1312,7 +1315,7 @@ Item {
 
                             CheckBox2 {
                                 text: checked ? "ON" : "OFF"
-                                checked: pageSetupSettings.watermarkEnabled
+                                checked: watermarkFeature.enabled ? pageSetupSettings.watermarkEnabled : true
                                 onToggled: pageSetupSettings.watermarkEnabled = checked
                             }
 
@@ -1324,7 +1327,7 @@ Item {
 
                             TextField2 {
                                 width: 300
-                                text: pageSetupSettings.watermarkText
+                                text: watermarkFeature.enabled ? pageSetupSettings.watermarkText : "Scrite"
                                 onTextEdited: pageSetupSettings.watermarkText = text
                                 enabled: pageSetupSettings.watermarkEnabled
                                 enableTransliteration: true
@@ -1407,6 +1410,13 @@ Item {
                                 enabled: pageSetupSettings.watermarkEnabled
                             }
                         }
+                    }
+
+                    DisabledFeatureNotice {
+                        anchors.fill: parent
+                        visible: !watermarkFeature.enabled
+                        color: Qt.rgba(1,1,1,0.9)
+                        featureName: "Watermark Settings"
                     }
                 }
 
