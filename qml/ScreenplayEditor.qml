@@ -591,7 +591,11 @@ Rectangle {
                     FocusTracker.indicator.target: mainUndoStack
                     FocusTracker.indicator.property: screenplayAdapter.isSourceScreenplay ? "screenplayEditorActive" : "sceneEditorActive"
 
-                    Component.onCompleted: positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
+                    Component.onCompleted: {
+                        if(Scrite.app.isMacOSPlatform)
+                            flickDeceleration = 7500
+                        positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
+                    }
 
                     property point firstPoint: mapToItem(contentItem, width/2, 1)
                     property point lastPoint: mapToItem(contentItem, width/2, height-2)
@@ -4127,7 +4131,7 @@ Rectangle {
 
             Timer {
                 id: delayLoadTimer
-                interval: 400
+                interval: 100
                 repeat: false
                 onTriggered: contentViewDelegateLoader.load()
                 running: false
