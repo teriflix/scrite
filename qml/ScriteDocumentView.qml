@@ -1819,6 +1819,7 @@ Item {
         property string pdfDownloadFilePath
         property string pdfTitle
         property int pdfPagesPerRow: 2
+        property bool pdfSaveAllowed: true
         enabled: !notificationsView.visible
         onActiveChanged: {
             if(!active) {
@@ -1829,12 +1830,13 @@ Item {
             }
         }
 
-        function show(title, filePath, dlFilePath, pagesPerRow) {
+        function show(title, filePath, dlFilePath, pagesPerRow, allowSave) {
             active = false
             pdfTitle = title
             pdfPagesPerRow = pagesPerRow
             pdfDownloadFilePath = dlFilePath
             pdfFilePath = filePath
+            pdfSaveAllowed = allowSave === undefined ? true : allowSave
             Qt.callLater( function() {
                 pdfViewer.active = true
             })
@@ -1850,7 +1852,8 @@ Item {
         sourceComponent: PdfView {
             source: Scrite.app.localFileToUrl(pdfViewer.pdfFilePath)
             saveFilePath: pdfViewer.pdfDownloadFilePath
-            allowFileSave: true
+            allowFileSave: pdfViewer.pdfSaveAllowed
+            saveFeatureDisabled: !pdfViewer.pdfSaveAllowed
             pagesPerRow: pdfViewer.pdfPagesPerRow
             allowFileReveal: false
 

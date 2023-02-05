@@ -31,6 +31,7 @@ Item {
     property bool closable: true
     property bool allowFileSave: true
     property bool allowFileReveal: false
+    property bool saveFeatureDisabled: false
     property bool displayRefreshButton: false
 
     signal closeRequest()
@@ -97,7 +98,7 @@ Item {
             ScrollBar.horizontal: ScrollBar2 {
                 flickable: pdfView
             }
-            FlickScrollSpeedControl.flickable: flickableItem
+            FlickScrollSpeedControl.flickable: pdfView
             FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
             onPdfPageScaleChanged: Qt.callLater(returnToBounds)
@@ -256,13 +257,14 @@ Item {
             Item {
                 width: 12
                 height: parent.height
-                visible: pdfDoc.pageCount > 1 && (allowFileSave || allowFileReveal || displayRefreshButton)
+                visible: pdfDoc.pageCount > 1
 
                 Rectangle {
                     width: 1
                     height: parent.height
                     anchors.right: parent.right
                     color: primaryColors.c400.background
+                    visible: displayRefreshButton.visible || saveFileButton.visible || revealFileButton.visible
                 }
             }
 
@@ -276,12 +278,20 @@ Item {
 
             ToolButton2 {
                 id: saveFileButton
-                visible: allowFileSave
+                visible: (allowFileSave || saveFeatureDisabled)
                 icon.source: "../icons/file/file_download.png"
                 ToolTip.text: "Save PDF"
                 anchors.verticalCenter: parent.verticalCenter
                 down: saveMenu.visible
-                onClicked: saveMenu.open()
+                onClicked: {
+                    if(saveFeatureDisabled) {
+                        modalDialog.closeable = true
+                        modalDialog.popupSource = saveFileButton
+                        modalDialog.sourceComponent = saveDisabledNotice
+                        modalDialog.active = true
+                    } else
+                        saveMenu.open()
+                }
 
                 Item {
                     anchors.top: parent.top
@@ -347,6 +357,7 @@ Item {
             }
 
             ToolButton2 {
+                id: revealFileButton
                 visible: allowFileReveal
                 icon.source: "../icons/file/folder_open.png"
                 ToolTip.text: "Reveal the location of this PDF on your computer."
@@ -383,6 +394,20 @@ Item {
             height: parent.height-6
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
+        }
+    }
+
+    Component {
+        id: saveDisabledNotice
+
+        Rectangle {
+            width: 640
+            height: 480
+
+            DisabledFeatureNotice {
+                featureName: "Saving PDF Files"
+                anchors.fill: parent
+            }
         }
     }
 }

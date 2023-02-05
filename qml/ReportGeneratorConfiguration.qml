@@ -195,6 +195,7 @@ Item {
                                         width: parent.width-20
                                         label: "Select a file to export into"
                                         absoluteFilePath: generator.fileName
+                                        enabled: reportSaveFeature.enabled
                                         allowedExtensions: [
                                             {
                                                 "label": "Adobe PDF Format",
@@ -335,6 +336,11 @@ Item {
                     id: fileManager
                 }
 
+                AppFeature {
+                    id: reportSaveFeature
+                    featureName: generator ? "report/" + generator.title.toLowerCase() + "/save" : "report"
+                }
+
                 onVisibleChanged: {
                     if(visible) {
                         Scrite.app.execLater(busyOverlay, 100, function() {
@@ -345,7 +351,7 @@ Item {
                             if(generator.generate()) {
                                 if(generator.format === AbstractReportGenerator.AdobePDF) {
                                     const ppr = generator.singlePageReport ? 1 : 2
-                                    pdfViewer.show(generator.title, generator.fileName, dlFileName, ppr)
+                                    pdfViewer.show(generator.title, generator.fileName, dlFileName, ppr, reportSaveFeature.enabled)
                                 } else
                                     Scrite.app.revealFileOnDesktop(generator.fileName)
                                 modalDialog.close()

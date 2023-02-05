@@ -164,7 +164,7 @@ Item {
 
             DisabledFeatureNotice {
                 anchors.fill: formView
-                visible: !exporter.featureEnabled
+                visible: isPdfExport ? !exporter.featureEnabled : !exportSaveFeature.enabled
                 color: Qt.rgba(1,1,1,0.9)
                 featureName: exporter.formatName + " - Export"
             }
@@ -211,6 +211,12 @@ Item {
                     id: fileManager
                 }
 
+                AppFeature {
+                    id: exportSaveFeature
+                    featureName: exporter ? "export/" + exporter.formatName.toLowerCase() + "/save" : "export"
+                    onFeatureNameChanged: Scrite.app.log(featureName)
+                }
+
                 onVisibleChanged: {
                     if(visible) {
                         Scrite.app.execLater(busyOverlay, 100, function() {
@@ -220,7 +226,7 @@ Item {
 
                             if(exporter.write()) {
                                 if(isPdfExport)
-                                    pdfViewer.show("Screenplay", exporter.fileName, dlFileName, 2)
+                                    pdfViewer.show("Screenplay", exporter.fileName, dlFileName, 2, exportSaveFeature.enabled)
                                 else
                                     Scrite.app.revealFileOnDesktop(exporter.fileName)
                                 modalDialog.close()
