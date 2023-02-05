@@ -4122,7 +4122,15 @@ Rectangle {
                 height = editorHints.height * zoomLevel
                 active = false
                 initialized = true
-                Scrite.app.execLater(contentViewDelegateLoader, 400, load)
+                delayLoadTimer.start()
+            }
+
+            Timer {
+                id: delayLoadTimer
+                interval: 400
+                repeat: false
+                onTriggered: contentViewDelegateLoader.load()
+                running: false
             }
 
             Component.onDestruction: {

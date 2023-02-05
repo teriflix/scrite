@@ -39,9 +39,11 @@
 #include <QMetaEnum>
 #include <QQuickItem>
 #include <QJsonArray>
+#include <QQmlEngine>
 #include <QQuickStyle>
 #include <QMessageBox>
 #include <QJsonObject>
+#include <QQmlContext>
 #include <QColorDialog>
 #include <QQuickWindow>
 #include <QElapsedTimer>
@@ -809,6 +811,9 @@ void Application::execLater(QObject *context, int howMuchLater, const QJSValue &
                             const QJSValueList &args)
 {
     QObject *parent = context ? context : this;
+    QQmlContext *parentContext = QQmlEngine::contextForObject(parent);
+    if (parentContext != nullptr)
+        parent = parentContext;
 
 #ifndef QT_NO_DEBUG_OUTPUT
     qDebug() << "Registering Exec Later for " << context << " after " << howMuchLater;
