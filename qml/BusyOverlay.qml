@@ -22,10 +22,7 @@ Rectangle {
     color: primaryColors.windowColor
     opacity: 0.9
     visible: false
-    onVisibleChanged: {
-        parent.enabled = !visible
-        Scrite.app.log("{" + busyMessage + "}.visible = " + visible)
-    }
+    onVisibleChanged: parent.enabled = !visible
 
     property string busyMessage: "Busy Doing Something..."
 

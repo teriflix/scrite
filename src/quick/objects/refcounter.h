@@ -17,6 +17,8 @@
 #include <QQmlEngine>
 #include <QReadWriteLock>
 
+#include "application.h"
+
 class RefCounter : public QObject
 {
     Q_OBJECT
@@ -38,17 +40,17 @@ public:
     Q_SIGNAL void refCountChanged();
 
     Q_PROPERTY(bool isReffed READ isReffed NOTIFY refCountChanged)
-    bool isReffed() const { return m_refCount > 0; }
+    bool isReffed() const { return this->refCount() > 0; }
 
-    Q_INVOKABLE void ref() { this->setRefCount(m_refCount + 1); }
+    Q_INVOKABLE void ref() { this->setRefCount(this->refCount() + 1); }
     Q_INVOKABLE bool deref()
     {
-        this->setRefCount(m_refCount - 1);
+        this->setRefCount(this->refCount() - 1);
         return this->isReffed();
     }
     Q_INVOKABLE bool reset()
     {
-        const bool ret = m_refCount > 0;
+        const bool ret = this->refCount() > 0;
         this->setRefCount(0);
         return ret;
     }

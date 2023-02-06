@@ -482,8 +482,9 @@ Item {
         secondsPerPage: Scrite.document.printFormat.secondsPerPage
         property Item editor
         property bool overlayRefCountModified: false
+        property bool requiresAppBusyOverlay: mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive
         onUpdateScheduled: {
-            if(mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive) {
+            if(requiresAppBusyOverlay) {
                 appBusyOverlay.ref()
                 overlayRefCountModified = true
             }
@@ -493,6 +494,13 @@ Item {
                 appBusyOverlay.deref()
             overlayRefCountModified = false
         }
+        onRequiresAppBusyOverlayChanged: {
+            if(!requiresAppBusyOverlay && overlayRefCountModified) {
+                appBusyOverlay.deref()
+                overlayRefCountModified = false
+            }
+        }
+
         Component.onCompleted: Scrite.app.registerObject(screenplayTextDocument, "screenplayTextDocument")
     }
 
@@ -2848,8 +2856,12 @@ Item {
         anchors.fill: parent
         busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
         visible: RefCounter.isReffed
-        function ref() { RefCounter.ref() }
-        function deref() { RefCounter.deref() }
+        function ref() {
+            RefCounter.ref()
+        }
+        function deref() {
+            RefCounter.deref()
+        }
     }
 
     HelpTipNotification {
