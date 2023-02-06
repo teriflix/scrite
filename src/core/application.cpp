@@ -769,59 +769,6 @@ bool Application::isMouseOverItem(QQuickItem *item) const
     return item->boundingRect().contains(pos);
 }
 
-class ExecLater : public QObject
-{
-public:
-    explicit ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &arg,
-                       QObject *parent = nullptr);
-    ~ExecLater();
-
-    void timerEvent(QTimerEvent *event);
-
-private:
-    ExecLaterTimer m_timer;
-    QJSValue m_function;
-    QJSValueList m_arguments;
-};
-
-ExecLater::ExecLater(int howMuchLater, const QJSValue &function, const QJSValueList &args,
-                     QObject *parent)
-    : QObject(parent), m_timer("ExecLater.m_timer"), m_function(function), m_arguments(args)
-{
-    howMuchLater = qBound(0, howMuchLater, 60 * 60 * 1000);
-    m_timer.start(howMuchLater, this);
-}
-
-ExecLater::~ExecLater()
-{
-    m_timer.stop();
-}
-
-void ExecLater::timerEvent(QTimerEvent *event)
-{
-    if (m_timer.timerId() == event->timerId()) {
-        m_timer.stop();
-        if (m_function.isCallable())
-            m_function.call(m_arguments);
-        GarbageCollector::instance()->add(this);
-    }
-}
-
-void Application::execLater(QObject *context, int howMuchLater, const QJSValue &function,
-                            const QJSValueList &args)
-{
-    QObject *parent = context ? context : this;
-    QQmlContext *parentContext = QQmlEngine::contextForObject(parent);
-    if (parentContext != nullptr)
-        parent = parentContext;
-
-#ifndef QT_NO_DEBUG_OUTPUT
-    qDebug() << "Registering Exec Later for " << context << " after " << howMuchLater;
-#endif
-
-    new ExecLater(howMuchLater, function, args, parent);
-}
-
 QColor Application::translucent(const QColor &input, qreal alpha)
 {
     QColor ret = input;

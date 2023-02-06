@@ -18,8 +18,8 @@ import QtQuick.Window 2.15
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
@@ -73,7 +73,7 @@ Rectangle {
                 originIsContentView = pos.x >= 0 && pos.x < contentView.width && pos.y >= 0 && pos.y < contentView.height
             }
             if(originIsContentView)
-                Scrite.app.execLater(contentView, 100, function() {
+                Utils.execLater(contentView, 100, function() {
                     contentView.scrollIntoView(currentIndex)
                 })
             else
@@ -82,7 +82,7 @@ Rectangle {
 
         function onCurrentIndexChanged(val) {
             swithToCurrentIndex()
-            Scrite.app.execLater(screenplayEditor, 500, swithToCurrentIndex)
+            Utils.execLater(screenplayEditor, 500, swithToCurrentIndex)
         }
 
         function onSourceChanged() {
@@ -104,7 +104,7 @@ Rectangle {
         target: screenplayAdapter.isSourceScreenplay ? Scrite.document : null
         ignoreUnknownSignals: true
         function onNewSceneCreated(scene, screenplayIndex) {
-            Scrite.app.execLater(screenplayAdapter.screenplay, 100, function() {
+            Utils.execLater(screenplayAdapter.screenplay, 100, function() {
                 contentView.positionViewAtIndex(screenplayIndex, ListView.Visible)
                 var item = contentView.loadedItemAtIndex(screenplayIndex)
                 if(mainTabBar.currentIndex === 0 || mainUndoStack.screenplayEditorActive)
@@ -296,7 +296,7 @@ Rectangle {
                         if(newCurrentIndex < 0)
                             return
                         contentView.positionViewAtIndex(newCurrentIndex, ListView.Center)
-                        Scrite.app.execLater(postSplitElementTimer, 250, function() {
+                        Utils.execLater(postSplitElementTimer, 250, function() {
                             var item = contentView.itemAtIndex(postSplitElementTimer.newCurrentIndex)
                             if(item)
                                 item.item.assumeFocus()
@@ -1815,7 +1815,7 @@ Rectangle {
                     }
 
                     function reload() {
-                        Scrite.app.execLater(sceneDocumentBinder, 1000, function() {
+                        Utils.execLater(sceneDocumentBinder, 1000, function() {
                             sceneDocumentBinder.preserveScrollAndReload()
                         } )
                     }
@@ -1834,7 +1834,7 @@ Rectangle {
                         }
 
                         function onSceneReset(cp) {
-                            Scrite.app.execLater(sceneTextEditor, 50, () => { sceneTextEditor.keepCursorInView = true } )
+                            Utils.execLater(sceneTextEditor, 50, () => { sceneTextEditor.keepCursorInView = true } )
                             if(cursorPositionBeforeReset >= 0) {
                                 contentItem.assumeFocusLater(cursorPositionBeforeReset, 250)
                                 if(cp >= 0)
@@ -1981,7 +1981,7 @@ Rectangle {
                         contentItem.theScene.undoRedoEnabled = false
                     }
                     Transliterator.onFinishedTransliterating: {
-                        Scrite.app.execLater(Transliterator, 0, function() {
+                        Utils.execLater(Transliterator, 0, function() {
                             contentItem.theScene.endUndoCapture()
                             contentItem.theScene.undoRedoEnabled = true
                         })
@@ -2450,7 +2450,7 @@ Rectangle {
 
                                 sceneTextEditor.select(selection.start, selection.end)
                                 sceneTextEditor.update()
-                                Scrite.app.execLater(textDocumentSearch, 50, scrollToSelection)
+                                Utils.execLater(textDocumentSearch, 50, scrollToSelection)
                             } else {
                                 sceneTextEditor.deselect()
                             }
@@ -2590,7 +2590,7 @@ Rectangle {
                     return
                 }
                 Scrite.document.setBusyMessage("Merging scene...")
-                Scrite.app.execLater(contentItem, 100, mergeWithPreviousSceneImpl)
+                Utils.execLater(contentItem, 100, mergeWithPreviousSceneImpl)
             }
 
             function mergeWithPreviousSceneImpl() {
@@ -2616,7 +2616,7 @@ Rectangle {
                     return
                 }
                 Scrite.document.setBusyMessage("Splitting scene...")
-                Scrite.app.execLater(contentItem, 100, splitSceneImpl)
+                Utils.execLater(contentItem, 100, splitSceneImpl)
             }
 
             function splitSceneImpl() {
@@ -2656,7 +2656,7 @@ Rectangle {
                 if(delay === 0)
                     Qt.callLater( assumeFocusAt, pos )
                 else
-                    Scrite.app.execLater(contentItem, delay, function() { contentItem.assumeFocusAt(pos) })
+                    Utils.execLater(contentItem, delay, function() { contentItem.assumeFocusAt(pos) })
             }
 
             function scrollToPreviousScene() {
@@ -3060,7 +3060,7 @@ Rectangle {
                             headingItem.sceneTextEditor.forceActiveFocus()
                             sceneCharactersListLoader.cursorPositionWhenNewCharacterWasAdded = curPosition
                             if(curPosition >= 0) {
-                                Scrite.app.execLater(sceneCharactersListLoader, 250, function() {
+                                Utils.execLater(sceneCharactersListLoader, 250, function() {
                                     headingItem.sceneTextEditor.cursorPosition = sceneCharactersListLoader.cursorPositionWhenNewCharacterWasAdded
                                     sceneCharactersListLoader.cursorPositionWhenNewCharacterWasAdded = -1
                                 })
@@ -3485,7 +3485,7 @@ Rectangle {
                                            }
 
                                            navigateToScreenplayElement()
-                                           Scrite.app.execLater(delegateMouseArea, 500, navigateToScreenplayElement)
+                                           Utils.execLater(delegateMouseArea, 500, navigateToScreenplayElement)
                                        }
                             drag.target: screenplayAdapter.isSourceScreenplay && !Scrite.document.readOnly ? parent : null
                             drag.axis: Drag.YAxis
@@ -4097,7 +4097,7 @@ Rectangle {
             property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex) && !contentView.ScrollBar.vertical.active
             onIsVisibleToUserChanged: {
                 if(!active && isVisibleToUser)
-                    Scrite.app.execLater(contentViewDelegateLoader, 100, load)
+                    Utils.execLater(contentViewDelegateLoader, 100, load)
             }
 
             function load() {
@@ -4126,15 +4126,8 @@ Rectangle {
                 height = editorHints.height * zoomLevel
                 active = false
                 initialized = true
+                Utils.execLater(contentViewDelegateLoader, 100, () => { contentViewDelegateLoader.load() } )
                 delayLoadTimer.start()
-            }
-
-            Timer {
-                id: delayLoadTimer
-                interval: 100
-                repeat: false
-                onTriggered: contentViewDelegateLoader.load()
-                running: false
             }
 
             Component.onDestruction: {
@@ -4181,7 +4174,7 @@ Rectangle {
             visible = Qt.binding( () => { return screenplayEditorSettings.textFormatDockVisible } )
         }
 
-        Component.onCompleted: Scrite.app.execLater(textFormatTools, 200, adjustCoordinates)
+        Component.onCompleted: Utils.execLater(textFormatTools, 200, adjustCoordinates)
         Component.onDestruction: {
             textFormatToolsSettings.contentX = Math.round(contentX)
             textFormatToolsSettings.contentY = Math.round(contentY)

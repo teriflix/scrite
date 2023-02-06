@@ -14,6 +14,7 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Item {
     id: specialSymbolsSupport
@@ -63,7 +64,7 @@ Item {
 
                         var cp = textEditor.cursorPosition
                         textEditor.insert(textEditor.cursorPosition, text)
-                        Scrite.app.execLater(textEditor, 250, function() { textEditor.cursorPosition = cp + text.length })
+                        Utils.execLater(textEditor, 250, function() { textEditor.cursorPosition = cp + text.length })
                         symbolMenu.close()
                         textEditor.forceActiveFocus()
                     } else {

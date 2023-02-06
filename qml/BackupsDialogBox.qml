@@ -15,6 +15,7 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Item {
     width: 640
@@ -156,7 +157,7 @@ Item {
                     ToolTip.text: "Closes the current document and loads the selected backup."
                     onClicked: {
                         busyOverlay.visible = true
-                        Scrite.app.execLater(busyOverlay, 50, function() {
+                        Utils.execLater(busyOverlay, 50, function() {
                             openInThisWindow(backupFilesView.currentBackupFilePath)
                         })
                     }
@@ -170,7 +171,7 @@ Item {
                     ToolTip.text: "Loads the selected backup in a new window."
                     onClicked: {
                         busyOverlay.visible = true
-                        Scrite.app.execLater(busyOverlay, 50, function() {
+                        Utils.execLater(busyOverlay, 50, function() {
                             openInNewWindow(backupFilesView.currentBackupFilePath)
                         })
                     }

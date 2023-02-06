@@ -160,7 +160,7 @@ private:
     QUrl m_host = QUrl(QStringLiteral("http://localhost:8934"));
     QString m_root;
 #else
-    QUrl m_host = QUrl("http://192.168.63.128"); // QUrl(QStringLiteral("https://www.scrite.io"));
+    QUrl m_host = QUrl(QStringLiteral("https://www.scrite.io"));
     QString m_root = QStringLiteral("api");
 #endif // REST_API_LOCALHOST
     Type m_type = POST;

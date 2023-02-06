@@ -19,8 +19,8 @@ import QtQuick.Layouts 1.15
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Item {
     id: scritedView
@@ -40,7 +40,7 @@ Item {
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
         if(!scritedSettings.experimentalFeatureNoticeDisplayed) {
-            Scrite.app.execLater(scritedView, 250, function() {
+            Utils.execLater(scritedView, 250, function() {
                 showInformation({
                     "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
                 })
@@ -184,7 +184,7 @@ Item {
             property bool keyFrameGrabMode: false
             function grabKeyFrame() {
                 keyFrameGrabMode = true
-                Scrite.app.execLater(playerArea, 250, function() {
+                Utils.execLater(playerArea, 250, function() {
                     var dpi = Scrite.document.formatting.devicePixelRatio
                     playerArea.grabToImage( function(result) {
                         keyFrameImage.source = result.url
@@ -570,7 +570,7 @@ Item {
                     height: parent.height - (videoArea.visible ? videoArea.height : 0)
 
                     Component.onCompleted: {
-                        Scrite.app.execLater(screenplayOffsetsModel, 100, function() {
+                        Utils.execLater(screenplayOffsetsModel, 100, function() {
                             screenplayOffsetsModel.allowScreenplay = true
                         })
                     }
@@ -753,7 +753,7 @@ Item {
                                 }
                             }
 
-                            onContentYChanged: Scrite.app.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
+                            onContentYChanged: Utils.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
                             function updateCurrentIndexOnScreenplayOffsetsView() {
                                 var offsetInfo = screenplayOffsetsModel.offsetInfoAtPoint(Qt.point(10, contentY/textDocumentView.documentScale))
                                 if(offsetInfo.row < 0)

@@ -15,8 +15,8 @@ import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Item {
     id: structureView
@@ -219,7 +219,7 @@ Item {
                     if(checked && Scrite.document.structure.elementCount > 0) {
                         Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
                     }
-                    Scrite.app.execLater(canvasPreview, 1000, function() {
+                    Utils.execLater(canvasPreview, 1000, function() {
                         cmdZoomOne.click()
                         canvasPreview.allowed = true
                     })
@@ -302,7 +302,7 @@ Item {
 
                         onToggled: {
                             if(selection.hasItems)
-                                Scrite.app.execLater(selection, 250, function() { selection.refit() })
+                                Utils.execLater(selection, 250, function() { selection.refit() })
                         }
 
                         onAboutToShow: {
@@ -504,7 +504,7 @@ Item {
 
         onEditItemChanged: {
             if(editItem) {
-                Scrite.app.execLater(canvasScroll, 500, function() {
+                Utils.execLater(canvasScroll, 500, function() {
                     if(!canvasScroll.editItem && canvas.scaleIsLessForEdit)
                         canvasScroll.zoomOneToItem(canvasScroll.editItem)
                 })
@@ -537,7 +537,7 @@ Item {
             if(delay === undefined || delay === null)
                 animatePanAndZoom = true;
             else
-                Scrite.app.execLater(canvasScroll, delay, () => {
+                Utils.execLater(canvasScroll, delay, () => {
                                         canvasScroll.animatePanAndZoom = true
                                      })
         }
@@ -571,7 +571,7 @@ Item {
                 canvasScroll.contentY = csData.contentY
                 canvasScroll.isZoomFit = csData.isZoomFit === true
                 if(canvasScroll.isZoomFit) {
-                    Scrite.app.execLater(canvasScroll, 500, function() {
+                    Utils.execLater(canvasScroll, 500, function() {
                         var area = canvasItemsBoundingBox.boundingBox
                         canvasScroll.zoomFit(area)
                         canvasScroll.enablePanAndZoomAnimation(2000)
@@ -599,12 +599,12 @@ Item {
         }
 
         function updateFromScriteDocumentUserDataLater() {
-            Scrite.app.execLater(canvasScroll, 500, updateFromScriteDocumentUserData)
+            Utils.execLater(canvasScroll, 500, updateFromScriteDocumentUserData)
         }
 
         onUpdateScriteDocumentUserDataEnabledChanged: {
             if(updateScriteDocumentUserDataEnabled)
-                Scrite.app.execLater(canvasScroll, 500, zoomSanityCheck)
+                Utils.execLater(canvasScroll, 500, zoomSanityCheck)
         }
 
         function zoomSanityCheck() {
@@ -1107,7 +1107,7 @@ Item {
             property var groupBoxes: []
             property var episodeBoxes: []
             property bool groupsBeingMoved: false
-            Component.onCompleted: Scrite.app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
+            Component.onCompleted: Utils.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
 
             function reevaluateEpisodeAndGroupBoxes() {
                 if(groupsBeingMoved)
@@ -1119,7 +1119,7 @@ Item {
 
             onGroupCategoryChanged: {
                 Scrite.document.structure.preferredGroupCategory = groupCategory
-                Scrite.app.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
+                Utils.execLater(canvas, 250, reevaluateEpisodeAndGroupBoxes)
             }
 
             TrackerPack {
@@ -1393,7 +1393,7 @@ Item {
 
                 if(event.type === EventFilter.Drop) {
                     element.stackId = ""
-                    Scrite.app.execLater(element, 250, function() {
+                    Utils.execLater(element, 250, function() {
                         if(!Scrite.document.structure.forceBeatBoardLayout) {
                             element.x = event.pos.x
                             element.y = event.pos.y
@@ -1680,7 +1680,7 @@ Item {
                             structure: Scrite.document.structure
                         }
 
-                        onToggled: Scrite.app.execLater(selection, 250, function() { selection.refit() })
+                        onToggled: Utils.execLater(selection, 250, function() { selection.refit() })
 
                         onAboutToShow: {
                             sceneGroup.clearScenes()
@@ -1700,7 +1700,7 @@ Item {
                     if(!hasItems) {
                         canvasPreview.allowed = false
                         var rect = Scrite.document.structure.layoutElements(type)
-                        Scrite.app.execLater(selection, 1000, function() {
+                        Utils.execLater(selection, 1000, function() {
                             cmdZoomOne.click()
                             canvasPreview.allowed = true
                         })
@@ -1883,7 +1883,7 @@ Item {
                     sceneGroup: SceneGroup {
                         structure: Scrite.document.structure
                     }
-                    onToggled: Scrite.app.execLater(selection, 250, function() { selection.refit() })
+                    onToggled: Utils.execLater(selection, 250, function() { selection.refit() })
                     onAboutToShow: {
                         sceneGroup.clearScenes()
                         sceneGroup.addScene(elementContextMenu.element.scene)
@@ -2931,7 +2931,7 @@ Item {
                                             }
                                         }
 
-                                        Component.onCompleted: Scrite.app.execLater(cursorFocusRect, 250, function() {
+                                        Component.onCompleted: Utils.execLater(cursorFocusRect, 250, function() {
                                             cursorFocusRect.visible = true
                                             cursorFocusRect.t = 1
                                         })
@@ -3228,7 +3228,7 @@ Item {
                     Component.onCompleted: {
                         elementItem.zoomOneForFocus()
                         forceActiveFocus()
-                        Scrite.app.execLater(deleteConfirmationItem, 500, function() {
+                        Utils.execLater(deleteConfirmationItem, 500, function() {
                             deleteConfirmationItem.allowDeactivate = true
                         })
                     }
@@ -4020,7 +4020,7 @@ Item {
     }
 
     function requestEditorLater() {
-        Scrite.app.execLater(structureView, 100, function() { requestEditor() })
+        Utils.execLater(structureView, 100, function() { requestEditor() })
     }
 
     Loader {

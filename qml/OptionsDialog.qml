@@ -17,8 +17,8 @@ import QtQuick.Dialogs 1.3
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Item {
     id: optionsDialog
@@ -1940,7 +1940,7 @@ Item {
                 opacity: 0
                 onOpacityChanged: {
                     if(opacity > 0)
-                        Scrite.app.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
+                        Utils.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
                 }
             }
         }

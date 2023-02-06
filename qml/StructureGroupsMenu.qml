@@ -13,8 +13,8 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Menu2 {
     id: structureGroupsMenu
@@ -136,7 +136,7 @@ Menu2 {
                     }
 
                     function adjustScrollingLater() {
-                        Scrite.app.execLater(groupsView, 50, adjustScrolling)
+                        Utils.execLater(groupsView, 50, adjustScrolling)
                     }
 
                     delegate: Rectangle {

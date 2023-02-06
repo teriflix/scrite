@@ -14,8 +14,8 @@
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Flickable {
     id: scrollAreaFlickable
@@ -170,7 +170,7 @@ Flickable {
             ensureVisibleParams = {
                 "area": area, "scaling": scaling, "leaveMargin": leaveMargin
             }
-            Scrite.app.execLater(scrollAreaFlickable, 500, function() {
+            Utils.execLater(scrollAreaFlickable, 500, function() {
                 var params = ensureVisibleParams
                 ensureVisibleParams = undefined
                 ensureVisible(params.area, params.scaling, params.leaveMargin)

@@ -16,6 +16,7 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 // For use from within StructureView.qml only!
 
@@ -351,7 +352,7 @@ Item {
                     if(visible && fontListView.systemFontInfo === undefined)
                         fontListView.systemFontInfo = Scrite.app.systemFontInfo()
                     if(visible)
-                        Scrite.app.execLater(fontListViewArea, 100, adjustScroll)
+                        Utils.execLater(fontListViewArea, 100, adjustScroll)
                 }
 
                 function adjustScroll() {

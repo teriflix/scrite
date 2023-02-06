@@ -18,8 +18,8 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Controls 1.4 as OldControls
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Rectangle {
     id: notebookView
@@ -1181,8 +1181,8 @@ Rectangle {
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: Scrite.app.execLater(sceneTabContentArea, 100, prepare)
-                        onVisibleChanged: Scrite.app.execLater(sceneTabContentArea, 100, prepare)
+                        Component.onCompleted: Utils.execLater(sceneTabContentArea, 100, prepare)
+                        onVisibleChanged: Utils.execLater(sceneTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
@@ -2230,8 +2230,8 @@ Rectangle {
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: Scrite.app.execLater(charactersTabContentArea, 100, prepare)
-                        onVisibleChanged: Scrite.app.execLater(charactersTabContentArea, 100, prepare)
+                        Component.onCompleted: Utils.execLater(charactersTabContentArea, 100, prepare)
+                        onVisibleChanged: Utils.execLater(charactersTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
@@ -2345,12 +2345,12 @@ Rectangle {
                                 Connections {
                                     target: characterNotes
                                     function onCharacterChanged() {
-                                        Scrite.app.execLater(this, 100, function() {
+                                        Utils.execLater(this, 100, function() {
                                             photoSlides.currentIndex = character.hasKeyPhoto ? character.keyPhotoIndex : 0
                                         } )
                                     }
                                 }
-                                Component.onCompleted: Scrite.app.execLater(this, 100, function() {
+                                Component.onCompleted: Utils.execLater(this, 100, function() {
                                     photoSlides.currentIndex = character.hasKeyPhoto ? character.keyPhotoIndex : 0
                                 } )
 
@@ -2849,8 +2849,8 @@ Rectangle {
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: Scrite.app.execLater(characterTabContentArea, 100, prepare)
-                        onVisibleChanged: Scrite.app.execLater(characterTabContentArea, 100, prepare)
+                        Component.onCompleted: Utils.execLater(characterTabContentArea, 100, prepare)
+                        onVisibleChanged: Utils.execLater(characterTabContentArea, 100, prepare)
                     }
 
                     DisabledFeatureNotice {
@@ -3090,7 +3090,7 @@ Rectangle {
                 if(note) {
                     note.color = color
                     note.objectName = "_newNote"
-                    Scrite.app.execLater(note, 10, function() {
+                    Utils.execLater(note, 10, function() {
                         switchTo(note);
                     })
                 }
@@ -3102,7 +3102,7 @@ Rectangle {
             title: "Form Note"
             notes: newNoteMenu.notes
             onNoteAdded: {
-                Scrite.app.execLater(note, 10, function() {
+                Utils.execLater(note, 10, function() {
                     switchTo(note);
                 })
                 newNoteMenu.close()
@@ -3134,7 +3134,7 @@ Rectangle {
                     notebookContentLoader.confirmAndDelete()
                 else {
                     notebookView.switchTo(noteContextMenu.note)
-                    Scrite.app.execLater( notebookContentLoader, 500, () => {
+                    Utils.execLater( notebookContentLoader, 500, () => {
                                      notebookContentLoader.confirmAndDelete()
                                  } )
                 }
@@ -3179,7 +3179,7 @@ Rectangle {
                     notebookContentLoader.confirmAndDelete()
                 else {
                     notebookView.switchTo(characterContextMenu.character.notes)
-                    Scrite.app.execLater( notebookContentLoader, 100, () => {
+                    Utils.execLater( notebookContentLoader, 100, () => {
                                      notebookContentLoader.confirmAndDelete()
                                  } )
                 }

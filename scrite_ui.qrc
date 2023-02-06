@@ -3,6 +3,7 @@
         <file alias="getBoxToBoxArrow.js">js/getBoxToBoxArrow.js</file>
     </qresource>
     <qresource prefix="/">
+        <file>js/utils.js</file>
         <file>LICENSE.txt</file>
         <file>main.qml</file>
         <file>qml/AboutBox.qml</file>

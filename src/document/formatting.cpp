@@ -1467,7 +1467,8 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
     if (m_textBlock.text().isEmpty() || m_sceneElement == nullptr)
         return;
 
-    if (!m_binder->m_autoCapitalizeSentences)
+    if (!m_binder->m_autoCapitalizeSentences
+        || TransliterationEngine::instance()->language() != TransliterationEngine::English)
         return;
 
     // Auto-capitalize needs to be done only on action and dialogue paragraphs.

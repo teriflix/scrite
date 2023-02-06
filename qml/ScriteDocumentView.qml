@@ -19,8 +19,8 @@ import QtQuick.Layouts 1.15
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
-
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Item {
     id: documentUI
@@ -45,7 +45,7 @@ Item {
     property bool canShowNotebookInStructure: width > 1600
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     onShowNotebookInStructureChanged: {
-        Scrite.app.execLater(workspaceSettings, 100, function() {
+        Utils.execLater(workspaceSettings, 100, function() {
             mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
         })
     }
@@ -334,7 +334,7 @@ Item {
                     Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                 else {
                     mainTabBar.activateTab(1)
-                    Scrite.app.execLater(mainTabBar, 250, function() {
+                    Utils.execLater(mainTabBar, 250, function() {
                         Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                     })
                 }
@@ -360,7 +360,7 @@ Item {
             var nbt = showNotebookInStructure ? 1 : 2
             if(mainTabBar.currentIndex !== nbt) {
                 mainTabBar.activateTab(nbt)
-                Scrite.app.execLater(mainTabBar, 250, function() {
+                Utils.execLater(mainTabBar, 250, function() {
                     Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", type)
                 })
             } else
@@ -418,7 +418,7 @@ Item {
             instanceSettings.firstSwitchToStructureTab = true
             appBusyOverlay.ref()
             screenplayAdapter.initialLoadTreshold = 25
-            Scrite.app.execLater(screenplayAdapter, 250, function() {
+            Utils.execLater(screenplayAdapter, 250, function() {
                 appBusyOverlay.deref()
                 screenplayAdapter.sessionId = Scrite.document.sessionId
             })
@@ -552,7 +552,7 @@ Item {
                                 contentLoader.allowContent = false
                                 Scrite.document.reset()
                                 contentLoader.allowContent = true
-                                Scrite.app.execLater(fileNewButton, 250, newFromTemplate)
+                                Utils.execLater(fileNewButton, 250, newFromTemplate)
                             }
                         }, fileNewButton)
                     else
@@ -597,7 +597,7 @@ Item {
                                     }
                                     recentFilesMenu.close()
                                     if(filePath === "#TEMPLATE")
-                                        Scrite.app.execLater(fileOpenButton, 250, newFromTemplate)
+                                        Utils.execLater(fileOpenButton, 250, newFromTemplate)
                                     else
                                         fileDialog.launch("OPEN", filePath)
                                 }
@@ -605,7 +605,7 @@ Item {
                     else {
                         recentFilesMenu.close()
                         if(filePath === "#TEMPLATE")
-                            Scrite.app.execLater(fileOpenButton, 250, newFromTemplate)
+                            Utils.execLater(fileOpenButton, 250, newFromTemplate)
                         else
                             fileDialog.launch("OPEN", filePath)
                     }
@@ -817,7 +817,7 @@ Item {
                                         return
                                     }
                                 }
-                                Scrite.app.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
+                                Utils.execLater(openFromLibrary, 250, function() { openFromLibrary.go() })
                             }
                         }, fileNewButton)
                     else
@@ -1131,7 +1131,7 @@ Item {
                                 const idata = data
                                 if(stype === "72892ED6-BA58-47EC-B045-E92D9EC1C47A") {
                                     if(idata && typeof idata === "number")
-                                        Scrite.app.execLater(ui, idata, showAboutDialog)
+                                        Utils.execLater(ui, idata, showAboutDialog)
                                     else
                                         showAboutDialog()
                                 }
@@ -1147,14 +1147,14 @@ Item {
                         MenuItem2 {
                             text: "Toggle Fullscreen\tF7"
                             icon.source: "../icons/navigation/fullscreen.png"
-                            onClicked: Scrite.app.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
+                            onClicked: Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: "Toggle Fullscreen"
                             ShortcutsModelItem.shortcut: "F7"
                             Shortcut {
                                 context: Qt.ApplicationShortcut
                                 sequence: "F7"
-                                onActivated: Scrite.app.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
+                                onActivated: Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
                             }
                         }
                     }
@@ -1628,7 +1628,7 @@ Item {
                     var message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
                     Scrite.document.setBusyMessage(message)
                     Scrite.document.screenplay.clearSelection()
-                    Scrite.app.execLater(mainTabBar, 100, function() {
+                    Utils.execLater(mainTabBar, 100, function() {
                         mainTabBar.currentIndex = index
                         Scrite.document.clearBusyMessage()
                     })
@@ -1971,7 +1971,7 @@ Item {
                                              const stype = "" + type
                                              if(mainTabBar.currentIndex === 0 && stype === "{f4048da2-775d-11ec-90d6-0242ac120003}") {
                                                  uiLoader.active = false
-                                                 Scrite.app.execLater(uiLoader, 250, function() {
+                                                 Utils.execLater(uiLoader, 250, function() {
                                                     uiLoader.active = true
                                                  })
                                              }
@@ -2137,19 +2137,19 @@ Item {
                                         else if(sdata.startsWith("Notebook")) {
                                             structureEditorTabs.currentTabIndex = 1
                                             if(sdata !== "Notebook")
-                                                Scrite.app.execLater(notebookViewLoader, 100, function() {
+                                                Utils.execLater(notebookViewLoader, 100, function() {
                                                     notebookViewLoader.item.switchTo(sdata)
                                                 })
                                         }
                                     } else if(stype === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8") {
                                         structureEditorTabs.currentTabIndex = 1
-                                        Scrite.app.execLater(notebookViewLoader, 100, function() {
+                                        Utils.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToCharacterTab(data)
                                         })
                                     }
                                     else if(stype === "41EE5E06-FF97-4DB6-B32D-F938418C9529") {
                                         structureEditorTabs.currentTabIndex = 1
-                                        Scrite.app.execLater(notebookViewLoader, 100, function() {
+                                        Utils.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToSceneTab(data)
                                         })
                                     }
@@ -2453,7 +2453,7 @@ Item {
                 }
 
                 if(structureCanvasSettings.showPullHandleAnimation && contentLoader.sessionId !== Scrite.document.sessionId) {
-                    Scrite.app.execLater(splitViewAnimationLoader, 250, function() {
+                    Utils.execLater(splitViewAnimationLoader, 250, function() {
                         splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
                     })
                     contentLoader.sessionId = Scrite.document.sessionId
@@ -2619,7 +2619,7 @@ Item {
             folder = mode === "IMPORT" ? workspaceSettings.lastOpenImportFolderUrl : workspaceSettings.lastOpenFolderUrl
 
             if(filePath)
-                Scrite.app.execLater(Scrite.window, 250, function() { processFile(filePath) } )
+                Utils.execLater(Scrite.window, 250, function() { processFile(filePath) } )
             else {
                 var modeInfo = modes[mode]
                 if(modeInfo["reset"] === true) {
@@ -2680,14 +2680,14 @@ Item {
             onOpenInThisWindow: {
                 contentLoader.allowContent = false
                 Scrite.document.openAnonymously(filePath)
-                Scrite.app.execLater(contentLoader, 50, function() {
+                Utils.execLater(contentLoader, 50, function() {
                     contentLoader.allowContent = true
                     modalDialog.close()
                 })
             }
             onOpenInNewWindow: {
                 Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                Scrite.app.execLater(modalDialog, 4000, function() {
+                Utils.execLater(modalDialog, 4000, function() {
                     modalDialog.close()
                 })
             }
@@ -2701,7 +2701,7 @@ Item {
             onOpenRequest: (filePath) => {
                                contentLoader.allowContent = false
                                Scrite.document.openAnonymously(filePath)
-                               Scrite.app.execLater(contentLoader, 50, function() {
+                               Utils.execLater(contentLoader, 50, function() {
                                    contentLoader.allowContent = true
                                    modalDialog.close()
                                })
