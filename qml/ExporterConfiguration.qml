@@ -214,7 +214,6 @@ Item {
                 AppFeature {
                     id: exportSaveFeature
                     featureName: exporter ? "export/" + exporter.formatName.toLowerCase() + "/save" : "export"
-                    onFeatureNameChanged: Scrite.app.log(featureName)
                 }
 
                 onVisibleChanged: {

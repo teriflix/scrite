@@ -587,30 +587,24 @@ void AttachmentsDropArea::denyDrop()
 void AttachmentsDropArea::dragEnterEvent(QDragEnterEvent *de)
 {
     this->setMouse(de->posF());
-    if (de->proposedAction() != Qt::CopyAction)
-        return;
 
     const QMimeData *mimeData = de->mimeData();
-    if (this->prepareAttachmentFromMimeData(mimeData))
+    if (de->proposedAction() == Qt::CopyAction && this->prepareAttachmentFromMimeData(mimeData)) {
+        de->setDropAction(Qt::CopyAction);
         de->acceptProposedAction();
-
-    if (m_raiseWindowTimer.isNull()) {
-        m_raiseWindowTimer = new QTimer(this);
-        connect(m_raiseWindowTimer, &QTimer::timeout, this, [=]() { this->raiseWindow(); });
-        m_raiseWindowTimer->setSingleShot(true);
-        m_raiseWindowTimer->setInterval(500);
-        m_raiseWindowTimer->start();
-    }
+    } else
+        de->ignore();
 }
 
 void AttachmentsDropArea::dragMoveEvent(QDragMoveEvent *de)
 {
     this->setMouse(de->posF());
-    if (de->proposedAction() != Qt::CopyAction)
-        return;
 
-    if (m_attachment != nullptr)
+    if (de->proposedAction() == Qt::CopyAction && m_attachment != nullptr) {
+        de->setDropAction(Qt::CopyAction);
         de->acceptProposedAction();
+    } else
+        de->ignore();
 }
 
 void AttachmentsDropArea::dragLeaveEvent(QDragLeaveEvent *)
@@ -623,17 +617,16 @@ void AttachmentsDropArea::dragLeaveEvent(QDragLeaveEvent *)
         if (ptr != nullptr)
             ptr->deleteLater();
     }
-
-    if (!m_raiseWindowTimer.isNull()) {
-        m_raiseWindowTimer->stop();
-        m_raiseWindowTimer->deleteLater();
-    }
 }
 
 void AttachmentsDropArea::dropEvent(QDropEvent *de)
 {
     if (m_attachment != nullptr) {
-        this->raiseWindow();
+        QQuickWindow *qmlWindow = this->window();
+        if (qmlWindow) {
+            qmlWindow->requestActivate();
+            qmlWindow->raise();
+        }
 
         this->setMouse(de->posF());
         m_allowDrop = true;
@@ -641,6 +634,7 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
         emit dropped();
 
         if (m_allowDrop) {
+            de->setDropAction(Qt::CopyAction);
             de->acceptProposedAction();
 
             if (m_target != nullptr) {
@@ -651,20 +645,6 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
 
         m_attachment->deleteLater();
         this->setAttachment(nullptr);
-    }
-}
-
-void AttachmentsDropArea::raiseWindow()
-{
-    QQuickWindow *qmlWindow = this->window();
-    if (qmlWindow) {
-        qmlWindow->requestActivate();
-        qmlWindow->raise();
-    }
-
-    if (!m_raiseWindowTimer.isNull()) {
-        m_raiseWindowTimer->stop();
-        m_raiseWindowTimer->deleteLater();
     }
 }
 

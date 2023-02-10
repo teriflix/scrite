@@ -77,103 +77,10 @@ Rectangle {
         active: sceneListPanelActive || screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
     }
 
-    AttachmentsDropArea {
-        id: fileOpenDropArea
-        anchors.fill: parent
-        enabled: ui.enabled && !modalDialog.active
-        allowedType: Attachments.NoMedia
-        allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
-        property string droppedFilePath
-        property string droppedFileName
-        onDropped: {
-            if(Scrite.document.empty)
-                Scrite.document.openOrImport(attachment.filePath)
-            else {
-                droppedFilePath = attachment.filePath
-                droppedFileName = attachment.originalFileName
-            }
-        }
-    }
-
     UI.ScriteDocumentView {
         id: ui
         anchors.fill: parent
-        enabled: !dialogUnderlay.visible && !fileOpenDropAreaNotification.active && !notificationsView.visible
-    }
-
-    Loader {
-        id: fileOpenDropAreaNotification
-        anchors.fill: fileOpenDropArea
-        active: fileOpenDropArea.active || fileOpenDropArea.droppedFilePath !== ""
-        sourceComponent: Rectangle {
-            color: Scrite.app.translucent(primaryColors.c500.background, 0.5)
-
-            Rectangle {
-                anchors.fill: fileOpenDropAreaNotice
-                anchors.margins: -30
-                radius: 4
-                color: primaryColors.c700.background
-            }
-
-            Column {
-                id: fileOpenDropAreaNotice
-                anchors.centerIn: parent
-                width: parent.width * 0.5
-                spacing: 20
-
-                Text {
-                    wrapMode: Text.WordWrap
-                    width: parent.width
-                    color: primaryColors.c700.text
-                    font.bold: true
-                    text: parent.visible ? fileOpenDropArea.active ? fileOpenDropArea.attachment.originalFileName : fileOpenDropArea.droppedFileName : ""
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: Scrite.app.idealFontPointSize
-                }
-
-                Text {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    color: primaryColors.c700.text
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: Scrite.app.idealFontPointSize
-                    text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
-                }
-
-                Text {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    color: primaryColors.c700.text
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: Scrite.app.idealFontPointSize
-                    visible: !Scrite.document.empty || Scrite.document.fileName !== ""
-                    text: "NOTE: Any unsaved changes in the currently open document will be discarded."
-                }
-
-                Row {
-                    spacing: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    visible: !Scrite.document.empty
-
-                    UI.Button2 {
-                        text: "Open/Import"
-                        onClicked: {
-                            Scrite.document.openOrImport(fileOpenDropArea.droppedFilePath)
-                            fileOpenDropArea.droppedFileName = ""
-                            fileOpenDropArea.droppedFilePath = ""
-                        }
-                    }
-
-                    UI.Button2 {
-                        text: "Cancel"
-                        onClicked:  {
-                            fileOpenDropArea.droppedFileName = ""
-                            fileOpenDropArea.droppedFilePath = ""
-                        }
-                    }
-                }
-            }
-        }
+        enabled: !dialogUnderlay.visible && !notificationsView.visible
     }
 
     Loader {
