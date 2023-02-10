@@ -334,7 +334,7 @@ void SpellCheckService::setMisspelledFragments(const QList<TextFragment> &val)
     m_misspelledFragments = val;
 
     QJsonArray json;
-    for (const TextFragment &textFrag : m_misspelledFragments) {
+    for (const TextFragment &textFrag : qAsConst(m_misspelledFragments)) {
         QJsonObject item;
         item.insert("start", textFrag.start());
         item.insert("length", textFrag.length());
