@@ -638,9 +638,11 @@ Item {
                                 else
                                     ret = idxList.length + " Scenes"
 
-                                var from = Scrite.document.screenplay.elementAt(idxList[0])
-                                var to = Scrite.document.screenplay.elementAt(idxList[idxList.length-1])
-                                ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
+                                if(!screenplayTextDocument.paused) {
+                                    var from = Scrite.document.screenplay.elementAt(idxList[0])
+                                    var to = Scrite.document.screenplay.elementAt(idxList[idxList.length-1])
+                                    ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
+                                }
 
                                 return ret
                             }
