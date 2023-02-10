@@ -4108,6 +4108,7 @@ Rectangle {
                 else {
                     active = true
                     Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
+                    contentView.movingChanged.disconnect(load)
                 }
             }
 

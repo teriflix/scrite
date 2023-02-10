@@ -3,7 +3,10 @@ function execLater(contextObject, delay, callback, args) {
     timer.interval = delay === undefined ? 100 : delay
     timer.repeat = false
     timer.triggered.connect(() => {
-                                callback(args)
+                                if(args)
+                                    callback(args)
+                                else
+                                    callback()
                                 timer.destroy()
                             })
     timer.start()
