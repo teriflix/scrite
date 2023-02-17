@@ -466,8 +466,8 @@ Item {
 
     ScreenplayTextDocument {
         id: screenplayTextDocument
-        screenplay: Scrite.document.loading || paused ? null : (editor ? screenplayAdapter.screenplay : null)
-        formatting: Scrite.document.loading || paused ? null : (editor ? Scrite.document.printFormat : null)
+        screenplay: Scrite.document.loading || paused ? null : screenplayAdapter.screenplay
+        formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
         property bool paused: screenplayEditorSettings.pausePageAndTimeComputation
         onPausedChanged: Qt.callLater( function() {
             screenplayEditorSettings.pausePageAndTimeComputation = screenplayTextDocument.paused
