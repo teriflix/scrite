@@ -212,7 +212,6 @@ Row {
     ToolButton3 {
         iconSource: "../icons/navigation/refresh.png"
         shortcut: "F5"
-        shortcutText: ""
         ToolTip.text: "Reloads formatting for this scene.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: binder ? true : false
         onClicked: {
@@ -278,7 +277,6 @@ Row {
     ToolButton3 {
         iconSource: "../icons/action/add_episode.png"
         shortcut: "Ctrl+Shift+P"
-        shortcutText: ""
         ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !Scrite.document.readOnly
         onClicked: addEpisode()
@@ -299,7 +297,6 @@ Row {
     ToolButton3 {
         iconSource: "../icons/action/add_act.png"
         shortcut: "Ctrl+Shift+B"
-        shortcutText: ""
         ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !Scrite.document.readOnly
         onClicked: addAct()
@@ -318,7 +315,6 @@ Row {
     ToolButton3 {
         iconSource: "../icons/action/add_scene.png"
         shortcut: "Ctrl+Shift+N"
-        shortcutText: ""
         ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !Scrite.document.readOnly
         onClicked: addScene()
@@ -370,7 +366,6 @@ Row {
         ToolButton3 {
             iconSource: modelData.icon
             shortcut: "Ctrl+" + index
-            shortcutText: (index+1)
             ToolTip.visible: containsMouse
             ToolTip.text: Scrite.app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
             enabled: screenplayEditorToolbar.formattable

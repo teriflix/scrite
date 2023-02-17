@@ -537,7 +537,6 @@ Item {
                 iconSource: "../icons/action/description.png"
                 text: "New"
                 shortcut: "Ctrl+N"
-                shortcutText: "N"
                 onClicked: {
                     if(Scrite.document.autoSave && Scrite.document.fileName !== "")
                         Scrite.document.save()
@@ -577,7 +576,6 @@ Item {
                 iconSource: "../icons/file/folder_open.png"
                 text: "Open"
                 shortcut: "Ctrl+O"
-                shortcutText: "O"
                 down: recentFilesMenu.visible
                 onClicked: recentFilesMenu.open()
 
@@ -760,7 +758,6 @@ Item {
                 iconSource: "../icons/content/save.png"
                 text: "Save"
                 shortcut: "Ctrl+S"
-                shortcutText: "S"
                 enabled: Scrite.document.modified && !Scrite.document.readOnly
                 onClicked: doClick()
                 function doClick() {
@@ -781,7 +778,6 @@ Item {
             ToolButton3 {
                 text: "Save As"
                 shortcut: "Ctrl+Shift+S"
-                shortcutText: "Shift+S"
                 iconSource: "../icons/content/save_as.png"
                 onClicked: fileDialog.launch("SAVE")
                 enabled: Scrite.document.structure.elementCount > 0 ||
@@ -798,7 +794,6 @@ Item {
                 iconSource: "../icons/action/library.png"
                 text: "<img src=\"qrc:/images/library_woicon_inverted.png\" height=\"30\" width=\"107\">\t&nbsp;"
                 shortcut: "Ctrl+Shift+O"
-                shortcutText: "Shift+O"
                 function go() {
                     modalDialog.closeable = false
                     modalDialog.popupSource = openFromLibrary
@@ -1181,7 +1176,6 @@ Item {
                 iconSource: "../icons/content/language.png"
                 text: Scrite.app.transliterationEngine.languageAsString
                 shortcut: "Ctrl+L"
-                shortcutText: "L"
                 ToolTip.text: Scrite.app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
                 onClicked: languageMenu.visible = true
                 down: languageMenu.visible
@@ -1279,7 +1273,6 @@ Item {
                 iconSource: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
                 ToolTip.text: "Show English to " + Scrite.app.transliterationEngine.languageAsString + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
                 shortcut: "Ctrl+K"
-                shortcutText: "K"
                 onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
                 down: alphabetMappingsPopup.visible
                 enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
