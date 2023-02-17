@@ -102,7 +102,7 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
 
         cursor.insertBlock(blockFormat, charFormat);
         cursor.insertText(it.key());
-        cursor.insertText(" (" + QString::number(headings.size()) + " occurances)");
+        cursor.insertText(" (" + QString::number(headings.size()) + " occurrences)");
 
         const QStringList locTypes = map.keys();
         for (const QString &locType : locTypes) {
