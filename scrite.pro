@@ -83,6 +83,7 @@ HEADERS += \
     src/quick/objects/announcement.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
+    src/quick/objects/contextmenuevent.h \
     src/quick/objects/deltadocument.h \
     src/quick/objects/filemanager.h \
     src/quick/objects/flickscrollspeedcontrol.h \
@@ -210,6 +211,7 @@ SOURCES += \
     src/quick/objects/announcement.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
+    src/quick/objects/contextmenuevent.cpp \
     src/quick/objects/deltadocument.cpp \
     src/quick/objects/filemanager.cpp \
     src/quick/objects/flickscrollspeedcontrol.cpp \

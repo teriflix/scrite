@@ -44,4 +44,39 @@ TextArea {
     Transliterator.cursorPosition: cursorPosition
     Transliterator.hasActiveFocus: activeFocus
     Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+
+    ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
+    ContextMenuEvent.onPopup: __contextMenu.popup()
+
+    Menu2 {
+        id: __contextMenu
+        focus: false
+
+        property bool __persistentSelection: false
+        onAboutToShow: {
+            __persistentSelection = txtAreaInput.persistentSelection
+            txtAreaInput.persistentSelection = true
+        }
+        onAboutToHide: txtAreaInput.persistentSelection = __persistentSelection
+
+        MenuItem2 {
+            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
+            enabled: txtAreaInput.selectedText !== ""
+            onClicked: txtAreaInput.cut()
+            focusPolicy: Qt.NoFocus
+        }
+
+        MenuItem2 {
+            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            enabled: txtAreaInput.selectedText !== ""
+            onClicked: txtAreaInput.copy()
+            focusPolicy: Qt.NoFocus
+        }
+
+        MenuItem2 {
+            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
+            onClicked: txtAreaInput.paste()
+            focusPolicy: Qt.NoFocus
+        }
+    }
 }

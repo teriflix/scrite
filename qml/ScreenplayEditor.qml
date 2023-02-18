@@ -415,21 +415,13 @@ Rectangle {
                                     color: loglineLimiter.limitReached ? "darkred" : primaryColors.a700.background
                                 }
 
-                                TextArea {
+                                TextAreaInput {
                                     id: logLineField
                                     width: parent.width
                                     font: screenplayFormat.defaultFont2
                                     readOnly: Scrite.document.readOnly
-                                    palette: Scrite.app.palette
-                                    selectByMouse: true
-                                    selectByKeyboard: true
                                     text: Scrite.document.screenplay.logline
                                     onTextChanged: Scrite.document.screenplay.logline = text
-                                    Transliterator.defaultFont: font
-                                    Transliterator.textDocument: textDocument
-                                    Transliterator.cursorPosition: cursorPosition
-                                    Transliterator.hasActiveFocus: activeFocus
-                                    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     placeholderText: "Type your logline here, max " + loglineLimiter.maxWordCount + " words or " + loglineLimiter.maxLetterCount + " letters."
                                     Component.onCompleted: Transliterator.highlighter.addDelegate(loglineLimitHighlighter)
@@ -1545,7 +1537,7 @@ Rectangle {
                     Component {
                         id: commentsEditComponent
 
-                        TextArea {
+                        TextAreaInput {
                             id: commentsEdit
                             background: Rectangle {
                                 color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
@@ -1554,8 +1546,6 @@ Rectangle {
                             onTextChanged: contentItem.theScene.comments = text
                             wrapMode: Text.WordWrap
                             text: contentItem.theScene.comments
-                            selectByMouse: true
-                            selectByKeyboard: true
                             leftPadding: 10
                             rightPadding: 10
                             topPadding: 10
@@ -1566,11 +1556,6 @@ Rectangle {
                                     screenplayAdapter.currentIndex = contentItem.theIndex
                             }
 
-                            Transliterator.defaultFont: font
-                            Transliterator.textDocument: textDocument
-                            Transliterator.cursorPosition: cursorPosition
-                            Transliterator.hasActiveFocus: activeFocus
-                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                             Transliterator.spellCheckEnabled: true
 
                             SpecialSymbolsSupport {

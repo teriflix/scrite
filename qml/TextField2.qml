@@ -118,21 +118,7 @@ TextField {
 
     Keys.onTabPressed: autoCompleteOrFocusNext(true)
 
-    EventFilter.events: [EventFilter.MouseButtonPress]
-    EventFilter.onFilter: (object,event,result) => {
-                              if(event.type === EventFilter.MouseButtonPress) {
-                                  if(event.button === Qt.RightButton) {
-                                      contextMenu.popup()
-                                      result.filter = true
-                                      result.acceptEvent = true
-                                      return
-                                  }
-                              }
-
-                              result.filter = false
-                              result.acceptEvent = false
-                              return
-                          }
+    ContextMenuEvent.onPopup: contextMenu.popup()
 
     function autoCompleteOrFocusNext(doTabItem) {
         if(completionModel.hasSuggestion && completionModel.suggestion !== text) {
@@ -234,6 +220,13 @@ TextField {
 
     Menu2 {
         id: contextMenu
+        focus: false
+        property bool __persistentSelection: false
+        onAboutToShow: {
+            __persistentSelection = textField.persistentSelection
+            textField.persistentSelection = true
+        }
+        onAboutToHide: textField.persistentSelection = __persistentSelection
 
         MenuItem2 {
             text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")

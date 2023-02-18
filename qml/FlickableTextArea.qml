@@ -105,4 +105,38 @@ Flickable {
         TabSequenceItem.manager: tabSequenceManager
         TabSequenceItem.sequence: tabSequenceIndex
     }
+
+    ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
+    ContextMenuEvent.onPopup: __contextMenu.popup()
+
+    Menu2 {
+        id: __contextMenu
+
+        property bool __persistentSelection: false
+        onAboutToShow: {
+            __persistentSelection = __textArea.persistentSelection
+            __textArea.persistentSelection = true
+        }
+        onAboutToHide: __textArea.persistentSelection = __persistentSelection
+
+        MenuItem2 {
+            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
+            enabled: __textArea.selectedText !== ""
+            onClicked: __textArea.cut()
+            focusPolicy: Qt.NoFocus
+        }
+
+        MenuItem2 {
+            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            enabled: __textArea.selectedText !== ""
+            onClicked: __textArea.copy()
+            focusPolicy: Qt.NoFocus
+        }
+
+        MenuItem2 {
+            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
+            onClicked: __textArea.paste()
+            focusPolicy: Qt.NoFocus
+        }
+    }
 }
