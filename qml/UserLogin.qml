@@ -325,27 +325,44 @@ Item {
                     anchors.centerIn: parent
                     spacing: 40
 
-                    TextField {
+                    TextField2 {
                         id: activationCodeField
                         width: parent.width
-                        placeholderText: "Paste the activation code here..."
-                        font.pixelSize: modalDialog.height * 0.035
+                        enableTransliteration: false
+                        includeEmojiSymbols: false
+                        tabItemUponReturn: false
+                        placeholderText: text === "" ? "Paste the activation code here..." : "Activation Code: "
+                        font.pixelSize: modalDialog.height * 0.025
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
                         Keys.onReturnPressed: nextButton.click()
                         Keys.onEscapePressed: focus = false
+                        onTextChanged: {
+                            if(text === "")
+                                resendActivationCodeTimer.begin()
+                            else {
+                                resendActivationCode.timeout = false
+                                resendActivationCodeTimer.end()
+                            }
+
+                            activateCall.reset()
+                            resendActivationCodeCall.reset()
+                        }
                     }
 
                     Text {
                         width: parent.width * 0.8
                         wrapMode: Text.WordWrap
                         font.pointSize: Scrite.app.idealFontPointSize
-                        horizontalAlignment: Text.AlignHCenter
+                        horizontalAlignment: resendActivationCode.visible && resendActivationCode.enabled ? Text.AlignLeft : Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: {
+                            const email = activateCall.fetch("email")
+                            if(resendActivationCode.visible && resendActivationCode.enabled)
+                                return "If you have not yet received the activation code on <b>" + email + "</b>, then<br/>... click on the 'Resend Code' to get a new code, or<br/>... click on 'Change Email' to provide a new email-id."
                             if(activationCodeField.length < 20)
-                                return "Paste the activation code sent to your email: <b>" + activateCall.fetch("email") + "</b> into the field above."
-                            return "Click on the Activate button to complete activating your installation of Scrite."
+                                return "Paste the activation code sent to your email: <b>" + email + "</b> into the field above."
+                            return "Click 'Activate' to complete activation."
                         }
                     }
                 }
@@ -368,14 +385,79 @@ Item {
                 anchors.leftMargin: 20
                 anchors.rightMargin: 20
 
+                Button2 {
+                    id: resendActivationCode
+                    text: "Resend Code" + (resendActivationCodeTimer.running ? " (" + resendActivationCodeTimer.secondsLeft + ")" : "")
+                    visible: !errorMessageText.visible
+                    enabled: timeout
+                    anchors.centerIn: parent
+                    property bool timeout: false
+
+                    Timer {
+                        id: resendActivationCodeTimer
+                        running: true
+                        interval: 1000
+                        repeat: true
+                        onTriggered: {
+                            secondsLeft = Math.max(secondsLeft-1, 0)
+                            if(secondsLeft === 0) {
+                                stop()
+                                resendActivationCode.timeout = true
+                            }
+                        }
+
+                        readonly property int maxSeconds: 30
+                        property int secondsLeft: maxSeconds
+
+                        function begin() {
+                            secondsLeft = maxSeconds
+                            start()
+                        }
+                        function end() {
+                            stop()
+                        }
+                    }
+
+                    JsonHttpRequest {
+                        id: resendActivationCodeCall
+                        type: JsonHttpRequest.POST
+                        api: "app/activate"
+                        token: ""
+                        reportNetworkErrors: true
+                        onFinished: {
+                            if(hasError || !hasResponse)
+                                return
+                            resendActivationCode.timeout = false
+                            resendActivationCodeTimer.begin()
+                        }
+                        onBusyChanged: modalDialog.closeable = !busy
+                    }
+
+                    onClicked: {
+                        resendActivationCodeCall.data = {
+                            "email": activateCall.fetch("email"),
+                            "request": "resendActivationCode"
+                        }
+                        resendActivationCodeCall.call()
+                    }
+                }
+
                 Text {
+                    id: errorMessageText
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
                     font.pointSize: (Scrite.app.isMacOSPlatform ? Scrite.app.idealFontPointSize-2 : Scrite.app.idealFontPointSize)
                     maximumLineCount: 3
                     color: "red"
-                    text: activateCall.hasError ? (activateCall.errorCode + ": " + activateCall.errorText) : ""
+                    visible: text !== ""
+                    text: {
+                        if(activateCall.hasError)
+                            return (activateCall.errorCode + ": " + activateCall.errorText)
+                        if(resendActivationCodeCall.hasError)
+                            return (resendActivationCodeCall.errorCode + ": " + resendActivationCodeCall.errorText)
+                        return ""
+                    }
                 }
             }
 
@@ -406,7 +488,7 @@ Item {
 
             BusyOverlay {
                 anchors.fill: parent
-                visible: activateCall.busy
+                visible: activateCall.busy || resendActivationCodeCall.busy
                 busyMessage: "Please wait.."
             }
 

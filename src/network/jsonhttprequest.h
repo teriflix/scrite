@@ -133,6 +133,13 @@ public:
     Q_SIGNAL void reportNetworkErrorsChanged();
 
     Q_INVOKABLE bool call();
+    Q_INVOKABLE void reset()
+    {
+        this->clearError();
+        this->clearResponse();
+    }
+    Q_INVOKABLE void clearError() { this->setError(QJsonObject()); }
+    Q_INVOKABLE void clearResponse() { this->setResponse(QJsonObject()); }
 
     bool autoDelete() const;
     void setAutoDelete(bool val);
@@ -150,8 +157,6 @@ signals:
 private:
     void setError(const QJsonObject &val);
     void setResponse(const QJsonObject &val);
-    void clearError() { this->setError(QJsonObject()); }
-    void clearResponse() { this->setResponse(QJsonObject()); }
     void onNetworkReplyError();
     void onNetworkReplyFinished();
 

@@ -118,6 +118,22 @@ TextField {
 
     Keys.onTabPressed: autoCompleteOrFocusNext(true)
 
+    EventFilter.events: [EventFilter.MouseButtonPress]
+    EventFilter.onFilter: (object,event,result) => {
+                              if(event.type === EventFilter.MouseButtonPress) {
+                                  if(event.button === Qt.RightButton) {
+                                      contextMenu.popup()
+                                      result.filter = true
+                                      result.acceptEvent = true
+                                      return
+                                  }
+                              }
+
+                              result.filter = false
+                              result.acceptEvent = false
+                              return
+                          }
+
     function autoCompleteOrFocusNext(doTabItem) {
         if(completionModel.hasSuggestion && completionModel.suggestion !== text) {
             text = includeSuggestion(completionModel.suggestion)
@@ -213,6 +229,30 @@ TextField {
             currentIndex: completionModel.currentRow
             height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
             ScrollBar.vertical: ScrollBar2 { flickable: completionView }
+        }
+    }
+
+    Menu2 {
+        id: contextMenu
+
+        MenuItem2 {
+            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
+            enabled: textField.selectedText !== ""
+            onClicked: textField.cut()
+            focusPolicy: Qt.NoFocus
+        }
+
+        MenuItem2 {
+            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            enabled: textField.selectedText !== ""
+            onClicked: textField.copy()
+            focusPolicy: Qt.NoFocus
+        }
+
+        MenuItem2 {
+            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
+            onClicked: textField.paste()
+            focusPolicy: Qt.NoFocus
         }
     }
 

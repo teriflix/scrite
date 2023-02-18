@@ -1515,7 +1515,7 @@ Item {
 
                         MenuSeparator { }
 
-                        Menu {
+                        Menu2 {
                             title: "View"
                             width: 250
 

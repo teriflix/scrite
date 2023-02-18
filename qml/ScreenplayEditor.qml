@@ -2046,6 +2046,13 @@ Rectangle {
                             height: completionView.height + topInset + bottomInset + topPadding + bottomPadding
                             focus: false
                             closePolicy: Popup.NoAutoClose
+                            Connections {
+                                target: dialogUnderlay
+                                function onVisibleChanged() {
+                                    if(dialogUnderlay.visible)
+                                        completionViewPopup.close()
+                                }
+                            }
                             contentItem: ListView {
                                 id: completionView
                                 model: completionModel
