@@ -107,7 +107,13 @@ Flickable {
     }
 
     ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
-    ContextMenuEvent.onPopup: __contextMenu.popup()
+    ContextMenuEvent.onPopup: (mouse) => {
+        if(!__textArea.activeFocus) {
+            __textArea.forceActiveFocus()
+            __textArea.cursorPosition = __textArea.positionAt(mouse.x, mouse.y)
+        }
+        __contextMenu.popup()
+    }
 
     Menu2 {
         id: __contextMenu

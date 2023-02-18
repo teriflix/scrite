@@ -1654,20 +1654,12 @@ Rectangle {
                             elide: Text.ElideMiddle
                         }
 
-                        TextArea {
+                        TextAreaInput {
                             id: synopsisEditorField
                             width: parent.width
                             font.pointSize: sceneHeadingFieldsFontPointSize
                             readOnly: Scrite.document.readOnly
-                            palette: Scrite.app.palette
-                            selectByMouse: true
-                            selectByKeyboard: true
                             text: contentItem.theScene.title
-                            Transliterator.defaultFont: font
-                            Transliterator.textDocument: textDocument
-                            Transliterator.cursorPosition: cursorPosition
-                            Transliterator.hasActiveFocus: activeFocus
-                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                             Transliterator.spellCheckEnabled: true
                             onTextChanged: contentItem.theScene.title = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere

@@ -45,7 +45,7 @@ public:
     Q_SIGNAL void modeChanged();
 
 signals:
-    void popup();
+    void popup(const QPointF &mouse);
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event);

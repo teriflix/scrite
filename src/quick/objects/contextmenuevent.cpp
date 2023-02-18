@@ -58,26 +58,23 @@ void ContextMenuEvent::setMode(Mode val)
 
 bool ContextMenuEvent::eventFilter(QObject *watched, QEvent *event)
 {
-    auto isMouseCursorInItem = [](QQuickItem *item) {
-        if (item == nullptr)
-            return false;
+    if (m_item == nullptr)
+        return false;
 
-        const QPointF globalCursorPos = QCursor::pos();
-        const QPointF itemCursorPos = item->mapFromGlobal(globalCursorPos);
-        const QRectF itemRect(0, 0, item->width(), item->height());
-        return itemRect.contains(itemCursorPos);
-    };
+    const QPointF globalCursorPos = QCursor::pos();
+    const QPointF itemCursorPos = m_item->mapFromGlobal(globalCursorPos);
+    const QRectF itemRect(0, 0, m_item->width(), m_item->height());
 
-    if (watched == m_item || m_mode == GlobalEventFilterMode ? isMouseCursorInItem(m_item) : false) {
+    if (watched == m_item || itemRect.contains(itemCursorPos)) {
         if (event->type() == QEvent::ContextMenu) {
-            emit popup();
+            emit popup(itemCursorPos);
             return true;
         }
 
         if (event->type() == QEvent::MouseButtonPress) {
             QMouseEvent *me = static_cast<QMouseEvent *>(event);
             if (me->button() == Qt::RightButton) {
-                emit popup();
+                emit popup(itemCursorPos);
                 return true;
             }
         }

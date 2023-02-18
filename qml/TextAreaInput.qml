@@ -46,7 +46,13 @@ TextArea {
     Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
 
     ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
-    ContextMenuEvent.onPopup: __contextMenu.popup()
+    ContextMenuEvent.onPopup: (mouse) => {
+        if(!txtAreaInput.activeFocus) {
+            txtAreaInput.forceActiveFocus()
+            txtAreaInput.cursorPosition = txtAreaInput.positionAt(mouse.x, mouse.y)
+        }
+        __contextMenu.popup()
+    }
 
     Menu2 {
         id: __contextMenu

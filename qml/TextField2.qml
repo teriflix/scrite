@@ -118,7 +118,13 @@ TextField {
 
     Keys.onTabPressed: autoCompleteOrFocusNext(true)
 
-    ContextMenuEvent.onPopup: contextMenu.popup()
+    ContextMenuEvent.onPopup: (mouse) => {
+        if(!textField.activeFocus) {
+            textField.forceActiveFocus()
+            textField.cursorPosition = textField.positionAt(mouse.x, mouse.y)
+        }
+        contextMenu.popup()
+    }
 
     function autoCompleteOrFocusNext(doTabItem) {
         if(completionModel.hasSuggestion && completionModel.suggestion !== text) {
