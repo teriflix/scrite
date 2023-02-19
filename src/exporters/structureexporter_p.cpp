@@ -148,7 +148,7 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
         this->addItem(titleCard);
     }
 
-    this->addStandardItems(WatermarkUnderlayLayer
+    this->addStandardItems(WatermarkOverlayLayer
                            + (exporter->isEnableHeaderFooter() ? HeaderFooterLayer : 0));
 }
 

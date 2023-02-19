@@ -42,20 +42,10 @@ public:
     Q_INVOKABLE bool deref();
     Q_INVOKABLE bool reset();
 
-    Q_PROPERTY(int autoDerefInterval READ autoDerefInterval WRITE setAutoDerefInterval NOTIFY autoDerefIntervalChanged)
-    void setAutoDerefInterval(int val);
-    int autoDerefInterval() const { return m_autoDerefInterval; }
-    Q_SIGNAL void autoDerefIntervalChanged();
-
-protected:
-    void timerEvent(QTimerEvent *event);
-
 private:
     void setRefCount(int val);
 
 private:
-    int m_autoDerefInterval = 3000;
-    QBasicTimer m_autoDerefTimer;
     int m_refCount = 0;
     mutable QReadWriteLock m_refCountLock;
 };

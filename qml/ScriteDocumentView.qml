@@ -418,10 +418,10 @@ Item {
             instanceSettings.firstSwitchToStructureTab = true
             appBusyOverlay.ref()
             screenplayAdapter.initialLoadTreshold = 25
-            Utils.execLater(screenplayAdapter, 250, function() {
-                appBusyOverlay.deref()
-                screenplayAdapter.sessionId = Scrite.document.sessionId
-            })
+            Utils.execLater(screenplayAdapter, 250, () => {
+                                appBusyOverlay.deref()
+                                screenplayAdapter.sessionId = Scrite.document.sessionId
+                            })
         }
         function onJustLoaded() {
             instanceSettings.firstSwitchToStructureTab = true
@@ -484,7 +484,7 @@ Item {
         property bool overlayRefCountModified: false
         property bool requiresAppBusyOverlay: mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive
         onUpdateScheduled: {
-            if(requiresAppBusyOverlay) {
+            if(requiresAppBusyOverlay && !overlayRefCountModified) {
                 appBusyOverlay.ref()
                 overlayRefCountModified = true
             }

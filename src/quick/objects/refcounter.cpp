@@ -41,30 +41,6 @@ bool RefCounter::reset()
     return ret;
 }
 
-void RefCounter::setAutoDerefInterval(int val)
-{
-    if (m_autoDerefInterval == val)
-        return;
-
-    m_autoDerefInterval = val;
-    if (m_autoDerefTimer.isActive()) {
-        m_autoDerefTimer.stop();
-        if (m_autoDerefInterval > 0)
-            m_autoDerefTimer.start(m_autoDerefInterval, this);
-    }
-
-    emit autoDerefIntervalChanged();
-}
-
-void RefCounter::timerEvent(QTimerEvent *event)
-{
-    if (event->timerId() == m_autoDerefTimer.timerId()) {
-        m_autoDerefTimer.stop();
-        this->setRefCount(this->refCount() - 1);
-    } else
-        QObject::timerEvent(event);
-}
-
 void RefCounter::setRefCount(int val)
 {
     const int val2 = qMax(0, val);
@@ -78,10 +54,6 @@ void RefCounter::setRefCount(int val)
     {
         QWriteLocker locker(&m_refCountLock);
         m_refCount = val2;
-
-        m_autoDerefTimer.stop();
-        if (m_autoDerefInterval > 0 && m_refCount > 0)
-            m_autoDerefTimer.start(m_autoDerefInterval, this);
     }
 
     emit refCountChanged();

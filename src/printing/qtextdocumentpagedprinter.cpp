@@ -537,15 +537,15 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
 
     // Print away!
     while (pageNr <= toPageNr) {
-        if (isPdfDevice)
-            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
-
         painter.save();
         painter.scale(contentScale.first, contentScale.second);
+        this->printPageContents(pageNr, toPageNr, &painter, doc, body);
         if (!isPdfDevice)
             this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
-        this->printPageContents(pageNr, toPageNr, &painter, doc, body);
         painter.restore();
+
+        if (isPdfDevice)
+            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
 
         m_progressReport->tick();
 

@@ -51,9 +51,10 @@ public:
         WatermarkUnderlayLayer = 4,
         WatermarkOverlayLayer = 8,
         HeaderFooterAndWatermarkUnderlay = 7,
+        HeaderFooterAndWatermarkOverlay = 11,
         DontIncludeScriteLink = 16
     };
-    void addStandardItems(int items = HeaderFooterAndWatermarkUnderlay);
+    void addStandardItems(int items = HeaderFooterAndWatermarkOverlay);
 
     bool exportToPdf(const QString &fileName);
     bool exportToPdf(QIODevice *device);
