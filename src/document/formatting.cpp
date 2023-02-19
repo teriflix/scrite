@@ -2433,6 +2433,8 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
 
         QTextCursor cursor(block);
         cursor.setBlockFormat(userData->blockFormat);
+        this->rehighlightBlockLater(block);
+        return;
     }
 
     this->setFormat(0, block.length(), userData->charFormat);
