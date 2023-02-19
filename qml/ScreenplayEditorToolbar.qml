@@ -160,10 +160,10 @@ Row {
                 }
 
                 MenuItem2 {
-                    text: "Show Text Format Tools"
-                    property bool toolsVisible: screenplayEditorSettings.textFormatDockVisible
+                    text: "Show Markup Tools"
+                    property bool toolsVisible: screenplayEditorSettings.markupToolsDockVisible
                     icon.source: toolsVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.textFormatDockVisible = !toolsVisible
+                    onTriggered: screenplayEditorSettings.markupToolsDockVisible = !toolsVisible
                 }
 
                 MenuItem2 {

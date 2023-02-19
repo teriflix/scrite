@@ -143,7 +143,7 @@ Item {
         property bool allowTaggingOfScenes: false
         property real spaceBetweenScenes: 0
         property int commentsPanelTabIndex: 1
-        property bool textFormatDockVisible: true
+        property bool markupToolsDockVisible: true
 
         property bool pausePageAndTimeComputation: false
         property bool highlightCurrentLine: true

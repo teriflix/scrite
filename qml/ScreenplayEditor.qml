@@ -1781,13 +1781,13 @@ Rectangle {
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalScreenplayEditorToolbar.sceneEditor = contentItem
-                            textFormatTools.textFormat = sceneDocumentBinder.textFormat
+                            markupTools.textFormat = sceneDocumentBinder.textFormat
                             justReceivedFocus = true
                         } else {
                             if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
                                 globalScreenplayEditorToolbar.sceneEditor = null
-                            if(textFormatTools.textFormat === sceneDocumentBinder.textFormat)
-                                textFormatTools.textFormat = null
+                            if(markupTools.textFormat === sceneDocumentBinder.textFormat)
+                                markupTools.textFormat = null
                         }
                     }
 
@@ -2114,7 +2114,9 @@ Rectangle {
                             enabled: !Scrite.document.readOnly
                             menu: Menu2 {
                                 property int sceneTextEditorCursorPosition: -1
+                                property SceneElement sceneCurrentElement
                                 onAboutToShow: {
+                                    sceneCurrentElement = sceneDocumentBinder.currentElement
                                     sceneTextEditorCursorPosition = sceneTextEditor.cursorPosition
                                     sceneTextEditor.persistentSelection = true
                                 }
@@ -2182,9 +2184,9 @@ Rectangle {
                                         MenuItem2 {
                                             focusPolicy: Qt.NoFocus
                                             text: modelData.display + "\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
-                                            enabled: sceneDocumentBinder.currentElement !== null
+                                            enabled: ssceneCurrentElement !== null
                                             onClicked: {
-                                                sceneDocumentBinder.currentElement.type = modelData.value
+                                                sceneCurrentElement.type = modelData.value
                                                 editorContextMenu.close()
                                             }
                                         }
@@ -4138,37 +4140,37 @@ Rectangle {
     }
 
     DockWidget {
-        id: textFormatTools
+        id: markupTools
         property TextFormat textFormat
         contentX: 20
         contentY: 20
         contentPadding: 20
         contentWidth: 280
         contentHeight: 84
-        title: "Text Format Tools"
+        title: "Markup Tools"
         anchors.fill: parent
         closable: true
         visible: false
-        onCloseRequest: screenplayEditorSettings.textFormatDockVisible = false
+        onCloseRequest: screenplayEditorSettings.markupToolsDockVisible = false
 
         function adjustCoordinates() {
-            const cx = textFormatToolsSettings.contentX
-            const cy = textFormatToolsSettings.contentY
+            const cx = markupToolsSettings.contentX
+            const cy = markupToolsSettings.contentY
             contentX = Math.round(Math.min(Math.max(20, cx), parent.width-contentWidth-20))
             contentY = Math.round(Math.min(Math.max(20, cy), parent.height-contentHeight-20))
-            visible = Qt.binding( () => { return screenplayEditorSettings.textFormatDockVisible } )
+            visible = Qt.binding( () => { return screenplayEditorSettings.markupToolsDockVisible } )
         }
 
-        Component.onCompleted: Utils.execLater(textFormatTools, 200, adjustCoordinates)
+        Component.onCompleted: Utils.execLater(markupTools, 200, adjustCoordinates)
         Component.onDestruction: {
-            textFormatToolsSettings.contentX = Math.round(contentX)
-            textFormatToolsSettings.contentY = Math.round(contentY)
+            markupToolsSettings.contentX = Math.round(contentX)
+            markupToolsSettings.contentY = Math.round(contentY)
         }
 
         Settings {
-            id: textFormatToolsSettings
+            id: markupToolsSettings
             fileName: Scrite.app.settingsFilePath
-            category: "Text Formatting Tools"
+            category: "Markup Tools"
             property real contentX: 20
             property real contentY: 20
         }
@@ -4176,34 +4178,34 @@ Rectangle {
         Shortcut {
             sequence: "Ctrl+B"
             context: Qt.ApplicationShortcut
-            enabled: textFormatTools.textFormat
+            enabled: markupTools.textFormat
             ShortcutsModelItem.title: "Bold"
             ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Text Formatting"
+            ShortcutsModelItem.group: "Markup Tools"
             ShortcutsModelItem.enabled: enabled
-            onActivated: textFormatTools.textFormat.toggleBold()
+            onActivated: markupTools.textFormat.toggleBold()
         }
 
         Shortcut {
             sequence: "Ctrl+I"
             context: Qt.ApplicationShortcut
-            enabled: textFormatTools.textFormat
+            enabled: markupTools.textFormat
             ShortcutsModelItem.title: "Italics"
             ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Text Formatting"
+            ShortcutsModelItem.group: "Markup Tools"
             ShortcutsModelItem.enabled: enabled
-            onActivated: textFormatTools.textFormat.toggleItalics()
+            onActivated: markupTools.textFormat.toggleItalics()
         }
 
         Shortcut {
             sequence: "Ctrl+U"
             context: Qt.ApplicationShortcut
-            enabled: textFormatTools.textFormat
+            enabled: markupTools.textFormat
             ShortcutsModelItem.title: "Underline"
             ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Text Formatting"
+            ShortcutsModelItem.group: "Markup Tools"
             ShortcutsModelItem.enabled: enabled
-            onActivated: textFormatTools.textFormat.toggleUnderline()
+            onActivated: markupTools.textFormat.toggleUnderline()
         }
 
         content: Rectangle {
@@ -4212,29 +4214,29 @@ Rectangle {
             Row {
                 id: toolsLayout
                 anchors.centerIn: parent
-                enabled: textFormatTools.textFormat
+                enabled: markupTools.textFormat
                 opacity: enabled ? 1 : 0.5
                 spacing: 4
                 height: 55
 
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_bold.png"
-                    checked: textFormatTools.textFormat ? textFormatTools.textFormat.bold : false
-                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.toggleBold()
+                    checked: markupTools.textFormat ? markupTools.textFormat.bold : false
+                    onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleBold()
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_italics.png"
-                    checked: textFormatTools.textFormat ? textFormatTools.textFormat.italics : false
-                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.toggleItalics()
+                    checked: markupTools.textFormat ? markupTools.textFormat.italics : false
+                    onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleItalics()
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_underline.png"
-                    checked: textFormatTools.textFormat ? textFormatTools.textFormat.underline : false
-                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.toggleUnderline()
+                    checked: markupTools.textFormat ? markupTools.textFormat.underline : false
+                    onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleUnderline()
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
@@ -4243,13 +4245,13 @@ Rectangle {
                     width: 42
                     height: 30
                     anchors.verticalCenter: parent.verticalCenter
-                    selectedColor: textFormatTools.textFormat ? textFormatTools.textFormat.textColor : transparent
+                    selectedColor: markupTools.textFormat ? markupTools.textFormat.textColor : transparent
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Text Color"
                     onColorPicked: (newColor) => {
-                                       if(textFormatTools.textFormat)
-                                            textFormatTools.textFormat.textColor = newColor
+                                       if(markupTools.textFormat)
+                                            markupTools.textFormat.textColor = newColor
                                    }
 
                     Rectangle {
@@ -4274,13 +4276,13 @@ Rectangle {
                     width: 42
                     height: 30
                     anchors.verticalCenter: parent.verticalCenter
-                    selectedColor: textFormatTools.textFormat ? textFormatTools.textFormat.backgroundColor : transparent
+                    selectedColor: markupTools.textFormat ? markupTools.textFormat.backgroundColor : transparent
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Background Color"
                     onColorPicked: (newColor) => {
-                                       if(textFormatTools.textFormat)
-                                            textFormatTools.textFormat.backgroundColor = newColor
+                                       if(markupTools.textFormat)
+                                            markupTools.textFormat.backgroundColor = newColor
                                    }
 
                     Rectangle {
@@ -4304,7 +4306,7 @@ Rectangle {
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_clear.png"
                     checked: false
-                    onClicked: if(textFormatTools.textFormat) textFormatTools.textFormat.reset()
+                    onClicked: if(markupTools.textFormat) markupTools.textFormat.reset()
                     anchors.verticalCenter: parent.verticalCenter
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
