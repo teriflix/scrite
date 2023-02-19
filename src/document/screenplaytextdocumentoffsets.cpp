@@ -236,7 +236,7 @@ QString ScreenplayTextDocumentOffsets::fileNameFrom(const QString &mediaFileName
         mediaFileName = mediaFileNameOrUrl;
 
     QFileInfo fi(mediaFileName);
-    return fi.absoluteDir().absoluteFilePath(fi.baseName()
+    return fi.absoluteDir().absoluteFilePath(fi.completeBaseName()
                                              + QStringLiteral(" Scrited View Offsets.json"));
 }
 

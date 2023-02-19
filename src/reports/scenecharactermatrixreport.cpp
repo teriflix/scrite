@@ -82,7 +82,7 @@ QString SceneCharacterMatrixReport::polishFileName(const QString &fileName) cons
 {
     if (this->format() == OpenDocumentFormat) {
         QFileInfo fi(fileName);
-        return fi.absoluteDir().absoluteFilePath(fi.baseName() + QStringLiteral(".csv"));
+        return fi.absoluteDir().absoluteFilePath(fi.completeBaseName() + QStringLiteral(".csv"));
     }
 
     return AbstractReportGenerator::polishFileName(fileName);

@@ -195,7 +195,7 @@ void NotebookReport::evaluateTitleAndSubtitle()
         if (scriteDocument->fileName().isEmpty())
             m_title = QLatin1String("Untitled Screenplay");
         else
-            m_title = QFileInfo(scriteDocument->fileName()).baseName();
+            m_title = QFileInfo(scriteDocument->fileName()).completeBaseName();
     } else
         m_title = screenplay->title();
 

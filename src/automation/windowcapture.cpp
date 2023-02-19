@@ -142,7 +142,7 @@ QString WindowCapture::capture()
     if (m_forceCounterInFileName || (fi.exists() && !m_replaceExistingFile)) {
         int counter = 1;
         while (1) {
-            absoluteFilePath = dir.absoluteFilePath(fi.baseName() + QStringLiteral("-")
+            absoluteFilePath = dir.absoluteFilePath(fi.completeBaseName() + QStringLiteral("-")
                                                     + QString::number(counter++)
                                                     + QStringLiteral(".") + fi.suffix());
             if (!QFile::exists(absoluteFilePath))

@@ -45,7 +45,7 @@ public:
 
     Q_PROPERTY(QString baseName READ baseName WRITE setBaseName NOTIFY fileInfoChanged)
     void setBaseName(const QString &val);
-    QString baseName() const { return m_fileInfo.baseName(); }
+    QString baseName() const { return m_fileInfo.completeBaseName(); }
 
     QFileInfo fileInfo() const { return m_fileInfo; }
     Q_SIGNAL void fileInfoChanged();

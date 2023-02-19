@@ -126,7 +126,7 @@ void Attachment::openAttachmentAnonymously()
         while (1) {
             QFileInfo fi(anonPath);
             if (fi.exists())
-                anonPath = fi.absolutePath() + QStringLiteral("/") + fi.baseName()
+                anonPath = fi.absolutePath() + QStringLiteral("/") + fi.completeBaseName()
                         + QString::number(index++) + QStringLiteral(".") + fi.suffix();
             else
                 break;
@@ -363,7 +363,7 @@ Attachment *Attachments::includeAttachment(const QString &filePath)
     const QString attachedFilePath = dfs->add(filePath, ns);
 
     Attachment *ptr = new Attachment(this);
-    ptr->setTitle(fi.baseName());
+    ptr->setTitle(fi.completeBaseName());
     ptr->setMimeType(mimeType.name());
     ptr->setFilePath(attachedFilePath);
     ptr->setOriginalFileName(fi.fileName());
@@ -722,7 +722,7 @@ bool AttachmentsDropArea::prepareAttachmentFromMimeData(const QMimeData *mimeDat
     }
 
     Attachment *ptr = new Attachment(this);
-    ptr->setTitle(fi.baseName());
+    ptr->setTitle(fi.completeBaseName());
     ptr->setFilePath(fi.absoluteFilePath());
     ptr->setMimeType(mimeType.name());
     ptr->setOriginalFileName(fi.fileName());

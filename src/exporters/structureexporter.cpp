@@ -96,10 +96,7 @@ bool StructureExporter::doExport(QIODevice *device)
 
 QString StructureExporter::polishFileName(const QString &fileName) const
 {
-    QFileInfo fi(fileName);
-
-    QString baseName = fi.baseName();
-    baseName.replace(QStringLiteral("Screenplay"), QStringLiteral("Structure"));
-
+    const QFileInfo fi(fileName);
+    const QString baseName = fi.completeBaseName();
     return fi.absoluteDir().absoluteFilePath(baseName + QStringLiteral(".pdf"));
 }

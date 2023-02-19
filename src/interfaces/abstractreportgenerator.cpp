@@ -53,7 +53,8 @@ void AbstractReportGenerator::setFormat(AbstractReportGenerator::Format val)
         const QString suffix =
                 m_format == AdobePDF ? QStringLiteral(".pdf") : QStringLiteral(".odt");
         const QFileInfo fileInfo(this->fileName());
-        this->setFileName(fileInfo.absoluteDir().absoluteFilePath(fileInfo.baseName() + suffix));
+        this->setFileName(
+                fileInfo.absoluteDir().absoluteFilePath(fileInfo.completeBaseName() + suffix));
     }
 }
 

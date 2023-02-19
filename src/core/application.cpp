@@ -734,7 +734,7 @@ QJsonObject Application::fileInfo(const QString &path) const
     if (!fi.exists())
         return ret;
 
-    ret.insert("baseName", fi.baseName());
+    ret.insert("baseName", fi.completeBaseName());
     ret.insert("absoluteFilePath", fi.absoluteFilePath());
     ret.insert("absolutePath", fi.absolutePath());
     ret.insert("suffix", fi.suffix());
@@ -1162,29 +1162,31 @@ QString Application::replaceCharacterName(const QString &from, const QString &to
     return in;
 }
 
-QString Application::sanitiseFileName(const QString &fileName)
+QString Application::sanitiseFileName(const QString &fileName, QSet<QChar> *removedChars)
 {
     const QFileInfo fi(fileName);
 
-    QString baseName = fi.baseName();
+    QString completeBaseName = fi.completeBaseName();
     bool changed = false;
-    for (int i = baseName.length() - 1; i >= 0; i--) {
-        const QChar ch = baseName.at(i);
+    for (int i = completeBaseName.length() - 1; i >= 0; i--) {
+        const QChar ch = completeBaseName.at(i);
         if (ch.isLetterOrNumber())
             continue;
 
-        static const QList<QChar> allowedChars = {
-            '-', '_', '[', ']', '(', ')', '{', '}', '&', ' '
-        };
+        static const QList<QChar> allowedChars = { '-', '_', '[', ']', '(', ')',
+                                                   '{', '}', '&', ' ', '.' };
         if (allowedChars.contains(ch))
             continue;
 
-        baseName = baseName.remove(i, 1);
+        if (removedChars)
+            *removedChars += ch;
+
+        completeBaseName = completeBaseName.remove(i, 1);
         changed = true;
     }
 
     if (changed)
-        return fi.absoluteDir().absoluteFilePath(baseName + QStringLiteral(".")
+        return fi.absoluteDir().absoluteFilePath(completeBaseName + QStringLiteral(".")
                                                  + fi.suffix().toLower());
 
     return fileName;
@@ -1423,7 +1425,7 @@ QString Application::copyFile(const QString &fromFilePath, const QString &toFold
         if (QFile::exists(toFilePath)) {
             const QFileInfo toFileInfo(toFilePath);
             toFilePath = toFileInfo.absoluteDir().absoluteFilePath(
-                    toFileInfo.baseName() + QStringLiteral(" ") + QString::number(counter++)
+                    toFileInfo.completeBaseName() + QStringLiteral(" ") + QString::number(counter++)
                     + QStringLiteral(".") + toFileInfo.suffix());
         } else
             break;
@@ -1460,7 +1462,7 @@ QString Application::fileContents(const QString &fileName)
 
 QString Application::fileName(const QString &path)
 {
-    return QFileInfo(path).baseName();
+    return QFileInfo(path).completeBaseName();
 }
 
 QString Application::filePath(const QString &fileName)

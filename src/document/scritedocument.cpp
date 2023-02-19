@@ -110,7 +110,7 @@ QVariant ScriteDocumentBackups::data(const QModelIndex &index, int role) const
         return fi.birthTime().toString();
     case Qt::DisplayRole:
     case FileNameRole:
-        return fi.baseName();
+        return fi.completeBaseName();
     case FilePathRole:
         return fi.absoluteFilePath();
     case RelativeTimeRole:
@@ -168,7 +168,7 @@ void ScriteDocumentBackups::loadBackupFileInformation()
         return;
     }
 
-    const QString backupDirPath(fi.absolutePath() + QStringLiteral("/") + fi.baseName()
+    const QString backupDirPath(fi.absolutePath() + QStringLiteral("/") + fi.completeBaseName()
                                 + QStringLiteral(" Backups"));
     QDir backupDir(backupDirPath);
     if (!backupDir.exists()) {
@@ -1267,7 +1267,7 @@ bool ScriteDocument::open(const QString &fileName)
 
     HourGlass hourGlass;
 
-    this->setBusyMessage("Loading " + QFileInfo(fileName).baseName() + " ...");
+    this->setBusyMessage("Loading " + QFileInfo(fileName).completeBaseName() + " ...");
     this->reset();
     const bool ret = this->load(fileName);
     if (ret)
@@ -1330,7 +1330,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     }
 
     if (!m_autoSaveMode)
-        this->setBusyMessage("Saving to " + QFileInfo(fileName).baseName() + " ...");
+        this->setBusyMessage("Saving to " + QFileInfo(fileName).completeBaseName() + " ...");
 
     m_progressReport->start();
 
@@ -1359,7 +1359,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 #endif
     if (saveJson) {
         const QFileInfo fi(fileName);
-        const QString fileName2 = fi.absolutePath() + "/" + fi.baseName() + ".json";
+        const QString fileName2 = fi.absolutePath() + "/" + fi.completeBaseName() + ".json";
         QFile file2(fileName2);
         file2.open(QFile::WriteOnly);
         file2.write(bytes);
@@ -1393,13 +1393,13 @@ void ScriteDocument::save()
 
     QFileInfo fi(m_fileName);
     if (fi.exists()) {
-        const QString backupDirPath(fi.absolutePath() + "/" + fi.baseName() + " Backups");
+        const QString backupDirPath(fi.absolutePath() + "/" + fi.completeBaseName() + " Backups");
         QDir().mkpath(backupDirPath);
 
         const qint64 now = QDateTime::currentSecsSinceEpoch();
 
         auto timeGapInSeconds = [now](const QFileInfo &fi) {
-            const QString baseName = fi.baseName();
+            const QString baseName = fi.completeBaseName();
             const QString thenStr = baseName.section('[', 1).section(']', 0, 0);
             const qint64 then = thenStr.toLongLong();
             return now - then;
@@ -1425,8 +1425,8 @@ void ScriteDocument::save()
             }
         }
 
-        const QString backupFileName =
-                backupDirPath + "/" + fi.baseName() + " [" + QString::number(now) + "].scrite";
+        const QString backupFileName = backupDirPath + "/" + fi.completeBaseName() + " ["
+                + QString::number(now) + "].scrite";
         const bool backupSuccessful = QFile::copy(m_fileName, backupFileName);
 
         if (firstBackup && backupSuccessful)
@@ -1669,7 +1669,7 @@ bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toScen
 
 inline QString createTimestampString(const QDateTime &dt = QDateTime::currentDateTime())
 {
-    static const QString format = QStringLiteral("MMM dd, yyyy HHmmss");
+    static const QString format = QStringLiteral("MMM dd yyyy h.m AP");
     return dt.toString(format);
 }
 
@@ -1707,14 +1707,17 @@ void ScriteDocument::setupExporter(AbstractExporter *exporter)
     exporter->setDocument(this);
 
     if (exporter->fileName().isEmpty()) {
-        QString suggestedName = m_screenplay->title();
+        QString suggestedName = QFileInfo(m_fileName).completeBaseName();
         if (suggestedName.isEmpty())
-            suggestedName = QFileInfo(m_fileName).baseName();
+            suggestedName = m_screenplay->title();
         if (suggestedName.isEmpty())
-            suggestedName = QStringLiteral("Scrite - Screenplay");
-        else
-            suggestedName += QStringLiteral(" - Screenplay");
+            suggestedName = QStringLiteral("Scrite Screenplay");
+
+        suggestedName += QStringLiteral(" - ") + exporter->formatName();
         suggestedName += QStringLiteral(" - ") + createTimestampString();
+
+        // Insert a dummy extension, so that exporters can correct it.
+        suggestedName += QStringLiteral(".ext");
 
 #if 0
         QFileInfo fi(m_fileName);
@@ -1756,15 +1759,16 @@ void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerat
     reportGenerator->setDocument(this);
 
     if (reportGenerator->fileName().isEmpty()) {
-        QString suggestedName = m_screenplay->title();
+        QString suggestedName = QFileInfo(m_fileName).completeBaseName();
         if (suggestedName.isEmpty())
-            suggestedName = QFileInfo(m_fileName).baseName();
+            suggestedName = m_screenplay->title();
         if (suggestedName.isEmpty())
             suggestedName = QStringLiteral("Scrite");
 
         const QString reportName = reportGenerator->name();
-        const QString suffix =
-                reportGenerator->format() == AbstractReportGenerator::AdobePDF ? ".pdf" : ".odt";
+        const QString suffix = reportGenerator->format() == AbstractReportGenerator::AdobePDF
+                ? QStringLiteral(".pdf")
+                : QStringLiteral(".odt");
         suggestedName = suggestedName + QStringLiteral(" - ") + reportName + QStringLiteral(" - ")
                 + createTimestampString() + suffix;
 
@@ -1849,26 +1853,24 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
         return false;
     }
 
-    QFileInfo fi(fileName);
-
     // 2. Filename must not contain special characters
     // It is true that file names will have already been sanitized using
     // Application::sanitiseFileName() But we double check it here anyway.
-    static const QList<QChar> allowedChars = { '-', '_', '[', ']', '(', ')', '{', '}', '&', ' ' };
-    const QString baseFileName = fi.baseName();
-    for (const QChar ch : baseFileName) {
-        if (ch.isLetterOrNumber() || ch.isSpace())
-            continue;
-
-        if (allowedChars.contains(ch))
-            continue;
-
-        m_errorReport->setErrorMessage(
-                QStringLiteral("File name cannot contain special character '%1'").arg(ch));
+    QSet<QChar> purgedChars;
+    const QString sanitisedFileName = Application::sanitiseFileName(fileName, &purgedChars);
+    if (sanitisedFileName != fileName || !purgedChars.isEmpty()) {
+        if (purgedChars.isEmpty())
+            m_errorReport->setErrorMessage(
+                    QStringLiteral("File name contains invalid characters."));
+        else
+            m_errorReport->setErrorMessage(
+                    QStringLiteral("File name cannot contain special character '%1'")
+                            .arg(*purgedChars.begin()));
         return false;
     }
 
     // 3. File already exists, but has become readonly now.
+    QFileInfo fi(fileName);
     if (fi.exists() && !fi.isWritable()) {
         m_errorReport->setErrorMessage(
                 QStringLiteral("Cannot open '%1' for writing.").arg(fileName));
@@ -1937,7 +1939,7 @@ void ScriteDocument::updateDocumentWindowTitle()
     if (m_fileName.isEmpty())
         title += QStringLiteral("[noname]");
     else
-        title += QFileInfo(m_fileName).baseName();
+        title += QFileInfo(m_fileName).completeBaseName();
     title += QStringLiteral(" - ") + qApp->property("baseWindowTitle").toString();
     this->setDocumentWindowTitle(title);
 }
@@ -2167,7 +2169,7 @@ bool ScriteDocument::load(const QString &fileName)
 #ifndef QT_NO_DEBUG_OUTPUT
     {
         const QFileInfo fi(fileName);
-        const QString fileName2 = fi.absolutePath() + "/" + fi.baseName() + ".json";
+        const QString fileName2 = fi.absolutePath() + "/" + fi.completeBaseName() + ".json";
         QFile file2(fileName2);
         file2.open(QFile::WriteOnly);
         file2.write(jsonDoc.toJson());

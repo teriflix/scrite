@@ -62,8 +62,8 @@ void FileInfo::setSuffix(const QString &val)
     if (ext.startsWith(QStringLiteral(".")))
         ext = ext.mid(1);
 
-    const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + m_fileInfo.baseName()
-            + QStringLiteral(".") + ext;
+    const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/")
+            + m_fileInfo.completeBaseName() + QStringLiteral(".") + ext;
     this->setFileInfo(QFileInfo(afp));
 }
 
