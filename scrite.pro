@@ -218,6 +218,7 @@ SOURCES += \
     src/quick/objects/itempositionmapper.cpp \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/propertyalias.cpp \
+    src/quick/objects/refcounter.cpp \
     src/quick/objects/syntaxhighlighter.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/fileinfo.cpp \

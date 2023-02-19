@@ -218,7 +218,7 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
     QTextTableFormat tableFormat;
     tableFormat.setCellSpacing(0);
     tableFormat.setCellPadding(5);
-    tableFormat.setBorder(3);
+    tableFormat.setBorder(1);
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_Solid);
     tableFormat.setHeaderRowCount(1);
     tableFormat.setAlignment(Qt::AlignHCenter);
