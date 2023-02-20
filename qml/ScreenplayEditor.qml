@@ -2115,6 +2115,7 @@ Rectangle {
                             menu: Menu2 {
                                 property int sceneTextEditorCursorPosition: -1
                                 property SceneElement sceneCurrentElement
+                                property TextFormat sceneTextFormat: sceneDocumentBinder.textFormat
                                 onAboutToShow: {
                                     sceneCurrentElement = sceneDocumentBinder.currentElement
                                     sceneTextEditorCursorPosition = sceneTextEditor.cursorPosition
@@ -2184,7 +2185,7 @@ Rectangle {
                                         MenuItem2 {
                                             focusPolicy: Qt.NoFocus
                                             text: modelData.display + "\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
-                                            enabled: ssceneCurrentElement !== null
+                                            enabled: sceneCurrentElement !== null
                                             onClicked: {
                                                 sceneCurrentElement.type = modelData.value
                                                 editorContextMenu.close()
@@ -4245,7 +4246,7 @@ Rectangle {
                     width: 42
                     height: 30
                     anchors.verticalCenter: parent.verticalCenter
-                    selectedColor: markupTools.textFormat ? markupTools.textFormat.textColor : transparent
+                    selectedColor: markupTools.textFormat ? markupTools.textFormat.textColor : transparentColor
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Text Color"
@@ -4266,7 +4267,7 @@ Rectangle {
                             font.bold: true
                             font.underline: true
                             text: "A"
-                            color: textColorButton.selectedColor === transparent ? "black" : textColorButton.selectedColor
+                            color: textColorButton.selectedColor === transparentColor ? "black" : textColorButton.selectedColor
                         }
                     }
                 }
@@ -4276,7 +4277,7 @@ Rectangle {
                     width: 42
                     height: 30
                     anchors.verticalCenter: parent.verticalCenter
-                    selectedColor: markupTools.textFormat ? markupTools.textFormat.backgroundColor : transparent
+                    selectedColor: markupTools.textFormat ? markupTools.textFormat.backgroundColor : transparentColor
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Background Color"
@@ -4288,7 +4289,7 @@ Rectangle {
                     Rectangle {
                         border.width: 1
                         border.color: "black"
-                        color: bgColorButton.selectedColor === transparent ? "white" : bgColorButton.selectedColor
+                        color: bgColorButton.selectedColor === transparentColor ? "white" : bgColorButton.selectedColor
                         width: Math.min(parent.width,parent.height)
                         height: width
                         anchors.centerIn: parent
@@ -4316,7 +4317,8 @@ Rectangle {
         }
     }
 
-    readonly property color transparent: "transparent"
+    readonly property color transparentColor: "transparent"
+    readonly property var availableColors: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
 
     component SimpleToolButton : Rectangle {
         width: 42
@@ -4344,12 +4346,64 @@ Rectangle {
         }
     }
 
+    component AvailableColorsPalette : Grid {
+        id: colorsGrid
+        property int cellSize: width/columns
+        readonly property int suggestedWidth: 280
+        readonly property int suggestedHeight: 200
+        columns: 7
+        opacity: enabled ? 1 : 0.25
+
+        property color selectedColor: transparentColor
+        signal colorPicked(color newColor)
+
+        Item {
+            width: colorsGrid.cellSize
+            height: colorsGrid.cellSize
+
+            Image {
+                source: "../icons/navigation/close.png"
+                anchors.fill: parent
+                anchors.margins: 5
+                mipmap: true
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: colorPicked(transparentColor)
+            }
+        }
+
+        Repeater {
+            model: availableColors
+
+            Item {
+                required property color modelData
+                required property int index
+                width: colorsGrid.cellSize
+                height: colorsGrid.cellSize
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.margins: 3
+                    border.width: colorsGrid.selectedColor === modelData ? 3 : 0.5
+                    border.color: "black"
+                    color: modelData
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: colorPicked(modelData)
+                }
+            }
+        }
+    }
+
     component ColorButton : Item {
         id: colorButton
         width: 42
         height: 42
-        property var colors: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
-        property color selectedColor: transparent
+        property color selectedColor: transparentColor
         opacity: enabled ? 1 : 0.5
         property alias hoverEnabled: cbMouseArea.hoverEnabled
         property alias containsMouse: cbMouseArea.containsMouse
@@ -4369,63 +4423,19 @@ Rectangle {
             sourceComponent: Popup {
                 id: colorsMenu
                 x: 0; y: 0
-                width: 280
-                height: 200
+                width: availableColorsPalette.suggestedWidth
+                height: availableColorsPalette.suggestedHeight
 
                 Component.onCompleted: open()
                 onClosed: Qt.callLater(() => { colorsMenuLoader.active = false})
 
-                contentItem: Grid {
-                    id: colorsGrid
-                    property int cellSize: width/columns
-                    columns: 7
-
-                    Item {
-                        width: colorsGrid.cellSize
-                        height: colorsGrid.cellSize
-
-                        Image {
-                            source: "../icons/navigation/close.png"
-                            anchors.fill: parent
-                            anchors.margins: 5
-                            mipmap: true
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                colorPicked(transparent)
-                                colorsMenu.close()
-                            }
-                        }
-                    }
-
-                    Repeater {
-                        model: colorButton.colors
-
-                        Item {
-                            required property color modelData
-                            required property int index
-                            width: colorsGrid.cellSize
-                            height: colorsGrid.cellSize
-
-                            Rectangle {
-                                anchors.fill: parent
-                                anchors.margins: 3
-                                border.width: colorButton.selectedColor === modelData ? 3 : 0.5
-                                border.color: "black"
-                                color: modelData
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    colorPicked(modelData)
-                                    colorsMenu.close()
-                                }
-                            }
-                        }
-                    }
+                contentItem: AvailableColorsPalette {
+                    id: availableColorsPalette
+                    selectedColor: colorButton.selectedColor
+                    onColorPicked: (newColor) => {
+                                       colorButton.colorPicked(newColor)
+                                       colorsMenu.close()
+                                   }
                 }
             }
         }
