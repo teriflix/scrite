@@ -213,7 +213,7 @@ public:
     int headerRight() const { return m_headerRight; }
     Q_SIGNAL void headerRightChanged();
 
-    Q_PROPERTY(qreal headerOpacity READ headerOpacity WRITE setHeaderOpacity NOTIFY headerOpacityChanged)
+    Q_PROPERTY(qreal headerOpacity READ headerOpacity WRITE setHeaderOpacity NOTIFY headerOpacityChanged STORED false)
     void setHeaderOpacity(qreal val);
     qreal headerOpacity() const { return m_headerOpacity; }
     Q_SIGNAL void headerOpacityChanged();
@@ -233,7 +233,7 @@ public:
     int footerRight() const { return m_footerRight; }
     Q_SIGNAL void footerRightChanged();
 
-    Q_PROPERTY(qreal footerOpacity READ footerOpacity WRITE setFooterOpacity NOTIFY footerOpacityChanged)
+    Q_PROPERTY(qreal footerOpacity READ footerOpacity WRITE setFooterOpacity NOTIFY footerOpacityChanged STORED false)
     void setFooterOpacity(qreal val);
     qreal footerOpacity() const { return m_footerOpacity; }
     Q_SIGNAL void footerOpacityChanged();
@@ -263,7 +263,7 @@ public:
     QColor watermarkColor() const { return m_watermarkColor; }
     Q_SIGNAL void watermarkColorChanged();
 
-    Q_PROPERTY(qreal watermarkOpacity READ watermarkOpacity WRITE setWatermarkOpacity NOTIFY watermarkOpacityChanged)
+    Q_PROPERTY(qreal watermarkOpacity READ watermarkOpacity WRITE setWatermarkOpacity NOTIFY watermarkOpacityChanged STORED false)
     void setWatermarkOpacity(qreal val);
     qreal watermarkOpacity() const { return m_watermarkOpacity; }
     Q_SIGNAL void watermarkOpacityChanged();
