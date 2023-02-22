@@ -29,10 +29,9 @@
 
 struct DocumentFileSystemData
 {
-    QMutex loadSaveMutex;
-
     QByteArray header;
     QList<DocumentFile *> files;
+    QMutex folderMutex;
     QScopedPointer<QTemporaryDir> folder;
 
     static const QString normalHeaderFile;
@@ -127,6 +126,12 @@ DocumentFileSystem::~DocumentFileSystem()
     delete d;
 }
 
+void DocumentFileSystem::hardReset()
+{
+    QMutexLocker mutexLocker(&d->folderMutex);
+    this->reset();
+}
+
 void DocumentFileSystem::reset()
 {
     d->header.clear();
@@ -200,7 +205,7 @@ bool doUnzip(const QFileInfo &fileInfo, const QTemporaryDir &dstDir)
 
 bool DocumentFileSystem::load(const QString &fileName, Format *format)
 {
-    QMutexLocker mutexLocker(&d->loadSaveMutex);
+    QMutexLocker mutexLocker(&d->folderMutex);
 
     this->reset();
     if (format)
@@ -389,7 +394,8 @@ bool DocumentFileSystem::save(const QString &fileName, bool encrypt, SaveMode mo
          * 1. We assume that when non-blocking-save is triggered, no other attachment is
          *    added to DFS until the save finishes.
          * 2. We also assume that while a non-blocking-save is underway, another request
-         *    won't come. If it does, then the results are undefined.
+         *    won't come. If it does, then the second request will block until the first
+         *    one is completed, even if its results get discarded soon after.
          * 3. We assume that save never takes more than 30 seconds on any computer, which
          *    is the least interval for auto-save.
          *
@@ -412,13 +418,13 @@ bool DocumentFileSystem::save(const QString &fileName, bool encrypt, SaveMode mo
         connect(watcher, &QFutureWatcher<bool>::finished, this,
                 &DocumentFileSystem::saveTaskFinished);
         watcher->setFuture(QtConcurrent::run(saveTask, d->header, encrypt, QDir(d->folder->path()),
-                                             fileName, &d->loadSaveMutex));
+                                             fileName, &d->folderMutex));
 
         return true;
     }
 
     const bool ret =
-            saveTask(d->header, encrypt, QDir(d->folder->path()), fileName, &d->loadSaveMutex);
+            saveTask(d->header, encrypt, QDir(d->folder->path()), fileName, &d->folderMutex);
     return ret;
 #endif
 }

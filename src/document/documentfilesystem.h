@@ -34,9 +34,9 @@ public:
     explicit DocumentFileSystem(QObject *parent = nullptr);
     ~DocumentFileSystem();
 
-    enum Format { UnknownFormat, ScriteFormat, ZipFormat };
+    void hardReset();
 
-    void reset();
+    enum Format { UnknownFormat, ScriteFormat, ZipFormat };
     bool load(const QString &fileName, Format *format = nullptr);
 
     enum SaveMode { BlockingSaveMode, NonBlockingSaveMode };
@@ -69,7 +69,6 @@ public:
                      bool replaceIfExists = true);
 
     // API to cleanup unreferenced files that may be lying around.
-    void cleanup();
     Q_SIGNAL void auction(const QString &path, int *claims);
 
 signals:
@@ -77,6 +76,8 @@ signals:
     void saveFinished(bool success);
 
 private:
+    void reset();
+    void cleanup();
     bool pack(QDataStream &ds);
     bool unpack(QDataStream &ds);
     void saveTaskFinished();

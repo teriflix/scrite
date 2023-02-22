@@ -1170,7 +1170,7 @@ void ScriteDocument::reset()
                    &ScriteDocument::markAsModified);
 
     UndoStack::clearAllStacks();
-    m_docFileSystem.reset();
+    m_docFileSystem.hardReset();
 
     this->setSessionId(QUuid::createUuid().toString());
     this->setDocumentId(QUuid::createUuid().toString());
@@ -2156,7 +2156,7 @@ bool ScriteDocument::load(const QString &fileName)
                 m_document->m_progressReport->finish();
                 m_document->setLoading(false);
             } else
-                m_document->m_docFileSystem.reset();
+                m_document->m_docFileSystem.hardReset();
         }
 
         void begin()
