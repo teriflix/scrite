@@ -38,7 +38,9 @@ public:
 
     void reset();
     bool load(const QString &fileName, Format *format = nullptr);
-    bool save(const QString &fileName, bool encrypt = false);
+
+    enum SaveMode { BlockingSaveMode, NonBlockingSaveMode };
+    bool save(const QString &fileName, bool encrypt = false, SaveMode mode = BlockingSaveMode);
 
     void setHeader(const QByteArray &header);
     QByteArray header() const;
@@ -70,9 +72,14 @@ public:
     void cleanup();
     Q_SIGNAL void auction(const QString &path, int *claims);
 
+signals:
+    void saveStarted();
+    void saveFinished(bool success);
+
 private:
     bool pack(QDataStream &ds);
     bool unpack(QDataStream &ds);
+    void saveTaskFinished();
 
 private:
     friend class DocumentFile;

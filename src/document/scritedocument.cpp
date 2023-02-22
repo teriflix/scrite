@@ -889,7 +889,7 @@ void ScriteDocument::disableCollaboration()
 
 void ScriteDocument::setAutoSaveDurationInSeconds(int val)
 {
-    val = qBound(1, val, 3600);
+    val = qBound(30, val, 3600);
     if (m_autoSaveDurationInSeconds == val)
         return;
 
@@ -1340,18 +1340,6 @@ void ScriteDocument::saveAs(const QString &givenFileName)
     const QByteArray bytes = QJsonDocument(json).toJson();
     m_docFileSystem.setHeader(bytes);
 
-    const bool success = m_docFileSystem.save(fileName, !m_collaborators.isEmpty());
-
-    if (!success) {
-        m_errorReport->setErrorMessage(QStringLiteral("Couldn't save document \"") + fileName
-                                       + QStringLiteral("\""));
-        emit justSaved();
-        m_progressReport->finish();
-        if (!m_autoSaveMode)
-            this->clearBusyMessage();
-        return;
-    }
-
 #ifndef QT_NO_DEBUG_OUTPUT
     const bool saveJson = true;
 #else
@@ -1365,20 +1353,52 @@ void ScriteDocument::saveAs(const QString &givenFileName)
         file2.write(bytes);
     }
 
-    this->setFileName(fileName);
-    this->setCreatedOnThisComputer(true);
+    if (m_autoSaveMode) {
+        QObject *autoSaveContext = new QObject(this);
+        connect(&m_docFileSystem, &DocumentFileSystem::saveFinished, autoSaveContext,
+                [=](bool success) {
+                    autoSaveContext->deleteLater();
+                    if (!success) {
+                        m_errorReport->setErrorMessage(QStringLiteral("Auto Save Failed."));
 
-    emit justSaved();
+                        m_modified = true;
+                        emit modifiedChanged();
+                    }
 
-    m_modified = false;
-    emit modifiedChanged();
+                    emit justSaved();
+                    m_progressReport->finish();
+                });
 
-    m_progressReport->finish();
+        m_docFileSystem.save(fileName, !m_collaborators.isEmpty(),
+                             DocumentFileSystem::NonBlockingSaveMode);
+        m_modified = false;
+        emit modifiedChanged();
+    } else {
+        const bool success = m_docFileSystem.save(fileName, !m_collaborators.isEmpty());
 
-    this->setReadOnly(false);
+        if (!success) {
+            m_errorReport->setErrorMessage(QStringLiteral("Couldn't save document \"") + fileName
+                                           + QStringLiteral("\""));
+            emit justSaved();
+            m_progressReport->finish();
+            this->clearBusyMessage();
+            return;
+        }
 
-    if (!m_autoSaveMode)
+        this->setFileName(fileName);
+        this->setCreatedOnThisComputer(true);
+
+        emit justSaved();
+
+        m_modified = false;
+        emit modifiedChanged();
+
+        m_progressReport->finish();
+
+        this->setReadOnly(false);
+
         this->clearBusyMessage();
+    }
 }
 
 void ScriteDocument::save()

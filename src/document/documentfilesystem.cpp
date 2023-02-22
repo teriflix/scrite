@@ -18,7 +18,9 @@
 #include <QDateTime>
 #include <QDataStream>
 #include <QTemporaryDir>
+#include <QFutureWatcher>
 #include <QStandardPaths>
+#include <QtConcurrentRun>
 
 #include "quazip.h"
 #include "quazipfile.h"
@@ -27,6 +29,8 @@
 
 struct DocumentFileSystemData
 {
+    QMutex loadSaveMutex;
+
     QByteArray header;
     QList<DocumentFile *> files;
     QScopedPointer<QTemporaryDir> folder;
@@ -196,6 +200,8 @@ bool doUnzip(const QFileInfo &fileInfo, const QTemporaryDir &dstDir)
 
 bool DocumentFileSystem::load(const QString &fileName, Format *format)
 {
+    QMutexLocker mutexLocker(&d->loadSaveMutex);
+
     this->reset();
     if (format)
         *format = UnknownFormat;
@@ -290,7 +296,7 @@ void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
     }
 }
 
-bool doZip(const QFileInfo &fileInfo, const QTemporaryDir &srcDir)
+bool doZip(const QFileInfo &fileInfo, const QDir &rootDir)
 {
     const QString zipFileName = fileInfo.absoluteFilePath();
 
@@ -301,8 +307,6 @@ bool doZip(const QFileInfo &fileInfo, const QTemporaryDir &srcDir)
         return false;
     }
 
-    const QDir rootDir(srcDir.path());
-
     doZipRecursively(rootDir, rootDir, qzip);
 
     qzip.close();
@@ -310,7 +314,47 @@ bool doZip(const QFileInfo &fileInfo, const QTemporaryDir &srcDir)
     return true;
 }
 
-bool DocumentFileSystem::save(const QString &fileName, bool encrypt)
+bool saveTask(const QByteArray &header, bool encrypt, const QDir &folder,
+              const QString &targetFileName, QMutex *mutex)
+{
+    QMutexLocker mutexLocker(mutex);
+
+    QByteArray headerData = header;
+    if (encrypt) {
+        SimpleCrypt sc(REST_CRYPT_KEY);
+        headerData = sc.encryptToByteArray(headerData);
+    }
+
+    const QString headerFileName =
+            folder.filePath(encrypt ? DocumentFileSystemData::encryptedHeaderFile
+                                    : DocumentFileSystemData::normalHeaderFile);
+    QSaveFile headerFile(headerFileName);
+    if (!headerFile.open(QFile::WriteOnly))
+        return false;
+
+    headerFile.write(headerData);
+    if (!headerFile.commit())
+        return false;
+
+    const QString tmpFileName = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
+            + QStringLiteral("/scrite_") + QString::number(QDateTime::currentMSecsSinceEpoch())
+            + QStringLiteral("_temp.scrite");
+
+    const QFileInfo fileInfo(tmpFileName);
+    bool success = doZip(fileInfo, folder);
+
+    if (success && QFile::exists(tmpFileName) && QFileInfo(tmpFileName).size() > 0) {
+        if (QFile::exists(targetFileName))
+            success &= QFile::remove(targetFileName);
+        if (success)
+            success &= QFile::copy(tmpFileName, targetFileName);
+        QFile::remove(tmpFileName);
+    }
+
+    return success;
+}
+
+bool DocumentFileSystem::save(const QString &fileName, bool encrypt, SaveMode mode)
 {
     if (fileName.isEmpty())
         return false;
@@ -337,39 +381,45 @@ bool DocumentFileSystem::save(const QString &fileName, bool encrypt)
     return true;
 #else
     // Starting with 0.5.5 Scrite documents are basically ZIP files.
-    const QString headerFileName =
-            d->folder->filePath(encrypt ? DocumentFileSystemData::encryptedHeaderFile
-                                        : DocumentFileSystemData::normalHeaderFile);
-    QSaveFile headerFile(headerFileName);
-    if (!headerFile.open(QFile::WriteOnly))
-        return false;
+    if (mode == NonBlockingSaveMode) {
+        /**
+         * NonBlockingSaveMode implementation is not perfect. A lot of assumptions are
+         * built into this code.
+         *
+         * 1. We assume that when non-blocking-save is triggered, no other attachment is
+         *    added to DFS until the save finishes.
+         * 2. We also assume that while a non-blocking-save is underway, another request
+         *    won't come. If it does, then the results are undefined.
+         * 3. We assume that save never takes more than 30 seconds on any computer, which
+         *    is the least interval for auto-save.
+         *
+         * So the advise is to use blocking-save for when the user actually clicks on the
+         * save button. Use the non-blocking save, for auto-save purposes.
+         */
+        emit saveStarted();
 
-    QByteArray headerData = d->header;
-    if (encrypt) {
-        SimpleCrypt sc(REST_CRYPT_KEY);
-        headerData = sc.encryptToByteArray(headerData);
+        const QString saveTaskWatcher = QStringLiteral("saveTaskWatcher");
+        QFutureWatcher<bool> *watcher = this->findChild<QFutureWatcher<bool> *>(
+                saveTaskWatcher, Qt::FindDirectChildrenOnly);
+        if (watcher) {
+            disconnect(watcher, &QFutureWatcher<bool>::finished, this,
+                       &DocumentFileSystem::saveTaskFinished);
+            watcher->deleteLater();
+        }
+
+        watcher = new QFutureWatcher<bool>(this);
+        watcher->setObjectName(saveTaskWatcher);
+        connect(watcher, &QFutureWatcher<bool>::finished, this,
+                &DocumentFileSystem::saveTaskFinished);
+        watcher->setFuture(QtConcurrent::run(saveTask, d->header, encrypt, QDir(d->folder->path()),
+                                             fileName, &d->loadSaveMutex));
+
+        return true;
     }
 
-    headerFile.write(headerData);
-    if (!headerFile.commit())
-        return false;
-
-    const QString tmpFileName = QStandardPaths::writableLocation(QStandardPaths::TempLocation)
-            + QStringLiteral("/scrite_") + QString::number(QDateTime::currentMSecsSinceEpoch())
-            + QStringLiteral("_temp.scrite");
-
-    const QFileInfo fileInfo(tmpFileName);
-    bool success = doZip(fileInfo, *d->folder);
-
-    if (success && QFile::exists(tmpFileName) && QFileInfo(tmpFileName).size() > 0) {
-        if (QFile::exists(fileName))
-            success &= QFile::remove(fileName);
-        if (success)
-            success &= QFile::copy(tmpFileName, fileName);
-        QFile::remove(tmpFileName);
-    }
-
-    return success;
+    const bool ret =
+            saveTask(d->header, encrypt, QDir(d->folder->path()), fileName, &d->loadSaveMutex);
+    return ret;
 #endif
 }
 
@@ -715,6 +765,18 @@ bool DocumentFileSystem::unpack(QDataStream &ds)
     }
 
     return true;
+}
+
+void DocumentFileSystem::saveTaskFinished()
+{
+    if (this->sender() && this->sender()->objectName() == QStringLiteral("saveTaskWatcher")
+        && this->sender()->inherits("QFutureWatcherBase")) {
+        QFutureWatcher<bool> *watcher = dynamic_cast<QFutureWatcher<bool> *>(this->sender());
+        if (watcher) {
+            emit saveFinished(watcher->result());
+            watcher->deleteLater();
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
