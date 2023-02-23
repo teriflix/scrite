@@ -264,7 +264,8 @@ void SceneElementFormat::activateDefaultLanguage()
     TransliterationEngine::instance()->setLanguage(language);
 }
 
-QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContentWidth) const
+QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAlignment,
+                                                       const qreal *givenContentWidth) const
 {
     if (m_lastCreatedBlockFormatPageWidth > 0 && givenContentWidth
         && *givenContentWidth == m_lastCreatedBlockFormatPageWidth)
@@ -284,7 +285,11 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(const qreal *givenContent
     format.setRightMargin(rightMargin);
     format.setTopMargin(topMargin);
     format.setLineHeight(m_lineHeight * 100, QTextBlockFormat::ProportionalHeight);
-    format.setAlignment(m_textAlignment);
+
+    if (overrideAlignment != 0)
+        format.setAlignment(overrideAlignment);
+    else
+        format.setAlignment(m_textAlignment);
 
     if (!qFuzzyIsNull(m_backgroundColor.alphaF()))
         format.setBackground(QBrush(m_backgroundColor));
@@ -2428,7 +2433,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     // Basic formatting
     const SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
     if (userData->shouldUpdateFromFormat(format)) {
-        userData->blockFormat = format->createBlockFormat();
+        userData->blockFormat = format->createBlockFormat(element->alignment());
         userData->charFormat = format->createCharFormat();
 
         QTextCursor cursor(block);

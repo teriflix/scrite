@@ -174,6 +174,11 @@ public:
     QString text() const { return m_text; }
     Q_SIGNAL void textChanged(const QString &val);
 
+    Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment NOTIFY alignmentChanged)
+    void setAlignment(Qt::Alignment val);
+    Qt::Alignment alignment() const { return m_alignment; }
+    Q_SIGNAL void alignmentChanged();
+
     Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
                        cursorPositionChanged STORED false)
     void setCursorPosition(int val);
@@ -221,6 +226,7 @@ private:
     mutable QString m_id;
     Type m_type = Action;
     QString m_text;
+    Qt::Alignment m_alignment;
     QVector<QTextLayout::FormatRange> m_textFormats;
     Scene *m_scene = nullptr;
     int m_wordCount = 0;

@@ -273,5 +273,11 @@
         <file>icons/editor/format_clear_inverted.png</file>
         <file>icons/content/comments_panel.png</file>
         <file>icons/content/comments_panel_inverted.png</file>
+        <file>icons/editor/format_align_center.png</file>
+        <file>icons/editor/format_align_center_inverted.png</file>
+        <file>icons/editor/format_align_left.png</file>
+        <file>icons/editor/format_align_left_inverted.png</file>
+        <file>icons/editor/format_align_right.png</file>
+        <file>icons/editor/format_align_right_inverted.png</file>
     </qresource>
 </RCC>

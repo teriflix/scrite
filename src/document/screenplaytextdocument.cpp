@@ -1244,7 +1244,8 @@ void ScreenplayTextDocument::loadScreenplay()
             const SceneElementFormat *firstParaFormat =
                     m_formatting->elementFormat(SceneElement::Heading);
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
-            const QTextBlockFormat blockFormat = firstParaFormat->createBlockFormat(&pageWidth);
+            const QTextBlockFormat blockFormat =
+                    firstParaFormat->createBlockFormat(Qt::Alignment(), &pageWidth);
             actBlockFormat.setTopMargin(blockFormat.topMargin());
         }
 
@@ -1326,7 +1327,8 @@ void ScreenplayTextDocument::loadScreenplay()
 
             const SceneElementFormat *firstParaFormat = m_formatting->elementFormat(firstParaType);
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
-            const QTextBlockFormat blockFormat = firstParaFormat->createBlockFormat(&pageWidth);
+            const QTextBlockFormat blockFormat =
+                    firstParaFormat->createBlockFormat(Qt::Alignment(), &pageWidth);
             frameFormat.setTopMargin(blockFormat.topMargin());
         }
 
@@ -1445,7 +1447,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                                      QStringLiteral("  (MORE)"));
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), moreMarkerFormat);
 
-        QTextBlockFormat characterBlockFormat = characterFormat->createBlockFormat();
+        QTextBlockFormat characterBlockFormat =
+                characterFormat->createBlockFormat(Qt::Alignment());
         QTextCharFormat characterCharFormat = characterFormat->createCharFormat();
         characterBlockFormat.setTopMargin(0);
         cursor.insertBlock(characterBlockFormat, characterCharFormat);
@@ -1553,7 +1556,8 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     cursor.select(QTextCursor::BlockUnderCursor);
                     cursor.removeSelectedText();
 
-                    QTextBlockFormat dialogBlockFormat = dialogueFormat->createBlockFormat();
+                    QTextBlockFormat dialogBlockFormat =
+                            dialogueFormat->createBlockFormat(Qt::Alignment());
                     QTextCharFormat dialogCharFormat = dialogueFormat->createCharFormat();
                     cursor.insertBlock(dialogBlockFormat, dialogCharFormat);
                     if (m_purpose == ForDisplay)
@@ -1900,7 +1904,8 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
 
         const SceneElementFormat *firstParaFormat = m_formatting->elementFormat(firstParaType);
         const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
-        const QTextBlockFormat blockFormat = firstParaFormat->createBlockFormat(&pageWidth);
+        const QTextBlockFormat blockFormat =
+                firstParaFormat->createBlockFormat(Qt::Alignment(), &pageWidth);
         frameFormat.setTopMargin(blockFormat.topMargin());
     }
 
@@ -2311,14 +2316,14 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
     QMap<SceneElement::Type, QPair<QTextCharFormat, QTextBlockFormat>> formatMap;
 
     auto applyFormattingOnCursor = [&](QTextCursor &cursor, SceneElement::Type paraType,
-                                       bool firstParagraph) {
+                                       Qt::Alignment overrideAlignment, bool firstParagraph) {
         QTextBlockFormat blockFormat;
         QTextCharFormat charFormat;
 
         if (!formatMap.contains(paraType)) {
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
             const SceneElementFormat *format = m_formatting->elementFormat(paraType);
-            blockFormat = format->createBlockFormat(&pageWidth);
+            blockFormat = format->createBlockFormat(overrideAlignment, &pageWidth);
             charFormat = format->createCharFormat(&pageWidth);
             formatMap[paraType] = qMakePair(charFormat, blockFormat);
         } else {
@@ -2348,7 +2353,8 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
             QTextCursor cursor(m_textDocument);
             cursor.setPosition(position);
             cursor.insertBlock();
-            applyFormattingOnCursor(cursor, para ? para->type() : SceneElement::Heading, i == 0);
+            applyFormattingOnCursor(cursor, para ? para->type() : SceneElement::Heading,
+                                    para ? para->alignment() : Qt::Alignment(), i == 0);
             block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(para));
         }
@@ -2371,7 +2377,7 @@ bool ScreenplayTextDocument::updateFromScreenplayElement(const ScreenplayElement
         {
             cursor.movePosition(QTextCursor::StartOfBlock);
             cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
-            applyFormattingOnCursor(cursor, data->elementType(), i==0);
+            applyFormattingOnCursor(cursor, data->elementType(), data->element()->alignment(), i==0);
         }
 #endif
 
@@ -2404,10 +2410,10 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                                   // its only from the second paragraph, that we need a new block.
 
         auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType,
-                                 bool firstParagraph) {
+                                 Qt::Alignment overrideAlignment, bool firstParagraph) {
             const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
             const SceneElementFormat *format = m_formatting->elementFormat(paraType);
-            QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
+            QTextBlockFormat blockFormat = format->createBlockFormat(overrideAlignment, &pageWidth);
             QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
             if (firstParagraph)
                 blockFormat.setTopMargin(0);
@@ -2449,7 +2455,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 cursor.insertText(QString(QChar::ObjectReplacementCharacter), sceneNumberFormat);
             }
 
-            prepareCursor(cursor, SceneElement::Heading, !insertBlock);
+            prepareCursor(cursor, SceneElement::Heading, Qt::Alignment(), !insertBlock);
 
             if (m_purpose == ForPrinting) {
                 TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
@@ -2486,7 +2492,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 if (insertBlock)
                     cursor.insertBlock();
 
-                prepareCursor(cursor, SceneElement::Action, !insertBlock);
+                prepareCursor(cursor, SceneElement::Action, Qt::Alignment(), !insertBlock);
 
                 if (m_purpose == ForDisplay) {
                     cursor.insertHtml(QStringLiteral("<strong>Characters: </strong>"));
@@ -2626,7 +2632,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 QColor sceneColor = scene->color().lighter(175);
                 sceneColor.setAlphaF(0.5);
 
-                prepareCursor(cursor, SceneElement::Heading, false);
+                prepareCursor(cursor, SceneElement::Heading, Qt::Alignment(), false);
 
                 QTextBlockFormat format;
                 format.setBackground(sceneColor);
@@ -2638,7 +2644,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             }
 
             if (!synopsis.isEmpty()) {
-                prepareCursor(cursor, SceneElement::Action, false);
+                prepareCursor(cursor, SceneElement::Action, Qt::Alignment(), false);
                 TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
             }
 
@@ -2700,7 +2706,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             QTextBlock block = cursor.block();
             block.setUserData(new ScreenplayParagraphBlockData(para));
-            prepareCursor(cursor, para->type(), !insertBlock);
+            prepareCursor(cursor, para->type(), para->alignment(), !insertBlock);
 
             if (!m_highlightDialoguesOf.isEmpty()) {
                 if (para->type() == SceneElement::Character) {
@@ -2743,7 +2749,8 @@ void ScreenplayTextDocument::formatBlock(const QTextBlock &block, const QString 
 
     const qreal pageWidth = m_formatting->pageLayout()->contentWidth();
     const SceneElementFormat *format = m_formatting->elementFormat(blockData->elementType());
-    const QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
+    const QTextBlockFormat blockFormat =
+            format->createBlockFormat(blockData->element()->alignment(), &pageWidth);
     const QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
 
     QTextCursor cursor(block);

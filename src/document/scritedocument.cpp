@@ -1628,10 +1628,11 @@ bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toScen
 
     QTextCursor cursor(&document);
 
-    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType) {
+    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType,
+                             Qt::Alignment overrideAlignment) {
         const qreal pageWidth = m_printFormat->pageLayout()->contentWidth();
         const SceneElementFormat *format = m_printFormat->elementFormat(paraType);
-        QTextBlockFormat blockFormat = format->createBlockFormat(&pageWidth);
+        QTextBlockFormat blockFormat = format->createBlockFormat(overrideAlignment, &pageWidth);
         QTextCharFormat charFormat = format->createCharFormat(&pageWidth);
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
@@ -1656,7 +1657,7 @@ bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toScen
             endParaIdx = scene->elementCount() - 1;
 
         if (startParaIdx == 0 && scene->heading()->isEnabled()) {
-            prepareCursor(cursor, SceneElement::Heading);
+            prepareCursor(cursor, SceneElement::Heading, Qt::Alignment());
             cursor.insertText(QStringLiteral("[") + element->resolvedSceneNumber()
                               + QStringLiteral("] "));
             cursor.insertText(scene->heading()->text());
@@ -1665,7 +1666,7 @@ bool ScriteDocument::exportToImage(int fromSceneIdx, int fromParaIdx, int toScen
 
         for (int p = startParaIdx; p <= endParaIdx; p++) {
             const SceneElement *para = scene->elementAt(p);
-            prepareCursor(cursor, para->type());
+            prepareCursor(cursor, para->type(), para->alignment());
             cursor.insertText(para->text());
             if (p < endParaIdx)
                 cursor.insertBlock();

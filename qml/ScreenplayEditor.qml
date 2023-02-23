@@ -1781,13 +1781,13 @@ Rectangle {
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             screenplayAdapter.currentIndex = contentItem.theIndex
                             globalScreenplayEditorToolbar.sceneEditor = contentItem
-                            markupTools.textFormat = sceneDocumentBinder.textFormat
+                            markupTools.sceneDocumentBinder = sceneDocumentBinder
                             justReceivedFocus = true
                         } else {
                             if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
                                 globalScreenplayEditorToolbar.sceneEditor = null
-                            if(markupTools.textFormat === sceneDocumentBinder.textFormat)
-                                markupTools.textFormat = null
+                            if(markupTools.sceneDocumentBinder === sceneDocumentBinder)
+                                markupTools.sceneDocumentBinder = null
                         }
                     }
 
@@ -4142,12 +4142,15 @@ Rectangle {
 
     DockWidget {
         id: markupTools
-        property TextFormat textFormat
+        property SceneDocumentBinder sceneDocumentBinder
+        property TextFormat textFormat: sceneDocumentBinder ? sceneDocumentBinder.textFormat : null
+        property SceneElement sceneElement: sceneDocumentBinder ? sceneDocumentBinder.currentElement : null
         contentX: 20
         contentY: 20
         contentPadding: 20
-        contentWidth: 280
-        contentHeight: 84
+        contentWidth: 360
+        contentHeight: 70
+        titleBarHeight: 32
         title: "Markup Tools"
         anchors.fill: parent
         closable: true
@@ -4215,13 +4218,12 @@ Rectangle {
             Row {
                 id: toolsLayout
                 anchors.centerIn: parent
-                enabled: markupTools.textFormat
-                opacity: enabled ? 1 : 0.5
-                spacing: 4
-                height: 55
+                spacing: 2
+                height: 48
 
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_bold.png"
+                    enabled: markupTools.textFormat
                     checked: markupTools.textFormat ? markupTools.textFormat.bold : false
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleBold()
                     anchors.verticalCenter: parent.verticalCenter
@@ -4230,6 +4232,7 @@ Rectangle {
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_italics.png"
                     checked: markupTools.textFormat ? markupTools.textFormat.italics : false
+                    enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleItalics()
                     anchors.verticalCenter: parent.verticalCenter
                 }
@@ -4237,16 +4240,16 @@ Rectangle {
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_underline.png"
                     checked: markupTools.textFormat ? markupTools.textFormat.underline : false
+                    enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleUnderline()
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
                 ColorButton {
                     id: textColorButton
-                    width: 42
-                    height: 30
                     anchors.verticalCenter: parent.verticalCenter
                     selectedColor: markupTools.textFormat ? markupTools.textFormat.textColor : transparentColor
+                    enabled: markupTools.textFormat
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Text Color"
@@ -4274,10 +4277,9 @@ Rectangle {
 
                 ColorButton {
                     id: bgColorButton
-                    width: 42
-                    height: 30
                     anchors.verticalCenter: parent.verticalCenter
                     selectedColor: markupTools.textFormat ? markupTools.textFormat.backgroundColor : transparentColor
+                    enabled: markupTools.textFormat
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Background Color"
@@ -4307,11 +4309,42 @@ Rectangle {
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_clear.png"
                     checked: false
+                    enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.reset()
                     anchors.verticalCenter: parent.verticalCenter
                     hoverEnabled: true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Clear formatting"
+                }
+
+                Rectangle {
+                    width: 1
+                    height: parent.height
+                    color: primaryColors.borderColor
+                }
+
+                SimpleToolButton {
+                    iconSource: "../icons/editor/format_align_left.png"
+                    checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignLeft : false
+                    enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked: markupTools.sceneElement.alignment = markupTools.sceneElement.alignment === Qt.AlignLeft ? 0 : Qt.AlignLeft
+                }
+
+                SimpleToolButton {
+                    iconSource: "../icons/editor/format_align_center.png"
+                    checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignHCenter : false
+                    enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked: markupTools.sceneElement.alignment = markupTools.sceneElement.alignment === Qt.AlignHCenter ? 0 : Qt.AlignHCenter
+                }
+
+                SimpleToolButton {
+                    iconSource: "../icons/editor/format_align_right.png"
+                    checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignRight : false
+                    enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
+                    anchors.verticalCenter: parent.verticalCenter
+                    onClicked: markupTools.sceneElement.alignment = markupTools.sceneElement.alignment === Qt.AlignRight ? 0 : Qt.AlignRight
                 }
             }
         }
@@ -4321,10 +4354,11 @@ Rectangle {
     readonly property var availableColors: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
 
     component SimpleToolButton : Rectangle {
-        width: 42
-        height: 42
-        radius: 6
+        width: 36
+        height: 36
+        radius: 4
         color: tbMouseArea.pressed ? primaryColors.button.background : (checked ? primaryColors.highlight.background : Qt.rgba(0,0,0,0))
+        opacity: enabled ? 1 : 0.5
 
         property bool checked: false
         property alias hoverEnabled: tbMouseArea.hoverEnabled
@@ -4401,8 +4435,8 @@ Rectangle {
 
     component ColorButton : Item {
         id: colorButton
-        width: 42
-        height: 42
+        width: 36
+        height: 36
         property color selectedColor: transparentColor
         opacity: enabled ? 1 : 0.5
         property alias hoverEnabled: cbMouseArea.hoverEnabled

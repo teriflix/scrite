@@ -475,6 +475,18 @@ void SceneElement::setText(const QString &val)
     this->evaluateWordCountLater();
 }
 
+void SceneElement::setAlignment(Qt::Alignment val)
+{
+    if (m_alignment == val)
+        return;
+
+    m_alignment = val;
+    emit alignmentChanged();
+
+    this->reportSceneElementChanged(
+            Scene::ElementTypeChange); // because the text hasnt technically changed.
+}
+
 void SceneElement::setCursorPosition(int val)
 {
     m_scene->setCursorPosition(val);
@@ -511,6 +523,8 @@ QString SceneElement::formattedText() const
 
 bool SceneElement::polishText(Scene *previousScene)
 {
+    Q_UNUSED(previousScene)
+
     if (m_scene == nullptr)
         return false;
 
@@ -2312,7 +2326,8 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
         if (m_heading && m_heading->isEnabled()) {
             SceneElementFormat *headingParaFormat =
                     printFormat->elementFormat(SceneElement::Heading);
-            const QTextBlockFormat headingParaBlockFormat = headingParaFormat->createBlockFormat();
+            const QTextBlockFormat headingParaBlockFormat =
+                    headingParaFormat->createBlockFormat(Qt::Alignment());
             const QTextCharFormat headingParaCharFormat = headingParaFormat->createCharFormat();
             cursor.setBlockFormat(headingParaBlockFormat);
             cursor.setBlockCharFormat(headingParaCharFormat);
@@ -2322,7 +2337,8 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
         for (SceneElement *para : m_elements) {
             SceneElementFormat *paraFormat = printFormat->elementFormat(para->type());
-            const QTextBlockFormat paraBlockFormat = paraFormat->createBlockFormat();
+            const QTextBlockFormat paraBlockFormat =
+                    paraFormat->createBlockFormat(para->alignment());
             const QTextCharFormat paraCharFormat = paraFormat->createCharFormat();
             cursor.setBlockFormat(paraBlockFormat);
             cursor.setBlockCharFormat(paraCharFormat);
@@ -2754,7 +2770,8 @@ QSizeF SceneSizeHintItem::evaluateSizeHint()
             if (j)
                 cursor.insertBlock();
 
-            const QTextBlockFormat blockFormat = style->createBlockFormat(&maxParaWidth);
+            const QTextBlockFormat blockFormat =
+                    style->createBlockFormat(para->alignment(), &maxParaWidth);
             const QTextCharFormat charFormat = style->createCharFormat(&maxParaWidth);
             cursor.setBlockFormat(blockFormat);
             cursor.setCharFormat(charFormat);

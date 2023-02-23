@@ -420,8 +420,9 @@ bool QObjectSerializer::fromJson(const QJsonObject &json, QObject *object, QObje
             if (prop.isEnumType() || prop.isFlagType()) {
                 const QByteArray key = jsonPropValue.toString().toLatin1();
                 const QMetaEnum enumerator = prop.enumerator();
-                int value = prop.isEnumType() ? enumerator.keyToValue(key)
-                                              : enumerator.keysToValue(key);
+                const int value = prop.isFlagType()
+                        ? (key.isEmpty() ? 0 : enumerator.keysToValue(key))
+                        : enumerator.keyToValue(key);
                 prop.write(object, value);
                 continue;
             }

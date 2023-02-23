@@ -575,9 +575,10 @@ void StatisticsReport::prepareTextDocument()
     m_textDocument.setDefaultFont(format->defaultFont());
 
     QTextCursor cursor(&m_textDocument);
-    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType) {
+    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType,
+                             Qt::Alignment overrideAlignment) {
         const SceneElementFormat *eformat = format->elementFormat(paraType);
-        QTextBlockFormat blockFormat = eformat->createBlockFormat(&pageWidth);
+        QTextBlockFormat blockFormat = eformat->createBlockFormat(overrideAlignment, &pageWidth);
         QTextCharFormat charFormat = eformat->createCharFormat(&pageWidth);
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
@@ -597,7 +598,7 @@ void StatisticsReport::prepareTextDocument()
         if (scene->heading()->isEnabled()) {
             if (cursor.position() > 0)
                 cursor.insertBlock();
-            prepareCursor(cursor, SceneElement::Heading);
+            prepareCursor(cursor, SceneElement::Heading, Qt::Alignment());
             polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text());
             m_textBlockMap.insert(scene->heading(), cursor.block());
         }
@@ -607,7 +608,7 @@ void StatisticsReport::prepareTextDocument()
                 cursor.insertBlock();
 
             const SceneElement *para = scene->elementAt(p);
-            prepareCursor(cursor, para->type());
+            prepareCursor(cursor, para->type(), para->alignment());
             polishFontsAndInsertTextAtCursor(cursor, para->text());
             m_textBlockMap.insert(para, cursor.block());
         }

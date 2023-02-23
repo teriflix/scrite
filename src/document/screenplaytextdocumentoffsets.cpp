@@ -670,9 +670,10 @@ void ScreenplayTextDocumentOffsets::reloadDocumentNow()
     m_document->setDefaultFont(m_format->defaultFont());
 
     QTextCursor cursor(m_document);
-    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType) {
+    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType,
+                             Qt::Alignment overrideAlignment) {
         const SceneElementFormat *format = m_format->elementFormat(paraType);
-        QTextBlockFormat blockFormat = format->createBlockFormat(&textWidth);
+        QTextBlockFormat blockFormat = format->createBlockFormat(overrideAlignment, &textWidth);
         QTextCharFormat charFormat = format->createCharFormat(&textWidth);
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
@@ -738,7 +739,7 @@ void ScreenplayTextDocumentOffsets::reloadDocumentNow()
         if (scene->heading()->isEnabled()) {
             if (cursor.position() > 0)
                 cursor.insertBlock();
-            prepareCursor(cursor, SceneElement::Heading);
+            prepareCursor(cursor, SceneElement::Heading, Qt::Alignment());
             polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text());
         }
 
@@ -750,7 +751,7 @@ void ScreenplayTextDocumentOffsets::reloadDocumentNow()
                 cursor.insertBlock();
 
             const SceneElement *para = scene->elementAt(p);
-            prepareCursor(cursor, para->type());
+            prepareCursor(cursor, para->type(), para->alignment());
             polishFontsAndInsertTextAtCursor(cursor, para->text());
 
             switch (para->type()) {

@@ -135,7 +135,8 @@ public:
 
     Q_INVOKABLE void activateDefaultLanguage();
 
-    QTextBlockFormat createBlockFormat(const qreal *pageWidth = nullptr) const;
+    QTextBlockFormat createBlockFormat(Qt::Alignment overrideAlignment,
+                                       const qreal *pageWidth = nullptr) const;
     QTextCharFormat createCharFormat(const qreal *pageWidth = nullptr) const;
 
     Q_SIGNAL void elementFormatChanged();
