@@ -4412,7 +4412,7 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        font.pixelSize: parent.height*0.65
+                        font.pixelSize: parent.height*0.5
                         text: "AB"
                     }
                 }
@@ -4427,7 +4427,7 @@ Rectangle {
 
                     Text {
                         anchors.centerIn: parent
-                        font.pixelSize: parent.height*0.65
+                        font.pixelSize: parent.height*0.5
                         text: "ab"
                     }
                 }
