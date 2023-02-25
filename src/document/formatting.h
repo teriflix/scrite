@@ -593,9 +593,13 @@ public:
     int selectionEndPosition() const { return m_selectionEndPosition; }
     Q_SIGNAL void selectionEndPositionChanged();
 
+    enum TextCasing { LowerCase, UpperCase };
+    Q_ENUM(TextCasing)
+
+    Q_INVOKABLE bool changeTextCase(SceneDocumentBinder::TextCasing casing);
+
     Q_PROPERTY(bool applyTextFormat READ isApplyTextFormat WRITE setApplyTextFormat NOTIFY
-                       applyTextFormatChanged)
-    void setApplyTextFormat(bool val);
+                       applyTextFormatChanged) void setApplyTextFormat(bool val);
     bool isApplyTextFormat() const { return m_applyTextFormat; }
     Q_SIGNAL void applyTextFormatChanged();
 

@@ -279,5 +279,7 @@
         <file>icons/editor/format_align_left_inverted.png</file>
         <file>icons/editor/format_align_right.png</file>
         <file>icons/editor/format_align_right_inverted.png</file>
+        <file>icons/editor/change_case_inverted.png</file>
+        <file>icons/editor/change_case.png</file>
     </qresource>
 </RCC>

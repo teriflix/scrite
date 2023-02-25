@@ -1885,7 +1885,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
         this->setWordUnderCursorIsMisspelled(cursor.isMisspelled());
         this->setSpellingSuggestions(cursor.suggestions());
 
-        if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0
+        if (m_selectionStartPosition >= 0 && m_selectionEndPosition > 0
             && m_selectionStartPosition != m_selectionEndPosition) {
             cursor.setPosition(m_selectionStartPosition);
             cursor.setPosition(m_selectionEndPosition, QTextCursor::KeepAnchor);
@@ -1914,6 +1914,80 @@ void SceneDocumentBinder::setSelectionEndPosition(int val)
 
     m_selectionEndPosition = val;
     emit selectionEndPositionChanged();
+}
+
+bool SceneDocumentBinder::changeTextCase(TextCasing casing)
+{
+    struct Fragment
+    {
+        int start = -1;
+        int end = -1;
+        QTextBlock block;
+    };
+    QVector<Fragment> fragments;
+
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition > 0
+        && m_selectionEndPosition > m_selectionStartPosition) {
+        QTextCursor cursor(this->document());
+        cursor.setPosition(m_selectionStartPosition);
+        while (1) {
+            Fragment fragment;
+            fragment.block = cursor.block();
+            fragment.start = qMax(m_selectionStartPosition, fragment.block.position());
+            fragment.end = qMin(m_selectionEndPosition, [](const QTextBlock &block) {
+                QTextCursor c(block);
+                c.movePosition(QTextCursor::EndOfBlock);
+                return c.position();
+            }(fragment.block));
+            fragments.append(fragment);
+            if (!cursor.movePosition(QTextCursor::NextBlock))
+                break;
+            if (cursor.atEnd() || cursor.position() > m_selectionEndPosition)
+                break;
+        }
+    } else if (m_cursorPosition >= 0) {
+        QTextCursor cursor(this->document());
+        cursor.setPosition(m_cursorPosition);
+        cursor.select(QTextCursor::WordUnderCursor);
+
+        if (cursor.hasSelection()) {
+            Fragment fragment;
+            fragment.end = cursor.selectionEnd();
+            fragment.start = cursor.selectionStart();
+            fragment.block = cursor.block();
+            fragments.append(fragment);
+        }
+    }
+
+    if (fragments.isEmpty())
+        return false;
+
+    auto changeTextCase = [casing](const QString &text) {
+        switch (casing) {
+        case LowerCase:
+            return text.toLower();
+        case UpperCase:
+            return text.toUpper();
+        }
+        return text;
+    };
+
+    QTextCursor cursor(this->document());
+
+    for (int i = fragments.length() - 1; i >= 0; i--) {
+        const Fragment fragment = fragments.at(i);
+
+        cursor.setPosition(fragment.start);
+        cursor.setPosition(fragment.end, QTextCursor::KeepAnchor);
+        cursor.insertText(changeTextCase(cursor.selectedText()));
+        cursor.clearSelection();
+
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(fragment.block);
+        if (userData)
+            userData->autoCapitalizeLater();
+    }
+
+    return true;
 }
 
 void SceneDocumentBinder::setApplyTextFormat(bool val)
@@ -3288,7 +3362,7 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
     QVector<Fragment> fragments;
 
     QTextCursor cursor(this->document());
-    if (m_selectionStartPosition >= 0 && m_selectionEndPosition >= 0
+    if (m_selectionStartPosition >= 0 && m_selectionEndPosition > 0
         && m_selectionStartPosition != m_selectionEndPosition) {
         cursor.setPosition(m_selectionStartPosition);
         while (1) {

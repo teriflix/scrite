@@ -1380,6 +1380,23 @@ Rectangle {
                                              if(position >= 0)
                                                 contentItem.assumeFocusLater(position, 100)
                                          }
+
+
+                function changeCase(textCase) {
+                    const sstart = sceneTextEditor.selectionStart
+                    const send = sceneTextEditor.selectionEnd
+                    const cp = sceneTextEditor.cursorPosition
+                    changeTextCase(textCase)
+                    if(sstart >= 0 && send > 0 && send > sstart)
+                        Utils.execLater(sceneTextEditor, 150, () => {
+                                            sceneTextEditor.forceActiveFocus()
+                                            sceneTextEditor.select(sstart, send)
+                                        })
+                    else if(cp >= 0)
+                        contentItem.assumeFocusLater(cp, 100)
+
+                }
+
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
                 applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 onCurrentParagraphTypeChanged: {
@@ -4148,7 +4165,7 @@ Rectangle {
         contentX: 20
         contentY: 20
         contentPadding: 20
-        contentWidth: 360
+        contentWidth: 426
         contentHeight: 70
         titleBarHeight: 32
         title: "Markup Tools"
@@ -4212,6 +4229,28 @@ Rectangle {
             onActivated: markupTools.textFormat.toggleUnderline()
         }
 
+        Shortcut {
+            sequence: "Shift+F3"
+            context: Qt.ApplicationShortcut
+            enabled: markupTools.sceneDocumentBinder
+            ShortcutsModelItem.title: "All CAPS"
+            ShortcutsModelItem.shortcut: sequence
+            ShortcutsModelItem.group: "Markup Tools"
+            ShortcutsModelItem.enabled: enabled
+            onActivated: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
+        }
+
+        Shortcut {
+            sequence: "Ctrl+Shift+F3"
+            context: Qt.ApplicationShortcut
+            enabled: markupTools.sceneDocumentBinder
+            ShortcutsModelItem.title: "All small"
+            ShortcutsModelItem.shortcut: sequence
+            ShortcutsModelItem.group: "Markup Tools"
+            ShortcutsModelItem.enabled: enabled
+            onActivated: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
+        }
+
         content: Rectangle {
             id: toolsContainer
 
@@ -4220,6 +4259,7 @@ Rectangle {
                 anchors.centerIn: parent
                 spacing: 2
                 height: 48
+                enabled: !Scrite.document.readOnly
 
                 SimpleToolButton {
                     iconSource: "../icons/editor/format_bold.png"
@@ -4227,6 +4267,9 @@ Rectangle {
                     checked: markupTools.textFormat ? markupTools.textFormat.bold : false
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleBold()
                     anchors.verticalCenter: parent.verticalCenter
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "Bold\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+B")
                 }
 
                 SimpleToolButton {
@@ -4235,6 +4278,9 @@ Rectangle {
                     enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleItalics()
                     anchors.verticalCenter: parent.verticalCenter
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "Italics\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+I")
                 }
 
                 SimpleToolButton {
@@ -4243,6 +4289,9 @@ Rectangle {
                     enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleUnderline()
                     anchors.verticalCenter: parent.verticalCenter
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "Underline\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+U")
                 }
 
                 ColorButton {
@@ -4260,13 +4309,13 @@ Rectangle {
 
                     Rectangle {
                         color: "white"
-                        width: Math.min(parent.width,parent.height)
+                        width: Math.min(parent.width,parent.height) * 0.8
                         height: width
                         anchors.centerIn: parent
 
                         Text {
                             anchors.centerIn: parent
-                            font.pixelSize: parent.height * 0.85
+                            font.pixelSize: parent.height * 0.70
                             font.bold: true
                             font.underline: true
                             text: "A"
@@ -4292,16 +4341,16 @@ Rectangle {
                         border.width: 1
                         border.color: "black"
                         color: bgColorButton.selectedColor === transparentColor ? "white" : bgColorButton.selectedColor
-                        width: Math.min(parent.width,parent.height)
+                        width: Math.min(parent.width,parent.height) * 0.8
                         height: width
                         anchors.centerIn: parent
 
                         Text {
                             anchors.centerIn: parent
-                            font.pixelSize: parent.height * 0.85
+                            font.pixelSize: parent.height * 0.70
                             font.bold: true
                             text: "A"
-                            color: "black"
+                            color: textColorButton.selectedColor === transparentColor ? "black" : textColorButton.selectedColor
                         }
                     }
                 }
@@ -4346,6 +4395,42 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter
                     onClicked: markupTools.sceneElement.alignment = markupTools.sceneElement.alignment === Qt.AlignRight ? 0 : Qt.AlignRight
                 }
+
+                Rectangle {
+                    width: 1
+                    height: parent.height
+                    color: primaryColors.borderColor
+                }
+
+                SimpleToolButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    enabled: markupTools.sceneDocumentBinder
+                    onClicked: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "All CAPS\t" + Scrite.app.polishShortcutTextForDisplay("Shift+F3")
+
+                    Text {
+                        anchors.centerIn: parent
+                        font.pixelSize: parent.height*0.65
+                        text: "AB"
+                    }
+                }
+
+                SimpleToolButton {
+                    anchors.verticalCenter: parent.verticalCenter
+                    enabled: markupTools.sceneDocumentBinder
+                    onClicked: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
+                    hoverEnabled: true
+                    ToolTip.visible: containsMouse
+                    ToolTip.text: "All small\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F3")
+
+                    Text {
+                        anchors.centerIn: parent
+                        font.pixelSize: parent.height*0.65
+                        text: "ab"
+                    }
+                }
             }
         }
     }
@@ -4357,10 +4442,12 @@ Rectangle {
         width: 36
         height: 36
         radius: 4
-        color: tbMouseArea.pressed ? primaryColors.button.background : (checked ? primaryColors.highlight.background : Qt.rgba(0,0,0,0))
+        color: tbMouseArea.pressed || down ? primaryColors.button.background : (checked ? primaryColors.highlight.background : Qt.rgba(0,0,0,0))
         opacity: enabled ? 1 : 0.5
 
+        property bool down: false
         property bool checked: false
+        property alias pressed: tbMouseArea.pressed
         property alias hoverEnabled: tbMouseArea.hoverEnabled
         property alias containsMouse: tbMouseArea.containsMouse
         property alias iconSource: tbIcon.source
