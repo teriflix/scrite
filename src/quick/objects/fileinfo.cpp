@@ -204,3 +204,96 @@ QImage FileIconProvider::requestImage(const QFileInfo &fi)
     m_suffixImageMap[suffix] = icon;
     return icon;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+
+RecentFileListModel::RecentFileListModel(QObject *parent) : QAbstractListModel(parent) { }
+
+RecentFileListModel::~RecentFileListModel() { }
+
+void RecentFileListModel::setMaxCount(int val)
+{
+    if (m_maxCount == val)
+        return;
+
+    m_maxCount = val;
+    emit maxCountChanged();
+
+    if (m_files.size() > m_maxCount) {
+        this->beginResetModel();
+        while (m_files.size() > m_maxCount)
+            m_files.removeLast();
+        this->endResetModel();
+    }
+}
+
+void RecentFileListModel::setFiles(const QStringList &val)
+{
+    QFileInfoList fiList;
+    for (const QString &filePath : val) {
+        const QFileInfo fi(filePath);
+        if (fi.exists() && !fiList.contains(fi))
+            fiList.append(fi);
+    }
+
+    if (fiList == m_files)
+        return;
+
+    this->beginResetModel();
+    m_files = fiList;
+    this->endResetModel();
+
+    emit filesChanged();
+}
+
+QStringList RecentFileListModel::files() const
+{
+    QStringList ret;
+    for (const QFileInfo &fi : m_files)
+        ret << fi.absoluteFilePath();
+
+    return ret;
+}
+
+void RecentFileListModel::add(const QString &filePath)
+{
+    const QFileInfo fi(filePath);
+    if (m_files.first() == fi)
+        return;
+
+    this->beginResetModel();
+    m_files.removeOne(fi);
+    m_files.prepend(fi);
+    while (m_files.size() > m_maxCount)
+        m_files.removeLast();
+    this->endResetModel();
+
+    emit filesChanged();
+}
+
+QVariant RecentFileListModel::data(const QModelIndex &index, int role) const
+{
+    if (index.row() < 0 || index.row() >= m_files.size())
+        return QVariant();
+
+    const QFileInfo fi = m_files.at(index.row());
+    switch (role) {
+    case FileNameRole:
+        return fi.fileName();
+    case FilePathRole:
+        return fi.absoluteFilePath();
+    case FileBaseNameRole:
+        return fi.completeBaseName();
+    default:
+        break;
+    }
+
+    return QVariant();
+}
+
+QHash<int, QByteArray> RecentFileListModel::roleNames() const
+{
+    return { { FileNameRole, QByteArrayLiteral("fileName") },
+             { FilePathRole, QByteArrayLiteral("filePath") },
+             { FileBaseNameRole, QByteArrayLiteral("fileBaseName") } };
+}

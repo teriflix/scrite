@@ -17,6 +17,7 @@
 #include <QObject>
 #include <QFileInfo>
 #include <QQuickImageProvider>
+#include <QAbstractListModel>
 
 class FileInfo : public QObject
 {
@@ -71,6 +72,41 @@ private:
 
 private:
     QMap<QString, QImage> m_suffixImageMap;
+};
+
+class RecentFileListModel : public QAbstractListModel
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    RecentFileListModel(QObject *parent = nullptr);
+    ~RecentFileListModel();
+
+    Q_PROPERTY(int count READ count NOTIFY filesChanged)
+    int count() const { return m_files.size(); }
+
+    Q_PROPERTY(int maxCount READ maxCount WRITE setMaxCount NOTIFY maxCountChanged)
+    void setMaxCount(int val);
+    int maxCount() const { return m_maxCount; }
+    Q_SIGNAL void maxCountChanged();
+
+    Q_PROPERTY(QStringList files READ files WRITE setFiles NOTIFY filesChanged)
+    void setFiles(const QStringList &val);
+    QStringList files() const;
+    Q_SIGNAL void filesChanged();
+
+    Q_INVOKABLE void add(const QString &filePath);
+
+    // QAbstractItemModel interface
+    enum Roles { FileNameRole = Qt::DisplayRole, FilePathRole, FileBaseNameRole };
+    int rowCount(const QModelIndex &parent) const { return parent.isValid() ? 0 : m_files.size(); }
+    QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const;
+
+private:
+    int m_maxCount = 10;
+    QFileInfoList m_files;
 };
 
 #endif // FILEINFO_H

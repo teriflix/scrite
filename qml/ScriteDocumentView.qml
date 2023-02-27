@@ -633,55 +633,29 @@ Item {
                     Settings {
                         fileName: Scrite.app.settingsFilePath
                         category: "RecentFiles"
-                        property alias files: recentFilesMenu.recentFiles
+                        property alias files: recentFilesModel.files
+                    }
+
+                    RecentFileListModel {
+                        id: recentFilesModel
+
+                        function addLater(filePath) {
+                            Utils.execLater(recentFilesModel, 50, () => { recentFilesModel.add(filePath) } )
+                        }
                     }
 
                     Menu2 {
                         id: recentFilesMenu
-                        width: recentFiles.length > 1 ? 400 : 200
+                        width: recentFilesModel.count > 1 ? 400 : 200
 
                         Connections {
                             target: Scrite.document
                             function onJustLoaded() { Qt.callLater( ()=> {
                                                                        if(Scrite.document.fileName !== "")
-                                                                            recentFilesMenu.add(Scrite.document.fileName)
+                                                                            recentFilesModel.add(Scrite.document.fileName)
                                                                    } )
                             }
                         }
-
-                        property int nrRecentFiles: recentFiles.length
-                        property var recentFiles: []
-                        function add(filePath) {
-                            if(filePath === "")
-                                return
-                            var r = recentFiles
-                            if(r.length > 0 && r[r.length-1] === filePath)
-                                return
-                            for(var i=0; i<r.length; i++) {
-                                if(r[i] === filePath)
-                                    r.splice(i,1);
-                            }
-                            r.push(filePath)
-                            if(r.length > 10)
-                                r.splice(0, r.length-10)
-                            recentFiles = r
-                        }
-
-                        function prepareRecentFilesList() {
-                            var newFiles = []
-                            var filesDropped = false
-                            recentFilesMenu.recentFiles.forEach(function(filePath) {
-                                var fi = Scrite.app.fileInfo(filePath)
-                                if(fi.exists)
-                                    newFiles.push(filePath)
-                                else
-                                    filesDropped = true
-                            })
-                            if(filesDropped)
-                                recentFilesMenu.recentFiles = newFiles
-                        }
-
-                        onAboutToShow: prepareRecentFilesList()
 
                         MenuItem2 {
                             text: "Open..."
@@ -711,12 +685,13 @@ Item {
                         }
 
                         Repeater {
-                            model: recentFilesMenu.recentFiles
+                            model: recentFilesModel
 
                             MenuItem2 {
-                                property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.nrRecentFiles-index-1]
-                                property var fileInfo: Scrite.app.fileInfo(filePath)
-                                text: recentFilesFontMetrics.elidedText(fileInfo.baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                required property string fileName
+                                required property string filePath
+                                required property string fileBaseName
+                                text: recentFilesFontMetrics.elidedText(fileBaseName, Qt.ElideMiddle, recentFilesMenu.width)
                                 ToolTip.text: filePath
                                 ToolTip.visible: hovered
                                 onClicked: fileOpenButton.doOpen(filePath)
@@ -1386,15 +1361,16 @@ Item {
 
                             Menu2 {
                                 title: "Recent"
-                                onAboutToShow: recentFilesMenu.prepareRecentFilesList()
                                 width: Math.min(documentUI.width * 0.75, 350)
 
                                 Repeater {
-                                    model: recentFilesMenu.recentFiles
+                                    model: recentFilesModel
 
                                     MenuItem2 {
-                                        property string filePath: recentFilesMenu.recentFiles[recentFilesMenu.recentFiles.length-index-1]
-                                        text: recentFilesFontMetrics.elidedText("" + (index+1) + ". " + Scrite.app.fileInfo(filePath).baseName, Qt.ElideMiddle, recentFilesMenu.width)
+                                        required property string fileName
+                                        required property string filePath
+                                        required property string fileBaseName
+                                        text: recentFilesFontMetrics.elidedText(fileBaseName, Qt.ElideMiddle, recentFilesMenu.width)
                                         ToolTip.text: filePath
                                         ToolTip.visible: hovered
                                         onClicked: fileOpenButton.doOpen(filePath)
@@ -2674,7 +2650,7 @@ Item {
                         contentLoader.allowContent = false
                         Scrite.document.open(path)
                         contentLoader.allowContent = true
-                        recentFilesMenu.add(path)
+                        recentFilesModel.add(path)
                     },
                     "reset": true,
                     "notificationTitle": "Opening Scrite Project"
@@ -2684,7 +2660,7 @@ Item {
                     "selectExisting": false,
                     "callback": function(path) {
                         Scrite.document.saveAs(path)
-                        recentFilesMenu.add(path)
+                        recentFilesModel.add(path)
                     },
                     "reset": false,
                     "notificationTitle": "Saving Scrite Project"
