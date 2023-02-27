@@ -123,7 +123,7 @@ public:
     Q_SIGNAL void userDataChanged();
 
     Q_PROPERTY(
-            QJsonValue editorHints READ editorHints WRITE setEditorHints NOTIFY editorHintsChanged)
+            QJsonValue editorHints READ editorHints WRITE setEditorHints NOTIFY editorHintsChanged STORED false)
     void setEditorHints(const QJsonValue &val);
     QJsonValue editorHints() const { return m_editorHints; }
     Q_SIGNAL void editorHintsChanged();
