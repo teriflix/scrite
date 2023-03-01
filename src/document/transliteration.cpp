@@ -1041,7 +1041,7 @@ TransliterationEngine::mergeTextFormats(const QList<Boundary> &boundaries,
             ret = qMax(format.start + format.length - 1, ret);
         return ret + 1;
     }();
-    const QString dummyText = QString('A', length);
+    const QString dummyText = QString(length, QChar('X'));
 
     QTextDocument doc;
 
@@ -1049,15 +1049,19 @@ TransliterationEngine::mergeTextFormats(const QList<Boundary> &boundaries,
     cursor.insertText(dummyText);
     cursor.setPosition(0);
 
-    for (const Boundary &boundary : boundaries) {
-        cursor.setPosition(boundary.start);
-        cursor.setPosition(boundary.end, QTextCursor::KeepAnchor);
+    const bool ignoreBoundaries = !boundaries.isEmpty() && boundaries.length() == 1
+            && boundaries.first().language == TransliterationEngine::English;
+    if (!ignoreBoundaries) {
+        for (const Boundary &boundary : boundaries) {
+            cursor.setPosition(boundary.start);
+            cursor.setPosition(boundary.end + 1, QTextCursor::KeepAnchor);
 
-        QTextCharFormat charFormat;
-        charFormat.setFontFamily(boundary.font.family());
-        charFormat.setProperty(QTextCharFormat::UserProperty, boundary.language);
-        cursor.setCharFormat(charFormat);
-        cursor.clearSelection();
+            QTextCharFormat charFormat;
+            charFormat.setFontFamily(boundary.font.family());
+            charFormat.setProperty(QTextCharFormat::UserProperty, boundary.language);
+            cursor.setCharFormat(charFormat);
+            cursor.clearSelection();
+        }
     }
 
     for (const QTextLayout::FormatRange &format : formats) {

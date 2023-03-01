@@ -96,16 +96,3 @@ bool CharacterRelationshipsGraphExporter::doExport(QIODevice *device)
         scene.addStandardItems(PdfExportableGraphicsScene::WatermarkOverlayLayer);
     return scene.exportToPdf(device);
 }
-
-QString CharacterRelationshipsGraphExporter::polishFileName(const QString &fileName) const
-{
-    QFileInfo fi(fileName);
-
-    const QString dot = QStringLiteral(".");
-    const QString ext = QStringLiteral("pdf");
-
-    if (fi.suffix() != ext)
-        return fileName + dot + ext;
-
-    return fileName;
-}

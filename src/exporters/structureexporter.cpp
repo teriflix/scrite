@@ -93,10 +93,3 @@ bool StructureExporter::doExport(QIODevice *device)
     scene.setTitle(screenplay->title() + QStringLiteral(" - Structure"));
     return scene.exportToPdf(device);
 }
-
-QString StructureExporter::polishFileName(const QString &fileName) const
-{
-    const QFileInfo fi(fileName);
-    const QString baseName = fi.completeBaseName();
-    return fi.absoluteDir().absoluteFilePath(baseName + QStringLiteral(".pdf"));
-}

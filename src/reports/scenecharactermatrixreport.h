@@ -83,7 +83,7 @@ public:
 
 protected:
     // AbstractDeviceIO interface
-    QString polishFileName(const QString &fileName) const;
+    QString fileNameExtension() const;
 
     // AbstractReportGenerator interface
     bool usePdfWriter() const { return false; }

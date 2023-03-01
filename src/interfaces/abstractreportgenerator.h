@@ -87,7 +87,7 @@ public:
 
 protected:
     // AbstractDeviceIO interface
-    QString polishFileName(const QString &fileName) const;
+    QString fileNameExtension() const;
 
 protected:
     AbstractReportGenerator(QObject *parent = nullptr);

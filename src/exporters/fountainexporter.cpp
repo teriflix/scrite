@@ -116,11 +116,3 @@ bool FountainExporter::doExport(QIODevice *device)
 
     return true;
 }
-
-QString FountainExporter::polishFileName(const QString &fileName) const
-{
-    QFileInfo fi(fileName);
-    if (fi.suffix().toLower() != "fountain")
-        return fileName + ".fountain";
-    return fileName;
-}

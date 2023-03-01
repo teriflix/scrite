@@ -42,7 +42,8 @@ public:
 
 protected:
     AbstractDeviceIO(QObject *parent = nullptr);
-    virtual QString polishFileName(const QString &fileName) const { return fileName; }
+    virtual QString polishFileName(const QString &fileName) const;
+    virtual QString fileNameExtension() const { return QString(); }
     void resetDocument();
 
     ProgressReport *progress() const { return m_progressReport; }

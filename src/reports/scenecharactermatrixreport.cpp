@@ -78,14 +78,9 @@ void SceneCharacterMatrixReport::setTags(const QStringList &val)
     emit tagsChanged();
 }
 
-QString SceneCharacterMatrixReport::polishFileName(const QString &fileName) const
+QString SceneCharacterMatrixReport::fileNameExtension() const
 {
-    if (this->format() == OpenDocumentFormat) {
-        QFileInfo fi(fileName);
-        return fi.absoluteDir().absoluteFilePath(fi.completeBaseName() + QStringLiteral(".csv"));
-    }
-
-    return AbstractReportGenerator::polishFileName(fileName);
+    return this->format() == OpenDocumentFormat ? QStringLiteral("csv") : QStringLiteral("pdf");
 }
 
 struct CreateColumnHeadingImageFunctor

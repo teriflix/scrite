@@ -204,11 +204,3 @@ bool PdfExporter::doExport(QIODevice *device)
 
     return success;
 }
-
-QString PdfExporter::polishFileName(const QString &fileName) const
-{
-    QFileInfo fi(fileName);
-    if (fi.suffix().toLower() != "pdf")
-        return fileName + ".pdf";
-    return fileName;
-}

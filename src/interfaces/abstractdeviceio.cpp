@@ -43,6 +43,19 @@ void AbstractDeviceIO::setDocument(ScriteDocument *val)
     emit documentChanged();
 }
 
+QString AbstractDeviceIO::polishFileName(const QString &fileName) const
+{
+    if (this->fileNameExtension().isEmpty())
+        return fileName;
+
+    QFileInfo fi(fileName);
+    if (fi.suffix().toLower() != this->fileNameExtension())
+        return fi.absoluteDir().absoluteFilePath(fi.completeBaseName() + QStringLiteral(".")
+                                                 + this->fileNameExtension());
+
+    return fileName;
+}
+
 void AbstractDeviceIO::resetDocument()
 {
     this->setDocument(nullptr);

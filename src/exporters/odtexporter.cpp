@@ -43,11 +43,3 @@ bool OdtExporter::doExport(QIODevice *device)
 
     return true;
 }
-
-QString OdtExporter::polishFileName(const QString &fileName) const
-{
-    QFileInfo fi(fileName);
-    if (fi.suffix().toLower() != "odt")
-        return fileName + ".odt";
-    return fileName;
-}

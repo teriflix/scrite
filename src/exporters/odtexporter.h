@@ -39,7 +39,7 @@ public:
 
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
-    QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+    QString fileNameExtension() const { return QStringLiteral("odt"); }
 
 private:
     bool m_includeSceneNumbers = false;

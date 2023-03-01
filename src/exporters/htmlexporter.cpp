@@ -42,6 +42,7 @@ void HtmlExporter::setIncludeSceneNumbers(bool val)
 static void alignmentToCssValue(QTextStream &ts, Qt::Alignment alignment)
 {
     switch (alignment) {
+    default:
     case Qt::AlignLeft:
         ts << "left;";
         break;
@@ -52,7 +53,6 @@ static void alignmentToCssValue(QTextStream &ts, Qt::Alignment alignment)
         ts << "center;";
         break;
     case Qt::AlignJustify:
-    default:
         ts << "justify;";
         break;
     }
@@ -349,12 +349,4 @@ bool HtmlExporter::doExport(QIODevice *device)
     ts.flush();
 
     return true;
-}
-
-QString HtmlExporter::polishFileName(const QString &fileName) const
-{
-    QFileInfo fi(fileName);
-    if (fi.suffix().toLower() != "html")
-        return fileName + ".html";
-    return fileName;
 }
