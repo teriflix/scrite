@@ -183,6 +183,7 @@ private:
     SceneElement::Type m_elementType = SceneElement::Action;
     DefaultLanguage m_defaultLanguage = Default;
 
+    mutable Qt::Alignment m_lastCreatedBlockAlignment;
     mutable qreal m_lastCreatedBlockFormatPageWidth = 0;
     mutable QTextBlockFormat m_lastCreatedBlockFormat;
     mutable qreal m_lastCreatedCharFormatPageWidth = 0;

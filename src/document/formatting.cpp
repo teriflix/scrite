@@ -268,7 +268,8 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAli
                                                        const qreal *givenContentWidth) const
 {
     if (m_lastCreatedBlockFormatPageWidth > 0 && givenContentWidth
-        && *givenContentWidth == m_lastCreatedBlockFormatPageWidth)
+        && *givenContentWidth == m_lastCreatedBlockFormatPageWidth
+        && overrideAlignment == m_lastCreatedBlockAlignment)
         return m_lastCreatedBlockFormat;
 
     const qreal dpr = m_format->devicePixelRatio();
@@ -296,6 +297,7 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAli
 
     if (givenContentWidth) {
         m_lastCreatedBlockFormatPageWidth = *givenContentWidth;
+        m_lastCreatedBlockAlignment = overrideAlignment;
         m_lastCreatedBlockFormat = format;
     }
 
