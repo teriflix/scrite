@@ -81,6 +81,15 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     this->progress()->setProgressStep(1.0 / qreal(paragraphs.size() + 1));
     this->configureCanvas(paragraphs.size());
 
+    auto fromFdxColorCode = [](const QString &code) -> QColor {
+        if (code.isEmpty())
+            return Qt::black;
+        const QString red = code.mid(1, 2);
+        const QString green = code.mid(5, 2);
+        const QString blue = code.mid(9, 2);
+        return QColor(code.mid(0, 1) + red + green + blue);
+    };
+
     static const QStringList types({ QLatin1String("Scene Heading"), QLatin1String("Action"),
                                      QLatin1String("Character"), QLatin1String("Dialogue"),
                                      QLatin1String("Parenthetical"), QLatin1String("Shot"),
@@ -94,18 +103,53 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         if (typeIndex < 0)
             continue;
 
+        const QString alignmentHint = paragraphE.attribute(QLatin1String("Alignment"));
+        const Qt::Alignment alignment = [alignmentHint]() {
+            return QHash<QString, Qt::Alignment>({ { QLatin1String("Left"), Qt::AlignLeft },
+                                                   { QLatin1String("Right"), Qt::AlignRight },
+                                                   { QLatin1String("Center"), Qt::AlignCenter } })
+                    .value(alignmentHint, Qt::Alignment());
+        }();
+
+        QVector<QTextLayout::FormatRange> formats;
         const QString textN = QLatin1String("Text");
         QString text;
         QDomElement textE = paragraphE.firstChildElement(textN);
         while (!textE.isNull()) {
+            QTextLayout::FormatRange format;
+            format.start = text.length();
+
             const QString textEText = textE.text();
             text += textEText;
+
+            format.length = text.length() - format.start;
+
+            const QStringList styles = textE.attribute(QLatin1String("Style")).split(QChar('+'));
+            if (styles.contains(QLatin1String("Bold")))
+                format.format.setFontWeight(QFont::Bold);
+            if (styles.contains(QLatin1String("Italic")))
+                format.format.setFontItalic(true);
+            if (styles.contains(QLatin1String("Underline")))
+                format.format.setFontUnderline(true);
+
+            const QString colorAttr = QLatin1String("Color");
+            const QString backgroundAttr = QLatin1String("Background");
+            if (textE.hasAttribute(colorAttr))
+                format.format.setForeground(QBrush(fromFdxColorCode(textE.attribute(colorAttr))));
+            if (textE.hasAttribute(backgroundAttr))
+                format.format.setBackground(
+                        QBrush(fromFdxColorCode(textE.attribute(backgroundAttr))));
+
+            if (!format.format.isEmpty())
+                formats.append(format);
+
             textE = textE.nextSiblingElement(textN);
         }
 
         if (text.isEmpty())
             continue;
 
+        SceneElement *sceneElement = nullptr;
         switch (typeIndex) {
         case 0: {
             scene = this->createScene(text);
@@ -117,23 +161,28 @@ bool FinalDraftImporter::doImport(QIODevice *device)
             }
         } break;
         case 1:
-            this->addSceneElement(scene, SceneElement::Action, text);
+            sceneElement = this->addSceneElement(scene, SceneElement::Action, text);
             break;
         case 2:
-            this->addSceneElement(scene, SceneElement::Character, text);
+            sceneElement = this->addSceneElement(scene, SceneElement::Character, text);
             break;
         case 3:
-            this->addSceneElement(scene, SceneElement::Dialogue, text);
+            sceneElement = this->addSceneElement(scene, SceneElement::Dialogue, text);
             break;
         case 4:
-            this->addSceneElement(scene, SceneElement::Parenthetical, text);
+            sceneElement = this->addSceneElement(scene, SceneElement::Parenthetical, text);
             break;
         case 5:
-            this->addSceneElement(scene, SceneElement::Shot, text);
+            sceneElement = this->addSceneElement(scene, SceneElement::Shot, text);
             break;
         case 6:
-            this->addSceneElement(scene, SceneElement::Transition, text);
+            sceneElement = this->addSceneElement(scene, SceneElement::Transition, text);
             break;
+        }
+
+        if (sceneElement != nullptr) {
+            sceneElement->setAlignment(alignment);
+            sceneElement->setTextFormats(formats);
         }
     }
 
