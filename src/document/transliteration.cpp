@@ -1029,6 +1029,50 @@ int TransliterationEngine::wordCount(const QString &text)
     return wordCount;
 }
 
+QVector<QTextLayout::FormatRange>
+TransliterationEngine::mergeTextFormats(const QList<Boundary> &boundaries,
+                                        const QVector<QTextLayout::FormatRange> &formats)
+{
+    const int length = [=]() {
+        int ret = -1;
+        for (const Boundary &boundary : boundaries)
+            ret = qMax(boundary.end, ret);
+        for (const QTextLayout::FormatRange &format : formats)
+            ret = qMax(format.start + format.length - 1, ret);
+        return ret + 1;
+    }();
+    const QString dummyText = QString('A', length);
+
+    QTextDocument doc;
+
+    QTextCursor cursor(&doc);
+    cursor.insertText(dummyText);
+    cursor.setPosition(0);
+
+    for (const Boundary &boundary : boundaries) {
+        cursor.setPosition(boundary.start);
+        cursor.setPosition(boundary.end, QTextCursor::KeepAnchor);
+
+        QTextCharFormat charFormat;
+        charFormat.setFontFamily(boundary.font.family());
+        charFormat.setProperty(QTextCharFormat::UserProperty, boundary.language);
+        cursor.setCharFormat(charFormat);
+        cursor.clearSelection();
+    }
+
+    for (const QTextLayout::FormatRange &format : formats) {
+        cursor.setPosition(format.start);
+        cursor.setPosition(format.start + format.length, QTextCursor::KeepAnchor);
+        cursor.mergeCharFormat(format.format);
+        cursor.clearSelection();
+    }
+
+    cursor.setPosition(0);
+
+    const QTextBlock block = cursor.block();
+    return block.textFormats();
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 Transliterator::Transliterator(QObject *parent)

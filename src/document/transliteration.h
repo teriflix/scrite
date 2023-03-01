@@ -23,6 +23,7 @@
 #include <QJsonArray>
 #include <QQmlEngine>
 #include <QStaticText>
+#include <QTextLayout>
 #include <QJsonObject>
 #include <QFontDatabase>
 #include <QQuickPaintedItem>
@@ -163,6 +164,10 @@ public:
     Q_INVOKABLE QString formattedHtmlOf(const QString &text) const;
 
     Q_INVOKABLE static int wordCount(const QString &text);
+
+    static QVector<QTextLayout::FormatRange>
+    mergeTextFormats(const QList<TransliterationEngine::Boundary> &boundaries,
+                     const QVector<QTextLayout::FormatRange> &formats);
 
 private:
     friend class AppWindow;

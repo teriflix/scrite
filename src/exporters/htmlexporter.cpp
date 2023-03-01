@@ -39,6 +39,25 @@ void HtmlExporter::setIncludeSceneNumbers(bool val)
     emit includeSceneNumbersChanged();
 }
 
+static void alignmentToCssValue(QTextStream &ts, Qt::Alignment alignment)
+{
+    switch (alignment) {
+    case Qt::AlignLeft:
+        ts << "left;";
+        break;
+    case Qt::AlignRight:
+        ts << "right;";
+        break;
+    case Qt::AlignHCenter:
+        ts << "center;";
+        break;
+    case Qt::AlignJustify:
+    default:
+        ts << "justify;";
+        break;
+    }
+};
+
 bool HtmlExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
@@ -105,7 +124,7 @@ bool HtmlExporter::doExport(QIODevice *device)
                    << rawFont.style() << ";\n";
                 ts << "      src: url(fonts/" << lang << "/" << fontFile << ");\n";
                 ts << "      font-weight: " << rawFont.weight() << ";\n";
-                ts << "      ";
+                ts << "      font-style: ";
                 switch (rawFont.style()) {
                 case QFont::StyleNormal:
                     ts << "normal;\n";
@@ -150,21 +169,8 @@ bool HtmlExporter::doExport(QIODevice *device)
         if (format->backgroundColor() != Qt::transparent)
             ts << "      background-color: " << format->backgroundColor().name() << ";\n";
         ts << "      text-align: ";
-        switch (format->textAlignment()) {
-        case Qt::AlignLeft:
-            ts << "left;\n";
-            break;
-        case Qt::AlignRight:
-            ts << "right;\n";
-            break;
-        case Qt::AlignHCenter:
-            ts << "center;\n";
-            break;
-        case Qt::AlignJustify:
-        default:
-            ts << "justify;\n";
-            break;
-        }
+        alignmentToCssValue(ts, format->textAlignment());
+        ts << ";\n";
 
         const int pLeftMargin = int(format->leftMargin() * contentWidth + leftMargin);
         const int pRightMargin = int(format->rightMargin() * contentWidth + rightMargin);
@@ -209,19 +215,84 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     ts << "    <div class=\"scrite-screenplay\">\n";
 
-    auto writeParagraph = [&ts, typeStringMap, langBundleMap](SceneElement::Type type,
-                                                              const QString &text) {
+    auto writeParagraph = [&ts, typeStringMap,
+                           langBundleMap](SceneElement::Type type, const QString &text,
+                                          Qt::Alignment overrideAlignment = Qt::Alignment(),
+                                          const QVector<QTextLayout::FormatRange> &textFormats =
+                                                  QVector<QTextLayout::FormatRange>()) {
         const QString styleName = "scrite-" + typeStringMap.value(type);
-        ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\">";
+        ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\"";
+
+        if (overrideAlignment != 0) {
+            ts << " style=\"text-align: ";
+            alignmentToCssValue(ts, overrideAlignment);
+            ts << ";\"";
+        }
+
+        ts << ">";
 
         const QList<TransliterationEngine::Boundary> breakup =
                 TransliterationEngine::instance()->evaluateBoundaries(text);
-        for (const TransliterationEngine::Boundary &item : breakup) {
-            if (!langBundleMap.value(item.language, false))
-                ts << "<span>" << item.string << "</span>";
-            else
-                ts << "<span class=\"lang_" << item.language << "_" << QFont::Normal << "_"
-                   << QFont::StyleNormal << "\">" << item.string << "</span>";
+        const QVector<QTextLayout::FormatRange> mergedTextFormats =
+                TransliterationEngine::mergeTextFormats(breakup, textFormats);
+        for (const QTextLayout::FormatRange &format : mergedTextFormats) {
+            TransliterationEngine::Language lang = (TransliterationEngine::Language)format.format
+                                                           .property(QTextFormat::UserProperty)
+                                                           .toInt();
+            ts << "<span ";
+            if (langBundleMap.value(lang))
+                ts << "class=\"lang_" << lang << "_" << QFont::Normal << "_" << QFont::StyleNormal
+                   << "\" ";
+
+            bool customStyle = false;
+            auto startCustomStyle = [&customStyle, &ts]() {
+                if (customStyle)
+                    return;
+                customStyle = true;
+                ts << "style=\"";
+            };
+
+            if (format.format.hasProperty(QTextFormat::FontWeight)) {
+                if (format.format.fontWeight() == QFont::Bold) {
+                    startCustomStyle();
+                    ts << "font-weight: bold; ";
+                }
+            }
+
+            if (format.format.hasProperty(QTextFormat::FontItalic)) {
+                if (format.format.fontItalic()) {
+                    startCustomStyle();
+                    ts << "font-style: italic; ";
+                }
+            }
+
+            if (format.format.hasProperty(QTextFormat::TextUnderlineStyle)) {
+                if (format.format.fontUnderline()) {
+                    startCustomStyle();
+                    ts << "text-decoration: underline; ";
+                }
+            }
+
+            if (format.format.hasProperty(QTextFormat::BackgroundBrush)) {
+                const QColor color = format.format.background().color();
+                if (!qFuzzyIsNull(color.alphaF())) {
+                    startCustomStyle();
+                    ts << "background-color: " << color.name() << "; ";
+                }
+            }
+
+            if (format.format.hasProperty(QTextFormat::ForegroundBrush)) {
+                const QColor color = format.format.foreground().color();
+                if (!qFuzzyIsNull(color.alphaF())) {
+                    startCustomStyle();
+                    ts << "color: " << color.name() << "; ";
+                }
+            }
+
+            if (customStyle)
+                ts << "\"";
+
+            ts << ">" << text.mid(format.start, format.length) << "</span>";
         }
         ts << "</p>\n";
     };
@@ -260,11 +331,12 @@ bool HtmlExporter::doExport(QIODevice *device)
         const int nrElements = scene->elementCount();
         for (int j = 0; j < nrElements; j++) {
             SceneElement *element = scene->elementAt(j);
-            writeParagraph(element->type(), element->formattedText());
+            writeParagraph(element->type(), element->formattedText(), element->alignment(),
+                           element->textFormats());
         }
 
         if (i == nrScenes - 1)
-            ts << "<p class=\"scrite-action\" custom-style=\"scrite-action\">&nbsp;</p>";
+            ts << "        <p class=\"scrite-action\" custom-style=\"scrite-action\">&nbsp;</p>";
 
         ts << "      </div>\n";
     }
