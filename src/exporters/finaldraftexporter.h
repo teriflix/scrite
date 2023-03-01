@@ -46,7 +46,7 @@ public:
 
 protected:
     bool doExport(QIODevice *device);
-    QString polishFileName(const QString &fileName) const; // AbstractDeviceIO interface
+    QString fileNameExtension() const { return QStringLiteral("fdx"); }
 
 private:
 #ifdef Q_OS_WIN
