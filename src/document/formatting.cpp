@@ -34,6 +34,7 @@
 #include <QTextBoundaryFinder>
 #include <QScopedValueRollback>
 #include <QTextDocumentFragment>
+#include <QAbstractTextDocumentLayout>
 
 Q_DECLARE_METATYPE(QTextCharFormat)
 
@@ -322,6 +323,7 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
     format.setFontOverline(font.overline());
     format.setFontPointSize(font.pointSize());
     format.setFontStrikeOut(font.strikeOut());
+    format.setFontFixedPitch(font.fixedPitch());
     format.setFontWordSpacing(font.wordSpacing());
     format.setFontLetterSpacing(font.letterSpacing());
     format.setFontCapitalization(font.capitalization());
@@ -2511,14 +2513,10 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
     if (userData->shouldUpdateFromFormat(format)) {
         userData->blockFormat = format->createBlockFormat(element->alignment());
         userData->charFormat = format->createCharFormat();
-
-        QTextCursor cursor(block);
-        cursor.setBlockFormat(userData->blockFormat);
-        this->rehighlightBlockLater(block);
-        return;
+        this->applyBlockFormatLater(block);
     }
 
-    this->setFormat(0, block.length(), userData->charFormat);
+    this->mergeFormat(0, block.length(), userData->charFormat);
 
     // Per-language fonts.
     if (m_applyLanguageFonts) {
@@ -2529,9 +2527,9 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
             if (boundary.isEmpty() || boundary.language == TransliterationEngine::English)
                 continue;
 
-            QTextCharFormat format = this->format(boundary.start);
+            QTextCharFormat format;
             format.setFontFamily(boundary.font.family());
-            this->setFormat(boundary.start, boundary.end - boundary.start + 1, format);
+            this->mergeFormat(boundary.start, boundary.end - boundary.start + 1, format);
         }
 
         if (m_currentElement == element)
@@ -2550,7 +2548,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
             if (script != QChar::Script_Latin)
                 continue;
 
-            QTextCharFormat spellingErrorFormat = this->format(fragment.start());
+            QTextCharFormat spellingErrorFormat;
 #if 0
             spellingErrorFormat.setUnderlineStyle(QTextCharFormat::SpellCheckUnderline);
             spellingErrorFormat.setUnderlineColor(Qt::red);
@@ -2558,7 +2556,35 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
 #else
             spellingErrorFormat.setBackground(QColor(255, 0, 0, 32));
 #endif
-            this->setFormat(fragment.start(), fragment.length(), spellingErrorFormat);
+            this->mergeFormat(fragment.start(), fragment.length(), spellingErrorFormat);
+        }
+
+        /*
+        Suppose that a paragraph of text has custom text and/or background
+        colors applied to one or more words in it. When spell check is enabled
+        and a paragraph of text has spelling mistakes, then the custom colors
+        are not rendered until all the spelling mistakes are fixed.
+
+        It appears that setting background color to light-red (as we do here)
+        for misspelled words, causes all colors to disappear in that paragraph.
+        I am unable to reproduce this issue on a separate sample Qt app; and I
+        am unable to find out why its causing this issue here.
+
+        Until we figure out why this is happening, we reapply background and
+        foreground colors whenever spelling mistakes are detected.
+        */
+
+        const QVector<QTextLayout::FormatRange> formats = block.textFormats();
+        for (const QTextLayout::FormatRange &format : formats) {
+            if (format.format.hasProperty(QTextFormat::BackgroundBrush)
+                || format.format.hasProperty(QTextFormat::ForegroundBrush)) {
+                QTextCharFormat charFormat;
+                if (format.format.hasProperty(QTextFormat::BackgroundBrush))
+                    charFormat.setBackground(format.format.background());
+                if (format.format.hasProperty(QTextFormat::ForegroundBrush))
+                    charFormat.setForeground(format.format.foreground());
+                this->mergeFormat(format.start, format.length, charFormat);
+            }
         }
 
         emit spellingMistakesDetected();
@@ -2575,17 +2601,30 @@ void SceneDocumentBinder::timerEvent(QTimerEvent *te)
 
         const int nrBlocks = this->document()->blockCount();
         const int nrTresholdBlocks = nrBlocks >> 1;
-        if (m_rehighlightBlockQueue.size() > nrTresholdBlocks || m_rehighlightBlockQueue.isEmpty())
+        const QList<QTextBlock> queue = m_rehighlightBlockQueue;
+        m_rehighlightBlockQueue.clear();
+
+        if (queue.size() > nrTresholdBlocks || queue.isEmpty()) {
             this->QSyntaxHighlighter::rehighlight();
-        else {
-            for (const QTextBlock &block : qAsConst(m_rehighlightBlockQueue))
+        } else {
+            for (const QTextBlock &block : queue)
                 this->rehighlightBlock(block);
         }
-
-        m_rehighlightBlockQueue.clear();
     } else if (te->timerId() == m_sceneElementTaskTimer.timerId()) {
         m_sceneElementTaskTimer.stop();
         this->performAllSceneElementTasks();
+    } else if (te->timerId() == m_applyBlockFormatTimer.timerId()) {
+        m_applyBlockFormatTimer.stop();
+
+        const QList<QTextBlock> queue = m_applyBlockFormatQueue;
+        m_applyBlockFormatQueue.clear();
+        for (const QTextBlock &block : queue) {
+            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+            if (userData) {
+                QTextCursor cursor(block);
+                cursor.setBlockFormat(userData->blockFormat);
+            }
+        }
     }
 }
 
@@ -2602,6 +2641,15 @@ bool SceneDocumentBinder::eventFilter(QObject *watched, QEvent *event)
     }
 
     return false;
+}
+
+void SceneDocumentBinder::mergeFormat(int start, int count, const QTextCharFormat &format)
+{
+    for (int i = start; i < start + count; i++) {
+        QTextCharFormat mergedFormat = this->format(i);
+        mergedFormat.merge(format);
+        this->setFormat(i, 1, mergedFormat);
+    }
 }
 
 void SceneDocumentBinder::resetScene()
@@ -3327,8 +3375,16 @@ void SceneDocumentBinder::rehighlightLater()
 
 void SceneDocumentBinder::rehighlightBlockLater(const QTextBlock &block)
 {
+    m_rehighlightBlockQueue.removeOne(block);
     m_rehighlightBlockQueue << block;
     this->rehighlightLater();
+}
+
+void SceneDocumentBinder::applyBlockFormatLater(const QTextBlock &block)
+{
+    m_applyBlockFormatQueue.removeOne(block);
+    m_applyBlockFormatQueue << block;
+    m_applyBlockFormatTimer.start(0, this);
 }
 
 void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)

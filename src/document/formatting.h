@@ -756,6 +756,9 @@ protected:
     void timerEvent(QTimerEvent *te);
     bool eventFilter(QObject *watched, QEvent *event);
 
+    // Helpers
+    void mergeFormat(int start, int count, const QTextCharFormat &format);
+
 private:
     void resetScene();
     void resetTextDocument();
@@ -786,6 +789,8 @@ private:
 
     void rehighlightLater();
     void rehighlightBlockLater(const QTextBlock &block);
+
+    void applyBlockFormatLater(const QTextBlock &block);
 
     void onTextFormatChanged(const QList<int> &properties);
 
@@ -834,8 +839,10 @@ private:
     bool m_wordUnderCursorIsMisspelled = false;
     ExecLaterTimer m_initializeDocumentTimer;
     ExecLaterTimer m_sceneElementTaskTimer;
+    ExecLaterTimer m_applyBlockFormatTimer;
     QList<SceneElement::Type> m_tabHistory;
     bool m_applyFormattingEvenInTransaction = false;
+    QList<QTextBlock> m_applyBlockFormatQueue;
     QList<QTextBlock> m_rehighlightBlockQueue;
     QObjectProperty<SceneElement> m_currentElement;
     QObjectProperty<QQuickTextDocument> m_textDocument;
