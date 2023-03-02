@@ -111,6 +111,13 @@ Item {
         width: (sourceGeometry.width + (targetGeometry.width - sourceGeometry.width)*t)
         height: (sourceGeometry.height + (targetGeometry.height - sourceGeometry.height)*t)
 
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            propagateComposedEvents: false
+            enabled: dockWidget.visible
+        }
+
         Rectangle {
             id: titleBar
             anchors.top: parent.top
@@ -160,13 +167,6 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                propagateComposedEvents: false
-                enabled: dockWidget.visible
-            }
 
             Loader {
                 id: contentLoader
