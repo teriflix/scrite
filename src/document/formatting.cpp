@@ -2313,6 +2313,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
         QJsonObject para;
         para.insert(QStringLiteral("type"), element->type());
+        para.insert(QStringLiteral("alignment"), (int)element->alignment());
         para.insert(QStringLiteral("text"), cursor.selectedText());
 
         const QVector<QTextLayout::FormatRange> blockFormats = block.textFormats();
@@ -2365,6 +2366,7 @@ int SceneDocumentBinder::paste(int fromPosition)
 
         QString text;
         SceneElement::Type type = SceneElement::Action;
+        Qt::Alignment alignment;
         QVector<QTextLayout::FormatRange> formats;
     };
 
@@ -2392,6 +2394,7 @@ int SceneDocumentBinder::paste(int fromPosition)
         for (const QJsonValue &item : content) {
             const QJsonObject itemObject = item.toObject();
             const int type = itemObject.value(QStringLiteral("type")).toInt();
+            const int alignment = itemObject.value(QStringLiteral("alignment")).toInt();
 
             Paragraph paragraph;
             paragraph.type = (type < SceneElement::Min || type > SceneElement::Max
@@ -2399,6 +2402,7 @@ int SceneDocumentBinder::paste(int fromPosition)
                     ? SceneElement::Action
                     : SceneElement::Type(type);
             paragraph.text = itemObject.value(QStringLiteral("text")).toString();
+            paragraph.alignment = alignment == 0 ? Qt::Alignment() : Qt::Alignment(alignment);
             paragraph.formats = SceneElement::textFormatsFromJson(
                     itemObject.value(QStringLiteral("formats")).toArray());
             paragraphs.append(paragraph);
@@ -2429,8 +2433,10 @@ int SceneDocumentBinder::paste(int fromPosition)
             lastPastedBlock = cursor.block();
             SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(lastPastedBlock);
             if (userData) {
-                if (userData->sceneElement())
+                if (userData->sceneElement()) {
                     userData->sceneElement()->setType(paragraph.type);
+                    userData->sceneElement()->setAlignment(paragraph.alignment);
+                }
                 userData->resetFormat();
             }
         }
