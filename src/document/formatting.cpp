@@ -2930,9 +2930,17 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
         if (userData != nullptr && userData->sceneElement() == element) {
             // Text changes from scene element to block are not applied
             // Only element type changes can be applied.
+            const SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
+            userData->blockFormat = format->createBlockFormat(element->alignment());
+            userData->charFormat = format->createCharFormat();
+
+            QTextCursor cursor(block);
+            cursor.setBlockFormat(userData->blockFormat);
+
             new ForceCursorPositionHack(block, m_cursorPosition - block.position(), this);
-            userData->resetFormat();
-            this->rehighlightBlock(block);
+
+            this->rehighlightBlockLater(block);
+
             return true;
         }
         return false;
@@ -3124,6 +3132,7 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
                 switch (prevElement->type()) {
                 case SceneElement::Action:
                     newElement->setType(SceneElement::Action);
+                    newElement->setAlignment(prevElement->alignment());
                     break;
                 case SceneElement::Character:
                     newElement->setType(SceneElement::Dialogue);
