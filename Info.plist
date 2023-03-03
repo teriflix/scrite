@@ -13,15 +13,15 @@
     <key>CFBundleName</key>
     <string>Scrite</string>
     <key>CFBundleGetInfoString</key>
-    <string>Scrite - Version 0.9.3l Beta</string>
+    <string>Scrite - Version 0.9.3m Beta</string>
     <key>CFBundleExecutable</key>
     <string>Scrite</string>
     <key>CFBundleIdentifier</key>
     <string>com.teriflix.scrite</string>
     <key>CFBundleVersion</key>
-    <string>0.9.3l</string>
+    <string>0.9.3m</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.9.3l</string>
+    <string>0.9.3m</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.productivity</string>
     <key>Vendor</key>
