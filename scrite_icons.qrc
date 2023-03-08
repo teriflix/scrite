@@ -281,5 +281,7 @@
         <file>icons/editor/format_align_right_inverted.png</file>
         <file>icons/editor/change_case_inverted.png</file>
         <file>icons/editor/change_case.png</file>
+        <file>icons/content/checklist_inverted.png</file>
+        <file>icons/content/checklist.png</file>
     </qresource>
 </RCC>

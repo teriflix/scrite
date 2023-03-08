@@ -100,7 +100,7 @@ Rectangle {
             notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
         }
         function onCurrentElementIndexChanged(val) {
-            if(workspaceSettings.syncCurrentSceneOnNotebook)
+            if(workspaceSettings.syncCurrentSceneOnNotebook && !notebookTree.activatingScreenplayElement)
                 notebookTree.activateFromCurrentScreenplayElement()
         }
     }
@@ -435,6 +435,8 @@ Rectangle {
                                         return "../icons/content/note.png"
                                     case Note.FormNoteType:
                                         return "../icons/content/form.png"
+                                    case Note.CheckListNoteType:
+                                        return "../icons/content/checklist.png"
                                     default:
                                         break
                                     }
@@ -498,7 +500,11 @@ Rectangle {
                 }
             }
 
+            property bool activatingScreenplayElement: false
             function activateScreenplayElement(_modelData) {
+                activatingScreenplayElement = true
+                Qt.callLater( () => { notebookTree.activatingScreenplayElement = false })
+
                 var makeSceneCurrent = function(notes) {
                     if(notes.ownerType === Notes.SceneOwner) {
                         var scene = notes.owner
@@ -676,6 +682,8 @@ Rectangle {
                             return textNoteComponent
                         case Note.FormNoteType:
                             return formNoteComponent
+                        case Note.CheckListNoteType:
+                            return checkListNoteComponent
                         }
                         break
                     case NotebookModel.EpisodeBreakType:
@@ -1492,6 +1500,31 @@ Rectangle {
             }
 
             FormView {
+                anchors.fill: parent
+                note: parent.note
+            }
+        }
+    }
+
+    Component {
+        id: checkListNoteComponent
+
+        Rectangle {
+            id: checkListNoteItem
+            property var componentData
+            property Note note: componentData.notebookItemObject
+            color: Qt.tint(note.color, "#E7FFFFFF")
+
+            // Report support
+            property bool hasReport: false
+
+            function deleteSelf() {
+                var notes = note.notes
+                notes.removeNote(note)
+                switchTo(notes)
+            }
+
+            CheckListView {
                 anchors.fill: parent
                 note: parent.note
             }
@@ -3085,28 +3118,43 @@ Rectangle {
 
         ColorMenu {
             title: "Text Note"
-            onMenuItemClicked: {
-                var note = newNoteMenu.notes.addTextNote()
-                if(note) {
-                    note.color = color
-                    note.objectName = "_newNote"
-                    Utils.execLater(note, 10, function() {
-                        switchTo(note);
-                    })
-                }
-                newNoteMenu.close()
-            }
+            onMenuItemClicked: (color) => {
+                                   var note = newNoteMenu.notes.addTextNote()
+                                   if(note) {
+                                       note.color = color
+                                       note.objectName = "_newNote"
+                                       Utils.execLater(note, 10, function() {
+                                           switchTo(note);
+                                       })
+                                   }
+                                   newNoteMenu.close()
+                               }
         }
 
         FormMenu {
             title: "Form Note"
             notes: newNoteMenu.notes
-            onNoteAdded: {
-                Utils.execLater(note, 10, function() {
-                    switchTo(note);
-                })
-                newNoteMenu.close()
-            }
+            onNoteAdded: (note) => {
+                             Utils.execLater(note, 10, function() {
+                                 switchTo(note);
+                             })
+                             newNoteMenu.close()
+                         }
+        }
+
+        ColorMenu {
+            title: "CheckList Note"
+            onMenuItemClicked: (color) => {
+                                   var note = newNoteMenu.notes.addCheckListNote()
+                                   if(note) {
+                                       note.color = color
+                                       note.objectName = "_newNote"
+                                       Utils.execLater(note, 10, function() {
+                                            switchTo(note)
+                                       })
+                                   }
+                                   newNoteMenu.close()
+                               }
         }
     }
 

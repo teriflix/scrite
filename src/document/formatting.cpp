@@ -2937,7 +2937,9 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
             QTextCursor cursor(block);
             cursor.setBlockFormat(userData->blockFormat);
 
-            new ForceCursorPositionHack(block, m_cursorPosition - block.position(), this);
+            if (m_cursorPosition >= block.position()
+                && m_cursorPosition <= block.position() + block.length())
+                new ForceCursorPositionHack(block, m_cursorPosition - block.position(), this);
 
             this->rehighlightBlockLater(block);
 

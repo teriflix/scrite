@@ -54,7 +54,7 @@ public:
     QString id() const;
     Q_SIGNAL void idChanged();
 
-    enum Type { TextNoteType, FormNoteType };
+    enum Type { TextNoteType, FormNoteType, CheckListNoteType };
     Q_ENUM(Type)
     Q_PROPERTY(Type type READ type NOTIFY typeChanged)
     Type type() const { return m_type; }
@@ -212,6 +212,7 @@ public:
 
     Q_INVOKABLE Note *addTextNote();
     Q_INVOKABLE Note *addFormNote(const QString &id);
+    Q_INVOKABLE Note *addCheckListNote();
     Q_INVOKABLE void removeNote(Note *ptr);
     Q_INVOKABLE Note *noteAt(int index) const;
     Q_INVOKABLE Note *firstNote() const { return this->noteAt(0); }

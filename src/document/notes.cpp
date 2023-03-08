@@ -228,25 +228,41 @@ void Note::serializeToJson(QJsonObject &json) const
 {
     json.insert(QStringLiteral("id"), this->id());
 
-    if (m_type == TextNoteType)
-        json.insert(QStringLiteral("type"), QStringLiteral("Text"));
-    else if (m_type == FormNoteType) {
-        json.insert(QStringLiteral("type"), QStringLiteral("Form"));
+    const QMetaObject *mo = &Note::staticMetaObject;
+    const QMetaEnum typeEnum = mo->enumerator(mo->indexOfEnumerator("Type"));
+    json.insert(QStringLiteral("type"), typeEnum.valueToKey(m_type));
+
+    if (m_type == FormNoteType)
         json.insert(QStringLiteral("formId"), m_formId);
-    }
 }
 
 void Note::deserializeFromJson(const QJsonObject &json)
 {
     this->setId(json.value(QStringLiteral("id")).toString());
 
-    const QString type = json.value(QStringLiteral("type")).toString();
-    if (type == QStringLiteral("Text"))
+    /**
+     * Previously type should be stored as Text, Form etc.
+     * From now on, it will be stored as TextNoteType, FormNoteType -- so that we
+     * can match the Type enum exactly. For this reason, we have to append 'NoteType'
+     * if we read type attribute from previous versions.
+     */
+    const QString noteTypeSuffix = QStringLiteral("NoteType");
+    QString typeStr = json.value(QStringLiteral("type")).toString();
+    if (!typeStr.endsWith(noteTypeSuffix))
+        typeStr += noteTypeSuffix;
+
+    const QMetaObject *mo = &Note::staticMetaObject;
+    const QMetaEnum typeEnum = mo->enumerator(mo->indexOfEnumerator("Type"));
+
+    bool ok = false;
+    const int type = typeEnum.keyToValue(qPrintable(typeStr), &ok);
+    if (ok)
+        this->setType(Type(type));
+    else
         this->setType(TextNoteType);
-    else if (type == QStringLiteral("Form")) {
-        this->setType(FormNoteType);
+
+    if (m_type == FormNoteType)
         this->setFormId(json.value(QStringLiteral("formId")).toString());
-    }
 }
 
 void Note::write(QTextCursor &cursor, const WriteOptions &options) const
@@ -648,6 +664,14 @@ Note *Notes::addFormNote(const QString &id)
         return nullptr;
     }
 
+    this->addNote(ptr);
+    return ptr;
+}
+
+Note *Notes::addCheckListNote()
+{
+    Note *ptr = new Note(this);
+    ptr->setType(Note::CheckListNoteType);
     this->addNote(ptr);
     return ptr;
 }
