@@ -13,11 +13,13 @@
 
 import QtQml 2.15
 import QtQuick 2.15
-import Qt.labs.settings 1.0
 import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.15
+import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import QtQuick.Controls 1.4 as OldControls
+
 import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 
@@ -1516,7 +1518,13 @@ Rectangle {
             color: Qt.tint(note.color, "#E7FFFFFF")
 
             // Report support
-            property bool hasReport: false
+            property bool hasReport: true
+            property string reportDescription: "Export this checklist as a PDF or ODT."
+            function createReportGenerator() {
+                var generator = Scrite.document.createReportGenerator("Notebook Report")
+                generator.section = note
+                return generator
+            }
 
             function deleteSelf() {
                 var notes = note.notes
@@ -1525,8 +1533,26 @@ Rectangle {
             }
 
             CheckListView {
+                id: checkListView
+                note: checkListNoteItem.note
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: checkListAttachments.top
+            }
+
+            AttachmentsView {
+                id: checkListAttachments
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                attachments: checkListNoteItem.note ? checkListNoteItem.note.attachments : null
+            }
+
+            AttachmentsDropArea2 {
+                id: checkListAttachmentsDropArea
                 anchors.fill: parent
-                note: parent.note
+                target: checkListNoteItem.note ? checkListNoteItem.note.attachments : null
             }
         }
     }

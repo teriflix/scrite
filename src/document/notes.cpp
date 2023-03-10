@@ -25,6 +25,7 @@
 #include "screenplaytextdocument.h"
 
 #include <QSet>
+#include <QTextTable>
 #include <QUuid>
 
 typedef QHash<QString, Note *> IdNoteMapType;
@@ -372,6 +373,36 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
                 cursor.insertBlock(answerBlockFormat, answerCharFormat);
                 cursor.insertText(answer.trimmed());
             }
+        }
+    } else if (m_type == CheckListNoteType) {
+        const QJsonArray checkListItems = m_content.toArray();
+        if (!checkListItems.isEmpty()) {
+            QTextFrame *frame = cursor.currentFrame();
+
+            QTextTableFormat tableFormat;
+            tableFormat.setBorderCollapse(true);
+            tableFormat.setCellPadding(1);
+            tableFormat.setCellSpacing(1);
+            tableFormat.setBorder(0);
+
+            QTextTable *table = cursor.insertTable(checkListItems.size(), 2, tableFormat);
+
+            for (int row = 0; row < checkListItems.size(); row++) {
+                const QJsonObject checkListItemObj = checkListItems.at(row).toObject();
+                const QString text = checkListItemObj.value(QStringLiteral("_text")).toString();
+                const bool checked = checkListItemObj.value(QStringLiteral("_checked")).toBool();
+
+                cursor = table->cellAt(row, 0).firstCursorPosition();
+                if (checked)
+                    cursor.insertText(QStringLiteral("✓ "));
+                else
+                    cursor.insertText(QStringLiteral("☐ "));
+
+                cursor = table->cellAt(row, 1).firstCursorPosition();
+                cursor.insertText(text);
+            }
+
+            cursor = frame->lastCursorPosition();
         }
     }
 }
@@ -829,7 +860,8 @@ void Notes::write(QTextCursor &cursor, const WriteOptions &options) const
 {
     for (Note *note : this->constList()) {
         if ((options.includeTextNotes && note->type() == Note::TextNoteType)
-            || (options.includeFormNotes && note->type() == Note::FormNoteType))
+            || (options.includeFormNotes && note->type() == Note::FormNoteType)
+            || (options.includeCheckListNotes && note->type() == Note::CheckListNoteType))
             note->write(cursor);
     }
 }

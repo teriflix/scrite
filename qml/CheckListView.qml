@@ -121,9 +121,9 @@ Item {
                 onCurrentIndexChanged: checkListModel.modelUpdated()
 
                 onFocusChanged: {
-                    if(focus) {
+                    if(activeFocus) {
                         currentIndex = 0
-                        switchFocusTo(0)
+                        switchFocusTo(0, true)
                     }
                 }
 
@@ -155,14 +155,17 @@ Item {
                                            checkListView.switchFocusTo(index+1)
                                            checkListModel.modelUpdated()
                                        }
-                    onScrollToNextItem: () => { checkListView.switchFocusTo(index+1) }
-                    onScrollToPreviousItem: () => { checkListView.switchFocusTo(index-1) }
+                    onScrollToNextItem: (tabReason) => { checkListView.switchFocusTo(index+1, tabReason) }
+                    onScrollToPreviousItem: (tabReason) => {
+                                                if(index > 0 || tabReason)
+                                                    checkListView.switchFocusTo(index-1, tabReason)
+                                            }
 
                     Connections {
                         target: checkListView
-                        function onAssumeFocusRequest(focusItemIndex) {
+                        function onAssumeFocusRequest(focusItemIndex, tabReason) {
                             if(focusItemIndex === index)
-                                checkListItem.assumeFocus()
+                                checkListItem.assumeFocus(tabReason)
                         }
                     }
                 }
@@ -179,7 +182,9 @@ Item {
                                            checkListModel.modelUpdated()
                                            Qt.callLater(reset)
                                        }
-                    onScrollToPreviousItem: checkListView.switchFocusTo(checkListModel.count-1)
+                    onScrollToPreviousItem: (tabReason) => {
+                                                checkListView.switchFocusTo(checkListModel.count-1, tabReason)
+                                            }
 
                     function reset() {
                         checked = false
@@ -188,14 +193,14 @@ Item {
 
                     Connections {
                         target: checkListView
-                        function onAssumeFocusRequest(focusItemIndex) {
+                        function onAssumeFocusRequest(focusItemIndex, tabReason) {
                             if(focusItemIndex < 0)
-                                footerItem.assumeFocus()
+                                footerItem.assumeFocus(tabReason)
                         }
                     }
                 }
 
-                function switchFocusTo(index) {
+                function switchFocusTo(index, tabReason) {
                     index = Math.min(Math.max(-1, index), checkListModel.count)
                     if(index < 0) {
                         currentIndex = 0
@@ -209,10 +214,10 @@ Item {
                     } else {
                         currentIndex = index
                     }
-                    Qt.callLater(assumeFocusRequest, currentIndex)
+                    Qt.callLater(assumeFocusRequest, currentIndex, tabReason)
                 }
 
-                signal assumeFocusRequest(int focusItemIndex)
+                signal assumeFocusRequest(int focusItemIndex, bool tabReason)
             }
         }
     }
@@ -233,11 +238,13 @@ Item {
 
         signal textEdited(string text)
         signal editingFinished()
-        signal scrollToPreviousItem()
-        signal scrollToNextItem()
+        signal scrollToPreviousItem(bool tabReason)
+        signal scrollToNextItem(bool tabReason)
 
-        function assumeFocus() {
+        function assumeFocus(tabReason) {
             textField.forceActiveFocus()
+            if(tabReason)
+                textField.selectAll()
         }
 
         RowLayout {
@@ -283,7 +290,7 @@ Item {
                                           event.accepted = false
                                           return
                                       }
-                                      _checkListItem.scrollToPreviousItem()
+                                      _checkListItem.scrollToPreviousItem(false)
                                       event.accepted = true
                                   }
                 Keys.onDownPressed: (event) => {
@@ -291,15 +298,15 @@ Item {
                                             event.accepted = false
                                             return
                                         }
-                                        _checkListItem.scrollToNextItem()
+                                        _checkListItem.scrollToNextItem(false)
                                         event.accepted = true
                                     }
                 Keys.onTabPressed: (event) => {
-                                       _checkListItem.scrollToNextItem()
+                                       _checkListItem.scrollToNextItem(true)
                                        event.accepted = true
                                    }
                 Keys.onBacktabPressed: (event) => {
-                                           _checkListItem.scrollToPreviousItem()
+                                           _checkListItem.scrollToPreviousItem(true)
                                            event.accepted = true
                                        }
             }

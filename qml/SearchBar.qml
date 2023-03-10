@@ -56,6 +56,7 @@ Item {
 
             TextAreaInput {
                 id: txtSearch
+                property bool canClear: searchEngine.searchResultCount > 0 || text !== ""
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.right: searchButtonsRow.left
@@ -65,7 +66,7 @@ Item {
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 Keys.onReturnPressed: triggerSearch()
                 Keys.onEscapePressed: {
-                    if(searchEngine.searchResultCount > 0) {
+                    if(canClear) {
                         clearSearch()
                         event.accepted = true
                     }
@@ -151,7 +152,7 @@ Item {
                 ToolButton2 {
                     icon.source: "../icons/navigation/close.png"
                     anchors.verticalCenter: parent.verticalCenter
-                    enabled: searchEngine.searchResultCount > 0
+                    enabled: txtSearch.canClear
                     onClicked: txtSearch.clearSearch()
                     suggestedHeight: 40
                     hoverEnabled: false

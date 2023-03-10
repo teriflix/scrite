@@ -58,7 +58,9 @@ void ContextMenuEvent::setMode(Mode val)
 
 bool ContextMenuEvent::eventFilter(QObject *watched, QEvent *event)
 {
-    if (m_item == nullptr)
+    if (m_item == nullptr
+        || (event->type() != QEvent::ContextMenu && event->type() != QEvent::MouseButtonPress)
+        || !m_item->isVisible() || !m_item->isEnabled())
         return false;
 
     const QPointF globalCursorPos = QCursor::pos();
