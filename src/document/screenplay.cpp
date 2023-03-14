@@ -629,12 +629,7 @@ bool Screenplay::isEmpty() const
             const ScreenplayElement *firstElement = m_elements.first();
             if (firstElement->elementType() == ScreenplayElement::SceneElementType) {
                 const Scene *firstScene = firstElement->scene();
-                if (firstScene->elementCount() == 0)
-                    return true;
-
-                const SceneElement *para = firstScene->elementAt(0);
-                if (para->text().isEmpty())
-                    return true;
+                return firstScene->isEmpty();
             }
         }
 

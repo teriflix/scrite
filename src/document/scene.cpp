@@ -1135,6 +1135,17 @@ Scene *Scene::clone(QObject *parent) const
     return newScene;
 }
 
+bool Scene::isEmpty() const
+{
+    const bool noNotes = (m_notes == nullptr || m_notes->noteCount() == 0);
+    const bool noAttachments = (m_attachments == nullptr || m_attachments->attachmentCount() == 0);
+    const bool noContent = m_elements.isEmpty()
+            || (m_elements.size() == 1 && m_elements.first()->text().isEmpty());
+    const bool noSynopsis = m_structureElement == nullptr || m_structureElement->title().isEmpty();
+
+    return noNotes && noAttachments && noContent && noSynopsis;
+}
+
 void Scene::setId(const QString &val)
 {
     if (m_id == val || !m_id.isEmpty())

@@ -1521,6 +1521,8 @@ Rectangle {
             property bool hasReport: true
             property string reportDescription: "Export this checklist as a PDF or ODT."
             function createReportGenerator() {
+                checkListView.commitPendingItems()
+
                 var generator = Scrite.document.createReportGenerator("Notebook Report")
                 generator.section = note
                 return generator
@@ -3169,7 +3171,7 @@ Rectangle {
         }
 
         ColorMenu {
-            title: "CheckList Note"
+            title: "Checklist Note"
             onMenuItemClicked: (color) => {
                                    var note = newNoteMenu.notes.addCheckListNote()
                                    if(note) {

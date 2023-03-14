@@ -24,6 +24,15 @@ Item {
     id: root
     property Note note
 
+    Component.onDestruction: commitPendingItems()
+
+    function commitPendingItems() {
+        if(checkListView.footerItem)
+            checkListView.footerItem.commit()
+
+        checkListModel.saveUpdates()
+    }
+
     Connections {
         target: root
         enabled: true
@@ -38,13 +47,15 @@ Item {
 
     ListModel {
         id: checkListModel
+        property bool dirty: false
 
         function modelUpdated() {
+            dirty = true
             Utils.execLater(checkListModel, 250, saveUpdates)
         }
 
         function saveUpdates() {
-            if(root.note) {
+            if(dirty && root.note) {
                 var newContent = []
                 for(var i=count-1; i>=0; i--) {
                     const item = get(i)
@@ -58,6 +69,7 @@ Item {
                 }
                 newContent = newContent.reverse()
                 root.note.content = newContent
+                dirty = false
             }
         }
     }
@@ -173,18 +185,26 @@ Item {
                 footer: CheckListItem {
                     id: footerItem
                     width: checkListView.width - (checkListView.height < checkListView.contentHeight ? 20 : 1)
-                    onEditingFinished: () => {
-                                           const newItem = {
-                                               _checked: checked,
-                                               _text: text
-                                           }
-                                           checkListModel.append(newItem)
-                                           checkListModel.modelUpdated()
-                                           Qt.callLater(reset)
-                                       }
+                    onEditingFinished: {
+                        commit()
+                        checkListView.switchFocusTo(checkListView.count)
+                    }
                     onScrollToPreviousItem: (tabReason) => {
                                                 checkListView.switchFocusTo(checkListModel.count-1, tabReason)
                                             }
+
+                    function commit() {
+                        if(text === "")
+                            return
+
+                        const newItem = {
+                            _checked: checked,
+                            _text: text
+                        }
+                        checkListModel.append(newItem)
+                        checkListModel.modelUpdated()
+                        Qt.callLater(reset)
+                    }
 
                     function reset() {
                         checked = false
