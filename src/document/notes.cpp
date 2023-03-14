@@ -385,18 +385,47 @@ void Note::write(QTextCursor &cursor, const WriteOptions &options) const
             tableFormat.setCellSpacing(1);
             tableFormat.setBorder(0);
 
+            const QUrl checkedUrl(QStringLiteral("checklist://checked.png"));
+            const QUrl uncheckedUrl(QStringLiteral("checklist://unchecked.png"));
+
+            // Ensure that we have infact included checked and unchecked as resources
+            [=]() {
+                QTextDocument *doc = cursor.document();
+
+                QVariant checkedIcon = doc->resource(QTextDocument::ImageResource, checkedUrl);
+                QVariant uncheckedIcon = doc->resource(QTextDocument::ImageResource, uncheckedUrl);
+
+                if (checkedIcon.isNull() || !checkedIcon.isValid()
+                    || checkedIcon.userType() != QMetaType::QImage) {
+                    QImage image(QStringLiteral(":/icons/reports/checklistitem_checked.png"));
+                    doc->addResource(QTextDocument::ImageResource, checkedUrl, image);
+                }
+
+                if (uncheckedIcon.isNull() || !uncheckedIcon.isValid()
+                    || uncheckedIcon.userType() != QMetaType::QImage) {
+                    QImage image(QStringLiteral(":/icons/reports/checklistitem_unchecked.png"));
+                    doc->addResource(QTextDocument::ImageResource, uncheckedUrl, image);
+                }
+            }();
+
             QTextTable *table = cursor.insertTable(checkListItems.size(), 2, tableFormat);
+
+            const QFontMetricsF defaultFontMetrics(cursor.document()->defaultFont());
 
             for (int row = 0; row < checkListItems.size(); row++) {
                 const QJsonObject checkListItemObj = checkListItems.at(row).toObject();
                 const QString text = checkListItemObj.value(QStringLiteral("_text")).toString();
                 const bool checked = checkListItemObj.value(QStringLiteral("_checked")).toBool();
 
+                QTextImageFormat image;
+                image.setWidth(defaultFontMetrics.height());
+                image.setHeight(defaultFontMetrics.height());
                 cursor = table->cellAt(row, 0).firstCursorPosition();
                 if (checked)
-                    cursor.insertText(QStringLiteral("✓ "));
+                    image.setName(checkedUrl.toString());
                 else
-                    cursor.insertText(QStringLiteral("☐ "));
+                    image.setName(uncheckedUrl.toString());
+                cursor.insertImage(image);
 
                 cursor = table->cellAt(row, 1).firstCursorPosition();
                 cursor.insertText(text);

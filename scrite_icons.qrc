@@ -283,5 +283,7 @@
         <file>icons/editor/change_case.png</file>
         <file>icons/content/checklist_inverted.png</file>
         <file>icons/content/checklist.png</file>
+        <file>icons/reports/checklistitem_unchecked.png</file>
+        <file>icons/reports/checklistitem_checked.png</file>
     </qresource>
 </RCC>
