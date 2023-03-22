@@ -613,7 +613,8 @@ void PageSetup::useSavedDefaults()
             settings->value(group + QLatin1String("watermarkFontSize"), m_watermarkFontSize)
                     .toInt());
     this->setWatermarkColor(
-            settings->value(group + QLatin1String("watermarkColor")).value<QColor>());
+            settings->value(group + QLatin1String("watermarkColor"), m_watermarkColor)
+                    .value<QColor>());
     this->setWatermarkOpacity(
             settings->value(group + QLatin1String("watermarkOpacity"), m_watermarkOpacity)
                     .toReal());
