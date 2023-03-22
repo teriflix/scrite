@@ -47,6 +47,22 @@ Rectangle {
         return zoomSlider.zoomLevelModifierToApply()
     }
 
+    function navigateToScreenplayElementAt(index) {
+        // Show busy indicator
+        screenplayEditorBusyOverlay.ref()
+
+        // Switch current index after 10 ms
+        Utils.execLater(screenplayAdapter, 10, () => {
+                            screenplayAdapter.currentIndex = index
+                        })
+
+        // Ensure that the content-view is positioned right after 250 ms.
+        Utils.execLater(contentView, 250, () => {
+                            contentView.positionViewAtIndex(index, ListView.Beginning)
+                            screenplayEditorBusyOverlay.deref()
+                        })
+    }
+
     color: primaryColors.windowColor
     clip: true
 
@@ -59,7 +75,7 @@ Rectangle {
     Connections {
         target: screenplayAdapter
 
-        function swithToCurrentIndex() {
+        function switchToCurrentIndex() {
             var currentIndex = screenplayAdapter.currentIndex
             if(currentIndex < 0) {
                 contentView.scrollToFirstScene()
@@ -81,8 +97,8 @@ Rectangle {
         }
 
         function onCurrentIndexChanged(val) {
-            swithToCurrentIndex()
-            Utils.execLater(screenplayEditor, 500, swithToCurrentIndex)
+            switchToCurrentIndex()
+            Utils.execLater(screenplayEditor, 100, switchToCurrentIndex)
         }
 
         function onSourceChanged() {
@@ -3445,7 +3461,7 @@ Rectangle {
                             onDoubleClicked: (mouse) => {
                                                  screenplayAdapter.screenplay.clearSelection()
                                                  screenplayElement.toggleSelection()
-                                                 navigateToScreenplayElement()
+                                                 navigateToScreenplayElementAt(index)
                                                  sceneListSidePanel.expanded = false
                                              }
                             onClicked: (mouse) => {
@@ -3459,8 +3475,6 @@ Rectangle {
                                                }
 
                                                Scrite.document.screenplay.currentElementIndex = index
-                                               requestEditorLater()
-
                                                return
                                            }
 
@@ -3488,16 +3502,10 @@ Rectangle {
                                                }
                                            }
 
-                                           navigateToScreenplayElement()
-                                           Utils.execLater(delegateMouseArea, 500, navigateToScreenplayElement)
+                                           navigateToScreenplayElementAt(index)
                                        }
                             drag.target: screenplayAdapter.isSourceScreenplay && !Scrite.document.readOnly ? parent : null
                             drag.axis: Drag.YAxis
-
-                            function navigateToScreenplayElement() {
-                                contentView.positionViewAtIndex(index, ListView.Beginning)
-                                screenplayAdapter.currentIndex = index
-                            }
                         }
 
                         Drag.active: delegateMouseArea.drag.active
@@ -4131,7 +4139,7 @@ Rectangle {
                 height = editorHints.height * zoomLevel
                 active = false
                 initialized = true
-                Utils.execLater(contentViewDelegateLoader, 100, () => { contentViewDelegateLoader.load() } )
+                Utils.execLater(contentViewDelegateLoader, 0, () => { contentViewDelegateLoader.load() } )
                 delayLoadTimer.start()
             }
 
@@ -4559,6 +4567,21 @@ Rectangle {
                                    }
                 }
             }
+        }
+    }
+
+    BusyOverlay {
+        id: screenplayEditorBusyOverlay
+        color: Qt.rgba(0,0,0,0.1)
+        opacity: 1
+        anchors.fill: parent
+        busyMessage: "Please wait ..."
+        visible: RefCounter.isReffed
+        function ref() {
+            RefCounter.ref()
+        }
+        function deref() {
+            RefCounter.deref()
         }
     }
 }

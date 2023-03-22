@@ -98,7 +98,7 @@ public:
         SceneRole,
         ModelDataRole
     };
-    Q_ENUMS(Roles)
+    Q_ENUM(Roles)
     QHash<int, QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
