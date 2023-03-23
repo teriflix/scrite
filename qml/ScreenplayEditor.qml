@@ -47,22 +47,6 @@ Rectangle {
         return zoomSlider.zoomLevelModifierToApply()
     }
 
-    function navigateToScreenplayElementAt(index) {
-        // Show busy indicator
-        screenplayEditorBusyOverlay.ref()
-
-        // Switch current index after 10 ms
-        Utils.execLater(screenplayAdapter, 10, () => {
-                            screenplayAdapter.currentIndex = index
-                        })
-
-        // Ensure that the content-view is positioned right after 250 ms.
-        Utils.execLater(contentView, 250, () => {
-                            contentView.positionViewAtIndex(index, ListView.Beginning)
-                            screenplayEditorBusyOverlay.deref()
-                        })
-    }
-
     color: primaryColors.windowColor
     clip: true
 
@@ -72,39 +56,81 @@ Rectangle {
         sourceProperty: "source"
     }
 
+    QtObject {
+        id: privateData
+
+        readonly property int _InternalSource: 0
+        readonly property int _ExternalSource: 1
+        property int currentIndexChangeSoruce: _ExternalSource
+
+        function changeCurrentIndexTo(val) {
+            currentIndexChangeSoruce = _InternalSource
+            screenplayAdapter.currentIndex = val
+            Utils.execLater(privateData, 10, () => { privateData.currentIndexChangeSoruce = _ExternalSource })
+        }
+    }
+
     Connections {
+        id: screenplayAdapterConnections
         target: screenplayAdapter
 
-        function switchToCurrentIndex() {
-            var currentIndex = screenplayAdapter.currentIndex
+        function internalSwitchToCurrentIndex() {
+            contentView.delegateLoaded.disconnect(positionViewAtCurrentIndexLater)
+
+            const currentIndex = screenplayAdapter.currentIndex
             if(currentIndex < 0) {
                 contentView.scrollToFirstScene()
                 return
             }
 
-            var originIsContentView = mainTabBar.currentIndex === 0 || Scrite.app.hasActiveFocus(Scrite.window,contentView)
-            if(!originIsContentView) {
-                var gp = Scrite.app.cursorPosition()
-                var pos = Scrite.app.mapGlobalPositionToItem(contentView,gp)
-                originIsContentView = pos.x >= 0 && pos.x < contentView.width && pos.y >= 0 && pos.y < contentView.height
-            }
-            if(originIsContentView)
-                Utils.execLater(contentView, 100, function() {
-                    contentView.scrollIntoView(currentIndex)
-                })
+            Utils.execLater(contentView, 100, function() {
+                contentView.scrollIntoView(currentIndex)
+            })
+        }
+
+        function externalSwitchToCurrentIndex() {
+            screenplayEditorBusyOverlay.ref()
+
+            contentView.delegateLoaded.connect(positionViewAtCurrentIndexLater)
+
+            Utils.execLater(contentView, 100, () => {
+                                positionViewAtCurrentIndex()
+                                screenplayEditorBusyOverlay.reset()
+                            })
+        }
+
+        function positionViewAtCurrentIndexLater() {
+            forceContentViewPosition.start()
+        }
+
+        function positionViewAtCurrentIndex() {
+            const currentIndex = screenplayAdapter.currentIndex
+            if(currentIndex < 0)
+                contentView.scrollToFirstScene()
             else
                 contentView.positionViewAtIndex(currentIndex, ListView.Beginning)
         }
 
         function onCurrentIndexChanged(val) {
-            switchToCurrentIndex()
-            Utils.execLater(screenplayEditor, 100, switchToCurrentIndex)
+            if(privateData.currentIndexChangeSoruce === privateData._InternalSource)
+                internalSwitchToCurrentIndex()
+            else
+                externalSwitchToCurrentIndex()
         }
 
         function onSourceChanged() {
             contentView.commentsExpandCounter = 0
             contentView.commentsExpanded = false
+            screenplayEditorBusyOverlay.reset()
         }
+    }
+
+    Timer {
+        id: forceContentViewPosition
+        running: false
+        interval: 250
+        repeat: false
+        onTriggered: screenplayAdapterConnections.positionViewAtCurrentIndex()
     }
 
     Connections {
@@ -564,6 +590,9 @@ Rectangle {
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
 
+                    function delegateWasLoaded() { Qt.callLater(delegateLoaded) }
+                    signal delegateLoaded()
+
                     property bool allowContentYAnimation
                     Behavior on contentY {
                         enabled: applicationSettings.enableAnimations && contentView.allowContentYAnimation
@@ -652,7 +681,7 @@ Rectangle {
                             pos = mapToItem(contentItem, pos.x, pos.y)
                             ci = indexAt(pos.x, pos.y)
                             if(ci >= 0 && ci <= screenplayAdapter.elementCount-1)
-                                screenplayAdapter.currentIndex = ci
+                                privateData.changeCurrentIndexTo(ci)
                         }
                     }
 
@@ -1586,7 +1615,7 @@ Rectangle {
                             readOnly: Scrite.document.readOnly
                             onActiveFocusChanged: {
                                 if(activeFocus)
-                                    screenplayAdapter.currentIndex = contentItem.theIndex
+                                    privateData.changeCurrentIndexTo(contentItem.theIndex)
                             }
 
                             Transliterator.spellCheckEnabled: true
@@ -1704,7 +1733,7 @@ Rectangle {
                             onActiveFocusChanged: {
                                 if(activeFocus) {
                                     contentView.ensureVisible(synopsisEditorField, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
-                                    screenplayAdapter.currentIndex = contentItem.theIndex
+                                    privateData.changeCurrentIndexTo(contentItem.theIndex)
                                 } else
                                     Qt.callLater( function() { synopsisEditorField.cursorPosition = -1 } )
                             }
@@ -1812,7 +1841,7 @@ Rectangle {
                         if(activeFocus) {
                             completionModel.actuallyEnable = true
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
-                            screenplayAdapter.currentIndex = contentItem.theIndex
+                            privateData.changeCurrentIndexTo(contentItem.theIndex)
                             globalScreenplayEditorToolbar.sceneEditor = contentItem
                             markupTools.sceneDocumentBinder = sceneDocumentBinder
                             justReceivedFocus = true
@@ -2783,7 +2812,7 @@ Rectangle {
                         visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType &&
                                  headingItem.theScene.heading.enabled &&
                                  screenplayAdapter.isSourceScreenplay
-                        onActiveFocusChanged: if(activeFocus) screenplayAdapter.currentIndex = headingItem.theElementIndex
+                        onActiveFocusChanged: if(activeFocus) privateData.changeCurrentIndexTo(headingItem.theElementIndex)
                         tabItem: headingItem.sceneTextEditor
                     }
 
@@ -2848,7 +2877,7 @@ Rectangle {
                             property int previouslyActiveLanguage: TransliterationEngine.English
                             onActiveFocusChanged: {
                                 if(activeFocus) {
-                                    screenplayAdapter.currentIndex = headingItem.theElementIndex
+                                    privateData.changeCurrentIndexTo(headingItem.theElementIndex)
                                     previouslyActiveLanguage = Scrite.app.transliterationEngine.language
                                     const headingFormat = Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
                                     headingFormat.activateDefaultLanguage()
@@ -3461,7 +3490,7 @@ Rectangle {
                             onDoubleClicked: (mouse) => {
                                                  screenplayAdapter.screenplay.clearSelection()
                                                  screenplayElement.toggleSelection()
-                                                 navigateToScreenplayElementAt(index)
+                                                 screenplayAdapter.currentIndex = index
                                                  sceneListSidePanel.expanded = false
                                              }
                             onClicked: (mouse) => {
@@ -3502,7 +3531,7 @@ Rectangle {
                                                }
                                            }
 
-                                           navigateToScreenplayElementAt(index)
+                                           screenplayAdapter.currentIndex = index
                                        }
                             drag.target: screenplayAdapter.isSourceScreenplay && !Scrite.document.readOnly ? parent : null
                             drag.axis: Drag.YAxis
@@ -3626,7 +3655,7 @@ Rectangle {
                                 moveSelectedElementsAnimation.draggedElement = null
 
                                 contentView.positionViewAtIndex(targetndex, ListView.Beginning)
-                                screenplayAdapter.currentIndex = targetndex
+                                privateData.changeCurrentIndexTo(targetndex)
 
                                 sceneListView.forceActiveFocus()
                             }
@@ -4078,6 +4107,7 @@ Rectangle {
 
             active: false
             sourceComponent: componentData ? (componentData.scene ? contentComponent : (componentData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)) : noContentComponent
+            onLoaded: contentView.delegateWasLoaded()
 
             // Background for episode and act break components, when "Scene Blocks" is enabled.
             Rectangle {
@@ -4582,6 +4612,9 @@ Rectangle {
         }
         function deref() {
             RefCounter.deref()
+        }
+        function reset() {
+            RefCounter.reset()
         }
     }
 }
