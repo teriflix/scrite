@@ -66,7 +66,7 @@ Rectangle {
         function changeCurrentIndexTo(val) {
             currentIndexChangeSoruce = _InternalSource
             screenplayAdapter.currentIndex = val
-            Utils.execLater(privateData, 10, () => { privateData.currentIndexChangeSoruce = _ExternalSource })
+            currentIndexChangeSoruce = _ExternalSource
         }
     }
 
@@ -75,7 +75,9 @@ Rectangle {
         target: screenplayAdapter
 
         function internalSwitchToCurrentIndex() {
-            contentView.delegateLoaded.disconnect(positionViewAtCurrentIndexLater)
+            screenplayEditorBusyOverlay.reset()
+            delegateLoadedConnection.enabled = false
+            forceContentViewPosition.stop()
 
             const currentIndex = screenplayAdapter.currentIndex
             if(currentIndex < 0) {
@@ -91,8 +93,8 @@ Rectangle {
         function externalSwitchToCurrentIndex() {
             screenplayEditorBusyOverlay.ref()
 
+            delegateLoadedConnection.enabled = true
             contentView.focus = false
-            contentView.delegateLoaded.connect(positionViewAtCurrentIndexLater)
 
             Utils.execLater(contentView, 10, () => {
                                 positionViewAtCurrentIndex()
@@ -123,6 +125,15 @@ Rectangle {
             contentView.commentsExpandCounter = 0
             contentView.commentsExpanded = false
             screenplayEditorBusyOverlay.reset()
+        }
+    }
+
+    Connections {
+        id: delegateLoadedConnection
+        target: contentView
+        enabled: false
+        function onDelegateLoaded() {
+            screenplayAdapterConnections.positionViewAtCurrentIndexLater()
         }
     }
 
