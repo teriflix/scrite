@@ -91,9 +91,10 @@ Rectangle {
         function externalSwitchToCurrentIndex() {
             screenplayEditorBusyOverlay.ref()
 
+            contentView.focus = false
             contentView.delegateLoaded.connect(positionViewAtCurrentIndexLater)
 
-            Utils.execLater(contentView, 100, () => {
+            Utils.execLater(contentView, 10, () => {
                                 positionViewAtCurrentIndex()
                                 screenplayEditorBusyOverlay.reset()
                             })
@@ -3357,7 +3358,7 @@ Rectangle {
                     keyNavigationEnabled: false
                     preferredHighlightEnd: height*0.8
                     preferredHighlightBegin: height*0.2
-                    highlightRangeMode: ListView.ApplyRange
+                    highlightRangeMode: ListView.NoHighlightRange
                     property bool hasEpisodes: screenplayAdapter.isSourceScreenplay ? screenplayAdapter.screenplay.episodeCount > 0 : false
 
                     FocusTracker.window: Scrite.window
@@ -4600,13 +4601,19 @@ Rectangle {
         }
     }
 
-    BusyOverlay {
+    Rectangle {
         id: screenplayEditorBusyOverlay
-        color: Qt.rgba(0,0,0,0.1)
-        opacity: 1
         anchors.fill: parent
-        busyMessage: "Please wait ..."
+        color: Qt.rgba(0,0,0,0.05)
+        opacity: 1
         visible: RefCounter.isReffed
+        onVisibleChanged: parent.enabled = !visible
+
+        BusyIndicator {
+            anchors.centerIn: parent
+            running: parent.visible
+        }
+
         function ref() {
             RefCounter.ref()
         }

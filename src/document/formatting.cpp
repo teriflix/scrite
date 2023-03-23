@@ -2742,12 +2742,23 @@ void SceneDocumentBinder::initializeDocument()
     // text-formats while inserting text.
     for (QTextBlock &block : blocks) {
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        const SceneElement *element = userData->sceneElement();
+        const SceneElementFormat *format = m_screenplayFormat->elementFormat(element->type());
+
+        cursor = QTextCursor(block);
+
+        userData->resetFormat();
+        if (userData->shouldUpdateFromFormat(format)) {
+            userData->blockFormat = format->createBlockFormat(element->alignment());
+            userData->charFormat = format->createCharFormat();
+        }
+        cursor.setBlockFormat(userData->blockFormat);
+
         const QVector<QTextLayout::FormatRange> formatRanges =
                 userData->sceneElement()->textFormats();
         if (formatRanges.isEmpty())
             continue;
 
-        cursor = QTextCursor(block);
         const int startPos = cursor.position();
 
         for (const QTextLayout::FormatRange &formatRange : formatRanges) {
