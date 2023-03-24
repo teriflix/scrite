@@ -1013,6 +1013,7 @@ public:
     Q_INVOKABLE QObject *createExporterObject();
 
     // QObjectSerializer::Interface interface
+    void prepareForDeserialization();
     void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
     bool canSetPropertyFromObjectList(const QString &propName) const;
@@ -1111,6 +1112,9 @@ private:
     QVariantMap m_categoryActNames;
     QStringList m_groupCategories;
     QString m_preferredGroupCategory;
+
+    enum DeserializationStage { FullyDeserialized = -1, JustDeserialized, BeingDeserialized };
+    DeserializationStage m_deserializationStage = FullyDeserialized;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

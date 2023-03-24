@@ -3213,7 +3213,7 @@ QRectF Structure::layoutElements(Structure::LayoutType layoutType)
 
 void Structure::setForceBeatBoardLayout(bool val)
 {
-    if (m_forceBeatBoardLayout == val)
+    if (m_forceBeatBoardLayout == val || m_deserializationStage == BeingDeserialized)
         return;
 
     m_forceBeatBoardLayout = val;
@@ -3223,7 +3223,7 @@ void Structure::setForceBeatBoardLayout(bool val)
                 [=]() {
                     this->placeElementsInBeatBoardLayout(ScriteDocument::instance()->screenplay());
                 },
-                250);
+                m_deserializationStage == JustDeserialized ? 1000 : 250);
     }
 
     emit forceBeatBoardLayoutChanged();
@@ -4564,6 +4564,11 @@ QObject *Structure::createExporterObject()
     return this->createExporter();
 }
 
+void Structure::prepareForDeserialization()
+{
+    m_deserializationStage = BeingDeserialized;
+}
+
 void Structure::serializeToJson(QJsonObject &) const
 {
     // Do nothing
@@ -4622,6 +4627,11 @@ void Structure::deserializeFromJson(const QJsonObject &json)
         m_notes->loadOldNotes(notes.toArray());
 
     this->updateCharacterNamesShotsTransitionsAndTagsLater();
+
+    m_deserializationStage = JustDeserialized;
+    if (json.value(QLatin1String("forceBeatBoardLayout")).toBool())
+        this->setForceBeatBoardLayout(true);
+    m_deserializationStage = FullyDeserialized;
 }
 
 bool Structure::canSetPropertyFromObjectList(const QString &propName) const
