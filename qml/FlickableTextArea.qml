@@ -50,6 +50,7 @@ Flickable {
     TextArea {
         id: __textArea
         property SyntaxHighlighter syntaxHighlighter: Transliterator.highlighter
+        property var spellChecker: syntaxHighlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
         width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired && textAreaFlickable.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(textAreaFlickable.height-topPadding-bottomPadding, contentHeight+20)
         font.pointSize: Scrite.app.idealFontPointSize
@@ -106,6 +107,7 @@ Flickable {
         TabSequenceItem.sequence: tabSequenceIndex
     }
 
+    ContextMenuEvent.active: __textArea.spellChecker ? !__textArea.spellChecker.wordUnderCursorIsMisspelled : true
     ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
     ContextMenuEvent.onPopup: (mouse) => {
         if(!__textArea.activeFocus) {

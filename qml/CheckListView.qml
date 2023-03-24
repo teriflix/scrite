@@ -192,6 +192,7 @@ Item {
                     onScrollToPreviousItem: (tabReason) => {
                                                 checkListView.switchFocusTo(checkListModel.count-1, tabReason)
                                             }
+                    opacity: userIsInteracting ? 1 : (text === "" ? 0.25 : 0.85)
 
                     function commit() {
                         if(text === "")
@@ -255,6 +256,7 @@ Item {
         property bool checked
         property alias font: textField.font
         property alias placeholderText: textField.placeholderText
+        property bool userIsInteracting: textField.activeFocus || checkBox.activeFocus
 
         signal textEdited(string text)
         signal editingFinished()
@@ -271,6 +273,7 @@ Item {
             id: rowLayout
             anchors.verticalCenter: parent.verticalCenter
             width: parent.width - parent.leftPadding - parent.rightPadding
+            height: Math.max(checkBox.height, textField.height)
             spacing: 2
 
             CheckBox {
@@ -293,6 +296,8 @@ Item {
                 }
 
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                undoRedoEnabled: true
+                spellCheckEnabled: true
 
                 TextDocument.cursorPosition: cursorPosition
 

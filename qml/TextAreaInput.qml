@@ -18,6 +18,9 @@ import io.scrite.components 1.0
 
 TextArea {
     id: txtAreaInput
+    property bool undoRedoEnabled: false
+    property bool spellCheckEnabled: false
+
     palette: Scrite.app.palette
     selectByKeyboard: true
     selectByMouse: true
@@ -44,7 +47,29 @@ TextArea {
     Transliterator.cursorPosition: cursorPosition
     Transliterator.hasActiveFocus: activeFocus
     Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+    Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
+    Transliterator.spellCheckEnabled: spellCheckEnabled
 
+    SpecialSymbolsSupport {
+        anchors.top: parent.bottom
+        anchors.left: parent.left
+        textEditor: txtAreaInput
+        textEditorHasCursorInterface: true
+        enabled: !Scrite.document.readOnly
+    }
+
+    UndoHandler {
+        enabled: !txtAreaInput.readOnly && txtAreaInput.activeFocus && txtAreaInput.undoRedoEnabled
+        canUndo: txtAreaInput.canUndo
+        canRedo: txtAreaInput.canRedo
+        onUndoRequest: txtAreaInput.undo()
+        onRedoRequest: txtAreaInput.redo()
+    }
+
+    SpellingSuggestionsMenu2 { }
+
+    property var spellChecker: Transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
+    ContextMenuEvent.active: spellChecker ? !spellChecker.wordUnderCursorIsMisspelled : true
     ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
     ContextMenuEvent.onPopup: (mouse) => {
         if(!txtAreaInput.activeFocus) {

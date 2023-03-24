@@ -96,7 +96,7 @@ Rectangle {
             delegateLoadedConnection.enabled = true
             contentView.focus = false
 
-            Utils.execLater(contentView, 10, () => {
+            Utils.execLater(contentView, Scrite.app.isMacOSPlatform ? 50 : 10, () => {
                                 positionViewAtCurrentIndex()
                                 screenplayEditorBusyOverlay.reset()
                             })
