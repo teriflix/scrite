@@ -66,7 +66,7 @@ Rectangle {
         function changeCurrentIndexTo(val) {
             currentIndexChangeSoruce = _InternalSource
             screenplayAdapter.currentIndex = val
-            currentIndexChangeSoruce = _ExternalSource
+            privateData.currentIndexChangeSoruce = privateData._ExternalSource
         }
     }
 
@@ -76,7 +76,6 @@ Rectangle {
 
         function internalSwitchToCurrentIndex() {
             screenplayEditorBusyOverlay.reset()
-            delegateLoadedConnection.enabled = false
             forceContentViewPosition.stop()
 
             const currentIndex = screenplayAdapter.currentIndex
@@ -92,8 +91,6 @@ Rectangle {
 
         function externalSwitchToCurrentIndex() {
             screenplayEditorBusyOverlay.ref()
-
-            delegateLoadedConnection.enabled = true
             contentView.focus = false
 
             Utils.execLater(contentView, Scrite.app.isMacOSPlatform ? 50 : 10, () => {
@@ -131,10 +128,17 @@ Rectangle {
     Connections {
         id: delegateLoadedConnection
         target: contentView
-        enabled: false
+        enabled: !contentViewMovingProperty.get
         function onDelegateLoaded() {
             screenplayAdapterConnections.positionViewAtCurrentIndexLater()
         }
+    }
+
+    DelayedPropertyBinder {
+        id: contentViewMovingProperty
+        initial: false
+        set: contentView.moving
+        delay: 100
     }
 
     Timer {
