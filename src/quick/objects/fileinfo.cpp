@@ -258,7 +258,7 @@ QStringList RecentFileListModel::files() const
 void RecentFileListModel::add(const QString &filePath)
 {
     const QFileInfo fi(filePath);
-    if (m_files.first() == fi)
+    if (!m_files.isEmpty() && m_files.first() == fi)
         return;
 
     this->beginResetModel();
