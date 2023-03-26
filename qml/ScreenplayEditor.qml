@@ -137,8 +137,8 @@ Rectangle {
     DelayedPropertyBinder {
         id: contentViewMovingProperty
         initial: false
-        set: contentView.moving
-        delay: 100
+        set: contentView.moving || verticalScrollBar.active
+        delay: 250
     }
 
     Timer {
@@ -790,6 +790,12 @@ Rectangle {
         orientation: Qt.Vertical
         minimumSize: 0.1
         policy: screenplayAdapter.elementCount > 0 ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+        onPressedChanged: {
+            if(!pressed)
+                Utils.execLater(verticalScrollBar, 250, () => {
+                                    privateData.changeCurrentIndexTo(contentView.lastItemIndex)
+                                })
+        }
     }
 
     Rectangle {
@@ -4173,10 +4179,7 @@ Rectangle {
             Component.onCompleted: {
                 var editorHints = componentData.screenplayElement.editorHints
                 if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
-                    !editorHints ||
-                    editorHints.displaySceneCharacters !== screenplayEditorSettings.displaySceneCharacters ||
-                    editorHints.displaySceneSynopsis !== screenplayEditorSettings.displaySceneSynopsis ||
-                    componentData.scene.elementCount <= 1) {
+                    !editorHints || componentData.scene.elementCount <= 1) {
                         active = true
                         initialized = true
                         return
@@ -4185,18 +4188,13 @@ Rectangle {
                 height = editorHints.height * zoomLevel
                 active = false
                 initialized = true
-                Utils.execLater(contentViewDelegateLoader, 0, () => { contentViewDelegateLoader.load() } )
-                delayLoadTimer.start()
+                Utils.execLater(contentViewDelegateLoader, 100, () => { contentViewDelegateLoader.load() } )
             }
 
             Component.onDestruction: {
                 if(!active || componentData.screenplayElementType === ScreenplayElement.BreakElementType)
                     return
-                var editorHints = {
-                    "height": height / zoomLevel,
-                    "displaySceneCharacters": screenplayEditorSettings.displaySceneCharacters,
-                    "displaySceneSynopsis": screenplayEditorSettings.displaySceneSynopsis
-                }
+                var editorHints = { "height": height / zoomLevel }
                 componentData.screenplayElement.editorHints = editorHints
             }
 

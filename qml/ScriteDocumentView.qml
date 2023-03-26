@@ -428,12 +428,8 @@ Item {
             var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
             if(firstElement) {
                 var editorHints = firstElement.editorHints
-                if(editorHints) {
+                if(editorHints)
                     screenplayAdapter.initialLoadTreshold = -1
-                    screenplayEditorSettings.displaySceneCharacters = editorHints.displaySceneCharacters
-                    screenplayEditorSettings.displaySceneSynopsis = editorHints.displaySceneSynopsis
-                    return
-                }
             }
         }
     }
