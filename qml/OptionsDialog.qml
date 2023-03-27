@@ -15,6 +15,7 @@ import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Dialogs 1.3
 import Qt.labs.settings 1.0
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
@@ -221,17 +222,19 @@ Item {
                         text: "Screenplay Editor"
                     }
 
-                    Column {
+                    GridLayout {
                         id: screenplayEditorSettingsLayout
                         width: parent.width-20
+                        columns: 2
                         anchors.centerIn: parent
-                        readonly property int _padding: 2
+                        readonly property int _padding: 4
 
                         CheckBox2 {
                             checked: screenplayEditorSettings.enableSpellCheck
                             text: "Spell Check"
                             onToggled: screenplayEditorSettings.enableSpellCheck = checked
                             padding: parent._padding
+                            Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
@@ -241,6 +244,7 @@ Item {
                             padding: parent._padding
                             ToolTip.text: "If checked, single click on an option in auto-complete popup will apply it in the screenplay editor."
                             ToolTip.visible: hovered
+                            Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
@@ -251,6 +255,7 @@ Item {
                             hoverEnabled: true
                             onToggled: screenplayEditorSettings.enableAutoCapitalizeSentences = checked
                             padding: parent._padding
+                            Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
@@ -261,6 +266,7 @@ Item {
                             hoverEnabled: true
                             onToggled: screenplayEditorSettings.enableAutoPolishParagraphs = checked
                             padding: parent._padding
+                            Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
@@ -271,6 +277,18 @@ Item {
                             hoverEnabled: true
                             onToggled: screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor = checked
                             padding: parent._padding
+                            Layout.preferredWidth: parent.width / parent.columns
+                        }
+
+                        CheckBox2 {
+                            checked: screenplayEditorSettings.optimiseScrolling
+                            text: "Smooth Scrolling"
+                            ToolTip.visible: hovered
+                            ToolTip.text: "Checking this option will make scrolling in screenplay editor smooth, but uses a lot of RAM and can cause application to freeze at times while scrolling is being computed."
+                            hoverEnabled: true
+                            onToggled: screenplayEditorSettings.optimiseScrolling = checked
+                            padding: parent._padding
+                            Layout.preferredWidth: parent.width / parent.columns
                         }
                     }
                 }

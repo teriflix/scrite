@@ -591,7 +591,7 @@ Rectangle {
                 ListView {
                     id: contentView
                     anchors.fill: parent
-                    model: contentViewModel.value
+                    model: defaultCacheBuffer >= 0 ? contentViewModel.value : null
                     spacing: screenplayAdapter.elementCount > 0 ? screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
@@ -644,10 +644,24 @@ Rectangle {
                     FocusTracker.indicator.target: mainUndoStack
                     FocusTracker.indicator.property: screenplayAdapter.isSourceScreenplay ? "screenplayEditorActive" : "sceneEditorActive"
 
+                    property int defaultCacheBuffer: -1
+                    function configureCacheBuffer() {
+                        defaultCacheBuffer = cacheBuffer
+                        cacheBuffer = Qt.binding( () => {
+                                                     if(!model)
+                                                        return defaultCacheBuffer
+                                                     const maxCacheBuffer = 2147483647
+                                                     if(screenplayEditorSettings.optimiseScrolling)
+                                                        return maxCacheBuffer
+                                                     return screenplayAdapter.heightHintsAvailable ? defaultCacheBuffer : maxCacheBuffer
+                                                 })
+                    }
+
                     Component.onCompleted: {
                         if(Scrite.app.isMacOSPlatform)
                             flickDeceleration = 7500
                         positionViewAtIndex(screenplayAdapter.currentIndex, ListView.Beginning)
+                        configureCacheBuffer()
                     }
 
                     property point firstPoint: mapToItem(contentItem, width/2, 1)
@@ -4128,8 +4142,13 @@ Rectangle {
             }
 
             active: false
+            onActiveChanged: Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
             sourceComponent: componentData ? (componentData.scene ? contentComponent : (componentData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)) : noContentComponent
-            onLoaded: contentView.delegateWasLoaded()
+            onLoaded: {
+                contentView.delegateWasLoaded()
+                updateHeightHint()
+            }
+            onHeightChanged: Qt.callLater(updateHeightHint)
 
             // Background for episode and act break components, when "Scene Blocks" is enabled.
             Rectangle {
@@ -4167,25 +4186,24 @@ Rectangle {
             function load() {
                 if(active || componentData === undefined)
                     return
+
+                contentView.movingChanged.disconnect(load)
                 if(contentView.moving)
                     contentView.movingChanged.connect(load)
-                else {
+                else
                     active = true
-                    Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
-                    contentView.movingChanged.disconnect(load)
-                }
             }
 
             Component.onCompleted: {
-                var editorHints = componentData.screenplayElement.editorHints
+                const heightHint = componentData.screenplayElement.heightHint
                 if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
-                    !editorHints || componentData.scene.elementCount <= 1) {
+                    heightHint === 0 || componentData.scene.elementCount <= 1) {
                         active = true
                         initialized = true
                         return
                     }
 
-                height = editorHints.height * zoomLevel
+                height = heightHint * zoomLevel
                 active = false
                 initialized = true
                 Utils.execLater(contentViewDelegateLoader, 100, () => { contentViewDelegateLoader.load() } )
@@ -4194,8 +4212,13 @@ Rectangle {
             Component.onDestruction: {
                 if(!active || componentData.screenplayElementType === ScreenplayElement.BreakElementType)
                     return
-                var editorHints = { "height": height / zoomLevel }
-                componentData.screenplayElement.editorHints = editorHints
+
+                updateHeightHint()
+            }
+
+            function updateHeightHint() {
+                if(zoomLevel > 0 && active)
+                    componentData.screenplayElement.heightHint = height / zoomLevel
             }
 
             /*

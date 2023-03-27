@@ -122,11 +122,10 @@ public:
     QJsonValue userData() const { return m_userData; }
     Q_SIGNAL void userDataChanged();
 
-    Q_PROPERTY(
-            QJsonValue editorHints READ editorHints WRITE setEditorHints NOTIFY editorHintsChanged)
-    void setEditorHints(const QJsonValue &val);
-    QJsonValue editorHints() const { return m_editorHints; }
-    Q_SIGNAL void editorHintsChanged();
+    Q_PROPERTY(qreal heightHint READ heightHint WRITE setHeightHint NOTIFY heightHintChanged)
+    void setHeightHint(qreal val);
+    qreal heightHint() const { return m_heightHint; }
+    Q_SIGNAL void heightHintChanged();
 
     Q_PROPERTY(bool selected READ isSelected WRITE setSelected NOTIFY selectedChanged STORED false)
     void setSelected(bool val);
@@ -229,11 +228,11 @@ private:
     Attachments *m_attachments = nullptr;
     QString m_breakTitle;
     QJsonValue m_userData;
+    qreal m_heightHint = 0;
     QString m_breakSummary;
     QString m_breakSubtitle;
     int m_customSceneNumber = -1;
     bool m_elementTypeIsSet = false;
-    QJsonValue m_editorHints;
     QString m_userSceneNumber;
     ElementType m_elementType = SceneElementType;
     QObjectProperty<Scene> m_scene;
@@ -318,6 +317,10 @@ public:
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY emptyChanged)
     bool isEmpty() const;
     Q_SIGNAL void emptyChanged();
+
+    Q_PROPERTY(bool heightHintsAvailable READ isHeightHintsAvailable NOTIFY heightHintsAvailableChanged)
+    bool isHeightHintsAvailable() const { return m_heightHintsAvailable; }
+    Q_SIGNAL void heightHintsAvailableChanged();
 
     Q_PROPERTY(QString coverPagePhoto READ coverPagePhoto NOTIFY coverPagePhotoChanged STORED false)
     Q_INVOKABLE void setCoverPagePhoto(const QString &val);
@@ -528,6 +531,9 @@ protected:
     void evaluateWordCount();
     void evaluateWordCountLater();
     bool getPasteDataFromClipboard(QJsonObject &clipboardJson) const;
+    void setHeightHintsAvailable(bool val);
+    void evaluateIfHeightHintsAreAvailable();
+    void evaluateIfHeightHintsAreAvailableLater();
 
 private:
     QString m_title;
@@ -548,6 +554,7 @@ private:
     int m_maximumParagraphCount = 0;
     int m_averageParagraphCount = 0;
     bool m_hasTitlePageAttributes = false;
+    bool m_heightHintsAvailable = false;
     ScriteDocument *m_scriteDocument = nullptr;
     CoverPagePhotoSize m_coverPagePhotoSize = LargeCoverPhoto;
     friend class ScreenplayTextDocument;
@@ -573,6 +580,7 @@ private:
     ExecLaterTimer m_updateBreakTitlesTimer;
     ExecLaterTimer m_sceneNumberEvaluationTimer;
     ExecLaterTimer m_paragraphCountEvaluationTimer;
+    ExecLaterTimer m_evalHeightHintsAvailableTimer;
 };
 
 /**

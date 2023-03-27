@@ -40,7 +40,6 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
             &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::breakSummaryChanged, this,
             &ScreenplayElement::elementChanged);
-    connect(this, &ScreenplayElement::editorHintsChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::elementChanged, [=]() { this->markAsModified(); });
 
     connect(this, &ScreenplayElement::sceneChanged, [=]() {
@@ -250,13 +249,13 @@ void ScreenplayElement::setUserData(const QJsonValue &val)
     emit userDataChanged();
 }
 
-void ScreenplayElement::setEditorHints(const QJsonValue &val)
+void ScreenplayElement::setHeightHint(qreal val)
 {
-    if (m_editorHints == val)
+    if (qFuzzyCompare(m_heightHint, val))
         return;
 
-    m_editorHints = val;
-    emit editorHintsChanged();
+    m_heightHint = val;
+    emit heightHintChanged();
 }
 
 void ScreenplayElement::setSelected(bool val)
@@ -416,7 +415,7 @@ void ScreenplayElement::setElementIndex(int val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const QString coverPagePhotoPath("coverPage/photo.jpg");
+static const QString coverPagePhotoPath = QLatin1String("coverPage/photo.jpg");
 
 Screenplay::Screenplay(QObject *parent)
     : QAbstractListModel(parent),
@@ -440,6 +439,8 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::coverPagePhotoChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateSceneNumbersLater);
     connect(this, &Screenplay::elementsChanged, this, &Screenplay::evaluateParagraphCountsLater);
+    connect(this, &Screenplay::elementsChanged, this,
+            &Screenplay::evaluateIfHeightHintsAreAvailableLater);
     connect(this, &Screenplay::coverPagePhotoSizeChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::titlePageIsCenteredChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::screenplayChanged, [=]() {
@@ -1796,7 +1797,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
 
         this->setCurrentElementIndex(this->indexOfElement(ret));
 
-        ptr->setEditorHints(QJsonValue());
+        ptr->setHeightHint(0);
     }
 
     if (ret != nullptr && UndoStack::active() != nullptr) {
@@ -1835,7 +1836,7 @@ ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *eleme
     Scene *previousScene = previousSceneElement->scene();
     currentScene->mergeInto(previousScene);
 
-    previousSceneElement->setEditorHints(QJsonValue());
+    previousSceneElement->setHeightHint(0);
     screenplay->setCurrentElementIndex(previousElementIndex);
     GarbageCollector::instance()->add(element);
     return previousSceneElement;
@@ -2131,6 +2132,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::selectedChanged, this, &Screenplay::hasSelectedElementsChanged,
             Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::heightHintChanged, this,
+            &Screenplay::evaluateIfHeightHintsAreAvailableLater, Qt::UniqueConnection);
 }
 
 void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
@@ -2154,6 +2157,8 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
     disconnect(ptr, &ScreenplayElement::selectedChanged, this,
                &Screenplay::hasSelectedElementsChanged);
+    disconnect(ptr, &ScreenplayElement::heightHintChanged, this,
+               &Screenplay::evaluateIfHeightHintsAreAvailableLater);
 }
 
 void Screenplay::setWordCount(int val)
@@ -2225,6 +2230,36 @@ bool Screenplay::getPasteDataFromClipboard(QJsonObject &clipboardJson) const
     clipboardJson = jsonObj;
 
     return true;
+}
+
+void Screenplay::setHeightHintsAvailable(bool val)
+{
+    if (m_heightHintsAvailable == val)
+        return;
+
+    m_heightHintsAvailable = val;
+    emit heightHintsAvailableChanged();
+}
+
+void Screenplay::evaluateIfHeightHintsAreAvailable()
+{
+    bool available = true;
+
+    for (const ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->elementType() != ScreenplayElement::SceneElementType)
+            continue;
+
+        available &= !qFuzzyIsNull(element->heightHint());
+        if (!available)
+            break;
+    }
+
+    this->setHeightHintsAvailable(available);
+}
+
+void Screenplay::evaluateIfHeightHintsAreAvailableLater()
+{
+    m_evalHeightHintsAvailableTimer.start(100, this);
 }
 
 void Screenplay::setCurrentElementIndex(int val)
@@ -2606,14 +2641,17 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
 
     this->updateBreakTitlesLater();
 
+#if 0
     if (!m_scriteDocument->isCreatedOnThisComputer()) {
         for (ScreenplayElement *element : qAsConst(m_elements))
-            element->setEditorHints(QJsonValue());
+            element->setHeightHint(0);
 
         this->setCurrentElementIndex(-1);
     }
+#endif
 
     this->evaluateWordCountLater();
+    this->evaluateIfHeightHintsAreAvailableLater();
 }
 
 bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const
@@ -2756,6 +2794,9 @@ void Screenplay::timerEvent(QTimerEvent *te)
     } else if (te->timerId() == m_wordCountTimer.timerId()) {
         m_wordCountTimer.stop();
         this->evaluateWordCount();
+    } else if (te->timerId() == m_evalHeightHintsAvailableTimer.timerId()) {
+        m_evalHeightHintsAvailableTimer.stop();
+        this->evaluateIfHeightHintsAreAvailable();
     }
 }
 

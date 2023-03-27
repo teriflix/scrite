@@ -148,6 +148,7 @@ Item {
         property bool pausePageAndTimeComputation: false
         property bool highlightCurrentLine: true
         property bool applyUserDefinedLanguageFonts: true
+        property bool optimiseScrolling: false
     }
 
     Settings {
@@ -457,6 +458,13 @@ Item {
             }
 
             return Scrite.document.screenplay
+        }
+
+        onHeightHintsAvailableChanged: {
+            if(heightHintsAvailable)
+                appBusyOverlay.deref()
+            else
+                appBusyOverlay.ref()
         }
     }
 

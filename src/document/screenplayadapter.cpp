@@ -37,6 +37,8 @@ ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
             &ScreenplayAdapter::clearCurrentIndex);
 
     connect(this, &ScreenplayAdapter::sourceChanged, this, &ScreenplayAdapter::wordCountChanged);
+    connect(this, &ScreenplayAdapter::sourceChanged, this,
+            &ScreenplayAdapter::heightHintsAvailableChanged);
 }
 
 ScreenplayAdapter::~ScreenplayAdapter() { }
@@ -88,6 +90,8 @@ void ScreenplayAdapter::setSource(QObject *val)
                     &ScreenplayAdapter::hasNonStandardScenesChanged);
             connect(screenplay, &Screenplay::wordCountChanged, this,
                     &ScreenplayAdapter::wordCountChanged);
+            connect(screenplay, &Screenplay::heightHintsAvailableChanged, this,
+                    &ScreenplayAdapter::heightHintsAvailableChanged);
 
             this->setSourceModel(screenplay);
         } else {
@@ -117,6 +121,8 @@ void ScreenplayAdapter::setSource(QObject *val)
                         &ScreenplayAdapter::hasNonStandardScenesChanged);
                 connect(screenplay, &Screenplay::wordCountChanged, this,
                         &ScreenplayAdapter::wordCountChanged);
+                connect(screenplay, &Screenplay::heightHintsAvailableChanged, this,
+                        &ScreenplayAdapter::heightHintsAvailableChanged);
 
                 this->setSourceModel(screenplay);
             } else
@@ -179,6 +185,12 @@ int ScreenplayAdapter::wordCount() const
 {
     Screenplay *screenplay = this->screenplay();
     return screenplay == nullptr ? 0 : screenplay->wordCount();
+}
+
+bool ScreenplayAdapter::isHeightHintsAvailable() const
+{
+    Screenplay *screenplay = this->screenplay();
+    return screenplay == nullptr ? true : screenplay->isHeightHintsAvailable();
 }
 
 void ScreenplayAdapter::setInitialLoadTreshold(int val)
