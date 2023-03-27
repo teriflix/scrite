@@ -2429,16 +2429,17 @@ int SceneDocumentBinder::paste(int fromPosition)
         const int bend = cursor.position();
         finalCursorPos = bend;
 
-        if (pasteFormatting) {
-            lastPastedBlock = cursor.block();
-            SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(lastPastedBlock);
-            if (userData) {
-                if (userData->sceneElement()) {
-                    userData->sceneElement()->setType(paragraph.type);
-                    userData->sceneElement()->setAlignment(paragraph.alignment);
-                }
-                userData->resetFormat();
+        lastPastedBlock = cursor.block();
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(lastPastedBlock);
+        if (userData && userData->sceneElement())
+            userData->sceneElement()->setText(lastPastedBlock.text());
+
+        if (userData && pasteFormatting) {
+            if (userData->sceneElement()) {
+                userData->sceneElement()->setType(paragraph.type);
+                userData->sceneElement()->setAlignment(paragraph.alignment);
             }
+            userData->resetFormat();
         }
 
         if (!paragraph.formats.isEmpty()) {
