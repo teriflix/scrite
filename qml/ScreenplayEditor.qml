@@ -596,6 +596,7 @@ Rectangle {
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
                     property bool scrollingBetweenScenes: false
+                    readonly property bool loadAllDelegates: false // for future use
                     property real spaceForComments: {
                         if(screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
                             return Math.round(screenplayEditorWorkspace.width - pageRulerArea.width - pageRulerArea.minLeftMargin - 20)
@@ -650,10 +651,7 @@ Rectangle {
                         cacheBuffer = Qt.binding( () => {
                                                      if(!model)
                                                         return defaultCacheBuffer
-                                                     const maxCacheBuffer = 2147483647
-                                                     if(screenplayEditorSettings.optimiseScrolling)
-                                                        return maxCacheBuffer
-                                                     return screenplayAdapter.heightHintsAvailable ? defaultCacheBuffer : maxCacheBuffer
+                                                     return (screenplayEditorSettings.optimiseScrolling || contentView.loadAllDelegates) ? 2147483647 : defaultCacheBuffer
                                                  })
                     }
 
@@ -1817,6 +1815,7 @@ Rectangle {
                     property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
                     property Scene scene: contentItem.theScene
                     readOnly: Scrite.document.readOnly
+
                     background: Item {
                         id: sceneTextEditorBackground
 
@@ -4146,7 +4145,7 @@ Rectangle {
             sourceComponent: componentData ? (componentData.scene ? contentComponent : (componentData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)) : noContentComponent
             onLoaded: {
                 contentView.delegateWasLoaded()
-                updateHeightHint()
+                Qt.callLater(updateHeightHint)
             }
             onHeightChanged: Qt.callLater(updateHeightHint)
 
@@ -4197,13 +4196,14 @@ Rectangle {
             Component.onCompleted: {
                 const heightHint = componentData.screenplayElement.heightHint
                 if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
-                    heightHint === 0 || componentData.scene.elementCount <= 1) {
+                    contentView.loadAllDelegates || screenplayEditorSettings.optimiseScrolling ||
+                    componentData.scene.elementCount <= 1) {
                         active = true
                         initialized = true
                         return
                     }
 
-                height = heightHint * zoomLevel
+                height = (heightHint === 0 ? 400 : heightHint) * zoomLevel
                 active = false
                 initialized = true
                 Utils.execLater(contentViewDelegateLoader, 100, () => { contentViewDelegateLoader.load() } )
@@ -4640,7 +4640,7 @@ Rectangle {
     Rectangle {
         id: screenplayEditorBusyOverlay
         anchors.fill: parent
-        color: Qt.rgba(0,0,0,0.05)
+        color: Qt.rgba(0,0,0,0.1)
         opacity: 1
         visible: RefCounter.isReffed
         onVisibleChanged: parent.enabled = !visible

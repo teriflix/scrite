@@ -697,7 +697,8 @@ protected:
 
 private:
     void updateSize(const QSizeF &size);
-    QSizeF evaluateSizeHint();
+    static QSizeF evaluateSizeHint(const qreal pageWidth, const qreal devicePixelRatio, const QMarginsF &margins,
+                                   const QJsonObject &sceneJson, const QJsonObject &formatJson);
     void evaluateSizeHintLater();
     void sceneReset();
     void onSceneChanged();
@@ -715,7 +716,6 @@ private:
     qreal m_bottomMargin = 0;
     qreal m_contentWidth = 0;
     qreal m_contentHeight = 0;
-    QReadWriteLock m_lock;
     bool m_componentComplete = false;
     bool m_trackSceneChanges = true;
     bool m_trackFormatChanges = true;

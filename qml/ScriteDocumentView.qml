@@ -459,13 +459,6 @@ Item {
 
             return Scrite.document.screenplay
         }
-
-        onHeightHintsAvailableChanged: {
-            if(heightHintsAvailable)
-                appBusyOverlay.deref()
-            else
-                appBusyOverlay.ref()
-        }
     }
 
     ScreenplayTextDocument {
