@@ -259,6 +259,7 @@ Rectangle {
                 Item {
                     anchors.fill: canvas.selectedNodeItem
                     visible: canvas.selectedNodeItem
+                    z: 10
 
                     Loader {
                         id: removeRelationshipConfirmation

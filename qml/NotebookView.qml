@@ -3055,6 +3055,10 @@ Rectangle {
                                         TabSequenceItem.manager: characterListTabManager
                                         TabSequenceItem.sequence: index
                                         maximumLength: 50
+                                        onActiveFocusChanged: {
+                                            if(activeFocus)
+                                                charactersListScroll.ensureItemVisible(characterRowItem)
+                                        }
                                     }
 
                                     Text {
