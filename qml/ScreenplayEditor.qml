@@ -128,16 +128,16 @@ Rectangle {
     Connections {
         id: delegateLoadedConnection
         target: contentView
-        enabled: !contentViewMovingProperty.get
+        enabled: !contentViewIsBeingAltered.get
         function onDelegateLoaded() {
             screenplayAdapterConnections.positionViewAtCurrentIndexLater()
         }
     }
 
     DelayedPropertyBinder {
-        id: contentViewMovingProperty
+        id: contentViewIsBeingAltered
         initial: false
-        set: contentView.moving || verticalScrollBar.active
+        set: contentView.moving || verticalScrollBar.isBeingUsed || contentView.FocusTracker.hasFocus
         delay: 250
     }
 
@@ -802,10 +802,14 @@ Rectangle {
         orientation: Qt.Vertical
         minimumSize: 0.1
         policy: screenplayAdapter.elementCount > 0 ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+        property bool isBeingUsed: false
         onPressedChanged: {
-            if(!pressed)
+            if(pressed)
+                isBeingUsed = true
+            else
                 Utils.execLater(verticalScrollBar, 250, () => {
                                     privateData.changeCurrentIndexTo(contentView.lastItemIndex)
+                                    isBeingUsed = false
                                 })
         }
     }
