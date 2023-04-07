@@ -27,6 +27,7 @@
 #include <QQuickPaintedItem>
 #include <QAbstractListModel>
 #include <QQuickTextDocument>
+#include <QImage>
 
 #include "notes.h"
 #include "modifiable.h"
@@ -654,27 +655,6 @@ public:
     bool trackFormatChanges() const { return m_trackFormatChanges; }
     Q_SIGNAL void trackFormatChangesChanged();
 
-    Q_PROPERTY(qreal leftMargin READ leftMargin WRITE setLeftMargin NOTIFY leftMarginChanged)
-    void setLeftMargin(qreal val);
-    qreal leftMargin() const { return m_leftMargin; }
-    Q_SIGNAL void leftMarginChanged();
-
-    Q_PROPERTY(qreal rightMargin READ rightMargin WRITE setRightMargin NOTIFY rightMarginChanged)
-    void setRightMargin(qreal val);
-    qreal rightMargin() const { return m_rightMargin; }
-    Q_SIGNAL void rightMarginChanged();
-
-    Q_PROPERTY(qreal topMargin READ topMargin WRITE setTopMargin NOTIFY topMarginChanged)
-    void setTopMargin(qreal val);
-    qreal topMargin() const { return m_topMargin; }
-    Q_SIGNAL void topMarginChanged();
-
-    Q_PROPERTY(
-            qreal bottomMargin READ bottomMargin WRITE setBottomMargin NOTIFY bottomMarginChanged)
-    void setBottomMargin(qreal val);
-    qreal bottomMargin() const { return m_bottomMargin; }
-    Q_SIGNAL void bottomMarginChanged();
-
     Q_PROPERTY(qreal contentWidth READ contentWidth NOTIFY contentWidthChanged)
     qreal contentWidth() const { return m_contentWidth; }
     Q_SIGNAL void contentWidthChanged();
@@ -682,6 +662,16 @@ public:
     Q_PROPERTY(qreal contentHeight READ contentHeight NOTIFY contentHeightChanged)
     qreal contentHeight() const { return m_contentHeight; }
     Q_SIGNAL void contentHeightChanged();
+
+    Q_PROPERTY(bool asynchronous READ isAsynchronous WRITE setAsynchronous NOTIFY asynchronousChanged)
+    void setAsynchronous(bool val);
+    bool isAsynchronous() const { return m_asynchronous; }
+    Q_SIGNAL void asynchronousChanged();
+
+    Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
+    void setActive(bool val);
+    bool isActive() const { return m_active; }
+    Q_SIGNAL void activeChanged();
 
     Q_PROPERTY(bool hasPendingComputeSize READ hasPendingComputeSize NOTIFY
                        hasPendingComputeSizeChanged)
@@ -694,12 +684,12 @@ public:
 
 protected:
     void timerEvent(QTimerEvent *te);
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 private:
     void updateSize(const QSizeF &size);
-    static QSizeF evaluateSizeHint(const qreal pageWidth, const qreal devicePixelRatio, const QMarginsF &margins,
-                                   const QJsonObject &sceneJson, const QJsonObject &formatJson);
-    void evaluateSizeHintLater();
+    void updateSizeAndImageLater();
+    void updateSizeAndImageNow();
     void sceneReset();
     void onSceneChanged();
     void formatReset();
@@ -710,12 +700,11 @@ private:
     void setHasPendingComputeSize(bool val);
 
 private:
-    qreal m_topMargin = 0;
-    qreal m_leftMargin = 0;
-    qreal m_rightMargin = 0;
-    qreal m_bottomMargin = 0;
+    bool m_active = true;
+    bool m_asynchronous = true;
     qreal m_contentWidth = 0;
     qreal m_contentHeight = 0;
+    QImage m_documentImage;
     bool m_componentComplete = false;
     bool m_trackSceneChanges = true;
     bool m_trackFormatChanges = true;

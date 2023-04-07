@@ -1345,6 +1345,12 @@ Rectangle {
         id: placeholderSceneComponent
 
         Rectangle {
+            required property int spElementIndex
+            required property var spElementData
+            required property int spElementType
+
+            property bool evaluateSuggestedSceneHeight: true
+
             border.width: 1
             border.color: screenplayElement.scene ? screenplayElement.scene.color : primaryColors.c400.background
             color: screenplayElement.scene ? Qt.tint(screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
@@ -1352,6 +1358,18 @@ Rectangle {
             readonly property ScreenplayElement screenplayElement: spElementData.screenplayElement
             readonly property Scene scene: spElementData.scene
             readonly property int screenplayElementType: spElementData.screenplayElementType
+            property real suggestedSceneHeight: sizeHint.height
+
+            SceneSizeHintItem {
+                id: sizeHint
+                visible: false
+                asynchronous: false
+                width: contentWidth * zoomLevel
+                height: contentHeight * zoomLevel
+                format: Scrite.document.printFormat
+                scene: parent.scene
+                active: parent.evaluateSuggestedSceneHeight
+            }
 
             Text {
                 font: sceneHeadingText.font
@@ -1392,8 +1410,8 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.top: sceneHeadingText.bottom
-                anchors.topMargin: 20
-                anchors.bottomMargin: 20
+                anchors.topMargin: 20 * zoomLevel
+                anchors.bottomMargin: 20 * zoomLevel
                 fillMode: Image.TileVertically
                 source: "../images/sample_scene.png"
                 opacity: 0.5
@@ -4150,6 +4168,8 @@ Rectangle {
             onLoaded: {
                 contentView.delegateWasLoaded()
                 Qt.callLater(updateHeightHint)
+                if(placeHolderSceneItem)
+                    placeHolderSceneItem.destroy()
             }
             onHeightChanged: Qt.callLater(updateHeightHint)
 
@@ -4168,17 +4188,7 @@ Rectangle {
                 opacity: componentData.scene ? 0.25 : 1
             }
 
-            // Placeholder item for when scrolling is rapid.
-            Loader {
-                anchors.fill: parent
-                readonly property int spElementIndex: componentIndex
-                readonly property var spElementData: componentData
-                readonly property int spElementType: screenplayElementType
-
-                active: componentData.scene && !parent.active
-                sourceComponent: placeholderSceneComponent
-            }
-
+            property Item placeHolderSceneItem
             property bool initialized: false
             property bool isVisibleToUser: !contentView.moving && initialized && (index >= contentView.firstItemIndex && index <= contentView.lastItemIndex) && !contentView.ScrollBar.vertical.active
             onIsVisibleToUserChanged: {
@@ -4207,7 +4217,20 @@ Rectangle {
                         return
                     }
 
-                height = (heightHint === 0 ? 400 : heightHint) * zoomLevel
+                const placeHolderSceneProps = {
+                    "spElementIndex": componentIndex,
+                    "spElementData": componentData,
+                    "spElementType": screenplayElementType,
+                    "evaluateSuggestedSceneHeight": heightHint === 0
+                };
+                placeHolderSceneItem = placeholderSceneComponent.createObject(contentViewDelegateLoader, placeHolderSceneProps)
+                placeHolderSceneItem.anchors.fill = contentViewDelegateLoader
+
+                if(heightHint === 0)
+                    height = Qt.binding( () => { return placeHolderSceneItem.suggestedSceneHeight } )
+                else
+                    height = heightHint * zoomLevel
+
                 active = false
                 initialized = true
                 Utils.execLater(contentViewDelegateLoader, 100, () => { contentViewDelegateLoader.load() } )

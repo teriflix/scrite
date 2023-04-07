@@ -46,6 +46,7 @@ public:
     QString text;
     QList<TextFragment> misspelledFragments;
 };
+Q_DECLARE_METATYPE(SpellCheckServiceResult)
 
 class EnglishLanguageSpeller : public Sonnet::Speller
 {
@@ -69,6 +70,7 @@ struct SpellCheckServiceRequest
     QStringList characterNames;
     QStringList ignoreList;
 };
+Q_DECLARE_METATYPE(SpellCheckServiceRequest)
 
 void InitializeSpellCheckThread()
 {
@@ -279,6 +281,14 @@ void SpellCheckService::update()
         emit finished();
         return;
     }
+
+    // Since the result travels from background thread to main thread
+    static int serviceResultTypeId = qRegisterMetaType<SpellCheckServiceResult>();
+    Q_UNUSED(serviceResultTypeId)
+
+    // Since the result travels from background thread to main thread
+    static int serviceRequestTypeId = qRegisterMetaType<SpellCheckServiceRequest>();
+    Q_UNUSED(serviceRequestTypeId)
 
     SpellCheckServiceRequest request;
     request.text = m_text;

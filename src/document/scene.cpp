@@ -39,6 +39,8 @@
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
 #include <QQuickWindow>
+#include <QSGOpaqueTextureMaterial>
+#include <QPainter>
 
 static QDataStream &operator<<(QDataStream &ds, const QTextLayout::FormatRange &formatRange)
 {
@@ -2586,7 +2588,9 @@ int Scene::staticElementCount(QQmlListProperty<SceneElement> *list)
 SceneSizeHintItem::SceneSizeHintItem(QQuickItem *parent)
     : QQuickItem(parent), m_scene(this, "scene"), m_format(this, "format")
 {
-    this->setFlag(QQuickItem::ItemHasContents, false);
+    this->setFlag(QQuickItem::ItemHasContents, true);
+
+    connect(this, &QQuickItem::visibleChanged, this, &SceneSizeHintItem::updateSizeAndImageLater);
 }
 
 SceneSizeHintItem::~SceneSizeHintItem() { }
@@ -2611,7 +2615,7 @@ void SceneSizeHintItem::setScene(Scene *val)
 
     emit sceneChanged();
 
-    this->evaluateSizeHintLater();
+    this->updateSizeAndImageLater();
 }
 
 void SceneSizeHintItem::setTrackSceneChanges(bool val)
@@ -2650,7 +2654,7 @@ void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
 
     emit formatChanged();
 
-    this->evaluateSizeHintLater();
+    this->updateSizeAndImageLater();
 }
 
 void SceneSizeHintItem::setTrackFormatChanges(bool val)
@@ -2669,53 +2673,37 @@ void SceneSizeHintItem::setTrackFormatChanges(bool val)
                    &SceneSizeHintItem::onFormatChanged);
 }
 
-void SceneSizeHintItem::setLeftMargin(qreal val)
+void SceneSizeHintItem::setAsynchronous(bool val)
 {
-    if (qFuzzyCompare(m_leftMargin, val))
+    if (m_asynchronous == val)
         return;
 
-    m_leftMargin = val;
-    emit leftMarginChanged();
-
-    this->evaluateSizeHintLater();
+    m_asynchronous = val;
+    emit asynchronousChanged();
 }
 
-void SceneSizeHintItem::setRightMargin(qreal val)
+void SceneSizeHintItem::setActive(bool val)
 {
-    if (qFuzzyCompare(m_rightMargin, val))
+    if (m_active == val)
         return;
 
-    m_rightMargin = val;
-    emit rightMarginChanged();
+    m_active = val;
+    emit activeChanged();
 
-    this->evaluateSizeHintLater();
-}
-
-void SceneSizeHintItem::setTopMargin(qreal val)
-{
-    if (qFuzzyCompare(m_topMargin, val))
-        return;
-
-    m_topMargin = val;
-    emit topMarginChanged();
-
-    this->evaluateSizeHintLater();
-}
-
-void SceneSizeHintItem::setBottomMargin(qreal val)
-{
-    if (qFuzzyCompare(m_bottomMargin, val))
-        return;
-
-    m_bottomMargin = val;
-    emit bottomMarginChanged();
-
-    this->evaluateSizeHintLater();
+    if (m_componentComplete) {
+        if (m_active)
+            this->updateSizeAndImageLater();
+        else {
+            m_documentImage = QImage();
+            this->update();
+        }
+    }
 }
 
 void SceneSizeHintItem::classBegin()
 {
     m_componentComplete = false;
+    this->setHasPendingComputeSize(true);
 }
 
 void SceneSizeHintItem::componentComplete()
@@ -2723,7 +2711,115 @@ void SceneSizeHintItem::componentComplete()
     QQuickItem::componentComplete();
 
     m_componentComplete = true;
-    this->evaluateSizeHintLater();
+    if (m_asynchronous)
+        this->updateSizeAndImageLater();
+    else
+        this->updateSizeAndImageNow();
+}
+
+struct SceneSizeHintItem_TaskResult
+{
+    QSizeF documentSize;
+    QImage documentImage;
+};
+Q_DECLARE_METATYPE(SceneSizeHintItem_TaskResult)
+
+SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRatio,
+                                                     const Scene *scene,
+                                                     const ScreenplayFormat *format,
+                                                     bool evaluateSize = true,
+                                                     bool evaluateImage = true)
+{
+    SceneSizeHintItem_TaskResult result;
+
+    const qreal pageWidth = format->pageLayout()->contentWidth();
+
+    QTextDocument document;
+    document.setTextWidth(pageWidth);
+    document.setDefaultFont(format->defaultFont());
+
+    QTextCursor cursor(&document);
+
+    if (scene->heading()->isEnabled()) {
+        const SceneElementFormat *style = format->elementFormat(SceneElement::Heading);
+        QTextBlockFormat blockFormat = style->createBlockFormat(Qt::Alignment(), &pageWidth);
+        QTextCharFormat charFormat = style->createCharFormat(&pageWidth);
+        blockFormat.setTopMargin(0);
+
+        cursor.setCharFormat(charFormat);
+        cursor.setBlockFormat(blockFormat);
+#if 0
+        TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text(),
+                                                               QVector<QTextLayout::FormatRange>());
+#else
+        cursor.insertText(scene->heading()->text());
+#endif
+        cursor.insertBlock();
+    }
+
+    for (int j = 0; j < scene->elementCount(); j++) {
+        const SceneElement *para = scene->elementAt(j);
+        const SceneElementFormat *style = format->elementFormat(para->type());
+        if (j)
+            cursor.insertBlock();
+
+        QTextBlockFormat blockFormat = style->createBlockFormat(para->alignment(), &pageWidth);
+        QTextCharFormat charFormat = style->createCharFormat(&pageWidth);
+        if (!scene->heading()->isEnabled() && j == 0)
+            blockFormat.setTopMargin(0);
+
+        cursor.setCharFormat(charFormat);
+        cursor.setBlockFormat(blockFormat);
+#if 0
+        TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, para->text(),
+                                                               para->textFormats());
+#else
+        cursor.insertText(para->text());
+#endif
+    }
+
+    const QSizeF docSize = document.size() * devicePixelRatio;
+
+    if (evaluateSize)
+        result.documentSize = document.size() * devicePixelRatio;
+
+    if (evaluateImage) {
+        result.documentImage = QImage(docSize.toSize(), QImage::Format_ARGB32);
+        result.documentImage.fill(Qt::transparent);
+        result.documentImage.setDevicePixelRatio(devicePixelRatio);
+
+        QPainter paint(&result.documentImage);
+        paint.setRenderHint(QPainter::Antialiasing);
+        paint.setRenderHint(QPainter::TextAntialiasing);
+        QAbstractTextDocumentLayout::PaintContext context;
+        QAbstractTextDocumentLayout *layout = document.documentLayout();
+        layout->draw(&paint, context);
+        paint.end();
+    }
+
+    return result;
+}
+
+SceneSizeHintItem_TaskResult SceneSizeHintItem_Task(const qreal devicePixelRatio,
+                                                    const QJsonObject &sceneJson,
+                                                    const QJsonObject &formatJson,
+                                                    bool evaluateSize = true,
+                                                    bool evaluateImage = true)
+{
+    SceneSizeHintItem_TaskResult result;
+
+    Scene scene;
+    ScreenplayFormat format;
+    format.resetToFactoryDefaults();
+
+    if (!QObjectSerializer::fromJson(formatJson, &format))
+        return result;
+
+    if (!QObjectSerializer::fromJson(sceneJson, &scene))
+        return result;
+
+    format.pageLayout()->evaluateRectsNow();
+    return SceneSizeHintItem_Task2(devicePixelRatio, &scene, &format, evaluateSize, evaluateImage);
 }
 
 void SceneSizeHintItem::timerEvent(QTimerEvent *te)
@@ -2733,38 +2829,93 @@ void SceneSizeHintItem::timerEvent(QTimerEvent *te)
 
         const QString watcherName = QStringLiteral("SceneSizeHintItemFutureWatcher");
 
-        QFutureWatcher<QSizeF> *watcher = this->findChild<QFutureWatcher<QSizeF> *>(watcherName);
+        QFutureWatcher<SceneSizeHintItem_TaskResult> *watcher =
+                this->findChild<QFutureWatcher<SceneSizeHintItem_TaskResult> *>(watcherName);
         if (watcher) {
-            this->evaluateSizeHintLater();
+            this->updateSizeAndImageLater();
             return;
         }
 
         const QQuickWindow *window = this->window();
-        if (m_scene == nullptr || m_format == nullptr || qFuzzyIsNull(this->width())
-            || window == nullptr) {
+        if (!m_active || m_scene == nullptr || m_format == nullptr || window == nullptr) {
             this->setContentWidth(0);
             this->setContentHeight(0);
             this->setHasPendingComputeSize(false);
             return;
         }
 
-        watcher = new QFutureWatcher<QSizeF>(this);
-        watcher->setObjectName(watcherName);
+        if (m_asynchronous) {
+            // Since the result travels from background thread to main thread
+            static int taskResultTypeId = qRegisterMetaType<SceneSizeHintItem_TaskResult>();
+            Q_UNUSED(taskResultTypeId)
 
-        connect(watcher, &QFutureWatcher<QSizeF>::finished, this,
-                [=]() { this->updateSize(watcher->result()); });
-        connect(watcher, &QFutureWatcher<QSizeF>::finished, watcher, &QObject::deleteLater);
+            watcher = new QFutureWatcher<SceneSizeHintItem_TaskResult>(this);
+            watcher->setObjectName(watcherName);
+            connect(watcher, &QFutureWatcher<SceneSizeHintItem_TaskResult>::finished, this, [=]() {
+                const SceneSizeHintItem_TaskResult result = watcher->result();
+                m_documentImage = result.documentImage;
+                this->updateSize(result.documentSize);
+                this->update();
+            });
+            connect(watcher, &QFutureWatcher<SceneSizeHintItem_TaskResult>::finished, watcher,
+                    &QObject::deleteLater);
 
-        const QMarginsF margins(m_leftMargin, m_topMargin, m_rightMargin, m_bottomMargin);
-        const qreal pageWidth = this->width();
-        const QJsonObject sceneJson = QObjectSerializer::toJson(m_scene);
-        const QJsonObject formatJson = QObjectSerializer::toJson(m_format);
+            const QJsonObject sceneJson = QObjectSerializer::toJson(m_scene);
+            const QJsonObject formatJson = QObjectSerializer::toJson(m_format);
 
-        QFuture<QSizeF> future = QtConcurrent::run(&SceneSizeHintItem::evaluateSizeHint, pageWidth,
-                                                   window->effectiveDevicePixelRatio(), margins,
-                                                   sceneJson, formatJson);
-        watcher->setFuture(future);
+            QFuture<SceneSizeHintItem_TaskResult> future =
+                    QtConcurrent::run(SceneSizeHintItem_Task, window->effectiveDevicePixelRatio(),
+                                      sceneJson, formatJson, true, this->isVisible());
+            watcher->setFuture(future);
+        } else {
+            this->updateSizeAndImageNow();
+        }
     }
+}
+
+QSGNode *SceneSizeHintItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+{
+    const qreal w = this->width();
+    const qreal h = this->height();
+
+    if (oldNode)
+        delete oldNode;
+
+    QSGNode *rootNode = new QSGNode;
+    if (m_documentImage.isNull())
+        return rootNode; // nothing to show
+
+    QSGOpacityNode *opacityNode = new QSGOpacityNode;
+    opacityNode->setFlag(QSGNode::OwnedByParent);
+    opacityNode->setOpacity(this->opacity());
+    rootNode->appendChildNode(opacityNode);
+
+    QSGGeometryNode *geoNode = new QSGGeometryNode;
+    geoNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial | QSGNode::OwnedByParent);
+    opacityNode->appendChildNode(geoNode);
+
+    QSGGeometry *rectGeo = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 6);
+    rectGeo->setDrawingMode(QSGGeometry::DrawTriangles);
+    geoNode->setGeometry(rectGeo);
+
+    QSGGeometry::TexturedPoint2D *rectPoints = rectGeo->vertexDataAsTexturedPoint2D();
+
+    rectPoints[0].set(0.f, 0.f, 0.f, 0.f);
+    rectPoints[1].set(float(w), 0.f, 1.f, 0.f);
+    rectPoints[2].set(float(w), float(h), 1.f, 1.f);
+
+    rectPoints[3].set(0.f, 0.f, 0.f, 0.f);
+    rectPoints[4].set(float(w), float(h), 1.f, 1.f);
+    rectPoints[5].set(0.f, float(h), 0.f, 1.f);
+
+    QSGTexture *texture = this->window()->createTextureFromImage(m_documentImage);
+    QSGOpaqueTextureMaterial *textureMaterial = new QSGOpaqueTextureMaterial;
+    textureMaterial->setFlag(QSGMaterial::Blending);
+    textureMaterial->setFiltering(QSGTexture::Nearest);
+    textureMaterial->setTexture(texture);
+    geoNode->setMaterial(textureMaterial);
+
+    return rootNode;
 }
 
 void SceneSizeHintItem::updateSize(const QSizeF &size)
@@ -2776,57 +2927,30 @@ void SceneSizeHintItem::updateSize(const QSizeF &size)
         this->setHasPendingComputeSize(false);
 }
 
-QSizeF SceneSizeHintItem::evaluateSizeHint(const qreal pageWidth, const qreal devicePixelRatio,
-                                           const QMarginsF &margins, const QJsonObject &sceneJson,
-                                           const QJsonObject &formatJson)
+void SceneSizeHintItem::updateSizeAndImageLater()
 {
-    QTextDocument document;
-
-    QTextFrameFormat frameFormat;
-    frameFormat.setTopMargin(margins.top());
-    frameFormat.setLeftMargin(margins.left());
-    frameFormat.setRightMargin(margins.right());
-    frameFormat.setBottomMargin(margins.bottom());
-
-    QTextFrame *rootFrame = document.rootFrame();
-    rootFrame->setFrameFormat(frameFormat);
-
-    document.setTextWidth(pageWidth);
-
-    Scene scene;
-    ScreenplayFormat format;
-
-    if (!QObjectSerializer::fromJson(formatJson, &format))
-        return QSizeF();
-
-    if (!QObjectSerializer::fromJson(sceneJson, &scene))
-        return QSizeF();
-
-    const qreal maxParaWidth = (pageWidth - margins.left() - margins.right()) / devicePixelRatio;
-
-    QTextCursor cursor(&document);
-    for (int j = 0; j < scene.elementCount(); j++) {
-        const SceneElement *para = scene.elementAt(j);
-        const SceneElementFormat *style = format.elementFormat(para->type());
-        if (j)
-            cursor.insertBlock();
-
-        const QTextBlockFormat blockFormat =
-                style->createBlockFormat(para->alignment(), &maxParaWidth);
-        const QTextCharFormat charFormat = style->createCharFormat(&maxParaWidth);
-        cursor.setBlockFormat(blockFormat);
-        cursor.setCharFormat(charFormat);
-        cursor.insertText(para->text());
+    if (m_componentComplete) {
+        this->setHasPendingComputeSize(true);
+        m_updateTimer.start(0, this);
     }
-
-    return document.size();
 }
 
-void SceneSizeHintItem::evaluateSizeHintLater()
+void SceneSizeHintItem::updateSizeAndImageNow()
 {
-    this->setHasPendingComputeSize(true);
+    const QQuickWindow *window = this->window();
+    if (!m_active || m_scene == nullptr || m_format == nullptr || window == nullptr) {
+        this->setContentWidth(0);
+        this->setContentHeight(0);
+        this->setHasPendingComputeSize(false);
+        m_documentImage = QImage();
+    } else {
+        const SceneSizeHintItem_TaskResult result = SceneSizeHintItem_Task2(
+                window->effectiveDevicePixelRatio(), m_scene, m_format, true, this->isVisible());
+        m_documentImage = result.documentImage;
+        this->updateSize(result.documentSize);
+    }
 
-    m_updateTimer.start(10, this);
+    this->update();
 }
 
 void SceneSizeHintItem::sceneReset()
@@ -2834,13 +2958,13 @@ void SceneSizeHintItem::sceneReset()
     m_scene = nullptr;
     emit sceneChanged();
 
-    this->evaluateSizeHintLater();
+    this->updateSizeAndImageLater();
 }
 
 void SceneSizeHintItem::onSceneChanged()
 {
     if (m_trackSceneChanges)
-        this->evaluateSizeHintLater();
+        this->updateSizeAndImageLater();
 }
 
 void SceneSizeHintItem::formatReset()
@@ -2848,13 +2972,13 @@ void SceneSizeHintItem::formatReset()
     m_format = nullptr;
     emit formatChanged();
 
-    this->evaluateSizeHintLater();
+    this->updateSizeAndImageLater();
 }
 
 void SceneSizeHintItem::onFormatChanged()
 {
     if (m_trackFormatChanges)
-        this->evaluateSizeHintLater();
+        this->updateSizeAndImageLater();
 }
 
 void SceneSizeHintItem::setContentWidth(qreal val)
