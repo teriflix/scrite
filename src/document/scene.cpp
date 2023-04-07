@@ -1412,17 +1412,30 @@ void Scene::addMuteCharacter(const QString &characterName)
 {
     HourGlass hourGlass;
 
-    const QList<SceneElement *> elements = m_characterElementMap.characterElements(characterName);
-    if (!elements.isEmpty())
-        return;
+    const QStringList names = [characterName]() -> QStringList {
+        QStringList ret = characterName.split(QChar(','), Qt::SkipEmptyParts);
+        for (QString &name : ret)
+            name = name.trimmed();
+        return ret;
+    }();
 
-    SceneElement *element = new SceneElement(this);
-    element->setProperty("#mute", true);
-    element->setType(SceneElement::Character);
-    element->setText(characterName);
-    emit sceneElementChanged(element, ElementTypeChange);
+    int nrMuteCharactersAdded = 0;
+    for (const QString &name : names) {
+        const QList<SceneElement *> elements = m_characterElementMap.characterElements(name);
+        if (!elements.isEmpty())
+            continue;
 
-    emit sceneChanged();
+        SceneElement *element = new SceneElement(this);
+        element->setProperty("#mute", true);
+        element->setType(SceneElement::Character);
+        element->setText(name);
+        emit sceneElementChanged(element, ElementTypeChange);
+
+        ++nrMuteCharactersAdded;
+    }
+
+    if (nrMuteCharactersAdded > 0)
+        emit sceneChanged();
 }
 
 void Scene::removeMuteCharacter(const QString &characterName)
