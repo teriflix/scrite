@@ -2108,12 +2108,20 @@ Rectangle {
                             enabled: !Scrite.document.readOnly
                         }
 
+                        ResetOnChange {
+                            id: completionModelEnable
+                            trackChangesOn: sceneTextEditor.cursorRectangle
+                            from: false
+                            to: true
+                            delay: 250
+                        }
+
                         CompletionModel {
                             id: completionModel
                             property bool actuallyEnable: true
                             property string suggestion: currentCompletion
                             property bool hasSuggestion: count > 0
-                            enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus
+                            enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus && completionModelEnable.value
                             strings: sceneDocumentBinder.autoCompleteHints
                             priorityStrings: contentItem.theScene.characterNames
                             sortStrings: false

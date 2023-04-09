@@ -2850,7 +2850,8 @@ void SceneSizeHintItem::timerEvent(QTimerEvent *te)
         }
 
         const QQuickWindow *window = this->window();
-        if (!m_active || m_scene == nullptr || m_format == nullptr || window == nullptr) {
+        if (!m_componentComplete || !m_active || m_scene == nullptr || m_format == nullptr
+            || window == nullptr) {
             this->setContentWidth(0);
             this->setContentHeight(0);
             this->setHasPendingComputeSize(false);
@@ -2951,7 +2952,8 @@ void SceneSizeHintItem::updateSizeAndImageLater()
 void SceneSizeHintItem::updateSizeAndImageNow()
 {
     const QQuickWindow *window = this->window();
-    if (!m_active || m_scene == nullptr || m_format == nullptr || window == nullptr) {
+    if (!m_componentComplete || !m_active || m_scene == nullptr || m_format == nullptr
+        || window == nullptr) {
         this->setContentWidth(0);
         this->setContentHeight(0);
         this->setHasPendingComputeSize(false);
