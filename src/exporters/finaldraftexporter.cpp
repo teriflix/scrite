@@ -230,8 +230,10 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                     summaryE.appendChild(summaryParagraphE);
 
                     const QString synopsis = scene->synopsis();
-
                     QVector<QTextLayout::FormatRange> formats;
+
+#if 0
+                    // We don't need to apply scene color to synopsis text also.
 
                     QTextLayout::FormatRange format;
                     format.start = 0;
@@ -239,9 +241,8 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                     format.format.setBackground(exportSceneColor);
                     format.format.setForeground(Application::textColorFor(exportSceneColor));
                     formats.append(format);
-
-                    addTextToParagraph(summaryParagraphE, scene->synopsis(), Qt::Alignment(),
-                                       formats);
+#endif
+                    addTextToParagraph(summaryParagraphE, synopsis, Qt::Alignment(), formats);
                 }
             }
         }
