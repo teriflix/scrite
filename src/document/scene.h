@@ -336,20 +336,21 @@ public:
     QString id() const;
     Q_SIGNAL void idChanged();
 
-    Q_PROPERTY(QString name READ name NOTIFY titleChanged)
+    Q_PROPERTY(QString name READ name NOTIFY synopsisChanged)
     QString name() const;
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    void setTitle(const QString &val);
-    QString title() const { return m_title; }
-    Q_SIGNAL void titleChanged();
+    Q_PROPERTY(QString title READ synopsis WRITE setSynopsis NOTIFY synopsisChanged STORED false)
+    Q_PROPERTY(QString synopsis READ synopsis WRITE setSynopsis NOTIFY synopsisChanged)
+    void setSynopsis(const QString &val);
+    QString synopsis() const { return m_synopsis; }
+    Q_SIGNAL void synopsisChanged();
 
-    void inferTitleFromContent();
+    void inferSynopsisFromContent();
 
-    Q_PROPERTY(bool hasTitle READ hasTitle NOTIFY titleChanged)
-    bool hasTitle() const { return !m_title.isEmpty(); }
+    Q_PROPERTY(bool hasSynopsis READ hasSynopsis NOTIFY synopsisChanged)
+    bool hasSynopsis() const { return !m_synopsis.isEmpty(); }
 
-    Q_INVOKABLE void trimTitle();
+    Q_INVOKABLE void trimSynopsis();
 
     Q_PROPERTY(QString emotionalChange READ emotionalChange WRITE setEmotionalChange NOTIFY
                        emotionalChangeChanged)
@@ -586,7 +587,7 @@ private:
     QString m_act;
     Type m_type = Standard;
     QColor m_color = QColor(Qt::white);
-    QString m_title;
+    QString m_synopsis;
     QString m_comments;
     QStringList m_groups;
     QString m_emotionalChange;

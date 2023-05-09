@@ -623,7 +623,7 @@ NotesItem::NotesItem(Notes *notes) : ObjectItem(notes), m_notes(notes)
             m_connections << QObject::connect(element, &StructureElement::titleChanged, m_notes,
                                               updateTextSlot);
         else
-            m_connections << QObject::connect(m_notes->scene(), &Scene::titleChanged, m_notes,
+            m_connections << QObject::connect(m_notes->scene(), &Scene::synopsisChanged, m_notes,
                                               updateTextSlot);
         m_connections << QObject::connect(m_notes->scene(),
                                           &Scene::screenplayElementIndexListChanged, m_notes,
@@ -737,7 +737,7 @@ void NotesItem::updateText()
         if (element)
             title = element->title();
         else
-            title = m_notes->scene()->title();
+            title = m_notes->scene()->synopsis();
         if (!idxStringList.isEmpty())
             title = QStringLiteral("[") + idxStringList.join(QStringLiteral(","))
                     + QStringLiteral("]: ") + title;

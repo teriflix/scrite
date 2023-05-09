@@ -671,7 +671,7 @@ QString Notes::summary() const
     switch (m_ownerType) {
     case SceneOwner: {
         const Scene *scene = this->scene();
-        return scene->title();
+        return scene->synopsis();
     } break;
     case BreakOwner:
         return this->breakElement()->breakSummary();

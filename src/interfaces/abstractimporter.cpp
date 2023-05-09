@@ -112,7 +112,7 @@ bool AbstractImporter::read()
         for (int i = 0; i < structure->elementCount(); i++) {
             StructureElement *element = structure->elementAt(i);
             if (element != nullptr && element->scene() != nullptr)
-                element->scene()->inferTitleFromContent();
+                element->scene()->inferSynopsisFromContent();
         }
     }
     screenplay->setCurrentElementIndex(0);
@@ -172,7 +172,7 @@ Scene *AbstractImporter::createScene(const QString &heading)
 
     const QString location = scene->heading()->location();
     const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
-    scene->setTitle(QString("Scene number #%1 at %2").arg(sceneIndex + 1).arg(titleBit.toLower()));
+    scene->setSynopsis(QString("Scene number #%1 at %2").arg(sceneIndex + 1).arg(titleBit.toLower()));
 
     return scene;
 }

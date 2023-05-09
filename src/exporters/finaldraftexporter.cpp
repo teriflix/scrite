@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "finaldraftexporter.h"
+#include "application.h"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -39,6 +40,16 @@ void FinalDraftExporter::setUseScriteFonts(bool val)
     m_useScriteFonts = val;
     emit useScriteFontsChanged();
 }
+
+static QString fdxColorCode(const QColor &color)
+{
+    const QChar fillChar('0');
+    const QString templ = QStringLiteral("%1");
+    const QString red = templ.arg(color.red(), 2, 16, fillChar).toUpper();
+    const QString green = templ.arg(color.green(), 2, 16, fillChar).toUpper();
+    const QString blue = templ.arg(color.blue(), 2, 16, fillChar).toUpper();
+    return QStringLiteral("#") + red + red + green + green + blue + blue;
+};
 
 bool FinalDraftExporter::doExport(QIODevice *device)
 {
@@ -105,20 +116,15 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             return textE;
         };
 
-        auto fdxColorCode = [](const QColor &color) {
-            const QChar fillChar('0');
-            const QString templ = QStringLiteral("%1");
-            const QString red = templ.arg(color.red(), 2, 16, fillChar).toUpper();
-            const QString green = templ.arg(color.green(), 2, 16, fillChar).toUpper();
-            const QString blue = templ.arg(color.blue(), 2, 16, fillChar).toUpper();
-            return QStringLiteral("#") + red + red + green + green + blue + blue;
-        };
-
         if (mergedTextFormats.isEmpty()) {
             QDomElement textE = createTextElement();
             textE.appendChild(doc.createTextNode(text));
         } else {
             for (const QTextLayout::FormatRange &format : qAsConst(mergedTextFormats)) {
+                const QString snippet = text.mid(format.start, format.length);
+                if (snippet.isEmpty())
+                    continue;
+
                 QDomElement textE = createTextElement();
 
                 QStringList styles;
@@ -165,7 +171,6 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                     }
                 }
 
-                const QString snippet = text.mid(format.start, format.length);
                 textE.appendChild(doc.createTextNode(snippet));
             }
         }
@@ -178,9 +183,11 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             continue;
 
         const Scene *scene = element->scene();
+        const StructureElement *selement = scene->structureElement();
         const SceneHeading *heading = scene->heading();
 
-        if (heading->isEnabled()) {
+        if (heading->isEnabled() || scene->hasSynopsis()
+            || (selement && selement->hasNativeTitle())) {
             QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
             contentE.appendChild(paragraphE);
 
@@ -188,14 +195,55 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             if (element->hasUserSceneNumber())
                 paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
 
-            addTextToParagraph(paragraphE, heading->text());
-            locations.append(heading->location());
+            if (heading->isEnabled()) {
+                addTextToParagraph(paragraphE, heading->text());
+                locations.append(heading->location());
 
-            if (!locationTypes.contains(heading->locationType()))
-                locationTypes.append(heading->locationType());
+                if (!locationTypes.contains(heading->locationType()))
+                    locationTypes.append(heading->locationType());
 
-            if (!moments.contains(heading->moment()))
-                moments.append(heading->moment());
+                if (!moments.contains(heading->moment()))
+                    moments.append(heading->moment());
+            }
+
+            if (scene->hasSynopsis() || (selement && selement->hasNativeTitle())) {
+                QDomElement scenePropsE = doc.createElement(QStringLiteral("SceneProperties"));
+                paragraphE.appendChild(scenePropsE);
+                if (selement && selement->hasNativeTitle())
+                    scenePropsE.setAttribute(QStringLiteral("Title"), selement->nativeTitle());
+
+                const QColor sceneColor = scene->color();
+                const QColor tintColor(QStringLiteral("#E7FFFFFF"));
+                const QColor exportSceneColor =
+                        QColor::fromRgbF((sceneColor.redF() + tintColor.redF()) / 2,
+                                         (sceneColor.greenF() + tintColor.greenF()) / 2,
+                                         (sceneColor.blueF() + tintColor.blueF()) / 2,
+                                         (sceneColor.alphaF() + tintColor.alphaF()) / 2);
+
+                scenePropsE.setAttribute(QStringLiteral("Color"), fdxColorCode(exportSceneColor));
+
+                if (scene->hasSynopsis()) {
+                    QDomElement summaryE = doc.createElement(QStringLiteral("Summary"));
+                    scenePropsE.appendChild(summaryE);
+
+                    QDomElement summaryParagraphE = doc.createElement(QStringLiteral("Paragraph"));
+                    summaryE.appendChild(summaryParagraphE);
+
+                    const QString synopsis = scene->synopsis();
+
+                    QVector<QTextLayout::FormatRange> formats;
+
+                    QTextLayout::FormatRange format;
+                    format.start = 0;
+                    format.length = synopsis.length();
+                    format.format.setBackground(exportSceneColor);
+                    format.format.setForeground(Application::textColorFor(exportSceneColor));
+                    formats.append(format);
+
+                    addTextToParagraph(summaryParagraphE, scene->synopsis(), Qt::Alignment(),
+                                       formats);
+                }
+            }
         }
 
         const int nrSceneElements = scene->elementCount();

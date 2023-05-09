@@ -264,7 +264,7 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
         QGraphicsTextItem *synopsisTextItem = new QGraphicsTextItem(cardContentRectItem);
         synopsisTextItem->setPos(0, 0);
         synopsisTextItem->setTextWidth(contentRect.width());
-        synopsisTextItem->setPlainText(element->scene()->title());
+        synopsisTextItem->setPlainText(element->scene()->synopsis());
         synopsisTextItem->setFont(normalFont);
 
         if (synopsisTextItem->boundingRect().height() > cardContentRectItem->rect().height())

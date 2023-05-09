@@ -1115,10 +1115,10 @@ Rectangle {
                                         id: sceneSynopsisField
                                         anchors.fill: parent
                                         anchors.rightMargin: sceneSynopsisVScrollBar.visible ? sceneSynopsisVScrollBar.width : 0
-                                        text: scene.title
+                                        text: scene.synopsis
                                         placeholderText: "Scene Synopsis"
                                         readOnly: Scrite.document.readOnly
-                                        onTextChanged: scene.title = text
+                                        onTextChanged: scene.synopsis = text
                                         undoRedoEnabled: true
                                         backTabItem: sceneTitleField
                                         adjustTextWidthBasedOnScrollBar: false

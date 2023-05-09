@@ -2608,7 +2608,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             const StructureElement *structureElement = scene->structureElement();
             const QString title = structureElement ? structureElement->nativeTitle() : QString();
 
-            QString synopsis = scene->title();
+            QString synopsis = scene->synopsis();
             synopsis = synopsis.replace(newlinesRegEx, newline);
 
             const bool includingSomething = !title.isEmpty() || !synopsis.isEmpty();
@@ -2674,7 +2674,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 QTextCharFormat charFormat;
                 charFormat.setFont(cursor.document()->defaultFont());
 
-                QString synopsis = scene->title();
+                QString synopsis = scene->synopsis();
                 synopsis.replace(newlinesRegEx, newline);
 
                 cursor.insertBlock(blockFormat, charFormat);

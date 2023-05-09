@@ -533,7 +533,7 @@ Item {
                                 ret += "NO SCENE HEADING"
                         }
                     } else
-                        ret += escene.title
+                        ret += escene.synopsis
                 } else if(isEpisodeBreak)
                     ret = "EP " + (element.episodeIndex+1)
                 else

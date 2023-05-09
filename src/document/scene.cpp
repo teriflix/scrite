@@ -1076,7 +1076,7 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
     m_structureElement = qobject_cast<StructureElement *>(parent);
 
-    connect(this, &Scene::titleChanged, this, &Scene::sceneChanged);
+    connect(this, &Scene::synopsisChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::groupsChanged, this, &Scene::sceneChanged);
     connect(m_notes, &Notes::notesModified, this, &Scene::sceneChanged);
@@ -1112,7 +1112,7 @@ Scene::~Scene()
 Scene *Scene::clone(QObject *parent) const
 {
     Scene *newScene = new Scene(parent);
-    newScene->setTitle(m_title + QStringLiteral(" [Copy]"));
+    newScene->setSynopsis(m_synopsis + QStringLiteral(" [Copy]"));
     newScene->setColor(m_color);
     newScene->setEnabled(m_enabled);
     newScene->heading()->setMoment(m_heading->moment());
@@ -1144,7 +1144,7 @@ bool Scene::isEmpty() const
     const bool noAttachments = (m_attachments == nullptr || m_attachments->attachmentCount() == 0);
     const bool noContent = m_elements.isEmpty()
             || (m_elements.size() == 1 && m_elements.first()->text().isEmpty());
-    const bool noSynopsis = m_title.isEmpty();
+    const bool noSynopsis = m_synopsis.isEmpty();
 
     return noNotes && noAttachments && noContent && noSynopsis;
 }
@@ -1168,15 +1168,15 @@ QString Scene::id() const
 
 QString Scene::name() const
 {
-    if (m_title.length() > 15)
-        return QString("Scene: %1...").arg(m_title.left(13));
+    if (m_synopsis.length() > 15)
+        return QString("Scene: %1...").arg(m_synopsis.left(13));
 
-    return QString("Scene: %1").arg(m_title);
+    return QString("Scene: %1").arg(m_synopsis);
 }
 
-void Scene::setTitle(const QString &val)
+void Scene::setSynopsis(const QString &val)
 {
-    if (m_title == val)
+    if (m_synopsis == val)
         return;
 
     ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "title");
@@ -1184,15 +1184,18 @@ void Scene::setTitle(const QString &val)
     if (!info->isLocked() && m_undoRedoEnabled)
         cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
 
-    m_title = val;
-    emit titleChanged();
+    m_synopsis = val;
+    emit synopsisChanged();
 }
 
-void Scene::inferTitleFromContent()
+void Scene::inferSynopsisFromContent()
 {
     /**
      * This function is called from importers to let Scenes infer their synopsis (title) from
      * scene contents.
+     *
+     * If a synopsis is already set (because the importer was able to parse one), then we don't
+     * do anything in here.
      *
      * Here we look for the first action paragraph and extract its first sentence as synopsis.
      * If the scene doesnt have any action paragraph, we extract the first dialogue and infer from
@@ -1200,9 +1203,12 @@ void Scene::inferTitleFromContent()
      * disabled, then we leave the title empty.
      */
 
+    if (!m_synopsis.isEmpty())
+        return;
+
     auto setTitleInternal = [=](const QString &val) {
-        m_title = val;
-        emit titleChanged();
+        m_synopsis = val;
+        emit synopsisChanged();
     };
     setTitleInternal(QStringLiteral("Empty Scene"));
 
@@ -1260,12 +1266,12 @@ void Scene::inferTitleFromContent()
     }
 }
 
-void Scene::trimTitle()
+void Scene::trimSynopsis()
 {
-    const QString val = m_title.trimmed();
-    if (m_title != val) {
-        m_title = val;
-        emit titleChanged();
+    const QString val = m_synopsis.trimmed();
+    if (m_synopsis != val) {
+        m_synopsis = val;
+        emit synopsisChanged();
     }
 }
 
@@ -1884,11 +1890,11 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
 
     emit sceneAboutToReset();
 
-    const bool splitTitleAlso = !m_title.trimmed().isEmpty();
+    const bool splitTitleAlso = !m_synopsis.trimmed().isEmpty();
 
     Scene *newScene = new Scene(parent);
     if (splitTitleAlso)
-        newScene->setTitle("2nd Part Of " + this->title());
+        newScene->setSynopsis("2nd Part Of " + this->synopsis());
     newScene->setColor(this->color());
     newScene->heading()->setEnabled(this->heading()->isEnabled());
     newScene->heading()->setLocationType(this->heading()->locationType());
@@ -1897,7 +1903,7 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
     newScene->id(); // trigger creation of new Scene ID
 
     if (splitTitleAlso)
-        this->setTitle("1st Part Of " + this->title());
+        this->setSynopsis("1st Part Of " + this->synopsis());
 
     // Move all elements from index onwards to the new scene.
     for (int i = this->elementCount() - 1; i >= index; i--) {
@@ -2008,7 +2014,7 @@ QByteArray Scene::toByteArray() const
     QByteArray bytes;
     QDataStream ds(&bytes, QIODevice::WriteOnly);
     ds << m_id;
-    ds << m_title;
+    ds << m_synopsis;
     ds << m_color;
     ds << m_cursorPosition;
     ds << m_heading->locationType();
@@ -2042,7 +2048,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
 
     QString title;
     ds >> title;
-    this->setTitle(title);
+    this->setSynopsis(title);
 
     QColor color;
     ds >> color;
@@ -2205,6 +2211,11 @@ void Scene::deserializeFromJson(const QJsonObject &json)
         m_notes->loadOldNotes(notes.toArray());
 
     this->evaluateWordCountLater();
+
+    // 'title' property has changed to 'synopsis' since 0.9.3.23 (0.9.3w)
+    const QString titleAttr = QStringLiteral("title");
+    if (json.contains(titleAttr))
+        this->setSynopsis(json.value(titleAttr).toString());
 }
 
 bool Scene::canSetPropertyFromObjectList(const QString &propName) const
@@ -2237,7 +2248,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
     static const QString newline = QStringLiteral("\n");
     QTextDocument *textDocument = cursor.document();
 
-    if (m_title.isEmpty() && m_comments.isEmpty() && (m_notes == nullptr || m_notes->isEmpty()))
+    if (m_synopsis.isEmpty() && m_comments.isEmpty() && (m_notes == nullptr || m_notes->isEmpty()))
         return;
 
     // Scene number: heading
@@ -2294,7 +2305,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
     // Synopsis
     if (options.includeSynopsis) {
-        QString synopsis = this->title().trimmed();
+        QString synopsis = this->synopsis().trimmed();
         synopsis.replace(newlinesRegEx, newline);
 
         if (!synopsis.isEmpty()) {
@@ -2494,10 +2505,10 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     {
         int nrReplacements = 0;
         const QString newTitle =
-                Application::replaceCharacterName(from, to, m_title, &nrReplacements);
+                Application::replaceCharacterName(from, to, m_synopsis, &nrReplacements);
         if (nrReplacements > 0) {
-            m_title = newTitle;
-            emit titleChanged();
+            m_synopsis = newTitle;
+            emit synopsisChanged();
         }
     }
 

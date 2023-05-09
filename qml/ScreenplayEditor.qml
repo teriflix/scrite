@@ -1777,9 +1777,9 @@ Rectangle {
                             width: parent.width
                             font.pointSize: sceneHeadingFieldsFontPointSize
                             readOnly: Scrite.document.readOnly
-                            text: contentItem.theScene.title
+                            text: contentItem.theScene.synopsis
                             Transliterator.spellCheckEnabled: true
-                            onTextChanged: contentItem.theScene.title = text
+                            onTextChanged: contentItem.theScene.synopsis = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
                             background: Item { }

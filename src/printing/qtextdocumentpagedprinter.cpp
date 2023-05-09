@@ -532,6 +532,7 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     m_progressReport->start();
     m_progressReport->setProgressStep(1 / qreal(doc->pageCount() + 1));
     int pageNr = fromPageNr;
+    QRectF pageRect;
 
     const bool isPdfDevice = printer->paintEngine()->type() == QPaintEngine::Pdf;
 
@@ -539,13 +540,13 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     while (pageNr <= toPageNr) {
         painter.save();
         painter.scale(contentScale.first, contentScale.second);
-        this->printPageContents(pageNr, toPageNr, &painter, doc, body);
+        this->printPageContents(pageNr, toPageNr, &painter, doc, body, pageRect);
         if (!isPdfDevice)
-            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
+            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body, pageRect);
         painter.restore();
 
         if (isPdfDevice)
-            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body);
+            this->printHeaderFooterWatermark(pageNr, toPageNr, &painter, doc, body, pageRect);
 
         m_progressReport->tick();
 
@@ -601,7 +602,8 @@ void QTextDocumentPagedPrinter::loadSettings(HeaderFooter *header, HeaderFooter 
 }
 
 void QTextDocumentPagedPrinter::printPageContents(int pageNr, int pageCount, QPainter *painter,
-                                                  const QTextDocument *doc, const QRectF &body)
+                                                  const QTextDocument *doc, const QRectF &body,
+                                                  QRectF &docPageRect)
 {
     Q_UNUSED(pageCount)
 
@@ -609,6 +611,7 @@ void QTextDocumentPagedPrinter::printPageContents(int pageNr, int pageCount, QPa
 
     painter->translate(body.left(), body.top() - (pageNr - 1) * body.height());
     const QRectF pageRect(0, (pageNr - 1) * body.height(), body.width(), body.height());
+    docPageRect = pageRect;
 
     QAbstractTextDocumentLayout *layout = doc->documentLayout();
     QAbstractTextDocumentLayout::PaintContext ctx;
@@ -624,7 +627,8 @@ void QTextDocumentPagedPrinter::printPageContents(int pageNr, int pageCount, QPa
 void QTextDocumentPagedPrinter::printHeaderFooterWatermark(int pageNr, int pageCount,
                                                            QPainter *painter,
                                                            const QTextDocument *doc,
-                                                           const QRectF &body)
+                                                           const QRectF &body,
+                                                           const QRectF &docPageRect)
 {
     Q_UNUSED(doc)
     Q_UNUSED(body)
@@ -634,9 +638,20 @@ void QTextDocumentPagedPrinter::printHeaderFooterWatermark(int pageNr, int pageC
     m_watermark->paint(painter, QRectF(m_headerRect.bottomLeft(), m_footerRect.topRight()), pageNr,
                        pageCount);
 
+    if (m_sideBar) {
+        const QRectF rightSideRect(m_headerRect.bottomRight(),
+                                   QPointF(body.right(), m_footerRect.top()));
+        m_sideBar->paint(painter, QTextDocumentPageSideBarInterface::RightSide, rightSideRect, docPageRect);
+
+        const QRectF leftSideRect(QPointF(body.left(), m_headerRect.bottom()),
+                                  m_footerRect.topLeft());
+        m_sideBar->paint(painter, QTextDocumentPageSideBarInterface::LeftSide, leftSideRect, docPageRect);
+    }
+
 #if 0
     painter->setPen(Qt::black);
-    painter->drawLine(QLineF(body.left(), m_headerRect.bottom(), body.right(), m_headerRect.bottom()));
+    painter->drawLine(
+            QLineF(body.left(), m_headerRect.bottom(), body.right(), m_headerRect.bottom()));
     painter->drawLine(QLineF(body.left(), m_footerRect.top(), body.right(), m_footerRect.top()));
 #endif
 }

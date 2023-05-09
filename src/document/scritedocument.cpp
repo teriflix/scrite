@@ -1019,7 +1019,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     Scene *scene = new Scene(m_structure);
     scene->setColor(activeScene ? activeScene->color() : defaultColor);
     if (m_structure->canvasUIMode() != Structure::IndexCardUI)
-        scene->setTitle(QStringLiteral("New Scene"));
+        scene->setSynopsis(QStringLiteral("New Scene"));
     scene->heading()->setEnabled(true);
     scene->heading()->setLocationType(activeScene ? activeScene->heading()->locationType()
                                                   : QStringLiteral("EXT"));

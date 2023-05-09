@@ -139,7 +139,7 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
                     Scene *scene = heading->scene();
                     int sceneNr = screenplay->firstIndexOfScene(scene) + 1;
                     ScreenplayElement *screenplayElement = screenplay->elementAt(sceneNr - 1);
-                    QString snippet = scene->title();
+                    QString snippet = scene->synopsis();
                     if (snippet.length() > snippetLength)
                         snippet = snippet.left(snippetLength - 3) + "...";
 

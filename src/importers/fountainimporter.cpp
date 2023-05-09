@@ -181,7 +181,7 @@ bool FountainImporter::doImport(QIODevice *device)
             if (locationForTitle.length() > 25)
                 locationForTitle = locationForTitle.left(22) + "...";
 
-            currentScene->setTitle(QStringLiteral("Scene number #%1 at %2")
+            currentScene->setSynopsis(QStringLiteral("Scene number #%1 at %2")
                                            .arg(sceneCounter + 1)
                                            .arg(locationForTitle));
             continue;
@@ -235,7 +235,7 @@ bool FountainImporter::doImport(QIODevice *device)
             } else {
                 currentScene = this->createScene(QStringLiteral("INT. SOMEWHERE - DAY"));
                 currentScene->heading()->setEnabled(false);
-                currentScene->setTitle(QString());
+                currentScene->setSynopsis(QString());
 
                 SceneElement *para = new SceneElement;
                 para->setText(line);

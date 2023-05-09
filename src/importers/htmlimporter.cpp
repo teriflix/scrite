@@ -108,7 +108,7 @@ bool HtmlImporter::importFrom(const QByteArray &bytes)
             if (scene == nullptr) {
                 scene = this->createScene(QStringLiteral("INT. SOMEWHERE - DAY"));
                 scene->heading()->setEnabled(false);
-                scene->setTitle(QString());
+                scene->setSynopsis(QString());
             }
 
             switch (typeIndex) {

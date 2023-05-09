@@ -2360,11 +2360,11 @@ Item {
                 id: titleText
                 width: 250
                 wrapMode: Text.WordWrap
-                text: element.scene.title
+                text: element.scene.synopsis
                 anchors.centerIn: parent
                 font.pointSize: 13
                 horizontalAlignment: Text.AlignHCenter
-                onTextEdited: element.scene.title = text
+                onTextEdited: element.scene.synopsis = text
                 onEditingFinished: {
                     editMode = false
                     element.objectName = "oldElement"
@@ -2813,7 +2813,7 @@ Item {
                             leftPadding: 4
                             rightPadding: 4
                             bottomPadding: 4
-                            text: element.scene.hasTitle ? element.scene.title : "Describe what happens in this scene."
+                            text: element.scene.hasSynopsis ? element.scene.synopsis : "Describe what happens in this scene."
                             readOnly: true
                             selectByKeyboard: false
                             selectByMouse: false
@@ -2875,8 +2875,8 @@ Item {
                                 font.pointSize: Scrite.app.idealFontPointSize
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 readOnly: Scrite.document.readOnly
-                                text: element.scene.title
-                                onTextChanged: element.scene.title = text
+                                text: element.scene.synopsis
+                                onTextChanged: element.scene.synopsis = text
                                 onActiveFocusChanged: {
                                     if(activeFocus) {
                                         elementItem.select()

@@ -204,7 +204,7 @@ void NotebookReport::evaluateTitleAndSubtitle()
     else if (m_notesSection)
         m_subtitle = m_notesSection->title();
     else if (m_sceneSection)
-        m_subtitle = m_sceneSection->title();
+        m_subtitle = m_sceneSection->synopsis();
     else if (m_characterSection)
         m_subtitle = QLatin1String("Character");
     else if (m_storySection) {
