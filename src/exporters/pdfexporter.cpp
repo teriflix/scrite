@@ -133,8 +133,10 @@ public:
     // AbstractPageSideBar interface
     void paint(QPainter *paint, Side side, const QRectF &rect, const QRectF &docRect)
     {
+#if 0
         if (side == RightSide)
             paint->fillRect(rect, Qt::yellow);
+#endif
     }
 };
 
