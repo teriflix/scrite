@@ -3928,6 +3928,9 @@ Item {
             clip: true
             color: image.isSet ? (annotation.attributes.fillBackground ? annotation.attributes.backgroundColor : Qt.rgba(0,0,0,0)) : primaryColors.c100.background
 
+            BoundingBoxItem.livePreview: false
+            BoundingBoxItem.previewImageSource: image.source
+
             Image {
                 id: image
                 property bool isSet: annotation.attributes.image !== "" && status === Image.Ready

@@ -23,6 +23,7 @@
 #include <QtConcurrentRun>
 #include <QtConcurrentMap>
 #include <QQuickItemGrabResult>
+#include <QFutureWatcher>
 
 BoundingBoxEvaluator::BoundingBoxEvaluator(QObject *parent) : QObject(parent)
 {
@@ -156,6 +157,14 @@ void BoundingBoxEvaluator::updatePreview()
     for (BoundingBoxItem *item : qAsConst(m_items))
         itemInfoArray << item->asJson();
 
+    QFutureWatcher<QPicture> *futureWatcher = new QFutureWatcher<QPicture>(this);
+    futureWatcher->setObjectName(futureWatcherName);
+    connect(futureWatcher, &QFutureWatcher<QPicture>::finished, this, [=]() {
+        m_preview = futureWatcher->result();
+        futureWatcher->deleteLater();
+        emit previewUpdated();
+    });
+
     QFuture<QPicture> future = QtConcurrent::run(
             &m_threadPool,
             [=](const QList<QJsonObject> &items, const QRectF &bbox,
@@ -164,13 +173,6 @@ void BoundingBoxEvaluator::updatePreview()
                 return BoundingBoxEvaluator::createPreviewPicture(items, bbox, scale);
             },
             itemInfoArray, m_boundingBox, m_previewScale);
-    QFutureWatcher<QPicture> *futureWatcher = new QFutureWatcher<QPicture>(this);
-    futureWatcher->setObjectName(futureWatcherName);
-    connect(futureWatcher, &QFutureWatcher<QPicture>::finished, this, [=]() {
-        m_preview = future.result();
-        futureWatcher->deleteLater();
-        emit previewUpdated();
-    });
     futureWatcher->setFuture(future);
 }
 
@@ -228,16 +230,14 @@ QPicture BoundingBoxEvaluator::createPreviewPicture(const QList<QJsonObject> &it
 
     for (const QJsonObject &item : qAsConst(itemsCopy)) {
         const QRectF itemRect = rectFromJson(item.value(QStringLiteral("boundingRect")).toObject());
-        const bool isLivePreview = item.value(QStringLiteral("livePreview")).toBool();
-        const QImage itemPreview =
-                isLivePreview ? imageFromJson(item.value(QStringLiteral("preview"))) : QImage();
+        const QImage itemPreview = imageFromJson(item.value(QStringLiteral("preview")));
         const QColor previewBorderColor(
                 item.value(QStringLiteral("previewBorderColor")).toString());
         const QColor previewFillColor(item.value(QStringLiteral("previewFillColor")).toString());
         const qreal previewBorderWidth =
                 item.value(QStringLiteral("previewBorderWidth")).toDouble();
 
-        if (isLivePreview && !itemPreview.isNull())
+        if (!itemPreview.isNull())
             paint.drawImage(itemRect, itemPreview);
         else if (previewBorderColor.alpha() > 0 || previewFillColor.alpha() > 0) {
             QPen pen(previewBorderColor);
@@ -297,6 +297,8 @@ BoundingBoxItem::BoundingBoxItem(QObject *parent)
             QOverload<>::of(&QTimer::start));
     connect(this, &BoundingBoxItem::previewBorderWidthChanged, &m_jsonUpdateTimer,
             QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::previewImageSourceChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
     connect(this, &BoundingBoxItem::livePreviewChanged, &m_jsonUpdateTimer,
             QOverload<>::of(&QTimer::start));
     connect(this, &BoundingBoxItem::previewUpdated, &m_jsonUpdateTimer,
@@ -304,7 +306,11 @@ BoundingBoxItem::BoundingBoxItem(QObject *parent)
 
     m_jsonUpdateTimer.setInterval(0);
     m_jsonUpdateTimer.setSingleShot(true);
-    connect(&m_jsonUpdateTimer, &QTimer::timeout, this, [=]() { m_json = this->toJson(); });
+    connect(&m_jsonUpdateTimer, &QTimer::timeout, this, [=]() {
+        m_json = this->toJson();
+        if (m_evaluator)
+            m_evaluator->markPreviewDirty();
+    });
 }
 
 BoundingBoxItem::~BoundingBoxItem()
@@ -362,6 +368,47 @@ void BoundingBoxItem::setPreviewFillColor(const QColor &val)
     emit previewFillColorChanged();
 
     this->updatePreviewLater();
+}
+
+void BoundingBoxItem::setPreviewImageSource(const QString &val)
+{
+    if (m_previewImageSource == val)
+        return;
+
+    m_previewImageSource = val;
+    emit previewImageSourceChanged();
+
+    if (val.isEmpty()) {
+        if (!m_staticPreview.isNull()) {
+            m_staticPreview = QImage();
+            m_jsonUpdateTimer.start();
+        }
+
+        return;
+    }
+
+    auto loadImage = [](const QString &url, const QSize &size) -> QImage {
+        if (url.isEmpty())
+            return QImage();
+
+        QString filePath = url;
+        if (filePath.contains("://"))
+            filePath = QUrl(url).toLocalFile();
+        if (filePath.isEmpty())
+            return QImage();
+
+        QImage image(filePath);
+        image = image.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        return image;
+    };
+
+    QFutureWatcher<QImage> *futureWatcher = new QFutureWatcher<QImage>(this);
+    connect(futureWatcher, &QFutureWatcher<QImage>::finished, this, [=]() {
+        m_staticPreview = futureWatcher->result();
+        m_jsonUpdateTimer.start();
+        futureWatcher->deleteLater();
+    });
+    futureWatcher->setFuture(QtConcurrent::run(loadImage, val, QSize(128, 128)));
 }
 
 void BoundingBoxItem::setPreviewBorderColor(const QColor &val)
@@ -465,11 +512,12 @@ QJsonObject BoundingBoxItem::toJson() const
     jsRect.insert(QStringLiteral("height"), bRect.height());
     ret.insert(QStringLiteral("boundingRect"), jsRect);
 
-    if (m_livePreview) {
+    if (m_livePreview || !m_staticPreview.isNull()) {
+        const QImage &preview = m_preview.isNull() ? m_staticPreview : m_preview;
         QByteArray bytes;
         QBuffer buffer(&bytes);
         buffer.open(QIODevice::WriteOnly);
-        m_preview.save(&buffer, "PNG"); // writes image into ba in PNG format
+        preview.save(&buffer, "PNG"); // writes image into ba in PNG format
         bytes = bytes.toBase64();
         ret.insert(QStringLiteral("preview"), QString::fromLatin1(bytes));
     }
@@ -490,7 +538,7 @@ void BoundingBoxItem::requestReevaluation()
     if (m_evaluator)
         m_evaluator->markDirty(this);
 
-    this->updatePreviewLater();
+    this->markPreviewDirty();
 }
 
 void BoundingBoxItem::resetEvaluator()

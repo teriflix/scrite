@@ -167,6 +167,11 @@ public:
     QColor previewFillColor() const { return m_previewFillColor; }
     Q_SIGNAL void previewFillColorChanged();
 
+    Q_PROPERTY(QString previewImageSource READ previewImageSource WRITE setPreviewImageSource NOTIFY previewImageSourceChanged)
+    void setPreviewImageSource(const QString &val);
+    QString previewImageSource() const { return m_previewImageSource; }
+    Q_SIGNAL void previewImageSourceChanged();
+
     Q_PROPERTY(QColor previewBorderColor READ previewBorderColor WRITE setPreviewBorderColor NOTIFY previewBorderColorChanged)
     void setPreviewBorderColor(const QColor &val);
     QColor previewBorderColor() const { return m_previewBorderColor; }
@@ -235,12 +240,14 @@ private:
 
 private:
     QImage m_preview;
+    QImage m_staticPreview; // incase previewImageSource is set.
     qreal m_stackOrder = 0;
     bool m_livePreview = true;
     QRectF m_viewportRect;
     QJsonObject m_json;
     QTimer m_jsonUpdateTimer;
     QPointer<QQuickItem> m_item;
+    QString m_previewImageSource;
     qreal m_previewBorderWidth = 1;
     QColor m_previewFillColor = Qt::white;
     QColor m_previewBorderColor = Qt::black;
