@@ -263,19 +263,27 @@ void CompletionModel::filterStrings()
     QStringList fstrings;
     if (m_completionPrefix.isEmpty())
         fstrings = m_strings2;
-    else
-        std::copy_if(m_strings2.begin(), m_strings2.end(), std::back_inserter(fstrings),
-                     [&](const QString &item) {
-                         if (m_completionPrefix.isEmpty())
-                             return true;
-                         const bool ret = item.compare(m_completionPrefix, Qt::CaseInsensitive)
-                                 && item.startsWith(m_completionPrefix, Qt::CaseInsensitive);
-                         someFilteringHappened |= !ret;
-                         return ret;
-                     });
+    else {
+        if (m_completionPrefix.isEmpty())
+            fstrings = m_strings2;
+        // if an exact match was found, then clear the completion model
+        // even if there is another potential match possible.
+        else if (m_strings2.contains(m_completionPrefix, Qt::CaseInsensitive))
+            fstrings.clear();
+        else
+            std::copy_if(m_strings2.begin(), m_strings2.end(), std::back_inserter(fstrings),
+                         [&](const QString &item) {
+                             const bool ret =
+                                     item.startsWith(m_completionPrefix, Qt::CaseInsensitive);
+                             someFilteringHappened |= !ret;
+                             return ret;
+                         });
+    }
 
     this->beginResetModel();
-    m_filteredStrings = m_maxVisibleItems > 0 ? fstrings.mid(0, m_maxVisibleItems) : fstrings;
+    m_filteredStrings = fstrings.isEmpty() ? fstrings
+            : m_maxVisibleItems > 0        ? fstrings.mid(0, m_maxVisibleItems)
+                                           : fstrings;
     this->endResetModel();
 
     if (m_filteredStrings.isEmpty() || !someFilteringHappened)
