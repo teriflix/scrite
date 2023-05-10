@@ -1481,6 +1481,7 @@ Item {
                 property string email
                 property string phone
                 property string website
+                property bool includeTimestamp: false
             }
 
             Column {
@@ -1924,9 +1925,9 @@ Item {
                     }
 
                     CheckBox2 {
-                        text: "Center Align Title Page"
-                        checked: Scrite.document.screenplay.titlePageIsCentered
-                        onToggled: Scrite.document.screenplay.titlePageIsCentered = checked
+                        text: "Include Timestamp"
+                        checked: titlePageSettings.includeTimestamp
+                        onToggled: titlePageSettings.includeTimestamp = checked
                     }
                 }
 

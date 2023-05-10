@@ -44,6 +44,7 @@
 #include <QTextBlockUserData>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
+#include <QSettings>
 
 inline QTime secondsToTime(int seconds)
 {
@@ -1447,8 +1448,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                                      QStringLiteral("  (MORE)"));
         cursor.insertText(QString(QChar::ObjectReplacementCharacter), moreMarkerFormat);
 
-        QTextBlockFormat characterBlockFormat =
-                characterFormat->createBlockFormat(Qt::Alignment());
+        QTextBlockFormat characterBlockFormat = characterFormat->createBlockFormat(Qt::Alignment());
         QTextCharFormat characterCharFormat = characterFormat->createCharFormat();
         characterBlockFormat.setTopMargin(0);
         cursor.insertBlock(characterBlockFormat, characterCharFormat);
@@ -3150,6 +3150,14 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
             ts << "<br/><br/>" << basedOn;
         if (!version.isEmpty())
             ts << "<br/><br/>" << version;
+
+        const QSettings *settings = Application::instance()->settings();
+        const bool includeTimestamp =
+                settings->value(QStringLiteral("TitlePage/includeTimestamp"), false).toBool();
+        if (includeTimestamp) {
+            ts << "<br/><br/>Generated on ";
+            ts << QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
+        }
 
         ts << "</center>";
     }
