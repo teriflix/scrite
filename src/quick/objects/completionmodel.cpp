@@ -247,15 +247,7 @@ void CompletionModel::filterStrings()
 {
     if (!m_enabled || m_completionPrefix.size() < m_minimumCompletionPrefixLength
         || m_strings2.isEmpty()) {
-        if (m_filteredStrings.isEmpty())
-            return;
-
-        this->beginResetModel();
-        m_filteredStrings.clear();
-        this->endResetModel();
-
-        this->setCurrentRow(-1);
-
+        this->clearFilterStrings();
         return;
     }
 
@@ -324,7 +316,11 @@ void CompletionModel::prepareStrings()
 
 void CompletionModel::clearFilterStrings()
 {
-    this->beginResetModel();
-    m_filteredStrings.clear();
-    this->endResetModel();
+    if (!m_filteredStrings.isEmpty()) {
+        this->beginResetModel();
+        m_filteredStrings.clear();
+        this->endResetModel();
+    }
+
+    this->setCurrentRow(-1);
 }

@@ -2110,20 +2110,34 @@ Rectangle {
 
                         ResetOnChange {
                             id: completionModelEnable
-                            trackChangesOn: sceneTextEditor.cursorRectangle
+                            trackChangesOn: sceneTextEditor.cursorRectangle.y
                             from: false
                             to: true
                             delay: 250
+                        }
+
+                        Connections {
+                            target: sceneDocumentBinder
+                            function onCurrentElementChanged() {
+                                Qt.callLater(updateCompletionModel)
+                            }
+                            function updateCompletionModel() {
+                                completionModel.strings = sceneDocumentBinder.autoCompleteHints
+                                completionModel.priorityStrings = contentItem.theScene.characterNames
+                            }
+                        }
+
+                        BatchChange {
+                            id: completionModelCount
+                            trackChangesOn: completionModel.count
                         }
 
                         CompletionModel {
                             id: completionModel
                             property bool actuallyEnable: true
                             property string suggestion: currentCompletion
-                            property bool hasSuggestion: count > 0
+                            property bool hasSuggestion: completionModelCount.value > 0
                             enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus && completionModelEnable.value
-                            strings: sceneDocumentBinder.autoCompleteHints
-                            priorityStrings: contentItem.theScene.characterNames
                             sortStrings: false
                             acceptEnglishStringsOnly: false
                             completionPrefix: sceneDocumentBinder.completionPrefix
@@ -2135,10 +2149,13 @@ Rectangle {
                             }
                             minimumCompletionPrefixLength: 0
                             onHasSuggestionChanged: {
-                                if(hasSuggestion)
-                                    completionViewPopup.open()
-                                else
-                                    completionViewPopup.close()
+                                if(hasSuggestion) {
+                                    if(!completionViewPopup.visible)
+                                        completionViewPopup.open()
+                                } else {
+                                    if(completionViewPopup.visible)
+                                        completionViewPopup.close()
+                                }
                             }
                         }
 

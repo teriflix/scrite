@@ -81,6 +81,7 @@ HEADERS += \
     src/quick/items/simpletabbaritem.h \
     src/quick/items/textdocumentitem.h \
     src/quick/objects/announcement.h \
+    src/quick/objects/batchchange.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
     src/quick/objects/contextmenuevent.h \
@@ -209,6 +210,7 @@ SOURCES += \
     src/quick/items/simpletabbaritem.cpp \
     src/quick/items/textdocumentitem.cpp \
     src/quick/objects/announcement.cpp \
+    src/quick/objects/batchchange.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
     src/quick/objects/contextmenuevent.cpp \
