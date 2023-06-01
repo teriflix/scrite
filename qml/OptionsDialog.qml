@@ -813,7 +813,7 @@ Item {
                 }
 
                 GroupBox {
-                    label: Text { text: "Page Layout (Display)" }
+                    label: Text { text: "Display" }
                     width: (parent.width - parent.spacing)/2
                     clip: true
 
