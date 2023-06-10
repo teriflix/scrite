@@ -2766,6 +2766,35 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
             } break;
             case ScreenplayElement::BreakElementType: {
                 addSection(element->breakTitle() + QLatin1String(" - ") + element->breakSubtitle());
+
+                const QString breakSummary = element->breakSummary();
+                if (!breakSummary.isEmpty()) {
+                    QTextBlockFormat blockFormat;
+                    QTextCharFormat charFormat;
+                    cursor.insertBlock(blockFormat, charFormat);
+                    cursor.insertText(QLatin1String("Summary: ") + breakSummary);
+                }
+
+                Notes *notes = element->notes();
+                if (notes) {
+                    const int cp1 = cursor.position();
+                    Notes::WriteOptions options;
+                    notes->write(cursor, options);
+                    const int cp2 = cursor.position();
+
+                    cursor.setPosition(cp1);
+                    cursor.movePosition(QTextCursor::NextBlock);
+
+                    while (cursor.position() < cp2) {
+                        QTextBlockFormat blockFormat = cursor.blockFormat();
+                        blockFormat.setIndent(blockFormat.indent() + 1);
+                        cursor.setBlockFormat(blockFormat);
+                        if (!cursor.movePosition(QTextCursor::NextBlock))
+                            break;
+                    }
+
+                    cursor.setPosition(cp2);
+                }
             } break;
             }
         }
