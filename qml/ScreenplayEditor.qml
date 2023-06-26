@@ -2077,10 +2077,8 @@ Rectangle {
                         contentItem.theScene.undoRedoEnabled = false
                     }
                     Transliterator.onFinishedTransliterating: {
-                        Utils.execLater(Transliterator, 0, function() {
-                            contentItem.theScene.endUndoCapture()
-                            contentItem.theScene.undoRedoEnabled = true
-                        })
+                        contentItem.theScene.endUndoCapture()
+                        contentItem.theScene.undoRedoEnabled = true
                     }
 
                     // Support for auto completion
