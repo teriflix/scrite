@@ -1263,7 +1263,7 @@ private:
     void autoCapitalizeNow();
     void performPendingTasks();
     bool markCursorPosition();
-    int markedCursorPosiiton(bool removeMarker = true);
+    int markedCursorPosition(bool removeMarker = true);
 
 private:
     friend class SceneDocumentBinder;
@@ -1461,7 +1461,7 @@ void SceneDocumentBlockUserData::polishTextNow()
 
         // Restore cursor position
         if (cursorPositionMarked) {
-            const int cp = this->markedCursorPosiiton(true);
+            const int cp = this->markedCursorPosition(true);
             emit m_binder->requestCursorPosition(cp);
         }
     }
@@ -1509,15 +1509,15 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
             cursor.setPosition(m_textBlock.position() + pos);
         }
 
-        // Restore cursor position
-        if (cursorPositionMarked) {
-            const int cp = this->markedCursorPosiiton(true);
-            emit m_binder->requestCursorPosition(cp);
-        }
-
         // Store changes into the element.
         m_sceneElement->setText(m_textBlock.text());
         m_sceneElement->setTextFormats(m_textBlock.textFormats());
+
+        // Restore cursor position
+        if (cursorPositionMarked) {
+            const int cp = this->markedCursorPosition(true);
+            emit m_binder->requestCursorPosition(cp);
+        }
     }
 
     // Rehighlight the block
@@ -1551,7 +1551,7 @@ bool SceneDocumentBlockUserData::markCursorPosition()
     return true;
 }
 
-int SceneDocumentBlockUserData::markedCursorPosiiton(bool removeMarker)
+int SceneDocumentBlockUserData::markedCursorPosition(bool removeMarker)
 {
     if (m_binder.isNull() || !m_textBlock.isValid())
         return 0;
