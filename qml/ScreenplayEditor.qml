@@ -2135,7 +2135,8 @@ Rectangle {
                             property bool actuallyEnable: true
                             property string suggestion: currentCompletion
                             property bool hasSuggestion: completionModelCount.value > 0
-                            enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus && completionModelEnable.value
+                            property bool completable: [SceneElement.Character,SceneElement.Shot,SceneElement.Transition].indexOf(sceneDocumentBinder.currentElement.type) >= 0
+                            enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus && completionModelEnable.value && completable
                             sortStrings: false
                             acceptEnglishStringsOnly: false
                             completionPrefix: sceneDocumentBinder.completionPrefix
