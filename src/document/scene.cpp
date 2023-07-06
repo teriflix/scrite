@@ -2212,7 +2212,7 @@ void Scene::deserializeFromJson(const QJsonObject &json)
 
     this->evaluateWordCountLater();
 
-    // 'title' property has changed to 'synopsis' since 0.9.3.23 (0.9.3y)
+    // 'title' property has changed to 'synopsis' since 0.9.3.23
     const QString titleAttr = QStringLiteral("title");
     if (json.contains(titleAttr))
         this->setSynopsis(json.value(titleAttr).toString());
