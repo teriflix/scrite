@@ -1503,32 +1503,36 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     Loader {
-                        anchors.fill: parent
-                        active: Scrite.document.screenplay.coverPagePhoto !== "" && (coverPagePhoto.paintedWidth < parent.width || coverPagePhoto.paintedHeight < parent.height)
-                        opacity: 0.1
-                        sourceComponent: Item {
-                            Image {
-                                id: coverPageImage
-                                anchors.fill: parent
-                                fillMode: Image.PreserveAspectCrop
-                                source: "file://" + Scrite.document.screenplay.coverPagePhoto
-                                asynchronous: true
-                            }
-                        }
-                    }
-
-                    Image {
-                        id: coverPagePhoto
+                        id: coverPagePhotoLoader
                         anchors.fill: parent
                         anchors.margins: 1
-                        smooth: true; mipmap: true
-                        fillMode: Image.PreserveAspectFit
-                        source: Scrite.document.screenplay.coverPagePhoto !== "" ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
-                        opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
+                        active: Scrite.document.screenplay.coverPagePhoto !== ""
+                        sourceComponent: Item {
+                            Image {
+                                anchors.fill: parent
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                                source: "file://" + Scrite.document.screenplay.coverPagePhoto
+                                visible: coverPagePhoto.status === Image.Ready && (coverPagePhoto.paintedWidth < width || coverPagePhoto.paintedHeight < height)
+                                opacity: 0.1
+                                cache: false
+                            }
 
-                        BusyIcon {
-                            anchors.centerIn: parent
-                            running: parent.status === Image.Loading
+                            Image {
+                                id: coverPagePhoto
+                                anchors.fill: parent
+                                smooth: true; mipmap: true
+                                asynchronous: true
+                                fillMode: Image.PreserveAspectFit
+                                source: "file:///" + Scrite.document.screenplay.coverPagePhoto
+                                opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
+                                cache: false
+
+                                BusyIcon {
+                                    anchors.centerIn: parent
+                                    running: parent.status === Image.Loading
+                                }
+                            }
                         }
                     }
 

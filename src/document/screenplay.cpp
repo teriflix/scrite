@@ -444,6 +444,7 @@ Screenplay::Screenplay(QObject *parent)
     connect(this, &Screenplay::coverPagePhotoSizeChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::titlePageIsCenteredChanged, this, &Screenplay::screenplayChanged);
     connect(this, &Screenplay::screenplayChanged, [=]() {
+        this->evaluateHasTitlePageAttributes();
         this->evaluateParagraphCountsLater();
         this->evaluateWordCountLater();
         this->markAsModified();
@@ -488,8 +489,6 @@ void Screenplay::setTitle(const QString &val)
 
     m_title = val;
     emit titleChanged();
-
-    this->evaluateHasTitlePageAttributes();
 }
 
 void Screenplay::setSubtitle(const QString &val)
@@ -545,8 +544,6 @@ void Screenplay::setAuthor(const QString &val)
 
     m_author = val;
     emit authorChanged();
-
-    this->evaluateHasTitlePageAttributes();
 }
 
 void Screenplay::setContact(const QString &val)
@@ -601,8 +598,6 @@ void Screenplay::setVersion(const QString &val)
 
     m_version = val;
     emit versionChanged();
-
-    this->evaluateHasTitlePageAttributes();
 }
 
 bool Screenplay::isEmpty() const
@@ -653,8 +648,26 @@ void Screenplay::setCoverPagePhoto(const QString &val)
     m_coverPagePhoto.clear();
     emit coverPagePhotoChanged();
 
-    m_coverPagePhoto = val2.isEmpty() ? val2 : m_scriteDocument->fileSystem()->absolutePath(val2);
-    emit coverPagePhotoChanged();
+    /*
+     * We need to give some time for the QML UI to unload the previously loaded
+     * image, remove that from cache and then load this new image from the disk
+     * again. The reason why we need to do this is because cover page photo has
+     * a standard path and doesnt change even if the cover page photo itself is
+     * changed.
+     *
+     * This also means that the Image {} QML elements used to show cover page
+     * photo must have their cache property set to false.
+     */
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(500);
+    timer->setSingleShot(true);
+    connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
+    connect(timer, &QTimer::timeout, this, [=]() {
+        m_coverPagePhoto =
+                val2.isEmpty() ? val2 : m_scriteDocument->fileSystem()->absolutePath(val2);
+        emit coverPagePhotoChanged();
+    });
+    timer->start();
 }
 
 void Screenplay::clearCoverPagePhoto()
@@ -3024,8 +3037,9 @@ void Screenplay::setHasTitlePageAttributes(bool val)
 
 void Screenplay::evaluateHasTitlePageAttributes()
 {
-    this->setHasTitlePageAttributes(!m_title.isEmpty() && !m_author.isEmpty()
-                                    && !m_version.isEmpty());
+    this->setHasTitlePageAttributes(
+            QFile::exists(m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath))
+            || !m_title.isEmpty() || !m_author.isEmpty() || !m_version.isEmpty());
 }
 
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list,

@@ -584,7 +584,7 @@ Rectangle {
 
                     Item {
                         width: contentView.width
-                        height: 10 * zoomSlider.zoomLevel
+                        height: contentView.height * 0.25 * zoomSlider.zoomLevel
                     }
                 }
 
@@ -3932,9 +3932,10 @@ Rectangle {
                         return parent.width
                     }
 
+                    cache: false
                     source: visible ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
                     visible: Scrite.document.screenplay.coverPagePhoto !== ""
-                    smooth: true; mipmap: true
+                    smooth: true; mipmap: true; asynchronous: true
                     fillMode: Image.PreserveAspectFit
                     anchors.horizontalCenter: parent.horizontalCenter
 
