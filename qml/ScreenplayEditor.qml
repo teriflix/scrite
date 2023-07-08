@@ -1674,7 +1674,7 @@ Rectangle {
                                     privateData.changeCurrentIndexTo(contentItem.theIndex)
                             }
 
-                            Transliterator.spellCheckEnabled: true
+                            Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
 
                             SpecialSymbolsSupport {
                                 anchors.top: parent.bottom
@@ -1778,7 +1778,7 @@ Rectangle {
                             font.pointSize: sceneHeadingFieldsFontPointSize
                             readOnly: Scrite.document.readOnly
                             text: contentItem.theScene.synopsis
-                            Transliterator.spellCheckEnabled: true
+                            Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
                             onTextChanged: contentItem.theScene.synopsis = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."

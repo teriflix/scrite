@@ -135,7 +135,7 @@ Column {
                 Transliterator.hasActiveFocus: activeFocus
                 Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
-                Transliterator.spellCheckEnabled: true
+                Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
                 readOnly: Scrite.document.readOnly
                 background: Item { }
                 SpecialSymbolsSupport {

@@ -22,6 +22,9 @@ AbstractSyntaxHighlighterDelegate::AbstractSyntaxHighlighterDelegate(QObject *pa
     : QObject(parent)
 {
     m_highlighter = qobject_cast<SyntaxHighlighter *>(parent);
+
+    connect(this, &AbstractSyntaxHighlighterDelegate::enabledChanged, this,
+            &AbstractSyntaxHighlighterDelegate::rehighlight);
 }
 
 AbstractSyntaxHighlighterDelegate::~AbstractSyntaxHighlighterDelegate() { }

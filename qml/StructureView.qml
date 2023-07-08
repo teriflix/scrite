@@ -2820,7 +2820,7 @@ Item {
                             Transliterator.defaultFont: font
                             Transliterator.textDocument: textDocument
                             Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
-                            Transliterator.spellCheckEnabled: true
+                            Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
                             font.pointSize: Scrite.app.idealFontPointSize
                             color: element.scene.hasTitle ? "black" : "gray"
                             // maximumLineCount: Math.max(1, (parent.height / idealAppFontMetrics.lineSpacing)-1)
@@ -2870,7 +2870,7 @@ Item {
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus
                                 Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
-                                Transliterator.spellCheckEnabled: true
+                                Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
                                 placeholderText: "Describe what happens in this scene."
                                 font.pointSize: Scrite.app.idealFontPointSize
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere

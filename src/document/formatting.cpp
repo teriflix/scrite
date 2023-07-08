@@ -1641,13 +1641,13 @@ void SceneDocumentBinder::setScreenplayFormat(ScreenplayFormat *val)
 
     if (m_screenplayFormat != nullptr) {
         disconnect(m_screenplayFormat, &ScreenplayFormat::formatChanged, this,
-                   &SceneDocumentBinder::rehighlightLater);
+                   &SceneDocumentBinder::refresh);
     }
 
     m_screenplayFormat = val;
     if (m_screenplayFormat != nullptr) {
         connect(m_screenplayFormat, &ScreenplayFormat::formatChanged, this,
-                &SceneDocumentBinder::rehighlightLater);
+                &SceneDocumentBinder::refresh);
 
         if (qFuzzyCompare(m_textWidth, 0.0))
             this->setTextWidth(m_screenplayFormat->pageLayout()->contentWidth());
@@ -2170,7 +2170,7 @@ void SceneDocumentBinder::refresh()
             block = block.next();
         }
 
-        this->rehighlightLater();
+        this->rehighlight();
     }
 }
 
