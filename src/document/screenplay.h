@@ -504,6 +504,8 @@ public:
         WriteOptions() { }
         bool includeTextNotes = true;
         bool includeFormNotes = true;
+        bool actsOnNewPage = false;
+        bool episodesOnNewPage = false;
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 

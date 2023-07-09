@@ -2780,6 +2780,13 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
             case ScreenplayElement::BreakElementType: {
                 addSection(element->breakTitle() + QLatin1String(" - ") + element->breakSubtitle());
 
+                if ((options.actsOnNewPage && element->breakType() == Screenplay::Act)
+                    || (options.episodesOnNewPage && element->breakType() == Screenplay::Episode)) {
+                    QTextBlockFormat pageBreakFormat;
+                    pageBreakFormat.setPageBreakPolicy(QTextBlockFormat::PageBreak_AlwaysBefore);
+                    cursor.mergeBlockFormat(pageBreakFormat);
+                }
+
                 const QString breakSummary = element->breakSummary();
                 if (!breakSummary.isEmpty()) {
                     QTextBlockFormat blockFormat;

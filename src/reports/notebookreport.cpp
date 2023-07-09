@@ -30,6 +30,24 @@ NotebookReport::NotebookReport(QObject *parent) : AbstractReportGenerator(parent
 
 NotebookReport::~NotebookReport() { }
 
+void NotebookReport::setActsOnNewPage(bool val)
+{
+    if (m_actsOnNewPage == val)
+        return;
+
+    m_actsOnNewPage = val;
+    emit actsOnNewPageChanged();
+}
+
+void NotebookReport::setEpisodesOnNewPage(bool val)
+{
+    if (m_episodesOnNewPage == val)
+        return;
+
+    m_episodesOnNewPage = val;
+    emit episodesOnNewPageChanged();
+}
+
 void NotebookReport::setSection(QObject *val)
 {
     if (m_section == val)
@@ -148,9 +166,12 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
         m_sceneSection->write(cursor);
     else if (m_characterSection)
         m_characterSection->write(cursor);
-    else if (m_screenplaySection)
-        m_screenplaySection->write(cursor);
-    else if (m_storySection) {
+    else if (m_screenplaySection) {
+        Screenplay::WriteOptions options;
+        options.actsOnNewPage = m_actsOnNewPage;
+        options.episodesOnNewPage = m_episodesOnNewPage;
+        m_screenplaySection->write(cursor, options);
+    } else if (m_storySection) {
         Structure::WriteOptions options;
         options.charactersOnly = charactersIntent;
         m_storySection->write(cursor, options);
@@ -175,7 +196,12 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
         structure->write(cursor);
 
         addSection(QLatin1String("Scene Notes"));
-        screenplay->write(cursor);
+        {
+            Screenplay::WriteOptions options;
+            options.actsOnNewPage = m_actsOnNewPage;
+            options.episodesOnNewPage = m_episodesOnNewPage;
+            screenplay->write(cursor, options);
+        }
 
         addSection(QLatin1String("Character Notes"));
         const QList<Character *> characters = structure->charactersModel()->list();

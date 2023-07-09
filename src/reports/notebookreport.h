@@ -28,6 +28,22 @@ public:
     Q_INVOKABLE NotebookReport(QObject *parent = nullptr);
     ~NotebookReport();
 
+    Q_CLASSINFO("actsOnNewPage_FieldGroup", "Basic")
+    Q_CLASSINFO("actsOnNewPage_FieldLabel", "Start each Act on a new page.")
+    Q_CLASSINFO("actsOnNewPage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool actsOnNewPage READ isActsOnNewPage WRITE setActsOnNewPage NOTIFY actsOnNewPageChanged)
+    void setActsOnNewPage(bool val);
+    bool isActsOnNewPage() const { return m_actsOnNewPage; }
+    Q_SIGNAL void actsOnNewPageChanged();
+
+    Q_CLASSINFO("episodesOnNewPage_FieldGroup", "Basic")
+    Q_CLASSINFO("episodesOnNewPage_FieldLabel", "Start each Episode on a new page.")
+    Q_CLASSINFO("episodesOnNewPage_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool episodesOnNewPage READ isEpisodesOnNewPage WRITE setEpisodesOnNewPage NOTIFY episodesOnNewPageChanged)
+    void setEpisodesOnNewPage(bool val);
+    bool isEpisodesOnNewPage() const { return m_episodesOnNewPage; }
+    Q_SIGNAL void episodesOnNewPageChanged();
+
     // Can be Scene, Structure, Screenplay, Character, Notes or Note
     // Otherwise it generates a dump of all notes in the Notebook
     Q_PROPERTY(QObject *section READ section WRITE setSection NOTIFY sectionChanged STORED false)
@@ -71,6 +87,8 @@ private:
 
     QString m_title;
     QString m_subtitle;
+    bool m_actsOnNewPage = false;
+    bool m_episodesOnNewPage = false;
 };
 
 #endif // NOTEBOOKREPORT_H
