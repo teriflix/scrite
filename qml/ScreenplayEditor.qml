@@ -402,7 +402,7 @@ Rectangle {
 
                         Loader {
                             id: titleCardLoader
-                            active: screenplayAdapter.isSourceScreenplay && (Scrite.document.screenplay.hasTitlePageAttributes || logLineEditor.visible)
+                            active: screenplayAdapter.isSourceScreenplay && (Scrite.document.screenplay.hasTitlePageAttributes || logLineEditor.visible || Scrite.document.screenplay.coverPagePhoto !== "")
                             sourceComponent: titleCardComponent
                             anchors.left: parent.left
                             anchors.right: parent.right
