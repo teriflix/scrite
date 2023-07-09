@@ -110,7 +110,7 @@ private:
     void setHelpTips(const QJsonObject &val);
     void loadStoredHelpTips();
 
-    Q_SLOT void firstReload();
+    Q_SLOT void firstReload(bool loadStoredUserInfoAlso = true);
 
     void fetchHelpTips();
     void reset();
