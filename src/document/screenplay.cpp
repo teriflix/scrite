@@ -3037,9 +3037,8 @@ void Screenplay::setHasTitlePageAttributes(bool val)
 
 void Screenplay::evaluateHasTitlePageAttributes()
 {
-    this->setHasTitlePageAttributes(
-            QFile::exists(m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath))
-            || !m_title.isEmpty() || !m_author.isEmpty() || !m_version.isEmpty());
+    this->setHasTitlePageAttributes(!m_title.isEmpty() || !m_author.isEmpty()
+                                    || !m_version.isEmpty());
 }
 
 void Screenplay::staticAppendElement(QQmlListProperty<ScreenplayElement> *list,
