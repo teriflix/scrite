@@ -2116,12 +2116,14 @@ Rectangle {
 
                         Connections {
                             target: sceneDocumentBinder
-                            function onCurrentElementChanged() {
-                                Qt.callLater(updateCompletionModel)
+                            function onCompletionModeChanged() {
+                                completionModel.completable = false
+                                Utils.execLater(completionModel, 250, updateCompletionModel)
                             }
                             function updateCompletionModel() {
                                 completionModel.strings = sceneDocumentBinder.autoCompleteHints
-                                completionModel.priorityStrings = contentItem.theScene.characterNames
+                                completionModel.priorityStrings = sceneDocumentBinder.priorityAutoCompleteHints
+                                completionModel.completable = sceneDocumentBinder.completionMode !== SceneDocumentBinder.NoCompletionMode
                             }
                         }
 
@@ -2135,7 +2137,7 @@ Rectangle {
                             property bool actuallyEnable: true
                             property string suggestion: currentCompletion
                             property bool hasSuggestion: completionModelCount.value > 0
-                            property bool completable: [SceneElement.Character,SceneElement.Shot,SceneElement.Transition].indexOf(sceneDocumentBinder.currentElement.type) >= 0
+                            property bool completable: false
                             enabled: /*allowEnable &&*/ sceneTextEditor.activeFocus && completionModelEnable.value && completable
                             sortStrings: false
                             acceptEnglishStringsOnly: false

@@ -988,6 +988,9 @@ bool DistinctElementValuesMap::include(SceneElement *element)
 
         QString newName = element->formattedText();
         newName = newName.section('(', 0, 0).trimmed();
+        if ((m_type == SceneElement::Shot || m_type == SceneElement::Transition)
+            && newName.endsWith(':'))
+            newName = newName.left(newName.length() - 1);
         if (newName.isEmpty())
             return ret;
 

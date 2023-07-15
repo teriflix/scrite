@@ -723,6 +723,18 @@ public:
         return m_completionPrefixStart >= 0 && m_completionPrefixEnd >= 0;
     }
 
+    enum CompletionMode {
+        NoCompletionMode,
+        CharacterNameCompletionMode,
+        CharacterBracketNotationCompletionMode,
+        ShotCompletionMode,
+        TransitionCompletionMode
+    };
+    Q_ENUM(CompletionMode)
+    Q_PROPERTY(CompletionMode completionMode READ completionMode NOTIFY completionModeChanged)
+    CompletionMode completionMode() const { return m_completionMode; }
+    Q_SIGNAL void completionModeChanged();
+
     Q_PROPERTY(QFont currentFont READ currentFont NOTIFY currentFontChanged)
     QFont currentFont() const;
     Q_SIGNAL void currentFontChanged();
@@ -780,6 +792,7 @@ private:
     void setAutoCompleteHints(const QStringList &hints,
                               const QStringList &priorityHints = QStringList());
     void setCompletionPrefix(const QString &prefix, int start = -1, int end = -1);
+    void setCompletionMode(CompletionMode val);
     void setSpellingSuggestions(const QStringList &val);
     void setWordUnderCursorIsMisspelled(bool val);
 
@@ -821,6 +834,7 @@ private:
     QString m_completionPrefix;
     int m_completionPrefixEnd = -1;
     int m_completionPrefixStart = -1;
+    CompletionMode m_completionMode = NoCompletionMode;
     bool m_initializingDocument = false;
     QStringList m_shots;
     QStringList m_transitions;

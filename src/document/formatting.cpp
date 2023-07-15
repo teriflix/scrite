@@ -2240,6 +2240,15 @@ void SceneDocumentBinder::addWordAtPositionToIgnoreList(int position)
     this->setWordUnderCursorIsMisspelled(false);
 }
 
+void SceneDocumentBinder::setCompletionMode(CompletionMode val)
+{
+    if (m_completionMode == val)
+        return;
+
+    m_completionMode = val;
+    emit completionModeChanged();
+}
+
 int SceneDocumentBinder::lastCursorPosition() const
 {
     if (m_cursorPosition < 0 || this->document() == nullptr)
@@ -3220,6 +3229,8 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
     completionStart = block.position();
     completionEnd = m_cursorPosition;
 
+    CompletionMode completionMode = NoCompletionMode;
+
     switch (m_currentElement->type()) {
     case SceneElement::Character: {
         const QString bracketOpen = QLatin1String(" (");
@@ -3279,6 +3290,7 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
                 cursor.setPosition(bracketCursor.position());
                 cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::KeepAnchor);
                 completionPrefix = cursor.selectedText().simplified();
+                completionMode = CharacterBracketNotationCompletionMode;
             } else {
                 cursor.setPosition(block.position());
                 cursor.setPosition(m_cursorPosition, QTextCursor::KeepAnchor);
@@ -3287,20 +3299,24 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
                 completionPrefix = cursor.selectedText().trimmed();
                 completionStart = block.position();
                 completionEnd = bracketCursor.selectionStart();
+                completionMode = CharacterNameCompletionMode;
             }
         } else {
             hints = m_characterNames;
             priorityHints = m_scene->characterNames();
             completionPrefix = blockText;
+            completionMode = CharacterNameCompletionMode;
         }
     } break;
     case SceneElement::Transition:
         hints = m_transitions;
         completionPrefix = block.text();
+        completionMode = TransitionCompletionMode;
         break;
     case SceneElement::Shot:
         hints = m_shots;
         completionPrefix = block.text();
+        completionMode = ShotCompletionMode;
         break;
     default:
         break;
@@ -3308,6 +3324,7 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
 
     this->setAutoCompleteHints(hints, priorityHints);
     this->setCompletionPrefix(completionPrefix, completionStart, completionEnd);
+    this->setCompletionMode(completionMode);
 }
 
 void SceneDocumentBinder::setAutoCompleteHintsFor(SceneElement::Type val)
