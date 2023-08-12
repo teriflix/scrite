@@ -298,6 +298,8 @@ private:
     void onSceneMoved(ScreenplayElement *ptr, int from, int to);
     void onSceneRemoved(ScreenplayElement *ptr, int index);
     void onSceneInserted(ScreenplayElement *element, int index);
+    void onSceneOmitted(ScreenplayElement *element, int index);
+    void onSceneIncluded(ScreenplayElement *element, int index);
 
     // Hook to signals that convey changes to a specific scene content
     void onSceneReset();

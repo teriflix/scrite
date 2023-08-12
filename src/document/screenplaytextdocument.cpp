@@ -734,25 +734,25 @@ If you ran the following script, then you would be able to get a fairly good sup
 the save the cat structure on an existing screenplay.
 
 var structure = {
-    "name": "Save The Cat",
-    "pageCount": 110,
-    "elements": [
-        {"name": "Opening Image", "page": 1, "act": "ACT 1" },
-        {"name": "Setup", "page": "1-10", "act": "ACT 1" },
-        {"name": "Theme Stated", "page": 5, "act": "ACT 1", "allowMultiple": true },
-        {"name": "Catalyst", "page": 12, "act": "ACT 1" },
-        {"name": "Debate", "page": "12-25", "act": "ACT 1"},
-        {"name": "Break Into Two", "page": "25-30", "act": "ACT 1" },
-        {"name": "B Story", "page": 30, "act": "ACT 2A" },
-        {"name": "Fun And Games", "page": "30-55", "act": "ACT 2A" },
-        {"name": "Midpoint", "page": 55, "act": "ACT 2A" },
-        {"name": "Bad Guys Close In", "page": "55-75", "act": "ACT 2B" },
-        {"name": "All Is Lost", "page": 75, "act": "ACT 2B" },
-        {"name": "Dark Night Of The Soul", "page": "75-85", "act": "ACT 2B" },
-        {"name": "Break Into Three", "page": 85, "act": "ACT 2B"},
-        {"name": "Finale", "page": "85-110", "act": "ACT 3" },
-        {"name": "Final Image", "page": 110, "act": "ACT 3" }
-    ]
+ "name": "Save The Cat",
+ "pageCount": 110,
+ "elements": [
+     {"name": "Opening Image", "page": 1, "act": "ACT 1" },
+     {"name": "Setup", "page": "1-10", "act": "ACT 1" },
+     {"name": "Theme Stated", "page": 5, "act": "ACT 1", "allowMultiple": true },
+     {"name": "Catalyst", "page": 12, "act": "ACT 1" },
+     {"name": "Debate", "page": "12-25", "act": "ACT 1"},
+     {"name": "Break Into Two", "page": "25-30", "act": "ACT 1" },
+     {"name": "B Story", "page": 30, "act": "ACT 2A" },
+     {"name": "Fun And Games", "page": "30-55", "act": "ACT 2A" },
+     {"name": "Midpoint", "page": 55, "act": "ACT 2A" },
+     {"name": "Bad Guys Close In", "page": "55-75", "act": "ACT 2B" },
+     {"name": "All Is Lost", "page": 75, "act": "ACT 2B" },
+     {"name": "Dark Night Of The Soul", "page": "75-85", "act": "ACT 2B" },
+     {"name": "Break Into Three", "page": 85, "act": "ACT 2B"},
+     {"name": "Finale", "page": "85-110", "act": "ACT 3" },
+     {"name": "Final Image", "page": 110, "act": "ACT 3" }
+ ]
 }
 
 screenplayTextDocument.superImposeStructure(structure)
@@ -1367,13 +1367,13 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
     /**
       When we print a screenplay, we expect it to do the following
 
-      1. Slug line or Scene Heading cannot come on the last line of the page
-      2. Character name cannot be on the last line of the page
-      3. If only one line of the dialogue can be squeezed into the last line of the page, then
-         we must move it to the next page along with the charactername.
-      4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with
-      character name.
-      */
+       1. Slug line or Scene Heading cannot come on the last line of the page
+       2. Character name cannot be on the last line of the page
+       3. If only one line of the dialogue can be squeezed into the last line of the page, then
+          we must move it to the next page along with the charactername.
+       4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with
+       character name.
+       */
     const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
     const QMarginsF pageMargins = pageLayout->margins();
     const QFont defaultFont = m_formatting->defaultFont();
@@ -1648,6 +1648,10 @@ void ScreenplayTextDocument::connectToScreenplaySignals()
             &ScreenplayTextDocument::onActiveSceneChanged, Qt::UniqueConnection);
     connect(m_screenplay, &Screenplay::modelAboutToBeReset, this,
             &ScreenplayTextDocument::onScreenplayAboutToReset, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::elementOmitted, this,
+            &ScreenplayTextDocument::onSceneOmitted, Qt::UniqueConnection);
+    connect(m_screenplay, &Screenplay::elementIncluded, this,
+            &ScreenplayTextDocument::onSceneIncluded, Qt::UniqueConnection);
 
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
@@ -1701,6 +1705,10 @@ void ScreenplayTextDocument::disconnectFromScreenplaySignals()
                &ScreenplayTextDocument::onActiveSceneChanged);
     disconnect(m_screenplay, &Screenplay::modelAboutToBeReset, this,
                &ScreenplayTextDocument::onScreenplayAboutToReset);
+    disconnect(m_screenplay, &Screenplay::elementOmitted, this,
+               &ScreenplayTextDocument::onSceneOmitted);
+    disconnect(m_screenplay, &Screenplay::elementIncluded, this,
+               &ScreenplayTextDocument::onSceneIncluded);
 
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         ScreenplayElement *element = m_screenplay->elementAt(i);
@@ -1917,6 +1925,18 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
         this->connectToSceneSignals(scene);
         this->evaluatePageBoundariesLater();
     }
+}
+
+void ScreenplayTextDocument::onSceneOmitted(ScreenplayElement *element, int index)
+{
+    this->onSceneRemoved(element, index);
+    this->onSceneInserted(element, index);
+}
+
+void ScreenplayTextDocument::onSceneIncluded(ScreenplayElement *element, int index)
+{
+    this->onSceneRemoved(element, index);
+    this->onSceneInserted(element, index);
 }
 
 void ScreenplayTextDocument::onSceneReset()
@@ -2422,7 +2442,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
         };
 
         const SceneHeading *heading = scene->heading();
-        const bool headingEnabled = heading->isEnabled() || (m_purpose == ForDisplay);
+        const bool headingEnabled =
+                heading->isEnabled() || (m_purpose == ForDisplay) || element->isOmitted();
         if (headingEnabled) {
             if (insertBlock)
                 cursor.insertBlock();
@@ -2457,7 +2478,17 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             prepareCursor(cursor, SceneElement::Heading, Qt::Alignment(), !insertBlock);
 
-            if (m_purpose == ForPrinting) {
+            if (element->isOmitted() && m_purpose == ForPrinting) {
+                cursor.insertText(QStringLiteral("[OMITTED] "));
+
+                QTextCharFormat strikeoutFormat;
+                strikeoutFormat.setFontStrikeOut(true);
+                cursor.mergeCharFormat(strikeoutFormat);
+            }
+        }
+
+        if (m_purpose == ForPrinting) {
+            if (heading->isEnabled()) {
                 TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
                                                                        heading->locationType());
                 cursor.insertText(QStringLiteral(". "));
@@ -2465,6 +2496,10 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 cursor.insertText(QStringLiteral(" - "));
                 TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, heading->moment());
             } else {
+                cursor.insertText(QStringLiteral("NO SCENE HEADING"));
+            }
+        } else {
+            if (heading->isEnabled()) {
                 if (m_sceneNumbers)
                     cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
                 cursor.insertText(heading->locationType());
@@ -2472,10 +2507,15 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 cursor.insertText(heading->location());
                 cursor.insertText(QStringLiteral(" - "));
                 cursor.insertText(heading->moment());
+            } else {
+                cursor.insertText(QStringLiteral("NO SCENE HEADING"));
             }
-
-            insertBlock = true;
         }
+
+        insertBlock = true;
+
+        if (element->isOmitted())
+            return;
 
         AbstractScreenplayTextDocumentInjectionInterface *injection =
                 qobject_cast<AbstractScreenplayTextDocumentInjectionInterface *>(m_injection);
@@ -3032,25 +3072,25 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
     /**
       The title page now consists of 3 frames.
 
-      In the center of the page, we will have the first frame, with the following
-               TITLE        <----- Bold
-              VERSION       <----- Normal
+       In the center of the page, we will have the first frame, with the following
+                TITLE        <----- Bold
+               VERSION       <----- Normal
 
-             Written by     <----- Normal
-              AUTHORS       <----- Normal
+               Written by     <----- Normal
+                AUTHORS       <----- Normal
 
-      In the bottom left, we will have the second frame, with the following
+       In the bottom left, we will have the second frame, with the following
 
-      COPYRIGHT OWNER
-      ADDRESS
-      PHONE
-      EMAIL
-      URL
+        COPYRIGHT OWNER
+        ADDRESS
+        PHONE
+        EMAIL
+        URL
 
-      On the bottom right, we will have the third frame with the following information
-      Written or Generated using Scrite
-      https://www.scrite.io
-      */
+       On the bottom right, we will have the third frame with the following information
+       Written or Generated using Scrite
+       https://www.scrite.io
+       */
     auto evaluateCenteredPaintRect = [=]() {
         const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
         const qreal margin = (rootFrameFormat.rightMargin() + rootFrameFormat.leftMargin()) / 2;

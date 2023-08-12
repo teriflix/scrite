@@ -116,6 +116,11 @@ public:
     bool isExpanded() const { return m_expanded; }
     Q_SIGNAL void expandedChanged();
 
+    Q_PROPERTY(bool omitted READ isOmitted WRITE setOmitted NOTIFY omittedChanged)
+    void setOmitted(bool val);
+    bool isOmitted() const { return m_omitted; }
+    Q_SIGNAL void omittedChanged();
+
     Q_PROPERTY(
             QJsonValue userData READ userData WRITE setUserData NOTIFY userDataChanged STORED false)
     void setUserData(const QJsonValue &val);
@@ -216,6 +221,7 @@ private:
     friend class AbstractImporter;
     friend class AbstractScreenplaySubsetReport;
 
+    bool m_omitted = false;
     bool m_expanded = true;
     int m_breakType = -1;
     bool m_selected = false;
@@ -356,6 +362,14 @@ public:
     bool hasSelectedElements() const;
     Q_SIGNAL void hasSelectedElementsChanged();
 
+    enum OmitStatus { Omitted, NotOmitted, PartiallyOmitted };
+    Q_ENUM(OmitStatus)
+
+    Q_PROPERTY(OmitStatus selectedElementsOmitStatus READ selectedElementsOmitStatus WRITE setSelectedElementsOmitStatus NOTIFY selectedElementsOmitStatusChanged)
+    void setSelectedElementsOmitStatus(OmitStatus val);
+    OmitStatus selectedElementsOmitStatus() const;
+    Q_SIGNAL void selectedElementsOmitStatusChanged();
+
     Q_PROPERTY(QQmlListProperty<ScreenplayElement> elements READ elements NOTIFY elementsChanged)
     QQmlListProperty<ScreenplayElement> elements();
     Q_INVOKABLE void addElement(ScreenplayElement *ptr);
@@ -367,6 +381,8 @@ public:
     Q_INVOKABLE void moveElement(ScreenplayElement *ptr, int toRow);
     Q_INVOKABLE void moveSelectedElements(int toRow);
     Q_INVOKABLE void removeSelectedElements();
+    Q_INVOKABLE void omitSelectedElements();
+    Q_INVOKABLE void includeSelectedElements();
     Q_INVOKABLE void clearSelection();
     void setSelection(const QList<ScreenplayElement *> &elements);
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
@@ -379,6 +395,8 @@ public:
     Q_SIGNAL void elementInserted(ScreenplayElement *element, int index);
     Q_SIGNAL void elementRemoved(ScreenplayElement *element, int index);
     Q_SIGNAL void elementMoved(ScreenplayElement *element, int from, int to);
+    Q_SIGNAL void elementOmitted(ScreenplayElement *element, int index);
+    Q_SIGNAL void elementIncluded(ScreenplayElement *element, int index);
     Q_SIGNAL void aboutToMoveElements(int at);
 
     Q_SIGNAL void elementSceneGroupsChanged(ScreenplayElement *ptr);
@@ -514,6 +532,7 @@ protected:
     void timerEvent(QTimerEvent *te);
     void resetActiveScene();
     void onSceneReset(int elementIndex);
+    void onScreenplayElementOmittedChanged();
     void evaluateSceneNumbers(bool minorAlso = false);
     void evaluateSceneNumbersLater();
     void validateCurrentElementIndex();
@@ -583,6 +602,7 @@ private:
     ExecLaterTimer m_sceneNumberEvaluationTimer;
     ExecLaterTimer m_paragraphCountEvaluationTimer;
     ExecLaterTimer m_evalHeightHintsAvailableTimer;
+    ExecLaterTimer m_selectedElementsOmitStatusChangedTimer;
 };
 
 /**

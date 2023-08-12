@@ -13,7 +13,9 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Shapes 1.5
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 
@@ -786,6 +788,17 @@ Item {
                                     elementItemDelegate.Drag.imageSource = result.url
                                 })
                             }
+                        }
+                    }
+
+                    Loader {
+                        anchors.fill: parent
+                        active: elementItemDelegate.element.omitted
+                        opacity: 0.75
+                        sourceComponent: Image {
+                            source: "../icons/action/cross.svg"
+                            fillMode: Image.Stretch
+                            mipmap: true
                         }
                     }
                 }

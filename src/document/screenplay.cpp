@@ -240,6 +240,15 @@ void ScreenplayElement::setExpanded(bool val)
     emit expandedChanged();
 }
 
+void ScreenplayElement::setOmitted(bool val)
+{
+    if (m_omitted == val || m_elementType != SceneElementType)
+        return;
+
+    m_omitted = val;
+    emit omittedChanged();
+}
+
 void ScreenplayElement::setUserData(const QJsonValue &val)
 {
     if (m_userData == val)
@@ -700,6 +709,40 @@ bool Screenplay::hasSelectedElements() const
             return true;
 
     return false;
+}
+
+void Screenplay::setSelectedElementsOmitStatus(OmitStatus val)
+{
+    for (ScreenplayElement *element : m_elements) {
+        if (element->isSelected()) {
+            switch (val) {
+            case Omitted:
+                element->setOmitted(true);
+                break;
+            case NotOmitted:
+                element->setOmitted(false);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+}
+
+Screenplay::OmitStatus Screenplay::selectedElementsOmitStatus() const
+{
+    OmitStatus ret = NotOmitted;
+
+    for (ScreenplayElement *element : m_elements) {
+        if (element->isSelected()) {
+            if (element->isOmitted())
+                ret = ret == NotOmitted ? Omitted : ret;
+            else if (ret == Omitted)
+                ret = PartiallyOmitted;
+        }
+    }
+
+    return ret;
 }
 
 QQmlListProperty<ScreenplayElement> Screenplay::elements()
@@ -1379,6 +1422,22 @@ void Screenplay::removeSelectedElements()
         this->setCurrentElementIndex(qMax(0, firstSelectedIndex - 1));
 }
 
+void Screenplay::omitSelectedElements()
+{
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->isSelected())
+            element->setOmitted(true);
+    }
+}
+
+void Screenplay::includeSelectedElements()
+{
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->isSelected())
+            element->setOmitted(false);
+    }
+}
+
 void Screenplay::clearSelection()
 {
     for (ScreenplayElement *element : qAsConst(m_elements))
@@ -1540,7 +1599,7 @@ void Screenplay::gatherSelectedScenes(SceneGroup *into)
 {
     into->clearScenes();
 
-    for (ScreenplayElement *element : m_elements) {
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
         if (element->isSelected())
             into->addScene(element->scene());
     }
@@ -2147,6 +2206,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::heightHintChanged, this,
             &Screenplay::evaluateIfHeightHintsAreAvailableLater, Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::omittedChanged, this,
+            &Screenplay::onScreenplayElementOmittedChanged, Qt::UniqueConnection);
 }
 
 void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
@@ -2172,6 +2233,8 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
                &Screenplay::hasSelectedElementsChanged);
     disconnect(ptr, &ScreenplayElement::heightHintChanged, this,
                &Screenplay::evaluateIfHeightHintsAreAvailableLater);
+    disconnect(ptr, &ScreenplayElement::omittedChanged, this,
+               &Screenplay::onScreenplayElementOmittedChanged);
 }
 
 void Screenplay::setWordCount(int val)
@@ -2298,7 +2361,7 @@ int Screenplay::nextSceneElementIndex()
     int index = m_currentElementIndex + 1;
     while (index < m_elements.size() - 1) {
         ScreenplayElement *element = m_elements.at(index);
-        if (element->elementType() == ScreenplayElement::BreakElementType) {
+        if (element->elementType() == ScreenplayElement::BreakElementType || element->isOmitted()) {
             ++index;
             continue;
         }
@@ -2317,7 +2380,7 @@ int Screenplay::previousSceneElementIndex()
     int index = m_currentElementIndex - 1;
     while (index >= 0) {
         ScreenplayElement *element = m_elements.at(index);
-        if (element->elementType() == ScreenplayElement::BreakElementType) {
+        if (element->elementType() == ScreenplayElement::BreakElementType || element->isOmitted()) {
             --index;
             continue;
         }
@@ -2846,6 +2909,9 @@ void Screenplay::timerEvent(QTimerEvent *te)
     } else if (te->timerId() == m_evalHeightHintsAvailableTimer.timerId()) {
         m_evalHeightHintsAvailableTimer.stop();
         this->evaluateIfHeightHintsAreAvailable();
+    } else if (te->timerId() == m_selectedElementsOmitStatusChangedTimer.timerId()) {
+        m_selectedElementsOmitStatusChangedTimer.stop();
+        emit selectedElementsOmitStatusChanged();
     }
 }
 
@@ -2867,6 +2933,24 @@ void Screenplay::onSceneReset(int elementIndex)
         return;
 
     emit sceneReset(sceneIndex, elementIndex);
+}
+
+void Screenplay::onScreenplayElementOmittedChanged()
+{
+    ScreenplayElement *element = qobject_cast<ScreenplayElement *>(this->sender());
+    if (element == nullptr)
+        return;
+
+    int sceneIndex = this->indexOfElement(element);
+    if (sceneIndex < 0)
+        return;
+
+    if (element->isOmitted())
+        emit elementOmitted(element, sceneIndex);
+    else
+        emit elementIncluded(element, sceneIndex);
+
+    m_selectedElementsOmitStatusChangedTimer.start(10, this);
 }
 
 void Screenplay::updateBreakTitlesLater()

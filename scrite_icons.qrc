@@ -285,5 +285,6 @@
         <file>icons/content/checklist.png</file>
         <file>icons/reports/checklistitem_unchecked.png</file>
         <file>icons/reports/checklistitem_checked.png</file>
+        <file>icons/action/cross.svg</file>
     </qresource>
 </RCC>

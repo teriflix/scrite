@@ -1429,6 +1429,45 @@ Rectangle {
     }
 
     Component {
+        id: omittedContentComponent
+
+        Rectangle {
+            id: omittedContentItem
+            property int theIndex: componentIndex
+            property Scene theScene: componentData.scene
+            property ScreenplayElement theElement: componentData.screenplayElement
+            property bool isCurrent: theElement === screenplayAdapter.currentElement
+            z: isCurrent ? 2 : 1
+
+            width: contentArea.width
+            height: omittedContentItemLayout.height
+            color: Scrite.app.isVeryLightColor(theScene.color) ? primaryColors.highlight.background : Qt.tint(theScene.color, "#9CFFFFFF")
+
+            Column {
+                id: omittedContentItemLayout
+                width: parent.width
+
+                Loader {
+                    id: omittedSceneHeadingAreaLoader
+                    width: parent.width
+                    active: omittedContentItem.theScene
+                    sourceComponent: sceneHeadingArea
+                    z: 1
+                    onItemChanged: {
+                        if(item) {
+                            item.theElementIndex = omittedContentItem.theIndex
+                            item.theScene = omittedContentItem.theScene
+                            item.theElement = omittedContentItem.theElement
+                        }
+                    }
+                }
+
+                // For future expansion
+            }
+        }
+    }
+
+    Component {
         id: contentComponent
 
         Rectangle {
@@ -2941,10 +2980,11 @@ Rectangle {
                             property SceneHeading sceneHeading: headingItem.theScene.heading
 
                             text: activeFocus ? sceneHeading.editText : sceneHeading.displayText
-                            enabled: sceneHeading.enabled
+                            enabled: sceneHeading.enabled && !headingItem.theElement.omitted
                             label: ""
                             placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
                             maximumLength: 140
+                            font.strikeout: headingItem.theElement.omitted
                             font.family: headingFontMetrics.font.family
                             font.pointSize: headingFontMetrics.font.pointSize
                             font.bold: headingFontMetrics.font.bold
@@ -3080,7 +3120,9 @@ Rectangle {
 
                             Menu2 {
                                 id: sceneMenu
+
                                 MenuItem2 {
+                                    enabled: !headingItem.theElement.omitted
                                     action: Action {
                                         text: "Scene Heading"
                                         checkable: true
@@ -3103,16 +3145,17 @@ Rectangle {
                                 MarkSceneAsMenu {
                                     title: "Mark Scene As"
                                     scene: headingItem.theScene
+                                    enabled: !headingItem.theElement.omitted
                                 }
 
                                 Repeater {
-                                    model: additionalSceneMenuItems.length ? 1 : 0
+                                    model: headingItem.theElement.omitted ? 0 : additionalSceneMenuItems.length ? 1 : 0
 
                                     MenuSeparator { }
                                 }
 
                                 Repeater {
-                                    model: additionalSceneMenuItems
+                                    model: headingItem.theElement.omitted ? 0 : additionalSceneMenuItems
 
                                     MenuItem2 {
                                         text: modelData
@@ -3124,9 +3167,18 @@ Rectangle {
                                 }
 
                                 Repeater {
-                                    model: additionalSceneMenuItems.length ? 1 : 0
+                                    model: headingItem.theElement.omitted ? 0 : additionalSceneMenuItems.length ? 1 : 0
 
                                     MenuSeparator { }
+                                }
+
+                                MenuItem2 {
+                                    text: headingItem.theElement.omitted ? "Include" : "Omit"
+                                    enabled: screenplayAdapter.screenplay === Scrite.document.screenplay
+                                    onClicked: {
+                                        sceneMenu.close()
+                                        headingItem.theElement.omitted = !headingItem.theElement.omitted
+                                    }
                                 }
 
                                 MenuItem2 {
@@ -3156,7 +3208,7 @@ Rectangle {
                     property Scene scene: headingItem.theScene
                     property bool allow: true
                     active: screenplayEditorSettings.displaySceneCharacters && allow
-                    sourceComponent: sceneCharactersList
+                    sourceComponent: headingItem.theElement.omitted ? null : sceneCharactersList
 
                     Announcement.onIncoming: (type,data) => {
                         var stype = "" + type
@@ -3207,7 +3259,7 @@ Rectangle {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     font.pointSize: sceneHeadingFieldsFontPointSize
                     text: sceneCharactersListLoader.active ? Scrite.document.structure.presentableGroupNames(headingItem.theScene.groups) : ""
-                    visible: sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
+                    visible: !headingItem.theElement.omitted && sceneCharactersListLoader.active && headingItem.theScene.groups.length > 0
                     topPadding: 5*Math.min(zoomLevel,1)
                     bottomPadding: 5*Math.min(zoomLevel,1)
                     font.underline: sceneGroupTagsTextMouseArea.containsMouse && !sceneTagMenuLoader.active
@@ -3224,7 +3276,7 @@ Rectangle {
                 Item {
                     width: parent.width
                     height: 10*Math.min(zoomLevel,1)
-                    visible: !screenplayEditorSettings.displaySceneSynopsis
+                    visible: !headingItem.theElement.omitted && !screenplayEditorSettings.displaySceneSynopsis
                 }
             }
         }
@@ -3543,6 +3595,7 @@ Rectangle {
                             horizontalAlignment: Qt.AlignLeft
                             color: primaryColors.c10.text
                             font.capitalization: parent.elementIsBreak ? Font.MixedCase : Font.AllUppercase
+                            font.strikeout: screenplayElement.omitted
                             text: {
                                 if(scene && scene.heading.enabled)
                                     return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
@@ -4191,7 +4244,16 @@ Rectangle {
 
             active: false
             onActiveChanged: Scrite.app.resetObjectProperty(contentViewDelegateLoader, "height")
-            sourceComponent: componentData ? (componentData.scene ? contentComponent : (componentData.breakType === Screenplay.Episode ? episodeBreakComponent : actBreakComponent)) : noContentComponent
+            sourceComponent: {
+                if(componentData) {
+                    if(componentData.scene)
+                        return componentData.screenplayElement.omitted ? omittedContentComponent : contentComponent
+                    if(componentData.breakType === Screenplay.Episode)
+                        return episodeBreakComponent
+                    return actBreakComponent
+                }
+                return noContentComponent
+            }
             onLoaded: {
                 contentView.delegateWasLoaded()
                 Qt.callLater(updateHeightHint)

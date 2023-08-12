@@ -56,7 +56,7 @@ Menu2 {
     MarkSceneAsMenu {
         title: "Mark Scene As"
         scene: screenplayContextMenu.element ? screenplayContextMenu.element.scene : null
-        enabled: !Scrite.document.readOnly
+        enabled: !Scrite.document.readOnly && !omitIncludeMenuItem.omitted
         onTriggered: {
             mainUndoStack.sceneListPanelActive = true
             for(var i=0; i<elementItemMenuSceneGroup.sceneCount; i++) {
@@ -85,6 +85,19 @@ Menu2 {
     }
 
     MenuSeparator { }
+
+    MenuItem2 {
+        id: omitIncludeMenuItem
+        property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
+        text: omitted ? "Include" : "Omit"
+        onClicked: {
+            screenplayContextMenu.close()
+            if(omitted)
+                Scrite.document.screenplay.includeSelectedElements()
+            else
+                Scrite.document.screenplay.omitSelectedElements()
+        }
+    }
 
     MenuItem2 {
         text: "Remove"
