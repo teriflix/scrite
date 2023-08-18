@@ -745,8 +745,14 @@ ScriteDocument::ScriteDocument(QObject *parent)
 
     connect(this, &ScriteDocument::collaboratorsChanged, this,
             &ScriteDocument::canModifyCollaboratorsChanged);
-    connect(User::instance(), &User::loggedInChanged, this,
-            &ScriteDocument::canModifyCollaboratorsChanged);
+
+    // We cannot use User::instance() right now, because it will
+    // refer back to ScriteDocument::instance() and cause a recusrion,
+    // leading to crash.
+    ExecLaterTimer::call("scriteDocumentInit", this, [=]() {
+        connect(User::instance(), &User::loggedInChanged, this,
+                &ScriteDocument::canModifyCollaboratorsChanged);
+    });
 
     connect(qApp, &QApplication::aboutToQuit, this, [=]() {
         if (m_autoSave && !m_fileName.isEmpty())
