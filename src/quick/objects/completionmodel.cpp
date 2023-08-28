@@ -219,12 +219,7 @@ bool CompletionModel::eventFilter(QObject *target, QEvent *event)
             if (!cc.isEmpty()) {
                 emit requestCompletion(cc);
 
-                QTimer *timer = new QTimer(this);
-                timer->setInterval(0);
-                timer->setSingleShot(true);
-                connect(timer, &QTimer::timeout, this, &CompletionModel::clearFilterStrings);
-                connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
-                timer->start();
+                QTimer::singleShot(0, this, &CompletionModel::clearFilterStrings);
                 return true;
             }
         } break;

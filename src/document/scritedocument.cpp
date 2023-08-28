@@ -749,7 +749,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
     // We cannot use User::instance() right now, because it will
     // refer back to ScriteDocument::instance() and cause a recusrion,
     // leading to crash.
-    ExecLaterTimer::call("scriteDocumentInit", this, [=]() {
+    QTimer::singleShot(10, this, [=]() {
         connect(User::instance(), &User::loggedInChanged, this,
                 &ScriteDocument::canModifyCollaboratorsChanged);
     });
@@ -2527,7 +2527,7 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
 
         // Without a proper document-id, we will end up having too many restore
         // points of the same doucment.
-        ExecLaterTimer::call("ScriteDocument.saveNewDocumentId", this, [=]() {
+        QTimer::singleShot(0, this, [=]() {
             if (!m_fileName.isEmpty())
                 this->save();
         });

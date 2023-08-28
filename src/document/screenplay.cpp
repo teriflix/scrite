@@ -667,16 +667,11 @@ void Screenplay::setCoverPagePhoto(const QString &val)
      * This also means that the Image {} QML elements used to show cover page
      * photo must have their cache property set to false.
      */
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(500);
-    timer->setSingleShot(true);
-    connect(timer, &QTimer::timeout, timer, &QTimer::deleteLater);
-    connect(timer, &QTimer::timeout, this, [=]() {
+    QTimer::singleShot(500, this, [=]() {
         m_coverPagePhoto =
                 val2.isEmpty() ? val2 : m_scriteDocument->fileSystem()->absolutePath(val2);
         emit coverPagePhotoChanged();
     });
-    timer->start();
 }
 
 void Screenplay::clearCoverPagePhoto()
@@ -1157,13 +1152,10 @@ bool ScreenplayElementsMoveCommand::restore(const QVariantList &array, bool forw
             ++it;
         }
 
-        ExecLaterTimer::call(
-                "ScreenplayElementsMoveCommand::restore", m_screenplay,
-                [=]() {
-                    m_screenplay->setCurrentElementIndex(currentIndex);
-                    emit m_screenplay->requestEditorAt(currentIndex);
-                },
-                50);
+        QTimer::singleShot(50, m_screenplay, [=]() {
+            m_screenplay->setCurrentElementIndex(currentIndex);
+            emit m_screenplay->requestEditorAt(currentIndex);
+        });
     }
 
     return ret;
@@ -1239,13 +1231,10 @@ void Screenplay::moveSelectedElements(int toRow)
         ++it;
     }
 
-    ExecLaterTimer::call(
-            "moveSelectedElements", this,
-            [=]() {
-                this->setCurrentElementIndex(toRow);
-                emit this->requestEditorAt(toRow);
-            },
-            50);
+    QTimer::singleShot(50, this, [=]() {
+        this->setCurrentElementIndex(toRow);
+        emit this->requestEditorAt(toRow);
+    });
 
     if (UndoStack::active())
         UndoStack::active()->push(cmd);

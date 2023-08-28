@@ -627,7 +627,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
                 emit formatChanged();
             });
 
-    ExecLaterTimer::call("resetToUserDefaults", this, [=]() { this->resetToUserDefaults(); });
+    QTimer::singleShot(0, this, &ScreenplayFormat::resetToUserDefaults);
 }
 
 ScreenplayFormat::~ScreenplayFormat() { }
@@ -2473,14 +2473,10 @@ int SceneDocumentBinder::paste(int fromPosition)
     m_sceneElementTaskTimer.stop();
     this->performAllSceneElementTasks();
 
-    QTimer *refreshLaterTimer = new QTimer(this);
-    refreshLaterTimer->setInterval(50);
-    refreshLaterTimer->setSingleShot(true);
-    connect(refreshLaterTimer, &QTimer::timeout, this, &SceneDocumentBinder::refresh);
-    connect(refreshLaterTimer, &QTimer::timeout, this,
-            [this, cp]() { emit requestCursorPosition(cp); });
-    connect(refreshLaterTimer, &QTimer::timeout, refreshLaterTimer, &QTimer::deleteLater);
-    refreshLaterTimer->start();
+    QTimer::singleShot(50, this, [this, cp]() {
+        this->refresh();
+        emit requestCursorPosition(cp);
+    });
 
     return cp;
 }
@@ -3057,25 +3053,14 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
             m_applyNextCharFormat = false;
             cursor.setCharFormat(m_nextCharFormat);
 
-            QTimer *timer = new QTimer(this->document());
-            timer->setProperty(
-                    "#data",
-                    QVariantList({ from, QVariant::fromValue<QTextCharFormat>(m_nextCharFormat) }));
-            timer->setInterval(0);
-            connect(timer, &QTimer::timeout, this, [timer]() {
-                const QVariantList data = timer->property("#data").toList();
-                const int from = data.first().toInt();
-                const QTextCharFormat format = data.last().value<QTextCharFormat>();
-                QTextDocument *doc = qobject_cast<QTextDocument *>(timer->parent());
-
+            const QTextCharFormat ncf = m_nextCharFormat;
+            QTextDocument *doc = this->document();
+            QTimer::singleShot(0, this, [from, ncf, doc]() {
                 QTextCursor cursor(doc);
                 cursor.setPosition(from);
                 cursor.movePosition(QTextCursor::NextCharacter, QTextCursor::KeepAnchor, 1);
-                cursor.setCharFormat(format);
-
-                timer->deleteLater();
+                cursor.setCharFormat(ncf);
             });
-            timer->start();
         }
     }
 

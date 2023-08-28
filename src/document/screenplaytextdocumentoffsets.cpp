@@ -649,14 +649,10 @@ void ScreenplayTextDocumentOffsets::reloadDocument()
      * We are doing this because we want to allow some time for the UI to update itself
      * and show the busy message, before we get into a long operation.
      */
-    QTimer *reloadNowTimer = new QTimer(this);
-    reloadNowTimer->setInterval(100);
-    connect(reloadNowTimer, &QTimer::timeout, this, [=]() {
+    QTimer::singleShot(100, this, [=]() {
         this->reloadDocumentNow();
-        reloadNowTimer->deleteLater();
         this->setBusy(false);
     });
-    reloadNowTimer->start();
 }
 
 void ScreenplayTextDocumentOffsets::reloadDocumentNow()
