@@ -2478,37 +2478,36 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             prepareCursor(cursor, SceneElement::Heading, Qt::Alignment(), !insertBlock);
 
-            if (element->isOmitted() && m_purpose == ForPrinting) {
+            if (element->isOmitted())
                 cursor.insertText(QStringLiteral("[OMITTED] "));
-
-                QTextCharFormat strikeoutFormat;
-                strikeoutFormat.setFontStrikeOut(true);
-                cursor.mergeCharFormat(strikeoutFormat);
-            }
         }
 
-        if (m_purpose == ForPrinting) {
-            if (heading->isEnabled()) {
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
-                                                                       heading->locationType());
-                cursor.insertText(QStringLiteral(". "));
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, heading->location());
-                cursor.insertText(QStringLiteral(" - "));
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, heading->moment());
+        if (!element->isOmitted()) {
+            if (m_purpose == ForPrinting) {
+                if (heading->isEnabled()) {
+                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
+                                                                           heading->locationType());
+                    cursor.insertText(QStringLiteral(". "));
+                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
+                                                                           heading->location());
+                    cursor.insertText(QStringLiteral(" - "));
+                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
+                                                                           heading->moment());
+                } else {
+                    cursor.insertText(QStringLiteral("NO SCENE HEADING"));
+                }
             } else {
-                cursor.insertText(QStringLiteral("NO SCENE HEADING"));
-            }
-        } else {
-            if (heading->isEnabled()) {
-                if (m_sceneNumbers)
-                    cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
-                cursor.insertText(heading->locationType());
-                cursor.insertText(QStringLiteral(". "));
-                cursor.insertText(heading->location());
-                cursor.insertText(QStringLiteral(" - "));
-                cursor.insertText(heading->moment());
-            } else {
-                cursor.insertText(QStringLiteral("NO SCENE HEADING"));
+                if (heading->isEnabled()) {
+                    if (m_sceneNumbers)
+                        cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
+                    cursor.insertText(heading->locationType());
+                    cursor.insertText(QStringLiteral(". "));
+                    cursor.insertText(heading->location());
+                    cursor.insertText(QStringLiteral(" - "));
+                    cursor.insertText(heading->moment());
+                } else {
+                    cursor.insertText(QStringLiteral("NO SCENE HEADING"));
+                }
             }
         }
 

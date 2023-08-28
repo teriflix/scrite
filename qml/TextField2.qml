@@ -61,7 +61,7 @@ TextField {
     }
 
     onActiveFocusChanged: {
-        if(activeFocus)
+        if(activeFocus && !readOnly)
             selectAll()
         else
             completionViewPopup.close()

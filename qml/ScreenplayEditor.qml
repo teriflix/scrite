@@ -1358,7 +1358,7 @@ Rectangle {
             readonly property ScreenplayElement screenplayElement: spElementData.screenplayElement
             readonly property Scene scene: spElementData.scene
             readonly property int screenplayElementType: spElementData.screenplayElementType
-            property real suggestedSceneHeight: sizeHint.height
+            property real suggestedSceneHeight: screenplayElement.omitted ? (sceneHeadingText.height + sceneHeadingText.anchors.topMargin*2) : sizeHint.height
 
             SceneSizeHintItem {
                 id: sizeHint
@@ -1368,7 +1368,7 @@ Rectangle {
                 height: contentHeight * zoomLevel
                 format: Scrite.document.printFormat
                 scene: parent.scene
-                active: parent.evaluateSuggestedSceneHeight
+                active: parent.evaluateSuggestedSceneHeight && !parent.screenplayElement.omitted
             }
 
             Text {
@@ -1398,7 +1398,7 @@ Rectangle {
                 elide: Text.ElideMiddle
                 text: {
                     if(scene && scene.heading.enabled)
-                        return scene.heading.text
+                        return screenplayElement.omitted ? "[OMITTED]" : scene.heading.text
                     if(screenplayElementType === ScreenplayElement.BreakElementType)
                         return screenplayElement.breakTitle
                     return "NO SCENE HEADING"
@@ -1415,6 +1415,7 @@ Rectangle {
                 fillMode: Image.TileVertically
                 source: "../images/sample_scene.png"
                 opacity: 0.5
+                visible: !parent.screenplayElement.omitted
             }
         }
     }
@@ -2978,13 +2979,24 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
 
                             property SceneHeading sceneHeading: headingItem.theScene.heading
+                            function updateSceneHeading(text) {
+                                if(readOnly)
+                                    return
+                                sceneHeading.parseFrom(text)
+                            }
 
-                            text: activeFocus ? sceneHeading.editText : sceneHeading.displayText
-                            enabled: sceneHeading.enabled && !headingItem.theElement.omitted
+                            text: {
+                                if(headingItem.theElement.omitted)
+                                    return "[OMITTED] " + (hovered ? sceneHeading.displayText : "")
+                                if(activeFocus)
+                                    return sceneHeading.editText
+                                return sceneHeading.displayText
+                            }
+                            hoverEnabled: headingItem.theElement.omitted
+                            readOnly: Scrite.document.readOnly || !(sceneHeading.enabled && !headingItem.theElement.omitted)
                             label: ""
                             placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
                             maximumLength: 140
-                            font.strikeout: headingItem.theElement.omitted
                             font.family: headingFontMetrics.font.family
                             font.pointSize: headingFontMetrics.font.pointSize
                             font.bold: headingFontMetrics.font.bold
@@ -2992,11 +3004,10 @@ Rectangle {
                             font.italic: headingFontMetrics.font.italic
                             font.letterSpacing: headingFontMetrics.font.letterSpacing
                             font.capitalization: activeFocus ? (currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
-                            color: headingFontMetrics.format.textColor
+                            color: headingItem.theElement.omitted ? "gray" : headingFontMetrics.format.textColor
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            readOnly: Scrite.document.readOnly
                             background: Item { }
-                            onEditingComplete: sceneHeading.parseFrom(text)
+                            onEditingComplete: updateSceneHeading(text)
                             property int previouslyActiveLanguage: TransliterationEngine.English
                             onActiveFocusChanged: {
                                 if(activeFocus) {
@@ -3005,7 +3016,7 @@ Rectangle {
                                     const headingFormat = Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
                                     headingFormat.activateDefaultLanguage()
                                 } else {
-                                    sceneHeading.parseFrom(text)
+                                    updateSceneHeading(text)
                                     Scrite.app.transliterationEngine.language = previouslyActiveLanguage
                                 }
                             }
@@ -3595,12 +3606,17 @@ Rectangle {
                             horizontalAlignment: Qt.AlignLeft
                             color: primaryColors.c10.text
                             font.capitalization: parent.elementIsBreak ? Font.MixedCase : Font.AllUppercase
-                            font.strikeout: screenplayElement.omitted
                             text: {
-                                if(scene && scene.heading.enabled)
-                                    return screenplayElement.resolvedSceneNumber + ". " + scene.heading.text
+                                var ret = ""
+                                if(scene && scene.heading.enabled) {
+                                    ret = screenplayElement.resolvedSceneNumber + ". "
+                                    if(screenplayElement.omitted)
+                                        ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                                    else
+                                        ret += scene.heading.text
+                                    return ret
+                                }
                                 if(parent.elementIsBreak) {
-                                    var ret = ""
                                     if(parent.elementIsEpisodeBreak)
                                         ret = screenplayElement.breakTitle
                                     else if(sceneListView.hasEpisodes)

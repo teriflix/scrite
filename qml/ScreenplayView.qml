@@ -556,7 +556,8 @@ Item {
             }
 
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
-                   Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel)
+                    (element.omitted ? screenplayElementList.minimumDelegateWidth
+                                     : Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel))
             height: screenplayElementList.height
 
             Rectangle {
@@ -576,7 +577,8 @@ Item {
                 enabled: !delegateDropArea.containsDrag
                 sourceComponent: Rectangle {
                     id: elementItemBoxItem
-                    color: element.scene ? Qt.tint(sceneColor, (element.selected || elementItemDelegate.active) ? "#9CFFFFFF" : "#C0FFFFFF") : sceneColor
+                    property color sceneColor2 : Qt.tint(sceneColor, (element.selected || elementItemDelegate.active) ? "#9CFFFFFF" : "#C0FFFFFF")
+                    color: element.scene ? (elementItemDelegate.element.omitted ? Qt.tint(sceneColor2, "#C0FFFFFF") : sceneColor2) : sceneColor
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width {
@@ -793,12 +795,11 @@ Item {
 
                     Loader {
                         anchors.fill: parent
+                        anchors.margins: parent.width * 0.25
                         active: elementItemDelegate.element.omitted
-                        opacity: 0.75
                         sourceComponent: Image {
-                            source: "../icons/action/cross.svg"
-                            fillMode: Image.Stretch
-                            mipmap: true
+                            source: "../icons/content/omitted_scene.png"
+                            fillMode: Image.PreserveAspectFit
                         }
                     }
                 }
