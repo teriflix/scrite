@@ -25,6 +25,7 @@ Row {
     property alias pressed: zoomSlider.pressed
     property alias stepSize: zoomSlider.stepSize
     property alias zoomLevel: zoomSlider.zoomLevel
+    property alias zoomSliderVisible: zoomSlider.visible
 
     signal zoomOutRequest()
     signal zoomInRequest()

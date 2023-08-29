@@ -730,7 +730,10 @@ Item {
                             checkable: true
                             enabled: Scrite.document.structure.elementStacks.objectCount === 0
                             checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
-                            onToggled: contentLoader.reset( contentLoader.toggleCanvasUI )
+                            onToggled: contentLoader.reset( () => {
+                                                               Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
+                                                               Scrite.document.structure.indexCardContent = Structure.Synopsis
+                                                           } )
                         }
                     }
                 }

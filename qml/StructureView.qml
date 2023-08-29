@@ -2076,7 +2076,7 @@ Item {
         Text {
             id: attachmentNotice
             anchors.centerIn: parent
-            width: parent.width * noticeWidthFactor
+            width: parent.width * 0.5 /* noticeWidthFactor */
             wrapMode: Text.WordWrap
             color: primaryColors.c700.text
             text: parent.visible ? "<b>" + annotationAttachmentDropArea.attachment.originalFileName + "</b><br/><br/>" + "Drop this photo here as an annotation." : ""
@@ -2147,41 +2147,51 @@ Item {
                     anchors.bottom: parent.top
                     anchors.bottomMargin: item ? item.height : 0
                     menu: Menu2 {
-                        Menu2 {
-                            title: "Card UI Mode"
 
-                            MenuItem2 {
-                                text: "Index Card UI"
-                                checkable: true
-                                checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
-                                onToggled: if(checked) contentLoader.reset( contentLoader.toggleCanvasUI )
-                            }
-
-                            MenuItem2 {
-                                text: "Synopsis Card UI"
-                                enabled: Scrite.document.structure.elementStacks.objectCount === 0
-                                checkable: true
-                                checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
-                                onToggled: if(checked) contentLoader.reset( contentLoader.toggleCanvasUI )
+                        MenuItem2 {
+                            text: "Index Cards"
+                            property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
+                                                    Scrite.document.structure.indexCardContent === Structure.Synopsis
+                            icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            onClicked: {
+                                if(!_checked) {
+                                    if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
+                                        Scrite.document.structure.indexCardContent = Structure.Synopsis
+                                    else
+                                        contentLoader.reset( () => {
+                                            Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
+                                            Scrite.document.structure.indexCardContent = Structure.Synopsis
+                                        } )
+                                }
                             }
                         }
 
-                        Menu2 {
-                            title: "Index Card Content"
-                            enabled: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
-
-                            MenuItem2 {
-                                text: "Synopsis"
-                                checkable: true
-                                checked: Scrite.document.structure.indexCardContent === Structure.Synopsis
-                                onToggled: if(checked) Scrite.document.structure.indexCardContent = Structure.Synopsis
+                        MenuItem2 {
+                            text: "Photo Cards"
+                            property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
+                                                    Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
+                            icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            onClicked: {
+                                if(!_checked)
+                                    if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
+                                        Scrite.document.structure.indexCardContent = Structure.FeaturedPhoto
+                                    else
+                                        contentLoader.reset( () => {
+                                            Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
+                                            Scrite.document.structure.indexCardContent = Structure.FeaturedPhoto
+                                        } )
                             }
+                        }
 
-                            MenuItem2 {
-                                text: "Featured Photo"
-                                checkable: true
-                                checked: Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
-                                onToggled: if(checked) Scrite.document.structure.indexCardContent = Structure.FeaturedPhoto
+                        MenuItem2 {
+                            text: "Synopsis Cards"
+                            property bool _checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
+                            icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            onClicked: {
+                                if(!_checked)
+                                    contentLoader.reset( () => {
+                                        Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
+                                    } )
                             }
                         }
                     }
@@ -2363,7 +2373,7 @@ Item {
                 text: element.scene.synopsis
                 anchors.centerIn: parent
                 font.pointSize: 13
-                horizontalAlignment: Text.AlignHCenter
+                horizontalAlignment: Text.AlignLeft
                 onTextEdited: element.scene.synopsis = text
                 onEditingFinished: {
                     editMode = false
@@ -2461,10 +2471,10 @@ Item {
             Drag.source: element.scene
 
             SceneTypeImage {
+                anchors.top: parent.top
                 anchors.left: parent.left
-                anchors.bottom: parent.bottom
                 anchors.margins: 3
-                width: 24; height: 24
+                width: 18; height: 18
                 opacity: 0.5
                 showTooltip: false
                 sceneType: elementItem.element.scene.type
@@ -2476,11 +2486,11 @@ Item {
                 visible: !parent.editing && !Scrite.document.readOnly
                 enabled: !canvasScroll.editItem && !Scrite.document.readOnly
                 source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
-                width: 24; height: 24
+                width: 18; height: 18
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                anchors.bottomMargin: 1
                 anchors.rightMargin: 3
+                anchors.bottomMargin: 1
                 opacity: elementItem.selected ? 1 : 0.1
                 scale: dragMouseArea.pressed ? 2 : 1
                 Behavior on scale {

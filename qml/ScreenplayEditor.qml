@@ -798,7 +798,7 @@ Rectangle {
         id: verticalScrollBar
         anchors.top: screenplayEditorWorkspace.top
         anchors.right: parent.right
-        anchors.bottom: statusBar.top
+        anchors.bottom: statusBar.enabled ? statusBar.top : parent.bottom
         orientation: Qt.Vertical
         minimumSize: 0.1
         policy: screenplayAdapter.elementCount > 0 ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -824,6 +824,8 @@ Rectangle {
         border.width: 1
         border.color: primaryColors.borderColor
         clip: true
+        enabled: (width > (metricsDisplay.width + zoomSlider.width + 40))
+        opacity: enabled ? 1 : 0
 
         Item {
             anchors.fill: metricsDisplay
@@ -859,6 +861,7 @@ Rectangle {
                     return Scrite.document.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
                 }
                 scale: toggleLockMouseArea.containsMouse ? (toggleLockMouseArea.pressed ? 1 : 1.5) : 1
+                visible: mainTabBar.currentIndex === 0
                 Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
@@ -914,6 +917,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: screenplayTextDocument.paused ? 0.85 : 1
                 scale: refreshMouseArea.containsMouse ? (refreshMouseArea.pressed ? 1 : 1.5) : 1
+                visible: mainTabBar.currentIndex === 0
                 Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
@@ -936,6 +940,7 @@ Rectangle {
                 width: 1
                 height: parent.height
                 color: primaryColors.borderColor
+                visible: mainTabBar.currentIndex === 0
             }
 
             Image {
@@ -1160,6 +1165,7 @@ Rectangle {
             from: 0; to: zoomLevels.length-1
             height: parent.height-6
             stepSize: 1
+            zoomSliderVisible: mainTabBar.currentIndex === 0
             function reset() {
                 var zls = zoomLevels
                 for(var i=0; i<zls.length; i++) {

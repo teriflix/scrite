@@ -1736,13 +1736,6 @@ Item {
         property bool allowContent: true
         property string sessionId
 
-        function toggleCanvasUI() {
-            if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
-                Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
-            else
-                Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
-        }
-
         function reset(callback) {
             active = false
             Qt.callLater( (callback) => {

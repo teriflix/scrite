@@ -310,6 +310,7 @@ Item {
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
         model: Scrite.document.loading ? null : Scrite.document.screenplay
+        readonly property real omittedDelegateWidth: 34
         property real minimumDelegateWidth: {
             var treshold = Math.floor(width / 100)
             if(Scrite.document.screenplay.elementCount < treshold)
@@ -556,7 +557,7 @@ Item {
             }
 
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
-                    (element.omitted ? screenplayElementList.minimumDelegateWidth
+                    (element.omitted ? screenplayElementList.omittedDelegateWidth
                                      : Math.max(screenplayElementList.minimumDelegateWidth, sceneElementCount*screenplayElementList.perElementWidth*zoomLevel))
             height: screenplayElementList.height
 
@@ -650,6 +651,9 @@ Item {
 
                                 return ret
                             }
+
+                            if(elementItemDelegate.element.omitted)
+                                return "Omitted Scene"
 
                             var pc = elementItemDelegate.element.scene.elementCount
                             ret += pc + " " + (pc > 1 ? "Paragraphs" : "Paragraph")
