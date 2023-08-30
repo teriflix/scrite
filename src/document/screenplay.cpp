@@ -2822,6 +2822,8 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
         for (ScreenplayElement *element : m_elements) {
             switch (element->elementType()) {
             case ScreenplayElement::SceneElementType: {
+                if (element->isOmitted())
+                    continue;
                 const Scene *scene = element->scene();
                 QString heading = scene->structureElement()->title();
                 if (scene->heading() && scene->heading()->isEnabled())

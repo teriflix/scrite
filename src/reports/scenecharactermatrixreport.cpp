@@ -118,7 +118,12 @@ struct CreateColumnHeadingImageFunctor
 bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
 {
     const Screenplay *screenplay = this->document()->screenplay();
-    QList<ScreenplayElement *> screenplayElements = this->getScreenplayElements();
+    QList<ScreenplayElement *> allScreenplayElements = this->getScreenplayElements();
+    QList<ScreenplayElement *> screenplayElements; // ones that are not emotted
+    std::copy_if(allScreenplayElements.begin(), allScreenplayElements.end(),
+                 std::back_inserter(screenplayElements),
+                 [](ScreenplayElement *e) { return !e->isOmitted(); });
+
     this->finalizeCharacterNames();
 
     // Lets compile a list of scene names.

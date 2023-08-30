@@ -41,6 +41,9 @@ void CharacterScreenplayReport::setCharacterNames(const QStringList &val)
 
 bool CharacterScreenplayReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
+    if (element->isOmitted())
+        return false;
+
     const Scene *scene = element->scene();
     if (scene == nullptr)
         return false;

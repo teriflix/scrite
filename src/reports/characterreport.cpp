@@ -398,6 +398,9 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             QTextTable *dialogueTable = nullptr;
             bool sceneInfoWritten = false;
             ScreenplayElement *element = screenplay->elementAt(i);
+            if (element->isOmitted())
+                continue;
+
             Scene *scene = element->scene();
             if (scene == nullptr)
                 continue;

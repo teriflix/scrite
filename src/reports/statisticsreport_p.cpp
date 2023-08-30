@@ -163,7 +163,7 @@ StatisticsReportKeyNumbers::StatisticsReportKeyNumbers(const StatisticsReport *r
     const Structure *structure = report->document()->structure();
 
     auto sceneElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
-        return e->scene() != nullptr && e->scene()->heading()->isEnabled();
+        return e->scene() != nullptr && e->scene()->heading()->isEnabled() && !e->isOmitted();
     });
 
     const int nrDialogues = screenplay->dialogueCount();
@@ -471,7 +471,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
 
     const Screenplay *screenplay = report->document()->screenplay();
     const QList<ScreenplayElement *> sceneElements = screenplay->getFilteredElements(
-            [](ScreenplayElement *e) { return e->scene() != nullptr; });
+            [](ScreenplayElement *e) { return e->scene() != nullptr && !e->isOmitted(); });
 
     qreal currentPixel = 0;
     int currentSceneIndex = -1;
@@ -736,7 +736,7 @@ StatisticsReportTimeline::createScenePullouts(const StatisticsReport *report,
 {
     const Screenplay *screenplay = report->document()->screenplay();
     const QList<ScreenplayElement *> sceneElements = screenplay->getFilteredElements(
-            [](ScreenplayElement *e) { return e->scene() != nullptr; });
+            [](ScreenplayElement *e) { return e->scene() != nullptr && !e->isOmitted(); });
 
     struct SceneInfo
     {
@@ -972,7 +972,7 @@ QList<QPair<QString, QList<int>>> StatisticsReportTimeline::evalPresence(
 
     const Screenplay *screenplay = report->document()->screenplay();
     const QList<ScreenplayElement *> sceneElements = screenplay->getFilteredElements(
-            [](ScreenplayElement *e) { return e->scene() != nullptr; });
+            [](ScreenplayElement *e) { return e->scene() != nullptr && !e->isOmitted(); });
 
     for (const QString &name : allNames)
         ret << qMakePair(name, QList<int>());
@@ -1005,7 +1005,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createCharacterPresenceGraph(
 
     const Screenplay *screenplay = report->document()->screenplay();
     const QList<ScreenplayElement *> sceneElements = screenplay->getFilteredElements(
-            [](ScreenplayElement *e) { return e->scene() != nullptr; });
+            [](ScreenplayElement *e) { return e->scene() != nullptr && !e->isOmitted(); });
 
     const QList<StatisticsReport::Distribution> dialogueDist = report->dialogueDistribution();
     auto evalCharacterLabel = [=](const QString &characterName,
@@ -1054,7 +1054,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createLocationPresenceGraph(
 
     const Screenplay *screenplay = report->document()->screenplay();
     const QList<ScreenplayElement *> sceneElements = screenplay->getFilteredElements(
-            [](ScreenplayElement *e) { return e->scene() != nullptr; });
+            [](ScreenplayElement *e) { return e->scene() != nullptr && !e->isOmitted(); });
 
     auto evalLocationLabel = [=](const QString &locationName,
                                  const QList<int> presence) -> QString {
@@ -1333,8 +1333,9 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
 
     const qreal chartSize = 200;
     const Screenplay *screenplay = report->document()->screenplay();
-    const auto sceneElements = screenplay->getFilteredElements(
-            [](ScreenplayElement *e) { return e->scene() && e->scene()->heading()->isEnabled(); });
+    const auto sceneElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
+        return e->scene() && e->scene()->heading()->isEnabled() && !e->isOmitted();
+    });
 
     const QString othersKey = QStringLiteral("OTHERS");
 

@@ -81,11 +81,23 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
         QList<SceneHeading *> headings = it.value();
         for (int i = headings.size() - 1; i >= 0; i--) {
             SceneHeading *heading = headings.at(i);
+            if (!heading->isEnabled())
+                continue;
+
             Scene *scene = heading->scene();
-            if (screenplay->firstIndexOfScene(scene) < 0)
+            auto sceneIndexes = scene->screenplayElementIndexList();
+            if (sceneIndexes.isEmpty())
                 headings.removeAt(i);
-            else
-                map[heading->locationType()][heading->moment()].prepend(heading);
+            else {
+                for (int i = sceneIndexes.size() - 1; i >= 0; i--) {
+                    auto element = screenplay->elementAt(sceneIndexes.at(i));
+                    if (element->isOmitted())
+                        sceneIndexes.removeAt(i);
+                }
+
+                if (!sceneIndexes.isEmpty())
+                    map[heading->locationType()][heading->moment()].prepend(heading);
+            }
         }
 
         if (headings.isEmpty()) {
@@ -137,8 +149,22 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
 
                 for (SceneHeading *heading : qAsConst(it2.value())) {
                     Scene *scene = heading->scene();
-                    int sceneNr = screenplay->firstIndexOfScene(scene) + 1;
-                    ScreenplayElement *screenplayElement = screenplay->elementAt(sceneNr - 1);
+
+                    QStringList sceneNumbers;
+
+                    auto sceneIndexes = scene->screenplayElementIndexList();
+                    for (int sceneIndex : qAsConst(sceneIndexes)) {
+                        int sceneNr = sceneIndex + 1;
+                        ScreenplayElement *screenplayElement = screenplay->elementAt(sceneIndex);
+                        if (screenplayElement->isOmitted())
+                            continue;
+
+                        if (screenplayElement)
+                            sceneNumbers << screenplayElement->resolvedSceneNumber();
+                        else
+                            sceneNumbers << QString::number(sceneNr);
+                    }
+
                     QString snippet = scene->synopsis();
                     if (snippet.length() > snippetLength)
                         snippet = snippet.left(snippetLength - 3) + "...";
@@ -148,11 +174,8 @@ bool LocationReport::doGenerate(QTextDocument *textDocument)
                     charFormat = defaultCharFormat;
 
                     cursor.insertBlock(blockFormat, charFormat);
-                    if (screenplayElement)
-                        cursor.insertText("Scene #" + screenplayElement->resolvedSceneNumber()
-                                          + +": ");
-                    else
-                        cursor.insertText("Scene #" + QString::number(sceneNr) + +": ");
+
+                    cursor.insertText("Scene #" + sceneNumbers.join(", ") + ": ");
                     TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor,
                                                                                        snippet);
                 }

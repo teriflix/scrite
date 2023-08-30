@@ -145,7 +145,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool co
     };
 
     {
-        // First, lets sum up pixel lengths of all paragrap types.
+        // First, lets sum up pixel lengths of all paragraph types.
         auto it = m_textBlockMap.constBegin();
         auto end = m_textBlockMap.constEnd();
         while (it != end) {
@@ -206,7 +206,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::dialogueDistribution() c
     for (int i = 0; i < screenplay->elementCount(); i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
         const Scene *scene = element->scene();
-        if (scene == nullptr)
+        if (scene == nullptr || element->isOmitted())
             continue;
 
         auto dialogues = scene->dialogueElements();
@@ -249,7 +249,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::sceneDistribution() cons
     for (int i = 0; i < screenplay->elementCount(); i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
         const Scene *scene = element->scene();
-        if (!scene)
+        if (!scene || element->isOmitted())
             continue;
 
         if (scene && scene->heading()->isEnabled()) {
@@ -591,7 +591,7 @@ void StatisticsReport::prepareTextDocument()
     const int nrElements = screenplay->elementCount();
     for (int i = 0; i < nrElements; i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        if (element->scene() == nullptr)
+        if (element->scene() == nullptr || element->isOmitted())
             continue;
 
         const Scene *scene = element->scene();
@@ -638,7 +638,7 @@ void StatisticsReport::prepareTextDocument()
 
     for (int i = 0; i < nrElements; i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        if (element->scene() == nullptr)
+        if (element->scene() == nullptr || element->isOmitted())
             continue;
 
         const Scene *scene = element->scene();
@@ -701,6 +701,7 @@ QRectF StatisticsReport::boundingRect(const Scene *scene) const
     if (scene->heading()->isEnabled()) {
         if (!m_textBlockMap.contains(scene->heading()))
             return nullRect;
+
         fromBlock = m_textBlockMap.value(scene->heading());
         toBlock = fromBlock;
     } else {

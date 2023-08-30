@@ -41,7 +41,7 @@ void ScreenplaySubsetReport::setGenerateSummary(bool val)
 
 bool ScreenplaySubsetReport::includeScreenplayElement(const ScreenplayElement *element) const
 {
-    if (element->scene() == nullptr)
+    if (element->scene() == nullptr || element->isOmitted())
         return false;
 
     return m_sceneNumbers.isEmpty() || m_sceneNumbers.contains(element->elementIndex());
