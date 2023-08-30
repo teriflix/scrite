@@ -182,12 +182,8 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         if (element->elementType() != ScreenplayElement::SceneElementType)
             continue;
 
-        const Scene *scene = element->scene();
-        const StructureElement *selement = scene->structureElement();
-        const SceneHeading *heading = scene->heading();
-
-        if (heading->isEnabled() || scene->hasSynopsis() || (selement && selement->hasNativeTitle())
-            || element->isOmitted()) {
+        QDomElement paragraphContainerE = contentE;
+        if (element->isOmitted()) {
             QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
             contentE.appendChild(paragraphE);
 
@@ -195,10 +191,28 @@ bool FinalDraftExporter::doExport(QIODevice *device)
             if (element->hasUserSceneNumber())
                 paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
 
-            if (element->isOmitted()) {
-                addTextToParagraph(paragraphE, QStringLiteral("[OMITTED]"));
-                continue;
-            }
+            QDomElement textE = doc.createElement(QStringLiteral("Text"));
+            textE.appendChild(doc.createTextNode(QStringLiteral("OMITTED")));
+            paragraphE.appendChild(textE);
+
+            QDomElement omittedSceneE = doc.createElement(QStringLiteral("OmittedScene"));
+            paragraphE.appendChild(omittedSceneE);
+
+            paragraphContainerE = omittedSceneE;
+        }
+
+        const Scene *scene = element->scene();
+        const StructureElement *selement = scene->structureElement();
+        const SceneHeading *heading = scene->heading();
+
+        if (heading->isEnabled() || scene->hasSynopsis()
+            || (selement && selement->hasNativeTitle())) {
+            QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
+            paragraphContainerE.appendChild(paragraphE);
+
+            paragraphE.setAttribute(QStringLiteral("Type"), QStringLiteral("Scene Heading"));
+            if (element->hasUserSceneNumber())
+                paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
 
             if (heading->isEnabled()) {
                 addTextToParagraph(paragraphE, heading->text());
@@ -256,7 +270,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         for (int j = 0; j < nrSceneElements; j++) {
             const SceneElement *sceneElement = scene->elementAt(j);
             QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
-            contentE.appendChild(paragraphE);
+            paragraphContainerE.appendChild(paragraphE);
 
             paragraphE.setAttribute(QStringLiteral("Type"), sceneElement->typeAsString());
             addTextToParagraph(paragraphE, sceneElement->formattedText(), sceneElement->alignment(),
@@ -305,7 +319,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         sceneIntroE.appendChild(doc.createTextNode(locationType));
     }
 
-    const QString xml = doc.toString(4);
+    const QString xml = doc.toString(2);
 
     QTextStream ts(device);
     ts.setCodec("utf-8");
