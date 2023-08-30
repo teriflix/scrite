@@ -2478,8 +2478,12 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             prepareCursor(cursor, SceneElement::Heading, Qt::Alignment(), !insertBlock);
 
-            if (element->isOmitted())
+            if (element->isOmitted()) {
+                if (m_purpose == ForDisplay && heading->isEnabled() && m_sceneNumbers)
+                    cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
+
                 cursor.insertText(QStringLiteral("[OMITTED] "));
+            }
         }
 
         if (!element->isOmitted()) {

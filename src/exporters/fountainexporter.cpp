@@ -65,8 +65,18 @@ bool FountainExporter::doExport(QIODevice *device)
         else {
             const Scene *scene = element->scene();
             const SceneHeading *heading = scene->heading();
-            if (heading->isEnabled())
-                ts << "." << heading->text() << "\n\n";
+            if (heading->isEnabled()) {
+                ts << ".";
+                if (element->isOmitted())
+                    ts << "[OMITTED] ";
+                ts << heading->text() << "\n\n";
+            } else {
+                if (element->isOmitted())
+                    ts << ".[OMITTED]\n\n";
+            }
+
+            if (element->isOmitted())
+                continue;
 
             const int nrParas = scene->elementCount();
             for (int j = 0; j < nrParas; j++) {

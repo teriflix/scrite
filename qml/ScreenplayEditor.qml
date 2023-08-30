@@ -1403,10 +1403,12 @@ Rectangle {
                 color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
                 elide: Text.ElideMiddle
                 text: {
-                    if(scene && scene.heading.enabled)
-                        return screenplayElement.omitted ? "[OMITTED]" : scene.heading.text
                     if(screenplayElementType === ScreenplayElement.BreakElementType)
                         return screenplayElement.breakTitle
+                    if(screenplayElement.omitted)
+                        return "[OMITTED]"
+                    if(scene && scene.heading.enabled)
+                        return scene.heading.text
                     return "NO SCENE HEADING"
                 }
             }
@@ -3614,12 +3616,15 @@ Rectangle {
                             font.capitalization: parent.elementIsBreak ? Font.MixedCase : Font.AllUppercase
                             text: {
                                 var ret = ""
-                                if(scene && scene.heading.enabled) {
-                                    ret = screenplayElement.resolvedSceneNumber + ". "
-                                    if(screenplayElement.omitted)
-                                        ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
-                                    else
-                                        ret += scene.heading.text
+                                if(scene) {
+                                    if(scene.heading.enabled) {
+                                        ret = screenplayElement.resolvedSceneNumber + ". "
+                                        if(screenplayElement.omitted)
+                                            ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                                        else
+                                            ret += scene.heading.text
+                                    } else if(screenplayElement.omitted)
+                                        ret = "[OMITTED]"
                                     return ret
                                 }
                                 if(parent.elementIsBreak) {

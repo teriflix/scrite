@@ -318,15 +318,23 @@ bool HtmlExporter::doExport(QIODevice *device)
             ts << "      <div class=\"scrite-scene\" custom-style=\"scrite-scene\">\n";
 
         const SceneHeading *heading = scene->heading();
+        const QString headingText = screenplayElement->isOmitted()
+                ? QStringLiteral("OMITTED")
+                : (heading->isEnabled() ? heading->text() : QStringLiteral("NO SCENE HEADING"));
         if (heading->isEnabled()) {
             ++nrHeadings;
             if (m_includeSceneNumbers)
                 writeParagraph(SceneElement::Heading,
-                               "[" + screenplayElement->resolvedSceneNumber() + "] "
-                                       + heading->text());
+                               "[" + screenplayElement->resolvedSceneNumber() + "] " + headingText);
             else
-                writeParagraph(SceneElement::Heading, heading->text());
+                writeParagraph(SceneElement::Heading, headingText);
+        } else {
+            if (screenplayElement->isOmitted())
+                writeParagraph(SceneElement::Heading, headingText);
         }
+
+        if (screenplayElement->isOmitted())
+            continue;
 
         const int nrElements = scene->elementCount();
         for (int j = 0; j < nrElements; j++) {

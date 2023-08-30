@@ -207,7 +207,9 @@ void ScreenplayElement::setUserSceneNumber(const QString &val)
 
 QString ScreenplayElement::resolvedSceneNumber() const
 {
-    return m_userSceneNumber.isEmpty() ? QString::number(this->sceneNumber()) : m_userSceneNumber;
+    const int sn = this->sceneNumber();
+    return m_userSceneNumber.isEmpty() ? (sn < 0 ? QString() : QString::number(this->sceneNumber()))
+                                       : m_userSceneNumber;
 }
 
 void ScreenplayElement::setScene(Scene *val)
