@@ -186,14 +186,19 @@ bool FinalDraftExporter::doExport(QIODevice *device)
         const StructureElement *selement = scene->structureElement();
         const SceneHeading *heading = scene->heading();
 
-        if (heading->isEnabled() || scene->hasSynopsis()
-            || (selement && selement->hasNativeTitle())) {
+        if (heading->isEnabled() || scene->hasSynopsis() || (selement && selement->hasNativeTitle())
+            || element->isOmitted()) {
             QDomElement paragraphE = doc.createElement(QStringLiteral("Paragraph"));
             contentE.appendChild(paragraphE);
 
             paragraphE.setAttribute(QStringLiteral("Type"), QStringLiteral("Scene Heading"));
             if (element->hasUserSceneNumber())
                 paragraphE.setAttribute(QStringLiteral("Number"), element->userSceneNumber());
+
+            if (element->isOmitted()) {
+                addTextToParagraph(paragraphE, QStringLiteral("[OMITTED]"));
+                continue;
+            }
 
             if (heading->isEnabled()) {
                 addTextToParagraph(paragraphE, heading->text());
