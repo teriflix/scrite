@@ -2996,14 +2996,17 @@ Rectangle {
                             text: {
                                 if(headingItem.theElement.omitted)
                                     return "[OMITTED] " + (hovered ? sceneHeading.displayText : "")
-                                if(activeFocus)
-                                    return sceneHeading.editText
-                                return sceneHeading.displayText
+                                if(sceneHeading.enabled) {
+                                    if(activeFocus)
+                                        return sceneHeading.editText
+                                    return sceneHeading.displayText
+                                }
+                                return ""
                             }
                             hoverEnabled: headingItem.theElement.omitted
                             readOnly: Scrite.document.readOnly || !(sceneHeading.enabled && !headingItem.theElement.omitted)
                             label: ""
-                            placeholderText: enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
+                            placeholderText: sceneHeading.enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
                             maximumLength: 140
                             font.family: headingFontMetrics.font.family
                             font.pointSize: headingFontMetrics.font.pointSize
@@ -3615,7 +3618,7 @@ Rectangle {
                             color: primaryColors.c10.text
                             font.capitalization: parent.elementIsBreak ? Font.MixedCase : Font.AllUppercase
                             text: {
-                                var ret = ""
+                                var ret = "UNKNOWN"
                                 if(scene) {
                                     if(scene.heading.enabled) {
                                         ret = screenplayElement.resolvedSceneNumber + ". "
@@ -3625,6 +3628,8 @@ Rectangle {
                                             ret += scene.heading.text
                                     } else if(screenplayElement.omitted)
                                         ret = "[OMITTED]"
+                                    else
+                                        ret = "NO SCENE HEADING"
                                     return ret
                                 }
                                 if(parent.elementIsBreak) {
@@ -3637,7 +3642,7 @@ Rectangle {
                                     ret +=  ": " + screenplayElement.breakSubtitle
                                     return ret
                                 }
-                                return "NO SCENE HEADING"
+                                return ret
                             }
                             elide: Text.ElideMiddle
                         }

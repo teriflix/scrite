@@ -167,12 +167,17 @@ Scene *AbstractImporter::createScene(const QString &heading)
     screenplayElement->setScene(scene);
     screenplay->addElement(screenplayElement);
 
-    scene->heading()->setEnabled(true);
-    scene->heading()->parseFrom(heading);
+    if (heading.isEmpty())
+        scene->heading()->setEnabled(false);
+    else {
+        scene->heading()->setEnabled(true);
+        scene->heading()->parseFrom(heading);
 
-    const QString location = scene->heading()->location();
-    const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
-    scene->setSynopsis(QString("Scene number #%1 at %2").arg(sceneIndex + 1).arg(titleBit.toLower()));
+        const QString location = scene->heading()->location();
+        const QString titleBit = location.length() > 50 ? location.left(47) + "..." : location;
+        scene->setSynopsis(
+                QString("Scene number #%1 at %2").arg(sceneIndex + 1).arg(titleBit.toLower()));
+    }
 
     return scene;
 }

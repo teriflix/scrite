@@ -16,13 +16,15 @@
 
 #include <QXmlSimpleReader>
 
+static void fixOmittedScenes(QDomElement &contentE);
+
 FinalDraftImporter::FinalDraftImporter(QObject *parent) : AbstractImporter(parent) { }
 
 FinalDraftImporter::~FinalDraftImporter() { }
 
 bool FinalDraftImporter::canImport(const QString &fileName) const
 {
-    return QFileInfo(fileName).suffix().toLower() == QLatin1String("fdx");
+    return QFileInfo(fileName).suffix().toLower() == QStringLiteral("fdx");
 }
 
 static QColor fromFdxColorCode(const QString &code)
@@ -59,7 +61,7 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
     QDomDocument doc;
     if (!doc.setContent(&xmlInputSource, &xmlParser, &errMsg, &errLine, &errCol)) {
-        const QString msg = QLatin1String("Parse Error: %1 at Line %2, Column %3")
+        const QString msg = QStringLiteral("Parse Error: %1 at Line %2, Column %3")
                                     .arg(errMsg)
                                     .arg(errLine)
                                     .arg(errCol);
@@ -68,24 +70,26 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     }
 
     QDomElement rootE = doc.documentElement();
-    if (rootE.tagName() != QLatin1String("FinalDraft")) {
+    if (rootE.tagName() != QStringLiteral("FinalDraft")) {
         this->error()->setErrorMessage("Not a Final-Draft file.");
         return false;
     }
 
     const int fdxVersion = rootE.attribute("Version").toInt();
-    if (rootE.attribute("DocumentType") != QLatin1String("Script") || fdxVersion < 1
+    if (rootE.attribute("DocumentType") != QStringLiteral("Script") || fdxVersion < 1
         || fdxVersion > 5) {
         this->error()->setErrorMessage("Unrecognised Final Draft file version.");
         return false;
     }
 
-    QDomElement contentE = rootE.firstChildElement(QLatin1String("Content"));
-    QDomNodeList paragraphs = contentE.elementsByTagName(QLatin1String("Paragraph"));
+    QDomElement contentE = rootE.firstChildElement(QStringLiteral("Content"));
+    QDomNodeList paragraphs = contentE.elementsByTagName(QStringLiteral("Paragraph"));
     if (paragraphs.isEmpty()) {
-        this->error()->setErrorMessage(QLatin1String("No paragraphs to import."));
+        this->error()->setErrorMessage(QStringLiteral("No paragraphs to import."));
         return false;
     }
+
+    ::fixOmittedScenes(contentE);
 
     Scene *scene = nullptr;
     this->progress()->setProgressStep(1.0 / qreal(paragraphs.size() + 1));
@@ -95,10 +99,10 @@ bool FinalDraftImporter::doImport(QIODevice *device)
             [](const QDomElement &paragraphE) -> QPair<QString, QVector<QTextLayout::FormatRange>> {
         QVector<QTextLayout::FormatRange> formats;
         QString text;
-        if(paragraphE.isNull())
+        if (paragraphE.isNull())
             return qMakePair(text, formats);
 
-        const QString textN = QLatin1String("Text");
+        const QString textN = QStringLiteral("Text");
         QDomElement textE = paragraphE.firstChildElement(textN);
         while (!textE.isNull()) {
             QTextLayout::FormatRange format;
@@ -109,16 +113,16 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
             format.length = text.length() - format.start;
 
-            const QStringList styles = textE.attribute(QLatin1String("Style")).split(QChar('+'));
-            if (styles.contains(QLatin1String("Bold")))
+            const QStringList styles = textE.attribute(QStringLiteral("Style")).split(QChar('+'));
+            if (styles.contains(QStringLiteral("Bold")))
                 format.format.setFontWeight(QFont::Bold);
-            if (styles.contains(QLatin1String("Italic")))
+            if (styles.contains(QStringLiteral("Italic")))
                 format.format.setFontItalic(true);
-            if (styles.contains(QLatin1String("Underline")))
+            if (styles.contains(QStringLiteral("Underline")))
                 format.format.setFontUnderline(true);
 
-            const QString colorAttr = QLatin1String("Color");
-            const QString backgroundAttr = QLatin1String("Background");
+            const QString colorAttr = QStringLiteral("Color");
+            const QString backgroundAttr = QStringLiteral("Background");
             if (textE.hasAttribute(colorAttr))
                 format.format.setForeground(QBrush(fromFdxColorCode(textE.attribute(colorAttr))));
             if (textE.hasAttribute(backgroundAttr))
@@ -134,25 +138,29 @@ bool FinalDraftImporter::doImport(QIODevice *device)
         return qMakePair(text, formats);
     };
 
-    static const QStringList types({ QLatin1String("Scene Heading"), QLatin1String("Action"),
-                                     QLatin1String("Character"), QLatin1String("Dialogue"),
-                                     QLatin1String("Parenthetical"), QLatin1String("Shot"),
-                                     QLatin1String("Transition") });
-    static const QString paragraphName = QLatin1String("Paragraph");
+    const QStringList types({ QStringLiteral("Scene Heading"), QStringLiteral("Action"),
+                              QStringLiteral("Character"), QStringLiteral("Dialogue"),
+                              QStringLiteral("Parenthetical"), QStringLiteral("Shot"),
+                              QStringLiteral("Transition") });
+    const QString paragraphName = QStringLiteral("Paragraph");
     QDomElement paragraphE = contentE.firstChildElement(paragraphName);
     while (!paragraphE.isNull()) {
         TraverseDomElement tde(paragraphE, this->progress());
 
-        const QString type = paragraphE.attribute(QLatin1String("Type"));
+        const QString flags = paragraphE.attribute(QStringLiteral("Flags"));
+        if (flags == "Ignore")
+            continue;
+
+        const QString type = paragraphE.attribute(QStringLiteral("Type"));
         const int typeIndex = types.indexOf(type);
         if (typeIndex < 0)
             continue;
 
-        const QString alignmentHint = paragraphE.attribute(QLatin1String("Alignment"));
+        const QString alignmentHint = paragraphE.attribute(QStringLiteral("Alignment"));
         const Qt::Alignment alignment = [alignmentHint]() {
-            return QHash<QString, Qt::Alignment>({ { QLatin1String("Left"), Qt::AlignLeft },
-                                                   { QLatin1String("Right"), Qt::AlignRight },
-                                                   { QLatin1String("Center"), Qt::AlignCenter } })
+            return QHash<QString, Qt::Alignment>({ { QStringLiteral("Left"), Qt::AlignLeft },
+                                                   { QStringLiteral("Right"), Qt::AlignRight },
+                                                   { QStringLiteral("Center"), Qt::AlignCenter } })
                     .value(alignmentHint, Qt::Alignment());
         }();
 
@@ -161,19 +169,19 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
         const QString text = paragraphText.first;
         const QVector<QTextLayout::FormatRange> formats = paragraphText.second;
-        if (text.isEmpty())
-            continue;
 
         SceneElement *sceneElement = nullptr;
         switch (typeIndex) {
         case 0: {
             scene = this->createScene(text);
-            const QString number = paragraphE.attribute(QLatin1String("Number"));
-            if (!number.isEmpty()) {
-                ScreenplayElement *element = this->document()->screenplay()->elementAt(
-                        this->document()->screenplay()->elementCount() - 1);
+
+            ScreenplayElement *element = this->document()->screenplay()->elementAt(
+                    this->document()->screenplay()->elementCount() - 1);
+            element->setOmitted(flags == "Omitted");
+
+            const QString number = paragraphE.attribute(QStringLiteral("Number"));
+            if (!number.isEmpty())
                 element->setUserSceneNumber(number);
-            }
 
             const QDomElement sceneProperiesE =
                     paragraphE.firstChildElement(QStringLiteral("SceneProperties"));
@@ -186,8 +194,9 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
                 const QDomElement summaryE =
                         sceneProperiesE.firstChildElement(QStringLiteral("Summary"));
-                const QDomElement summaryParagraphE = summaryE.isNull() ? QDomElement() :
-                        summaryE.firstChildElement(paragraphName);
+                const QDomElement summaryParagraphE = summaryE.isNull()
+                        ? QDomElement()
+                        : summaryE.firstChildElement(paragraphName);
                 const QPair<QString, QVector<QTextLayout::FormatRange>> summaryParagraphText =
                         parseParagraphTexts(summaryParagraphE);
 
@@ -222,4 +231,90 @@ bool FinalDraftImporter::doImport(QIODevice *device)
     }
 
     return true;
+}
+
+void fixOmittedScenes(QDomElement &contentE)
+{
+    /**
+     * The final-draft importer is built to process a flat <Paragraph> hierarchy like this.
+     *
+     * <FinalDraft ...>
+     * <Content>
+     *   <Paragraph ...>
+     *
+     *   </Paragraph>
+     *
+     *   <Paragraph ....>
+     *
+     *   </Paragraph>
+     *
+     *   ....
+     * </Content>
+     * </FinalDraft>
+     *
+     * However, if there are omitted scenes, then they show up like this in the FDX file.
+     *
+     * <FinalDraft ...>
+     *  <Content>
+     *      <Paragraph Type="Scene Heading" ...>
+     *          <Text>Omitted</Text>
+     *          <OmittedScene>
+     *              <Paragraph Type="Scene Heading" ...>...</Paragraph>
+     *              <Paragraph Type="Action" ...>...</Paragraph>
+     *              <Paragraph Type="Character" ...>...</Paragraph>
+     *              <Paragraph Type="Dialog" ...>...</Paragraph>
+     *              <Paragraph Type="Shot" ...>...</Paragraph>
+     *              .....
+     *          </OmittedScene>
+     *      </Paragraph>
+     *      <Paragraph Type="Scene Heading">...</Paragraph>
+     *      ....
+     *  </Content>
+     * </FinalDraft>
+     *
+     * We need to transform this into ...
+     *
+     * <FinalDraft ...>
+     *  <Content>
+     *     <Paragraph Flags="Omitted" Type="Scene Heading" ...>...</Paragraph>
+     *     <Paragraph Flags="Omitted" Type="Action" ...>...</Paragraph>
+     *     <Paragraph Flags="Omitted" Type="Character" ...>...</Paragraph>
+     *     <Paragraph Flags="Omitted" Type="Dialog" ...>...</Paragraph>
+     *     <Paragraph Flags="Omitted" Type="Shot" ...>...</Paragraph>
+     *     .....
+     *     <Paragraph Flags="Ignore" Type="Scene Heading" ...>
+     *          <Text>Omitted</Text>
+     *          <OmittedScene>
+     *     </Paragraph>
+     *     <Paragraph Type="Scene Heading">...</Paragraph>
+     *     ....
+     *  </Content>
+     * </FinalDraft>
+     *
+     * So, that the existing parser can continue to import this FDX file without
+     * having to make too many adjustments.
+     *
+     * So, that's what this function does!
+     */
+
+    const QString paragraphName = QStringLiteral("Paragraph");
+    const QString omittedSceneName = QStringLiteral("OmittedScene");
+    const QString flagsAttr = QStringLiteral("Flags");
+
+    QDomElement paragraphE = contentE.firstChildElement(paragraphName);
+    while (!paragraphE.isNull()) {
+
+        QDomElement omittedSceneE = paragraphE.firstChildElement(omittedSceneName);
+        if (!omittedSceneE.isNull()) {
+            paragraphE.setAttribute(flagsAttr, QStringLiteral("Ignore"));
+            const QDomNodeList childParagraphs = omittedSceneE.elementsByTagName(paragraphName);
+            for (int i = childParagraphs.size() - 1; i >= 0; i--) {
+                QDomElement childParagraphE = childParagraphs.at(i).toElement();
+                childParagraphE.setAttribute(flagsAttr, QStringLiteral("Omitted"));
+                contentE.insertAfter(childParagraphE, paragraphE);
+            }
+        }
+
+        paragraphE = paragraphE.nextSiblingElement(paragraphName);
+    }
 }
