@@ -114,6 +114,7 @@ Item {
         property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
         property var customColors: []
+        property bool autoOpenLastFile: false
     }
 
     Settings {
@@ -555,6 +556,7 @@ Item {
                                 }
                                 contentLoader.allowContent = false
                                 Scrite.document.reset()
+                                recentFilesSettings.lastOpenFilePath = ""
                                 contentLoader.allowContent = true
                                 Utils.execLater(fileNewButton, 250, newFromTemplate)
                             }
@@ -628,9 +630,12 @@ Item {
                     anchors.left: parent.left
 
                     Settings {
+                        id: recentFilesSettings
                         fileName: Scrite.app.settingsFilePath
                         category: "RecentFiles"
                         property alias files: recentFilesModel.files
+                        property string lastOpenFilePath
+                        property bool autoOpenLastFile: true
                     }
 
                     RecentFileListModel {
@@ -2567,6 +2572,7 @@ Item {
         if(!Scrite.document.empty) {
             contentLoader.allowContent = false
             Scrite.document.reset()
+            recentFilesSettings.lastOpenFilePath = ""
             contentLoader.allowContent = true
         }
         if(Scrite.app.internetAvailable) {
@@ -2641,6 +2647,7 @@ Item {
                         Scrite.document.open(path)
                         contentLoader.allowContent = true
                         recentFilesModel.add(path)
+                        recentFilesSettings.lastOpenFilePath = path
                     },
                     "reset": true,
                     "notificationTitle": "Opening Scrite Project"
@@ -2651,6 +2658,7 @@ Item {
                     "callback": function(path) {
                         Scrite.document.saveAs(path)
                         recentFilesModel.add(path)
+                        recentFilesSettings.lastOpenFilePath = path
                     },
                     "reset": false,
                     "notificationTitle": "Saving Scrite Project"
@@ -2895,14 +2903,23 @@ Item {
     }
 
     Component.onCompleted: {
+        var tryOpenLastFile = recentFilesSettings.autoOpenLastFile
         if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
             workspaceSettings.screenplayEditorWidth = -1
-        if(Scrite.app.maybeOpenAnonymously())
+        if(Scrite.app.maybeOpenAnonymously()) {
             splashLoader.active = false
+            tryOpenLastFile = false
+        }
         screenplayAdapter.sessionId = Scrite.document.sessionId
         Qt.callLater( function() {
             Announcement.shout("{f4048da2-775d-11ec-90d6-0242ac120003}", "restoreWindowGeometryDone")
         })
+
+        if(tryOpenLastFile) {
+            const lastFilePath = recentFilesSettings.lastOpenFilePath
+            if(lastFilePath !== "")
+                fileOpenButton.doOpen(lastFilePath)
+        }
     }
 
     BusyOverlay {

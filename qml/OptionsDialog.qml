@@ -154,7 +154,7 @@ Item {
 
                     Column {
                         width: parent.width
-                        spacing: 10
+                        spacing: 0
                         anchors.centerIn: parent
 
                         Row {
@@ -210,6 +210,15 @@ Item {
                             width: parent.width
                             checked: Scrite.vault.enabled
                             onToggled: Scrite.vault.enabled = checked
+                        }
+
+                        CheckBox2 {
+                            text: "AutoOpen Last File"
+                            width: parent.width
+                            checked: recentFilesSettings.autoOpenLastFile
+                            onToggled: recentFilesSettings.autoOpenLastFile = checked
+                            ToolTip.text: "Check this to automatically open the last file upon starting the app."
+                            ToolTip.visible: hovered
                         }
                     }
                 }
