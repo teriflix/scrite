@@ -120,7 +120,7 @@ private:
     void updateCurrentIndexAndCount();
 
 private:
-    int m_maxRows = MAX_ELEMENT_COUNT;
+    int m_adapterRowCount = MAX_ELEMENT_COUNT;
     int m_currentIndex = -1;
     int m_initialLoadTreshold = -1;
     QPointer<QTimer> m_fetchMoreTimer;

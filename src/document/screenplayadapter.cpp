@@ -70,15 +70,15 @@ void ScreenplayAdapter::setSource(QObject *val)
     this->setCurrentIndex(-1);
 
     m_source = val;
-    m_maxRows = MAX_ELEMENT_COUNT;
+    m_adapterRowCount = MAX_ELEMENT_COUNT;
 
     if (m_source != nullptr) {
         Screenplay *screenplay = qobject_cast<Screenplay *>(m_source);
         if (screenplay != nullptr) {
             if (m_initialLoadTreshold < 0 || screenplay->elementCount() <= m_initialLoadTreshold)
-                m_maxRows = MAX_ELEMENT_COUNT;
+                m_adapterRowCount = MAX_ELEMENT_COUNT;
             else {
-                m_maxRows = 0;
+                m_adapterRowCount = 0;
                 screenplay->setCurrentElementIndex(-1);
             }
 
@@ -287,8 +287,9 @@ int ScreenplayAdapter::rowCount(const QModelIndex &parent) const
         return 0;
 
     const Screenplay *screenplay = this->screenplay();
-    return m_source.isNull() || screenplay == nullptr ? 0
-                                                      : qMin(screenplay->elementCount(), m_maxRows);
+    return m_source.isNull() || screenplay == nullptr
+            ? 0
+            : qMin(screenplay->elementCount(), m_adapterRowCount);
 }
 
 void ScreenplayAdapter::fetchMore(const QModelIndex &parent)
@@ -299,15 +300,14 @@ void ScreenplayAdapter::fetchMore(const QModelIndex &parent)
     if (this->isSourceScreenplay()) {
         const Screenplay *screenplay = this->screenplay();
         const int delta = m_initialLoadTreshold < 0 ? MAX_ELEMENT_COUNT : m_initialLoadTreshold;
-        const int is = qMax(0, qMin(m_maxRows, screenplay->elementCount() - 1));
-        const int ie = qMin(screenplay->elementCount() - 1, is + delta - 1);
-        if (ie > is)
-            this->beginInsertRows(QModelIndex(), is, ie);
-        m_maxRows = ie >= screenplay->elementCount() - 1 ? INT_MAX : ie + 1;
-        if (ie > is) {
+        const int start = qMax(0, m_adapterRowCount);
+        const int end = qMin(screenplay->elementCount() - 1, start + delta - 1);
+        if (end >= start) {
+            this->beginInsertRows(QModelIndex(), start, end);
+            m_adapterRowCount = end >= screenplay->elementCount() - 1 ? MAX_ELEMENT_COUNT : end + 1;
             this->endInsertRows();
 
-            if (m_maxRows < INT_MAX && m_fetchMoreTimer.isNull()) {
+            if (m_adapterRowCount < MAX_ELEMENT_COUNT && m_fetchMoreTimer.isNull()) {
                 m_fetchMoreTimer = new QTimer(this);
                 connect(m_fetchMoreTimer, &QTimer::timeout, this,
                         &ScreenplayAdapter::continueFetchingMore);
@@ -325,7 +325,7 @@ bool ScreenplayAdapter::canFetchMore(const QModelIndex &parent) const
         return false;
 
     if (this->isSourceScreenplay())
-        return m_maxRows < INT_MAX;
+        return m_adapterRowCount < INT_MAX;
 
     return false;
 }
@@ -409,11 +409,13 @@ void ScreenplayAdapter::clearCurrentIndex()
 
 void ScreenplayAdapter::continueFetchingMore()
 {
+    if (this->sender() != m_fetchMoreTimer || m_fetchMoreTimer.isNull())
+        return;
+
     if (this->canFetchMore(QModelIndex())) {
         this->fetchMore(QModelIndex());
-        if (m_fetchMoreTimer)
-            m_fetchMoreTimer->setInterval(10);
-    } else if (m_fetchMoreTimer) {
+        m_fetchMoreTimer->setInterval(10);
+    } else {
         m_fetchMoreTimer->stop();
         m_fetchMoreTimer->deleteLater();
     }
