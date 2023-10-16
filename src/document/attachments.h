@@ -212,6 +212,11 @@ public:
     QStringList allowedExtensions() const { return m_allowedExtensions; }
     Q_SIGNAL void allowedExtensionsChanged();
 
+    Q_PROPERTY(bool allowMultiple READ isAllowMultiple WRITE setAllowMultiple NOTIFY allowMultipleChanged)
+    void setAllowMultiple(bool val);
+    bool isAllowMultiple() const { return m_allowMultiple; }
+    Q_SIGNAL void allowMultipleChanged();
+
     Q_PROPERTY(bool active READ isActive NOTIFY attachmentChanged)
     bool isActive() const { return m_attachment != nullptr; }
 
@@ -222,6 +227,10 @@ public:
     Q_PROPERTY(QPointF mouse READ mouse NOTIFY mouseChanged)
     QPointF mouse() const { return m_mouse; }
     Q_SIGNAL void mouseChanged();
+
+    Q_PROPERTY(QList<QUrl> dropUrls READ dropUrls NOTIFY dropUrlsChanged)
+    QList<QUrl> dropUrls() const { return m_dropUrls; }
+    Q_SIGNAL void dropUrlsChanged();
 
     Q_INVOKABLE void allowDrop();
     Q_INVOKABLE void denyDrop();
@@ -238,7 +247,7 @@ protected:
 
 private:
     void resetAttachments();
-    void setAttachment(Attachment *val);
+    void setAttachment(Attachment *attachment, const QList<QUrl> &dropUrls = QList<QUrl>());
     void setMouse(const QPointF &val);
     bool prepareAttachmentFromMimeData(const QMimeData *mimeData);
 
@@ -250,6 +259,8 @@ private:
     QStringList m_allowedExtensions;
     Attachment *m_attachment = nullptr;
     Attachments *m_target = nullptr;
+    QList<QUrl> m_dropUrls;
+    bool m_allowMultiple = false;
 };
 
 #endif // ATTACHMENTS_H

@@ -101,6 +101,7 @@ Item {
     AttachmentsDropArea2 {
         id: attachmentsDropArea
         anchors.fill: parent
+        allowMultiple: true
         target: note ? note.attachments : null
     }
 

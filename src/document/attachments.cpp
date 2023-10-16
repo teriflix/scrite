@@ -574,6 +574,15 @@ void AttachmentsDropArea::setAllowedExtensions(const QStringList &val)
     emit allowedExtensionsChanged();
 }
 
+void AttachmentsDropArea::setAllowMultiple(bool val)
+{
+    if (m_allowMultiple == val)
+        return;
+
+    m_allowMultiple = val;
+    emit allowMultipleChanged();
+}
+
 void AttachmentsDropArea::allowDrop()
 {
     m_allowDrop = true;
@@ -638,8 +647,12 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
             de->acceptProposedAction();
 
             if (m_target != nullptr) {
-                auto attachment = m_target->includeAttachment(m_attachment->filePath());
-                attachment->setFeatured(m_attachment->isFeatured());
+                for (int i = 0; i < m_dropUrls.size(); i++) {
+                    const QUrl dropUrl = m_dropUrls.at(i);
+                    const QFileInfo fi(dropUrl.toLocalFile());
+                    Attachment *attachment = m_target->includeAttachment(fi.absoluteFilePath());
+                    attachment->setFeatured(i == 0 && m_attachment->isFeatured());
+                }
             }
         }
 
@@ -648,16 +661,20 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
     }
 }
 
-void AttachmentsDropArea::setAttachment(Attachment *val)
+void AttachmentsDropArea::setAttachment(Attachment *attachment, const QList<QUrl> &dropUrls)
 {
-    if (m_attachment == val)
-        return;
+    if (m_attachment != attachment) {
+        if (m_attachment != nullptr && m_attachment->parent() == this)
+            m_attachment->deleteLater();
 
-    if (m_attachment != nullptr && m_attachment->parent() == this)
-        m_attachment->deleteLater();
+        m_attachment = attachment;
+        emit attachmentChanged();
+    }
 
-    m_attachment = val;
-    emit attachmentChanged();
+    if (m_dropUrls != dropUrls) {
+        m_dropUrls = dropUrls;
+        emit dropUrlsChanged();
+    }
 }
 
 void AttachmentsDropArea::setMouse(const QPointF &val)
@@ -677,59 +694,49 @@ bool AttachmentsDropArea::prepareAttachmentFromMimeData(const QMimeData *mimeDat
         return false;
     }
 
-    // Find the first URL that has a local file.
-    QUrl url;
-    for (const QUrl &_url : urls) {
-        if (_url.scheme() == QStringLiteral("file")) {
-            url = _url;
-            break;
+    QList<QUrl> dropUrls;
+    std::copy_if(urls.begin(), urls.end(), std::back_inserter(dropUrls), [=](const QUrl &url) {
+        if (url.isValid() && url.scheme() == QStringLiteral("file")) {
+            const QFileInfo fi(url.toLocalFile());
+            const QMimeType mimeType = Attachments::mimeTypeFor(fi);
+            return fi.exists() && fi.isReadable() && !fi.isDir()
+                    && Attachments::canAllow(fi, Attachments::AllowedType(m_allowedType))
+                    && mimeType.isValid()
+                    && (m_allowedExtensions.isEmpty()
+                                ? true
+                                : m_allowedExtensions.contains(fi.suffix(), Qt::CaseInsensitive));
         }
+        return false;
+    });
+
+    if (!m_allowMultiple) {
+        if (!dropUrls.isEmpty())
+            dropUrls = QList<QUrl>({ dropUrls.first() });
     }
 
-    if (url.isEmpty() || !url.isValid()) {
+    if (dropUrls.isEmpty()) {
         this->setAttachment(nullptr);
         return false;
     }
 
-    const QString filePath = url.toLocalFile();
-    const QFileInfo fi(filePath);
-
-    if (m_attachment != nullptr) {
-        if (m_attachment->filePath() == fi.absoluteFilePath())
-            return true;
-    }
-
-    if (!fi.exists() || !fi.isReadable() || fi.isDir()) {
-        this->setAttachment(nullptr);
-        return false;
-    }
-
-    if (!Attachments::canAllow(fi, Attachments::AllowedType(m_allowedType))) {
-        this->setAttachment(nullptr);
-        return false;
-    }
-
-    if (!m_allowedExtensions.isEmpty()
-        && !m_allowedExtensions.contains(fi.suffix(), Qt::CaseInsensitive)) {
-        this->setAttachment(nullptr);
-        return false;
-    }
-
-    const QMimeType mimeType = Attachments::mimeTypeFor(fi);
-    if (!mimeType.isValid()) {
-        this->setAttachment(nullptr);
-        return false;
-    }
+    const QUrl firstUrl = dropUrls.first();
+    const QString firstFilePath = firstUrl.toLocalFile();
+    const QFileInfo firstFileInfo(firstFilePath);
+    const QMimeType firstFileMimeType = Attachments::mimeTypeFor(firstFileInfo);
 
     Attachment *ptr = new Attachment(this);
-    ptr->setTitle(fi.completeBaseName());
-    ptr->setFilePath(fi.absoluteFilePath());
-    ptr->setMimeType(mimeType.name());
-    ptr->setOriginalFileName(fi.fileName());
-    ptr->setType(Attachment::determineType(fi));
+    if (dropUrls.size() > 1)
+        ptr->setTitle(firstFileInfo.fileName()
+                      + QStringLiteral(" and %1 more files").arg(dropUrls.size() - 1));
+    else
+        ptr->setTitle(firstFileInfo.fileName());
+    ptr->setFilePath(firstFileInfo.absoluteFilePath());
+    ptr->setMimeType(firstFileMimeType.name());
+    ptr->setOriginalFileName(firstFileInfo.fileName());
+    ptr->setType(Attachment::determineType(firstFileInfo));
     ptr->setRemoveFileOnDelete(false);
 
-    this->setAttachment(ptr);
+    this->setAttachment(ptr, dropUrls);
 
     return true;
 }

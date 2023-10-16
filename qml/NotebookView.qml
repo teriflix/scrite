@@ -1165,6 +1165,7 @@ Rectangle {
                     AttachmentsDropArea2 {
                         id: sceneAttachmentsDropArea
                         target: scene ? scene.attachments : null
+                        allowMultiple: true
                         anchors.fill: synopsisContentTabView.currentTabIndex === 1 ? sceneAttachments : parent
                     }
                 }
@@ -1554,6 +1555,7 @@ Rectangle {
             AttachmentsDropArea2 {
                 id: checkListAttachmentsDropArea
                 anchors.fill: parent
+                allowMultiple: true
                 target: checkListNoteItem.note ? checkListNoteItem.note.attachments : null
             }
         }
@@ -1655,6 +1657,7 @@ Rectangle {
             AttachmentsDropArea2 {
                 id: attachmentsDropArea
                 anchors.fill: parent
+                allowMultiple: true
                 target: breakElement ? breakElement.attachments : null
             }
 
@@ -2809,12 +2812,15 @@ Rectangle {
                                     flickable: characterQuickInfoView
                                 }
 
+                                // TODO: figure out a way to drop multiple photos for a character
                                 AttachmentsDropArea2 {
                                     anchors.fill: parent
-                                    attachmentNoticeSuffix: "Drop this photo here to capture as character pic."
+                                    attachmentNoticeSuffix: "Drop here to capture as character pic(s)."
                                     allowedType: Attachments.PhotosOnly
+                                    allowMultiple: true
                                     onDropped: {
-                                        character.addPhoto(attachment.filePath)
+                                        const dus = dropUrls
+                                        dus.forEach( (url) => { character.addPhoto(Scrite.app.urlToLocalFile(url)) } )
                                         photoSlides.currentIndex = character.photos.length - 1
                                     }
                                 }
@@ -2826,6 +2832,7 @@ Rectangle {
 
                                 AttachmentsDropArea2 {
                                     anchors.fill: parent
+                                    allowMultiple: true
                                     target: character ? character.attachments : null
                                 }
 
@@ -2863,6 +2870,7 @@ Rectangle {
                         AttachmentsDropArea2 {
                             anchors.fill: parent
                             noticeWidthFactor: 0.8
+                            allowMultiple: true
                             target: character ? character.attachments : null
                         }
                     }

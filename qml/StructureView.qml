@@ -2079,7 +2079,7 @@ Item {
             width: parent.width * 0.5 /* noticeWidthFactor */
             wrapMode: Text.WordWrap
             color: primaryColors.c700.text
-            text: parent.visible ? "<b>" + annotationAttachmentDropArea.attachment.originalFileName + "</b><br/><br/>" + "Drop this photo here as an annotation." : ""
+            text: parent.visible ? "<b>" + annotationAttachmentDropArea.attachment.title + "</b><br/><br/>" + "Drop here as an annotation." : ""
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: Scrite.app.idealFontPointSize
         }
