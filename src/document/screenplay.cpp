@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "user.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "screenplay.h"
@@ -461,7 +462,6 @@ Screenplay::Screenplay(QObject *parent)
         this->markAsModified();
     });
 
-    m_author = QSysInfo::machineHostName();
     m_version = QStringLiteral("Initial Draft");
 
     QSettings *settings = Application::instance()->settings();
@@ -477,6 +477,19 @@ Screenplay::Screenplay(QObject *parent)
     fetchSettings(QStringLiteral("email"), m_email);
     fetchSettings(QStringLiteral("phone"), m_phoneNumber);
     fetchSettings(QStringLiteral("website"), m_website);
+
+    if (m_author.isEmpty()) {
+        // If author is not configured by the user, then instead of using machine
+        // name like we have been doing so far, we can use user's full name
+        // as provided to us while the user created a login.
+        QTimer::singleShot(100, this, [=]() {
+            if (User::instance()->isLoggedIn())
+                this->evaluateAuthor();
+            else
+                QObject::connect(User::instance(), &User::infoChanged, this,
+                                 &Screenplay::evaluateAuthor);
+        });
+    }
 
     if (m_scriteDocument != nullptr) {
         DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
@@ -2331,6 +2344,20 @@ void Screenplay::evaluateIfHeightHintsAreAvailable()
 void Screenplay::evaluateIfHeightHintsAreAvailableLater()
 {
     m_evalHeightHintsAvailableTimer.start(100, this);
+}
+
+void Screenplay::evaluateAuthor()
+{
+    // If author is not configured by the user, then instead of using machine
+    // name like we have been doing so far, we can use user's full name
+    // as provided to us while the user created a login.
+
+    if (m_author.isEmpty()) {
+        if (User::instance()->isLoggedIn())
+            m_author = User::instance()->fullName();
+        else
+            m_author = QSysInfo::machineHostName();
+    }
 }
 
 void Screenplay::setCurrentElementIndex(int val)

@@ -275,7 +275,8 @@ public:
     QString logline() const { return m_logline; }
     Q_SIGNAL void loglineChanged();
 
-    Q_PROPERTY(QString loglineComments READ loglineComments WRITE setLoglineComments NOTIFY loglineCommentsChanged)
+    Q_PROPERTY(QString loglineComments READ loglineComments WRITE setLoglineComments NOTIFY
+                       loglineCommentsChanged)
     void setLoglineComments(const QString &val);
     QString loglineComments() const { return m_loglineComments; }
     Q_SIGNAL void loglineCommentsChanged();
@@ -324,7 +325,8 @@ public:
     bool isEmpty() const;
     Q_SIGNAL void emptyChanged();
 
-    Q_PROPERTY(bool heightHintsAvailable READ isHeightHintsAvailable NOTIFY heightHintsAvailableChanged)
+    Q_PROPERTY(bool heightHintsAvailable READ isHeightHintsAvailable NOTIFY
+                       heightHintsAvailableChanged)
     bool isHeightHintsAvailable() const { return m_heightHintsAvailable; }
     Q_SIGNAL void heightHintsAvailableChanged();
 
@@ -365,7 +367,8 @@ public:
     enum OmitStatus { Omitted, NotOmitted, PartiallyOmitted };
     Q_ENUM(OmitStatus)
 
-    Q_PROPERTY(OmitStatus selectedElementsOmitStatus READ selectedElementsOmitStatus WRITE setSelectedElementsOmitStatus NOTIFY selectedElementsOmitStatusChanged)
+    Q_PROPERTY(OmitStatus selectedElementsOmitStatus READ selectedElementsOmitStatus WRITE
+                       setSelectedElementsOmitStatus NOTIFY selectedElementsOmitStatusChanged)
     void setSelectedElementsOmitStatus(OmitStatus val);
     OmitStatus selectedElementsOmitStatus() const;
     Q_SIGNAL void selectedElementsOmitStatusChanged();
@@ -555,6 +558,7 @@ protected:
     void setHeightHintsAvailable(bool val);
     void evaluateIfHeightHintsAreAvailable();
     void evaluateIfHeightHintsAreAvailableLater();
+    void evaluateAuthor();
 
 private:
     QString m_title;
