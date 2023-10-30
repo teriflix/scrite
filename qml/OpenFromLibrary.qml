@@ -15,6 +15,7 @@ import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+import Qt.labs.settings 1.0
 import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 
@@ -37,63 +38,41 @@ Item {
         color: primaryColors.c200.background
     }
 
-    Column {
+    Text {
         id: titleBar
         width: parent.width
         y: 30
+        padding: 10
 
-        Row {
-            spacing: 10
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            Image {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: -height*0.22
-                height: subtitle.height * 1.75
-                fillMode: Image.PreserveAspectFit
-                smooth: true; mipmap: true
-                source: "../images/library.png"
-            }
-
-            Text {
-                id: subtitle
-                font.pointSize: Screen.devicePixelRatio > 1 ? 22 : 18
-                text: "-  Repository of Screenplays & Templates in Scrite Format"
-                color: primaryColors.c200.text
-            }
-        }
-
-        Text {
-            text: pageView.pagesArray[pageView.currentIndex].disclaimer
-            font.pointSize: Scrite.app.idealFontPointSize-2
-            width: parent.width * 0.9
-            wrapMode: Text.WordWrap
-            anchors.horizontalCenter: parent.horizontalCenter
-            color: primaryColors.c200.text
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    var linkUrl = parent.linkAt(mouse.x, mouse.y)
-                    Qt.openUrlExternally(linkUrl)
-                }
-            }
-        }
+        font.pointSize: Screen.devicePixelRatio > 1 ? 22 : 18
+        horizontalAlignment: Text.AlignHCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        text: "Open Scrite Document"
+        color: primaryColors.c200.text
     }
 
-    LibraryService {
-        id: libraryService
-        onImportStarted: {
-            var library = pageView.currentIndex === 0 ? libraryService.screenplays : libraryService.templates
-            busyOverlay.busyMessage = "Loading \"" + library.recordAt(index).name + "\" " + pageView.pagesArray[pageView.currentIndex].kind + " ..."
-            busyOverlay.visible = true
-            importFromLibraryUi.importStarted()
-        }
-        onImportFinished: {
-            Utils.execLater(libraryService, 250, function() {
-                importFromLibraryUi.importFinished()
-                modalDialog.close()
-            })
+    property LibraryService libraryService
+    function initLibraryService() {
+        if(!libraryService)
+            libraryService = libraryServiceComponent.createObject(importFromLibraryUi)
+    }
+
+    Component {
+        id: libraryServiceComponent
+
+        LibraryService {
+            onImportStarted: {
+                var library = pageView.currentIndex === 0 ? libraryService.screenplays : libraryService.templates
+                busyOverlay.busyMessage = "Loading \"" + library.recordAt(index).name + "\" " + pageView.pagesArray[pageView.currentIndex].kind + " ..."
+                busyOverlay.visible = true
+                importFromLibraryUi.importStarted()
+            }
+            onImportFinished: {
+                Utils.execLater(libraryService, 250, function() {
+                    importFromLibraryUi.importFinished()
+                    modalDialog.close()
+                })
+            }
         }
     }
 
@@ -107,8 +86,36 @@ Item {
         pageListWidth: 180
 
         pagesArray: [
-            { "kind": "Screenplay", "title": "Screenplays", "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>.", appFeature: Scrite.ScriptalayFeature },
-            { "kind": "Template", "title": "Templates", "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please post a message on our Discord server.", appFeature: Scrite.TemplateFeature }
+            {
+                "kind": "Recents",
+                "title": "Recents",
+                "disclaimer": "Open any of the files you recently worked on.",
+                "appFeature": Scrite.RecentFilesFeature,
+                "canReload": false
+            },
+            {
+                "kind": "Template",
+                "title": "New",
+                "disclaimer": "Templates in Scriptalay capture popular structures of screenplays so you can build your own work by leveraging those structures. If you want to contribute templates, please post a message on our Discord server.",
+                "appFeature": Scrite.TemplateFeature,
+                "canReload": true,
+                "reloadFn": () => { libraryService.templates.reload() }
+            },
+            {
+                "kind": "Scriptalay",
+                "title": "Scriptalay",
+                "disclaimer": "Screenplays in Scriptalay consists of curated works either directly contributed by their respective copyright owners or sourced from publicly available screenplay repositories. In all cases, <u>the copyright of the works rests with its respective owners only</u> - <a href=\"https://www.scrite.io/index.php/disclaimer/\">disclaimer</a>.",
+                "appFeature": Scrite.ScriptalayFeature,
+                "canReload": true,
+                "reloadFn": () => { libraryService.screenplays.reload() }
+            },
+            {
+                "kind": "Vault",
+                "title": "Vault",
+                "disclaimer": "Open unsaved files stored in a private vault on your hard disk.",
+                "appFeature": Scrite.VaultFilesFeature,
+                "canReload": false
+            }
         ]
 
         pageTitleRole: "title"
@@ -116,17 +123,14 @@ Item {
         currentIndex: 0
 
         cornerContent: Item {
+            visible: pageView.pagesArray[pageView.currentIndex].canReload
+
             Button2 {
                 text: "Reload"
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 10
-                onClicked: {
-                    if(pageView.currentIndex === 0)
-                        libraryService.screenplays.reload()
-                    else
-                        libraryService.templates.reload()
-                }
+                onClicked: pageView.pagesArray[pageView.currentIndex].reloadFn()
             }
         }
 
@@ -157,8 +161,10 @@ Item {
                     opacity: enabled ? 1 : 0.5
                     sourceComponent: {
                         switch(pageView.currentIndex) {
-                        case 0: return scriptalayComponent
+                        case 0: return recentFilesComponent
                         case 1: return templatesComponent
+                        case 2: return scriptalayComponent
+                        case 3: return vaultFilesComponent
                         }
                     }
                 }
@@ -185,7 +191,7 @@ Item {
                     anchors.left: parent.left
                     anchors.right: rightButtons.left
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: !libraryService.busy
+                    visible: libraryService && !libraryService.busy
                 }
 
                 Row {
@@ -220,176 +226,16 @@ Item {
     }
 
     Component {
-        id: scriptalayComponent
+        id: recentFilesComponent
 
         Item {
-            property bool somethingIsSelected: libraryGridView.currentIndex >= 0
+            property bool somethingIsSelected: false
+            property string statusText: ""
 
-            property string statusText: "" + libraryService.screenplays.count + " Screenplays Available"
+            function openSelected() { }
 
-            function openSelected() {
-                libraryService.openScreenplayAt(libraryGridView.currentIndex)
-            }
+            ListView {
 
-            GridView {
-                id: libraryGridView
-                anchors.fill: parent
-                model: libraryService.screenplays
-                rightMargin: contentHeight > height ? 15 : 0
-                highlightMoveDuration: 0
-                clip: true
-                ScrollBar.vertical: ScrollBar2 { flickable: libraryGridView }
-                property real availableWidth: width-rightMargin
-                readonly property real posterWidth: 80 * 1.75
-                readonly property real posterHeight: 120 * 1.5
-                readonly property real minCellWidth: posterWidth * 1.5
-                property int nrCells: Math.floor(availableWidth/minCellWidth)
-                cellWidth: availableWidth / nrCells
-                cellHeight: posterHeight + 20
-
-                highlight: Rectangle {
-                    color: primaryColors.highlight.background
-                }
-
-                delegate: Item {
-                    width: libraryGridView.cellWidth
-                    height: libraryGridView.cellHeight
-                    property color textColor: libraryGridView.currentIndex === index ? primaryColors.highlight.text : "black"
-                    z: mouseArea.containsMouse || libraryGridView.currentIndex === index ? 2 : 1
-
-                    Rectangle {
-                        visible: toolTipVisibility.get
-                        width: libraryGridView.cellWidth * 2.5
-                        height: description.contentHeight + 20
-                        color: primaryColors.c600.background
-
-                        DelayedPropertyBinder {
-                            id: toolTipVisibility
-                            initial: false
-                            set: mouseArea.containsMouse
-                            delay: mouseArea.containsMouse && libraryGridView.currentIndex !== index  ? 1000 : 0
-                        }
-
-                        onVisibleChanged: {
-                            if(visible === false)
-                                return
-
-                            var referencePoint = parent.mapToItem(libraryGridView, parent.width/2,0)
-                            if(referencePoint.y - height >= 0)
-                                y = -height
-                            else
-                                y = parent.height
-
-                            var hasSpaceOnLeft = referencePoint.x - width/2 > 0
-                            var hasSpaceOnRight = referencePoint.x + width/2 < libraryGridView.width
-                            if(hasSpaceOnLeft && hasSpaceOnRight)
-                                x = (parent.width - width)/2
-                            else if(!hasSpaceOnLeft)
-                                x = 0
-                            else
-                                x = parent.width - width
-                        }
-
-                        Text {
-                            id: description
-                            width: parent.width-20
-                            font.pointSize: Scrite.app.idealFontPointSize
-                            anchors.centerIn: parent
-                            wrapMode: Text.WordWrap
-                            color: primaryColors.c600.text
-                            text: record.logline + "<br/><br/>" +
-                                  "<strong>Revision:</strong> " + record.revision + "<br/>" +
-                                  "<strong>Copyright:</strong> " + record.copyright + "<br/>" +
-                                  "<strong>Source:</strong> " + record.source
-                        }
-                    }
-
-                    Rectangle {
-                        anchors.fill: parent
-                        color: primaryColors.c200.background
-                        visible: mouseArea.containsMouse && libraryGridView.currentIndex !== index
-                        border.width: 1
-                        border.color: primaryColors.borderColor
-                    }
-
-                    Column {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.top: parent.top
-                        anchors.topMargin: 10
-                        width: parent.width-20
-                        clip: true
-                        onHeightChanged: libraryGridView.cellHeight = Math.max(libraryGridView.cellHeight,height+20)
-                        spacing: 10
-
-                        Image {
-                            id: poster
-                            width: libraryGridView.posterWidth
-                            height: libraryGridView.posterHeight
-                            fillMode: Image.PreserveAspectCrop
-                            smooth: true
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            source: libraryService.screenplays.baseUrl + "/" + record.poster
-
-                            Rectangle {
-                                anchors.fill: parent
-                                color: primaryColors.button.background
-                                visible: parent.status !== Image.Ready
-                            }
-
-                            BusyIcon {
-                                anchors.centerIn: parent
-                                running: parent.status === Image.Loading
-                                opacity: 0.5
-                            }
-                        }
-
-                        Column {
-                            id: metaData
-                            width: parent.width
-                            spacing: 5
-
-                            Text {
-                                font.pointSize: Scrite.app.idealFontPointSize
-                                font.bold: true
-                                text: record.name
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                color: textColor
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-
-                            Text {
-                                font.pointSize: Scrite.app.idealFontPointSize-1
-                                text: record.authors
-                                width: parent.width
-                                wrapMode: Text.WordWrap
-                                color: textColor
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-
-                            Text {
-                                font.pointSize: Scrite.app.idealFontPointSize-3
-                                text: record.pageCount + " Pages"
-                                width: parent.width
-                                elide: Text.ElideRight
-                                color: textColor
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-                        }
-                    }
-
-                    MouseArea {
-                        id: mouseArea
-                        hoverEnabled: true
-                        anchors.fill: parent
-                        onClicked: libraryGridView.currentIndex = index
-                        onDoubleClicked: {
-                            libraryGridView.currentIndex = index
-                            importFromLibraryUi.enabled = false
-                            libraryService.openScreenplayAt(libraryGridView.currentIndex)
-                        }
-                    }
-                }
             }
         }
     }
@@ -405,6 +251,8 @@ Item {
             function openSelected() {
                 libraryService.openTemplateAt(templatesGridView.currentIndex)
             }
+
+            Component.onCompleted: importFromLibraryUi.initLibraryService()
 
             GridView {
                 id: templatesGridView
@@ -576,10 +424,198 @@ Item {
         }
     }
 
+    Component {
+        id: scriptalayComponent
+
+        Item {
+            property bool somethingIsSelected: libraryGridView.currentIndex >= 0
+
+            property string statusText: "" + libraryService.screenplays.count + " Screenplays Available"
+
+            function openSelected() {
+                libraryService.openScreenplayAt(libraryGridView.currentIndex)
+            }
+
+            Component.onCompleted: importFromLibraryUi.initLibraryService()
+
+            GridView {
+                id: libraryGridView
+                anchors.fill: parent
+                model: libraryService.screenplays
+                rightMargin: contentHeight > height ? 15 : 0
+                highlightMoveDuration: 0
+                clip: true
+                ScrollBar.vertical: ScrollBar2 { flickable: libraryGridView }
+                property real availableWidth: width-rightMargin
+                readonly property real posterWidth: 80 * 1.75
+                readonly property real posterHeight: 120 * 1.5
+                readonly property real minCellWidth: posterWidth * 1.5
+                property int nrCells: Math.floor(availableWidth/minCellWidth)
+                cellWidth: availableWidth / nrCells
+                cellHeight: posterHeight + 20
+
+                highlight: Rectangle {
+                    color: primaryColors.highlight.background
+                }
+
+                delegate: Item {
+                    width: libraryGridView.cellWidth
+                    height: libraryGridView.cellHeight
+                    property color textColor: libraryGridView.currentIndex === index ? primaryColors.highlight.text : "black"
+                    z: mouseArea.containsMouse || libraryGridView.currentIndex === index ? 2 : 1
+
+                    Rectangle {
+                        visible: toolTipVisibility.get
+                        width: libraryGridView.cellWidth * 2.5
+                        height: description.contentHeight + 20
+                        color: primaryColors.c600.background
+
+                        DelayedPropertyBinder {
+                            id: toolTipVisibility
+                            initial: false
+                            set: mouseArea.containsMouse
+                            delay: mouseArea.containsMouse && libraryGridView.currentIndex !== index  ? 1000 : 0
+                        }
+
+                        onVisibleChanged: {
+                            if(visible === false)
+                                return
+
+                            var referencePoint = parent.mapToItem(libraryGridView, parent.width/2,0)
+                            if(referencePoint.y - height >= 0)
+                                y = -height
+                            else
+                                y = parent.height
+
+                            var hasSpaceOnLeft = referencePoint.x - width/2 > 0
+                            var hasSpaceOnRight = referencePoint.x + width/2 < libraryGridView.width
+                            if(hasSpaceOnLeft && hasSpaceOnRight)
+                                x = (parent.width - width)/2
+                            else if(!hasSpaceOnLeft)
+                                x = 0
+                            else
+                                x = parent.width - width
+                        }
+
+                        Text {
+                            id: description
+                            width: parent.width-20
+                            font.pointSize: Scrite.app.idealFontPointSize
+                            anchors.centerIn: parent
+                            wrapMode: Text.WordWrap
+                            color: primaryColors.c600.text
+                            text: record.logline + "<br/><br/>" +
+                                  "<strong>Revision:</strong> " + record.revision + "<br/>" +
+                                  "<strong>Copyright:</strong> " + record.copyright + "<br/>" +
+                                  "<strong>Source:</strong> " + record.source
+                        }
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        color: primaryColors.c200.background
+                        visible: mouseArea.containsMouse && libraryGridView.currentIndex !== index
+                        border.width: 1
+                        border.color: primaryColors.borderColor
+                    }
+
+                    Column {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
+                        width: parent.width-20
+                        clip: true
+                        onHeightChanged: libraryGridView.cellHeight = Math.max(libraryGridView.cellHeight,height+20)
+                        spacing: 10
+
+                        Image {
+                            id: poster
+                            width: libraryGridView.posterWidth
+                            height: libraryGridView.posterHeight
+                            fillMode: Image.PreserveAspectCrop
+                            smooth: true
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            source: libraryService.screenplays.baseUrl + "/" + record.poster
+
+                            Rectangle {
+                                anchors.fill: parent
+                                color: primaryColors.button.background
+                                visible: parent.status !== Image.Ready
+                            }
+
+                            BusyIcon {
+                                anchors.centerIn: parent
+                                running: parent.status === Image.Loading
+                                opacity: 0.5
+                            }
+                        }
+
+                        Column {
+                            id: metaData
+                            width: parent.width
+                            spacing: 5
+
+                            Text {
+                                font.pointSize: Scrite.app.idealFontPointSize
+                                font.bold: true
+                                text: record.name
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                color: textColor
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+
+                            Text {
+                                font.pointSize: Scrite.app.idealFontPointSize-1
+                                text: record.authors
+                                width: parent.width
+                                wrapMode: Text.WordWrap
+                                color: textColor
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+
+                            Text {
+                                font.pointSize: Scrite.app.idealFontPointSize-3
+                                text: record.pageCount + " Pages"
+                                width: parent.width
+                                elide: Text.ElideRight
+                                color: textColor
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        id: mouseArea
+                        hoverEnabled: true
+                        anchors.fill: parent
+                        onClicked: libraryGridView.currentIndex = index
+                        onDoubleClicked: {
+                            libraryGridView.currentIndex = index
+                            importFromLibraryUi.enabled = false
+                            libraryService.openScreenplayAt(libraryGridView.currentIndex)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: vaultFilesComponent
+
+        Item {
+            property bool somethingIsSelected: false
+            property string statusText: ""
+
+            function openSelected() { }
+        }
+    }
+
     BusyOverlay {
         id: busyOverlay
         anchors.fill: parent
         busyMessage: "Loading library..."
-        visible: libraryService.busy
+        visible: libraryService && libraryService.busy
     }
 }

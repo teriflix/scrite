@@ -69,6 +69,8 @@ HEADERS += \
     src/document/notes.h \
     src/document/screenplaytextdocumentoffsets.h \
     src/document/scritedocumentvault.h \
+    src/document/scritefileinfo.h \
+    src/document/scritefilelistmodel.h \
     src/exporters/characterrelationshipsgraphexporter.h \
     src/exporters/characterrelationshipsgraphexporter_p.h \
     src/exporters/structureexporter_p.h \
@@ -78,9 +80,12 @@ HEADERS += \
     src/network/user.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/quick/items/boundingboxevaluator.h \
+    src/quick/items/qimageitem.h \
     src/quick/items/simpletabbaritem.h \
     src/quick/items/textdocumentitem.h \
     src/quick/objects/announcement.h \
+    src/quick/objects/basicfileiconprovider.h \
+    src/quick/objects/basicfileinfo.h \
     src/quick/objects/batchchange.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
@@ -96,7 +101,6 @@ HEADERS += \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
     src/quick/objects/notification.h \
-    src/quick/objects/fileinfo.h \
     src/quick/objects/searchengine.h \
     src/quick/objects/eventfilter.h \
     src/quick/objects/polygontesselator.h \
@@ -198,6 +202,8 @@ SOURCES += \
     src/document/notes.cpp \
     src/document/screenplaytextdocumentoffsets.cpp \
     src/document/scritedocumentvault.cpp \
+    src/document/scritefileinfo.cpp \
+    src/document/scritefilelistmodel.cpp \
     src/exporters/characterrelationshipsgraphexporter.cpp \
     src/exporters/characterrelationshipsgraphexporter_p.cpp \
     src/exporters/structureexporter_p.cpp \
@@ -207,9 +213,12 @@ SOURCES += \
     src/network/user.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/quick/items/boundingboxevaluator.cpp \
+    src/quick/items/qimageitem.cpp \
     src/quick/items/simpletabbaritem.cpp \
     src/quick/items/textdocumentitem.cpp \
     src/quick/objects/announcement.cpp \
+    src/quick/objects/basicfileiconprovider.cpp \
+    src/quick/objects/basicfileinfo.cpp \
     src/quick/objects/batchchange.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
@@ -223,7 +232,6 @@ SOURCES += \
     src/quick/objects/refcounter.cpp \
     src/quick/objects/syntaxhighlighter.cpp \
     src/quick/objects/tabsequencemanager.cpp \
-    src/quick/objects/fileinfo.cpp \
     src/quick/objects/focustracker.cpp \
     src/quick/objects/delayedpropertybinder.cpp \
     src/quick/objects/notificationmanager.cpp \

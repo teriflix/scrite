@@ -15,6 +15,7 @@
 
 #include "application.h"
 #include "timeprofiler.h"
+#include "scritefileinfo.h"
 #include "scritedocument.h"
 #include "qobjectserializer.h"
 
@@ -270,25 +271,12 @@ void ScriteDocumentVault::updateModelFromFolder()
                 MetaData metaData;
                 metaData.fileInfo = fi;
 
-                DocumentFileSystem dfs;
-                if (dfs.load(fi.absoluteFilePath())) {
-                    const QJsonDocument jsonDoc = QJsonDocument::fromJson(dfs.header());
-                    const QJsonObject docObj = jsonDoc.object();
-
-                    metaData.documentId = docObj.value(QStringLiteral("documentId")).toString();
-
-                    const QJsonObject structure =
-                            docObj.value(QStringLiteral("structure")).toObject();
-                    metaData.numberOfScenes =
-                            structure.value(QStringLiteral("elements")).toArray().size();
-
-                    const QJsonObject screenplay =
-                            docObj.value(QStringLiteral("screenplay")).toObject();
-                    metaData.screenplayTitle =
-                            screenplay.value(QStringLiteral("title")).toString().trimmed();
-                    if (metaData.screenplayTitle.isEmpty())
-                        metaData.screenplayTitle = QStringLiteral("Untitled Screenplay");
-                }
+                const ScriteFileInfo sfi = ScriteFileInfo::load(fi.absoluteFilePath());
+                metaData.documentId = sfi.documentId;
+                metaData.numberOfScenes = sfi.sceneCount;
+                metaData.screenplayTitle = sfi.title;
+                if (metaData.screenplayTitle.isEmpty())
+                    metaData.screenplayTitle = QStringLiteral("Untitled Screenplay");
 
                 ret.append(metaData);
             }

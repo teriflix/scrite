@@ -12,7 +12,6 @@
 ****************************************************************************/
 
 #include "user.h"
-#include "fileinfo.h"
 #include "appwindow.h"
 #include "automation.h"
 #include "application.h"
@@ -20,6 +19,7 @@
 #include "scritedocument.h"
 #include "colorimageprovider.h"
 #include "notificationmanager.h"
+#include "basicfileiconprovider.h"
 
 #include <QMenuBar>
 #include <QQuickStyle>
@@ -90,7 +90,7 @@ AppWindow::AppWindow()
 
     // Register image providers
     this->engine()->addImageProvider(QStringLiteral("color"), new ColorImageProvider);
-    this->engine()->addImageProvider(QStringLiteral("fileIcon"), new FileIconProvider);
+    this->engine()->addImageProvider(QStringLiteral("fileIcon"), new BasicFileIconProvider);
     this->engine()->addImageProvider(QStringLiteral("userIcon"), new UserIconProvider);
 
     // Force registration of QML types in io.scrite.components

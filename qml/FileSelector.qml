@@ -34,7 +34,7 @@ Item {
             selectedExtension = allowedExtensions[0]
     }
 
-    FileInfo {
+    BasicFileInfo {
         id: fileInfo
     }
 

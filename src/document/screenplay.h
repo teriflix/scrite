@@ -257,6 +257,8 @@ public:
     ~Screenplay();
     Q_SIGNAL void aboutToDelete(Screenplay *ptr);
 
+    static QString standardCoverPathPhotoPath();
+
     Q_PROPERTY(ScriteDocument *scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 

@@ -427,8 +427,6 @@ void ScreenplayElement::setElementIndex(int val)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static const QString coverPagePhotoPath = QLatin1String("coverPage/photo.jpg");
-
 Screenplay::Screenplay(QObject *parent)
     : QAbstractListModel(parent),
       m_scriteDocument(qobject_cast<ScriteDocument *>(parent)),
@@ -496,6 +494,11 @@ Screenplay::~Screenplay()
 {
     GarbageCollector::instance()->avoidChildrenOf(this);
     emit aboutToDelete(this);
+}
+
+QString Screenplay::standardCoverPathPhotoPath()
+{
+    return QLatin1String("coverPage/photo.jpg");
 }
 
 void Screenplay::setTitle(const QString &val)
@@ -670,7 +673,7 @@ void Screenplay::setCoverPagePhoto(const QString &val)
     connect(dfs, &DocumentFileSystem::auction, this, &Screenplay::onDfsAuction);
 
     const QSize fullHdSize(1920, 1080);
-    const QString val2 = dfs->addImage(val, coverPagePhotoPath, fullHdSize);
+    const QString val2 = dfs->addImage(val, standardCoverPathPhotoPath(), fullHdSize);
 
     m_coverPagePhoto.clear();
     emit coverPagePhotoChanged();
@@ -2182,7 +2185,7 @@ void Screenplay::setEpisodeCount(int val)
 
 void Screenplay::onDfsAuction(const QString &filePath, int *claims)
 {
-    if (filePath == coverPagePhotoPath)
+    if (filePath == standardCoverPathPhotoPath())
         *claims = *claims + 1;
 }
 
@@ -2720,7 +2723,8 @@ void Screenplay::serializeToJson(QJsonObject &json) const
 
 void Screenplay::deserializeFromJson(const QJsonObject &)
 {
-    const QString cpPhotoPath = m_scriteDocument->fileSystem()->absolutePath(coverPagePhotoPath);
+    const QString cpPhotoPath =
+            m_scriteDocument->fileSystem()->absolutePath(standardCoverPathPhotoPath());
     if (QFile::exists(cpPhotoPath)) {
         m_coverPagePhoto = cpPhotoPath;
         emit coverPagePhotoChanged();
