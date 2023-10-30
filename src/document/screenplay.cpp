@@ -478,18 +478,10 @@ Screenplay::Screenplay(QObject *parent)
     fetchSettings(QStringLiteral("phone"), m_phoneNumber);
     fetchSettings(QStringLiteral("website"), m_website);
 
-    if (m_author.isEmpty()) {
-        // If author is not configured by the user, then instead of using machine
-        // name like we have been doing so far, we can use user's full name
-        // as provided to us while the user created a login.
-        QTimer::singleShot(100, this, [=]() {
-            if (User::instance()->isLoggedIn())
-                this->evaluateAuthor();
-            else
-                QObject::connect(User::instance(), &User::infoChanged, this,
-                                 &Screenplay::evaluateAuthor);
-        });
-    }
+    QTimer::singleShot(100, this, [=]() {
+        connect(User::instance(), &User::loggedInChanged, this, &Screenplay::authorChanged);
+        connect(User::instance(), &User::infoChanged, this, &Screenplay::authorChanged);
+    });
 
     if (m_scriteDocument != nullptr) {
         DocumentFileSystem *dfs = m_scriteDocument->fileSystem();
@@ -568,6 +560,17 @@ void Screenplay::setAuthor(const QString &val)
 
     m_author = val;
     emit authorChanged();
+}
+
+QString Screenplay::author() const
+{
+    if (m_author.isEmpty()) {
+        if (User::instance()->isLoggedIn())
+            return User::instance()->fullName();
+        return QSysInfo::machineHostName();
+    }
+
+    return m_author;
 }
 
 void Screenplay::setContact(const QString &val)
@@ -2344,20 +2347,6 @@ void Screenplay::evaluateIfHeightHintsAreAvailable()
 void Screenplay::evaluateIfHeightHintsAreAvailableLater()
 {
     m_evalHeightHintsAvailableTimer.start(100, this);
-}
-
-void Screenplay::evaluateAuthor()
-{
-    // If author is not configured by the user, then instead of using machine
-    // name like we have been doing so far, we can use user's full name
-    // as provided to us while the user created a login.
-
-    if (m_author.isEmpty()) {
-        if (User::instance()->isLoggedIn())
-            m_author = User::instance()->fullName();
-        else
-            m_author = QSysInfo::machineHostName();
-    }
 }
 
 void Screenplay::setCurrentElementIndex(int val)

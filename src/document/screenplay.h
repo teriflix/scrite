@@ -286,9 +286,11 @@ public:
     QString basedOn() const { return m_basedOn; }
     Q_SIGNAL void basedOnChanged();
 
+    Q_PROPERTY(QString authorValue READ authorValue WRITE setAuthor NOTIFY authorChanged)
     Q_PROPERTY(QString author READ author WRITE setAuthor NOTIFY authorChanged)
     void setAuthor(const QString &val);
-    QString author() const { return m_author; }
+    QString author() const;
+    QString authorValue() const { return m_author; }
     Q_SIGNAL void authorChanged();
 
     Q_PROPERTY(QString contact READ contact WRITE setContact NOTIFY contactChanged)
@@ -558,7 +560,6 @@ protected:
     void setHeightHintsAvailable(bool val);
     void evaluateIfHeightHintsAreAvailable();
     void evaluateIfHeightHintsAreAvailableLater();
-    void evaluateAuthor();
 
 private:
     QString m_title;

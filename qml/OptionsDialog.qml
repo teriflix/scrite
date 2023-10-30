@@ -1775,12 +1775,16 @@ Item {
                             TextField2 {
                                 id: authorField
                                 width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.author
+                                text: Scrite.document.screenplay.authorValue
                                 selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.author = text
+                                onTextEdited: Scrite.document.screenplay.authorValue = text
                                 font.pixelSize: 20
                                 maximumLength: 100
-                                placeholderText: "(max 100 letters)"
+                                placeholderText: {
+                                    if(Scrite.document.screenplay.authorValue === "")
+                                        return Scrite.document.screenplay.author
+                                    return "(max 100 letters)"
+                                }
                                 tabItem: contactField
                                 backTabItem: versionField
                                 enableTransliteration: true
