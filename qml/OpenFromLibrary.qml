@@ -20,13 +20,13 @@ import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 
 Item {
-    id: importFromLibraryUi
-    width: documentUI.width * 0.75
-    height: documentUI.height * 0.85
+    id: openDialog
+    width: scriteDocumentViewItem.width * 0.75
+    height: scriteDocumentViewItem.height * 0.85
 
-    signal importStarted()
-    signal importFinished()
-    signal importCancelled()
+    signal openStarted()
+    signal openFinished()
+    signal openCancelled()
 
     Component.onCompleted: modalDialog.closeOnEscape = true
 
@@ -54,7 +54,7 @@ Item {
     property LibraryService libraryService
     function initLibraryService() {
         if(!libraryService)
-            libraryService = libraryServiceComponent.createObject(importFromLibraryUi)
+            libraryService = libraryServiceComponent.createObject(openDialog)
     }
 
     Component {
@@ -65,11 +65,11 @@ Item {
                 var library = pageView.currentIndex === 0 ? libraryService.screenplays : libraryService.templates
                 busyOverlay.busyMessage = "Loading \"" + library.recordAt(index).name + "\" " + pageView.pagesArray[pageView.currentIndex].kind + " ..."
                 busyOverlay.visible = true
-                importFromLibraryUi.importStarted()
+                openDialog.openStarted()
             }
             onImportFinished: {
                 Utils.execLater(libraryService, 250, function() {
-                    importFromLibraryUi.importFinished()
+                    openDialog.openFinished()
                     modalDialog.close()
                 })
             }
@@ -172,7 +172,7 @@ Item {
                 DisabledFeatureNotice {
                     anchors.fill: parent
                     color: Qt.rgba(1,1,1,0.9)
-                    featureName: "Loading " + pageView.pagesArray[pageView.currentIndex].kind + " From Scriptalay"
+                    featureName: pageView.pagesArray[pageView.currentIndex].kind
                     visible: !appFeatureCheck.enabled
                 }
             }
@@ -191,7 +191,6 @@ Item {
                     anchors.left: parent.left
                     anchors.right: rightButtons.left
                     anchors.verticalCenter: parent.verticalCenter
-                    visible: libraryService && !libraryService.busy
                 }
 
                 Row {
@@ -203,7 +202,7 @@ Item {
                     Button2 {
                         text: "Cancel"
                         onClicked: {
-                            importFromLibraryUi.importCancelled()
+                            openDialog.openCancelled()
                             modalDialog.close()
                         }
                     }
@@ -211,9 +210,9 @@ Item {
                     Button2 {
                         id: openButton
                         text: "Open"
-                        enabled: (loader.item && loader.item.somethingIsSelected) && !libraryService.busy && loader.enabled
+                        enabled: loader.enabled && loader.item && loader.item.somethingIsSelected
                         function click() {
-                            importFromLibraryUi.enabled = false
+                            openDialog.enabled = false
                             loader.item.openSelected()
                         }
                         onClicked: click()
@@ -229,13 +228,106 @@ Item {
         id: recentFilesComponent
 
         Item {
-            property bool somethingIsSelected: false
-            property string statusText: ""
+            property bool somethingIsSelected: recentFilesList.currentIndex >= 0
+            property string statusText: somethingIsSelected ?
+                                            "Click 'Open' to open the selected file." :
+                                            (recentFilesModel.count > 0 ? ("Click to select any of the " + recentFilesModel.count + " files.")
+                                                                       : "No file was recently opened.")
 
-            function openSelected() { }
+            function openSelected() {
+                if(recentFilesList.currentIndex >= 0) {
+                    openDialog.openStarted()
+                    const fileInfo = recentFilesList.currentItem.fileInfo
+                    fileOperations.doOpen(fileInfo.filePath)
+                    Utils.execLater(openDialog, 50, () => {
+                                        openDialog.openFinished()
+                                        modalDialog.close()
+                                    })
+                }
+            }
 
             ListView {
+                id: recentFilesList
+                anchors.fill: parent
+                anchors.margins: 3
+                clip: true
+                model: recentFilesModel
+                spacing: 5
+                currentIndex: -1
+                highlightMoveDuration: 0
+                highlightResizeDuration: 0
+                highlight: Rectangle {
+                    color: primaryColors.highlight.background
+                }
+                delegate: Item {
+                    required property int index
+                    required property var fileInfo
 
+                    width: recentFilesList.width-1
+                    height: 60
+
+                    Row {
+                        spacing: 5
+                        anchors.fill: parent
+
+                        Loader {
+                            width: parent.height
+                            height: parent.height
+
+                            sourceComponent: fileInfo.hasCoverPage ? qimageitem : imageitem
+
+                            Component {
+                                id: imageitem
+
+                                Image {
+                                    fillMode: Image.PreserveAspectFit
+                                    source: "../images/blank_document.png"
+                                }
+                            }
+
+                            Component {
+                                id: qimageitem
+
+                                QImageItem {
+                                    image: fileInfo.coverPageImage
+                                    fillMode: QImageItem.PreserveAspectCrop
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: parent.width - parent.height - parent.spacing
+                            spacing: 5
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Text {
+                                verticalAlignment: Text.AlignTop
+                                width: parent.width
+                                elide: Text.ElideRight
+                                font.pointSize: Scrite.app.idealFontPointSize + 2
+                                property string title: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
+                                text: "<b>" + title + "</b> (" + fileInfo.sceneCount + (fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")"
+                            }
+
+                            Text {
+                                verticalAlignment: Text.AlignTop
+                                width: parent.width
+                                elide: Text.ElideMiddle
+                                font.pointSize: Scrite.app.idealFontPointSize - 1
+                                font.italic: true
+                                text: fileInfo.filePath
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            recentFilesList.focus = true
+                            recentFilesList.currentIndex = index
+                        }
+                    }
+                }
             }
         }
     }
@@ -252,7 +344,7 @@ Item {
                 libraryService.openTemplateAt(templatesGridView.currentIndex)
             }
 
-            Component.onCompleted: importFromLibraryUi.initLibraryService()
+            Component.onCompleted: openDialog.initLibraryService()
 
             GridView {
                 id: templatesGridView
@@ -340,7 +432,7 @@ Item {
                         onClicked: templatesGridView.currentIndex = index
                         onDoubleClicked: {
                             templatesGridView.currentIndex = index
-                            importFromLibraryUi.enabled = false
+                            openDialog.enabled = false
                             libraryService.openTemplateAt(templatesGridView.currentIndex)
                         }
                     }
@@ -436,7 +528,7 @@ Item {
                 libraryService.openScreenplayAt(libraryGridView.currentIndex)
             }
 
-            Component.onCompleted: importFromLibraryUi.initLibraryService()
+            Component.onCompleted: openDialog.initLibraryService()
 
             GridView {
                 id: libraryGridView
@@ -592,7 +684,7 @@ Item {
                         onClicked: libraryGridView.currentIndex = index
                         onDoubleClicked: {
                             libraryGridView.currentIndex = index
-                            importFromLibraryUi.enabled = false
+                            openDialog.enabled = false
                             libraryService.openScreenplayAt(libraryGridView.currentIndex)
                         }
                     }
@@ -605,10 +697,115 @@ Item {
         id: vaultFilesComponent
 
         Item {
-            property bool somethingIsSelected: false
-            property string statusText: ""
+            property bool somethingIsSelected: vaultFilesList.currentIndex >= 0
+            property string statusText: somethingIsSelected ?
+                                            "Click 'Open' to open the selected file." :
+                                            (Scrite.vault.documentCount > 0 ? ("Click to select any of the " + Scrite.vault.documentCount + " files in the vault.")
+                                                                       : "No file found in the vault.")
 
-            function openSelected() { }
+            function openSelected() {
+                if(vaultFilesList.currentIndex >= 0) {
+                    openDialog.openStarted()
+                    const fileInfo = vaultFilesList.currentItem.fileInfo
+                    Scrite.document.openAnonymously(fileInfo.filePath)
+                    Utils.execLater(openDialog, 50, () => {
+                                        openDialog.openFinished()
+                                        modalDialog.close()
+                                    })
+                }
+            }
+
+            ListView {
+                id: vaultFilesList
+                anchors.fill: parent
+                anchors.margins: 3
+                clip: true
+                model: Scrite.vault
+                spacing: 5
+                currentIndex: -1
+                highlightMoveDuration: 0
+                highlightResizeDuration: 0
+                highlight: Rectangle {
+                    color: primaryColors.highlight.background
+                }
+                delegate: Item {
+                    required property int index
+                    required property var fileInfo
+                    required property string timestampAsString
+                    required property string relativeTime
+
+                    width: vaultFilesList.width-1
+                    height: 60
+
+                    Row {
+                        spacing: 5
+                        anchors.fill: parent
+
+                        Loader {
+                            width: parent.height
+                            height: parent.height
+
+                            sourceComponent: fileInfo.hasCoverPage ? qimageitem : imageitem
+
+                            Component {
+                                id: imageitem
+
+                                Image {
+                                    fillMode: Image.PreserveAspectFit
+                                    source: "../images/blank_document.png"
+                                }
+                            }
+
+                            Component {
+                                id: qimageitem
+
+                                QImageItem {
+                                    image: fileInfo.coverPageImage
+                                }
+                            }
+                        }
+
+                        Column {
+                            width: parent.width - parent.height - parent.spacing
+                            spacing: 5
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            Text {
+                                verticalAlignment: Text.AlignTop
+                                width: parent.width
+                                elide: Text.ElideRight
+                                font.pointSize: Scrite.app.idealFontPointSize + 2
+                                text: "<b>" + fileInfo.title + "</b> (" + fileInfo.sceneCount + (fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")"
+                            }
+
+                            Text {
+                                verticalAlignment: Text.AlignTop
+                                width: parent.width
+                                elide: Text.ElideMiddle
+                                font.pointSize: Scrite.app.idealFontPointSize - 1
+                                font.italic: true
+                                text: fileSizeInfo + ", " + relativeTime + " on " + timestampAsString
+                                property string fileSizeInfo: {
+                                    const fileSize = fileInfo.fileSize
+                                    if(fileSize < 1024)
+                                        return fileSize + " B"
+                                    if(fileSize < 1024*1024)
+                                        return Math.round(fileSize / 1024, 2) + " KB"
+                                    return Math.round(fileSize / (1024*1024), 2) + " MB"
+                                }
+                            }
+                        }
+                    }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            vaultFilesList.focus = true
+                            vaultFilesList.currentIndex = index
+                        }
+                    }
+                }
+            }
         }
     }
 

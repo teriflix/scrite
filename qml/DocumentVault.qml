@@ -20,7 +20,7 @@ import io.scrite.components 1.0
 
 Item {
     width: 640
-    height: Math.min(documentUI.height*0.9, 550)
+    height: Math.min(scriteDocumentViewItem.height*0.9, 550)
 
     signal openRequest(string filePath)
 

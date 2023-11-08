@@ -23,7 +23,7 @@ import io.scrite.components 1.0
 import "./qml" as UI
 
 Rectangle {
-    id: window
+    id: mainWindow
     width: 1366
     height: 700
     color: primaryColors.windowColor
@@ -78,7 +78,7 @@ Rectangle {
     }
 
     UI.ScriteDocumentView {
-        id: ui
+        id: mainScriteDocumentView
         anchors.fill: parent
         enabled: !dialogUnderlay.visible && !notificationsView.visible
     }
@@ -134,7 +134,7 @@ Rectangle {
 
     Item {
         id: dialogUnderlay
-        anchors.fill: ui
+        anchors.fill: mainScriteDocumentView
         property color color: primaryColors.windowColor
 
         property int visibilityCounter: 0

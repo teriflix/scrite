@@ -27,7 +27,7 @@ Item {
     width: 700
     height: {
         if(exporter && exporter.featureEnabled)
-            return (exporter.requiresConfiguration || exporter.canBundleFonts) ? Math.min(documentUI.height*0.9, contentLoader.item.idealHeight) : 300
+            return (exporter.requiresConfiguration || exporter.canBundleFonts) ? Math.min(scriteDocumentViewItem.height*0.9, contentLoader.item.idealHeight) : 300
         return 500
     }
 

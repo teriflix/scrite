@@ -94,5 +94,6 @@
         <file>qml/SpellingSuggestionsMenu2.qml</file>
         <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/CheckListView.qml</file>
+        <file>qml/HomeScreen.qml</file>
     </qresource>
 </RCC>

@@ -27,6 +27,14 @@ public:
     QImageItem(QQuickItem *parentItem = nullptr);
     ~QImageItem();
 
+    enum FillMode { Stretch, PreserveAspectFit, PreserveAspectCrop };
+    Q_ENUM(FillMode)
+
+    Q_PROPERTY(FillMode fillMode READ fillMode WRITE setFillMode NOTIFY fillModeChanged)
+    void setFillMode(FillMode val);
+    FillMode fillMode() const { return m_fillMode; }
+    Q_SIGNAL void fillModeChanged();
+
     Q_INVOKABLE static QImage fromIcon(const QIcon &icon, const QSize &size);
 
     Q_PROPERTY(QImage image READ image WRITE setImage NOTIFY imageChanged)
@@ -40,6 +48,7 @@ protected:
 
 private:
     QImage m_image;
+    FillMode m_fillMode = PreserveAspectFit;
 };
 
 #endif // QIMAGEITEM_H

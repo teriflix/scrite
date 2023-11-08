@@ -1,0 +1,798 @@
+/****************************************************************************
+**
+** Copyright (C) VCreate Logic Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth@scrite.io)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+/**
+  This is a replacement for a bunch of UI elements that were prevalent in
+  Scrite until 0.9.4f, viz:
+  - New From Template (dialog)
+  - Scriptalay (dialog)
+  - Recent Files (menu)
+  - Vault (dialog)
+  - Import (menu)
+  - Open (menu item)
+  In the future, we may add support for open file from Google Drive in this same
+  dialog box.
+
+  By introducing this dialog box, we will deprecate (as in delete) all the QML
+  files associated with the dialog boxes and menus listed above. This will make
+  things streamlined and provide more open space in the main-window.
+*/
+
+import QtQuick 2.15
+import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+
+import io.scrite.components 1.0
+import "../js/utils.js" as Utils
+
+Item {
+    id: homeScreen
+    width: Math.min(800, scriteDocumentViewItem.height*0.9)
+    height: banner.height * 2
+
+    Image {
+        id: banner
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        source: "../images/splash.jpg"
+        fillMode: Image.PreserveAspectFit
+
+        Text {
+            property real ratio: parent.height / parent.sourceSize.height
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.margins: 25 * ratio
+            font.pixelSize: 25 * ratio
+            text: Scrite.app.applicationVersion
+            color: "white"
+        }
+    }
+
+    StackView {
+        id: stackView
+        anchors.top: banner.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        onDepthChanged: modalDialog.closeable = depth === 1
+
+        initialItem: ContentPage1 { }
+    }
+
+    BusyOverlay {
+        id: homeScreenBusyOverlay
+        anchors.fill: parent
+        busyMessage: "Fetching content ..."
+        visible: libraryService.busy
+    }
+
+    LibraryService {
+        id: libraryService
+
+        onImportStarted: (index) => {
+                             homeScreen.enabled = false
+                         }
+
+        onImportFinished: (index) => {
+                              Utils.execLater(libraryService, 250, function() {
+                                  modalDialog.close()
+                              })
+                          }
+    }
+
+    component ContentPage1 : Item {
+        RowLayout {
+            anchors.fill: parent
+            anchors.topMargin: 25
+            anchors.leftMargin: 50
+            anchors.rightMargin: 50
+            anchors.bottomMargin: 25
+            spacing: 20
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 10
+
+                    NewFileOptions {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+
+                    OpenFileOptions {
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 10
+
+                    RecentFileOptions {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+
+                    ImportOptions {
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+        }
+    }
+
+    Component {
+        id: iconFromSource
+
+        Image {
+            fillMode: Image.PreserveAspectFit
+            smooth: true; mipmap: true
+        }
+    }
+
+    Component {
+        id: iconFromImage
+
+        QImageItem {
+            fillMode: QImageItem.PreserveAspectFit
+        }
+    }
+
+    component LinkButton : Rectangle {
+        id: button
+        property string text
+        property string tooltip
+        property string iconSource
+        property var iconImage // has to be QImage
+        property bool singleClick: true
+
+        signal clicked()
+
+        width: 100
+        height: buttonLayout.height + 6
+        color: buttonMouseArea.containsMouse ? primaryColors.highlight.background : Qt.rgba(0,0,0,0)
+
+        RowLayout {
+            id: buttonLayout
+            width: parent.width - 10
+            anchors.centerIn: parent
+            spacing: 5
+
+            Loader {
+                property real h: buttonLabel.contentHeight * 1.5
+                Layout.preferredWidth: h
+                Layout.preferredHeight: h
+                sourceComponent: {
+                    if(iconSource !== "")
+                        return iconFromSource
+                    return iconFromImage
+                }
+                onLoaded: {
+                    if(iconSource !== "")
+                        item.source = iconSource
+                    else
+                        item.image = iconImage
+                }
+            }
+
+            Text {
+                id: buttonLabel
+                padding: 3
+                font.pointSize: Scrite.app.idealFontPointSize
+                font.underline: singleClick ? buttonMouseArea.containsMouse : false
+                text: button.text
+                Layout.fillWidth: true
+                elide: Text.ElideRight
+            }
+        }
+
+        MouseArea {
+            id: buttonMouseArea
+            anchors.fill: parent
+            hoverEnabled: singleClick || button.tooltip !== ""
+            cursorShape: singleClick ? Qt.PointingHandCursor : Qt.ArrowCursor
+            onClicked: button.clicked()
+            ToolTip.text: button.tooltip
+            ToolTip.visible: button.tooltip !== "" && containsMouse
+        }
+    }
+
+    component NewFileOptions : Item {
+        ColumnLayout {
+            anchors.fill: parent
+
+            Text {
+                font.pointSize: Scrite.app.idealFontPointSize
+                text: "New File"
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                // Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                color: Qt.rgba(0,0,0,0)
+                border.width: templatesView.interactive ? 1 : 0
+                border.color: primaryColors.borderColor
+
+                AppFeature {
+                    id: templatesFeatureCheck
+                    feature: Scrite.TemplateFeature
+                }
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    visible: !templatesFeatureCheck.enabled
+
+                    LinkButton {
+                        text: "Blank Document"
+                        iconSource: "../images/blank_document.png"
+                        Layout.fillWidth: true
+                        tooltip: "Creates a new blank Scrite document."
+                        onClicked: {
+                            // TODO: save before reset?
+                            Scrite.document.reset()
+                        }
+                    }
+
+                    DisabledFeatureNotice {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        color: Qt.rgba(1,1,1,0.9)
+                        featureName: "Screenplay Templates"
+                        visible: !templatesFeatureCheck.enabled
+                    }
+                }
+
+                ListView {
+                    id: templatesView
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    model: templatesFeatureCheck.enabled ? libraryService.templates : []
+                    visible: templatesFeatureCheck.enabled
+                    currentIndex: -1
+                    clip: true
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    ScrollBar.vertical: ScrollBar2 {
+                        flickable: templatesView
+                    }
+                    highlightMoveDuration: 0
+                    interactive: height < contentHeight
+                    delegate: LinkButton {
+                        required property int index
+                        required property var record
+                        width: templatesView.width
+                        text: record.name
+                        tooltip: record.description
+                        iconSource: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
+                        onClicked: {
+                            // TODO: save before open?
+                            libraryService.openTemplateAt(index)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    component OpenFileOptions : ColumnLayout {
+        LinkButton {
+            text: "Open ..."
+            iconSource: "../icons/file/folder_open.png"
+            Layout.fillWidth: true
+            tooltip: "Launches a file dialog box so you can select a .scrite file to load from disk."
+            onClicked: {
+                mainFileDialog.accepted.connect( () => { modalDialog.close() } )
+                mainFileDialog.launch("OPEN")
+            }
+        }
+
+        LinkButton {
+            text: "Scriptalay"
+            iconSource: "../icons/action/library.png"
+            Layout.fillWidth: true
+            tooltip: "Download a screenplay from our online-library of screenplays."
+            onClicked: stackView.push(scriptalayPage)
+        }
+    }
+
+    component RecentFileOptions : Item {
+        ColumnLayout {
+            anchors.fill: parent
+
+            Text {
+                font.pointSize: Scrite.app.idealFontPointSize
+                text: "Recent Files"
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                // Layout.leftMargin: 20
+                Layout.rightMargin: 20
+                color: Qt.rgba(0,0,0,0)
+                border.width: recentFilesView.interactive ? 1 : 0
+                border.color: primaryColors.borderColor
+
+                ListView {
+                    id: recentFilesView
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    model: recentFilesModel
+                    currentIndex: -1
+                    clip: true
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    ScrollBar.vertical: ScrollBar2 {
+                        flickable: recentFilesView
+                    }
+                    highlightMoveDuration: 0
+                    interactive: height < contentHeight
+                    delegate: LinkButton {
+                        required property int index
+                        required property var fileInfo
+                        width: recentFilesView.width
+                        text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
+                        tooltip: fileInfo.filePath
+                        iconSource: fileInfo.hasCoverPage ? "" : "../images/blank_document.png"
+                        iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
+                        onClicked: {
+                            if(Scrite.document.modified)
+                                fileOperations.doOpenLater(fileInfo.filePath)
+                            else
+                                fileOperations.doOpen(fileInfo.filePath)
+                            modalDialog.close()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    component ImportOptions : ColumnLayout {
+        // Show restore and import options
+        LinkButton {
+            text: "Recover ..."
+            tooltip: "Open cached files from your private on-disk vault."
+            iconSource: "../icons/file/backup_open.png"
+            Layout.fillWidth: true
+            onClicked: stackView.push(vaultPage)
+        }
+
+        LinkButton {
+            text: "Import ..."
+            tooltip: "Import a screenplay from Final Draft, Fountain or HTML formats."
+            iconSource: "../icons/file/import_export.png"
+            Layout.fillWidth: true
+            onClicked: stackView.push(importPage)
+        }
+    }
+
+    component ScriptalayPage : Item {
+        // Show contents of Scriptalay
+        function openSelected() {
+            if(screenplaysView.currentIndex >= 0)
+                libraryService.openScreenplayAt(screenplaysView.currentIndex)
+        }
+
+        RowLayout {
+            anchors.fill: parent
+            spacing: 10
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: Qt.rgba(0,0,0,0)
+                border.width: 1
+                border.color: primaryColors.borderColor
+
+                ListView {
+                    id: screenplaysView
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    clip: true
+                    model: libraryService.screenplays
+                    currentIndex: count ? 0 : -1
+                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    highlight: Rectangle {
+                        color: primaryColors.highlight.background
+                    }
+                    ScrollBar.vertical: ScrollBar2 {
+                        flickable: screenplaysView
+                    }
+                    highlightMoveDuration: 0
+                    highlightResizeDuration: 0
+                    delegate: LinkButton {
+                        required property int index
+                        required property var record
+                        width: screenplaysView.width
+                        text: record.name
+                        singleClick: false
+                        iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
+                        onClicked: screenplaysView.currentIndex = index
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                color: Qt.rgba(0,0,0,0)
+                border.width: 1
+                border.color: primaryColors.borderColor
+
+                Flickable {
+                    id: screenplayDetailsFlick
+                    anchors.fill: parent
+                    anchors.margins: 1
+                    contentWidth: screenplayDetailsText.width
+                    contentHeight: screenplayDetailsText.height
+                    visible: screenplaysView.currentIndex >= 0
+                    clip: true
+
+                    ScrollBar.vertical: ScrollBar2 {
+                        flickable: screenplayDetailsFlick
+                    }
+
+                    TextArea {
+                        id: screenplayDetailsText
+                        width: screenplayDetailsFlick.width-20
+                        property var record: libraryService.screenplays.recordAt(screenplaysView.currentIndex)
+                        textFormat: TextArea.RichText
+                        wrapMode: Text.WordWrap
+                        padding: 4
+                        text: "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
+                              "<strong>Pages:</strong> " + record.pageCount + "<br/><br/>" +
+                              "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
+                              "<strong>Copyright:</strong> " + record.copyright + "<br/><br/>" +
+                              "<strong>Source:</strong> " + record.source + "<br/><br/>" +
+                              "<strong>Logline:</strong> " + record.logline + "<br/><br/>"
+                    }
+                }
+            }
+        }
+    }
+
+    component VaultPage : Rectangle {
+        border.width: 1
+        border.color: primaryColors.borderColor
+        color: Qt.rgba(0,0,0,0)
+
+        function openSelected() {
+            if(vaultFilesView.currentIndex < 0)
+                return
+
+            // const fileInfo = vaultFilesView.currentItem.fileInfo
+            homeScreenBusyOverlay.visible = true
+            scriteDocumentViewItem.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath, () => { modalDialog.close() })
+        }
+
+        function clearVault() {
+
+        }
+
+        ListView {
+            id: vaultFilesView
+            anchors.fill: parent
+            anchors.margins: 1
+            clip: true
+            model: Scrite.vault
+            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+            currentIndex: count ? 0 : -1
+            ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
+            highlight: Rectangle {
+                color: primaryColors.highlight.background
+            }
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
+            delegate: LinkButton {
+                required property int index
+                required property var fileInfo
+                required property string timestampAsString
+                required property string relativeTime
+                width: vaultFilesView.width-1
+                height: 60
+
+                singleClick: false
+                iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
+                iconSource: fileInfo.hasCoverPage ? "" : "../images/blank_document.png"
+                text: "<b>" + fileInfo.title + "</b> (" + fileInfo.sceneCount + (fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")<br/>" +
+                      "<font size=\"-1\">" + fileSizeInfo + ", " + relativeTime + " on " + timestampAsString + "</font>"
+                property string fileSizeInfo: {
+                    const fileSize = fileInfo.fileSize
+                    if(fileSize < 1024)
+                        return fileSize + " B"
+                    if(fileSize < 1024*1024)
+                        return Math.round(fileSize / 1024, 2) + " KB"
+                    return Math.round(fileSize / (1024*1024), 2) + " MB"
+                }
+
+                onClicked: vaultFilesView.currentIndex = index
+            }
+        }
+    }
+
+    component ImportPage : Item {
+        property bool hasActionButton: importPageStackLayout.currentIndex >= 1
+        property string actionButtonText: importPageStackLayout.currentIndex === 1 ? "Browse" : "Import"
+        function onActionButtonClicked() {
+            if(importPageStackLayout.currentIndex === 1)
+                dropBrowseItem.doBrowse()
+            else if(importPageStackLayout.currentIndex === 2)
+                importDroppedFileItem.doImport()
+        }
+
+        QtObject {
+            id: fileToImport
+
+            property bool valid: path !== ""
+            property string path
+            property string name: Scrite.app.fileInfo(path).fileName
+        }
+
+        AppFeature {
+            id: importFeatureCheck
+            feature: Scrite.ImportFeature
+        }
+
+        AttachmentsDropArea {
+            id: importDropArea
+            anchors.fill: parent
+            enabled: importFeatureCheck.enabled
+            allowedType: Attachments.NoMedia
+            allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
+            onDropped: fileToImport.path = attachment.filePath
+        }
+
+        StackLayout {
+            id: importPageStackLayout
+            anchors.fill: parent
+            currentIndex: importFeatureCheck.enabled ? (fileToImport.valid ? 2 : 1) : 0
+
+            DisabledFeatureNotice {
+                visible: !importFeatureCheck.enabled
+                color: Qt.rgba(1,1,1,0.9)
+                featureName: "Import from 3rd Party Formats"
+            }
+
+            Rectangle {
+                id: dropBrowseItem
+                border.width: 1
+                border.color: primaryColors.borderColor
+                color: Qt.rgba(0,0,0,0)
+
+                function doBrowse() {
+                    fileDialog.open()
+                }
+
+                FileDialog {
+                    id: fileDialog
+                    nameFilters: ["*.scrite *.fdx *.fountain *.txt *.fountain *.html"]
+                    selectFolder: false
+                    selectMultiple: false
+                    sidebarVisible: true
+                    selectExisting: true
+                    folder: workspaceSettings.lastOpenImportFolderUrl
+                    dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+                    onFolderChanged: workspaceSettings.lastOpenImportFolderUrl = folder
+
+                    onAccepted: {
+                        if(fileUrl != "")
+                            fileToImport.path = Scrite.app.urlToLocalFile(fileUrl)
+                    }
+                }
+
+                ColumnLayout {
+                    width: parent.width-40
+                    anchors.centerIn: parent
+                    spacing: 20
+
+                    Text {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: Scrite.app.idealFontPointSize+2
+                        text: importDropArea.active ? importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: Scrite.app.idealFontPointSize-1
+                        color: primaryColors.c700.background
+                        text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + fileDialog.nameFilters.join(", ") + ")"
+                    }
+                }
+            }
+
+            Rectangle {
+                id: importDroppedFileItem
+                border.width: 1
+                border.color: primaryColors.borderColor
+                color: Qt.rgba(0,0,0,0)
+
+                function doImport() {
+                    Scrite.document.openOrImport(fileToImport.path)
+                    modalDialog.close()
+                }
+
+                ColumnLayout {
+                    width: parent.width-40
+                    anchors.centerIn: parent
+                    spacing: 20
+
+                    Text {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: Scrite.app.idealFontPointSize+2
+                        font.bold: true
+                        elide: Text.ElideMiddle
+                        text: fileToImport.name
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: Scrite.app.idealFontPointSize
+                        text: "Click on 'Import' button to import this file."
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                        font.pointSize: Scrite.app.idealFontPointSize-2
+                        color: accentColors.c700.background
+                        text: "<b>NOTE</b>: Unsaved changes in the current document will be discarded."
+                        visible: !Scrite.document.empty
+                    }
+                }
+            }
+        }
+    }
+
+    component StackPage : Item {
+        id: stackPage
+
+        property Component content
+        property alias contentItem: contentLoader.item
+
+        property Component title
+        property alias titleItem: titleLoader.item
+
+        property Component buttons
+        property alias buttonsItem: buttonsLoader.item
+
+        Item {
+            anchors.fill: parent
+            anchors.topMargin: 25
+            anchors.leftMargin: 50
+            anchors.rightMargin: 50
+            anchors.bottomMargin: 25
+
+            Loader {
+                id: contentLoader
+                width: parent.width
+                anchors.top: parent.top
+                anchors.bottom: buttonsRow.top
+                anchors.bottomMargin: 20
+                sourceComponent: stackPage.content
+            }
+
+            RowLayout {
+                id: buttonsRow
+                width: parent.width
+                anchors.bottom: parent.bottom
+
+                Button {
+                    text: "< Back"
+                    onClicked: stackView.pop()
+                }
+
+                Loader {
+                    id: titleLoader
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    sourceComponent: title
+                }
+
+                Loader {
+                    id: buttonsLoader
+                    sourceComponent: buttons
+                }
+            }
+        }
+    }
+
+    Component {
+        id: scriptalayPage
+
+        StackPage {
+            id: scriptalayPageItem
+            content: ScriptalayPage { }
+            title: Item {
+                Image {
+                    anchors.centerIn: parent
+                    source: "../images/library.png"
+                    height: 36
+                    fillMode: Image.PreserveAspectFit
+                }
+            }
+            buttons: Button {
+                text: "Open"
+                enabled: libraryService.screenplays.count > 0
+                onClicked: scriptalayPageItem.contentItem.openSelected()
+            }
+        }
+    }
+
+    Component {
+        id: vaultPage
+
+        StackPage {
+            id: vaultPageItem
+            content: VaultPage { }
+            title: Text {
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                text: "Select a file to restore from the vault."
+                font.pointSize: Scrite.app.idealFontPointSize
+                elide: Text.ElideRight
+            }
+            buttons: RowLayout {
+                spacing: 10
+
+                Button {
+                    text: "Open"
+                    onClicked: vaultPageItem.contentItem.openSelected()
+                    enabled: Scrite.vault.documentCount > 0
+                }
+
+                Button {
+                    text: "Clear"
+                    enabled: Scrite.vault.documentCount > 0
+                }
+            }
+        }
+    }
+
+    Component {
+        id: importPage
+
+        StackPage {
+            id: importPageItem
+            content: ImportPage { }
+            title: Item { }
+            buttons: RowLayout {
+                Button {
+                    visible: importPageItem.contentItem.hasActionButton
+                    text: importPageItem.contentItem.actionButtonText
+                    onClicked: importPageItem.contentItem.onActionButtonClicked()
+                }
+            }
+        }
+    }
+}

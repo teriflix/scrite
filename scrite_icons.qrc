@@ -287,5 +287,7 @@
         <file>icons/reports/checklistitem_checked.png</file>
         <file>icons/content/omitted_scene_inverted.png</file>
         <file>icons/content/omitted_scene.png</file>
+        <file>icons/action/home.png</file>
+        <file>icons/action/home_inverted.png</file>
     </qresource>
 </RCC>

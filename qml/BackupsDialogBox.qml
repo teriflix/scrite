@@ -19,7 +19,7 @@ import "../js/utils.js" as Utils
 
 Item {
     width: 640
-    height: Math.min(documentUI.height*0.9, 550)
+    height: Math.min(scriteDocumentViewItem.height*0.9, 550)
 
     signal openInThisWindow(string filePath)
     signal openInNewWindow(string filePath)

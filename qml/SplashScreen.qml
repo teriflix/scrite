@@ -28,7 +28,7 @@ Item {
 
     Item {
         id: splashImageArea
-        width: Math.min(ui.width * 0.7, splashImage.sourceSize.width)
+        width: Math.min(mainScriteDocumentView.width * 0.7, splashImage.sourceSize.width)
         height: width / 2.35
         anchors.centerIn: parent
         clip: true

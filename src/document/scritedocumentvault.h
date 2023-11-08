@@ -19,6 +19,8 @@
 #include <QFileInfoList>
 #include <QAbstractItemModel>
 
+#include "scritefileinfo.h"
+
 class ScriteDocument;
 class QFileSystemWatcher;
 
@@ -41,7 +43,7 @@ public:
     Q_SIGNAL void enabledChanged();
 
     Q_PROPERTY(int documentCount READ documentCount NOTIFY documentCountChanged)
-    int documentCount() const { return m_metaDataList.size(); }
+    int documentCount() const { return m_fileInfoList.size(); }
     Q_SIGNAL void documentCountChanged();
 
     Q_INVOKABLE void clearAllDocuments();
@@ -51,11 +53,7 @@ public:
         TimestampRole = Qt::UserRole,
         TimestampAsStringRole,
         RelativeTimeRole,
-        FileNameRole,
-        FilePathRole,
-        FileSizeRole,
-        ScreenplayTitleRole,
-        NumberOfScenesRole
+        FileInfoRole
     };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -89,15 +87,8 @@ private:
     ScriteDocument *m_document = nullptr;
     QFileSystemWatcher *m_folderWatcher = nullptr;
 
-    struct MetaData
-    {
-        QString documentId;
-        QFileInfo fileInfo;
-        QString screenplayTitle;
-        int numberOfScenes = 0;
-    };
-    QList<MetaData> m_allMetaDataList; // including current document
-    QList<MetaData> m_metaDataList; // excluding current document
+    QList<ScriteFileInfo> m_allFileInfoList; // including current document
+    QList<ScriteFileInfo> m_fileInfoList; // excluding current document
 };
 
 #endif // SCRITEDOCUMENTVAULT_H

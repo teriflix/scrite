@@ -43,6 +43,14 @@ public:
     Q_PROPERTY(QString baseFileName MEMBER baseFileName)
     QString baseFileName;
 
+    // File size in bytes
+    Q_PROPERTY(qint64 fileSize MEMBER fileSize)
+    qint64 fileSize = 0;
+
+    // Qt's file info
+    Q_PROPERTY(QFileInfo fileInfo MEMBER fileInfo)
+    QFileInfo fileInfo;
+
     // Document ID
     Q_PROPERTY(QString documentId MEMBER documentId)
     QString documentId;
@@ -66,6 +74,9 @@ public:
     // Screenplay cover-page-image if available (if specified)
     Q_PROPERTY(QImage coverPageImage MEMBER coverPageImage)
     QImage coverPageImage;
+
+    Q_PROPERTY(bool hasCoverPage MEMBER hasCoverPage)
+    bool hasCoverPage = false;
 
     // Number of scenes in the screenplay (not structure)
     Q_PROPERTY(int sceneCount MEMBER sceneCount)

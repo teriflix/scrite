@@ -23,6 +23,7 @@
  * Simply provide a list of ScriteFiles and extract information about the files
  * via a model interface.
  */
+class QFileSystemWatcher;
 
 class ScriteFileListModel : public QAbstractListModel
 {
@@ -50,6 +51,7 @@ public:
 
     // Using this method we can add a new file to list, as the first item in the list
     Q_INVOKABLE void add(const QString &filePath);
+    Q_INVOKABLE void update(const QString &filePath);
 
     // This property returns the number of items in the model
     Q_PROPERTY(int count READ count NOTIFY filesChanged)
@@ -70,6 +72,7 @@ public:
 private:
     int m_maxCount = 10;
     QList<ScriteFileInfo> m_files;
+    QFileSystemWatcher *m_watcher = nullptr;
 };
 
 #endif // SCRITEFILELISTMODEL_H

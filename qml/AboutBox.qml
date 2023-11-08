@@ -22,7 +22,7 @@ Item {
     id: aboutBox
     readonly property real splashWidth: 1464
     readonly property real splashHeight: 978
-    readonly property real iscale: (ui.width * 0.5)/splashWidth
+    readonly property real iscale: (mainScriteDocumentView.width * 0.5)/splashWidth
     readonly property real ascale: width/splashWidth
     width: 973
     height: 650

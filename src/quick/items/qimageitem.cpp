@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "qimageitem.h"
+#include "application.h"
 
 #include <QSGNode>
 #include <QSGTexture>
@@ -22,11 +23,19 @@ QImageItem::QImageItem(QQuickItem *parentItem) : QQuickItem(parentItem)
 {
     this->setFlag(QQuickItem::ItemHasContents);
     connect(this, &QImageItem::imageChanged, this, &QQuickItem::update);
+    connect(this, &QImageItem::fillModeChanged, this, &QQuickItem::update);
 }
 
-QImageItem::~QImageItem()
-{
+QImageItem::~QImageItem() { }
 
+void QImageItem::setFillMode(FillMode val)
+{
+    if (m_fillMode == val)
+        return;
+
+    m_fillMode = val;
+    this->setClip(m_fillMode == PreserveAspectCrop);
+    emit fillModeChanged();
 }
 
 QImage QImageItem::fromIcon(const QIcon &icon, const QSize &size)
@@ -52,9 +61,6 @@ QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *)
     if (m_image.isNull())
         return rootNode;
 
-    const qreal w = this->width();
-    const qreal h = this->height();
-
     QSGOpacityNode *opacityNode = new QSGOpacityNode;
     opacityNode->setFlag(QSGNode::OwnedByParent);
     opacityNode->setOpacity(this->opacity());
@@ -70,18 +76,43 @@ QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *)
 
     QSGGeometry::TexturedPoint2D *rectPoints = rectGeo->vertexDataAsTexturedPoint2D();
 
-    rectPoints[0].set(0.f, 0.f, 0.f, 0.f);
-    rectPoints[1].set(float(w), 0.f, 1.f, 0.f);
-    rectPoints[2].set(float(w), float(h), 1.f, 1.f);
+    QRectF imageRect = this->boundingRect();
 
-    rectPoints[3].set(0.f, 0.f, 0.f, 0.f);
-    rectPoints[4].set(float(w), float(h), 1.f, 1.f);
-    rectPoints[5].set(0.f, float(h), 0.f, 1.f);
+    switch (m_fillMode) {
+    case Stretch:
+        break;
+    case PreserveAspectFit:
+        imageRect = QRectF(QPointF(0, 0),
+                           QSizeF(m_image.size()).scaled(this->size(), Qt::KeepAspectRatio));
+        imageRect.moveCenter(this->boundingRect().center());
+        break;
+    case PreserveAspectCrop:
+        imageRect =
+                QRectF(QPointF(0, 0),
+                       QSizeF(m_image.size()).scaled(this->size(), Qt::KeepAspectRatioByExpanding));
+        imageRect.moveCenter(this->boundingRect().center());
+        break;
+    }
+
+    const float x1 = (float)imageRect.left();
+    const float y1 = (float)imageRect.top();
+    const float x2 = (float)imageRect.right();
+    const float y2 = (float)imageRect.bottom();
+
+    rectPoints[0].set(x1, y1, 0.f, 0.f);
+    rectPoints[1].set(x2, y1, 1.f, 0.f);
+    rectPoints[2].set(x2, y2, 1.f, 1.f);
+
+    rectPoints[3].set(x1, y1, 0.f, 0.f);
+    rectPoints[4].set(x2, y2, 1.f, 1.f);
+    rectPoints[5].set(x1, y2, 0.f, 1.f);
 
     QSGTexture *texture = this->window()->createTextureFromImage(m_image);
+    texture->setFiltering(QSGTexture::Linear);
+
     QSGOpaqueTextureMaterial *textureMaterial = new QSGOpaqueTextureMaterial;
     textureMaterial->setFlag(QSGMaterial::Blending);
-    textureMaterial->setFiltering(QSGTexture::Nearest);
+    textureMaterial->setFiltering(QSGTexture::Linear);
     textureMaterial->setTexture(texture);
     geoNode->setMaterial(textureMaterial);
 

@@ -115,8 +115,8 @@ void ScriteDocumentVault::setEnabled(bool val)
 
 void ScriteDocumentVault::clearAllDocuments()
 {
-    for (const MetaData &data : qAsConst(m_allMetaDataList))
-        QFile::remove(data.fileInfo.absoluteFilePath());
+    for (const ScriteFileInfo &sfi : qAsConst(m_allFileInfoList))
+        QFile::remove(sfi.fileInfo.absoluteFilePath());
 
     ++m_nrUnsavedChanges;
     this->updateModelFromFolderLater();
@@ -124,50 +124,37 @@ void ScriteDocumentVault::clearAllDocuments()
 
 int ScriteDocumentVault::rowCount(const QModelIndex &parent) const
 {
-    return parent.isValid() ? 0 : m_metaDataList.size();
+    return parent.isValid() ? 0 : m_fileInfoList.size();
 }
 
 QVariant ScriteDocumentVault::data(const QModelIndex &index, int role) const
 {
-    if (index.row() < 0 || index.row() >= m_metaDataList.size())
-        return QVariant();
+    const QVariant none;
+    if (index.row() < 0 || index.row() >= m_fileInfoList.size())
+        return none;
 
-    const MetaData metaData = m_metaDataList.at(index.row());
+    const ScriteFileInfo sfi = m_fileInfoList.at(index.row());
 
     switch (role) {
     case TimestampRole:
-        return metaData.fileInfo.lastModified().toMSecsSinceEpoch();
+        return sfi.fileInfo.lastModified().toMSecsSinceEpoch();
     case TimestampAsStringRole:
-        return metaData.fileInfo.lastModified().toString();
+        return sfi.fileInfo.lastModified().toString(QStringLiteral("dd MMM yyyy @ hh:mm:ss"));
     case RelativeTimeRole:
-        return Application::relativeTime(metaData.fileInfo.lastModified());
-    case FileNameRole:
-        return metaData.fileInfo.fileName();
-    case FilePathRole:
-        return metaData.fileInfo.absoluteFilePath();
-    case FileSizeRole:
-        return metaData.fileInfo.size();
-    case ScreenplayTitleRole:
-        return metaData.screenplayTitle;
-    case NumberOfScenesRole:
-        return metaData.numberOfScenes;
+        return Application::relativeTime(sfi.fileInfo.lastModified());
+    case FileInfoRole:
+        return QVariant::fromValue<ScriteFileInfo>(sfi);
     }
 
-    return QVariant();
+    return none;
 }
 
 QHash<int, QByteArray> ScriteDocumentVault::roleNames() const
 {
-    static const QHash<int, QByteArray> roles(
-            { { TimestampRole, QByteArrayLiteral("timestamp") },
-              { TimestampAsStringRole, QByteArrayLiteral("timestampAsString") },
-              { RelativeTimeRole, QByteArrayLiteral("relativeTime") },
-              { FileNameRole, QByteArrayLiteral("fileName") },
-              { FilePathRole, QByteArrayLiteral("filePath") },
-              { FileSizeRole, QByteArrayLiteral("fileSize") },
-              { ScreenplayTitleRole, QByteArrayLiteral("screenplayTitle") },
-              { NumberOfScenesRole, QByteArrayLiteral("numberOfScenes") } });
-    return roles;
+    return { { TimestampRole, QByteArrayLiteral("timestamp") },
+             { TimestampAsStringRole, QByteArrayLiteral("timestampAsString") },
+             { RelativeTimeRole, QByteArrayLiteral("relativeTime") },
+             { FileInfoRole, QByteArrayLiteral("fileInfo") } };
 }
 
 void ScriteDocumentVault::onDocumentAboutToReset()
@@ -248,37 +235,31 @@ void ScriteDocumentVault::cleanup()
 void ScriteDocumentVault::updateModelFromFolder()
 {
     auto fetchInfoAboutFilesInVault = [](const QString &currentDocumentId, const QString &folder,
-                                         QList<MetaData> oldMetaDataList) -> QList<MetaData> {
+                                         QList<ScriteFileInfo> oldList) -> QList<ScriteFileInfo> {
         Q_UNUSED(currentDocumentId);
 
-        QList<MetaData> ret;
+        QList<ScriteFileInfo> ret;
         const QFileInfoList fiList =
                 QDir(folder).entryInfoList({ QStringLiteral("*.scrite") }, QDir::Files, QDir::Time);
 
         for (const QFileInfo &fi : fiList) {
-            const int oldIndex = [oldMetaDataList](const QFileInfo &fi) {
-                for (int i = 0; i < oldMetaDataList.size(); i++) {
-                    const MetaData &md = oldMetaDataList[i];
-                    if (md.fileInfo == fi)
+            const int oldIndex = [oldList](const QFileInfo &fi) {
+                for (int i = 0; i < oldList.size(); i++) {
+                    const ScriteFileInfo &sfi = oldList[i];
+                    if (sfi.fileInfo == fi)
                         return i;
                 }
                 return -1;
             }(fi);
 
             if (oldIndex >= 0)
-                ret.append(oldMetaDataList.takeAt(oldIndex));
+                ret.append(oldList.takeAt(oldIndex));
             else {
-                MetaData metaData;
-                metaData.fileInfo = fi;
+                ScriteFileInfo sfi = ScriteFileInfo::load(fi.absoluteFilePath());
+                if (sfi.title.isEmpty())
+                    sfi.title = QStringLiteral("Untitled Screenplay");
 
-                const ScriteFileInfo sfi = ScriteFileInfo::load(fi.absoluteFilePath());
-                metaData.documentId = sfi.documentId;
-                metaData.numberOfScenes = sfi.sceneCount;
-                metaData.screenplayTitle = sfi.title;
-                if (metaData.screenplayTitle.isEmpty())
-                    metaData.screenplayTitle = QStringLiteral("Untitled Screenplay");
-
-                ret.append(metaData);
+                ret.append(sfi);
             }
         }
 
@@ -287,24 +268,24 @@ void ScriteDocumentVault::updateModelFromFolder()
 
     const QString futureWatcherName = QStringLiteral("ScriteDocumentVault::updateModelFromFolder");
 
-    QFutureWatcher<QList<MetaData>> *futureWatcher =
-            this->findChild<QFutureWatcher<QList<MetaData>> *>(futureWatcherName,
-                                                               Qt::FindDirectChildrenOnly);
+    QFutureWatcher<QList<ScriteFileInfo>> *futureWatcher =
+            this->findChild<QFutureWatcher<QList<ScriteFileInfo>> *>(futureWatcherName,
+                                                                     Qt::FindDirectChildrenOnly);
     if (futureWatcher) {
         futureWatcher->cancel();
         futureWatcher->deleteLater();
     }
 
-    futureWatcher = new QFutureWatcher<QList<MetaData>>(this);
-    connect(futureWatcher, &QFutureWatcher<QList<MetaData>>::finished, this, [=]() {
-        m_allMetaDataList = futureWatcher->result();
+    futureWatcher = new QFutureWatcher<QList<ScriteFileInfo>>(this);
+    connect(futureWatcher, &QFutureWatcher<QList<ScriteFileInfo>>::finished, this, [=]() {
+        m_allFileInfoList = futureWatcher->result();
         this->prepareModel();
         futureWatcher->deleteLater();
     });
 
     const QString documentId = m_document ? m_document->documentId() : QString();
-    const QFuture<QList<MetaData>> future =
-            QtConcurrent::run(fetchInfoAboutFilesInVault, documentId, m_folder, m_allMetaDataList);
+    const QFuture<QList<ScriteFileInfo>> future =
+            QtConcurrent::run(fetchInfoAboutFilesInVault, documentId, m_folder, m_allFileInfoList);
     futureWatcher->setFuture(future);
 }
 
@@ -331,13 +312,14 @@ void ScriteDocumentVault::prepareModel()
 {
     this->beginResetModel();
 
-    m_metaDataList.clear();
+    m_fileInfoList.clear();
 
     if (m_enabled) {
         const QString currentDocumentId = m_document ? m_document->documentId() : QString();
-        std::copy_if(m_allMetaDataList.begin(), m_allMetaDataList.end(),
-                     std::back_inserter(m_metaDataList), [currentDocumentId](const MetaData &md) {
-                         return md.documentId != currentDocumentId;
+        std::copy_if(m_allFileInfoList.begin(), m_allFileInfoList.end(),
+                     std::back_inserter(m_fileInfoList),
+                     [currentDocumentId](const ScriteFileInfo &sfi) {
+                         return sfi.documentId != currentDocumentId;
                      });
     }
 

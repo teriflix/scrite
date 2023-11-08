@@ -139,7 +139,7 @@ Rectangle {
 
             ToolButton3 {
                 id: structureTabButton
-                visible: ui.showNotebookInStructure
+                visible: mainScriteDocumentView.showNotebookInStructure
                 iconSource: "../icons/navigation/structure_tab.png"
                 ToolTip.text: "Structure Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
@@ -149,7 +149,7 @@ Rectangle {
 
             ToolButton3 {
                 id: notebookTabButton
-                visible: ui.showNotebookInStructure
+                visible: mainScriteDocumentView.showNotebookInStructure
                 iconSource: "../icons/navigation/notebook_tab.png"
                 down: true
                 ToolTip.text: "Notebook\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
@@ -1285,7 +1285,7 @@ Rectangle {
             id: notesSummary
             property var componentData
             property Notes notes: componentData.notebookItemObject
-            property real minimumNoteSize: Math.max(200, ui.width*0.15)
+            property real minimumNoteSize: Math.max(200, mainScriteDocumentView.width*0.15)
             property real noteSize: notesFlick.width > minimumNoteSize ? notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize) : notesFlick.width
             clip: true
             color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
@@ -2402,7 +2402,7 @@ Rectangle {
 
                             Rectangle {
                                 id: characterQuickInfoArea
-                                width: workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, ui.width*0.3)
+                                width: workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, mainScriteDocumentView.width*0.3)
                                 height: parent.height
                                 color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
 
@@ -2946,8 +2946,8 @@ Rectangle {
         id: addRelationshipDialogComponent
 
         Rectangle {
-            width: Math.max(maxTextAreaSize, ui.width*0.5)
-            height: Math.min(ui.height*0.85, Math.min(charactersList.height, 500) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80)
+            width: Math.max(maxTextAreaSize, mainScriteDocumentView.width*0.5)
+            height: Math.min(mainScriteDocumentView.height*0.85, Math.min(charactersList.height, 500) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80)
             color: primaryColors.c10.background
 
             Component.onCompleted: {
@@ -3281,7 +3281,7 @@ Rectangle {
 
     Loader {
         id: structureIconAnimator
-        active: workspaceSettings.animateStructureIcon && !modalDialog.active && ui.showNotebookInStructure
+        active: workspaceSettings.animateStructureIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: structureTabButton

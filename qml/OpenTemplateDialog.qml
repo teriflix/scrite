@@ -20,8 +20,8 @@ import "../js/utils.js" as Utils
 
 Item {
     id: newFileDialog
-    width: documentUI.width * 0.75
-    height: documentUI.height * 0.85
+    width: scriteDocumentViewItem.width * 0.75
+    height: scriteDocumentViewItem.height * 0.85
 
     signal importStarted()
     signal importFinished()

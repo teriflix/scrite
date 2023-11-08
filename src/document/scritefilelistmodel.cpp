@@ -14,8 +14,14 @@
 #include "scritefilelistmodel.h"
 
 #include <QDir>
+#include <QTimer>
+#include <QFileSystemWatcher>
 
-ScriteFileListModel::ScriteFileListModel(QObject *parent) : QAbstractListModel(parent) { }
+ScriteFileListModel::ScriteFileListModel(QObject *parent) : QAbstractListModel(parent)
+{
+    m_watcher = new QFileSystemWatcher(this);
+    connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &ScriteFileListModel::update);
+}
 
 ScriteFileListModel::~ScriteFileListModel() { }
 
@@ -29,9 +35,11 @@ QStringList ScriteFileListModel::filesInFolder(const QString &folder)
             dir.entryInfoList(QStringList { "*.scrite" }, QDir::Files, QDir::Time | QDir::Reversed);
     QStringList ret;
     std::transform(fiList.begin(), fiList.end(), std::back_inserter(ret), [](const QFileInfo &fi) {
+        // TODO: load() could be time-consuming, perhaps it should be done in a separate thread.
         const ScriteFileInfo sfi = ScriteFileInfo::load(fi);
         if (sfi.isValid())
             return sfi.filePath;
+        return QString();
     });
 
     return ret;
@@ -41,6 +49,7 @@ void ScriteFileListModel::setFiles(const QStringList &val)
 {
     QList<ScriteFileInfo> newList;
     for (const QString &filePath : val) {
+        // TODO: load() could be time-consuming, perhaps it should be done in a separate thread.
         const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
         if (sfi.isValid())
             newList.append(sfi);
@@ -49,8 +58,12 @@ void ScriteFileListModel::setFiles(const QStringList &val)
     if (newList == m_files)
         return;
 
+    m_watcher->removePaths(m_watcher->files());
+
     this->beginResetModel();
     m_files = newList.mid(0, m_maxCount);
+    for (const ScriteFileInfo &sfi : qAsConst(m_files))
+        m_watcher->addPath(sfi.filePath);
     this->endResetModel();
 
     emit filesChanged();
@@ -73,6 +86,10 @@ void ScriteFileListModel::setMaxCount(int val)
     emit maxCountChanged();
 
     if (m_maxCount > m_files.size()) {
+        const auto prunedFiles = m_files.mid(m_maxCount);
+        for (auto prunedFile : prunedFiles)
+            m_watcher->removePath(prunedFile.filePath);
+
         this->beginRemoveRows(QModelIndex(), m_maxCount, m_files.size() - 1);
         m_files = m_files.mid(0, m_maxCount);
         this->endRemoveRows();
@@ -81,6 +98,7 @@ void ScriteFileListModel::setMaxCount(int val)
 
 void ScriteFileListModel::add(const QString &filePath)
 {
+    // TODO: load() could be time-consuming, perhaps it should be done in a separate thread.
     const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
     if (!sfi.isValid())
         return;
@@ -97,7 +115,26 @@ void ScriteFileListModel::add(const QString &filePath)
 
     this->beginInsertRows(QModelIndex(), 0, 0);
     m_files.prepend(sfi);
-    this->endRemoveRows();
+    this->endInsertRows();
+
+    m_watcher->addPath(sfi.filePath);
+
+    emit filesChanged();
+}
+
+void ScriteFileListModel::update(const QString &filePath)
+{
+    const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
+    if (!sfi.isValid())
+        return;
+
+    const int idx = m_files.indexOf(sfi);
+    if (idx < 0)
+        return;
+
+    const QModelIndex index = this->index(idx);
+    m_files.replace(idx, sfi);
+    emit dataChanged(index, index);
 }
 
 QVariant ScriteFileListModel::data(const QModelIndex &index, int role) const

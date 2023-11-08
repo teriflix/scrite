@@ -24,7 +24,7 @@ import "../js/utils.js" as Utils
 Item {
     id: optionsDialog
     width: 1050
-    height: Math.min(documentUI.height*0.9, 750)
+    height: Math.min(scriteDocumentViewItem.height*0.9, 750)
     readonly property color dialogColor: primaryColors.windowColor
     readonly property var systemFontInfo: Scrite.app.systemFontInfo()
 
@@ -739,7 +739,7 @@ Item {
                             checkable: true
                             enabled: Scrite.document.structure.elementStacks.objectCount === 0
                             checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
-                            onToggled: contentLoader.reset( () => {
+                            onToggled: mainUiContentLoader.reset( () => {
                                                                Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
                                                                Scrite.document.structure.indexCardContent = Structure.Synopsis
                                                            } )
@@ -913,8 +913,8 @@ Item {
                         }
 
                         CheckBox2 {
-                            checked: ui.showNotebookInStructure
-                            enabled: ui.canShowNotebookInStructure
+                            checked: mainScriteDocumentView.showNotebookInStructure
+                            enabled: mainScriteDocumentView.canShowNotebookInStructure
                             text: "Move Notebook into the Structure tab"
                             onToggled: {
                                 workspaceSettings.showNotebookInStructure = checked

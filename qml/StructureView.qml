@@ -45,7 +45,7 @@ Item {
 
             ToolButton3 {
                 id: structureTabButton
-                visible: ui.showNotebookInStructure
+                visible: mainScriteDocumentView.showNotebookInStructure
                 iconSource: "../icons/navigation/structure_tab.png"
                 down: true
                 ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
@@ -53,7 +53,7 @@ Item {
 
             ToolButton3 {
                 id: notebookTabButton
-                visible: ui.showNotebookInStructure
+                visible: mainScriteDocumentView.showNotebookInStructure
                 iconSource: "../icons/navigation/notebook_tab.png"
                 ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
@@ -949,9 +949,9 @@ Item {
                             floatingDockWidget.hide()
                         else {
                             if(floatingDockWidget.contentX < 0) {
-                                var maxContentX = (documentUI.width - floatingDockWidget.contentWidth - 20)
-                                floatingDockWidget.contentX = Math.min(documentUI.mapFromItem(structureView, 0, 0).x + structureView.width + 40, maxContentX)
-                                floatingDockWidget.contentY = (documentUI.height - floatingDockWidget.contentHeight)/2
+                                var maxContentX = (scriteDocumentViewItem.width - floatingDockWidget.contentWidth - 20)
+                                floatingDockWidget.contentX = Math.min(scriteDocumentViewItem.mapFromItem(structureView, 0, 0).x + structureView.width + 40, maxContentX)
+                                floatingDockWidget.contentY = (scriteDocumentViewItem.height - floatingDockWidget.contentHeight)/2
                             }
 
                             if(structureCanvasSettings.displayAnnotationProperties)
@@ -2158,7 +2158,7 @@ Item {
                                     if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
                                         Scrite.document.structure.indexCardContent = Structure.Synopsis
                                     else
-                                        contentLoader.reset( () => {
+                                        mainUiContentLoader.reset( () => {
                                             Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
                                             Scrite.document.structure.indexCardContent = Structure.Synopsis
                                         } )
@@ -2176,7 +2176,7 @@ Item {
                                     if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
                                         Scrite.document.structure.indexCardContent = Structure.FeaturedPhoto
                                     else
-                                        contentLoader.reset( () => {
+                                        mainUiContentLoader.reset( () => {
                                             Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
                                             Scrite.document.structure.indexCardContent = Structure.FeaturedPhoto
                                         } )
@@ -2189,7 +2189,7 @@ Item {
                             icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                             onClicked: {
                                 if(!_checked)
-                                    contentLoader.reset( () => {
+                                    mainUiContentLoader.reset( () => {
                                         Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
                                     } )
                             }
@@ -4038,7 +4038,7 @@ Item {
 
     Loader {
         id: notebookIconAnimator
-        active: workspaceSettings.animateNotebookIcon && !modalDialog.active && ui.showNotebookInStructure
+        active: workspaceSettings.animateNotebookIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: notebookTabButton
