@@ -532,8 +532,6 @@ Item {
                     fileName: Scrite.app.settingsFilePath
                     category: "RecentFiles"
                     property alias files: recentFilesModel.files
-                    property string lastOpenFilePath
-                    property bool autoOpenLastFile: true
                 }
 
                 ScriteFileListModel {
@@ -685,7 +683,43 @@ Item {
                         }
                     }
                 }
+            }
 
+            ToolButton3 {
+                id: cmdReports
+                iconSource: "../icons/content/stats.png"
+                ToolTip.text: "Reports"
+                checkable: false
+                checked: false
+                onClicked: reportsMenu.open()
+                visible: scriteDocumentViewItem.width >= 1400 || !appToolBar.visible
+
+                Item {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.bottom: parent.bottom
+
+                    Menu2 {
+                        id: reportsMenu
+                        width: 250
+
+                        Repeater {
+                            model: Scrite.document.supportedReports
+
+                            MenuItem2 {
+                                required property var modelData
+                                text: modelData.name
+                                onClicked: {
+                                    modalDialog.closeable = false
+                                    modalDialog.arguments = text
+                                    modalDialog.sourceComponent = reportGeneratorConfigurationComponent
+                                    modalDialog.popupSource = cmdReports
+                                    modalDialog.active = true
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             /*
@@ -2205,8 +2239,8 @@ Item {
         }
     }
 
-    function showHomeScreen() {
-        modalDialog.popupSource = homeButton
+    function showHomeScreen(ps) {
+        modalDialog.popupSource = ps === undefined ? homeButton : ps
         modalDialog.sourceComponent = homeScreenComponent
         modalDialog.closeable = true
         modalDialog.active = true
@@ -2275,10 +2309,9 @@ Item {
                     "selectExisting": true,
                     "callback": function(path) {
                         mainUiContentLoader.allowContent = false
+                        recentFilesModel.add(path)
                         Scrite.document.open(path)
                         mainUiContentLoader.allowContent = true
-                        recentFilesModel.add(path)
-                        recentFilesSettings.lastOpenFilePath = path
                     },
                     "reset": true,
                     "notificationTitle": "Opening Scrite Project"
@@ -2287,9 +2320,8 @@ Item {
                     "nameFilters": ["Scrite Projects (*.scrite)"],
                     "selectExisting": false,
                     "callback": function(path) {
-                        Scrite.document.saveAs(path)
                         recentFilesModel.add(path)
-                        recentFilesSettings.lastOpenFilePath = path
+                        Scrite.document.saveAs(path)
                     },
                     "reset": false,
                     "notificationTitle": "Saving Scrite Project"
@@ -2510,23 +2542,14 @@ Item {
     }
 
     Component.onCompleted: {
-        var tryOpenLastFile = recentFilesSettings.autoOpenLastFile
         if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
             workspaceSettings.screenplayEditorWidth = -1
-        if(Scrite.app.maybeOpenAnonymously()) {
+        if(Scrite.app.maybeOpenAnonymously())
             splashLoader.active = false
-            tryOpenLastFile = false
-        }
         screenplayAdapter.sessionId = Scrite.document.sessionId
         Qt.callLater( function() {
             Announcement.shout("{f4048da2-775d-11ec-90d6-0242ac120003}", "restoreWindowGeometryDone")
         })
-
-        if(tryOpenLastFile) {
-            const lastFilePath = recentFilesSettings.lastOpenFilePath
-            if(lastFilePath !== "")
-                fileOperations.doOpen(lastFilePath)
-        }
     }
 
     BusyOverlay {

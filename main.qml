@@ -478,20 +478,6 @@ Rectangle {
         }
     }
 
-    Rectangle {
-        anchors.fill: parent
-        visible: Scrite.notifications.count > 0
-        color: Scrite.app.translucent(primaryColors.borderColor, 0.6)
-
-        UI.NotificationsView {
-            id: notificationsView
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.topMargin: -1
-            width: parent.width * 0.7
-        }
-    }
-
     Connections {
         target: Scrite.window
         function onScreenChanged() { Scrite.document.formatting.setSreeenFromWindow(Scrite.window) }
@@ -505,14 +491,35 @@ Rectangle {
             Component.onCompleted: dialogUnderlay.show()
             Component.onDestruction: dialogUnderlay.hide()
             onDone: {
+                const launchHomeScreen = function() {
+                    if(Scrite.user.loggedIn)
+                        mainScriteDocumentView.showHomeScreen(null)
+                }
                 splashLoader.active = false
                 if(Scrite.app.isWindowsPlatform && Scrite.app.isNotWindows10)
                     showInformation({
-                        "message": "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher."
+                        "message": "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
+                        "callback": function(value) { launchHomeScreen() }
                     })
+                else
+                    launchHomeScreen()
                 if(fileNameToOpen !== "")
                     Scrite.document.open(fileNameToOpen)
             }
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        visible: Scrite.notifications.count > 0
+        color: Scrite.app.translucent(primaryColors.borderColor, 0.6)
+
+        UI.NotificationsView {
+            id: notificationsView
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.topMargin: -1
+            width: parent.width * 0.7
         }
     }
 

@@ -86,8 +86,8 @@ void ScriteFileListModel::setMaxCount(int val)
     emit maxCountChanged();
 
     if (m_maxCount > m_files.size()) {
-        const auto prunedFiles = m_files.mid(m_maxCount);
-        for (auto prunedFile : prunedFiles)
+        const QList<ScriteFileInfo> prunedFiles = m_files.mid(m_maxCount);
+        for (const ScriteFileInfo &prunedFile : prunedFiles)
             m_watcher->removePath(prunedFile.filePath);
 
         this->beginRemoveRows(QModelIndex(), m_maxCount, m_files.size() - 1);
@@ -124,17 +124,23 @@ void ScriteFileListModel::add(const QString &filePath)
 
 void ScriteFileListModel::update(const QString &filePath)
 {
-    const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
-    if (!sfi.isValid())
-        return;
-
-    const int idx = m_files.indexOf(sfi);
+    const int idx = m_files.indexOf(ScriteFileInfo { filePath });
     if (idx < 0)
         return;
 
     const QModelIndex index = this->index(idx);
-    m_files.replace(idx, sfi);
-    emit dataChanged(index, index);
+
+    const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
+    if (sfi.isValid()) {
+        m_files.replace(idx, sfi);
+        emit dataChanged(index, index);
+    } else {
+        m_watcher->removePath(filePath);
+
+        this->beginRemoveRows(QModelIndex(), index.row(), index.row());
+        m_files.removeAt(index.row());
+        this->endRemoveRows();
+    }
 }
 
 QVariant ScriteFileListModel::data(const QModelIndex &index, int role) const

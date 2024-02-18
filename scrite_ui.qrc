@@ -95,5 +95,6 @@
         <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/CheckListView.qml</file>
         <file>qml/HomeScreen.qml</file>
+        <file>qml/SaveWorkflow.qml</file>
     </qresource>
 </RCC>

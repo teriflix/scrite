@@ -74,18 +74,18 @@ Item {
             if(privateData.showLoginWizardOnForceLoginRequest) {
                 if(splashLoader.active)
                     splashLoader.activeChanged.connect( () => {
-                        showLoginWizard()
+                        showLoginWizard(null)
                     })
                 else
-                    showLoginWizard()
+                    showLoginWizard(null)
                 privateData.showLoginWizardOnForceLoginRequest = false
             }
         }
     }
 
-    function showLoginWizard() {
+    function showLoginWizard(ps) {
         modalDialog.sourceComponent = loginWizard
-        modalDialog.popupSource = profilePic
+        modalDialog.popupSource = ps === undefined ? profilePic : ps
         modalDialog.active = true
     }
 

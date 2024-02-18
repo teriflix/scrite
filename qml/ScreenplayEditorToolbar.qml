@@ -42,39 +42,6 @@ Row {
     spacing: scriteDocumentViewItem.width >= 1440 ? 2 : 0
 
     ToolButton3 {
-        id: statsReportButton
-        iconSource: "../icons/content/stats.png"
-        ToolTip.text: "Generate Statistics Report"
-        checkable: false
-        checked: false
-        onClicked: Qt.callLater(generateStatsReport)
-        visible: scriteDocumentViewItem.width >= 1400 || !appToolBar.visible
-
-        function generateStatsReport() {
-            modalDialog.closeable = false
-            modalDialog.arguments = "Statistics Report"
-            modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-            modalDialog.popupSource = statsReportButton
-            modalDialog.active = true
-        }
-    }
-
-    ToolButton3 {
-        id: screenplayPreviewButton
-        iconSource: "../icons/file/generate_pdf.png"
-        ToolTip.text: "Generate PDF Output"
-        onClicked: Qt.callLater(generatePdf)
-
-        function generatePdf() {
-            modalDialog.closeable = false
-            modalDialog.arguments = "Screenplay/Adobe PDF"
-            modalDialog.sourceComponent = exporterConfigurationComponent
-            modalDialog.popupSource = screenplayPreviewButton
-            modalDialog.active = true
-        }
-    }
-
-    ToolButton3 {
         id: findButton
         iconSource: "../icons/action/search.png"
         shortcut: "Ctrl+F"

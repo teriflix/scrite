@@ -78,14 +78,36 @@ Item {
         visible: libraryService.busy
     }
 
+    Loader {
+        id: saveWorkflow
+        anchors.fill: parent
+        active: false
+        property var operation: null
+
+        function launch(op) {
+            operation = op
+            active = true
+        }
+
+        sourceComponent: SaveWorkflow {
+            onDone: {
+                saveWorkflow.operation = null
+                saveWorkflow.active = false
+            }
+            operation: saveWorkflow.operation
+        }
+    }
+
     LibraryService {
         id: libraryService
 
         onImportStarted: (index) => {
                              homeScreen.enabled = false
+                             mainUiContentLoader.allowContent = false
                          }
 
         onImportFinished: (index) => {
+                              mainUiContentLoader.allowContent = true
                               Utils.execLater(libraryService, 250, function() {
                                   modalDialog.close()
                               })
@@ -128,7 +150,7 @@ Item {
                     anchors.fill: parent
                     spacing: 10
 
-                    RecentFileOptions {
+                    QuickFileOpenOptions {
                         Layout.fillWidth: true
                         Layout.fillHeight: true
                     }
@@ -167,6 +189,7 @@ Item {
         property bool singleClick: true
 
         signal clicked()
+        signal doubleClicked()
 
         width: 100
         height: buttonLayout.height + 6
@@ -177,6 +200,7 @@ Item {
             width: parent.width - 10
             anchors.centerIn: parent
             spacing: 5
+            opacity: enabled ? 1 : 0.6
 
             Loader {
                 property real h: buttonLabel.contentHeight * 1.5
@@ -189,9 +213,9 @@ Item {
                 }
                 onLoaded: {
                     if(iconSource !== "")
-                        item.source = iconSource
+                        item.source = Qt.binding( () => { return iconSource } )
                     else
-                        item.image = iconImage
+                        item.image = Qt.binding( () => { return iconImage } )
                 }
             }
 
@@ -212,8 +236,14 @@ Item {
             hoverEnabled: singleClick || button.tooltip !== ""
             cursorShape: singleClick ? Qt.PointingHandCursor : Qt.ArrowCursor
             onClicked: button.clicked()
-            ToolTip.text: button.tooltip
-            ToolTip.visible: button.tooltip !== "" && containsMouse
+            onDoubleClicked: button.doubleClicked()
+
+            ToolTip {
+                text: button.tooltip
+                visible: text !== "" && parent.containsMouse
+                delay: Qt.styleHints.mousePressAndHoldInterval
+                contentWidth: homeScreen.width * 0.4
+            }
         }
     }
 
@@ -247,12 +277,15 @@ Item {
 
                     LinkButton {
                         text: "Blank Document"
-                        iconSource: "../images/blank_document.png"
+                        iconSource: "../icons/filetype/document.png"
                         Layout.fillWidth: true
                         tooltip: "Creates a new blank Scrite document."
                         onClicked: {
-                            // TODO: save before reset?
-                            Scrite.document.reset()
+                            saveWorkflow.launch( () => {
+                                                    homeScreen.enabled = false
+                                                    Scrite.document.reset()
+                                                    modalDialog.close()
+                                                } )
                         }
                     }
 
@@ -287,8 +320,9 @@ Item {
                         tooltip: record.description
                         iconSource: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
                         onClicked: {
-                            // TODO: save before open?
-                            libraryService.openTemplateAt(index)
+                            saveWorkflow.launch( () => {
+                                                    libraryService.openTemplateAt(index)
+                                                } )
                         }
                     }
                 }
@@ -303,27 +337,70 @@ Item {
             Layout.fillWidth: true
             tooltip: "Launches a file dialog box so you can select a .scrite file to load from disk."
             onClicked: {
-                mainFileDialog.accepted.connect( () => { modalDialog.close() } )
-                mainFileDialog.launch("OPEN")
+                saveWorkflow.launch( () => {
+                                        openFileDialog.open()
+                                    } )
             }
         }
 
         LinkButton {
-            text: "Scriptalay"
-            iconSource: "../icons/action/library.png"
+            text: recentFilesModel.count === 0 ? "Recent files ..." : "Scriptalay"
+            iconSource: recentFilesModel.count === 0 ? "../icons/filetype/document.png" : "../icons/action/library.png"
             Layout.fillWidth: true
-            tooltip: "Download a screenplay from our online-library of screenplays."
+            tooltip: recentFilesModel.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
             onClicked: stackView.push(scriptalayPage)
+            enabled: recentFilesModel.count > 0
         }
     }
 
-    component RecentFileOptions : Item {
+    Component {
+        id: quickFilesRecentFilesDelegate
+
+        LinkButton {
+            required property int index
+            required property var fileInfo
+            width: ListView.view.width
+            text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
+            tooltip: fileInfo.filePath
+            iconSource: fileInfo.hasCoverPage ? "" : "../icons/filetype/document.png"
+            iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
+            onClicked: {
+                saveWorkflow.launch( () => {
+                                      _private.openScriteDocument(fileInfo.filePath)
+                                    } )
+            }
+        }
+    }
+
+    Component {
+        id: quickFilesScriptalayDelegate
+
+        LinkButton {
+            required property int index
+            required property var record
+            width: ListView.view.width
+            text: record.name
+            tooltip: record.logline + "\n\n" + record.authors + "\n" + record.copyright
+            iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
+            onClicked: {
+                saveWorkflow.launch( () => {
+                                        libraryService.openScreenplayAt(index)
+                                    } )
+            }
+        }
+    }
+
+    // This component should show "Recent Files", if recent files exist
+    // It should show Scriptalay Scripts, if no recent files exist.
+    component QuickFileOpenOptions : Item {
+        property bool scriptalayMode: recentFilesModel.count === 0
+
         ColumnLayout {
             anchors.fill: parent
 
             Text {
                 font.pointSize: Scrite.app.idealFontPointSize
-                text: "Recent Files"
+                text: scriptalayMode ? "Scriptalay" : "Recent Files"
             }
 
             Rectangle {
@@ -332,38 +409,23 @@ Item {
                 // Layout.leftMargin: 20
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
-                border.width: recentFilesView.interactive ? 1 : 0
+                border.width: quickFilesView.interactive ? 1 : 0
                 border.color: primaryColors.borderColor
 
                 ListView {
-                    id: recentFilesView
+                    id: quickFilesView // shows either Scriptalay or Recent Files
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: recentFilesModel
+                    model: scriptalayMode ? libraryService.screenplays : recentFilesModel
                     currentIndex: -1
                     clip: true
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 {
-                        flickable: recentFilesView
+                        flickable: quickFilesView
                     }
                     highlightMoveDuration: 0
                     interactive: height < contentHeight
-                    delegate: LinkButton {
-                        required property int index
-                        required property var fileInfo
-                        width: recentFilesView.width
-                        text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
-                        tooltip: fileInfo.filePath
-                        iconSource: fileInfo.hasCoverPage ? "" : "../images/blank_document.png"
-                        iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
-                        onClicked: {
-                            if(Scrite.document.modified)
-                                fileOperations.doOpenLater(fileInfo.filePath)
-                            else
-                                fileOperations.doOpen(fileInfo.filePath)
-                            modalDialog.close()
-                        }
-                    }
+                    delegate: scriptalayMode ? quickFilesScriptalayDelegate : quickFilesRecentFilesDelegate
                 }
             }
         }
@@ -391,8 +453,10 @@ Item {
     component ScriptalayPage : Item {
         // Show contents of Scriptalay
         function openSelected() {
-            if(screenplaysView.currentIndex >= 0)
-                libraryService.openScreenplayAt(screenplaysView.currentIndex)
+            saveWorkflow.launch( () => {
+                                    if(screenplaysView.currentIndex >= 0)
+                                        libraryService.openScreenplayAt(screenplaysView.currentIndex)
+                                } )
         }
 
         RowLayout {
@@ -430,6 +494,10 @@ Item {
                         singleClick: false
                         iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
                         onClicked: screenplaysView.currentIndex = index
+                        onDoubleClicked: {
+                            screenplaysView.currentIndex = index
+                            Qt.callLater(openSelected)
+                        }
                     }
                 }
             }
@@ -482,13 +550,18 @@ Item {
             if(vaultFilesView.currentIndex < 0)
                 return
 
-            // const fileInfo = vaultFilesView.currentItem.fileInfo
-            homeScreenBusyOverlay.visible = true
-            scriteDocumentViewItem.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath, () => { modalDialog.close() })
+            saveWorkflow.launch( () => {
+                                    homeScreenBusyOverlay.visible = true
+                                    homeScreen.enabled = false
+                                    mainUiContentLoader.allowContent = false
+                                    Scrite.document.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
+                                    mainUiContentLoader.allowContent = true
+                                    modalDialog.close()
+                                } )
         }
 
         function clearVault() {
-
+            Scrite.vault.clearAllDocuments()
         }
 
         ListView {
@@ -499,6 +572,7 @@ Item {
             model: Scrite.vault
             FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
             currentIndex: count ? 0 : -1
+            visible: count > 0
             ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
             highlight: Rectangle {
                 color: primaryColors.highlight.background
@@ -515,7 +589,7 @@ Item {
 
                 singleClick: false
                 iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
-                iconSource: fileInfo.hasCoverPage ? "" : "../images/blank_document.png"
+                iconSource: fileInfo.hasCoverPage ? "" : "../icons/filetype/document.png"
                 text: "<b>" + fileInfo.title + "</b> (" + fileInfo.sceneCount + (fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")<br/>" +
                       "<font size=\"-1\">" + fileSizeInfo + ", " + relativeTime + " on " + timestampAsString + "</font>"
                 property string fileSizeInfo: {
@@ -528,7 +602,20 @@ Item {
                 }
 
                 onClicked: vaultFilesView.currentIndex = index
+                onDoubleClicked: {
+                    vaultFilesView.currentIndex = index
+                    Qt.callLater( openSelected )
+                }
             }
+        }
+
+        Text {
+            anchors.centerIn: parent
+            width: parent.width * 0.8
+            visible: Scrite.vault.documentCount === 0
+            horizontalAlignment: Text.AlignHCenter
+            wrapMode: Text.WordWrap
+            text: "No documents found in vault."
         }
     }
 
@@ -538,8 +625,12 @@ Item {
         function onActionButtonClicked() {
             if(importPageStackLayout.currentIndex === 1)
                 dropBrowseItem.doBrowse()
-            else if(importPageStackLayout.currentIndex === 2)
-                importDroppedFileItem.doImport()
+            else if(importPageStackLayout.currentIndex === 2) {
+                saveWorkflow.launch( () => {
+                                        homeScreen.enabled = false
+                                        importDroppedFileItem.doImport()
+                                    } )
+            }
         }
 
         QtObject {
@@ -547,7 +638,9 @@ Item {
 
             property bool valid: path !== ""
             property string path
-            property string name: Scrite.app.fileInfo(path).fileName
+            property var info: Scrite.app.fileInfo(path)
+            property string name: info.fileName
+            property string folder: info.absolutePath
         }
 
         AppFeature {
@@ -582,11 +675,13 @@ Item {
                 color: Qt.rgba(0,0,0,0)
 
                 function doBrowse() {
-                    fileDialog.open()
+                    importFileDialog.open()
                 }
 
                 FileDialog {
-                    id: fileDialog
+                    id: importFileDialog
+                    title: "Import Screenplay"
+                    objectName: "Import Dialog Box"
                     nameFilters: ["*.scrite *.fdx *.fountain *.txt *.fountain *.html"]
                     selectFolder: false
                     selectMultiple: false
@@ -621,7 +716,7 @@ Item {
                         verticalAlignment: Text.AlignVCenter
                         font.pointSize: Scrite.app.idealFontPointSize-1
                         color: primaryColors.c700.background
-                        text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + fileDialog.nameFilters.join(", ") + ")"
+                        text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + importFileDialog.nameFilters.join(", ") + ")"
                     }
                 }
             }
@@ -633,7 +728,15 @@ Item {
                 color: Qt.rgba(0,0,0,0)
 
                 function doImport() {
+                    homeScreenBusyOverlay.busyMessage = "Importing screenplay ..."
+                    homeScreenBusyOverlay.visible = true
+
+                    workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
+
+                    mainUiContentLoader.allowContent = false
                     Scrite.document.openOrImport(fileToImport.path)
+                    mainUiContentLoader.allowContent = true
+
                     modalDialog.close()
                 }
 
@@ -707,9 +810,19 @@ Item {
                 width: parent.width
                 anchors.bottom: parent.bottom
 
-                Button {
+                Button2 {
                     text: "< Back"
                     onClicked: stackView.pop()
+
+                    EventFilter.target: Scrite.app
+                    EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease,EventFilter.Shortcut]
+                    EventFilter.onFilter: (watched,event,result) => {
+                                              if(event.key === Qt.Key_Escape) {
+                                                  result.acceptEvent = true
+                                                  result.filter = true
+                                                  stackView.pop()
+                                              }
+                                          }
                 }
 
                 Loader {
@@ -741,7 +854,7 @@ Item {
                     fillMode: Image.PreserveAspectFit
                 }
             }
-            buttons: Button {
+            buttons: Button2 {
                 text: "Open"
                 enabled: libraryService.screenplays.count > 0
                 onClicked: scriptalayPageItem.contentItem.openSelected()
@@ -758,22 +871,23 @@ Item {
             title: Text {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                text: "Select a file to restore from the vault."
+                text: Scrite.vault.documentCount > 0 ? "Select a file to restore from the vault." : ""
                 font.pointSize: Scrite.app.idealFontPointSize
                 elide: Text.ElideRight
             }
             buttons: RowLayout {
                 spacing: 10
 
-                Button {
+                Button2 {
                     text: "Open"
                     onClicked: vaultPageItem.contentItem.openSelected()
                     enabled: Scrite.vault.documentCount > 0
                 }
 
-                Button {
+                Button2 {
                     text: "Clear"
                     enabled: Scrite.vault.documentCount > 0
+                    onClicked: vaultPageItem.contentItem.clearVault()
                 }
             }
         }
@@ -787,12 +901,52 @@ Item {
             content: ImportPage { }
             title: Item { }
             buttons: RowLayout {
-                Button {
+                Button2 {
                     visible: importPageItem.contentItem.hasActionButton
                     text: importPageItem.contentItem.actionButtonText
                     onClicked: importPageItem.contentItem.onActionButtonClicked()
                 }
             }
+        }
+    }
+
+    FileDialog {
+        id: openFileDialog
+
+        title: "Open Scrite Document"
+        nameFilters: ["Scrite Documents (*.scrite)"]
+        selectFolder: false
+        selectMultiple: false
+        objectName: "Open File Dialog"
+        dirUpAction.shortcut: "Ctrl+Shift+U"
+        folder: workspaceSettings.lastOpenFolderUrl
+        onFolderChanged: workspaceSettings.lastOpenFolderUrl = folder
+        sidebarVisible: true
+        selectExisting: true
+
+        onAccepted: {
+            workspaceSettings.lastOpenFolderUrl = fileUrl
+
+            const path = Scrite.app.urlToLocalFile(fileUrl)
+            _private.openScriteDocument(path)
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        function openScriteDocument(path) {
+            homeScreenBusyOverlay.busyMessage = "Opening document ..."
+            homeScreenBusyOverlay.visible = true
+
+            homeScreen.enabled = false
+
+            mainUiContentLoader.allowContent = false
+            recentFilesModel.add(path)
+            Scrite.document.open(path)
+            mainUiContentLoader.allowContent = true
+
+            modalDialog.close()
         }
     }
 }

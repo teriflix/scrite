@@ -51,6 +51,8 @@ public:
 
     // Using this method we can add a new file to list, as the first item in the list
     Q_INVOKABLE void add(const QString &filePath);
+
+    // Using this method
     Q_INVOKABLE void update(const QString &filePath);
 
     // This property returns the number of items in the model

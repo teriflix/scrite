@@ -84,7 +84,7 @@ Rectangle {
     EventFilter.target: Scrite.app
     EventFilter.events: [6] // KeyPress
     EventFilter.active: closeOnEscape && visible
-    EventFilter.onFilter: (event) => {
+    EventFilter.onFilter: (watched,event,result) => {
         if(event.key === Qt.Key_Escape) {
             result.acceptEvent = true
             result.filter = true
@@ -164,6 +164,8 @@ Rectangle {
         anchors.top: contentsArea.top
         anchors.right: contentsArea.right
         anchors.margins: -width/2
+        width: 36
+        height: 36
         source: "../icons/action/dialog_close_button.png"
         smooth: true
         fillMode: Image.PreserveAspectFit
