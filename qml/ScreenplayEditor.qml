@@ -3860,7 +3860,7 @@ Rectangle {
 
     Menu2 {
         id: characterMenu
-        width: 300
+        width: 350
         property Item popupSource
         property string characterName
         property var characterReports: []
@@ -3869,6 +3869,8 @@ Rectangle {
             model: characterMenu.characterReports
 
             MenuItem2 {
+                required property var modelData
+
                 leftPadding: 15
                 rightPadding: 15
                 topPadding: 5
@@ -3896,8 +3898,11 @@ Rectangle {
                 }
 
                 onTriggered: {
-                    reportGeneratorTimer.requestSource = this
-                    reportGeneratorTimer.reportArgs = {"reportName": modelData.name, "configuration": {"characterNames": [characterMenu.characterName]}}
+                    Scrite.app.log( JSON.stringify(modelData) )
+                    const reportArgs = {"reportName": modelData.name, "configuration": {"characterNames": [characterMenu.characterName]}}
+                    Utils.execLater(screenplayEditor, 100, (reportArgs) => {
+                                        showReportWorkflow(reportArgs)
+                                    }, reportArgs)
                     characterMenu.close()
                     characterMenu.characterName = ""
                 }

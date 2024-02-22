@@ -21,6 +21,8 @@ class OdtExporter : public AbstractTextDocumentExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Screenplay/Open Document Format")
     Q_CLASSINFO("NameFilters", "Open Document Format (*.odt)")
+    Q_CLASSINFO("Description", "Exports the current screenplay to Open Document Text file format. Such files can be opened in Google Docs, Microsoft Word and Libre/Open Office.")
+    Q_CLASSINFO("Icon", ":/icons/exporter/odt.png")
 
 public:
     Q_INVOKABLE explicit OdtExporter(QObject *parent = nullptr);

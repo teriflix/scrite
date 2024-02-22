@@ -70,6 +70,13 @@ QString AbstractReportGenerator::description() const
     return cii >= 0 ? QString::fromLatin1(this->metaObject()->classInfo(cii).value()) : QString();
 }
 
+QIcon AbstractReportGenerator::icon() const
+{
+    const int cii = this->metaObject()->indexOfClassInfo("Icon");
+    return cii >= 0 ? QIcon(QString::fromLatin1(this->metaObject()->classInfo(cii).value()))
+                    : QIcon();
+}
+
 bool AbstractReportGenerator::isFeatureEnabled() const
 {
     if (User::instance()->isLoggedIn()) {

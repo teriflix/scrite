@@ -21,6 +21,8 @@ class FinalDraftExporter : public AbstractExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Screenplay/Final Draft")
     Q_CLASSINFO("NameFilters", "Final Draft (*.fdx)")
+    Q_CLASSINFO("Description", "Exports the current screenplay to Final Draft (FDX) file format.")
+    Q_CLASSINFO("Icon", ":/icons/exporter/final_draft.png")
 
 public:
     Q_INVOKABLE explicit FinalDraftExporter(QObject *parent = nullptr);

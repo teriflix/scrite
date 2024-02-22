@@ -15,12 +15,21 @@
 
 #include <QDir>
 #include <QTimer>
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QtConcurrentRun>
+#include <QtConcurrentMap>
 #include <QFileSystemWatcher>
 
 ScriteFileListModel::ScriteFileListModel(QObject *parent) : QAbstractListModel(parent)
 {
     m_watcher = new QFileSystemWatcher(this);
     connect(m_watcher, &QFileSystemWatcher::fileChanged, this, &ScriteFileListModel::update);
+
+    connect(this, &QAbstractListModel::rowsInserted, this, &ScriteFileListModel::filesChanged);
+    connect(this, &QAbstractListModel::rowsRemoved, this, &ScriteFileListModel::filesChanged);
+    connect(this, &QAbstractListModel::modelReset, this, &ScriteFileListModel::filesChanged);
+    connect(this, &QAbstractListModel::dataChanged, this, &ScriteFileListModel::filesChanged);
 }
 
 ScriteFileListModel::~ScriteFileListModel() { }
@@ -34,24 +43,28 @@ QStringList ScriteFileListModel::filesInFolder(const QString &folder)
     const QFileInfoList fiList =
             dir.entryInfoList(QStringList { "*.scrite" }, QDir::Files, QDir::Time | QDir::Reversed);
     QStringList ret;
-    std::transform(fiList.begin(), fiList.end(), std::back_inserter(ret), [](const QFileInfo &fi) {
-        // TODO: load() could be time-consuming, perhaps it should be done in a separate thread.
-        const ScriteFileInfo sfi = ScriteFileInfo::load(fi);
-        if (sfi.isValid())
-            return sfi.filePath;
-        return QString();
-    });
+    std::transform(fiList.begin(), fiList.end(), std::back_inserter(ret),
+                   [](const QFileInfo &fi) { return fi.absoluteFilePath(); });
 
     return ret;
 }
 
-void ScriteFileListModel::setFiles(const QStringList &val)
+inline static ScriteFileInfo loadScriteFileInfo(const QString &filePath)
 {
+    ScriteFileInfo ret = ScriteFileInfo::load(filePath);
+    if (!ret.isValid())
+        ret.filePath = filePath;
+
+    return ret;
+};
+
+void ScriteFileListModel::setFiles(const QStringList &filePaths)
+{
+    // Right now, we are only doing a quick load of ScriteFileInfo objects
     QList<ScriteFileInfo> newList;
-    for (const QString &filePath : val) {
-        // TODO: load() could be time-consuming, perhaps it should be done in a separate thread.
-        const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
-        if (sfi.isValid())
+    for (const QString &filePath : filePaths) {
+        const ScriteFileInfo sfi = ScriteFileInfo::quickLoad(filePath);
+        if (sfi.fileInfo.exists())
             newList.append(sfi);
     }
 
@@ -66,7 +79,18 @@ void ScriteFileListModel::setFiles(const QStringList &val)
         m_watcher->addPath(sfi.filePath);
     this->endResetModel();
 
-    emit filesChanged();
+    // At this point, we can afford to schedule a complete load of ScriteFileInfo
+    // objects in a separate thread. As and when we get results, we can update
+    // them in the model.
+    QFutureWatcher<ScriteFileInfo> *futureWatcher = new QFutureWatcher<ScriteFileInfo>(this);
+    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::resultReadyAt, this, [=](int index) {
+        const ScriteFileInfo sfi = futureWatcher->resultAt(index);
+        this->updateFromScriteFileInfo(sfi);
+    });
+    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::finished, futureWatcher,
+            &QObject::deleteLater);
+    QFuture<ScriteFileInfo> future = QtConcurrent::mapped(filePaths, loadScriteFileInfo);
+    futureWatcher->setFuture(future);
 }
 
 QStringList ScriteFileListModel::files() const
@@ -98,44 +122,94 @@ void ScriteFileListModel::setMaxCount(int val)
 
 void ScriteFileListModel::add(const QString &filePath)
 {
-    // TODO: load() could be time-consuming, perhaps it should be done in a separate thread.
-    const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
-    if (!sfi.isValid())
+    // Right now, we are only doing a quick load of ScriteFileInfo object for the given filePath
+    ScriteFileInfo sfi = ScriteFileInfo::quickLoad(filePath);
+    if (!sfi.fileInfo.exists())
         return;
 
     const int idx = m_files.indexOf(sfi);
-    if (idx == 0)
-        return;
+    if (idx != 0) {
+        if (idx > 0) {
+            this->beginRemoveRows(QModelIndex(), idx, idx);
+            sfi = m_files.takeAt(idx);
+            this->endRemoveRows();
+        }
 
-    if (idx > 0) {
-        this->beginRemoveRows(QModelIndex(), idx, idx);
-        m_files.removeAt(idx);
-        this->endRemoveRows();
+        this->beginInsertRows(QModelIndex(), 0, 0);
+        m_files.prepend(sfi);
+        this->endInsertRows();
+
+        m_watcher->addPath(sfi.filePath);
     }
 
-    this->beginInsertRows(QModelIndex(), 0, 0);
-    m_files.prepend(sfi);
-    this->endInsertRows();
-
-    m_watcher->addPath(sfi.filePath);
-
-    emit filesChanged();
+    // At this point, we can afford to schedule a complete load of ScriteFileInfo
+    // object in a separate thread and update this model when its done.
+    QFutureWatcher<ScriteFileInfo> *futureWatcher = new QFutureWatcher<ScriteFileInfo>(this);
+    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::finished, this, [=]() {
+        const ScriteFileInfo sfi = futureWatcher->result();
+        this->updateFromScriteFileInfo(sfi);
+        futureWatcher->deleteLater();
+    });
+    QFuture<ScriteFileInfo> future = QtConcurrent::run(loadScriteFileInfo, filePath);
+    futureWatcher->setFuture(future);
 }
 
 void ScriteFileListModel::update(const QString &filePath)
 {
-    const int idx = m_files.indexOf(ScriteFileInfo { filePath });
+    // Check if this path already existed in the model
+    int idx = -1;
+    for (int i = 0; i < m_files.size(); i++) {
+        if (m_files[i].filePath == filePath) {
+            idx = i;
+            break;
+        }
+    }
+
+    // If we did not already have the path in this model, then there is nothing to update.
     if (idx < 0)
         return;
 
     const QModelIndex index = this->index(idx);
 
-    const ScriteFileInfo sfi = ScriteFileInfo::load(filePath);
+    // If the file at filePath no longer exists, then we simply need to remove it.
+    if (!QFile::exists(filePath)) {
+        m_watcher->removePath(filePath);
+
+        this->beginRemoveRows(QModelIndex(), index.row(), index.row());
+        m_files.removeAt(index.row());
+        this->endRemoveRows();
+
+        return;
+    }
+
+    // At this point, we can afford to schedule a complete load of ScriteFileInfo
+    // object in a separate thread and update this model when its done.
+    QFutureWatcher<ScriteFileInfo> *futureWatcher = new QFutureWatcher<ScriteFileInfo>(this);
+    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::finished, this, [=]() {
+        const ScriteFileInfo sfi = futureWatcher->result();
+        this->updateFromScriteFileInfo(sfi);
+        futureWatcher->deleteLater();
+    });
+    QFuture<ScriteFileInfo> future = QtConcurrent::run(loadScriteFileInfo, filePath);
+    futureWatcher->setFuture(future);
+}
+
+void ScriteFileListModel::updateFromScriteFileInfo(const ScriteFileInfo &sfi)
+{
+    if (sfi.filePath.isEmpty())
+        return;
+
+    const int idx = m_files.indexOf(sfi);
+    if (idx < 0)
+        return;
+
+    const QModelIndex index = this->index(idx);
+
     if (sfi.isValid()) {
         m_files.replace(idx, sfi);
         emit dataChanged(index, index);
     } else {
-        m_watcher->removePath(filePath);
+        m_watcher->removePath(sfi.filePath);
 
         this->beginRemoveRows(QModelIndex(), index.row(), index.row());
         m_files.removeAt(index.row());

@@ -265,8 +265,6 @@
         <file>icons/action/filter_inverted.png</file>
         <file>icons/content/view_options.png</file>
         <file>icons/content/view_options_inverted.png</file>
-        <file>icons/content/stats.png</file>
-        <file>icons/content/stats_inverted.png</file>
         <file>icons/action/pin_inverted.png</file>
         <file>icons/action/pin.png</file>
         <file>icons/editor/format_clear.png</file>
@@ -289,5 +287,23 @@
         <file>icons/content/omitted_scene.png</file>
         <file>icons/action/home.png</file>
         <file>icons/action/home_inverted.png</file>
+        <file>icons/reports/character_report.png</file>
+        <file>icons/reports/location_report.png</file>
+        <file>icons/reports/character_screenplay.png</file>
+        <file>icons/reports/notebook_report.png</file>
+        <file>icons/reports/reports_menu_item.png</file>
+        <file>icons/reports/scene_character_matrix_report.png</file>
+        <file>icons/reports/screenplay_subset_report.png</file>
+        <file>icons/reports/statistics_report.png</file>
+        <file>icons/exporter/character_relationship_graph.png</file>
+        <file>icons/exporter/exporters_menu_item.png</file>
+        <file>icons/exporter/final_draft.png</file>
+        <file>icons/exporter/fountain.png</file>
+        <file>icons/exporter/html.png</file>
+        <file>icons/exporter/odt.png</file>
+        <file>icons/exporter/pdf.png</file>
+        <file>icons/exporter/structure_pdf.png</file>
+        <file>icons/exporter/text.png</file>
+        <file>icons/exporter/scrite.png</file>
     </qresource>
 </RCC>

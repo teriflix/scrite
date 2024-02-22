@@ -21,6 +21,8 @@ class TextExporter : public AbstractExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Screenplay/Text File")
     Q_CLASSINFO("NameFilters", "Text File (*.txt)")
+    Q_CLASSINFO("Description", "Exports the current screenplay as a text file.")
+    Q_CLASSINFO("Icon", ":/icons/exporter/text.png")
 
 public:
     Q_INVOKABLE explicit TextExporter(QObject *parent = nullptr);

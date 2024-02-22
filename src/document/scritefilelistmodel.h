@@ -52,7 +52,8 @@ public:
     // Using this method we can add a new file to list, as the first item in the list
     Q_INVOKABLE void add(const QString &filePath);
 
-    // Using this method
+    // Using this method we can update information about the file at filePath. If the
+    // file is deleted, the corresponding row will be removed from the model.
     Q_INVOKABLE void update(const QString &filePath);
 
     // This property returns the number of items in the model
@@ -70,6 +71,9 @@ public:
     {
         return { { FileInfoRole, QByteArrayLiteral("fileInfo") } };
     }
+
+private:
+    void updateFromScriteFileInfo(const ScriteFileInfo &sfi);
 
 private:
     int m_maxCount = 10;

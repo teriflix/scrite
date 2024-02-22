@@ -21,6 +21,8 @@ class PdfExporter : public AbstractTextDocumentExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Screenplay/Adobe PDF")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
+    Q_CLASSINFO("Description", "Exports the current screenplay to PDF format.")
+    Q_CLASSINFO("Icon", ":/icons/exporter/pdf.png")
 
 public:
     Q_INVOKABLE explicit PdfExporter(QObject *parent = nullptr);

@@ -25,11 +25,7 @@ struct ScriteFileInfo
 
 public:
     // Test whether a file info instance is valid or not
-    Q_INVOKABLE bool isValid() const
-    {
-        return !filePath.isEmpty() && !fileName.isEmpty() && !baseFileName.isEmpty()
-                && !documentId.isEmpty();
-    }
+    Q_INVOKABLE bool isValid() const;
 
     // Absolute file path
     Q_PROPERTY(QString filePath MEMBER filePath)
@@ -83,6 +79,9 @@ public:
     int sceneCount = 0;
 
     // Static method to help load a file-info from a given file
+    static ScriteFileInfo quickLoad(const QString &filePath);
+    static ScriteFileInfo quickLoad(const QFileInfo &filePath);
+
     static ScriteFileInfo load(const QString &filePath);
     static ScriteFileInfo load(const QFileInfo &fileInfo);
 

@@ -202,6 +202,66 @@ Item {
         }
     }
 
+    Settings {
+        id: recentFilesSettings
+        fileName: Scrite.app.settingsFilePath
+        category: "RecentFiles"
+        property alias files: recentFilesModel.files
+    }
+
+    ScriteFileListModel {
+        id: recentFilesModel
+
+        function addLater(filePath) {
+            Utils.execLater(recentFilesModel, 50, () => { recentFilesModel.add(filePath) } )
+        }
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+S"
+        onActivated: saveFileDialog.launch("SAVE_AS")
+
+        ShortcutsModelItem.group: "File"
+        ShortcutsModelItem.title: "Save As"
+        ShortcutsModelItem.shortcut: sequence
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+N"
+        onActivated: showHomeScreen(homeButton)
+
+        ShortcutsModelItem.group: "File"
+        ShortcutsModelItem.title: "New"
+        ShortcutsModelItem.shortcut: sequence
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+O"
+        onActivated: showHomeScreen(homeButton)
+
+        ShortcutsModelItem.group: "File"
+        ShortcutsModelItem.title: "Open"
+        ShortcutsModelItem.shortcut: sequence
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+O"
+        onActivated: {
+            showHomeScreen(homeButton)
+            Utils.execLater(modalDialog, 500, () => {
+                                Announcement.shout("710A08E7-9F60-4D36-9DEA-0993EEBA7DCA", "Scriptalay")
+                            })
+        }
+
+        ShortcutsModelItem.group: "File"
+        ShortcutsModelItem.title: "Scriptalay"
+        ShortcutsModelItem.shortcut: sequence
+    }
+
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+P"
@@ -524,70 +584,6 @@ Item {
 
             spacing: scriteDocumentViewItem.width >= 1440 ? 2 : 0
 
-            Item {
-                id: fileOperations
-
-                Settings {
-                    id: recentFilesSettings
-                    fileName: Scrite.app.settingsFilePath
-                    category: "RecentFiles"
-                    property alias files: recentFilesModel.files
-                }
-
-                ScriteFileListModel {
-                    id: recentFilesModel
-
-                    function addLater(filePath) {
-                        Utils.execLater(recentFilesModel, 50, () => { recentFilesModel.add(filePath) } )
-                    }
-                }
-
-                Connections {
-                    target: Scrite.app
-                    function onOpenFileRequest(filePath) { fileOperations.doOpen(filePath) }
-                }
-
-                function doOpenLater(filePath, delay) {
-                    if(delay === undefined)
-                        delay = 250
-                    Utils.execLater(fileOperations, delay, () => { doOpen(filePath) })
-                }
-
-                function doOpen(filePath) {
-                    if(filePath === Scrite.document.fileName)
-                        return
-
-                    if(Scrite.document.autoSave && Scrite.document.fileName !== "")
-                        Scrite.document.save()
-
-                    if(Scrite.document.modified) {
-                        const saveQuestionText = () => {
-                            if(Scrite.document.fileName === "")
-                                return "Do you want to save this document first?"
-                            return "Do you want to save changes to <strong>" + Scrite.app.fileName(Scrite.document.fileName) + "</strong> first?"
-                        }
-                        askQuestion({
-                                "question": saveQuestionText(),
-                                "okButtonText": "Yes",
-                                "cancelButtonText": "No",
-                                "abortButtonText": "Cancel",
-                                "callback": function(val) {
-                                    if(val) {
-                                        if(Scrite.document.fileName !== "")
-                                            Scrite.document.save()
-                                        else {
-                                            cmdSave.doClick()
-                                            return
-                                        }
-                                    }
-                                    mainFileDialog.launch("OPEN", filePath)
-                                }
-                            }, fileOperations)
-                    } else
-                        mainFileDialog.launch("OPEN", filePath)
-                }
-            }
-
             ToolButton3 {
                 id: homeButton
                 iconSource: "../icons/action/home.png"
@@ -628,15 +624,7 @@ Item {
                 text: "Save"
                 shortcut: "Ctrl+S"
                 enabled: Scrite.document.modified && !Scrite.document.readOnly
-                onClicked: doClick()
-                function doClick() {
-                    if(Scrite.document.fileName === "")
-                        mainFileDialog.launch("SAVE")
-                    else {
-                        mainFileDialog.mode = "SAVE"
-                        Scrite.document.save()
-                    }
-                }
+                onClicked: saveFileDialog.launch()
 
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text
@@ -647,13 +635,9 @@ Item {
             ToolButton3 {
                 id: cmdExport
                 text: "Export to ..."
-                shortcut: "Ctrl+Shift+S"
                 iconSource: "../icons/action/share.png"
                 enabled: appToolsMenu.visible === false
                 onClicked: exportMenu.open()
-                ShortcutsModelItem.group: "File"
-                ShortcutsModelItem.title: text
-                ShortcutsModelItem.shortcut: shortcut
 
                 Item {
                     anchors.left: parent.left
@@ -662,24 +646,32 @@ Item {
 
                     Menu2 {
                         id: exportMenu
-                        width: 250
-
-                        MenuItem2 {
-                            text: "Scrite"
-                            onClicked: mainFileDialog.launch("SAVE")
-                        }
+                        width: 300
 
                         Repeater {
                             model: Scrite.document.supportedExportFormats
 
                             MenuItem2 {
-                                required property string modelData
-                                text: {
-                                    var fields = modelData.split("/")
-                                    return fields[fields.length-1]
+                                required property var modelData
+                                text: modelData.name
+                                icon.source: "qrc" + modelData.icon
+                                onClicked: showExportWorkflow(modelData.key)
+
+                                ToolTip {
+                                    text: modelData.description + "\n\nCategory: " + modelData.category
+                                    width: 300
+                                    visible: parent.hovered
+                                    delay: Qt.styleHints.mousePressAndHoldInterval
                                 }
-                                onClicked: showExportWorkflow(modelData)
                             }
+                        }
+
+                        MenuSeparator { }
+
+                        MenuItem2 {
+                            text: "Scrite"
+                            icon.source: "qrc:/icons/exporter/scrite.png"
+                            onClicked: saveFileDialog.launch("SAVE_AS")
                         }
                     }
                 }
@@ -687,7 +679,7 @@ Item {
 
             ToolButton3 {
                 id: cmdReports
-                iconSource: "../icons/content/stats.png"
+                iconSource: "../icons/reports/reports_menu_item.png"
                 ToolTip.text: "Reports"
                 checkable: false
                 checked: false
@@ -701,7 +693,7 @@ Item {
 
                     Menu2 {
                         id: reportsMenu
-                        width: 250
+                        width: 350
 
                         Repeater {
                             model: Scrite.document.supportedReports
@@ -709,12 +701,14 @@ Item {
                             MenuItem2 {
                                 required property var modelData
                                 text: modelData.name
-                                onClicked: {
-                                    modalDialog.closeable = false
-                                    modalDialog.arguments = text
-                                    modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-                                    modalDialog.popupSource = cmdReports
-                                    modalDialog.active = true
+                                icon.source: "qrc" + modelData.icon
+                                onClicked: showReportWorkflow(modelData.name)
+
+                                ToolTip {
+                                    text: modelData.description
+                                    width: 300
+                                    visible: parent.hovered
+                                    delay: Qt.styleHints.mousePressAndHoldInterval
                                 }
                             }
                         }
@@ -895,8 +889,8 @@ Item {
                             MenuItem2 {
                                 property string baseText: modelData.key
                                 property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
-                                property string tabs: Scrite.app.isWindowsPlatform ? (modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t") : "\t\t"
-                                text: baseText + tabs + "" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
+                                property string tabs: /*Scrite.app.isWindowsPlatform ? (modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t") : */"\t\t"
+                                text: baseText + tabs + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
                                 font.bold: Scrite.app.transliterationEngine.language === modelData.value
                                 focusPolicy: Qt.NoFocus
                                 enabled: Scrite.app.transliterationEngine.enabledLanguages.indexOf(modelData.value) >= 0
@@ -1087,22 +1081,23 @@ Item {
                             title: "Share"
                             width: 250
 
-                            MenuItem2 {
-                                text: "Scrite"
-                                onClicked: mainFileDialog.launch("SAVE")
-                            }
-
                             Repeater {
                                 model: Scrite.document.supportedExportFormats
 
                                 MenuItem2 {
-                                    required property string modelData
-                                    text: {
-                                        var fields = modelData.split("/")
-                                        return fields[fields.length-1]
-                                    }
-                                    onClicked: showExportWorkflow(modelData)
+                                    required property var modelData
+                                    text: modelData.name
+                                    icon.source: "qrc" + modelData.icon
+                                    onClicked: showExportWorkflow(modelData.key)
                                 }
+                            }
+
+                            MenuSeparator { }
+
+                            MenuItem2 {
+                                text: "Scrite"
+                                icon.source: "qrc:/icons/exporter/scrite.png"
+                                onClicked: saveFileDialog.launch("SAVE_AS")
                             }
                         }
 
@@ -1114,7 +1109,9 @@ Item {
                                 model: Scrite.document.supportedReports
 
                                 MenuItem2 {
+                                    required property var modelData
                                     text: modelData.name
+                                    icon.source: "qrc" + modelData.icon
                                     onClicked: reportsMenu.itemAt(index).click()
                                     enabled: scriteDocumentViewItem.width >= 800
                                 }
@@ -1522,39 +1519,6 @@ Item {
             }
 
             onCloseRequest: pdfViewer.active = false
-        }
-    }
-
-    SequentialAnimation {
-        id: resetContentAnimation
-        property string filePath
-        property var callback
-        property bool openFileDialog: false
-
-        ScriptAction {
-            script: {
-                mainUiContentLoader.active = false
-            }
-        }
-
-        PauseAnimation {
-            duration: 100
-        }
-
-        ScriptAction {
-            script: {
-                if(resetContentAnimation.filePath === "")
-                    Scrite.document.reset()
-                else
-                    resetContentAnimation.callback(resetContentAnimation.filePath)
-                resetContentAnimation.filePath = ""
-                resetContentAnimation.callback = undefined
-                mainUiContentLoader.active = true
-
-                if(resetContentAnimation.openFileDialog)
-                    mainFileDialog.open()
-                resetContentAnimation.openFileDialog = false
-            }
         }
     }
 
@@ -2256,6 +2220,16 @@ Item {
         }
     }
 
+    function showReportWorkflow(reportName) {
+        if(reportName !== "") {
+            modalDialog.closeable = false
+            modalDialog.arguments = reportName
+            modalDialog.sourceComponent = reportGeneratorConfigurationComponent
+            modalDialog.popupSource = cmdReports
+            modalDialog.active = true
+        }
+    }
+
     Component {
         id: homeScreenComponent
 
@@ -2272,109 +2246,6 @@ Item {
         id: optionsDialogComponent
 
         OptionsDialog { }
-    }
-
-    FileDialog {
-        id: mainFileDialog
-        nameFilters: modes[mode].nameFilters
-        selectFolder: false
-        selectMultiple: false
-        objectName: "Main File Dialog"
-        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
-        onFolderChanged: {
-            if(mode === "OPEN")
-                workspaceSettings.lastOpenFolderUrl = folder
-            else
-                workspaceSettings.lastOpenImportFolderUrl = folder
-        }
-        sidebarVisible: true
-        selectExisting: modes[mode].selectExisting
-        property string mode: "OPEN"
-
-        property ErrorReport errorReport: Aggregation.findErrorReport(Scrite.document)
-        Notification.title: modes[mode].notificationTitle
-        Notification.text: errorReport.errorMessage
-        Notification.active: errorReport.hasError
-        Notification.autoClose: false
-        Notification.onDismissed: {
-            if(errorReport.details && errorReport.details.revealOnDesktopRequest)
-                Scrite.app.revealFileOnDesktop(errorReport.details.revealOnDesktopRequest)
-            errorReport.clear()
-        }
-
-        Component.onCompleted: {
-            var availableModes = {
-                "OPEN": {
-                    "nameFilters": ["Scrite Projects (*.scrite)"],
-                    "selectExisting": true,
-                    "callback": function(path) {
-                        mainUiContentLoader.allowContent = false
-                        recentFilesModel.add(path)
-                        Scrite.document.open(path)
-                        mainUiContentLoader.allowContent = true
-                    },
-                    "reset": true,
-                    "notificationTitle": "Opening Scrite Project"
-                },
-                "SAVE": {
-                    "nameFilters": ["Scrite Projects (*.scrite)"],
-                    "selectExisting": false,
-                    "callback": function(path) {
-                        recentFilesModel.add(path)
-                        Scrite.document.saveAs(path)
-                    },
-                    "reset": false,
-                    "notificationTitle": "Saving Scrite Project"
-                }
-            }
-
-            Scrite.document.supportedImportFormats.forEach(function(format) {
-                availableModes["IMPORT " + format] = {
-                    "nameFilters": Scrite.document.importFormatFileSuffix(format),
-                    "selectExisting": true,
-                    "callback": function(path) {
-                        mainUiContentLoader.allowContent = false
-                        Scrite.document.importFile(path, format)
-                        mainUiContentLoader.allowContent = true
-                    },
-                    "reset": true,
-                    "notificationTitle": "Creating Scrite project from " + format
-                }
-            })
-
-            modes = availableModes
-        }
-
-        property var modes
-
-        function launch(launchMode, filePath) {
-            mode = launchMode
-            folder = mode === "IMPORT" ? workspaceSettings.lastOpenImportFolderUrl : workspaceSettings.lastOpenFolderUrl
-
-            if(filePath)
-                Utils.execLater(Scrite.window, 250, function() { processFile(filePath) } )
-            else {
-                var modeInfo = modes[mode]
-                if(modeInfo["reset"] === true) {
-                    resetContentAnimation.openFileDialog = true
-                    resetContentAnimation.start()
-                } else
-                    open()
-            }
-        }
-
-        onAccepted: processFile()
-
-        function processFile(filePath) {
-            var modeInfo = modes[mode]
-            if(modeInfo["reset"] === true) {
-                resetContentAnimation.filePath = filePath ? filePath : Scrite.app.urlToLocalFile(fileUrl)
-                resetContentAnimation.callback = modeInfo.callback
-                resetContentAnimation.start()
-            } else {
-                modeInfo.callback(Scrite.app.urlToLocalFile(fileUrl))
-            }
-        }
     }
 
     Item {
@@ -2535,12 +2406,6 @@ Item {
         }
     }
 
-    Loader {
-        active: automationScript !== ""
-        source: automationScript
-        onSourceChanged: console.log("PA: " + source)
-    }
-
     Component.onCompleted: {
         if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
             workspaceSettings.screenplayEditorWidth = -1
@@ -2593,5 +2458,55 @@ Item {
             if(onCompleted)
                 onCompleted()
         })
+    }
+
+    FileDialog {
+        id: saveFileDialog
+
+        title: "Save Scrite Document As"
+        nameFilters: ["Scrite Documents (*.scrite)"]
+        selectFolder: false
+        selectMultiple: false
+        objectName: "Save File Dialog"
+        dirUpAction.shortcut: "Ctrl+Shift+U"
+        folder: workspaceSettings.lastOpenFolderUrl
+        onFolderChanged: workspaceSettings.lastOpenFolderUrl = folder
+        sidebarVisible: true
+        selectExisting: false
+
+        function launch(mode) {
+            if(Scrite.document.empty)
+                return
+
+            if(mode === "SAVE_AS") {
+                open()
+                return
+            }
+
+            if(!Scrite.document.modified || Scrite.document.readOnly)
+                 return;
+
+            if(Scrite.document.fileName === "") {
+                open()
+                return
+            }
+
+            Scrite.document.save()
+
+            const fileName = Scrite.document.fileName
+            const fileInfo = Scrite.app.fileInfo(fileName)
+            recentFilesModel.add(fileInfo.filePath)
+            return
+        }
+
+        onAccepted: {
+            const path = Scrite.app.urlToLocalFile(fileUrl)
+            Scrite.document.saveAs(path)
+
+            recentFilesModel.add(path)
+
+            const fileInfo = Scrite.app.fileInfo(path)
+            workspaceSettings.lastOpenFolderUrl = folder
+        }
     }
 }

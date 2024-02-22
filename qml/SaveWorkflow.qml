@@ -60,7 +60,8 @@ Item {
         id: _private
 
         function execute() {
-            saveWorkflow.operation()
+            if(saveWorkflow.operation)
+                saveWorkflow.operation()
             Qt.callLater(endWorkflow)
         }
 
@@ -81,6 +82,13 @@ Item {
         color: primaryColors.windowColor
         opacity: 0.9
         visible: workflowLoader.active
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            preventStealing: true
+            propagateComposedEvents: false
+        }
     }
 
     BoxShadow {
@@ -257,7 +265,7 @@ Item {
             recentFilesModel.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
-            workspaceSettings.lastOpenFolderUrl = Scrite.app.localFileToUrl(fileInfo.absolutePath)
+            workspaceSettings.lastOpenFolderUrl = folder
 
             _private.execute()
         }

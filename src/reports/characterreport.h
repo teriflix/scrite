@@ -21,6 +21,7 @@ class CharacterReport : public AbstractReportGenerator
     Q_OBJECT
     Q_CLASSINFO("Title", "Character Report")
     Q_CLASSINFO("Description", "Generate a report with dialogues and notes for one or more selected characters.")
+    Q_CLASSINFO("Icon", ":/icons/reports/character_report.png")
 
 public:
     Q_INVOKABLE explicit CharacterReport(QObject *parent = nullptr);

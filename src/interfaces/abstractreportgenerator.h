@@ -17,6 +17,7 @@
 #include "abstractdeviceio.h"
 #include "garbagecollector.h"
 
+#include <QIcon>
 #include <QTextDocument>
 
 class QPrinter;
@@ -42,10 +43,13 @@ public:
     Q_SIGNAL void formatChanged();
 
     Q_PROPERTY(QString title READ title CONSTANT)
-    QString title() const;
+    virtual QString title() const;
 
     Q_PROPERTY(QString description READ description CONSTANT)
-    QString description() const;
+    virtual QString description() const;
+
+    Q_PROPERTY(QIcon icon READ icon CONSTANT)
+    virtual QIcon icon() const;
 
     Q_PROPERTY(bool singlePageReport READ isSinglePageReport CONSTANT)
     virtual bool isSinglePageReport() const { return false; }

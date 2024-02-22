@@ -21,6 +21,7 @@ class CharacterScreenplayReport : public AbstractScreenplaySubsetReport
     Q_OBJECT
     Q_CLASSINFO("Title", "Character Screenplay")
     Q_CLASSINFO("Description", "Generate screenplay with only those scenes where one or more characters are present.")
+    Q_CLASSINFO("Icon", ":/icons/reports/character_screenplay.png")
 
 public:
     Q_INVOKABLE explicit CharacterScreenplayReport(QObject *parent = nullptr);

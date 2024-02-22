@@ -23,6 +23,7 @@ class NotebookReport : public AbstractReportGenerator
     Q_OBJECT
     Q_CLASSINFO("Title", "Notebook Report")
     Q_CLASSINFO("Description", "Generates a report of notes in the Notebook.")
+    Q_CLASSINFO("Icon", ":/icons/reports/notebook_report.png")
 
 public:
     Q_INVOKABLE NotebookReport(QObject *parent = nullptr);

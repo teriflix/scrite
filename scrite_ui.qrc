@@ -51,7 +51,6 @@
         <file>qml/DockWidget.qml</file>
         <file>qml/SpecialSymbolsPanel.qml</file>
         <file>qml/SpecialSymbolsSupport.qml</file>
-        <file>qml/OpenFromLibrary.qml</file>
         <file>qml/TabView2.qml</file>
         <file>qml/PageView.qml</file>
         <file>qml/AnnotationPropertyEditor.qml</file>
@@ -62,7 +61,6 @@
         <file>qml/ScritedView.qml</file>
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
-        <file>qml/OpenTemplateDialog.qml</file>
         <file>qml/BusyOverlay.qml</file>
         <file>qml/LodLoader.qml</file>
         <file>qml/MarkSceneAsMenu.qml</file>
@@ -86,7 +84,6 @@
         <file>qml/PdfView.qml</file>
         <file>qml/BusyIcon.qml</file>
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
-        <file>qml/DocumentVault.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
         <file>qml/RichTextEdit.qml</file>
         <file>qml/HelpTipNotification.qml</file>

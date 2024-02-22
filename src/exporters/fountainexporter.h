@@ -21,6 +21,8 @@ class FountainExporter : public AbstractExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Screenplay/Fountain")
     Q_CLASSINFO("NameFilters", "Fountain (*.fountain)")
+    Q_CLASSINFO("Description", "Exports the current screenplay to Fountain file format.")
+    Q_CLASSINFO("Icon", ":/icons/exporter/fountain.png")
 
 public:
     Q_INVOKABLE explicit FountainExporter(QObject *parent = nullptr);

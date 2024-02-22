@@ -1487,60 +1487,64 @@ QString ScriteDocument::importFormatFileSuffix(const QString &format) const
     return QString::fromLatin1(classInfo.value());
 }
 
-QStringList ScriteDocument::supportedExportFormats() const
+QJsonArray ScriteDocument::supportedExportFormats() const
 {
-    static const QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
-    static QStringList formats;
-    if (formats.isEmpty()) {
-        for (const QByteArray &key : keys)
-            formats << key;
-        std::sort(formats.begin(), formats.end());
+    static QJsonArray exporters;
 
-        if (formats.size() >= 2) {
-            QList<int> seps;
-            for (int i = formats.size() - 2; i >= 0; i--) {
-                QString thisFormat = formats.at(i);
-                QString previousFormat = formats.at(i + 1);
-                if (thisFormat.split("/").first() != previousFormat.split("/").first())
-                    seps << i + 1;
-            }
+    if (exporters.isEmpty()) {
+        QList<QByteArray> keys = deviceIOFactories->ExporterFactory.keys();
+        std::sort(keys.begin(), keys.end());
 
-            for (int sep : qAsConst(seps))
-                formats.insert(sep, QString());
+        for (const QByteArray &key : qAsConst(keys)) {
+            const QString skey = QString::fromLatin1(key);
+            const QStringList fields = skey.split("/");
+
+            QJsonObject item;
+            item.insert("key", skey);
+            item.insert("category", fields.first());
+            item.insert("name", fields.last());
+
+            const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(key);
+            const int d_cii = mo->indexOfClassInfo("Description");
+            item.insert("description",
+                        d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
+                                   : QString::fromLatin1(key));
+            const int i_cii = mo->indexOfClassInfo("Icon");
+            item.insert("icon",
+                        i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
+                                   : QStringLiteral(":/icons/exporters/exporters_menu_item.png"));
+            const int n_cii = mo->indexOfClassInfo("NameFilters");
+            item.insert("nameFilters",
+                        n_cii >= 0 ? QString::fromLatin1(mo->classInfo(n_cii).value())
+                                   : QStringLiteral("Scrite Document (*.scrite)"));
+
+            exporters.append(item);
         }
     }
-    return formats;
-}
 
-QString ScriteDocument::exportFormatFileSuffix(const QString &format) const
-{
-    const QMetaObject *mo = deviceIOFactories->ExporterFactory.find(format.toLatin1());
-    if (mo == nullptr)
-        return QString();
-
-    const int ciIndex = mo->indexOfClassInfo("NameFilters");
-    if (ciIndex < 0)
-        return QString();
-
-    const QMetaClassInfo classInfo = mo->classInfo(ciIndex);
-    return QString::fromLatin1(classInfo.value());
+    return exporters;
 }
 
 QJsonArray ScriteDocument::supportedReports() const
 {
-    static const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
     static QJsonArray reports;
+
     if (reports.isEmpty()) {
+        static const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
+
         for (const QByteArray &key : keys) {
             QJsonObject item;
             item.insert("name", QString::fromLatin1(key));
 
             const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
-            const int ciIndex = mo->indexOfClassInfo("Description");
-            if (ciIndex >= 0)
-                item.insert("description", QString::fromLatin1(mo->classInfo(ciIndex).value()));
-            else
-                item.insert("description", QString::fromLatin1(key));
+            const int d_cii = mo->indexOfClassInfo("Description");
+            item.insert("description",
+                        d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
+                                   : QString::fromLatin1(key));
+            const int i_cii = mo->indexOfClassInfo("Icon");
+            item.insert("icon",
+                        i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
+                                   : QStringLiteral(":/icons/reports/reports_menu_item.png"));
 
             reports.append(item);
         }

@@ -515,9 +515,8 @@ public:
     QStringList supportedImportFormats() const;
     Q_INVOKABLE QString importFormatFileSuffix(const QString &format) const;
 
-    Q_PROPERTY(QStringList supportedExportFormats READ supportedExportFormats CONSTANT)
-    QStringList supportedExportFormats() const;
-    Q_INVOKABLE QString exportFormatFileSuffix(const QString &format) const;
+    Q_PROPERTY(QJsonArray supportedExportFormats READ supportedExportFormats CONSTANT)
+    QJsonArray supportedExportFormats() const;
 
     Q_PROPERTY(QJsonArray supportedReports READ supportedReports CONSTANT)
     QJsonArray supportedReports() const;

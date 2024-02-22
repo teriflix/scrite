@@ -20,6 +20,34 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
+bool ScriteFileInfo::isValid() const
+{
+    return !filePath.isEmpty() && !fileName.isEmpty() && !baseFileName.isEmpty()
+            && fileInfo.exists() && !documentId.isEmpty();
+}
+
+ScriteFileInfo ScriteFileInfo::quickLoad(const QString &filePath)
+{
+    const QFileInfo fi(filePath);
+    return quickLoad(fi);
+}
+
+ScriteFileInfo ScriteFileInfo::quickLoad(const QFileInfo &fileInfo)
+{
+    ScriteFileInfo ret;
+    if (!fileInfo.exists() && fileInfo.suffix().toLower() != QLatin1String("scrite")
+        && !fileInfo.isReadable())
+        return ret;
+
+    ret.filePath = fileInfo.absoluteFilePath();
+    ret.fileName = fileInfo.fileName();
+    ret.baseFileName = fileInfo.completeBaseName();
+    ret.fileSize = fileInfo.size();
+    ret.fileInfo = fileInfo;
+
+    return ret;
+}
+
 ScriteFileInfo ScriteFileInfo::load(const QString &filePath)
 {
     const QFileInfo fi(filePath);

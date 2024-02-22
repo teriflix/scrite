@@ -350,6 +350,13 @@ Item {
             tooltip: recentFilesModel.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
             onClicked: stackView.push(scriptalayPage)
             enabled: recentFilesModel.count > 0
+
+            Announcement.onIncoming: (type,data) => {
+                                         if(type === "710A08E7-9F60-4D36-9DEA-0993EEBA7DCA") {
+                                             if(data === "Scriptalay" && enabled)
+                                                stackView.push(scriptalayPage)
+                                         }
+                                     }
         }
     }
 
@@ -925,7 +932,7 @@ Item {
         selectExisting: true
 
         onAccepted: {
-            workspaceSettings.lastOpenFolderUrl = fileUrl
+            workspaceSettings.lastOpenFolderUrl = folder
 
             const path = Scrite.app.urlToLocalFile(fileUrl)
             _private.openScriteDocument(path)

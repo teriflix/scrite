@@ -21,6 +21,8 @@ class StructureExporter : public AbstractExporter
     Q_OBJECT
     Q_CLASSINFO("Format", "Structure/Screenplay Structure")
     Q_CLASSINFO("NameFilters", "Adobe PDF (*.pdf)")
+    Q_CLASSINFO("Description", "Exports the contents of the entire structure canvas as a single page PDF file.")
+    Q_CLASSINFO("Icon", ":/icons/exporter/structure_pdf.png")
 
 public:
     Q_INVOKABLE explicit StructureExporter(QObject *parent = nullptr);
