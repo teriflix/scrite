@@ -1667,7 +1667,13 @@ Item {
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
                     if(showNotebookInStructure)
-                        return [{"name": "Character Notes", "description": "Create/switch to notes for the character in notebook"}]
+                        return [
+                                    {
+                                        "name": "Character Notes",
+                                        "description": "Create/switch to notes for the character in notebook",
+                                        "icon": ":/icons/content/note.png"
+                                    }
+                                ]
                 }
                 return []
             }

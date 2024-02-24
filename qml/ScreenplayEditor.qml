@@ -3870,35 +3870,10 @@ Rectangle {
 
             MenuItem2 {
                 required property var modelData
-
-                leftPadding: 15
-                rightPadding: 15
-                topPadding: 5
-                bottomPadding: 5
-                width: reportsMenu.width
-                height: 65
-                contentItem: Column {
-                    id: menuContent
-                    width: characterMenu.width - 30
-                    spacing: 5
-
-                    Text {
-                        font.bold: true
-                        font.pixelSize: 16
-                        text: modelData.name
-                    }
-
-                    Text {
-                        text: modelData.description
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 12
-                        font.italic: true
-                    }
-                }
+                text: modelData.name
+                icon.source: "qrc" + modelData.icon
 
                 onTriggered: {
-                    Scrite.app.log( JSON.stringify(modelData) )
                     const reportArgs = {"reportName": modelData.name, "configuration": {"characterNames": [characterMenu.characterName]}}
                     Utils.execLater(screenplayEditor, 100, (reportArgs) => {
                                         showReportWorkflow(reportArgs)
@@ -3913,30 +3888,9 @@ Rectangle {
             model: characterMenu.characterReports.length > 0 ? additionalCharacterMenuItems : []
 
             MenuItem2 {
-                leftPadding: 15
-                rightPadding: 15
-                topPadding: 5
-                bottomPadding: 5
-                width: reportsMenu.width
-                height: 65
-                contentItem: Column {
-                    width: characterMenu.width - 30
-                    spacing: 5
-
-                    Text {
-                        font.bold: true
-                        font.pixelSize: 16
-                        text: modelData.name
-                    }
-
-                    Text {
-                        text: modelData.description
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 12
-                        font.italic: true
-                    }
-                }
+                required property var modelData
+                text: modelData.name
+                icon.source: "qrc" + modelData.icon
 
                 onTriggered: additionalCharacterMenuItemClicked(characterMenu.characterName, modelData.name)
             }
@@ -3946,30 +3900,8 @@ Rectangle {
             model: characterMenu.characterReports.length > 0 ? 1 : 0
 
             MenuItem2 {
-                leftPadding: 15
-                rightPadding: 15
-                topPadding: 5
-                bottomPadding: 5
-                width: reportsMenu.width
-                height: 65
-                contentItem: Column {
-                    width: characterMenu.width - 30
-                    spacing: 5
-
-                    Text {
-                        font.bold: true
-                        font.pixelSize: 16
-                        text: "Rename Character"
-                    }
-
-                    Text {
-                        text: "Rename character across all scenes, notes, comments, titles and descriptions."
-                        width: parent.width
-                        wrapMode: Text.WordWrap
-                        font.pixelSize: 12
-                        font.italic: true
-                    }
-                }
+                text: "Rename Character"
+                icon.source: "qrc:/icons/screenplay/character.png"
 
                 onTriggered: {
                     const character = Scrite.document.structure.addCharacter(characterMenu.characterName)
