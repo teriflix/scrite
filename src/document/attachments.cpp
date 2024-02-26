@@ -651,7 +651,7 @@ void AttachmentsDropArea::dropEvent(QDropEvent *de)
                     const QUrl dropUrl = m_dropUrls.at(i);
                     const QFileInfo fi(dropUrl.toLocalFile());
                     Attachment *attachment = m_target->includeAttachment(fi.absoluteFilePath());
-                    attachment->setFeatured(i == 0 && m_attachment->isFeatured());
+                    attachment->setFeatured(i == 0 || m_attachment->isFeatured());
                 }
             }
         }

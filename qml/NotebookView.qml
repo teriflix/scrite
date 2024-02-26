@@ -2812,7 +2812,6 @@ Rectangle {
                                     flickable: characterQuickInfoView
                                 }
 
-                                // TODO: figure out a way to drop multiple photos for a character
                                 AttachmentsDropArea2 {
                                     anchors.fill: parent
                                     attachmentNoticeSuffix: "Drop here to capture as character pic(s)."

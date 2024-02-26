@@ -16,9 +16,7 @@
 #include "hourglass.h"
 #include "autoupdate.h"
 #include "application.h"
-#include "timeprofiler.h"
 #include "notification.h"
-#include "execlatertimer.h"
 #include "scritedocument.h"
 #include "jsonhttprequest.h"
 

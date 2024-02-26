@@ -576,13 +576,13 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 5
-            visible: appToolBarArea.width >= 1280
+            visible: appToolBarArea.width >= 1150
             onVisibleChanged: {
                 if(enabled && !visible)
                     mainTabBar.activateTab(0)
             }
 
-            spacing: scriteDocumentViewItem.width >= 1440 ? 2 : 0
+            // spacing: scriteDocumentViewItem.width >= 1440 ? 2 : 0
 
             ToolButton3 {
                 id: homeButton
@@ -684,7 +684,7 @@ Item {
                 checkable: false
                 checked: false
                 onClicked: reportsMenu.open()
-                visible: scriteDocumentViewItem.width >= 1400 || !appToolBar.visible
+                // visible: scriteDocumentViewItem.width >= 1400 || !appToolBar.visible
 
                 Item {
                     anchors.left: parent.left
@@ -1025,10 +1025,10 @@ Item {
             }
 
             Text {
+                id: languageDescLabel
                 anchors.verticalCenter: parent.verticalCenter
-                text: scriteDocumentViewItem.width > 1470 ? fullText : fullText.substring(0, 2)
+                text: Scrite.app.transliterationEngine.languageAsString
                 font.pointSize: Scrite.app.idealFontPointSize-2
-                property string fullText: Scrite.app.transliterationEngine.languageAsString
                 width: 80
                 visible: mainTabBar.currentIndex <= 2
 
@@ -1113,7 +1113,7 @@ Item {
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
                                     onClicked: reportsMenu.itemAt(index).click()
-                                    enabled: scriteDocumentViewItem.width >= 800
+                                    // enabled: scriteDocumentViewItem.width >= 800
                                 }
                             }
                         }
@@ -1195,7 +1195,7 @@ Item {
 
                         MenuItem2 {
                             text: "Settings"
-                            enabled: scriteDocumentViewItem.width >= 1100
+                            // enabled: scriteDocumentViewItem.width >= 1100
                             onTriggered: settingsMenuItem.activate()
                         }
 

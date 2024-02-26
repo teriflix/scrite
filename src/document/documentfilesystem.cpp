@@ -33,6 +33,7 @@ struct DocumentFileSystemData
     QList<DocumentFile *> files;
     QMutex folderMutex;
     QScopedPointer<QTemporaryDir> folder;
+    qint64 fileNameCounter = 0;
 
     static const QString normalHeaderFile;
     static const QString encryptedHeaderFile;
@@ -135,6 +136,7 @@ void DocumentFileSystem::hardReset()
 void DocumentFileSystem::reset()
 {
     d->header.clear();
+    d->fileNameCounter = QDateTime::currentMSecsSinceEpoch();
 
     while (!d->files.isEmpty()) {
         DocumentFile *file = d->files.first();
@@ -505,8 +507,7 @@ QString DocumentFileSystem::add(const QString &fileName, const QString &ns)
         return QString();
 
     const QString suffix = fi.suffix().toLower();
-    const QString path =
-            ns + "/" + QString::number(QDateTime::currentSecsSinceEpoch()) + "." + suffix;
+    const QString path = ns + "/" + QString::number(d->fileNameCounter++) + "." + suffix;
     const QString absPath = this->absolutePath(path, true);
     if (QFile::copy(fileName, absPath)) {
         QFile copiedFile(absPath);
@@ -533,8 +534,7 @@ QString DocumentFileSystem::duplicate(const QString &fileName, const QString &ns
     if (!fi.exists() || !fi.isFile())
         return QString();
 
-    const QString path =
-            ns + "/" + QString::number(QDateTime::currentSecsSinceEpoch()) + "." + fi.suffix();
+    const QString path = ns + "/" + QString::number(d->fileNameCounter++) + "." + fi.suffix();
     const QString absPath = this->absolutePath(path, true);
     if (QFile::copy(fi.absoluteFilePath(), absPath)) {
         QFile copiedFile(absPath);

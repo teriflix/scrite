@@ -23,8 +23,8 @@ import "../js/utils.js" as Utils
 
 Item {
     id: optionsDialog
-    width: 1050
-    height: Math.min(scriteDocumentViewItem.height*0.9, 750)
+    width: Math.min(scriteDocumentViewItem.width-80, 1050)
+    height: Math.min(scriteDocumentViewItem.height-80, 750)
     readonly property color dialogColor: primaryColors.windowColor
     readonly property var systemFontInfo: Scrite.app.systemFontInfo()
 
@@ -151,6 +151,7 @@ Item {
                     id: fileSaveSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
                     label: Text { text: "Saving Files" }
+                    clip: true
 
                     Column {
                         width: parent.width
