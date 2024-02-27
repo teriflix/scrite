@@ -638,6 +638,7 @@ Item {
                 iconSource: "../icons/action/share.png"
                 enabled: appToolsMenu.visible === false
                 onClicked: exportMenu.open()
+                down: exportMenu.visible
 
                 Item {
                     anchors.left: parent.left
@@ -684,6 +685,7 @@ Item {
                 checkable: false
                 checked: false
                 onClicked: reportsMenu.open()
+                down: reportsMenu.visible
                 // visible: scriteDocumentViewItem.width >= 1400 || !appToolBar.visible
 
                 Item {

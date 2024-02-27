@@ -32,7 +32,7 @@ Rectangle {
     Rectangle {
         id: pageList
         width: pageListWidth
-        color: primaryColors.c700.background
+        color: accentColors.c500.background // primaryColors.c700.background
         height: parent.height
         anchors.left: parent.left
         property int currentIndex: -1

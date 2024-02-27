@@ -39,48 +39,54 @@ import "../js/utils.js" as Utils
 Item {
     id: homeScreen
     width: Math.min(800, scriteDocumentViewItem.height*0.9)
-    height: banner.height * 2
+    height: banner.height * 2.2
 
     Image {
         id: banner
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        source: "../images/splash.jpg"
+        source: "../images/banner.png"
         fillMode: Image.PreserveAspectFit
 
+        Image {
+            anchors.centerIn: parent
+            source: "../images/banner_logo_overlay.png"
+            width: homeScreen.width * 0.2
+            fillMode: Image.PreserveAspectFit
+            smooth: true; mipmap: true
+            visible: false
+            Component.onCompleted: Utils.execLater(banner, 50, () => { visible = true } )
+        }
+
         Text {
+            id: appVersionLabel
             property real ratio: parent.height / parent.sourceSize.height
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            anchors.margins: 25 * ratio
-            font.pixelSize: 25 * ratio
+            anchors.rightMargin: 30 * ratio
+            anchors.bottomMargin: 10 * ratio
+            font.pointSize: Scrite.app.idealFontPointSize-2
             text: Scrite.app.applicationVersion
             color: "white"
         }
 
-        Rectangle {
-            anchors.fill: commonToolTip
-            color: "black"
-            opacity: 0.2
-            visible: commonToolTip.visible
-        }
-
         Text {
             id: commonToolTip
-            width: parent.width * 0.5
-            anchors.horizontalCenter: parent.horizontalCenter
+            width: parent.width * 0.75
+            anchors.left: parent.left
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: 5
+            anchors.leftMargin: 30 * appVersionLabel.ratio
+            anchors.bottomMargin: 10 * appVersionLabel.ratio
 
             font.pointSize: Scrite.app.idealFontPointSize-2
             padding: 5
-            horizontalAlignment: lineCount <= 1 ? Text.AlignHCenter : Text.AlignLeft
+            horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
             wrapMode: Text.WordWrap
             color: "white"
             visible: text !== ""
-            maximumLineCount: 8
+            maximumLineCount: 4
             elide: Text.ElideRight
 
             property Item source
@@ -94,6 +100,16 @@ Item {
                 if(source === _source)
                     text = ""
             }
+        }
+
+        Text {
+            anchors.left: commonToolTip.left
+            anchors.bottom: commonToolTip.bottom
+            padding: commonToolTip.padding
+            visible: !commonToolTip.visible
+            text: "scrite.io"
+            color: commonToolTip.color
+            font.pointSize: commonToolTip.font.pointSize
         }
     }
 
@@ -400,7 +416,7 @@ Item {
             required property var fileInfo
             width: ListView.view.width
             text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
-            tooltip: "Path: " + fileInfo.filePath
+            tooltip: fileInfo.logline
             iconSource: fileInfo.hasCoverPage ? "" : "../icons/filetype/document.png"
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
             onClicked: {
@@ -419,7 +435,7 @@ Item {
             required property var record
             width: ListView.view.width
             text: record.name
-            tooltip: record.logline + "\n\n" + record.authors + "\n" + record.copyright
+            tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline
             iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
             onClicked: {
                 saveWorkflow.launch( () => {

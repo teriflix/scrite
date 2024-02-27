@@ -244,7 +244,7 @@ void Library::setRecords(const QJsonArray &array)
         defaultTemplate.insert(QStringLiteral("name"), "Blank Document");
         defaultTemplate.insert(QStringLiteral("authors"), QStringLiteral("Scrite"));
         defaultTemplate.insert(QStringLiteral("poster"),
-                               QStringLiteral("qrc:/images/blank_document.png"));
+                               QStringLiteral("qrc:/icons/filetype/document.png"));
         defaultTemplate.insert(QStringLiteral("url_kind"), QStringLiteral("local"));
         defaultTemplate.insert(QStringLiteral("description"),
                                QStringLiteral("An empty Scrite document."));

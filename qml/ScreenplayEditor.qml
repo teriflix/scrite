@@ -3521,10 +3521,12 @@ Rectangle {
                     FocusTracker.indicator.target: mainUndoStack
                     FocusTracker.indicator.property: "sceneListPanelActive"
 
+                    headerPositioning: ListView.OverlayHeader
                     header: Rectangle {
                         width: sceneListView.width-1
                         height: 40
-                        color: screenplayAdapter.currentIndex < 0 ? accentColors.windowColor : Qt.rgba(0,0,0,0)
+                        z: 10
+                        color: accentColors.windowColor
 
                         Text {
                             id: headingText
