@@ -58,6 +58,43 @@ Item {
             text: Scrite.app.applicationVersion
             color: "white"
         }
+
+        Rectangle {
+            anchors.fill: commonToolTip
+            color: "black"
+            opacity: 0.2
+            visible: commonToolTip.visible
+        }
+
+        Text {
+            id: commonToolTip
+            width: parent.width * 0.5
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 5
+
+            font.pointSize: Scrite.app.idealFontPointSize-2
+            padding: 5
+            horizontalAlignment: lineCount <= 1 ? Text.AlignHCenter : Text.AlignLeft
+            verticalAlignment: Text.AlignBottom
+            wrapMode: Text.WordWrap
+            color: "white"
+            visible: text !== ""
+            maximumLineCount: 8
+            elide: Text.ElideRight
+
+            property Item source
+
+            function show(_source, _text) {
+                source = _source
+                text = _text
+            }
+
+            function hide(_source) {
+                if(source === _source)
+                    text = ""
+            }
+        }
     }
 
     StackView {
@@ -237,13 +274,8 @@ Item {
             cursorShape: singleClick ? Qt.PointingHandCursor : Qt.ArrowCursor
             onClicked: button.clicked()
             onDoubleClicked: button.doubleClicked()
-
-            ToolTip {
-                text: button.tooltip
-                visible: text !== "" && parent.containsMouse
-                delay: Qt.styleHints.mousePressAndHoldInterval
-                contentWidth: homeScreen.width * 0.4
-            }
+            onEntered: commonToolTip.show(parent, parent.tooltip)
+            onExited: commonToolTip.hide(parent)
         }
     }
 
@@ -368,7 +400,7 @@ Item {
             required property var fileInfo
             width: ListView.view.width
             text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
-            tooltip: fileInfo.filePath
+            tooltip: "Path: " + fileInfo.filePath
             iconSource: fileInfo.hasCoverPage ? "" : "../icons/filetype/document.png"
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
             onClicked: {
@@ -536,6 +568,7 @@ Item {
                         textFormat: TextArea.RichText
                         wrapMode: Text.WordWrap
                         padding: 4
+                        readOnly: true
                         text: "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
                               "<strong>Pages:</strong> " + record.pageCount + "<br/><br/>" +
                               "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
