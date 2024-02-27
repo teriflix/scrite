@@ -2517,4 +2517,19 @@ Item {
             workspaceSettings.lastOpenFolderUrl = folder
         }
     }
+
+    QtObject {
+        id: documentLoadErrors
+
+        property ErrorReport errorReport: Aggregation.findErrorReport(Scrite.document)
+        Notification.title: modes[mode].notificationTitle
+        Notification.text: errorReport.errorMessage
+        Notification.active: errorReport.hasError
+        Notification.autoClose: false
+        Notification.onDismissed: {
+            if(errorReport.details && errorReport.details.revealOnDesktopRequest)
+                Scrite.app.revealFileOnDesktop(errorReport.details.revealOnDesktopRequest)
+            errorReport.clear()
+        }
+    }
 }
