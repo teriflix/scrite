@@ -13,7 +13,6 @@
 
 #include "formatting.h"
 #include "application.h"
-#include "timeprofiler.h"
 #include "scritedocument.h"
 #include "qobjectserializer.h"
 #include "qobjectserializer.h"
@@ -37,6 +36,24 @@
 #include <QAbstractTextDocumentLayout>
 
 Q_DECLARE_METATYPE(QTextCharFormat)
+
+class BlockKeyStrokes : public QObject
+{
+public:
+    BlockKeyStrokes() { qApp->installEventFilter(this); }
+    ~BlockKeyStrokes() { qApp->removeEventFilter(this); }
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event)
+    {
+        Q_UNUSED(watched);
+        if (QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::ShortcutOverride,
+                         QEvent::Shortcut })
+                    .contains(event->type()))
+            return true;
+        return false;
+    }
+};
 
 struct ParagraphMetrics
 {
@@ -1396,6 +1413,8 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
 
 void SceneDocumentBlockUserData::polishTextNow()
 {
+    BlockKeyStrokes blockKeyStrokes;
+
     if (m_binder.isNull() || !m_textBlock.isValid())
         return;
 
@@ -1472,6 +1491,8 @@ void SceneDocumentBlockUserData::polishTextNow()
 
 void SceneDocumentBlockUserData::autoCapitalizeNow()
 {
+    BlockKeyStrokes blockKeyStrokes;
+
     // If the block has no text, then there is no point in polishing text
     if (m_textBlock.text().isEmpty() || m_sceneElement == nullptr)
         return;
