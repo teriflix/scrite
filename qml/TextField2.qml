@@ -33,6 +33,8 @@ TextField {
     property Item backTabItem
     property bool labelAlwaysVisible: false
     property alias label: labelText.text
+    property alias labelColor: labelText.color
+    property alias labelTextAlign: labelText.horizontalAlignment
     property bool enableTransliteration: false
     property bool includeEmojiSymbols: true
     property bool undoRedoEnabled: false
@@ -166,8 +168,9 @@ TextField {
         text: parent.placeholderText
         font.pointSize: 2*Scrite.app.idealFontPointSize/3
         anchors.left: parent.left
+        anchors.right: parent.right
         anchors.verticalCenter: parent.top
-        anchors.verticalCenterOffset: -parent.topPadding/3
+        anchors.verticalCenterOffset: parent.topPadding/4
         visible: parent.labelAlwaysVisible ? true : parent.text !== ""
     }
 

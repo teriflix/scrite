@@ -153,6 +153,9 @@ public:
     Q_INVOKABLE bool verifyType(QObject *object, const QString &name) const;
     Q_INVOKABLE bool isTextInputItem(QQuickItem *item) const;
 
+    Q_INVOKABLE QVariant objectProperty(QObject *object, const QString &name) const;
+    Q_INVOKABLE bool setObjectProperty(QObject *object, const QString &name, const QVariant &value);
+
     Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
     QVersionNumber versionNumber() const { return m_versionNumber; }
 

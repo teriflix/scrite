@@ -491,6 +491,22 @@ bool Application::isTextInputItem(QQuickItem *item) const
     return item && item->flags() & QQuickItem::ItemAcceptsInputMethod;
 }
 
+QVariant Application::objectProperty(QObject *object, const QString &name) const
+{
+    if (object != nullptr && !name.isEmpty())
+        return object->property(qPrintable(name));
+
+    return QVariant();
+}
+
+bool Application::setObjectProperty(QObject *object, const QString &name, const QVariant &value)
+{
+    if (object != nullptr && !name.isEmpty())
+        return object->setProperty(qPrintable(name), value);
+
+    return false;
+}
+
 UndoStack *Application::findUndoStack(const QString &objectName) const
 {
     const QList<QUndoStack *> stacks = m_undoGroup->stacks();

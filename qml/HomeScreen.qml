@@ -414,6 +414,7 @@ Item {
         LinkButton {
             required property int index
             required property var fileInfo
+
             width: ListView.view.width
             text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
             tooltip: fileInfo.logline
@@ -433,6 +434,7 @@ Item {
         LinkButton {
             required property int index
             required property var record
+
             width: ListView.view.width
             text: record.name
             tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline

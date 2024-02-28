@@ -2522,7 +2522,7 @@ Item {
         id: documentLoadErrors
 
         property ErrorReport errorReport: Aggregation.findErrorReport(Scrite.document)
-        Notification.title: modes[mode].notificationTitle
+        Notification.title: "Document Error"
         Notification.text: errorReport.errorMessage
         Notification.active: errorReport.hasError
         Notification.autoClose: false

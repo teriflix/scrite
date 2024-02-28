@@ -1472,7 +1472,8 @@ Item {
         id: titlePageSettingsComponent
 
         Item {
-            readonly property real labelWidth: 60
+            id: titlePageContainer
+            readonly property real fieldLabelWidth: 60
 
             Settings {
                 id: titlePageSettings
@@ -1488,23 +1489,29 @@ Item {
                 property bool includeTimestamp: false
             }
 
-            Column {
+            TabSequenceManager {
+                id: titlePageFieldsTabSequence
+                wrapAround: true
+            }
+
+            ColumnLayout {
                 id: titlePageSettingsLayout
-                width: parent.width - 80
+                width: titlePageContainer.width-160
+                spacing: 30
                 anchors.centerIn: parent
-                spacing: 20
 
                 // Cover page photo field
                 Rectangle {
                     id: coverPageEdit
                     /*
-                  At best we can paint a 464x261 point photo on the cover page. Nothing more.
-                  So, we need to provide a image preview in this aspect ratio.
-                  */
-                    width: 400; height: 225
+                      At best we can paint a 464x261 point photo on the cover page. Nothing more.
+                      So, we need to provide a image preview in this aspect ratio.
+                      */
                     border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
                     border.color: "black"
-                    anchors.horizontalCenter: parent.horizontalCenter
+                    Layout.preferredWidth: 400
+                    Layout.preferredHeight: 255
+                    Layout.alignment: Qt.AlignHCenter
 
                     Loader {
                         id: coverPagePhotoLoader
@@ -1516,9 +1523,9 @@ Item {
                                 anchors.fill: parent
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
-                                source: "file://" + Scrite.document.screenplay.coverPagePhoto
-                                visible: coverPagePhoto.status === Image.Ready && (coverPagePhoto.paintedWidth < width || coverPagePhoto.paintedHeight < height)
-                                opacity: 0.1
+                                source: coverPagePhoto.source
+                                visible: (coverPagePhoto.go && coverPagePhoto.status === Image.Ready) && (coverPagePhoto.paintedWidth < width || coverPagePhoto.paintedHeight < height)
+                                opacity: 0.1 * coverPagePhoto.opacity
                                 cache: false
                             }
 
@@ -1528,14 +1535,19 @@ Item {
                                 smooth: true; mipmap: true
                                 asynchronous: true
                                 fillMode: Image.PreserveAspectFit
-                                source: "file:///" + Scrite.document.screenplay.coverPagePhoto
+                                source: go ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
                                 opacity: coverPagePhotoMouseArea.containsMouse ? 0.25 : 1
                                 cache: false
+                                property bool go: false
 
                                 BusyIcon {
                                     anchors.centerIn: parent
-                                    running: parent.status === Image.Loading
+                                    running: parent.status === Image.Loading || !parent.go
                                 }
+
+                                Component.onCompleted: Utils.execLater(coverPagePhoto, 400, () => {
+                                                                           coverPagePhoto.go = true
+                                                                       } )
                             }
                         }
                     }
@@ -1629,337 +1641,137 @@ Item {
                     }
                 }
 
-                Row {
+                Grid {
                     id: titlePageFields
-                    width: parent.width
-                    spacing: 20
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    rowSpacing: 5
+                    columnSpacing: 40
                     enabled: !Scrite.document.readOnly
+                    flow: Flow.TopToBottom
+                    columns: 2
 
-                    Column {
-                        width: (parent.width - parent.spacing)/2
-                        spacing: 10
-
-                        // Title field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Title"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: titleField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.title
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.title = text
-                                font.pixelSize: 20
-                                maximumLength: 100
-                                placeholderText: "(max 100 letters)"
-                                tabItem: subtitleField
-                                backTabItem: websiteField
-                                enableTransliteration: true
-                            }
+                    Repeater {
+                        model: ListModel {
+                            ListElement { name: "Title";      fieldSize: 100;    key: "title"       }
+                            ListElement { name: "Subtitle";   fieldSize: 100;    key: "subtitle"    }
+                            ListElement { name: "Based on";   fieldSize: 100;    key: "basedOn"     }
+                            ListElement { name: "Version";    fieldSize: 20 ;    key: "version"     }
+                            ListElement { name: "Written by"; fieldSize: 100;    key: "authorValue" }
+                            ListElement { name: "Contact";    fieldSize: 100;    key: "contact"     }
+                            ListElement { name: "Address";    fieldSize: 100;    key: "address"     }
+                            ListElement { name: "Email";      fieldSize: 100;    key: "email"       }
+                            ListElement { name: "Phone";      fieldSize: 100;    key: "phone"       }
+                            ListElement { name: "Website";    fieldSize: 100;    key: "website"     }
                         }
 
-                        // Subtitle field
-                        Row {
-                            spacing: 10
-                            width: parent.width
+                        Item {
+                            required property int index
+                            required property string name
+                            required property int fieldSize
+                            required property string key
 
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Subtitle"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
+                            width: (titlePageFields.width-titlePageFields.columnSpacing)/2
+                            height: _tpfRow.height
+
+                            TextLimiter {
+                                id: _tpfLimiter
+                                maxWordCount: fieldSize
+                                maxLetterCount: fieldSize
+                                countMode: TextLimiter.CountInText
+                                text: _tpfScreenplayProperty.value
                             }
 
-                            TextField2 {
-                                id: subtitleField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.subtitle
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.subtitle = text
-                                font.pixelSize: 20
-                                maximumLength: 100
-                                placeholderText: "(max 100 letters)"
-                                tabItem: basedOnField
-                                backTabItem: titleField
-                                enableTransliteration: true
-                            }
-                        }
-
-                        // Based on field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Based on"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
+                            PropertyAlias {
+                                id: _tpfScreenplayProperty
+                                sourceObject: Scrite.document.screenplay
+                                sourceProperty: key
                             }
 
-                            TextField2 {
-                                id: basedOnField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.basedOn
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.basedOn = text
-                                font.pixelSize: 20
-                                maximumLength: 100
-                                placeholderText: "(max 100 letters)"
-                                tabItem: versionField
-                                backTabItem: subtitleField
-                                enableTransliteration: true
-                            }
-                        }
+                            Row {
+                                id: _tpfRow
+                                width: parent.width
+                                spacing: 10
 
-                        // Version field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Version"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: versionField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.version
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.version = text
-                                font.pixelSize: 20
-                                maximumLength: 20
-                                placeholderText: "(max 20 letters)"
-                                tabItem: authorField
-                                backTabItem:  basedOnField
-                                enableTransliteration: true
-                            }
-                        }
-
-                        // Author field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Written By"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: authorField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.authorValue
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.authorValue = text
-                                font.pixelSize: 20
-                                maximumLength: 100
-                                placeholderText: {
-                                    if(Scrite.document.screenplay.authorValue === "")
-                                        return Scrite.document.screenplay.author
-                                    return "(max 100 letters)"
+                                Text {
+                                    width: fieldLabelWidth
+                                    horizontalAlignment: Text.AlignRight
+                                    text: name
+                                    font.pointSize: Scrite.app.idealFontPointSize-2
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    color: primaryColors.c800.background
                                 }
-                                tabItem: contactField
-                                backTabItem: versionField
-                                enableTransliteration: true
-                            }
-                        }
-                    }
 
-                    Column {
-                        width: (parent.width - parent.spacing)/2
-                        spacing: 10
-
-                        // Contact field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Contact"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: contactField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.contact
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.contact = text
-                                font.pixelSize: 20
-                                placeholderText: "(Optional) Company / Studio name (max 100 letters)"
-                                maximumLength: 100
-                                tabItem: addressField
-                                backTabItem: authorField
-                                enableTransliteration: true
-                            }
-                        }
-
-                        // Address field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Address"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: addressField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.address
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.address = text
-                                font.pixelSize: 20
-                                maximumLength: 100
-                                placeholderText: "(Optional) Address (max 100 letters)"
-                                tabItem: emailField
-                                backTabItem: contactField
-                            }
-                        }
-
-                        // Email field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Email"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: emailField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.email
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.email = text
-                                font.pixelSize: 20
-                                maximumLength: 100
-                                placeholderText: "(Optional) Email (max 100 letters)"
-                                tabItem: phoneField
-                                backTabItem: addressField
-                            }
-                        }
-
-                        // Phone field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Phone"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: phoneField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.phoneNumber
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.phoneNumber = text
-                                font.pixelSize: 20
-                                maximumLength: 20
-                                placeholderText: "(Optional) Phone number (max 20 digits/letters)"
-                                tabItem: websiteField
-                                backTabItem: emailField
-                            }
-                        }
-
-                        // Website field
-                        Row {
-                            spacing: 10
-                            width: parent.width
-
-                            Text {
-                                width: labelWidth
-                                horizontalAlignment: Text.AlignRight
-                                text: "Website"
-                                font.pixelSize: 14
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
-
-                            TextField2 {
-                                id: websiteField
-                                width: parent.width-parent.spacing-labelWidth
-                                text: Scrite.document.screenplay.website
-                                selectByMouse: true
-                                onTextEdited: Scrite.document.screenplay.website = text
-                                font.pixelSize: 20
-                                maximumLength: 150
-                                placeholderText: "(Optional) Website (max 150 letters)"
-                                tabItem: titleField
-                                backTabItem: phoneField
+                                TextField2 {
+                                    id: _tpfField
+                                    width: parent.width-parent.spacing-fieldLabelWidth
+                                    text: _tpfScreenplayProperty.value
+                                    selectByMouse: true
+                                    placeholderText: activeFocus ?
+                                                     (text === "" ? ("(max " + _tpfLimiter.maxLetterCount + " letters)") : (_tpfLimiter.letterCount + "/" + _tpfLimiter.maxLetterCount)) :
+                                                     ""
+                                    labelColor: _tpfLimiter.limitReached ? "red" : "gray"
+                                    labelTextAlign: Text.AlignRight
+                                    onTextEdited: {
+                                        _tpfLimiter.text = text
+                                        _tpfScreenplayProperty.value = text
+                                    }
+                                    font.pointSize: Scrite.app.idealFontPointSize+1
+                                    enableTransliteration: true
+                                    TabSequenceItem.manager: titlePageFieldsTabSequence
+                                    TabSequenceItem.sequence: index
+                                }
                             }
                         }
                     }
                 }
 
-                Row {
-                    spacing: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
+                Item {
+                    id: titlePageOptions
+
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: useAsDefaultsButton.height
 
                     CheckBox2 {
+                        anchors.left: parent.left
+                        anchors.verticalCenter: parent.verticalCenter
+
                         text: "Include Title Page In Preview"
                         checked: screenplayEditorSettings.includeTitlePageInPreview
                         onToggled: screenplayEditorSettings.includeTitlePageInPreview = checked
                     }
 
+                    Button2 {
+                        id: useAsDefaultsButton
+                        anchors.centerIn: parent
+
+                        text: "Use As Defaults"
+                        hoverEnabled: true
+                        ToolTip.visible: hovered && defaultsSavedNotice.opacity === 0
+                        ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
+                        ToolTip.delay: 1000
+                        onClicked: {
+                            titlePageSettings.author = Scrite.document.screenplay.author
+                            titlePageSettings.contact = Scrite.document.screenplay.contact
+                            titlePageSettings.address = Scrite.document.screenplay.address
+                            titlePageSettings.email = Scrite.document.screenplay.email
+                            titlePageSettings.phone = Scrite.document.screenplay.phoneNumber
+                            titlePageSettings.website = Scrite.document.screenplay.website
+                            defaultsSavedNotice.opacity = 1
+                        }
+                    }
+
                     CheckBox2 {
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+
                         text: "Include Timestamp"
                         checked: titlePageSettings.includeTimestamp
                         onToggled: titlePageSettings.includeTimestamp = checked
                     }
                 }
 
-                Button2 {
-                    text: "Use As Defaults"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    hoverEnabled: true
-                    ToolTip.visible: hovered && defaultsSavedNotice.opacity === 0
-                    ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
-                    ToolTip.delay: 1000
-                    onClicked: {
-                        titlePageSettings.author = Scrite.document.screenplay.author
-                        titlePageSettings.contact = Scrite.document.screenplay.contact
-                        titlePageSettings.address = Scrite.document.screenplay.address
-                        titlePageSettings.email = Scrite.document.screenplay.email
-                        titlePageSettings.phone = Scrite.document.screenplay.phoneNumber
-                        titlePageSettings.website = Scrite.document.screenplay.website
-                        defaultsSavedNotice.opacity = true
-                    }
-                }
             }
 
             Text {
