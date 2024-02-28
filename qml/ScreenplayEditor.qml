@@ -17,6 +17,7 @@ import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.15
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 import "../js/utils.js" as Utils
@@ -3500,6 +3501,14 @@ Rectangle {
                                           }
                 }
 
+                Settings {
+                    id: sceneListPanelSettings
+                    fileName: Scrite.app.settingsFilePath
+                    category: "Scene List Panel"
+
+                    property string displaySceneLength: "NO" // can be PAGE, TIME
+                }
+
                 ListView {
                     id: sceneListView
                     anchors.fill: parent
@@ -3528,38 +3537,98 @@ Rectangle {
                         z: 10
                         color: accentColors.windowColor
 
-                        Text {
-                            id: headingText
-                            readonly property real iconWidth: 18
-                            property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
-                            property real leftMargin: 6 + (iconWidth+12)*t
-                            Behavior on t {
-                                enabled: applicationSettings.enableAnimations
-                                NumberAnimation { duration: 250 }
-                            }
-
+                        RowLayout {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.left: parent.left
-                            anchors.leftMargin: leftMargin
+                            anchors.leftMargin: headingText.leftMargin
                             anchors.right: parent.right
-                            elide: Text.ElideRight
-                            font.family: "Courier Prime"
-                            font.pixelSize: Math.ceil(Scrite.app.idealFontPointSize * 1.2)
-                            font.bold: true
-                            text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
-                        }
+                            anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height) ? 10 : 0
 
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: headingText.truncated
-                            ToolTip.text: headingText.text
-                            ToolTip.delay: 1000
-                            ToolTip.visible: headingText.truncated && containsMouse
-                            onClicked: {
-                                if(screenplayAdapter.isSourceScreenplay)
-                                    screenplayAdapter.screenplay.clearSelection()
-                                screenplayAdapter.currentIndex = -1
-                                contentView.positionViewAtBeginning()
+                            Text {
+                                id: headingText
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignVCenter
+                                readonly property real iconWidth: 18
+                                property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
+                                property real leftMargin: 6 + (iconWidth+12)*t
+                                Behavior on t {
+                                    enabled: applicationSettings.enableAnimations
+                                    NumberAnimation { duration: 250 }
+                                }
+
+                                elide: Text.ElideRight
+                                font.family: "Courier Prime"
+                                font.pixelSize: Math.ceil(Scrite.app.idealFontPointSize * 1.2)
+                                font.bold: true
+                                text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: headingText.truncated
+                                    ToolTip.text: headingText.text
+                                    ToolTip.delay: 1000
+                                    ToolTip.visible: headingText.truncated && containsMouse
+                                    onClicked: {
+                                        if(screenplayAdapter.isSourceScreenplay)
+                                            screenplayAdapter.screenplay.clearSelection()
+                                        screenplayAdapter.currentIndex = -1
+                                        contentView.positionViewAtBeginning()
+                                    }
+                                }
+                            }
+
+                            ToolButton2 {
+                                icon.source: {
+                                    switch(sceneListPanelSettings.displaySceneLength) {
+                                    case "TIME":
+                                        return "../icons/content/time.png"
+                                    case "PAGE":
+                                        return "../icons/content/page_count.png"
+                                    default:
+                                        return "../icons/content/view_options.png"
+                                    }
+                                }
+                                Layout.alignment: Qt.AlignVCenter
+                                onClicked: sceneListPanelMenu.open()
+                                down: sceneListPanelMenu.visible
+                                ToolTip.text: "Scene List Options"
+                                enabled: !screenplayTextDocument.paused
+
+                                Item {
+                                    anchors.bottom: parent.bottom
+                                    width: parent.width
+
+                                    Menu2 {
+                                        id: sceneListPanelMenu
+
+                                        MenuItem2 {
+                                            text: "Scene Duration"
+
+                                            readonly property string option: "TIME"
+                                            icon.source: sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: sceneListPanelSettings.displaySceneLength = option
+                                            enabled: !screenplayTextDocument.paused
+                                        }
+
+                                        MenuItem2 {
+                                            text: "Page Length"
+
+                                            readonly property string option: "PAGE"
+                                            icon.source: sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: sceneListPanelSettings.displaySceneLength = option
+                                            enabled: !screenplayTextDocument.paused
+                                        }
+
+                                        MenuItem2 {
+                                            text: "None"
+
+                                            readonly property string option: "NO"
+                                            icon.source: sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: sceneListPanelSettings.displaySceneLength = option
+                                            enabled: !screenplayTextDocument.paused
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -3605,48 +3674,94 @@ Rectangle {
                             }
                         }
 
-                        Text {
-                            id: delegateText
+                        RowLayout {
                             property real leftMargin: 11 + (sceneTypeImage.width+12)*sceneTypeImage.t
                             anchors.left: parent.left
                             anchors.leftMargin: leftMargin
                             anchors.right: parent.right
                             anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 5) + 5
                             anchors.verticalCenter: parent.verticalCenter
-                            font.family: "Courier Prime"
-                            font.bold: screenplayAdapter.currentIndex === index || parent.elementIsBreak
-                            font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*(parent.elementIsBreak ? 1.2 : 1))
-                            horizontalAlignment: Qt.AlignLeft
-                            color: primaryColors.c10.text
-                            font.capitalization: parent.elementIsBreak ? Font.MixedCase : Font.AllUppercase
-                            text: {
-                                var ret = "UNKNOWN"
-                                if(scene) {
-                                    if(scene.heading.enabled) {
-                                        ret = screenplayElement.resolvedSceneNumber + ". "
-                                        if(screenplayElement.omitted)
-                                            ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                            spacing: 5
+
+                            Text {
+                                id: delegateText
+                                Layout.fillWidth: true
+                                Layout.alignment: Qt.AlignVCenter
+
+                                font.family: "Courier Prime"
+                                font.bold: screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
+                                font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
+                                horizontalAlignment: Qt.AlignLeft
+                                color: primaryColors.c10.text
+                                font.capitalization: delegateItem.elementIsBreak ? Font.MixedCase : Font.AllUppercase
+                                text: {
+                                    var ret = "UNKNOWN"
+                                    if(scene) {
+                                        if(scene.heading.enabled) {
+                                            ret = screenplayElement.resolvedSceneNumber + ". "
+                                            if(screenplayElement.omitted)
+                                                ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                                            else
+                                                ret += scene.heading.text
+                                        } else if(screenplayElement.omitted)
+                                            ret = "[OMITTED]"
                                         else
-                                            ret += scene.heading.text
-                                    } else if(screenplayElement.omitted)
-                                        ret = "[OMITTED]"
-                                    else
-                                        ret = "NO SCENE HEADING"
+                                            ret = "NO SCENE HEADING"
+                                        return ret
+                                    }
+                                    if(delegateItem.elementIsBreak) {
+                                        if(delegateItem.elementIsEpisodeBreak)
+                                            ret = screenplayElement.breakTitle
+                                        else if(sceneListView.hasEpisodes)
+                                            ret = "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
+                                        else
+                                            ret = screenplayElement.breakTitle
+                                        ret +=  ": " + screenplayElement.breakSubtitle
+                                        return ret
+                                    }
                                     return ret
                                 }
-                                if(parent.elementIsBreak) {
-                                    if(parent.elementIsEpisodeBreak)
-                                        ret = screenplayElement.breakTitle
-                                    else if(sceneListView.hasEpisodes)
-                                        ret = "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
-                                    else
-                                        ret = screenplayElement.breakTitle
-                                    ret +=  ": " + screenplayElement.breakSubtitle
-                                    return ret
-                                }
-                                return ret
+                                elide: Text.ElideMiddle
                             }
-                            elide: Text.ElideMiddle
+
+                            Text {
+                                id: sceneLengthText
+                                font.pointSize: Scrite.app.idealFontPointSize-3
+                                color: primaryColors.c10.text
+                                text: evaluateText()
+                                visible: !screenplayTextDocument.paused && (sceneListPanelSettings.displaySceneLength === "PAGE" || sceneListPanelSettings.displaySceneLength === "TIME")
+                                opacity: 0.5
+                                Layout.alignment: Qt.AlignVCenter
+
+                                function evaluateText() {
+                                    if(scene) {
+                                        if(sceneListPanelSettings.displaySceneLength === "PAGE") {
+                                            const pl = screenplayTextDocument.lengthInPages(screenplayElement, null)
+                                            return Math.round(pl*100,2)/100
+                                        }
+                                        if(sceneListPanelSettings.displaySceneLength === "TIME")
+                                            return screenplayTextDocument.lengthInTimeAsString(screenplayElement, null)
+                                    }
+                                    return ""
+                                }
+
+                                function updateText() {
+                                    text = evaluateText()
+                                }
+
+                                function updateTextLater() {
+                                    Qt.callLater(updateText)
+                                }
+
+                                Connections {
+                                    target: screenplayTextDocument
+                                    enabled: !screenplayTextDocument.paused
+                                    function onUpdateFinished() { sceneLengthText.updateTextLater() }
+                                }
+
+                                property string option: sceneListPanelSettings.displaySceneLength
+                                onOptionChanged: updateTextLater()
+                            }
                         }
 
                         MouseArea {
