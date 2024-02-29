@@ -1527,8 +1527,12 @@ Rectangle {
                     firstInitializationDone = true
                 }
                 onRequestCursorPosition: (position) => {
-                                             if(position >= 0)
-                                                contentItem.assumeFocusLater(position, 100)
+                                             /* Upon receipt of this signal, lets immediately reset cursor position.
+                                                if there is a need for delayed setting of cursor position, let that be
+                                                a separate signal emission from the backend. */
+                                             // if(position >= 0)
+                                             //    contentItem.assumeFocusLater(position, 100)
+                                             contentItem.assumeFocusAt(position)
                                          }
 
 

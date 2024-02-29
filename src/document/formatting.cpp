@@ -3398,10 +3398,10 @@ void SceneDocumentBinder::onSceneReset(int position)
         QTextCursor cursor(this->document());
         cursor.movePosition(QTextCursor::End);
         position = qBound(0, position, cursor.position());
-        emit requestCursorPosition(position);
-    }
+        QTimer::singleShot(100, this, [=]() { emit requestCursorPosition(position); });
 
-    m_sceneIsBeingReset = false;
+        m_sceneIsBeingReset = false;
+    }
 }
 
 void SceneDocumentBinder::onSceneRefreshed()
