@@ -2211,6 +2211,12 @@ Item {
         }
     }
 
+    function showHomeScreenLater(ps, delay) {
+        Utils.execLater(scriteDocumentViewItem, delay, () => {
+                            showHomeScreen(ps)
+                        })
+    }
+
     function showHomeScreen(ps) {
         modalDialog.popupSource = ps === undefined ? homeButton : ps
         modalDialog.sourceComponent = homeScreenComponent

@@ -17,6 +17,7 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
+import "../js/utils.js" as Utils
 
 Item {
     id: userLogin
@@ -102,6 +103,7 @@ Item {
         id: loginWizard
 
         Item {
+            id: loginWizardItem
             width: 800
             height: 520
 
@@ -156,6 +158,24 @@ Item {
                         Qt.callLater( function() { pageLoader.active = true } )
                     }
                 }
+            }
+
+            property bool showHomeScreenUponLogin: false
+
+            Connections {
+                target: Scrite.user
+                function onLoggedInChanged() {
+                    if(!Scrite.user.loggedIn)
+                        loginWizardItem.showHomeScreenUponLogin = true
+                }
+            }
+
+            Component.onCompleted: {
+                showHomeScreenUponLogin = !Scrite.user.loggedIn
+            }
+            Component.onDestruction: {
+                if(showHomeScreenUponLogin && Scrite.user.loggedIn)
+                    showHomeScreenLater(null, 500)
             }
         }
     }
