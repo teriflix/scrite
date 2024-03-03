@@ -141,8 +141,9 @@ Item {
                                     const bound = (min, val, max) => {
                                         return Math.min(max, Math.max(min,val))
                                     }
-                                    sourceSize = Qt.size(2*bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
-                                                         2*bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
+                                    const dpr = Scrite.app.isMacOSPlatform ? Scrite.document.displayFormat.devicePixelRatio : 1.0
+                                    sourceSize = Qt.size(dpr*bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
+                                                         dpr*bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
                                 }
 
                                 Connections {
