@@ -2338,7 +2338,7 @@ Item {
                                 if(Scrite.document.fileName !== "")
                                     Scrite.document.save()
                                 else {
-                                    cmdSave.doClick()
+                                    saveFileDialog.launch()
                                     return
                                 }
                             }
