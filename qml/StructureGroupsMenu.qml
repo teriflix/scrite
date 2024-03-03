@@ -33,8 +33,9 @@ Menu2 {
     HelpTipNotification {
         id: htn
         tipName: "story_beat_tagging"
-        enabled: structureGroupsMenu.opened
+        enabled: false
     }
+    onOpened: htn.enabled = true
 
     MenuItem2 {
         width: structureGroupsMenu.width
