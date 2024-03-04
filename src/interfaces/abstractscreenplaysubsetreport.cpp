@@ -96,6 +96,15 @@ void AbstractScreenplaySubsetReport::setIncludeSceneNumbers(bool val)
     emit includeSceneNumbersChanged();
 }
 
+void AbstractScreenplaySubsetReport::setUseSceneColors(bool val)
+{
+    if (m_useSceneColors == val)
+        return;
+
+    m_useSceneColors = val;
+    emit useSceneColorsChanged();
+}
+
 void AbstractScreenplaySubsetReport::setIncludeSceneIcons(bool val)
 {
     if (m_includeSceneIcons == val)
@@ -278,6 +287,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     stDoc.setIncludeLoglineInTitlePage(stDoc.hasTitlePage() ? m_includeLogline : false);
     stDoc.setSceneNumbers(m_includeSceneNumbers);
     stDoc.setSceneIcons(this->format() == AdobePDF ? m_includeSceneIcons : false);
+    stDoc.setSceneColors(m_useSceneColors);
     stDoc.setListSceneCharacters(m_listSceneCharacters);
     stDoc.setPrintEachSceneOnANewPage(this->format() == AdobePDF ? m_printEachSceneOnANewPage
                                                                  : false);

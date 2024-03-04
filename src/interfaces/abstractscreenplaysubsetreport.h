@@ -83,6 +83,14 @@ public:
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
+    Q_CLASSINFO("useSceneColors_FieldGroup", "Options")
+    Q_CLASSINFO("useSceneColors_FieldLabel", "Use scene colors as background of scene headings.")
+    Q_CLASSINFO("useSceneColors_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool useSceneColors READ isUseSceneColors WRITE setUseSceneColors NOTIFY useSceneColorsChanged)
+    void setUseSceneColors(bool val);
+    bool isUseSceneColors() const { return m_useSceneColors; }
+    Q_SIGNAL void useSceneColorsChanged();
+
     Q_CLASSINFO("generateTitlePage_FieldGroup", "Options")
     Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page. (PDF Only)")
     Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
@@ -191,6 +199,7 @@ private:
     bool m_includeLogline = false;
     bool m_printSceneContent = true;
     bool m_includeSceneIcons = true;
+    bool m_useSceneColors = false;
     bool m_includeSceneNumbers = true;
     bool m_listSceneCharacters = false;
     bool m_includeSceneContents = true;

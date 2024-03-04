@@ -558,14 +558,51 @@ QJsonObject Application::systemFontInfo()
     return ret;
 }
 
-QColor Application::pickColor(const QColor &initial) const
+QColor Application::pickColor(const QColor &initial)
 {
     QColorDialog::ColorDialogOptions options =
             QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog;
     return QColorDialog::getColor(initial, nullptr, "Select Color", options);
 }
 
-QRectF Application::textBoundingRect(const QString &text, const QFont &font) const
+QColor Application::tintedColor(const QColor &c, qreal tintFactor)
+{
+    const int r = c.red();
+    const int g = c.green();
+    const int b = c.blue();
+
+    const int newR = r + static_cast<int>((255 - r) * tintFactor);
+    const int newG = g + static_cast<int>((255 - g) * tintFactor);
+    const int newB = b + static_cast<int>((255 - b) * tintFactor);
+
+    return QColor(newR, newG, newB);
+}
+
+QColor Application::tintColors(const QColor &a, const QColor &b)
+{
+    auto computeTint = [](const QColor &color1, const QColor &color2, qreal tintFactor) {
+        const int r1 = color1.red();
+        const int g1 = color1.green();
+        const int b1 = color1.blue();
+
+        const int r2 = color2.red();
+        const int g2 = color2.green();
+        const int b2 = color2.blue();
+
+        const int newR = r1 + static_cast<int>((255 - r2) * tintFactor);
+        const int newG = g1 + static_cast<int>((255 - g2) * tintFactor);
+        const int newB = b1 + static_cast<int>((255 - b2) * tintFactor);
+
+        return QColor(newR, newG, newB);
+    };
+
+    const QColor _a = QColor(a.red(), a.green(), a.blue());
+    const QColor _b = QColor(b.red(), b.green(), b.blue());
+    const qreal tintFactor = b.alphaF();
+    return computeTint(_a, _b, tintFactor);
+}
+
+QRectF Application::textBoundingRect(const QString &text, const QFont &font)
 {
     return QFontMetricsF(font).boundingRect(text);
 }
@@ -694,14 +731,13 @@ QJsonArray enumerationModel(const QMetaObject *metaObject, const QString &enumNa
     return ret;
 }
 
-QJsonArray Application::enumerationModel(QObject *object, const QString &enumName) const
+QJsonArray Application::enumerationModel(QObject *object, const QString &enumName)
 {
     const QMetaObject *mo = object ? object->metaObject() : nullptr;
     return ::enumerationModel(mo, enumName);
 }
 
-QJsonArray Application::enumerationModelForType(const QString &typeName,
-                                                const QString &enumName) const
+QJsonArray Application::enumerationModelForType(const QString &typeName, const QString &enumName)
 {
     const int typeId = QMetaType::type(qPrintable(typeName + "*"));
     const QMetaObject *mo =
@@ -727,13 +763,13 @@ QString enumerationKey(const QMetaObject *metaObject, const QString &enumName, i
     return QString::fromLatin1(enumInfo.valueToKey(value));
 }
 
-QString Application::enumerationKey(QObject *object, const QString &enumName, int value) const
+QString Application::enumerationKey(QObject *object, const QString &enumName, int value)
 {
     return ::enumerationKey(object->metaObject(), enumName, value);
 }
 
 QString Application::enumerationKeyForType(const QString &typeName, const QString &enumName,
-                                           int value) const
+                                           int value)
 {
     const int typeId = QMetaType::type(qPrintable(typeName + "*"));
     const QMetaObject *mo =
@@ -741,7 +777,7 @@ QString Application::enumerationKeyForType(const QString &typeName, const QStrin
     return ::enumerationKey(mo, enumName, value);
 }
 
-QJsonObject Application::fileInfo(const QString &path) const
+QJsonObject Application::fileInfo(const QString &path)
 {
     QFileInfo fi(path);
     QJsonObject ret;
@@ -762,12 +798,12 @@ QString Application::settingsFilePath() const
     return m_settings->fileName();
 }
 
-QPointF Application::cursorPosition() const
+QPointF Application::cursorPosition()
 {
     return QCursor::pos();
 }
 
-QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const
+QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos)
 {
     if (item == nullptr)
         return pos;
@@ -775,12 +811,12 @@ QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &po
     return item->mapFromGlobal(pos);
 }
 
-bool Application::isMouseOverItem(QQuickItem *item) const
+bool Application::isMouseOverItem(QQuickItem *item)
 {
     if (item == nullptr)
         return false;
 
-    const QPointF pos = this->mapGlobalPositionToItem(item, QCursor::pos());
+    const QPointF pos = Application::mapGlobalPositionToItem(item, QCursor::pos());
     return item->boundingRect().contains(pos);
 }
 
@@ -796,8 +832,7 @@ AutoUpdate *Application::autoUpdate() const
     return AutoUpdate::instance();
 }
 
-QJsonObject Application::objectConfigurationFormInfo(const QObject *object,
-                                                     const QMetaObject *from) const
+QJsonObject Application::objectConfigurationFormInfo(const QObject *object, const QMetaObject *from)
 {
     QJsonObject ret;
     if (object == nullptr)
@@ -1272,9 +1307,9 @@ QObject *Application::findRegisteredObject(const QString &name) const
     return nullptr;
 }
 
-QColor Application::pickStandardColor(int counter) const
+QColor Application::pickStandardColor(int counter)
 {
-    const QVector<QColor> colors = this->standardColors();
+    const QVector<QColor> colors = Application::standardColors();
     if (colors.isEmpty())
         return QColor("white");
 
@@ -1303,7 +1338,7 @@ QColor Application::textColorFor(const QColor &bgColor)
     return evaluateLuminance(bgColor) > 0.5 ? Qt::black : Qt::white;
 }
 
-QRectF Application::largestBoundingRect(const QStringList &strings, const QFont &font) const
+QRectF Application::largestBoundingRect(const QStringList &strings, const QFont &font)
 {
     if (strings.isEmpty())
         return QRectF();
@@ -1325,45 +1360,45 @@ QRectF Application::largestBoundingRect(const QStringList &strings, const QFont 
     return ret;
 }
 
-QRectF Application::boundingRect(const QString &text, const QFont &font) const
+QRectF Application::boundingRect(const QString &text, const QFont &font)
 {
     const QFontMetricsF fm(font);
     return fm.boundingRect(text);
 }
 
-QRectF Application::intersectedRectangle(const QRectF &of, const QRectF &with) const
+QRectF Application::intersectedRectangle(const QRectF &of, const QRectF &with)
 {
     return of.intersected(with);
 }
 
-bool Application::doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const
+bool Application::doRectanglesIntersect(const QRectF &r1, const QRectF &r2)
 {
     return r1.intersects(r2);
 }
 
-QSizeF Application::scaledSize(const QSizeF &of, const QSizeF &into) const
+QSizeF Application::scaledSize(const QSizeF &of, const QSizeF &into)
 {
     return of.scaled(into, Qt::KeepAspectRatio);
 }
 
-QRectF Application::uniteRectangles(const QRectF &r1, const QRectF &r2) const
+QRectF Application::uniteRectangles(const QRectF &r1, const QRectF &r2)
 {
     return r1.united(r2);
 }
 
 QRectF Application::adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right,
-                                    qreal bottom) const
+                                    qreal bottom)
 {
     return rect.adjusted(left, top, right, bottom);
 }
 
-bool Application::isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const
+bool Application::isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect)
 {
     return bigRect.contains(smallRect);
 }
 
 QPointF Application::translationRequiredToBringRectangleInRectangle(const QRectF &bigRect,
-                                                                    const QRectF &smallRect) const
+                                                                    const QRectF &smallRect)
 {
     QPointF ret(0, 0);
 
@@ -1382,13 +1417,12 @@ QPointF Application::translationRequiredToBringRectangleInRectangle(const QRectF
     return ret;
 }
 
-qreal Application::distanceBetweenPoints(const QPointF &p1, const QPointF &p2) const
+qreal Application::distanceBetweenPoints(const QPointF &p1, const QPointF &p2)
 {
     return QLineF(p1, p2).length();
 }
 
-QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around,
-                                      const QSizeF &atBest) const
+QRectF Application::querySubRectangle(const QRectF &in, const QRectF &around, const QSizeF &atBest)
 {
     if (in.width() < atBest.width() || in.height() < atBest.height()) {
         QRectF ret(0, 0, atBest.width(), atBest.height());
@@ -1491,7 +1525,7 @@ QString Application::neighbouringFilePath(const QString &filePath, const QString
     return fi.absoluteDir().absoluteFilePath(nfileName);
 }
 
-QScreen *Application::windowScreen(QObject *window) const
+QScreen *Application::windowScreen(QObject *window)
 {
     QWindow *qwindow = qobject_cast<QWindow *>(window);
     if (qwindow)
@@ -1558,7 +1592,7 @@ void Application::removeWindowsEnvironmentVariable(const QString &name)
 }
 #endif
 
-QPointF Application::globalMousePosition() const
+QPointF Application::globalMousePosition()
 {
     return QCursor::pos();
 }
@@ -1766,7 +1800,7 @@ bool Application::resetObjectProperty(QObject *object, const QString &propName)
     return prop.reset(object);
 }
 
-int Application::objectTreeSize(QObject *ptr) const
+int Application::objectTreeSize(QObject *ptr)
 {
     return ptr->findChildren<QObject *>(QString(), Qt::FindChildrenRecursively).size() + 1;
 }

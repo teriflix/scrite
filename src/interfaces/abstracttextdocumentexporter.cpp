@@ -48,6 +48,15 @@ void AbstractTextDocumentExporter::setIncludeSceneFeaturedImage(bool val)
     emit includeSceneFeaturedImageChanged();
 }
 
+void AbstractTextDocumentExporter::setUseSceneColors(bool val)
+{
+    if (m_useSceneColors == val)
+        return;
+
+    m_useSceneColors = val;
+    emit useSceneColorsChanged();
+}
+
 void AbstractTextDocumentExporter::setIncludeSceneComments(bool val)
 {
     if (m_includeSceneComments == val)
@@ -99,6 +108,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setIncludeLoglineInTitlePage(this->isIncludeLogline());
     stDoc.setSceneNumbers(this->isIncludeSceneNumbers());
     stDoc.setSceneIcons(this->isIncludeSceneIcons());
+    stDoc.setSceneColors(this->isUseSceneColors());
     stDoc.setListSceneCharacters(m_listSceneCharacters);
     stDoc.setIncludeSceneSynopsis(m_includeSceneSynopsis);
     stDoc.setIncludeSceneFeaturedImage(m_includeSceneFeaturedImage);

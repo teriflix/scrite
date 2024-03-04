@@ -115,6 +115,11 @@ public:
     bool hasSceneIcons() const { return m_sceneIcons; }
     Q_SIGNAL void sceneIconsChanged();
 
+    Q_PROPERTY(bool sceneColors READ hasSceneColors WRITE setSceneColors NOTIFY sceneColorsChanged)
+    void setSceneColors(bool val);
+    bool hasSceneColors() const { return m_sceneColors; }
+    Q_SIGNAL void sceneColorsChanged();
+
     Q_PROPERTY(bool syncEnabled READ isSyncEnabled WRITE setSyncEnabled NOTIFY syncEnabledChanged)
     void setSyncEnabled(bool val);
     bool isSyncEnabled() const { return m_syncEnabled; }
@@ -350,6 +355,7 @@ private:
     bool m_includeLoglineInTitlePage = false;
     int m_currentPage = 0;
     bool m_sceneIcons = true;
+    bool m_sceneColors = false;
     Purpose m_purpose = ForDisplay;
     QTime m_totalTime = QTime(0, 0, 0);
     bool m_syncEnabled = true;

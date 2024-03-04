@@ -370,6 +370,17 @@ void ScreenplayTextDocument::setSceneIcons(bool val)
     this->loadScreenplayLater();
 }
 
+void ScreenplayTextDocument::setSceneColors(bool val)
+{
+    if (m_sceneColors == val)
+        return;
+
+    m_sceneColors = val;
+    emit sceneColorsChanged();
+
+    this->loadScreenplayLater();
+}
+
 void ScreenplayTextDocument::setSyncEnabled(bool val)
 {
     if (m_syncEnabled == val)
@@ -2477,6 +2488,16 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
             }
 
             prepareCursor(cursor, SceneElement::Heading, Qt::Alignment(), !insertBlock);
+
+            if (m_sceneColors) {
+                const QColor bgColor = scene->color();
+
+                if (!qFuzzyIsNull(bgColor.alphaF())) {
+                    QTextBlockFormat sceneColorFormat;
+                    sceneColorFormat.setBackground(Application::tintedColor(bgColor, 0.8));
+                    cursor.mergeBlockFormat(sceneColorFormat);
+                }
+            }
 
             if (element->isOmitted()) {
                 if (m_purpose == ForDisplay && heading->isEnabled() && m_sceneNumbers)

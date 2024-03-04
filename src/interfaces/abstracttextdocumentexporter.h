@@ -47,6 +47,13 @@ public:
     bool isIncludeSceneFeaturedImage() const { return m_includeSceneFeaturedImage; }
     Q_SIGNAL void includeSceneFeaturedImageChanged();
 
+    Q_CLASSINFO("useSceneColors_FieldLabel", "Use scene colors as background for scene headings.")
+    Q_CLASSINFO("useSceneColors_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool useSceneColors READ isUseSceneColors WRITE setUseSceneColors NOTIFY useSceneColorsChanged)
+    void setUseSceneColors(bool val);
+    bool isUseSceneColors() const { return m_useSceneColors; }
+    Q_SIGNAL void useSceneColorsChanged();
+
     Q_CLASSINFO("includeSceneComments_FieldLabel", "Include scene comments, if available.")
     Q_CLASSINFO("includeSceneComments_FieldEditor", "CheckBox")
     Q_PROPERTY(bool includeSceneComments READ isIncludeSceneComments WRITE setIncludeSceneComments NOTIFY includeSceneCommentsChanged)
@@ -98,6 +105,7 @@ private:
     bool m_listSceneCharacters = false;
     bool m_includeSceneSynopsis = false;
     bool m_includeSceneContents = true;
+    bool m_useSceneColors = false;
     bool m_includeSceneFeaturedImage = false;
     bool m_includeSceneComments = false;
     bool m_polishParagraphs = false;

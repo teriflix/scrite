@@ -183,17 +183,20 @@ public:
     static QFontDatabase &fontDatabase();
 
     Q_INVOKABLE static QJsonObject systemFontInfo();
-    Q_INVOKABLE QColor pickColor(const QColor &initial) const;
-    Q_INVOKABLE QString colorName(const QColor &color) const { return color.name(); }
-    Q_INVOKABLE QRectF textBoundingRect(const QString &text, const QFont &font) const;
+    Q_INVOKABLE static QColor pickColor(const QColor &initial);
+    Q_INVOKABLE static QString colorName(const QColor &color) { return color.name(); }
+    Q_INVOKABLE static QColor tintedColor(const QColor &c, qreal factor);
+    Q_INVOKABLE static QColor tintColors(const QColor &a, const QColor &b);
+    Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha = 0.5);
+    Q_INVOKABLE static QRectF textBoundingRect(const QString &text, const QFont &font);
     Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
-    Q_INVOKABLE QJsonArray enumerationModel(QObject *object, const QString &enumName) const;
-    Q_INVOKABLE QJsonArray enumerationModelForType(const QString &typeName,
-                                                   const QString &enumName) const;
-    Q_INVOKABLE QString enumerationKey(QObject *object, const QString &enumName, int value) const;
-    Q_INVOKABLE QString enumerationKeyForType(const QString &typeName, const QString &enumName,
-                                              int value) const;
-    Q_INVOKABLE QJsonObject fileInfo(const QString &path) const;
+    Q_INVOKABLE static QJsonArray enumerationModel(QObject *object, const QString &enumName);
+    Q_INVOKABLE static QJsonArray enumerationModelForType(const QString &typeName,
+                                                          const QString &enumName);
+    Q_INVOKABLE static QString enumerationKey(QObject *object, const QString &enumName, int value);
+    Q_INVOKABLE static QString enumerationKeyForType(const QString &typeName,
+                                                     const QString &enumName, int value);
+    Q_INVOKABLE static QJsonObject fileInfo(const QString &path);
 
     Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
     QString settingsFilePath() const;
@@ -207,45 +210,42 @@ public:
     Q_PROPERTY(SystemTextInputManager *textInputManager READ textInputManager CONSTANT)
     SystemTextInputManager *textInputManager() const { return SystemTextInputManager::instance(); }
 
-    Q_INVOKABLE QPointF cursorPosition() const;
-    Q_INVOKABLE QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos) const;
-    Q_INVOKABLE bool isMouseOverItem(QQuickItem *item) const;
-
-    Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha = 0.5);
+    Q_INVOKABLE static QPointF cursorPosition();
+    Q_INVOKABLE static QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos);
+    Q_INVOKABLE static bool isMouseOverItem(QQuickItem *item);
 
     QSettings *settings() const { return m_settings; }
 
     Q_PROPERTY(AutoUpdate *autoUpdate READ autoUpdate CONSTANT)
     AutoUpdate *autoUpdate() const;
 
-    Q_INVOKABLE QJsonObject objectConfigurationFormInfo(const QObject *object,
-                                                        const QMetaObject *from = nullptr) const;
+    Q_INVOKABLE static QJsonObject objectConfigurationFormInfo(const QObject *object,
+                                                               const QMetaObject *from = nullptr);
 
     Q_PROPERTY(QVariantList standardColors READ standardColorsVariantList NOTIFY
                        standardColorsChanged STORED false)
     QVariantList standardColorsVariantList() const { return m_standardColors; }
     Q_SIGNAL void standardColorsChanged();
 
-    Q_INVOKABLE QColor pickStandardColor(int counter) const;
+    Q_INVOKABLE static QColor pickStandardColor(int counter);
     Q_INVOKABLE static bool isLightColor(const QColor &color);
     Q_INVOKABLE static bool isVeryLightColor(const QColor &color);
     Q_INVOKABLE static QColor textColorFor(const QColor &bgColor);
-    const QVector<QColor> standardColors() const { return standardColors(QVersionNumber()); }
 
-    Q_INVOKABLE QRectF largestBoundingRect(const QStringList &text, const QFont &font) const;
-    Q_INVOKABLE QRectF boundingRect(const QString &text, const QFont &font) const;
-    Q_INVOKABLE QRectF intersectedRectangle(const QRectF &of, const QRectF &with) const;
-    Q_INVOKABLE bool doRectanglesIntersect(const QRectF &r1, const QRectF &r2) const;
-    Q_INVOKABLE QSizeF scaledSize(const QSizeF &of, const QSizeF &into) const;
-    Q_INVOKABLE QRectF uniteRectangles(const QRectF &r1, const QRectF &r2) const;
-    Q_INVOKABLE QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right,
-                                       qreal bottom) const;
-    Q_INVOKABLE bool isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect) const;
-    Q_INVOKABLE QPointF translationRequiredToBringRectangleInRectangle(
-            const QRectF &bigRect, const QRectF &smallRect) const;
-    Q_INVOKABLE qreal distanceBetweenPoints(const QPointF &p1, const QPointF &p2) const;
-    Q_INVOKABLE QRectF querySubRectangle(const QRectF &in, const QRectF &around,
-                                         const QSizeF &atBest) const;
+    Q_INVOKABLE static QRectF largestBoundingRect(const QStringList &text, const QFont &font);
+    Q_INVOKABLE static QRectF boundingRect(const QString &text, const QFont &font);
+    Q_INVOKABLE static QRectF intersectedRectangle(const QRectF &of, const QRectF &with);
+    Q_INVOKABLE static bool doRectanglesIntersect(const QRectF &r1, const QRectF &r2);
+    Q_INVOKABLE static QSizeF scaledSize(const QSizeF &of, const QSizeF &into);
+    Q_INVOKABLE static QRectF uniteRectangles(const QRectF &r1, const QRectF &r2);
+    Q_INVOKABLE static QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top,
+                                              qreal right, qreal bottom);
+    Q_INVOKABLE static bool isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect);
+    Q_INVOKABLE static QPointF
+    translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect);
+    Q_INVOKABLE static qreal distanceBetweenPoints(const QPointF &p1, const QPointF &p2);
+    Q_INVOKABLE static QRectF querySubRectangle(const QRectF &in, const QRectF &around,
+                                                const QSizeF &atBest);
 
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
@@ -258,7 +258,7 @@ public:
     Q_INVOKABLE static QString neighbouringFilePath(const QString &filePath,
                                                     const QString &nfileName);
 
-    Q_INVOKABLE QScreen *windowScreen(QObject *window) const;
+    Q_INVOKABLE static QScreen *windowScreen(QObject *window);
 
     Q_INVOKABLE static QString getEnvironmentVariable(const QString &name);
 
@@ -268,7 +268,7 @@ public:
                                                              const QString &value);
     Q_INVOKABLE static void removeWindowsEnvironmentVariable(const QString &name);
 
-    Q_INVOKABLE QPointF globalMousePosition() const;
+    Q_INVOKABLE static QPointF globalMousePosition();
 
     Q_INVOKABLE static QString camelCased(const QString &val);
 
@@ -280,13 +280,13 @@ public:
     Q_INVOKABLE void toggleFullscreen(QWindow *window);
     Q_INVOKABLE bool hasActiveFocus(QQuickWindow *window, QQuickItem *item);
 
-    Q_INVOKABLE bool resetObjectProperty(QObject *object, const QString &propName);
+    Q_INVOKABLE static bool resetObjectProperty(QObject *object, const QString &propName);
 
-    Q_INVOKABLE int objectTreeSize(QObject *ptr) const;
+    Q_INVOKABLE static int objectTreeSize(QObject *ptr);
 
     Q_INVOKABLE static QString createUniqueId();
 
-    Q_INVOKABLE void sleep(int ms);
+    Q_INVOKABLE static void sleep(int ms);
 
     Q_INVOKABLE static QTime secondsToTime(int nrSeconds);
     Q_INVOKABLE static QString relativeTime(const QDateTime &dt);
@@ -297,7 +297,7 @@ public:
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 
-    static QVector<QColor> standardColors(const QVersionNumber &version);
+    static QVector<QColor> standardColors(const QVersionNumber &version = QVersionNumber());
 
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);
