@@ -49,7 +49,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    font.pointSize: Scrite.app.idealFontPointSize + 2
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
@@ -58,7 +58,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
                     text: "<b>Position:</b> " + Math.round(annotation.geometry.x-canvasItemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-canvasItemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
                 }
@@ -67,7 +67,7 @@ Item {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: PrimaryColors.separatorColor
+                color: ScritePrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -83,7 +83,7 @@ Item {
                     Text {
                         width: parent.width
                         text: propertyInfo.title
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         font.bold: true
                     }
 
@@ -126,7 +126,7 @@ Item {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: PrimaryColors.separatorColor
+                color: ScritePrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -220,7 +220,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: propertyValue
                 font.capitalization: Font.AllUppercase
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             }
         }
     }
@@ -256,12 +256,12 @@ Item {
 
         TextArea {
             background: Rectangle {
-                color: PrimaryColors.c50.background
+                color: ScritePrimaryColors.c50.background
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
             }
             text: propertyValue
-            font.pointSize: Scrite.app.idealFontPointSize
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             height: Math.max(80, contentHeight) + topPadding + bottomPadding
             padding: 7.5
             onTextChanged: Qt.callLater(commitTextChanges)
@@ -303,7 +303,7 @@ Item {
 
             Text {
                 width: parent.width
-                font.pointSize: Scrite.app.idealFontPointSize-1
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-1
                 visible: propertyValue != urlField.text
                 text: "Press " + (Scrite.app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
             }
@@ -318,7 +318,7 @@ Item {
 
             Text {
                 rightPadding: changeFontButton.width + 5
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 text: propertyValue
                 height: 42
                 verticalAlignment: Text.AlignVCenter
@@ -344,10 +344,10 @@ Item {
 
             Rectangle {
                 id: fontListViewArea
-                color: PrimaryColors.c50.background
+                color: ScritePrimaryColors.c50.background
                 width: parent.width - 10
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
                 height: 200 + fontSearchBar.height
                 visible: false
                 anchors.right: parent.right
@@ -371,7 +371,7 @@ Item {
                     width: parent.width
                     placeholderText: "search for a font"
                     anchors.top: parent.top
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     onTextEdited: Qt.callLater(highlightFont)
                     function highlightFont() {
                         var utext = text.toUpperCase()
@@ -405,7 +405,7 @@ Item {
                     keyNavigationEnabled: false
                     delegate: Text {
                         font.family: modelData
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         text: modelData
                         width: fontListView.width-20
                         color: fontListView.currentIndex === index ? Scrite.app.palette.highlightedText : "black"
@@ -494,9 +494,9 @@ Item {
 
         Rectangle {
             height: (width/16)*9
-            color: PrimaryColors.c100.background
+            color: ScritePrimaryColors.c100.background
             border.width: 1
-            border.color: PrimaryColors.borderColor
+            border.color: ScritePrimaryColors.borderColor
 
             FileDialog {
                 id: fileDialog
@@ -544,7 +544,7 @@ Item {
                     text: propertyValue == "" ? "Set" : "Change"
                     color: "blue"
                     font.underline: true
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
 
                     MouseArea {
                         anchors.fill: parent
@@ -558,7 +558,7 @@ Item {
                     color: "blue"
                     font.underline: true
                     visible: propertyValue != ""
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
 
                     MouseArea {
                         anchors.fill: parent

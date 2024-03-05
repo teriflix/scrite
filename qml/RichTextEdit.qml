@@ -79,7 +79,7 @@ Item {
 
         Component.onCompleted: {
             font.family = "Verdana"
-            font.pointSize = Qt.binding( () => { return Scrite.app.idealFontPointSize } )
+            font.pointSize = Qt.binding( () => { return ScriteFontMetrics.ideal.font.pointSize } )
         }
 
         // internal private property only
@@ -173,7 +173,7 @@ Item {
         sourceComponent: Item {
             Rectangle {
                 anchors.fill: parent
-                color: PrimaryColors.c600.background
+                color: ScritePrimaryColors.c600.background
                 opacity: 0.7
             }
 
@@ -191,8 +191,8 @@ Item {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: "In here, you can only type in English or in languages for which you have configured a text input method from your OS in Scrite Settings."
                     font.bold: true
-                    font.pointSize: Scrite.app.idealFontPointSize + 3
-                    color: PrimaryColors.c600.text
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 3
+                    color: ScritePrimaryColors.c600.text
                 }
 
                 Button2 {

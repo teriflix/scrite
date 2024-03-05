@@ -54,7 +54,7 @@ Item {
                     }
                     return "This screenplay has been marked for collaboration by <strong>" + Scrite.document.primaryCollaborator + "</strong> with the emails listed below."
                 }
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 wrapMode: Text.WordWrap
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -77,8 +77,8 @@ Item {
             width: parent.width
             height: parent.height - titleText.height - protectionSwitchRow.height - 2*parent.spacing
             border.width: 1
-            border.color: PrimaryColors.c700.background
-            color: PrimaryColors.c100.background
+            border.color: ScritePrimaryColors.c700.background
+            color: ScritePrimaryColors.c100.background
             enabled: Scrite.document.hasCollaborators
             opacity: enabled ? 1.0 : 0.5
 
@@ -125,7 +125,7 @@ Item {
                         Text {
                             width: parent.width - (deleteIcon.opacity > 0 ? (deleteIcon.width+parent.spacing) : 0)
                             wrapMode: Text.WordWrap
-                            font.pointSize: Scrite.app.idealFontPointSize
+                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                             font.italic: collaboratorName === ""
                             text: collaborator
                             anchors.verticalCenter: parent.verticalCenter
@@ -155,7 +155,7 @@ Item {
                         id: newCollaboratorEmail
                         width: parent.width - addCollaboratorButton.width - parent.spacing
                         placeholderText: "Enter Email ID and hit Return"
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         validator: RegExpValidator {
                             regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                         }

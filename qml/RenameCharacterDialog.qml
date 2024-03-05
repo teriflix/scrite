@@ -17,6 +17,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     width: 640
     height: layout.height + 80
@@ -37,7 +39,7 @@ Item {
         anchors.centerIn: parent
 
         Text {
-            font.pointSize: Scrite.app.idealFontPointSize + 2
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
             text: "Rename Character"
             width: parent.width
             wrapMode: Text.WordWrap
@@ -57,7 +59,7 @@ Item {
             label: ""
             focus: true
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize: Scrite.app.idealFontPointSize + 2
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
             onReturnPressed: renameButton.click()
         }
 
@@ -85,7 +87,7 @@ Item {
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
                     elide: Text.ElideRight
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
                 }
 
@@ -98,7 +100,7 @@ Item {
                     Text {
                         width: parent.width
                         text: "This operation cannot be undone."
-                        font.pointSize: Math.max(10,Scrite.app.idealFontPointSize-4)
+                        font.pointSize: Math.max(10,ScriteFontMetrics.ideal.font.pointSize-4)
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter

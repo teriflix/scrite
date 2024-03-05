@@ -18,6 +18,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     id: formView
     property Form form: note ? note.form : null
@@ -91,7 +93,7 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     font.bold: true
-                    font.pointSize: Scrite.app.idealFontPointSize + 2
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
                     placeholderText: "Title"
                     TabSequenceItem.manager: formTabManager
                     TabSequenceItem.sequence: 0
@@ -110,7 +112,7 @@ Item {
                     text: note ? note.content : ""
                     width: parent.width
                     wrapMode: Text.WordWrap
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     placeholderText: "Description"
                     TabSequenceItem.manager: formTabManager
                     TabSequenceItem.sequence: 1

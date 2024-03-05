@@ -25,7 +25,7 @@ Item {
     property string label: ""
     property alias buttonColor: expandCollapseButton.color
     property alias backgroundColor: panelBackground.color
-    property color borderColor: PrimaryColors.borderColor
+    property color borderColor: ScritePrimaryColors.borderColor
     property real borderWidth: 1
 
     property bool expanded: false
@@ -123,12 +123,12 @@ Item {
         id: expandCollapseButton
         x: sidePanel.expanded ? 4 : -radius
         y: sidePanel.expanded ? 4 : parent.buttonY
-        color: PrimaryColors.button.background
+        color: ScritePrimaryColors.button.background
         width: parent.minPanelWidth
         height: sidePanel.expanded ? parent.height-8 : sidePanel.buttonSize
         radius: (1.0-contentLoader.opacity) * 6
         border.width: contentLoader.visible ? 0 : 1
-        border.color: sidePanel.expanded ? PrimaryColors.windowColor : borderColor
+        border.color: sidePanel.expanded ? ScritePrimaryColors.windowColor : borderColor
 
         Behavior on height {
             enabled: applicationSettings.enableAnimations

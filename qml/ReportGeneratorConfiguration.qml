@@ -30,7 +30,7 @@ Item {
 
     width: 750
     height: formInfo.fields.length > 0 || (generator && !generator.featureEnabled) ? 720 : 275
-    readonly property color dialogColor: PrimaryColors.c300.background
+    readonly property color dialogColor: ScritePrimaryColors.c300.background
     readonly property bool isPdfExport: generator ? generator.format === AbstractReportGenerator.AdobePDF : false
 
     Component.onCompleted: {
@@ -92,7 +92,7 @@ Item {
                     font.bold: true
                     text: formInfo.title
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: PrimaryColors.c300.text
+                    color: ScritePrimaryColors.c300.text
                 }
 
                 Text {
@@ -102,7 +102,7 @@ Item {
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: PrimaryColors.c300.text
+                    color: ScritePrimaryColors.c300.text
                 }
             }
 
@@ -121,7 +121,7 @@ Item {
                     id: pageList
                     width: 175
                     height: parent.height
-                    color: PrimaryColors.c700.background
+                    color: ScritePrimaryColors.c700.background
                     property int currentIndex: 0
                     visible: pageRepeater.count > 1
 
@@ -135,7 +135,7 @@ Item {
                             Rectangle {
                                 width: parent.width
                                 height: 60
-                                color: pageList.currentIndex === index ? contentPanel.color : PrimaryColors.c10.background
+                                color: pageList.currentIndex === index ? contentPanel.color : ScritePrimaryColors.c10.background
 
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
@@ -145,7 +145,7 @@ Item {
                                     horizontalAlignment: Text.AlignRight
                                     text: modelData.name
                                     elide: Text.ElideRight
-                                    color: pageList.currentIndex === index ? "black" : PrimaryColors.c700.text
+                                    color: pageList.currentIndex === index ? "black" : ScritePrimaryColors.c700.text
                                 }
 
                                 Image {
@@ -302,8 +302,8 @@ Item {
 
                 Button2 {
                     text: "Cancel"
-                    Material.background: PrimaryColors.c100.background
-                    Material.foreground: PrimaryColors.c100.text
+                    Material.background: ScritePrimaryColors.c100.background
+                    Material.foreground: ScritePrimaryColors.c100.text
                     onClicked: {
                         generator.discard()
                         modalDialog.close()
@@ -324,8 +324,8 @@ Item {
                 Button2 {
                     enabled: fileSelector.absoluteFilePath !== "" && generator.featureEnabled
                     text: "Generate"
-                    Material.background: PrimaryColors.c100.background
-                    Material.foreground: PrimaryColors.c100.text
+                    Material.background: ScritePrimaryColors.c100.background
+                    Material.foreground: ScritePrimaryColors.c100.text
                     onClicked: busyOverlay.visible = true
                 }
             }
@@ -420,7 +420,7 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             }
 
             Loader {
@@ -443,7 +443,7 @@ Item {
                         model: characterNames
 
                         TagText {
-                            property var colors: AccentColors.c600
+                            property var colors: ScriteAccentColors.c600
                             border.width: 1
                             border.color: colors.text
                             color: colors.background
@@ -538,7 +538,7 @@ Item {
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
                     elide: Text.ElideRight
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 }
 
                 Text {
@@ -553,9 +553,9 @@ Item {
                     width: parent.width - 20
                     height: 300
                     background: Rectangle {
-                        color: PrimaryColors.c50.background
+                        color: ScritePrimaryColors.c50.background
                         border.width: 1
-                        border.color: PrimaryColors.c50.text
+                        border.color: ScritePrimaryColors.c50.text
                     }
                     ListView {
                         id: locationListView
@@ -664,9 +664,9 @@ Item {
                 width: parent.width - 20
                 height: 320
                 background: Rectangle {
-                    color: PrimaryColors.c50.background
+                    color: ScritePrimaryColors.c50.background
                     border.width: 1
-                    border.color: PrimaryColors.c50.text
+                    border.color: ScritePrimaryColors.c50.text
                 }
                 ListView {
                     id: sceneListView
@@ -725,7 +725,7 @@ Item {
                         CheckBox2 {
                             id: sceneCheckBox
                             width: parent.width-1
-                            font.pointSize: Scrite.app.idealFontPointSize
+                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                             font.family: Scrite.document.formatting.defaultFont.family
                             visible: sceneListView.filter(screenplayElement.scene) && screenplayElement.scene && screenplayElement.scene.heading.enabled
                             text: {
@@ -781,7 +781,7 @@ Item {
                 }
 
                 Text {
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
                     anchors.verticalCenter: parent.verticalCenter
                     padding: 5
@@ -820,9 +820,9 @@ Item {
                 width: parent.width-20
                 height: 320
                 background: Rectangle {
-                    color: PrimaryColors.c50.background
+                    color: ScritePrimaryColors.c50.background
                     border.width: 1
-                    border.color: PrimaryColors.c50.text
+                    border.color: ScritePrimaryColors.c50.text
                 }
                 ListView {
                     id: episodeListView
@@ -863,7 +863,7 @@ Item {
                             text: "EPISODE " + index
                             anchors.verticalCenter: parent.verticalCenter
                             visible: index > 0
-                            font.pointSize: Scrite.app.idealFontPointSize
+                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                             font.family: Scrite.document.formatting.defaultFont.family
                             checked: episodeListView.episodeNumbers.indexOf(index) >= 0
                             onToggled: episodeListView.select(index, checked)
@@ -901,9 +901,9 @@ Item {
                 height: 350
                 width: parent.width-20
                 background: Rectangle {
-                    color: PrimaryColors.c50.background
+                    color: ScritePrimaryColors.c50.background
                     border.width: 1
-                    border.color: PrimaryColors.c50.text
+                    border.color: ScritePrimaryColors.c50.text
                 }
                 ListView {
                     id: groupsView
@@ -921,14 +921,14 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             anchors.margins: 3
-                            color: PrimaryColors.windowColor
+                            color: ScritePrimaryColors.windowColor
                             Text {
                                 text: section
                                 topPadding: 5
                                 bottomPadding: 5
                                 anchors.centerIn: parent
-                                color: PrimaryColors.button.text
-                                font.pointSize: Scrite.app.idealFontPointSize
+                                color: ScritePrimaryColors.button.text
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                             }
                         }
                     }
@@ -958,7 +958,7 @@ Item {
             property var fieldInfo
             text: fieldInfo.label
             checkable: true
-            font.pointSize: Scrite.app.idealFontPointSize
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             checked: generator ? generator.getConfigurationValue(fieldInfo.name) : false
             onToggled: generator ? generator.setConfigurationValue(fieldInfo.name, checked) : false
         }
@@ -1000,14 +1000,14 @@ Item {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 font.capitalization: Font.Capitalize
-                font.pointSize: Scrite.app.idealFontPointSize-2
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
             }
 
             Text {
                 text: fieldInfo.note
                 width: parent.width
                 wrapMode: Text.WordWrap
-                font.pointSize: Scrite.app.idealFontPointSize-2
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                 font.italic: true
                 visible: text !== ""
             }
@@ -1038,14 +1038,14 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             }
 
             Text {
                 text: fieldInfo.note
                 width: parent.width-10
                 wrapMode: Text.WordWrap
-                font.pointSize: Scrite.app.idealFontPointSize-4
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-4
                 font.italic: true
                 visible: text !== ""
             }

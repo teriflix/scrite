@@ -52,7 +52,7 @@ Item {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 30
-                font.pointSize: Scrite.app.idealFontPointSize + 2
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
                 text: Scrite.app.applicationVersion
                 font.letterSpacing: applicationSettings.enableAnimations ? 20 : 0
 
@@ -94,7 +94,7 @@ Item {
 
                 Text {
                     text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "gray"
 
@@ -112,18 +112,18 @@ Item {
 
                 Text {
                     text: "The app uses:"
-                    font.pointSize: Scrite.app.idealFontPointSize - 2
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
                 Rectangle {
                     width: aboutBox.width * 0.5
                     height: (creditsViewFontMetrics.height+creditsView.spacing) * creditsView.model.count + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
-                    color: creditsView.ScrollBar.vertical.needed ? PrimaryColors.c100.background : Qt.rgba(0,0,0,0)
+                    color: creditsView.ScrollBar.vertical.needed ? ScritePrimaryColors.c100.background : Qt.rgba(0,0,0,0)
 
                     FontMetrics {
                         id: creditsViewFontMetrics
-                        font.pointSize: Scrite.app.idealFontPointSize - 2
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
                     }
 
                     ListView {
@@ -180,7 +180,7 @@ Item {
                             color: creditLabelMouseArea.containsMouse ? "blue" : "black"
                             width: ListView.view.width - (creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
-                            font.pointSize: Scrite.app.idealFontPointSize - 2
+                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
                             horizontalAlignment: Text.AlignHCenter
 
                             MouseArea {

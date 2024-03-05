@@ -61,16 +61,16 @@ Column {
         Label {
             id: questionNumberText
             font.bold: true
-            font.pointSize: Scrite.app.idealFontPointSize + 2
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
             horizontalAlignment: Text.AlignRight
-            width: idealAppFontMetrics.averageCharacterWidth * nrQuestionDigits
+            width: ScriteFontMetrics.ideal.averageCharacterWidth * nrQuestionDigits
             anchors.top: parent.top
         }
 
         Label {
             id: questionText
             font.bold: true
-            font.pointSize: Scrite.app.idealFontPointSize + 2
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
             width: parent.width - questionNumberText.width - parent.spacing
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.top: parent.top
@@ -81,11 +81,11 @@ Column {
         id: answerArea
         width: questionText.width
         anchors.right: parent.right
-        color: Scrite.app.translucent(PrimaryColors.c100.background, 0.75)
+        color: Scrite.app.translucent(ScritePrimaryColors.c100.background, 0.75)
         border.width: 1
-        border.color: Scrite.app.translucent(PrimaryColors.borderColor, 0.25)
+        border.color: Scrite.app.translucent(ScritePrimaryColors.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
-        property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
+        property real minHeight: (ScriteFontMetrics.ideal.lineSpacing + ScriteFontMetrics.ideal.descent + ScriteFontMetrics.ideal.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 
         LodLoader {
             id: answerItemLoader
@@ -103,7 +103,7 @@ Column {
             }
 
             lowDetailComponent: TextArea {
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 text: formField.answer === "" ? formField.placeholderText : formField.answer
                 opacity: formField.answer === "" ? 0.5 : 1
@@ -125,7 +125,7 @@ Column {
 
             highDetailComponent: TextArea {
                 id: answerText
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 selectByMouse: true
                 selectByKeyboard: true

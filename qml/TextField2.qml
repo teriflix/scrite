@@ -45,10 +45,10 @@ TextField {
         return suggestion
     }
     property bool tabItemUponReturn: true
-    selectedTextColor: AccentColors.c700.text
-    selectionColor: AccentColors.c700.background
+    selectedTextColor: ScriteAccentColors.c700.text
+    selectionColor: ScriteAccentColors.c700.background
     selectByMouse: true
-    font.pointSize: Scrite.app.idealFontPointSize
+    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
 
     signal editingComplete()
     signal returnPressed()
@@ -168,7 +168,7 @@ TextField {
     Text {
         id: labelText
         text: parent.placeholderText
-        font.pointSize: 2*Scrite.app.idealFontPointSize/3
+        font.pointSize: 2*ScriteFontMetrics.ideal.font.pointSize/3
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.verticalCenter: parent.top
@@ -204,7 +204,7 @@ TextField {
                 text: string
                 padding: 5
                 font: textField.font
-                color: index === completionView.currentIndex ? PrimaryColors.highlight.text : PrimaryColors.c10.text
+                color: index === completionView.currentIndex ? ScritePrimaryColors.highlight.text : ScritePrimaryColors.c10.text
                 MouseArea {
                     id: textMouseArea
                     anchors.fill: parent
@@ -221,7 +221,7 @@ TextField {
                 }
             }
             highlight: Rectangle {
-                color: PrimaryColors.highlight.background
+                color: ScritePrimaryColors.highlight.background
             }
             currentIndex: completionModel.currentRow
             height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
@@ -270,7 +270,7 @@ TextField {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: textField.activeFocus ? PrimaryColors.c700.background : PrimaryColors.c300.background
+                color: textField.activeFocus ? ScritePrimaryColors.c700.background : ScritePrimaryColors.c300.background
                 anchors.bottom: parent.bottom
             }
         }

@@ -45,7 +45,7 @@ Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    color: AccentColors.c500.background
+                    color: ScriteAccentColors.c500.background
                     visible: parent.selected
                 }
 

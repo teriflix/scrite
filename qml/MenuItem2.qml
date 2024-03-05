@@ -20,8 +20,8 @@ import io.scrite.components 1.0
 import "./globals"
 
 MenuItem {
-    Material.accent: PrimaryColors.key
-    Material.background: PrimaryColors.c100.background
-    Material.foreground: PrimaryColors.c100.text
+    Material.accent: ScritePrimaryColors.key
+    Material.background: ScritePrimaryColors.c100.background
+    Material.foreground: ScritePrimaryColors.c100.text
     objectName: text
 }

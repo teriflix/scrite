@@ -18,6 +18,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     property bool animationsEnabled: Scrite.app.isWindowsPlatform ? !Scrite.app.isNotWindows10 : true
     signal done()
@@ -50,7 +52,7 @@ Item {
                 id: versionText
                 x: parent.width - width - ((35 / splashImage.sourceSize.height) * parent.height)
                 y: (750 / splashImage.sourceSize.height) * parent.height
-                font.pixelSize: Scrite.app.idealFontPointSize + 1
+                font.pixelSize: ScriteFontMetrics.ideal.font.pointSize + 1
                 text: Scrite.app.applicationVersion
                 color: "white"
             }

@@ -122,7 +122,7 @@ Item {
                             width: parent.width
                             label: Text {
                                 text: "Export fonts for the following languages"
-                                font.pointSize: Scrite.app.idealFontPointSize
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                             }
                             height: languageBundleView.height+45
 
@@ -142,7 +142,7 @@ Item {
                                         text: modelData.key
                                         onToggled: exporter.bundleFontForLanguage(modelData.value,checked)
                                         TabSequenceItem.manager: tabSequence
-                                        font.pointSize: Scrite.app.idealFontPointSize
+                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                                     }
                                 }
                             }
@@ -271,7 +271,7 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             }
 
             SpinBox {
@@ -300,7 +300,7 @@ Item {
                 checkable: true
                 checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
                 onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 TabSequenceItem.manager: tabSequence
             }
 
@@ -309,8 +309,8 @@ Item {
                 wrapMode: Text.WordWrap
                 leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
                 text: fieldInfo.note
-                font.pointSize: Scrite.app.idealFontPointSize-2
-                color: PrimaryColors.c600.background
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                color: ScritePrimaryColors.c600.background
                 visible: fieldInfo.note !== ""
             }
         }
@@ -326,7 +326,7 @@ Item {
             Text {
                 text: fieldInfo.name
                 font.capitalization: Font.Capitalize
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             }
 
             TextField2 {

@@ -69,7 +69,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.rightMargin: 30 * ratio
             anchors.bottomMargin: 10 * ratio
-            font.pointSize: Scrite.app.idealFontPointSize-2
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
             text: Scrite.app.applicationVersion
             color: "white"
         }
@@ -82,7 +82,7 @@ Item {
             anchors.leftMargin: 30 * appVersionLabel.ratio
             anchors.bottomMargin: 10 * appVersionLabel.ratio
 
-            font.pointSize: Scrite.app.idealFontPointSize-2
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
             padding: 5
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
@@ -249,7 +249,7 @@ Item {
 
         width: 100
         height: buttonLayout.height + 6
-        color: buttonMouseArea.containsMouse ? PrimaryColors.highlight.background : Qt.rgba(0,0,0,0)
+        color: buttonMouseArea.containsMouse ? ScritePrimaryColors.highlight.background : Qt.rgba(0,0,0,0)
 
         RowLayout {
             id: buttonLayout
@@ -278,7 +278,7 @@ Item {
             Text {
                 id: buttonLabel
                 padding: 3
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 font.underline: singleClick ? buttonMouseArea.containsMouse : false
                 text: button.text
                 Layout.fillWidth: true
@@ -303,7 +303,7 @@ Item {
             anchors.fill: parent
 
             Text {
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 text: "New File"
             }
 
@@ -314,7 +314,7 @@ Item {
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
                 border.width: templatesView.interactive ? 1 : 0
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
 
                 AppFeature {
                     id: templatesFeatureCheck
@@ -459,7 +459,7 @@ Item {
             anchors.fill: parent
 
             Text {
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 text: scriptalayMode ? "Scriptalay" : "Recent Files"
             }
 
@@ -470,7 +470,7 @@ Item {
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
                 border.width: quickFilesView.interactive ? 1 : 0
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
 
                 ListView {
                     id: quickFilesView // shows either Scriptalay or Recent Files
@@ -528,7 +528,7 @@ Item {
                 Layout.fillHeight: true
                 color: Qt.rgba(0,0,0,0)
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
 
                 ListView {
                     id: screenplaysView
@@ -539,7 +539,7 @@ Item {
                     currentIndex: count ? 0 : -1
                     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
                     highlight: Rectangle {
-                        color: PrimaryColors.highlight.background
+                        color: ScritePrimaryColors.highlight.background
                     }
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: screenplaysView
@@ -567,7 +567,7 @@ Item {
                 Layout.fillHeight: true
                 color: Qt.rgba(0,0,0,0)
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
 
                 Flickable {
                     id: screenplayDetailsFlick
@@ -604,7 +604,7 @@ Item {
 
     component VaultPage : Rectangle {
         border.width: 1
-        border.color: PrimaryColors.borderColor
+        border.color: ScritePrimaryColors.borderColor
         color: Qt.rgba(0,0,0,0)
 
         function openSelected() {
@@ -636,7 +636,7 @@ Item {
             visible: count > 0
             ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
             highlight: Rectangle {
-                color: PrimaryColors.highlight.background
+                color: ScritePrimaryColors.highlight.background
             }
             highlightMoveDuration: 0
             highlightResizeDuration: 0
@@ -732,7 +732,7 @@ Item {
             Rectangle {
                 id: dropBrowseItem
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doBrowse() {
@@ -767,7 +767,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Scrite.app.idealFontPointSize+2
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize+2
                         text: importDropArea.active ? importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
                     }
 
@@ -775,8 +775,8 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Scrite.app.idealFontPointSize-1
-                        color: PrimaryColors.c700.background
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize-1
+                        color: ScritePrimaryColors.c700.background
                         text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + importFileDialog.nameFilters.join(", ") + ")"
                     }
                 }
@@ -785,7 +785,7 @@ Item {
             Rectangle {
                 id: importDroppedFileItem
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doImport() {
@@ -810,7 +810,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Scrite.app.idealFontPointSize+2
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize+2
                         font.bold: true
                         elide: Text.ElideMiddle
                         text: fileToImport.name
@@ -820,7 +820,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         text: "Click on 'Import' button to import this file."
                     }
 
@@ -828,8 +828,8 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Scrite.app.idealFontPointSize-2
-                        color: AccentColors.c700.background
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                        color: ScriteAccentColors.c700.background
                         text: "<b>NOTE</b>: Unsaved changes in the current document will be discarded."
                         visible: !Scrite.document.empty
                     }
@@ -933,7 +933,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: Scrite.vault.documentCount > 0 ? "Select a file to restore from the vault." : ""
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 elide: Text.ElideRight
             }
             buttons: RowLayout {

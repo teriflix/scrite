@@ -105,7 +105,7 @@ Loader {
             background: Rectangle {
                 visible: frameVisible
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
             }
             opacity: activeFocus ? 1 : 0.5
             leftPadding: textViewEdit.leftPadding
@@ -178,10 +178,10 @@ Loader {
                         text: string
                         padding: 5
                         font: textArea.font
-                        color: index === completionView.currentIndex ? PrimaryColors.highlight.text : PrimaryColors.c10.text
+                        color: index === completionView.currentIndex ? ScritePrimaryColors.highlight.text : ScritePrimaryColors.c10.text
                     }
                     highlight: Rectangle {
-                        color: PrimaryColors.highlight.background
+                        color: ScritePrimaryColors.highlight.background
                     }
                     currentIndex: completionModel.currentRow
                     height: contentHeight

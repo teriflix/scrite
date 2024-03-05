@@ -23,7 +23,7 @@ Item {
     property string name: "Tabs"
     property var tabs: []
     property alias spacing: tabsRow.spacing
-    height: tabsRow.height + idealAppFontMetrics.descent + currentTabUnderline.height
+    height: tabsRow.height + ScriteFontMetrics.ideal.descent + currentTabUnderline.height
 
     Row {
         id: tabsRow
@@ -32,8 +32,8 @@ Item {
 
         Text {
             id: nameText
-            font.pointSize: idealAppFontMetrics.font.pointSize
-            font.family: idealAppFontMetrics.font.family
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.family: ScriteFontMetrics.ideal.font.family
             font.capitalization: Font.AllUppercase
             font.bold: true
             text: name + ": "
@@ -45,8 +45,8 @@ Item {
             model: tabs
 
             Text {
-                font: idealAppFontMetrics.font
-                color: textTabBar.tabIndex === index ? AccentColors.c900.background : PrimaryColors.c700.background
+                font: ScriteFontMetrics.ideal.font
+                color: textTabBar.tabIndex === index ? ScriteAccentColors.c900.background : ScritePrimaryColors.c700.background
                 text: modelData
 
                 MouseArea {
@@ -68,10 +68,10 @@ Item {
         id: currentTabUnderline
         x: currentTabItemPositionMapper.mappedPosition.x
         height: 2
-        color: AccentColors.c900.background
+        color: ScriteAccentColors.c900.background
         width: currentTabItemPositionMapper.from.width
         anchors.top: tabsRow.bottom
-        anchors.topMargin: idealAppFontMetrics.descent
+        anchors.topMargin: ScriteFontMetrics.ideal.descent
         property bool placedOnce: false
         Behavior on x {
             enabled: currentTabUnderline.placedOnce && applicationSettings.enableAnimations

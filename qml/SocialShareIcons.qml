@@ -18,6 +18,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     width: buttonsRow.width + 2*buttonsRow.spacing
     height: buttonsRow.height + 2*buttonsRow.spacing
@@ -35,7 +37,7 @@ Item {
         }
 
         Text {
-            font.pointSize: Scrite.app.idealFontPointSize
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             leftPadding: 10; rightPadding: 3
             text: "Share Scrite: "
             visible: displayShareText

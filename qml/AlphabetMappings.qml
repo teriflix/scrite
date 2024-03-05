@@ -29,20 +29,20 @@ Rectangle {
     ]
     width: layout.width + 20
     height: layout.height + 20
-    color: PrimaryColors.c10.background
-    border { width: 1; color: PrimaryColors.borderColor }
+    color: ScritePrimaryColors.c10.background
+    border { width: 1; color: ScritePrimaryColors.borderColor }
 
     readonly property real textCellWidth: 50
 
     FontMetrics {
         id: languageFontMetrics
         font.family: languageFont.family
-        font.pointSize: Scrite.app.idealFontPointSize
+        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
     }
 
     FontMetrics {
         id: normalFontMetrics
-        font.pointSize: Scrite.app.idealFontPointSize
+        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
     }
 
     Row {
@@ -59,14 +59,14 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 30
-                    color: PrimaryColors.c600.background
+                    color: ScritePrimaryColors.c600.background
 
                     Text {
                         text: modelData.heading
                         padding: 8
                         font.pointSize: normalFontMetrics.font.pointSize
                         anchors.centerIn: parent
-                        color: PrimaryColors.c600.text
+                        color: ScritePrimaryColors.c600.text
                     }
                 }
 

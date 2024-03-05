@@ -31,8 +31,8 @@ ToolButton {
     implicitWidth: suggestedWidth
     implicitHeight: suggestedHeight
 
-    Material.background: AccentColors.key
-    Material.foreground: PrimaryColors.key
+    Material.background: ScriteAccentColors.key
+    Material.foreground: ScritePrimaryColors.key
 
     font.pixelSize: 16
     hoverEnabled: true
@@ -40,9 +40,9 @@ ToolButton {
     opacity: enabled ? 1 : 0.5
     flat: true
     contentItem: Rectangle {
-        color: PrimaryColors.c10.background
+        color: ScritePrimaryColors.c10.background
         border.width: toolButton.flat ? 0 : 1
-        border.color: PrimaryColors.borderColor
+        border.color: ScritePrimaryColors.borderColor
 
         Row {
             anchors.centerIn: parent

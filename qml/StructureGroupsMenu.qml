@@ -50,13 +50,13 @@ Menu2 {
                 anchors.fill: parent
                 anchors.bottomMargin: structureGroupsMenu.bottomPadding
                 border.width: 1
-                border.color: PrimaryColors.borderColor
+                border.color: ScritePrimaryColors.borderColor
                 enabled: structureAppFeature.enabled && sceneGroup.sceneCount > 0
                 opacity: enabled ? 1 : 0.5
 
                 Rectangle {
                     anchors.fill: innerTitleText
-                    color: PrimaryColors.c700.background
+                    color: ScritePrimaryColors.c700.background
                     visible: innerTitleText.visible
                 }
 
@@ -76,11 +76,11 @@ Menu2 {
                         }
                         return ret;
                     }
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     visible: text !== ""
                     horizontalAlignment: Text.AlignHCenter
                     padding: 5
-                    color: PrimaryColors.c700.text
+                    color: ScritePrimaryColors.c700.text
                     font.bold: true
                 }
 
@@ -100,15 +100,15 @@ Menu2 {
                     section.delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                         height: 30
-                        color: PrimaryColors.windowColor
+                        color: ScritePrimaryColors.windowColor
                         Text {
                             id: categoryLabel
                             text: section
                             topPadding: 5
                             bottomPadding: 5
                             anchors.centerIn: parent
-                            color: PrimaryColors.button.text
-                            font.pointSize: Scrite.app.idealFontPointSize
+                            color: ScritePrimaryColors.button.text
+                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         }
                     }
                     property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
@@ -146,7 +146,7 @@ Menu2 {
                     delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                         height: 30
-                        color: groupItemMouseArea.containsMouse ? PrimaryColors.button.background : Qt.rgba(0,0,0,0)
+                        color: groupItemMouseArea.containsMouse ? ScritePrimaryColors.button.background : Qt.rgba(0,0,0,0)
                         opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
                         property bool doesNotBelongToAnyAct: arrayItem.act === ""
                         property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
@@ -176,7 +176,7 @@ Menu2 {
                                 width: parent.width - parent.spacing - 24
                                 anchors.verticalCenter: parent.verticalCenter
                                 font.bold: groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
-                                font.pointSize: Scrite.app.idealFontPointSize
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                                 leftPadding: arrayItem.type > 0 ? 20 : 0
                                 elide: Text.ElideRight
                             }

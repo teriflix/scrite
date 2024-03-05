@@ -17,6 +17,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Flickable {
     property Item textArea: __textArea
     property bool scrollBarRequired: contentHeight > height
@@ -53,7 +55,7 @@ Flickable {
         property var spellChecker: syntaxHighlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
         width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired && textAreaFlickable.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(textAreaFlickable.height-topPadding-bottomPadding, contentHeight+20)
-        font.pointSize: Scrite.app.idealFontPointSize
+        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         selectByMouse: true
         selectByKeyboard: true

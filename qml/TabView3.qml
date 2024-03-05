@@ -22,7 +22,7 @@ import "./globals"
 Item {
     id: tabView
     property var tabNames: ["Default"]
-    property color tabColor: PrimaryColors.windowColor
+    property color tabColor: ScritePrimaryColors.windowColor
     property alias currentTabIndex: tabBar.currentIndex
     property alias currentTabContent: tabContentLoader.sourceComponent
     property alias tabBarVisible: tabBar.visible
@@ -49,7 +49,7 @@ Item {
                 tabIndex: index
                 tabCount: 2
                 textColor: active ? Scrite.app.textColorFor(tabColor) : "black"
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 font.bold: active
                 currentTabIndex: tabBar.currentIndex
                 onRequestActivation: tabBar.currentIndex = index
@@ -82,7 +82,7 @@ Item {
         Rectangle {
             anchors.fill: tabContentLoader
             border.width: 1
-            border.color: Scrite.app.isVeryLightColor(tabColor) ? PrimaryColors.windowColor : tabColor
+            border.color: Scrite.app.isVeryLightColor(tabColor) ? ScritePrimaryColors.windowColor : tabColor
             color: Qt.rgba(0,0,0,0)
         }
     }

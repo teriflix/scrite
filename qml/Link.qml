@@ -22,12 +22,12 @@ Text {
     property alias containsMouse: linkMouseArea.containsMouse
     signal clicked()
 
-    font.pointSize: Scrite.app.idealFontPointSize
+    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
     font.underline: true
     color: linkMouseArea.containsMouse ? hoverColor : defaultColor
 
     property color hoverColor: "#65318f"
-    property color defaultColor: PrimaryColors.c10.text
+    property color defaultColor: ScritePrimaryColors.c10.text
 
     MouseArea {
         id: linkMouseArea

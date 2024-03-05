@@ -24,7 +24,7 @@ Rectangle {
     property string reason: Scrite.user.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
     property string suggestion: Scrite.user.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
     property string featureName
-    color: PrimaryColors.c100.background
+    color: ScritePrimaryColors.c100.background
     clip: true
 
     signal clicked()
@@ -72,7 +72,7 @@ Rectangle {
 
             Text {
                 text: featureName
-                font.pointSize: Scrite.app.idealFontPointSize + 8
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 8
                 font.bold: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: text !== ""
@@ -82,7 +82,7 @@ Rectangle {
                 id: reasonSuggestion
                 text: [reason, suggestion].join(" ").trim()
                 width: parent.width
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 visible: text !== ""
             }

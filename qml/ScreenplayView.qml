@@ -58,7 +58,7 @@ Item {
     Rectangle {
         id: screenplayTools
         z: 1
-        color: AccentColors.c100.background
+        color: ScriteAccentColors.c100.background
         width: screenplayToolsLayout.width+4
         anchors.top: parent.top
         anchors.left: parent.left
@@ -116,7 +116,7 @@ Item {
             width: 1
             height: parent.height
             anchors.right: parent.right
-            color: AccentColors.borderColor
+            color: ScriteAccentColors.borderColor
         }
     }
 
@@ -161,7 +161,7 @@ Item {
         Item {
             id: screenplayTracksFlickContent
             width: screenplayElementList.contentWidth
-            height: screenplayTracks.trackCount * (minimumAppFontMetrics.height + 10)
+            height: screenplayTracks.trackCount * (ScriteFontMetrics.minimum.height + 10)
 
             Repeater {
                 model: screenplayTracks
@@ -169,10 +169,10 @@ Item {
                 Rectangle {
                     readonly property var trackData: modelData
                     width: screenplayTracksFlickContent.width
-                    height: minimumAppFontMetrics.height + 8
-                    y: index * (minimumAppFontMetrics.height + 10)
+                    height: ScriteFontMetrics.minimum.height + 8
+                    y: index * (ScriteFontMetrics.minimum.height + 10)
                     color: Scrite.app.translucent( border.color, 0.1 )
-                    border.color: AccentColors.c900.background
+                    border.color: ScriteAccentColors.c900.background
                     border.width: 0.5
 
                     MouseArea {
@@ -212,7 +212,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             Text {
-                                font: minimumAppFontMetrics.font
+                                font: ScriteFontMetrics.minimum.font
                                 text: groupData.group
                                 width: parent.width-10
                                 horizontalAlignment: Text.AlignHCenter
@@ -407,8 +407,8 @@ Item {
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 0
-                color: PrimaryColors.button.background
-                border.color: PrimaryColors.borderColor
+                color: ScritePrimaryColors.button.background
+                border.color: ScritePrimaryColors.borderColor
                 border.width: 1
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5
                 visible: Scrite.document.structure.elementCount > 0 && enableDragDrop
@@ -416,7 +416,7 @@ Item {
                 Text {
                     anchors.fill: parent
                     anchors.margins: 5
-                    font.pointSize: Scrite.app.idealFontPointSize-2
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     wrapMode: Text.WordWrap
@@ -555,8 +555,8 @@ Item {
                     return { "background": element.scene.color, "text": "white" }
                 }
                 if(element.breakType === Screenplay.Episode)
-                    return AccentColors.c700
-                return AccentColors.c500
+                    return ScriteAccentColors.c700
+                return ScriteAccentColors.c500
             }
 
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
@@ -568,7 +568,7 @@ Item {
                 visible: element.selected
                 anchors.fill: elementItemBox
                 anchors.margins: -5
-                color: AccentColors.a700.background
+                color: ScriteAccentColors.a700.background
             }
 
             Loader {

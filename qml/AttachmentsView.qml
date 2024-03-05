@@ -29,7 +29,7 @@ ListView {
     onAttachmentsChanged: currentIndex = -1
     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
     highlight: Rectangle {
-        color: PrimaryColors.highlight.background
+        color: ScritePrimaryColors.highlight.background
     }
     clip: true
     highlightMoveDuration: 0
@@ -38,9 +38,9 @@ ListView {
 
     Rectangle {
         anchors.fill: parent
-        color: Scrite.app.translucent(PrimaryColors.windowColor, 0.5)
+        color: Scrite.app.translucent(ScritePrimaryColors.windowColor, 0.5)
         border.width: 1
-        border.color: PrimaryColors.borderColor
+        border.color: ScritePrimaryColors.borderColor
         z: -1
 
         Text {
@@ -48,7 +48,7 @@ ListView {
             anchors.margins: 10
             anchors.leftMargin: attachmentsView.delegateSize
             verticalAlignment: Text.AlignVCenter
-            font.pointSize: Scrite.app.idealFontPointSize
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
             opacity: 0.5
             text: "Attachments"
             visible: attachments && attachments.attachmentCount === 0
@@ -79,11 +79,11 @@ ListView {
                 width: parent.width
                 elide: Text.ElideMiddle
                 padding: 2
-                font.pointSize: Scrite.app.idealFontPointSize/2
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize/2
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
                 text: objectItem.originalFileName
-                color: isSelected ? PrimaryColors.highlight.text : PrimaryColors.c10.text
+                color: isSelected ? ScritePrimaryColors.highlight.text : ScritePrimaryColors.c10.text
             }
         }
 

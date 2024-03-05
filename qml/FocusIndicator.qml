@@ -20,9 +20,9 @@ Rectangle {
     property bool active: false
     border.width: active ? 2 : 0
     border.color: color1
-    color: AccentColors.c10.background
-    property color color1: Scrite.app.translucent(AccentColors.c800.background, 0.55)
-    property color color2: Scrite.app.translucent(AccentColors.c500.background, 0.45)
+    color: ScriteAccentColors.c10.background
+    property color color1: Scrite.app.translucent(ScriteAccentColors.c800.background, 0.55)
+    property color color2: Scrite.app.translucent(ScriteAccentColors.c500.background, 0.45)
 
     SequentialAnimation {
         running: focusIndicator.active

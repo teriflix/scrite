@@ -1,4 +1,4 @@
-StandardColorPalette 1.0 StandardColorPalette.qml
-singleton PrimaryColors 1.0 PrimaryColors.qml
-singleton AccentColors 1.0 AccentColors.qml
+singleton ScritePrimaryColors 1.0 ScritePrimaryColors.qml
+singleton ScriteAccentColors 1.0 ScriteAccentColors.qml
+singleton ScriteFontMetrics 1.0 ScriteFontMetrics.qml
 

@@ -27,22 +27,12 @@ Rectangle {
     id: mainWindow
     width: 1366
     height: 700
-    color: PrimaryColors.windowColor
+    color: ScritePrimaryColors.windowColor
 
-    FontMetrics {
-        id: minimumAppFontMetrics
-        font.pointSize: Math.min(Scrite.app.idealFontPointSize-2, 12)
-    }
-
-    FontMetrics {
-        id: idealAppFontMetrics
-        font.pointSize: Scrite.app.idealFontPointSize
-    }
-
-    Material.primary: PrimaryColors.key
-    Material.accent: AccentColors.key
+    Material.primary: ScritePrimaryColors.key
+    Material.accent: ScriteAccentColors.key
     Material.theme: Material.Light
-    Material.background: AccentColors.c700.background
+    Material.background: ScriteAccentColors.c700.background
 
     UndoStack {
         id: mainUndoStack
@@ -114,7 +104,7 @@ Rectangle {
     Item {
         id: dialogUnderlay
         anchors.fill: mainScriteDocumentView
-        property color color: PrimaryColors.windowColor
+        property color color: ScritePrimaryColors.windowColor
 
         property int visibilityCounter: 0
         function show() {
@@ -133,7 +123,7 @@ Rectangle {
         visible: false
         onVisibleChanged: {
             if(!visible) {
-                color = PrimaryColors.windowColor
+                color = ScritePrimaryColors.windowColor
                 visibilityCounter = 0
             }
         }
@@ -166,8 +156,8 @@ Rectangle {
         category: "Structure Tab"
 
         property bool showGrid: true
-        property color gridColor: AccentColors.c400.background
-        property color canvasColor: AccentColors.c50.background
+        property color gridColor: ScriteAccentColors.c400.background
+        property color canvasColor: ScriteAccentColors.c50.background
         property bool showPreview: true
         property bool displayAnnotationProperties: true
         property bool showPullHandleAnimation: true
@@ -297,7 +287,7 @@ Rectangle {
                     font.pixelSize: 16
                     text: question
                     horizontalAlignment: Text.AlignHCenter
-                    color: AccentColors.c50.text
+                    color: ScriteAccentColors.c50.text
                 }
 
                 Row {
@@ -353,7 +343,7 @@ Rectangle {
                     font.pixelSize: 16
                     text: message
                     horizontalAlignment: Text.AlignHCenter
-                    color: AccentColors.c50.text
+                    color: ScriteAccentColors.c50.text
                 }
 
                 Row {
@@ -389,7 +379,7 @@ Rectangle {
                 anchors.fill: indication
                 anchors.margins: -30
                 radius: 4
-                color: PrimaryColors.c600.background
+                color: ScritePrimaryColors.c600.background
             }
 
             Row {
@@ -414,7 +404,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     text: Scrite.document.busyMessage
                     font.pixelSize: 16
-                    color: PrimaryColors.c600.text
+                    color: ScritePrimaryColors.c600.text
                 }
             }
 
@@ -491,7 +481,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         visible: Scrite.notifications.count > 0
-        color: Scrite.app.translucent(PrimaryColors.borderColor, 0.6)
+        color: Scrite.app.translucent(ScritePrimaryColors.borderColor, 0.6)
 
         UI.NotificationsView {
             id: notificationsView

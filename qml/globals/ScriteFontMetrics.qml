@@ -11,16 +11,18 @@
 **
 ****************************************************************************/
 
+pragma Singleton
+
 import QtQuick 2.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
+QtObject {
+    readonly property FontMetrics minimum: FontMetrics {
+        font.pointSize: Math.min(Scrite.app.idealFontPointSize-2, 12)
+    }
 
-RadioButton {
-    Material.accent: ScritePrimaryColors.key
-    Material.background: ScritePrimaryColors.c100.background
-    Material.foreground: ScritePrimaryColors.c100.text
+    readonly property FontMetrics ideal: FontMetrics {
+        font.pointSize: Scrite.app.idealFontPointSize
+    }
 }

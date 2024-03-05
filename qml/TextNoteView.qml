@@ -49,7 +49,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.WordWrap
             font.bold: true
-            font.pointSize: Scrite.app.idealFontPointSize + 2
+            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
             placeholderText: "Heading"
             TabSequenceItem.manager: noteTabManager
             TabSequenceItem.sequence: 0
@@ -80,7 +80,7 @@ Item {
                     note.content = text
             }
             background: Rectangle {
-                color: PrimaryColors.windowColor
+                color: ScritePrimaryColors.windowColor
                 opacity: 0.15
             }
         }

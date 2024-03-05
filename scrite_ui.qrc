@@ -93,8 +93,9 @@
         <file>qml/CheckListView.qml</file>
         <file>qml/HomeScreen.qml</file>
         <file>qml/SaveWorkflow.qml</file>
-        <file>qml/globals/AccentColors.qml</file>
-        <file>qml/globals/PrimaryColors.qml</file>
         <file>qml/globals/qmldir</file>
+        <file>qml/globals/ScriteAccentColors.qml</file>
+        <file>qml/globals/ScritePrimaryColors.qml</file>
+        <file>qml/globals/ScriteFontMetrics.qml</file>
     </qresource>
 </RCC>

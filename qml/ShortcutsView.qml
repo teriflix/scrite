@@ -13,7 +13,10 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 Item {
     property alias backgroundColor: background.color
@@ -54,7 +57,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 5
                     // font.family: "Courier Prime"
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     font.bold: true
                     text: section
                 }
@@ -75,7 +78,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     // font.family: "Courier Prime"
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     text: itemTitle
                     width: parent.width * 0.65
                     elide: Text.ElideRight
@@ -84,7 +87,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     font.family: "Courier Prime"
-                    font.pointSize: Scrite.app.idealFontPointSize-2
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                     text: Scrite.app.polishShortcutTextForDisplay(itemShortcut)
                     width: parent.width * 0.35
                 }

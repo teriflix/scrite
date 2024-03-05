@@ -28,7 +28,7 @@ Item {
     id: optionsDialog
     width: Math.min(scriteDocumentViewItem.width-80, 1050)
     height: Math.min(scriteDocumentViewItem.height-80, 750)
-    readonly property color dialogColor: PrimaryColors.windowColor
+    readonly property color dialogColor: ScritePrimaryColors.windowColor
     readonly property var systemFontInfo: Scrite.app.systemFontInfo()
 
     Component.onCompleted: {
@@ -368,8 +368,8 @@ Item {
 
                         TextField {
                             id: appFontSizeField
-                            text: Scrite.app.customFontPointSize === 0 ? Scrite.app.idealFontPointSize : Scrite.app.customFontPointSize
-                            width: idealAppFontMetrics.averageCharacterWidth*5
+                            text: Scrite.app.customFontPointSize === 0 ? ScriteFontMetrics.ideal.font.pointSize : Scrite.app.customFontPointSize
+                            width: ScriteFontMetrics.ideal.averageCharacterWidth*5
                             selectByMouse: true
                             onActiveFocusChanged: {
                                 if(activeFocus)
@@ -454,10 +454,10 @@ Item {
                 anchors.bottom: fontSettingsComboBox.top
                 anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: Scrite.app.idealFontPointSize-2
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                 horizontalAlignment: Text.AlignLeft
                 wrapMode: Text.WordWrap
-                color: PrimaryColors.c100.background
+                color: ScritePrimaryColors.c100.background
                 property string englishFontFamily: Scrite.app.transliterationEngine.languageFont(TransliterationEngine.English).family
                 text: {
                     if(screenplayEditorSettings.applyUserDefinedLanguageFonts)
@@ -511,7 +511,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         text: modelData.key
                         width: 175
                         horizontalAlignment: Text.AlignRight
@@ -559,7 +559,7 @@ Item {
 
             Text {
                 id: titleText
-                font.pointSize: Scrite.app.idealFontPointSize
+                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                 wrapMode: Text.WordWrap
                 width: parent.width - 40
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -576,7 +576,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         text: modelData.key + ": "
                         width: 175
                         horizontalAlignment: Text.AlignRight
@@ -662,7 +662,7 @@ Item {
 
                             Rectangle {
                                 border.width: 1
-                                border.color: PrimaryColors.borderColor
+                                border.color: ScritePrimaryColors.borderColor
                                 width: 30; height: 30
                                 color: structureCanvasSettings.canvasColor
                                 anchors.verticalCenter: parent.verticalCenter
@@ -683,7 +683,7 @@ Item {
 
                             Rectangle {
                                 border.width: 1
-                                border.color: PrimaryColors.borderColor
+                                border.color: ScritePrimaryColors.borderColor
                                 width: 30; height: 30
                                 color: structureCanvasSettings.gridColor
                                 anchors.verticalCenter: parent.verticalCenter
@@ -787,7 +787,7 @@ Item {
                                 id: themeLabel
                                 text: "Theme: "
                                 leftPadding: 10
-                                font.pointSize: Scrite.app.idealFontPointSize-2
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
@@ -902,7 +902,7 @@ Item {
                         Text {
                             id: windowTabsExplainerText
                             width: parent.width
-                            font.pointSize: Scrite.app.idealFontPointSize-2
+                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                             text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. (Note: This works when Scrite window size is atleast 1600 px wide.)"
                             wrapMode: Text.WordWrap
                         }
@@ -950,7 +950,7 @@ Item {
                         Text {
                             width: parent.width
                             height: windowTabsExplainerText.height
-                            font.pointSize: Scrite.app.idealFontPointSize-2
+                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                             text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
                             wrapMode: Text.WordWrap
                         }
@@ -997,7 +997,7 @@ Item {
                     width: parent.width
 
                     TextArea {
-                        font.pointSize: Scrite.app.idealFontPointSize
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         width: parent.width
                         wrapMode: Text.WordWrap
                         textFormat: TextArea.RichText
@@ -1016,14 +1016,14 @@ Item {
 
                             Text {
                                 font.bold: true
-                                font.pointSize: Scrite.app.idealFontPointSize
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                                 text: "Max Time In Milliseconds"
                                 width: parent.width
                             }
 
                             Text {
                                 font.bold: false
-                                font.pointSize: Scrite.app.idealFontPointSize-2
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                                 text: "Default: 1000"
                             }
 
@@ -1051,14 +1051,14 @@ Item {
 
                             Text {
                                 font.bold: true
-                                font.pointSize: Scrite.app.idealFontPointSize
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                                 text: "Max Iterations"
                                 width: parent.width
                             }
 
                             Text {
                                 font.bold: false
-                                font.pointSize: Scrite.app.idealFontPointSize-2
+                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                                 text: "Default: 50000"
                             }
 
@@ -1366,7 +1366,7 @@ Item {
 
                             Rectangle {
                                 border.width: 1
-                                border.color: PrimaryColors.borderColor
+                                border.color: ScritePrimaryColors.borderColor
                                 color: pageSetupSettings.watermarkColor
                                 width: 30; height: 30
                                 enabled: pageSetupSettings.watermarkEnabled
@@ -1381,7 +1381,7 @@ Item {
                         Rectangle {
                             width: 1
                             height: parent.height
-                            color: PrimaryColors.borderColor
+                            color: ScritePrimaryColors.borderColor
                         }
 
                         Grid {
@@ -1599,7 +1599,7 @@ Item {
                             font.bold: true
                             topPadding: 5
                             bottomPadding: 5
-                            color: PrimaryColors.c300.text
+                            color: ScritePrimaryColors.c300.text
                             opacity: enabled ? 1 : 0.5
                         }
 
@@ -1700,9 +1700,9 @@ Item {
                                     width: fieldLabelWidth
                                     horizontalAlignment: Text.AlignRight
                                     text: name
-                                    font.pointSize: Scrite.app.idealFontPointSize-2
+                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                                     anchors.verticalCenter: parent.verticalCenter
-                                    color: PrimaryColors.c800.background
+                                    color: ScritePrimaryColors.c800.background
                                 }
 
                                 TextField2 {
@@ -1719,7 +1719,7 @@ Item {
                                         _tpfLimiter.text = text
                                         _tpfScreenplayProperty.value = text
                                     }
-                                    font.pointSize: Scrite.app.idealFontPointSize+1
+                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize+1
                                     enableTransliteration: true
                                     TabSequenceItem.manager: titlePageFieldsTabSequence
                                     TabSequenceItem.sequence: index
@@ -1874,7 +1874,7 @@ Item {
                             readOnly: true
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             background: Rectangle {
-                                color: PrimaryColors.c10.background
+                                color: ScritePrimaryColors.c10.background
                             }
 
                             SceneDocumentBinder {
@@ -2131,7 +2131,7 @@ Item {
 
                         Rectangle {
                             border.width: 1
-                            border.color: PrimaryColors.borderColor
+                            border.color: ScritePrimaryColors.borderColor
                             color: displayElementFormat.textColor
                             width: 30; height: 30
                             anchors.verticalCenter: parent.verticalCenter
@@ -2154,7 +2154,7 @@ Item {
 
                         Rectangle {
                             border.width: 1
-                            border.color: PrimaryColors.borderColor
+                            border.color: ScritePrimaryColors.borderColor
                             color: displayElementFormat.backgroundColor
                             width: 30; height: 30
                             anchors.verticalCenter: parent.verticalCenter
@@ -2284,10 +2284,10 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 20
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pointSize: Scrite.app.idealFontPointSize-2
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.WordWrap
-                        color: PrimaryColors.c100.background
+                        color: ScritePrimaryColors.c100.background
                         text: "Customize categories & groups you use for tagging index cards on the structure canvas. Each document has its own groups, there is a system wide copy as well."
                     }
                 }
@@ -2328,12 +2328,12 @@ Item {
                     height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
                     font.family: "Courier Prime"
-                    font.pointSize: Scrite.app.idealFontPointSize
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                     text: Scrite.document.structure.groupsData
                     background: Rectangle {
-                        color: PrimaryColors.c50.background
+                        color: ScritePrimaryColors.c50.background
                         border.width: 1
-                        border.color: PrimaryColors.borderColor
+                        border.color: ScritePrimaryColors.borderColor
                     }
                 }
 
@@ -2375,12 +2375,12 @@ Item {
                     height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
                     font.family: "Courier Prime"
-                    font.pointSize: Scrite.app.idealFontPointSize + 2
+                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
                     text: Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
                     background: Rectangle {
-                        color: AccentColors.c50.background
+                        color: ScriteAccentColors.c50.background
                         border.width: 1
-                        border.color: AccentColors.borderColor
+                        border.color: ScriteAccentColors.borderColor
                     }
                 }
 
