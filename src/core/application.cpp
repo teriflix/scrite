@@ -173,9 +173,6 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     m_settings->sync();
 
-    TransliterationEngine::instance(this);
-    SystemTextInputManager::instance();
-
     m_networkConfiguration = new QNetworkConfigurationManager(this);
     m_networkConfiguration->allConfigurations(QNetworkConfiguration::Active);
     connect(m_networkConfiguration, &QNetworkConfigurationManager::onlineStateChanged, this,

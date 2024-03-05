@@ -27,6 +27,8 @@ int main(int argc, char **argv)
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     Application scriteApp(argc, argv, Application::prepare());
+    TransliterationEngine::instance();
+    SystemTextInputManager::instance();
     NotificationManager::instance();
     DocumentFileSystem::setMarker(QByteArrayLiteral("SCRITE"));
     ShortcutsModel::instance();
