@@ -17,6 +17,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 ScrollBar {
     property Flickable flickable
     property int contentSize: flickable ? (orientation === Qt.Vertical ? flickable.contentHeight : flickable.contentWidth) : 0
@@ -30,7 +32,7 @@ ScrollBar {
     }
     opacity: active ? 1 : 0.4
     Behavior on opacity {
-        enabled: applicationSettings.enableAnimations
+        enabled: ScriteSettings.application.enableAnimations
         NumberAnimation { duration: 250 }
     }
 }

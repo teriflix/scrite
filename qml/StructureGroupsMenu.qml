@@ -86,7 +86,7 @@ Menu2 {
 
                 ListView {
                     id: groupsView
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                     anchors.left: parent.left
                     anchors.top: innerTitleText.visible ? innerTitleText.bottom : parent.top
                     anchors.right: parent.right

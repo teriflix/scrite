@@ -12,7 +12,10 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 // For use from within StructureView only!!!!
 // Because we assume the existence of 'annotation' and 'annotationGripLoader'
@@ -45,7 +48,7 @@ Rectangle {
         onClicked: parent.grip()
         onDoubleClicked: {
             parent.grip()
-            structureCanvasSettings.displayAnnotationProperties = true
+            ScriteSettings.structureCanvas.displayAnnotationProperties = true
         }
     }
 

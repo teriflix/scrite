@@ -65,11 +65,11 @@ Item {
             font.bold: tabBarTab.active
             rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
             Behavior on font.pixelSize {
-                enabled: applicationSettings.enableAnimations
+                enabled: ScriteSettings.application.enableAnimations
                 NumberAnimation { duration: 250 }
             }
             Behavior on color {
-                enabled: applicationSettings.enableAnimations
+                enabled: ScriteSettings.application.enableAnimations
                 ColorAnimation { duration: 125 }
             }
         }

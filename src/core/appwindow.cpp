@@ -15,10 +15,8 @@
 #include "appwindow.h"
 #include "automation.h"
 #include "application.h"
-#include "shortcutsmodel.h"
 #include "scritedocument.h"
 #include "colorimageprovider.h"
-#include "notificationmanager.h"
 #include "basicfileiconprovider.h"
 
 #include <QMenuBar>

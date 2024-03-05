@@ -54,14 +54,14 @@ Item {
                 anchors.margins: 30
                 font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
                 text: Scrite.app.applicationVersion
-                font.letterSpacing: applicationSettings.enableAnimations ? 20 : 0
+                font.letterSpacing: ScriteSettings.application.enableAnimations ? 20 : 0
 
                 NumberAnimation {
                     target: versionText
                     property: "font.letterSpacing"
                     from: 20; to: 0
                     duration: 1500
-                    running: true && applicationSettings.enableAnimations
+                    running: true && ScriteSettings.application.enableAnimations
                     easing.type: Easing.OutBack
                 }
             }

@@ -191,7 +191,7 @@ Rectangle {
         visible: opacity > 0
         opacity: globalScreenplayEditorToolbar.showFind ? 1 : 0
         Behavior on opacity {
-            enabled: applicationSettings.enableAnimations
+            enabled: ScriteSettings.application.enableAnimations
             NumberAnimation { duration: 100 }
         }
 
@@ -310,7 +310,7 @@ Rectangle {
                 return availableMargin
             }
             Behavior on leftMargin {
-                enabled: applicationSettings.enableAnimations && contentView.commentsExpandCounter > 0
+                enabled: ScriteSettings.application.enableAnimations && contentView.commentsExpandCounter > 0
                 NumberAnimation { duration: 50 }
             }
 
@@ -449,7 +449,7 @@ Rectangle {
                             anchors.bottomMargin: Math.max(ruler.topMarginPx * 0.1, 10)
                             property real contentHeight: visible ? logLineEditorLayout.height + anchors.topMargin + anchors.bottomMargin : 0
                             height: logLineEditorLayout.height
-                            visible: screenplayEditorSettings.showLoglineEditor && screenplayAdapter.isSourceScreenplay && (Scrite.document.readOnly ? logLineField.text !== "" : true)
+                            visible: ScriteSettings.screenplayEditor.showLoglineEditor && screenplayAdapter.isSourceScreenplay && (Scrite.document.readOnly ? logLineField.text !== "" : true)
 
                             TextLimiterSyntaxHighlighterDelegate {
                                 id: loglineLimitHighlighter
@@ -568,7 +568,7 @@ Rectangle {
 
                         Loader {
                             id: addButtonsAnimator
-                            active: mainTabBar.currentIndex === 0 && contentView.count === 1 && !modalDialog.active && !splashLoader.active && !instanceSettings.screenplayEditorAddButtonsAnimationShown
+                            active: mainTabBar.currentIndex === 0 && contentView.count === 1 && !modalDialog.active && !splashLoader.active && !ScriteSettings.screenplayEditor.screenplayEditorAddButtonsAnimationShown
                             anchors.fill: parent
                             sourceComponent: UiElementHighlight {
                                 uiElement: addButtonsRow
@@ -577,7 +577,7 @@ Rectangle {
                                 description: "Use these buttons to add new a scene, act or episode."
                                 highlightAnimationEnabled: false
                                 onDone: addButtonsAnimator.active = false
-                                Component.onCompleted: instanceSettings.screenplayEditorAddButtonsAnimationShown = true
+                                Component.onCompleted: ScriteSettings.screenplayEditor.screenplayEditorAddButtonsAnimationShown = true
                             }
                         }
                     }
@@ -596,27 +596,27 @@ Rectangle {
                     id: contentView
                     anchors.fill: parent
                     model: defaultCacheBuffer >= 0 ? contentViewModel.value : null
-                    spacing: screenplayAdapter.elementCount > 0 ? screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
+                    spacing: screenplayAdapter.elementCount > 0 ? ScriteSettings.screenplayEditor.spaceBetweenScenes*zoomLevel : 0
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
                     property bool scrollingBetweenScenes: false
                     readonly property bool loadAllDelegates: false // for future use
                     property real spaceForComments: {
-                        if(screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
+                        if(ScriteSettings.screenplayEditor.displaySceneComments && commentsPanelAllowed)
                             return Math.round(screenplayEditorWorkspace.width - pageRulerArea.width - pageRulerArea.minLeftMargin - 20)
                         return 0
                     }
-                    property int commentsPanelTabIndex: screenplayEditorSettings.commentsPanelTabIndex
-                    onCommentsPanelTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = commentsPanelTabIndex
+                    property int commentsPanelTabIndex: ScriteSettings.screenplayEditor.commentsPanelTabIndex
+                    onCommentsPanelTabIndexChanged: ScriteSettings.screenplayEditor.commentsPanelTabIndex = commentsPanelTabIndex
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                     function delegateWasLoaded() { Qt.callLater(delegateLoaded) }
                     signal delegateLoaded()
 
                     property bool allowContentYAnimation
                     Behavior on contentY {
-                        enabled: applicationSettings.enableAnimations && contentView.allowContentYAnimation
+                        enabled: ScriteSettings.application.enableAnimations && contentView.allowContentYAnimation
                         NumberAnimation {
                             duration: 100
                             onFinished: contentView.allowContentYAnimation = false
@@ -624,17 +624,17 @@ Rectangle {
                     }
 
                     header: {
-                        if(screenplayEditorSettings.displayEmptyTitleCard)
+                        if(ScriteSettings.screenplayEditor.displayEmptyTitleCard)
                             return contentViewHeaderComponent
                         if(screenplayAdapter.isSourceScreenplay) {
-                            const logLineEditorVisible = screenplayEditorSettings.showLoglineEditor && (Scrite.document.readOnly ? screenplayAdapter.screenplay.logline !== "" : true)
+                            const logLineEditorVisible = ScriteSettings.screenplayEditor.showLoglineEditor && (Scrite.document.readOnly ? screenplayAdapter.screenplay.logline !== "" : true)
                             if (screenplayAdapter.screenplay.hasTitlePageAttributes || logLineEditorVisible)
                                 return contentViewHeaderComponent
                         }
                         return contentViewDummyHeaderComponent
                     }
 
-                    footer: screenplayEditorSettings.displayAddSceneBreakButtons ? contentViewFooterComponent : contentViewDummyFooterComponent
+                    footer: ScriteSettings.screenplayEditor.displayAddSceneBreakButtons ? contentViewFooterComponent : contentViewDummyFooterComponent
 
                     delegate: contentViewDelegateComponent
 
@@ -655,7 +655,7 @@ Rectangle {
                         cacheBuffer = Qt.binding( () => {
                                                      if(!model)
                                                         return defaultCacheBuffer
-                                                     return (screenplayEditorSettings.optimiseScrolling || contentView.loadAllDelegates) ? 2147483647 : defaultCacheBuffer
+                                                     return (ScriteSettings.screenplayEditor.optimiseScrolling || contentView.loadAllDelegates) ? 2147483647 : defaultCacheBuffer
                                                  })
                     }
 
@@ -782,7 +782,7 @@ Rectangle {
                 rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
                 zoomLevel: screenplayEditor.zoomLevel
                 resolution: Scrite.document.displayFormat.pageLayout.resolution
-                visible: screenplayEditorSettings.displayRuler
+                visible: ScriteSettings.screenplayEditor.displayRuler
 
                 property real leftMarginPx: leftMargin * zoomLevel
                 property real rightMarginPx: rightMargin * zoomLevel
@@ -1120,7 +1120,7 @@ Rectangle {
                 down: taggingMenu.active
                 onClicked: taggingMenu.show()
                 ToolTip.text: "Grouping Options"
-                visible: screenplayEditorSettings.allowTaggingOfScenes && mainTabBar.currentIndex === 0
+                visible: ScriteSettings.screenplayEditor.allowTaggingOfScenes && mainTabBar.currentIndex === 0
 
                 MenuLoader {
                     id: taggingMenu
@@ -1520,8 +1520,8 @@ Rectangle {
                 screenplayElement: contentItem.theElement
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 spellCheckEnabled: !Scrite.document.readOnly && spellCheckEnabledFlag.value
-                autoCapitalizeSentences: !Scrite.document.readOnly && screenplayEditorSettings.enableAutoCapitalizeSentences
-                autoPolishParagraphs: !Scrite.document.readOnly && screenplayEditorSettings.enableAutoPolishParagraphs
+                autoCapitalizeSentences: !Scrite.document.readOnly && ScriteSettings.screenplayEditor.enableAutoCapitalizeSentences
+                autoPolishParagraphs: !Scrite.document.readOnly && ScriteSettings.screenplayEditor.enableAutoPolishParagraphs
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 property bool firstInitializationDone: false
                 onDocumentInitialized: {
@@ -1555,7 +1555,7 @@ Rectangle {
                 }
 
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
-                applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
                 onCurrentParagraphTypeChanged: {
                     if(currentParagraphType === SceneElement.Action) {
                         ruler.paragraphLeftMargin = 0
@@ -1578,7 +1578,7 @@ Rectangle {
                 id: spellCheckEnabledFlag
                 trackChangesOn: contentView.numberOfWordsAddedToDict
                 from: false
-                to: screenplayEditorSettings.enableSpellCheck
+                to: ScriteSettings.screenplayEditor.enableSpellCheck
                 delay: 100
             }
 
@@ -1684,10 +1684,10 @@ Rectangle {
                 maxPanelWidth: Math.min(contentView.spaceForComments, 400)
                 width: maxPanelWidth
                 clip: true
-                visible: width >= 100 && screenplayEditorSettings.displaySceneComments
+                visible: width >= 100 && ScriteSettings.screenplayEditor.displaySceneComments
                 opacity: expanded ? (screenplayAdapter.currentIndex < 0 || screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
                 Behavior on opacity {
-                    enabled: applicationSettings.enableAnimations
+                    enabled: ScriteSettings.application.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
                 content: TabView3 {
@@ -1730,7 +1730,7 @@ Rectangle {
                                     privateData.changeCurrentIndexTo(contentItem.theIndex)
                             }
 
-                            Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
+                            Transliterator.spellCheckEnabled: ScriteSettings.screenplayEditor.enableSpellCheck
 
                             SpecialSymbolsSupport {
                                 anchors.top: parent.bottom
@@ -1807,7 +1807,7 @@ Rectangle {
                     width: parent.width
                     height: synopsisEditorLayout.height + 10*Math.min(zoomLevel,1)
                     color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
-                    visible: screenplayEditorSettings.displaySceneSynopsis
+                    visible: ScriteSettings.screenplayEditor.displaySceneSynopsis
 
                     Column {
                         id: synopsisEditorLayout
@@ -1834,7 +1834,7 @@ Rectangle {
                             font.pointSize: sceneHeadingFieldsFontPointSize
                             readOnly: Scrite.document.readOnly
                             text: contentItem.theScene.synopsis
-                            Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
+                            Transliterator.spellCheckEnabled: ScriteSettings.screenplayEditor.enableSpellCheck
                             onTextChanged: contentItem.theScene.synopsis = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
@@ -1863,7 +1863,7 @@ Rectangle {
                             }
 
                             Announcement.onIncoming: (type,data) => {
-                                if(!sceneTextEditor.activeFocus || !screenplayEditorSettings.displaySceneSynopsis)
+                                if(!sceneTextEditor.activeFocus || !ScriteSettings.screenplayEditor.displaySceneSynopsis)
                                     return
                                 var sdata = "" + data
                                 var stype = "" + type
@@ -1931,7 +1931,7 @@ Rectangle {
                         }
 
                         Rectangle {
-                            visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
+                            visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && ScriteSettings.screenplayEditor.highlightCurrentLine && Scrite.app.usingMaterialTheme
                             x: 0; y: sceneTextEditor.cursorRectangle.y-2*zoomLevel
                             width: parent.width
                             height: sceneTextEditor.cursorRectangle.height+4*zoomLevel
@@ -2235,7 +2235,7 @@ Rectangle {
                                 id: completionView
                                 model: completionModel
                                 clip: true
-                                FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                                FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                                 height: Math.min(contentHeight, 7*(defaultFontMetrics.lineSpacing+2*5))
                                 interactive: true
                                 ScrollBar.vertical: ScrollBar2 {
@@ -2248,7 +2248,7 @@ Rectangle {
                                     font: defaultFontMetrics.font
                                     color: index === completionView.currentIndex ? ScritePrimaryColors.highlight.text : ScritePrimaryColors.c10.text
                                     MouseArea {
-                                        property bool singleClickAutoComplete: screenplayEditorSettings.singleClickAutoComplete
+                                        property bool singleClickAutoComplete: ScriteSettings.screenplayEditor.singleClickAutoComplete
                                         anchors.fill: parent
                                         hoverEnabled: singleClickAutoComplete
                                         onContainsMouseChanged: if(singleClickAutoComplete) completionModel.currentRow = index
@@ -2924,7 +2924,7 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
                     spacing: 20
-//                    property bool headingFieldOnly: !screenplayEditorSettings.displaySceneCharacters && !screenplayEditorSettings.displaySceneSynopsis
+//                    property bool headingFieldOnly: !ScriteSettings.screenplayEditor.displaySceneCharacters && !ScriteSettings.screenplayEditor.displaySceneSynopsis
 //                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
 
                     SceneTypeImage {
@@ -2973,7 +2973,7 @@ Rectangle {
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: ruler.rightMarginPx
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: screenplayEditorSettings.displaySceneCharacters ? 8 : 4
+                anchors.verticalCenterOffset: ScriteSettings.screenplayEditor.displaySceneCharacters ? 8 : 4
 
                 Item {
                     property real spacing: 5
@@ -3049,7 +3049,7 @@ Rectangle {
                             property bool editingLocationTypePart: dotPosition < 0 || cursorPosition < dotPosition
                             property bool editingMomentPart: dashPosition > 0 && cursorPosition >= dashPosition
                             property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
-                            singleClickAutoComplete: screenplayEditorSettings.singleClickAutoComplete
+                            singleClickAutoComplete: ScriteSettings.screenplayEditor.singleClickAutoComplete
                             completionStrings: {
                                 if(editingLocationPart)
                                     return Scrite.document.structure.allLocations()
@@ -3100,7 +3100,7 @@ Rectangle {
                     ToolButton3 {
                         id: sceneTaggingButton
                         iconSource: "../icons/action/tag.png"
-                        visible: screenplayEditorSettings.allowTaggingOfScenes && mainTabBar.currentIndex === 0
+                        visible: ScriteSettings.screenplayEditor.allowTaggingOfScenes && mainTabBar.currentIndex === 0
                         down: sceneTagMenuLoader.active
                         onClicked: sceneTagMenuLoader.show()
                         anchors.verticalCenter: parent.verticalCenter
@@ -3237,7 +3237,7 @@ Rectangle {
                     property int sceneEditorCursorPosition: headingItem.sceneTextEditor.cursorPosition
                     property Scene scene: headingItem.theScene
                     property bool allow: true
-                    active: screenplayEditorSettings.displaySceneCharacters && allow
+                    active: ScriteSettings.screenplayEditor.displaySceneCharacters && allow
                     sourceComponent: headingItem.theElement.omitted ? null : sceneCharactersList
 
                     Announcement.onIncoming: (type,data) => {
@@ -3306,7 +3306,7 @@ Rectangle {
                 Item {
                     width: parent.width
                     height: 10*Math.min(zoomLevel,1)
-                    visible: !headingItem.theElement.omitted && !screenplayEditorSettings.displaySceneSynopsis
+                    visible: !headingItem.theElement.omitted && !ScriteSettings.screenplayEditor.displaySceneSynopsis
                 }
             }
         }
@@ -3508,21 +3508,13 @@ Rectangle {
                                           }
                 }
 
-                Settings {
-                    id: sceneListPanelSettings
-                    fileName: Scrite.app.settingsFilePath
-                    category: "Scene List Panel"
-
-                    property string displaySceneLength: "NO" // can be PAGE, TIME
-                }
-
                 ListView {
                     id: sceneListView
                     anchors.fill: parent
                     clip: true
                     model: screenplayAdapter
                     currentIndex: screenplayAdapter.currentIndex
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 { flickable: sceneListView }
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
@@ -3559,7 +3551,7 @@ Rectangle {
                                 property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
                                 property real leftMargin: 6 + (iconWidth+12)*t
                                 Behavior on t {
-                                    enabled: applicationSettings.enableAnimations
+                                    enabled: ScriteSettings.application.enableAnimations
                                     NumberAnimation { duration: 250 }
                                 }
 
@@ -3586,7 +3578,7 @@ Rectangle {
 
                             ToolButton2 {
                                 icon.source: {
-                                    switch(sceneListPanelSettings.displaySceneLength) {
+                                    switch(ScriteSettings.sceneListPanel.displaySceneLength) {
                                     case "TIME":
                                         return "../icons/content/time.png"
                                     case "PAGE":
@@ -3612,8 +3604,8 @@ Rectangle {
                                             text: "Scene Duration"
 
                                             readonly property string option: "TIME"
-                                            icon.source: sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                            onClicked: sceneListPanelSettings.displaySceneLength = option
+                                            icon.source: ScriteSettings.sceneListPanel.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: ScriteSettings.sceneListPanel.displaySceneLength = option
                                             enabled: !screenplayTextDocument.paused
                                         }
 
@@ -3621,8 +3613,8 @@ Rectangle {
                                             text: "Page Length"
 
                                             readonly property string option: "PAGE"
-                                            icon.source: sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                            onClicked: sceneListPanelSettings.displaySceneLength = option
+                                            icon.source: ScriteSettings.sceneListPanel.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: ScriteSettings.sceneListPanel.displaySceneLength = option
                                             enabled: !screenplayTextDocument.paused
                                         }
 
@@ -3630,8 +3622,8 @@ Rectangle {
                                             text: "None"
 
                                             readonly property string option: "NO"
-                                            icon.source: sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                            onClicked: sceneListPanelSettings.displaySceneLength = option
+                                            icon.source: ScriteSettings.sceneListPanel.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: ScriteSettings.sceneListPanel.displaySceneLength = option
                                             enabled: !screenplayTextDocument.paused
                                         }
                                     }
@@ -3676,7 +3668,7 @@ Rectangle {
                             lightBackground: Scrite.app.isLightColor(delegateItem.color)
                             property real t: screenplayAdapter.hasNonStandardScenes ? 1 : 0
                             Behavior on t {
-                                enabled: applicationSettings.enableAnimations
+                                enabled: ScriteSettings.application.enableAnimations
                                 NumberAnimation { duration: 250 }
                             }
                         }
@@ -3736,17 +3728,17 @@ Rectangle {
                                 font.pointSize: ScriteFontMetrics.ideal.font.pointSize-3
                                 color: ScritePrimaryColors.c10.text
                                 text: evaluateText()
-                                visible: !screenplayTextDocument.paused && (sceneListPanelSettings.displaySceneLength === "PAGE" || sceneListPanelSettings.displaySceneLength === "TIME")
+                                visible: !screenplayTextDocument.paused && (ScriteSettings.sceneListPanel.displaySceneLength === "PAGE" || ScriteSettings.sceneListPanel.displaySceneLength === "TIME")
                                 opacity: 0.5
                                 Layout.alignment: Qt.AlignVCenter
 
                                 function evaluateText() {
                                     if(scene) {
-                                        if(sceneListPanelSettings.displaySceneLength === "PAGE") {
+                                        if(ScriteSettings.sceneListPanel.displaySceneLength === "PAGE") {
                                             const pl = screenplayTextDocument.lengthInPages(screenplayElement, null)
                                             return Math.round(pl*100,2)/100
                                         }
-                                        if(sceneListPanelSettings.displaySceneLength === "TIME")
+                                        if(ScriteSettings.sceneListPanel.displaySceneLength === "TIME")
                                             return screenplayTextDocument.lengthInTimeAsString(screenplayElement, null)
                                     }
                                     return ""
@@ -3766,7 +3758,7 @@ Rectangle {
                                     function onUpdateFinished() { sceneLengthText.updateTextLater() }
                                 }
 
-                                property string option: sceneListPanelSettings.displaySceneLength
+                                property string option: ScriteSettings.sceneListPanel.displaySceneLength
                                 onOptionChanged: updateTextLater()
                             }
                         }
@@ -4392,7 +4384,7 @@ Rectangle {
             Component.onCompleted: {
                 const heightHint = componentData.screenplayElement.heightHint
                 if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
-                    contentView.loadAllDelegates || screenplayEditorSettings.optimiseScrolling ||
+                    contentView.loadAllDelegates || ScriteSettings.screenplayEditor.optimiseScrolling ||
                     componentData.scene.elementCount <= 1) {
                         active = true
                         initialized = true
@@ -4456,28 +4448,20 @@ Rectangle {
         anchors.fill: parent
         closable: true
         visible: false
-        onCloseRequest: screenplayEditorSettings.markupToolsDockVisible = false
+        onCloseRequest: ScriteSettings.screenplayEditor.markupToolsDockVisible = false
 
         function adjustCoordinates() {
-            const cx = markupToolsSettings.contentX
-            const cy = markupToolsSettings.contentY
+            const cx = ScriteSettings.markupTools.contentX
+            const cy = ScriteSettings.markupTools.contentY
             contentX = Math.round(Math.min(Math.max(20, cx), parent.width-contentWidth-20))
             contentY = Math.round(Math.min(Math.max(20, cy), parent.height-contentHeight-20))
-            visible = Qt.binding( () => { return screenplayEditorSettings.markupToolsDockVisible } )
+            visible = Qt.binding( () => { return ScriteSettings.screenplayEditor.markupToolsDockVisible } )
         }
 
         Component.onCompleted: Utils.execLater(markupTools, 200, adjustCoordinates)
         Component.onDestruction: {
-            markupToolsSettings.contentX = Math.round(contentX)
-            markupToolsSettings.contentY = Math.round(contentY)
-        }
-
-        Settings {
-            id: markupToolsSettings
-            fileName: Scrite.app.settingsFilePath
-            category: "Markup Tools"
-            property real contentX: 20
-            property real contentY: 20
+            ScriteSettings.markupTools.contentX = Math.round(contentX)
+            ScriteSettings.markupTools.contentY = Math.round(contentY)
         }
 
         Shortcut {

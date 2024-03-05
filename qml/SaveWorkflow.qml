@@ -255,8 +255,8 @@ Item {
         selectMultiple: false
         objectName: "Save File Dialog"
         dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: workspaceSettings.lastOpenFolderUrl
-        onFolderChanged: workspaceSettings.lastOpenFolderUrl = folder
+        folder: ScriteSettings.workspace.lastOpenFolderUrl
+        onFolderChanged: ScriteSettings.workspace.lastOpenFolderUrl = folder
         sidebarVisible: true
         selectExisting: false
 
@@ -267,7 +267,7 @@ Item {
             recentFilesModel.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
-            workspaceSettings.lastOpenFolderUrl = folder
+            ScriteSettings.workspace.lastOpenFolderUrl = folder
 
             _private.execute()
         }

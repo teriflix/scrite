@@ -12,12 +12,15 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 QtObject {
     property string tipName
     property var helpTip: Scrite.user.helpTips[tipName]
-    property bool tipShown: helpNotificationSettings.isTipShown(tipName)
+    property bool tipShown: ScriteSettings.helpNotification.isTipShown(tipName)
     property bool enabled: true
 
     Notification.title: helpTip ? helpTip.title : ""
@@ -55,6 +58,6 @@ QtObject {
                                   }
 
     function markTipAsShown() {
-        helpNotificationSettings.markTipAsShown(tipName)
+        ScriteSettings.helpNotification.markTipAsShown(tipName)
     }
 }

@@ -149,7 +149,7 @@ Item {
         interactive: false
         contentX: screenplayElementList.contentX - screenplayElementList.originX
         clip: true
-        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
         EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
@@ -308,7 +308,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
         anchors.topMargin: screenplayTracks.trackCount > 0 ? 0 : 3
-        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
         clip: true
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
@@ -327,7 +327,7 @@ Item {
             return 34
         }
         Behavior on minimumDelegateWidth {
-            enabled: applicationSettings.enableAnimations
+            enabled: ScriteSettings.application.enableAnimations
             NumberAnimation { duration: 250 }
         }
 
@@ -527,7 +527,7 @@ Item {
                     if(sheading.enabled)
                         ret += "[" + element.resolvedSceneNumber + "]: "
 
-                    if(timelineViewSettings.textMode === "HeadingOrTitle") {
+                    if(ScriteSettings.timelineView.textMode === "HeadingOrTitle") {
                         var selement = escene.structureElement
                         var ntitle = selement.nativeTitle
                         if(ntitle !== "")
@@ -586,7 +586,7 @@ Item {
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width {
-                        enabled: applicationSettings.enableAnimations
+                        enabled: ScriteSettings.application.enableAnimations
                         NumberAnimation { duration: 400 }
                     }
 
@@ -777,7 +777,7 @@ Item {
                         visible: !Scrite.document.readOnly && enableDragDrop
                         enabled: visible
                         Behavior on scale {
-                            enabled: applicationSettings.enableAnimations
+                            enabled: ScriteSettings.application.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
 
@@ -843,7 +843,7 @@ Item {
 
     Loader {
         anchors.fill: screenplayElementList
-        active: applicationSettings.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
+        active: ScriteSettings.application.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
         sourceComponent: Item {
             id: highlightedItemOverlay
 

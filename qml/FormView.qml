@@ -48,7 +48,7 @@ Item {
         sourceModel: form.questionsModel
         filterFunction: formFilterFunction
 
-        property bool filterForms: !notebookSettings.showAllFormQuestions
+        property bool filterForms: !ScriteSettings.notebook.showAllFormQuestions
         onFilterFormsChanged: invalidate()
 
         function formFilterFunction(form) {
@@ -68,7 +68,7 @@ Item {
         ScrollBar.vertical: formVScrollBar
         ScrollBar.horizontal: formHScrollBar
         flickableDirection: Flickable.VerticalFlick
-        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
         Column {
             id: formContentLayout
@@ -147,14 +147,14 @@ Item {
 
                 RadioButton2 {
                     text: "All"
-                    checked: notebookSettings.showAllFormQuestions
-                    onToggled: notebookSettings.showAllFormQuestions = true
+                    checked: ScriteSettings.notebook.showAllFormQuestions
+                    onToggled: ScriteSettings.notebook.showAllFormQuestions = true
                 }
 
                 RadioButton2 {
                     text: "Answered"
-                    checked: !notebookSettings.showAllFormQuestions
-                    onToggled: notebookSettings.showAllFormQuestions = false
+                    checked: !ScriteSettings.notebook.showAllFormQuestions
+                    onToggled: ScriteSettings.notebook.showAllFormQuestions = false
                 }
             }
 

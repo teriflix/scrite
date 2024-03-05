@@ -11,10 +11,13 @@
 **
 ****************************************************************************/
 
-import io.scrite.components 1.0
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
+import io.scrite.components 1.0
+
+import "./globals"
 
 /**
   ToolButton from QtQuick.Controls is what we normally use in Scrite.
@@ -72,7 +75,7 @@ Item {
             return parent.width-2*am < 16 ? (parent.width*0.15) : am
         }
         Behavior on anchorMargins {
-            enabled: iconImage.anchorMargins > 0 && applicationSettings.enableAnimations
+            enabled: iconImage.anchorMargins > 0 && ScriteSettings.application.enableAnimations
             NumberAnimation {
                 duration: 250
             }

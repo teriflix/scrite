@@ -357,7 +357,7 @@ Item {
                     visible: templatesFeatureCheck.enabled
                     currentIndex: -1
                     clip: true
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: templatesView
                     }
@@ -479,7 +479,7 @@ Item {
                     model: scriptalayMode ? libraryService.screenplays : recentFilesModel
                     currentIndex: -1
                     clip: true
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: quickFilesView
                     }
@@ -537,7 +537,7 @@ Item {
                     clip: true
                     model: libraryService.screenplays
                     currentIndex: count ? 0 : -1
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                     highlight: Rectangle {
                         color: ScritePrimaryColors.highlight.background
                     }
@@ -631,7 +631,7 @@ Item {
             anchors.margins: 1
             clip: true
             model: Scrite.vault
-            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
             currentIndex: count ? 0 : -1
             visible: count > 0
             ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
@@ -748,9 +748,9 @@ Item {
                     selectMultiple: false
                     sidebarVisible: true
                     selectExisting: true
-                    folder: workspaceSettings.lastOpenImportFolderUrl
+                    folder: ScriteSettings.workspace.lastOpenImportFolderUrl
                     dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
-                    onFolderChanged: workspaceSettings.lastOpenImportFolderUrl = folder
+                    onFolderChanged: ScriteSettings.workspace.lastOpenImportFolderUrl = folder
 
                     onAccepted: {
                         if(fileUrl != "")
@@ -792,7 +792,7 @@ Item {
                     homeScreenBusyOverlay.busyMessage = "Importing screenplay ..."
                     homeScreenBusyOverlay.visible = true
 
-                    workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
+                    ScriteSettings.workspace.lastOpenImportFolderUrl = "file://" + fileToImport.folder
 
                     mainUiContentLoader.allowContent = false
                     Scrite.document.openOrImport(fileToImport.path)
@@ -980,13 +980,13 @@ Item {
         selectMultiple: false
         objectName: "Open File Dialog"
         dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: workspaceSettings.lastOpenFolderUrl
-        onFolderChanged: workspaceSettings.lastOpenFolderUrl = folder
+        folder: ScriteSettings.workspace.lastOpenFolderUrl
+        onFolderChanged: ScriteSettings.workspace.lastOpenFolderUrl = folder
         sidebarVisible: true
         selectExisting: true
 
         onAccepted: {
-            workspaceSettings.lastOpenFolderUrl = folder
+            ScriteSettings.workspace.lastOpenFolderUrl = folder
 
             const path = Scrite.app.urlToLocalFile(fileUrl)
             _private.openScriteDocument(path)

@@ -47,8 +47,8 @@ Item {
                 mainTabBar.currentIndex = 1 // FIXME: Ugly hack to ensure that structure tab is active for StructureExporter.
 
             if(Scrite.app.verifyType(exporter, "AbstractTextDocumentExporter")) {
-                exporter.capitalizeSentences = screenplayEditorSettings.enableAutoCapitalizeSentences
-                exporter.polishParagraphs = screenplayEditorSettings.enableAutoPolishParagraphs
+                exporter.capitalizeSentences = ScriteSettings.screenplayEditor.enableAutoCapitalizeSentences
+                exporter.polishParagraphs = ScriteSettings.screenplayEditor.enableAutoPolishParagraphs
             }
         }
 

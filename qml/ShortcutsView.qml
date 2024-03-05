@@ -38,7 +38,7 @@ Item {
         anchors.fill: parent
         anchors.margins: 5
         model: Scrite.shortcuts
-        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: ScrollBar2 { flickable: shortcutsView }

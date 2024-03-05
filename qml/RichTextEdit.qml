@@ -160,16 +160,9 @@ Item {
         registeredObjects: [scriteWebChannelObject]
     }
 
-    Settings {
-        id: richTextEditorSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "Rich Text Editor"
-        property bool languageNoteShown: false
-    }
-
     Loader {
         anchors.fill: parent
-        active: richTextEditorSettings.languageNoteShown === false
+        active: ScriteSettings.richTextEditor.languageNoteShown === false
         sourceComponent: Item {
             Rectangle {
                 anchors.fill: parent
@@ -198,7 +191,7 @@ Item {
                 Button2 {
                     text: "Got it!"
                     Layout.alignment: Qt.AlignHCenter
-                    onClicked: richTextEditorSettings.languageNoteShown = true
+                    onClicked: ScriteSettings.richTextEditor.languageNoteShown = true
                 }
             }
         }

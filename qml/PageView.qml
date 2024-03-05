@@ -100,7 +100,7 @@ Rectangle {
         property bool showScrollBars: contentHeight > height
         contentWidth: pageContentLoader.width
         contentHeight: pageContentLoader.height
-        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
         ScrollBar.vertical: ScrollBar2 { flickable: pageContentArea }
         Loader {

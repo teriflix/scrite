@@ -14,8 +14,11 @@
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Flickable {
     id: scrollAreaFlickable
@@ -29,7 +32,7 @@ Flickable {
     property bool animatePanAndZoom: true
     property alias minimumScale: pinchHandler.minimumScale
     property alias maximumScale: pinchHandler.maximumScale
-    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
     boundsBehavior: Flickable.StopAtBounds
     clip: true
@@ -65,12 +68,12 @@ Flickable {
     signal zoomScaleChangedInteractively()
 
     function zoomIn() {
-        const zf = 1+scrollAreaSettings.zoomFactor
+        const zf = 1+ScriteSettings.scrollArea.zoomFactor
         zoomScale = Math.min(zoomScale*zf, pinchHandler.maximumScale)
     }
 
     function zoomOut() {
-        const zf = 1-scrollAreaSettings.zoomFactor
+        const zf = 1-ScriteSettings.scrollArea.zoomFactor
         zoomScale = Math.max(zoomScale*zf, pinchHandler.minimumScale)
     }
 
@@ -101,17 +104,17 @@ Flickable {
 
     property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
     Behavior on contentX {
-        enabled: applicationSettings.enableAnimations && animatePanAndZoom
+        enabled: ScriteSettings.application.enableAnimations && animatePanAndZoom
         NumberAnimation { id: contentXAnimation; duration: 250 }
     }
     Behavior on contentY {
-        enabled: applicationSettings.enableAnimations && animatePanAndZoom
+        enabled: ScriteSettings.application.enableAnimations && animatePanAndZoom
         NumberAnimation { id: contentYAnimation; duration: 250 }
     }
     Behavior on zoomScale {
         id: zoomScaleBehavior
         property bool allow: true
-        enabled: applicationSettings.enableAnimations && animatePanAndZoom && allow
+        enabled: ScriteSettings.application.enableAnimations && animatePanAndZoom && allow
         NumberAnimation { id: zoomScaleAnimation; duration: 250 }
     }
 

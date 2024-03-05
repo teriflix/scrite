@@ -101,7 +101,7 @@ Item {
                 flickable: pdfView
             }
             FlickScrollSpeedControl.flickable: pdfView
-            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
             onPdfPageScaleChanged: Qt.callLater(returnToBounds)
 

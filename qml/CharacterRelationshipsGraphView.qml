@@ -50,8 +50,8 @@ Rectangle {
         id: crGraph
         structure: Scrite.document.loading ? null : Scrite.document.structure
         nodeSize: Qt.size(150,150)
-        maxTime: notebookSettings.graphLayoutMaxTime
-        maxIterations: notebookSettings.graphLayoutMaxIterations
+        maxTime: ScriteSettings.notebook.graphLayoutMaxTime
+        maxIterations: ScriteSettings.notebook.graphLayoutMaxIterations
         leftMargin: 1000
         topMargin: 1000
         onUpdated: {
@@ -85,7 +85,7 @@ Rectangle {
         initialContentHeight: canvas.height
         showScrollBars: true
         handlePinchZoom: true
-        zoomOnScroll: workspaceSettings.mouseWheelZoomsInCharacterGraph
+        zoomOnScroll: ScriteSettings.workspace.mouseWheelZoomsInCharacterGraph
         minimumScale: nodeItemsBoxEvaluator.itemCount > 0 ? Math.min(0.25, width/nodeItemsBoxEvaluator.width, height/nodeItemsBoxEvaluator.height) : 0.25
 
         function zoomOneMiddleArea() {
@@ -374,8 +374,8 @@ Rectangle {
                 autoRepeat: false
                 ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
                 checkable: true
-                checked: workspaceSettings.mouseWheelZoomsInCharacterGraph
-                onCheckedChanged: workspaceSettings.mouseWheelZoomsInCharacterGraph = checked
+                checked: ScriteSettings.workspace.mouseWheelZoomsInCharacterGraph
+                onCheckedChanged: ScriteSettings.workspace.mouseWheelZoomsInCharacterGraph = checked
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
             }
@@ -682,7 +682,7 @@ Rectangle {
                         return character.isDirectlyRelatedTo(canvas.activeCharacter) ? 0 : 0.75
                     }
                     Behavior on alpha {
-                        enabled: applicationSettings.enableAnimations
+                        enabled: ScriteSettings.application.enableAnimations
                         NumberAnimation { duration: 250 }
                     }
                 }
@@ -713,7 +713,7 @@ Rectangle {
         id: crGraphEdgeDelegate
 
         PainterPathItem {
-            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * structureCanvasSettings.lineWidthOfConnectors
+            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * ScriteSettings.structureCanvas.lineWidthOfConnectors
             outlineColor: ScritePrimaryColors.c700.background
             renderType: PainterPathItem.OutlineOnly
             renderingMechanism: PainterPathItem.UseOpenGL
@@ -724,7 +724,7 @@ Rectangle {
             }
             z: opacity
             Behavior on opacity {
-                enabled: applicationSettings.enableAnimations
+                enabled: ScriteSettings.application.enableAnimations
                 NumberAnimation { duration: 250 }
             }
 

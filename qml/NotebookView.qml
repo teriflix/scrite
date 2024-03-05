@@ -104,7 +104,7 @@ Rectangle {
             notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
         }
         function onCurrentElementIndexChanged(val) {
-            if(workspaceSettings.syncCurrentSceneOnNotebook && !notebookTree.activatingScreenplayElement)
+            if(ScriteSettings.workspace.syncCurrentSceneOnNotebook && !notebookTree.activatingScreenplayElement)
                 notebookTree.activateFromCurrentScreenplayElement()
         }
     }
@@ -170,9 +170,9 @@ Rectangle {
                 checkable: true
                 iconSource: "../icons/navigation/sync.png"
                 ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
-                checked: workspaceSettings.syncCurrentSceneOnNotebook
+                checked: ScriteSettings.workspace.syncCurrentSceneOnNotebook
                 onToggled: {
-                    workspaceSettings.syncCurrentSceneOnNotebook = checked
+                    ScriteSettings.workspace.syncCurrentSceneOnNotebook = checked
                     if(checked)
                         notebookTree.activateFromCurrentScreenplayElement()
                 }
@@ -536,7 +536,7 @@ Rectangle {
             }
 
             onClicked: {
-                if(mainTabBar.currentIndex != 1 || workspaceSettings.syncCurrentSceneOnNotebook)
+                if(mainTabBar.currentIndex != 1 || ScriteSettings.workspace.syncCurrentSceneOnNotebook)
                     activateScreenplayElement( notebookModel.modelIndexData(index) )
             }
 
@@ -1101,8 +1101,8 @@ Rectangle {
                             tabNames: ["Synopsis", "Featured Photo"]
                             tabColor: scene.color
                             currentTabContent: currentTabIndex === 0 ? sceneSynopsisFieldComponent : featuredPhotoComponent
-                            currentTabIndex: screenplayEditorSettings.commentsPanelTabIndex
-                            onCurrentTabIndexChanged: screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
+                            currentTabIndex: ScriteSettings.screenplayEditor.commentsPanelTabIndex
+                            onCurrentTabIndexChanged: ScriteSettings.screenplayEditor.commentsPanelTabIndex = currentTabIndex
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneCharactersList.height - parent.spacing*3
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -1320,7 +1320,7 @@ Rectangle {
                 property int currentIndex: 0
                 contentWidth: width
                 contentHeight: noteItemsFlow.height
-                FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                 Flow {
                     id: noteItemsFlow
@@ -1345,7 +1345,7 @@ Rectangle {
                                 color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
 
                                 Behavior on color {
-                                    enabled: applicationSettings.enableAnimations
+                                    enabled: ScriteSettings.application.enableAnimations
                                     ColorAnimation { duration: 250 }
                                 }
 
@@ -1734,7 +1734,7 @@ Rectangle {
                         property bool hscrollBarRequired: contentWidth > width
                         ScrollBar.vertical: titlePageVScrollBar
                         ScrollBar.horizontal: titlePageHScrollBar
-                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                         Column {
                             id: titlePageLayout
@@ -2393,7 +2393,7 @@ Rectangle {
                         anchors.bottom: attachmentsView.top
                         contentWidth: quickInfoFlickableContent.width
                         contentHeight: quickInfoFlickableContent.height
-                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                         property bool scrollBarVisible: contentWidth > width
 
@@ -2404,7 +2404,7 @@ Rectangle {
 
                             Rectangle {
                                 id: characterQuickInfoArea
-                                width: workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, mainScriteDocumentView.width*0.3)
+                                width: ScriteSettings.workspace.showNotebookInStructure ? 300 : Math.max(300, mainScriteDocumentView.width*0.3)
                                 height: parent.height
                                 color: Scrite.app.translucent(ScritePrimaryColors.c100.background, 0.5)
 
@@ -2427,9 +2427,9 @@ Rectangle {
                                     selectMultiple: false
                                     sidebarVisible: true
                                     selectExisting: true
-                                    folder: workspaceSettings.lastOpenPhotosFolderUrl
+                                    folder: ScriteSettings.workspace.lastOpenPhotosFolderUrl
                                     dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
-                                    onFolderChanged: workspaceSettings.lastOpenPhotosFolderUrl = folder
+                                    onFolderChanged: ScriteSettings.workspace.lastOpenPhotosFolderUrl = folder
 
                                     onAccepted: {
                                         if(fileUrl != "") {
@@ -2454,7 +2454,7 @@ Rectangle {
                                     contentHeight: characterQuickInfoViewContent.height
                                     clip: true
                                     ScrollBar.vertical: characterQuickInfoViewScrollBar
-                                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                                     function scrollIntoView(field) {
                                         const fy = field.mapToItem(characterQuickInfoViewContent, 0, 0).y
@@ -3137,7 +3137,7 @@ Rectangle {
             }
 
             Behavior on height {
-                enabled: applicationSettings.enableAnimations
+                enabled: ScriteSettings.application.enableAnimations
                 NumberAnimation { duration: 250 }
             }
 
@@ -3282,17 +3282,17 @@ Rectangle {
 
     Loader {
         id: structureIconAnimator
-        active: workspaceSettings.animateStructureIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
+        active: ScriteSettings.workspace.animateStructureIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: structureTabButton
-            onDone: workspaceSettings.animateStructureIcon = false
+            onDone: ScriteSettings.workspace.animateStructureIcon = false
             description: structureTabButton.ToolTip.text
             property bool scaleDone: false
             onScaleAnimationDone: scaleDone = true
             Component.onDestruction: {
                 if(scaleDone)
-                    workspaceSettings.animateStructureIcon = false
+                    ScriteSettings.workspace.animateStructureIcon = false
             }
         }
     }

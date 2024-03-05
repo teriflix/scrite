@@ -66,7 +66,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 1
                 model: Scrite.document.backupFilesModel
-                FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                 currentIndex: -1
                 ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
                 highlight: Rectangle {

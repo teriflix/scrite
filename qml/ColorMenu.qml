@@ -16,10 +16,12 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Menu2 {
     id: colorMenu
     width: minCellSize * 5 + 10
-    height: minCellSize * (4 + Math.ceil((workspaceSettings.customColors.length+1)/4)) +  10
+    height: minCellSize * (4 + Math.ceil((ScriteSettings.workspace.customColors.length+1)/4)) +  10
 
     signal menuItemClicked(string color)
     readonly property real minCellSize: 50
@@ -39,7 +41,7 @@ Menu2 {
             columns: Math.floor(width / minCellSize)
 
             Repeater {
-                model: Scrite.app.standardColors.concat(workspaceSettings.customColors)
+                model: Scrite.app.standardColors.concat(ScriteSettings.workspace.customColors)
                 delegate: colorItemDelegate
             }
 
@@ -50,11 +52,11 @@ Menu2 {
                 ToolTip.text: "Pick a custom color"
                 onClicked: {
                     var color = Scrite.app.pickColor("white")
-                    var colors = workspaceSettings.customColors
+                    var colors = ScriteSettings.workspace.customColors
                     colors.unshift(color)
                     if(colors.length > 10)
                         colors.pop()
-                    workspaceSettings.customColors = colors
+                    ScriteSettings.workspace.customColors = colors
 
                     colorMenu.menuItemClicked(modelData)
                     colorMenu.close()

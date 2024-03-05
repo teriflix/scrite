@@ -111,7 +111,7 @@ Column {
                 topPadding: 5; bottomPadding: 5
                 Transliterator.defaultFont: font
                 Transliterator.textDocument: textDocument
-                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
                 Transliterator.spellCheckEnabled: formField.answer !== ""
                 readOnly: true
                 selectByMouse: false
@@ -135,9 +135,9 @@ Column {
                 Transliterator.textDocument: textDocument
                 Transliterator.cursorPosition: cursorPosition
                 Transliterator.hasActiveFocus: activeFocus
-                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
-                Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
+                Transliterator.spellCheckEnabled: ScriteSettings.screenplayEditor.enableSpellCheck
                 readOnly: Scrite.document.readOnly
                 background: Item { }
                 SpecialSymbolsSupport {

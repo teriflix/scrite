@@ -37,7 +37,7 @@ Item {
     function show() {
         if(visible)
             return
-        if(sourceItem && applicationSettings.enableAnimations)
+        if(sourceItem && ScriteSettings.application.enableAnimations)
             showAnimation.start()
         else {
             container.t = 1
@@ -48,7 +48,7 @@ Item {
     function hide() {
         if(!visible)
             return
-        if(sourceItem && applicationSettings.enableAnimations)
+        if(sourceItem && ScriteSettings.application.enableAnimations)
             hideAnimation.start()
         else {
             container.t = 1

@@ -193,7 +193,7 @@ TextField {
             id: completionView
             clip: true
             model: completionModel
-            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
             highlightMoveDuration: 0
             highlightResizeDuration: 0
             keyNavigationEnabled: false

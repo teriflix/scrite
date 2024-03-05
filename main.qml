@@ -13,7 +13,6 @@
 
 import QtQml 2.15
 import QtQuick 2.15
-import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 // import QtGraphicalEffects 1.0
 import QtQuick.Controls.Material 2.15
@@ -45,7 +44,7 @@ Rectangle {
         active: false
         anchors.fill: parent
         property string text
-        property bool enableAnimations: true
+        property bool animationsEnabled: ScriteSettings.application.enableAnimations
         function show(t) {
             text = t
             active = true
@@ -55,15 +54,14 @@ Rectangle {
                 text = ""
         }
         sourceComponent: Item {
-
             Text {
                 id: textItem
                 anchors.centerIn: parent
                 font.pixelSize: parent.height * 0.075
                 text: statusText.text
-                property real t: statusText.enableAnimations ? 0 : 1
+                property real t: statusText.animationsEnabled ? 0 : 1
                 scale: 0.5 + t/1.0
-                opacity: statusText.enableAnimations ? (1.0 - t*0.75) : 0.8
+                opacity: statusText.animationsEnabled ? (1.0 - t*0.75) : 0.8
             }
 
             SequentialAnimation {
@@ -74,17 +72,24 @@ Rectangle {
                     properties: "t"
                     from: 0
                     to: 1
-                    duration: statusText.enableAnimations ? 250 : 0
+                    duration: statusText.animationsEnabled ? 250 : 0
                     easing.type: Easing.OutQuint
                 }
 
                 PauseAnimation {
-                    duration: statusText.enableAnimations ? 0 : 250
+                    duration: statusText.animationsEnabled ? 0 : 250
                 }
 
                 ScriptAction {
                     script: statusText.active = false
                 }
+            }
+        }
+
+        Connections {
+            target: ScriteSettings.application
+            function onEnableAnimationsChanged() {
+                statusText.animationsEnabled = ScriteSettings.application.enableAnimations
             }
         }
     }
@@ -129,45 +134,6 @@ Rectangle {
             propagateComposedEvents: false
             enabled: parent.visible
         }
-    }
-
-    Settings {
-        id: scrollAreaSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "ScrollArea"
-        property real zoomFactor: 0.05
-    }
-
-    Settings {
-        id: structureCanvasSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "Structure Tab"
-
-        property bool showGrid: true
-        property color gridColor: ScriteAccentColors.c400.background
-        property color canvasColor: ScriteAccentColors.c50.background
-        property bool showPreview: true
-        property bool displayAnnotationProperties: true
-        property bool showPullHandleAnimation: true
-        property real lineWidthOfConnectors: 1.5
-    }
-
-    Settings {
-        id: timelineViewSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "Timeline View"
-
-        property string textMode: "HeadingOrTitle"
-    }
-
-    Settings {
-        id: instanceSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "Screenplay Editor"
-
-        property bool screenplayEditorAddButtonsAnimationShown: false
-        property bool refreshButtonInStatsReportAnimationDone: false
-        property bool firstSwitchToStructureTab: true
     }
 
     function showInformation(params, popupSource) {
@@ -235,6 +201,7 @@ Rectangle {
         active: false
         anchors.fill: parent
         enabled: Scrite.notifications.count === 0
+        animationsEnabled: ScriteSettings.application.enableAnimations
         onCloseRequest: {
             active = false
             closeable = true
@@ -249,6 +216,13 @@ Rectangle {
             initItemCallback = undefined
         }
         opacity: !enabled || Scrite.document.busy ? 0.5 : 1
+
+        Connections {
+            target: ScriteSettings.application
+            function onEnableAnimationsChanged() {
+                modalDialog.animationsEnabled = ScriteSettings.application.enableAnimations
+            }
+        }
     }
 
     Component {

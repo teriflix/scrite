@@ -482,7 +482,7 @@ Item {
 
     Rectangle {
         anchors.fill: canvasScroll
-        color: structureCanvasSettings.canvasColor
+        color: ScriteSettings.structureCanvas.canvasColor
     }
 
     ScrollArea {
@@ -497,7 +497,7 @@ Item {
         initialContentHeight: canvas.height
         clip: true
         showScrollBars: Scrite.document.structure.elementCount >= 1
-        zoomOnScroll: workspaceSettings.mouseWheelZoomsInStructureCanvas
+        zoomOnScroll: ScriteSettings.workspace.mouseWheelZoomsInStructureCanvas
         interactive: !(rubberBand.active || selection.active || canvasPreview.interacting || annotationGripLoader.active) && mouseOverItem === null && editItem === null && maybeDragItem === null
         minimumScale: canvasItemsBoundingBox.itemCount > 0 ? Math.min(0.25, width/canvasItemsBoundingBox.width, height/canvasItemsBoundingBox.height) : 0.25
         property Item mouseOverItem
@@ -585,7 +585,7 @@ Item {
                     var item = currentElementItemBinder.get
                     if(item === null)
                         item = elementItems.itemAt(0)
-                    if(instanceSettings.firstSwitchToStructureTab)
+                    if(ScriteSettings.screenplayEditor.firstSwitchToStructureTab)
                         canvasScroll.zoomOneToItem(item)
                     else
                         canvasScroll.ensureItemVisible(item, canvas.scale)
@@ -598,7 +598,7 @@ Item {
                 Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
 
             updateScriteDocumentUserDataEnabled = true
-            instanceSettings.firstSwitchToStructureTab = false
+            ScriteSettings.screenplayEditor.firstSwitchToStructureTab = false
         }
 
         function updateFromScriteDocumentUserDataLater() {
@@ -698,15 +698,15 @@ Item {
             tickColorOpacity: 0.25 * scale
             scale: canvasScroll.suggestedScale
             border.width: 2
-            border.color: structureCanvasSettings.gridColor
-            gridIsVisible: structureCanvasSettings.showGrid && canvasScroll.interactive
-            majorTickColor: structureCanvasSettings.gridColor
-            minorTickColor: structureCanvasSettings.gridColor
+            border.color: ScriteSettings.structureCanvas.gridColor
+            gridIsVisible: ScriteSettings.structureCanvas.showGrid && canvasScroll.interactive
+            majorTickColor: ScriteSettings.structureCanvas.gridColor
+            minorTickColor: ScriteSettings.structureCanvas.gridColor
             tickDistance: Scrite.document.structure.canvasGridSize
             transformOrigin: Item.TopLeft
             backgroundColor: canvasScroll.interactive ? ScritePrimaryColors.c10.background : Scrite.app.translucent(ScritePrimaryColors.c300.background, 0.75)
             Behavior on backgroundColor {
-                enabled: applicationSettings.enableAnimations
+                enabled: ScriteSettings.application.enableAnimations
                 ColorAnimation { duration: 250 }
             }
 
@@ -871,7 +871,7 @@ Item {
                 opacity: rubberBand.selectionMode || rubberBand.selecting ? 0.1 : 1
 
                 Behavior on opacity {
-                    enabled: applicationSettings.enableAnimations
+                    enabled: ScriteSettings.application.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
 
@@ -940,7 +940,7 @@ Item {
                     Connections {
                         target: structureCanvasSettings
                         function onDisplayAnnotationPropertiesChanged() {
-                            if(structureCanvasSettings.displayAnnotationProperties)
+                            if(ScriteSettings.structureCanvas.displayAnnotationProperties)
                                 floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
                             else
                                 floatingDockWidget.close()
@@ -957,7 +957,7 @@ Item {
                                 floatingDockWidget.contentY = (scriteDocumentViewItem.height - floatingDockWidget.contentHeight)/2
                             }
 
-                            if(structureCanvasSettings.displayAnnotationProperties)
+                            if(ScriteSettings.structureCanvas.displayAnnotationProperties)
                                 floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
                         }
                     }
@@ -1042,7 +1042,7 @@ Item {
                 opacity: canvas.activeFocus && !selection.hasItems ? 1 : 0.25
 
                 Behavior on opacity {
-                    enabled: applicationSettings.enableAnimations
+                    enabled: ScriteSettings.application.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
 
@@ -1438,7 +1438,7 @@ Item {
                         height: contentHeight
                         interactive: contentWidth > width
                         clip: interactive
-                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                         SimpleTabBarItem {
                             id: tabBarItem
@@ -1914,7 +1914,7 @@ Item {
 
     Item {
         id: canvasPreview
-        visible: allowed && structureCanvasSettings.showPreview && parent.width > 400
+        visible: allowed && ScriteSettings.structureCanvas.showPreview && parent.width > 400
         anchors.right: canvasScroll.right
         anchors.bottom: canvasScroll.bottom
         anchors.margins: 30
@@ -2206,8 +2206,8 @@ Item {
                 autoRepeat: false
                 ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
                 checkable: true
-                checked: workspaceSettings.mouseWheelZoomsInStructureCanvas
-                onCheckedChanged: workspaceSettings.mouseWheelZoomsInStructureCanvas = checked
+                checked: ScriteSettings.workspace.mouseWheelZoomsInStructureCanvas
+                onCheckedChanged: ScriteSettings.workspace.mouseWheelZoomsInStructureCanvas = checked
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
             }
@@ -2216,7 +2216,7 @@ Item {
                 down: canvasPreview.visible
                 checked: canvasPreview.visible
                 checkable: true
-                onToggled: structureCanvasSettings.showPreview = checked
+                onToggled: ScriteSettings.structureCanvas.showPreview = checked
                 iconSource: "../icons/action/thumbnail.png"
                 ToolTip.text: "Preview"
                 suggestedWidth: parent.height
@@ -2364,7 +2364,7 @@ Item {
                 border.color: (element.scene.color === Qt.rgba(1,1,1,1) ? "gray" : element.scene.color)
                 color: Qt.tint(element.scene.color, "#C0FFFFFF")
                 Behavior on border.width {
-                    enabled: applicationSettings.enableAnimations
+                    enabled: ScriteSettings.application.enableAnimations
                     NumberAnimation { duration: 400 }
                 }
             }
@@ -2497,7 +2497,7 @@ Item {
                 opacity: elementItem.selected ? 1 : 0.1
                 scale: dragMouseArea.pressed ? 2 : 1
                 Behavior on scale {
-                    enabled: applicationSettings.enableAnimations
+                    enabled: ScriteSettings.application.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
 
@@ -2731,7 +2731,7 @@ Item {
                         selectByMouse: false
                         Transliterator.defaultFont: font
                         Transliterator.textDocument: textDocument
-                        Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+                        Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
                         font.bold: true
                         font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         font.capitalization: Font.AllUppercase
@@ -2832,8 +2832,8 @@ Item {
                             selectByMouse: false
                             Transliterator.defaultFont: font
                             Transliterator.textDocument: textDocument
-                            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
-                            Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
+                            Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
+                            Transliterator.spellCheckEnabled: ScriteSettings.screenplayEditor.enableSpellCheck
                             font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                             color: element.scene.hasTitle ? "black" : "gray"
                             // maximumLineCount: Math.max(1, (parent.height / ScriteFontMetrics.ideal.lineSpacing)-1)
@@ -2870,7 +2870,7 @@ Item {
                             property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
                             ScrollBar.vertical: ScrollBar2 { flickable: synopsisFieldFlick }
                             flickableDirection: Flickable.VerticalFlick
-                            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                             TextArea {
                                 id: synopsisField
                                 width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
@@ -2882,8 +2882,8 @@ Item {
                                 Transliterator.textDocument: textDocument
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus
-                                Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
-                                Transliterator.spellCheckEnabled: screenplayEditorSettings.enableSpellCheck
+                                Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
+                                Transliterator.spellCheckEnabled: ScriteSettings.screenplayEditor.enableSpellCheck
                                 placeholderText: "Describe what happens in this scene."
                                 font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -3104,7 +3104,7 @@ Item {
                         scale: dragHandleMouseArea.pressed ? 2 : 1
                         opacity: elementItem.selected ? 1 : 0.1
                         Behavior on scale {
-                            enabled: applicationSettings.enableAnimations
+                            enabled: ScriteSettings.application.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
 
@@ -3308,7 +3308,7 @@ Item {
             fromElement: connectorFromElement
             toElement: connectorToElement
             arrowAndLabelSpacing: labelBg.width
-            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * structureCanvasSettings.lineWidthOfConnectors
+            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * ScriteSettings.structureCanvas.lineWidthOfConnectors
             visible: {
                 if(canBeVisible)
                     return intersects(canvasScroll.viewportRect)
@@ -3385,11 +3385,11 @@ Item {
                         iconSource: "../icons/action/edit.png"
                         ToolTip.text: "Edit properties of this annotation"
                         down: floatingDockWidget.visible
-                        onClicked: structureCanvasSettings.displayAnnotationProperties = !structureCanvasSettings.displayAnnotationProperties
+                        onClicked: ScriteSettings.structureCanvas.displayAnnotationProperties = !ScriteSettings.structureCanvas.displayAnnotationProperties
                         Connections {
                             target: floatingDockWidget
                             function onCloseRequest() {
-                                structureCanvasSettings.displayAnnotationProperties = false
+                                ScriteSettings.structureCanvas.displayAnnotationProperties = false
                             }
                         }
                     }
@@ -3488,8 +3488,8 @@ Item {
                     result.filter = true
                     break
                 case Qt.Key_F2:
-                    if(structureCanvasSettings.displayAnnotationProperties === false) {
-                        structureCanvasSettings.displayAnnotationProperties = true
+                    if(ScriteSettings.structureCanvas.displayAnnotationProperties === false) {
+                        ScriteSettings.structureCanvas.displayAnnotationProperties = true
                         result.accept = true
                         result.filter = true
                     }
@@ -3540,8 +3540,8 @@ Item {
                 propagateComposedEvents: true
                 onPressed: canvas.forceActiveFocus()
                 onDoubleClicked: {
-                    if(structureCanvasSettings.displayAnnotationProperties === false)
-                        structureCanvasSettings.displayAnnotationProperties = true
+                    if(ScriteSettings.structureCanvas.displayAnnotationProperties === false)
+                        ScriteSettings.structureCanvas.displayAnnotationProperties = true
                 }
             }
 
@@ -4041,17 +4041,17 @@ Item {
 
     Loader {
         id: notebookIconAnimator
-        active: workspaceSettings.animateNotebookIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
+        active: ScriteSettings.workspace.animateNotebookIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: notebookTabButton
-            onDone: workspaceSettings.animateNotebookIcon = false
+            onDone: ScriteSettings.workspace.animateNotebookIcon = false
             description: notebookTabButton.ToolTip.text
             property bool scaleDone: false
             onScaleAnimationDone: scaleDone = true
             Component.onDestruction: {
                 if(scaleDone)
-                    workspaceSettings.animateNotebookIcon = false
+                    ScriteSettings.workspace.animateNotebookIcon = false
             }
         }
     }

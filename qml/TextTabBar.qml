@@ -74,11 +74,11 @@ Item {
         anchors.topMargin: ScriteFontMetrics.ideal.descent
         property bool placedOnce: false
         Behavior on x {
-            enabled: currentTabUnderline.placedOnce && applicationSettings.enableAnimations
+            enabled: currentTabUnderline.placedOnce && ScriteSettings.application.enableAnimations
             NumberAnimation { duration: 100 }
         }
         Behavior on width {
-            enabled: currentTabUnderline.placedOnce && applicationSettings.enableAnimations
+            enabled: currentTabUnderline.placedOnce && ScriteSettings.application.enableAnimations
             NumberAnimation { duration: 100 }
         }
     }

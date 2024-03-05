@@ -49,7 +49,7 @@ TextArea {
     Transliterator.textDocument: textDocument
     Transliterator.cursorPosition: cursorPosition
     Transliterator.hasActiveFocus: activeFocus
-    Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+    Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
     Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
     Transliterator.spellCheckEnabled: spellCheckEnabled
 

@@ -59,8 +59,8 @@ Item {
             formInfo = generator.configurationFormInfo()
 
             if(Scrite.app.verifyType(generator, "AbstractScreenplaySubsetReport")) {
-                generator.capitalizeSentences = screenplayEditorSettings.enableAutoCapitalizeSentences
-                generator.polishParagraphs = screenplayEditorSettings.enableAutoPolishParagraphs
+                generator.capitalizeSentences = ScriteSettings.screenplayEditor.enableAutoCapitalizeSentences
+                generator.polishParagraphs = ScriteSettings.screenplayEditor.enableAutoPolishParagraphs
             }
         }
 
@@ -561,7 +561,7 @@ Item {
                         id: locationListView
                         model: allLocations
                         clip: true
-                        FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                         delegate: CheckBox2 {
                             width: locationListView.width-1
                             font.family: Scrite.document.formatting.defaultFont.family
@@ -674,7 +674,7 @@ Item {
                     clip: true
                     property var selectedSceneNumbers: []
                     property var selectedEpisodeNumbers: generator.episodeNumbers
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                     function filter(scene) {
                         if(selectedEpisodeNumbers && selectedEpisodeNumbers.length > 0) {
@@ -829,7 +829,7 @@ Item {
                     model: Scrite.document.screenplay.episodeCount + 1
                     clip: true
                     property var episodeNumbers: generator.getConfigurationValue(fieldInfo.name)
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                     function select(episodeNumber, flag) {
                         var numbers = generator.getConfigurationValue(fieldInfo.name)
@@ -912,7 +912,7 @@ Item {
                         array: Scrite.document.structure.groupsModel
                         objectMembers: ["category", "label", "name"]
                     }
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                     section.property: "category"
                     section.criteria: ViewSection.FullString
                     section.delegate: Item {

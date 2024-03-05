@@ -41,7 +41,7 @@ Item {
     readonly property real minPanelWidth: 25
     property real maxPanelWidth: 450
     Behavior on width {
-        enabled: applicationSettings.enableAnimations
+        enabled: ScriteSettings.application.enableAnimations
         NumberAnimation { duration: 50 }
     }
 
@@ -112,7 +112,7 @@ Item {
             opacity: sidePanel.expanded ? 1 : 0
             property var contentData
             Behavior on opacity {
-                enabled: applicationSettings.enableAnimations
+                enabled: ScriteSettings.application.enableAnimations
                 NumberAnimation { duration: 50 }
             }
             active: opacity > 0
@@ -131,7 +131,7 @@ Item {
         border.color: sidePanel.expanded ? ScritePrimaryColors.windowColor : borderColor
 
         Behavior on height {
-            enabled: applicationSettings.enableAnimations
+            enabled: ScriteSettings.application.enableAnimations
             NumberAnimation { duration: 50 }
         }
 

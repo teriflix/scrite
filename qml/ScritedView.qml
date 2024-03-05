@@ -42,12 +42,12 @@ Item {
 
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
-        if(!scritedSettings.experimentalFeatureNoticeDisplayed) {
+        if(!ScriteSettings.scrited.experimentalFeatureNoticeDisplayed) {
             Utils.execLater(scritedView, 250, function() {
                 showInformation({
                     "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
                 })
-                scritedSettings.experimentalFeatureNoticeDisplayed = true
+                ScriteSettings.scrited.experimentalFeatureNoticeDisplayed = true
             })
         }
         Scrite.user.logActivity1("scrited")
@@ -148,21 +148,10 @@ Item {
         screenplayOffsetsModel.fileName = screenplayOffsetsModel.fileNameFrom(fileUrl)
     }
 
-    Settings {
-        id: scritedSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "Scrited"
-        property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
-        property bool experimentalFeatureNoticeDisplayed: false
-        property bool codecsNoticeDisplayed: false
-        property real playerAreaRatio: 0.5
-        property bool videoPlayerVisible: true
-    }
-
     FileDialog {
         id: fileDialog
-        folder: scritedSettings.lastOpenScritedFolderUrl
-        onFolderChanged: Qt.callLater( function() { scritedSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
+        folder: ScriteSettings.scrited.lastOpenScritedFolderUrl
+        onFolderChanged: Qt.callLater( function() { ScriteSettings.scrited.lastOpenScritedFolderUrl = fileDialog.folder } )
         selectFolder: false
         selectMultiple: false
         selectExisting: true
@@ -177,11 +166,11 @@ Item {
 
         Item {
             id: playerArea
-            SplitView.preferredWidth: scritedView.width * scritedSettings.playerAreaRatio
+            SplitView.preferredWidth: scritedView.width * ScriteSettings.scrited.playerAreaRatio
             onWidthChanged: updateScritedSettings()
 
             function updateScritedSettings() {
-                scritedSettings.playerAreaRatio = width / scritedView.width
+                ScriteSettings.scrited.playerAreaRatio = width / scritedView.width
             }
 
             property bool keyFrameGrabMode: false
@@ -204,7 +193,7 @@ Item {
                     width: parent.width
                     height: width / 16 * 9
                     color: "black"
-                    visible: scritedSettings.videoPlayerVisible || mediaIsLoaded
+                    visible: ScriteSettings.scrited.videoPlayerVisible || mediaIsLoaded
 
                     MediaPlayer {
                         id: mediaPlayer
@@ -294,7 +283,7 @@ Item {
                         visible: !mediaIsLoaded
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
-                        onClicked: scritedSettings.videoPlayerVisible = false
+                        onClicked: ScriteSettings.scrited.videoPlayerVisible = false
                         ToolTip.text: "Closes the video player until a video file is loaded."
                     }
 
@@ -674,7 +663,7 @@ Item {
                             width: parent.width
                             anchors.top: textDocumentFlickPadding.bottom
                             anchors.bottom: parent.bottom
-                            FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
                             property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
                             property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
@@ -801,7 +790,7 @@ Item {
                         visible: !videoArea.visible
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
-                        onClicked: scritedSettings.videoPlayerVisible = true
+                        onClicked: ScriteSettings.scrited.videoPlayerVisible = true
                         ToolTip.text: "Shows the video player."
                     }
                 }
@@ -1188,7 +1177,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                 clip: true
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
@@ -1441,12 +1430,12 @@ Item {
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
+        Notification.active: !ScriteSettings.scrited.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
         Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
                 Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
-            scritedSettings.codecsNoticeDisplayed = true
+            ScriteSettings.scrited.codecsNoticeDisplayed = true
         }
     }
 

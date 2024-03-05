@@ -98,64 +98,64 @@ Row {
 
                 MenuItem2 {
                     text: "Show Logline Editor"
-                    icon.source: screenplayEditorSettings.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.showLoglineEditor = !screenplayEditorSettings.showLoglineEditor
+                    icon.source: ScriteSettings.screenplayEditor.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.showLoglineEditor = !ScriteSettings.screenplayEditor.showLoglineEditor
                 }
 
                 MenuItem2 {
                     text: "Show Ruler"
-                    icon.source: screenplayEditorSettings.displayRuler ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displayRuler = !screenplayEditorSettings.displayRuler
+                    icon.source: ScriteSettings.screenplayEditor.displayRuler ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.displayRuler = !ScriteSettings.screenplayEditor.displayRuler
                 }
 
                 MenuItem2 {
                     text: "Show Empty Title Card"
-                    icon.source: screenplayEditorSettings.displayEmptyTitleCard ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displayEmptyTitleCard = !screenplayEditorSettings.displayEmptyTitleCard
+                    icon.source: ScriteSettings.screenplayEditor.displayEmptyTitleCard ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.displayEmptyTitleCard = !ScriteSettings.screenplayEditor.displayEmptyTitleCard
                 }
 
                 MenuItem2 {
                     text: "Show Add Scene Controls"
-                    icon.source: screenplayEditorSettings.displayAddSceneBreakButtons ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displayAddSceneBreakButtons = !screenplayEditorSettings.displayAddSceneBreakButtons
+                    icon.source: ScriteSettings.screenplayEditor.displayAddSceneBreakButtons ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.displayAddSceneBreakButtons = !ScriteSettings.screenplayEditor.displayAddSceneBreakButtons
                 }
 
                 MenuItem2 {
                     text: "Show Scene Blocks"
-                    property bool sceneBlocksVisible: screenplayEditorSettings.spaceBetweenScenes > 0
+                    property bool sceneBlocksVisible: ScriteSettings.screenplayEditor.spaceBetweenScenes > 0
                     icon.source: sceneBlocksVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.spaceBetweenScenes = sceneBlocksVisible ? 0 : 40
+                    onTriggered: ScriteSettings.screenplayEditor.spaceBetweenScenes = sceneBlocksVisible ? 0 : 40
                 }
 
                 MenuItem2 {
                     text: "Show Markup Tools"
-                    property bool toolsVisible: screenplayEditorSettings.markupToolsDockVisible
+                    property bool toolsVisible: ScriteSettings.screenplayEditor.markupToolsDockVisible
                     icon.source: toolsVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.markupToolsDockVisible = !toolsVisible
+                    onTriggered: ScriteSettings.screenplayEditor.markupToolsDockVisible = !toolsVisible
                 }
 
                 MenuItem2 {
                     text: "Show Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displaySceneSynopsis = !screenplayEditorSettings.displaySceneSynopsis
+                    icon.source: ScriteSettings.screenplayEditor.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.displaySceneSynopsis = !ScriteSettings.screenplayEditor.displaySceneSynopsis
                 }
 
                 MenuItem2 {
                     text: "Show Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displaySceneComments = !screenplayEditorSettings.displaySceneComments
+                    icon.source: ScriteSettings.screenplayEditor.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.displaySceneComments = !ScriteSettings.screenplayEditor.displaySceneComments
                 }
 
                 MenuItem2 {
                     text: "Show Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.displaySceneCharacters = !screenplayEditorSettings.displaySceneCharacters
+                    icon.source: ScriteSettings.screenplayEditor.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.displaySceneCharacters = !ScriteSettings.screenplayEditor.displaySceneCharacters
                 }
 
                 MenuItem2 {
                     text: "Enable Tagging Of Scenes\t\t" +Scrite.app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                    onTriggered: screenplayEditorSettings.allowTaggingOfScenes = !screenplayEditorSettings.allowTaggingOfScenes
+                    icon.source: ScriteSettings.screenplayEditor.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    onTriggered: ScriteSettings.screenplayEditor.allowTaggingOfScenes = !ScriteSettings.screenplayEditor.allowTaggingOfScenes
                 }
 
                 MenuSeparator {  }
@@ -164,7 +164,7 @@ Row {
                     icon.source: "../icons/content/blank.png"
                     text: "Scan For Mute Characters"
                     onClicked: Scrite.document.structure.scanForMuteCharacters()
-                    enabled: !Scrite.document.readOnly && screenplayEditorSettings.displaySceneCharacters
+                    enabled: !Scrite.document.readOnly && ScriteSettings.screenplayEditor.displaySceneCharacters
                 }
 
                 MenuItem2 {
@@ -361,7 +361,7 @@ Row {
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: "Add Mute Character"
         ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && screenplayEditorSettings.displaySceneCharacters
+        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && ScriteSettings.screenplayEditor.displaySceneCharacters
         ShortcutsModelItem.priority: -7
 
         onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Add Mute Character")
@@ -373,7 +373,7 @@ Row {
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: "Synopsis"
         ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && screenplayEditorSettings.displaySceneSynopsis
+        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && ScriteSettings.screenplayEditor.displaySceneSynopsis
         ShortcutsModelItem.priority: -8
 
         onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Scene Synopsis")

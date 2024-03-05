@@ -132,7 +132,7 @@ Loader {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
-            Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+            Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
 
             onFocusChanged: completionModel.allowEnable = true
 
@@ -171,7 +171,7 @@ Loader {
                 contentItem: ListView {
                     id: completionView
                     model: completionModel
-                    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
                     keyNavigationEnabled: false
                     delegate: Text {
                         width: completionView.width-1

@@ -31,7 +31,7 @@ Item {
     clip: true
 
     Behavior on height {
-        enabled: applicationSettings.enableAnimations
+        enabled: ScriteSettings.application.enableAnimations
         NumberAnimation { duration: 100 }
     }
 

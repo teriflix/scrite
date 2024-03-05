@@ -33,13 +33,14 @@ Flickable {
     property alias placeholderText: __textArea.placeholderText
     property alias readOnly: __textArea.readOnly
     property alias background: __textArea.background
+    property alias color: __textArea.color
     property bool enforceDefaultFont: true
     property bool enforceHeadingFontSize: false
     property bool spellCheckEnabled: true
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
     property alias syntaxHighlighter: __textArea.syntaxHighlighter
-    FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
+    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
 
     signal editingFinished()
 
@@ -65,7 +66,7 @@ Flickable {
         Transliterator.textDocument: textDocument
         Transliterator.cursorPosition: cursorPosition
         Transliterator.hasActiveFocus: activeFocus
-        Transliterator.applyLanguageFonts: screenplayEditorSettings.applyUserDefinedLanguageFonts
+        Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
         Transliterator.spellCheckEnabled: textAreaFlickable.spellCheckEnabled
         Transliterator.enforeDefaultFont: textAreaFlickable.enforceDefaultFont
