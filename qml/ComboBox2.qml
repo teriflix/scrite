@@ -11,13 +11,16 @@
 **
 ****************************************************************************/
 
-import io.scrite.components 1.0
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import io.scrite.components 1.0
+
+import "./globals"
+
 ComboBox {
-    Material.background: primaryColors.button.background
-    Material.foreground: primaryColors.button.text
+    Material.background: PrimaryColors.button.background
+    Material.foreground: PrimaryColors.button.text
     font.pointSize: Scrite.app.fontPointSize
 }

@@ -17,6 +17,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 ListView {
     id: attachmentsView
     property Attachments attachments
@@ -27,7 +29,7 @@ ListView {
     onAttachmentsChanged: currentIndex = -1
     FlickScrollSpeedControl.factor: workspaceSettings.flickScrollSpeedFactor
     highlight: Rectangle {
-        color: primaryColors.highlight.background
+        color: PrimaryColors.highlight.background
     }
     clip: true
     highlightMoveDuration: 0
@@ -36,9 +38,9 @@ ListView {
 
     Rectangle {
         anchors.fill: parent
-        color: Scrite.app.translucent(primaryColors.windowColor, 0.5)
+        color: Scrite.app.translucent(PrimaryColors.windowColor, 0.5)
         border.width: 1
-        border.color: primaryColors.borderColor
+        border.color: PrimaryColors.borderColor
         z: -1
 
         Text {
@@ -81,7 +83,7 @@ ListView {
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
                 text: objectItem.originalFileName
-                color: isSelected ? primaryColors.highlight.text : primaryColors.c10.text
+                color: isSelected ? PrimaryColors.highlight.text : PrimaryColors.c10.text
             }
         }
 

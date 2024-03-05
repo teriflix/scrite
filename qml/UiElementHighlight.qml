@@ -18,6 +18,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 /**
   This item is used for highlighting UI elements to educate users about where
   certain options are present.
@@ -52,7 +54,7 @@ Item {
             anchors.margins: -2.5
             color: Qt.rgba(0,0,0,0)
             border.width: 2
-            border.color: accentColors.highlight.background
+            border.color: AccentColors.highlight.background
             visible: uiElementBoxVisible
         }
 
@@ -62,18 +64,18 @@ Item {
 
         Rectangle {
             id: descTip
-            color: accentColors.highlight.background
+            color: AccentColors.highlight.background
             width: descLabel.width
             height: descLabel.height
             border.width: 1
-            border.color: accentColors.borderColor
+            border.color: AccentColors.borderColor
 
             Label {
                 id: descLabel
                 text: description
                 font.bold: true
                 font.pointSize: Scrite.app.idealFontPointSize+2
-                color: accentColors.highlight.text
+                color: AccentColors.highlight.text
                 leftPadding: (descriptionPosition === Item.Right ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
                 rightPadding: (descriptionPosition === Item.Left ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
                 topPadding: descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? descIcon.height : 10

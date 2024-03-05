@@ -15,8 +15,11 @@ import QtQuick 2.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 // For use from within StructureView.qml only!
 
@@ -64,7 +67,7 @@ Item {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: primaryColors.separatorColor
+                color: PrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -123,7 +126,7 @@ Item {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: primaryColors.separatorColor
+                color: PrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -253,9 +256,9 @@ Item {
 
         TextArea {
             background: Rectangle {
-                color: primaryColors.c50.background
+                color: PrimaryColors.c50.background
                 border.width: 1
-                border.color: primaryColors.borderColor
+                border.color: PrimaryColors.borderColor
             }
             text: propertyValue
             font.pointSize: Scrite.app.idealFontPointSize
@@ -341,10 +344,10 @@ Item {
 
             Rectangle {
                 id: fontListViewArea
-                color: primaryColors.c50.background
+                color: PrimaryColors.c50.background
                 width: parent.width - 10
                 border.width: 1
-                border.color: primaryColors.borderColor
+                border.color: PrimaryColors.borderColor
                 height: 200 + fontSearchBar.height
                 visible: false
                 anchors.right: parent.right
@@ -491,9 +494,9 @@ Item {
 
         Rectangle {
             height: (width/16)*9
-            color: primaryColors.c100.background
+            color: PrimaryColors.c100.background
             border.width: 1
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
 
             FileDialog {
                 id: fileDialog

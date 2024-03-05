@@ -13,7 +13,10 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 Item {
     id: sidePanel
@@ -22,7 +25,7 @@ Item {
     property string label: ""
     property alias buttonColor: expandCollapseButton.color
     property alias backgroundColor: panelBackground.color
-    property color borderColor: primaryColors.borderColor
+    property color borderColor: PrimaryColors.borderColor
     property real borderWidth: 1
 
     property bool expanded: false
@@ -120,12 +123,12 @@ Item {
         id: expandCollapseButton
         x: sidePanel.expanded ? 4 : -radius
         y: sidePanel.expanded ? 4 : parent.buttonY
-        color: primaryColors.button.background
+        color: PrimaryColors.button.background
         width: parent.minPanelWidth
         height: sidePanel.expanded ? parent.height-8 : sidePanel.buttonSize
         radius: (1.0-contentLoader.opacity) * 6
         border.width: contentLoader.visible ? 0 : 1
-        border.color: sidePanel.expanded ? primaryColors.windowColor : borderColor
+        border.color: sidePanel.expanded ? PrimaryColors.windowColor : borderColor
 
         Behavior on height {
             enabled: applicationSettings.enableAnimations

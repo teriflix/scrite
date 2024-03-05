@@ -16,6 +16,8 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Text {
     property alias containsMouse: linkMouseArea.containsMouse
     signal clicked()
@@ -25,7 +27,7 @@ Text {
     color: linkMouseArea.containsMouse ? hoverColor : defaultColor
 
     property color hoverColor: "#65318f"
-    property color defaultColor: primaryColors.c10.text
+    property color defaultColor: PrimaryColors.c10.text
 
     MouseArea {
         id: linkMouseArea

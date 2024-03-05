@@ -16,6 +16,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Rectangle {
     id: pageView
     property alias pagesArray: pageRepeater.model
@@ -32,7 +34,7 @@ Rectangle {
     Rectangle {
         id: pageList
         width: pageListWidth
-        color: accentColors.c500.background // primaryColors.c700.background
+        color: AccentColors.c500.background // PrimaryColors.c700.background
         height: parent.height
         anchors.left: parent.left
         property int currentIndex: -1
@@ -49,7 +51,7 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 60
-                    color: pageList.currentIndex === index ? pageView.color : primaryColors.c10.background
+                    color: pageList.currentIndex === index ? pageView.color : PrimaryColors.c10.background
 
                     Text {
                         anchors.right: parent.right
@@ -58,7 +60,7 @@ Rectangle {
                         font.pixelSize: 18
                         font.bold: pageList.currentIndex === index
                         text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
-                        color: pageList.currentIndex === index ? "black" : primaryColors.c700.text
+                        color: pageList.currentIndex === index ? "black" : PrimaryColors.c700.text
                     }
 
                     Image {

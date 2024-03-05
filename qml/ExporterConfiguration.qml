@@ -15,8 +15,11 @@ import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     id: configurationBox
@@ -307,7 +310,7 @@ Item {
                 leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
                 text: fieldInfo.note
                 font.pointSize: Scrite.app.idealFontPointSize-2
-                color: primaryColors.c600.background
+                color: PrimaryColors.c600.background
                 visible: fieldInfo.note !== ""
             }
         }

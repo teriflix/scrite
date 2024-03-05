@@ -17,6 +17,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 TextField {
     id: textField
     property alias completionAcceptsEnglishStringsOnly: completionModel.acceptEnglishStringsOnly
@@ -43,8 +45,8 @@ TextField {
         return suggestion
     }
     property bool tabItemUponReturn: true
-    selectedTextColor: accentColors.c700.text
-    selectionColor: accentColors.c700.background
+    selectedTextColor: AccentColors.c700.text
+    selectionColor: AccentColors.c700.background
     selectByMouse: true
     font.pointSize: Scrite.app.idealFontPointSize
 
@@ -202,7 +204,7 @@ TextField {
                 text: string
                 padding: 5
                 font: textField.font
-                color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
+                color: index === completionView.currentIndex ? PrimaryColors.highlight.text : PrimaryColors.c10.text
                 MouseArea {
                     id: textMouseArea
                     anchors.fill: parent
@@ -219,7 +221,7 @@ TextField {
                 }
             }
             highlight: Rectangle {
-                color: primaryColors.highlight.background
+                color: PrimaryColors.highlight.background
             }
             currentIndex: completionModel.currentRow
             height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
@@ -268,7 +270,7 @@ TextField {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: textField.activeFocus ? primaryColors.c700.background : primaryColors.c300.background
+                color: textField.activeFocus ? PrimaryColors.c700.background : PrimaryColors.c300.background
                 anchors.bottom: parent.bottom
             }
         }

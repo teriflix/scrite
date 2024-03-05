@@ -15,6 +15,8 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 AttachmentsDropArea {
     id: attachmentsDropArea
     enabled: !Scrite.document.readOnly
@@ -25,13 +27,13 @@ AttachmentsDropArea {
     Rectangle {
         anchors.fill: parent
         visible: attachmentsDropArea.active
-        color: Scrite.app.translucent(primaryColors.c500.background, 0.5)
+        color: Scrite.app.translucent(PrimaryColors.c500.background, 0.5)
 
         Rectangle {
             anchors.fill: attachmentNotice
             anchors.margins: -30
             radius: 4
-            color: primaryColors.c700.background
+            color: PrimaryColors.c700.background
         }
 
         Text {
@@ -39,7 +41,7 @@ AttachmentsDropArea {
             anchors.centerIn: parent
             width: parent.width * noticeWidthFactor
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            color: primaryColors.c700.text
+            color: PrimaryColors.c700.text
             text: parent.visible ? "<b>" + attachmentsDropArea.attachment.title + "</b><br/><br/>" + attachmentNoticeSuffix : ""
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: Scrite.app.idealFontPointSize

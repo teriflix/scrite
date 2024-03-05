@@ -15,7 +15,10 @@ import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+
+import "./globals"
 
 Rectangle {
     id: crGraphView
@@ -30,9 +33,9 @@ Rectangle {
     signal addNewRelationshipRequest(Item sourceItem)
     signal removeRelationshipWithRequest(Character otherCharacter, Item sourceItem)
 
-    color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
+    color: Scrite.app.translucent(PrimaryColors.c100.background, 0.5)
     border.width: 1
-    border.color: primaryColors.borderColor
+    border.color: PrimaryColors.borderColor
 
     function resetGraph() { crGraph.reset() }
     function exportToPdf(popupSource) {
@@ -134,7 +137,7 @@ Rectangle {
                 height: crGraph.nodes.objectCount > 0 ? (nodeItemsBoxEvaluator.boundingBox.height + 100) : width
                 color: Qt.rgba(0,0,0,0)
                 border.width: crGraph.nodes.objectCount > 0 ? 1 : 0
-                border.color: primaryColors.borderColor
+                border.color: PrimaryColors.borderColor
                 radius: 6
             }
 
@@ -193,9 +196,9 @@ Rectangle {
                         id: floatingToolBar
                         height: floatingToolbarLayout.height + 4
                         width: floatingToolbarLayout.width + 6
-                        color: primaryColors.windowColor
+                        color: PrimaryColors.windowColor
                         border.width: 1
-                        border.color: primaryColors.borderColor
+                        border.color: PrimaryColors.borderColor
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.top
                         anchors.bottomMargin: canvas.selectedNodeItem ? Math.min(canvas.selectedNodeItem.width,canvas.selectedNodeItem.height)*0.075+5 : 5
@@ -267,7 +270,7 @@ Rectangle {
                         active: false
                         sourceComponent: Rectangle {
                             id: removeRelationshipConfirmationItem
-                            color: Scrite.app.translucent(primaryColors.c600.background,0.85)
+                            color: Scrite.app.translucent(PrimaryColors.c600.background,0.85)
                             focus: true
                             width: removeRelationshipConfirmationContentLayout.width + 45
                             height: removeRelationshipConfirmationContentLayout.height + 40
@@ -315,7 +318,7 @@ Rectangle {
                                     width: parent.width
                                     horizontalAlignment: Text.AlignHCenter
                                     wrapMode: Text.WordWrap
-                                    color: primaryColors.c600.text
+                                    color: PrimaryColors.c600.text
                                 }
 
                                 Row {
@@ -354,9 +357,9 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: primaryColors.windowColor
+        color: PrimaryColors.windowColor
         border.width: 1
-        border.color: primaryColors.borderColor
+        border.color: PrimaryColors.borderColor
         clip: true
 
         Row {
@@ -434,7 +437,7 @@ Rectangle {
             width: parent.width * 0.65
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             text: "Graph will be refreshed when you use it next."
-            color: primaryColors.c900.background
+            color: PrimaryColors.c900.background
         }
 
         MouseArea {
@@ -642,10 +645,10 @@ Rectangle {
                     anchors.fill: infoLabel
                     anchors.margins: -4
                     radius: 4
-                    color: node.marked ? accentColors.a700.background : Qt.tint(character.color, "#C0FFFFFF")
+                    color: node.marked ? AccentColors.a700.background : Qt.tint(character.color, "#C0FFFFFF")
                     opacity: character.photos.length === 0 ? 1 : 0.8
                     border.width: 1
-                    border.color: node.marked ? accentColors.a700.text : "black"
+                    border.color: node.marked ? AccentColors.a700.text : "black"
                 }
 
                 Text {
@@ -658,7 +661,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: 10
                     maximumLineCount: 3
-                    color: node.marked ? accentColors.a700.text : "black"
+                    color: node.marked ? AccentColors.a700.text : "black"
                     text: {
                         var fields = []
                         fields.push("<b>" + character.name + "</b>");
@@ -671,7 +674,7 @@ Rectangle {
                 Rectangle {
                     anchors.fill: parent
                     border.width: character === canvas.activeCharacter ? 3 : 1
-                    border.color: character === canvas.activeCharacter ? "black" : primaryColors.borderColor
+                    border.color: character === canvas.activeCharacter ? "black" : PrimaryColors.borderColor
                     color: Qt.rgba(1,1,1,alpha)
                     property real alpha: {
                         if(!canvas.activeCharacter || character === canvas.activeCharacter)
@@ -711,7 +714,7 @@ Rectangle {
 
         PainterPathItem {
             outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * structureCanvasSettings.lineWidthOfConnectors
-            outlineColor: primaryColors.c700.background
+            outlineColor: PrimaryColors.c700.background
             renderType: PainterPathItem.OutlineOnly
             renderingMechanism: PainterPathItem.UseOpenGL
             opacity: {
@@ -734,14 +737,14 @@ Rectangle {
                 rotation: modelData.labelAngle
                 width: nameLabel.width + 10
                 height: nameLabel.height + 4
-                color: nameLabelMouseArea.containsMouse ? accentColors.c700.background : primaryColors.c700.background
+                color: nameLabelMouseArea.containsMouse ? AccentColors.c700.background : PrimaryColors.c700.background
 
                 Text {
                     id: nameLabel
                     text: modelData.relationship.name
                     font.pointSize: Math.floor(Scrite.app.idealFontPointSize*0.75)
                     anchors.centerIn: parent
-                    color: nameLabelMouseArea.containsMouse ? accentColors.c700.text : primaryColors.c700.text
+                    color: nameLabelMouseArea.containsMouse ? AccentColors.c700.text : PrimaryColors.c700.text
                     horizontalAlignment: Text.AlignHCenter
                 }
 

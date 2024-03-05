@@ -16,11 +16,13 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Rectangle {
     id: tagText
-    color: primaryColors.c10.background
+    color: PrimaryColors.c10.background
     border.width: 1
-    border.color: primaryColors.borderColor
+    border.color: PrimaryColors.borderColor
     radius: height/2
 
     property alias text: textItem.text
@@ -52,7 +54,7 @@ Rectangle {
             y: tagText.topPadding
             width: contentWidth
             height: contentHeight
-            color: primaryColors.c10.text
+            color: PrimaryColors.c10.text
         }
     }
 
@@ -72,7 +74,7 @@ Rectangle {
         active: false
 
         sourceComponent: Rectangle {
-            color: closeButtonMouseArea.pressed ? accentColors.c600.background : accentColors.c100.background
+            color: closeButtonMouseArea.pressed ? AccentColors.c600.background : AccentColors.c100.background
             radius: height/2
 
             Image {

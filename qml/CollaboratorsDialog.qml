@@ -18,6 +18,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     width: 640
     height: 550
@@ -75,8 +77,8 @@ Item {
             width: parent.width
             height: parent.height - titleText.height - protectionSwitchRow.height - 2*parent.spacing
             border.width: 1
-            border.color: primaryColors.c700.background
-            color: primaryColors.c100.background
+            border.color: PrimaryColors.c700.background
+            color: PrimaryColors.c100.background
             enabled: Scrite.document.hasCollaborators
             opacity: enabled ? 1.0 : 0.5
 

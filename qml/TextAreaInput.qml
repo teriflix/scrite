@@ -14,7 +14,10 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 TextArea {
     id: txtAreaInput
@@ -25,17 +28,17 @@ TextArea {
     selectByKeyboard: true
     selectByMouse: true
     // renderType: Text.NativeRendering
-    Material.primary: primaryColors.key
-    Material.accent: accentColors.key
-    selectedTextColor: accentColors.c700.text
-    selectionColor: accentColors.c700.background
+    Material.primary: PrimaryColors.key
+    Material.accent: AccentColors.key
+    selectedTextColor: AccentColors.c700.text
+    selectionColor: AccentColors.c700.background
     background: Rectangle {
-        color: enabled ? primaryColors.c10.background : primaryColors.button.background
+        color: enabled ? PrimaryColors.c10.background : PrimaryColors.button.background
 
         Rectangle {
             width: parent.width
             height: txtAreaInput.activeFocus ? 2 : 1
-            color: accentColors.c700.background
+            color: AccentColors.c700.background
             visible: txtAreaInput.enabled
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 4

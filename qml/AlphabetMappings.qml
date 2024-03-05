@@ -13,7 +13,9 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+import "./globals"
 
 Rectangle {
     property var mappings: Scrite.app.transliterationEngine.alphabetMappings
@@ -27,8 +29,8 @@ Rectangle {
     ]
     width: layout.width + 20
     height: layout.height + 20
-    color: primaryColors.c10.background
-    border { width: 1; color: primaryColors.borderColor }
+    color: PrimaryColors.c10.background
+    border { width: 1; color: PrimaryColors.borderColor }
 
     readonly property real textCellWidth: 50
 
@@ -57,14 +59,14 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 30
-                    color: primaryColors.c600.background
+                    color: PrimaryColors.c600.background
 
                     Text {
                         text: modelData.heading
                         padding: 8
                         font.pointSize: normalFontMetrics.font.pointSize
                         anchors.centerIn: parent
-                        color: primaryColors.c600.text
+                        color: PrimaryColors.c600.text
                     }
                 }
 

@@ -11,14 +11,17 @@
 **
 ****************************************************************************/
 
-import io.scrite.components 1.0
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import io.scrite.components 1.0
+
+import "./globals"
+
 MenuItem {
-    Material.accent: primaryColors.key
-    Material.background: primaryColors.c100.background
-    Material.foreground: primaryColors.c100.text
+    Material.accent: PrimaryColors.key
+    Material.background: PrimaryColors.c100.background
+    Material.foreground: PrimaryColors.c100.text
     objectName: text
 }

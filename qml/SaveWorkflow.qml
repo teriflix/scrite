@@ -17,7 +17,9 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 /**
 Save workflow
@@ -79,7 +81,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: primaryColors.windowColor
+        color: PrimaryColors.windowColor
         opacity: 0.9
         visible: workflowLoader.active
 
@@ -101,8 +103,8 @@ Item {
         anchors.fill: workflowLoader
         anchors.margins: -40
         border.width: 2
-        border.color: primaryColors.borderColor
-        color: primaryColors.c100.background
+        border.color: PrimaryColors.borderColor
+        color: PrimaryColors.c100.background
         visible: workflowLoader.active
     }
 

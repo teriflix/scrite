@@ -18,6 +18,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     id: aboutBox
     readonly property real splashWidth: 1464
@@ -117,7 +119,7 @@ Item {
                 Rectangle {
                     width: aboutBox.width * 0.5
                     height: (creditsViewFontMetrics.height+creditsView.spacing) * creditsView.model.count + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
-                    color: creditsView.ScrollBar.vertical.needed ? primaryColors.c100.background : Qt.rgba(0,0,0,0)
+                    color: creditsView.ScrollBar.vertical.needed ? PrimaryColors.c100.background : Qt.rgba(0,0,0,0)
 
                     FontMetrics {
                         id: creditsViewFontMetrics

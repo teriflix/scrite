@@ -17,14 +17,16 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Rectangle {
     property bool showFilterBox: true
     property alias selectedCharacters: charactersModel.selectedCharacters
     property int sortFilterRole: 0
     property alias filterTags: charactersModel.tags
 
-    color: primaryColors.c10.background
-    border { width: 1; color: primaryColors.borderColor }
+    color: PrimaryColors.c10.background
+    border { width: 1; color: PrimaryColors.borderColor }
     implicitWidth: charactersListLayout.width
 
     CharacterNamesModel {
@@ -51,7 +53,7 @@ Rectangle {
                 font.bold: true
                 text: charactersModel.tags.length > 0 ? charactersModel.tags.length : ""
                 padding: 2
-                color: primaryColors.highlight.text
+                color: PrimaryColors.highlight.text
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
             }
@@ -122,8 +124,8 @@ Rectangle {
                     background: Rectangle {
                         color: characterCheckBox.Material.background
                     }
-                    Material.background: highlight ? accentColors.c300.background : primaryColors.c10.background
-                    Material.foreground: highlight ? accentColors.c300.text : primaryColors.c10.text
+                    Material.background: highlight ? AccentColors.c300.background : PrimaryColors.c10.background
+                    Material.foreground: highlight ? AccentColors.c300.text : PrimaryColors.c10.text
 
                     SearchAgent.engine: searchBar.searchEngine
                     SearchAgent.onSearchRequest: {

@@ -18,14 +18,17 @@ import Qt.labs.settings 1.0
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     id: optionsDialog
     width: Math.min(scriteDocumentViewItem.width-80, 1050)
     height: Math.min(scriteDocumentViewItem.height-80, 750)
-    readonly property color dialogColor: primaryColors.windowColor
+    readonly property color dialogColor: PrimaryColors.windowColor
     readonly property var systemFontInfo: Scrite.app.systemFontInfo()
 
     Component.onCompleted: {
@@ -454,7 +457,7 @@ Item {
                 font.pointSize: Scrite.app.idealFontPointSize-2
                 horizontalAlignment: Text.AlignLeft
                 wrapMode: Text.WordWrap
-                color: primaryColors.c100.background
+                color: PrimaryColors.c100.background
                 property string englishFontFamily: Scrite.app.transliterationEngine.languageFont(TransliterationEngine.English).family
                 text: {
                     if(screenplayEditorSettings.applyUserDefinedLanguageFonts)
@@ -659,7 +662,7 @@ Item {
 
                             Rectangle {
                                 border.width: 1
-                                border.color: primaryColors.borderColor
+                                border.color: PrimaryColors.borderColor
                                 width: 30; height: 30
                                 color: structureCanvasSettings.canvasColor
                                 anchors.verticalCenter: parent.verticalCenter
@@ -680,7 +683,7 @@ Item {
 
                             Rectangle {
                                 border.width: 1
-                                border.color: primaryColors.borderColor
+                                border.color: PrimaryColors.borderColor
                                 width: 30; height: 30
                                 color: structureCanvasSettings.gridColor
                                 anchors.verticalCenter: parent.verticalCenter
@@ -1363,7 +1366,7 @@ Item {
 
                             Rectangle {
                                 border.width: 1
-                                border.color: primaryColors.borderColor
+                                border.color: PrimaryColors.borderColor
                                 color: pageSetupSettings.watermarkColor
                                 width: 30; height: 30
                                 enabled: pageSetupSettings.watermarkEnabled
@@ -1378,7 +1381,7 @@ Item {
                         Rectangle {
                             width: 1
                             height: parent.height
-                            color: primaryColors.borderColor
+                            color: PrimaryColors.borderColor
                         }
 
                         Grid {
@@ -1596,7 +1599,7 @@ Item {
                             font.bold: true
                             topPadding: 5
                             bottomPadding: 5
-                            color: primaryColors.c300.text
+                            color: PrimaryColors.c300.text
                             opacity: enabled ? 1 : 0.5
                         }
 
@@ -1699,7 +1702,7 @@ Item {
                                     text: name
                                     font.pointSize: Scrite.app.idealFontPointSize-2
                                     anchors.verticalCenter: parent.verticalCenter
-                                    color: primaryColors.c800.background
+                                    color: PrimaryColors.c800.background
                                 }
 
                                 TextField2 {
@@ -1871,7 +1874,7 @@ Item {
                             readOnly: true
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             background: Rectangle {
-                                color: primaryColors.c10.background
+                                color: PrimaryColors.c10.background
                             }
 
                             SceneDocumentBinder {
@@ -2128,7 +2131,7 @@ Item {
 
                         Rectangle {
                             border.width: 1
-                            border.color: primaryColors.borderColor
+                            border.color: PrimaryColors.borderColor
                             color: displayElementFormat.textColor
                             width: 30; height: 30
                             anchors.verticalCenter: parent.verticalCenter
@@ -2151,7 +2154,7 @@ Item {
 
                         Rectangle {
                             border.width: 1
-                            border.color: primaryColors.borderColor
+                            border.color: PrimaryColors.borderColor
                             color: displayElementFormat.backgroundColor
                             width: 30; height: 30
                             anchors.verticalCenter: parent.verticalCenter
@@ -2284,7 +2287,7 @@ Item {
                         font.pointSize: Scrite.app.idealFontPointSize-2
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.WordWrap
-                        color: primaryColors.c100.background
+                        color: PrimaryColors.c100.background
                         text: "Customize categories & groups you use for tagging index cards on the structure canvas. Each document has its own groups, there is a system wide copy as well."
                     }
                 }
@@ -2328,9 +2331,9 @@ Item {
                     font.pointSize: Scrite.app.idealFontPointSize
                     text: Scrite.document.structure.groupsData
                     background: Rectangle {
-                        color: primaryColors.c50.background
+                        color: PrimaryColors.c50.background
                         border.width: 1
-                        border.color: primaryColors.borderColor
+                        border.color: PrimaryColors.borderColor
                     }
                 }
 
@@ -2375,9 +2378,9 @@ Item {
                     font.pointSize: Scrite.app.idealFontPointSize + 2
                     text: Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
                     background: Rectangle {
-                        color: accentColors.c50.background
+                        color: AccentColors.c50.background
                         border.width: 1
-                        border.color: accentColors.borderColor
+                        border.color: AccentColors.borderColor
                     }
                 }
 

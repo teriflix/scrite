@@ -21,7 +21,9 @@ import QtQuick.Controls.Material 2.15
 import QtQuick.Controls 1.4 as OldControls
 
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Rectangle {
     id: notebookView
@@ -130,7 +132,7 @@ Rectangle {
         id: toolbar
         width: toolButtonSize+4
         height: parent.height
-        color: primaryColors.c100.background
+        color: PrimaryColors.c100.background
 
         Column {
             id: toolbarLayout
@@ -160,7 +162,7 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: primaryColors.separatorColor
+                color: PrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -200,7 +202,7 @@ Rectangle {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: primaryColors.separatorColor
+                color: PrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -308,7 +310,7 @@ Rectangle {
             width: 1
             height: parent.height
             anchors.right: parent.right
-            color: primaryColors.borderColor
+            color: PrimaryColors.borderColor
         }
     }
 
@@ -318,7 +320,7 @@ Rectangle {
         anchors.left: toolbar.right
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        Material.background: Qt.darker(primaryColors.button.background, 1.1)
+        Material.background: Qt.darker(PrimaryColors.button.background, 1.1)
 
         OldControls.TreeView {
             id: notebookTree
@@ -334,7 +336,7 @@ Rectangle {
             verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
             rowDelegate: Rectangle {
                 height: fontMetrics.height + 20
-                color: styleData.selected ? primaryColors.highlight.background : primaryColors.c10.background
+                color: styleData.selected ? PrimaryColors.highlight.background : PrimaryColors.c10.background
             }
             EventFilter.events: [EventFilter.Wheel]
             EventFilter.onFilter: {
@@ -364,7 +366,7 @@ Rectangle {
                     height: fontMetrics.height + 20
                     color: {
                         if(styleData.selected)
-                            return primaryColors.highlight.background
+                            return PrimaryColors.highlight.background
 
                         var baseColor = undefined
 
@@ -383,7 +385,7 @@ Rectangle {
                         if(baseColor)
                             return Qt.tint(baseColor, "#E7FFFFFF")
 
-                        return primaryColors.c10.background
+                        return PrimaryColors.c10.background
                     }
 
                     Row {
@@ -584,7 +586,7 @@ Rectangle {
                     case NotebookModel.CharactersCategory:
                         return Qt.rgba(0,0,0,0)
                     case NotebookModel.BookmarksCategory:
-                        return Scrite.app.translucent(primaryColors.c100.background, 0.5)
+                        return Scrite.app.translucent(PrimaryColors.c100.background, 0.5)
                     }
                     break
                 case NotebookModel.NotesType:
@@ -599,7 +601,7 @@ Rectangle {
                         return Qt.tint(scene.color, "#e7ffffff")
                         }
                     default:
-                        return Scrite.app.translucent(primaryColors.c100.background, 0.5)
+                        return Scrite.app.translucent(PrimaryColors.c100.background, 0.5)
                     }
                 case NotebookModel.NoteType:
                     switch(notebookTree.currentData.notebookItemObject.type) {
@@ -720,7 +722,7 @@ Rectangle {
                 active: false
                 sourceComponent: Rectangle {
                     id: deleteConfirmationItem
-                    color: Scrite.app.translucent(primaryColors.c600.background,0.85)
+                    color: Scrite.app.translucent(PrimaryColors.c600.background,0.85)
                     focus: true
 
                     MouseArea {
@@ -745,7 +747,7 @@ Rectangle {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
-                            color: primaryColors.c600.text
+                            color: PrimaryColors.c600.text
                         }
 
                         Row {
@@ -788,9 +790,9 @@ Rectangle {
         Rectangle {
             id: bookmarksItem
             property var componentData
-            color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
+            color: Scrite.app.translucent(PrimaryColors.c100.background, 0.5)
             border.width: 1
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
             clip: true
 
             GridView {
@@ -825,7 +827,7 @@ Rectangle {
                         anchors.leftMargin: 12
                         anchors.topMargin: 12
                         border.width: 1
-                        border.color: bookmarksView.currentIndex === index ? "darkgray" : primaryColors.borderColor
+                        border.color: bookmarksView.currentIndex === index ? "darkgray" : PrimaryColors.borderColor
 
                         Column {
                             anchors.fill: parent
@@ -1022,7 +1024,7 @@ Rectangle {
 
                                 TagText {
                                     id: characterNameLabel
-                                    property var colors: containsMouse ? accentColors.c900 : accentColors.c600
+                                    property var colors: containsMouse ? AccentColors.c900 : AccentColors.c600
                                     border.width: 1
                                     border.color: colors.text
                                     color: colors.background
@@ -1125,7 +1127,7 @@ Rectangle {
                                         ScrollBar.vertical: sceneSynopsisVScrollBar
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         background: Rectangle {
-                                            color: primaryColors.windowColor
+                                            color: PrimaryColors.windowColor
                                             opacity: 0.15
                                         }
                                     }
@@ -1259,7 +1261,7 @@ Rectangle {
                             adjustTextWidthBasedOnScrollBar: false
                             anchors.horizontalCenter: parent.horizontalCenter
                             background: Rectangle {
-                                color: primaryColors.windowColor
+                                color: PrimaryColors.windowColor
                                 opacity: 0.15
                             }
                         }
@@ -1288,9 +1290,9 @@ Rectangle {
             property real minimumNoteSize: Math.max(200, mainScriteDocumentView.width*0.15)
             property real noteSize: notesFlick.width > minimumNoteSize ? notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize) : notesFlick.width
             clip: true
-            color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
+            color: Scrite.app.translucent(PrimaryColors.c100.background, 0.5)
             border.width: 1
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
 
             // Report support
             property bool hasReport: {
@@ -1407,9 +1409,9 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             anchors.margins: 10
-                            color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
+                            color: Scrite.app.translucent(PrimaryColors.c100.background, 0.5)
                             border.width: 1
-                            border.color: primaryColors.borderColor
+                            border.color: PrimaryColors.borderColor
 
                             MouseArea {
                                 anchors.fill: parent
@@ -1628,7 +1630,7 @@ Rectangle {
                             adjustTextWidthBasedOnScrollBar: false
                             ScrollBar.vertical: breakSummaryVScrollBar
                             background: Rectangle {
-                                color: primaryColors.windowColor
+                                color: PrimaryColors.windowColor
                                 opacity: 0.15
                             }
                         }
@@ -1985,7 +1987,7 @@ Rectangle {
                                 ScrollBar.vertical: loglineVScrollBar
                                 adjustTextWidthBasedOnScrollBar: false
                                 background: Rectangle {
-                                    color: primaryColors.windowColor
+                                    color: PrimaryColors.windowColor
                                     opacity: 0.15
                                 }
                                 Component.onCompleted: syntaxHighlighter.addDelegate(textLimitHighlighter)
@@ -1998,7 +2000,7 @@ Rectangle {
                                 topPadding: 5
                                 text: (textLimiter.limitReached ? "WARNING: " : "") + "Words: " + textLimiter.wordCount + "/" + textLimiter.maxWordCount +
                                     ", Letters: " + textLimiter.letterCount + "/" + textLimiter.maxLetterCount
-                                color: textLimiter.limitReached ? "darkred" : primaryColors.a700.background
+                                color: textLimiter.limitReached ? "darkred" : PrimaryColors.a700.background
                             }
                         }
                     }
@@ -2136,7 +2138,7 @@ Rectangle {
                                 anchors.margins: 5
                                 color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : "#E7FFFFFF")
                                 border.width: 1
-                                border.color: Scrite.app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "darkgray" : primaryColors.borderColor) : character.color
+                                border.color: Scrite.app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "darkgray" : PrimaryColors.borderColor) : character.color
 
                                 Row {
                                     anchors.fill: parent
@@ -2227,8 +2229,8 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: Scrite.app.translucent(primaryColors.windowColor, 0.5)
-                                border { width: 1; color: primaryColors.borderColor }
+                                color: Scrite.app.translucent(PrimaryColors.windowColor, 0.5)
+                                border { width: 1; color: PrimaryColors.borderColor }
 
                                 Row {
                                     spacing: 10
@@ -2404,7 +2406,7 @@ Rectangle {
                                 id: characterQuickInfoArea
                                 width: workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, mainScriteDocumentView.width*0.3)
                                 height: parent.height
-                                color: Scrite.app.translucent(primaryColors.c100.background, 0.5)
+                                color: Scrite.app.translucent(PrimaryColors.c100.background, 0.5)
 
                                 Connections {
                                     target: characterNotes
@@ -2474,7 +2476,7 @@ Rectangle {
                                             height: width
                                             color: photoSlides.currentIndex === photoSlides.count-1 ? Qt.rgba(0,0,0,0.25) : Qt.rgba(0,0,0,0.75)
                                             border.width: 1
-                                            border.color: primaryColors.borderColor
+                                            border.color: PrimaryColors.borderColor
                                             anchors.horizontalCenter: parent.horizontalCenter
 
                                             SwipeView {
@@ -2609,7 +2611,7 @@ Rectangle {
                                                     model: character.tags
 
                                                     TagText {
-                                                        property var colors: containsMouse ? accentColors.c900 : accentColors.c500
+                                                        property var colors: containsMouse ? AccentColors.c900 : AccentColors.c500
                                                         border.color: colors.text
                                                         border.width: 1
                                                         color: colors.background
@@ -2847,7 +2849,7 @@ Rectangle {
                                     tabSequenceIndex: 10
                                     tabSequenceManager: characterInfoTabSequence
                                     background: Rectangle {
-                                        color: primaryColors.windowColor
+                                        color: PrimaryColors.windowColor
                                         opacity: 0.15
                                     }
                                     adjustTextWidthBasedOnScrollBar: false
@@ -2947,7 +2949,7 @@ Rectangle {
         Rectangle {
             width: Math.max(maxTextAreaSize, mainScriteDocumentView.width*0.5)
             height: Math.min(mainScriteDocumentView.height*0.85, Math.min(charactersList.height, 500) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80)
-            color: primaryColors.c10.background
+            color: PrimaryColors.c10.background
 
             Component.onCompleted: {
                 character = modalDialog.arguments
@@ -2975,7 +2977,7 @@ Rectangle {
                     anchors.fill: charactersListScroll
                     anchors.margins: -1
                     border.width: 1
-                    border.color: primaryColors.borderColor
+                    border.color: PrimaryColors.borderColor
                     visible: charactersListScroll.height >= 600
                 }
 
@@ -3082,8 +3084,8 @@ Rectangle {
 
                                 color: backgroundColor
                                 property bool highlight: false
-                                property color backgroundColor: highlight ? accentColors.c100.background : primaryColors.c10.background
-                                property color foregroundColor: highlight ? accentColors.c100.text : primaryColors.c10.text
+                                property color backgroundColor: highlight ? AccentColors.c100.background : PrimaryColors.c10.background
+                                property color foregroundColor: highlight ? AccentColors.c100.text : PrimaryColors.c10.text
 
                                 SearchAgent.engine: searchBar.searchEngine
                                 SearchAgent.onSearchRequest: {

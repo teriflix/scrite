@@ -14,6 +14,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
+import "./globals"
+
 Item {
     property alias tabsArray: tabRepeater.model
     property alias content: contentLoader.sourceComponent
@@ -43,7 +45,7 @@ Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    color: accentColors.c500.background
+                    color: AccentColors.c500.background
                     visible: parent.selected
                 }
 

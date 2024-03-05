@@ -17,6 +17,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Flickable {
     id: notificationsView
     height: Math.min( contentHeight, parent.height*0.25 )
@@ -39,7 +41,7 @@ Flickable {
                 width: notificationsView.width-1
                 height: Math.max(100, nLayout.implicitHeight+44)
                 color: notification.color
-                border { width: 1; color: primaryColors.borderColor }
+                border { width: 1; color: PrimaryColors.borderColor }
 
                 RowLayout {
                     id: nLayout
@@ -56,7 +58,7 @@ Flickable {
                             return Layout.preferredWidth*9/16
                         }
                         border.width: 1
-                        border.color: primaryColors.borderColor
+                        border.color: PrimaryColors.borderColor
 
                         Image {
                             id: nimage

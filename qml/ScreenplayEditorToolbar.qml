@@ -18,6 +18,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Row {
     id: screenplayEditorToolbar
     property SceneDocumentBinder binder
@@ -206,7 +208,7 @@ Row {
     Rectangle {
         width: 1
         height: parent.height
-        color: primaryColors.separatorColor
+        color: PrimaryColors.separatorColor
         opacity: 0.5
     }
 
@@ -312,7 +314,7 @@ Row {
     Rectangle {
         width: 1
         height: parent.height
-        color: primaryColors.separatorColor
+        color: PrimaryColors.separatorColor
         opacity: 0.5
     }
 

@@ -15,6 +15,8 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     id: textTabBar
     property int tabIndex: -1
@@ -44,7 +46,7 @@ Item {
 
             Text {
                 font: idealAppFontMetrics.font
-                color: textTabBar.tabIndex === index ? accentColors.c900.background : primaryColors.c700.background
+                color: textTabBar.tabIndex === index ? AccentColors.c900.background : PrimaryColors.c700.background
                 text: modelData
 
                 MouseArea {
@@ -66,7 +68,7 @@ Item {
         id: currentTabUnderline
         x: currentTabItemPositionMapper.mappedPosition.x
         height: 2
-        color: accentColors.c900.background
+        color: AccentColors.c900.background
         width: currentTabItemPositionMapper.from.width
         anchors.top: tabsRow.bottom
         anchors.topMargin: idealAppFontMetrics.descent

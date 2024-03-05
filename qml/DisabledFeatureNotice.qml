@@ -17,12 +17,14 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Rectangle {
     id: dfNotice
     property string reason: Scrite.user.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
     property string suggestion: Scrite.user.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
     property string featureName
-    color: primaryColors.c100.background
+    color: PrimaryColors.c100.background
     clip: true
 
     signal clicked()

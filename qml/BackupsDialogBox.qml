@@ -15,7 +15,9 @@ import QtQuick 2.15
 import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     width: 640
@@ -42,7 +44,7 @@ Item {
             Text {
                 font.pointSize: Screen.devicePixelRatio > 1 ? 22 : 18
                 text: "Select A Backup To Load"
-                color: primaryColors.c200.text
+                color: PrimaryColors.c200.text
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -54,9 +56,9 @@ Item {
             anchors.bottom: buttonBar.top
             anchors.topMargin: 20
             anchors.bottomMargin: 20
-            color: primaryColors.c200.background
+            color: PrimaryColors.c200.background
             border.width: 1
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
 
             ListView {
                 id: backupFilesView
@@ -68,7 +70,7 @@ Item {
                 currentIndex: -1
                 ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
                 highlight: Rectangle {
-                    color: primaryColors.highlight.background
+                    color: PrimaryColors.highlight.background
                 }
                 highlightMoveDuration: 0
                 highlightResizeDuration: 0

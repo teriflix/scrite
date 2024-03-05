@@ -13,11 +13,14 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 PainterPathItem {
     property string pageNumber: "-1"
-    readonly property var colors: primaryColors.c600
+    readonly property var colors: PrimaryColors.c600
 
     Text {
         id: sceneNumberText

@@ -18,6 +18,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     id: textNoteView
     property Note note
@@ -78,7 +80,7 @@ Item {
                     note.content = text
             }
             background: Rectangle {
-                color: primaryColors.windowColor
+                color: PrimaryColors.windowColor
                 opacity: 0.15
             }
         }

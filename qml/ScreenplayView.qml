@@ -17,7 +17,10 @@ import QtQuick.Shapes 1.5
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+
+import "./globals"
 
 Item {
     id: screenplayView
@@ -55,7 +58,7 @@ Item {
     Rectangle {
         id: screenplayTools
         z: 1
-        color: accentColors.c100.background
+        color: AccentColors.c100.background
         width: screenplayToolsLayout.width+4
         anchors.top: parent.top
         anchors.left: parent.left
@@ -113,7 +116,7 @@ Item {
             width: 1
             height: parent.height
             anchors.right: parent.right
-            color: accentColors.borderColor
+            color: AccentColors.borderColor
         }
     }
 
@@ -169,7 +172,7 @@ Item {
                     height: minimumAppFontMetrics.height + 8
                     y: index * (minimumAppFontMetrics.height + 10)
                     color: Scrite.app.translucent( border.color, 0.1 )
-                    border.color: accentColors.c900.background
+                    border.color: AccentColors.c900.background
                     border.width: 0.5
 
                     MouseArea {
@@ -404,8 +407,8 @@ Item {
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 0
-                color: primaryColors.button.background
-                border.color: primaryColors.borderColor
+                color: PrimaryColors.button.background
+                border.color: PrimaryColors.borderColor
                 border.width: 1
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5
                 visible: Scrite.document.structure.elementCount > 0 && enableDragDrop
@@ -552,8 +555,8 @@ Item {
                     return { "background": element.scene.color, "text": "white" }
                 }
                 if(element.breakType === Screenplay.Episode)
-                    return accentColors.c700
-                return accentColors.c500
+                    return AccentColors.c700
+                return AccentColors.c500
             }
 
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
@@ -565,7 +568,7 @@ Item {
                 visible: element.selected
                 anchors.fill: elementItemBox
                 anchors.margins: -5
-                color: accentColors.a700.background
+                color: AccentColors.a700.background
             }
 
             Loader {

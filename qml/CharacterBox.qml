@@ -16,6 +16,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Rectangle {
     id: characterBox
     property Character character
@@ -39,7 +41,7 @@ Rectangle {
             width: parent.height
             height: parent.height
             border.width: 1
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
             radius: character.photos.length > 0 ? 0 : 6
 
             Image {

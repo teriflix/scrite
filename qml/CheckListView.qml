@@ -18,7 +18,9 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     id: root
@@ -122,7 +124,7 @@ Item {
             Layout.fillHeight: true
             color: Qt.rgba(0,0,0,0)
             border.width: checkListView.height < checkListView.contentHeight ? 1 : 0
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
 
             ListView {
                 id: checkListView

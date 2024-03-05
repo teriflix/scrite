@@ -12,7 +12,10 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 Item {
     id: dockWidget
@@ -81,7 +84,7 @@ Item {
 
     Rectangle {
         id: container
-        color: primaryColors.c100.background
+        color: PrimaryColors.c100.background
         function evaluateSourceGeometry() {
             if(sourceItem) {
                 var pt = dockWidget.mapFromItem(sourceItem, 0, 0)
@@ -124,13 +127,13 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             height: 40
-            color: primaryColors.c300.background
+            color: PrimaryColors.c300.background
 
             Text {
                 id: titleText
                 anchors.centerIn: parent
                 font.pointSize: Scrite.app.idealFontPointSize
-                color: primaryColors.c300.text
+                color: PrimaryColors.c300.text
             }
 
             MouseArea {

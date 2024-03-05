@@ -109,7 +109,6 @@ HEADERS += \
     src/quick/objects/textlimiter.h \
     src/quick/objects/trackobject.h \
     src/quick/objects/notificationmanager.h \
-    src/quick/objects/materialcolors.h \
     src/quick/objects/errorreport.h \
     src/quick/objects/resetonchange.h \
     src/quick/objects/focustracker.h \
@@ -243,7 +242,6 @@ SOURCES += \
     src/quick/objects/textdocument.cpp \
     src/quick/objects/textlimiter.cpp \
     src/quick/objects/trackobject.cpp \
-    src/quick/objects/materialcolors.cpp \
     src/quick/objects/errorreport.cpp \
     src/quick/objects/standardpaths.cpp \
     src/quick/objects/polygontesselator.cpp \

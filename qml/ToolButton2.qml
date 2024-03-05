@@ -15,6 +15,8 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
+import "./globals"
+
 ToolButton {
     id: toolButton
 
@@ -29,8 +31,8 @@ ToolButton {
     implicitWidth: suggestedWidth
     implicitHeight: suggestedHeight
 
-    Material.background: accentColors.key
-    Material.foreground: primaryColors.key
+    Material.background: AccentColors.key
+    Material.foreground: PrimaryColors.key
 
     font.pixelSize: 16
     hoverEnabled: true
@@ -38,9 +40,9 @@ ToolButton {
     opacity: enabled ? 1 : 0.5
     flat: true
     contentItem: Rectangle {
-        color: primaryColors.c10.background
+        color: PrimaryColors.c10.background
         border.width: toolButton.flat ? 0 : 1
-        border.color: primaryColors.borderColor
+        border.color: PrimaryColors.borderColor
 
         Row {
             anchors.centerIn: parent

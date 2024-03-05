@@ -21,6 +21,8 @@ import Qt.labs.settings 1.0
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     // RichTextEdit is intented to be used as a drop-in-replacement for FlickableTextArea
     property alias textArea: webEngineView
@@ -171,7 +173,7 @@ Item {
         sourceComponent: Item {
             Rectangle {
                 anchors.fill: parent
-                color: primaryColors.c600.background
+                color: PrimaryColors.c600.background
                 opacity: 0.7
             }
 
@@ -190,7 +192,7 @@ Item {
                     text: "In here, you can only type in English or in languages for which you have configured a text input method from your OS in Scrite Settings."
                     font.bold: true
                     font.pointSize: Scrite.app.idealFontPointSize + 3
-                    color: primaryColors.c600.text
+                    color: PrimaryColors.c600.text
                 }
 
                 Button2 {

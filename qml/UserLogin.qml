@@ -17,7 +17,9 @@ import QtQuick.Window 2.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     id: userLogin
@@ -970,7 +972,7 @@ Item {
                 }
 
                 delegate: Rectangle {
-                    property var colors: index%2 ? primaryColors.c200 : primaryColors.c300
+                    property var colors: index%2 ? PrimaryColors.c200 : PrimaryColors.c300
                     width: installationsView.availableDelegateWidth
                     height: Math.max(infoLayout.height, logoutButton.height) + 16
                     color: colors.background

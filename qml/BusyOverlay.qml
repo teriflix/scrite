@@ -17,9 +17,11 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Rectangle {
     id: busyOverlay
-    color: primaryColors.windowColor
+    color: PrimaryColors.windowColor
     opacity: 0.9
     visible: false
     onVisibleChanged: parent.enabled = !visible
@@ -30,7 +32,7 @@ Rectangle {
         anchors.fill: busyOverlayNotice
         anchors.margins: -30
         radius: 4
-        color: primaryColors.c700.background
+        color: PrimaryColors.c700.background
 
         MouseArea {
             anchors.fill: parent
@@ -57,7 +59,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             text: busyMessage
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            color: primaryColors.c700.text
+            color: PrimaryColors.c700.text
         }
     }
 

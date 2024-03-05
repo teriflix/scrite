@@ -18,6 +18,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Column {
     id: formField
     spacing: 10
@@ -79,9 +81,9 @@ Column {
         id: answerArea
         width: questionText.width
         anchors.right: parent.right
-        color: Scrite.app.translucent(primaryColors.c100.background, 0.75)
+        color: Scrite.app.translucent(PrimaryColors.c100.background, 0.75)
         border.width: 1
-        border.color: Scrite.app.translucent(primaryColors.borderColor, 0.25)
+        border.color: Scrite.app.translucent(PrimaryColors.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
         property real minHeight: (idealAppFontMetrics.lineSpacing + idealAppFontMetrics.descent + idealAppFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 

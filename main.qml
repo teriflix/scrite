@@ -21,34 +21,13 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./qml" as UI
+import "./qml/globals"
 
 Rectangle {
     id: mainWindow
     width: 1366
     height: 700
-    color: primaryColors.windowColor
-
-    MaterialColors {
-        id: primaryColors
-        name: "Gray"
-        readonly property int key: Material.Grey
-        readonly property color windowColor: c300.background
-        readonly property color borderColor: c400.background
-        readonly property color separatorColor: c400.background
-        readonly property var highlight: c400
-        readonly property var button: c200
-    }
-
-    MaterialColors {
-        id: accentColors
-        name: "Blue Gray"
-        readonly property int key: Material.BlueGrey
-        readonly property color windowColor: c300.background
-        readonly property color borderColor: c400.background
-        readonly property color separatorColor: c400.background
-        readonly property var highlight: c400
-        readonly property var button: c200
-    }
+    color: PrimaryColors.windowColor
 
     FontMetrics {
         id: minimumAppFontMetrics
@@ -60,10 +39,10 @@ Rectangle {
         font.pointSize: Scrite.app.idealFontPointSize
     }
 
-    Material.primary: primaryColors.key
-    Material.accent: accentColors.key
+    Material.primary: PrimaryColors.key
+    Material.accent: AccentColors.key
     Material.theme: Material.Light
-    Material.background: accentColors.c700.background
+    Material.background: AccentColors.c700.background
 
     UndoStack {
         id: mainUndoStack
@@ -135,7 +114,7 @@ Rectangle {
     Item {
         id: dialogUnderlay
         anchors.fill: mainScriteDocumentView
-        property color color: primaryColors.windowColor
+        property color color: PrimaryColors.windowColor
 
         property int visibilityCounter: 0
         function show() {
@@ -154,7 +133,7 @@ Rectangle {
         visible: false
         onVisibleChanged: {
             if(!visible) {
-                color = primaryColors.windowColor
+                color = PrimaryColors.windowColor
                 visibilityCounter = 0
             }
         }
@@ -187,8 +166,8 @@ Rectangle {
         category: "Structure Tab"
 
         property bool showGrid: true
-        property color gridColor: accentColors.c400.background
-        property color canvasColor: accentColors.c50.background
+        property color gridColor: AccentColors.c400.background
+        property color canvasColor: AccentColors.c50.background
         property bool showPreview: true
         property bool displayAnnotationProperties: true
         property bool showPullHandleAnimation: true
@@ -318,7 +297,7 @@ Rectangle {
                     font.pixelSize: 16
                     text: question
                     horizontalAlignment: Text.AlignHCenter
-                    color: accentColors.c50.text
+                    color: AccentColors.c50.text
                 }
 
                 Row {
@@ -374,7 +353,7 @@ Rectangle {
                     font.pixelSize: 16
                     text: message
                     horizontalAlignment: Text.AlignHCenter
-                    color: accentColors.c50.text
+                    color: AccentColors.c50.text
                 }
 
                 Row {
@@ -410,7 +389,7 @@ Rectangle {
                 anchors.fill: indication
                 anchors.margins: -30
                 radius: 4
-                color: primaryColors.c600.background
+                color: PrimaryColors.c600.background
             }
 
             Row {
@@ -435,7 +414,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     text: Scrite.document.busyMessage
                     font.pixelSize: 16
-                    color: primaryColors.c600.text
+                    color: PrimaryColors.c600.text
                 }
             }
 
@@ -512,7 +491,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         visible: Scrite.notifications.count > 0
-        color: Scrite.app.translucent(primaryColors.borderColor, 0.6)
+        color: Scrite.app.translucent(PrimaryColors.borderColor, 0.6)
 
         UI.NotificationsView {
             id: notificationsView

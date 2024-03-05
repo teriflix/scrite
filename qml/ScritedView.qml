@@ -19,8 +19,11 @@ import QtQuick.Layouts 1.15
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     id: scritedView
@@ -170,7 +173,7 @@ Item {
     SplitView {
         anchors.fill: parent
         orientation: Qt.Horizontal
-        Material.background: Qt.darker(primaryColors.button.background, 1.1)
+        Material.background: Qt.darker(PrimaryColors.button.background, 1.1)
 
         Item {
             id: playerArea
@@ -637,19 +640,19 @@ Item {
                                 gradient: Gradient {
                                     GradientStop {
                                         position: 0
-                                        color: Scrite.app.translucent(primaryColors.c600.background, 1)
+                                        color: Scrite.app.translucent(PrimaryColors.c600.background, 1)
                                     }
                                     GradientStop {
                                         position: 0.175
-                                        color: Scrite.app.translucent(primaryColors.c600.background, 0.5)
+                                        color: Scrite.app.translucent(PrimaryColors.c600.background, 0.5)
                                     }
                                     GradientStop {
                                         position: 0.35
-                                        color: Scrite.app.translucent(primaryColors.c600.background, 0.3)
+                                        color: Scrite.app.translucent(PrimaryColors.c600.background, 0.3)
                                     }
                                     GradientStop {
                                         position: 0.56
-                                        color: Scrite.app.translucent(primaryColors.c600.background, 0.1)
+                                        color: Scrite.app.translucent(PrimaryColors.c600.background, 0.1)
                                     }
                                     GradientStop {
                                         position: 0.7
@@ -720,7 +723,7 @@ Item {
                                     id: textDocumentTimeCursor
                                     width: parent.width
                                     height: 2
-                                    color: primaryColors.c500.background
+                                    color: PrimaryColors.c500.background
                                     visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && !playerArea.keyFrameGrabMode
                                     x: 0
                                     Behavior on y {
@@ -1113,7 +1116,7 @@ Item {
 
         Rectangle {
             SplitView.fillWidth: true
-            color: primaryColors.c100.background
+            color: PrimaryColors.c100.background
 
             Row {
                 id: screenplayOffsesHeading
@@ -1174,7 +1177,7 @@ Item {
                 width: parent.width
                 height: 1
                 anchors.bottom: screenplayOffsesHeading.bottom
-                color: primaryColors.borderColor
+                color: PrimaryColors.borderColor
                 visible: screenplayOffsesHeading.visible
             }
 
@@ -1209,16 +1212,16 @@ Item {
                         ColorAnimation {
                             target: highlighter
                             property: "color"
-                            from: primaryColors.c200.background
-                            to: accentColors.c200.background
+                            from: PrimaryColors.c200.background
+                            to: AccentColors.c200.background
                             duration: 750
                         }
 
                         ColorAnimation {
                             target: highlighter
                             property: "color"
-                            to: primaryColors.c200.background
-                            from: accentColors.c200.background
+                            to: PrimaryColors.c200.background
+                            from: AccentColors.c200.background
                             duration: 750
                         }
                     }
@@ -1229,8 +1232,8 @@ Item {
                     height: isSceneItem ? 40 : 30
                     color: {
                         if(isSceneItem)
-                            return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : primaryColors.c300.background
-                        return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : primaryColors.c100.background
+                            return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : PrimaryColors.c300.background
+                        return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : PrimaryColors.c100.background
                     }
                     property bool isSceneItem: arrayItem.type === SceneElement.Heading
                     property bool locked: arrayItem.locked

@@ -19,8 +19,11 @@ import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
@@ -48,7 +51,7 @@ Rectangle {
         return zoomSlider.zoomLevelModifierToApply()
     }
 
-    color: primaryColors.windowColor
+    color: PrimaryColors.windowColor
     clip: true
 
     PropertyAlias {
@@ -179,12 +182,12 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 1
-        color: primaryColors.c100.background
+        color: PrimaryColors.c100.background
         width: ruler.width
         height: screenplaySearchBar.height * opacity
         enabled: screenplayAdapter.screenplay
         border.width: 1
-        border.color: primaryColors.borderColor
+        border.color: PrimaryColors.borderColor
         visible: opacity > 0
         opacity: globalScreenplayEditorToolbar.showFind ? 1 : 0
         Behavior on opacity {
@@ -471,7 +474,7 @@ Rectangle {
                                     font.family: screenplayFormat.defaultFont2.family
                                     font.pointSize: screenplayFormat.defaultFont2.pointSize-2
                                     visible: logLineField.length > 0
-                                    color: loglineLimiter.limitReached ? "darkred" : primaryColors.a700.background
+                                    color: loglineLimiter.limitReached ? "darkred" : PrimaryColors.a700.background
                                 }
 
                                 TextAreaInput {
@@ -821,9 +824,9 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: primaryColors.windowColor
+        color: PrimaryColors.windowColor
         border.width: 1
-        border.color: primaryColors.borderColor
+        border.color: PrimaryColors.borderColor
         clip: true
         enabled: (width > (metricsDisplay.width + zoomSlider.width + 40))
         opacity: enabled ? 1 : 0
@@ -940,7 +943,7 @@ Rectangle {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: primaryColors.borderColor
+                color: PrimaryColors.borderColor
                 visible: mainTabBar.currentIndex === 0
             }
 
@@ -973,7 +976,7 @@ Rectangle {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: primaryColors.borderColor
+                color: PrimaryColors.borderColor
             }
 
             Image {
@@ -1005,7 +1008,7 @@ Rectangle {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: primaryColors.borderColor
+                color: PrimaryColors.borderColor
                 visible: wordCountLabel.visible
             }
 
@@ -1153,7 +1156,7 @@ Rectangle {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: primaryColors.borderColor
+                color: PrimaryColors.borderColor
             }
         }
 
@@ -1241,7 +1244,7 @@ Rectangle {
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
             height: episodeBreakSubtitle.height + headingFontMetrics.lineSpacing*0.1
-            color: primaryColors.c10.background
+            color: PrimaryColors.c10.background
 
             TextField {
                 id: episodeBreakTitle
@@ -1299,7 +1302,7 @@ Rectangle {
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
             height: actBreakTitle.height
-            color: primaryColors.c10.background
+            color: PrimaryColors.c10.background
 
             TextField {
                 id: actBreakTitle
@@ -1359,8 +1362,8 @@ Rectangle {
             property bool evaluateSuggestedSceneHeight: true
 
             border.width: 1
-            border.color: screenplayElement.scene ? screenplayElement.scene.color : primaryColors.c400.background
-            color: screenplayElement.scene ? Qt.tint(screenplayElement.scene.color, "#E7FFFFFF") : primaryColors.c300.background
+            border.color: screenplayElement.scene ? screenplayElement.scene.color : PrimaryColors.c400.background
+            color: screenplayElement.scene ? Qt.tint(screenplayElement.scene.color, "#E7FFFFFF") : PrimaryColors.c300.background
 
             readonly property ScreenplayElement screenplayElement: spElementData.screenplayElement
             readonly property Scene scene: spElementData.scene
@@ -1451,7 +1454,7 @@ Rectangle {
 
             width: contentArea.width
             height: omittedContentItemLayout.height
-            color: Scrite.app.isVeryLightColor(theScene.color) ? primaryColors.highlight.background : Qt.tint(theScene.color, "#9CFFFFFF")
+            color: Scrite.app.isVeryLightColor(theScene.color) ? PrimaryColors.highlight.background : Qt.tint(theScene.color, "#9CFFFFFF")
 
             Column {
                 id: omittedContentItemLayout
@@ -1581,10 +1584,10 @@ Rectangle {
 
             SidePanel {
                 id: commentsSidePanel
-                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? primaryColors.c500.background : contentItem.theScene.color
+                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? PrimaryColors.c500.background : contentItem.theScene.color
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
-                borderColor: expanded ? primaryColors.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
+                borderColor: expanded ? PrimaryColors.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
                 z: contentItem.isCurrent ? 1 : 0
                 borderWidth: contentItem.isCurrent ? 2 : 1
                 anchors.top: parent.top
@@ -1918,7 +1921,7 @@ Rectangle {
                                 y: (modelData.position >= 0 ? cursorRect.y : -contentItem.totalSceneHeadingHeight) - height/2
                                 width: sceneTextEditorBackground.width
                                 height: 1
-                                // color: primaryColors.c400.background
+                                // color: PrimaryColors.c400.background
 
                                 PageNumberBubble {
                                     x: -width - 20
@@ -1932,7 +1935,7 @@ Rectangle {
                             x: 0; y: sceneTextEditor.cursorRectangle.y-2*zoomLevel
                             width: parent.width
                             height: sceneTextEditor.cursorRectangle.height+4*zoomLevel
-                            color: primaryColors.c100.background
+                            color: PrimaryColors.c100.background
 
                             Rectangle {
                                 width: currentSceneHighlight.width
@@ -2031,7 +2034,7 @@ Rectangle {
                                 width: parent.width*Screen.devicePixelRatio
                                 height: parent.height
                                 anchors.centerIn: parent
-                                color: Scrite.document.readOnly ? primaryColors.borderColor : "black"
+                                color: Scrite.document.readOnly ? PrimaryColors.borderColor : "black"
                             }
 
                             SequentialAnimation {
@@ -2243,7 +2246,7 @@ Rectangle {
                                     text: string
                                     padding: 5
                                     font: defaultFontMetrics.font
-                                    color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
+                                    color: index === completionView.currentIndex ? PrimaryColors.highlight.text : PrimaryColors.c10.text
                                     MouseArea {
                                         property bool singleClickAutoComplete: screenplayEditorSettings.singleClickAutoComplete
                                         anchors.fill: parent
@@ -2262,7 +2265,7 @@ Rectangle {
                                 highlightMoveDuration: 0
                                 highlightResizeDuration: 0
                                 highlight: Rectangle {
-                                    color: primaryColors.highlight.background
+                                    color: PrimaryColors.highlight.background
                                 }
                                 currentIndex: completionModel.currentRow
                             }
@@ -2765,7 +2768,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                color: Scrite.app.isVeryLightColor(contentItem.theScene.color) ? primaryColors.highlight.background : Qt.tint(contentItem.theScene.color, "#9CFFFFFF")
+                color: Scrite.app.isVeryLightColor(contentItem.theScene.color) ? PrimaryColors.highlight.background : Qt.tint(contentItem.theScene.color, "#9CFFFFFF")
                 visible: screenplayAdapter.currentIndex === contentItem.theIndex
             }
 
@@ -3348,8 +3351,8 @@ Rectangle {
                     id: characterNameLabel
                     property var colors: {
                         if(containsMouse)
-                            return accentColors.c900
-                        return editorHasActiveFocus ? accentColors.c600 : accentColors.c10
+                            return AccentColors.c900
+                        return editorHasActiveFocus ? AccentColors.c600 : AccentColors.c10
                     }
                     border.width: editorHasActiveFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
                     border.color: colors.text
@@ -3407,7 +3410,7 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: parent.fontHeight - parent.fontAscent - parent.fontHeight*0.25
                             height: 1
-                            color: accentColors.borderColor
+                            color: AccentColors.borderColor
                         }
                     }
                 }
@@ -3539,7 +3542,7 @@ Rectangle {
                         width: sceneListView.width-1
                         height: 40
                         z: 10
-                        color: accentColors.windowColor
+                        color: AccentColors.windowColor
 
                         RowLayout {
                             anchors.verticalCenter: parent.verticalCenter
@@ -3642,9 +3645,9 @@ Rectangle {
                         width: sceneListView.width-1
                         height: 40
                         color: scene ? (screenplayAdapter.currentIndex === index || screenplayElement.selected) ? selectedColor : normalColor
-                                     : screenplayAdapter.currentIndex === index ? Scrite.app.translucent(accentColors.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
+                                     : screenplayAdapter.currentIndex === index ? Scrite.app.translucent(AccentColors.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
-                        property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(primaryColors.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
+                        property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(PrimaryColors.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
                         property color normalColor: Qt.tint(scene.color, "#E7FFFFFF")
                         property int elementIndex: index
                         property bool elementIsBreak: screenplayElementType === ScreenplayElement.BreakElementType
@@ -3656,7 +3659,7 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             visible: screenplayAdapter.currentIndex === index
                             width: 8
-                            color: accentColors.windowColor
+                            color: AccentColors.windowColor
                         }
 
                         SceneTypeImage {
@@ -3696,7 +3699,7 @@ Rectangle {
                                 font.bold: screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
                                 font.pointSize: Math.ceil(Scrite.app.idealFontPointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                                 horizontalAlignment: Qt.AlignLeft
-                                color: primaryColors.c10.text
+                                color: PrimaryColors.c10.text
                                 font.capitalization: delegateItem.elementIsBreak ? Font.MixedCase : Font.AllUppercase
                                 text: {
                                     var ret = "UNKNOWN"
@@ -3731,7 +3734,7 @@ Rectangle {
                             Text {
                                 id: sceneLengthText
                                 font.pointSize: Scrite.app.idealFontPointSize-3
-                                color: primaryColors.c10.text
+                                color: PrimaryColors.c10.text
                                 text: evaluateText()
                                 visible: !screenplayTextDocument.paused && (sceneListPanelSettings.displaySceneLength === "PAGE" || sceneListPanelSettings.displaySceneLength === "TIME")
                                 opacity: 0.5
@@ -3866,7 +3869,7 @@ Rectangle {
                             id: dropIndicator
                             width: parent.width
                             height: 2
-                            color: primaryColors.borderColor
+                            color: PrimaryColors.borderColor
                             visible: delegateDropArea.containsDrag
                         }
 
@@ -3875,7 +3878,7 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             height: 1
-                            color: parent.elementIsEpisodeBreak ? accentColors.c200.background : accentColors.c100.background
+                            color: parent.elementIsEpisodeBreak ? AccentColors.c200.background : AccentColors.c100.background
                             visible: parent.elementIsBreak
                         }
                     }
@@ -3903,7 +3906,7 @@ Rectangle {
                         Rectangle {
                             width: parent.width
                             height: 2
-                            color: primaryColors.borderColor
+                            color: PrimaryColors.borderColor
                             visible: footerDropArea.containsDrag
                         }
                     }
@@ -4299,7 +4302,7 @@ Rectangle {
         anchors.fill: parent
         color: Qt.rgba(0,0,0,0)
         border.width: 1
-        border.color: primaryColors.borderColor
+        border.color: PrimaryColors.borderColor
     }
 
     Connections {
@@ -4361,7 +4364,7 @@ Rectangle {
                 anchors.topMargin: componentData.scene ? -1 : -contentView.spacing/2
                 anchors.bottomMargin: componentData.scene ? -1 : -contentView.spacing/2
                 visible: contentView.spacing > 0
-                color: componentData.scene ? Qt.rgba(0,0,0,0) : (componentData.breakType === Screenplay.Episode ? accentColors.c100.background : accentColors.c50.background)
+                color: componentData.scene ? Qt.rgba(0,0,0,0) : (componentData.breakType === Screenplay.Episode ? AccentColors.c100.background : AccentColors.c50.background)
                 border.width: componentData.scene ? 1 : 0
                 border.color: componentData.scene ? (Scrite.app.isLightColor(componentData.scene.color) ? "black" : componentData.scene.color) : Qt.rgba(0,0,0,0)
                 opacity: componentData.scene ? 0.25 : 1
@@ -4650,7 +4653,7 @@ Rectangle {
                 Rectangle {
                     width: 1
                     height: parent.height
-                    color: primaryColors.borderColor
+                    color: PrimaryColors.borderColor
                 }
 
                 SimpleToolButton {
@@ -4680,7 +4683,7 @@ Rectangle {
                 Rectangle {
                     width: 1
                     height: parent.height
-                    color: primaryColors.borderColor
+                    color: PrimaryColors.borderColor
                 }
 
                 SimpleToolButton {
@@ -4723,7 +4726,7 @@ Rectangle {
         width: 36
         height: 36
         radius: 4
-        color: tbMouseArea.pressed || down ? primaryColors.button.background : (checked ? primaryColors.highlight.background : Qt.rgba(0,0,0,0))
+        color: tbMouseArea.pressed || down ? PrimaryColors.button.background : (checked ? PrimaryColors.highlight.background : Qt.rgba(0,0,0,0))
         opacity: enabled ? 1 : 0.5
 
         property bool down: false

@@ -14,8 +14,11 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     id: searchBar
@@ -49,10 +52,10 @@ Item {
             id: findUiRect
             width: parent.width
             height: Math.max(55, Math.max(Math.max(txtSearch.height, searchButtonsRow.height), (replaceUiRect.visible ? replaceUiRect.height : 0)))
-            color: primaryColors.c10.background
+            color: PrimaryColors.c10.background
             enabled: searchEngine.searchAgentCount > 0
             border.width: borderWidth
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
 
             TextAreaInput {
                 id: txtSearch
@@ -178,10 +181,10 @@ Item {
             visible: showReplace
             width: parent.width
             height: Math.max(txtReplace.height, replaceButtonsRow.height)
-            color: primaryColors.c10.background
+            color: PrimaryColors.c10.background
             enabled: searchEngine.searchAgentCount > 0
             border.width: borderWidth
-            border.color: primaryColors.borderColor
+            border.color: PrimaryColors.borderColor
 
             TextAreaInput {
                 id: txtReplace

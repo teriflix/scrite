@@ -13,7 +13,10 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 Rectangle {
     property bool includeEmojis: true
@@ -36,7 +39,7 @@ Rectangle {
 
     id: symbolsView
     width: 500; height: 400
-    color: primaryColors.c100.background
+    color: PrimaryColors.c100.background
 
     Rectangle {
         id: symbolsPanel
@@ -44,7 +47,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        color: primaryColors.c700.background
+        color: PrimaryColors.c700.background
         property int currentIndex: 0
         property bool currentIndexIsEmoji: symbols[symbolsPanel.currentIndex].title === "Emoji"
 
@@ -56,7 +59,7 @@ Rectangle {
                 delegate: Rectangle {
                     width: symbolsPanel.width
                     height: 40
-                    color: symbolsPanel.currentIndex === index ? primaryColors.windowColor : Qt.rgba(0,0,0,0)
+                    color: symbolsPanel.currentIndex === index ? PrimaryColors.windowColor : Qt.rgba(0,0,0,0)
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
@@ -114,7 +117,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 1
                 border.width: 1
-                border.color: primaryColors.borderColor
+                border.color: PrimaryColors.borderColor
                 opacity: 0.5
             }
 

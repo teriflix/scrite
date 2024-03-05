@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>misc/material_colors_db.json</file>
         <file>misc/annotations_metadata.json</file>
         <file>misc/fetchogattribs.js</file>
         <file>misc/structure_groups.lst</file>

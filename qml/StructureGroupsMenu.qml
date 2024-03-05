@@ -13,8 +13,11 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Menu2 {
     id: structureGroupsMenu
@@ -47,13 +50,13 @@ Menu2 {
                 anchors.fill: parent
                 anchors.bottomMargin: structureGroupsMenu.bottomPadding
                 border.width: 1
-                border.color: primaryColors.borderColor
+                border.color: PrimaryColors.borderColor
                 enabled: structureAppFeature.enabled && sceneGroup.sceneCount > 0
                 opacity: enabled ? 1 : 0.5
 
                 Rectangle {
                     anchors.fill: innerTitleText
-                    color: primaryColors.c700.background
+                    color: PrimaryColors.c700.background
                     visible: innerTitleText.visible
                 }
 
@@ -77,7 +80,7 @@ Menu2 {
                     visible: text !== ""
                     horizontalAlignment: Text.AlignHCenter
                     padding: 5
-                    color: primaryColors.c700.text
+                    color: PrimaryColors.c700.text
                     font.bold: true
                 }
 
@@ -97,14 +100,14 @@ Menu2 {
                     section.delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                         height: 30
-                        color: primaryColors.windowColor
+                        color: PrimaryColors.windowColor
                         Text {
                             id: categoryLabel
                             text: section
                             topPadding: 5
                             bottomPadding: 5
                             anchors.centerIn: parent
-                            color: primaryColors.button.text
+                            color: PrimaryColors.button.text
                             font.pointSize: Scrite.app.idealFontPointSize
                         }
                     }
@@ -143,7 +146,7 @@ Menu2 {
                     delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                         height: 30
-                        color: groupItemMouseArea.containsMouse ? primaryColors.button.background : Qt.rgba(0,0,0,0)
+                        color: groupItemMouseArea.containsMouse ? PrimaryColors.button.background : Qt.rgba(0,0,0,0)
                         opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
                         property bool doesNotBelongToAnyAct: arrayItem.act === ""
                         property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0

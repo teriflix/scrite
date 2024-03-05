@@ -13,7 +13,10 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
+import "./globals"
 
 Loader {
     id: textViewEdit
@@ -102,7 +105,7 @@ Loader {
             background: Rectangle {
                 visible: frameVisible
                 border.width: 1
-                border.color: primaryColors.borderColor
+                border.color: PrimaryColors.borderColor
             }
             opacity: activeFocus ? 1 : 0.5
             leftPadding: textViewEdit.leftPadding
@@ -175,10 +178,10 @@ Loader {
                         text: string
                         padding: 5
                         font: textArea.font
-                        color: index === completionView.currentIndex ? primaryColors.highlight.text : primaryColors.c10.text
+                        color: index === completionView.currentIndex ? PrimaryColors.highlight.text : PrimaryColors.c10.text
                     }
                     highlight: Rectangle {
-                        color: primaryColors.highlight.background
+                        color: PrimaryColors.highlight.background
                     }
                     currentIndex: completionModel.currentRow
                     height: contentHeight

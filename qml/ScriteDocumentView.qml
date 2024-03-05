@@ -19,8 +19,11 @@ import QtQuick.Layouts 1.15
 import Qt.labs.settings 1.0
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+import "./globals"
 
 Item {
     id: scriteDocumentViewItem
@@ -567,7 +570,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 53
-        color: primaryColors.c50.background
+        color: PrimaryColors.c50.background
         visible: !pdfViewer.active
         enabled: visible
 
@@ -612,7 +615,7 @@ Item {
                     font.bold: true
                     text: Scrite.document.backupFilesModel.count
                     padding: 2
-                    color: primaryColors.highlight.text
+                    color: PrimaryColors.highlight.text
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
                 }
@@ -741,7 +744,7 @@ Item {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: primaryColors.separatorColor
+                color: PrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -863,7 +866,7 @@ Item {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: primaryColors.separatorColor
+                color: PrimaryColors.separatorColor
                 opacity: 0.5
             }
 
@@ -1003,7 +1006,7 @@ Item {
 
                                 Rectangle {
                                     visible: !parent.enabled
-                                    color: primaryColors.c300.background
+                                    color: PrimaryColors.c300.background
                                     opacity: 0.9
                                     anchors.fill: parent
 
@@ -1012,7 +1015,7 @@ Item {
                                         font.pointSize: Scrite.app.idealFontPointSize + 5
                                         anchors.centerIn: parent
                                         horizontalAlignment: Text.AlignHCenter
-                                        color: primaryColors.c300.text
+                                        color: PrimaryColors.c300.text
                                         text: {
                                             if(Scrite.app.isMacOSPlatform)
                                                 return "Scrite is using an input source from macOS while typing in " + Scrite.app.transliterationEngine.languageAsString + "."
@@ -1293,7 +1296,7 @@ Item {
                 ]
                 property var currentTabP1: currentTabExtents.value.p1
                 property var currentTabP2: currentTabExtents.value.p2
-                readonly property color activeTabColor: primaryColors.windowColor
+                readonly property color activeTabColor: PrimaryColors.windowColor
 
                 onCurrentIndexChanged: {
                     if(currentIndex !== 0)
@@ -1338,8 +1341,8 @@ Item {
 
                         PainterPathItem {
                             anchors.fill: parent
-                            fillColor: parent.active ? mainTabBar.activeTabColor : primaryColors.c10.background
-                            outlineColor: primaryColors.borderColor
+                            fillColor: parent.active ? mainTabBar.activeTabColor : PrimaryColors.c10.background
+                            outlineColor: PrimaryColors.borderColor
                             outlineWidth: 1
                             renderingMechanism: PainterPathItem.UseQPainter
                             renderType: parent.active ? PainterPathItem.OutlineAndFill : PainterPathItem.FillOnly
@@ -1426,13 +1429,13 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         height: 53
-        color: primaryColors.c50.background
+        color: PrimaryColors.c50.background
         visible: pdfViewer.active
         enabled: visible && !notificationsView.visible
 
         Text {
             text: pdfViewer.pdfTitle
-            color: accentColors.c50.text
+            color: AccentColors.c50.text
             elide: Text.ElideMiddle
             anchors.centerIn: parent
             width: parent.width * 0.8
@@ -1444,7 +1447,7 @@ Item {
         Rectangle {
             width: parent.width
             height: 1
-            color: primaryColors.borderColor
+            color: PrimaryColors.borderColor
             anchors.bottom: parent.bottom
         }
     }
@@ -1543,7 +1546,7 @@ Item {
                 renderingMechanism: PainterPathItem.UseQPainter
                 renderType: PainterPathItem.OutlineOnly
                 height: 1
-                outlineColor: primaryColors.borderColor
+                outlineColor: PrimaryColors.borderColor
                 outlineWidth: height
                 visible: mainTabBar.visible
                 painterPath: PainterPath {
@@ -1731,13 +1734,13 @@ Item {
                     onActiveChanged: appToolBarArea.enabled = !active
                     Component.onDestruction: appToolBarArea.enabled = true
                     sourceComponent: Rectangle {
-                        color: Scrite.app.translucent(primaryColors.c500.background, 0.5)
+                        color: Scrite.app.translucent(PrimaryColors.c500.background, 0.5)
 
                         Rectangle {
                             anchors.fill: fileOpenDropAreaNotice
                             anchors.margins: -30
                             radius: 4
-                            color: primaryColors.c700.background
+                            color: PrimaryColors.c700.background
                         }
 
                         Column {
@@ -1749,7 +1752,7 @@ Item {
                             Text {
                                 wrapMode: Text.WordWrap
                                 width: parent.width
-                                color: primaryColors.c700.text
+                                color: PrimaryColors.c700.text
                                 font.bold: true
                                 text: fileOpenDropArea.active ? fileOpenDropArea.attachment.originalFileName : fileOpenDropArea.droppedFileName
                                 horizontalAlignment: Text.AlignHCenter
@@ -1759,7 +1762,7 @@ Item {
                             Text {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                color: primaryColors.c700.text
+                                color: PrimaryColors.c700.text
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pointSize: Scrite.app.idealFontPointSize
                                 text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
@@ -1768,7 +1771,7 @@ Item {
                             Text {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                color: primaryColors.c700.text
+                                color: PrimaryColors.c700.text
                                 horizontalAlignment: Text.AlignHCenter
                                 font.pointSize: Scrite.app.idealFontPointSize
                                 visible: !Scrite.document.empty || Scrite.document.fileName !== ""
@@ -1810,26 +1813,26 @@ Item {
         SplitView {
             id: structureEditorSplitView1
             orientation: Qt.Vertical
-            Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+            Material.background: Qt.darker(PrimaryColors.windowColor, 1.1)
 
             Rectangle {
                 id: structureEditorRow1
                 SplitView.fillHeight: true
-                color: primaryColors.c10.background
+                color: PrimaryColors.c10.background
 
                 SplitView {
                     id: structureEditorSplitView2
                     orientation: Qt.Horizontal
-                    Material.background: Qt.darker(primaryColors.windowColor, 1.1)
+                    Material.background: Qt.darker(PrimaryColors.windowColor, 1.1)
                     anchors.fill: parent
 
                     Rectangle {
                         SplitView.fillWidth: true
                         SplitView.minimumWidth: 80
-                        color: primaryColors.c10.background
+                        color: PrimaryColors.c10.background
                         border {
                             width: showNotebookInStructure ? 0 : 1
-                            color: primaryColors.borderColor
+                            color: PrimaryColors.borderColor
                         }
 
                         Item {
@@ -1881,7 +1884,7 @@ Item {
                                 }
                                 visible: active
                                 sourceComponent: Rectangle {
-                                    color: primaryColors.c100.background
+                                    color: PrimaryColors.c100.background
                                     width: appToolBar.height+4
 
                                     Column {
@@ -1908,7 +1911,7 @@ Item {
                                         width: 1
                                         height: parent.height
                                         anchors.right: parent.right
-                                        color: primaryColors.borderColor
+                                        color: PrimaryColors.borderColor
                                     }
                                 }
                             }
@@ -1968,7 +1971,7 @@ Item {
                             active: false
                             property string sessionId
                             sourceComponent: Rectangle {
-                                color: Scrite.app.translucent(primaryColors.button, 0.5)
+                                color: Scrite.app.translucent(PrimaryColors.button, 0.5)
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -1997,12 +2000,12 @@ Item {
                                         width: 5
                                         anchors.right: parent.right
                                         anchors.verticalCenter: parent.verticalCenter
-                                        color: primaryColors.windowColor
+                                        color: PrimaryColors.windowColor
                                         visible: screenplayEditorHandleAnimation.running
                                     }
 
                                     Text {
-                                        color: primaryColors.c50.background
+                                        color: PrimaryColors.c50.background
                                         text: "Pull this handle to view the screenplay editor."
                                         font.pointSize: Scrite.app.idealFontPointSize + 2
                                         anchors.right: parent.left
@@ -2046,12 +2049,12 @@ Item {
                                         height: 5
                                         anchors.bottom: parent.bottom
                                         anchors.horizontalCenter: parent.horizontalCenter
-                                        color: primaryColors.windowColor
+                                        color: PrimaryColors.windowColor
                                         visible: timelineViewHandleAnimation.running
                                     }
 
                                     Text {
-                                        color: primaryColors.c50.background
+                                        color: PrimaryColors.c50.background
                                         text: "Pull this handle to get the timeline view."
                                         font.pointSize: Scrite.app.idealFontPointSize
                                         anchors.horizontalCenter: parent.horizontalCenter
@@ -2094,7 +2097,7 @@ Item {
                         Rectangle {
                             visible: !parent.active
                             anchors.fill: parent
-                            color: primaryColors.c400.background
+                            color: PrimaryColors.c400.background
                         }
                     }
                 }
@@ -2107,7 +2110,7 @@ Item {
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50
                 sourceComponent: Rectangle {
-                    color: FocusTracker.hasFocus ? accentColors.c100.background : accentColors.c50.background
+                    color: FocusTracker.hasFocus ? AccentColors.c100.background : AccentColors.c50.background
                     FocusTracker.window: Scrite.window
 
                     Behavior on color {
@@ -2123,14 +2126,14 @@ Item {
                     Rectangle {
                         anchors.fill: parent
                         color: Qt.rgba(0,0,0,0)
-                        border { width: 1; color: accentColors.borderColor }
+                        border { width: 1; color: AccentColors.borderColor }
                     }
                 }
 
                 Rectangle {
                     visible: !parent.active
                     anchors.fill: parent
-                    color: primaryColors.c400.background
+                    color: PrimaryColors.c400.background
                 }
             }
 

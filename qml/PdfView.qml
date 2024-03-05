@@ -20,6 +20,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     width: 1280
     height: 720
@@ -51,7 +53,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: statusBar.top
-        color: primaryColors.windowColor
+        color: PrimaryColors.windowColor
 
         PdfDocument {
             id: pdfDoc
@@ -193,9 +195,9 @@ Item {
 
     Rectangle {
         id: floatingToolBar
-        color: primaryColors.c100.background
+        color: PrimaryColors.c100.background
         border.width: 1
-        border.color: primaryColors.c500.background
+        border.color: PrimaryColors.c500.background
         width: floatingButtonsRow.width + 10
         height: floatingButtonsRow.height + 20
         anchors.bottom: statusBar.top
@@ -223,7 +225,7 @@ Item {
                     width: 1
                     height: parent.height
                     anchors.left: parent.left
-                    color: primaryColors.c400.background
+                    color: PrimaryColors.c400.background
                 }
             }
 
@@ -231,14 +233,14 @@ Item {
                 text: "View: "
                 font.pointSize: Scrite.app.idealFontPointSize
                 anchors.verticalCenter: parent.verticalCenter
-                color: primaryColors.c300.text
+                color: PrimaryColors.c300.text
                 visible: pdfDoc.pageCount > 1
                 rightPadding: 10
             }
 
             ComboBox2 {
-                Material.foreground: primaryColors.c300.text
-                Material.background: primaryColors.c300.background
+                Material.foreground: PrimaryColors.c300.text
+                Material.background: PrimaryColors.c300.background
                 currentIndex: Math.max(pdfDoc.pagesPerRow-1,0)
                 visible: pdfDoc.pageCount > 1
                 model: {
@@ -264,7 +266,7 @@ Item {
                     width: 1
                     height: parent.height
                     anchors.right: parent.right
-                    color: primaryColors.c400.background
+                    color: PrimaryColors.c400.background
                     visible: displayRefreshButton.visible || saveFileButton.visible || revealFileButton.visible
                 }
             }
@@ -374,9 +376,9 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: 30
-        color: primaryColors.c300.background
+        color: PrimaryColors.c300.background
         border.width: 1
-        border.color: primaryColors.c400.background
+        border.color: PrimaryColors.c400.background
 
         Text {
             text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
@@ -384,7 +386,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-            color: accentColors.c300.text
+            color: AccentColors.c300.text
         }
 
         ZoomSlider {

@@ -19,6 +19,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Item {
     id: sceneFeaturedPhotoItem
     property Scene scene
@@ -81,7 +83,7 @@ Item {
             anchors.fill: parent
             active: false
             sourceComponent: Rectangle {
-                color: Scrite.app.translucent(primaryColors.c600.background,0.85)
+                color: Scrite.app.translucent(PrimaryColors.c600.background,0.85)
 
                 MouseArea {
                     anchors.fill: parent
@@ -99,7 +101,7 @@ Item {
                         width: parent.width
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
-                        color: primaryColors.c600.text
+                        color: PrimaryColors.c600.text
                     }
 
                     Row {

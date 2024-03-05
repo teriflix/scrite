@@ -16,9 +16,11 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+
 Rectangle {
     id: dialogOverlay
-    color: Scrite.app.translucent(accentColors.c50.background, t*0.4)
+    color: Scrite.app.translucent(AccentColors.c50.background, t*0.4)
     property alias sourceComponent: contentsLoader.sourceComponent
     property alias active: contentsLoader.active
     property alias dialogItem: contentsLoader.item

@@ -11,10 +11,13 @@
 **
 ****************************************************************************/
 
-import io.scrite.components 1.0
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
+import io.scrite.components 1.0
+
+import "./globals"
 
 Item {
     id: tabBarTab
@@ -48,8 +51,8 @@ Item {
         id: tabShapeItem
         anchors.fill: parent
         anchors.topMargin: active ? 0 : parent.height*0.1
-        fillColor: active ? primaryColors.windowColor : primaryColors.c200.background
-        outlineColor: primaryColors.borderColor
+        fillColor: active ? PrimaryColors.windowColor : PrimaryColors.c200.background
+        outlineColor: PrimaryColors.borderColor
         outlineWidth: 2
         renderingMechanism: PainterPathItem.UseAntialiasedQPainter
         painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)
