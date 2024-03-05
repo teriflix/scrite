@@ -97,5 +97,6 @@
         <file>qml/globals/ScriteAccentColors.qml</file>
         <file>qml/globals/ScritePrimaryColors.qml</file>
         <file>qml/globals/ScriteFontMetrics.qml</file>
+        <file>qml/globals/ScriteUndoStack.qml</file>
     </qresource>
 </RCC>

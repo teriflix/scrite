@@ -2611,7 +2611,7 @@ Item {
             BoundingBoxItem.visibilityProperty: "visibleInViewport"
 
             onSelectedChanged: {
-                if(selected && (mainUndoStack.structureEditorActive || Scrite.document.structure.elementCount === 1))
+                if(selected && (ScriteUndoStack.structureEditorActive || Scrite.document.structure.elementCount === 1))
                     synopsisFieldLoader.forceActiveFocus()
                 else
                     canvasTabSequence.releaseFocus()

@@ -3278,7 +3278,7 @@ Rectangle {
     }
 
     FocusTracker.window: Scrite.window
-    FocusTracker.onHasFocusChanged: mainUndoStack.notebookActive = FocusTracker.hasFocus
+    FocusTracker.onHasFocusChanged: ScriteUndoStack.notebookActive = FocusTracker.hasFocus
 
     Loader {
         id: structureIconAnimator

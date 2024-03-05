@@ -219,7 +219,7 @@ Row {
 
         ++idx
 
-        if(mainTabBar.currentIndex == 0 || mainUndoStack.screenplayEditorActive) {
+        if(mainTabBar.currentIndex == 0 || ScriteUndoStack.screenplayEditorActive) {
             while(idx < Scrite.document.screenplay.elementCount) {
                 var e = Scrite.document.screenplay.elementAt(idx)
                 if(e === null)
@@ -277,7 +277,7 @@ Row {
     function addScene() {
         requestScreenplayEditor()
         if(!Scrite.document.readOnly)
-            Scrite.document.createNewScene(mainTabBar.currentIndex > 0 ? mainUndoStack.screenplayEditorActive : false)
+            Scrite.document.createNewScene(mainTabBar.currentIndex > 0 ? ScriteUndoStack.screenplayEditorActive : false)
     }
 
     ToolButton3 {

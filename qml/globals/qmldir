@@ -1,4 +1,4 @@
 singleton ScritePrimaryColors 1.0 ScritePrimaryColors.qml
 singleton ScriteAccentColors 1.0 ScriteAccentColors.qml
 singleton ScriteFontMetrics 1.0 ScriteFontMetrics.qml
-
+singleton ScriteUndoStack 1.0 ScriteUndoStack.qml

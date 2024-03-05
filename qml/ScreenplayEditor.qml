@@ -169,7 +169,7 @@ Rectangle {
             Utils.execLater(screenplayAdapter.screenplay, 100, function() {
                 contentView.positionViewAtIndex(screenplayIndex, ListView.Visible)
                 var item = contentView.loadedItemAtIndex(screenplayIndex)
-                if(mainTabBar.currentIndex === 0 || mainUndoStack.screenplayEditorActive)
+                if(mainTabBar.currentIndex === 0 || ScriteUndoStack.screenplayEditorActive)
                     item.assumeFocus()
             })
         }

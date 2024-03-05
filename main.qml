@@ -34,18 +34,6 @@ Rectangle {
     Material.theme: Material.Light
     Material.background: ScriteAccentColors.c700.background
 
-    UndoStack {
-        id: mainUndoStack
-        objectName: "MainUndoStack"
-        property bool sceneListPanelActive: false
-        property bool screenplayEditorActive: false
-        property bool timelineEditorActive: false
-        property bool structureEditorActive: false
-        property bool sceneEditorActive: false
-        property bool notebookActive: false
-        active: sceneListPanelActive || screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
-    }
-
     UI.ScriteDocumentView {
         id: mainScriteDocumentView
         anchors.fill: parent

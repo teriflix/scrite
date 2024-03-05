@@ -543,7 +543,7 @@ Item {
         secondsPerPage: Scrite.document.printFormat.secondsPerPage
         property Item editor
         property bool overlayRefCountModified: false
-        property bool requiresAppBusyOverlay: mainUndoStack.screenplayEditorActive || mainUndoStack.sceneEditorActive
+        property bool requiresAppBusyOverlay: ScriteUndoStack.screenplayEditorActive || ScriteUndoStack.sceneEditorActive
         onUpdateScheduled: {
             if(requiresAppBusyOverlay && !overlayRefCountModified) {
                 appBusyOverlay.ref()
