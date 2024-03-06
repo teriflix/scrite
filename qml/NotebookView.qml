@@ -1176,7 +1176,7 @@ Rectangle {
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
                     visible: sceneTabBar.tabIndex === 1
-                    active: crgraphAppFeature.enabled
+                    active: ScriteAppFeatures.characterRelationshipGraph.enabled
                     sourceComponent: CharacterRelationshipsGraphView {
                         id: crGraphView
                         scene: null
@@ -1217,7 +1217,7 @@ Rectangle {
                     DisabledFeatureNotice {
                         color: Qt.rgba(0,0,0,0)
                         anchors.fill: parent
-                        visible: !crgraphAppFeature.enabled
+                        visible: !ScriteAppFeatures.characterRelationshipGraph.enabled
                         featureName: "Relationship Map"
                     }
                 }
@@ -2280,7 +2280,7 @@ Rectangle {
                     width: charactersTabContentArea.width
                     height: charactersTabContentArea.height
                     visible: charactersTabBar.tabIndex === 1
-                    active: crgraphAppFeature.enabled
+                    active: ScriteAppFeatures.characterRelationshipGraph.enabled
                     sourceComponent: CharacterRelationshipsGraphView {
                         id: crGraphView
                         structure: null
@@ -2319,7 +2319,7 @@ Rectangle {
                     DisabledFeatureNotice {
                         color: Qt.rgba(0,0,0,0)
                         anchors.fill: parent
-                        visible: !crgraphAppFeature.enabled
+                        visible: !ScriteAppFeatures.characterRelationshipGraph.enabled
                         featureName: "Relationship Map"
                     }
                 }
@@ -2881,7 +2881,7 @@ Rectangle {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
                     visible: characterTabBar.tabIndex === 1
-                    active: crgraphAppFeature.enabled
+                    active: ScriteAppFeatures.characterRelationshipGraph.enabled
                     sourceComponent: CharacterRelationshipsGraphView {
                         id: crGraphView
                         character: null
@@ -2926,7 +2926,7 @@ Rectangle {
                     DisabledFeatureNotice {
                         color: Qt.rgba(0,0,0,0)
                         anchors.fill: parent
-                        visible: !crgraphAppFeature.enabled
+                        visible: !ScriteAppFeatures.characterRelationshipGraph.enabled
                         featureName: "Relationship Map"
                     }
                 }

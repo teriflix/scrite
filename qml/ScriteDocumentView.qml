@@ -34,48 +34,12 @@ Item {
 
     enabled: !Scrite.document.loading
 
-    FontMetrics {
-        id: sceneEditorFontMetrics
-        readonly property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Action)
-        readonly property int lettersPerLine: globalScreenplayEditorToolbar.editInFullscreen ? 70 : 60
-        readonly property int marginLetters: 5
-        readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
-        readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
-        readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
-        font: format ? format.font2 : Scrite.document.formatting.defaultFont2
-    }
-
     property bool canShowNotebookInStructure: width > 1600
     property bool showNotebookInStructure: ScriteSettings.workspace.showNotebookInStructure && canShowNotebookInStructure
     onShowNotebookInStructureChanged: {
         Utils.execLater(workspaceSettings, 100, function() {
             mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
         })
-    }
-
-    AppFeature {
-        id: structureAppFeature
-        feature: Scrite.StructureFeature
-    }
-
-    AppFeature {
-        id: notebookAppFeature
-        feature: Scrite.NotebookFeature
-    }
-
-    AppFeature {
-        id: scritedAppFeature
-        feature: Scrite.ScritedFeature
-    }
-
-    AppFeature {
-        id: crgraphAppFeature
-        feature: Scrite.RelationshipGraphFeature
-    }
-
-    AppFeature {
-        id: watermarkFeature
-        feature: Scrite.WatermarkFeature
     }
 
     ScriteFileListModel {
@@ -1743,12 +1707,12 @@ Item {
                                 anchors.left: parent.left
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
-                                // active: !structureAppFeature.enabled && ui.showNotebookInStructure
+                                // active: !ScriteAppFeatures.structure.enabled && ui.showNotebookInStructure
                                 active: {
                                     if(structureEditorTabs.currentTabIndex === 0)
-                                        return !structureAppFeature.enabled && mainScriteDocumentView.showNotebookInStructure
+                                        return !ScriteAppFeatures.structure.enabled && mainScriteDocumentView.showNotebookInStructure
                                     else if(structureEditorTabs.currentTabIndex === 1)
-                                        return !notebookAppFeature.enabled && mainScriteDocumentView.showNotebookInStructure
+                                        return !ScriteAppFeatures.notebook.enabled && mainScriteDocumentView.showNotebookInStructure
                                     return false
                                 }
                                 visible: active
@@ -1792,7 +1756,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
                                 visible: !showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
-                                active: structureAppFeature.enabled
+                                active: ScriteAppFeatures.structure.enabled
                                 sourceComponent: StructureView {
                                     HelpTipNotification {
                                         tipName: "structure"
@@ -1814,7 +1778,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
                                 visible: showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
-                                active: visible && notebookAppFeature.enabled
+                                active: visible && ScriteAppFeatures.notebook.enabled
                                 sourceComponent: NotebookView {
                                     toolbarSize: appToolBar.height+4
                                     toolbarSpacing: appToolBar.spacing
@@ -2048,7 +2012,7 @@ Item {
         id: notebookEditorComponent
 
         Loader {
-            active: notebookAppFeature.enabled
+            active: ScriteAppFeatures.notebook.enabled
             sourceComponent: NotebookView {
                 Announcement.onIncoming: (type,data) => {
                     var stype = "" + "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
@@ -2070,7 +2034,7 @@ Item {
         id: scritedComponent
 
         Loader {
-            active: scritedAppFeature.enabled
+            active: ScriteAppFeatures.scrited.enabled
             sourceComponent: ScritedView {
 
             }

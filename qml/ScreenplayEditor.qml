@@ -1880,9 +1880,9 @@ Rectangle {
                     // Basic editing functionality
                     id: sceneTextEditor
                     width: parent.width
-                    height: Math.ceil(contentHeight + topPadding + bottomPadding + sceneEditorFontMetrics.lineSpacing)
-                    topPadding: sceneEditorFontMetrics.height
-                    bottomPadding: sceneEditorFontMetrics.height
+                    height: Math.ceil(contentHeight + topPadding + bottomPadding + ScriteFontMetrics.sceneEditor.lineSpacing)
+                    topPadding: ScriteFontMetrics.sceneEditor.height
+                    bottomPadding: ScriteFontMetrics.sceneEditor.height
                     leftPadding: ruler.leftMarginPx
                     rightPadding: ruler.rightMarginPx
                     palette: Scrite.app.palette

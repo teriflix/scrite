@@ -36,7 +36,6 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
-
 import "./globals"
 
 Item {
@@ -316,15 +315,10 @@ Item {
                 border.width: templatesView.interactive ? 1 : 0
                 border.color: ScritePrimaryColors.borderColor
 
-                AppFeature {
-                    id: templatesFeatureCheck
-                    feature: Scrite.TemplateFeature
-                }
-
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 1
-                    visible: !templatesFeatureCheck.enabled
+                    visible: !ScriteAppFeatures.templates.enabled
 
                     LinkButton {
                         text: "Blank Document"
@@ -345,7 +339,7 @@ Item {
                         Layout.fillHeight: true
                         color: Qt.rgba(1,1,1,0.9)
                         featureName: "Screenplay Templates"
-                        visible: !templatesFeatureCheck.enabled
+                        visible: !ScriteAppFeatures.templates.enabled
                     }
                 }
 
@@ -353,8 +347,8 @@ Item {
                     id: templatesView
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: templatesFeatureCheck.enabled ? libraryService.templates : []
-                    visible: templatesFeatureCheck.enabled
+                    model: ScriteAppFeatures.templates.enabled ? libraryService.templates : []
+                    visible: ScriteAppFeatures.templates.enabled
                     currentIndex: -1
                     clip: true
                     FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
@@ -704,15 +698,10 @@ Item {
             property string folder: info.absolutePath
         }
 
-        AppFeature {
-            id: importFeatureCheck
-            feature: Scrite.ImportFeature
-        }
-
         AttachmentsDropArea {
             id: importDropArea
             anchors.fill: parent
-            enabled: importFeatureCheck.enabled
+            enabled: ScriteAppFeatures.importer.enabled
             allowedType: Attachments.NoMedia
             allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
             onDropped: fileToImport.path = attachment.filePath
@@ -721,10 +710,10 @@ Item {
         StackLayout {
             id: importPageStackLayout
             anchors.fill: parent
-            currentIndex: importFeatureCheck.enabled ? (fileToImport.valid ? 2 : 1) : 0
+            currentIndex: ScriteAppFeatures.importer.enabled ? (fileToImport.valid ? 2 : 1) : 0
 
             DisabledFeatureNotice {
-                visible: !importFeatureCheck.enabled
+                visible: !ScriteAppFeatures.importer.enabled
                 color: Qt.rgba(1,1,1,0.9)
                 featureName: "Import from 3rd Party Formats"
             }

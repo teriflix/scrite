@@ -25,4 +25,14 @@ QtObject {
     readonly property FontMetrics ideal: FontMetrics {
         font.pointSize: Scrite.app.idealFontPointSize
     }
+
+    readonly property FontMetrics sceneEditor: FontMetrics {
+        readonly property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Action)
+        readonly property int lettersPerLine: globalScreenplayEditorToolbar.editInFullscreen ? 70 : 60
+        readonly property int marginLetters: 5
+        readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
+        readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
+        readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
+        font: format ? format.font2 : Scrite.document.formatting.defaultFont2
+    }
 }

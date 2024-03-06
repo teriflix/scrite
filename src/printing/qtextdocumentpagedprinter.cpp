@@ -641,11 +641,13 @@ void QTextDocumentPagedPrinter::printHeaderFooterWatermark(int pageNr, int pageC
     if (m_sideBar) {
         const QRectF rightSideRect(m_headerRect.bottomRight(),
                                    QPointF(body.right(), m_footerRect.top()));
-        m_sideBar->paint(painter, QTextDocumentPageSideBarInterface::RightSide, rightSideRect, docPageRect);
+        m_sideBar->paint(painter, QTextDocumentPageSideBarInterface::RightSide, rightSideRect,
+                         docPageRect);
 
         const QRectF leftSideRect(QPointF(body.left(), m_headerRect.bottom()),
                                   m_footerRect.topLeft());
-        m_sideBar->paint(painter, QTextDocumentPageSideBarInterface::LeftSide, leftSideRect, docPageRect);
+        m_sideBar->paint(painter, QTextDocumentPageSideBarInterface::LeftSide, leftSideRect,
+                         docPageRect);
     }
 
 #if 0

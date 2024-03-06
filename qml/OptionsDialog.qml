@@ -59,7 +59,7 @@ Item {
         currentIndex: 0
         onCurrentIndexChanged: {
             modalDialog.closeOnEscape = true
-            modalDialog.closeable = currentIndex === 4 ? !structureAppFeature.enabled : true
+            modalDialog.closeable = currentIndex === 4 ? !ScriteAppFeatures.structure.enabled : true
         }
 
         tabsArray: [
@@ -1136,7 +1136,7 @@ Item {
                             text: Scrite.document.printFormat.secondsPerPage
                             validator: IntValidator { bottom: 15; top: 300 }
                             onTextEdited: Scrite.document.printFormat.secondsPerPage = parseInt(text)
-                            width: sceneEditorFontMetrics.averageCharacterWidth*3
+                            width: ScriteFontMetrics.sceneEditor.averageCharacterWidth*3
                         }
 
                         Text {
@@ -1318,7 +1318,7 @@ Item {
                         id: watermarkSettingsLayout
                         spacing: 30
                         anchors.horizontalCenter: parent.horizontalCenter
-                        enabled: watermarkFeature.enabled
+                        enabled: ScriteAppFeatures.watermark.enabled
 
                         Grid {
                             columns: 2
@@ -1333,7 +1333,7 @@ Item {
 
                             CheckBox2 {
                                 text: checked ? "ON" : "OFF"
-                                checked: watermarkFeature.enabled ? pageSetupSettings.watermarkEnabled : true
+                                checked: ScriteAppFeatures.watermark.enabled ? pageSetupSettings.watermarkEnabled : true
                                 onToggled: pageSetupSettings.watermarkEnabled = checked
                             }
 
@@ -1345,7 +1345,7 @@ Item {
 
                             TextField2 {
                                 width: 300
-                                text: watermarkFeature.enabled ? pageSetupSettings.watermarkText : "Scrite"
+                                text: ScriteAppFeatures.watermark.enabled ? pageSetupSettings.watermarkText : "Scrite"
                                 onTextEdited: pageSetupSettings.watermarkText = text
                                 enabled: pageSetupSettings.watermarkEnabled
                                 enableTransliteration: true
@@ -1432,7 +1432,7 @@ Item {
 
                     DisabledFeatureNotice {
                         anchors.fill: parent
-                        visible: !watermarkFeature.enabled
+                        visible: !ScriteAppFeatures.watermark.enabled
                         color: Qt.rgba(1,1,1,0.9)
                         featureName: "Watermark Settings"
                     }
@@ -2249,7 +2249,7 @@ Item {
             PageView {
                 id: categoriesAndStructurePages
                 anchors.fill: parent
-                enabled: structureAppFeature.enabled
+                enabled: ScriteAppFeatures.structure.enabled
                 opacity: enabled ? 1 : 0.5
                 pagesArray: [
                     { "title": "This Document" },
@@ -2283,7 +2283,7 @@ Item {
             }
 
             DisabledFeatureNotice {
-                visible: !structureAppFeature.enabled
+                visible: !ScriteAppFeatures.structure.enabled
                 anchors.fill: parent
                 featureName: "Structure Settings"
                 color: Qt.rgba(1,1,1,0.9)
