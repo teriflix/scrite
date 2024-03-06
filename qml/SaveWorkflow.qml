@@ -185,7 +185,7 @@ Item {
             YesNoCancel {
                 Layout.alignment: Qt.AlignHCenter
                 onYesClicked: {
-                    recentFilesModel.add(scriteFileInfo.absoluteFilePath)
+                    ScriteRuntime.recentFiles.add(scriteFileInfo.absoluteFilePath)
                     Scrite.document.save()
                     _private.execute()
                 }
@@ -206,7 +206,7 @@ Item {
 
             Component.onCompleted: {
                 Scrite.document.save()
-                recentFilesModel.add(scriteFileInfo.absoluteFilePath)
+                ScriteRuntime.recentFiles.add(scriteFileInfo.absoluteFilePath)
                 _private.execute()
             }
         }
@@ -264,7 +264,7 @@ Item {
             const path = Scrite.app.urlToLocalFile(fileUrl)
             Scrite.document.saveAs(path)
 
-            recentFilesModel.add(path)
+            ScriteRuntime.recentFiles.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
             ScriteSettings.workspace.lastOpenFolderUrl = folder

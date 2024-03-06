@@ -924,9 +924,14 @@ Item {
                             checked: ScriteSettings.workspace.showScritedTab
                             text: "Show Scrited Tab"
                             onToggled: {
-                                if(!checked && mainTabBar.currentIndex === 3)
-                                    mainTabBar.activateTab(0)
                                 ScriteSettings.workspace.showScritedTab = checked
+                                if(!checked && ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScritedTab) {
+                                    try {
+                                        ScriteRuntime.activateMainWindowTab(ScriteRuntime.e_ScreenplayTab)
+                                    } catch(e) {
+                                        Scrite.app.log(e)
+                                    }
+                                }
                             }
                         }
                     }

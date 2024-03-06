@@ -389,12 +389,12 @@ Item {
         }
 
         LinkButton {
-            text: recentFilesModel.count === 0 ? "Recent files ..." : "Scriptalay"
-            iconSource: recentFilesModel.count === 0 ? "../icons/filetype/document.png" : "../icons/action/library.png"
+            text: ScriteRuntime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
+            iconSource: ScriteRuntime.recentFiles.count === 0 ? "../icons/filetype/document.png" : "../icons/action/library.png"
             Layout.fillWidth: true
-            tooltip: recentFilesModel.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
+            tooltip: ScriteRuntime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
             onClicked: stackView.push(scriptalayPage)
-            enabled: recentFilesModel.count > 0
+            enabled: ScriteRuntime.recentFiles.count > 0
 
             Announcement.onIncoming: (type,data) => {
                                          if(type === "710A08E7-9F60-4D36-9DEA-0993EEBA7DCA") {
@@ -447,7 +447,7 @@ Item {
     // This component should show "Recent Files", if recent files exist
     // It should show Scriptalay Scripts, if no recent files exist.
     component QuickFileOpenOptions : Item {
-        property bool scriptalayMode: recentFilesModel.count === 0
+        property bool scriptalayMode: ScriteRuntime.recentFiles.count === 0
 
         ColumnLayout {
             anchors.fill: parent
@@ -470,7 +470,7 @@ Item {
                     id: quickFilesView // shows either Scriptalay or Recent Files
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: scriptalayMode ? libraryService.screenplays : recentFilesModel
+                    model: scriptalayMode ? libraryService.screenplays : ScriteRuntime.recentFiles
                     currentIndex: -1
                     clip: true
                     FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
@@ -584,12 +584,15 @@ Item {
                         wrapMode: Text.WordWrap
                         padding: 4
                         readOnly: true
+                        background: Item { }
+                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
                         text: "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
-                              "<strong>Pages:</strong> " + record.pageCount + "<br/><br/>" +
+                              "<strong>Pages:</strong> " + record.pageCount + "<br/>" +
                               "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
-                              "<strong>Copyright:</strong> " + record.copyright + "<br/><br/>" +
-                              "<strong>Source:</strong> " + record.source + "<br/><br/>" +
-                              "<strong>Logline:</strong> " + record.logline + "<br/><br/>"
+                              "<strong>Copyright:</strong> " + record.copyright + "<br/>" +
+                              "<strong>Source:</strong> " + record.source
+                        onRecordChanged: commonToolTip.show(screenplayDetailsText, record.logline)
+                        Component.onDestruction: commonToolTip.hide(screenplayDetailsText)
                     }
                 }
             }
@@ -992,7 +995,7 @@ Item {
             homeScreen.enabled = false
 
             mainUiContentLoader.allowContent = false
-            recentFilesModel.add(path)
+            ScriteRuntime.recentFiles.add(path)
             Scrite.document.open(path)
             mainUiContentLoader.allowContent = true
 

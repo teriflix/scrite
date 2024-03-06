@@ -96,7 +96,7 @@ Rectangle {
     }
 
     Connections {
-        target: screenplayAdapter.isSourceScreenplay ? Scrite.document.screenplay : null
+        target: ScriteRuntime.screenplayAdapter.isSourceScreenplay ? Scrite.document.screenplay : null
         function onElementInserted(element, index) {
             notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
         }
@@ -461,7 +461,7 @@ Rectangle {
                                        (styleData.value.notebookItemType === NotebookModel.NotesType &&
                                         styleData.value.notebookItemObject.ownerType === Notes.StructureOwner)
                             text: styleData.value.notebookItemTitle ? styleData.value.notebookItemTitle : ""
-                            color: Scrite.app.isLightColor(parent.parent.color) ? "black" : "white"
+                            color: Scrite.app.textColorFor(parent.parent.color)
                             elide: Text.ElideRight
                             width: parent.width-(itemDelegateIcon.visible ? (itemDelegateIcon.width+parent.spacing) : 0)
                             anchors.verticalCenter: parent.verticalCenter
@@ -536,7 +536,7 @@ Rectangle {
             }
 
             onClicked: {
-                if(mainTabBar.currentIndex != 1 || ScriteSettings.workspace.syncCurrentSceneOnNotebook)
+                if(ScriteRuntime.mainWindowTab !== ScriteRuntime.e_StructureTab || ScriteSettings.workspace.syncCurrentSceneOnNotebook)
                     activateScreenplayElement( notebookModel.modelIndexData(index) )
             }
 

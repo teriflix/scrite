@@ -32,7 +32,7 @@ QtObject {
     }
 
     readonly property QtObject c10: QtObject {
-        readonly property color background: Qt.rgba(0,0,0,0)
+        readonly property color background: Qt.rgba(1,1,1,0)
         readonly property color text: "black"
     }
 

@@ -145,13 +145,6 @@ QtObject {
         property bool visible: true
     }
 
-    readonly property Settings recentFiles: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "RecentFiles"
-
-        property var files
-    }
-
     readonly property Settings helpNotification: Settings {
         fileName: Scrite.app.settingsFilePath
         category: "Help"

@@ -49,7 +49,7 @@ Row {
         ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
         checked: false
-        enabled: screenplayTextDocument.editor
+        enabled: ScriteRuntime.screenplayEditor
         onToggled: {
             if(!checked)
                 showReplace = false
@@ -71,7 +71,7 @@ Row {
                 showReplace = !showReplace
             }
         }
-        enabled: screenplayTextDocument.editor
+        enabled: ScriteRuntime.screenplayEditor
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find & Replace"
@@ -197,8 +197,8 @@ Row {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Shift+F5"
-        onActivated: screenplayTextDocument.reload()
-        enabled: screenplayTextDocument.editor
+        onActivated: ScriteRuntime.screenplayTextDocument.reload()
+        enabled: ScriteRuntime.screenplayEditor
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Redo Page Layout"
@@ -219,7 +219,7 @@ Row {
 
         ++idx
 
-        if(mainTabBar.currentIndex == 0 || ScriteUndoStack.screenplayEditorActive) {
+        if(ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab || ScriteUndoStack.screenplayEditorActive) {
             while(idx < Scrite.document.screenplay.elementCount) {
                 var e = Scrite.document.screenplay.elementAt(idx)
                 if(e === null)
@@ -277,7 +277,7 @@ Row {
     function addScene() {
         requestScreenplayEditor()
         if(!Scrite.document.readOnly)
-            Scrite.document.createNewScene(mainTabBar.currentIndex > 0 ? ScriteUndoStack.screenplayEditorActive : false)
+            Scrite.document.createNewScene(ScriteRuntime.mainWindowTab !== ScriteRuntime.e_ScreenplayTab ? ScriteUndoStack.screenplayEditorActive : false)
     }
 
     ToolButton3 {

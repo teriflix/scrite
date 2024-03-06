@@ -27,12 +27,12 @@ QtObject {
     }
 
     readonly property FontMetrics sceneEditor: FontMetrics {
-        readonly property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Action)
-        readonly property int lettersPerLine: globalScreenplayEditorToolbar.editInFullscreen ? 70 : 60
-        readonly property int marginLetters: 5
-        readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
-        readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
-        readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
+        property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Action)
+        property int lettersPerLine: 70
+        property int marginLetters: 5
+        property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
+        property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
+        property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
         font: format ? format.font2 : Scrite.document.formatting.defaultFont2
     }
 }

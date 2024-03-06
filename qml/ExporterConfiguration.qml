@@ -43,8 +43,9 @@ Item {
             var exportKind = modalDialog.arguments.split("/").last()
             notice.text = exportKind + " Export"
         } else {
-            if(Scrite.app.verifyType(exporter, "StructureExporter"))
-                mainTabBar.currentIndex = 1 // FIXME: Ugly hack to ensure that structure tab is active for StructureExporter.
+            if(Scrite.app.verifyType(exporter, "StructureExporter")) {
+                ScriteRuntime.mainWindowTab = ScriteRuntime.e_StructureTab
+            }
 
             if(Scrite.app.verifyType(exporter, "AbstractTextDocumentExporter")) {
                 exporter.capitalizeSentences = ScriteSettings.screenplayEditor.enableAutoCapitalizeSentences

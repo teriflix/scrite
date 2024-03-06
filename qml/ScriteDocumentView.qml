@@ -37,20 +37,9 @@ Item {
     property bool canShowNotebookInStructure: width > 1600
     property bool showNotebookInStructure: ScriteSettings.workspace.showNotebookInStructure && canShowNotebookInStructure
     onShowNotebookInStructureChanged: {
-        Utils.execLater(workspaceSettings, 100, function() {
+        Utils.execLater(ScriteSettings.workspace, 100, function() {
             mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
         })
-    }
-
-    ScriteFileListModel {
-        id: recentFilesModel
-        files: ScriteSettings.recentFiles.files
-
-        function addLater(filePath) {
-            Utils.execLater(recentFilesModel, 50, () => { recentFilesModel.add(filePath) } )
-        }
-
-        onFilesChanged: ScriteSettings.recentFiles.files = files
     }
 
     Shortcut {
@@ -312,90 +301,60 @@ Item {
 
     Connections {
         target: Scrite.document
+
         function onJustReset() {
             ScriteSettings.screenplayEditor.firstSwitchToStructureTab = true
             appBusyOverlay.ref()
-            screenplayAdapter.initialLoadTreshold = 25
-            Utils.execLater(screenplayAdapter, 250, () => {
+            ScriteRuntime.screenplayAdapter.initialLoadTreshold = 25
+            Utils.execLater(ScriteRuntime.screenplayAdapter, 250, () => {
                                 appBusyOverlay.deref()
-                                screenplayAdapter.sessionId = Scrite.document.sessionId
+                                ScriteRuntime.screenplayAdapter.sessionId = Scrite.document.sessionId
                             })
         }
+
         function onJustLoaded() {
             ScriteSettings.screenplayEditor.firstSwitchToStructureTab = true
             var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
             if(firstElement) {
                 var editorHints = firstElement.editorHints
                 if(editorHints)
-                    screenplayAdapter.initialLoadTreshold = -1
+                    ScriteRuntime.screenplayAdapter.initialLoadTreshold = -1
             }
         }
     }
 
-    ScreenplayAdapter {
-        id: screenplayAdapter
-        property string sessionId
-        source: {
-            if(Scrite.document.sessionId !== sessionId)
-                return null
-
-            if(mainTabBar.currentIndex === 0)
-                return Scrite.document.screenplay
-
-            if(Scrite.document.screenplay.currentElementIndex < 0) {
-                var index = Scrite.document.structure.currentElementIndex
-                var element = Scrite.document.structure.elementAt(index)
-                if(element) {
-                    if(element.scene.addedToScreenplay) {
-                        Scrite.document.screenplay.currentElementIndex = element.scene.screenplayElementIndexList[0]
-                        return Scrite.document.screenplay
-                    }
-                    return element.scene
-                }
-            }
-
-            return Scrite.document.screenplay
-        }
-    }
-
-    ScreenplayTextDocument {
-        id: screenplayTextDocument
-        screenplay: Scrite.document.loading || paused ? null : screenplayAdapter.screenplay
-        formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
-        property bool paused: ScriteSettings.screenplayEditor.pausePageAndTimeComputation
-        onPausedChanged: Qt.callLater( function() {
-            ScriteSettings.screenplayEditor.pausePageAndTimeComputation = screenplayTextDocument.paused
-        })
-        syncEnabled: true
-        sceneNumbers: false
-        titlePage: false
-        sceneIcons: false
-        listSceneCharacters: false
-        includeSceneSynopsis: false
-        printEachSceneOnANewPage: false
-        secondsPerPage: Scrite.document.printFormat.secondsPerPage
-        property Item editor
+    // Refactor QML TODO: Get rid of this stuff when we move to overlays and ApplicationMainWindow
+    QtObject {
         property bool overlayRefCountModified: false
         property bool requiresAppBusyOverlay: ScriteUndoStack.screenplayEditorActive || ScriteUndoStack.sceneEditorActive
-        onUpdateScheduled: {
+
+        function onUpdateScheduled() {
             if(requiresAppBusyOverlay && !overlayRefCountModified) {
                 appBusyOverlay.ref()
                 overlayRefCountModified = true
             }
         }
-        onUpdateFinished: {
+
+        function onUpdateFinished() {
             if(overlayRefCountModified)
                 appBusyOverlay.deref()
             overlayRefCountModified = false
         }
-        onRequiresAppBusyOverlayChanged: {
+
+        function onRequiresAppBusyOverlayChanged() {
             if(!requiresAppBusyOverlay && overlayRefCountModified) {
                 appBusyOverlay.deref()
                 overlayRefCountModified = false
             }
         }
 
-        Component.onCompleted: Scrite.app.registerObject(screenplayTextDocument, "screenplayTextDocument")
+        Component.onCompleted: {
+            // Cannot use Connections for this, because the Connections QML item
+            // does not allow usage of custom properties
+            ScriteRuntime.screenplayTextDocument.onUpdateScheduled.connect(onUpdateScheduled)
+            ScriteRuntime.screenplayTextDocument.onUpdateFinished.connect(onUpdateFinished)
+            ScriteRuntime.screenplayTextDocument.onRequiresAppBusyOverlayChanged.connect(onRequiresAppBusyOverlayChanged)
+        }
     }
 
     Rectangle {
@@ -1064,7 +1023,6 @@ Item {
             ScreenplayEditorToolbar {
                 id: globalScreenplayEditorToolbar
                 property Item sceneEditor
-                readonly property bool editInFullscreen: true
                 anchors.verticalCenter: parent.verticalCenter
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
@@ -1079,6 +1037,22 @@ Item {
                 id: mainTabBar
                 height: parent.height
                 visible: appToolBar.visible
+
+                readonly property var tabs: [
+                    { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true, "tab": ScriteRuntime.e_ScreenplayTab },
+                    { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true, "tab": ScriteRuntime.e_StructureTab },
+                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure, "tab": ScriteRuntime.e_NotebookTab },
+                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": ScriteSettings.workspace.showScritedTab, "tab": ScriteRuntime.e_ScritedTab }
+                ]
+                readonly property color activeTabColor: ScritePrimaryColors.windowColor
+                function indexOfTab(_ScriteRuntime_TabType) {
+                    for(var i=0; i<tabs.length; i++) {
+                        if(tabs[i].tab === _ScriteRuntime_TabType) {
+                            return i
+                        }
+                    }
+                    return -1
+                }
 
                 Connections {
                     target: Scrite.document
@@ -1121,19 +1095,29 @@ Item {
 
                 property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
                 property int currentIndex: -1
-                readonly property var tabs: [
-                    { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true },
-                    { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true },
-                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure },
-                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": ScriteSettings.workspace.showScritedTab }
-                ]
                 property var currentTabP1: currentTabExtents.value.p1
                 property var currentTabP2: currentTabExtents.value.p2
-                readonly property color activeTabColor: ScritePrimaryColors.windowColor
 
                 onCurrentIndexChanged: {
-                    if(currentIndex !== 0)
-                        shortcutsDockWidget.hide()
+                    ScriteRuntime.mainWindowTab = tabs[currentIndex].tab
+                }
+                Component.onCompleted: {
+                    ScriteRuntime.mainWindowTab = ScriteRuntime.e_ScreenplayTab
+                    currentIndex = indexOfTab(ScriteRuntime.mainWindowTab)
+
+                    const syncCurrentIndex = ()=>{
+                        const idx = indexOfTab(ScriteRuntime.mainWindowTab)
+                        if(currentIndex !== idx)
+                            currentIndex = idx
+                    }
+                    ScriteRuntime.mainWindowTabChanged.connect( () => {
+                                                                   Qt.callLater(syncCurrentIndex)
+                                                               } )
+
+                    ScriteRuntime.activateMainWindowTab.connect( (tabType) => {
+                                                                    const tabIndex = indexOfTab(tabType)
+                                                                    activateTab(tabIndex)
+                                                                } )
                 }
 
                 TrackerPack {
@@ -1158,8 +1142,6 @@ Item {
                             value = fallback
                     }
                 }
-
-                Component.onCompleted: currentIndex = 0
 
                 Repeater {
                     id: mainTabBarRepeater
@@ -1358,12 +1340,6 @@ Item {
 
             onCloseRequest: pdfViewer.active = false
         }
-    }
-
-    ScreenplayTracks {
-        id: screenplayTracks
-        screenplay: Scrite.document.screenplay
-        Component.onCompleted: Scrite.app.registerObject(screenplayTracks, "screenplayTracks")
     }
 
     Component {
@@ -1938,7 +1914,7 @@ Item {
 
             Loader {
                 id: structureEditorRow2
-                SplitView.preferredHeight: 140 + ScriteFontMetrics.minimum.height*screenplayTracks.trackCount
+                SplitView.preferredHeight: 140 + ScriteFontMetrics.minimum.height*ScriteRuntime.screenplayTracks.trackCount
                 SplitView.minimumHeight: 16
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50
@@ -2213,6 +2189,15 @@ Item {
         onContentYChanged: ScriteSettings.shortcutsDockWidget.contentY = contentY
         onVisibleChanged: ScriteSettings.shortcutsDockWidget.visible = visible
 
+        PropertyAlias {
+            sourceObject: ScriteRuntime
+            sourceProperty: "mainWindowTab"
+            onValueChanged: {
+                if(value !== ScriteRuntime.e_ScreenplayTab)
+                    shortcutsDockWidget.hide()
+            }
+        }
+
         Connections {
             target: splashLoader
             function onActiveChanged() {
@@ -2256,7 +2241,7 @@ Item {
             ScriteSettings.workspace.screenplayEditorWidth = -1
         if(Scrite.app.maybeOpenAnonymously())
             splashLoader.active = false
-        screenplayAdapter.sessionId = Scrite.document.sessionId
+        ScriteRuntime.screenplayAdapter.sessionId = Scrite.document.sessionId
         Qt.callLater( function() {
             Announcement.shout("{f4048da2-775d-11ec-90d6-0242ac120003}", "restoreWindowGeometryDone")
         })
@@ -2340,7 +2325,7 @@ Item {
 
             const fileName = Scrite.document.fileName
             const fileInfo = Scrite.app.fileInfo(fileName)
-            recentFilesModel.add(fileInfo.filePath)
+            ScriteRuntime.recentFiles.add(fileInfo.filePath)
             return
         }
 
@@ -2348,7 +2333,7 @@ Item {
             const path = Scrite.app.urlToLocalFile(fileUrl)
             Scrite.document.saveAs(path)
 
-            recentFilesModel.add(path)
+            ScriteRuntime.recentFiles.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
             ScriteSettings.workspace.lastOpenFolderUrl = folder

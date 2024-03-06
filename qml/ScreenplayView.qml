@@ -141,7 +141,7 @@ Item {
         id: screenplayTracksFlick
         anchors.left: screenplayElementList.left
         anchors.top: parent.top
-        anchors.topMargin: screenplayTracks.trackCount > 0 ? 2 : 0
+        anchors.topMargin: ScriteRuntime.screenplayTracks.trackCount > 0 ? 2 : 0
         anchors.right: screenplayElementList.right
         height: contentHeight
         contentWidth: screenplayTracksFlickContent.width
@@ -161,10 +161,10 @@ Item {
         Item {
             id: screenplayTracksFlickContent
             width: screenplayElementList.contentWidth
-            height: screenplayTracks.trackCount * (ScriteFontMetrics.minimum.height + 10)
+            height: ScriteRuntime.screenplayTracks.trackCount * (ScriteFontMetrics.minimum.height + 10)
 
             Repeater {
-                model: screenplayTracks
+                model: ScriteRuntime.screenplayTracks
 
                 Rectangle {
                     readonly property var trackData: modelData
@@ -236,10 +236,10 @@ Item {
                                             ttText += "1 Scene"
                                         else
                                             ttText += (1 + groupData.endIndex - groupData.startIndex) + " Scenes"
-                                        if(!screenplayTextDocument.paused) {
+                                        if(!ScriteRuntime.screenplayTextDocument.paused) {
                                             var from = Scrite.document.screenplay.elementWithIndex(groupData.startIndex)
                                             var to = Scrite.document.screenplay.elementWithIndex(groupData.endIndex)
-                                            ttText += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
+                                            ttText += ", Length: " + ScriteRuntime.screenplayTextDocument.lengthInTimeAsString(from, to)
                                         }
 
                                         toolTipItem.x = mouseX + parent.x
@@ -268,7 +268,7 @@ Item {
 
     TrackerPack {
         TrackSignal {
-            target: screenplayTracks
+            target: ScriteRuntime.screenplayTracks
             signal: "trackCountChanged()"
         }
 
@@ -307,7 +307,7 @@ Item {
         anchors.top: screenplayTracksFlick.bottom
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
-        anchors.topMargin: screenplayTracks.trackCount > 0 ? 0 : 3
+        anchors.topMargin: ScriteRuntime.screenplayTracks.trackCount > 0 ? 0 : 3
         FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
         clip: true
         property bool somethingIsBeingDropped: false
@@ -479,7 +479,7 @@ Item {
 
         onCountChanged: updateCacheBuffer()
         function updateCacheBuffer() {
-            if(screenplayTracks.trackCount > 0)
+            if(ScriteRuntime.screenplayTracks.trackCount > 0)
                 cacheBuffer = Math.max(extents(count-1, count-1).to + 20, contentWidth)
             else
                 cacheBuffer = 0
@@ -646,10 +646,10 @@ Item {
                                 else
                                     ret = idxList.length + " Scenes"
 
-                                if(!screenplayTextDocument.paused) {
+                                if(!ScriteRuntime.screenplayTextDocument.paused) {
                                     var from = Scrite.document.screenplay.elementAt(idxList[0])
                                     var to = Scrite.document.screenplay.elementAt(idxList[idxList.length-1])
-                                    ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(from, to)
+                                    ret += ", Length: " + ScriteRuntime.screenplayTextDocument.lengthInTimeAsString(from, to)
                                 }
 
                                 return ret
@@ -661,8 +661,8 @@ Item {
                             var pc = elementItemDelegate.element.scene.elementCount
                             ret += pc + " " + (pc > 1 ? "Paragraphs" : "Paragraph")
 
-                            if(!screenplayTextDocument.paused)
-                                ret += ", Length: " + screenplayTextDocument.lengthInTimeAsString(elementItemDelegate.element, null)
+                            if(!ScriteRuntime.screenplayTextDocument.paused)
+                                ret += ", Length: " + ScriteRuntime.screenplayTextDocument.lengthInTimeAsString(elementItemDelegate.element, null)
 
                             if(parent.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
                                 var str = elementItemDelegate.sceneTitle
