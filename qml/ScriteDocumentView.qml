@@ -1682,12 +1682,12 @@ Item {
                                 anchors.left: parent.left
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
-                                // active: !ScriteAppFeatures.structure.enabled && ui.showNotebookInStructure
+                                // active: !ScriteRuntime.appFeatures.structure.enabled && ui.showNotebookInStructure
                                 active: {
                                     if(structureEditorTabs.currentTabIndex === 0)
-                                        return !ScriteAppFeatures.structure.enabled && mainScriteDocumentView.showNotebookInStructure
+                                        return !ScriteRuntime.appFeatures.structure.enabled && mainScriteDocumentView.showNotebookInStructure
                                     else if(structureEditorTabs.currentTabIndex === 1)
-                                        return !ScriteAppFeatures.notebook.enabled && mainScriteDocumentView.showNotebookInStructure
+                                        return !ScriteRuntime.appFeatures.notebook.enabled && mainScriteDocumentView.showNotebookInStructure
                                     return false
                                 }
                                 visible: active
@@ -1731,7 +1731,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
                                 visible: !showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
-                                active: ScriteAppFeatures.structure.enabled
+                                active: ScriteRuntime.appFeatures.structure.enabled
                                 sourceComponent: StructureView {
                                     HelpTipNotification {
                                         tipName: "structure"
@@ -1753,7 +1753,7 @@ Item {
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
                                 visible: showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
-                                active: visible && ScriteAppFeatures.notebook.enabled
+                                active: visible && ScriteRuntime.appFeatures.notebook.enabled
                                 sourceComponent: NotebookView {
                                     toolbarSize: appToolBar.height+4
                                     toolbarSpacing: appToolBar.spacing
@@ -1987,7 +1987,7 @@ Item {
         id: notebookEditorComponent
 
         Loader {
-            active: ScriteAppFeatures.notebook.enabled
+            active: ScriteRuntime.appFeatures.notebook.enabled
             sourceComponent: NotebookView {
                 Announcement.onIncoming: (type,data) => {
                     var stype = "" + "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
@@ -2009,7 +2009,7 @@ Item {
         id: scritedComponent
 
         Loader {
-            active: ScriteAppFeatures.scrited.enabled
+            active: ScriteRuntime.appFeatures.scrited.enabled
             sourceComponent: ScritedView {
 
             }

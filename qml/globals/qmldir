@@ -1,2 +1,1 @@
-singleton ScriteAppFeatures 1.0 ScriteAppFeatures.qml
 singleton ScriteRuntime 1.0 ScriteRuntime.qml

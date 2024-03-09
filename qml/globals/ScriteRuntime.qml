@@ -366,6 +366,45 @@ Item {
         }
     }
 
+    // All the app-features
+    readonly property QtObject appFeatures: QtObject {
+        readonly property AppFeature structure: AppFeature {
+            feature: Scrite.StructureFeature
+        }
+
+        readonly property AppFeature notebook: AppFeature {
+            feature: Scrite.NotebookFeature
+        }
+
+        readonly property AppFeature scrited: AppFeature {
+            feature: Scrite.ScritedFeature
+        }
+
+        readonly property AppFeature characterRelationshipGraph: AppFeature {
+            feature: Scrite.RelationshipGraphFeature
+        }
+
+        readonly property AppFeature watermark: AppFeature {
+            feature: Scrite.WatermarkFeature
+        }
+
+        readonly property AppFeature importer: AppFeature {
+            feature: Scrite.ImportFeature
+        }
+
+        readonly property AppFeature exporter: AppFeature {
+            feature: Scrite.ExportFeature
+        }
+
+        readonly property AppFeature scriptalay: AppFeature {
+            feature: Scrite.ScriptalayFeature
+        }
+
+        readonly property AppFeature templates: AppFeature {
+            feature: Scrite.TemplateFeature
+        }
+    }
+
     // These properties are only accessible at runtime, which means they are not
     // stored in persistent settings file.
     readonly property int e_ScreenplayTab: 0

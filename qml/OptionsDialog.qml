@@ -59,7 +59,7 @@ Item {
         currentIndex: 0
         onCurrentIndexChanged: {
             modalDialog.closeOnEscape = true
-            modalDialog.closeable = currentIndex === 4 ? !ScriteAppFeatures.structure.enabled : true
+            modalDialog.closeable = currentIndex === 4 ? !ScriteRuntime.appFeatures.structure.enabled : true
         }
 
         tabsArray: [
@@ -1323,7 +1323,7 @@ Item {
                         id: watermarkSettingsLayout
                         spacing: 30
                         anchors.horizontalCenter: parent.horizontalCenter
-                        enabled: ScriteAppFeatures.watermark.enabled
+                        enabled: ScriteRuntime.appFeatures.watermark.enabled
 
                         Grid {
                             columns: 2
@@ -1338,7 +1338,7 @@ Item {
 
                             CheckBox2 {
                                 text: checked ? "ON" : "OFF"
-                                checked: ScriteAppFeatures.watermark.enabled ? pageSetupSettings.watermarkEnabled : true
+                                checked: ScriteRuntime.appFeatures.watermark.enabled ? pageSetupSettings.watermarkEnabled : true
                                 onToggled: pageSetupSettings.watermarkEnabled = checked
                             }
 
@@ -1350,7 +1350,7 @@ Item {
 
                             TextField2 {
                                 width: 300
-                                text: ScriteAppFeatures.watermark.enabled ? pageSetupSettings.watermarkText : "Scrite"
+                                text: ScriteRuntime.appFeatures.watermark.enabled ? pageSetupSettings.watermarkText : "Scrite"
                                 onTextEdited: pageSetupSettings.watermarkText = text
                                 enabled: pageSetupSettings.watermarkEnabled
                                 enableTransliteration: true
@@ -1437,7 +1437,7 @@ Item {
 
                     DisabledFeatureNotice {
                         anchors.fill: parent
-                        visible: !ScriteAppFeatures.watermark.enabled
+                        visible: !ScriteRuntime.appFeatures.watermark.enabled
                         color: Qt.rgba(1,1,1,0.9)
                         featureName: "Watermark Settings"
                     }
@@ -2254,7 +2254,7 @@ Item {
             PageView {
                 id: categoriesAndStructurePages
                 anchors.fill: parent
-                enabled: ScriteAppFeatures.structure.enabled
+                enabled: ScriteRuntime.appFeatures.structure.enabled
                 opacity: enabled ? 1 : 0.5
                 pagesArray: [
                     { "title": "This Document" },
@@ -2288,7 +2288,7 @@ Item {
             }
 
             DisabledFeatureNotice {
-                visible: !ScriteAppFeatures.structure.enabled
+                visible: !ScriteRuntime.appFeatures.structure.enabled
                 anchors.fill: parent
                 featureName: "Structure Settings"
                 color: Qt.rgba(1,1,1,0.9)

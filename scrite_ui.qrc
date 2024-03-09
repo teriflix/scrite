@@ -94,7 +94,6 @@
         <file>qml/HomeScreen.qml</file>
         <file>qml/SaveWorkflow.qml</file>
         <file>qml/globals/qmldir</file>
-        <file>qml/globals/ScriteAppFeatures.qml</file>
         <file>qml/globals/ScriteRuntime.qml</file>
     </qresource>
 </RCC>

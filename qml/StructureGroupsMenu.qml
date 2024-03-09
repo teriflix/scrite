@@ -51,7 +51,7 @@ Menu2 {
                 anchors.bottomMargin: structureGroupsMenu.bottomPadding
                 border.width: 1
                 border.color: ScriteRuntime.colors.primary.borderColor
-                enabled: ScriteAppFeatures.structure.enabled && sceneGroup.sceneCount > 0
+                enabled: ScriteRuntime.appFeatures.structure.enabled && sceneGroup.sceneCount > 0
                 opacity: enabled ? 1 : 0.5
 
                 Rectangle {
@@ -199,7 +199,7 @@ Menu2 {
             DisabledFeatureNotice {
                 anchors.fill: parent
                 color: Qt.rgba(1,1,1,0.8)
-                visible: !ScriteAppFeatures.structure.enabled
+                visible: !ScriteRuntime.appFeatures.structure.enabled
                 featureName: "Structure Tagging"
                 onClicked: structureGroupsMenu.close()
             }

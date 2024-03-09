@@ -318,7 +318,7 @@ Item {
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 1
-                    visible: !ScriteAppFeatures.templates.enabled
+                    visible: !ScriteRuntime.appFeatures.templates.enabled
 
                     LinkButton {
                         text: "Blank Document"
@@ -339,7 +339,7 @@ Item {
                         Layout.fillHeight: true
                         color: Qt.rgba(1,1,1,0.9)
                         featureName: "Screenplay Templates"
-                        visible: !ScriteAppFeatures.templates.enabled
+                        visible: !ScriteRuntime.appFeatures.templates.enabled
                     }
                 }
 
@@ -347,8 +347,8 @@ Item {
                     id: templatesView
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: ScriteAppFeatures.templates.enabled ? libraryService.templates : []
-                    visible: ScriteAppFeatures.templates.enabled
+                    model: ScriteRuntime.appFeatures.templates.enabled ? libraryService.templates : []
+                    visible: ScriteRuntime.appFeatures.templates.enabled
                     currentIndex: -1
                     clip: true
                     FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
@@ -704,7 +704,7 @@ Item {
         AttachmentsDropArea {
             id: importDropArea
             anchors.fill: parent
-            enabled: ScriteAppFeatures.importer.enabled
+            enabled: ScriteRuntime.appFeatures.importer.enabled
             allowedType: Attachments.NoMedia
             allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
             onDropped: fileToImport.path = attachment.filePath
@@ -713,10 +713,10 @@ Item {
         StackLayout {
             id: importPageStackLayout
             anchors.fill: parent
-            currentIndex: ScriteAppFeatures.importer.enabled ? (fileToImport.valid ? 2 : 1) : 0
+            currentIndex: ScriteRuntime.appFeatures.importer.enabled ? (fileToImport.valid ? 2 : 1) : 0
 
             DisabledFeatureNotice {
-                visible: !ScriteAppFeatures.importer.enabled
+                visible: !ScriteRuntime.appFeatures.importer.enabled
                 color: Qt.rgba(1,1,1,0.9)
                 featureName: "Import from 3rd Party Formats"
             }
