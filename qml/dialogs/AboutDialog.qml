@@ -32,7 +32,7 @@ Dialog {
     padding: 0
 
     width: height * _private.bgImageDim.aspectRatio
-    height: Math.min(_private.bgImageDim.height*0.7, Scrite.window.height * 0.8)
+    height: Math.min(_private.bgImageDim.height*0.8, Scrite.window.height * 0.8)
 
     background: Image {
         source: "../../images/aboutbox.jpg"
@@ -40,7 +40,12 @@ Dialog {
         smooth: true; mipmap: true
     }
 
-    contentItem: Item {
+    contentItem: Loader {
+        sourceComponent: AboutBoxContent { }
+        active: aboutDialog.visible
+    }
+
+    component AboutBoxContent : Item {
         Text {
             id: versionText
             anchors.top: parent.top
@@ -55,7 +60,7 @@ Dialog {
                 property: "font.letterSpacing"
                 from: 20; to: 0
                 duration: 1500
-                running: true && Runtime.applicationSettings.enableAnimations
+                running: Runtime.applicationSettings.enableAnimations
                 easing.type: Easing.OutBack
             }
         }
@@ -117,7 +122,7 @@ Dialog {
             Rectangle {
                 Layout.alignment: Qt.AlignHCenter
                 Layout.preferredWidth: aboutDialog.width * 0.5
-                Layout.preferredHeight: (Runtime.minimumFontMetrics.height+creditsView.spacing) * creditsView.model.count + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
+                Layout.preferredHeight: (Runtime.minimumFontMetrics.height+creditsView.spacing) * (creditsView.model.count+1) + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
 
                 // color: creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
 
@@ -293,20 +298,25 @@ Dialog {
         width: aboutDialog.width * 0.9
         height: aboutDialog.height * 0.9
 
-        contentItem: ScrollView {
-            clip: true
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-            leftPadding: 40
+        contentItem: Loader {
+            sourceComponent: TermsOfUse { }
+            active: licenseTermsDialog.visible
+        }
+    }
 
-            TextEdit {
-                readOnly: true
-                font.family: "Courier Prime"
-                font.pointSize: 12
-                topPadding: backButton.y
-                bottomPadding: backButton.y
-                text: Scrite.app.fileContents(":/LICENSE.txt")
-                selectByMouse: true
-            }
+    component TermsOfUse : ScrollView {
+        clip: true
+        ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+        leftPadding: 40
+
+        TextEdit {
+            readOnly: true
+            font.family: "Courier Prime"
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            topPadding: backButton.y
+            bottomPadding: backButton.y
+            text: Scrite.app.fileContents(":/LICENSE.txt")
+            selectByMouse: true
         }
     }
 
