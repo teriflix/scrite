@@ -648,6 +648,14 @@ Rectangle {
                     FocusTracker.window: Scrite.window
                     FocusTracker.indicator.target: ScriteUndoStack
                     FocusTracker.indicator.property: ScriteRuntime.screenplayAdapter.isSourceScreenplay ? "screenplayEditorActive" : "sceneEditorActive"
+                    FocusTracker.onHasFocusChanged: {
+                        ScriteUndoStack.screenplayEditorActive = FocusTracker.hasFocus && ScriteRuntime.screenplayAdapter.isSourceScreenplay
+                        ScriteUndoStack.sceneEditorActive = !FocusTracker.hasFocus && ScriteRuntime.screenplayAdapter.isSourceScreenplay
+                    }
+                    Component.onCompleted: {
+                        ScriteUndoStack.screenplayEditorActive = false
+                        ScriteUndoStack.sceneEditorActive = false
+                    }
 
                     property int defaultCacheBuffer: -1
                     function configureCacheBuffer() {

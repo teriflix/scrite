@@ -341,7 +341,7 @@ Item {
             overlayRefCountModified = false
         }
 
-        function onRequiresAppBusyOverlayChanged() {
+        onRequiresAppBusyOverlayChanged: {
             if(!requiresAppBusyOverlay && overlayRefCountModified) {
                 appBusyOverlay.deref()
                 overlayRefCountModified = false
@@ -353,7 +353,6 @@ Item {
             // does not allow usage of custom properties
             ScriteRuntime.screenplayTextDocument.onUpdateScheduled.connect(onUpdateScheduled)
             ScriteRuntime.screenplayTextDocument.onUpdateFinished.connect(onUpdateFinished)
-            ScriteRuntime.screenplayTextDocument.onRequiresAppBusyOverlayChanged.connect(onRequiresAppBusyOverlayChanged)
         }
     }
 
