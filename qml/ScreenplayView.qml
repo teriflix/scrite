@@ -58,7 +58,7 @@ Item {
     Rectangle {
         id: screenplayTools
         z: 1
-        color: ScriteAccentColors.c100.background
+        color: ScriteRuntime.colors.accent.c100.background
         width: screenplayToolsLayout.width+4
         anchors.top: parent.top
         anchors.left: parent.left
@@ -116,7 +116,7 @@ Item {
             width: 1
             height: parent.height
             anchors.right: parent.right
-            color: ScriteAccentColors.borderColor
+            color: ScriteRuntime.colors.accent.borderColor
         }
     }
 
@@ -172,7 +172,7 @@ Item {
                     height: ScriteRuntime.minimumFontMetrics.height + 8
                     y: index * (ScriteRuntime.minimumFontMetrics.height + 10)
                     color: Scrite.app.translucent( border.color, 0.1 )
-                    border.color: ScriteAccentColors.c900.background
+                    border.color: ScriteRuntime.colors.accent.c900.background
                     border.width: 0.5
 
                     MouseArea {
@@ -407,8 +407,8 @@ Item {
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 0
-                color: ScritePrimaryColors.button.background
-                border.color: ScritePrimaryColors.borderColor
+                color: ScriteRuntime.colors.primary.button.background
+                border.color: ScriteRuntime.colors.primary.borderColor
                 border.width: 1
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5
                 visible: Scrite.document.structure.elementCount > 0 && enableDragDrop
@@ -555,8 +555,8 @@ Item {
                     return { "background": element.scene.color, "text": "white" }
                 }
                 if(element.breakType === Screenplay.Episode)
-                    return ScriteAccentColors.c700
-                return ScriteAccentColors.c500
+                    return ScriteRuntime.colors.accent.c700
+                return ScriteRuntime.colors.accent.c500
             }
 
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
@@ -568,7 +568,7 @@ Item {
                 visible: element.selected
                 anchors.fill: elementItemBox
                 anchors.margins: -5
-                color: ScriteAccentColors.a700.background
+                color: ScriteRuntime.colors.accent.a700.background
             }
 
             Loader {

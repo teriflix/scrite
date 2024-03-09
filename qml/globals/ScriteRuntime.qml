@@ -15,6 +15,7 @@ pragma Singleton
 
 import QtQuick 2.15
 import Qt.labs.settings 1.0
+import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
@@ -35,8 +36,8 @@ Item {
         category: "Structure Tab"
 
         property bool showGrid: true
-        property color gridColor: ScriteAccentColors.c400.background
-        property color canvasColor: ScriteAccentColors.c50.background
+        property color gridColor: ScriteRuntime.colors.accent.c400.background
+        property color canvasColor: ScriteRuntime.colors.accent.c50.background
         property bool showPreview: true
         property bool displayAnnotationProperties: true
         property bool showPullHandleAnimation: true
@@ -263,6 +264,106 @@ Item {
         property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
         property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
         font: format ? format.font2 : Scrite.document.formatting.defaultFont2
+    }
+
+    // Color Palettes
+    component Colors : QtObject {
+        property int key: Material.Indigo
+        property color windowColor: c300.background
+        property color borderColor: c400.background
+        property color separatorColor: c400.background
+        property var highlight: c400
+        property var button: c200
+
+        property QtObject regular: QtObject {
+            property color background: Material.color(key)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c10: QtObject {
+            property color background: Qt.rgba(1,1,1,0)
+            property color text: "black"
+        }
+
+        property QtObject c50: QtObject {
+            property color background: Material.color(key, Material.Shade50)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c100: QtObject {
+            property color background: Material.color(key, Material.Shade100)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c200: QtObject {
+            property color background: Material.color(key, Material.Shade200)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c300: QtObject {
+            property color background: Material.color(key, Material.Shade300)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c400: QtObject {
+            property color background: Material.color(key, Material.Shade400)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c500: QtObject {
+            property color background: Material.color(key, Material.Shade500)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c600: QtObject {
+            property color background: Material.color(key, Material.Shade600)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c700: QtObject {
+            property color background: Material.color(key, Material.Shade700)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c800: QtObject {
+            property color background: Material.color(key, Material.Shade800)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject c900: QtObject {
+            property color background: Material.color(key, Material.Shade900)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject a100: QtObject {
+            property color background: Material.color(key, Material.ShadeA100)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject a200: QtObject {
+            property color background: Material.color(key, Material.ShadeA200)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject a400: QtObject {
+            property color background: Material.color(key, Material.ShadeA400)
+            property color text: Scrite.app.textColorFor(background)
+        }
+
+        property QtObject a700: QtObject {
+            property color background: Material.color(key, Material.ShadeA700)
+            property color text: Scrite.app.textColorFor(background)
+        }
+    }
+
+    readonly property Item colors: Item {
+        readonly property Colors primary: Colors {
+            key: Material.Grey
+        }
+
+        readonly property Colors accent: Colors {
+            key: Material.BlueGrey
+        }
     }
 
     // These properties are only accessible at runtime, which means they are not

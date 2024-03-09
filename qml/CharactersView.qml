@@ -25,8 +25,8 @@ Rectangle {
     property int sortFilterRole: 0
     property alias filterTags: charactersModel.tags
 
-    color: ScritePrimaryColors.c10.background
-    border { width: 1; color: ScritePrimaryColors.borderColor }
+    color: ScriteRuntime.colors.primary.c10.background
+    border { width: 1; color: ScriteRuntime.colors.primary.borderColor }
     implicitWidth: charactersListLayout.width
 
     CharacterNamesModel {
@@ -53,7 +53,7 @@ Rectangle {
                 font.bold: true
                 text: charactersModel.tags.length > 0 ? charactersModel.tags.length : ""
                 padding: 2
-                color: ScritePrimaryColors.highlight.text
+                color: ScriteRuntime.colors.primary.highlight.text
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
             }
@@ -124,8 +124,8 @@ Rectangle {
                     background: Rectangle {
                         color: characterCheckBox.Material.background
                     }
-                    Material.background: highlight ? ScriteAccentColors.c300.background : ScritePrimaryColors.c10.background
-                    Material.foreground: highlight ? ScriteAccentColors.c300.text : ScritePrimaryColors.c10.text
+                    Material.background: highlight ? ScriteRuntime.colors.accent.c300.background : ScriteRuntime.colors.primary.c10.background
+                    Material.foreground: highlight ? ScriteRuntime.colors.accent.c300.text : ScriteRuntime.colors.primary.c10.text
 
                     SearchAgent.engine: searchBar.searchEngine
                     SearchAgent.onSearchRequest: {

@@ -34,7 +34,7 @@ Rectangle {
     Rectangle {
         id: pageList
         width: pageListWidth
-        color: ScriteAccentColors.c500.background // ScritePrimaryColors.c700.background
+        color: ScriteRuntime.colors.accent.c500.background // ScriteRuntime.colors.primary.c700.background
         height: parent.height
         anchors.left: parent.left
         property int currentIndex: -1
@@ -51,7 +51,7 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 60
-                    color: pageList.currentIndex === index ? pageView.color : ScritePrimaryColors.c10.background
+                    color: pageList.currentIndex === index ? pageView.color : ScriteRuntime.colors.primary.c10.background
 
                     Text {
                         anchors.right: parent.right
@@ -60,7 +60,7 @@ Rectangle {
                         font.pixelSize: 18
                         font.bold: pageList.currentIndex === index
                         text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
-                        color: pageList.currentIndex === index ? "black" : ScritePrimaryColors.c700.text
+                        color: pageList.currentIndex === index ? "black" : ScriteRuntime.colors.primary.c700.text
                     }
 
                     Image {

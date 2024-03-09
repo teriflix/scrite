@@ -166,7 +166,7 @@ Item {
         sourceComponent: Item {
             Rectangle {
                 anchors.fill: parent
-                color: ScritePrimaryColors.c600.background
+                color: ScriteRuntime.colors.primary.c600.background
                 opacity: 0.7
             }
 
@@ -185,7 +185,7 @@ Item {
                     text: "In here, you can only type in English or in languages for which you have configured a text input method from your OS in Scrite Settings."
                     font.bold: true
                     font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 3
-                    color: ScritePrimaryColors.c600.text
+                    color: ScriteRuntime.colors.primary.c600.text
                 }
 
                 Button2 {

@@ -45,8 +45,8 @@ TextField {
         return suggestion
     }
     property bool tabItemUponReturn: true
-    selectedTextColor: ScriteAccentColors.c700.text
-    selectionColor: ScriteAccentColors.c700.background
+    selectedTextColor: ScriteRuntime.colors.accent.c700.text
+    selectionColor: ScriteRuntime.colors.accent.c700.background
     selectByMouse: true
     font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
 
@@ -204,7 +204,7 @@ TextField {
                 text: string
                 padding: 5
                 font: textField.font
-                color: index === completionView.currentIndex ? ScritePrimaryColors.highlight.text : ScritePrimaryColors.c10.text
+                color: index === completionView.currentIndex ? ScriteRuntime.colors.primary.highlight.text : ScriteRuntime.colors.primary.c10.text
                 MouseArea {
                     id: textMouseArea
                     anchors.fill: parent
@@ -221,7 +221,7 @@ TextField {
                 }
             }
             highlight: Rectangle {
-                color: ScritePrimaryColors.highlight.background
+                color: ScriteRuntime.colors.primary.highlight.background
             }
             currentIndex: completionModel.currentRow
             height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
@@ -270,7 +270,7 @@ TextField {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: textField.activeFocus ? ScritePrimaryColors.c700.background : ScritePrimaryColors.c300.background
+                color: textField.activeFocus ? ScriteRuntime.colors.primary.c700.background : ScriteRuntime.colors.primary.c300.background
                 anchors.bottom: parent.bottom
             }
         }

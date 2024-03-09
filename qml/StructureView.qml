@@ -34,7 +34,7 @@ Item {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: statusBar.top
-        color: ScritePrimaryColors.c100.background
+        color: ScriteRuntime.colors.primary.c100.background
         width: toolbarLayout.width+4
 
         Flow {
@@ -65,7 +65,7 @@ Item {
             Rectangle {
                 width: toolbarLayout.columnWidth
                 height: 1
-                color: ScritePrimaryColors.separatorColor
+                color: ScriteRuntime.colors.primary.separatorColor
                 opacity: 0.5
             }
 
@@ -146,7 +146,7 @@ Item {
             Rectangle {
                 width: toolbarLayout.columnWidth
                 height: 1
-                color: ScritePrimaryColors.separatorColor
+                color: ScriteRuntime.colors.primary.separatorColor
                 opacity: 0.5
             }
 
@@ -410,7 +410,7 @@ Item {
             Rectangle {
                 width: toolbarLayout.columnWidth
                 height: 1
-                color: ScritePrimaryColors.separatorColor
+                color: ScriteRuntime.colors.primary.separatorColor
                 opacity: 0.5
             }
 
@@ -476,7 +476,7 @@ Item {
             width: 1
             height: parent.height
             anchors.right: parent.right
-            color: ScritePrimaryColors.borderColor
+            color: ScriteRuntime.colors.primary.borderColor
         }
     }
 
@@ -704,7 +704,7 @@ Item {
             minorTickColor: ScriteRuntime.structureCanvasSettings.gridColor
             tickDistance: Scrite.document.structure.canvasGridSize
             transformOrigin: Item.TopLeft
-            backgroundColor: canvasScroll.interactive ? ScritePrimaryColors.c10.background : Scrite.app.translucent(ScritePrimaryColors.c300.background, 0.75)
+            backgroundColor: canvasScroll.interactive ? ScriteRuntime.colors.primary.c10.background : Scrite.app.translucent(ScriteRuntime.colors.primary.c300.background, 0.75)
             Behavior on backgroundColor {
                 enabled: ScriteRuntime.applicationSettings.enableAnimations
                 ColorAnimation { duration: 250 }
@@ -1178,9 +1178,9 @@ Item {
                     y: modelData.geometry.y - 120 - topMarginForStacks
                     width: modelData.geometry.width + 80
                     height: modelData.geometry.height + 120 + topMarginForStacks + 40
-                    color: Scrite.app.translucent(ScriteAccentColors.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+                    color: Scrite.app.translucent(ScriteRuntime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 2
-                    border.color: ScriteAccentColors.c600.background
+                    border.color: ScriteRuntime.colors.accent.c600.background
                     enabled: !createItemMouseHandler.enabled && !currentElementItemShadow.visible && !annotationGripLoader.active
 
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -1198,7 +1198,7 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: episodeNameText.bottom
                         anchors.bottomMargin: -8
-                        color: ScriteAccentColors.c200.background
+                        color: ScriteRuntime.colors.accent.c200.background
                     }
 
                     Text {
@@ -1208,7 +1208,7 @@ Item {
                         anchors.margins: 8
                         font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 8
                         font.bold: true
-                        color: ScriteAccentColors.c200.text
+                        color: ScriteRuntime.colors.accent.c200.text
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
                     }
                 }
@@ -1225,9 +1225,9 @@ Item {
                     width: modelData.geometry.width + 40
                     height: modelData.geometry.height + 40 + topMarginForStacks
                     radius: 0
-                    color: Scrite.app.translucent(ScriteAccentColors.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+                    color: Scrite.app.translucent(ScriteRuntime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
                     border.width: 1
-                    border.color: ScriteAccentColors.borderColor
+                    border.color: ScriteRuntime.colors.accent.borderColor
                     enabled: !createItemMouseHandler.enabled && !annotationGripLoader.active
 
                     BoundingBoxItem.evaluator: canvasItemsBoundingBox
@@ -1310,7 +1310,7 @@ Item {
                         anchors.margins: -parent.radius
                         border.width: parent.border.width
                         border.color: parent.border.color
-                        color: Scrite.app.translucent(ScriteAccentColors.c200.background, 0.4)
+                        color: Scrite.app.translucent(ScriteRuntime.colors.accent.c200.background, 0.4)
 
                         MouseArea {
                             id: canvasBeatLabelMouseArea
@@ -1345,7 +1345,7 @@ Item {
                         anchors.leftMargin: parent.radius*2
                         anchors.bottomMargin: parent.radius-parent.border.width
                         padding: 10
-                        color: ScriteAccentColors.c200.text
+                        color: ScriteRuntime.colors.accent.c200.text
                     }
                 }
             }
@@ -1967,7 +1967,7 @@ Item {
             anchors.fill: parent
             anchors.margins: 5
             evaluator: canvasItemsBoundingBox
-            backgroundColor: ScritePrimaryColors.c100.background
+            backgroundColor: ScriteRuntime.colors.primary.c100.background
             backgroundOpacity: 0.9
 
             MouseArea {
@@ -1986,9 +1986,9 @@ Item {
 
             Rectangle {
                 id: viewportIndicator
-                color: Scrite.app.translucent(ScriteAccentColors.highlight.background, 0.25)
+                color: Scrite.app.translucent(ScriteRuntime.colors.accent.highlight.background, 0.25)
                 border.width: 2
-                border.color: ScriteAccentColors.borderColor
+                border.color: ScriteRuntime.colors.accent.borderColor
 
                 DelayedPropertyBinder {
                     id: geometryBinder
@@ -2067,13 +2067,13 @@ Item {
         id: annotationAttachmentNotice
         anchors.fill: parent
         visible: annotationAttachmentDropArea.active
-        color: Scrite.app.translucent(ScritePrimaryColors.c500.background, 0.5)
+        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c500.background, 0.5)
 
         Rectangle {
             anchors.fill: attachmentNotice
             anchors.margins: -30
             radius: 4
-            color: ScritePrimaryColors.c700.background
+            color: ScriteRuntime.colors.primary.c700.background
         }
 
         Text {
@@ -2081,7 +2081,7 @@ Item {
             anchors.centerIn: parent
             width: parent.width * 0.5 /* noticeWidthFactor */
             wrapMode: Text.WordWrap
-            color: ScritePrimaryColors.c700.text
+            color: ScriteRuntime.colors.primary.c700.text
             text: parent.visible ? "<b>" + annotationAttachmentDropArea.attachment.title + "</b><br/><br/>" + "Drop here as an annotation." : ""
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
@@ -2094,9 +2094,9 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: ScritePrimaryColors.windowColor
+        color: ScriteRuntime.colors.primary.windowColor
         border.width: 1
-        border.color: ScritePrimaryColors.borderColor
+        border.color: ScriteRuntime.colors.primary.borderColor
         clip: true
 
         Text {
@@ -2226,7 +2226,7 @@ Item {
             Rectangle {
                 height: parent.height
                 width: 1
-                color: ScritePrimaryColors.borderColor
+                color: ScriteRuntime.colors.primary.borderColor
             }
 
             ToolButton3 {
@@ -2815,7 +2815,7 @@ Item {
                         clip: true
                         height: synopsisFieldLoader.idealHeight
                         border.width: synopsisTextDisplay.truncated ? 1 : 0
-                        border.color: ScritePrimaryColors.borderColor
+                        border.color: ScriteRuntime.colors.primary.borderColor
                         color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
 
                         TextEdit {
@@ -2957,7 +2957,7 @@ Item {
                             anchors.bottom: parent.bottom
                             width: parent.width
                             height: synopsisField.hovered || synopsisField.activeFocus ? 2 : 1
-                            color: ScritePrimaryColors.c500.background
+                            color: ScriteRuntime.colors.primary.c500.background
                         }
                     }
 
@@ -3246,7 +3246,7 @@ Item {
                         })
                     }
 
-                    color: Scrite.app.translucent(ScritePrimaryColors.c600.background,0.85)
+                    color: Scrite.app.translucent(ScriteRuntime.colors.primary.c600.background,0.85)
 
                     property bool visibleInViewport: elementItem.visibleInViewport
                     onVisibleInViewportChanged: {
@@ -3275,7 +3275,7 @@ Item {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
-                            color: ScritePrimaryColors.c600.text
+                            color: ScriteRuntime.colors.primary.c600.text
                         }
 
                         Row {
@@ -3319,7 +3319,7 @@ Item {
                 id: labelBg
                 width: Math.max(labelItem.width,labelItem.height)+20
                 height: width; radius: width/2
-                border.width: 1; border.color: ScritePrimaryColors.borderColor
+                border.width: 1; border.color: ScriteRuntime.colors.primary.borderColor
                 x: parent.suggestedLabelPosition.x - radius
                 y: parent.suggestedLabelPosition.y - radius
                 color: Qt.tint(parent.outlineColor, "#E0FFFFFF")
@@ -3371,11 +3371,11 @@ Item {
                 anchors.left: parent.left
                 anchors.bottom: parent.top
                 anchors.bottomMargin: parent.gripSize
-                color: ScritePrimaryColors.c100.background
+                color: ScriteRuntime.colors.primary.c100.background
                 height: annotationToolBarLayout.height+5
                 width: annotationToolBarLayout.width+5
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
 
                 Row {
                     id: annotationToolBarLayout
@@ -3435,7 +3435,7 @@ Item {
                 renderType: PainterPathItem.OutlineOnly
                 renderingMechanism: PainterPathItem.UseQPainter
                 outlineWidth: onePxSize
-                outlineColor: ScriteAccentColors.a700.background
+                outlineColor: ScriteRuntime.colors.accent.a700.background
                 outlineStyle: PainterPathItem.DashDotDotLine
                 painterPath: PainterPath {
                     MoveTo { x: onePxSize; y: onePxSize }
@@ -3549,7 +3549,7 @@ Item {
                 id: rightGrip
                 width: gripSize
                 height: gripSize
-                color: ScriteAccentColors.a700.background
+                color: ScriteRuntime.colors.accent.a700.background
                 x: parent.width - width/2
                 y: (parent.height - height)/2
                 visible: annotation.resizable
@@ -3580,7 +3580,7 @@ Item {
                 id: bottomGrip
                 width: gripSize
                 height: gripSize
-                color: ScriteAccentColors.a700.background
+                color: ScriteRuntime.colors.accent.a700.background
                 x: (parent.width - width)/2
                 y: parent.height - height/2
                 visible: annotation.resizable
@@ -3611,7 +3611,7 @@ Item {
                 id: bottomRightGrip
                 width: gripSize
                 height: gripSize
-                color: ScriteAccentColors.a700.background
+                color: ScriteRuntime.colors.accent.a700.background
                 x: parent.width - width/2
                 y: parent.height - height/2
                 visible: annotation.resizable
@@ -3786,10 +3786,10 @@ Item {
 
         AnnotationItem {
             id: urlAnnotItem
-            color: ScritePrimaryColors.c50.background
+            color: ScriteRuntime.colors.primary.c50.background
             border {
                 width: 1
-                color: ScritePrimaryColors.borderColor
+                color: ScriteRuntime.colors.primary.borderColor
             }
             opacity: 1
             property bool annotationHasLocalImage: annotation.attributes.imageName !== undefined && annotation.attributes.imageName !== ""
@@ -3831,7 +3831,7 @@ Item {
                     Rectangle {
                         width: parent.width
                         height: (width/16)*9
-                        color: annotationHasLocalImage ? Qt.rgba(0,0,0,0) : ScritePrimaryColors.c500.background
+                        color: annotationHasLocalImage ? Qt.rgba(0,0,0,0) : ScriteRuntime.colors.primary.c500.background
 
                         Image {
                             id: imageItem
@@ -3939,7 +3939,7 @@ Item {
         AnnotationItem {
             id: imageAnnotItem
             clip: true
-            color: image.isSet ? (annotation.attributes.fillBackground ? annotation.attributes.backgroundColor : Qt.rgba(0,0,0,0)) : ScritePrimaryColors.c100.background
+            color: image.isSet ? (annotation.attributes.fillBackground ? annotation.attributes.backgroundColor : Qt.rgba(0,0,0,0)) : ScriteRuntime.colors.primary.c100.background
 
             BoundingBoxItem.livePreview: false
             BoundingBoxItem.previewImageSource: image.source

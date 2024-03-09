@@ -30,7 +30,7 @@ Item {
 
     width: 750
     height: formInfo.fields.length > 0 || (generator && !generator.featureEnabled) ? 720 : 275
-    readonly property color dialogColor: ScritePrimaryColors.c300.background
+    readonly property color dialogColor: ScriteRuntime.colors.primary.c300.background
     readonly property bool isPdfExport: generator ? generator.format === AbstractReportGenerator.AdobePDF : false
 
     Component.onCompleted: {
@@ -92,7 +92,7 @@ Item {
                     font.bold: true
                     text: formInfo.title
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: ScritePrimaryColors.c300.text
+                    color: ScriteRuntime.colors.primary.c300.text
                 }
 
                 Text {
@@ -102,7 +102,7 @@ Item {
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: ScritePrimaryColors.c300.text
+                    color: ScriteRuntime.colors.primary.c300.text
                 }
             }
 
@@ -121,7 +121,7 @@ Item {
                     id: pageList
                     width: 175
                     height: parent.height
-                    color: ScritePrimaryColors.c700.background
+                    color: ScriteRuntime.colors.primary.c700.background
                     property int currentIndex: 0
                     visible: pageRepeater.count > 1
 
@@ -135,7 +135,7 @@ Item {
                             Rectangle {
                                 width: parent.width
                                 height: 60
-                                color: pageList.currentIndex === index ? contentPanel.color : ScritePrimaryColors.c10.background
+                                color: pageList.currentIndex === index ? contentPanel.color : ScriteRuntime.colors.primary.c10.background
 
                                 Text {
                                     anchors.verticalCenter: parent.verticalCenter
@@ -145,7 +145,7 @@ Item {
                                     horizontalAlignment: Text.AlignRight
                                     text: modelData.name
                                     elide: Text.ElideRight
-                                    color: pageList.currentIndex === index ? "black" : ScritePrimaryColors.c700.text
+                                    color: pageList.currentIndex === index ? "black" : ScriteRuntime.colors.primary.c700.text
                                 }
 
                                 Image {
@@ -302,8 +302,8 @@ Item {
 
                 Button2 {
                     text: "Cancel"
-                    Material.background: ScritePrimaryColors.c100.background
-                    Material.foreground: ScritePrimaryColors.c100.text
+                    Material.background: ScriteRuntime.colors.primary.c100.background
+                    Material.foreground: ScriteRuntime.colors.primary.c100.text
                     onClicked: {
                         generator.discard()
                         modalDialog.close()
@@ -324,8 +324,8 @@ Item {
                 Button2 {
                     enabled: fileSelector.absoluteFilePath !== "" && generator.featureEnabled
                     text: "Generate"
-                    Material.background: ScritePrimaryColors.c100.background
-                    Material.foreground: ScritePrimaryColors.c100.text
+                    Material.background: ScriteRuntime.colors.primary.c100.background
+                    Material.foreground: ScriteRuntime.colors.primary.c100.text
                     onClicked: busyOverlay.visible = true
                 }
             }
@@ -443,7 +443,7 @@ Item {
                         model: characterNames
 
                         TagText {
-                            property var colors: ScriteAccentColors.c600
+                            property var colors: ScriteRuntime.colors.accent.c600
                             border.width: 1
                             border.color: colors.text
                             color: colors.background
@@ -553,9 +553,9 @@ Item {
                     width: parent.width - 20
                     height: 300
                     background: Rectangle {
-                        color: ScritePrimaryColors.c50.background
+                        color: ScriteRuntime.colors.primary.c50.background
                         border.width: 1
-                        border.color: ScritePrimaryColors.c50.text
+                        border.color: ScriteRuntime.colors.primary.c50.text
                     }
                     ListView {
                         id: locationListView
@@ -664,9 +664,9 @@ Item {
                 width: parent.width - 20
                 height: 320
                 background: Rectangle {
-                    color: ScritePrimaryColors.c50.background
+                    color: ScriteRuntime.colors.primary.c50.background
                     border.width: 1
-                    border.color: ScritePrimaryColors.c50.text
+                    border.color: ScriteRuntime.colors.primary.c50.text
                 }
                 ListView {
                     id: sceneListView
@@ -820,9 +820,9 @@ Item {
                 width: parent.width-20
                 height: 320
                 background: Rectangle {
-                    color: ScritePrimaryColors.c50.background
+                    color: ScriteRuntime.colors.primary.c50.background
                     border.width: 1
-                    border.color: ScritePrimaryColors.c50.text
+                    border.color: ScriteRuntime.colors.primary.c50.text
                 }
                 ListView {
                     id: episodeListView
@@ -901,9 +901,9 @@ Item {
                 height: 350
                 width: parent.width-20
                 background: Rectangle {
-                    color: ScritePrimaryColors.c50.background
+                    color: ScriteRuntime.colors.primary.c50.background
                     border.width: 1
-                    border.color: ScritePrimaryColors.c50.text
+                    border.color: ScriteRuntime.colors.primary.c50.text
                 }
                 ListView {
                     id: groupsView
@@ -921,13 +921,13 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             anchors.margins: 3
-                            color: ScritePrimaryColors.windowColor
+                            color: ScriteRuntime.colors.primary.windowColor
                             Text {
                                 text: section
                                 topPadding: 5
                                 bottomPadding: 5
                                 anchors.centerIn: parent
-                                color: ScritePrimaryColors.button.text
+                                color: ScriteRuntime.colors.primary.button.text
                                 font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                             }
                         }

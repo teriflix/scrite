@@ -29,8 +29,8 @@ Rectangle {
     ]
     width: layout.width + 20
     height: layout.height + 20
-    color: ScritePrimaryColors.c10.background
-    border { width: 1; color: ScritePrimaryColors.borderColor }
+    color: ScriteRuntime.colors.primary.c10.background
+    border { width: 1; color: ScriteRuntime.colors.primary.borderColor }
 
     readonly property real textCellWidth: 50
 
@@ -59,14 +59,14 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 30
-                    color: ScritePrimaryColors.c600.background
+                    color: ScriteRuntime.colors.primary.c600.background
 
                     Text {
                         text: modelData.heading
                         padding: 8
                         font.pointSize: normalFontMetrics.font.pointSize
                         anchors.centerIn: parent
-                        color: ScritePrimaryColors.c600.text
+                        color: ScriteRuntime.colors.primary.c600.text
                     }
                 }
 

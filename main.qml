@@ -26,12 +26,12 @@ Rectangle {
     id: mainWindow
     width: 1366
     height: 700
-    color: ScritePrimaryColors.windowColor
+    color: ScriteRuntime.colors.primary.windowColor
 
-    Material.primary: ScritePrimaryColors.key
-    Material.accent: ScriteAccentColors.key
+    Material.primary: ScriteRuntime.colors.primary.key
+    Material.accent: ScriteRuntime.colors.accent.key
     Material.theme: Material.Light
-    Material.background: ScriteAccentColors.c700.background
+    Material.background: ScriteRuntime.colors.accent.c700.background
 
     UI.ScriteDocumentView {
         id: mainScriteDocumentView
@@ -87,7 +87,7 @@ Rectangle {
         }
 
         Connections {
-            target: ScriteRuntime.application
+            target: ScriteRuntime.applicationSettings
             function onEnableAnimationsChanged() {
                 statusText.animationsEnabled = ScriteRuntime.applicationSettings.enableAnimations
             }
@@ -97,7 +97,7 @@ Rectangle {
     Item {
         id: dialogUnderlay
         anchors.fill: mainScriteDocumentView
-        property color color: ScritePrimaryColors.windowColor
+        property color color: ScriteRuntime.colors.primary.windowColor
 
         property int visibilityCounter: 0
         function show() {
@@ -116,7 +116,7 @@ Rectangle {
         visible: false
         onVisibleChanged: {
             if(!visible) {
-                color = ScritePrimaryColors.windowColor
+                color = ScriteRuntime.colors.primary.windowColor
                 visibilityCounter = 0
             }
         }
@@ -218,7 +218,7 @@ Rectangle {
         opacity: !enabled || Scrite.document.busy ? 0.5 : 1
 
         Connections {
-            target: ScriteRuntime.application
+            target: ScriteRuntime.applicationSettings
             function onEnableAnimationsChanged() {
                 modalDialog.animationsEnabled = ScriteRuntime.applicationSettings.enableAnimations
             }
@@ -249,7 +249,7 @@ Rectangle {
                     font.pixelSize: 16
                     text: question
                     horizontalAlignment: Text.AlignHCenter
-                    color: ScriteAccentColors.c50.text
+                    color: ScriteRuntime.colors.accent.c50.text
                 }
 
                 Row {
@@ -305,7 +305,7 @@ Rectangle {
                     font.pixelSize: 16
                     text: message
                     horizontalAlignment: Text.AlignHCenter
-                    color: ScriteAccentColors.c50.text
+                    color: ScriteRuntime.colors.accent.c50.text
                 }
 
                 Row {
@@ -341,7 +341,7 @@ Rectangle {
                 anchors.fill: indication
                 anchors.margins: -30
                 radius: 4
-                color: ScritePrimaryColors.c600.background
+                color: ScriteRuntime.colors.primary.c600.background
             }
 
             Row {
@@ -366,7 +366,7 @@ Rectangle {
                     horizontalAlignment: Text.AlignHCenter
                     text: Scrite.document.busyMessage
                     font.pixelSize: 16
-                    color: ScritePrimaryColors.c600.text
+                    color: ScriteRuntime.colors.primary.c600.text
                 }
             }
 
@@ -443,7 +443,7 @@ Rectangle {
     Rectangle {
         anchors.fill: parent
         visible: Scrite.notifications.count > 0
-        color: Scrite.app.translucent(ScritePrimaryColors.borderColor, 0.6)
+        color: Scrite.app.translucent(ScriteRuntime.colors.primary.borderColor, 0.6)
 
         UI.NotificationsView {
             id: notificationsView

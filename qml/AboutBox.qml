@@ -119,7 +119,7 @@ Item {
                 Rectangle {
                     width: aboutBox.width * 0.5
                     height: (creditsViewFontMetrics.height+creditsView.spacing) * creditsView.model.count + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
-                    color: creditsView.ScrollBar.vertical.needed ? ScritePrimaryColors.c100.background : Qt.rgba(0,0,0,0)
+                    color: creditsView.ScrollBar.vertical.needed ? ScriteRuntime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
 
                     FontMetrics {
                         id: creditsViewFontMetrics

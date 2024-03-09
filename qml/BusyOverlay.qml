@@ -21,7 +21,7 @@ import "./globals"
 
 Rectangle {
     id: busyOverlay
-    color: ScritePrimaryColors.windowColor
+    color: ScriteRuntime.colors.primary.windowColor
     opacity: 0.9
     visible: false
     onVisibleChanged: parent.enabled = !visible
@@ -32,7 +32,7 @@ Rectangle {
         anchors.fill: busyOverlayNotice
         anchors.margins: -30
         radius: 4
-        color: ScritePrimaryColors.c700.background
+        color: ScriteRuntime.colors.primary.c700.background
 
         MouseArea {
             anchors.fill: parent
@@ -59,7 +59,7 @@ Rectangle {
             horizontalAlignment: Text.AlignHCenter
             text: busyMessage
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            color: ScritePrimaryColors.c700.text
+            color: ScriteRuntime.colors.primary.c700.text
         }
     }
 

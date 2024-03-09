@@ -81,9 +81,9 @@ Column {
         id: answerArea
         width: questionText.width
         anchors.right: parent.right
-        color: Scrite.app.translucent(ScritePrimaryColors.c100.background, 0.75)
+        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c100.background, 0.75)
         border.width: 1
-        border.color: Scrite.app.translucent(ScritePrimaryColors.borderColor, 0.25)
+        border.color: Scrite.app.translucent(ScriteRuntime.colors.primary.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
         property real minHeight: (ScriteRuntime.idealFontMetrics.lineSpacing + ScriteRuntime.idealFontMetrics.descent + ScriteRuntime.idealFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 

@@ -83,7 +83,7 @@ Item {
             anchors.fill: parent
             active: false
             sourceComponent: Rectangle {
-                color: Scrite.app.translucent(ScritePrimaryColors.c600.background,0.85)
+                color: Scrite.app.translucent(ScriteRuntime.colors.primary.c600.background,0.85)
 
                 MouseArea {
                     anchors.fill: parent
@@ -101,7 +101,7 @@ Item {
                         width: parent.width
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
-                        color: ScritePrimaryColors.c600.text
+                        color: ScriteRuntime.colors.primary.c600.text
                     }
 
                     Row {

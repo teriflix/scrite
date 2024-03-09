@@ -51,8 +51,8 @@ Item {
         id: tabShapeItem
         anchors.fill: parent
         anchors.topMargin: active ? 0 : parent.height*0.1
-        fillColor: active ? ScritePrimaryColors.windowColor : ScritePrimaryColors.c200.background
-        outlineColor: ScritePrimaryColors.borderColor
+        fillColor: active ? ScriteRuntime.colors.primary.windowColor : ScriteRuntime.colors.primary.c200.background
+        outlineColor: ScriteRuntime.colors.primary.borderColor
         outlineWidth: 2
         renderingMechanism: PainterPathItem.UseAntialiasedQPainter
         painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)

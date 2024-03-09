@@ -77,8 +77,8 @@ Item {
             width: parent.width
             height: parent.height - titleText.height - protectionSwitchRow.height - 2*parent.spacing
             border.width: 1
-            border.color: ScritePrimaryColors.c700.background
-            color: ScritePrimaryColors.c100.background
+            border.color: ScriteRuntime.colors.primary.c700.background
+            color: ScriteRuntime.colors.primary.c100.background
             enabled: Scrite.document.hasCollaborators
             opacity: enabled ? 1.0 : 0.5
 

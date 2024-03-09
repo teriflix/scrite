@@ -27,7 +27,7 @@ Text {
     color: linkMouseArea.containsMouse ? hoverColor : defaultColor
 
     property color hoverColor: "#65318f"
-    property color defaultColor: ScritePrimaryColors.c10.text
+    property color defaultColor: ScriteRuntime.colors.primary.c10.text
 
     MouseArea {
         id: linkMouseArea

@@ -1,4 +1,2 @@
-singleton ScritePrimaryColors 1.0 ScritePrimaryColors.qml
-singleton ScriteAccentColors 1.0 ScriteAccentColors.qml
 singleton ScriteAppFeatures 1.0 ScriteAppFeatures.qml
 singleton ScriteRuntime 1.0 ScriteRuntime.qml

@@ -25,7 +25,7 @@ Item {
     property string label: ""
     property alias buttonColor: expandCollapseButton.color
     property alias backgroundColor: panelBackground.color
-    property color borderColor: ScritePrimaryColors.borderColor
+    property color borderColor: ScriteRuntime.colors.primary.borderColor
     property real borderWidth: 1
 
     property bool expanded: false
@@ -123,12 +123,12 @@ Item {
         id: expandCollapseButton
         x: sidePanel.expanded ? 4 : -radius
         y: sidePanel.expanded ? 4 : parent.buttonY
-        color: ScritePrimaryColors.button.background
+        color: ScriteRuntime.colors.primary.button.background
         width: parent.minPanelWidth
         height: sidePanel.expanded ? parent.height-8 : sidePanel.buttonSize
         radius: (1.0-contentLoader.opacity) * 6
         border.width: contentLoader.visible ? 0 : 1
-        border.color: sidePanel.expanded ? ScritePrimaryColors.windowColor : borderColor
+        border.color: sidePanel.expanded ? ScriteRuntime.colors.primary.windowColor : borderColor
 
         Behavior on height {
             enabled: ScriteRuntime.applicationSettings.enableAnimations

@@ -22,9 +22,9 @@ import "./globals"
 
 Menu {
     id: thisMenu
-    Material.accent: ScritePrimaryColors.key
-    Material.background: ScritePrimaryColors.c100.background
-    Material.foreground: ScritePrimaryColors.c50.text
+    Material.accent: ScriteRuntime.colors.primary.key
+    Material.background: ScriteRuntime.colors.primary.c100.background
+    Material.foreground: ScriteRuntime.colors.primary.c50.text
     objectName: title
 
     Connections {

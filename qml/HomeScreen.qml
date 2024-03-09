@@ -248,7 +248,7 @@ Item {
 
         width: 100
         height: buttonLayout.height + 6
-        color: buttonMouseArea.containsMouse ? ScritePrimaryColors.highlight.background : Qt.rgba(0,0,0,0)
+        color: buttonMouseArea.containsMouse ? ScriteRuntime.colors.primary.highlight.background : Qt.rgba(0,0,0,0)
 
         RowLayout {
             id: buttonLayout
@@ -313,7 +313,7 @@ Item {
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
                 border.width: templatesView.interactive ? 1 : 0
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -464,7 +464,7 @@ Item {
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
                 border.width: quickFilesView.interactive ? 1 : 0
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
 
                 ListView {
                     id: quickFilesView // shows either Scriptalay or Recent Files
@@ -522,7 +522,7 @@ Item {
                 Layout.fillHeight: true
                 color: Qt.rgba(0,0,0,0)
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
 
                 ListView {
                     id: screenplaysView
@@ -533,7 +533,7 @@ Item {
                     currentIndex: count ? 0 : -1
                     FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                     highlight: Rectangle {
-                        color: ScritePrimaryColors.highlight.background
+                        color: ScriteRuntime.colors.primary.highlight.background
                     }
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: screenplaysView
@@ -561,7 +561,7 @@ Item {
                 Layout.fillHeight: true
                 color: Qt.rgba(0,0,0,0)
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
 
                 Flickable {
                     id: screenplayDetailsFlick
@@ -601,7 +601,7 @@ Item {
 
     component VaultPage : Rectangle {
         border.width: 1
-        border.color: ScritePrimaryColors.borderColor
+        border.color: ScriteRuntime.colors.primary.borderColor
         color: Qt.rgba(0,0,0,0)
 
         function openSelected() {
@@ -633,7 +633,7 @@ Item {
             visible: count > 0
             ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
             highlight: Rectangle {
-                color: ScritePrimaryColors.highlight.background
+                color: ScriteRuntime.colors.primary.highlight.background
             }
             highlightMoveDuration: 0
             highlightResizeDuration: 0
@@ -724,7 +724,7 @@ Item {
             Rectangle {
                 id: dropBrowseItem
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doBrowse() {
@@ -768,7 +768,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-1
-                        color: ScritePrimaryColors.c700.background
+                        color: ScriteRuntime.colors.primary.c700.background
                         text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + importFileDialog.nameFilters.join(", ") + ")"
                     }
                 }
@@ -777,7 +777,7 @@ Item {
             Rectangle {
                 id: importDroppedFileItem
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doImport() {
@@ -821,7 +821,7 @@ Item {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
-                        color: ScriteAccentColors.c700.background
+                        color: ScriteRuntime.colors.accent.c700.background
                         text: "<b>NOTE</b>: Unsaved changes in the current document will be discarded."
                         visible: !Scrite.document.empty
                     }

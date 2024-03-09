@@ -53,7 +53,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: statusBar.top
-        color: ScritePrimaryColors.windowColor
+        color: ScriteRuntime.colors.primary.windowColor
 
         PdfDocument {
             id: pdfDoc
@@ -195,9 +195,9 @@ Item {
 
     Rectangle {
         id: floatingToolBar
-        color: ScritePrimaryColors.c100.background
+        color: ScriteRuntime.colors.primary.c100.background
         border.width: 1
-        border.color: ScritePrimaryColors.c500.background
+        border.color: ScriteRuntime.colors.primary.c500.background
         width: floatingButtonsRow.width + 10
         height: floatingButtonsRow.height + 20
         anchors.bottom: statusBar.top
@@ -225,7 +225,7 @@ Item {
                     width: 1
                     height: parent.height
                     anchors.left: parent.left
-                    color: ScritePrimaryColors.c400.background
+                    color: ScriteRuntime.colors.primary.c400.background
                 }
             }
 
@@ -233,14 +233,14 @@ Item {
                 text: "View: "
                 font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 anchors.verticalCenter: parent.verticalCenter
-                color: ScritePrimaryColors.c300.text
+                color: ScriteRuntime.colors.primary.c300.text
                 visible: pdfDoc.pageCount > 1
                 rightPadding: 10
             }
 
             ComboBox2 {
-                Material.foreground: ScritePrimaryColors.c300.text
-                Material.background: ScritePrimaryColors.c300.background
+                Material.foreground: ScriteRuntime.colors.primary.c300.text
+                Material.background: ScriteRuntime.colors.primary.c300.background
                 currentIndex: Math.max(pdfDoc.pagesPerRow-1,0)
                 visible: pdfDoc.pageCount > 1
                 model: {
@@ -266,7 +266,7 @@ Item {
                     width: 1
                     height: parent.height
                     anchors.right: parent.right
-                    color: ScritePrimaryColors.c400.background
+                    color: ScriteRuntime.colors.primary.c400.background
                     visible: displayRefreshButton.visible || saveFileButton.visible || revealFileButton.visible
                 }
             }
@@ -376,9 +376,9 @@ Item {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: 30
-        color: ScritePrimaryColors.c300.background
+        color: ScriteRuntime.colors.primary.c300.background
         border.width: 1
-        border.color: ScritePrimaryColors.c400.background
+        border.color: ScriteRuntime.colors.primary.c400.background
 
         Text {
             text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
@@ -386,7 +386,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 10
-            color: ScriteAccentColors.c300.text
+            color: ScriteRuntime.colors.accent.c300.text
         }
 
         ZoomSlider {

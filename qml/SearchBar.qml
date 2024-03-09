@@ -52,10 +52,10 @@ Item {
             id: findUiRect
             width: parent.width
             height: Math.max(55, Math.max(Math.max(txtSearch.height, searchButtonsRow.height), (replaceUiRect.visible ? replaceUiRect.height : 0)))
-            color: ScritePrimaryColors.c10.background
+            color: ScriteRuntime.colors.primary.c10.background
             enabled: searchEngine.searchAgentCount > 0
             border.width: borderWidth
-            border.color: ScritePrimaryColors.borderColor
+            border.color: ScriteRuntime.colors.primary.borderColor
 
             TextAreaInput {
                 id: txtSearch
@@ -181,10 +181,10 @@ Item {
             visible: showReplace
             width: parent.width
             height: Math.max(txtReplace.height, replaceButtonsRow.height)
-            color: ScritePrimaryColors.c10.background
+            color: ScriteRuntime.colors.primary.c10.background
             enabled: searchEngine.searchAgentCount > 0
             border.width: borderWidth
-            border.color: ScritePrimaryColors.borderColor
+            border.color: ScriteRuntime.colors.primary.borderColor
 
             TextAreaInput {
                 id: txtReplace

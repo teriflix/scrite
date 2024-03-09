@@ -44,7 +44,7 @@ Item {
             Text {
                 font.pointSize: Screen.devicePixelRatio > 1 ? 22 : 18
                 text: "Select A Backup To Load"
-                color: ScritePrimaryColors.c200.text
+                color: ScriteRuntime.colors.primary.c200.text
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -56,9 +56,9 @@ Item {
             anchors.bottom: buttonBar.top
             anchors.topMargin: 20
             anchors.bottomMargin: 20
-            color: ScritePrimaryColors.c200.background
+            color: ScriteRuntime.colors.primary.c200.background
             border.width: 1
-            border.color: ScritePrimaryColors.borderColor
+            border.color: ScriteRuntime.colors.primary.borderColor
 
             ListView {
                 id: backupFilesView
@@ -70,7 +70,7 @@ Item {
                 currentIndex: -1
                 ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
                 highlight: Rectangle {
-                    color: ScritePrimaryColors.highlight.background
+                    color: ScriteRuntime.colors.primary.highlight.background
                 }
                 highlightMoveDuration: 0
                 highlightResizeDuration: 0

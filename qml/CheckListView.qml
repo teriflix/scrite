@@ -124,7 +124,7 @@ Item {
             Layout.fillHeight: true
             color: Qt.rgba(0,0,0,0)
             border.width: checkListView.height < checkListView.contentHeight ? 1 : 0
-            border.color: ScritePrimaryColors.borderColor
+            border.color: ScriteRuntime.colors.primary.borderColor
 
             ListView {
                 id: checkListView

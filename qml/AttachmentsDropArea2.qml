@@ -27,13 +27,13 @@ AttachmentsDropArea {
     Rectangle {
         anchors.fill: parent
         visible: attachmentsDropArea.active
-        color: Scrite.app.translucent(ScritePrimaryColors.c500.background, 0.5)
+        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c500.background, 0.5)
 
         Rectangle {
             anchors.fill: attachmentNotice
             anchors.margins: -30
             radius: 4
-            color: ScritePrimaryColors.c700.background
+            color: ScriteRuntime.colors.primary.c700.background
         }
 
         Text {
@@ -41,7 +41,7 @@ AttachmentsDropArea {
             anchors.centerIn: parent
             width: parent.width * noticeWidthFactor
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-            color: ScritePrimaryColors.c700.text
+            color: ScriteRuntime.colors.primary.c700.text
             text: parent.visible ? "<b>" + attachmentsDropArea.attachment.title + "</b><br/><br/>" + attachmentNoticeSuffix : ""
             horizontalAlignment: Text.AlignHCenter
             font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize

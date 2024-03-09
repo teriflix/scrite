@@ -81,7 +81,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: ScritePrimaryColors.windowColor
+        color: ScriteRuntime.colors.primary.windowColor
         opacity: 0.9
         visible: workflowLoader.active
 
@@ -103,8 +103,8 @@ Item {
         anchors.fill: workflowLoader
         anchors.margins: -40
         border.width: 2
-        border.color: ScritePrimaryColors.borderColor
-        color: ScritePrimaryColors.c100.background
+        border.color: ScriteRuntime.colors.primary.borderColor
+        color: ScriteRuntime.colors.primary.c100.background
         visible: workflowLoader.active
     }
 

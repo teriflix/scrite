@@ -28,17 +28,17 @@ TextArea {
     selectByKeyboard: true
     selectByMouse: true
     // renderType: Text.NativeRendering
-    Material.primary: ScritePrimaryColors.key
-    Material.accent: ScriteAccentColors.key
-    selectedTextColor: ScriteAccentColors.c700.text
-    selectionColor: ScriteAccentColors.c700.background
+    Material.primary: ScriteRuntime.colors.primary.key
+    Material.accent: ScriteRuntime.colors.accent.key
+    selectedTextColor: ScriteRuntime.colors.accent.c700.text
+    selectionColor: ScriteRuntime.colors.accent.c700.background
     background: Rectangle {
-        color: enabled ? ScritePrimaryColors.c10.background : ScritePrimaryColors.button.background
+        color: enabled ? ScriteRuntime.colors.primary.c10.background : ScriteRuntime.colors.primary.button.background
 
         Rectangle {
             width: parent.width
             height: txtAreaInput.activeFocus ? 2 : 1
-            color: ScriteAccentColors.c700.background
+            color: ScriteRuntime.colors.accent.c700.background
             visible: txtAreaInput.enabled
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 4

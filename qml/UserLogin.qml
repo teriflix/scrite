@@ -972,7 +972,7 @@ Item {
                 }
 
                 delegate: Rectangle {
-                    property var colors: index%2 ? ScritePrimaryColors.c200 : ScritePrimaryColors.c300
+                    property var colors: index%2 ? ScriteRuntime.colors.primary.c200 : ScriteRuntime.colors.primary.c300
                     width: installationsView.availableDelegateWidth
                     height: Math.max(infoLayout.height, logoutButton.height) + 16
                     color: colors.background

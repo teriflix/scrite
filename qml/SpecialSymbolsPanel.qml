@@ -39,7 +39,7 @@ Rectangle {
 
     id: symbolsView
     width: 500; height: 400
-    color: ScritePrimaryColors.c100.background
+    color: ScriteRuntime.colors.primary.c100.background
 
     Rectangle {
         id: symbolsPanel
@@ -47,7 +47,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        color: ScritePrimaryColors.c700.background
+        color: ScriteRuntime.colors.primary.c700.background
         property int currentIndex: 0
         property bool currentIndexIsEmoji: symbols[symbolsPanel.currentIndex].title === "Emoji"
 
@@ -59,7 +59,7 @@ Rectangle {
                 delegate: Rectangle {
                     width: symbolsPanel.width
                     height: 40
-                    color: symbolsPanel.currentIndex === index ? ScritePrimaryColors.windowColor : Qt.rgba(0,0,0,0)
+                    color: symbolsPanel.currentIndex === index ? ScriteRuntime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
@@ -117,7 +117,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 1
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
                 opacity: 0.5
             }
 

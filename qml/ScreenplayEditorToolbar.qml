@@ -208,7 +208,7 @@ Row {
     Rectangle {
         width: 1
         height: parent.height
-        color: ScritePrimaryColors.separatorColor
+        color: ScriteRuntime.colors.primary.separatorColor
         opacity: 0.5
     }
 
@@ -314,7 +314,7 @@ Row {
     Rectangle {
         width: 1
         height: parent.height
-        color: ScritePrimaryColors.separatorColor
+        color: ScriteRuntime.colors.primary.separatorColor
         opacity: 0.5
     }
 

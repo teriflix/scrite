@@ -46,7 +46,7 @@ Item {
 
             Text {
                 font: ScriteRuntime.idealFontMetrics.font
-                color: textTabBar.tabIndex === index ? ScriteAccentColors.c900.background : ScritePrimaryColors.c700.background
+                color: textTabBar.tabIndex === index ? ScriteRuntime.colors.accent.c900.background : ScriteRuntime.colors.primary.c700.background
                 text: modelData
 
                 MouseArea {
@@ -68,7 +68,7 @@ Item {
         id: currentTabUnderline
         x: currentTabItemPositionMapper.mappedPosition.x
         height: 2
-        color: ScriteAccentColors.c900.background
+        color: ScriteRuntime.colors.accent.c900.background
         width: currentTabItemPositionMapper.from.width
         anchors.top: tabsRow.bottom
         anchors.topMargin: ScriteRuntime.idealFontMetrics.descent

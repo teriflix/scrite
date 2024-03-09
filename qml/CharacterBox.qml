@@ -41,7 +41,7 @@ Rectangle {
             width: parent.height
             height: parent.height
             border.width: 1
-            border.color: ScritePrimaryColors.borderColor
+            border.color: ScriteRuntime.colors.primary.borderColor
             radius: character.photos.length > 0 ? 0 : 6
 
             Image {

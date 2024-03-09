@@ -67,7 +67,7 @@ Item {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: ScritePrimaryColors.separatorColor
+                color: ScriteRuntime.colors.primary.separatorColor
                 opacity: 0.5
             }
 
@@ -126,7 +126,7 @@ Item {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: ScritePrimaryColors.separatorColor
+                color: ScriteRuntime.colors.primary.separatorColor
                 opacity: 0.5
             }
 
@@ -256,9 +256,9 @@ Item {
 
         TextArea {
             background: Rectangle {
-                color: ScritePrimaryColors.c50.background
+                color: ScriteRuntime.colors.primary.c50.background
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
             }
             text: propertyValue
             font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
@@ -344,10 +344,10 @@ Item {
 
             Rectangle {
                 id: fontListViewArea
-                color: ScritePrimaryColors.c50.background
+                color: ScriteRuntime.colors.primary.c50.background
                 width: parent.width - 10
                 border.width: 1
-                border.color: ScritePrimaryColors.borderColor
+                border.color: ScriteRuntime.colors.primary.borderColor
                 height: 200 + fontSearchBar.height
                 visible: false
                 anchors.right: parent.right
@@ -494,9 +494,9 @@ Item {
 
         Rectangle {
             height: (width/16)*9
-            color: ScritePrimaryColors.c100.background
+            color: ScriteRuntime.colors.primary.c100.background
             border.width: 1
-            border.color: ScritePrimaryColors.borderColor
+            border.color: ScriteRuntime.colors.primary.borderColor
 
             FileDialog {
                 id: fileDialog

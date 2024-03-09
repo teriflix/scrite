@@ -311,7 +311,7 @@ Item {
                 leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
                 text: fieldInfo.note
                 font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
-                color: ScritePrimaryColors.c600.background
+                color: ScriteRuntime.colors.primary.c600.background
                 visible: fieldInfo.note !== ""
             }
         }

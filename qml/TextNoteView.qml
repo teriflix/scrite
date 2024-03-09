@@ -80,7 +80,7 @@ Item {
                     note.content = text
             }
             background: Rectangle {
-                color: ScritePrimaryColors.windowColor
+                color: ScriteRuntime.colors.primary.windowColor
                 opacity: 0.15
             }
         }

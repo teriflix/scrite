@@ -41,7 +41,7 @@ Flickable {
                 width: notificationsView.width-1
                 height: Math.max(100, nLayout.implicitHeight+44)
                 color: notification.color
-                border { width: 1; color: ScritePrimaryColors.borderColor }
+                border { width: 1; color: ScriteRuntime.colors.primary.borderColor }
 
                 RowLayout {
                     id: nLayout
@@ -58,7 +58,7 @@ Flickable {
                             return Layout.preferredWidth*9/16
                         }
                         border.width: 1
-                        border.color: ScritePrimaryColors.borderColor
+                        border.color: ScriteRuntime.colors.primary.borderColor
 
                         Image {
                             id: nimage

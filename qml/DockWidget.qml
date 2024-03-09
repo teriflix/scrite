@@ -84,7 +84,7 @@ Item {
 
     Rectangle {
         id: container
-        color: ScritePrimaryColors.c100.background
+        color: ScriteRuntime.colors.primary.c100.background
         function evaluateSourceGeometry() {
             if(sourceItem) {
                 var pt = dockWidget.mapFromItem(sourceItem, 0, 0)
@@ -127,13 +127,13 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             height: 40
-            color: ScritePrimaryColors.c300.background
+            color: ScriteRuntime.colors.primary.c300.background
 
             Text {
                 id: titleText
                 anchors.centerIn: parent
                 font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
-                color: ScritePrimaryColors.c300.text
+                color: ScriteRuntime.colors.primary.c300.text
             }
 
             MouseArea {

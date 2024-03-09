@@ -20,7 +20,7 @@ import "./globals"
 
 Rectangle {
     id: dialogOverlay
-    color: Scrite.app.translucent(ScriteAccentColors.c50.background, t*0.4)
+    color: Scrite.app.translucent(ScriteRuntime.colors.accent.c50.background, t*0.4)
     property alias sourceComponent: contentsLoader.sourceComponent
     property alias active: contentsLoader.active
     property alias dialogItem: contentsLoader.item

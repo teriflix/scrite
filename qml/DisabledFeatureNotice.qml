@@ -24,7 +24,7 @@ Rectangle {
     property string reason: Scrite.user.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
     property string suggestion: Scrite.user.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
     property string featureName
-    color: ScritePrimaryColors.c100.background
+    color: ScriteRuntime.colors.primary.c100.background
     clip: true
 
     signal clicked()
