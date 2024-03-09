@@ -52,7 +52,7 @@ Item {
                 id: versionText
                 x: parent.width - width - ((35 / splashImage.sourceSize.height) * parent.height)
                 y: (750 / splashImage.sourceSize.height) * parent.height
-                font.pixelSize: ScriteFontMetrics.ideal.font.pointSize + 1
+                font.pixelSize: ScriteRuntime.idealFontMetrics.font.pointSize + 1
                 text: Scrite.app.applicationVersion
                 color: "white"
             }

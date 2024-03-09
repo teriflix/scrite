@@ -68,7 +68,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.rightMargin: 30 * ratio
             anchors.bottomMargin: 10 * ratio
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
             text: Scrite.app.applicationVersion
             color: "white"
         }
@@ -81,7 +81,7 @@ Item {
             anchors.leftMargin: 30 * appVersionLabel.ratio
             anchors.bottomMargin: 10 * appVersionLabel.ratio
 
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
             padding: 5
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
@@ -277,7 +277,7 @@ Item {
             Text {
                 id: buttonLabel
                 padding: 3
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 font.underline: singleClick ? buttonMouseArea.containsMouse : false
                 text: button.text
                 Layout.fillWidth: true
@@ -302,7 +302,7 @@ Item {
             anchors.fill: parent
 
             Text {
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 text: "New File"
             }
 
@@ -351,7 +351,7 @@ Item {
                     visible: ScriteAppFeatures.templates.enabled
                     currentIndex: -1
                     clip: true
-                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: templatesView
                     }
@@ -453,7 +453,7 @@ Item {
             anchors.fill: parent
 
             Text {
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 text: scriptalayMode ? "Scriptalay" : "Recent Files"
             }
 
@@ -473,7 +473,7 @@ Item {
                     model: scriptalayMode ? libraryService.screenplays : ScriteRuntime.recentFiles
                     currentIndex: -1
                     clip: true
-                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: quickFilesView
                     }
@@ -531,7 +531,7 @@ Item {
                     clip: true
                     model: libraryService.screenplays
                     currentIndex: count ? 0 : -1
-                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                     highlight: Rectangle {
                         color: ScritePrimaryColors.highlight.background
                     }
@@ -585,7 +585,7 @@ Item {
                         padding: 4
                         readOnly: true
                         background: Item { }
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         text: "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
                               "<strong>Pages:</strong> " + record.pageCount + "<br/>" +
                               "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
@@ -628,7 +628,7 @@ Item {
             anchors.margins: 1
             clip: true
             model: Scrite.vault
-            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
             currentIndex: count ? 0 : -1
             visible: count > 0
             ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
@@ -740,9 +740,9 @@ Item {
                     selectMultiple: false
                     sidebarVisible: true
                     selectExisting: true
-                    folder: ScriteSettings.workspace.lastOpenImportFolderUrl
+                    folder: ScriteRuntime.workspaceSettings.lastOpenImportFolderUrl
                     dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
-                    onFolderChanged: ScriteSettings.workspace.lastOpenImportFolderUrl = folder
+                    onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenImportFolderUrl = folder
 
                     onAccepted: {
                         if(fileUrl != "")
@@ -759,7 +759,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize+2
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+2
                         text: importDropArea.active ? importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
                     }
 
@@ -767,7 +767,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize-1
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-1
                         color: ScritePrimaryColors.c700.background
                         text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + importFileDialog.nameFilters.join(", ") + ")"
                     }
@@ -784,7 +784,7 @@ Item {
                     homeScreenBusyOverlay.busyMessage = "Importing screenplay ..."
                     homeScreenBusyOverlay.visible = true
 
-                    ScriteSettings.workspace.lastOpenImportFolderUrl = "file://" + fileToImport.folder
+                    ScriteRuntime.workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
 
                     mainUiContentLoader.allowContent = false
                     Scrite.document.openOrImport(fileToImport.path)
@@ -802,7 +802,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize+2
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+2
                         font.bold: true
                         elide: Text.ElideMiddle
                         text: fileToImport.name
@@ -812,7 +812,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         text: "Click on 'Import' button to import this file."
                     }
 
@@ -820,7 +820,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                         color: ScriteAccentColors.c700.background
                         text: "<b>NOTE</b>: Unsaved changes in the current document will be discarded."
                         visible: !Scrite.document.empty
@@ -925,7 +925,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: Scrite.vault.documentCount > 0 ? "Select a file to restore from the vault." : ""
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 elide: Text.ElideRight
             }
             buttons: RowLayout {
@@ -972,13 +972,13 @@ Item {
         selectMultiple: false
         objectName: "Open File Dialog"
         dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: ScriteSettings.workspace.lastOpenFolderUrl
-        onFolderChanged: ScriteSettings.workspace.lastOpenFolderUrl = folder
+        folder: ScriteRuntime.workspaceSettings.lastOpenFolderUrl
+        onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
         sidebarVisible: true
         selectExisting: true
 
         onAccepted: {
-            ScriteSettings.workspace.lastOpenFolderUrl = folder
+            ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
 
             const path = Scrite.app.urlToLocalFile(fileUrl)
             _private.openScriteDocument(path)

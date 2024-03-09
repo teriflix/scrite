@@ -37,7 +37,7 @@ Item {
     function show() {
         if(visible)
             return
-        if(sourceItem && ScriteSettings.application.enableAnimations)
+        if(sourceItem && ScriteRuntime.applicationSettings.enableAnimations)
             showAnimation.start()
         else {
             container.t = 1
@@ -48,7 +48,7 @@ Item {
     function hide() {
         if(!visible)
             return
-        if(sourceItem && ScriteSettings.application.enableAnimations)
+        if(sourceItem && ScriteRuntime.applicationSettings.enableAnimations)
             hideAnimation.start()
         else {
             container.t = 1
@@ -132,7 +132,7 @@ Item {
             Text {
                 id: titleText
                 anchors.centerIn: parent
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 color: ScritePrimaryColors.c300.text
             }
 

@@ -234,17 +234,17 @@ Item {
                         readonly property int _padding: 4
 
                         CheckBox2 {
-                            checked: ScriteSettings.screenplayEditor.enableSpellCheck
+                            checked: ScriteRuntime.screenplayEditorSettings.enableSpellCheck
                             text: "Spell Check"
-                            onToggled: ScriteSettings.screenplayEditor.enableSpellCheck = checked
+                            onToggled: ScriteRuntime.screenplayEditorSettings.enableSpellCheck = checked
                             padding: parent._padding
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.screenplayEditor.singleClickAutoComplete
+                            checked: ScriteRuntime.screenplayEditorSettings.singleClickAutoComplete
                             text: "Auto Complete on Single Click"
-                            onToggled: ScriteSettings.screenplayEditor.singleClickAutoComplete = checked
+                            onToggled: ScriteRuntime.screenplayEditorSettings.singleClickAutoComplete = checked
                             padding: parent._padding
                             ToolTip.text: "If checked, single click on an option in auto-complete popup will apply it in the screenplay editor."
                             ToolTip.visible: hovered
@@ -252,45 +252,45 @@ Item {
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.screenplayEditor.enableAutoCapitalizeSentences
+                            checked: ScriteRuntime.screenplayEditorSettings.enableAutoCapitalizeSentences
                             text: "Capitalize Sentences"
                             ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
                             ToolTip.visible: hovered
                             hoverEnabled: true
-                            onToggled: ScriteSettings.screenplayEditor.enableAutoCapitalizeSentences = checked
+                            onToggled: ScriteRuntime.screenplayEditorSettings.enableAutoCapitalizeSentences = checked
                             padding: parent._padding
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.screenplayEditor.enableAutoPolishParagraphs
+                            checked: ScriteRuntime.screenplayEditorSettings.enableAutoPolishParagraphs
                             text: "Add/Remove CONT'D"
                             ToolTip.text: "If checked, CONT'D will be automatically added/removed appropriately."
                             ToolTip.visible: hovered
                             hoverEnabled: true
-                            onToggled: ScriteSettings.screenplayEditor.enableAutoPolishParagraphs = checked
+                            onToggled: ScriteRuntime.screenplayEditorSettings.enableAutoPolishParagraphs = checked
                             padding: parent._padding
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.screenplayEditor.autoAdjustEditorWidthInScreenplayEditor
+                            checked: ScriteRuntime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor
                             text: "Auto Adjust Editor Width"
                             ToolTip.text: "If checked, the editor width is automatically adjusted when you first launch Scrite or switch back to the screenplay tab."
                             ToolTip.visible: hovered
                             hoverEnabled: true
-                            onToggled: ScriteSettings.screenplayEditor.autoAdjustEditorWidthInScreenplayEditor = checked
+                            onToggled: ScriteRuntime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor = checked
                             padding: parent._padding
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.screenplayEditor.optimiseScrolling
+                            checked: ScriteRuntime.screenplayEditorSettings.optimiseScrolling
                             text: "Smooth Scrolling"
                             ToolTip.visible: hovered
                             ToolTip.text: "Checking this option will make scrolling in screenplay editor smooth, but uses a lot of RAM and can cause application to freeze at times while scrolling is being computed."
                             hoverEnabled: true
-                            onToggled: ScriteSettings.screenplayEditor.optimiseScrolling = checked
+                            onToggled: ScriteRuntime.screenplayEditorSettings.optimiseScrolling = checked
                             padding: parent._padding
                             Layout.preferredWidth: parent.width / parent.columns
                         }
@@ -325,8 +325,8 @@ Item {
                                 { "label": "Scene Synopsis", "value": "Synopsis" }
                             ]
                             textRole: "label"
-                            currentIndex: ScriteSettings.timelineView.textMode === "HeadingOrTitle" ? 0 : 1
-                            onActivated: ScriteSettings.timelineView.textMode = model[currentIndex].value
+                            currentIndex: ScriteRuntime.timelineViewSettings.textMode === "HeadingOrTitle" ? 0 : 1
+                            onActivated: ScriteRuntime.timelineViewSettings.textMode = model[currentIndex].value
                         }
                     }
                 }
@@ -346,9 +346,9 @@ Item {
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.structureCanvas.showPullHandleAnimation
+                            checked: ScriteRuntime.structureCanvasSettings.showPullHandleAnimation
                             text: "Show Pull Handle Animation"
-                            onToggled: ScriteSettings.structureCanvas.showPullHandleAnimation = checked
+                            onToggled: ScriteRuntime.structureCanvasSettings.showPullHandleAnimation = checked
                         }
                     }
                 }
@@ -368,8 +368,8 @@ Item {
 
                         TextField {
                             id: appFontSizeField
-                            text: Scrite.app.customFontPointSize === 0 ? ScriteFontMetrics.ideal.font.pointSize : Scrite.app.customFontPointSize
-                            width: ScriteFontMetrics.ideal.averageCharacterWidth*5
+                            text: Scrite.app.customFontPointSize === 0 ? ScriteRuntime.idealFontMetrics.font.pointSize : Scrite.app.customFontPointSize
+                            width: ScriteRuntime.idealFontMetrics.averageCharacterWidth*5
                             selectByMouse: true
                             onActiveFocusChanged: {
                                 if(activeFocus)
@@ -409,12 +409,12 @@ Item {
                             id: flickSpeedSlider
                             from: 0.1
                             to: 3
-                            value: ScriteSettings.workspace.flickScrollSpeedFactor
+                            value: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                             stepSize: 0.1
                             width: parent.width - flickSpeedLabel.width - resetFlickSpeedButton.width - 2*parent.spacing
                             anchors.verticalCenter: parent.verticalCenter
                             snapMode: Slider.SnapAlways
-                            onMoved: ScriteSettings.workspace.flickScrollSpeedFactor = value
+                            onMoved: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor = value
                             ToolTip.text: "Configure the scroll sensitivity of your mouse and trackpad."
                         }
 
@@ -428,7 +428,7 @@ Item {
                             id: resetFlickSpeedButton
                             iconSource: "../icons/action/reset.png"
                             anchors.verticalCenter: parent.verticalCenter
-                            onClicked: ScriteSettings.workspace.flickScrollSpeedFactor = 1
+                            onClicked: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor = 1
                             ToolTip.text: "Reset flick/scroll speed to 100%"
                         }
                     }
@@ -454,13 +454,13 @@ Item {
                 anchors.bottom: fontSettingsComboBox.top
                 anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                 horizontalAlignment: Text.AlignLeft
                 wrapMode: Text.WordWrap
                 color: ScritePrimaryColors.c100.background
                 property string englishFontFamily: Scrite.app.transliterationEngine.languageFont(TransliterationEngine.English).family
                 text: {
-                    if(ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts)
+                    if(ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts)
                         return "Custom fonts are used for both display and in PDF & HTML."
                     return "For display, only '" + englishFontFamily + "' will be used. Custom fonts for languages are used only in exported PDF & HTML files."
                 }
@@ -481,9 +481,9 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width-20
                 model: ["PDF, HTML Only", "Display, PDF, HTML"]
-                currentIndex: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts ? 1 : 0
+                currentIndex: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts ? 1 : 0
                 onActivated: (index) => {
-                                 ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts = (index === 1)
+                                 ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts = (index === 1)
                              }
             }
         }
@@ -511,7 +511,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         text: modelData.key
                         width: 175
                         horizontalAlignment: Text.AlignRight
@@ -559,7 +559,7 @@ Item {
 
             Text {
                 id: titleText
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WordWrap
                 width: parent.width - 40
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -576,7 +576,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         text: modelData.key + ": "
                         width: 175
                         horizontalAlignment: Text.AlignRight
@@ -642,9 +642,9 @@ Item {
 
                         CheckBox2 {
                             checkable: true
-                            checked: ScriteSettings.structureCanvas.showGrid
+                            checked: ScriteRuntime.structureCanvasSettings.showGrid
                             text: "Show Grid in Structure Tab"
-                            onToggled: ScriteSettings.structureCanvas.showGrid = checked
+                            onToggled: ScriteRuntime.structureCanvasSettings.showGrid = checked
                             width: parent.width
                         }
 
@@ -664,13 +664,13 @@ Item {
                                 border.width: 1
                                 border.color: ScritePrimaryColors.borderColor
                                 width: 30; height: 30
-                                color: ScriteSettings.structureCanvas.canvasColor
+                                color: ScriteRuntime.structureCanvasSettings.canvasColor
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: ScriteSettings.structureCanvas.canvasColor = Scrite.app.pickColor(ScriteSettings.structureCanvas.canvasColor)
+                                    onClicked: ScriteRuntime.structureCanvasSettings.canvasColor = Scrite.app.pickColor(ScriteRuntime.structureCanvasSettings.canvasColor)
                                 }
                             }
 
@@ -685,13 +685,13 @@ Item {
                                 border.width: 1
                                 border.color: ScritePrimaryColors.borderColor
                                 width: 30; height: 30
-                                color: ScriteSettings.structureCanvas.gridColor
+                                color: ScriteRuntime.structureCanvasSettings.gridColor
                                 anchors.verticalCenter: parent.verticalCenter
 
                                 MouseArea {
                                     anchors.fill: parent
                                     cursorShape: Qt.PointingHandCursor
-                                    onClicked: ScriteSettings.structureCanvas.gridColor = Scrite.app.pickColor(ScriteSettings.structureCanvas.gridColor)
+                                    onClicked: ScriteRuntime.structureCanvasSettings.gridColor = Scrite.app.pickColor(ScriteRuntime.structureCanvasSettings.gridColor)
                                 }
                             }
                         }
@@ -712,10 +712,10 @@ Item {
                                 to: 100
                                 orientation: Qt.Horizontal
                                 snapMode: Slider.SnapAlways
-                                value: ScriteSettings.scrollArea.zoomFactor * 100
+                                value: ScriteRuntime.scrollAreaSettings.zoomFactor * 100
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width-wzfText.width-parent.spacing
-                                onMoved: ScriteSettings.scrollArea.zoomFactor = value / 100
+                                onMoved: ScriteRuntime.scrollAreaSettings.zoomFactor = value / 100
                             }
                         }
                     }
@@ -759,16 +759,16 @@ Item {
                         width: graphicsGroup.availableWidth
 
                         CheckBox2 {
-                            checked: ScriteSettings.application.enableAnimations
+                            checked: ScriteRuntime.applicationSettings.enableAnimations
                             text: "Enable Animations"
-                            onToggled: ScriteSettings.application.enableAnimations = checked
+                            onToggled: ScriteRuntime.applicationSettings.enableAnimations = checked
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.application.useSoftwareRenderer
+                            checked: ScriteRuntime.applicationSettings.useSoftwareRenderer
                             text: "Use Software Renderer"
                             onToggled: {
-                                ScriteSettings.application.useSoftwareRenderer = checked
+                                ScriteRuntime.applicationSettings.useSoftwareRenderer = checked
                                 Notification.active = true
                             }
                             Notification.title: "Requires Restart"
@@ -787,7 +787,7 @@ Item {
                                 id: themeLabel
                                 text: "Theme: "
                                 leftPadding: 10
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
@@ -797,14 +797,14 @@ Item {
                                 model: Scrite.app.availableThemes
                                 readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
                                 currentIndex: {
-                                    const idx = Scrite.app.availableThemes.indexOf(ScriteSettings.application.theme)
+                                    const idx = Scrite.app.availableThemes.indexOf(ScriteRuntime.applicationSettings.theme)
                                     if(idx < 0)
                                         return materialStyleIndex
                                     return idx
                                 }
                                 onCurrentTextChanged: {
-                                    const oldTheme = ScriteSettings.application.theme
-                                    ScriteSettings.application.theme = currentText
+                                    const oldTheme = ScriteRuntime.applicationSettings.theme
+                                    ScriteRuntime.applicationSettings.theme = currentText
                                     Notification.active = oldTheme !== currentText
                                 }
                                 Notification.title: "Requires Restart"
@@ -902,7 +902,7 @@ Item {
                         Text {
                             id: windowTabsExplainerText
                             width: parent.width
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                             text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. (Note: This works when Scrite window size is atleast 1600 px wide.)"
                             wrapMode: Text.WordWrap
                         }
@@ -912,19 +912,19 @@ Item {
                             enabled: mainScriteDocumentView.canShowNotebookInStructure
                             text: "Move Notebook into the Structure tab"
                             onToggled: {
-                                ScriteSettings.workspace.showNotebookInStructure = checked
+                                ScriteRuntime.workspaceSettings.showNotebookInStructure = checked
                                 if(checked) {
-                                    ScriteSettings.workspace.animateStructureIcon = true
-                                    ScriteSettings.workspace.animateNotebookIcon = true
+                                    ScriteRuntime.workspaceSettings.animateStructureIcon = true
+                                    ScriteRuntime.workspaceSettings.animateNotebookIcon = true
                                 }
                             }
                         }
 
                         CheckBox2 {
-                            checked: ScriteSettings.workspace.showScritedTab
+                            checked: ScriteRuntime.workspaceSettings.showScritedTab
                             text: "Show Scrited Tab"
                             onToggled: {
-                                ScriteSettings.workspace.showScritedTab = checked
+                                ScriteRuntime.workspaceSettings.showScritedTab = checked
                                 if(!checked && ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScritedTab) {
                                     try {
                                         ScriteRuntime.activateMainWindowTab(ScriteRuntime.e_ScreenplayTab)
@@ -948,7 +948,7 @@ Item {
                         Text {
                             width: parent.width
                             height: windowTabsExplainerText.height
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                             text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
                             wrapMode: Text.WordWrap
                         }
@@ -961,9 +961,9 @@ Item {
                                 { "key": "Printer Driver", "value": false }
                             ]
                             textRole: "key"
-                            // currentIndex: ScriteSettings.pdfExport.usePdfDriver ? 0 : 1
+                            // currentIndex: ScriteRuntime.pdfExportSettings.usePdfDriver ? 0 : 1
                             currentIndex: 1
-                            onCurrentIndexChanged: ScriteSettings.pdfExport.usePdfDriver = (currentIndex === 0)
+                            onCurrentIndexChanged: ScriteRuntime.pdfExportSettings.usePdfDriver = (currentIndex === 0)
                         }
                     }
                 }
@@ -995,7 +995,7 @@ Item {
                     width: parent.width
 
                     TextArea {
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         width: parent.width
                         wrapMode: Text.WordWrap
                         textFormat: TextArea.RichText
@@ -1014,20 +1014,20 @@ Item {
 
                             Text {
                                 font.bold: true
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 text: "Max Time In Milliseconds"
                                 width: parent.width
                             }
 
                             Text {
                                 font.bold: false
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                                 text: "Default: 1000"
                             }
 
                             TextField {
                                 id: txtMaxTime
-                                text: ScriteSettings.notebook.graphLayoutMaxTime
+                                text: ScriteRuntime.notebookSettings.graphLayoutMaxTime
                                 width: parent.width
                                 placeholderText: "if left empty, default of 1000 will be used"
                                 validator: IntValidator {
@@ -1036,9 +1036,9 @@ Item {
                                 }
                                 onTextEdited: {
                                     if(length === 0 || text.trim() === "")
-                                        ScriteSettings.notebook.graphLayoutMaxTime = 1000
+                                        ScriteRuntime.notebookSettings.graphLayoutMaxTime = 1000
                                     else
-                                        ScriteSettings.notebook.graphLayoutMaxTime = parseInt(text)
+                                        ScriteRuntime.notebookSettings.graphLayoutMaxTime = parseInt(text)
                                 }
                                 KeyNavigation.tab: txtMaxIterations
                             }
@@ -1049,20 +1049,20 @@ Item {
 
                             Text {
                                 font.bold: true
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 text: "Max Iterations"
                                 width: parent.width
                             }
 
                             Text {
                                 font.bold: false
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                                 text: "Default: 50000"
                             }
 
                             TextField {
                                 id: txtMaxIterations
-                                text: ScriteSettings.notebook.graphLayoutMaxIterations
+                                text: ScriteRuntime.notebookSettings.graphLayoutMaxIterations
                                 width: parent.width
                                 placeholderText: "if left empty, default of 50000 will be used"
                                 validator: IntValidator {
@@ -1071,9 +1071,9 @@ Item {
                                 }
                                 onTextEdited: {
                                     if(length === 0 || text.trim() === "")
-                                        ScriteSettings.notebook.graphLayoutMaxIterations = 50000
+                                        ScriteRuntime.notebookSettings.graphLayoutMaxIterations = 50000
                                     else
-                                        ScriteSettings.notebook.graphLayoutMaxIterations = parseInt(text)
+                                        ScriteRuntime.notebookSettings.graphLayoutMaxIterations = parseInt(text)
                                 }
                                 KeyNavigation.tab: txtMaxTime
                             }
@@ -1141,7 +1141,7 @@ Item {
                             text: Scrite.document.printFormat.secondsPerPage
                             validator: IntValidator { bottom: 15; top: 300 }
                             onTextEdited: Scrite.document.printFormat.secondsPerPage = parseInt(text)
-                            width: ScriteFontMetrics.sceneEditor.averageCharacterWidth*3
+                            width: ScriteRuntime.sceneEditorFontMetrics.averageCharacterWidth*3
                         }
 
                         Text {
@@ -1623,8 +1623,8 @@ Item {
                             if(fileUrl != "")
                                 Scrite.document.screenplay.setCoverPagePhoto(Scrite.app.urlToLocalFile(fileUrl))
                         }
-                        folder: ScriteSettings.workspace.lastOpenPhotosFolderUrl
-                        onFolderChanged: ScriteSettings.workspace.lastOpenPhotosFolderUrl = folder
+                        folder: ScriteRuntime.workspaceSettings.lastOpenPhotosFolderUrl
+                        onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenPhotosFolderUrl = folder
                     }
                 }
 
@@ -1684,7 +1684,7 @@ Item {
                                     width: fieldLabelWidth
                                     horizontalAlignment: Text.AlignRight
                                     text: name
-                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                                     anchors.verticalCenter: parent.verticalCenter
                                     color: ScritePrimaryColors.c800.background
                                 }
@@ -1703,7 +1703,7 @@ Item {
                                         _tpfLimiter.text = text
                                         _tpfScreenplayProperty.value = text
                                     }
-                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize+1
+                                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+1
                                     enableTransliteration: true
                                     TabSequenceItem.manager: titlePageFieldsTabSequence
                                     TabSequenceItem.sequence: index
@@ -1725,8 +1725,8 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
 
                         text: "Include Title Page In Preview"
-                        checked: ScriteSettings.screenplayEditor.includeTitlePageInPreview
-                        onToggled: ScriteSettings.screenplayEditor.includeTitlePageInPreview = checked
+                        checked: ScriteRuntime.screenplayEditorSettings.includeTitlePageInPreview
+                        onToggled: ScriteRuntime.screenplayEditorSettings.includeTitlePageInPreview = checked
                     }
 
                     Button2 {
@@ -1739,12 +1739,12 @@ Item {
                         ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
                         ToolTip.delay: 1000
                         onClicked: {
-                            ScriteSettings.titlePage.author = Scrite.document.screenplay.author
-                            ScriteSettings.titlePage.contact = Scrite.document.screenplay.contact
-                            ScriteSettings.titlePage.address = Scrite.document.screenplay.address
-                            ScriteSettings.titlePage.email = Scrite.document.screenplay.email
-                            ScriteSettings.titlePage.phone = Scrite.document.screenplay.phoneNumber
-                            ScriteSettings.titlePage.website = Scrite.document.screenplay.website
+                            ScriteRuntime.titlePageSettings.author = Scrite.document.screenplay.author
+                            ScriteRuntime.titlePageSettings.contact = Scrite.document.screenplay.contact
+                            ScriteRuntime.titlePageSettings.address = Scrite.document.screenplay.address
+                            ScriteRuntime.titlePageSettings.email = Scrite.document.screenplay.email
+                            ScriteRuntime.titlePageSettings.phone = Scrite.document.screenplay.phoneNumber
+                            ScriteRuntime.titlePageSettings.website = Scrite.document.screenplay.website
                             defaultsSavedNotice.opacity = 1
                         }
                     }
@@ -1754,8 +1754,8 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
 
                         text: "Include Timestamp"
-                        checked: ScriteSettings.titlePage.includeTimestamp
-                        onToggled: ScriteSettings.titlePage.includeTimestamp = checked
+                        checked: ScriteRuntime.titlePageSettings.includeTimestamp
+                        onToggled: ScriteRuntime.titlePageSettings.includeTimestamp = checked
                     }
                 }
 
@@ -1930,22 +1930,22 @@ Item {
                             displayElementFormat.defaultLanguageInt = enumModel[currentIndex].value
                             switch(displayElementFormat.elementType) {
                             case SceneElement.Action:
-                                ScriteSettings.paragraphLanguage.actionLanguage = enumModel[currentIndex].key
+                                ScriteRuntime.paragraphLanguageSettings.actionLanguage = enumModel[currentIndex].key
                                 break;
                             case SceneElement.Character:
-                                ScriteSettings.paragraphLanguage.characterLanguage = enumModel[currentIndex].key
+                                ScriteRuntime.paragraphLanguageSettings.characterLanguage = enumModel[currentIndex].key
                                 break;
                             case SceneElement.Parenthetical:
-                                ScriteSettings.paragraphLanguage.parentheticalLanguage = enumModel[currentIndex].key
+                                ScriteRuntime.paragraphLanguageSettings.parentheticalLanguage = enumModel[currentIndex].key
                                 break;
                             case SceneElement.Dialogue:
-                                ScriteSettings.paragraphLanguage.dialogueLanguage = enumModel[currentIndex].key
+                                ScriteRuntime.paragraphLanguageSettings.dialogueLanguage = enumModel[currentIndex].key
                                 break;
                             case SceneElement.Transition:
-                                ScriteSettings.paragraphLanguage.transitionLanguage = enumModel[currentIndex].key
+                                ScriteRuntime.paragraphLanguageSettings.transitionLanguage = enumModel[currentIndex].key
                                 break;
                             case SceneElement.Shot:
-                                ScriteSettings.paragraphLanguage.shotLanguage = enumModel[currentIndex].key
+                                ScriteRuntime.paragraphLanguageSettings.shotLanguage = enumModel[currentIndex].key
                                 break;
                             }
                         }
@@ -2268,7 +2268,7 @@ Item {
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 20
                         anchors.horizontalCenter: parent.horizontalCenter
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.WordWrap
                         color: ScritePrimaryColors.c100.background
@@ -2312,7 +2312,7 @@ Item {
                     height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
                     font.family: "Courier Prime"
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     text: Scrite.document.structure.groupsData
                     color: ScritePrimaryColors.c50.text
                     background: Rectangle {
@@ -2360,7 +2360,7 @@ Item {
                     height: parent.height - parent.spacing - buttonsRow.height
                     clip: true
                     font.family: "Courier Prime"
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     text: Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
                     color: ScriteAccentColors.c50.text
                     background: Rectangle {

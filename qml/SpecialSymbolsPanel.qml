@@ -66,7 +66,7 @@ Rectangle {
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         text: modelData.title
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         color: symbolsPanel.currentIndex === index ? "black" : "white"
                     }
 
@@ -102,7 +102,7 @@ Rectangle {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 anchors.centerIn: parent
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 text: includeEmojis ? "Emojis may not be included in PDF exports." : "Emojis are not supported in this text area."
             }
         }

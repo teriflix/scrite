@@ -96,9 +96,6 @@
         <file>qml/globals/qmldir</file>
         <file>qml/globals/ScriteAccentColors.qml</file>
         <file>qml/globals/ScritePrimaryColors.qml</file>
-        <file>qml/globals/ScriteFontMetrics.qml</file>
-        <file>qml/globals/ScriteUndoStack.qml</file>
-        <file>qml/globals/ScriteSettings.qml</file>
         <file>qml/globals/ScriteAppFeatures.qml</file>
         <file>qml/globals/ScriteRuntime.qml</file>
     </qresource>

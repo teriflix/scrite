@@ -52,16 +52,16 @@ Item {
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 30
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
                 text: Scrite.app.applicationVersion
-                font.letterSpacing: ScriteSettings.application.enableAnimations ? 20 : 0
+                font.letterSpacing: ScriteRuntime.applicationSettings.enableAnimations ? 20 : 0
 
                 NumberAnimation {
                     target: versionText
                     property: "font.letterSpacing"
                     from: 20; to: 0
                     duration: 1500
-                    running: true && ScriteSettings.application.enableAnimations
+                    running: true && ScriteRuntime.applicationSettings.enableAnimations
                     easing.type: Easing.OutBack
                 }
             }
@@ -94,7 +94,7 @@ Item {
 
                 Text {
                     text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: "gray"
 
@@ -112,7 +112,7 @@ Item {
 
                 Text {
                     text: "The app uses:"
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize - 2
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
 
@@ -123,7 +123,7 @@ Item {
 
                     FontMetrics {
                         id: creditsViewFontMetrics
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize - 2
                     }
 
                     ListView {
@@ -180,7 +180,7 @@ Item {
                             color: creditLabelMouseArea.containsMouse ? "blue" : "black"
                             width: ListView.view.width - (creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize - 2
                             horizontalAlignment: Text.AlignHCenter
 
                             MouseArea {

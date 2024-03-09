@@ -74,7 +74,7 @@ Rectangle {
             Text {
                 text: character.name
                 font.bold: true
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 font.capitalization: Font.AllUppercase
                 width: parent.width
                 elide: Text.ElideRight
@@ -83,7 +83,7 @@ Rectangle {
             Text {
                 width: parent.width
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-3
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-3
                 maximumLineCount: 3
                 text: {
                     var fields = []

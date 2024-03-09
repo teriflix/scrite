@@ -70,7 +70,7 @@ Item {
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
             text: label + ":<br/><font size=\"-2\">(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF
             enabled: visible
 
@@ -89,7 +89,7 @@ Item {
             placeholderText: "File Name"
             text: fileInfo.baseName
             width: parent.width
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             onTextChanged: fileInfo.baseName = text
             TabSequenceItem.manager: tabSequenceManager
             visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF

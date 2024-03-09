@@ -32,8 +32,8 @@ Rectangle {
     property real toolbarSpacing: 0
     property real toolbarLeftMargin: 0
     property real toolButtonSize: Math.max(toolbarSize - 4, 20)
-    property real maxTextAreaSize: ScriteFontMetrics.ideal.averageCharacterWidth * 80
-    property real minTextAreaSize: ScriteFontMetrics.ideal.averageCharacterWidth * 20
+    property real maxTextAreaSize: ScriteRuntime.idealFontMetrics.averageCharacterWidth * 80
+    property real minTextAreaSize: ScriteRuntime.idealFontMetrics.averageCharacterWidth * 20
 
     function switchToStoryTab() {
         switchTo(Scrite.document.structure.notes)
@@ -104,7 +104,7 @@ Rectangle {
             notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
         }
         function onCurrentElementIndexChanged(val) {
-            if(ScriteSettings.workspace.syncCurrentSceneOnNotebook && !notebookTree.activatingScreenplayElement)
+            if(ScriteRuntime.workspaceSettings.syncCurrentSceneOnNotebook && !notebookTree.activatingScreenplayElement)
                 notebookTree.activateFromCurrentScreenplayElement()
         }
     }
@@ -125,7 +125,7 @@ Rectangle {
 
     FontMetrics {
         id: fontMetrics
-        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
     }
 
     Rectangle {
@@ -170,9 +170,9 @@ Rectangle {
                 checkable: true
                 iconSource: "../icons/navigation/sync.png"
                 ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
-                checked: ScriteSettings.workspace.syncCurrentSceneOnNotebook
+                checked: ScriteRuntime.workspaceSettings.syncCurrentSceneOnNotebook
                 onToggled: {
-                    ScriteSettings.workspace.syncCurrentSceneOnNotebook = checked
+                    ScriteRuntime.workspaceSettings.syncCurrentSceneOnNotebook = checked
                     if(checked)
                         notebookTree.activateFromCurrentScreenplayElement()
                 }
@@ -536,7 +536,7 @@ Rectangle {
             }
 
             onClicked: {
-                if(ScriteRuntime.mainWindowTab !== ScriteRuntime.e_StructureTab || ScriteSettings.workspace.syncCurrentSceneOnNotebook)
+                if(ScriteRuntime.mainWindowTab !== ScriteRuntime.e_StructureTab || ScriteRuntime.workspaceSettings.syncCurrentSceneOnNotebook)
                     activateScreenplayElement( notebookModel.modelIndexData(index) )
             }
 
@@ -743,7 +743,7 @@ Rectangle {
                                 return "Cannot remove this item."
                             }
                             font.bold: true
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
@@ -873,7 +873,7 @@ Rectangle {
 
                                 Text {
                                     id: headingText
-                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                     font.bold: true
                                     maximumLineCount: 1
                                     width: parent.width-32-parent.spacing
@@ -888,7 +888,7 @@ Rectangle {
                                 height: parent.height - headingText.height - parent.spacing
                                 wrapMode: Text.WordWrap
                                 elide: Text.ElideRight
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                                 text: noteSummary
                                 color: headingText.color
                                 opacity: 0.75
@@ -983,7 +983,7 @@ Rectangle {
                             tabItem: sceneTitleField
                             font.capitalization: Font.AllUppercase
                             font.family: Scrite.document.formatting.elementFormat(SceneElement.Heading).font.family
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize+2
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+2
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 
@@ -1015,7 +1015,7 @@ Rectangle {
                                 font.bold: true
                                 topPadding: 5
                                 bottomPadding: 5
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 visible: !scene.hasCharacters
                             }
 
@@ -1034,7 +1034,7 @@ Rectangle {
                                     leftPadding: 10; rightPadding: 10
                                     font.family: "Courier Prime"
                                     font.capitalization: Font.AllUppercase
-                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                     closable: scene.isCharacterMute(modelData) && !Scrite.document.readOnly
                                     onCloseRequest: {
                                         if(!Scrite.document.readOnly)
@@ -1053,7 +1053,7 @@ Rectangle {
                                     readOnly: Scrite.document.readOnly
                                     font.family: "Courier Prime"
                                     font.capitalization: length > 0 ? Font.AllUppercase : Font.MixedCase
-                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                     wrapMode: Text.NoWrap
                                     completionStrings: Scrite.document.structure.characterNames
                                     placeholderText: "New Character Name"
@@ -1101,8 +1101,8 @@ Rectangle {
                             tabNames: ["Synopsis", "Featured Photo"]
                             tabColor: scene.color
                             currentTabContent: currentTabIndex === 0 ? sceneSynopsisFieldComponent : featuredPhotoComponent
-                            currentTabIndex: ScriteSettings.screenplayEditor.commentsPanelTabIndex
-                            onCurrentTabIndexChanged: ScriteSettings.screenplayEditor.commentsPanelTabIndex = currentTabIndex
+                            currentTabIndex: ScriteRuntime.screenplayEditorSettings.commentsPanelTabIndex
+                            onCurrentTabIndexChanged: ScriteRuntime.screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                             height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneCharactersList.height - parent.spacing*3
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -1320,7 +1320,7 @@ Rectangle {
                 property int currentIndex: 0
                 contentWidth: width
                 contentHeight: noteItemsFlow.height
-                FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
                 Flow {
                     id: noteItemsFlow
@@ -1345,7 +1345,7 @@ Rectangle {
                                 color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
 
                                 Behavior on color {
-                                    enabled: ScriteSettings.application.enableAnimations
+                                    enabled: ScriteRuntime.applicationSettings.enableAnimations
                                     ColorAnimation { duration: 250 }
                                 }
 
@@ -1356,7 +1356,7 @@ Rectangle {
 
                                     Text {
                                         id: headingText
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                         font.bold: true
                                         maximumLineCount: 1
                                         width: parent.width
@@ -1370,7 +1370,7 @@ Rectangle {
                                         height: parent.height - headingText.height - parent.spacing
                                         wrapMode: Text.WordWrap
                                         elide: Text.ElideRight
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                                         text: objectItem.type === Note.TextNoteType ? deltaDoc.plainText : objectItem.summary
                                         color: headingText.color
                                         opacity: 0.75
@@ -1601,7 +1601,7 @@ Rectangle {
                             Text {
                                 id: headingLabel
                                 text: breakElement.breakTitle + ": "
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 3
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 3
                                 anchors.baseline: breakElementHeadingField.baseline
                             }
 
@@ -1611,7 +1611,7 @@ Rectangle {
                                 width: parent.width - headingLabel.width - parent.spacing
                                 label: ""
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 5
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 5
                                 placeholderText: breakKind + " Name"
                                 onTextChanged: breakElement.breakSubtitle = text
                                 tabItem: breakElementSummaryField.textArea
@@ -1667,7 +1667,7 @@ Rectangle {
                 width: parent.width * 0.6
                 anchors.centerIn: parent
                 horizontalAlignment: Text.AlignHCenter
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 text: "Create " + breakKind.toLowerCase() + " break in the screenplay to capture a summary for it."
                 wrapMode: Text.WordWrap
                 visible: breakElement === null
@@ -1695,7 +1695,7 @@ Rectangle {
             FontMetrics {
                 id: screenplayFontMetrics
                 font.family: Scrite.document.formatting.defaultFont.family
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             }
 
             TextTabBar {
@@ -1734,7 +1734,7 @@ Rectangle {
                         property bool hscrollBarRequired: contentWidth > width
                         ScrollBar.vertical: titlePageVScrollBar
                         ScrollBar.horizontal: titlePageHScrollBar
-                        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
                         Column {
                             id: titlePageLayout
@@ -1954,12 +1954,12 @@ Rectangle {
                         Column {
                             spacing: 0
                             x: Math.max(0, (parent.width-width)/2)
-                            width: Math.min(ScriteFontMetrics.ideal.averageCharacterWidth*50, parent.width-20)
+                            width: Math.min(ScriteRuntime.idealFontMetrics.averageCharacterWidth*50, parent.width-20)
 
                             Label {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 topPadding: 20
                                 bottomPadding: 10
                                 text: "A logline should swiftly convey what a screenplay is about, including the main character, central conflict, setup and antagonist."
@@ -1979,9 +1979,9 @@ Rectangle {
                                 onTextChanged: Scrite.document.screenplay.logline = text
                                 placeholderText: "Type your logline here."
                                 font.family: Scrite.document.displayFormat.defaultFont2.family
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
                                 width: parent.width
-                                height: Math.max(ScriteFontMetrics.ideal.lineSpacing*10, contentHeight+10)
+                                height: Math.max(ScriteRuntime.idealFontMetrics.lineSpacing*10, contentHeight+10)
                                 readOnly: Scrite.document.readOnly
                                 undoRedoEnabled: true
                                 ScrollBar.vertical: loglineVScrollBar
@@ -1996,7 +1996,7 @@ Rectangle {
                             Label {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 topPadding: 5
                                 text: (textLimiter.limitReached ? "WARNING: " : "") + "Words: " + textLimiter.wordCount + "/" + textLimiter.maxWordCount +
                                     ", Letters: " + textLimiter.letterCount + "/" + textLimiter.maxLetterCount
@@ -2047,7 +2047,7 @@ Rectangle {
             Text {
                 anchors.fill: parent
                 anchors.margins: 20
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 text: "<b><font size=\"+2\">Unused Scenes</font></b><br/><br/>Unused scenes are those that are placed on structure but are not yet dragged into the screenplay (or timeline). Click on any of the unused scenes in the tree to the left to view their notes."
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             }
@@ -2163,7 +2163,7 @@ Rectangle {
                                         anchors.verticalCenter: parent.verticalCenter
 
                                         Text {
-                                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                             font.bold: true
                                             text: character.name
                                             width: parent.width
@@ -2171,7 +2171,7 @@ Rectangle {
                                         }
 
                                         Text {
-                                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
+                                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize - 2
                                             text: "Role: " + polishStr(character.designation, "-")
                                             width: parent.width
                                             elide: Text.ElideRight
@@ -2179,7 +2179,7 @@ Rectangle {
                                         }
 
                                         Text {
-                                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize - 2
+                                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize - 2
                                             text: ["Age: " + polishStr(character.age, "-"), "Gender: " + polishStr(character.gender, "-")].join(", ")
                                             width: parent.width
                                             elide: Text.ElideRight
@@ -2393,7 +2393,7 @@ Rectangle {
                         anchors.bottom: attachmentsView.top
                         contentWidth: quickInfoFlickableContent.width
                         contentHeight: quickInfoFlickableContent.height
-                        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
                         property bool scrollBarVisible: contentWidth > width
 
@@ -2404,7 +2404,7 @@ Rectangle {
 
                             Rectangle {
                                 id: characterQuickInfoArea
-                                width: ScriteSettings.workspace.showNotebookInStructure ? 300 : Math.max(300, mainScriteDocumentView.width*0.3)
+                                width: ScriteRuntime.workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, mainScriteDocumentView.width*0.3)
                                 height: parent.height
                                 color: Scrite.app.translucent(ScritePrimaryColors.c100.background, 0.5)
 
@@ -2427,9 +2427,9 @@ Rectangle {
                                     selectMultiple: false
                                     sidebarVisible: true
                                     selectExisting: true
-                                    folder: ScriteSettings.workspace.lastOpenPhotosFolderUrl
+                                    folder: ScriteRuntime.workspaceSettings.lastOpenPhotosFolderUrl
                                     dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
-                                    onFolderChanged: ScriteSettings.workspace.lastOpenPhotosFolderUrl = folder
+                                    onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenPhotosFolderUrl = folder
 
                                     onAccepted: {
                                         if(fileUrl != "") {
@@ -2454,7 +2454,7 @@ Rectangle {
                                     contentHeight: characterQuickInfoViewContent.height
                                     clip: true
                                     ScrollBar.vertical: characterQuickInfoViewScrollBar
-                                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
                                     function scrollIntoView(field) {
                                         const fy = field.mapToItem(characterQuickInfoViewContent, 0, 0).y
@@ -2657,7 +2657,7 @@ Rectangle {
                                                 text: "Priority: " + priority(character.priority) + ""
                                                 width: parent.width
                                                 elide: Text.ElideMiddle
-                                                font.pointSize: 2*ScriteFontMetrics.ideal.font.pointSize/3
+                                                font.pointSize: 2*ScriteRuntime.idealFontMetrics.font.pointSize/3
                                             }
 
                                             Slider {
@@ -3041,7 +3041,7 @@ Rectangle {
 
                                     Text {
                                         id: characterRowLabel1
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                         text: thisCharacterName + ": "
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
@@ -3056,7 +3056,7 @@ Rectangle {
                                         width: parent.width - 32 - characterRowLabel1.width - characterRowLabel2.width - 3*parent.spacing
                                         label: ""
                                         color: foregroundColor
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                         placeholderText: "husband of, wife of, friends with, reports to ..."
                                         Material.background: backgroundColor
                                         Material.foreground: foregroundColor
@@ -3072,7 +3072,7 @@ Rectangle {
 
                                     Text {
                                         id: characterRowLabel2
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                         text: Scrite.app.camelCased(otherCharacterName) + "."
                                         color: foregroundColor
                                         anchors.verticalCenter: parent.verticalCenter
@@ -3137,7 +3137,7 @@ Rectangle {
             }
 
             Behavior on height {
-                enabled: ScriteSettings.application.enableAnimations
+                enabled: ScriteRuntime.applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
 
@@ -3278,21 +3278,21 @@ Rectangle {
     }
 
     FocusTracker.window: Scrite.window
-    FocusTracker.onHasFocusChanged: ScriteUndoStack.notebookActive = FocusTracker.hasFocus
+    FocusTracker.onHasFocusChanged: ScriteRuntime.undoStack.notebookActive = FocusTracker.hasFocus
 
     Loader {
         id: structureIconAnimator
-        active: ScriteSettings.workspace.animateStructureIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
+        active: ScriteRuntime.workspaceSettings.animateStructureIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: structureTabButton
-            onDone: ScriteSettings.workspace.animateStructureIcon = false
+            onDone: ScriteRuntime.workspaceSettings.animateStructureIcon = false
             description: structureTabButton.ToolTip.text
             property bool scaleDone: false
             onScaleAnimationDone: scaleDone = true
             Component.onDestruction: {
                 if(scaleDone)
-                    ScriteSettings.workspace.animateStructureIcon = false
+                    ScriteRuntime.workspaceSettings.animateStructureIcon = false
             }
         }
     }

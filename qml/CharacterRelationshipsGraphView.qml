@@ -50,8 +50,8 @@ Rectangle {
         id: crGraph
         structure: Scrite.document.loading ? null : Scrite.document.structure
         nodeSize: Qt.size(150,150)
-        maxTime: ScriteSettings.notebook.graphLayoutMaxTime
-        maxIterations: ScriteSettings.notebook.graphLayoutMaxIterations
+        maxTime: ScriteRuntime.notebookSettings.graphLayoutMaxTime
+        maxIterations: ScriteRuntime.notebookSettings.graphLayoutMaxIterations
         leftMargin: 1000
         topMargin: 1000
         onUpdated: {
@@ -85,7 +85,7 @@ Rectangle {
         initialContentHeight: canvas.height
         showScrollBars: true
         handlePinchZoom: true
-        zoomOnScroll: ScriteSettings.workspace.mouseWheelZoomsInCharacterGraph
+        zoomOnScroll: ScriteRuntime.workspaceSettings.mouseWheelZoomsInCharacterGraph
         minimumScale: nodeItemsBoxEvaluator.itemCount > 0 ? Math.min(0.25, width/nodeItemsBoxEvaluator.width, height/nodeItemsBoxEvaluator.height) : 0.25
 
         function zoomOneMiddleArea() {
@@ -314,7 +314,7 @@ Rectangle {
 
                                 Text {
                                     text: "<b>Are you sure you want to delete this relationship?</b><br/><br/>NOTE: This action cannot be undone!!"
-                                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                     width: parent.width
                                     horizontalAlignment: Text.AlignHCenter
                                     wrapMode: Text.WordWrap
@@ -374,8 +374,8 @@ Rectangle {
                 autoRepeat: false
                 ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
                 checkable: true
-                checked: ScriteSettings.workspace.mouseWheelZoomsInCharacterGraph
-                onCheckedChanged: ScriteSettings.workspace.mouseWheelZoomsInCharacterGraph = checked
+                checked: ScriteRuntime.workspaceSettings.mouseWheelZoomsInCharacterGraph
+                onCheckedChanged: ScriteRuntime.workspaceSettings.mouseWheelZoomsInCharacterGraph = checked
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
             }
@@ -433,7 +433,7 @@ Rectangle {
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.margins: 25
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             width: parent.width * 0.65
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             text: "Graph will be refreshed when you use it next."
@@ -474,7 +474,7 @@ Rectangle {
                 anchors.centerIn: parent
 
                 Text {
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 4
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 4
                     text: "Edit Relationship"
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.bold: true
@@ -514,7 +514,7 @@ Rectangle {
                             maximumLineCount: 2
                             elide: Text.ElideRight
                             text: Scrite.app.camelCased(ofCharacter.name)
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         }
                     }
 
@@ -523,7 +523,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         text: relationship.name
                         label: "Relationship:"
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         placeholderText: "husband of, wife of, friends with, reports to ..."
                         maximumLength: 50
                         width: 300
@@ -564,7 +564,7 @@ Rectangle {
                             maximumLineCount: 2
                             elide: Text.ElideRight
                             text: Scrite.app.camelCased(withCharacter.name)
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         }
                     }
                 }
@@ -682,7 +682,7 @@ Rectangle {
                         return character.isDirectlyRelatedTo(canvas.activeCharacter) ? 0 : 0.75
                     }
                     Behavior on alpha {
-                        enabled: ScriteSettings.application.enableAnimations
+                        enabled: ScriteRuntime.applicationSettings.enableAnimations
                         NumberAnimation { duration: 250 }
                     }
                 }
@@ -713,7 +713,7 @@ Rectangle {
         id: crGraphEdgeDelegate
 
         PainterPathItem {
-            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * ScriteSettings.structureCanvas.lineWidthOfConnectors
+            outlineWidth: Scrite.app.devicePixelRatio * canvas.scale * ScriteRuntime.structureCanvasSettings.lineWidthOfConnectors
             outlineColor: ScritePrimaryColors.c700.background
             renderType: PainterPathItem.OutlineOnly
             renderingMechanism: PainterPathItem.UseOpenGL
@@ -724,7 +724,7 @@ Rectangle {
             }
             z: opacity
             Behavior on opacity {
-                enabled: ScriteSettings.application.enableAnimations
+                enabled: ScriteRuntime.applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
 
@@ -742,7 +742,7 @@ Rectangle {
                 Text {
                     id: nameLabel
                     text: modelData.relationship.name
-                    font.pointSize: Math.floor(ScriteFontMetrics.ideal.font.pointSize*0.75)
+                    font.pointSize: Math.floor(ScriteRuntime.idealFontMetrics.font.pointSize*0.75)
                     anchors.centerIn: parent
                     color: nameLabelMouseArea.containsMouse ? ScriteAccentColors.c700.text : ScritePrimaryColors.c700.text
                     horizontalAlignment: Text.AlignHCenter

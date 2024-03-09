@@ -37,12 +37,12 @@ Rectangle {
     FontMetrics {
         id: languageFontMetrics
         font.family: languageFont.family
-        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
     }
 
     FontMetrics {
         id: normalFontMetrics
-        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
     }
 
     Row {

@@ -35,9 +35,9 @@ Item {
     enabled: !Scrite.document.loading
 
     property bool canShowNotebookInStructure: width > 1600
-    property bool showNotebookInStructure: ScriteSettings.workspace.showNotebookInStructure && canShowNotebookInStructure
+    property bool showNotebookInStructure: ScriteRuntime.workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     onShowNotebookInStructureChanged: {
-        Utils.execLater(ScriteSettings.workspace, 100, function() {
+        Utils.execLater(ScriteRuntime.workspaceSettings, 100, function() {
             mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
         })
     }
@@ -112,9 +112,9 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+C"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: ScriteSettings.screenplayEditor.displaySceneCharacters ? "Hide Scene Characters, Tags" : "Show Scene Characters, Tags"
+        ShortcutsModelItem.title: ScriteRuntime.screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters, Tags" : "Show Scene Characters, Tags"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ScriteSettings.screenplayEditor.displaySceneCharacters = !ScriteSettings.screenplayEditor.displaySceneCharacters
+        onActivated: ScriteRuntime.screenplayEditorSettings.displaySceneCharacters = !ScriteRuntime.screenplayEditorSettings.displaySceneCharacters
     }
 
     Shortcut {
@@ -122,9 +122,9 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+S"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: ScriteSettings.screenplayEditor.displaySceneSynopsis ? "Hide Synopsis" : "Show Synopsis"
+        ShortcutsModelItem.title: ScriteRuntime.screenplayEditorSettings.displaySceneSynopsis ? "Hide Synopsis" : "Show Synopsis"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ScriteSettings.screenplayEditor.displaySceneSynopsis = !ScriteSettings.screenplayEditor.displaySceneSynopsis
+        onActivated: ScriteRuntime.screenplayEditorSettings.displaySceneSynopsis = !ScriteRuntime.screenplayEditorSettings.displaySceneSynopsis
     }
 
     Shortcut {
@@ -132,9 +132,9 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+M"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: ScriteSettings.screenplayEditor.displaySceneComments ? "Hide Comments" : "Show Comments"
+        ShortcutsModelItem.title: ScriteRuntime.screenplayEditorSettings.displaySceneComments ? "Hide Comments" : "Show Comments"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ScriteSettings.screenplayEditor.displaySceneComments = !ScriteSettings.screenplayEditor.displaySceneComments
+        onActivated: ScriteRuntime.screenplayEditorSettings.displaySceneComments = !ScriteRuntime.screenplayEditorSettings.displaySceneComments
     }
 
     Shortcut {
@@ -142,9 +142,9 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+G"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: ScriteSettings.screenplayEditor.allowTaggingOfScenes ? "Allow Tagging" : "Disable Tagging"
+        ShortcutsModelItem.title: ScriteRuntime.screenplayEditorSettings.allowTaggingOfScenes ? "Allow Tagging" : "Disable Tagging"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ScriteSettings.screenplayEditor.allowTaggingOfScenes = !ScriteSettings.screenplayEditor.allowTaggingOfScenes
+        onActivated: ScriteRuntime.screenplayEditorSettings.allowTaggingOfScenes = !ScriteRuntime.screenplayEditorSettings.allowTaggingOfScenes
     }
 
     Shortcut {
@@ -152,27 +152,27 @@ Item {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+L"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: ScriteSettings.screenplayEditor.enableSpellCheck ? "Disable Spellcheck" : "Enable Spellcheck"
+        ShortcutsModelItem.title: ScriteRuntime.screenplayEditorSettings.enableSpellCheck ? "Disable Spellcheck" : "Enable Spellcheck"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ScriteSettings.screenplayEditor.enableSpellCheck = !ScriteSettings.screenplayEditor.enableSpellCheck
+        onActivated: ScriteRuntime.screenplayEditorSettings.enableSpellCheck = !ScriteRuntime.screenplayEditorSettings.enableSpellCheck
     }
 
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+A"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: ScriteSettings.application.enableAnimations ? "Disable Animations" : "Enable Animations"
+        ShortcutsModelItem.title: ScriteRuntime.applicationSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ScriteSettings.application.enableAnimations = !ScriteSettings.application.enableAnimations
+        onActivated: ScriteRuntime.applicationSettings.enableAnimations = !ScriteRuntime.applicationSettings.enableAnimations
     }
 
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+H"
         ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: ScriteSettings.screenplayEditor.highlightCurrentLine ? "Line Highlight Off" : "Line Highlight On"
+        ShortcutsModelItem.title: ScriteRuntime.screenplayEditorSettings.highlightCurrentLine ? "Line Highlight Off" : "Line Highlight On"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ScriteSettings.screenplayEditor.highlightCurrentLine = !ScriteSettings.screenplayEditor.highlightCurrentLine
+        onActivated: ScriteRuntime.screenplayEditorSettings.highlightCurrentLine = !ScriteRuntime.screenplayEditorSettings.highlightCurrentLine
     }
 
     Shortcut {
@@ -291,7 +291,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Alt+4"
-        enabled: ScriteSettings.workspace.showScritedTab
+        enabled: ScriteRuntime.workspaceSettings.showScritedTab
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Scrited"
         ShortcutsModelItem.shortcut: sequence
@@ -303,7 +303,7 @@ Item {
         target: Scrite.document
 
         function onJustReset() {
-            ScriteSettings.screenplayEditor.firstSwitchToStructureTab = true
+            ScriteRuntime.screenplayEditorSettings.firstSwitchToStructureTab = true
             appBusyOverlay.ref()
             ScriteRuntime.screenplayAdapter.initialLoadTreshold = 25
             Utils.execLater(ScriteRuntime.screenplayAdapter, 250, () => {
@@ -313,7 +313,7 @@ Item {
         }
 
         function onJustLoaded() {
-            ScriteSettings.screenplayEditor.firstSwitchToStructureTab = true
+            ScriteRuntime.screenplayEditorSettings.firstSwitchToStructureTab = true
             var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
             if(firstElement) {
                 var editorHints = firstElement.editorHints
@@ -326,7 +326,7 @@ Item {
     // Refactor QML TODO: Get rid of this stuff when we move to overlays and ApplicationMainWindow
     QtObject {
         property bool overlayRefCountModified: false
-        property bool requiresAppBusyOverlay: ScriteUndoStack.screenplayEditorActive || ScriteUndoStack.sceneEditorActive
+        property bool requiresAppBusyOverlay: ScriteRuntime.undoStack.screenplayEditorActive || ScriteRuntime.undoStack.sceneEditorActive
 
         function onUpdateScheduled() {
             if(requiresAppBusyOverlay && !overlayRefCountModified) {
@@ -693,7 +693,7 @@ Item {
                                 onClicked: {
                                     Scrite.app.transliterationEngine.language = modelData.value
                                     Scrite.document.formatting.defaultLanguage = modelData.value
-                                    ScriteSettings.paragraphLanguage.defaultLanguage = modelData.key
+                                    ScriteRuntime.paragraphLanguageSettings.defaultLanguage = modelData.key
                                 }
                             }
                         }
@@ -708,7 +708,7 @@ Item {
                             onClicked: {
                                 Scrite.app.transliterationEngine.cycleLanguage()
                                 Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
-                                ScriteSettings.paragraphLanguage.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
+                                ScriteRuntime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
                             }
                         }
                     }
@@ -724,7 +724,7 @@ Item {
                                 onActivated: {
                                     Scrite.app.transliterationEngine.language = modelData.value
                                     Scrite.document.formatting.defaultLanguage = modelData.value
-                                    ScriteSettings.paragraphLanguage.defaultLanguage = modelData.key
+                                    ScriteRuntime.paragraphLanguageSettings.defaultLanguage = modelData.key
                                 }
                                 enabled: Scrite.app.transliterationEngine.enabledLanguages.indexOf(modelData.value) >= 0
 
@@ -743,7 +743,7 @@ Item {
                         onActivated: {
                             Scrite.app.transliterationEngine.cycleLanguage()
                             Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
-                            ScriteSettings.paragraphLanguage.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
+                            ScriteRuntime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
                         }
 
                         ShortcutsModelItem.priority: 1
@@ -803,7 +803,7 @@ Item {
 
                                     Text {
                                         width: parent.width * 0.75
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 5
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 5
                                         anchors.centerIn: parent
                                         horizontalAlignment: Text.AlignHCenter
                                         color: ScritePrimaryColors.c300.text
@@ -824,7 +824,7 @@ Item {
                 id: languageDescLabel
                 anchors.verticalCenter: parent.verticalCenter
                 text: Scrite.app.transliterationEngine.languageAsString
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                 width: 80
                 visible: mainTabBar.currentIndex <= 2
 
@@ -932,7 +932,7 @@ Item {
                                     onClicked: {
                                         Scrite.app.transliterationEngine.language = modelData.value
                                         Scrite.document.formatting.defaultLanguage = modelData.value
-                                        ScriteSettings.paragraphLanguage.defaultLanguage = modelData.key
+                                        ScriteRuntime.paragraphLanguageSettings.defaultLanguage = modelData.key
                                     }
                                 }
                             }
@@ -944,7 +944,7 @@ Item {
                                 onClicked: {
                                     Scrite.app.transliterationEngine.cycleLanguage()
                                     Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
-                                    ScriteSettings.paragraphLanguage.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
+                                    ScriteRuntime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
                                 }
                             }
                         }
@@ -1041,7 +1041,7 @@ Item {
                     { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true, "tab": ScriteRuntime.e_ScreenplayTab },
                     { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true, "tab": ScriteRuntime.e_StructureTab },
                     { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure, "tab": ScriteRuntime.e_NotebookTab },
-                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": ScriteSettings.workspace.showScritedTab, "tab": ScriteRuntime.e_ScritedTab }
+                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": ScriteRuntime.workspaceSettings.showScritedTab, "tab": ScriteRuntime.e_ScritedTab }
                 ]
                 readonly property color activeTabColor: ScritePrimaryColors.windowColor
                 function indexOfTab(_ScriteRuntime_TabType) {
@@ -1175,14 +1175,14 @@ Item {
 
                         FontMetrics {
                             id: tabBarFontMetrics
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         }
 
                         Image {
                             source: modelData.icon
                             width: parent.active ? 32 : 24; height: width
                             Behavior on width {
-                                enabled: ScriteSettings.application.enableAnimations
+                                enabled: ScriteRuntime.applicationSettings.enableAnimations
                                 NumberAnimation { duration: 250 }
                             }
 
@@ -1254,7 +1254,7 @@ Item {
             anchors.centerIn: parent
             width: parent.width * 0.8
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
             font.bold: true
         }
 
@@ -1454,10 +1454,10 @@ Item {
                     return _value - _oneValue
                 }
 
-                if(ScriteSettings.screenplayEditor.autoAdjustEditorWidthInScreenplayEditor)
+                if(ScriteRuntime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor)
                     zoomLevelModifier = evalZoomLevelModifierFn()
                 else {
-                    const zlms = ScriteSettings.screenplayEditor.zoomLevelModifiers
+                    const zlms = ScriteRuntime.screenplayEditorSettings.zoomLevelModifiers
                     const zlm = zlms["tab"+mainTabBar.currentIndex]
                     if(zlm !== undefined)
                         zoomLevelModifier = zlm
@@ -1471,9 +1471,9 @@ Item {
                 enabled: false
                 target: screenplayEditor
                 function onZoomLevelChanged() {
-                    var zlms = ScriteSettings.screenplayEditor.zoomLevelModifiers
+                    var zlms = ScriteRuntime.screenplayEditorSettings.zoomLevelModifiers
                     zlms["tab"+mainTabBar.currentIndex] = zoomLevelModifierToApply()
-                    ScriteSettings.screenplayEditor.zoomLevelModifiers = zlms
+                    ScriteRuntime.screenplayEditorSettings.zoomLevelModifiers = zlms
                 }
             }
 
@@ -1498,7 +1498,7 @@ Item {
                 return []
             }
             Behavior on opacity {
-                enabled: ScriteSettings.application.enableAnimations
+                enabled: ScriteRuntime.applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
 
@@ -1564,7 +1564,7 @@ Item {
                                 font.bold: true
                                 text: fileOpenDropArea.active ? fileOpenDropArea.attachment.originalFileName : fileOpenDropArea.droppedFileName
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                             }
 
                             Text {
@@ -1572,7 +1572,7 @@ Item {
                                 wrapMode: Text.WordWrap
                                 color: ScritePrimaryColors.c700.text
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
                             }
 
@@ -1581,7 +1581,7 @@ Item {
                                 wrapMode: Text.WordWrap
                                 color: ScritePrimaryColors.c700.text
                                 horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 visible: !Scrite.document.empty || Scrite.document.fileName !== ""
                                 text: "NOTE: Any unsaved changes in the currently open document will be discarded."
                             }
@@ -1815,7 +1815,7 @@ Item {
                                     Text {
                                         color: ScritePrimaryColors.c50.background
                                         text: "Pull this handle to view the screenplay editor."
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
                                         anchors.right: parent.left
                                         anchors.verticalCenter: parent.verticalCenter
                                         anchors.rightMargin: 20
@@ -1864,7 +1864,7 @@ Item {
                                     Text {
                                         color: ScritePrimaryColors.c50.background
                                         text: "Pull this handle to get the timeline view."
-                                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                         anchors.horizontalCenter: parent.horizontalCenter
                                         anchors.bottom: parent.top
                                         anchors.bottomMargin: 20
@@ -1898,7 +1898,7 @@ Item {
                         id: screenplayEditor2
                         SplitView.preferredWidth: mainScriteDocumentView.width * 0.5
                         SplitView.minimumWidth: 16
-                        onWidthChanged: ScriteSettings.workspace.screenplayEditorWidth = width
+                        onWidthChanged: ScriteRuntime.workspaceSettings.screenplayEditorWidth = width
                         active: width >= 50
                         sourceComponent: mainTabBar.currentIndex === 1 ? screenplayEditorComponent : null
 
@@ -1913,7 +1913,7 @@ Item {
 
             Loader {
                 id: structureEditorRow2
-                SplitView.preferredHeight: 140 + ScriteFontMetrics.minimum.height*ScriteRuntime.screenplayTracks.trackCount
+                SplitView.preferredHeight: 140 + ScriteRuntime.minimumFontMetrics.height*ScriteRuntime.screenplayTracks.trackCount
                 SplitView.minimumHeight: 16
                 SplitView.maximumHeight: SplitView.preferredHeight
                 active: height >= 50
@@ -1922,7 +1922,7 @@ Item {
                     FocusTracker.window: Scrite.window
 
                     Behavior on color {
-                        enabled: ScriteSettings.application.enableAnimations
+                        enabled: ScriteRuntime.applicationSettings.enableAnimations
                         ColorAnimation { duration: 250 }
                     }
 
@@ -1973,7 +1973,7 @@ Item {
                     screenplayEditor2.width = screenplayEditor2.SplitView.preferredWidth
                 }
 
-                if(ScriteSettings.structureCanvas.showPullHandleAnimation && mainUiContentLoader.sessionId !== Scrite.document.sessionId) {
+                if(ScriteRuntime.structureCanvasSettings.showPullHandleAnimation && mainUiContentLoader.sessionId !== Scrite.document.sessionId) {
                     Utils.execLater(splitViewAnimationLoader, 250, function() {
                         splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
                     })
@@ -2175,18 +2175,18 @@ Item {
         id: shortcutsDockWidget
         title: "Shortcuts"
         anchors.fill: parent
-        contentX: ScriteSettings.shortcutsDockWidget.contentX
-        contentY: ScriteSettings.shortcutsDockWidget.contentY
+        contentX: ScriteRuntime.shortcutsDockWidgetSettings.contentX
+        contentY: ScriteRuntime.shortcutsDockWidgetSettings.contentY
         contentWidth: 375
         contentHeight: (parent.height - appToolBarArea.height - 30) * 0.85
-        visible: ScriteSettings.shortcutsDockWidget.visible
+        visible: ScriteRuntime.shortcutsDockWidgetSettings.visible
         sourceItem: settingsAndShortcutsButton
         content: ShortcutsView { }
         onCloseRequest: hide()
 
-        onContentXChanged: ScriteSettings.shortcutsDockWidget.contentX = contentX
-        onContentYChanged: ScriteSettings.shortcutsDockWidget.contentY = contentY
-        onVisibleChanged: ScriteSettings.shortcutsDockWidget.visible = visible
+        onContentXChanged: ScriteRuntime.shortcutsDockWidgetSettings.contentX = contentX
+        onContentYChanged: ScriteRuntime.shortcutsDockWidgetSettings.contentY = contentY
+        onVisibleChanged: ScriteRuntime.shortcutsDockWidgetSettings.visible = visible
 
         PropertyAlias {
             sourceObject: ScriteRuntime
@@ -2237,7 +2237,7 @@ Item {
 
     Component.onCompleted: {
         if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
-            ScriteSettings.workspace.screenplayEditorWidth = -1
+            ScriteRuntime.workspaceSettings.screenplayEditorWidth = -1
         if(Scrite.app.maybeOpenAnonymously())
             splashLoader.active = false
         ScriteRuntime.screenplayAdapter.sessionId = Scrite.document.sessionId
@@ -2265,14 +2265,14 @@ Item {
 
         Component.onCompleted: {
             Qt.callLater( () => {
-                             if(ScriteSettings.helpNotification.dayZero === "")
-                                ScriteSettings.helpNotification.dayZero = new Date()
+                             if(ScriteRuntime.helpNotificationSettings.dayZero === "")
+                                ScriteRuntime.helpNotificationSettings.dayZero = new Date()
 
-                             const days = ScriteSettings.helpNotification.daysSinceZero()
+                             const days = ScriteRuntime.helpNotificationSettings.daysSinceZero()
                              if(days >= 2) {
-                                 if(!ScriteSettings.helpNotification.isTipShown("discord"))
+                                 if(!ScriteRuntime.helpNotificationSettings.isTipShown("discord"))
                                      htNotification.tipName = "discord"
-                                 else if(!ScriteSettings.helpNotification.isTipShown("subscription") && days >= 5)
+                                 else if(!ScriteRuntime.helpNotificationSettings.isTipShown("subscription") && days >= 5)
                                      htNotification.tipName = "subscription"
                              }
                          })
@@ -2298,8 +2298,8 @@ Item {
         selectMultiple: false
         objectName: "Save File Dialog"
         dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: ScriteSettings.workspace.lastOpenFolderUrl
-        onFolderChanged: ScriteSettings.workspace.lastOpenFolderUrl = folder
+        folder: ScriteRuntime.workspaceSettings.lastOpenFolderUrl
+        onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
         sidebarVisible: true
         selectExisting: false
 
@@ -2335,7 +2335,7 @@ Item {
             ScriteRuntime.recentFiles.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
-            ScriteSettings.workspace.lastOpenFolderUrl = folder
+            ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
         }
     }
 

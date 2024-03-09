@@ -49,7 +49,7 @@ Item {
                 tabIndex: index
                 tabCount: 2
                 textColor: active ? Scrite.app.textColorFor(tabColor) : "black"
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 font.bold: active
                 currentTabIndex: tabBar.currentIndex
                 onRequestActivation: tabBar.currentIndex = index

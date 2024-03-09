@@ -72,7 +72,7 @@ Rectangle {
 
             Text {
                 text: featureName
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 8
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 8
                 font.bold: true
                 anchors.horizontalCenter: parent.horizontalCenter
                 visible: text !== ""
@@ -82,7 +82,7 @@ Rectangle {
                 id: reasonSuggestion
                 text: [reason, suggestion].join(" ").trim()
                 width: parent.width
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 visible: text !== ""
             }

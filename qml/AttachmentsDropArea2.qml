@@ -44,7 +44,7 @@ AttachmentsDropArea {
             color: ScritePrimaryColors.c700.text
             text: parent.visible ? "<b>" + attachmentsDropArea.attachment.title + "</b><br/><br/>" + attachmentNoticeSuffix : ""
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
         }
     }
 }

@@ -44,7 +44,7 @@ Rectangle {
         active: false
         anchors.fill: parent
         property string text
-        property bool animationsEnabled: ScriteSettings.application.enableAnimations
+        property bool animationsEnabled: ScriteRuntime.applicationSettings.enableAnimations
         function show(t) {
             text = t
             active = true
@@ -87,9 +87,9 @@ Rectangle {
         }
 
         Connections {
-            target: ScriteSettings.application
+            target: ScriteRuntime.application
             function onEnableAnimationsChanged() {
-                statusText.animationsEnabled = ScriteSettings.application.enableAnimations
+                statusText.animationsEnabled = ScriteRuntime.applicationSettings.enableAnimations
             }
         }
     }
@@ -201,7 +201,7 @@ Rectangle {
         active: false
         anchors.fill: parent
         enabled: Scrite.notifications.count === 0
-        animationsEnabled: ScriteSettings.application.enableAnimations
+        animationsEnabled: ScriteRuntime.applicationSettings.enableAnimations
         onCloseRequest: {
             active = false
             closeable = true
@@ -218,9 +218,9 @@ Rectangle {
         opacity: !enabled || Scrite.document.busy ? 0.5 : 1
 
         Connections {
-            target: ScriteSettings.application
+            target: ScriteRuntime.application
             function onEnableAnimationsChanged() {
-                modalDialog.animationsEnabled = ScriteSettings.application.enableAnimations
+                modalDialog.animationsEnabled = ScriteRuntime.applicationSettings.enableAnimations
             }
         }
     }

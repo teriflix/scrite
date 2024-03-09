@@ -76,7 +76,7 @@ Menu2 {
                         }
                         return ret;
                     }
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     visible: text !== ""
                     horizontalAlignment: Text.AlignHCenter
                     padding: 5
@@ -86,7 +86,7 @@ Menu2 {
 
                 ListView {
                     id: groupsView
-                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                     anchors.left: parent.left
                     anchors.top: innerTitleText.visible ? innerTitleText.bottom : parent.top
                     anchors.right: parent.right
@@ -108,7 +108,7 @@ Menu2 {
                             bottomPadding: 5
                             anchors.centerIn: parent
                             color: ScritePrimaryColors.button.text
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         }
                     }
                     property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
@@ -176,7 +176,7 @@ Menu2 {
                                 width: parent.width - parent.spacing - 24
                                 anchors.verticalCenter: parent.verticalCenter
                                 font.bold: groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
-                                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                                 leftPadding: arrayItem.type > 0 ? 20 : 0
                                 elide: Text.ElideRight
                             }

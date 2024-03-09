@@ -39,7 +39,7 @@ Item {
         anchors.centerIn: parent
 
         Text {
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
             text: "Rename Character"
             width: parent.width
             wrapMode: Text.WordWrap
@@ -59,7 +59,7 @@ Item {
             label: ""
             focus: true
             horizontalAlignment: Text.AlignHCenter
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
             onReturnPressed: renameButton.click()
         }
 
@@ -87,7 +87,7 @@ Item {
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
                     elide: Text.ElideRight
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
                 }
 
@@ -100,7 +100,7 @@ Item {
                     Text {
                         width: parent.width
                         text: "This operation cannot be undone."
-                        font.pointSize: Math.max(10,ScriteFontMetrics.ideal.font.pointSize-4)
+                        font.pointSize: Math.max(10,ScriteRuntime.idealFontMetrics.font.pointSize-4)
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter

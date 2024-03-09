@@ -22,7 +22,7 @@ import "./globals"
 Item {
     id: tabBarTab
     width: implicitTabSize
-    height: ScriteFontMetrics.ideal.font.pointSize + 16
+    height: ScriteRuntime.idealFontMetrics.font.pointSize + 16
 
     readonly property real tabTextWidth: tabText.width
     readonly property real implicitTabSize: tabTextWidth*1.1 + 2*tabShapeOffset
@@ -61,15 +61,15 @@ Item {
             id: tabText
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             font.bold: tabBarTab.active
             rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
             Behavior on font.pixelSize {
-                enabled: ScriteSettings.application.enableAnimations
+                enabled: ScriteRuntime.applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
             Behavior on color {
-                enabled: ScriteSettings.application.enableAnimations
+                enabled: ScriteRuntime.applicationSettings.enableAnimations
                 ColorAnimation { duration: 125 }
             }
         }

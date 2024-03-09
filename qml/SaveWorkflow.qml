@@ -147,7 +147,7 @@ Item {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 width: _private.maxTextWidth
                 wrapMode: Text.WordWrap
                 text: "Do you want to save this document first?"
@@ -176,7 +176,7 @@ Item {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 width: _private.maxTextWidth
                 wrapMode: Text.WordWrap
                 text: "Do you want to save changes to '" + scriteFileInfo.baseName + "'?"
@@ -255,8 +255,8 @@ Item {
         selectMultiple: false
         objectName: "Save File Dialog"
         dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: ScriteSettings.workspace.lastOpenFolderUrl
-        onFolderChanged: ScriteSettings.workspace.lastOpenFolderUrl = folder
+        folder: ScriteRuntime.workspaceSettings.lastOpenFolderUrl
+        onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
         sidebarVisible: true
         selectExisting: false
 
@@ -267,7 +267,7 @@ Item {
             ScriteRuntime.recentFiles.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
-            ScriteSettings.workspace.lastOpenFolderUrl = folder
+            ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
 
             _private.execute()
         }

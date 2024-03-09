@@ -74,7 +74,7 @@ Item {
                 id: descLabel
                 text: description
                 font.bold: true
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize+2
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+2
                 color: ScriteAccentColors.highlight.text
                 leftPadding: (descriptionPosition === Item.Right ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
                 rightPadding: (descriptionPosition === Item.Left ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
@@ -83,7 +83,7 @@ Item {
 
                 Image {
                     id: descIcon
-                    width: ScriteFontMetrics.ideal.height
+                    width: ScriteRuntime.idealFontMetrics.height
                     height: width
                     smooth: true
                     source: {

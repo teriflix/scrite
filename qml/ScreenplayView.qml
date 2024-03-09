@@ -149,7 +149,7 @@ Item {
         interactive: false
         contentX: screenplayElementList.contentX - screenplayElementList.originX
         clip: true
-        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
         EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
@@ -161,7 +161,7 @@ Item {
         Item {
             id: screenplayTracksFlickContent
             width: screenplayElementList.contentWidth
-            height: ScriteRuntime.screenplayTracks.trackCount * (ScriteFontMetrics.minimum.height + 10)
+            height: ScriteRuntime.screenplayTracks.trackCount * (ScriteRuntime.minimumFontMetrics.height + 10)
 
             Repeater {
                 model: ScriteRuntime.screenplayTracks
@@ -169,8 +169,8 @@ Item {
                 Rectangle {
                     readonly property var trackData: modelData
                     width: screenplayTracksFlickContent.width
-                    height: ScriteFontMetrics.minimum.height + 8
-                    y: index * (ScriteFontMetrics.minimum.height + 10)
+                    height: ScriteRuntime.minimumFontMetrics.height + 8
+                    y: index * (ScriteRuntime.minimumFontMetrics.height + 10)
                     color: Scrite.app.translucent( border.color, 0.1 )
                     border.color: ScriteAccentColors.c900.background
                     border.width: 0.5
@@ -212,7 +212,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             Text {
-                                font: ScriteFontMetrics.minimum.font
+                                font: ScriteRuntime.minimumFontMetrics.font
                                 text: groupData.group
                                 width: parent.width-10
                                 horizontalAlignment: Text.AlignHCenter
@@ -308,7 +308,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
         anchors.topMargin: ScriteRuntime.screenplayTracks.trackCount > 0 ? 0 : 3
-        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
         clip: true
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
@@ -327,7 +327,7 @@ Item {
             return 34
         }
         Behavior on minimumDelegateWidth {
-            enabled: ScriteSettings.application.enableAnimations
+            enabled: ScriteRuntime.applicationSettings.enableAnimations
             NumberAnimation { duration: 250 }
         }
 
@@ -416,7 +416,7 @@ Item {
                 Text {
                     anchors.fill: parent
                     anchors.margins: 5
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     wrapMode: Text.WordWrap
@@ -527,7 +527,7 @@ Item {
                     if(sheading.enabled)
                         ret += "[" + element.resolvedSceneNumber + "]: "
 
-                    if(ScriteSettings.timelineView.textMode === "HeadingOrTitle") {
+                    if(ScriteRuntime.timelineViewSettings.textMode === "HeadingOrTitle") {
                         var selement = escene.structureElement
                         var ntitle = selement.nativeTitle
                         if(ntitle !== "")
@@ -586,7 +586,7 @@ Item {
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width {
-                        enabled: ScriteSettings.application.enableAnimations
+                        enabled: ScriteRuntime.applicationSettings.enableAnimations
                         NumberAnimation { duration: 400 }
                     }
 
@@ -777,7 +777,7 @@ Item {
                         visible: !Scrite.document.readOnly && enableDragDrop
                         enabled: visible
                         Behavior on scale {
-                            enabled: ScriteSettings.application.enableAnimations
+                            enabled: ScriteRuntime.applicationSettings.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
 
@@ -843,7 +843,7 @@ Item {
 
     Loader {
         anchors.fill: screenplayElementList
-        active: ScriteSettings.application.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
+        active: ScriteRuntime.applicationSettings.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
         sourceComponent: Item {
             id: highlightedItemOverlay
 

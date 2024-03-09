@@ -40,7 +40,7 @@ Flickable {
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
     property alias syntaxHighlighter: __textArea.syntaxHighlighter
-    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
     signal editingFinished()
 
@@ -56,7 +56,7 @@ Flickable {
         property var spellChecker: syntaxHighlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
         width: textAreaFlickable.width - (textAreaFlickable.scrollBarRequired && textAreaFlickable.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(textAreaFlickable.height-topPadding-bottomPadding, contentHeight+20)
-        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
         selectByMouse: true
         selectByKeyboard: true
@@ -66,7 +66,7 @@ Flickable {
         Transliterator.textDocument: textDocument
         Transliterator.cursorPosition: cursorPosition
         Transliterator.hasActiveFocus: activeFocus
-        Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
+        Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
         Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
         Transliterator.spellCheckEnabled: textAreaFlickable.spellCheckEnabled
         Transliterator.enforeDefaultFont: textAreaFlickable.enforceDefaultFont

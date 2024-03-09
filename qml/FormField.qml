@@ -61,16 +61,16 @@ Column {
         Label {
             id: questionNumberText
             font.bold: true
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
             horizontalAlignment: Text.AlignRight
-            width: ScriteFontMetrics.ideal.averageCharacterWidth * nrQuestionDigits
+            width: ScriteRuntime.idealFontMetrics.averageCharacterWidth * nrQuestionDigits
             anchors.top: parent.top
         }
 
         Label {
             id: questionText
             font.bold: true
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
             width: parent.width - questionNumberText.width - parent.spacing
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.top: parent.top
@@ -85,7 +85,7 @@ Column {
         border.width: 1
         border.color: Scrite.app.translucent(ScritePrimaryColors.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
-        property real minHeight: (ScriteFontMetrics.ideal.lineSpacing + ScriteFontMetrics.ideal.descent + ScriteFontMetrics.ideal.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
+        property real minHeight: (ScriteRuntime.idealFontMetrics.lineSpacing + ScriteRuntime.idealFontMetrics.descent + ScriteRuntime.idealFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 
         LodLoader {
             id: answerItemLoader
@@ -103,7 +103,7 @@ Column {
             }
 
             lowDetailComponent: TextArea {
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 text: formField.answer === "" ? formField.placeholderText : formField.answer
                 opacity: formField.answer === "" ? 0.5 : 1
@@ -111,7 +111,7 @@ Column {
                 topPadding: 5; bottomPadding: 5
                 Transliterator.defaultFont: font
                 Transliterator.textDocument: textDocument
-                Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
+                Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.spellCheckEnabled: formField.answer !== ""
                 readOnly: true
                 selectByMouse: false
@@ -125,7 +125,7 @@ Column {
 
             highDetailComponent: TextArea {
                 id: answerText
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 selectByMouse: true
                 selectByKeyboard: true
@@ -135,9 +135,9 @@ Column {
                 Transliterator.textDocument: textDocument
                 Transliterator.cursorPosition: cursorPosition
                 Transliterator.hasActiveFocus: activeFocus
-                Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
+                Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
-                Transliterator.spellCheckEnabled: ScriteSettings.screenplayEditor.enableSpellCheck
+                Transliterator.spellCheckEnabled: ScriteRuntime.screenplayEditorSettings.enableSpellCheck
                 readOnly: Scrite.document.readOnly
                 background: Item { }
                 SpecialSymbolsSupport {

@@ -20,7 +20,7 @@ import "./globals"
 QtObject {
     property string tipName
     property var helpTip: Scrite.user.helpTips[tipName]
-    property bool tipShown: ScriteSettings.helpNotification.isTipShown(tipName)
+    property bool tipShown: ScriteRuntime.helpNotificationSettings.isTipShown(tipName)
     property bool enabled: true
 
     Notification.title: helpTip ? helpTip.title : ""
@@ -58,6 +58,6 @@ QtObject {
                                   }
 
     function markTipAsShown() {
-        ScriteSettings.helpNotification.markTipAsShown(tipName)
+        ScriteRuntime.helpNotificationSettings.markTipAsShown(tipName)
     }
 }

@@ -27,7 +27,7 @@ ListView {
     orientation: ListView.Horizontal
     model: attachments
     onAttachmentsChanged: currentIndex = -1
-    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
     highlight: Rectangle {
         color: ScritePrimaryColors.highlight.background
     }
@@ -48,7 +48,7 @@ ListView {
             anchors.margins: 10
             anchors.leftMargin: attachmentsView.delegateSize
             verticalAlignment: Text.AlignVCenter
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             opacity: 0.5
             text: "Attachments"
             visible: attachments && attachments.attachmentCount === 0
@@ -79,7 +79,7 @@ ListView {
                 width: parent.width
                 elide: Text.ElideMiddle
                 padding: 2
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize/2
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize/2
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
                 text: objectItem.originalFileName

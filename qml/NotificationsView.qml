@@ -88,7 +88,7 @@ Flickable {
                             Layout.fillWidth: true
                             text: notification.title
                             wrapMode: Text.WordWrap
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 4
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 4
                             font.bold: true
                             visible: text !== ""
                             color: notification.textColor
@@ -96,7 +96,7 @@ Flickable {
 
                         Label {
                             Layout.fillWidth: true
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                             text: notification.text
                             wrapMode: Text.WordWrap
                             color: notification.textColor

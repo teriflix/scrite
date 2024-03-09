@@ -66,7 +66,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 1
                 model: Scrite.document.backupFilesModel
-                FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                 currentIndex: -1
                 ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
                 highlight: Rectangle {
@@ -90,7 +90,7 @@ Item {
                             padding: 5
                             leftPadding: 12
                             elide: Text.ElideRight
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                             anchors.top: parent.top
                         }
 
@@ -112,7 +112,7 @@ Item {
                             text: metaDataInfo + "<br/><font size=\"-2\">" + fileSizeInfo + "</font>"
                             padding: 5
                             elide: Text.ElideRight
-                            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         }
                     }
 
@@ -148,7 +148,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Open In: "
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 }
 
                 Button2 {

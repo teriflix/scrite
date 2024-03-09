@@ -97,7 +97,7 @@ Item {
                     Text {
                         text: "Are you sure you want to remove this photo?"
                         font.bold: true
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         width: parent.width
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
@@ -151,7 +151,7 @@ Item {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 text: sceneFeaturedPhotoItem.height > 150 ? "Drag & Drop a Photo\n\n-- OR --" : "Drag & Drop a Photo"
             }
 

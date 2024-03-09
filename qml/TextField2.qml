@@ -48,7 +48,7 @@ TextField {
     selectedTextColor: ScriteAccentColors.c700.text
     selectionColor: ScriteAccentColors.c700.background
     selectByMouse: true
-    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
 
     signal editingComplete()
     signal returnPressed()
@@ -168,7 +168,7 @@ TextField {
     Text {
         id: labelText
         text: parent.placeholderText
-        font.pointSize: 2*ScriteFontMetrics.ideal.font.pointSize/3
+        font.pointSize: 2*ScriteRuntime.idealFontMetrics.font.pointSize/3
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.verticalCenter: parent.top
@@ -193,7 +193,7 @@ TextField {
             id: completionView
             clip: true
             model: completionModel
-            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
             highlightMoveDuration: 0
             highlightResizeDuration: 0
             keyNavigationEnabled: false

@@ -48,7 +48,7 @@ Rectangle {
         onClicked: parent.grip()
         onDoubleClicked: {
             parent.grip()
-            ScriteSettings.structureCanvas.displayAnnotationProperties = true
+            ScriteRuntime.structureCanvasSettings.displayAnnotationProperties = true
         }
     }
 

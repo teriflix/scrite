@@ -43,7 +43,7 @@ Button {
     Component.onCompleted: {
         if(!Scrite.app.usingMaterialTheme) {
             background = backgroundComponent.createObject(button)
-            font.pointSize = ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize = ScriteRuntime.idealFontMetrics.font.pointSize
         }
     }
 }

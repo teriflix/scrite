@@ -93,7 +93,7 @@ Item {
             width: parent.width
             wrapMode: Text.WordWrap
             font.bold: true
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
             placeholderText: "Title"
             tabItem: descriptionField
             onTextChanged: {
@@ -108,7 +108,7 @@ Item {
             text: note ? note.content : ""
             width: parent.width
             wrapMode: Text.WordWrap
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             placeholderText: "Description"
             tabItem: checkListView
             backTabItem: titleField

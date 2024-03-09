@@ -55,7 +55,7 @@ Rectangle {
 
         Text {
             width: parent.width
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             horizontalAlignment: Text.AlignHCenter
             text: busyMessage
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere

@@ -23,7 +23,7 @@ Item {
     property string name: "Tabs"
     property var tabs: []
     property alias spacing: tabsRow.spacing
-    height: tabsRow.height + ScriteFontMetrics.ideal.descent + currentTabUnderline.height
+    height: tabsRow.height + ScriteRuntime.idealFontMetrics.descent + currentTabUnderline.height
 
     Row {
         id: tabsRow
@@ -32,8 +32,8 @@ Item {
 
         Text {
             id: nameText
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
-            font.family: ScriteFontMetrics.ideal.font.family
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+            font.family: ScriteRuntime.idealFontMetrics.font.family
             font.capitalization: Font.AllUppercase
             font.bold: true
             text: name + ": "
@@ -45,7 +45,7 @@ Item {
             model: tabs
 
             Text {
-                font: ScriteFontMetrics.ideal.font
+                font: ScriteRuntime.idealFontMetrics.font
                 color: textTabBar.tabIndex === index ? ScriteAccentColors.c900.background : ScritePrimaryColors.c700.background
                 text: modelData
 
@@ -71,14 +71,14 @@ Item {
         color: ScriteAccentColors.c900.background
         width: currentTabItemPositionMapper.from.width
         anchors.top: tabsRow.bottom
-        anchors.topMargin: ScriteFontMetrics.ideal.descent
+        anchors.topMargin: ScriteRuntime.idealFontMetrics.descent
         property bool placedOnce: false
         Behavior on x {
-            enabled: currentTabUnderline.placedOnce && ScriteSettings.application.enableAnimations
+            enabled: currentTabUnderline.placedOnce && ScriteRuntime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
         Behavior on width {
-            enabled: currentTabUnderline.placedOnce && ScriteSettings.application.enableAnimations
+            enabled: currentTabUnderline.placedOnce && ScriteRuntime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
     }

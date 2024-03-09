@@ -42,12 +42,12 @@ Item {
 
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
-        if(!ScriteSettings.scrited.experimentalFeatureNoticeDisplayed) {
+        if(!ScriteRuntime.scritedSettings.experimentalFeatureNoticeDisplayed) {
             Utils.execLater(scritedView, 250, function() {
                 showInformation({
                     "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
                 })
-                ScriteSettings.scrited.experimentalFeatureNoticeDisplayed = true
+                ScriteRuntime.scritedSettings.experimentalFeatureNoticeDisplayed = true
             })
         }
         Scrite.user.logActivity1("scrited")
@@ -150,8 +150,8 @@ Item {
 
     FileDialog {
         id: fileDialog
-        folder: ScriteSettings.scrited.lastOpenScritedFolderUrl
-        onFolderChanged: Qt.callLater( function() { ScriteSettings.scrited.lastOpenScritedFolderUrl = fileDialog.folder } )
+        folder: ScriteRuntime.scritedSettings.lastOpenScritedFolderUrl
+        onFolderChanged: Qt.callLater( function() { ScriteRuntime.scritedSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
         selectFolder: false
         selectMultiple: false
         selectExisting: true
@@ -166,11 +166,11 @@ Item {
 
         Item {
             id: playerArea
-            SplitView.preferredWidth: scritedView.width * ScriteSettings.scrited.playerAreaRatio
+            SplitView.preferredWidth: scritedView.width * ScriteRuntime.scritedSettings.playerAreaRatio
             onWidthChanged: updateScritedSettings()
 
             function updateScritedSettings() {
-                ScriteSettings.scrited.playerAreaRatio = width / scritedView.width
+                ScriteRuntime.scritedSettings.playerAreaRatio = width / scritedView.width
             }
 
             property bool keyFrameGrabMode: false
@@ -193,7 +193,7 @@ Item {
                     width: parent.width
                     height: width / 16 * 9
                     color: "black"
-                    visible: ScriteSettings.scrited.videoPlayerVisible || mediaIsLoaded
+                    visible: ScriteRuntime.scritedSettings.videoPlayerVisible || mediaIsLoaded
 
                     MediaPlayer {
                         id: mediaPlayer
@@ -283,7 +283,7 @@ Item {
                         visible: !mediaIsLoaded
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
-                        onClicked: ScriteSettings.scrited.videoPlayerVisible = false
+                        onClicked: ScriteRuntime.scritedSettings.videoPlayerVisible = false
                         ToolTip.text: "Closes the video player until a video file is loaded."
                     }
 
@@ -663,7 +663,7 @@ Item {
                             width: parent.width
                             anchors.top: textDocumentFlickPadding.bottom
                             anchors.bottom: parent.bottom
-                            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                            FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
                             property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
                             property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
@@ -790,7 +790,7 @@ Item {
                         visible: !videoArea.visible
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
-                        onClicked: ScriteSettings.scrited.videoPlayerVisible = true
+                        onClicked: ScriteRuntime.scritedSettings.videoPlayerVisible = true
                         ToolTip.text: "Shows the video player."
                     }
                 }
@@ -1177,7 +1177,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                 clip: true
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
@@ -1430,12 +1430,12 @@ Item {
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !ScriteSettings.scrited.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
+        Notification.active: !ScriteRuntime.scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
         Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
                 Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
-            ScriteSettings.scrited.codecsNoticeDisplayed = true
+            ScriteRuntime.scritedSettings.codecsNoticeDisplayed = true
         }
     }
 

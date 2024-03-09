@@ -38,7 +38,7 @@ Item {
         anchors.fill: parent
         anchors.margins: 5
         model: Scrite.shortcuts
-        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
         clip: true
         boundsBehavior: Flickable.StopAtBounds
         ScrollBar.vertical: ScrollBar2 { flickable: shortcutsView }
@@ -57,7 +57,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 5
                     // font.family: "Courier Prime"
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     font.bold: true
                     text: section
                 }
@@ -78,7 +78,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     // font.family: "Courier Prime"
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     text: itemTitle
                     width: parent.width * 0.65
                     elide: Text.ElideRight
@@ -87,7 +87,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     font.family: "Courier Prime"
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize-2
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
                     text: Scrite.app.polishShortcutTextForDisplay(itemShortcut)
                     width: parent.width * 0.35
                 }

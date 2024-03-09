@@ -37,7 +37,7 @@ Item {
         }
 
         Text {
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             leftPadding: 10; rightPadding: 3
             text: "Share Scrite: "
             visible: displayShareText

@@ -33,7 +33,7 @@ Item {
         anchors.rightMargin: scrollBarVisible ? 0 : 10
         contentWidth: propertyEditorItems.width
         contentHeight: propertyEditorItems.height
-        FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
         property bool scrollBarVisible: contentHeight > height
         ScrollBar.vertical: ScrollBar2 { flickable: propertyEditorView }
@@ -49,7 +49,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize + 2
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
                     font.bold: true
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
@@ -58,7 +58,7 @@ Item {
 
                 Text {
                     width: parent.width
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
                     text: "<b>Position:</b> " + Math.round(annotation.geometry.x-canvasItemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-canvasItemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
                 }
@@ -83,7 +83,7 @@ Item {
                     Text {
                         width: parent.width
                         text: propertyInfo.title
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         font.bold: true
                     }
 
@@ -220,7 +220,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 text: propertyValue
                 font.capitalization: Font.AllUppercase
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             }
         }
     }
@@ -261,7 +261,7 @@ Item {
                 border.color: ScritePrimaryColors.borderColor
             }
             text: propertyValue
-            font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
             height: Math.max(80, contentHeight) + topPadding + bottomPadding
             padding: 7.5
             onTextChanged: Qt.callLater(commitTextChanges)
@@ -276,7 +276,7 @@ Item {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
-            Transliterator.applyLanguageFonts: ScriteSettings.screenplayEditor.applyUserDefinedLanguageFonts
+            Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
             onCursorRectangleChanged: {
                 if(activeFocus) {
                     var pt = mapToItem(propertyEditorItems, cursorRectangle.x, cursorRectangle.y)
@@ -303,7 +303,7 @@ Item {
 
             Text {
                 width: parent.width
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize-1
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-1
                 visible: propertyValue != urlField.text
                 text: "Press " + (Scrite.app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
             }
@@ -318,7 +318,7 @@ Item {
 
             Text {
                 rightPadding: changeFontButton.width + 5
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 text: propertyValue
                 height: 42
                 verticalAlignment: Text.AlignVCenter
@@ -371,7 +371,7 @@ Item {
                     width: parent.width
                     placeholderText: "search for a font"
                     anchors.top: parent.top
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                     onTextEdited: Qt.callLater(highlightFont)
                     function highlightFont() {
                         var utext = text.toUpperCase()
@@ -390,7 +390,7 @@ Item {
                 ListView {
                     id: fontListView
                     property var systemFontInfo
-                    FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
                     anchors.top: fontSearchBar.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -405,7 +405,7 @@ Item {
                     keyNavigationEnabled: false
                     delegate: Text {
                         font.family: modelData
-                        font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                         text: modelData
                         width: fontListView.width-20
                         color: fontListView.currentIndex === index ? Scrite.app.palette.highlightedText : "black"
@@ -544,7 +544,7 @@ Item {
                     text: propertyValue == "" ? "Set" : "Change"
                     color: "blue"
                     font.underline: true
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
 
                     MouseArea {
                         anchors.fill: parent
@@ -558,7 +558,7 @@ Item {
                     color: "blue"
                     font.underline: true
                     visible: propertyValue != ""
-                    font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
 
                     MouseArea {
                         anchors.fill: parent

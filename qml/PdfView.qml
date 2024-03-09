@@ -101,7 +101,7 @@ Item {
                 flickable: pdfView
             }
             FlickScrollSpeedControl.flickable: pdfView
-            FlickScrollSpeedControl.factor: ScriteSettings.workspace.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
 
             onPdfPageScaleChanged: Qt.callLater(returnToBounds)
 
@@ -231,7 +231,7 @@ Item {
 
             Text {
                 text: "View: "
-                font.pointSize: ScriteFontMetrics.ideal.font.pointSize
+                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
                 anchors.verticalCenter: parent.verticalCenter
                 color: ScritePrimaryColors.c300.text
                 visible: pdfDoc.pageCount > 1
