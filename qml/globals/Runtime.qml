@@ -36,8 +36,8 @@ Item {
         category: "Structure Tab"
 
         property bool showGrid: true
-        property color gridColor: ScriteRuntime.colors.accent.c400.background
-        property color canvasColor: ScriteRuntime.colors.accent.c50.background
+        property color gridColor: Runtime.colors.accent.c400.background
+        property color canvasColor: Runtime.colors.accent.c50.background
         property bool showPreview: true
         property bool displayAnnotationProperties: true
         property bool showPullHandleAnimation: true
@@ -463,12 +463,12 @@ Item {
     readonly property ScreenplayTextDocument screenplayTextDocument: ScreenplayTextDocument {
         // Setting this is as good as setting the other.
         // when paused = true, page and time computation is halted.
-        property bool paused: ScriteRuntime.screenplayEditorSettings.pausePageAndTimeComputation
+        property bool paused: Runtime.screenplayEditorSettings.pausePageAndTimeComputation
         onPausedChanged: Qt.callLater( function() {
-            ScriteRuntime.screenplayEditorSettings.pausePageAndTimeComputation = screenplayTextDocument.paused
+            Runtime.screenplayEditorSettings.pausePageAndTimeComputation = screenplayTextDocument.paused
         })
 
-        screenplay: Scrite.document.loading || paused ? null : ScriteRuntime.screenplayAdapter.screenplay
+        screenplay: Scrite.document.loading || paused ? null : Runtime.screenplayAdapter.screenplay
         formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
         syncEnabled: true
         sceneNumbers: false

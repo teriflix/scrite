@@ -31,8 +31,8 @@ ToolButton {
     implicitWidth: suggestedWidth
     implicitHeight: suggestedHeight
 
-    Material.background: ScriteRuntime.colors.accent.key
-    Material.foreground: ScriteRuntime.colors.primary.key
+    Material.background: Runtime.colors.accent.key
+    Material.foreground: Runtime.colors.primary.key
 
     font.pixelSize: 16
     hoverEnabled: true
@@ -40,9 +40,9 @@ ToolButton {
     opacity: enabled ? 1 : 0.5
     flat: true
     contentItem: Rectangle {
-        color: ScriteRuntime.colors.primary.c10.background
+        color: Runtime.colors.primary.c10.background
         border.width: toolButton.flat ? 0 : 1
-        border.color: ScriteRuntime.colors.primary.borderColor
+        border.color: Runtime.colors.primary.borderColor
 
         Row {
             anchors.centerIn: parent
@@ -67,7 +67,7 @@ ToolButton {
                     font.pixelSize: toolButton.font.pixelSize
                     font.bold: toolButton.down
                     Behavior on color {
-                        enabled: ScriteRuntime.applicationSettings.enableAnimations
+                        enabled: Runtime.applicationSettings.enableAnimations
                         ColorAnimation { duration: 250 }
                     }
                     visible: toolButton.display !== AbstractButton.IconOnly

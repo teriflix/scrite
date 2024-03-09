@@ -37,7 +37,7 @@ Item {
     function show() {
         if(visible)
             return
-        if(sourceItem && ScriteRuntime.applicationSettings.enableAnimations)
+        if(sourceItem && Runtime.applicationSettings.enableAnimations)
             showAnimation.start()
         else {
             container.t = 1
@@ -48,7 +48,7 @@ Item {
     function hide() {
         if(!visible)
             return
-        if(sourceItem && ScriteRuntime.applicationSettings.enableAnimations)
+        if(sourceItem && Runtime.applicationSettings.enableAnimations)
             hideAnimation.start()
         else {
             container.t = 1
@@ -84,7 +84,7 @@ Item {
 
     Rectangle {
         id: container
-        color: ScriteRuntime.colors.primary.c100.background
+        color: Runtime.colors.primary.c100.background
         function evaluateSourceGeometry() {
             if(sourceItem) {
                 var pt = dockWidget.mapFromItem(sourceItem, 0, 0)
@@ -127,13 +127,13 @@ Item {
             anchors.left: parent.left
             anchors.right: parent.right
             height: 40
-            color: ScriteRuntime.colors.primary.c300.background
+            color: Runtime.colors.primary.c300.background
 
             Text {
                 id: titleText
                 anchors.centerIn: parent
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
-                color: ScriteRuntime.colors.primary.c300.text
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                color: Runtime.colors.primary.c300.text
             }
 
             MouseArea {

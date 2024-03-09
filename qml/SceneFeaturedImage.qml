@@ -83,7 +83,7 @@ Item {
             anchors.fill: parent
             active: false
             sourceComponent: Rectangle {
-                color: Scrite.app.translucent(ScriteRuntime.colors.primary.c600.background,0.85)
+                color: Scrite.app.translucent(Runtime.colors.primary.c600.background,0.85)
 
                 MouseArea {
                     anchors.fill: parent
@@ -97,11 +97,11 @@ Item {
                     Text {
                         text: "Are you sure you want to remove this photo?"
                         font.bold: true
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         width: parent.width
                         horizontalAlignment: Text.AlignHCenter
                         wrapMode: Text.WordWrap
-                        color: ScriteRuntime.colors.primary.c600.text
+                        color: Runtime.colors.primary.c600.text
                     }
 
                     Row {
@@ -151,7 +151,7 @@ Item {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: sceneFeaturedPhotoItem.height > 150 ? "Drag & Drop a Photo\n\n-- OR --" : "Drag & Drop a Photo"
             }
 

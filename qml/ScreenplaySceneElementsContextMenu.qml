@@ -29,7 +29,7 @@ Menu2 {
     }
 
     onAboutToShow: {
-        ScriteRuntime.undoStack.sceneListPanelActive = true
+        Runtime.undoStack.sceneListPanelActive = true
         if(element.selected) {
             Scrite.document.screenplay.gatherSelectedScenes(elementItemMenuSceneGroup)
         } else {
@@ -60,7 +60,7 @@ Menu2 {
         scene: screenplayContextMenu.element ? screenplayContextMenu.element.scene : null
         enabled: !Scrite.document.readOnly && !omitIncludeMenuItem.omitted
         onTriggered: {
-            ScriteRuntime.undoStack.sceneListPanelActive = true
+            Runtime.undoStack.sceneListPanelActive = true
             for(var i=0; i<elementItemMenuSceneGroup.sceneCount; i++) {
                 elementItemMenuSceneGroup.sceneAt(i).type = scene.type
             }

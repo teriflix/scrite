@@ -105,7 +105,7 @@ Loader {
             background: Rectangle {
                 visible: frameVisible
                 border.width: 1
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
             }
             opacity: activeFocus ? 1 : 0.5
             leftPadding: textViewEdit.leftPadding
@@ -132,7 +132,7 @@ Loader {
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
-            Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+            Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
 
             onFocusChanged: completionModel.allowEnable = true
 
@@ -171,17 +171,17 @@ Loader {
                 contentItem: ListView {
                     id: completionView
                     model: completionModel
-                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     keyNavigationEnabled: false
                     delegate: Text {
                         width: completionView.width-1
                         text: string
                         padding: 5
                         font: textArea.font
-                        color: index === completionView.currentIndex ? ScriteRuntime.colors.primary.highlight.text : ScriteRuntime.colors.primary.c10.text
+                        color: index === completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                     }
                     highlight: Rectangle {
-                        color: ScriteRuntime.colors.primary.highlight.background
+                        color: Runtime.colors.primary.highlight.background
                     }
                     currentIndex: completionModel.currentRow
                     height: contentHeight

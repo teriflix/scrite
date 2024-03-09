@@ -34,7 +34,7 @@ Rectangle {
     Rectangle {
         id: pageList
         width: pageListWidth
-        color: ScriteRuntime.colors.accent.c500.background // ScriteRuntime.colors.primary.c700.background
+        color: Runtime.colors.accent.c500.background // Runtime.colors.primary.c700.background
         height: parent.height
         anchors.left: parent.left
         property int currentIndex: -1
@@ -51,7 +51,7 @@ Rectangle {
                 Rectangle {
                     width: parent.width
                     height: 60
-                    color: pageList.currentIndex === index ? pageView.color : ScriteRuntime.colors.primary.c10.background
+                    color: pageList.currentIndex === index ? pageView.color : Runtime.colors.primary.c10.background
 
                     Text {
                         anchors.right: parent.right
@@ -60,7 +60,7 @@ Rectangle {
                         font.pixelSize: 18
                         font.bold: pageList.currentIndex === index
                         text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
-                        color: pageList.currentIndex === index ? "black" : ScriteRuntime.colors.primary.c700.text
+                        color: pageList.currentIndex === index ? "black" : Runtime.colors.primary.c700.text
                     }
 
                     Image {
@@ -100,7 +100,7 @@ Rectangle {
         property bool showScrollBars: contentHeight > height
         contentWidth: pageContentLoader.width
         contentHeight: pageContentLoader.height
-        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         ScrollBar.vertical: ScrollBar2 { flickable: pageContentArea }
         Loader {

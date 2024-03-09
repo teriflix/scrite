@@ -42,12 +42,12 @@ Item {
 
     Component.onCompleted: {
         scritedToolbar.scritedView = scritedView
-        if(!ScriteRuntime.scritedSettings.experimentalFeatureNoticeDisplayed) {
+        if(!Runtime.scritedSettings.experimentalFeatureNoticeDisplayed) {
             Utils.execLater(scritedView, 250, function() {
                 showInformation({
                     "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
                 })
-                ScriteRuntime.scritedSettings.experimentalFeatureNoticeDisplayed = true
+                Runtime.scritedSettings.experimentalFeatureNoticeDisplayed = true
             })
         }
         Scrite.user.logActivity1("scrited")
@@ -150,8 +150,8 @@ Item {
 
     FileDialog {
         id: fileDialog
-        folder: ScriteRuntime.scritedSettings.lastOpenScritedFolderUrl
-        onFolderChanged: Qt.callLater( function() { ScriteRuntime.scritedSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
+        folder: Runtime.scritedSettings.lastOpenScritedFolderUrl
+        onFolderChanged: Qt.callLater( function() { Runtime.scritedSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
         selectFolder: false
         selectMultiple: false
         selectExisting: true
@@ -162,15 +162,15 @@ Item {
     SplitView {
         anchors.fill: parent
         orientation: Qt.Horizontal
-        Material.background: Qt.darker(ScriteRuntime.colors.primary.button.background, 1.1)
+        Material.background: Qt.darker(Runtime.colors.primary.button.background, 1.1)
 
         Item {
             id: playerArea
-            SplitView.preferredWidth: scritedView.width * ScriteRuntime.scritedSettings.playerAreaRatio
+            SplitView.preferredWidth: scritedView.width * Runtime.scritedSettings.playerAreaRatio
             onWidthChanged: updateScritedSettings()
 
             function updateScritedSettings() {
-                ScriteRuntime.scritedSettings.playerAreaRatio = width / scritedView.width
+                Runtime.scritedSettings.playerAreaRatio = width / scritedView.width
             }
 
             property bool keyFrameGrabMode: false
@@ -193,7 +193,7 @@ Item {
                     width: parent.width
                     height: width / 16 * 9
                     color: "black"
-                    visible: ScriteRuntime.scritedSettings.videoPlayerVisible || mediaIsLoaded
+                    visible: Runtime.scritedSettings.videoPlayerVisible || mediaIsLoaded
 
                     MediaPlayer {
                         id: mediaPlayer
@@ -283,7 +283,7 @@ Item {
                         visible: !mediaIsLoaded
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
-                        onClicked: ScriteRuntime.scritedSettings.videoPlayerVisible = false
+                        onClicked: Runtime.scritedSettings.videoPlayerVisible = false
                         ToolTip.text: "Closes the video player until a video file is loaded."
                     }
 
@@ -629,19 +629,19 @@ Item {
                                 gradient: Gradient {
                                     GradientStop {
                                         position: 0
-                                        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c600.background, 1)
+                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 1)
                                     }
                                     GradientStop {
                                         position: 0.175
-                                        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c600.background, 0.5)
+                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.5)
                                     }
                                     GradientStop {
                                         position: 0.35
-                                        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c600.background, 0.3)
+                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.3)
                                     }
                                     GradientStop {
                                         position: 0.56
-                                        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c600.background, 0.1)
+                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.1)
                                     }
                                     GradientStop {
                                         position: 0.7
@@ -663,7 +663,7 @@ Item {
                             width: parent.width
                             anchors.top: textDocumentFlickPadding.bottom
                             anchors.bottom: parent.bottom
-                            FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                             property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
                             property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
@@ -712,7 +712,7 @@ Item {
                                     id: textDocumentTimeCursor
                                     width: parent.width
                                     height: 2
-                                    color: ScriteRuntime.colors.primary.c500.background
+                                    color: Runtime.colors.primary.c500.background
                                     visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && !playerArea.keyFrameGrabMode
                                     x: 0
                                     Behavior on y {
@@ -790,7 +790,7 @@ Item {
                         visible: !videoArea.visible
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
-                        onClicked: ScriteRuntime.scritedSettings.videoPlayerVisible = true
+                        onClicked: Runtime.scritedSettings.videoPlayerVisible = true
                         ToolTip.text: "Shows the video player."
                     }
                 }
@@ -1105,7 +1105,7 @@ Item {
 
         Rectangle {
             SplitView.fillWidth: true
-            color: ScriteRuntime.colors.primary.c100.background
+            color: Runtime.colors.primary.c100.background
 
             Row {
                 id: screenplayOffsesHeading
@@ -1166,7 +1166,7 @@ Item {
                 width: parent.width
                 height: 1
                 anchors.bottom: screenplayOffsesHeading.bottom
-                color: ScriteRuntime.colors.primary.borderColor
+                color: Runtime.colors.primary.borderColor
                 visible: screenplayOffsesHeading.visible
             }
 
@@ -1177,7 +1177,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                 clip: true
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
@@ -1201,16 +1201,16 @@ Item {
                         ColorAnimation {
                             target: highlighter
                             property: "color"
-                            from: ScriteRuntime.colors.primary.c200.background
-                            to: ScriteRuntime.colors.accent.c200.background
+                            from: Runtime.colors.primary.c200.background
+                            to: Runtime.colors.accent.c200.background
                             duration: 750
                         }
 
                         ColorAnimation {
                             target: highlighter
                             property: "color"
-                            to: ScriteRuntime.colors.primary.c200.background
-                            from: ScriteRuntime.colors.accent.c200.background
+                            to: Runtime.colors.primary.c200.background
+                            from: Runtime.colors.accent.c200.background
                             duration: 750
                         }
                     }
@@ -1221,8 +1221,8 @@ Item {
                     height: isSceneItem ? 40 : 30
                     color: {
                         if(isSceneItem)
-                            return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : ScriteRuntime.colors.primary.c300.background
-                        return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : ScriteRuntime.colors.primary.c100.background
+                            return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : Runtime.colors.primary.c300.background
+                        return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : Runtime.colors.primary.c100.background
                     }
                     property bool isSceneItem: arrayItem.type === SceneElement.Heading
                     property bool locked: arrayItem.locked
@@ -1430,12 +1430,12 @@ Item {
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !ScriteRuntime.scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
+        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
         Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
                 Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
-            ScriteRuntime.scritedSettings.codecsNoticeDisplayed = true
+            Runtime.scritedSettings.codecsNoticeDisplayed = true
         }
     }
 

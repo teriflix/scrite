@@ -54,7 +54,7 @@ Item {
             anchors.margins: -2.5
             color: Qt.rgba(0,0,0,0)
             border.width: 2
-            border.color: ScriteRuntime.colors.accent.highlight.background
+            border.color: Runtime.colors.accent.highlight.background
             visible: uiElementBoxVisible
         }
 
@@ -64,18 +64,18 @@ Item {
 
         Rectangle {
             id: descTip
-            color: ScriteRuntime.colors.accent.highlight.background
+            color: Runtime.colors.accent.highlight.background
             width: descLabel.width
             height: descLabel.height
             border.width: 1
-            border.color: ScriteRuntime.colors.accent.borderColor
+            border.color: Runtime.colors.accent.borderColor
 
             Label {
                 id: descLabel
                 text: description
                 font.bold: true
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+2
-                color: ScriteRuntime.colors.accent.highlight.text
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
+                color: Runtime.colors.accent.highlight.text
                 leftPadding: (descriptionPosition === Item.Right ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
                 rightPadding: (descriptionPosition === Item.Left ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
                 topPadding: descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? descIcon.height : 10
@@ -83,7 +83,7 @@ Item {
 
                 Image {
                     id: descIcon
-                    width: ScriteRuntime.idealFontMetrics.height
+                    width: Runtime.idealFontMetrics.height
                     height: width
                     smooth: true
                     source: {

@@ -58,7 +58,7 @@ Item {
     Rectangle {
         id: screenplayTools
         z: 1
-        color: ScriteRuntime.colors.accent.c100.background
+        color: Runtime.colors.accent.c100.background
         width: screenplayToolsLayout.width+4
         anchors.top: parent.top
         anchors.left: parent.left
@@ -116,7 +116,7 @@ Item {
             width: 1
             height: parent.height
             anchors.right: parent.right
-            color: ScriteRuntime.colors.accent.borderColor
+            color: Runtime.colors.accent.borderColor
         }
     }
 
@@ -141,7 +141,7 @@ Item {
         id: screenplayTracksFlick
         anchors.left: screenplayElementList.left
         anchors.top: parent.top
-        anchors.topMargin: ScriteRuntime.screenplayTracks.trackCount > 0 ? 2 : 0
+        anchors.topMargin: Runtime.screenplayTracks.trackCount > 0 ? 2 : 0
         anchors.right: screenplayElementList.right
         height: contentHeight
         contentWidth: screenplayTracksFlickContent.width
@@ -149,7 +149,7 @@ Item {
         interactive: false
         contentX: screenplayElementList.contentX - screenplayElementList.originX
         clip: true
-        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
@@ -161,18 +161,18 @@ Item {
         Item {
             id: screenplayTracksFlickContent
             width: screenplayElementList.contentWidth
-            height: ScriteRuntime.screenplayTracks.trackCount * (ScriteRuntime.minimumFontMetrics.height + 10)
+            height: Runtime.screenplayTracks.trackCount * (Runtime.minimumFontMetrics.height + 10)
 
             Repeater {
-                model: ScriteRuntime.screenplayTracks
+                model: Runtime.screenplayTracks
 
                 Rectangle {
                     readonly property var trackData: modelData
                     width: screenplayTracksFlickContent.width
-                    height: ScriteRuntime.minimumFontMetrics.height + 8
-                    y: index * (ScriteRuntime.minimumFontMetrics.height + 10)
+                    height: Runtime.minimumFontMetrics.height + 8
+                    y: index * (Runtime.minimumFontMetrics.height + 10)
                     color: Scrite.app.translucent( border.color, 0.1 )
-                    border.color: ScriteRuntime.colors.accent.c900.background
+                    border.color: Runtime.colors.accent.c900.background
                     border.width: 0.5
 
                     MouseArea {
@@ -212,7 +212,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
 
                             Text {
-                                font: ScriteRuntime.minimumFontMetrics.font
+                                font: Runtime.minimumFontMetrics.font
                                 text: groupData.group
                                 width: parent.width-10
                                 horizontalAlignment: Text.AlignHCenter
@@ -236,10 +236,10 @@ Item {
                                             ttText += "1 Scene"
                                         else
                                             ttText += (1 + groupData.endIndex - groupData.startIndex) + " Scenes"
-                                        if(!ScriteRuntime.screenplayTextDocument.paused) {
+                                        if(!Runtime.screenplayTextDocument.paused) {
                                             var from = Scrite.document.screenplay.elementWithIndex(groupData.startIndex)
                                             var to = Scrite.document.screenplay.elementWithIndex(groupData.endIndex)
-                                            ttText += ", Length: " + ScriteRuntime.screenplayTextDocument.lengthInTimeAsString(from, to)
+                                            ttText += ", Length: " + Runtime.screenplayTextDocument.lengthInTimeAsString(from, to)
                                         }
 
                                         toolTipItem.x = mouseX + parent.x
@@ -268,7 +268,7 @@ Item {
 
     TrackerPack {
         TrackSignal {
-            target: ScriteRuntime.screenplayTracks
+            target: Runtime.screenplayTracks
             signal: "trackCountChanged()"
         }
 
@@ -307,8 +307,8 @@ Item {
         anchors.top: screenplayTracksFlick.bottom
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 0
-        anchors.topMargin: ScriteRuntime.screenplayTracks.trackCount > 0 ? 0 : 3
-        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+        anchors.topMargin: Runtime.screenplayTracks.trackCount > 0 ? 0 : 3
+        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
         clip: true
         property bool somethingIsBeingDropped: false
         // visible: count > 0 || somethingIsBeingDropped
@@ -327,7 +327,7 @@ Item {
             return 34
         }
         Behavior on minimumDelegateWidth {
-            enabled: ScriteRuntime.applicationSettings.enableAnimations
+            enabled: Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 250 }
         }
 
@@ -407,8 +407,8 @@ Item {
                 anchors.leftMargin: 7.5
                 anchors.rightMargin: 2.5
                 anchors.bottomMargin: screenplayElementList.scrollBarRequired ? 20 : 0
-                color: ScriteRuntime.colors.primary.button.background
-                border.color: ScriteRuntime.colors.primary.borderColor
+                color: Runtime.colors.primary.button.background
+                border.color: Runtime.colors.primary.borderColor
                 border.width: 1
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5
                 visible: Scrite.document.structure.elementCount > 0 && enableDragDrop
@@ -416,7 +416,7 @@ Item {
                 Text {
                     anchors.fill: parent
                     anchors.margins: 5
-                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignVCenter
                     wrapMode: Text.WordWrap
@@ -479,7 +479,7 @@ Item {
 
         onCountChanged: updateCacheBuffer()
         function updateCacheBuffer() {
-            if(ScriteRuntime.screenplayTracks.trackCount > 0)
+            if(Runtime.screenplayTracks.trackCount > 0)
                 cacheBuffer = Math.max(extents(count-1, count-1).to + 20, contentWidth)
             else
                 cacheBuffer = 0
@@ -527,7 +527,7 @@ Item {
                     if(sheading.enabled)
                         ret += "[" + element.resolvedSceneNumber + "]: "
 
-                    if(ScriteRuntime.timelineViewSettings.textMode === "HeadingOrTitle") {
+                    if(Runtime.timelineViewSettings.textMode === "HeadingOrTitle") {
                         var selement = escene.structureElement
                         var ntitle = selement.nativeTitle
                         if(ntitle !== "")
@@ -555,8 +555,8 @@ Item {
                     return { "background": element.scene.color, "text": "white" }
                 }
                 if(element.breakType === Screenplay.Episode)
-                    return ScriteRuntime.colors.accent.c700
-                return ScriteRuntime.colors.accent.c500
+                    return Runtime.colors.accent.c700
+                return Runtime.colors.accent.c500
             }
 
             width: isBreakElement ? screenplayElementList.breakDelegateWidth :
@@ -568,7 +568,7 @@ Item {
                 visible: element.selected
                 anchors.fill: elementItemBox
                 anchors.margins: -5
-                color: ScriteRuntime.colors.accent.a700.background
+                color: Runtime.colors.accent.a700.background
             }
 
             Loader {
@@ -586,7 +586,7 @@ Item {
                     border.color: color === Qt.rgba(1,1,1,1) ? "black" : sceneColor
                     border.width: elementItemDelegate.active ? 2 : 1
                     Behavior on border.width {
-                        enabled: ScriteRuntime.applicationSettings.enableAnimations
+                        enabled: Runtime.applicationSettings.enableAnimations
                         NumberAnimation { duration: 400 }
                     }
 
@@ -646,10 +646,10 @@ Item {
                                 else
                                     ret = idxList.length + " Scenes"
 
-                                if(!ScriteRuntime.screenplayTextDocument.paused) {
+                                if(!Runtime.screenplayTextDocument.paused) {
                                     var from = Scrite.document.screenplay.elementAt(idxList[0])
                                     var to = Scrite.document.screenplay.elementAt(idxList[idxList.length-1])
-                                    ret += ", Length: " + ScriteRuntime.screenplayTextDocument.lengthInTimeAsString(from, to)
+                                    ret += ", Length: " + Runtime.screenplayTextDocument.lengthInTimeAsString(from, to)
                                 }
 
                                 return ret
@@ -661,8 +661,8 @@ Item {
                             var pc = elementItemDelegate.element.scene.elementCount
                             ret += pc + " " + (pc > 1 ? "Paragraphs" : "Paragraph")
 
-                            if(!ScriteRuntime.screenplayTextDocument.paused)
-                                ret += ", Length: " + ScriteRuntime.screenplayTextDocument.lengthInTimeAsString(elementItemDelegate.element, null)
+                            if(!Runtime.screenplayTextDocument.paused)
+                                ret += ", Length: " + Runtime.screenplayTextDocument.lengthInTimeAsString(elementItemDelegate.element, null)
 
                             if(parent.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
                                 var str = elementItemDelegate.sceneTitle
@@ -777,7 +777,7 @@ Item {
                         visible: !Scrite.document.readOnly && enableDragDrop
                         enabled: visible
                         Behavior on scale {
-                            enabled: ScriteRuntime.applicationSettings.enableAnimations
+                            enabled: Runtime.applicationSettings.enableAnimations
                             NumberAnimation { duration: 250 }
                         }
 
@@ -843,7 +843,7 @@ Item {
 
     Loader {
         anchors.fill: screenplayElementList
-        active: ScriteRuntime.applicationSettings.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
+        active: Runtime.applicationSettings.enableAnimations && !screenplayElementList.FocusTracker.hasFocus
         sourceComponent: Item {
             id: highlightedItemOverlay
 

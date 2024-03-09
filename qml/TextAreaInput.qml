@@ -28,17 +28,17 @@ TextArea {
     selectByKeyboard: true
     selectByMouse: true
     // renderType: Text.NativeRendering
-    Material.primary: ScriteRuntime.colors.primary.key
-    Material.accent: ScriteRuntime.colors.accent.key
-    selectedTextColor: ScriteRuntime.colors.accent.c700.text
-    selectionColor: ScriteRuntime.colors.accent.c700.background
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    selectedTextColor: Runtime.colors.accent.c700.text
+    selectionColor: Runtime.colors.accent.c700.background
     background: Rectangle {
-        color: enabled ? ScriteRuntime.colors.primary.c10.background : ScriteRuntime.colors.primary.button.background
+        color: enabled ? Runtime.colors.primary.c10.background : Runtime.colors.primary.button.background
 
         Rectangle {
             width: parent.width
             height: txtAreaInput.activeFocus ? 2 : 1
-            color: ScriteRuntime.colors.accent.c700.background
+            color: Runtime.colors.accent.c700.background
             visible: txtAreaInput.enabled
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 4
@@ -49,7 +49,7 @@ TextArea {
     Transliterator.textDocument: textDocument
     Transliterator.cursorPosition: cursorPosition
     Transliterator.hasActiveFocus: activeFocus
-    Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+    Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
     Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
     Transliterator.spellCheckEnabled: spellCheckEnabled
 

@@ -41,7 +41,7 @@ Rectangle {
             width: parent.height
             height: parent.height
             border.width: 1
-            border.color: ScriteRuntime.colors.primary.borderColor
+            border.color: Runtime.colors.primary.borderColor
             radius: character.photos.length > 0 ? 0 : 6
 
             Image {
@@ -74,7 +74,7 @@ Rectangle {
             Text {
                 text: character.name
                 font.bold: true
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 font.capitalization: Font.AllUppercase
                 width: parent.width
                 elide: Text.ElideRight
@@ -83,7 +83,7 @@ Rectangle {
             Text {
                 width: parent.width
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-3
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize-3
                 maximumLineCount: 3
                 text: {
                     var fields = []

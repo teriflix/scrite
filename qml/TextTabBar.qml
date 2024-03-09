@@ -23,7 +23,7 @@ Item {
     property string name: "Tabs"
     property var tabs: []
     property alias spacing: tabsRow.spacing
-    height: tabsRow.height + ScriteRuntime.idealFontMetrics.descent + currentTabUnderline.height
+    height: tabsRow.height + Runtime.idealFontMetrics.descent + currentTabUnderline.height
 
     Row {
         id: tabsRow
@@ -32,8 +32,8 @@ Item {
 
         Text {
             id: nameText
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
-            font.family: ScriteRuntime.idealFontMetrics.font.family
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.family: Runtime.idealFontMetrics.font.family
             font.capitalization: Font.AllUppercase
             font.bold: true
             text: name + ": "
@@ -45,8 +45,8 @@ Item {
             model: tabs
 
             Text {
-                font: ScriteRuntime.idealFontMetrics.font
-                color: textTabBar.tabIndex === index ? ScriteRuntime.colors.accent.c900.background : ScriteRuntime.colors.primary.c700.background
+                font: Runtime.idealFontMetrics.font
+                color: textTabBar.tabIndex === index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
                 text: modelData
 
                 MouseArea {
@@ -68,17 +68,17 @@ Item {
         id: currentTabUnderline
         x: currentTabItemPositionMapper.mappedPosition.x
         height: 2
-        color: ScriteRuntime.colors.accent.c900.background
+        color: Runtime.colors.accent.c900.background
         width: currentTabItemPositionMapper.from.width
         anchors.top: tabsRow.bottom
-        anchors.topMargin: ScriteRuntime.idealFontMetrics.descent
+        anchors.topMargin: Runtime.idealFontMetrics.descent
         property bool placedOnce: false
         Behavior on x {
-            enabled: currentTabUnderline.placedOnce && ScriteRuntime.applicationSettings.enableAnimations
+            enabled: currentTabUnderline.placedOnce && Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
         Behavior on width {
-            enabled: currentTabUnderline.placedOnce && ScriteRuntime.applicationSettings.enableAnimations
+            enabled: currentTabUnderline.placedOnce && Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
     }

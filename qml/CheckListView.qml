@@ -93,7 +93,7 @@ Item {
             width: parent.width
             wrapMode: Text.WordWrap
             font.bold: true
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
             placeholderText: "Title"
             tabItem: descriptionField
             onTextChanged: {
@@ -108,7 +108,7 @@ Item {
             text: note ? note.content : ""
             width: parent.width
             wrapMode: Text.WordWrap
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             placeholderText: "Description"
             tabItem: checkListView
             backTabItem: titleField
@@ -124,7 +124,7 @@ Item {
             Layout.fillHeight: true
             color: Qt.rgba(0,0,0,0)
             border.width: checkListView.height < checkListView.contentHeight ? 1 : 0
-            border.color: ScriteRuntime.colors.primary.borderColor
+            border.color: Runtime.colors.primary.borderColor
 
             ListView {
                 id: checkListView

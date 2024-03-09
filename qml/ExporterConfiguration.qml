@@ -44,12 +44,12 @@ Item {
             notice.text = exportKind + " Export"
         } else {
             if(Scrite.app.verifyType(exporter, "StructureExporter")) {
-                ScriteRuntime.mainWindowTab = ScriteRuntime.e_StructureTab
+                Runtime.mainWindowTab = Runtime.e_StructureTab
             }
 
             if(Scrite.app.verifyType(exporter, "AbstractTextDocumentExporter")) {
-                exporter.capitalizeSentences = ScriteRuntime.screenplayEditorSettings.enableAutoCapitalizeSentences
-                exporter.polishParagraphs = ScriteRuntime.screenplayEditorSettings.enableAutoPolishParagraphs
+                exporter.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
+                exporter.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
             }
         }
 
@@ -123,7 +123,7 @@ Item {
                             width: parent.width
                             label: Text {
                                 text: "Export fonts for the following languages"
-                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
                             height: languageBundleView.height+45
 
@@ -143,7 +143,7 @@ Item {
                                         text: modelData.key
                                         onToggled: exporter.bundleFontForLanguage(modelData.value,checked)
                                         TabSequenceItem.manager: tabSequence
-                                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                     }
                                 }
                             }
@@ -272,7 +272,7 @@ Item {
                 wrapMode: Text.WordWrap
                 maximumLineCount: 2
                 elide: Text.ElideRight
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
             SpinBox {
@@ -301,7 +301,7 @@ Item {
                 checkable: true
                 checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
                 onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 TabSequenceItem.manager: tabSequence
             }
 
@@ -310,8 +310,8 @@ Item {
                 wrapMode: Text.WordWrap
                 leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
                 text: fieldInfo.note
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
-                color: ScriteRuntime.colors.primary.c600.background
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                color: Runtime.colors.primary.c600.background
                 visible: fieldInfo.note !== ""
             }
         }
@@ -327,7 +327,7 @@ Item {
             Text {
                 text: fieldInfo.name
                 font.capitalization: Font.Capitalize
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
             TextField2 {

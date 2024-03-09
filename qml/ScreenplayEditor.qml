@@ -51,12 +51,12 @@ Rectangle {
         return zoomSlider.zoomLevelModifierToApply()
     }
 
-    color: ScriteRuntime.colors.primary.windowColor
+    color: Runtime.colors.primary.windowColor
     clip: true
 
     PropertyAlias {
         id: sourcePropertyAlias
-        sourceObject: ScriteRuntime.screenplayAdapter
+        sourceObject: Runtime.screenplayAdapter
         sourceProperty: "source"
     }
 
@@ -69,20 +69,20 @@ Rectangle {
 
         function changeCurrentIndexTo(val) {
             currentIndexChangeSoruce = _InternalSource
-            ScriteRuntime.screenplayAdapter.currentIndex = val
+            Runtime.screenplayAdapter.currentIndex = val
             privateData.currentIndexChangeSoruce = privateData._ExternalSource
         }
     }
 
     Connections {
         id: screenplayAdapterConnections
-        target: ScriteRuntime.screenplayAdapter
+        target: Runtime.screenplayAdapter
 
         function internalSwitchToCurrentIndex() {
             screenplayEditorBusyOverlay.reset()
             forceContentViewPosition.stop()
 
-            const currentIndex = ScriteRuntime.screenplayAdapter.currentIndex
+            const currentIndex = Runtime.screenplayAdapter.currentIndex
             if(currentIndex < 0) {
                 contentView.scrollToFirstScene()
                 return
@@ -108,7 +108,7 @@ Rectangle {
         }
 
         function positionViewAtCurrentIndex() {
-            const currentIndex = ScriteRuntime.screenplayAdapter.currentIndex
+            const currentIndex = Runtime.screenplayAdapter.currentIndex
             if(currentIndex < 0)
                 contentView.scrollToFirstScene()
             else
@@ -155,7 +155,7 @@ Rectangle {
 
     Connections {
         target: Scrite.document.screenplay
-        enabled: ScriteRuntime.screenplayAdapter.isSourceScreenplay
+        enabled: Runtime.screenplayAdapter.isSourceScreenplay
         function onRequestEditorAt(index) {
             contentView.positionViewAtIndex(index, ListView.Beginning)
         }
@@ -163,13 +163,13 @@ Rectangle {
 
     // Ctrl+Shift+N should result in the newly added scene to get keyboard focus
     Connections {
-        target: ScriteRuntime.screenplayAdapter.isSourceScreenplay ? Scrite.document : null
+        target: Runtime.screenplayAdapter.isSourceScreenplay ? Scrite.document : null
         ignoreUnknownSignals: true
         function onNewSceneCreated(scene, screenplayIndex) {
-            Utils.execLater(ScriteRuntime.screenplayAdapter.screenplay, 100, function() {
+            Utils.execLater(Runtime.screenplayAdapter.screenplay, 100, function() {
                 contentView.positionViewAtIndex(screenplayIndex, ListView.Visible)
                 var item = contentView.loadedItemAtIndex(screenplayIndex)
-                if(ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab || ScriteRuntime.undoStack.screenplayEditorActive)
+                if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab || Runtime.undoStack.screenplayEditorActive)
                     item.assumeFocus()
             })
         }
@@ -182,16 +182,16 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 1
-        color: ScriteRuntime.colors.primary.c100.background
+        color: Runtime.colors.primary.c100.background
         width: ruler.width
         height: screenplaySearchBar.height * opacity
-        enabled: ScriteRuntime.screenplayAdapter.screenplay
+        enabled: Runtime.screenplayAdapter.screenplay
         border.width: 1
-        border.color: ScriteRuntime.colors.primary.borderColor
+        border.color: Runtime.colors.primary.borderColor
         visible: opacity > 0
         opacity: globalScreenplayEditorToolbar.showFind ? 1 : 0
         Behavior on opacity {
-            enabled: ScriteRuntime.applicationSettings.enableAnimations
+            enabled: Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
 
@@ -211,7 +211,7 @@ Rectangle {
 
             Repeater {
                 id: searchAgents
-                model: ScriteRuntime.screenplayAdapter.screenplay ? 1 : 0
+                model: Runtime.screenplayAdapter.screenplay ? 1 : 0
 
                 Item {
                     property string searchString
@@ -221,9 +221,9 @@ Rectangle {
                     signal replaceCurrentRequest(string replacementText)
 
                     SearchAgent.onReplaceAll: {
-                        ScriteRuntime.screenplayTextDocument.syncEnabled = false
-                        ScriteRuntime.screenplayAdapter.screenplay.replace(searchString, replacementText, 0)
-                        ScriteRuntime.screenplayTextDocument.syncEnabled = true
+                        Runtime.screenplayTextDocument.syncEnabled = false
+                        Runtime.screenplayAdapter.screenplay.replace(searchString, replacementText, 0)
+                        Runtime.screenplayTextDocument.syncEnabled = true
                     }
                     SearchAgent.onReplaceCurrent: replaceCurrentRequest(replacementText)
 
@@ -231,7 +231,7 @@ Rectangle {
 
                     SearchAgent.onSearchRequest: {
                         searchString = string
-                        searchResults = ScriteRuntime.screenplayAdapter.screenplay.search(string, 0)
+                        searchResults = Runtime.screenplayAdapter.screenplay.search(string, 0)
                         SearchAgent.searchResultCount = searchResults.length
                     }
 
@@ -242,7 +242,7 @@ Rectangle {
                             if(sceneIndex !== previousSceneIndex)
                                 clearPreviousElementUserData()
                             var sceneResultIndex = searchResult["sceneResultIndex"]
-                            var screenplayElement = ScriteRuntime.screenplayAdapter.screenplay.elementAt(sceneIndex)
+                            var screenplayElement = Runtime.screenplayAdapter.screenplay.elementAt(sceneIndex)
                             var data = {
                                 "searchString": searchString,
                                 "sceneResultIndex": sceneResultIndex,
@@ -256,7 +256,7 @@ Rectangle {
                     }
 
                     SearchAgent.onClearSearchRequest: {
-                        ScriteRuntime.screenplayAdapter.screenplay.currentElementIndex = previousSceneIndex
+                        Runtime.screenplayAdapter.screenplay.currentElementIndex = previousSceneIndex
                         searchString = ""
                         searchResults = []
                         clearPreviousElementUserData()
@@ -264,7 +264,7 @@ Rectangle {
 
                     function clearPreviousElementUserData() {
                         if(previousSceneIndex >= 0) {
-                            var screenplayElement = ScriteRuntime.screenplayAdapter.screenplay.elementAt(previousSceneIndex)
+                            var screenplayElement = Runtime.screenplayAdapter.screenplay.elementAt(previousSceneIndex)
                             if(screenplayElement)
                                 screenplayElement.userData = undefined
                         }
@@ -310,7 +310,7 @@ Rectangle {
                 return availableMargin
             }
             Behavior on leftMargin {
-                enabled: ScriteRuntime.applicationSettings.enableAnimations && contentView.commentsExpandCounter > 0
+                enabled: Runtime.applicationSettings.enableAnimations && contentView.commentsExpandCounter > 0
                 NumberAnimation { duration: 50 }
             }
 
@@ -321,17 +321,17 @@ Rectangle {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.topMargin: ruler.visible ? 5 : 1
-                color: ScriteRuntime.screenplayAdapter.elementCount === 0 || contentView.spacing === 0 ? "white" : Qt.rgba(0,0,0,0)
+                color: Runtime.screenplayAdapter.elementCount === 0 || contentView.spacing === 0 ? "white" : Qt.rgba(0,0,0,0)
 
                 TrackerPack {
                     id: trackerPack
                     property int counter: 0
-                    TrackProperty { target: ScriteRuntime.screenplayEditorSettings; property: "displaySceneCharacters" }
+                    TrackProperty { target: Runtime.screenplayEditorSettings; property: "displaySceneCharacters" }
                     // We shouldnt be tracking changes in elementCount as a reason to reset
                     // the model used by contentView. This causes too many delegate creation/deletions.
                     // Just not effective.
-                    // TrackProperty { target: ScriteRuntime.screenplayAdapter; property: "elementCount" }
-                    TrackProperty { target: ScriteRuntime.screenplayAdapter; property: "source" }
+                    // TrackProperty { target: Runtime.screenplayAdapter; property: "elementCount" }
+                    TrackProperty { target: Runtime.screenplayAdapter; property: "source" }
                     onTracked: counter = counter+1
                 }
 
@@ -339,12 +339,12 @@ Rectangle {
                     id: contentViewModel
                     trackChangesOn: trackerPack.counter
                     from: null
-                    to: ScriteRuntime.screenplayAdapter
+                    to: Runtime.screenplayAdapter
                     onJustReset: {
-                        if(ScriteRuntime.screenplayAdapter.currentIndex < 0)
+                        if(Runtime.screenplayAdapter.currentIndex < 0)
                             contentView.positionViewAtBeginning()
                         else
-                            contentView.positionViewAtIndex(ScriteRuntime.screenplayAdapter.currentIndex, ListView.Beginning)
+                            contentView.positionViewAtIndex(Runtime.screenplayAdapter.currentIndex, ListView.Beginning)
                     }
                 }
 
@@ -374,10 +374,10 @@ Rectangle {
                         id: contentViewHeaderItem
                         width: contentView.width
                         height: {
-                            if(!ScriteRuntime.screenplayAdapter.isSourceScreenplay)
+                            if(!Runtime.screenplayAdapter.isSourceScreenplay)
                                 return contentView.spacing
                             var ret = logLineEditor.visible ? logLineEditor.contentHeight : 0;
-                            if(ScriteRuntime.screenplayAdapter.isSourceScreenplay)
+                            if(Runtime.screenplayAdapter.isSourceScreenplay)
                                 ret += titleCardLoader.active ? titleCardLoader.height : Math.max(ruler.topMarginPx,editTitlePageButton.height+20)
                             return ret + contentView.spacing
                         }
@@ -386,7 +386,7 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             anchors.bottomMargin: contentView.spacing
-                            visible: ScriteRuntime.screenplayAdapter.elementCount > 0 && contentView.spacing > 0 && ScriteRuntime.screenplayAdapter.isSourceScreenplay
+                            visible: Runtime.screenplayAdapter.elementCount > 0 && contentView.spacing > 0 && Runtime.screenplayAdapter.isSourceScreenplay
                         }
 
                         function editTitlePage(source) {
@@ -406,7 +406,7 @@ Rectangle {
 
                         Loader {
                             id: titleCardLoader
-                            active: ScriteRuntime.screenplayAdapter.isSourceScreenplay && (Scrite.document.screenplay.hasTitlePageAttributes || logLineEditor.visible || Scrite.document.screenplay.coverPagePhoto !== "")
+                            active: Runtime.screenplayAdapter.isSourceScreenplay && (Scrite.document.screenplay.hasTitlePageAttributes || logLineEditor.visible || Scrite.document.screenplay.coverPagePhoto !== "")
                             sourceComponent: titleCardComponent
                             anchors.left: parent.left
                             anchors.right: parent.right
@@ -429,10 +429,10 @@ Rectangle {
                             flat: false
                             width: implicitWidth * 1.5
                             height: implicitHeight * 1.25
-                            visible: ScriteRuntime.screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
+                            visible: Runtime.screenplayAdapter.isSourceScreenplay && titleCardLoader.active === false && enabled
                             opacity: hovered ? 1 : 0.75
                             anchors.centerIn: parent
-                            anchors.verticalCenterOffset: ScriteRuntime.screenplayAdapter.elementCount > 0 ? -contentView.spacing/2 : 0
+                            anchors.verticalCenterOffset: Runtime.screenplayAdapter.elementCount > 0 ? -contentView.spacing/2 : 0
                             onClicked: editTitlePage(this)
                             enabled: !Scrite.document.readOnly
                         }
@@ -449,7 +449,7 @@ Rectangle {
                             anchors.bottomMargin: Math.max(ruler.topMarginPx * 0.1, 10)
                             property real contentHeight: visible ? logLineEditorLayout.height + anchors.topMargin + anchors.bottomMargin : 0
                             height: logLineEditorLayout.height
-                            visible: ScriteRuntime.screenplayEditorSettings.showLoglineEditor && ScriteRuntime.screenplayAdapter.isSourceScreenplay && (Scrite.document.readOnly ? logLineField.text !== "" : true)
+                            visible: Runtime.screenplayEditorSettings.showLoglineEditor && Runtime.screenplayAdapter.isSourceScreenplay && (Scrite.document.readOnly ? logLineField.text !== "" : true)
 
                             TextLimiterSyntaxHighlighterDelegate {
                                 id: loglineLimitHighlighter
@@ -474,7 +474,7 @@ Rectangle {
                                     font.family: screenplayFormat.defaultFont2.family
                                     font.pointSize: screenplayFormat.defaultFont2.pointSize-2
                                     visible: logLineField.length > 0
-                                    color: loglineLimiter.limitReached ? "darkred" : ScriteRuntime.colors.primary.a700.background
+                                    color: loglineLimiter.limitReached ? "darkred" : Runtime.colors.primary.a700.background
                                 }
 
                                 TextAreaInput {
@@ -509,7 +509,7 @@ Rectangle {
                         width: contentView.width
                         z: 10 // So that the UiElementHightlight doesnt get clipped at the top-edge of the footer.
                         height: {
-                            if(!ScriteRuntime.screenplayAdapter.isSourceScreenplay)
+                            if(!Runtime.screenplayAdapter.isSourceScreenplay)
                                 return contentView.spacing
                             return Math.max(ruler.bottomMarginPx, addEpisodeButton.height+20) + contentView.spacing
                         }
@@ -517,14 +517,14 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             anchors.topMargin: contentView.spacing
-                            visible: ScriteRuntime.screenplayAdapter.elementCount > 0 && contentView.spacing > 0 && ScriteRuntime.screenplayAdapter.isSourceScreenplay
+                            visible: Runtime.screenplayAdapter.elementCount > 0 && contentView.spacing > 0 && Runtime.screenplayAdapter.isSourceScreenplay
                         }
 
                         Row {
                             id: addButtonsRow
                             anchors.centerIn: parent
-                            anchors.verticalCenterOffset: ScriteRuntime.screenplayAdapter.elementCount > 0 ? contentView.spacing/2 : 0
-                            visible: ScriteRuntime.screenplayAdapter.isSourceScreenplay && enabled
+                            anchors.verticalCenterOffset: Runtime.screenplayAdapter.elementCount > 0 ? contentView.spacing/2 : 0
+                            visible: Runtime.screenplayAdapter.isSourceScreenplay && enabled
                             enabled: !Scrite.document.readOnly
                             spacing: 20
 
@@ -568,7 +568,7 @@ Rectangle {
 
                         Loader {
                             id: addButtonsAnimator
-                            active: ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab && contentView.count === 1 && !modalDialog.active && !splashLoader.active && !ScriteRuntime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown
+                            active: Runtime.mainWindowTab === Runtime.e_ScreenplayTab && contentView.count === 1 && !modalDialog.active && !splashLoader.active && !Runtime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown
                             anchors.fill: parent
                             sourceComponent: UiElementHighlight {
                                 uiElement: addButtonsRow
@@ -577,7 +577,7 @@ Rectangle {
                                 description: "Use these buttons to add new a scene, act or episode."
                                 highlightAnimationEnabled: false
                                 onDone: addButtonsAnimator.active = false
-                                Component.onCompleted: ScriteRuntime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown = true
+                                Component.onCompleted: Runtime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown = true
                             }
                         }
                     }
@@ -596,27 +596,27 @@ Rectangle {
                     id: contentView
                     anchors.fill: parent
                     model: defaultCacheBuffer >= 0 ? contentViewModel.value : null
-                    spacing: ScriteRuntime.screenplayAdapter.elementCount > 0 ? ScriteRuntime.screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
+                    spacing: Runtime.screenplayAdapter.elementCount > 0 ? Runtime.screenplayEditorSettings.spaceBetweenScenes*zoomLevel : 0
                     property int commentsExpandCounter: 0
                     property bool commentsExpanded: false
                     property bool scrollingBetweenScenes: false
                     readonly property bool loadAllDelegates: false // for future use
                     property real spaceForComments: {
-                        if(ScriteRuntime.screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
+                        if(Runtime.screenplayEditorSettings.displaySceneComments && commentsPanelAllowed)
                             return Math.round(screenplayEditorWorkspace.width - pageRulerArea.width - pageRulerArea.minLeftMargin - 20)
                         return 0
                     }
-                    property int commentsPanelTabIndex: ScriteRuntime.screenplayEditorSettings.commentsPanelTabIndex
-                    onCommentsPanelTabIndexChanged: ScriteRuntime.screenplayEditorSettings.commentsPanelTabIndex = commentsPanelTabIndex
+                    property int commentsPanelTabIndex: Runtime.screenplayEditorSettings.commentsPanelTabIndex
+                    onCommentsPanelTabIndexChanged: Runtime.screenplayEditorSettings.commentsPanelTabIndex = commentsPanelTabIndex
                     onCommentsExpandedChanged: commentsExpandCounter = commentsExpandCounter+1
-                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                     function delegateWasLoaded() { Qt.callLater(delegateLoaded) }
                     signal delegateLoaded()
 
                     property bool allowContentYAnimation
                     Behavior on contentY {
-                        enabled: ScriteRuntime.applicationSettings.enableAnimations && contentView.allowContentYAnimation
+                        enabled: Runtime.applicationSettings.enableAnimations && contentView.allowContentYAnimation
                         NumberAnimation {
                             duration: 100
                             onFinished: contentView.allowContentYAnimation = false
@@ -624,17 +624,17 @@ Rectangle {
                     }
 
                     header: {
-                        if(ScriteRuntime.screenplayEditorSettings.displayEmptyTitleCard)
+                        if(Runtime.screenplayEditorSettings.displayEmptyTitleCard)
                             return contentViewHeaderComponent
-                        if(ScriteRuntime.screenplayAdapter.isSourceScreenplay) {
-                            const logLineEditorVisible = ScriteRuntime.screenplayEditorSettings.showLoglineEditor && (Scrite.document.readOnly ? ScriteRuntime.screenplayAdapter.screenplay.logline !== "" : true)
-                            if (ScriteRuntime.screenplayAdapter.screenplay.hasTitlePageAttributes || logLineEditorVisible)
+                        if(Runtime.screenplayAdapter.isSourceScreenplay) {
+                            const logLineEditorVisible = Runtime.screenplayEditorSettings.showLoglineEditor && (Scrite.document.readOnly ? Runtime.screenplayAdapter.screenplay.logline !== "" : true)
+                            if (Runtime.screenplayAdapter.screenplay.hasTitlePageAttributes || logLineEditorVisible)
                                 return contentViewHeaderComponent
                         }
                         return contentViewDummyHeaderComponent
                     }
 
-                    footer: ScriteRuntime.screenplayEditorSettings.displayAddSceneBreakButtons ? contentViewFooterComponent : contentViewDummyFooterComponent
+                    footer: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons ? contentViewFooterComponent : contentViewDummyFooterComponent
 
                     delegate: contentViewDelegateComponent
 
@@ -646,15 +646,15 @@ Rectangle {
                     property int numberOfWordsAddedToDict : 0
 
                     FocusTracker.window: Scrite.window
-                    FocusTracker.indicator.target: ScriteRuntime.undoStack
-                    FocusTracker.indicator.property: ScriteRuntime.screenplayAdapter.isSourceScreenplay ? "screenplayEditorActive" : "sceneEditorActive"
+                    FocusTracker.indicator.target: Runtime.undoStack
+                    FocusTracker.indicator.property: Runtime.screenplayAdapter.isSourceScreenplay ? "screenplayEditorActive" : "sceneEditorActive"
                     FocusTracker.onHasFocusChanged: {
-                        ScriteRuntime.undoStack.screenplayEditorActive = FocusTracker.hasFocus && ScriteRuntime.screenplayAdapter.isSourceScreenplay
-                        ScriteRuntime.undoStack.sceneEditorActive = !FocusTracker.hasFocus && ScriteRuntime.screenplayAdapter.isSourceScreenplay
+                        Runtime.undoStack.screenplayEditorActive = FocusTracker.hasFocus && Runtime.screenplayAdapter.isSourceScreenplay
+                        Runtime.undoStack.sceneEditorActive = !FocusTracker.hasFocus && Runtime.screenplayAdapter.isSourceScreenplay
                     }
                     Component.onDestruction: {
-                        ScriteRuntime.undoStack.screenplayEditorActive = false
-                        ScriteRuntime.undoStack.sceneEditorActive = false
+                        Runtime.undoStack.screenplayEditorActive = false
+                        Runtime.undoStack.sceneEditorActive = false
                     }
 
                     property int defaultCacheBuffer: -1
@@ -663,21 +663,21 @@ Rectangle {
                         cacheBuffer = Qt.binding( () => {
                                                      if(!model)
                                                         return defaultCacheBuffer
-                                                     return (ScriteRuntime.screenplayEditorSettings.optimiseScrolling || contentView.loadAllDelegates) ? 2147483647 : defaultCacheBuffer
+                                                     return (Runtime.screenplayEditorSettings.optimiseScrolling || contentView.loadAllDelegates) ? 2147483647 : defaultCacheBuffer
                                                  })
                     }
 
                     Component.onCompleted: {
                         if(Scrite.app.isMacOSPlatform)
                             flickDeceleration = 7500
-                        positionViewAtIndex(ScriteRuntime.screenplayAdapter.currentIndex, ListView.Beginning)
+                        positionViewAtIndex(Runtime.screenplayAdapter.currentIndex, ListView.Beginning)
                         configureCacheBuffer()
                     }
 
                     property point firstPoint: mapToItem(contentItem, width/2, 1)
                     property point lastPoint: mapToItem(contentItem, width/2, height-2)
-                    property int firstItemIndex: ScriteRuntime.screenplayAdapter.elementCount > 0 ? Math.max(indexAt(firstPoint.x, firstPoint.y), 0) : 0
-                    property int lastItemIndex: ScriteRuntime.screenplayAdapter.elementCount > 0 ? validOrLastIndex(indexAt(lastPoint.x, lastPoint.y)) : 0
+                    property int firstItemIndex: Runtime.screenplayAdapter.elementCount > 0 ? Math.max(indexAt(firstPoint.x, firstPoint.y), 0) : 0
+                    property int lastItemIndex: Runtime.screenplayAdapter.elementCount > 0 ? validOrLastIndex(indexAt(lastPoint.x, lastPoint.y)) : 0
 
                     onContentYChanged: Qt.callLater(evaluateFirstAndLastPoint)
                     onOriginYChanged: Qt.callLater(evaluateFirstAndLastPoint)
@@ -708,7 +708,7 @@ Rectangle {
                         // If the current item is already visible, then lets not
                         // second guess user's intent. We will leave the current
                         // item as is.
-                        var ci = ScriteRuntime.screenplayAdapter.currentIndex
+                        var ci = Runtime.screenplayAdapter.currentIndex
                         if(ci >= firstItemIndex && ci <= lastItemIndex)
                             return
 
@@ -720,12 +720,12 @@ Rectangle {
                             // Find out the item under mouse and make it current.
                             pos = mapToItem(contentItem, pos.x, pos.y)
                             ci = indexAt(pos.x, pos.y)
-                            if(ci >= 0 && ci <= ScriteRuntime.screenplayAdapter.elementCount-1)
+                            if(ci >= 0 && ci <= Runtime.screenplayAdapter.elementCount-1)
                                 privateData.changeCurrentIndexTo(ci)
                         }
                     }
 
-                    function validOrLastIndex(val) { return val < 0 ? ScriteRuntime.screenplayAdapter.elementCount-1 : val }
+                    function validOrLastIndex(val) { return val < 0 ? Runtime.screenplayAdapter.elementCount-1 : val }
 
                     function isVisible(index) {
                         return index >= firstItemIndex && index <= lastItemIndex
@@ -790,7 +790,7 @@ Rectangle {
                 rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
                 zoomLevel: screenplayEditor.zoomLevel
                 resolution: Scrite.document.displayFormat.pageLayout.resolution
-                visible: ScriteRuntime.screenplayEditorSettings.displayRuler
+                visible: Runtime.screenplayEditorSettings.displayRuler
 
                 property real leftMarginPx: leftMargin * zoomLevel
                 property real rightMarginPx: rightMargin * zoomLevel
@@ -801,7 +801,7 @@ Rectangle {
 
         BusyIcon {
             anchors.centerIn: parent
-            running: Scrite.document.loading || !ScriteRuntime.screenplayTextDocument.paused && ScriteRuntime.screenplayTextDocument.updating
+            running: Scrite.document.loading || !Runtime.screenplayTextDocument.paused && Runtime.screenplayTextDocument.updating
             visible: running
         }
     }
@@ -813,7 +813,7 @@ Rectangle {
         anchors.bottom: statusBar.enabled ? statusBar.top : parent.bottom
         orientation: Qt.Vertical
         minimumSize: 0.1
-        policy: ScriteRuntime.screenplayAdapter.elementCount > 0 ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+        policy: Runtime.screenplayAdapter.elementCount > 0 ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
         property bool isBeingUsed: false
         onPressedChanged: {
             if(pressed)
@@ -832,9 +832,9 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: ScriteRuntime.colors.primary.windowColor
+        color: Runtime.colors.primary.windowColor
         border.width: 1
-        border.color: ScriteRuntime.colors.primary.borderColor
+        border.color: Runtime.colors.primary.borderColor
         clip: true
         enabled: (width > (metricsDisplay.width + zoomSlider.width + 40))
         opacity: enabled ? 1 : 0
@@ -842,7 +842,7 @@ Rectangle {
         Item {
             anchors.fill: metricsDisplay
 
-            ToolTip.text: "Page count and time estimates are approximate, assuming " + ScriteRuntime.screenplayTextDocument.timePerPageAsString + " per page."
+            ToolTip.text: "Page count and time estimates are approximate, assuming " + Runtime.screenplayTextDocument.timePerPageAsString + " per page."
             ToolTip.delay: 1000
             ToolTip.visible: metricsDisplayOverlayMouseArea.containsMouse
 
@@ -873,7 +873,7 @@ Rectangle {
                     return Scrite.document.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
                 }
                 scale: toggleLockMouseArea.containsMouse ? (toggleLockMouseArea.pressed ? 1 : 1.5) : 1
-                visible: ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab
+                visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
                 Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
@@ -927,9 +927,9 @@ Rectangle {
                 source: "../icons/navigation/refresh.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: ScriteRuntime.screenplayTextDocument.paused ? 0.85 : 1
+                opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
                 scale: refreshMouseArea.containsMouse ? (refreshMouseArea.pressed ? 1 : 1.5) : 1
-                visible: ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab
+                visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
                 Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
@@ -937,10 +937,10 @@ Rectangle {
                     anchors.fill: parent
                     hoverEnabled: true
                     onClicked: {
-                        if(ScriteRuntime.screenplayTextDocument.paused)
-                            ScriteRuntime.screenplayTextDocument.paused = false
+                        if(Runtime.screenplayTextDocument.paused)
+                            Runtime.screenplayTextDocument.paused = false
                         else
-                            ScriteRuntime.screenplayTextDocument.reload()
+                            Runtime.screenplayTextDocument.reload()
                     }
                     ToolTip.visible: containsMouse && !pressed
                     ToolTip.text: enabled ? "Computes page layout from scratch, thereby reevaluating page count and time." : "Resume page and time computation."
@@ -951,22 +951,22 @@ Rectangle {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: ScriteRuntime.colors.primary.borderColor
-                visible: ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab
+                color: Runtime.colors.primary.borderColor
+                visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
             }
 
             Image {
                 source: "../icons/content/page_count.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: ScriteRuntime.screenplayTextDocument.paused ? 0.85 : 1
+                opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
                 scale: pageCountMouseAra.containsMouse ? (pageCountMouseAra.pressed ? 1 : 1.5) : 1
                 Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
                     id: pageCountMouseAra
                     anchors.fill: parent
-                    onClicked: ScriteRuntime.screenplayTextDocument.paused = !ScriteRuntime.screenplayTextDocument.paused
+                    onClicked: Runtime.screenplayTextDocument.paused = !Runtime.screenplayTextDocument.paused
                     hoverEnabled: true
                     ToolTip.visible: containsMouse && !pressed
                     ToolTip.text: "Click here to toggle page computation, in case the app is not responding fast while typing."
@@ -976,29 +976,29 @@ Rectangle {
 
             Text {
                 font.pixelSize: statusBar.height * 0.5
-                text: ScriteRuntime.screenplayTextDocument.paused ? "- of -" : (ScriteRuntime.screenplayTextDocument.currentPage + " of " + ScriteRuntime.screenplayTextDocument.pageCount)
+                text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentPage + " of " + Runtime.screenplayTextDocument.pageCount)
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: ScriteRuntime.screenplayTextDocument.paused ? 0.5 : 1
+                opacity: Runtime.screenplayTextDocument.paused ? 0.5 : 1
             }
 
             Rectangle {
                 width: 1
                 height: parent.height
-                color: ScriteRuntime.colors.primary.borderColor
+                color: Runtime.colors.primary.borderColor
             }
 
             Image {
                 source: "../icons/content/time.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: ScriteRuntime.screenplayTextDocument.paused ? 0.85 : 1
+                opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
                 scale: timeMouseArea.containsMouse ? (timeMouseArea.pressed ? 1 : 1.5) : 1
                 Behavior on scale { NumberAnimation { duration: 250 } }
 
                 MouseArea {
                     id: timeMouseArea
                     anchors.fill: parent
-                    onClicked: ScriteRuntime.screenplayTextDocument.paused = !ScriteRuntime.screenplayTextDocument.paused
+                    onClicked: Runtime.screenplayTextDocument.paused = !Runtime.screenplayTextDocument.paused
                     hoverEnabled: true
                     ToolTip.visible: containsMouse && !pressed
                     ToolTip.text: "Click here to toggle time computation, in case the app is not responding fast while typing."
@@ -1008,15 +1008,15 @@ Rectangle {
 
             Text {
                 font.pixelSize: statusBar.height * 0.5
-                text: ScriteRuntime.screenplayTextDocument.paused ? "- of -" : (ScriteRuntime.screenplayTextDocument.currentTimeAsString + " of " + (ScriteRuntime.screenplayTextDocument.pageCount > 1 ? ScriteRuntime.screenplayTextDocument.totalTimeAsString : ScriteRuntime.screenplayTextDocument.timePerPageAsString))
+                text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentTimeAsString + " of " + (Runtime.screenplayTextDocument.pageCount > 1 ? Runtime.screenplayTextDocument.totalTimeAsString : Runtime.screenplayTextDocument.timePerPageAsString))
                 anchors.verticalCenter: parent.verticalCenter
-                opacity: ScriteRuntime.screenplayTextDocument.paused ? 0.5 : 1
+                opacity: Runtime.screenplayTextDocument.paused ? 0.5 : 1
             }
 
             Rectangle {
                 width: 1
                 height: parent.height
-                color: ScriteRuntime.colors.primary.borderColor
+                color: Runtime.colors.primary.borderColor
                 visible: wordCountLabel.visible
             }
 
@@ -1024,9 +1024,9 @@ Rectangle {
                 id: wordCountLabel
                 font.pixelSize: statusBar.height * 0.5
                 text: {
-                    const currentScene = ScriteRuntime.screenplayAdapter.currentScene
+                    const currentScene = Runtime.screenplayAdapter.currentScene
                     const currentSceneWordCount = currentScene ? currentScene.wordCount + " / " : ""
-                    const totalWordCount = ScriteRuntime.screenplayAdapter.wordCount + (ScriteRuntime.screenplayAdapter.wordCount !== 1 ? " words" : " word")
+                    const totalWordCount = Runtime.screenplayAdapter.wordCount + (Runtime.screenplayAdapter.wordCount !== 1 ? " words" : " word")
                     return currentSceneWordCount + totalWordCount
                 }
                 anchors.verticalCenter: parent.verticalCenter
@@ -1071,14 +1071,14 @@ Rectangle {
                 visible: x > 0
 
                 property ScreenplayElement currentSceneElement: {
-                    if(ScriteRuntime.screenplayAdapter.isSourceScene || ScriteRuntime.screenplayAdapter.elementCount === 0)
+                    if(Runtime.screenplayAdapter.isSourceScene || Runtime.screenplayAdapter.elementCount === 0)
                         return null
 
                     var element = null
-                    if(contentView.isVisible(ScriteRuntime.screenplayAdapter.currentIndex)) {
-                        element = ScriteRuntime.screenplayAdapter.currentElement
+                    if(contentView.isVisible(Runtime.screenplayAdapter.currentIndex)) {
+                        element = Runtime.screenplayAdapter.currentElement
                     } else {
-                        var data = ScriteRuntime.screenplayAdapter.at(contentView.firstItemIndex)
+                        var data = Runtime.screenplayAdapter.at(contentView.firstItemIndex)
                         element = data ? data.screenplayElement : null
                     }
 
@@ -1128,7 +1128,7 @@ Rectangle {
                 down: taggingMenu.active
                 onClicked: taggingMenu.show()
                 ToolTip.text: "Grouping Options"
-                visible: ScriteRuntime.screenplayEditorSettings.allowTaggingOfScenes && ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab
+                visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
 
                 MenuLoader {
                     id: taggingMenu
@@ -1164,7 +1164,7 @@ Rectangle {
             Rectangle {
                 width: 1
                 height: parent.height
-                color: ScriteRuntime.colors.primary.borderColor
+                color: Runtime.colors.primary.borderColor
             }
         }
 
@@ -1177,7 +1177,7 @@ Rectangle {
             from: 0; to: zoomLevels.length-1
             height: parent.height-6
             stepSize: 1
-            zoomSliderVisible: ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab
+            zoomSliderVisible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
             function reset() {
                 var zls = zoomLevels
                 for(var i=0; i<zls.length; i++) {
@@ -1252,7 +1252,7 @@ Rectangle {
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
             height: episodeBreakSubtitle.height + headingFontMetrics.lineSpacing*0.1
-            color: ScriteRuntime.colors.primary.c10.background
+            color: Runtime.colors.primary.c10.background
 
             TextField {
                 id: episodeBreakTitle
@@ -1295,7 +1295,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: ruler.rightMarginPx
-                onClicked: ScriteRuntime.screenplayAdapter.screenplay.removeElement(episodeBreakItem.theElement)
+                onClicked: Runtime.screenplayAdapter.screenplay.removeElement(episodeBreakItem.theElement)
                 ToolTip.text: "Deletes this episode break."
             }
         }
@@ -1310,7 +1310,7 @@ Rectangle {
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
             height: actBreakTitle.height
-            color: ScriteRuntime.colors.primary.c10.background
+            color: Runtime.colors.primary.c10.background
 
             TextField {
                 id: actBreakTitle
@@ -1353,7 +1353,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: ruler.rightMarginPx
-                onClicked: ScriteRuntime.screenplayAdapter.screenplay.removeElement(actBreakItem.theElement)
+                onClicked: Runtime.screenplayAdapter.screenplay.removeElement(actBreakItem.theElement)
                 ToolTip.text: "Deletes this act break."
             }
         }
@@ -1370,8 +1370,8 @@ Rectangle {
             property bool evaluateSuggestedSceneHeight: true
 
             border.width: 1
-            border.color: screenplayElement.scene ? screenplayElement.scene.color : ScriteRuntime.colors.primary.c400.background
-            color: screenplayElement.scene ? Qt.tint(screenplayElement.scene.color, "#E7FFFFFF") : ScriteRuntime.colors.primary.c300.background
+            border.color: screenplayElement.scene ? screenplayElement.scene.color : Runtime.colors.primary.c400.background
+            color: screenplayElement.scene ? Qt.tint(screenplayElement.scene.color, "#E7FFFFFF") : Runtime.colors.primary.c300.background
 
             readonly property ScreenplayElement screenplayElement: spElementData.screenplayElement
             readonly property Scene scene: spElementData.scene
@@ -1457,12 +1457,12 @@ Rectangle {
             property int theIndex: componentIndex
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
-            property bool isCurrent: theElement === ScriteRuntime.screenplayAdapter.currentElement
+            property bool isCurrent: theElement === Runtime.screenplayAdapter.currentElement
             z: isCurrent ? 2 : 1
 
             width: contentArea.width
             height: omittedContentItemLayout.height
-            color: Scrite.app.isVeryLightColor(theScene.color) ? ScriteRuntime.colors.primary.highlight.background : Qt.tint(theScene.color, "#9CFFFFFF")
+            color: Scrite.app.isVeryLightColor(theScene.color) ? Runtime.colors.primary.highlight.background : Qt.tint(theScene.color, "#9CFFFFFF")
 
             Column {
                 id: omittedContentItemLayout
@@ -1496,7 +1496,7 @@ Rectangle {
             property int theIndex: componentIndex
             property Scene theScene: componentData.scene
             property ScreenplayElement theElement: componentData.screenplayElement
-            property bool isCurrent: theElement === ScriteRuntime.screenplayAdapter.currentElement
+            property bool isCurrent: theElement === Runtime.screenplayAdapter.currentElement
             z: isCurrent ? 2 : 1
 
             width: contentArea.width
@@ -1504,7 +1504,7 @@ Rectangle {
             color: "white"
             readonly property var binder: sceneDocumentBinder
             readonly property var editor: sceneTextEditor
-            property bool canSplitScene: sceneTextEditor.activeFocus && !Scrite.document.readOnly && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition === 0 && ScriteRuntime.screenplayAdapter.isSourceScreenplay
+            property bool canSplitScene: sceneTextEditor.activeFocus && !Scrite.document.readOnly && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElementCursorPosition === 0 && Runtime.screenplayAdapter.isSourceScreenplay
             property bool canJoinToPreviousScene: sceneTextEditor.activeFocus && !Scrite.document.readOnly && sceneTextEditor.cursorPosition === 0 && contentItem.theIndex > 0
 
             FocusTracker.window: Scrite.window
@@ -1528,8 +1528,8 @@ Rectangle {
                 screenplayElement: contentItem.theElement
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 spellCheckEnabled: !Scrite.document.readOnly && spellCheckEnabledFlag.value
-                autoCapitalizeSentences: !Scrite.document.readOnly && ScriteRuntime.screenplayEditorSettings.enableAutoCapitalizeSentences
-                autoPolishParagraphs: !Scrite.document.readOnly && ScriteRuntime.screenplayEditorSettings.enableAutoPolishParagraphs
+                autoCapitalizeSentences: !Scrite.document.readOnly && Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
+                autoPolishParagraphs: !Scrite.document.readOnly && Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                 liveSpellCheckEnabled: sceneTextEditor.activeFocus
                 property bool firstInitializationDone: false
                 onDocumentInitialized: {
@@ -1563,7 +1563,7 @@ Rectangle {
                 }
 
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
-                applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
                 onCurrentParagraphTypeChanged: {
                     if(currentParagraphType === SceneElement.Action) {
                         ruler.paragraphLeftMargin = 0
@@ -1586,16 +1586,16 @@ Rectangle {
                 id: spellCheckEnabledFlag
                 trackChangesOn: contentView.numberOfWordsAddedToDict
                 from: false
-                to: ScriteRuntime.screenplayEditorSettings.enableSpellCheck
+                to: Runtime.screenplayEditorSettings.enableSpellCheck
                 delay: 100
             }
 
             SidePanel {
                 id: commentsSidePanel
-                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? ScriteRuntime.colors.primary.c500.background : contentItem.theScene.color
+                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? Runtime.colors.primary.c500.background : contentItem.theScene.color
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
-                borderColor: expanded ? ScriteRuntime.colors.primary.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
+                borderColor: expanded ? Runtime.colors.primary.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
                 z: contentItem.isCurrent ? 1 : 0
                 borderWidth: contentItem.isCurrent ? 2 : 1
                 anchors.top: parent.top
@@ -1692,10 +1692,10 @@ Rectangle {
                 maxPanelWidth: Math.min(contentView.spaceForComments, 400)
                 width: maxPanelWidth
                 clip: true
-                visible: width >= 100 && ScriteRuntime.screenplayEditorSettings.displaySceneComments
-                opacity: expanded ? (ScriteRuntime.screenplayAdapter.currentIndex < 0 || ScriteRuntime.screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
+                visible: width >= 100 && Runtime.screenplayEditorSettings.displaySceneComments
+                opacity: expanded ? (Runtime.screenplayAdapter.currentIndex < 0 || Runtime.screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
                 Behavior on opacity {
-                    enabled: ScriteRuntime.applicationSettings.enableAnimations
+                    enabled: Runtime.applicationSettings.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
                 content: TabView3 {
@@ -1724,7 +1724,7 @@ Rectangle {
                             background: Rectangle {
                                 color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
                             }
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 1
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 1
                             onTextChanged: contentItem.theScene.comments = text
                             wrapMode: Text.WordWrap
                             text: contentItem.theScene.comments
@@ -1738,7 +1738,7 @@ Rectangle {
                                     privateData.changeCurrentIndexTo(contentItem.theIndex)
                             }
 
-                            Transliterator.spellCheckEnabled: ScriteRuntime.screenplayEditorSettings.enableSpellCheck
+                            Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
 
                             SpecialSymbolsSupport {
                                 anchors.top: parent.bottom
@@ -1815,7 +1815,7 @@ Rectangle {
                     width: parent.width
                     height: synopsisEditorLayout.height + 10*Math.min(zoomLevel,1)
                     color: Qt.tint(contentItem.theScene.color, "#E7FFFFFF")
-                    visible: ScriteRuntime.screenplayEditorSettings.displaySceneSynopsis
+                    visible: Runtime.screenplayEditorSettings.displaySceneSynopsis
 
                     Column {
                         id: synopsisEditorLayout
@@ -1842,7 +1842,7 @@ Rectangle {
                             font.pointSize: sceneHeadingFieldsFontPointSize
                             readOnly: Scrite.document.readOnly
                             text: contentItem.theScene.synopsis
-                            Transliterator.spellCheckEnabled: ScriteRuntime.screenplayEditorSettings.enableSpellCheck
+                            Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
                             onTextChanged: contentItem.theScene.synopsis = text
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             placeholderText: "Enter the synopsis of your scene here."
@@ -1871,7 +1871,7 @@ Rectangle {
                             }
 
                             Announcement.onIncoming: (type,data) => {
-                                if(!sceneTextEditor.activeFocus || !ScriteRuntime.screenplayEditorSettings.displaySceneSynopsis)
+                                if(!sceneTextEditor.activeFocus || !Runtime.screenplayEditorSettings.displaySceneSynopsis)
                                     return
                                 var sdata = "" + data
                                 var stype = "" + type
@@ -1888,9 +1888,9 @@ Rectangle {
                     // Basic editing functionality
                     id: sceneTextEditor
                     width: parent.width
-                    height: Math.ceil(contentHeight + topPadding + bottomPadding + ScriteRuntime.sceneEditorFontMetrics.lineSpacing)
-                    topPadding: ScriteRuntime.sceneEditorFontMetrics.height
-                    bottomPadding: ScriteRuntime.sceneEditorFontMetrics.height
+                    height: Math.ceil(contentHeight + topPadding + bottomPadding + Runtime.sceneEditorFontMetrics.lineSpacing)
+                    topPadding: Runtime.sceneEditorFontMetrics.height
+                    bottomPadding: Runtime.sceneEditorFontMetrics.height
                     leftPadding: ruler.leftMarginPx
                     rightPadding: ruler.rightMarginPx
                     palette: Scrite.app.palette
@@ -1909,7 +1909,7 @@ Rectangle {
                             id: document
                             trackChangesOn: sceneDocumentBinder.documentLoadCount + zoomSlider.value
                             from: null
-                            to: ScriteRuntime.screenplayTextDocument.paused ? null : ScriteRuntime.screenplayTextDocument
+                            to: Runtime.screenplayTextDocument.paused ? null : Runtime.screenplayTextDocument
                             delay: 100
                         }
 
@@ -1929,7 +1929,7 @@ Rectangle {
                                 y: (modelData.position >= 0 ? cursorRect.y : -contentItem.totalSceneHeadingHeight) - height/2
                                 width: sceneTextEditorBackground.width
                                 height: 1
-                                // color: ScriteRuntime.colors.primary.c400.background
+                                // color: Runtime.colors.primary.c400.background
 
                                 PageNumberBubble {
                                     x: -width - 20
@@ -1939,11 +1939,11 @@ Rectangle {
                         }
 
                         Rectangle {
-                            visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && ScriteRuntime.screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
+                            visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && Runtime.screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
                             x: 0; y: sceneTextEditor.cursorRectangle.y-2*zoomLevel
                             width: parent.width
                             height: sceneTextEditor.cursorRectangle.height+4*zoomLevel
-                            color: ScriteRuntime.colors.primary.c100.background
+                            color: Runtime.colors.primary.c100.background
 
                             Rectangle {
                                 width: currentSceneHighlight.width
@@ -2042,7 +2042,7 @@ Rectangle {
                                 width: parent.width*Screen.devicePixelRatio
                                 height: parent.height
                                 anchors.centerIn: parent
-                                color: Scrite.document.readOnly ? ScriteRuntime.colors.primary.borderColor : "black"
+                                color: Scrite.document.readOnly ? Runtime.colors.primary.borderColor : "black"
                             }
 
                             SequentialAnimation {
@@ -2243,7 +2243,7 @@ Rectangle {
                                 id: completionView
                                 model: completionModel
                                 clip: true
-                                FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                                 height: Math.min(contentHeight, 7*(defaultFontMetrics.lineSpacing+2*5))
                                 interactive: true
                                 ScrollBar.vertical: ScrollBar2 {
@@ -2254,9 +2254,9 @@ Rectangle {
                                     text: string
                                     padding: 5
                                     font: defaultFontMetrics.font
-                                    color: index === completionView.currentIndex ? ScriteRuntime.colors.primary.highlight.text : ScriteRuntime.colors.primary.c10.text
+                                    color: index === completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                                     MouseArea {
-                                        property bool singleClickAutoComplete: ScriteRuntime.screenplayEditorSettings.singleClickAutoComplete
+                                        property bool singleClickAutoComplete: Runtime.screenplayEditorSettings.singleClickAutoComplete
                                         anchors.fill: parent
                                         hoverEnabled: singleClickAutoComplete
                                         onContainsMouseChanged: if(singleClickAutoComplete) completionModel.currentRow = index
@@ -2273,7 +2273,7 @@ Rectangle {
                                 highlightMoveDuration: 0
                                 highlightResizeDuration: 0
                                 highlight: Rectangle {
-                                    color: ScriteRuntime.colors.primary.highlight.background
+                                    color: Runtime.colors.primary.highlight.background
                                 }
                                 currentIndex: completionModel.currentRow
                             }
@@ -2754,7 +2754,7 @@ Rectangle {
                     }
 
                     Connections {
-                        target: ScriteRuntime.screenplayTextDocument
+                        target: Runtime.screenplayTextDocument
                         ignoreUnknownSignals: true
                         enabled: sceneTextEditor.activeFocus && !sceneTextEditor.readOnly
                         property bool needsCursorAnimation: false
@@ -2776,8 +2776,8 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                color: Scrite.app.isVeryLightColor(contentItem.theScene.color) ? ScriteRuntime.colors.primary.highlight.background : Qt.tint(contentItem.theScene.color, "#9CFFFFFF")
-                visible: ScriteRuntime.screenplayAdapter.currentIndex === contentItem.theIndex
+                color: Scrite.app.isVeryLightColor(contentItem.theScene.color) ? Runtime.colors.primary.highlight.background : Qt.tint(contentItem.theScene.color, "#9CFFFFFF")
+                visible: Runtime.screenplayAdapter.currentIndex === contentItem.theIndex
             }
 
             function mergeWithPreviousScene() {
@@ -2790,13 +2790,13 @@ Rectangle {
             }
 
             function mergeWithPreviousSceneImpl() {
-                ScriteRuntime.screenplayTextDocument.syncEnabled = false
-                var ret = ScriteRuntime.screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
-                ScriteRuntime.screenplayTextDocument.syncEnabled = true
+                Runtime.screenplayTextDocument.syncEnabled = false
+                var ret = Runtime.screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
+                Runtime.screenplayTextDocument.syncEnabled = true
                 Scrite.document.clearBusyMessage()
                 if(ret === null)
                     showCantMergeSceneMessage()
-                contentView.scrollIntoView(ScriteRuntime.screenplayAdapter.currentIndex)
+                contentView.scrollIntoView(Runtime.screenplayAdapter.currentIndex)
             }
 
             function showCantMergeSceneMessage() {
@@ -2816,10 +2816,10 @@ Rectangle {
             }
 
             function splitSceneImpl() {
-                ScriteRuntime.screenplayTextDocument.syncEnabled = false
+                Runtime.screenplayTextDocument.syncEnabled = false
                 postSplitElementTimer.newCurrentIndex = contentItem.theIndex+1
-                var ret = ScriteRuntime.screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
-                ScriteRuntime.screenplayTextDocument.syncEnabled = true
+                var ret = Runtime.screenplayAdapter.splitElement(contentItem.theElement, sceneDocumentBinder.currentElement, sceneDocumentBinder.currentElementCursorPosition)
+                Runtime.screenplayTextDocument.syncEnabled = true
                 Scrite.document.clearBusyMessage()
                 if(ret === null)
                     showCantSplitSceneMessage()
@@ -2857,7 +2857,7 @@ Rectangle {
 
             function scrollToPreviousScene() {
                 contentView.scrollingBetweenScenes = true
-                var idx = ScriteRuntime.screenplayAdapter.previousSceneElementIndex()
+                var idx = Runtime.screenplayAdapter.previousSceneElementIndex()
                 if(idx === 0 && idx === theIndex) {
                     contentView.scrollToFirstScene()
                     assumeFocusAt(0)
@@ -2876,8 +2876,8 @@ Rectangle {
 
             function scrollToNextScene() {
                 contentView.scrollingBetweenScenes = true
-                var idx = ScriteRuntime.screenplayAdapter.nextSceneElementIndex()
-                if(idx === ScriteRuntime.screenplayAdapter.elementCount-1 && idx === theIndex) {
+                var idx = Runtime.screenplayAdapter.nextSceneElementIndex()
+                if(idx === Runtime.screenplayAdapter.elementCount-1 && idx === theIndex) {
                     contentView.positionViewAtEnd()
                     assumeFocusAt(-1)
                     contentView.scrollingBetweenScenes = false
@@ -2932,7 +2932,7 @@ Rectangle {
                     anchors.right: parent.right
                     anchors.rightMargin: parent.width * 0.075
                     spacing: 20
-//                    property bool headingFieldOnly: !ScriteRuntime.screenplayEditorSettings.displaySceneCharacters && !ScriteRuntime.screenplayEditorSettings.displaySceneSynopsis
+//                    property bool headingFieldOnly: !Runtime.screenplayEditorSettings.displaySceneCharacters && !Runtime.screenplayEditorSettings.displaySceneSynopsis
 //                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
 
                     SceneTypeImage {
@@ -2958,7 +2958,7 @@ Rectangle {
                         placeholderText: headingItem.theElement.sceneNumber
                         visible: headingItem.theElement.elementType === ScreenplayElement.SceneElementType &&
                                  headingItem.theScene.heading.enabled &&
-                                 ScriteRuntime.screenplayAdapter.isSourceScreenplay
+                                 Runtime.screenplayAdapter.isSourceScreenplay
                         onActiveFocusChanged: if(activeFocus) privateData.changeCurrentIndexTo(headingItem.theElementIndex)
                         tabItem: headingItem.sceneTextEditor
                     }
@@ -2981,7 +2981,7 @@ Rectangle {
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: ruler.rightMarginPx
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: ScriteRuntime.screenplayEditorSettings.displaySceneCharacters ? 8 : 4
+                anchors.verticalCenterOffset: Runtime.screenplayEditorSettings.displaySceneCharacters ? 8 : 4
 
                 Item {
                     property real spacing: 5
@@ -3057,7 +3057,7 @@ Rectangle {
                             property bool editingLocationTypePart: dotPosition < 0 || cursorPosition < dotPosition
                             property bool editingMomentPart: dashPosition > 0 && cursorPosition >= dashPosition
                             property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
-                            singleClickAutoComplete: ScriteRuntime.screenplayEditorSettings.singleClickAutoComplete
+                            singleClickAutoComplete: Runtime.screenplayEditorSettings.singleClickAutoComplete
                             completionStrings: {
                                 if(editingLocationPart)
                                     return Scrite.document.structure.allLocations()
@@ -3108,7 +3108,7 @@ Rectangle {
                     ToolButton3 {
                         id: sceneTaggingButton
                         iconSource: "../icons/action/tag.png"
-                        visible: ScriteRuntime.screenplayEditorSettings.allowTaggingOfScenes && ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab
+                        visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
                         down: sceneTagMenuLoader.active
                         onClicked: sceneTagMenuLoader.show()
                         anchors.verticalCenter: parent.verticalCenter
@@ -3212,7 +3212,7 @@ Rectangle {
 
                                 MenuItem2 {
                                     text: headingItem.theElement.omitted ? "Include" : "Omit"
-                                    enabled: ScriteRuntime.screenplayAdapter.screenplay === Scrite.document.screenplay
+                                    enabled: Runtime.screenplayAdapter.screenplay === Scrite.document.screenplay
                                     onClicked: {
                                         sceneMenu.close()
                                         headingItem.theElement.omitted = !headingItem.theElement.omitted
@@ -3221,7 +3221,7 @@ Rectangle {
 
                                 MenuItem2 {
                                     text: "Remove"
-                                    enabled: ScriteRuntime.screenplayAdapter.screenplay === Scrite.document.screenplay
+                                    enabled: Runtime.screenplayAdapter.screenplay === Scrite.document.screenplay
                                     onClicked: {
                                         sceneMenu.close()
                                         Scrite.document.screenplay.removeSceneElements(headingItem.theScene)
@@ -3245,7 +3245,7 @@ Rectangle {
                     property int sceneEditorCursorPosition: headingItem.sceneTextEditor.cursorPosition
                     property Scene scene: headingItem.theScene
                     property bool allow: true
-                    active: ScriteRuntime.screenplayEditorSettings.displaySceneCharacters && allow
+                    active: Runtime.screenplayEditorSettings.displaySceneCharacters && allow
                     sourceComponent: headingItem.theElement.omitted ? null : sceneCharactersList
 
                     Announcement.onIncoming: (type,data) => {
@@ -3314,7 +3314,7 @@ Rectangle {
                 Item {
                     width: parent.width
                     height: 10*Math.min(zoomLevel,1)
-                    visible: !headingItem.theElement.omitted && !ScriteRuntime.screenplayEditorSettings.displaySceneSynopsis
+                    visible: !headingItem.theElement.omitted && !Runtime.screenplayEditorSettings.displaySceneSynopsis
                 }
             }
         }
@@ -3359,8 +3359,8 @@ Rectangle {
                     id: characterNameLabel
                     property var colors: {
                         if(containsMouse)
-                            return ScriteRuntime.colors.accent.c900
-                        return editorHasActiveFocus ? ScriteRuntime.colors.accent.c600 : ScriteRuntime.colors.accent.c10
+                            return Runtime.colors.accent.c900
+                        return editorHasActiveFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
                     }
                     border.width: editorHasActiveFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
                     border.color: colors.text
@@ -3418,7 +3418,7 @@ Rectangle {
                             anchors.bottom: parent.bottom
                             anchors.bottomMargin: parent.fontHeight - parent.fontAscent - parent.fontHeight*0.25
                             height: 1
-                            color: ScriteRuntime.colors.accent.borderColor
+                            color: Runtime.colors.accent.borderColor
                         }
                     }
                 }
@@ -3479,7 +3479,7 @@ Rectangle {
                 Text {
                     id: dragHotspotItem
                     font.family: "Courier Prime"
-                    font.pixelSize: ScriteRuntime.idealFontMetrics.font.pointSize + 4
+                    font.pixelSize: Runtime.idealFontMetrics.font.pointSize + 4
                     visible: false
                 }
 
@@ -3487,17 +3487,17 @@ Rectangle {
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                    font.pixelSize: Runtime.idealFontMetrics.font.pointSize
                     text: "Scene headings will be listed here as you add them into your screenplay."
                     anchors.horizontalCenter: sceneListView.horizontalCenter
                     anchors.top: parent.top
                     anchors.topMargin: 50
-                    visible: ScriteRuntime.screenplayAdapter.elementCount === 0
+                    visible: Runtime.screenplayAdapter.elementCount === 0
                 }
 
                 Connections {
                     target: Scrite.document.screenplay
-                    enabled: ScriteRuntime.screenplayAdapter.isSourceScreenplay
+                    enabled: Runtime.screenplayAdapter.isSourceScreenplay
                     function onElementMoved(element, from, to) {
                         Qt.callLater(sceneListView.forceLayout)
                     }
@@ -3505,7 +3505,7 @@ Rectangle {
 
                 QtObject {
                     EventFilter.target: Scrite.app
-                    EventFilter.active: ScriteRuntime.screenplayAdapter.isSourceScreenplay && Scrite.document.screenplay.hasSelectedElements
+                    EventFilter.active: Runtime.screenplayAdapter.isSourceScreenplay && Scrite.document.screenplay.hasSelectedElements
                     EventFilter.events: [EventFilter.KeyPress]
                     EventFilter.onFilter: (object,event,result) => {
                                               if(event.key === Qt.Key_Escape) {
@@ -3520,9 +3520,9 @@ Rectangle {
                     id: sceneListView
                     anchors.fill: parent
                     clip: true
-                    model: ScriteRuntime.screenplayAdapter
-                    currentIndex: ScriteRuntime.screenplayAdapter.currentIndex
-                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                    model: Runtime.screenplayAdapter
+                    currentIndex: Runtime.screenplayAdapter.currentIndex
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 { flickable: sceneListView }
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
@@ -3531,7 +3531,7 @@ Rectangle {
                     preferredHighlightEnd: height*0.8
                     preferredHighlightBegin: height*0.2
                     highlightRangeMode: ListView.NoHighlightRange
-                    property bool hasEpisodes: ScriteRuntime.screenplayAdapter.isSourceScreenplay ? ScriteRuntime.screenplayAdapter.screenplay.episodeCount > 0 : false
+                    property bool hasEpisodes: Runtime.screenplayAdapter.isSourceScreenplay ? Runtime.screenplayAdapter.screenplay.episodeCount > 0 : false
 
                     FocusTracker.window: Scrite.window
                     FocusTracker.indicator.target: mainUndoStack
@@ -3542,7 +3542,7 @@ Rectangle {
                         width: sceneListView.width-1
                         height: 40
                         z: 10
-                        color: ScriteRuntime.colors.accent.windowColor
+                        color: Runtime.colors.accent.windowColor
 
                         RowLayout {
                             anchors.verticalCenter: parent.verticalCenter
@@ -3556,16 +3556,16 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
                                 readonly property real iconWidth: 18
-                                property real t: ScriteRuntime.screenplayAdapter.hasNonStandardScenes ? 1 : 0
+                                property real t: Runtime.screenplayAdapter.hasNonStandardScenes ? 1 : 0
                                 property real leftMargin: 6 + (iconWidth+12)*t
                                 Behavior on t {
-                                    enabled: ScriteRuntime.applicationSettings.enableAnimations
+                                    enabled: Runtime.applicationSettings.enableAnimations
                                     NumberAnimation { duration: 250 }
                                 }
 
                                 elide: Text.ElideRight
                                 font.family: "Courier Prime"
-                                font.pixelSize: Math.ceil(ScriteRuntime.idealFontMetrics.font.pointSize * 1.2)
+                                font.pixelSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize * 1.2)
                                 font.bold: true
                                 text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
 
@@ -3576,9 +3576,9 @@ Rectangle {
                                     ToolTip.delay: 1000
                                     ToolTip.visible: headingText.truncated && containsMouse
                                     onClicked: {
-                                        if(ScriteRuntime.screenplayAdapter.isSourceScreenplay)
-                                            ScriteRuntime.screenplayAdapter.screenplay.clearSelection()
-                                        ScriteRuntime.screenplayAdapter.currentIndex = -1
+                                        if(Runtime.screenplayAdapter.isSourceScreenplay)
+                                            Runtime.screenplayAdapter.screenplay.clearSelection()
+                                        Runtime.screenplayAdapter.currentIndex = -1
                                         contentView.positionViewAtBeginning()
                                     }
                                 }
@@ -3586,7 +3586,7 @@ Rectangle {
 
                             ToolButton2 {
                                 icon.source: {
-                                    switch(ScriteRuntime.sceneListPanelSettings.displaySceneLength) {
+                                    switch(Runtime.sceneListPanelSettings.displaySceneLength) {
                                     case "TIME":
                                         return "../icons/content/time.png"
                                     case "PAGE":
@@ -3599,7 +3599,7 @@ Rectangle {
                                 onClicked: sceneListPanelMenu.open()
                                 down: sceneListPanelMenu.visible
                                 ToolTip.text: "Scene List Options"
-                                enabled: !ScriteRuntime.screenplayTextDocument.paused
+                                enabled: !Runtime.screenplayTextDocument.paused
 
                                 Item {
                                     anchors.bottom: parent.bottom
@@ -3612,27 +3612,27 @@ Rectangle {
                                             text: "Scene Duration"
 
                                             readonly property string option: "TIME"
-                                            icon.source: ScriteRuntime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                            onClicked: ScriteRuntime.sceneListPanelSettings.displaySceneLength = option
-                                            enabled: !ScriteRuntime.screenplayTextDocument.paused
+                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+                                            enabled: !Runtime.screenplayTextDocument.paused
                                         }
 
                                         MenuItem2 {
                                             text: "Page Length"
 
                                             readonly property string option: "PAGE"
-                                            icon.source: ScriteRuntime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                            onClicked: ScriteRuntime.sceneListPanelSettings.displaySceneLength = option
-                                            enabled: !ScriteRuntime.screenplayTextDocument.paused
+                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+                                            enabled: !Runtime.screenplayTextDocument.paused
                                         }
 
                                         MenuItem2 {
                                             text: "None"
 
                                             readonly property string option: "NO"
-                                            icon.source: ScriteRuntime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
-                                            onClicked: ScriteRuntime.sceneListPanelSettings.displaySceneLength = option
-                                            enabled: !ScriteRuntime.screenplayTextDocument.paused
+                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+                                            enabled: !Runtime.screenplayTextDocument.paused
                                         }
                                     }
                                 }
@@ -3644,10 +3644,10 @@ Rectangle {
                         id: delegateItem
                         width: sceneListView.width-1
                         height: 40
-                        color: scene ? (ScriteRuntime.screenplayAdapter.currentIndex === index || screenplayElement.selected) ? selectedColor : normalColor
-                                     : ScriteRuntime.screenplayAdapter.currentIndex === index ? Scrite.app.translucent(ScriteRuntime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
+                        color: scene ? (Runtime.screenplayAdapter.currentIndex === index || screenplayElement.selected) ? selectedColor : normalColor
+                                     : Runtime.screenplayAdapter.currentIndex === index ? Scrite.app.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
-                        property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(ScriteRuntime.colors.primary.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
+                        property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(Runtime.colors.primary.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
                         property color normalColor: Qt.tint(scene.color, "#E7FFFFFF")
                         property int elementIndex: index
                         property bool elementIsBreak: screenplayElementType === ScreenplayElement.BreakElementType
@@ -3657,9 +3657,9 @@ Rectangle {
                             anchors.top: parent.top
                             anchors.left: parent.left
                             anchors.bottom: parent.bottom
-                            visible: ScriteRuntime.screenplayAdapter.currentIndex === index
+                            visible: Runtime.screenplayAdapter.currentIndex === index
                             width: 8
-                            color: ScriteRuntime.colors.accent.windowColor
+                            color: Runtime.colors.accent.windowColor
                         }
 
                         SceneTypeImage {
@@ -3671,12 +3671,12 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.leftMargin: 12
                             sceneType: scene ? scene.type : Scene.Standard
-                            opacity: (ScriteRuntime.screenplayAdapter.currentIndex === index ? 1 : 0.5) * t
+                            opacity: (Runtime.screenplayAdapter.currentIndex === index ? 1 : 0.5) * t
                             visible: t > 0
                             lightBackground: Scrite.app.isLightColor(delegateItem.color)
-                            property real t: ScriteRuntime.screenplayAdapter.hasNonStandardScenes ? 1 : 0
+                            property real t: Runtime.screenplayAdapter.hasNonStandardScenes ? 1 : 0
                             Behavior on t {
-                                enabled: ScriteRuntime.applicationSettings.enableAnimations
+                                enabled: Runtime.applicationSettings.enableAnimations
                                 NumberAnimation { duration: 250 }
                             }
                         }
@@ -3696,10 +3696,10 @@ Rectangle {
                                 Layout.alignment: Qt.AlignVCenter
 
                                 font.family: "Courier Prime"
-                                font.bold: ScriteRuntime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
-                                font.pointSize: Math.ceil(ScriteRuntime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
+                                font.bold: Runtime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
+                                font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                                 horizontalAlignment: Qt.AlignLeft
-                                color: ScriteRuntime.colors.primary.c10.text
+                                color: Runtime.colors.primary.c10.text
                                 font.capitalization: delegateItem.elementIsBreak ? Font.MixedCase : Font.AllUppercase
                                 text: {
                                     var ret = "UNKNOWN"
@@ -3733,21 +3733,21 @@ Rectangle {
 
                             Text {
                                 id: sceneLengthText
-                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-3
-                                color: ScriteRuntime.colors.primary.c10.text
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize-3
+                                color: Runtime.colors.primary.c10.text
                                 text: evaluateText()
-                                visible: !ScriteRuntime.screenplayTextDocument.paused && (ScriteRuntime.sceneListPanelSettings.displaySceneLength === "PAGE" || ScriteRuntime.sceneListPanelSettings.displaySceneLength === "TIME")
+                                visible: !Runtime.screenplayTextDocument.paused && (Runtime.sceneListPanelSettings.displaySceneLength === "PAGE" || Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
                                 opacity: 0.5
                                 Layout.alignment: Qt.AlignVCenter
 
                                 function evaluateText() {
                                     if(scene) {
-                                        if(ScriteRuntime.sceneListPanelSettings.displaySceneLength === "PAGE") {
-                                            const pl = ScriteRuntime.screenplayTextDocument.lengthInPages(screenplayElement, null)
+                                        if(Runtime.sceneListPanelSettings.displaySceneLength === "PAGE") {
+                                            const pl = Runtime.screenplayTextDocument.lengthInPages(screenplayElement, null)
                                             return Math.round(pl*100,2)/100
                                         }
-                                        if(ScriteRuntime.sceneListPanelSettings.displaySceneLength === "TIME")
-                                            return ScriteRuntime.screenplayTextDocument.lengthInTimeAsString(screenplayElement, null)
+                                        if(Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
+                                            return Runtime.screenplayTextDocument.lengthInTimeAsString(screenplayElement, null)
                                     }
                                     return ""
                                 }
@@ -3761,12 +3761,12 @@ Rectangle {
                                 }
 
                                 Connections {
-                                    target: ScriteRuntime.screenplayTextDocument
-                                    enabled: !ScriteRuntime.screenplayTextDocument.paused
+                                    target: Runtime.screenplayTextDocument
+                                    enabled: !Runtime.screenplayTextDocument.paused
                                     function onUpdateFinished() { sceneLengthText.updateTextLater() }
                                 }
 
-                                property string option: ScriteRuntime.sceneListPanelSettings.displaySceneLength
+                                property string option: Runtime.sceneListPanelSettings.displaySceneLength
                                 onOptionChanged: updateTextLater()
                             }
                         }
@@ -3780,9 +3780,9 @@ Rectangle {
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onDoubleClicked: (mouse) => {
-                                                 ScriteRuntime.screenplayAdapter.screenplay.clearSelection()
+                                                 Runtime.screenplayAdapter.screenplay.clearSelection()
                                                  screenplayElement.toggleSelection()
-                                                 ScriteRuntime.screenplayAdapter.currentIndex = index
+                                                 Runtime.screenplayAdapter.currentIndex = index
                                                  sceneListSidePanel.expanded = false
                                              }
                             onClicked: (mouse) => {
@@ -3799,33 +3799,33 @@ Rectangle {
                                                return
                                            }
 
-                                           if(ScriteRuntime.screenplayAdapter.isSourceScreenplay) {
+                                           if(Runtime.screenplayAdapter.isSourceScreenplay) {
                                                const isControlPressed = mouse.modifiers & Qt.ControlModifier
                                                const isShiftPressed = mouse.modifiers & Qt.ShiftModifier
                                                if(isControlPressed) {
                                                    screenplayElement.toggleSelection()
                                                } else if(isShiftPressed) {
-                                                   const fromIndex = Math.min(ScriteRuntime.screenplayAdapter.currentIndex, index)
-                                                   const toIndex = Math.max(ScriteRuntime.screenplayAdapter.currentIndex, index)
+                                                   const fromIndex = Math.min(Runtime.screenplayAdapter.currentIndex, index)
+                                                   const toIndex = Math.max(Runtime.screenplayAdapter.currentIndex, index)
                                                    if(fromIndex === toIndex) {
                                                        screenplayElement.toggleSelection()
                                                    } else {
                                                        for(var i=fromIndex; i<=toIndex; i++) {
-                                                           var element = ScriteRuntime.screenplayAdapter.screenplay.elementAt(i)
+                                                           var element = Runtime.screenplayAdapter.screenplay.elementAt(i)
                                                            if(element.elementType === ScreenplayElement.SceneElementType) {
                                                                element.selected = true
                                                            }
                                                        }
                                                    }
                                                } else {
-                                                   ScriteRuntime.screenplayAdapter.screenplay.clearSelection()
+                                                   Runtime.screenplayAdapter.screenplay.clearSelection()
                                                    screenplayElement.toggleSelection()
                                                }
                                            }
 
-                                           ScriteRuntime.screenplayAdapter.currentIndex = index
+                                           Runtime.screenplayAdapter.currentIndex = index
                                        }
-                            drag.target: ScriteRuntime.screenplayAdapter.isSourceScreenplay && !Scrite.document.readOnly ? parent : null
+                            drag.target: Runtime.screenplayAdapter.isSourceScreenplay && !Scrite.document.readOnly ? parent : null
                             drag.axis: Drag.YAxis
                         }
 
@@ -3869,7 +3869,7 @@ Rectangle {
                             id: dropIndicator
                             width: parent.width
                             height: 2
-                            color: ScriteRuntime.colors.primary.borderColor
+                            color: Runtime.colors.primary.borderColor
                             visible: delegateDropArea.containsDrag
                         }
 
@@ -3878,7 +3878,7 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             height: 1
-                            color: parent.elementIsEpisodeBreak ? ScriteRuntime.colors.accent.c200.background : ScriteRuntime.colors.accent.c100.background
+                            color: parent.elementIsEpisodeBreak ? Runtime.colors.accent.c200.background : Runtime.colors.accent.c100.background
                             visible: parent.elementIsBreak
                         }
                     }
@@ -3899,14 +3899,14 @@ Rectangle {
 
                             onDropped: (drop) => {
                                            drop.acceptProposedAction()
-                                           moveSelectedElementsAnimation.targetIndex = ScriteRuntime.screenplayAdapter.elementCount
+                                           moveSelectedElementsAnimation.targetIndex = Runtime.screenplayAdapter.elementCount
                                        }
                         }
 
                         Rectangle {
                             width: parent.width
                             height: 2
-                            color: ScriteRuntime.colors.primary.borderColor
+                            color: Runtime.colors.primary.borderColor
                             visible: footerDropArea.containsDrag
                         }
                     }
@@ -4269,8 +4269,8 @@ Rectangle {
 
     Component.onCompleted: {
         restoreLayoutDetails()
-        ScriteRuntime.screenplayEditor = screenplayEditor
-        if(ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab)
+        Runtime.screenplayEditor = screenplayEditor
+        if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab)
             Scrite.user.logActivity1("screenplay")
     }
     Component.onDestruction: {
@@ -4302,13 +4302,13 @@ Rectangle {
         anchors.fill: parent
         color: Qt.rgba(0,0,0,0)
         border.width: 1
-        border.color: ScriteRuntime.colors.primary.borderColor
+        border.color: Runtime.colors.primary.borderColor
     }
 
     Connections {
         target: modalDialog
         function onActiveChanged() {
-            if(modalDialog.active === false && ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab && contentView.count === 1)
+            if(modalDialog.active === false && Runtime.mainWindowTab === Runtime.e_ScreenplayTab && contentView.count === 1)
                 contentView.itemAtIndex(0).item.assumeFocus()
         }
     }
@@ -4316,7 +4316,7 @@ Rectangle {
     Connections {
         target: splashLoader
         function onActiveChanged() {
-            if(splashLoader.active === false && ScriteRuntime.mainWindowTab === ScriteRuntime.e_ScreenplayTab && contentView.count === 1)
+            if(splashLoader.active === false && Runtime.mainWindowTab === Runtime.e_ScreenplayTab && contentView.count === 1)
                 contentView.itemAtIndex(0).item.assumeFocus()
         }
     }
@@ -4364,7 +4364,7 @@ Rectangle {
                 anchors.topMargin: componentData.scene ? -1 : -contentView.spacing/2
                 anchors.bottomMargin: componentData.scene ? -1 : -contentView.spacing/2
                 visible: contentView.spacing > 0
-                color: componentData.scene ? Qt.rgba(0,0,0,0) : (componentData.breakType === Screenplay.Episode ? ScriteRuntime.colors.accent.c100.background : ScriteRuntime.colors.accent.c50.background)
+                color: componentData.scene ? Qt.rgba(0,0,0,0) : (componentData.breakType === Screenplay.Episode ? Runtime.colors.accent.c100.background : Runtime.colors.accent.c50.background)
                 border.width: componentData.scene ? 1 : 0
                 border.color: componentData.scene ? (Scrite.app.isLightColor(componentData.scene.color) ? "black" : componentData.scene.color) : Qt.rgba(0,0,0,0)
                 opacity: componentData.scene ? 0.25 : 1
@@ -4392,7 +4392,7 @@ Rectangle {
             Component.onCompleted: {
                 const heightHint = componentData.screenplayElement.heightHint
                 if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
-                    contentView.loadAllDelegates || ScriteRuntime.screenplayEditorSettings.optimiseScrolling ||
+                    contentView.loadAllDelegates || Runtime.screenplayEditorSettings.optimiseScrolling ||
                     componentData.scene.elementCount <= 1) {
                         active = true
                         initialized = true
@@ -4456,20 +4456,20 @@ Rectangle {
         anchors.fill: parent
         closable: true
         visible: false
-        onCloseRequest: ScriteRuntime.screenplayEditorSettings.markupToolsDockVisible = false
+        onCloseRequest: Runtime.screenplayEditorSettings.markupToolsDockVisible = false
 
         function adjustCoordinates() {
-            const cx = ScriteRuntime.markupToolsSettings.contentX
-            const cy = ScriteRuntime.markupToolsSettings.contentY
+            const cx = Runtime.markupToolsSettings.contentX
+            const cy = Runtime.markupToolsSettings.contentY
             contentX = Math.round(Math.min(Math.max(20, cx), parent.width-contentWidth-20))
             contentY = Math.round(Math.min(Math.max(20, cy), parent.height-contentHeight-20))
-            visible = Qt.binding( () => { return ScriteRuntime.screenplayEditorSettings.markupToolsDockVisible } )
+            visible = Qt.binding( () => { return Runtime.screenplayEditorSettings.markupToolsDockVisible } )
         }
 
         Component.onCompleted: Utils.execLater(markupTools, 200, adjustCoordinates)
         Component.onDestruction: {
-            ScriteRuntime.markupToolsSettings.contentX = Math.round(contentX)
-            ScriteRuntime.markupToolsSettings.contentY = Math.round(contentY)
+            Runtime.markupToolsSettings.contentX = Math.round(contentX)
+            Runtime.markupToolsSettings.contentY = Math.round(contentY)
         }
 
         Shortcut {
@@ -4645,7 +4645,7 @@ Rectangle {
                 Rectangle {
                     width: 1
                     height: parent.height
-                    color: ScriteRuntime.colors.primary.borderColor
+                    color: Runtime.colors.primary.borderColor
                 }
 
                 SimpleToolButton {
@@ -4675,7 +4675,7 @@ Rectangle {
                 Rectangle {
                     width: 1
                     height: parent.height
-                    color: ScriteRuntime.colors.primary.borderColor
+                    color: Runtime.colors.primary.borderColor
                 }
 
                 SimpleToolButton {
@@ -4718,7 +4718,7 @@ Rectangle {
         width: 36
         height: 36
         radius: 4
-        color: tbMouseArea.pressed || down ? ScriteRuntime.colors.primary.button.background : (checked ? ScriteRuntime.colors.primary.highlight.background : Qt.rgba(0,0,0,0))
+        color: tbMouseArea.pressed || down ? Runtime.colors.primary.button.background : (checked ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0))
         opacity: enabled ? 1 : 0.5
 
         property bool down: false

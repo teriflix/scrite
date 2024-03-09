@@ -44,7 +44,7 @@ Item {
             Text {
                 font.pointSize: Screen.devicePixelRatio > 1 ? 22 : 18
                 text: "Select A Backup To Load"
-                color: ScriteRuntime.colors.primary.c200.text
+                color: Runtime.colors.primary.c200.text
                 anchors.verticalCenter: parent.verticalCenter
             }
         }
@@ -56,9 +56,9 @@ Item {
             anchors.bottom: buttonBar.top
             anchors.topMargin: 20
             anchors.bottomMargin: 20
-            color: ScriteRuntime.colors.primary.c200.background
+            color: Runtime.colors.primary.c200.background
             border.width: 1
-            border.color: ScriteRuntime.colors.primary.borderColor
+            border.color: Runtime.colors.primary.borderColor
 
             ListView {
                 id: backupFilesView
@@ -66,11 +66,11 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 1
                 model: Scrite.document.backupFilesModel
-                FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                 currentIndex: -1
                 ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
                 highlight: Rectangle {
-                    color: ScriteRuntime.colors.primary.highlight.background
+                    color: Runtime.colors.primary.highlight.background
                 }
                 highlightMoveDuration: 0
                 highlightResizeDuration: 0
@@ -90,7 +90,7 @@ Item {
                             padding: 5
                             leftPadding: 12
                             elide: Text.ElideRight
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             anchors.top: parent.top
                         }
 
@@ -112,7 +112,7 @@ Item {
                             text: metaDataInfo + "<br/><font size=\"-2\">" + fileSizeInfo + "</font>"
                             padding: 5
                             elide: Text.ElideRight
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
                     }
 
@@ -148,7 +148,7 @@ Item {
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "Open In: "
-                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 }
 
                 Button2 {

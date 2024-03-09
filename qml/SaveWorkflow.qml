@@ -81,7 +81,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent
-        color: ScriteRuntime.colors.primary.windowColor
+        color: Runtime.colors.primary.windowColor
         opacity: 0.9
         visible: workflowLoader.active
 
@@ -103,8 +103,8 @@ Item {
         anchors.fill: workflowLoader
         anchors.margins: -40
         border.width: 2
-        border.color: ScriteRuntime.colors.primary.borderColor
-        color: ScriteRuntime.colors.primary.c100.background
+        border.color: Runtime.colors.primary.borderColor
+        color: Runtime.colors.primary.c100.background
         visible: workflowLoader.active
     }
 
@@ -147,7 +147,7 @@ Item {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 width: _private.maxTextWidth
                 wrapMode: Text.WordWrap
                 text: "Do you want to save this document first?"
@@ -176,7 +176,7 @@ Item {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 width: _private.maxTextWidth
                 wrapMode: Text.WordWrap
                 text: "Do you want to save changes to '" + scriteFileInfo.baseName + "'?"
@@ -185,7 +185,7 @@ Item {
             YesNoCancel {
                 Layout.alignment: Qt.AlignHCenter
                 onYesClicked: {
-                    ScriteRuntime.recentFiles.add(scriteFileInfo.absoluteFilePath)
+                    Runtime.recentFiles.add(scriteFileInfo.absoluteFilePath)
                     Scrite.document.save()
                     _private.execute()
                 }
@@ -206,7 +206,7 @@ Item {
 
             Component.onCompleted: {
                 Scrite.document.save()
-                ScriteRuntime.recentFiles.add(scriteFileInfo.absoluteFilePath)
+                Runtime.recentFiles.add(scriteFileInfo.absoluteFilePath)
                 _private.execute()
             }
         }
@@ -255,8 +255,8 @@ Item {
         selectMultiple: false
         objectName: "Save File Dialog"
         dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: ScriteRuntime.workspaceSettings.lastOpenFolderUrl
-        onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
+        folder: Runtime.workspaceSettings.lastOpenFolderUrl
+        onFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
         sidebarVisible: true
         selectExisting: false
 
@@ -264,10 +264,10 @@ Item {
             const path = Scrite.app.urlToLocalFile(fileUrl)
             Scrite.document.saveAs(path)
 
-            ScriteRuntime.recentFiles.add(path)
+            Runtime.recentFiles.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
-            ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
+            Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
             _private.execute()
         }

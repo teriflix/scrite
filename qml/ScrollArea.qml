@@ -32,7 +32,7 @@ Flickable {
     property bool animatePanAndZoom: true
     property alias minimumScale: pinchHandler.minimumScale
     property alias maximumScale: pinchHandler.maximumScale
-    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
     boundsBehavior: Flickable.StopAtBounds
     clip: true
@@ -68,12 +68,12 @@ Flickable {
     signal zoomScaleChangedInteractively()
 
     function zoomIn() {
-        const zf = 1+ScriteRuntime.scrollAreaSettings.zoomFactor
+        const zf = 1+Runtime.scrollAreaSettings.zoomFactor
         zoomScale = Math.min(zoomScale*zf, pinchHandler.maximumScale)
     }
 
     function zoomOut() {
-        const zf = 1-ScriteRuntime.scrollAreaSettings.zoomFactor
+        const zf = 1-Runtime.scrollAreaSettings.zoomFactor
         zoomScale = Math.max(zoomScale*zf, pinchHandler.minimumScale)
     }
 
@@ -104,17 +104,17 @@ Flickable {
 
     property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
     Behavior on contentX {
-        enabled: ScriteRuntime.applicationSettings.enableAnimations && animatePanAndZoom
+        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
         NumberAnimation { id: contentXAnimation; duration: 250 }
     }
     Behavior on contentY {
-        enabled: ScriteRuntime.applicationSettings.enableAnimations && animatePanAndZoom
+        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
         NumberAnimation { id: contentYAnimation; duration: 250 }
     }
     Behavior on zoomScale {
         id: zoomScaleBehavior
         property bool allow: true
-        enabled: ScriteRuntime.applicationSettings.enableAnimations && animatePanAndZoom && allow
+        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom && allow
         NumberAnimation { id: zoomScaleAnimation; duration: 250 }
     }
 

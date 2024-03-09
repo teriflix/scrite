@@ -54,7 +54,7 @@ Item {
                     }
                     return "This screenplay has been marked for collaboration by <strong>" + Scrite.document.primaryCollaborator + "</strong> with the emails listed below."
                 }
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WordWrap
                 anchors.verticalCenter: parent.verticalCenter
             }
@@ -77,8 +77,8 @@ Item {
             width: parent.width
             height: parent.height - titleText.height - protectionSwitchRow.height - 2*parent.spacing
             border.width: 1
-            border.color: ScriteRuntime.colors.primary.c700.background
-            color: ScriteRuntime.colors.primary.c100.background
+            border.color: Runtime.colors.primary.c700.background
+            color: Runtime.colors.primary.c100.background
             enabled: Scrite.document.hasCollaborators
             opacity: enabled ? 1.0 : 0.5
 
@@ -125,7 +125,7 @@ Item {
                         Text {
                             width: parent.width - (deleteIcon.opacity > 0 ? (deleteIcon.width+parent.spacing) : 0)
                             wrapMode: Text.WordWrap
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             font.italic: collaboratorName === ""
                             text: collaborator
                             anchors.verticalCenter: parent.verticalCenter
@@ -155,7 +155,7 @@ Item {
                         id: newCollaboratorEmail
                         width: parent.width - addCollaboratorButton.width - parent.spacing
                         placeholderText: "Enter Email ID and hit Return"
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         validator: RegExpValidator {
                             regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
                         }

@@ -79,7 +79,7 @@ Item {
 
         Component.onCompleted: {
             font.family = "Verdana"
-            font.pointSize = Qt.binding( () => { return ScriteRuntime.idealFontMetrics.font.pointSize } )
+            font.pointSize = Qt.binding( () => { return Runtime.idealFontMetrics.font.pointSize } )
         }
 
         // internal private property only
@@ -162,11 +162,11 @@ Item {
 
     Loader {
         anchors.fill: parent
-        active: ScriteRuntime.richTextEditorSettings.languageNoteShown === false
+        active: Runtime.richTextEditorSettings.languageNoteShown === false
         sourceComponent: Item {
             Rectangle {
                 anchors.fill: parent
-                color: ScriteRuntime.colors.primary.c600.background
+                color: Runtime.colors.primary.c600.background
                 opacity: 0.7
             }
 
@@ -184,14 +184,14 @@ Item {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: "In here, you can only type in English or in languages for which you have configured a text input method from your OS in Scrite Settings."
                     font.bold: true
-                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 3
-                    color: ScriteRuntime.colors.primary.c600.text
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
+                    color: Runtime.colors.primary.c600.text
                 }
 
                 Button2 {
                     text: "Got it!"
                     Layout.alignment: Qt.AlignHCenter
-                    onClicked: ScriteRuntime.richTextEditorSettings.languageNoteShown = true
+                    onClicked: Runtime.richTextEditorSettings.languageNoteShown = true
                 }
             }
         }

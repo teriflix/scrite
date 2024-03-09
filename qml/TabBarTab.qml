@@ -22,7 +22,7 @@ import "./globals"
 Item {
     id: tabBarTab
     width: implicitTabSize
-    height: ScriteRuntime.idealFontMetrics.font.pointSize + 16
+    height: Runtime.idealFontMetrics.font.pointSize + 16
 
     readonly property real tabTextWidth: tabText.width
     readonly property real implicitTabSize: tabTextWidth*1.1 + 2*tabShapeOffset
@@ -51,8 +51,8 @@ Item {
         id: tabShapeItem
         anchors.fill: parent
         anchors.topMargin: active ? 0 : parent.height*0.1
-        fillColor: active ? ScriteRuntime.colors.primary.windowColor : ScriteRuntime.colors.primary.c200.background
-        outlineColor: ScriteRuntime.colors.primary.borderColor
+        fillColor: active ? Runtime.colors.primary.windowColor : Runtime.colors.primary.c200.background
+        outlineColor: Runtime.colors.primary.borderColor
         outlineWidth: 2
         renderingMechanism: PainterPathItem.UseAntialiasedQPainter
         painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)
@@ -61,15 +61,15 @@ Item {
             id: tabText
             anchors.centerIn: parent
             anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             font.bold: tabBarTab.active
             rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
             Behavior on font.pixelSize {
-                enabled: ScriteRuntime.applicationSettings.enableAnimations
+                enabled: Runtime.applicationSettings.enableAnimations
                 NumberAnimation { duration: 250 }
             }
             Behavior on color {
-                enabled: ScriteRuntime.applicationSettings.enableAnimations
+                enabled: Runtime.applicationSettings.enableAnimations
                 ColorAnimation { duration: 125 }
             }
         }

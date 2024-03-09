@@ -20,8 +20,8 @@ import io.scrite.components 1.0
 import "./globals"
 
 CheckBox {
-    Material.accent: ScriteRuntime.colors.primary.key
-    Material.background: ScriteRuntime.colors.primary.c100.background
-    Material.foreground: ScriteRuntime.colors.primary.c100.text
+    Material.accent: Runtime.colors.primary.key
+    Material.background: Runtime.colors.primary.c100.background
+    Material.foreground: Runtime.colors.primary.c100.text
     font.pointSize: Scrite.app.fontPointSize
 }

@@ -20,7 +20,7 @@ import io.scrite.components 1.0
 import "./globals"
 
 ComboBox {
-    Material.background: ScriteRuntime.colors.primary.button.background
-    Material.foreground: ScriteRuntime.colors.primary.button.text
+    Material.background: Runtime.colors.primary.button.background
+    Material.foreground: Runtime.colors.primary.button.text
     font.pointSize: Scrite.app.fontPointSize
 }

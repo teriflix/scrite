@@ -20,9 +20,9 @@ import "./globals"
 
 Rectangle {
     id: tagText
-    color: ScriteRuntime.colors.primary.c10.background
+    color: Runtime.colors.primary.c10.background
     border.width: 1
-    border.color: ScriteRuntime.colors.primary.borderColor
+    border.color: Runtime.colors.primary.borderColor
     radius: height/2
 
     property alias text: textItem.text
@@ -54,7 +54,7 @@ Rectangle {
             y: tagText.topPadding
             width: contentWidth
             height: contentHeight
-            color: ScriteRuntime.colors.primary.c10.text
+            color: Runtime.colors.primary.c10.text
         }
     }
 
@@ -74,7 +74,7 @@ Rectangle {
         active: false
 
         sourceComponent: Rectangle {
-            color: closeButtonMouseArea.pressed ? ScriteRuntime.colors.accent.c600.background : ScriteRuntime.colors.accent.c100.background
+            color: closeButtonMouseArea.pressed ? Runtime.colors.accent.c600.background : Runtime.colors.accent.c100.background
             radius: height/2
 
             Image {

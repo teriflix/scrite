@@ -32,7 +32,7 @@ ScrollBar {
     }
     opacity: active ? 1 : 0.4
     Behavior on opacity {
-        enabled: ScriteRuntime.applicationSettings.enableAnimations
+        enabled: Runtime.applicationSettings.enableAnimations
         NumberAnimation { duration: 250 }
     }
 }

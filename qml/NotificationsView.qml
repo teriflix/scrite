@@ -41,7 +41,7 @@ Flickable {
                 width: notificationsView.width-1
                 height: Math.max(100, nLayout.implicitHeight+44)
                 color: notification.color
-                border { width: 1; color: ScriteRuntime.colors.primary.borderColor }
+                border { width: 1; color: Runtime.colors.primary.borderColor }
 
                 RowLayout {
                     id: nLayout
@@ -58,7 +58,7 @@ Flickable {
                             return Layout.preferredWidth*9/16
                         }
                         border.width: 1
-                        border.color: ScriteRuntime.colors.primary.borderColor
+                        border.color: Runtime.colors.primary.borderColor
 
                         Image {
                             id: nimage
@@ -88,7 +88,7 @@ Flickable {
                             Layout.fillWidth: true
                             text: notification.title
                             wrapMode: Text.WordWrap
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 4
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                             font.bold: true
                             visible: text !== ""
                             color: notification.textColor
@@ -96,7 +96,7 @@ Flickable {
 
                         Label {
                             Layout.fillWidth: true
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             text: notification.text
                             wrapMode: Text.WordWrap
                             color: notification.textColor

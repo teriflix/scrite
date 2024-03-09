@@ -75,7 +75,7 @@ Item {
             return parent.width-2*am < 16 ? (parent.width*0.15) : am
         }
         Behavior on anchorMargins {
-            enabled: iconImage.anchorMargins > 0 && ScriteRuntime.applicationSettings.enableAnimations
+            enabled: iconImage.anchorMargins > 0 && Runtime.applicationSettings.enableAnimations
             NumberAnimation {
                 duration: 250
             }

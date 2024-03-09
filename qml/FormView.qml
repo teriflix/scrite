@@ -48,7 +48,7 @@ Item {
         sourceModel: form.questionsModel
         filterFunction: formFilterFunction
 
-        property bool filterForms: !ScriteRuntime.notebookSettings.showAllFormQuestions
+        property bool filterForms: !Runtime.notebookSettings.showAllFormQuestions
         onFilterFormsChanged: invalidate()
 
         function formFilterFunction(form) {
@@ -68,7 +68,7 @@ Item {
         ScrollBar.vertical: formVScrollBar
         ScrollBar.horizontal: formHScrollBar
         flickableDirection: Flickable.VerticalFlick
-        FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         Column {
             id: formContentLayout
@@ -93,7 +93,7 @@ Item {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     font.bold: true
-                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                     placeholderText: "Title"
                     TabSequenceItem.manager: formTabManager
                     TabSequenceItem.sequence: 0
@@ -112,7 +112,7 @@ Item {
                     text: note ? note.content : ""
                     width: parent.width
                     wrapMode: Text.WordWrap
-                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     placeholderText: "Description"
                     TabSequenceItem.manager: formTabManager
                     TabSequenceItem.sequence: 1
@@ -147,14 +147,14 @@ Item {
 
                 RadioButton2 {
                     text: "All"
-                    checked: ScriteRuntime.notebookSettings.showAllFormQuestions
-                    onToggled: ScriteRuntime.notebookSettings.showAllFormQuestions = true
+                    checked: Runtime.notebookSettings.showAllFormQuestions
+                    onToggled: Runtime.notebookSettings.showAllFormQuestions = true
                 }
 
                 RadioButton2 {
                     text: "Answered"
-                    checked: !ScriteRuntime.notebookSettings.showAllFormQuestions
-                    onToggled: ScriteRuntime.notebookSettings.showAllFormQuestions = false
+                    checked: !Runtime.notebookSettings.showAllFormQuestions
+                    onToggled: Runtime.notebookSettings.showAllFormQuestions = false
                 }
             }
 

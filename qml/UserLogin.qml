@@ -224,7 +224,7 @@ Item {
                     Text {
                         width: parent.width
                         wrapMode: Text.WordWrap
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 4
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                         horizontalAlignment: Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "Signup / login to unlock Structure, Notebook and many more features in Scrite."
@@ -235,7 +235,7 @@ Item {
                         id: emailField
                         width: parent.width
                         placeholderText: "Enter your Email ID"
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 4
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                         text: sendActivationCodeCall.email()
                         validator: RegExpValidator {
                             regExp: /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -280,7 +280,7 @@ Item {
                             anchors.topMargin: 20
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
-                            font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                            font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                             maximumLineCount: 3
                             color: "red"
                             text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
@@ -375,7 +375,7 @@ Item {
                     Text {
                         width: parent.width * 0.8
                         wrapMode: Text.WordWrap
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         horizontalAlignment: resendActivationCode.visible && resendActivationCode.enabled ? Text.AlignLeft : Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: {
@@ -469,7 +469,7 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     maximumLineCount: 3
                     color: "red"
                     visible: text !== ""
@@ -577,7 +577,7 @@ Item {
                         Text {
                             width: parent.width
                             wrapMode: Text.WordWrap
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             horizontalAlignment: Text.AlignHCenter
                             anchors.horizontalCenter: parent.horizontalCenter
                             visible: Scrite.user.loggedIn
@@ -588,7 +588,7 @@ Item {
                             width: parent.width
                             anchors.horizontalCenter: parent.horizontalCenter
                             horizontalAlignment: Text.AlignHCenter
-                            font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                            font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                             text: "Review Your Scrite Installations »"
                             onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_INSTALLATIONS_PAGE)
                         }
@@ -729,7 +729,7 @@ Item {
 
                 Link {
                     text: needsSaving ? "Cancel" : "Logout"
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     opacity: needsSaving ? 0.85 : 1
                     onClicked: {
                         if(needsSaving) {
@@ -745,7 +745,7 @@ Item {
                 Link {
                     text: "Privacy Policy"
                     opacity: needsSaving ? 0.5 : 1
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     anchors.right: parent.right
                     onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
                 }
@@ -764,7 +764,7 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     maximumLineCount: 3
                     color: "red"
                     text: {
@@ -807,7 +807,7 @@ Item {
                 Link {
                     id: saveRefreshLink
                     text: needsSaving ? "Save" : "Refresh"
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     transformOrigin: Item.BottomRight
                     anchors.right: parent.right
                     property real characterSpacing: 0
@@ -849,7 +849,7 @@ Item {
 
                     function restore() {
                         saveRefreshLink.font.bold = needsSaving
-                        saveRefreshLink.font.pointSize = ScriteRuntime.idealFontMetrics.font.pointSize + (needsSaving ? 5 : 0)
+                        saveRefreshLink.font.pointSize = Runtime.idealFontMetrics.font.pointSize + (needsSaving ? 5 : 0)
                     }
 
                     SequentialAnimation {
@@ -900,7 +900,7 @@ Item {
                 Link {
                     text: "Feedback / About"
                     opacity: needsSaving ? 0.5 : 1
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? ScriteRuntime.idealFontMetrics.font.pointSize-2 : ScriteRuntime.idealFontMetrics.font.pointSize)
+                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     onClicked: {
                         modalDialog.close()
                         var time = 100
@@ -940,7 +940,7 @@ Item {
             Link {
                 id: backLink
                 text: "« Back"
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 20
@@ -965,14 +965,14 @@ Item {
                 header: Text {
                     width: installationsView.availableDelegateWidth
                     wrapMode: Text.WordWrap
-                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     text: "<strong>" + Scrite.user.email + "</strong> is currently logged in at " + (Scrite.user.installations.length) + " computers(s)."
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
                 }
 
                 delegate: Rectangle {
-                    property var colors: index%2 ? ScriteRuntime.colors.primary.c200 : ScriteRuntime.colors.primary.c300
+                    property var colors: index%2 ? Runtime.colors.primary.c200 : Runtime.colors.primary.c300
                     width: installationsView.availableDelegateWidth
                     height: Math.max(infoLayout.height, logoutButton.height) + 16
                     color: colors.background
@@ -992,7 +992,7 @@ Item {
                             spacing: 4
 
                             Text {
-                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 font.bold: true
                                 text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
                                 color: colors.text
@@ -1001,7 +1001,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 text: "Runs Scrite " + modelData.appVersions[0]
                                 color: colors.text
                                 width: parent.width
@@ -1009,7 +1009,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-4
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize-4
                                 text: "Since: " + Scrite.app.relativeTime(new Date(modelData.firstActivationDate))
                                 color: colors.text
                                 opacity: 0.90
@@ -1018,7 +1018,7 @@ Item {
                             }
 
                             Text {
-                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-4
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize-4
                                 text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastActivationDate))
                                 color: colors.text
                                 opacity: 0.75

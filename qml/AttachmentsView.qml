@@ -27,9 +27,9 @@ ListView {
     orientation: ListView.Horizontal
     model: attachments
     onAttachmentsChanged: currentIndex = -1
-    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
     highlight: Rectangle {
-        color: ScriteRuntime.colors.primary.highlight.background
+        color: Runtime.colors.primary.highlight.background
     }
     clip: true
     highlightMoveDuration: 0
@@ -38,9 +38,9 @@ ListView {
 
     Rectangle {
         anchors.fill: parent
-        color: Scrite.app.translucent(ScriteRuntime.colors.primary.windowColor, 0.5)
+        color: Scrite.app.translucent(Runtime.colors.primary.windowColor, 0.5)
         border.width: 1
-        border.color: ScriteRuntime.colors.primary.borderColor
+        border.color: Runtime.colors.primary.borderColor
         z: -1
 
         Text {
@@ -48,7 +48,7 @@ ListView {
             anchors.margins: 10
             anchors.leftMargin: attachmentsView.delegateSize
             verticalAlignment: Text.AlignVCenter
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             opacity: 0.5
             text: "Attachments"
             visible: attachments && attachments.attachmentCount === 0
@@ -79,11 +79,11 @@ ListView {
                 width: parent.width
                 elide: Text.ElideMiddle
                 padding: 2
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize/2
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize/2
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
                 text: objectItem.originalFileName
-                color: isSelected ? ScriteRuntime.colors.primary.highlight.text : ScriteRuntime.colors.primary.c10.text
+                color: isSelected ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
             }
         }
 

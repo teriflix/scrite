@@ -50,13 +50,13 @@ Menu2 {
                 anchors.fill: parent
                 anchors.bottomMargin: structureGroupsMenu.bottomPadding
                 border.width: 1
-                border.color: ScriteRuntime.colors.primary.borderColor
-                enabled: ScriteRuntime.appFeatures.structure.enabled && sceneGroup.sceneCount > 0
+                border.color: Runtime.colors.primary.borderColor
+                enabled: Runtime.appFeatures.structure.enabled && sceneGroup.sceneCount > 0
                 opacity: enabled ? 1 : 0.5
 
                 Rectangle {
                     anchors.fill: innerTitleText
-                    color: ScriteRuntime.colors.primary.c700.background
+                    color: Runtime.colors.primary.c700.background
                     visible: innerTitleText.visible
                 }
 
@@ -76,17 +76,17 @@ Menu2 {
                         }
                         return ret;
                     }
-                    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     visible: text !== ""
                     horizontalAlignment: Text.AlignHCenter
                     padding: 5
-                    color: ScriteRuntime.colors.primary.c700.text
+                    color: Runtime.colors.primary.c700.text
                     font.bold: true
                 }
 
                 ListView {
                     id: groupsView
-                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     anchors.left: parent.left
                     anchors.top: innerTitleText.visible ? innerTitleText.bottom : parent.top
                     anchors.right: parent.right
@@ -100,15 +100,15 @@ Menu2 {
                     section.delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                         height: 30
-                        color: ScriteRuntime.colors.primary.windowColor
+                        color: Runtime.colors.primary.windowColor
                         Text {
                             id: categoryLabel
                             text: section
                             topPadding: 5
                             bottomPadding: 5
                             anchors.centerIn: parent
-                            color: ScriteRuntime.colors.primary.button.text
-                            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                            color: Runtime.colors.primary.button.text
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
                     }
                     property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
@@ -146,7 +146,7 @@ Menu2 {
                     delegate: Rectangle {
                         width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                         height: 30
-                        color: groupItemMouseArea.containsMouse ? ScriteRuntime.colors.primary.button.background : Qt.rgba(0,0,0,0)
+                        color: groupItemMouseArea.containsMouse ? Runtime.colors.primary.button.background : Qt.rgba(0,0,0,0)
                         opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
                         property bool doesNotBelongToAnyAct: arrayItem.act === ""
                         property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
@@ -176,7 +176,7 @@ Menu2 {
                                 width: parent.width - parent.spacing - 24
                                 anchors.verticalCenter: parent.verticalCenter
                                 font.bold: groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
-                                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 leftPadding: arrayItem.type > 0 ? 20 : 0
                                 elide: Text.ElideRight
                             }
@@ -199,7 +199,7 @@ Menu2 {
             DisabledFeatureNotice {
                 anchors.fill: parent
                 color: Qt.rgba(1,1,1,0.8)
-                visible: !ScriteRuntime.appFeatures.structure.enabled
+                visible: !Runtime.appFeatures.structure.enabled
                 featureName: "Structure Tagging"
                 onClicked: structureGroupsMenu.close()
             }

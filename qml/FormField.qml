@@ -61,16 +61,16 @@ Column {
         Label {
             id: questionNumberText
             font.bold: true
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
             horizontalAlignment: Text.AlignRight
-            width: ScriteRuntime.idealFontMetrics.averageCharacterWidth * nrQuestionDigits
+            width: Runtime.idealFontMetrics.averageCharacterWidth * nrQuestionDigits
             anchors.top: parent.top
         }
 
         Label {
             id: questionText
             font.bold: true
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize + 2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
             width: parent.width - questionNumberText.width - parent.spacing
             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
             anchors.top: parent.top
@@ -81,11 +81,11 @@ Column {
         id: answerArea
         width: questionText.width
         anchors.right: parent.right
-        color: Scrite.app.translucent(ScriteRuntime.colors.primary.c100.background, 0.75)
+        color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.75)
         border.width: 1
-        border.color: Scrite.app.translucent(ScriteRuntime.colors.primary.borderColor, 0.25)
+        border.color: Scrite.app.translucent(Runtime.colors.primary.borderColor, 0.25)
         height: Math.max(minHeight, answerItemLoader.item ? answerItemLoader.item.height : 0)
-        property real minHeight: (ScriteRuntime.idealFontMetrics.lineSpacing + ScriteRuntime.idealFontMetrics.descent + ScriteRuntime.idealFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
+        property real minHeight: (Runtime.idealFontMetrics.lineSpacing + Runtime.idealFontMetrics.descent + Runtime.idealFontMetrics.ascent) * (answerLength == FormQuestion.ShortParagraph ? 1.1 : 3)
 
         LodLoader {
             id: answerItemLoader
@@ -103,7 +103,7 @@ Column {
             }
 
             lowDetailComponent: TextArea {
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 text: formField.answer === "" ? formField.placeholderText : formField.answer
                 opacity: formField.answer === "" ? 0.5 : 1
@@ -111,7 +111,7 @@ Column {
                 topPadding: 5; bottomPadding: 5
                 Transliterator.defaultFont: font
                 Transliterator.textDocument: textDocument
-                Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.spellCheckEnabled: formField.answer !== ""
                 readOnly: true
                 selectByMouse: false
@@ -125,7 +125,7 @@ Column {
 
             highDetailComponent: TextArea {
                 id: answerText
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 selectByMouse: true
                 selectByKeyboard: true
@@ -135,9 +135,9 @@ Column {
                 Transliterator.textDocument: textDocument
                 Transliterator.cursorPosition: cursorPosition
                 Transliterator.hasActiveFocus: activeFocus
-                Transliterator.applyLanguageFonts: ScriteRuntime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
-                Transliterator.spellCheckEnabled: ScriteRuntime.screenplayEditorSettings.enableSpellCheck
+                Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
                 readOnly: Scrite.document.readOnly
                 background: Item { }
                 SpecialSymbolsSupport {

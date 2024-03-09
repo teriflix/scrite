@@ -68,7 +68,7 @@ Item {
             anchors.bottom: parent.bottom
             anchors.rightMargin: 30 * ratio
             anchors.bottomMargin: 10 * ratio
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
             text: Scrite.app.applicationVersion
             color: "white"
         }
@@ -81,7 +81,7 @@ Item {
             anchors.leftMargin: 30 * appVersionLabel.ratio
             anchors.bottomMargin: 10 * appVersionLabel.ratio
 
-            font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
             padding: 5
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
@@ -248,7 +248,7 @@ Item {
 
         width: 100
         height: buttonLayout.height + 6
-        color: buttonMouseArea.containsMouse ? ScriteRuntime.colors.primary.highlight.background : Qt.rgba(0,0,0,0)
+        color: buttonMouseArea.containsMouse ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0)
 
         RowLayout {
             id: buttonLayout
@@ -277,7 +277,7 @@ Item {
             Text {
                 id: buttonLabel
                 padding: 3
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 font.underline: singleClick ? buttonMouseArea.containsMouse : false
                 text: button.text
                 Layout.fillWidth: true
@@ -302,7 +302,7 @@ Item {
             anchors.fill: parent
 
             Text {
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: "New File"
             }
 
@@ -313,12 +313,12 @@ Item {
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
                 border.width: templatesView.interactive ? 1 : 0
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
 
                 ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 1
-                    visible: !ScriteRuntime.appFeatures.templates.enabled
+                    visible: !Runtime.appFeatures.templates.enabled
 
                     LinkButton {
                         text: "Blank Document"
@@ -339,7 +339,7 @@ Item {
                         Layout.fillHeight: true
                         color: Qt.rgba(1,1,1,0.9)
                         featureName: "Screenplay Templates"
-                        visible: !ScriteRuntime.appFeatures.templates.enabled
+                        visible: !Runtime.appFeatures.templates.enabled
                     }
                 }
 
@@ -347,11 +347,11 @@ Item {
                     id: templatesView
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: ScriteRuntime.appFeatures.templates.enabled ? libraryService.templates : []
-                    visible: ScriteRuntime.appFeatures.templates.enabled
+                    model: Runtime.appFeatures.templates.enabled ? libraryService.templates : []
+                    visible: Runtime.appFeatures.templates.enabled
                     currentIndex: -1
                     clip: true
-                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: templatesView
                     }
@@ -389,12 +389,12 @@ Item {
         }
 
         LinkButton {
-            text: ScriteRuntime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
-            iconSource: ScriteRuntime.recentFiles.count === 0 ? "../icons/filetype/document.png" : "../icons/action/library.png"
+            text: Runtime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
+            iconSource: Runtime.recentFiles.count === 0 ? "../icons/filetype/document.png" : "../icons/action/library.png"
             Layout.fillWidth: true
-            tooltip: ScriteRuntime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
+            tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
             onClicked: stackView.push(scriptalayPage)
-            enabled: ScriteRuntime.recentFiles.count > 0
+            enabled: Runtime.recentFiles.count > 0
 
             Announcement.onIncoming: (type,data) => {
                                          if(type === "710A08E7-9F60-4D36-9DEA-0993EEBA7DCA") {
@@ -447,13 +447,13 @@ Item {
     // This component should show "Recent Files", if recent files exist
     // It should show Scriptalay Scripts, if no recent files exist.
     component QuickFileOpenOptions : Item {
-        property bool scriptalayMode: ScriteRuntime.recentFiles.count === 0
+        property bool scriptalayMode: Runtime.recentFiles.count === 0
 
         ColumnLayout {
             anchors.fill: parent
 
             Text {
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: scriptalayMode ? "Scriptalay" : "Recent Files"
             }
 
@@ -464,16 +464,16 @@ Item {
                 Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
                 border.width: quickFilesView.interactive ? 1 : 0
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
 
                 ListView {
                     id: quickFilesView // shows either Scriptalay or Recent Files
                     anchors.fill: parent
                     anchors.margins: 1
-                    model: scriptalayMode ? libraryService.screenplays : ScriteRuntime.recentFiles
+                    model: scriptalayMode ? libraryService.screenplays : Runtime.recentFiles
                     currentIndex: -1
                     clip: true
-                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: quickFilesView
                     }
@@ -522,7 +522,7 @@ Item {
                 Layout.fillHeight: true
                 color: Qt.rgba(0,0,0,0)
                 border.width: 1
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
 
                 ListView {
                     id: screenplaysView
@@ -531,9 +531,9 @@ Item {
                     clip: true
                     model: libraryService.screenplays
                     currentIndex: count ? 0 : -1
-                    FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     highlight: Rectangle {
-                        color: ScriteRuntime.colors.primary.highlight.background
+                        color: Runtime.colors.primary.highlight.background
                     }
                     ScrollBar.vertical: ScrollBar2 {
                         flickable: screenplaysView
@@ -561,7 +561,7 @@ Item {
                 Layout.fillHeight: true
                 color: Qt.rgba(0,0,0,0)
                 border.width: 1
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
 
                 Flickable {
                     id: screenplayDetailsFlick
@@ -585,7 +585,7 @@ Item {
                         padding: 4
                         readOnly: true
                         background: Item { }
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
                               "<strong>Pages:</strong> " + record.pageCount + "<br/>" +
                               "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
@@ -601,7 +601,7 @@ Item {
 
     component VaultPage : Rectangle {
         border.width: 1
-        border.color: ScriteRuntime.colors.primary.borderColor
+        border.color: Runtime.colors.primary.borderColor
         color: Qt.rgba(0,0,0,0)
 
         function openSelected() {
@@ -628,12 +628,12 @@ Item {
             anchors.margins: 1
             clip: true
             model: Scrite.vault
-            FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
             currentIndex: count ? 0 : -1
             visible: count > 0
             ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
             highlight: Rectangle {
-                color: ScriteRuntime.colors.primary.highlight.background
+                color: Runtime.colors.primary.highlight.background
             }
             highlightMoveDuration: 0
             highlightResizeDuration: 0
@@ -704,7 +704,7 @@ Item {
         AttachmentsDropArea {
             id: importDropArea
             anchors.fill: parent
-            enabled: ScriteRuntime.appFeatures.importer.enabled
+            enabled: Runtime.appFeatures.importer.enabled
             allowedType: Attachments.NoMedia
             allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
             onDropped: fileToImport.path = attachment.filePath
@@ -713,10 +713,10 @@ Item {
         StackLayout {
             id: importPageStackLayout
             anchors.fill: parent
-            currentIndex: ScriteRuntime.appFeatures.importer.enabled ? (fileToImport.valid ? 2 : 1) : 0
+            currentIndex: Runtime.appFeatures.importer.enabled ? (fileToImport.valid ? 2 : 1) : 0
 
             DisabledFeatureNotice {
-                visible: !ScriteRuntime.appFeatures.importer.enabled
+                visible: !Runtime.appFeatures.importer.enabled
                 color: Qt.rgba(1,1,1,0.9)
                 featureName: "Import from 3rd Party Formats"
             }
@@ -724,7 +724,7 @@ Item {
             Rectangle {
                 id: dropBrowseItem
                 border.width: 1
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doBrowse() {
@@ -740,9 +740,9 @@ Item {
                     selectMultiple: false
                     sidebarVisible: true
                     selectExisting: true
-                    folder: ScriteRuntime.workspaceSettings.lastOpenImportFolderUrl
+                    folder: Runtime.workspaceSettings.lastOpenImportFolderUrl
                     dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
-                    onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenImportFolderUrl = folder
+                    onFolderChanged: Runtime.workspaceSettings.lastOpenImportFolderUrl = folder
 
                     onAccepted: {
                         if(fileUrl != "")
@@ -759,7 +759,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+2
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
                         text: importDropArea.active ? importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
                     }
 
@@ -767,8 +767,8 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-1
-                        color: ScriteRuntime.colors.primary.c700.background
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
+                        color: Runtime.colors.primary.c700.background
                         text: importDropArea.active ? "Drop to import this file." : "(Allowed file types: " + importFileDialog.nameFilters.join(", ") + ")"
                     }
                 }
@@ -777,14 +777,14 @@ Item {
             Rectangle {
                 id: importDroppedFileItem
                 border.width: 1
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
                 color: Qt.rgba(0,0,0,0)
 
                 function doImport() {
                     homeScreenBusyOverlay.busyMessage = "Importing screenplay ..."
                     homeScreenBusyOverlay.visible = true
 
-                    ScriteRuntime.workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
+                    Runtime.workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
 
                     mainUiContentLoader.allowContent = false
                     Scrite.document.openOrImport(fileToImport.path)
@@ -802,7 +802,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize+2
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
                         font.bold: true
                         elide: Text.ElideMiddle
                         text: fileToImport.name
@@ -812,7 +812,7 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: "Click on 'Import' button to import this file."
                     }
 
@@ -820,8 +820,8 @@ Item {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize-2
-                        color: ScriteRuntime.colors.accent.c700.background
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                        color: Runtime.colors.accent.c700.background
                         text: "<b>NOTE</b>: Unsaved changes in the current document will be discarded."
                         visible: !Scrite.document.empty
                     }
@@ -925,7 +925,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: Scrite.vault.documentCount > 0 ? "Select a file to restore from the vault." : ""
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 elide: Text.ElideRight
             }
             buttons: RowLayout {
@@ -972,13 +972,13 @@ Item {
         selectMultiple: false
         objectName: "Open File Dialog"
         dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: ScriteRuntime.workspaceSettings.lastOpenFolderUrl
-        onFolderChanged: ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
+        folder: Runtime.workspaceSettings.lastOpenFolderUrl
+        onFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
         sidebarVisible: true
         selectExisting: true
 
         onAccepted: {
-            ScriteRuntime.workspaceSettings.lastOpenFolderUrl = folder
+            Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
             const path = Scrite.app.urlToLocalFile(fileUrl)
             _private.openScriteDocument(path)
@@ -995,7 +995,7 @@ Item {
             homeScreen.enabled = false
 
             mainUiContentLoader.allowContent = false
-            ScriteRuntime.recentFiles.add(path)
+            Runtime.recentFiles.add(path)
             Scrite.document.open(path)
             mainUiContentLoader.allowContent = true
 

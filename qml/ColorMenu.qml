@@ -21,7 +21,7 @@ import "./globals"
 Menu2 {
     id: colorMenu
     width: minCellSize * 5 + 10
-    height: minCellSize * (4 + Math.ceil((ScriteRuntime.workspaceSettings.customColors.length+1)/4)) +  10
+    height: minCellSize * (4 + Math.ceil((Runtime.workspaceSettings.customColors.length+1)/4)) +  10
 
     signal menuItemClicked(string color)
     readonly property real minCellSize: 50
@@ -41,7 +41,7 @@ Menu2 {
             columns: Math.floor(width / minCellSize)
 
             Repeater {
-                model: Scrite.app.standardColors.concat(ScriteRuntime.workspaceSettings.customColors)
+                model: Scrite.app.standardColors.concat(Runtime.workspaceSettings.customColors)
                 delegate: colorItemDelegate
             }
 
@@ -52,11 +52,11 @@ Menu2 {
                 ToolTip.text: "Pick a custom color"
                 onClicked: {
                     var color = Scrite.app.pickColor("white")
-                    var colors = ScriteRuntime.workspaceSettings.customColors
+                    var colors = Runtime.workspaceSettings.customColors
                     colors.unshift(color)
                     if(colors.length > 10)
                         colors.pop()
-                    ScriteRuntime.workspaceSettings.customColors = colors
+                    Runtime.workspaceSettings.customColors = colors
 
                     colorMenu.menuItemClicked(modelData)
                     colorMenu.close()

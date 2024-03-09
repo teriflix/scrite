@@ -1,1 +1,1 @@
-singleton ScriteRuntime 1.0 ScriteRuntime.qml
+singleton Runtime 1.0 Runtime.qml

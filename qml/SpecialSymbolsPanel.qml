@@ -39,7 +39,7 @@ Rectangle {
 
     id: symbolsView
     width: 500; height: 400
-    color: ScriteRuntime.colors.primary.c100.background
+    color: Runtime.colors.primary.c100.background
 
     Rectangle {
         id: symbolsPanel
@@ -47,7 +47,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        color: ScriteRuntime.colors.primary.c700.background
+        color: Runtime.colors.primary.c700.background
         property int currentIndex: 0
         property bool currentIndexIsEmoji: symbols[symbolsPanel.currentIndex].title === "Emoji"
 
@@ -59,14 +59,14 @@ Rectangle {
                 delegate: Rectangle {
                     width: symbolsPanel.width
                     height: 40
-                    color: symbolsPanel.currentIndex === index ? ScriteRuntime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
+                    color: symbolsPanel.currentIndex === index ? Runtime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
                         anchors.rightMargin: 10
                         text: modelData.title
-                        font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         color: symbolsPanel.currentIndex === index ? "black" : "white"
                     }
 
@@ -102,7 +102,7 @@ Rectangle {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 anchors.centerIn: parent
-                font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: includeEmojis ? "Emojis may not be included in PDF exports." : "Emojis are not supported in this text area."
             }
         }
@@ -117,7 +117,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 1
                 border.width: 1
-                border.color: ScriteRuntime.colors.primary.borderColor
+                border.color: Runtime.colors.primary.borderColor
                 opacity: 0.5
             }
 

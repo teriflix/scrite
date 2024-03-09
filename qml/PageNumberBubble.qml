@@ -20,7 +20,7 @@ import "./globals"
 
 PainterPathItem {
     property string pageNumber: "-1"
-    readonly property var colors: ScriteRuntime.colors.primary.c600
+    readonly property var colors: Runtime.colors.primary.c600
 
     Text {
         id: sceneNumberText

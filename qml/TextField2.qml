@@ -45,10 +45,10 @@ TextField {
         return suggestion
     }
     property bool tabItemUponReturn: true
-    selectedTextColor: ScriteRuntime.colors.accent.c700.text
-    selectionColor: ScriteRuntime.colors.accent.c700.background
+    selectedTextColor: Runtime.colors.accent.c700.text
+    selectionColor: Runtime.colors.accent.c700.background
     selectByMouse: true
-    font.pointSize: ScriteRuntime.idealFontMetrics.font.pointSize
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
     signal editingComplete()
     signal returnPressed()
@@ -168,7 +168,7 @@ TextField {
     Text {
         id: labelText
         text: parent.placeholderText
-        font.pointSize: 2*ScriteRuntime.idealFontMetrics.font.pointSize/3
+        font.pointSize: 2*Runtime.idealFontMetrics.font.pointSize/3
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.verticalCenter: parent.top
@@ -193,7 +193,7 @@ TextField {
             id: completionView
             clip: true
             model: completionModel
-            FlickScrollSpeedControl.factor: ScriteRuntime.workspaceSettings.flickScrollSpeedFactor
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
             highlightMoveDuration: 0
             highlightResizeDuration: 0
             keyNavigationEnabled: false
@@ -204,7 +204,7 @@ TextField {
                 text: string
                 padding: 5
                 font: textField.font
-                color: index === completionView.currentIndex ? ScriteRuntime.colors.primary.highlight.text : ScriteRuntime.colors.primary.c10.text
+                color: index === completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                 MouseArea {
                     id: textMouseArea
                     anchors.fill: parent
@@ -221,7 +221,7 @@ TextField {
                 }
             }
             highlight: Rectangle {
-                color: ScriteRuntime.colors.primary.highlight.background
+                color: Runtime.colors.primary.highlight.background
             }
             currentIndex: completionModel.currentRow
             height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
@@ -270,7 +270,7 @@ TextField {
             Rectangle {
                 width: parent.width
                 height: 1
-                color: textField.activeFocus ? ScriteRuntime.colors.primary.c700.background : ScriteRuntime.colors.primary.c300.background
+                color: textField.activeFocus ? Runtime.colors.primary.c700.background : Runtime.colors.primary.c300.background
                 anchors.bottom: parent.bottom
             }
         }

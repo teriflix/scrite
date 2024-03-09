@@ -25,7 +25,7 @@ Item {
     property string label: ""
     property alias buttonColor: expandCollapseButton.color
     property alias backgroundColor: panelBackground.color
-    property color borderColor: ScriteRuntime.colors.primary.borderColor
+    property color borderColor: Runtime.colors.primary.borderColor
     property real borderWidth: 1
 
     property bool expanded: false
@@ -41,7 +41,7 @@ Item {
     readonly property real minPanelWidth: 25
     property real maxPanelWidth: 450
     Behavior on width {
-        enabled: ScriteRuntime.applicationSettings.enableAnimations
+        enabled: Runtime.applicationSettings.enableAnimations
         NumberAnimation { duration: 50 }
     }
 
@@ -112,7 +112,7 @@ Item {
             opacity: sidePanel.expanded ? 1 : 0
             property var contentData
             Behavior on opacity {
-                enabled: ScriteRuntime.applicationSettings.enableAnimations
+                enabled: Runtime.applicationSettings.enableAnimations
                 NumberAnimation { duration: 50 }
             }
             active: opacity > 0
@@ -123,15 +123,15 @@ Item {
         id: expandCollapseButton
         x: sidePanel.expanded ? 4 : -radius
         y: sidePanel.expanded ? 4 : parent.buttonY
-        color: ScriteRuntime.colors.primary.button.background
+        color: Runtime.colors.primary.button.background
         width: parent.minPanelWidth
         height: sidePanel.expanded ? parent.height-8 : sidePanel.buttonSize
         radius: (1.0-contentLoader.opacity) * 6
         border.width: contentLoader.visible ? 0 : 1
-        border.color: sidePanel.expanded ? ScriteRuntime.colors.primary.windowColor : borderColor
+        border.color: sidePanel.expanded ? Runtime.colors.primary.windowColor : borderColor
 
         Behavior on height {
-            enabled: ScriteRuntime.applicationSettings.enableAnimations
+            enabled: Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 50 }
         }
 
