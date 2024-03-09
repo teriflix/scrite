@@ -24,6 +24,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./dialogs"
 
 Item {
     id: scriteDocumentViewItem
@@ -630,10 +631,12 @@ Item {
                                 }
                             }
 
+                            AboutDialog {
+                                id: aboutDialog
+                            }
+
                             function showAboutDialog() {
-                                modalDialog.sourceComponent = aboutBoxComponent
-                                modalDialog.popupSource = parent
-                                modalDialog.active = true
+                                aboutDialog.open()
                             }
                         }
 
@@ -2059,12 +2062,6 @@ Item {
         id: homeScreenComponent
 
         HomeScreen { }
-    }
-
-    Component {
-        id: aboutBoxComponent
-
-        AboutBox { }
     }
 
     Component {

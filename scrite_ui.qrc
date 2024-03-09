@@ -6,7 +6,6 @@
         <file>js/utils.js</file>
         <file>LICENSE.txt</file>
         <file>main.qml</file>
-        <file>qml/AboutBox.qml</file>
         <file>qml/AlphabetMappings.qml</file>
         <file>qml/Button2.qml</file>
         <file>qml/CharactersView.qml</file>
@@ -78,7 +77,6 @@
         <file>qml/UserLogin.qml</file>
         <file>qml/DisabledFeatureNotice.qml</file>
         <file>qml/Link.qml</file>
-        <file>qml/SocialShareIcons.qml</file>
         <file>qml/CollaboratorsDialog.qml</file>
         <file>qml/RenameCharacterDialog.qml</file>
         <file>qml/PdfView.qml</file>
@@ -95,5 +93,7 @@
         <file>qml/SaveWorkflow.qml</file>
         <file>qml/globals/qmldir</file>
         <file>qml/globals/Runtime.qml</file>
+        <file>qml/dialogs/qmldir</file>
+        <file>qml/dialogs/AboutDialog.qml</file>
     </qresource>
 </RCC>
