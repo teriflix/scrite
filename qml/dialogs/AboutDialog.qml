@@ -21,31 +21,26 @@ import io.scrite.components 1.0
 import "../../js/utils.js" as Utils
 import "../globals"
 
-Dialog {
+AbstractDialog {
     id: aboutDialog
 
-    modal: true
-    parent: Overlay.overlay
-    anchors.centerIn: parent
-    closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-    margins: 0
-    padding: 0
+    title: "About Scrite"
+    width: {
+        const bgImageAspectRatio = 1464.0/978.0
+        return height * bgImageAspectRatio
+    }
+    height: {
+        const bgImageHeight = 978
+        return Math.min(bgImageHeight*0.8, Scrite.window.height * 0.8)
+    }
 
-    width: height * _private.bgImageDim.aspectRatio
-    height: Math.min(_private.bgImageDim.height*0.8, Scrite.window.height * 0.8)
-
-    background: Image {
+    backdrop: Image {
         source: "../../images/aboutbox.jpg"
         fillMode: Image.PreserveAspectFit
         smooth: true; mipmap: true
     }
 
-    contentItem: Loader {
-        sourceComponent: AboutBoxContent { }
-        active: aboutDialog.visible
-    }
-
-    component AboutBoxContent : Item {
+    content: Item {
         Text {
             id: versionText
             anchors.top: parent.top
@@ -126,6 +121,7 @@ Dialog {
 
                 // color: creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
 
+                // Refactoring QML TODO: Add ScrollBar back to this.
                 ListView {
                     id: creditsView
                     anchors.fill: parent
@@ -197,8 +193,66 @@ Dialog {
                 Layout.preferredHeight: 14
             }
 
-            SocialShareIcons {
+            RowLayout {
                 Layout.alignment: Qt.AlignHCenter
+
+                Image {
+                    Layout.alignment: Qt.AlignVCenter
+                    Layout.preferredWidth: 24
+                    Layout.preferredHeight: 24
+
+                    source: "../../icons/action/share.png"
+                }
+
+                Text {
+                    Layout.alignment: Qt.AlignVCenter
+
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                    leftPadding: 10; rightPadding: 3
+                    text: "Share Scrite: "
+                }
+
+                RowLayout {
+                    spacing: -8
+
+                    ToolButton {
+                        Layout.preferredWidth: 50
+                        Layout.preferredHeight: 50
+                        flat: true
+                        icon.source: "../../icons/action/share_on_facebook.png"
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_facebook")
+                        ToolTip.text: "Post about Scrite on your Facebook page."
+                    }
+
+                    ToolButton {
+                        Layout.preferredWidth: 50
+                        Layout.preferredHeight: 50
+                        flat: true
+                        icon.source: "../../icons/action/share_on_linkedin.png"
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_linkedin")
+                        ToolTip.text: "Post about Scrite on your LinkedIn page."
+                    }
+
+                    ToolButton {
+                        Layout.preferredWidth: 50
+                        Layout.preferredHeight: 50
+                        flat: true
+                        icon.source: "../../icons/action/share_on_twitter.png"
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_twitter")
+                        ToolTip.text: "Tweet about Scrite from your handle."
+                    }
+
+                    ToolButton {
+                        Layout.preferredWidth: 50
+                        Layout.preferredHeight: 50
+                        flat: true
+                        icon.source: "../../icons/action/share_on_email.png"
+
+                        readonly property string url: "mailto:?Subject=Take a look at Scrite&Body=I am using Scrite and I thought you should check it out as well. Visit https://www.scrite.io"
+                        onClicked: Qt.openUrlExternally(url)
+                        ToolTip.text: "Send an email about Scrite."
+                    }
+                }
             }
 
             RowLayout {
@@ -224,108 +278,27 @@ Dialog {
         }
     }
 
-    component SocialShareIcons : RowLayout {
-        property bool displayShareText: true
-
-        Image {
-            Layout.alignment: Qt.AlignVCenter
-            Layout.preferredWidth: 24
-            Layout.preferredHeight: 24
-
-            source: "../../icons/action/share.png"
-            visible: displayShareText
-        }
-
-        Text {
-            Layout.alignment: Qt.AlignVCenter
-
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            leftPadding: 10; rightPadding: 3
-            text: "Share Scrite: "
-            visible: displayShareText
-        }
-
-        RowLayout {
-            spacing: -8
-
-            ToolButton {
-                Layout.preferredWidth: 50
-                Layout.preferredHeight: 50
-                icon.source: "../../icons/action/share_on_facebook.png"
-                onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_facebook")
-                ToolTip.text: "Post about Scrite on your Facebook page."
-            }
-
-            ToolButton {
-                Layout.preferredWidth: 50
-                Layout.preferredHeight: 50
-                icon.source: "../../icons/action/share_on_linkedin.png"
-                onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_linkedin")
-                ToolTip.text: "Post about Scrite on your LinkedIn page."
-            }
-
-            ToolButton {
-                Layout.preferredWidth: 50
-                Layout.preferredHeight: 50
-                icon.source: "../../icons/action/share_on_twitter.png"
-                onClicked: Qt.openUrlExternally("https://www.scrite.io?share_on_twitter")
-                ToolTip.text: "Tweet about Scrite from your handle."
-            }
-
-            ToolButton {
-                Layout.preferredWidth: 50
-                Layout.preferredHeight: 50
-                icon.source: "../../icons/action/share_on_email.png"
-
-                readonly property string url: "mailto:?Subject=Take a look at Scrite&Body=I am using Scrite and I thought you should check it out as well. Visit https://www.scrite.io"
-                onClicked: Qt.openUrlExternally(url)
-                ToolTip.text: "Send an email about Scrite."
-            }
-        }
-    }
-
-    Dialog {
+    AbstractDialog {
         id: licenseTermsDialog
-
-        modal: true
-        parent: Overlay.overlay
-        anchors.centerIn: parent
-        closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-        margins: 0
-        padding: 0
 
         title: "Terms Of Use"
         width: aboutDialog.width * 0.9
         height: aboutDialog.height * 0.9
 
-        contentItem: Loader {
-            sourceComponent: TermsOfUse { }
-            active: licenseTermsDialog.visible
+        content:  ScrollView {
+            clip: true
+            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            leftPadding: 40
+
+            TextEdit {
+                readOnly: true
+                font.family: "Courier Prime"
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                topPadding: backButton.y
+                bottomPadding: backButton.y
+                text: Scrite.app.fileContents(":/LICENSE.txt")
+                selectByMouse: true
+            }
         }
-    }
-
-    component TermsOfUse : ScrollView {
-        clip: true
-        ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-        leftPadding: 40
-
-        TextEdit {
-            readOnly: true
-            font.family: "Courier Prime"
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            topPadding: backButton.y
-            bottomPadding: backButton.y
-            text: Scrite.app.fileContents(":/LICENSE.txt")
-            selectByMouse: true
-        }
-    }
-
-    QtObject {
-        id: _private
-
-        // This size is hard-coded by looking up the actual size of ../images/aboutbox.jpg
-        // We could load the image at runtime and figure out the size, but then we hardly
-        // change the background image. So its perfectly okay to hardcode this.
-        readonly property var bgImageDim: { "width": 1464, "height": 978, "aspectRatio": 1464.0/978.0 }
     }
 }

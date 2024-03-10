@@ -362,7 +362,7 @@ Item {
         }
 
         readonly property Colors accent: Colors {
-            key: Material.BlueGrey
+            key: Material.DeepPurple
         }
     }
 

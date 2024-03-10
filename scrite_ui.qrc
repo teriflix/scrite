@@ -95,5 +95,6 @@
         <file>qml/globals/Runtime.qml</file>
         <file>qml/dialogs/qmldir</file>
         <file>qml/dialogs/AboutDialog.qml</file>
+        <file>qml/dialogs/AbstractDialog.qml</file>
     </qresource>
 </RCC>
