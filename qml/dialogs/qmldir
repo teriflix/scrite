@@ -1,1 +1,3 @@
+AbstractDialog 1.0 AbstractDialog.qml
 AboutDialog 1.0 AboutDialog.qml
+TitlePageDialog 1.0 TitlePageDialog.qml

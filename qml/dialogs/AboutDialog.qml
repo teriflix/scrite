@@ -41,6 +41,8 @@ AbstractDialog {
     }
 
     content: Item {
+        implicitHeight: aboutInfoLayout.implicitHeight + 40
+
         Text {
             id: versionText
             anchors.top: parent.top
@@ -70,6 +72,7 @@ AbstractDialog {
         }
 
         ColumnLayout {
+            id: aboutInfoLayout
             spacing: 10
             anchors.centerIn: parent
 
@@ -285,20 +288,15 @@ AbstractDialog {
         width: aboutDialog.width * 0.9
         height: aboutDialog.height * 0.9
 
-        content:  ScrollView {
-            clip: true
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
-            leftPadding: 40
-
-            TextEdit {
-                readOnly: true
-                font.family: "Courier Prime"
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                topPadding: backButton.y
-                bottomPadding: backButton.y
-                text: Scrite.app.fileContents(":/LICENSE.txt")
-                selectByMouse: true
-            }
+        content: TextEdit {
+            padding: 40
+            readOnly: true
+            font.family: "Courier Prime"
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            topPadding: backButton.y
+            bottomPadding: backButton.y
+            text: Scrite.app.fileContents(":/LICENSE.txt")
+            selectByMouse: true
         }
     }
 }

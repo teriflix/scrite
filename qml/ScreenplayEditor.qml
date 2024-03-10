@@ -24,6 +24,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./dialogs"
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
@@ -390,10 +391,11 @@ Rectangle {
                         }
 
                         function editTitlePage(source) {
-                            modalDialog.arguments = {"activeTabIndex": 2}
-                            modalDialog.popupSource = source
-                            modalDialog.sourceComponent = optionsDialogComponent
-                            modalDialog.active = true
+                            titlePageDialog.open()
+                        }
+
+                        TitlePageDialog {
+                            id: titlePageDialog
                         }
 
                         Connections {

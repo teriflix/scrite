@@ -96,5 +96,6 @@
         <file>qml/dialogs/qmldir</file>
         <file>qml/dialogs/AboutDialog.qml</file>
         <file>qml/dialogs/AbstractDialog.qml</file>
+        <file>qml/dialogs/TitlePageDialog.qml</file>
     </qresource>
 </RCC>

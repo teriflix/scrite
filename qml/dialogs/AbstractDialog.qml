@@ -43,7 +43,7 @@ Dialog {
 
     // Assign a component whose instance may be shown as background
     property Component backdrop: Rectangle {
-        color: Runtime.colors.primary.windowColor
+        color: Runtime.colors.primary.c100.background
     }
 
     // Assign a component whose instance may be shown in the content
@@ -65,14 +65,30 @@ Dialog {
         }
     }
 
+    // This signal is emitted after the dialog box has been dismissed.
+    signal dismissed()
+
     // Configure built-in properties of the Dialog
     parent: Overlay.overlay
     anchors.centerIn: parent
 
     modal: true
     closePolicy: Popup.NoAutoClose
-    margins: 0
-    padding: 0
+
+    topPadding: 0
+    leftPadding: 0
+    rightPadding: 0
+    bottomPadding: 0
+
+    topMargin: 0
+    leftMargin: 0
+    rightMargin: 0
+    bottomMargin: 0
+
+    topInset: 0
+    leftInset: 0
+    rightInset: 0
+    bottomInset: 0
 
     background: Loader {
         width: dialog.width
@@ -81,11 +97,34 @@ Dialog {
         active: dialog.visible
     }
 
-    contentItem: Loader {
+    contentItem: Item {
         width: dialog.width
-        height: dialog.hight - dialog.header.height
-        sourceComponent: content
-        active: dialog.visible
+        height: dialog.height - dialog.header.height
+        clip: contentItemScroll.contentWidth > contentItemScroll.width ||
+              contentItemScroll.contentHeight > contentItemScroll.height
+
+        Flickable {
+            id: contentItemScroll
+            anchors.fill: parent
+            contentWidth: contentItemLoader.width
+            contentHeight: contentItemLoader.height
+            ScrollBar.vertical: ScrollBar {
+                policy: contentItemLoader.height > contentItemScroll.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            }
+            ScrollBar.horizontal: ScrollBar {
+                policy: contentItemLoader.width > contentItemScroll.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
+            }
+
+            Loader {
+                id: contentItemLoader
+                sourceComponent: content
+                active: dialog.visible
+                property real itemImplicitWidth: item ? item.implicitWidth : 0
+                property real itemImplicitHeight: item ? item.implicitHeight : 0
+                width: (itemImplicitWidth === 0) ? contentItemScroll.width : Math.max(contentItemScroll.width,itemImplicitWidth)
+                height: (itemImplicitHeight === 0) ? contentItemScroll.height : Math.max(contentItemScroll.height,itemImplicitHeight)
+            }
+        }
     }
 
     header: Rectangle {
@@ -117,4 +156,6 @@ Dialog {
             }
         }
     }
+
+    onClosed: Utils.execLater(dialog, 50, dismissed)
 }
