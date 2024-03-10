@@ -17,13 +17,16 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
+import "../globals"
 
 ScrollBar {
+    id: scrollBar
+
     property Flickable flickable
     property int contentSize: flickable ? (orientation === Qt.Vertical ? flickable.contentHeight : flickable.contentWidth) : 0
     property int actualSize: flickable ? (orientation === Qt.Vertical ? flickable.height : flickable.width) : 0
     property bool needed: contentSize > actualSize
+
     policy: needed ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
     minimumSize: 0.1
     palette {
@@ -31,8 +34,14 @@ ScrollBar {
         dark: Qt.rgba(0,0,0,0.75)
     }
     opacity: active ? 1 : 0.4
+
     Behavior on opacity {
         enabled: Runtime.applicationSettings.enableAnimations
         NumberAnimation { duration: 250 }
+    }
+
+    Component.onCompleted: {
+        if(flickable === null)
+            flickable = Scrite.app.findFirstParentOfType(scrollBar, "QQuickFlickable")
     }
 }

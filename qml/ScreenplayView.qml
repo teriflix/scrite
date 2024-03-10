@@ -21,6 +21,7 @@ import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 
 import "./globals"
+import "./controls"
 
 Item {
     id: screenplayView
@@ -363,7 +364,7 @@ Item {
         }
 
         property bool scrollBarRequired: screenplayElementList.width < screenplayElementList.contentWidth
-        ScrollBar.horizontal: ScrollBar2 {
+        ScrollBar.horizontal: VclScrollBar {
             flickable: screenplayElementList
             opacity: 1
         }

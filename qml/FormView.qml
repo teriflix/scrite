@@ -19,6 +19,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     id: formView
@@ -249,7 +250,7 @@ Item {
         wrapAround: true
     }
 
-    ScrollBar2 {
+    VclScrollBar {
         id: formVScrollBar
         orientation: Qt.Vertical
         flickable: formFlickable
@@ -258,7 +259,7 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    ScrollBar2 {
+    VclScrollBar {
         id: formHScrollBar
         orientation: Qt.Horizontal
         flickable: formFlickable

@@ -22,6 +22,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: configurationBox
@@ -253,7 +254,7 @@ Item {
                                     anchors.leftMargin: 20
                                     contentWidth: subsequenTabScrollViewContent.width
                                     contentHeight: subsequenTabScrollViewContent.height
-                                    ScrollBar.vertical: ScrollBar2 {
+                                    ScrollBar.vertical: VclScrollBar {
                                         flickable: subsequenTabScrollView
                                     }
 
@@ -300,7 +301,7 @@ Item {
                 anchors.bottomMargin: 20
                 spacing: 20
 
-                Button2 {
+                VclButton {
                     text: "Cancel"
                     Material.background: Runtime.colors.primary.c100.background
                     Material.foreground: Runtime.colors.primary.c100.text
@@ -321,7 +322,7 @@ Item {
                     }
                 }
 
-                Button2 {
+                VclButton {
                     enabled: fileSelector.absoluteFilePath !== "" && generator.featureEnabled
                     text: "Generate"
                     Material.background: Runtime.colors.primary.c100.background
@@ -562,7 +563,7 @@ Item {
                         model: allLocations
                         clip: true
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                        delegate: CheckBox2 {
+                        delegate: VclCheckBox {
                             width: locationListView.width-1
                             font.family: Scrite.document.formatting.defaultFont.family
                             text: modelData
@@ -722,7 +723,7 @@ Item {
                         width: sceneListView.width-1
                         height: sceneCheckBox.visible ? sceneCheckBox.height : 0
 
-                        CheckBox2 {
+                        VclCheckBox {
                             id: sceneCheckBox
                             width: parent.width-1
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -745,7 +746,7 @@ Item {
             Row {
                 spacing: 10
 
-                Button2 {
+                VclButton {
                     text: "Select All"
                     onClicked: {
                         var count = Scrite.document.screenplay.elementCount
@@ -762,7 +763,7 @@ Item {
                     }
                 }
 
-                Button2 {
+                VclButton {
                     text: "Unselect All"
                     onClicked: {
                         var count = Scrite.document.screenplay.elementCount
@@ -859,7 +860,7 @@ Item {
                             anchors.centerIn: parent
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             text: "EPISODE " + index
                             anchors.verticalCenter: parent.verticalCenter
                             visible: index > 0
@@ -933,7 +934,7 @@ Item {
                         }
                     }
                     property var checkedTags: generator.getConfigurationValue(fieldInfo.name)
-                    delegate: CheckBox2 {
+                    delegate: VclCheckBox {
                         text: label
                         checked: groupsView.checkedTags.indexOf(name) >= 0
                         onToggled: {
@@ -954,7 +955,7 @@ Item {
     Component {
         id: editor_CheckBox
 
-        CheckBox2 {
+        VclCheckBox {
             property var fieldInfo
             text: fieldInfo.label
             checkable: true
@@ -976,7 +977,7 @@ Item {
                 width: parent.width - 30
             }
 
-            ComboBox2 {
+            VclComboBox {
                 model: fieldInfo.choices
                 textRole: "key"
                 width: parent.width - 30

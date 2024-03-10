@@ -19,6 +19,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: searchBar
@@ -209,7 +210,7 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: 5
 
-                Button2 {
+                VclButton {
                     id: cmdReplace
                     text: "Replace"
                     enabled: txtReplace.text.length > 0 && txtSearch.text.length > 0 && searchEngine.currentSearchResultIndex >= 0 && searchEngine.searchResultCount > 0
@@ -220,7 +221,7 @@ Item {
                     }
                 }
 
-                Button2 {
+                VclButton {
                     text: "Replace All"
                     enabled: txtReplace.text.length > 0 && txtSearch.text.length > 0 && searchEngine.searchResultCount > 0
                     onClicked: searchEngine.replaceAll(txtReplace.text)

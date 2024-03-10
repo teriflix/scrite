@@ -25,6 +25,7 @@ import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 import "./globals"
 import "./dialogs"
+import "./controls"
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
@@ -2248,7 +2249,7 @@ Rectangle {
                                 FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                                 height: Math.min(contentHeight, 7*(defaultFontMetrics.lineSpacing+2*5))
                                 interactive: true
-                                ScrollBar.vertical: ScrollBar2 {
+                                ScrollBar.vertical: VclScrollBar {
                                     flickable: completionView
                                 }
                                 delegate: Text {
@@ -3525,7 +3526,7 @@ Rectangle {
                     model: Runtime.screenplayAdapter
                     currentIndex: Runtime.screenplayAdapter.currentIndex
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    ScrollBar.vertical: ScrollBar2 { flickable: sceneListView }
+                    ScrollBar.vertical: VclScrollBar { flickable: sceneListView }
                     highlightFollowsCurrentItem: true
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0

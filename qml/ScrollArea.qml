@@ -19,9 +19,11 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Flickable {
     id: scrollAreaFlickable
+
     property rect visibleRect: Qt.rect(contentX, contentY, width, height)
     property real initialContentWidth: 100
     property real initialContentHeight: 100
@@ -118,8 +120,8 @@ Flickable {
         NumberAnimation { id: zoomScaleAnimation; duration: 250 }
     }
 
-    ScrollBar.horizontal: ScrollBar2 { flickable: scrollAreaFlickable }
-    ScrollBar.vertical: ScrollBar2 { flickable: scrollAreaFlickable }
+    ScrollBar.horizontal: VclScrollBar { flickable: scrollAreaFlickable }
+    ScrollBar.vertical: VclScrollBar { flickable: scrollAreaFlickable }
 
     Timer {
         id: ensureItemVisibleTimer

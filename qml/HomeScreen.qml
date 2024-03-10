@@ -37,6 +37,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: homeScreen
@@ -352,7 +353,7 @@ Item {
                     currentIndex: -1
                     clip: true
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    ScrollBar.vertical: ScrollBar2 {
+                    ScrollBar.vertical: VclScrollBar {
                         flickable: templatesView
                     }
                     highlightMoveDuration: 0
@@ -474,7 +475,7 @@ Item {
                     currentIndex: -1
                     clip: true
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    ScrollBar.vertical: ScrollBar2 {
+                    ScrollBar.vertical: VclScrollBar {
                         flickable: quickFilesView
                     }
                     highlightMoveDuration: 0
@@ -535,7 +536,7 @@ Item {
                     highlight: Rectangle {
                         color: Runtime.colors.primary.highlight.background
                     }
-                    ScrollBar.vertical: ScrollBar2 {
+                    ScrollBar.vertical: VclScrollBar {
                         flickable: screenplaysView
                     }
                     highlightMoveDuration: 0
@@ -572,7 +573,7 @@ Item {
                     visible: screenplaysView.currentIndex >= 0
                     clip: true
 
-                    ScrollBar.vertical: ScrollBar2 {
+                    ScrollBar.vertical: VclScrollBar {
                         flickable: screenplayDetailsFlick
                     }
 
@@ -631,7 +632,7 @@ Item {
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
             currentIndex: count ? 0 : -1
             visible: count > 0
-            ScrollBar.vertical: ScrollBar2 { flickable: documentsView }
+            ScrollBar.vertical: VclScrollBar { flickable: documentsView }
             highlight: Rectangle {
                 color: Runtime.colors.primary.highlight.background
             }
@@ -863,7 +864,7 @@ Item {
                 width: parent.width
                 anchors.bottom: parent.bottom
 
-                Button2 {
+                VclButton {
                     text: "< Back"
                     onClicked: stackView.pop()
 
@@ -907,7 +908,7 @@ Item {
                     fillMode: Image.PreserveAspectFit
                 }
             }
-            buttons: Button2 {
+            buttons: VclButton {
                 text: "Open"
                 enabled: libraryService.screenplays.count > 0
                 onClicked: scriptalayPageItem.contentItem.openSelected()
@@ -931,13 +932,13 @@ Item {
             buttons: RowLayout {
                 spacing: 10
 
-                Button2 {
+                VclButton {
                     text: "Open"
                     onClicked: vaultPageItem.contentItem.openSelected()
                     enabled: Scrite.vault.documentCount > 0
                 }
 
-                Button2 {
+                VclButton {
                     text: "Clear"
                     enabled: Scrite.vault.documentCount > 0
                     onClicked: vaultPageItem.contentItem.clearVault()
@@ -954,7 +955,7 @@ Item {
             content: ImportPage { }
             title: Item { }
             buttons: RowLayout {
-                Button2 {
+                VclButton {
                     visible: importPageItem.contentItem.hasActionButton
                     text: importPageItem.contentItem.actionButtonText
                     onClicked: importPageItem.contentItem.onActionButtonClicked()

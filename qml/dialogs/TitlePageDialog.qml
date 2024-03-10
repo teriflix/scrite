@@ -21,10 +21,11 @@ import io.scrite.components 1.0
 
 import "../../js/utils.js" as Utils
 import "../globals"
+import "../controls"
 import "../" // Refactoring QML TODO: This is bad, there needs to be a proper module for this.
 import "./"  // Refactoring QML TODO: This is bad, there needs to be a proper module for this.
 
-AbstractDialog {
+VclDialog {
     id: titlePageDialog
 
     title: "Title Page"
@@ -166,7 +167,7 @@ AbstractDialog {
                         onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
                     }
 
-                    Button2 {
+                    VclButton {
                         text: "Remove"
                         onClicked: Scrite.document.screenplay.clearCoverPagePhoto()
                     }
@@ -281,7 +282,7 @@ AbstractDialog {
                 Layout.fillWidth: true
                 Layout.preferredHeight: useAsDefaultsButton.height
 
-                CheckBox2 {
+                VclCheckBox {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
 
@@ -290,7 +291,7 @@ AbstractDialog {
                     onToggled: Runtime.screenplayEditorSettings.includeTitlePageInPreview = checked
                 }
 
-                Button2 {
+                VclButton {
                     id: useAsDefaultsButton
                     anchors.centerIn: parent
 
@@ -310,7 +311,7 @@ AbstractDialog {
                     }
                 }
 
-                CheckBox2 {
+                VclCheckBox {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
 

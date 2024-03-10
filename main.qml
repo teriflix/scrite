@@ -20,6 +20,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./qml" as UI
+import "./qml/controls"
 import "./qml/globals"
 
 Rectangle {
@@ -256,7 +257,7 @@ Rectangle {
                     spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    UI.Button2 {
+                    VclButton {
                         text: okButtonText
                         onClicked: {
                             if(okCallback)
@@ -265,7 +266,7 @@ Rectangle {
                         }
                     }
 
-                    UI.Button2 {
+                    VclButton {
                         text: cancelButtonText
                         onClicked: {
                             if(cancelCallback)
@@ -274,7 +275,7 @@ Rectangle {
                         }
                     }
 
-                    UI.Button2 {
+                    VclButton {
                         visible: text !== ""
                         text: abortButtonText
                         onClicked: modalDialog.closeRequest()
@@ -312,7 +313,7 @@ Rectangle {
                     spacing: 20
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    UI.Button2 {
+                    VclButton {
                         text: okButtonText
                         onClicked: {
                             if(okCallback)

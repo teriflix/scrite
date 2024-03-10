@@ -18,9 +18,15 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 TextField {
     id: textField
+
+    signal requestCompletion(string string)
+    signal editingComplete()
+    signal returnPressed()
+
     property alias completionAcceptsEnglishStringsOnly: completionModel.acceptEnglishStringsOnly
     property alias completionSortMode: completionModel.sortMode
     property alias completionStrings: completionModel.strings
@@ -29,8 +35,6 @@ TextField {
     property int maxVisibleItems: maxCompletionItems
     property int minimumCompletionPrefixLength: 1
     property bool singleClickAutoComplete: true
-    signal requestCompletion(string string)
-
     property Item tabItem
     property Item backTabItem
     property bool labelAlwaysVisible: false
@@ -45,13 +49,11 @@ TextField {
         return suggestion
     }
     property bool tabItemUponReturn: true
+
     selectedTextColor: Runtime.colors.accent.c700.text
     selectionColor: Runtime.colors.accent.c700.background
     selectByMouse: true
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-
-    signal editingComplete()
-    signal returnPressed()
 
     onEditingFinished: {
         transliterate(true)
@@ -225,7 +227,7 @@ TextField {
             }
             currentIndex: completionModel.currentRow
             height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
-            ScrollBar.vertical: ScrollBar2 { flickable: completionView }
+            ScrollBar.vertical: VclScrollBar { flickable: completionView }
         }
     }
 

@@ -18,6 +18,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     width: 640
@@ -67,7 +68,7 @@ Item {
             width: parent.width
             spacing: 20
 
-            Button2 {
+            VclButton {
                 id: cancelButton
                 text: "Cancel"
                 anchors.top: parent.top
@@ -106,7 +107,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                     }
 
-                    CheckBox2 {
+                    VclCheckBox {
                         id: chkNotice
                         anchors.horizontalCenter: parent.horizontalCenter
                         padding: 0
@@ -115,7 +116,7 @@ Item {
                 }
             }
 
-            Button2 {
+            VclButton {
                 id: renameButton
                 text: "Rename"
                 enabled: chkNotice.checked && newNameField.length > 0 && newNameField.text.toUpperCase() !== character.name

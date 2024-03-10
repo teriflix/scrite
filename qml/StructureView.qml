@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: structureView
@@ -2868,7 +2869,7 @@ Item {
                             contentHeight: synopsisField.height
                             interactive: synopsisField.activeFocus && scrollBarVisible
                             property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
-                            ScrollBar.vertical: ScrollBar2 { flickable: synopsisFieldFlick }
+                            ScrollBar.vertical: VclScrollBar { flickable: synopsisFieldFlick }
                             flickableDirection: Flickable.VerticalFlick
                             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                             TextArea {
@@ -3282,13 +3283,13 @@ Item {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 20
 
-                            Button2 {
+                            VclButton {
                                 text: "Yes"
                                 focusPolicy: Qt.NoFocus
                                 onClicked: canvasScroll.deleteElement(elementItem.element)
                             }
 
-                            Button2 {
+                            VclButton {
                                 text: "No"
                                 focusPolicy: Qt.NoFocus
                                 onClicked: deleteConfirmationBox.active = false

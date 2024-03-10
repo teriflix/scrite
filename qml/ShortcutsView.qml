@@ -17,6 +17,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     property alias backgroundColor: background.color
@@ -41,7 +42,7 @@ Item {
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        ScrollBar.vertical: ScrollBar2 { flickable: shortcutsView }
+        ScrollBar.vertical: VclScrollBar { flickable: shortcutsView }
         section.property: "itemGroup"
         section.criteria: ViewSection.FullString
         section.delegate: Item {

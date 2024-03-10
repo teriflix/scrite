@@ -1304,6 +1304,51 @@ QObject *Application::findRegisteredObject(const QString &name) const
     return nullptr;
 }
 
+static QObject *recursivelyFindChildOfType(QObject *object, const QString &className)
+{
+    if (object == nullptr || className.isEmpty())
+        return nullptr;
+
+    const QObjectList children = object->children();
+    for (QObject *child : children) {
+        if (child->inherits(qPrintable(className)))
+            return child;
+        QObject *ret = recursivelyFindChildOfType(child, className);
+        if (ret)
+            return ret;
+    }
+    return nullptr;
+};
+
+QObject *Application::findFirstChildOfType(QObject *object, const QString &className)
+{
+    return recursivelyFindChildOfType(object, className);
+}
+
+QObject *Application::findFirstParentOfType(QObject *object, const QString &className)
+{
+    auto getObjectParent = [](QObject *object) -> QObject * {
+        if (object == nullptr)
+            return nullptr;
+
+        QQuickItem *qmlItem = qobject_cast<QQuickItem *>(object);
+        if (qmlItem)
+            return qmlItem->parentItem();
+
+        return object->parent();
+    };
+
+    QObject *parent = getObjectParent(object);
+    while (parent != nullptr) {
+        if (parent->inherits(qPrintable(className)))
+            return parent;
+
+        parent = getObjectParent(parent);
+    }
+
+    return nullptr;
+}
+
 QColor Application::pickStandardColor(int counter)
 {
     const QVector<QColor> colors = Application::standardColors();

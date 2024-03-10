@@ -25,6 +25,7 @@ import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 import "./globals"
 import "./dialogs"
+import "./controls"
 
 Item {
     id: scriteDocumentViewItem
@@ -1594,7 +1595,7 @@ Item {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 visible: !Scrite.document.empty
 
-                                Button2 {
+                                VclButton {
                                     text: "Open/Import"
                                     onClicked: {
                                         Scrite.document.openOrImport(fileOpenDropArea.droppedFilePath)
@@ -1603,7 +1604,7 @@ Item {
                                     }
                                 }
 
-                                Button2 {
+                                VclButton {
                                     text: "Cancel"
                                     onClicked:  {
                                         fileOpenDropArea.droppedFileName = ""

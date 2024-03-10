@@ -18,6 +18,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Flickable {
     id: notificationsView
@@ -109,7 +110,7 @@ Flickable {
                             Repeater {
                                 model: notification.buttons
 
-                                Button2 {
+                                VclButton {
                                     required property string modelData
                                     required property int index
 
@@ -123,7 +124,7 @@ Flickable {
                         }
                     }
 
-                    Button2 {
+                    VclButton {
                         id: dismissButton
                         visible: !notification.autoClose && !notification.hasButtons
                         text: "Dismiss"

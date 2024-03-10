@@ -24,6 +24,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: scritedView
@@ -762,7 +763,7 @@ Item {
                             }
                         }
 
-                        ScrollBar2 {
+                        VclScrollBar {
                             id: textDocumentScrollBar
                             anchors.top: parent.top
                             anchors.right: parent.right
@@ -1183,7 +1184,7 @@ Item {
                 property bool scrollBarVisible: contentHeight > height
                 property bool currentSceneTimeIsLocked: currentItem ? currentItem.locked : false
 
-                ScrollBar.vertical: ScrollBar2 { flickable: screenplayOffsetsView }
+                ScrollBar.vertical: VclScrollBar { flickable: screenplayOffsetsView }
 
                 highlightFollowsCurrentItem: true
                 highlightMoveDuration: 0

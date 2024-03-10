@@ -17,16 +17,18 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
+import "../globals"
 
 Button {
     id: button
+
     Material.background: Runtime.colors.primary.button.background
     Material.foreground: Runtime.colors.primary.button.text
-    width: Math.max(textRect.width + 40, 120)
-    height: Math.max(textRect.height + 20, 50)
-    property rect textRect: Scrite.app.boundingRect(text, font)
-    font.pointSize: Scrite.app.fontPointSize
+
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+    width: Math.max(_private.textRect.width + 40, 120)
+    height: Math.max(_private.textRect.height + 20, 50)
 
     Component {
         id: backgroundComponent
@@ -45,5 +47,11 @@ Button {
             background = backgroundComponent.createObject(button)
             font.pointSize = Runtime.idealFontMetrics.font.pointSize
         }
+    }
+
+    QtObject {
+        id: _private
+
+        property rect textRect: Scrite.app.boundingRect(text, font)
     }
 }

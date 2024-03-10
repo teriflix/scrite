@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 /**
 Save workflow
@@ -230,17 +231,17 @@ Item {
         signal noClicked()
         signal cancelClicked()
 
-        Button2 {
+        VclButton {
             text: "Yes"
             onClicked: _yesNoCancel.yesClicked()
         }
 
-        Button2 {
+        VclButton {
             text: "No"
             onClicked: _yesNoCancel.noClicked()
         }
 
-        Button2 {
+        VclButton {
             text: "Cancel"
             onClicked: _yesNoCancel.cancelClicked()
         }

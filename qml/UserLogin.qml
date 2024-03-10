@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: userLogin
@@ -390,7 +391,7 @@ Item {
                 }
             }
 
-            Button2 {
+            VclButton {
                 id: changeEmailButton
                 text: "« Change Email"
                 anchors.left: parent.left
@@ -407,7 +408,7 @@ Item {
                 anchors.leftMargin: 20
                 anchors.rightMargin: 20
 
-                Button2 {
+                VclButton {
                     id: resendActivationCode
                     text: "Resend Code" + (resendActivationCodeTimer.running ? " (" + resendActivationCodeTimer.secondsLeft + ")" : "")
                     visible: !errorMessageText.visible
@@ -483,7 +484,7 @@ Item {
                 }
             }
 
-            Button2 {
+            VclButton {
                 id: nextButton
                 text: "Activate »"
                 anchors.right: parent.right
@@ -682,7 +683,7 @@ Item {
                             undoRedoEnabled: true
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             id: chkAnalyticsConsent
                             checked: Scrite.user.info.consent.activity
                             text: "Send analytics data."
@@ -691,7 +692,7 @@ Item {
                             onToggled: allowHighlightSaveAnimation = true
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             id: chkEmailConsent
                             checked: Scrite.user.info.consent.email
                             text: "Send marketing email."
@@ -957,7 +958,7 @@ Item {
                 clip: true
 
                 model: Scrite.user.installations
-                ScrollBar.vertical: ScrollBar2 {
+                ScrollBar.vertical: VclScrollBar {
                     flickable: installationsView
                 }
                 spacing: 20

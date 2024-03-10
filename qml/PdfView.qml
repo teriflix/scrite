@@ -21,6 +21,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     width: 1280
@@ -94,10 +95,10 @@ Item {
             rowHeightProvider: () => { return pdfPageCellHeight }
             columnWidthProvider: () => { return Math.max(width,pdfPageCellWidth*pdfPagesPerRow) }
             reuseItems: false
-            ScrollBar.vertical: ScrollBar2 {
+            ScrollBar.vertical: VclScrollBar {
                 flickable: pdfView
             }
-            ScrollBar.horizontal: ScrollBar2 {
+            ScrollBar.horizontal: VclScrollBar {
                 flickable: pdfView
             }
             FlickScrollSpeedControl.flickable: pdfView
@@ -238,7 +239,7 @@ Item {
                 rightPadding: 10
             }
 
-            ComboBox2 {
+            VclComboBox {
                 Material.foreground: Runtime.colors.primary.c300.text
                 Material.background: Runtime.colors.primary.c300.background
                 currentIndex: Math.max(pdfDoc.pagesPerRow-1,0)

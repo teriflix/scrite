@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: configurationBox
@@ -136,7 +137,7 @@ Item {
 
                                 Repeater {
                                     model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
-                                    delegate: CheckBox2 {
+                                    delegate: VclCheckBox {
                                         width: languageBundleView.width/languageBundleView.columns
                                         checkable: true
                                         checked: exporter.isFontForLanguageBundled(modelData.value)
@@ -180,7 +181,7 @@ Item {
                 anchors.margins: 20
                 spacing: 20
 
-                Button2 {
+                VclButton {
                     text: "Cancel"
                     onClicked: {
                         exporter.discard()
@@ -199,7 +200,7 @@ Item {
                     }
                 }
 
-                Button2 {
+                VclButton {
                     enabled: fileSelector.absoluteFilePath !== "" && exporter.featureEnabled
                     text: isPdfExport ? "Generate" : "Export"
                     onClicked: busyOverlay.visible = true
@@ -294,7 +295,7 @@ Item {
         Column {
             property var fieldInfo
 
-            CheckBox2 {
+            VclCheckBox {
                 id: checkBox
                 width: parent.width
                 text: fieldInfo.label

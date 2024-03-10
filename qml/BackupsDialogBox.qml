@@ -18,6 +18,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     width: 640
@@ -68,7 +69,7 @@ Item {
                 model: Scrite.document.backupFilesModel
                 FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                 currentIndex: -1
-                ScrollBar.vertical: ScrollBar2 { flickable: backupFilesView }
+                ScrollBar.vertical: VclScrollBar { flickable: backupFilesView }
                 highlight: Rectangle {
                     color: Runtime.colors.primary.highlight.background
                 }
@@ -134,7 +135,7 @@ Item {
             width: parent.width
             height: cancelButton.height
 
-            Button2 {
+            VclButton {
                 id: cancelButton
                 text: "Cancel"
                 onClicked: modalDialog.close()
@@ -151,7 +152,7 @@ Item {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 }
 
-                Button2 {
+                VclButton {
                     text: "This Window"
                     enabled: backupFilesView.currentIndex >= 0
                     hoverEnabled: true
@@ -165,7 +166,7 @@ Item {
                     }
                 }
 
-                Button2 {
+                VclButton {
                     text: "New Window"
                     enabled: backupFilesView.currentIndex >= 0
                     hoverEnabled: true

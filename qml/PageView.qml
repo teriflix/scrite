@@ -17,9 +17,11 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Rectangle {
     id: pageView
+
     property alias pagesArray: pageRepeater.model
     property alias currentIndex: pageList.currentIndex
     property string pageTitleRole
@@ -102,7 +104,7 @@ Rectangle {
         contentHeight: pageContentLoader.height
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-        ScrollBar.vertical: ScrollBar2 { flickable: pageContentArea }
+        ScrollBar.vertical: VclScrollBar { flickable: pageContentArea }
         Loader {
             id: pageContentLoader
             width: pageContentArea.showScrollBars ? pageContentArea.width-17 : pageContentArea.width

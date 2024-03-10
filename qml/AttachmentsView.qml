@@ -18,12 +18,15 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 ListView {
     id: attachmentsView
+
     property Attachments attachments
     readonly property real delegateSize: 83
     property bool readonly: Scrite.document.readOnly
+
     orientation: ListView.Horizontal
     model: attachments
     onAttachmentsChanged: currentIndex = -1
@@ -118,7 +121,7 @@ ListView {
     }
 
     property bool scrollBarVisible: contentWidth > width
-    ScrollBar.horizontal: ScrollBar2 { flickable: attachmentsView }
+    ScrollBar.horizontal: VclScrollBar { flickable: attachmentsView }
 
     FileDialog {
         id: fileDialog

@@ -18,6 +18,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Flickable {
     property Item textArea: __textArea
@@ -48,7 +49,7 @@ Flickable {
     clip: true
     contentWidth: __textArea.width
     contentHeight: __textArea.height
-    ScrollBar.vertical: ScrollBar2 { flickable: textAreaFlickable }
+    ScrollBar.vertical: VclScrollBar { flickable: textAreaFlickable }
 
     TextArea {
         id: __textArea

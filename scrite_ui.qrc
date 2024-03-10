@@ -7,11 +7,8 @@
         <file>LICENSE.txt</file>
         <file>main.qml</file>
         <file>qml/AlphabetMappings.qml</file>
-        <file>qml/Button2.qml</file>
         <file>qml/CharactersView.qml</file>
-        <file>qml/CheckBox2.qml</file>
         <file>qml/ColorMenu.qml</file>
-        <file>qml/ComboBox2.qml</file>
         <file>qml/DialogOverlay.qml</file>
         <file>qml/ExporterConfiguration.qml</file>
         <file>qml/FocusIndicator.qml</file>
@@ -70,7 +67,6 @@
         <file>qml/TextTabBar.qml</file>
         <file>qml/FormField.qml</file>
         <file>qml/FormView.qml</file>
-        <file>qml/ScrollBar2.qml</file>
         <file>qml/FormMenu.qml</file>
         <file>qml/UiElementHighlight.qml</file>
         <file>qml/TextNoteView.qml</file>
@@ -95,7 +91,12 @@
         <file>qml/globals/Runtime.qml</file>
         <file>qml/dialogs/qmldir</file>
         <file>qml/dialogs/AboutDialog.qml</file>
-        <file>qml/dialogs/AbstractDialog.qml</file>
         <file>qml/dialogs/TitlePageDialog.qml</file>
+        <file>qml/controls/qmldir</file>
+        <file>qml/controls/VclDialog.qml</file>
+        <file>qml/controls/VclButton.qml</file>
+        <file>qml/controls/VclComboBox.qml</file>
+        <file>qml/controls/VclCheckBox.qml</file>
+        <file>qml/controls/VclScrollBar.qml</file>
     </qresource>
 </RCC>

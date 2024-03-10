@@ -341,6 +341,9 @@ public:
     Q_INVOKABLE void unregisterObject(QObject *object);
     Q_INVOKABLE QObject *findRegisteredObject(const QString &name) const;
 
+    Q_INVOKABLE static QObject *findFirstChildOfType(QObject *object, const QString &className);
+    Q_INVOKABLE static QObject *findFirstParentOfType(QObject *object, const QString &className);
+
 private:
     bool loadScript();
     bool registerFileTypes();

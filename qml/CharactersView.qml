@@ -18,6 +18,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Rectangle {
     property bool showFilterBox: true
@@ -111,7 +112,7 @@ Rectangle {
             Repeater {
                 model: charactersModel
 
-                CheckBox2 {
+                VclCheckBox {
                     id: characterCheckBox
                     width: charactersListLayout.columnWidth
                     Component.onCompleted: charactersListLayout.columnWidth = Math.max(charactersListLayout.columnWidth, implicitWidth)
@@ -156,13 +157,13 @@ Rectangle {
         anchors.leftMargin: 10
         anchors.bottomMargin: 4
 
-        Button2 {
+        VclButton {
             text: "Select All"
             enabled: charactersModel.count > 0
             onClicked: charactersModel.selectAll()
         }
 
-        Button2 {
+        VclButton {
             text: "Unselect All"
             enabled: charactersModel.count > 0
             onClicked: charactersModel.unselectAll()

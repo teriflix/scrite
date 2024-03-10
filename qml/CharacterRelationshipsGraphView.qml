@@ -19,6 +19,7 @@ import io.scrite.components 1.0
 import "../js/utils.js" as Utils
 
 import "./globals"
+import "./controls"
 
 Rectangle {
     id: crGraphView
@@ -326,7 +327,7 @@ Rectangle {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     spacing: 20
 
-                                    Button2 {
+                                    VclButton {
                                         text: "Yes"
                                         focusPolicy: Qt.NoFocus
                                         onClicked: {
@@ -336,7 +337,7 @@ Rectangle {
                                         }
                                     }
 
-                                    Button2 {
+                                    VclButton {
                                         text: "No"
                                         focusPolicy: Qt.NoFocus
                                         onClicked: removeRelationshipConfirmation.active = false

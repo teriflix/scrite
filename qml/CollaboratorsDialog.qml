@@ -19,6 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     width: 640
@@ -98,7 +99,7 @@ Item {
                 anchors.leftMargin: 10
                 clip: true
                 property real viewportWidth: contentHeight > height ? width-20 : width-1
-                ScrollBar.vertical: ScrollBar2 {
+                ScrollBar.vertical: VclScrollBar {
                     flickable: collaboratorsList
                 }
                 header: Scrite.document.canModifyCollaborators ? collaboratorsListHeader : null

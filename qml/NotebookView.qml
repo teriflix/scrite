@@ -24,6 +24,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Rectangle {
     id: notebookView
@@ -754,7 +755,7 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 20
 
-                            Button2 {
+                            VclButton {
                                 text: "Yes"
                                 focusPolicy: Qt.NoFocus
                                 onClicked: {
@@ -764,7 +765,7 @@ Rectangle {
                                 visible: notebookTree.currentNote || notebookTree.currentCharacter
                             }
 
-                            Button2 {
+                            VclButton {
                                 text: notebookTree.currentNote || notebookTree.currentCharacter ? "No" : "OK"
                                 focusPolicy: Qt.NoFocus
                                 onClicked: deleteConfirmationBox.active = false
@@ -907,7 +908,7 @@ Rectangle {
                 }
             }
 
-            ScrollBar2 {
+            VclScrollBar {
                 id: bookmarksViewScrollbar
                 anchors.top: parent.top
                 anchors.right: parent.right
@@ -1132,7 +1133,7 @@ Rectangle {
                                         }
                                     }
 
-                                    ScrollBar2 {
+                                    VclScrollBar {
                                         id: sceneSynopsisVScrollBar
                                         orientation: Qt.Vertical
                                         flickable: sceneSynopsisField
@@ -1267,7 +1268,7 @@ Rectangle {
                         }
                     }
 
-                    ScrollBar2 {
+                    VclScrollBar {
                         id: sceneCommentsVScrollBar
                         orientation: Qt.Vertical
                         flickable: sceneCommentsField
@@ -1439,7 +1440,7 @@ Rectangle {
                 ScrollBar.vertical: notesFlickScrollBar
             }
 
-            ScrollBar2 {
+            VclScrollBar {
                 id: notesFlickScrollBar
                 anchors.top: parent.top
                 anchors.right: parent.right
@@ -1637,7 +1638,7 @@ Rectangle {
                     }
 
 
-                    ScrollBar2 {
+                    VclScrollBar {
                         id: breakSummaryVScrollBar
                         orientation: Qt.Vertical
                         flickable: breakElementSummaryField
@@ -1904,7 +1905,7 @@ Rectangle {
                         enabled: !Scrite.document.readOnly
                     }
 
-                    ScrollBar2 {
+                    VclScrollBar {
                         id: titlePageVScrollBar
                         anchors.right: parent.right
                         anchors.top: parent.top
@@ -1913,7 +1914,7 @@ Rectangle {
                         flickable: titlePageFlickable
                     }
 
-                    ScrollBar2 {
+                    VclScrollBar {
                         id: titlePageHScrollBar
                         anchors.left: parent.left
                         anchors.right: parent.right
@@ -2005,7 +2006,7 @@ Rectangle {
                         }
                     }
 
-                    ScrollBar2 {
+                    VclScrollBar {
                         id: loglineVScrollBar
                         orientation: Qt.Vertical
                         flickable: loglineFieldArea
@@ -2266,7 +2267,7 @@ Rectangle {
                         }
                     }
 
-                    ScrollBar2 {
+                    VclScrollBar {
                         id: charactersListViewScrollBar
                         anchors.top: parent.top
                         anchors.right: parent.right
@@ -2501,7 +2502,7 @@ Rectangle {
                                                     width: photoSlides.width
                                                     height: photoSlides.height
 
-                                                    Button2 {
+                                                    VclButton {
                                                         anchors.centerIn: parent
                                                         text: "Add Photo"
                                                         onClicked: fileDialog.open()
@@ -2805,7 +2806,7 @@ Rectangle {
                                     }
                                 }
 
-                                ScrollBar2 {
+                                VclScrollBar {
                                     id: characterQuickInfoViewScrollBar
                                     anchors.top: parent.top
                                     anchors.right: parent.right
@@ -2858,7 +2859,7 @@ Rectangle {
                             }
                         }
 
-                        ScrollBar.horizontal: ScrollBar2 { flickable: quickInfoFlickable }
+                        ScrollBar.horizontal: VclScrollBar { flickable: quickInfoFlickable }
                     }
 
                     AttachmentsView {
@@ -3106,12 +3107,12 @@ Rectangle {
                     anchors.right: parent.right
                     spacing: 10
 
-                    Button2 {
+                    VclButton {
                         text: "Cancel"
                         onClicked: modalDialog.close()
                     }
 
-                    Button2 {
+                    VclButton {
                         text: "Create Relationships"
                         onClicked: {
                             for(var i=0; i<otherCharacterItems.count; i++) {

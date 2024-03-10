@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 // For use from within StructureView.qml only!
 
@@ -36,7 +37,7 @@ Item {
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         property bool scrollBarVisible: contentHeight > height
-        ScrollBar.vertical: ScrollBar2 { flickable: propertyEditorView }
+        ScrollBar.vertical: VclScrollBar { flickable: propertyEditorView }
 
         Column {
             id: propertyEditorItems
@@ -134,7 +135,7 @@ Item {
                 spacing: 10
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                Button2 {
+                VclButton {
                     text: "Bring To Front"
                     onClicked: {
                         var a = annotationGripLoader.annotation
@@ -143,7 +144,7 @@ Item {
                     }
                 }
 
-                Button2 {
+                VclButton {
                     text: "Send To Back"
                     onClicked: {
                         var a = annotationGripLoader.annotation
@@ -153,7 +154,7 @@ Item {
                 }
             }
 
-            Button2 {
+            VclButton {
                 text: "Delete Annotation"
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
@@ -243,7 +244,7 @@ Item {
     Component {
         id: booleanEditor
 
-        CheckBox2 {
+        VclCheckBox {
             text: propertyInfo.text
             checked: propertyValue
             checkable: true
@@ -415,7 +416,7 @@ Item {
                         }
                         padding: 4
                     }
-                    ScrollBar.vertical: ScrollBar2 { flickable: propertyEditorView }
+                    ScrollBar.vertical: VclScrollBar { flickable: propertyEditorView }
                     currentIndex: systemFontInfo ? systemFontInfo.families.indexOf(propertyValue) : -1
                 }
             }
@@ -431,7 +432,7 @@ Item {
             Repeater {
                 model: ['bold', 'italic', 'underline']
 
-                CheckBox2 {
+                VclCheckBox {
                     text: modelData
                     font.capitalization: Font.Capitalize
                     font.bold: index === 0

@@ -23,6 +23,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: optionsDialog
@@ -133,7 +134,7 @@ Item {
 
                     Repeater {
                         model: Scrite.app.transliterationEngine.getLanguages()
-                        delegate: CheckBox2 {
+                        delegate: VclCheckBox {
                             width: activeLanguagesView.width/activeLanguagesView.columns
                             checkable: true
                             checked: modelData.active
@@ -164,7 +165,7 @@ Item {
                         Row {
                             width: parent.width
 
-                            CheckBox2 {
+                            VclCheckBox {
                                 text: "Auto Save"
                                 checked: Scrite.document.autoSave
                                 onToggled: Scrite.document.autoSave = checked
@@ -188,7 +189,7 @@ Item {
                         Row {
                             width: parent.width
 
-                            CheckBox2 {
+                            VclCheckBox {
                                 text: "Limit Backups"
                                 checked: Scrite.document.maxBackupCount > 0
                                 onToggled: Scrite.document.maxBackupCount = checked ? 20 : 0
@@ -209,7 +210,7 @@ Item {
                             }
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             text: "Enable Restore (" + (Scrite.document.autoSave ? "New Files Only" : "All Files") + ")"
                             width: parent.width
                             checked: Scrite.vault.enabled
@@ -233,7 +234,7 @@ Item {
                         anchors.centerIn: parent
                         readonly property int _padding: 4
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.screenplayEditorSettings.enableSpellCheck
                             text: "Spell Check"
                             onToggled: Runtime.screenplayEditorSettings.enableSpellCheck = checked
@@ -241,7 +242,7 @@ Item {
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.screenplayEditorSettings.singleClickAutoComplete
                             text: "Auto Complete on Single Click"
                             onToggled: Runtime.screenplayEditorSettings.singleClickAutoComplete = checked
@@ -251,7 +252,7 @@ Item {
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
                             text: "Capitalize Sentences"
                             ToolTip.text: "If checked, it automatically capitalizes first letter of every sentence while typing."
@@ -262,7 +263,7 @@ Item {
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                             text: "Add/Remove CONT'D"
                             ToolTip.text: "If checked, CONT'D will be automatically added/removed appropriately."
@@ -273,7 +274,7 @@ Item {
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor
                             text: "Auto Adjust Editor Width"
                             ToolTip.text: "If checked, the editor width is automatically adjusted when you first launch Scrite or switch back to the screenplay tab."
@@ -284,7 +285,7 @@ Item {
                             Layout.preferredWidth: parent.width / parent.columns
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.screenplayEditorSettings.optimiseScrolling
                             text: "Smooth Scrolling"
                             ToolTip.visible: hovered
@@ -318,7 +319,7 @@ Item {
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         }
 
-                        ComboBox2 {
+                        VclComboBox {
                             width: parent.width
                             model: [
                                 { "label": "Scene Heading Or Title", "value": "HeadingOrTitle" },
@@ -345,7 +346,7 @@ Item {
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.structureCanvasSettings.showPullHandleAnimation
                             text: "Show Pull Handle Animation"
                             onToggled: Runtime.structureCanvasSettings.showPullHandleAnimation = checked
@@ -474,7 +475,7 @@ Item {
                                          }
             }
 
-            ComboBox2 {
+            VclComboBox {
                 id: fontSettingsComboBox
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 20
@@ -518,7 +519,7 @@ Item {
                         font.bold: fontCombo.down
                     }
 
-                    ComboBox2 {
+                    VclComboBox {
                         id: fontCombo
                         property var fontFamilies: Scrite.app.transliterationEngine.availableLanguageFontFamilies(modelData.value)
                         model: fontFamilies.families
@@ -583,7 +584,7 @@ Item {
                         font.bold: tisSourceCombo.down
                     }
 
-                    ComboBox2 {
+                    VclComboBox {
                         id: tisSourceCombo
                         property var sources: []
                         model: sources
@@ -640,7 +641,7 @@ Item {
                         width: (parent.width-parent.spacing)/2
                         spacing: 10
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checkable: true
                             checked: Runtime.structureCanvasSettings.showGrid
                             text: "Show Grid in Structure Tab"
@@ -729,7 +730,7 @@ Item {
                             text: "Starting with version 0.5.5, Scrite documents use Index Card UI by default. Older projects continue to use synopsis editor as before."
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             text: "Use Index Card UI On Canvas"
                             checkable: true
                             enabled: Scrite.document.structure.elementStacks.objectCount === 0
@@ -758,13 +759,13 @@ Item {
                     Column {
                         width: graphicsGroup.availableWidth
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.applicationSettings.enableAnimations
                             text: "Enable Animations"
                             onToggled: Runtime.applicationSettings.enableAnimations = checked
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.applicationSettings.useSoftwareRenderer
                             text: "Use Software Renderer"
                             onToggled: {
@@ -791,7 +792,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            ComboBox2 {
+                            VclComboBox {
                                 width: parent.width - themeLabel.width - parent.spacing
                                 anchors.verticalCenter: parent.verticalCenter
                                 model: Scrite.app.availableThemes
@@ -907,7 +908,7 @@ Item {
                             wrapMode: Text.WordWrap
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: mainScriteDocumentView.showNotebookInStructure
                             enabled: mainScriteDocumentView.canShowNotebookInStructure
                             text: "Move Notebook into the Structure tab"
@@ -920,7 +921,7 @@ Item {
                             }
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             checked: Runtime.workspaceSettings.showScritedTab
                             text: "Show Scrited Tab"
                             onToggled: {
@@ -953,7 +954,7 @@ Item {
                             wrapMode: Text.WordWrap
                         }
 
-                        ComboBox2 {
+                        VclComboBox {
                             enabled: false // Qt 5.15.7's PdfWriter is broken!
                             width: parent.width
                             model: [
@@ -1111,7 +1112,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        ComboBox2 {
+                        VclComboBox {
                             width: parent.width - parent.spacing - paperSizeLabel.width
                             textRole: "key"
                             currentIndex: pageSetupSettings.paperSize
@@ -1176,7 +1177,7 @@ Item {
                                         text: "Left"
                                     }
 
-                                    ComboBox2 {
+                                    VclComboBox {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -1199,7 +1200,7 @@ Item {
                                         text: "Center"
                                     }
 
-                                    ComboBox2 {
+                                    VclComboBox {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -1222,7 +1223,7 @@ Item {
                                         text: "Right"
                                     }
 
-                                    ComboBox2 {
+                                    VclComboBox {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -1255,7 +1256,7 @@ Item {
                                         text: "Left"
                                     }
 
-                                    ComboBox2 {
+                                    VclComboBox {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -1278,7 +1279,7 @@ Item {
                                         text: "Center"
                                     }
 
-                                    ComboBox2 {
+                                    VclComboBox {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -1301,7 +1302,7 @@ Item {
                                         text: "Right"
                                     }
 
-                                    ComboBox2 {
+                                    VclComboBox {
                                         width: parent.width
                                         model: fieldsModel
                                         textRole: "key"
@@ -1336,7 +1337,7 @@ Item {
                                 horizontalAlignment: Text.AlignRight
                             }
 
-                            CheckBox2 {
+                            VclCheckBox {
                                 text: checked ? "ON" : "OFF"
                                 checked: Runtime.appFeatures.watermark.enabled ? pageSetupSettings.watermarkEnabled : true
                                 onToggled: pageSetupSettings.watermarkEnabled = checked
@@ -1393,7 +1394,7 @@ Item {
                                 horizontalAlignment: Text.AlignRight
                             }
 
-                            ComboBox2 {
+                            VclComboBox {
                                 width: 300
                                 model: systemFontInfo.families
                                 currentIndex: systemFontInfo.families.indexOf(pageSetupSettings.watermarkFont)
@@ -1447,19 +1448,19 @@ Item {
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: 20
 
-                    Button2 {
+                    VclButton {
                         text: "Save As Default"
                         onClicked: pageSetupSettings.saveAsDefaults()
                         enabled: !pageSetupSettings.usingSavedDefaults
                     }
 
-                    Button2 {
+                    VclButton {
                         text: "Use Saved Defaults"
                         onClicked: pageSetupSettings.useSavedDefaults()
                         enabled: !pageSetupSettings.usingSavedDefaults
                     }
 
-                    Button2 {
+                    VclButton {
                         text: "Use Factory Defaults"
                         onClicked: pageSetupSettings.useFactoryDefaults()
                         enabled: !pageSetupSettings.usingFactoryDefaults
@@ -1605,7 +1606,7 @@ Item {
                             onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
                         }
 
-                        Button2 {
+                        VclButton {
                             text: "Remove"
                             onClicked: Scrite.document.screenplay.clearCoverPagePhoto()
                         }
@@ -1720,7 +1721,7 @@ Item {
                     Layout.fillWidth: true
                     Layout.preferredHeight: useAsDefaultsButton.height
 
-                    CheckBox2 {
+                    VclCheckBox {
                         anchors.left: parent.left
                         anchors.verticalCenter: parent.verticalCenter
 
@@ -1729,7 +1730,7 @@ Item {
                         onToggled: Runtime.screenplayEditorSettings.includeTitlePageInPreview = checked
                     }
 
-                    Button2 {
+                    VclButton {
                         id: useAsDefaultsButton
                         anchors.centerIn: parent
 
@@ -1749,7 +1750,7 @@ Item {
                         }
                     }
 
-                    CheckBox2 {
+                    VclCheckBox {
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
 
@@ -1811,7 +1812,7 @@ Item {
                     anchors.bottomMargin: 15
                     spacing: 10
 
-                    Button2 {
+                    VclButton {
                         text: "Make Default"
                         width: parent.width
                         ToolTip.text: "Saves current formatting options as default for all current and future documents."
@@ -1821,7 +1822,7 @@ Item {
                         }
                     }
 
-                    Button2 {
+                    VclButton {
                         text: "Factory Reset"
                         width: parent.width
                         ToolTip.text: "Restores formatting options to defaults for current document only."
@@ -1920,7 +1921,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                     }
 
-                    ComboBox2 {
+                    VclComboBox {
                         property var enumModel: Scrite.app.enumerationModel(displayElementFormat, "DefaultLanguage")
                         model: enumModel
                         width: 300
@@ -2008,7 +2009,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
-                        CheckBox2 {
+                        VclCheckBox {
                             text: "Bold"
                             font.bold: true
                             checkable: true
@@ -2019,7 +2020,7 @@ Item {
                             }
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             text: "Italics"
                             font.italic: true
                             checkable: true
@@ -2030,7 +2031,7 @@ Item {
                             }
                         }
 
-                        CheckBox2 {
+                        VclCheckBox {
                             text: "Underline"
                             font.underline: true
                             checkable: true
@@ -2327,12 +2328,12 @@ Item {
                     anchors.right: parent.right
                     spacing: 20
 
-                    Button2 {
+                    VclButton {
                         text: "Cancel"
                         onClicked: modalDialog.close()
                     }
 
-                    Button2 {
+                    VclButton {
                         text: "Apply"
                         onClicked: {
                             Scrite.document.structure.groupsData = groupsDataEdit.text
@@ -2375,12 +2376,12 @@ Item {
                     anchors.right: parent.right
                     spacing: 20
 
-                    Button2 {
+                    VclButton {
                         text: "Cancel"
                         onClicked: modalDialog.close()
                     }
 
-                    Button2 {
+                    VclButton {
                         text: "Apply"
                         onClicked: {
                             Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, groupsDataEdit.text)

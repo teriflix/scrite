@@ -18,6 +18,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Rectangle {
     id: dfNotice
@@ -96,7 +97,7 @@ Rectangle {
                 onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/login-and-activation/")
             }
 
-            Button2 {
+            VclButton {
                 text: Scrite.user.loggedIn ? "Subscribe" : "Sign Up / Login"
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
@@ -109,7 +110,7 @@ Rectangle {
         }
     }
 
-    ScrollBar2 {
+    VclScrollBar {
         id: vscrollBar
         flickable: contentsFlick
         orientation: Qt.Vertical

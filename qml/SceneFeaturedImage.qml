@@ -20,6 +20,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     id: sceneFeaturedPhotoItem
@@ -108,7 +109,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         spacing: 20
 
-                        Button2 {
+                        VclButton {
                             text: "Yes"
                             focusPolicy: Qt.NoFocus
                             onClicked: {
@@ -119,7 +120,7 @@ Item {
                             }
                         }
 
-                        Button2 {
+                        VclButton {
                             text: "No"
                             focusPolicy: Qt.NoFocus
                             onClicked: removeFeaturedImageDialog.active = false
@@ -155,7 +156,7 @@ Item {
                 text: sceneFeaturedPhotoItem.height > 150 ? "Drag & Drop a Photo\n\n-- OR --" : "Drag & Drop a Photo"
             }
 
-            Button2 {
+            VclButton {
                 text: "Select Photo"
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: featuredAttachmentFileDialog.open()

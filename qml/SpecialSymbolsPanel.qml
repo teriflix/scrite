@@ -17,6 +17,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Rectangle {
     property bool includeEmojis: true
@@ -87,7 +88,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.leftMargin: 5
         clip: true
-        ScrollBar.vertical: ScrollBar2 { flickable: symbolsGridView }
+        ScrollBar.vertical: VclScrollBar { flickable: symbolsGridView }
         rightMargin: 14
 
         cellWidth: symbolsPanel.currentIndexIsEmoji ? 50 : 40

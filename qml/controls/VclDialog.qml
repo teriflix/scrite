@@ -15,9 +15,6 @@
   This QML component extends the Dialog item from QtQuick controls to standardise
   appearence and functionality of dialog boxes in the UI across the whole application.
 
-  Since all dialog box QML files are stored in this folder, it makes sense to keep
-  this file in the same folder.
-
   Key features offered by this component
 
   1. Backdrop and content items are accepted as components, they are instantiated
@@ -26,6 +23,9 @@
   2. Dialogs are modal by default, parented to Overlay.overlay and centered in it.
 
   3. Title bar is standardised with a close/apply button on the top right.
+
+  4. Content is shown in a ScrollView, whose scrollbars show up whenever size available
+     is less than the implicit-size declared by the content component.
   */
 
 import QtQuick 2.15
@@ -108,12 +108,8 @@ Dialog {
             anchors.fill: parent
             contentWidth: contentItemLoader.width
             contentHeight: contentItemLoader.height
-            ScrollBar.vertical: ScrollBar {
-                policy: contentItemLoader.height > contentItemScroll.height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            }
-            ScrollBar.horizontal: ScrollBar {
-                policy: contentItemLoader.width > contentItemScroll.width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-            }
+            ScrollBar.vertical: VclScrollBar { }
+            ScrollBar.horizontal: VclScrollBar { }
 
             Loader {
                 id: contentItemLoader

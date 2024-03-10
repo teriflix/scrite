@@ -18,6 +18,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Menu2 {
     id: structureGroupsMenu
@@ -112,7 +113,7 @@ Menu2 {
                         }
                     }
                     property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
-                    ScrollBar.vertical: ScrollBar2 { flickable: groupsView }
+                    ScrollBar.vertical: VclScrollBar { flickable: groupsView }
                     property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
                     onShowingFilteredItemsChanged: adjustScrollingLater()
 

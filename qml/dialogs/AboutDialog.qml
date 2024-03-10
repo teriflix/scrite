@@ -20,8 +20,9 @@ import io.scrite.components 1.0
 
 import "../../js/utils.js" as Utils
 import "../globals"
+import "../controls"
 
-AbstractDialog {
+VclDialog {
     id: aboutDialog
 
     title: "About Scrite"
@@ -281,7 +282,7 @@ AbstractDialog {
         }
     }
 
-    AbstractDialog {
+    VclDialog {
         id: licenseTermsDialog
 
         title: "Terms Of Use"

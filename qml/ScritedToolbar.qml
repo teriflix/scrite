@@ -18,6 +18,8 @@ import QtQuick.Layouts 1.15
 
 import io.scrite.components 1.0
 
+import "./controls"
+
 Item {
     property Item scritedView
     height: 45
@@ -195,7 +197,7 @@ Item {
                 onClicked: scritedView.toggleTimeOffsetDisplay()
             }
 
-            CheckBox2 {
+            VclCheckBox {
                 anchors.verticalCenter: parent.verticalCenter
                 checked: scritedView.playbackScreenplaySync
                 onToggled: scritedView.playbackScreenplaySync = checked

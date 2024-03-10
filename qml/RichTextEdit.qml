@@ -22,6 +22,7 @@ import Qt.labs.settings 1.0
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     // RichTextEdit is intented to be used as a drop-in-replacement for FlickableTextArea
@@ -188,7 +189,7 @@ Item {
                     color: Runtime.colors.primary.c600.text
                 }
 
-                Button2 {
+                VclButton {
                     text: "Got it!"
                     Layout.alignment: Qt.AlignHCenter
                     onClicked: Runtime.richTextEditorSettings.languageNoteShown = true
