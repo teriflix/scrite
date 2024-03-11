@@ -18,20 +18,12 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
+import "../globals"
 
 Menu {
-    id: thisMenu
     Material.accent: Runtime.colors.primary.key
     Material.background: Runtime.colors.primary.c100.background
     Material.foreground: Runtime.colors.primary.c50.text
-    objectName: title
 
-    Connections {
-        target: dialogUnderlay
-        function onVisibleChanged() {
-            if(dialogUnderlay.visible)
-                thisMenu.close()
-        }
-    }
+    objectName: title
 }

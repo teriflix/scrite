@@ -17,12 +17,15 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-Menu2 {
+import "./globals"
+import "./controls"
+
+VclMenu {
     id: breakElementContextMenu
     property ScreenplayElement element
     onClosed: element = null
 
-    MenuItem2 {
+    VclMenuItem {
         text: "Paste After"
         enabled: Scrite.document.screenplay.canPaste
         onClicked: {
@@ -32,7 +35,7 @@ Menu2 {
         }
     }
 
-    MenuItem2 {
+    VclMenuItem {
         text: "Remove"
         enabled: !Scrite.document.readOnly
         onClicked: {

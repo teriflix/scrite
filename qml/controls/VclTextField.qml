@@ -11,14 +11,25 @@
 **
 ****************************************************************************/
 
+/**
+  We this kind of a heavy TextField implementation because, we have to add
+
+  - Transliteration support
+  - Special symbols spport
+  - Auto completion popups support
+  - Cut/Copy/Paste context menu support
+
+  None of these are available in vanilla TextField QML component from QtQuick Controls
+  */
+
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
-import "./controls"
+import "../globals"
+import "../" // Refactoring QML TODO: This is bad, there needs to be a proper module for this.
 
 TextField {
     id: textField
@@ -231,7 +242,7 @@ TextField {
         }
     }
 
-    Menu2 {
+    VclMenu {
         id: contextMenu
         focus: false
         property bool __persistentSelection: false
@@ -241,21 +252,21 @@ TextField {
         }
         onAboutToHide: textField.persistentSelection = __persistentSelection
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
             enabled: textField.selectedText !== ""
             onClicked: textField.cut()
             focusPolicy: Qt.NoFocus
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
             enabled: textField.selectedText !== ""
             onClicked: textField.copy()
             focusPolicy: Qt.NoFocus
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
             onClicked: textField.paste()
             focusPolicy: Qt.NoFocus

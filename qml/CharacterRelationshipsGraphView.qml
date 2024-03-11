@@ -519,7 +519,7 @@ Rectangle {
                         }
                     }
 
-                    TextField2 {
+                    VclTextField {
                         id: txtRelationshipName
                         anchors.verticalCenter: parent.verticalCenter
                         text: relationship.name

@@ -18,6 +18,9 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "./globals"
+import "./controls"
+
 MenuLoader {
     id: root
     enabled: !Scrite.document.readOnly
@@ -29,7 +32,7 @@ MenuLoader {
     signal addToDictionaryRequest()
     signal addToIgnoreListRequest()
 
-    menu: Menu2 {
+    menu: VclMenu {
         id: spellingSuggestionsMenu
         property int cursorPosition: -1
         onAboutToShow: root.menuAboutToShow()
@@ -39,7 +42,7 @@ MenuLoader {
             id: suggestionsRepeater
             model: root.spellingSuggestions
 
-            MenuItem2 {
+            VclMenuItem {
                 text: modelData
                 focusPolicy: Qt.NoFocus
                 onClicked: {
@@ -51,7 +54,7 @@ MenuLoader {
 
         MenuSeparator { }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Add to dictionary"
             focusPolicy: Qt.NoFocus
             onClicked: {
@@ -60,7 +63,7 @@ MenuLoader {
             }
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Ignore"
             focusPolicy: Qt.NoFocus
             onClicked: {

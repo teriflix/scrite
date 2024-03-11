@@ -149,19 +149,19 @@ VclDialog {
                         opacity: enabled ? 1 : 0.5
                     }
 
-                    RadioButton2 {
+                    VclRadioButton {
                         text: "Small"
                         checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.SmallCoverPhoto
                         onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.SmallCoverPhoto
                     }
 
-                    RadioButton2 {
+                    VclRadioButton {
                         text: "Medium"
                         checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.MediumCoverPhoto
                         onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.MediumCoverPhoto
                     }
 
-                    RadioButton2 {
+                    VclRadioButton {
                         text: "Large"
                         checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.LargeCoverPhoto
                         onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
@@ -251,7 +251,7 @@ VclDialog {
                                 color: Runtime.colors.primary.c800.background
                             }
 
-                            TextField2 {
+                            VclTextField {
                                 id: _tpfField
                                 width: parent.width-parent.spacing-_private.fieldLabelWidth
                                 text: _tpfScreenplayProperty.value

@@ -53,7 +53,7 @@ Item {
             }
         }
 
-        TextField2 {
+        VclTextField {
             id: newNameField
             placeholderText: "New name"
             width: parent.width

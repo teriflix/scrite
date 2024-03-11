@@ -84,10 +84,10 @@ Item {
                     anchors.top: parent.top
                     anchors.right: parent.right
 
-                    Menu2 {
+                    VclMenu {
                         id: newSceneMenu
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "New Scene"
                             enabled: !Scrite.document.readOnly
                             onClicked: {
@@ -124,13 +124,13 @@ Item {
                     anchors.top: parent.top
                     anchors.right: parent.right
 
-                    Menu2 {
+                    VclMenu {
                         id: newAnnotationMenu
 
                         Repeater {
                             model: canvas.annotationsList
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 property var annotationInfo: canvas.annotationsList[index]
                                 text: annotationInfo.title
                                 enabled: !Scrite.document.readOnly && annotationInfo.what !== ""
@@ -179,29 +179,29 @@ Item {
                     anchors.top: parent.top
                     anchors.right: parent.right
 
-                    Menu2 {
+                    VclMenu {
                         id: layoutOptionsMenu
                         width: 250
 
-                        MenuItem2 {
+                        VclMenuItem {
                             icon.source: "../icons/action/layout_horizontally.png"
                             text: "Layout Horizontally"
                             onClicked: selection.layout(Structure.HorizontalLayout)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             icon.source: "../icons/action/layout_vertically.png"
                             text: "Layout Vertically"
                             onClicked: selection.layout(Structure.VerticalLayout)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             icon.source: "../icons/action/layout_flow_horizontally.png"
                             text: "Flow Horizontally"
                             onClicked: selection.layout(Structure.FlowHorizontalLayout)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             icon.source: "../icons/action/layout_flow_vertically.png"
                             text: "Flow Vertically"
                             onClicked: selection.layout(Structure.FlowVerticalLayout)
@@ -255,11 +255,11 @@ Item {
                 onClicked: layoutGroupingMenu.popup()
                 down: layoutGroupingMenu.visible
 
-                Menu2 {
+                VclMenu {
                     id: layoutGroupingMenu
                     width: 350
 
-                    MenuItem2 {
+                    VclMenuItem {
                         text: "Acts"
                         font.bold: canvas.groupCategory === ""
                         onTriggered: canvas.groupCategory = ""
@@ -270,7 +270,7 @@ Item {
                     Repeater {
                         model: Scrite.document.structure.groupCategories
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: Scrite.app.camelCased(modelData)
                             font.bold: canvas.groupCategory === modelData
                             onTriggered: canvas.groupCategory = modelData
@@ -1544,7 +1544,7 @@ Item {
                     item.y = Scrite.document.structure.snapToGrid(item.y)
                 }
 
-                contextMenu: Menu2 {
+                contextMenu: VclMenu {
                     id: selectionContextMenu
                     width: 250
 
@@ -1571,31 +1571,31 @@ Item {
                         }
                     }
 
-                    Menu2 {
+                    VclMenu {
                         title: "Layout"
 
-                        MenuItem2 {
+                        VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_horizontally.png"
                             text: "Layout Horizontally"
                             onClicked: selection.layout(Structure.HorizontalLayout)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_vertically.png"
                             text: "Layout Vertically"
                             onClicked: selection.layout(Structure.VerticalLayout)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_flow_horizontally.png"
                             text: "Flow Horizontally"
                             onClicked: selection.layout(Structure.FlowHorizontalLayout)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
                             icon.source: "../icons/action/layout_flow_vertically.png"
                             text: "Flow Vertically"
@@ -1603,7 +1603,7 @@ Item {
                         }
                     }
 
-                    MenuItem2 {
+                    VclMenuItem {
                         text: "Annotate With Rectangle"
                         onClicked: {
                             createNewRectangleAnnotation(selection.rect.x-10, selection.rect.y-10, selection.rect.width+20, selection.rect.height+20)
@@ -1611,7 +1611,7 @@ Item {
                         }
                     }
 
-                    MenuItem2 {
+                    VclMenuItem {
                         text: "Stack"
                         enabled: {
                             if(Scrite.document.structure.canvasUIMode !== Structure.IndexCardUI)
@@ -1645,7 +1645,7 @@ Item {
                         }
                     }
 
-                    MenuItem2 {
+                    VclMenuItem {
                         text: "Add To Timeline"
                         onClicked: {
                             var items = selection.items
@@ -1655,7 +1655,7 @@ Item {
                         }
                     }
 
-                    MenuItem2 {
+                    VclMenuItem {
                         text: "Remove From Timeline"
                         enabled: {
                             if(!selection.hasItems)
@@ -1774,12 +1774,12 @@ Item {
                 }
             }
 
-            Menu2 {
+            VclMenu {
                 id: canvasContextMenu
 
                 property bool isContextMenu: false
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "New Scene"
                     enabled: !Scrite.document.readOnly
                     onClicked: {
@@ -1801,13 +1801,13 @@ Item {
 
                 MenuSeparator { }
 
-                Menu2 {
+                VclMenu {
                     title: "Annotation"
 
                     Repeater {
                         model: canvas.annotationsList
 
-                        MenuItem2 {
+                        VclMenuItem {
                             property var annotationInfo: canvas.annotationsList[index]
                             text: annotationInfo.title
                             enabled: !Scrite.document.readOnly && annotationInfo.what !== ""
@@ -1820,7 +1820,7 @@ Item {
                 }
             }
 
-            Menu2 {
+            VclMenu {
                 id: elementContextMenu
                 width: 250
                 property StructureElement element
@@ -1831,7 +1831,7 @@ Item {
                         close()
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     action: Action {
                         text: "Scene Heading"
                         checkable: true
@@ -1859,7 +1859,7 @@ Item {
                     onTriggered: elementContextMenu.element = null
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Add To Timeline"
                     property Scene lastScene: Scrite.document.screenplay.elementCount > 0 && Scrite.document.screenplay.elementAt(Scrite.document.screenplay.elementCount-1).scene
                     enabled: elementContextMenu.element && elementContextMenu.element.scene !== lastScene
@@ -1873,7 +1873,7 @@ Item {
                     }
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Remove From Timeline"
                     enabled: elementContextMenu.element && elementContextMenu.element.scene.addedToScreenplay
                     onClicked: {
@@ -1897,7 +1897,7 @@ Item {
 
                 MenuSeparator { }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Delete"
                     enabled: elementContextMenu.element
                     onClicked: {
@@ -2150,9 +2150,9 @@ Item {
                     anchors.left: parent.left
                     anchors.bottom: parent.top
                     anchors.bottomMargin: item ? item.height : 0
-                    menu: Menu2 {
+                    menu: VclMenu {
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Index Cards"
                             property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
                                                     Scrite.document.structure.indexCardContent === Structure.Synopsis
@@ -2170,7 +2170,7 @@ Item {
                             }
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Photo Cards"
                             property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
                                                     Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
@@ -2187,7 +2187,7 @@ Item {
                             }
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Synopsis Cards"
                             property bool _checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
                             icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
@@ -2745,7 +2745,7 @@ Item {
                                               }
                     }
 
-                    highDetailComponent: TextField2 {
+                    highDetailComponent: VclTextField {
                         id: headingField
                         width: parent.width
                         text: element.title

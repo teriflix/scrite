@@ -441,14 +441,14 @@ Item {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
 
-                    Menu2 {
+                    VclMenu {
                         id: exportMenu
                         width: 300
 
                         Repeater {
                             model: Scrite.document.supportedExportFormats
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 required property var modelData
                                 text: modelData.name
                                 icon.source: "qrc" + modelData.icon
@@ -465,7 +465,7 @@ Item {
 
                         MenuSeparator { }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Scrite"
                             icon.source: "qrc:/icons/exporter/scrite.png"
                             onClicked: saveFileDialog.launch("SAVE_AS")
@@ -489,14 +489,14 @@ Item {
                     anchors.right: parent.right
                     anchors.bottom: parent.bottom
 
-                    Menu2 {
+                    VclMenu {
                         id: reportsMenu
                         width: 350
 
                         Repeater {
                             model: Scrite.document.supportedReports
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 required property var modelData
                                 text: modelData.name
                                 icon.source: "qrc" + modelData.icon
@@ -552,11 +552,11 @@ Item {
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
-                    Menu2 {
+                    VclMenu {
                         id: settingsAndShortcutsMenu
                         width: 300
 
-                        MenuItem2 {
+                        VclMenuItem {
                             id: settingsMenuItem
                             text: "Settings\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+,")
                             icon.source: "../icons/action/settings_applications.png"
@@ -581,7 +581,7 @@ Item {
                             }
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             id: shortcutsMenuItem
                             text: "Shortcuts\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+E")
                             icon.source: {
@@ -610,13 +610,13 @@ Item {
                             }
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             icon.source: "../icons/action/help.png"
                             text: "Help\t\tF1"
                             onClicked: Qt.openUrlExternally(helpUrl)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             icon.source: "../icons/action/info.png"
                             text: "About"
                             onClicked: showAboutDialog()
@@ -641,7 +641,7 @@ Item {
                             }
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Toggle Fullscreen\tF7"
                             icon.source: "../icons/navigation/fullscreen.png"
                             onClicked: Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
@@ -679,14 +679,14 @@ Item {
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
-                    Menu2 {
+                    VclMenu {
                         id: languageMenu
                         width: 250
 
                         Repeater {
                             model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 property string baseText: modelData.key
                                 property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
                                 property string tabs: /*Scrite.app.isWindowsPlatform ? (modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t") : */"\t\t"
@@ -706,7 +706,7 @@ Item {
                             focusPolicy: Qt.NoFocus
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Next-Language\tF10"
                             focusPolicy: Qt.NoFocus
                             onClicked: {
@@ -861,22 +861,22 @@ Item {
                     id: appFileMenu
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
-                    menu: Menu2 {
+                    menu: VclMenu {
                         width: 300
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Home"
                             onTriggered: showHomeScreen()
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Save"
                             onTriggered: cmdSave.doClick()
                         }
 
                         MenuSeparator { }
 
-                        Menu2 {
+                        VclMenu {
                             id: exportMenu2
                             title: "Share"
                             width: 250
@@ -884,7 +884,7 @@ Item {
                             Repeater {
                                 model: Scrite.document.supportedExportFormats
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     required property var modelData
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
@@ -894,21 +894,21 @@ Item {
 
                             MenuSeparator { }
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 text: "Scrite"
                                 icon.source: "qrc:/icons/exporter/scrite.png"
                                 onClicked: saveFileDialog.launch("SAVE_AS")
                             }
                         }
 
-                        Menu2 {
+                        VclMenu {
                             title: "Reports"
                             width: 300
 
                             Repeater {
                                 model: Scrite.document.supportedReports
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     required property var modelData
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
@@ -920,7 +920,7 @@ Item {
 
                         MenuSeparator { }
 
-                        Menu2 {
+                        VclMenu {
                             // FIXME: This is a duplicate of the languageMenu.
                             // We should remove this when we build an ActionManager.
                             title: "Language"
@@ -928,7 +928,7 @@ Item {
                             Repeater {
                                 model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     property string baseText: modelData.key
                                     property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
                                     text: baseText + " (" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
@@ -943,7 +943,7 @@ Item {
 
                             MenuSeparator { }
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 text: "Next-Language (F10)"
                                 onClicked: {
                                     Scrite.app.transliterationEngine.cycleLanguage()
@@ -953,7 +953,7 @@ Item {
                             }
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Alphabet Mappings For " + Scrite.app.transliterationEngine.languageAsString
                             enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
                             onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
@@ -961,30 +961,30 @@ Item {
 
                         MenuSeparator { }
 
-                        Menu2 {
+                        VclMenu {
                             title: "View"
                             width: 250
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 text: "Screenplay (" + Scrite.app.polishShortcutTextForDisplay("Alt+1") + ")"
                                 onTriggered: mainTabBar.activateTab(0)
                                 font.bold: mainTabBar.currentIndex === 0
                             }
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 text: "Structure (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                                 onTriggered: mainTabBar.activateTab(1)
                                 font.bold: mainTabBar.currentIndex === 1
                             }
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 text: "Notebook (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                                 onTriggered: mainTabBar.activateTab(2)
                                 font.bold: mainTabBar.currentIndex === 2
                                 enabled: !showNotebookInStructure
                             }
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 text: "Scrited (" + Scrite.app.polishShortcutTextForDisplay("Alt+4") + ")"
                                 onTriggered: mainTabBar.currentIndex = 3
                                 font.bold: mainTabBar.currentIndex === 3
@@ -993,13 +993,13 @@ Item {
 
                         MenuSeparator { }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Settings"
                             // enabled: scriteDocumentViewItem.width >= 1100
                             onTriggered: settingsMenuItem.activate()
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Help"
                             onTriggered: Qt.openUrlExternally(helpUrl)
                         }

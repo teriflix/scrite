@@ -194,7 +194,7 @@ Item {
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
-                    menu: Menu2 {
+                    menu: VclMenu {
                         ColorMenu {
                             title: "Standard Colors"
                             onMenuItemClicked: {
@@ -205,7 +205,7 @@ Item {
 
                         MenuSeparator { }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Custom Color"
                             onClicked: {
                                 var newColor = Scrite.app.pickColor(propertyValue)
@@ -461,7 +461,7 @@ Item {
             Repeater {
                 model: ['left', 'center', 'right']
 
-                RadioButton2 {
+                VclRadioButton {
                     text: modelData
                     font.capitalization: Font.Capitalize
                     checked: modelData === propertyValue
@@ -480,7 +480,7 @@ Item {
             Repeater {
                 model: ['top', 'center', 'bottom']
 
-                RadioButton2 {
+                VclRadioButton {
                     text: modelData
                     font.capitalization: Font.Capitalize
                     checked: modelData === propertyValue

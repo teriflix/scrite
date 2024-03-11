@@ -18,8 +18,9 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
-Menu2 {
+VclMenu {
     id: screenplayContextMenu
     property ScreenplayElement element
 
@@ -75,12 +76,12 @@ Menu2 {
 
     MenuSeparator { }
 
-    MenuItem2 {
+    VclMenuItem {
         text: "Copy"
         onClicked: Scrite.document.screenplay.copySelection()
     }
 
-    MenuItem2 {
+    VclMenuItem {
         text: "Paste After"
         enabled: Scrite.document.screenplay.canPaste
         onClicked: Scrite.document.screenplay.pasteAfter( Scrite.document.screenplay.indexOfElement(element) )
@@ -88,7 +89,7 @@ Menu2 {
 
     MenuSeparator { }
 
-    MenuItem2 {
+    VclMenuItem {
         id: omitIncludeMenuItem
         property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
         text: omitted ? "Include" : "Omit"
@@ -101,7 +102,7 @@ Menu2 {
         }
     }
 
-    MenuItem2 {
+    VclMenuItem {
         text: "Remove"
         enabled: !Scrite.document.readOnly
         onClicked: {

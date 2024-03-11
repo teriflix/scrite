@@ -18,6 +18,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     id: fileSelector
@@ -85,7 +86,7 @@ Item {
             }
         }
 
-        TextField2 {
+        VclTextField {
             placeholderText: "File Name"
             text: fileInfo.baseName
             width: parent.width
@@ -102,7 +103,7 @@ Item {
             Repeater {
                 model: allowedExtensions
 
-                RadioButton2 {
+                VclRadioButton {
                     text: modelData.label + " (." + modelData.suffix + ")"
                     checked: selectedExtension.value === modelData.value
                     onClicked: {

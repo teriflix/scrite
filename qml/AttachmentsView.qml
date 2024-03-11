@@ -139,10 +139,10 @@ ListView {
         }
     }
 
-    Menu2 {
+    VclMenu {
         id: attachmentContextMenu
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Edit"
             enabled: attachmentsView.currentIndex >= 0
             onClicked: {
@@ -154,7 +154,7 @@ ListView {
 
         MenuSeparator { }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Remove"
             enabled: attachmentsView.currentIndex >= 0
             onClicked: attachments.removeAttachment( attachments.attachmentAt(attachmentsView.currentIndex) )

@@ -19,6 +19,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Item {
     id: textNoteView
@@ -42,7 +43,7 @@ Item {
         anchors.bottomMargin: 0
         spacing: 10
 
-        TextField2 {
+        VclTextField {
             id: titleField
             text: note ? note.title : ""
             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20

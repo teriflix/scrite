@@ -633,7 +633,7 @@ Item {
                     return items
                 }
 
-                TextField2 {
+                VclTextField {
                     id: locTypeFilter
                     width: (parent.width - parent.spacing*2)*0.25
                     label: ""
@@ -642,7 +642,7 @@ Item {
                     font.capitalization: Font.AllUppercase
                 }
 
-                TextField2 {
+                VclTextField {
                     id: locFilter
                     width: parent.width - locTypeFilter.width - locTypeFilter.width
                     label: ""
@@ -651,7 +651,7 @@ Item {
                     font.capitalization: Font.AllUppercase
                 }
 
-                TextField2 {
+                VclTextField {
                     id: momentFilter
                     width: locTypeFilter.width
                     label: ""
@@ -1013,7 +1013,7 @@ Item {
                 visible: text !== ""
             }
 
-            TextField2 {
+            VclTextField {
                 width: parent.width - 30
                 label: ""
                 text: generator.getConfigurationValue(fieldInfo.name)

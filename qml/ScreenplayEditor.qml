@@ -425,7 +425,7 @@ Rectangle {
                             }
                         }
 
-                        ToolButton2 {
+                        VclToolButton {
                             id: editTitlePageButton
                             text: "Edit Title Page"
                             icon.source: "../icons/action/edit_title_page.png"
@@ -1137,11 +1137,11 @@ Rectangle {
                     id: taggingMenu
                     anchors.left: parent.left
                     anchors.bottom: parent.top
-                    menu: Menu2 {
+                    menu: VclMenu {
                         id: layoutGroupingMenu
                         width: 350
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "None"
                             icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                             font.bold: Scrite.document.structure.preferredGroupCategory === ""
@@ -1153,7 +1153,7 @@ Rectangle {
                         Repeater {
                             model: Scrite.document.structure.groupCategories
 
-                            MenuItem2 {
+                            VclMenuItem {
                                 text: Scrite.app.camelCased(modelData)
                                 icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                                 font.bold: Scrite.document.structure.preferredGroupCategory === modelData
@@ -1272,7 +1272,7 @@ Rectangle {
                 background: Item { }
             }
 
-            TextField2 {
+            VclTextField {
                 id: episodeBreakSubtitle
                 label: ""
                 anchors.left: parent.left
@@ -1330,7 +1330,7 @@ Rectangle {
                 background: Item { }
             }
 
-            TextField2 {
+            VclTextField {
                 id: actBreakSubtitle
                 label: ""
                 anchors.left: parent.left
@@ -2324,7 +2324,7 @@ Rectangle {
                             id: editorContextMenu
                             anchors.bottom: parent.bottom
                             enabled: !Scrite.document.readOnly
-                            menu: Menu2 {
+                            menu: VclMenu {
                                 property int sceneTextEditorCursorPosition: -1
                                 property SceneElement sceneCurrentElement
                                 property TextFormat sceneTextFormat: sceneDocumentBinder.textFormat
@@ -2335,21 +2335,21 @@ Rectangle {
                                 }
                                 onAboutToHide: sceneTextEditor.persistentSelection = false
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     focusPolicy: Qt.NoFocus
                                     text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
                                     enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
                                     onClicked: { sceneTextEditor.cut2(); editorContextMenu.close() }
                                 }
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     focusPolicy: Qt.NoFocus
                                     text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
                                     enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
                                     onClicked: { sceneTextEditor.copy2(); editorContextMenu.close() }
                                 }
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     focusPolicy: Qt.NoFocus
                                     text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
                                     enabled: sceneTextEditor.canPaste
@@ -2358,7 +2358,7 @@ Rectangle {
 
                                 MenuSeparator {  }
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     focusPolicy: Qt.NoFocus
                                     text: "Split Scene"
                                     enabled: contentItem.canSplitScene
@@ -2368,7 +2368,7 @@ Rectangle {
                                     }
                                 }
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     focusPolicy: Qt.NoFocus
                                     text: "Join Previous Scene"
                                     enabled: contentItem.canJoinToPreviousScene
@@ -2380,7 +2380,7 @@ Rectangle {
 
                                 MenuSeparator {  }
 
-                                Menu2 {
+                                VclMenu {
                                     title: "Format"
                                     width: 250
 
@@ -2394,7 +2394,7 @@ Rectangle {
                                             { "value": SceneElement.Transition, "display": "Transition" }
                                         ]
 
-                                        MenuItem2 {
+                                        VclMenuItem {
                                             focusPolicy: Qt.NoFocus
                                             text: modelData.display + "\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
                                             enabled: sceneCurrentElement !== null
@@ -2406,14 +2406,14 @@ Rectangle {
                                     }
                                 }
 
-                                Menu2 {
+                                VclMenu {
                                     title: "Translate"
                                     enabled: sceneTextEditor.hasSelection
 
                                     Repeater {
                                         model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
-                                        MenuItem2 {
+                                        VclMenuItem {
                                             focusPolicy: Qt.NoFocus
                                             visible: index >= 0
                                             enabled: modelData.value !== TransliterationEngine.English
@@ -2947,7 +2947,7 @@ Rectangle {
                         sceneType: headingItem.theScene.type
                     }
 
-                    TextField2 {
+                    VclTextField {
                         id: sceneNumberField
                         label: cursorVisible ? "Scene No." : ""
                         labelAlwaysVisible: false
@@ -3000,7 +3000,7 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.verticalCenterOffset: headingFontMetrics.descent
 
-                        TextField2 {
+                        VclTextField {
                             id: sceneHeadingField
                             width: parent.width
                             anchors.verticalCenter: parent.verticalCenter
@@ -3159,10 +3159,10 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
 
-                            Menu2 {
+                            VclMenu {
                                 id: sceneMenu
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     enabled: !headingItem.theElement.omitted
                                     action: Action {
                                         text: "Scene Heading"
@@ -3198,7 +3198,7 @@ Rectangle {
                                 Repeater {
                                     model: headingItem.theElement.omitted ? 0 : additionalSceneMenuItems
 
-                                    MenuItem2 {
+                                    VclMenuItem {
                                         text: modelData
                                         onTriggered: {
                                             Scrite.document.screenplay.currentElementIndex = headingItem.theElementIndex
@@ -3213,7 +3213,7 @@ Rectangle {
                                     MenuSeparator { }
                                 }
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     text: headingItem.theElement.omitted ? "Include" : "Omit"
                                     enabled: Runtime.screenplayAdapter.screenplay === Scrite.document.screenplay
                                     onClicked: {
@@ -3222,7 +3222,7 @@ Rectangle {
                                     }
                                 }
 
-                                MenuItem2 {
+                                VclMenuItem {
                                     text: "Remove"
                                     enabled: Runtime.screenplayAdapter.screenplay === Scrite.document.screenplay
                                     onClicked: {
@@ -3587,7 +3587,7 @@ Rectangle {
                                 }
                             }
 
-                            ToolButton2 {
+                            VclToolButton {
                                 icon.source: {
                                     switch(Runtime.sceneListPanelSettings.displaySceneLength) {
                                     case "TIME":
@@ -3608,10 +3608,10 @@ Rectangle {
                                     anchors.bottom: parent.bottom
                                     width: parent.width
 
-                                    Menu2 {
+                                    VclMenu {
                                         id: sceneListPanelMenu
 
-                                        MenuItem2 {
+                                        VclMenuItem {
                                             text: "Scene Duration"
 
                                             readonly property string option: "TIME"
@@ -3620,7 +3620,7 @@ Rectangle {
                                             enabled: !Runtime.screenplayTextDocument.paused
                                         }
 
-                                        MenuItem2 {
+                                        VclMenuItem {
                                             text: "Page Length"
 
                                             readonly property string option: "PAGE"
@@ -3629,7 +3629,7 @@ Rectangle {
                                             enabled: !Runtime.screenplayTextDocument.paused
                                         }
 
-                                        MenuItem2 {
+                                        VclMenuItem {
                                             text: "None"
 
                                             readonly property string option: "NO"
@@ -3985,7 +3985,7 @@ Rectangle {
         characterMenu.popup()
     }
 
-    Menu2 {
+    VclMenu {
         id: characterMenu
         width: 350
         property Item popupSource
@@ -3995,7 +3995,7 @@ Rectangle {
         Repeater {
             model: characterMenu.characterReports
 
-            MenuItem2 {
+            VclMenuItem {
                 required property var modelData
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
@@ -4014,7 +4014,7 @@ Rectangle {
         Repeater {
             model: characterMenu.characterReports.length > 0 ? additionalCharacterMenuItems : []
 
-            MenuItem2 {
+            VclMenuItem {
                 required property var modelData
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
@@ -4026,7 +4026,7 @@ Rectangle {
         Repeater {
             model: characterMenu.characterReports.length > 0 ? 1 : 0
 
-            MenuItem2 {
+            VclMenuItem {
                 text: "Rename Character"
                 icon.source: "qrc:/icons/screenplay/character.png"
 

@@ -20,7 +20,7 @@ import "../js/utils.js" as Utils
 import "./globals"
 import "./controls"
 
-Menu2 {
+VclMenu {
     id: structureGroupsMenu
 
     property SceneGroup sceneGroup: null
@@ -41,7 +41,7 @@ Menu2 {
     }
     onOpened: htn.enabled = true
 
-    MenuItem2 {
+    VclMenuItem {
         width: structureGroupsMenu.width
         height: structureGroupsMenu.height
 

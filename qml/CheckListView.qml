@@ -21,6 +21,7 @@ import io.scrite.components 1.0
 
 import "../js/utils.js" as Utils
 import "./globals"
+import "./controls"
 
 Item {
     id: root
@@ -87,7 +88,7 @@ Item {
             Layout.preferredHeight: 1
         }
 
-        TextField2 {
+        VclTextField {
             id: titleField
             text: note ? note.title : ""
             width: parent.width
@@ -103,7 +104,7 @@ Item {
             Layout.fillWidth: true
         }
 
-        TextField2 {
+        VclTextField {
             id: descriptionField
             text: note ? note.content : ""
             width: parent.width

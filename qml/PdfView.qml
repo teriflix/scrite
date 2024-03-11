@@ -209,7 +209,7 @@ Item {
             id: floatingButtonsRow
             anchors.centerIn: parent
 
-            ToolButton2 {
+            VclToolButton {
                 icon.source: "../icons/action/close.png"
                 ToolTip.text: "Closes the PDF View"
                 anchors.verticalCenter: parent.verticalCenter
@@ -272,7 +272,7 @@ Item {
                 }
             }
 
-            ToolButton2 {
+            VclToolButton {
                 visible: displayRefreshButton
                 icon.source: "../icons/navigation/refresh.png"
                 ToolTip.text: "Refresh"
@@ -280,7 +280,7 @@ Item {
                 onClicked: refreshRequest()
             }
 
-            ToolButton2 {
+            VclToolButton {
                 id: saveFileButton
                 visible: (allowFileSave || saveFeatureDisabled)
                 icon.source: "../icons/file/file_download.png"
@@ -321,17 +321,17 @@ Item {
                         }
                     }
 
-                    Menu2 {
+                    VclMenu {
                         id: saveMenu
                         width: 325
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "To 'Downloads' folder"
                             property string targetFolder: StandardPaths.writableLocation(StandardPaths.DownloadLocation)
                             onClicked: saveFileButton.savePdf(targetFolder)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: Scrite.document.fileName === "" ?
                                   "To 'Desktop' folder" :
                                   "To the Scrite document folder"
@@ -339,7 +339,7 @@ Item {
                             onClicked: saveFileButton.savePdf(targetFolder)
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Other ..."
                             onClicked: saveFileDialog.open()
                         }
@@ -360,7 +360,7 @@ Item {
                 }
             }
 
-            ToolButton2 {
+            VclToolButton {
                 id: revealFileButton
                 visible: allowFileReveal
                 icon.source: "../icons/file/folder_open.png"

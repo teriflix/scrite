@@ -412,7 +412,7 @@ Item {
                             RowLayout {
                                 width: parent.width
 
-                                ToolButton2 {
+                                VclToolButton {
                                     icon.source: "../icons/mediaplayer/movie_inverted.png"
                                     onClicked: fileDialog.open()
                                     suggestedHeight: 36
@@ -421,7 +421,7 @@ Item {
                                     enabled: Scrite.document.screenplay.elementCount > 0
                                 }
 
-                                ToolButton2 {
+                                VclToolButton {
                                     icon.source: {
                                         if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
                                             return "../icons/mediaplayer/pause_inverted.png"
@@ -458,7 +458,7 @@ Item {
                                     }
                                 }
 
-                                ToolButton2 {
+                                VclToolButton {
                                     icon.source: "../icons/mediaplayer/rewind_10_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position > 0
                                     suggestedHeight: 36
@@ -467,7 +467,7 @@ Item {
                                     focusPolicy: Qt.NoFocus
                                 }
 
-                                ToolButton2 {
+                                VclToolButton {
                                     icon.source: "../icons/mediaplayer/forward_10_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position < mediaPlayer.duration
                                     suggestedHeight: 36
@@ -476,7 +476,7 @@ Item {
                                     focusPolicy: Qt.NoFocus
                                 }
 
-                                ToolButton2 {
+                                VclToolButton {
                                     icon.source: "../icons/navigation/zoom_fit_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia
                                     suggestedHeight: 36

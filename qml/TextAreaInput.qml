@@ -18,6 +18,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 TextArea {
     id: txtAreaInput
@@ -82,7 +83,7 @@ TextArea {
         __contextMenu.popup()
     }
 
-    Menu2 {
+    VclMenu {
         id: __contextMenu
         focus: false
 
@@ -93,21 +94,21 @@ TextArea {
         }
         onAboutToHide: txtAreaInput.persistentSelection = __persistentSelection
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
             enabled: txtAreaInput.selectedText !== ""
             onClicked: txtAreaInput.cut()
             focusPolicy: Qt.NoFocus
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
             enabled: txtAreaInput.selectedText !== ""
             onClicked: txtAreaInput.copy()
             focusPolicy: Qt.NoFocus
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
             onClicked: txtAreaInput.paste()
             focusPolicy: Qt.NoFocus

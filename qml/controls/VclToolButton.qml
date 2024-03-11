@@ -15,7 +15,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
-import "./globals"
+import "../globals"
 
 ToolButton {
     id: toolButton
@@ -28,17 +28,22 @@ ToolButton {
     property real suggestedHeight: 55
     property string shortcut
     property string shortcutText: shortcut
-    implicitWidth: suggestedWidth
-    implicitHeight: suggestedHeight
 
     Material.background: Runtime.colors.accent.key
     Material.foreground: Runtime.colors.primary.key
 
-    font.pixelSize: 16
+    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
+    ToolTip.visible: ToolTip.text === "" ? false : hovered
+
+    implicitWidth: suggestedWidth
+    implicitHeight: suggestedHeight
+
     hoverEnabled: true
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
     display: AbstractButton.TextBesideIcon
     opacity: enabled ? 1 : 0.5
     flat: true
+
     contentItem: Rectangle {
         color: Runtime.colors.primary.c10.background
         border.width: toolButton.flat ? 0 : 1
@@ -82,11 +87,9 @@ ToolButton {
             }
         }
     }
+
     action: Action {
         text: toolButton.text
         shortcut: toolButton.shortcut
     }
-
-    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
-    ToolTip.visible: ToolTip.text === "" ? false : hovered
 }

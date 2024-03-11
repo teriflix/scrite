@@ -971,7 +971,7 @@ Rectangle {
                             result.accepted = true
                         }
 
-                        TextField2 {
+                        VclTextField {
                             id: sceneHeadingField
                             text: scene.heading.text
                             label: ""
@@ -988,7 +988,7 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 
-                        TextField2 {
+                        VclTextField {
                             id: sceneTitleField
                             text: scene.structureElement.nativeTitle
                             label: ""
@@ -1049,7 +1049,7 @@ Rectangle {
                                 active: false
                                 width: active && item ? Math.max(250, item.contentWidth) : 0
                                 visible: active
-                                sourceComponent: TextField2 {
+                                sourceComponent: VclTextField {
                                     id: newCharacterNameInput
                                     readOnly: Scrite.document.readOnly
                                     font.family: "Courier Prime"
@@ -1606,7 +1606,7 @@ Rectangle {
                                 anchors.baseline: breakElementHeadingField.baseline
                             }
 
-                            TextField2 {
+                            VclTextField {
                                 id: breakElementHeadingField
                                 text: breakElement.breakSubtitle
                                 width: parent.width - headingLabel.width - parent.spacing
@@ -2238,7 +2238,7 @@ Rectangle {
                                     width: parent.width-20
                                     anchors.centerIn: parent
 
-                                    TextField2 {
+                                    VclTextField {
                                         id: characterNameField
                                         completionStrings: Scrite.document.structure.characterNames
                                         width: parent.width - characterAddButton.width - parent.spacing
@@ -2565,7 +2565,7 @@ Rectangle {
                                             interactive: true
                                         }
 
-                                        TextField2 {
+                                        VclTextField {
                                             id: designationField
                                             label: "Role / Designation:"
                                             width: parent.width
@@ -2585,7 +2585,7 @@ Rectangle {
                                             width: parent.width
                                             spacing: parent.spacing/2
 
-                                            TextField2 {
+                                            VclTextField {
                                                 id: newTagField
                                                 label: "Tags:"
                                                 width: parent.width
@@ -2677,7 +2677,7 @@ Rectangle {
                                             }
                                         }
 
-                                        TextField2 {
+                                        VclTextField {
                                             id: aliasesField
                                             label: "Aliases:"
                                             width: parent.width
@@ -2697,7 +2697,7 @@ Rectangle {
                                             spacing: 10
                                             width: parent.width
 
-                                            TextField2 {
+                                            VclTextField {
                                                 id: typeField
                                                 label: "Type:"
                                                 width: (parent.width - parent.spacing)/2
@@ -2713,7 +2713,7 @@ Rectangle {
                                                 onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(typeField)
                                             }
 
-                                            TextField2 {
+                                            VclTextField {
                                                 id: genderField
                                                 label: "Gender:"
                                                 width: (parent.width - parent.spacing)/2
@@ -2734,7 +2734,7 @@ Rectangle {
                                             spacing: 10
                                             width: parent.width
 
-                                            TextField2 {
+                                            VclTextField {
                                                 id: ageField
                                                 label: "Age:"
                                                 width: (parent.width - parent.spacing)/2
@@ -2750,7 +2750,7 @@ Rectangle {
                                                 onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(ageField)
                                             }
 
-                                            TextField2 {
+                                            VclTextField {
                                                 id: bodyTypeField
                                                 label: "Body Type:"
                                                 width: (parent.width - parent.spacing)/2
@@ -2771,7 +2771,7 @@ Rectangle {
                                             spacing: 10
                                             width: parent.width
 
-                                            TextField2 {
+                                            VclTextField {
                                                 id: heightField
                                                 label: "Height:"
                                                 width: (parent.width - parent.spacing)/2
@@ -2787,7 +2787,7 @@ Rectangle {
                                                 onActiveFocusChanged: if(activeFocus) characterQuickInfoView.scrollIntoView(heightField)
                                             }
 
-                                            TextField2 {
+                                            VclTextField {
                                                 id: weightField
                                                 label: "Weight:"
                                                 width: (parent.width - parent.spacing)/2
@@ -3051,7 +3051,7 @@ Rectangle {
                                         horizontalAlignment: Text.AlignRight
                                     }
 
-                                    TextField2 {
+                                    VclTextField {
                                         id: relationshipName
                                         enableTransliteration: true
                                         width: parent.width - 32 - characterRowLabel1.width - characterRowLabel2.width - 3*parent.spacing
@@ -3152,7 +3152,7 @@ Rectangle {
         }
     }
 
-    Menu2 {
+    VclMenu {
         id: newNoteMenu
         property Notes notes
         enabled: notes
@@ -3200,7 +3200,7 @@ Rectangle {
         }
     }
 
-    Menu2 {
+    VclMenu {
         id: noteContextMenu
         property Note note
         enabled: note
@@ -3217,7 +3217,7 @@ Rectangle {
 
         MenuSeparator { }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Delete Note"
             onClicked: {
                 if(notebookTree.currentNote == noteContextMenu.note)
@@ -3233,7 +3233,7 @@ Rectangle {
         }
     }
 
-    Menu2 {
+    VclMenu {
         id: characterContextMenu
         property Character character
         property Item characterItem
@@ -3249,7 +3249,7 @@ Rectangle {
             }
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Rename Character"
             onClicked: {
                 modalDialog.arguments = characterContextMenu.character
@@ -3262,7 +3262,7 @@ Rectangle {
 
         MenuSeparator { }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Delete Character"
             onClicked: {
                 if(notebookTree.currentCharacter == characterContextMenu.character)

@@ -331,7 +331,7 @@ Item {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
-            TextField2 {
+            VclTextField {
                 width: parent.width-30
                 label: ""
                 placeholderText: fieldInfo.label

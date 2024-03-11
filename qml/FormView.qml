@@ -88,7 +88,7 @@ Item {
                     height: 1
                 }
 
-                TextField2 {
+                VclTextField {
                     id: titleField
                     text: note ? note.title : ""
                     width: parent.width
@@ -108,7 +108,7 @@ Item {
                     }
                 }
 
-                TextField2 {
+                VclTextField {
                     id: descriptionField
                     text: note ? note.content : ""
                     width: parent.width
@@ -146,13 +146,13 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                RadioButton2 {
+                VclRadioButton {
                     text: "All"
                     checked: Runtime.notebookSettings.showAllFormQuestions
                     onToggled: Runtime.notebookSettings.showAllFormQuestions = true
                 }
 
-                RadioButton2 {
+                VclRadioButton {
                     text: "Answered"
                     checked: !Runtime.notebookSettings.showAllFormQuestions
                     onToggled: Runtime.notebookSettings.showAllFormQuestions = false

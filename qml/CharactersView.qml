@@ -65,13 +65,13 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 height: 1
 
-                Menu2 {
+                VclMenu {
                     id: tagsMenu
 
                     Repeater {
                         model: charactersModel.availableTags
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: modelData
                             checkable: true
                             checked: charactersModel.hasTag(modelData)

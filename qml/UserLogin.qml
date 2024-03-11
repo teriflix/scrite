@@ -348,7 +348,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 40
 
-                    TextField2 {
+                    VclTextField {
                         id: activationCodeField
                         width: parent.width
                         enableTransliteration: false
@@ -606,7 +606,7 @@ Item {
                         rowSpacing: parent.spacing/2
                         columnSpacing: parent.spacing/2
 
-                        TextField2 {
+                        VclTextField {
                             id: nameField
                             width: (parent.width-parent.columnSpacing)/2
                             placeholderText: "Name"
@@ -620,7 +620,7 @@ Item {
                             undoRedoEnabled: true
                         }
 
-                        TextField2 {
+                        VclTextField {
                             id: experienceField
                             width: (parent.width-parent.columnSpacing)/2
                             text: Scrite.user.experience
@@ -637,7 +637,7 @@ Item {
                             undoRedoEnabled: true
                         }
 
-                        TextField2 {
+                        VclTextField {
                             id: locationField
                             width: (parent.width-parent.columnSpacing)/2
                             text: Scrite.user.location
@@ -653,7 +653,7 @@ Item {
                             undoRedoEnabled: true
                         }
 
-                        TextField2 {
+                        VclTextField {
                             id: wdyhasField
                             width: (parent.width-parent.columnSpacing)/2
                             text: Scrite.user.wdyhas

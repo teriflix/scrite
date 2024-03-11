@@ -13,8 +13,13 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+
 import io.scrite.components 1.0
+
 import "../js/utils.js" as Utils
+
+import "./globals"
+import "./controls"
 
 Item {
     id: specialSymbolsSupport
@@ -42,12 +47,12 @@ Item {
         }
     }
 
-    Menu2 {
+    VclMenu {
         id: symbolMenu
         width: 514
         focus: false
 
-        MenuItem2 {
+        VclMenuItem {
             width: symbolMenu.width
             height: 400
             focusPolicy: Qt.NoFocus

@@ -12,13 +12,10 @@
         <file>qml/DialogOverlay.qml</file>
         <file>qml/ExporterConfiguration.qml</file>
         <file>qml/FocusIndicator.qml</file>
-        <file>qml/Menu2.qml</file>
-        <file>qml/MenuItem2.qml</file>
         <file>qml/MenuLoader.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
         <file>qml/OptionsDialog.qml</file>
-        <file>qml/RadioButton2.qml</file>
         <file>qml/ReportGeneratorConfiguration.qml</file>
         <file>qml/RubberBand.qml</file>
         <file>qml/ScreenplayEditorToolbar.qml</file>
@@ -32,9 +29,7 @@
         <file>qml/TabBarTab.qml</file>
         <file>qml/TagText.qml</file>
         <file>qml/TextAreaInput.qml</file>
-        <file>qml/TextField2.qml</file>
         <file>qml/TextViewEdit.qml</file>
-        <file>qml/ToolButton2.qml</file>
         <file>qml/ToolButton3.qml</file>
         <file>qml/PageNumberBubble.qml</file>
         <file>qml/ZoomSlider.qml</file>
@@ -98,5 +93,10 @@
         <file>qml/controls/VclComboBox.qml</file>
         <file>qml/controls/VclCheckBox.qml</file>
         <file>qml/controls/VclScrollBar.qml</file>
+        <file>qml/controls/VclMenu.qml</file>
+        <file>qml/controls/VclMenuItem.qml</file>
+        <file>qml/controls/VclTextField.qml</file>
+        <file>qml/controls/VclToolButton.qml</file>
+        <file>qml/controls/VclRadioButton.qml</file>
     </qresource>
 </RCC>

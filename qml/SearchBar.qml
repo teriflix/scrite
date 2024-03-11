@@ -99,7 +99,7 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: 5
 
-                ToolButton2 {
+                VclToolButton {
                     icon.source: "../icons/action/search.png"
                     anchors.verticalCenter: parent.verticalCenter
                     suggestedHeight: 40
@@ -107,17 +107,17 @@ Item {
                     onPressAndHold: searchOptionsMenu.popup()
                     hoverEnabled: false
 
-                    Menu2 {
+                    VclMenu {
                         id: searchOptionsMenu
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Case Sensitive"
                             checkable: true
                             checked: searchEngine.isSearchCaseSensitive
                             onToggled: searchEngine.isSearchCaseSensitive = checked
                         }
 
-                        MenuItem2 {
+                        VclMenuItem {
                             text: "Whole Words"
                             checkable: true
                             checked: searchEngine.isSearchWholeWords
@@ -135,7 +135,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                 }
 
-                ToolButton2 {
+                VclToolButton {
                     icon.source: "../icons/action/keyboard_arrow_up.png"
                     anchors.verticalCenter: parent.verticalCenter
                     enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex > 0
@@ -144,7 +144,7 @@ Item {
                     hoverEnabled: false
                 }
 
-                ToolButton2 {
+                VclToolButton {
                     icon.source: "../icons/action/keyboard_arrow_down.png"
                     anchors.verticalCenter: parent.verticalCenter
                     enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex < searchEngine.searchResultCount
@@ -153,7 +153,7 @@ Item {
                     hoverEnabled: false
                 }
 
-                ToolButton2 {
+                VclToolButton {
                     icon.source: "../icons/navigation/close.png"
                     anchors.verticalCenter: parent.verticalCenter
                     enabled: txtSearch.canClear
@@ -162,7 +162,7 @@ Item {
                     hoverEnabled: false
                 }
 
-                ToolButton2 {
+                VclToolButton {
                     icon.source: "../icons/action/find_replace.png"
                     anchors.verticalCenter: parent.verticalCenter
                     down: checked

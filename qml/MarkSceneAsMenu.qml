@@ -16,7 +16,10 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-Menu2 {
+import "./globals"
+import "./controls"
+
+VclMenu {
     id: msaMenu
     title: "Mark Scene As"
 
@@ -27,7 +30,7 @@ Menu2 {
     Repeater {
         model: Scrite.app.enumerationModelForType("Scene", "Type")
 
-        MenuItem2 {
+        VclMenuItem {
             text: modelData.key + (scene ? (font.bold ? " ✔" : "") : "")
             icon.source: modelData.icon
             enabled: enableValidation ? scene : true

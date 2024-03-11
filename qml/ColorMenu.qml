@@ -17,8 +17,9 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
-Menu2 {
+VclMenu {
     id: colorMenu
     width: minCellSize * 5 + 10
     height: minCellSize * (4 + Math.ceil((Runtime.workspaceSettings.customColors.length+1)/4)) +  10
@@ -27,7 +28,7 @@ Menu2 {
     readonly property real minCellSize: 50
     property color selectedColor: "white"
 
-    MenuItem2 {
+    VclMenuItem {
         width: colorMenu.width
         height: colorGrid.height
 
@@ -45,7 +46,7 @@ Menu2 {
                 delegate: colorItemDelegate
             }
 
-            ToolButton2 {
+            VclToolButton {
                 icon.source: "../icons/content/add_circle_outline.png"
                 suggestedWidth: colorGrid.cellSize
                 suggestedHeight: colorGrid.cellSize

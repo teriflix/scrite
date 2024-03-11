@@ -2,6 +2,9 @@ VclButton 1.0 VclButton.qml
 VclCheckBox 1.0 VclCheckBox.qml
 VclComboBox 1.0 VclComboBox.qml
 VclDialog 1.0 VclDialog.qml
+VclMenu 1.0 VclMenu.qml
+VclMenuItem 1.0 VclMenuItem.qml
+VclRadioButton 1.0 VclRadioButton.qml
 VclScrollBar 1.0 VclScrollBar.qml
-
-
+VclTextField 1.0 VclTextField.qml
+VclToolButton 1.0 VclToolButton.qml

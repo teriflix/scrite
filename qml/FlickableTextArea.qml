@@ -121,7 +121,7 @@ Flickable {
         __contextMenu.popup()
     }
 
-    Menu2 {
+    VclMenu {
         id: __contextMenu
 
         property bool __persistentSelection: false
@@ -131,21 +131,21 @@ Flickable {
         }
         onAboutToHide: __textArea.persistentSelection = __persistentSelection
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
             enabled: __textArea.selectedText !== ""
             onClicked: __textArea.cut()
             focusPolicy: Qt.NoFocus
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
             enabled: __textArea.selectedText !== ""
             onClicked: __textArea.copy()
             focusPolicy: Qt.NoFocus
         }
 
-        MenuItem2 {
+        VclMenuItem {
             text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
             onClicked: __textArea.paste()
             focusPolicy: Qt.NoFocus

@@ -19,6 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "./globals"
+import "./controls"
 
 Row {
     id: screenplayEditorToolbar
@@ -91,68 +92,68 @@ Row {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
-            Menu2 {
+            VclMenu {
                 id: screenplayViewOptionsMenu
                 width: 500
                 title: "Screenplay Options"
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Logline Editor"
                     icon.source: Runtime.screenplayEditorSettings.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.showLoglineEditor = !Runtime.screenplayEditorSettings.showLoglineEditor
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Ruler"
                     icon.source: Runtime.screenplayEditorSettings.displayRuler ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displayRuler = !Runtime.screenplayEditorSettings.displayRuler
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Empty Title Card"
                     icon.source: Runtime.screenplayEditorSettings.displayEmptyTitleCard ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displayEmptyTitleCard = !Runtime.screenplayEditorSettings.displayEmptyTitleCard
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Add Scene Controls"
                     icon.source: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons = !Runtime.screenplayEditorSettings.displayAddSceneBreakButtons
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Scene Blocks"
                     property bool sceneBlocksVisible: Runtime.screenplayEditorSettings.spaceBetweenScenes > 0
                     icon.source: sceneBlocksVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.spaceBetweenScenes = sceneBlocksVisible ? 0 : 40
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Markup Tools"
                     property bool toolsVisible: Runtime.screenplayEditorSettings.markupToolsDockVisible
                     icon.source: toolsVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.markupToolsDockVisible = !toolsVisible
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Show Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     text: "Enable Tagging Of Scenes\t\t" +Scrite.app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
@@ -160,14 +161,14 @@ Row {
 
                 MenuSeparator {  }
 
-                MenuItem2 {
+                VclMenuItem {
                     icon.source: "../icons/content/blank.png"
                     text: "Scan For Mute Characters"
                     onClicked: Scrite.document.structure.scanForMuteCharacters()
                     enabled: !Scrite.document.readOnly && Runtime.screenplayEditorSettings.displaySceneCharacters
                 }
 
-                MenuItem2 {
+                VclMenuItem {
                     icon.source: "../icons/content/blank.png"
                     text: "Reset Scene Numbers"
                     onClicked: Scrite.document.screenplay.resetSceneNumbers()

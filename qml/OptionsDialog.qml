@@ -173,7 +173,7 @@ Item {
                                 width: parent.width/2
                             }
 
-                            TextField2 {
+                            VclTextField {
                                 label: enabled ? "Interval in seconds:" : ""
                                 enabled: Scrite.document.autoSave
                                 text: enabled ? Scrite.document.autoSaveDurationInSeconds : "No Auto Save"
@@ -197,7 +197,7 @@ Item {
                                 width: parent.width/2
                             }
 
-                            TextField2 {
+                            VclTextField {
                                 label: enabled ? "Number of backups to retain:" : ""
                                 enabled: Scrite.document.maxBackupCount > 0
                                 text: enabled ? Scrite.document.maxBackupCount : "Unlimited Backups"
@@ -840,7 +840,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField2 {
+                            VclTextField {
                                 width: parent.width * 0.8
                                 placeholderText: "leave empty for default (" + Math.round(Scrite.document.displayFormat.pageLayout.defaultResolution) + "), or enter a custom value."
                                 text: Scrite.document.displayFormat.pageLayout.customResolution > 0 ? Scrite.document.displayFormat.pageLayout.customResolution : ""
@@ -866,7 +866,7 @@ Item {
                                 anchors.verticalCenter: parent.verticalCenter
                             }
 
-                            TextField2 {
+                            VclTextField {
                                 width: parent.width * 0.8
                                 placeholderText: "Default: 1.0. Requires restart if changed."
                                 text: Scrite.app.isWindowsPlatform ? Scrite.app.getWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
@@ -1136,7 +1136,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        TextField2 {
+                        VclTextField {
                             label: "Seconds (15 - 300)"
                             labelAlwaysVisible: true
                             text: Scrite.document.printFormat.secondsPerPage
@@ -1349,7 +1349,7 @@ Item {
                                 horizontalAlignment: Text.AlignRight
                             }
 
-                            TextField2 {
+                            VclTextField {
                                 width: 300
                                 text: Runtime.appFeatures.watermark.enabled ? pageSetupSettings.watermarkText : "Scrite"
                                 onTextEdited: pageSetupSettings.watermarkText = text
@@ -1588,19 +1588,19 @@ Item {
                             opacity: enabled ? 1 : 0.5
                         }
 
-                        RadioButton2 {
+                        VclRadioButton {
                             text: "Small"
                             checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.SmallCoverPhoto
                             onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.SmallCoverPhoto
                         }
 
-                        RadioButton2 {
+                        VclRadioButton {
                             text: "Medium"
                             checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.MediumCoverPhoto
                             onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.MediumCoverPhoto
                         }
 
-                        RadioButton2 {
+                        VclRadioButton {
                             text: "Large"
                             checked: Scrite.document.screenplay.coverPagePhotoSize === Screenplay.LargeCoverPhoto
                             onToggled: Scrite.document.screenplay.coverPagePhotoSize = Screenplay.LargeCoverPhoto
@@ -1690,7 +1690,7 @@ Item {
                                     color: Runtime.colors.primary.c800.background
                                 }
 
-                                TextField2 {
+                                VclTextField {
                                     id: _tpfField
                                     width: parent.width-parent.spacing-fieldLabelWidth
                                     text: _tpfScreenplayProperty.value
@@ -1979,7 +1979,7 @@ Item {
                         }
                     }
 
-                    ToolButton2 {
+                    VclToolButton {
                         icon.source: "../icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this font size to all '" + pageData.elementName + "' paragraphs."
@@ -2043,7 +2043,7 @@ Item {
                         }
                     }
 
-                    ToolButton2 {
+                    VclToolButton {
                         icon.source: "../icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this font style to all '" + pageData.group + "' paragraphs."
@@ -2084,7 +2084,7 @@ Item {
                         }
                     }
 
-                    ToolButton2 {
+                    VclToolButton {
                         icon.source: "../icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this line height to all '" + pageData.group + "' paragraphs."
@@ -2154,7 +2154,7 @@ Item {
                         }
                     }
 
-                    ToolButton2 {
+                    VclToolButton {
                         icon.source: "../icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply these colors to all '" + pageData.group + "' paragraphs."
@@ -2184,7 +2184,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 5
 
-                        RadioButton2 {
+                        VclRadioButton {
                             text: "Left"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignLeft
@@ -2196,7 +2196,7 @@ Item {
                             }
                         }
 
-                        RadioButton2 {
+                        VclRadioButton {
                             text: "Center"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignHCenter
@@ -2208,7 +2208,7 @@ Item {
                             }
                         }
 
-                        RadioButton2 {
+                        VclRadioButton {
                             text: "Right"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignRight
@@ -2220,7 +2220,7 @@ Item {
                             }
                         }
 
-                        RadioButton2 {
+                        VclRadioButton {
                             text: "Justify"
                             checkable: true
                             checked: displayElementFormat.textAlignment === Qt.AlignJustify
@@ -2233,7 +2233,7 @@ Item {
                         }
                     }
 
-                    ToolButton2 {
+                    VclToolButton {
                         icon.source: "../icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this alignment to all '" + pageData.group + "' paragraphs."

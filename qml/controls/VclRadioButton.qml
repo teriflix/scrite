@@ -17,11 +17,10 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
+import "../globals"
 
-MenuItem {
+RadioButton {
     Material.accent: Runtime.colors.primary.key
     Material.background: Runtime.colors.primary.c100.background
     Material.foreground: Runtime.colors.primary.c100.text
-    objectName: text
 }
