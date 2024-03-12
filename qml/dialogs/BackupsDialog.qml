@@ -147,6 +147,7 @@ VclDialog {
         }
     }
 
+    // QML Refactor TODO: Use the common message box after this.
     VclDialog {
         id: messageBox
 

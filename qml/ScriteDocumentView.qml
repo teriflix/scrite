@@ -26,7 +26,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
-import "qrc:/qml/components"
+import "qrc:/qml/helpers"
 
 Item {
     id: scriteDocumentViewItem
@@ -393,13 +393,7 @@ Item {
                 iconSource: "qrc:/icons/file/backup_open.png"
                 text: "Open Backup"
                 visible: Scrite.document.backupFilesModel.count > 0
-                onClicked: {
-                    modalDialog.closeable = false
-                    modalDialog.closeOnEscape = true
-                    modalDialog.popupSource = backupOpenButton
-                    modalDialog.sourceComponent = backupsDialogBoxComponent
-                    modalDialog.active = true
-                }
+                onClicked: backupsDialog.open()
 
                 ToolTip.text: "Open any of the " + Scrite.document.backupFilesModel.count + " backup(s) available for this file."
 
@@ -412,6 +406,21 @@ Item {
                     color: Runtime.colors.primary.highlight.text
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
+                }
+
+                BackupsDialog {
+                    id: backupsDialog
+
+                    onOpenInThisWindow: (filePath) => {
+                                            mainUiContentLoader.allowContent = false
+                                            Scrite.document.openAnonymously(filePath)
+                                            Utils.execLater(mainUiContentLoader, 50, function() {
+                                                mainUiContentLoader.allowContent = true
+                                            })
+                                        }
+                    onOpenInNewWindow: (filePath) => {
+                                           Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
+                                       }
                 }
             }
 
@@ -2090,27 +2099,6 @@ Item {
         id: exporterConfigurationComponent
 
         ExporterConfiguration { }
-    }
-
-    Component {
-        id: backupsDialogBoxComponent
-
-        BackupsDialogBox {
-            onOpenInThisWindow: {
-                mainUiContentLoader.allowContent = false
-                Scrite.document.openAnonymously(filePath)
-                Utils.execLater(mainUiContentLoader, 50, function() {
-                    mainUiContentLoader.allowContent = true
-                    modalDialog.close()
-                })
-            }
-            onOpenInNewWindow: {
-                Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                Utils.execLater(modalDialog, 4000, function() {
-                    modalDialog.close()
-                })
-            }
-        }
     }
 
     Item {
