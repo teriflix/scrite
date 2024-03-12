@@ -14,7 +14,7 @@
 import QtQuick 2.15
 
 BorderImage {
-    source: "../icons/content/shadow.png"
+    source: "qrc:/icons/content/shadow.png"
     horizontalTileMode: BorderImage.Stretch
     verticalTileMode: BorderImage.Stretch
     anchors { leftMargin: -9; topMargin: -9; rightMargin: -9; bottomMargin: -9 }

@@ -35,6 +35,7 @@ Rectangle {
     // QML components.
 
     id: screenplayEditor
+
     property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
     property alias source: sourcePropertyAlias.value
@@ -415,11 +416,11 @@ Rectangle {
                             anchors.left: parent.left
                             anchors.right: parent.right
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 anchors.top: parent.top
                                 anchors.right: parent.right
                                 anchors.rightMargin: ruler.rightMarginPx
-                                iconSource: "../icons/action/edit_title_page.png"
+                                iconSource: "qrc:/icons/action/edit_title_page.png"
                                 onClicked: editTitlePage(this)
                                 visible: parent.active && enabled
                                 enabled: !Scrite.document.readOnly
@@ -429,7 +430,7 @@ Rectangle {
                         VclToolButton {
                             id: editTitlePageButton
                             text: "Edit Title Page"
-                            icon.source: "../icons/action/edit_title_page.png"
+                            icon.source: "qrc:/icons/action/edit_title_page.png"
                             flat: false
                             width: implicitWidth * 1.5
                             height: implicitHeight * 1.25
@@ -532,9 +533,9 @@ Rectangle {
                             enabled: !Scrite.document.readOnly
                             spacing: 20
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 id: addSceneButton
-                                iconSource: "../icons/action/add_scene.png"
+                                iconSource: "qrc:/icons/action/add_scene.png"
                                 shortcutText: "Ctrl+Shift+N"
                                 ToolTip.delay: 0
                                 text: "Add Scene"
@@ -547,9 +548,9 @@ Rectangle {
                                 }
                             }
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 id: addActBreakButton
-                                iconSource: "../icons/action/add_act.png"
+                                iconSource: "qrc:/icons/action/add_act.png"
                                 shortcutText: "Ctrl+Shift+B"
                                 ToolTip.delay: 0
                                 text: "Add Act Break"
@@ -558,9 +559,9 @@ Rectangle {
                                 onClicked: Scrite.document.screenplay.addBreakElement(Screenplay.Act)
                             }
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 id: addEpisodeButton
-                                iconSource: "../icons/action/add_episode.png"
+                                iconSource: "qrc:/icons/action/add_episode.png"
                                 shortcutText: "Ctrl+Shift+P"
                                 ToolTip.delay: 0
                                 text: "Add Episode Break"
@@ -871,10 +872,10 @@ Rectangle {
                 enabled: !Scrite.document.readOnly
                 source: {
                     if(Scrite.document.readOnly)
-                        return "../icons/action/lock_outline.png"
+                        return "qrc:/icons/action/lock_outline.png"
                     if(Scrite.user.loggedIn)
-                        return Scrite.document.hasCollaborators ? "../icons/file/protected.png" : "../icons/file/unprotected.png"
-                    return Scrite.document.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
+                        return Scrite.document.hasCollaborators ? "qrc:/icons/file/protected.png" : "qrc:/icons/file/unprotected.png"
+                    return Scrite.document.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
                 }
                 scale: toggleLockMouseArea.containsMouse ? (toggleLockMouseArea.pressed ? 1 : 1.5) : 1
                 visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
@@ -928,7 +929,7 @@ Rectangle {
             }
 
             Image {
-                source: "../icons/navigation/refresh.png"
+                source: "qrc:/icons/navigation/refresh.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
@@ -960,7 +961,7 @@ Rectangle {
             }
 
             Image {
-                source: "../icons/content/page_count.png"
+                source: "qrc:/icons/content/page_count.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
@@ -992,7 +993,7 @@ Rectangle {
             }
 
             Image {
-                source: "../icons/content/time.png"
+                source: "qrc:/icons/content/time.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
@@ -1125,8 +1126,8 @@ Rectangle {
             anchors.rightMargin: spacing
             height: zoomSlider.height
 
-            ToolButton3 {
-                iconSource: "../icons/action/layout_grouping.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/action/layout_grouping.png"
                 height: parent.height; width: height
                 anchors.verticalCenter: parent.verticalCenter
                 down: taggingMenu.active
@@ -1144,7 +1145,7 @@ Rectangle {
 
                         VclMenuItem {
                             text: "None"
-                            icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                             font.bold: Scrite.document.structure.preferredGroupCategory === ""
                             onTriggered: Scrite.document.structure.preferredGroupCategory = ""
                         }
@@ -1156,7 +1157,7 @@ Rectangle {
 
                             VclMenuItem {
                                 text: Scrite.app.camelCased(modelData)
-                                icon.source: font.bold ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                                 font.bold: Scrite.document.structure.preferredGroupCategory === modelData
                                 onTriggered: Scrite.document.structure.preferredGroupCategory = modelData
                             }
@@ -1291,9 +1292,9 @@ Rectangle {
                 onEditingComplete: theElement.breakSubtitle = text
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: deleteBreakButton
-                iconSource: "../icons/action/delete.png"
+                iconSource: "qrc:/icons/action/delete.png"
                 width: headingFontMetrics.lineSpacing
                 height: headingFontMetrics.lineSpacing
                 anchors.verticalCenter: parent.verticalCenter
@@ -1349,9 +1350,9 @@ Rectangle {
                 onEditingComplete: theElement.breakSubtitle = text
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: deleteBreakButton
-                iconSource: "../icons/action/delete.png"
+                iconSource: "qrc:/icons/action/delete.png"
                 width: headingFontMetrics.lineSpacing
                 height: headingFontMetrics.lineSpacing
                 anchors.verticalCenter: parent.verticalCenter
@@ -1437,7 +1438,7 @@ Rectangle {
                 anchors.topMargin: 20 * zoomLevel
                 anchors.bottomMargin: 20 * zoomLevel
                 fillMode: Image.TileVertically
-                source: "../images/sample_scene.png"
+                source: "qrc:/images/sample_scene.png"
                 opacity: 0.5
                 visible: !parent.screenplayElement.omitted
             }
@@ -1631,10 +1632,10 @@ Rectangle {
                             mipmap: true
                             source: {
                                 if(hasSceneComments)
-                                    return "../icons/content/note.png"
+                                    return "qrc:/icons/content/note.png"
 
                                 if(sceneFeaturedImage)
-                                    return "../icons/filetype/photo.png"
+                                    return "qrc:/icons/filetype/photo.png"
 
                                 return ""
                             }
@@ -1648,8 +1649,8 @@ Rectangle {
                     Column {
                         spacing: 8
 
-                        ToolButton3 {
-                            iconSource: down ? "../icons/content/comments_panel_inverted.png" : "../icons/content/comments_panel.png"
+                        FlatToolButton {
+                            iconSource: down ? "qrc:/icons/content/comments_panel_inverted.png" : "qrc:/icons/content/comments_panel.png"
                             suggestedWidth: parent.width
                             suggestedHeight: parent.width
                             down: contentView.commentsPanelTabIndex === 0
@@ -1659,8 +1660,8 @@ Rectangle {
                             ToolTip.text: "View/edit scene comments."
                         }
 
-                        ToolButton3 {
-                            iconSource: down ? "../icons/filetype/photo_inverted.png" : "../icons/filetype/photo.png"
+                        FlatToolButton {
+                            iconSource: down ? "qrc:/icons/filetype/photo_inverted.png" : "qrc:/icons/filetype/photo.png"
                             suggestedWidth: parent.width
                             suggestedHeight: parent.width
                             down: contentView.commentsPanelTabIndex === 1
@@ -1702,7 +1703,7 @@ Rectangle {
                     enabled: Runtime.applicationSettings.enableAnimations
                     NumberAnimation { duration: 250 }
                 }
-                content: TabView3 {
+                content: TrapeziumTabView {
                     id: commentsSidePanelTabView
                     tabBarVisible: false
                     tabColor: commentsSidePanel.theSceneDarkColor
@@ -3109,9 +3110,9 @@ Rectangle {
                         }
                     }
 
-                    ToolButton3 {
+                    FlatToolButton {
                         id: sceneTaggingButton
-                        iconSource: "../icons/action/tag.png"
+                        iconSource: "qrc:/icons/action/tag.png"
                         visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
                         down: sceneTagMenuLoader.active
                         onClicked: sceneTagMenuLoader.show()
@@ -3141,9 +3142,9 @@ Rectangle {
                         }
                     }
 
-                    ToolButton3 {
+                    FlatToolButton {
                         id: sceneMenuButton
-                        iconSource: "../icons/navigation/menu.png"
+                        iconSource: "qrc:/icons/navigation/menu.png"
                         ToolTip.text: "Click here to view scene options menu."
                         ToolTip.delay: 1000
                         onClicked: sceneMenu.visible = true
@@ -3429,7 +3430,7 @@ Rectangle {
             }
 
             Image {
-                source: "../icons/content/add_box.png"
+                source: "qrc:/icons/content/add_box.png"
                 width: sceneCharactersListHeading.height
                 height: width
                 opacity: 0.5
@@ -3592,11 +3593,11 @@ Rectangle {
                                 icon.source: {
                                     switch(Runtime.sceneListPanelSettings.displaySceneLength) {
                                     case "TIME":
-                                        return "../icons/content/time.png"
+                                        return "qrc:/icons/content/time.png"
                                     case "PAGE":
-                                        return "../icons/content/page_count.png"
+                                        return "qrc:/icons/content/page_count.png"
                                     default:
-                                        return "../icons/content/view_options.png"
+                                        return "qrc:/icons/content/view_options.png"
                                     }
                                 }
                                 Layout.alignment: Qt.AlignVCenter
@@ -3616,7 +3617,7 @@ Rectangle {
                                             text: "Scene Duration"
 
                                             readonly property string option: "TIME"
-                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                                             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
                                             enabled: !Runtime.screenplayTextDocument.paused
                                         }
@@ -3625,7 +3626,7 @@ Rectangle {
                                             text: "Page Length"
 
                                             readonly property string option: "PAGE"
-                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                                             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
                                             enabled: !Runtime.screenplayTextDocument.paused
                                         }
@@ -3634,7 +3635,7 @@ Rectangle {
                                             text: "None"
 
                                             readonly property string option: "NO"
-                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                                             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
                                             enabled: !Runtime.screenplayTextDocument.paused
                                         }
@@ -4542,7 +4543,7 @@ Rectangle {
                 enabled: !Scrite.document.readOnly
 
                 SimpleToolButton {
-                    iconSource: "../icons/editor/format_bold.png"
+                    iconSource: "qrc:/icons/editor/format_bold.png"
                     enabled: markupTools.textFormat
                     checked: markupTools.textFormat ? markupTools.textFormat.bold : false
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleBold()
@@ -4553,7 +4554,7 @@ Rectangle {
                 }
 
                 SimpleToolButton {
-                    iconSource: "../icons/editor/format_italics.png"
+                    iconSource: "qrc:/icons/editor/format_italics.png"
                     checked: markupTools.textFormat ? markupTools.textFormat.italics : false
                     enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleItalics()
@@ -4564,7 +4565,7 @@ Rectangle {
                 }
 
                 SimpleToolButton {
-                    iconSource: "../icons/editor/format_underline.png"
+                    iconSource: "qrc:/icons/editor/format_underline.png"
                     checked: markupTools.textFormat ? markupTools.textFormat.underline : false
                     enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleUnderline()
@@ -4636,7 +4637,7 @@ Rectangle {
                 }
 
                 SimpleToolButton {
-                    iconSource: "../icons/editor/format_clear.png"
+                    iconSource: "qrc:/icons/editor/format_clear.png"
                     checked: false
                     enabled: markupTools.textFormat
                     onClicked: if(markupTools.textFormat) markupTools.textFormat.reset()
@@ -4653,7 +4654,7 @@ Rectangle {
                 }
 
                 SimpleToolButton {
-                    iconSource: "../icons/editor/format_align_left.png"
+                    iconSource: "qrc:/icons/editor/format_align_left.png"
                     checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignLeft : false
                     enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
                     anchors.verticalCenter: parent.verticalCenter
@@ -4661,7 +4662,7 @@ Rectangle {
                 }
 
                 SimpleToolButton {
-                    iconSource: "../icons/editor/format_align_center.png"
+                    iconSource: "qrc:/icons/editor/format_align_center.png"
                     checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignHCenter : false
                     enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
                     anchors.verticalCenter: parent.verticalCenter
@@ -4669,7 +4670,7 @@ Rectangle {
                 }
 
                 SimpleToolButton {
-                    iconSource: "../icons/editor/format_align_right.png"
+                    iconSource: "qrc:/icons/editor/format_align_right.png"
                     checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignRight : false
                     enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
                     anchors.verticalCenter: parent.verticalCenter
@@ -4763,7 +4764,7 @@ Rectangle {
             height: colorsGrid.cellSize
 
             Image {
-                source: "../icons/navigation/close.png"
+                source: "qrc:/icons/navigation/close.png"
                 anchors.fill: parent
                 anchors.margins: 5
                 mipmap: true

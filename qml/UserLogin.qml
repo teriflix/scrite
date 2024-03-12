@@ -21,6 +21,7 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: userLogin
@@ -777,7 +778,7 @@ Item {
                 }
 
                 Image {
-                    source: "../images/scrite_discord_button.png"
+                    source: "qrc:/images/scrite_discord_button.png"
                     height: parent.height
                     fillMode: Image.PreserveAspectFit
                     anchors.centerIn: parent
@@ -1028,9 +1029,9 @@ Item {
                             }
                         }
 
-                        ToolButton3 {
+                        FlatToolButton {
                             id: logoutButton
-                            iconSource: "../icons/action/logout.png"
+                            iconSource: "qrc:/icons/action/logout.png"
                             anchors.top: parent.top
                             anchors.right: parent.right
                             enabled: index !== Scrite.user.currentInstallationIndex

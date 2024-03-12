@@ -141,20 +141,20 @@ Rectangle {
             width: toolButtonSize
             anchors.horizontalCenter: parent.horizontalCenter
 
-            ToolButton3 {
+            FlatToolButton {
                 id: structureTabButton
                 visible: mainScriteDocumentView.showNotebookInStructure
-                iconSource: "../icons/navigation/structure_tab.png"
+                iconSource: "qrc:/icons/navigation/structure_tab.png"
                 ToolTip.text: "Structure Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: notebookTabButton
                 visible: mainScriteDocumentView.showNotebookInStructure
-                iconSource: "../icons/navigation/notebook_tab.png"
+                iconSource: "qrc:/icons/navigation/notebook_tab.png"
                 down: true
                 ToolTip.text: "Notebook\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                 suggestedWidth: toolButtonSize
@@ -168,9 +168,9 @@ Rectangle {
                 opacity: 0.5
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 checkable: true
-                iconSource: "../icons/navigation/sync.png"
+                iconSource: "qrc:/icons/navigation/sync.png"
                 ToolTip.text: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
                 checked: Runtime.workspaceSettings.syncCurrentSceneOnNotebook
                 onToggled: {
@@ -182,18 +182,18 @@ Rectangle {
                 suggestedHeight: toolButtonSize
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: refreshButton
-                iconSource: "../icons/navigation/refresh.png"
+                iconSource: "qrc:/icons/navigation/refresh.png"
                 ToolTip.text: "Reloads the the notebook tree."
                 onClicked: notebookModel.refresh()
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: pdfExportButton
-                iconSource: "../icons/file/generate_pdf.png"
+                iconSource: "qrc:/icons/file/generate_pdf.png"
                 ToolTip.text: notebookContentLoader.reportDescription
                 onClicked: notebookContentLoader.generateReport()
                 suggestedWidth: toolButtonSize
@@ -208,9 +208,9 @@ Rectangle {
                 opacity: 0.5
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: newNoteToolButton
-                iconSource: "../icons/action/note_add.png"
+                iconSource: "qrc:/icons/action/note_add.png"
                 hasMenu: true
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
@@ -236,7 +236,7 @@ Rectangle {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: noteColorButton
                 property Character character: notebookTree.currentCharacter
                 property Note note: notebookTree.currentNote
@@ -271,7 +271,7 @@ Rectangle {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: bookmarkButton
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
@@ -285,9 +285,9 @@ Rectangle {
                 }
                 function updateIcon() {
                     if(enabled && notebookModel.bookmarkedNotes.isBookmarked(notebookObject))
-                        iconSource = "../icons/content/bookmark.png"
+                        iconSource = "qrc:/icons/content/bookmark.png"
                     else
-                        iconSource = "../icons/content/bookmark_outline.png"
+                        iconSource = "qrc:/icons/content/bookmark_outline.png"
                 }
 
                 shortcut: "Ctrl+D"
@@ -297,13 +297,13 @@ Rectangle {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: deleteNoteButton
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
                 enabled: (noteColorButton.note || noteColorButton.character) && !Scrite.document.readOnly
                 ToolTip.text: "Delete the current note or character"
-                iconSource: "../icons/action/delete.png"
+                iconSource: "qrc:/icons/action/delete.png"
                 onClicked: notebookContentLoader.confirmAndDelete()
             }
         }
@@ -420,17 +420,17 @@ Rectangle {
                             source: {
                                 switch(styleData.value.notebookItemType) {
                                 case NotebookModel.EpisodeBreakType:
-                                    return "../icons/content/episode.png"
+                                    return "qrc:/icons/content/episode.png"
                                 case NotebookModel.ActBreakType:
-                                    return "../icons/content/act.png"
+                                    return "qrc:/icons/content/act.png"
                                 case NotebookModel.NotesType:
                                     switch(styleData.value.notebookItemObject.ownerType) {
                                     case Notes.SceneOwner:
-                                        return "../icons/content/scene.png"
+                                        return "qrc:/icons/content/scene.png"
                                     case Notes.CharacterOwner:
-                                        return "../icons/content/person_outline.png"
+                                        return "qrc:/icons/content/person_outline.png"
                                     case Notes.BreakOwner:
-                                        return "../icons/content/story.png"
+                                        return "qrc:/icons/content/story.png"
                                     default:
                                         break
                                     }
@@ -438,11 +438,11 @@ Rectangle {
                                 case NotebookModel.NoteType:
                                     switch(styleData.value.notebookItemObject.type) {
                                     case Note.TextNoteType:
-                                        return "../icons/content/note.png"
+                                        return "qrc:/icons/content/note.png"
                                     case Note.FormNoteType:
-                                        return "../icons/content/form.png"
+                                        return "qrc:/icons/content/form.png"
                                     case Note.CheckListNoteType:
-                                        return "../icons/content/checklist.png"
+                                        return "qrc:/icons/content/checklist.png"
                                     default:
                                         break
                                     }
@@ -849,27 +849,27 @@ Rectangle {
                                         if(Scrite.app.typeName(noteObject) === "Notes") {
                                             switch(noteObject.ownerType) {
                                             case Notes.SceneOwner:
-                                                return "../icons/content/scene.png"
+                                                return "qrc:/icons/content/scene.png"
                                             case Notes.CharacterOwner:
-                                                return "../icons/content/person_outline.png"
+                                                return "qrc:/icons/content/person_outline.png"
                                             case Notes.BreakOwner:
-                                                return "../icons/content/story.png"
+                                                return "qrc:/icons/content/story.png"
                                             default:
                                                 break
                                             }
                                         } else if(Scrite.app.typeName(noteObject) === "Character")
-                                            return "../icons/content/person_outline.png"
+                                            return "qrc:/icons/content/person_outline.png"
                                         else if(Scrite.app.typeName(noteObject) === "Note") {
                                             switch(styleData.value.notebookItemObject.type) {
                                             case Note.TextNoteType:
-                                                return "../icons/content/note.png"
+                                                return "qrc:/icons/content/note.png"
                                             case Note.FormNoteType:
-                                                return "../icons/content/form.png"
+                                                return "qrc:/icons/content/form.png"
                                             default:
                                                 break
                                             }
                                         }
-                                        return "../icons/content/bookmark.png"
+                                        return "qrc:/icons/content/bookmark.png"
                                     }
                                 }
 
@@ -1079,7 +1079,7 @@ Rectangle {
                             }
 
                             Image {
-                                source: "../icons/content/add_box.png"
+                                source: "qrc:/icons/content/add_box.png"
                                 width: sceneCharactersListHeading.height
                                 height: width
                                 opacity: 0.5
@@ -1098,7 +1098,7 @@ Rectangle {
                             }
                         }
 
-                        TabView3 {
+                        TrapeziumTabView {
                             id: synopsisContentTabView
                             tabNames: ["Synopsis", "Featured Photo"]
                             tabColor: scene.color
@@ -1424,11 +1424,11 @@ Rectangle {
                             }
                         }
 
-                        ToolButton3 {
+                        FlatToolButton {
                             id: newNoteButton
                             anchors.centerIn: parent
                             ToolTip.text: "Add a new text or form note."
-                            iconSource: "../icons/action/note_add.png"
+                            iconSource: "qrc:/icons/action/note_add.png"
                             down: newNoteMenu.visible
                             onClicked: {
                                 newNoteMenu.notes = notesSummary.notes
@@ -1892,11 +1892,11 @@ Rectangle {
                         }
                     }
 
-                    ToolButton3 {
+                    FlatToolButton {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.rightMargin: titlePageFlickable.vscrollBarRequired ? 20 : 0
-                        iconSource: "../icons/action/edit_title_page.png"
+                        iconSource: "qrc:/icons/action/edit_title_page.png"
                         onClicked: {
                             modalDialog.arguments = {"activeTabIndex": 2}
                             modalDialog.popupSource = this
@@ -2153,7 +2153,7 @@ Rectangle {
                                         source: {
                                             if(character.hasKeyPhoto > 0)
                                                 return "file:///" + character.keyPhoto
-                                            return "../icons/content/character_icon.png"
+                                            return "qrc:/icons/content/character_icon.png"
                                         }
                                         fillMode: Image.PreserveAspectCrop
                                         mipmap: true; smooth: true
@@ -2248,9 +2248,9 @@ Rectangle {
                                         onReturnPressed: characterAddButton.click()
                                     }
 
-                                    ToolButton3 {
+                                    FlatToolButton {
                                         id: characterAddButton
-                                        iconSource: "../icons/content/person_add.png"
+                                        iconSource: "qrc:/icons/content/person_add.png"
                                         ToolTip.text: "Add Character"
                                         onClicked: {
                                             var chName = characterNameField.text
@@ -2512,29 +2512,29 @@ Rectangle {
                                                 }
                                             }
 
-                                            ToolButton3 {
+                                            FlatToolButton {
                                                 anchors.verticalCenter: photoSlides.verticalCenter
                                                 anchors.left: parent.left
                                                 anchors.leftMargin: parent.fillWidth ? 0 : -width
-                                                iconSource: parent.fillWidth ? "../icons/navigation/arrow_left_inverted.png" : "../icons/navigation/arrow_left.png"
+                                                iconSource: parent.fillWidth ? "qrc:/icons/navigation/arrow_left_inverted.png" : "qrc:/icons/navigation/arrow_left.png"
                                                 enabled: photoSlides.currentIndex > 0
                                                 onClicked: photoSlides.currentIndex = Math.max(photoSlides.currentIndex-1, 0)
                                             }
 
-                                            ToolButton3 {
+                                            FlatToolButton {
                                                 anchors.verticalCenter: photoSlides.verticalCenter
                                                 anchors.right: parent.right
                                                 anchors.rightMargin: parent.fillWidth ? 0 : -width
-                                                iconSource: parent.fillWidth ? "../icons/navigation/arrow_right_inverted.png" : "../icons/navigation/arrow_right.png"
+                                                iconSource: parent.fillWidth ? "qrc:/icons/navigation/arrow_right_inverted.png" : "qrc:/icons/navigation/arrow_right.png"
                                                 enabled: photoSlides.currentIndex < photoSlides.count-1
                                                 onClicked: photoSlides.currentIndex = Math.min(photoSlides.currentIndex+1, photoSlides.count-1)
                                             }
 
-                                            ToolButton3 {
+                                            FlatToolButton {
                                                 anchors.top: parent.top
                                                 anchors.right: parent.right
                                                 anchors.rightMargin: parent.fillWidth ? 0 : -width
-                                                iconSource: parent.fillWidth ? "../icons/action/delete_inverted.png" : "../icons/action/delete.png"
+                                                iconSource: parent.fillWidth ? "qrc:/icons/action/delete_inverted.png" : "qrc:/icons/action/delete.png"
                                                 visible: photoSlides.currentIndex < photoSlides.count-1
                                                 onClicked: {
                                                     var ci = photoSlides.currentIndex
@@ -2543,11 +2543,11 @@ Rectangle {
                                                 }
                                             }
 
-                                            ToolButton3 {
+                                            FlatToolButton {
                                                 anchors.top: parent.top
                                                 anchors.left: parent.left
                                                 anchors.leftMargin: parent.fillWidth ? 0 : -width
-                                                iconSource: parent.fillWidth ? "../icons/action/pin_inverted.png" : "../icons/action/pin.png"
+                                                iconSource: parent.fillWidth ? "qrc:/icons/action/pin_inverted.png" : "qrc:/icons/action/pin.png"
                                                 down: photoSlides.currentIndex === character.keyPhotoIndex
                                                 onClicked: {
                                                     if(photoSlides.currentIndex === character.keyPhotoIndex)
@@ -3036,7 +3036,7 @@ Rectangle {
 
                                     Image {
                                         width: 24; height: 24
-                                        source: "../icons/navigation/check.png"
+                                        source: "qrc:/icons/navigation/check.png"
                                         anchors.verticalCenter: parent.verticalCenter
                                         opacity: relationshipName.length > 0 ? 1 : 0.05
                                     }

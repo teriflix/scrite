@@ -46,7 +46,7 @@ Item {
     }
 
     BorderImage {
-        source: "../icons/content/shadow.png"
+        source: "qrc:/icons/content/shadow.png"
         anchors.fill: panelBackground
         horizontalTileMode: BorderImage.Stretch
         verticalTileMode: BorderImage.Stretch
@@ -146,7 +146,7 @@ Item {
                 width: parent.width
                 height: width
                 anchors.centerIn: parent
-                source: sidePanel.expanded ? "../icons/navigation/arrow_left.png" : "../icons/navigation/arrow_right.png"
+                source: sidePanel.expanded ? "qrc:/icons/navigation/arrow_left.png" : "qrc:/icons/navigation/arrow_right.png"
                 fillMode: Image.PreserveAspectFit
             }
 

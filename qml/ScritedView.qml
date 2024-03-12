@@ -272,16 +272,16 @@ Item {
                         width: Math.max(Math.min(videoOutput.width, videoOutput.height)*0.10, 80)
                         height: width
                         visible: mediaIsLoaded
-                        source: "../images/appicon.png"
+                        source: "qrc:/images/appicon.png"
                         smooth: true; mipmap: true
                         fillMode: Image.PreserveAspectFit
                     }
 
-                    ToolButton3 {
+                    FlatToolButton {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.margins: 4
-                        iconSource: "../icons/navigation/arrow_up_inverted.png"
+                        iconSource: "qrc:/icons/navigation/arrow_up_inverted.png"
                         visible: !mediaIsLoaded
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
@@ -414,7 +414,7 @@ Item {
                                 width: parent.width
 
                                 VclToolButton {
-                                    icon.source: "../icons/mediaplayer/movie_inverted.png"
+                                    icon.source: "qrc:/icons/mediaplayer/movie_inverted.png"
                                     onClicked: fileDialog.open()
                                     suggestedHeight: 36
                                     ToolTip.text: "Load a video file for this screenplay."
@@ -425,8 +425,8 @@ Item {
                                 VclToolButton {
                                     icon.source: {
                                         if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
-                                            return "../icons/mediaplayer/pause_inverted.png"
-                                        return "../icons/mediaplayer/play_arrow_inverted.png"
+                                            return "qrc:/icons/mediaplayer/pause_inverted.png"
+                                        return "qrc:/icons/mediaplayer/play_arrow_inverted.png"
                                     }
                                     onClicked: mediaPlayer.togglePlayback()
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia
@@ -460,7 +460,7 @@ Item {
                                 }
 
                                 VclToolButton {
-                                    icon.source: "../icons/mediaplayer/rewind_10_inverted.png"
+                                    icon.source: "qrc:/icons/mediaplayer/rewind_10_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position > 0
                                     suggestedHeight: 36
                                     onClicked: rewind()
@@ -469,7 +469,7 @@ Item {
                                 }
 
                                 VclToolButton {
-                                    icon.source: "../icons/mediaplayer/forward_10_inverted.png"
+                                    icon.source: "qrc:/icons/mediaplayer/forward_10_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position < mediaPlayer.duration
                                     suggestedHeight: 36
                                     onClicked: forward()
@@ -478,7 +478,7 @@ Item {
                                 }
 
                                 VclToolButton {
-                                    icon.source: "../icons/navigation/zoom_fit_inverted.png"
+                                    icon.source: "qrc:/icons/navigation/zoom_fit_inverted.png"
                                     enabled: mediaPlayer.status !== MediaPlayer.NoMedia
                                     suggestedHeight: 36
                                     onClicked: {
@@ -601,7 +601,7 @@ Item {
 
                             Image {
                                 anchors.fill: parent
-                                source: "../images/white-paper-texture.jpg"
+                                source: "qrc:/images/white-paper-texture.jpg"
                                 fillMode: Image.TileVertically
                             }
                         }
@@ -783,12 +783,12 @@ Item {
                         }
                     }
 
-                    ToolButton3 {
+                    FlatToolButton {
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.topMargin: 4
                         anchors.rightMargin: textDocumentScrollBar.width + 4
-                        iconSource: "../icons/navigation/arrow_down.png"
+                        iconSource: "qrc:/icons/navigation/arrow_down.png"
                         visible: !videoArea.visible
                         enabled: visible
                         opacity: hovered ? 1 : 0.5
@@ -1086,7 +1086,7 @@ Item {
                     height: width
                     anchors.centerIn: parent
                     mipmap: true
-                    source: "../images/scrited_closing_frame.png"
+                    source: "qrc:/images/scrited_closing_frame.png"
                 }
 
                 Image {
@@ -1244,7 +1244,7 @@ Item {
                         height: parent.height
 
                         Image {
-                            source: arrayItem.locked ? "../icons/action/lock_outline.png" : "../icons/action/lock_open.png"
+                            source: arrayItem.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
                             anchors.fill: parent
                             fillMode: Image.PreserveAspectFit
                             anchors.margins: 5

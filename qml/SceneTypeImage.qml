@@ -25,9 +25,9 @@ Image {
     mipmap: true
     source: {
         switch(sceneType) {
-        case Scene.Song: return lightBackground ? "../icons/content/queue_mus24px.png" : "../icons/content/queue_mus24px_inverted.png"
-        case Scene.Action: return lightBackground ? "../icons/content/fight_scene.png" : "../icons/content/fight_scene_inverted.png"
-        case Scene.Montage: return lightBackground ? "../icons/content/camera_alt.png" : "../icons/content/camera_alt_inverted.png"
+        case Scene.Song: return lightBackground ? "qrc:/icons/content/queue_mus24px.png" : "qrc:/icons/content/queue_mus24px_inverted.png"
+        case Scene.Action: return lightBackground ? "qrc:/icons/content/fight_scene.png" : "qrc:/icons/content/fight_scene_inverted.png"
+        case Scene.Montage: return lightBackground ? "qrc:/icons/content/camera_alt.png" : "qrc:/icons/content/camera_alt_inverted.png"
         default: break
         }
         return ""

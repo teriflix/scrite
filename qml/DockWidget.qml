@@ -16,6 +16,7 @@ import QtQuick 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/components"
 
 Item {
     id: dockWidget
@@ -153,14 +154,14 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: closeButton
                 height: parent.height - 6
                 width: height
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: 4
-                iconSource: "../icons/navigation/close.png"
+                iconSource: "qrc:/icons/navigation/close.png"
                 onClicked: closeRequest()
             }
         }

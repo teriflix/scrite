@@ -22,6 +22,7 @@ import "qrc:/js/utils.js" as Utils
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: screenplayView
@@ -73,8 +74,8 @@ Item {
             flow: Flow.TopToBottom
             layoutDirection: Qt.RightToLeft
 
-            ToolButton3 {
-                iconSource: "../icons/content/clear_all.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/content/clear_all.png"
                 ToolTip.text: "Clear the screenplay, while retaining the scenes."
                 enabled: !Scrite.document.readOnly
                 onClicked: {
@@ -92,8 +93,8 @@ Item {
                 }
             }
 
-            ToolButton3 {
-                iconSource: "../icons/navigation/zoom_in.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/navigation/zoom_in.png"
                 ToolTip.text: "Increase size of blocks in this view."
                 onClicked: {
                     zoomLevel = Math.min(zoomLevel * 1.1, 4.0)
@@ -102,8 +103,8 @@ Item {
                 autoRepeat: true
             }
 
-            ToolButton3 {
-                iconSource: "../icons/navigation/zoom_out.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/navigation/zoom_out.png"
                 ToolTip.text: "Decrease size of blocks in this view."
                 onClicked: {
                     zoomLevel = Math.max(zoomLevel * 0.9, screenplayElementList.perElementWidth/screenplayElementList.minimumDelegateWidth)
@@ -597,7 +598,7 @@ Item {
                         anchors.margins: 10
                         anchors.horizontalCenter: parent.horizontalCenter
                         visible: isBreakElement
-                        source: isEpisodeBreak ? "../icons/content/episode_inverted.png" : "../icons/content/act_inverted.png"
+                        source: isEpisodeBreak ? "qrc:/icons/content/episode_inverted.png" : "qrc:/icons/content/act_inverted.png"
                         width: 24; height: 24
                     }
 
@@ -749,7 +750,7 @@ Item {
                         width: 24; height: 24
                         opacity: 0.4
                         sourceComponent: Image {
-                            source: "../icons/content/bookmark_outline.png"
+                            source: "qrc:/icons/content/bookmark_outline.png"
                         }
                     }
 
@@ -767,7 +768,7 @@ Item {
 
                     Image {
                         id: dragTriggerButton
-                        source: "../icons/action/view_array.png"
+                        source: "qrc:/icons/action/view_array.png"
                         width: 24; height: 24
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
@@ -806,7 +807,7 @@ Item {
                         anchors.margins: parent.width * 0.25
                         active: elementItemDelegate.element.omitted
                         sourceComponent: Image {
-                            source: "../icons/content/omitted_scene.png"
+                            source: "qrc:/icons/content/omitted_scene.png"
                             fillMode: Image.PreserveAspectFit
                         }
                     }

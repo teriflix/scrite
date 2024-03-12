@@ -19,9 +19,10 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./qml" as UI
-import "./qml/controls"
-import "./qml/globals"
+import "qrc:/qml" as UI
+import "qrc:/qml/controls"
+import "qrc:/qml/globals"
+import "qrc:/qml/components"
 
 Rectangle {
     id: mainWindow
@@ -352,7 +353,7 @@ Rectangle {
                 width: Math.min(parent.width * 0.4, implicitWidth)
                 property real maxWidth: parent.width*0.4
 
-                UI.BusyIcon {
+                BusyIcon {
                     id: busyIndicator
                     anchors.verticalCenter: parent.verticalCenter
                     running: true

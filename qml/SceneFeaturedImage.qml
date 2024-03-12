@@ -49,7 +49,7 @@ Item {
         mipmap: sceneFeaturedPhotoItem.mipmap
 
         RoundButton {
-            icon.source: parent.fillMode === Image.PreserveAspectCrop ? "../icons/navigation/zoom_fit.png" : "../icons/navigation/zoom_one.png"
+            icon.source: parent.fillMode === Image.PreserveAspectCrop ? "qrc:/icons/navigation/zoom_fit.png" : "qrc:/icons/navigation/zoom_one.png"
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.margins: 5
@@ -69,7 +69,7 @@ Item {
         }
 
         RoundButton {
-            icon.source: "../icons/action/delete.png"
+            icon.source: "qrc:/icons/action/delete.png"
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 5

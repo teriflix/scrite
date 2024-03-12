@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     width: 640
@@ -132,10 +133,10 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        ToolButton3 {
+                        FlatToolButton {
                             id: deleteIcon
                             opacity: delegateMouseArea.containsMouse || containsMouse ? (enabled ? 1 : 0.5) : 0
-                            iconSource: "../icons/action/close.png"
+                            iconSource: "qrc:/icons/action/close.png"
                             anchors.verticalCenter: parent.verticalCenter
                             onClicked: Scrite.document.removeCollaborator(collaboratorEmail)
                             enabled: Scrite.document.canModifyCollaborators
@@ -173,9 +174,9 @@ Item {
                         }
                     }
 
-                    ToolButton3 {
+                    FlatToolButton {
                         id: addCollaboratorButton
-                        iconSource: "../icons/content/add_box.png"
+                        iconSource: "qrc:/icons/content/add_box.png"
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: newCollaboratorEmail.addCollaborator()
                         enabled: newCollaboratorEmail.acceptableInput

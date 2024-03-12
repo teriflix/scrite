@@ -1,4 +1,14 @@
 AttachmentsDropArea 1.0 AttachmentsDropArea.qml
+AttachmentsView 1.0 AttachmentsView.qml
+BoxShadow 1.0 BoxShadow.qml
+BusyIcon 1.0 BusyIcon.qml
+BusyOverlay 1.0 BusyOverlay.qml
+CheckListView 1.0 CheckListView.qml
+FlatToolButton 1.0 FlatToolButton.qml
 MenuLoader 1.0 MenuLoader.qml
+RectangleTabView 1.0 RectangleTabView.qml
+SpecialSymbolsSupport 1.0 SpecialSymbolsSupport.qml
 SpellingSuggestionsMenu 1.0 SpellingSuggestionsMenu.qml
+TextAreaInput 1.0 TextAreaInput.qml
 TextAreaSpellingSuggestionsMenu 1.0 TextAreaSpellingSuggestionsMenu.qml
+TrapeziumTabView 1.0 TrapeziumTabView.qml

@@ -16,6 +16,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/qml/components"
+
 Row {
     id: zoomSliderBox
 
@@ -31,11 +33,11 @@ Row {
     signal zoomInRequest()
     signal sliderMoved()
 
-    ToolButton3 {
+    FlatToolButton {
         id: decrZoom
         suggestedWidth: parent.height
         suggestedHeight: parent.height
-        iconSource: "../icons/navigation/zoom_out.png"
+        iconSource: "qrc:/icons/navigation/zoom_out.png"
         autoRepeat: true
         ToolTip.text: "Zoom Out"
         anchors.verticalCenter: parent.verticalCenter
@@ -58,11 +60,11 @@ Row {
         onMoved: sliderMoved()
     }
 
-    ToolButton3 {
+    FlatToolButton {
         id: incrZoom
         suggestedWidth: parent.height
         suggestedHeight: parent.height
-        iconSource: "../icons/navigation/zoom_in.png"
+        iconSource: "qrc:/icons/navigation/zoom_in.png"
         autoRepeat: true
         ToolTip.text: "Zoom In"
         anchors.verticalCenter: parent.verticalCenter

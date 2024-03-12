@@ -19,6 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/components"
 
 Item {
     property bool animationsEnabled: Scrite.app.isWindowsPlatform ? !Scrite.app.isNotWindows10 : true
@@ -41,7 +42,7 @@ Item {
 
             Image {
                 id: splashImage
-                source: "../images/splash.jpg"
+                source: "qrc:/images/splash.jpg"
                 anchors.fill: parent
                 smooth: true
                 mipmap: true

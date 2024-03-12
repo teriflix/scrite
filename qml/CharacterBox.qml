@@ -50,7 +50,7 @@ Rectangle {
                 source: {
                     if(character.hasKeyPhoto)
                         return "file:///" + character.keyPhoto
-                    return "../icons/content/character_icon.png"
+                    return "qrc:/icons/content/character_icon.png"
                 }
                 fillMode: Image.PreserveAspectFit
                 mipmap: true; smooth: true

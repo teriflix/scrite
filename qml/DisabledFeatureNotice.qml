@@ -64,7 +64,7 @@ Rectangle {
 
             Image {
                 id: icon
-                source: "../images/feature_locked.png"
+                source: "qrc:/images/feature_locked.png"
                 width: 64; height: 64
                 asynchronous: false
                 fillMode: Image.PreserveAspectFit

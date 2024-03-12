@@ -67,7 +67,7 @@ Rectangle {
 
                     Image {
                         width: 24; height: 24
-                        source: "../icons/navigation/arrow_right.png"
+                        source: "qrc:/icons/navigation/arrow_right.png"
                         visible: pageList.currentIndex === index
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right

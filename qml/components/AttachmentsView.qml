@@ -46,7 +46,7 @@ ListView {
         border.color: Runtime.colors.primary.borderColor
         z: -1
 
-        Text {
+        Label {
             anchors.fill: parent
             anchors.margins: 10
             anchors.leftMargin: attachmentsView.delegateSize
@@ -77,7 +77,7 @@ ListView {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            Text {
+            Label {
                 id: ofnLabel
                 width: parent.width
                 elide: Text.ElideMiddle
@@ -112,8 +112,8 @@ ListView {
         width: attachmentsView.delegateSize
         height: attachmentsView.delegateSize
 
-        ToolButton3 {
-            iconSource: "../icons/action/attach_file.png"
+        FlatToolButton {
+            iconSource: "qrc:/icons/action/attach_file.png"
             anchors.centerIn: parent
             onClicked: if(!readonly) fileDialog.open()
             visible: !readonly

@@ -20,6 +20,7 @@ import "qrc:/js/utils.js" as Utils
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Rectangle {
     id: crGraphView
@@ -212,10 +213,10 @@ Rectangle {
                             height: 42
                             anchors.centerIn: parent
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 id: floatingRefreshButton
                                 onClicked: crGraph.reset()
-                                iconSource: "../icons/navigation/refresh.png"
+                                iconSource: "qrc:/icons/navigation/refresh.png"
                                 autoRepeat: true
                                 ToolTip.text: "Refresh"
                                 visible: !Scrite.document.readOnly && (crGraph.character ? crGraph.character === canvas.activeCharacter : true)
@@ -223,10 +224,10 @@ Rectangle {
                                 suggestedHeight: parent.height
                             }
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 id: floatingPdfExportButton
                                 onClicked: crGraphView.exportToPdf(floatingPdfExportButton)
-                                iconSource: "../icons/file/generate_pdf.png"
+                                iconSource: "qrc:/icons/file/generate_pdf.png"
                                 autoRepeat: true
                                 ToolTip.text: "Export to PDF"
                                 visible: !Scrite.document.readOnly && (crGraph.character ? crGraph.character === canvas.activeCharacter : true)
@@ -234,10 +235,10 @@ Rectangle {
                                 suggestedHeight: parent.height
                             }
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 id: floatingAddButton
                                 onClicked: { canvas.reloadIfDirty(); addNewRelationshipRequest(this) }
-                                iconSource: "../icons/content/add_circle_outline.png"
+                                iconSource: "qrc:/icons/content/add_circle_outline.png"
                                 autoRepeat: false
                                 ToolTip.text: "Add A New Relationship"
                                 enabled: visible
@@ -246,10 +247,10 @@ Rectangle {
                                 suggestedHeight: parent.height
                             }
 
-                            ToolButton3 {
+                            FlatToolButton {
                                 id: floatingDeleteButton
                                 onClicked: removeRelationshipConfirmation.active = true
-                                iconSource: "../icons/action/delete.png"
+                                iconSource: "qrc:/icons/action/delete.png"
                                 autoRepeat: false
                                 ToolTip.text: canvas.activeCharacter ? ("Remove relationship with " + canvas.activeCharacter.name) : "Remove Relationship"
                                 enabled: visible
@@ -370,8 +371,8 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
 
-            ToolButton3 {
-                iconSource: "../icons/hardware/mouse.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/hardware/mouse.png"
                 autoRepeat: false
                 ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
                 checkable: true
@@ -381,7 +382,7 @@ Rectangle {
                 suggestedHeight: parent.height
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 onClicked: {
                     canvas.reloadIfDirty()
                     var item = canvas.selectedNodeItem
@@ -390,16 +391,16 @@ Rectangle {
                     else
                         canvasScroll.zoomOneMiddleArea()
                 }
-                iconSource: "../icons/navigation/zoom_one.png"
+                iconSource: "qrc:/icons/navigation/zoom_one.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom One"
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 onClicked: { canvas.reloadIfDirty(); canvas.zoomFit() }
-                iconSource: "../icons/navigation/zoom_fit.png"
+                iconSource: "qrc:/icons/navigation/zoom_fit.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Fit"
                 suggestedWidth: parent.height
@@ -501,7 +502,7 @@ Rectangle {
                                 source: {
                                     if(ofCharacter.hasKeyPhoto > 0)
                                         return "file:///" + ofCharacter.keyPhoto
-                                    return "../icons/content/character_icon.png"
+                                    return "qrc:/icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
                                 mipmap: true; smooth: true
@@ -551,7 +552,7 @@ Rectangle {
                                 source: {
                                     if(withCharacter.hasKeyPhoto > 0)
                                         return "file:///" + withCharacter.keyPhoto
-                                    return "../icons/content/character_icon.png"
+                                    return "qrc:/icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
                                 mipmap: true; smooth: true
@@ -636,7 +637,7 @@ Rectangle {
                 source: {
                     if(character.hasKeyPhoto > 0)
                         return "file:///" + character.keyPhoto
-                    return "../icons/content/character_icon.png"
+                    return "qrc:/icons/content/character_icon.png"
                 }
                 fillMode: Image.PreserveAspectCrop
                 mipmap: true; smooth: true

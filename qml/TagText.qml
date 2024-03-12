@@ -78,7 +78,7 @@ Rectangle {
             radius: height/2
 
             Image {
-                source: closeButtonMouseArea.pressed ? "../icons/navigation/close_inverted.png" : "../icons/navigation/close.png"
+                source: closeButtonMouseArea.pressed ? "qrc:/icons/navigation/close_inverted.png" : "qrc:/icons/navigation/close.png"
                 height: parent.height * 0.85; width: height
                 smooth: true
                 anchors.centerIn: parent

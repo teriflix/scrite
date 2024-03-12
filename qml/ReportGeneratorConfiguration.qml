@@ -23,9 +23,11 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: configurationBox
+
     property AbstractReportGenerator generator
     property var formInfo: {"title": "Unknown", "description": "", "groupedFields": []}
 
@@ -151,7 +153,7 @@ Item {
 
                                 Image {
                                     width: 24; height: 24
-                                    source: "../icons/navigation/arrow_right.png"
+                                    source: "qrc:/icons/navigation/arrow_right.png"
                                     visible: pageList.currentIndex === index
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.right: parent.right
@@ -465,7 +467,7 @@ Item {
                     }
 
                     Image {
-                        source: "../icons/content/add_box.png"
+                        source: "qrc:/icons/content/add_box.png"
                         width: charactersPrefix.height
                         height: charactersPrefix.height
                         opacity: 0.5
@@ -483,7 +485,7 @@ Item {
                     }
 
                     Image {
-                        source: "../icons/content/clear_all.png"
+                        source: "qrc:/icons/content/clear_all.png"
                         width: charactersPrefix.height
                         height: charactersPrefix.height
                         opacity: 0.5

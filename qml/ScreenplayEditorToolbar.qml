@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Row {
     id: screenplayEditorToolbar
@@ -34,18 +35,18 @@ Row {
     clip: true
 
     property var tools: [
-        { "value": SceneElement.Heading, "display": "Current Scene Heading", "icon": "../icons/screenplay/heading.png" },
-        { "value": SceneElement.Action, "display": "Action", "icon": "../icons/screenplay/action.png" },
-        { "value": SceneElement.Character, "display": "Character", "icon": "../icons/screenplay/character.png" },
-        { "value": SceneElement.Dialogue, "display": "Dialogue", "icon": "../icons/screenplay/dialogue.png" },
-        { "value": SceneElement.Parenthetical, "display": "Parenthetical", "icon": "../icons/screenplay/parenthetical.png" },
-        { "value": SceneElement.Shot, "display": "Shot", "icon": "../icons/screenplay/shot.png" },
-        { "value": SceneElement.Transition, "display": "Transition", "icon": "../icons/screenplay/transition.png" }
+        { "value": SceneElement.Heading, "display": "Current Scene Heading", "icon": "qrc:/icons/screenplay/heading.png" },
+        { "value": SceneElement.Action, "display": "Action", "icon": "qrc:/icons/screenplay/action.png" },
+        { "value": SceneElement.Character, "display": "Character", "icon": "qrc:/icons/screenplay/character.png" },
+        { "value": SceneElement.Dialogue, "display": "Dialogue", "icon": "qrc:/icons/screenplay/dialogue.png" },
+        { "value": SceneElement.Parenthetical, "display": "Parenthetical", "icon": "qrc:/icons/screenplay/parenthetical.png" },
+        { "value": SceneElement.Shot, "display": "Shot", "icon": "qrc:/icons/screenplay/shot.png" },
+        { "value": SceneElement.Transition, "display": "Transition", "icon": "qrc:/icons/screenplay/transition.png" }
     ]
 
-    ToolButton3 {
+    FlatToolButton {
         id: findButton
-        iconSource: "../icons/action/search.png"
+        iconSource: "qrc:/icons/action/search.png"
         shortcut: "Ctrl+F"
         ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         checkable: true
@@ -79,9 +80,9 @@ Row {
         ShortcutsModelItem.shortcut: sequence
     }
 
-    ToolButton3 {
+    FlatToolButton {
         id: screenplayViewOptions
-        iconSource: "../icons/content/view_options.png"
+        iconSource: "qrc:/icons/content/view_options.png"
         ToolTip.text: "Screenplay Editor Options"
         down: screenplayViewOptionsMenu.visible
         onClicked: screenplayViewOptionsMenu.open()
@@ -99,77 +100,77 @@ Row {
 
                 VclMenuItem {
                     text: "Show Logline Editor"
-                    icon.source: Runtime.screenplayEditorSettings.showLoglineEditor ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.showLoglineEditor ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.showLoglineEditor = !Runtime.screenplayEditorSettings.showLoglineEditor
                 }
 
                 VclMenuItem {
                     text: "Show Ruler"
-                    icon.source: Runtime.screenplayEditorSettings.displayRuler ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.displayRuler ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displayRuler = !Runtime.screenplayEditorSettings.displayRuler
                 }
 
                 VclMenuItem {
                     text: "Show Empty Title Card"
-                    icon.source: Runtime.screenplayEditorSettings.displayEmptyTitleCard ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.displayEmptyTitleCard ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displayEmptyTitleCard = !Runtime.screenplayEditorSettings.displayEmptyTitleCard
                 }
 
                 VclMenuItem {
                     text: "Show Add Scene Controls"
-                    icon.source: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displayAddSceneBreakButtons = !Runtime.screenplayEditorSettings.displayAddSceneBreakButtons
                 }
 
                 VclMenuItem {
                     text: "Show Scene Blocks"
                     property bool sceneBlocksVisible: Runtime.screenplayEditorSettings.spaceBetweenScenes > 0
-                    icon.source: sceneBlocksVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: sceneBlocksVisible ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.spaceBetweenScenes = sceneBlocksVisible ? 0 : 40
                 }
 
                 VclMenuItem {
                     text: "Show Markup Tools"
                     property bool toolsVisible: Runtime.screenplayEditorSettings.markupToolsDockVisible
-                    icon.source: toolsVisible ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: toolsVisible ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.markupToolsDockVisible = !toolsVisible
                 }
 
                 VclMenuItem {
                     text: "Show Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: Runtime.screenplayEditorSettings.displaySceneSynopsis && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.displaySceneSynopsis && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
                 }
 
                 VclMenuItem {
                     text: "Show Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: Runtime.screenplayEditorSettings.displaySceneComments && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.displaySceneComments && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
                 }
 
                 VclMenuItem {
                     text: "Show Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: Runtime.screenplayEditorSettings.displaySceneCharacters ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.displaySceneCharacters ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
                 }
 
                 VclMenuItem {
                     text: "Enable Tagging Of Scenes\t\t" +Scrite.app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
-                    icon.source: Runtime.screenplayEditorSettings.allowTaggingOfScenes && enabled ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                    icon.source: Runtime.screenplayEditorSettings.allowTaggingOfScenes && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
                 }
 
                 MenuSeparator {  }
 
                 VclMenuItem {
-                    icon.source: "../icons/content/blank.png"
+                    icon.source: "qrc:/icons/content/blank.png"
                     text: "Scan For Mute Characters"
                     onClicked: Scrite.document.structure.scanForMuteCharacters()
                     enabled: !Scrite.document.readOnly && Runtime.screenplayEditorSettings.displaySceneCharacters
                 }
 
                 VclMenuItem {
-                    icon.source: "../icons/content/blank.png"
+                    icon.source: "qrc:/icons/content/blank.png"
                     text: "Reset Scene Numbers"
                     onClicked: Scrite.document.screenplay.resetSceneNumbers()
                     enabled: !Scrite.document.readOnly
@@ -178,8 +179,8 @@ Row {
         }
     }
 
-    ToolButton3 {
-        iconSource: "../icons/navigation/refresh.png"
+    FlatToolButton {
+        iconSource: "qrc:/icons/navigation/refresh.png"
         shortcut: "F5"
         ToolTip.text: "Reloads formatting for this scene.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: binder ? true : false
@@ -243,8 +244,8 @@ Row {
             Scrite.document.screenplay.insertBreakElement(Screenplay.Episode, breakInsertIndex)
     }
 
-    ToolButton3 {
-        iconSource: "../icons/action/add_episode.png"
+    FlatToolButton {
+        iconSource: "qrc:/icons/action/add_episode.png"
         shortcut: "Ctrl+Shift+P"
         ToolTip.text: "Creates an episode break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !Scrite.document.readOnly
@@ -263,8 +264,8 @@ Row {
             Scrite.document.screenplay.insertBreakElement(Screenplay.Act, breakInsertIndex)
     }
 
-    ToolButton3 {
-        iconSource: "../icons/action/add_act.png"
+    FlatToolButton {
+        iconSource: "qrc:/icons/action/add_act.png"
         shortcut: "Ctrl+Shift+B"
         ToolTip.text: "Creates an act break after the current scene in the screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !Scrite.document.readOnly
@@ -281,8 +282,8 @@ Row {
             Scrite.document.createNewScene(Runtime.mainWindowTab !== Runtime.e_ScreenplayTab ? Runtime.undoStack.screenplayEditorActive : false)
     }
 
-    ToolButton3 {
-        iconSource: "../icons/action/add_scene.png"
+    FlatToolButton {
+        iconSource: "qrc:/icons/action/add_scene.png"
         shortcut: "Ctrl+Shift+N"
         ToolTip.text: "Creates a new scene and adds it to both structure and screenplay.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
         enabled: !Scrite.document.readOnly
@@ -332,7 +333,7 @@ Row {
     Repeater {
         model: screenplayEditorToolbar.tools
 
-        ToolButton3 {
+        FlatToolButton {
             iconSource: modelData.icon
             shortcut: "Ctrl+" + index
             ToolTip.visible: containsMouse

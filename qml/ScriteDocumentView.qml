@@ -381,16 +381,16 @@ Item {
 
             // spacing: scriteDocumentViewItem.width >= 1440 ? 2 : 0
 
-            ToolButton3 {
+            FlatToolButton {
                 id: homeButton
-                iconSource: "../icons/action/home.png"
+                iconSource: "qrc:/icons/action/home.png"
                 text: "Home"
                 onClicked: showHomeScreen()
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: backupOpenButton
-                iconSource: "../icons/file/backup_open.png"
+                iconSource: "qrc:/icons/file/backup_open.png"
                 text: "Open Backup"
                 visible: Scrite.document.backupFilesModel.count > 0
                 onClicked: {
@@ -415,9 +415,9 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: cmdSave
-                iconSource: "../icons/content/save.png"
+                iconSource: "qrc:/icons/content/save.png"
                 text: "Save"
                 shortcut: "Ctrl+S"
                 enabled: Scrite.document.modified && !Scrite.document.readOnly
@@ -429,10 +429,10 @@ Item {
                 ShortcutsModelItem.shortcut: shortcut
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: cmdExport
                 text: "Export to ..."
-                iconSource: "../icons/action/share.png"
+                iconSource: "qrc:/icons/action/share.png"
                 enabled: appToolsMenu.visible === false
                 onClicked: exportMenu.open()
                 down: exportMenu.visible
@@ -475,9 +475,9 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: cmdReports
-                iconSource: "../icons/reports/reports_menu_item.png"
+                iconSource: "qrc:/icons/reports/reports_menu_item.png"
                 ToolTip.text: "Reports"
                 checkable: false
                 checked: false
@@ -542,9 +542,9 @@ Item {
                 opacity: 0.5
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: settingsAndShortcutsButton
-                iconSource: "../icons/action/settings_applications.png"
+                iconSource: "qrc:/icons/action/settings_applications.png"
                 text: "Settings & Shortcuts"
                 down: settingsAndShortcutsMenu.visible
                 onClicked: settingsAndShortcutsMenu.visible = true
@@ -560,7 +560,7 @@ Item {
                         VclMenuItem {
                             id: settingsMenuItem
                             text: "Settings\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+,")
-                            icon.source: "../icons/action/settings_applications.png"
+                            icon.source: "qrc:/icons/action/settings_applications.png"
                             onClicked: activate()
                             enabled: appToolBar.visible
 
@@ -587,10 +587,10 @@ Item {
                             text: "Shortcuts\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+E")
                             icon.source: {
                                 if(Scrite.app.isMacOSPlatform)
-                                    return "../icons/navigation/shortcuts_macos.png"
+                                    return "qrc:/icons/navigation/shortcuts_macos.png"
                                 if(Scrite.app.isWindowsPlatform)
-                                    return "../icons/navigation/shortcuts_windows.png"
-                                return "../icons/navigation/shortcuts_linux.png"
+                                    return "qrc:/icons/navigation/shortcuts_windows.png"
+                                return "qrc:/icons/navigation/shortcuts_linux.png"
                             }
                             onClicked: activate()
                             enabled: appToolBar.visible
@@ -612,13 +612,13 @@ Item {
                         }
 
                         VclMenuItem {
-                            icon.source: "../icons/action/help.png"
+                            icon.source: "qrc:/icons/action/help.png"
                             text: "Help\t\tF1"
                             onClicked: Qt.openUrlExternally(helpUrl)
                         }
 
                         VclMenuItem {
-                            icon.source: "../icons/action/info.png"
+                            icon.source: "qrc:/icons/action/info.png"
                             text: "About"
                             onClicked: showAboutDialog()
 
@@ -644,7 +644,7 @@ Item {
 
                         VclMenuItem {
                             text: "Toggle Fullscreen\tF7"
-                            icon.source: "../icons/navigation/fullscreen.png"
+                            icon.source: "qrc:/icons/navigation/fullscreen.png"
                             onClicked: Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: "Toggle Fullscreen"
@@ -666,9 +666,9 @@ Item {
                 opacity: 0.5
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: languageToolButton
-                iconSource: "../icons/content/language.png"
+                iconSource: "qrc:/icons/content/language.png"
                 text: Scrite.app.transliterationEngine.languageAsString
                 shortcut: "Ctrl+L"
                 ToolTip.text: Scrite.app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
@@ -764,8 +764,8 @@ Item {
                 }
             }
 
-            ToolButton3 {
-                iconSource: down ? "../icons/hardware/keyboard_hide.png" : "../icons/hardware/keyboard.png"
+            FlatToolButton {
+                iconSource: down ? "qrc:/icons/hardware/keyboard_hide.png" : "qrc:/icons/hardware/keyboard.png"
                 ToolTip.text: "Show English to " + Scrite.app.transliterationEngine.languageAsString + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
                 shortcut: "Ctrl+K"
                 onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
@@ -847,9 +847,9 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             visible: !appToolBar.visible
 
-            ToolButton3 {
+            FlatToolButton {
                 text: "File"
-                iconSource: "../icons/navigation/menu.png"
+                iconSource: "qrc:/icons/navigation/menu.png"
                 onClicked: {
                     if(appFileMenu.active)
                         appFileMenu.close()
@@ -1043,10 +1043,10 @@ Item {
                 visible: appToolBar.visible
 
                 readonly property var tabs: [
-                    { "name": "Screenplay", "icon": "../icons/navigation/screenplay_tab.png", "visible": true, "tab": Runtime.e_ScreenplayTab },
-                    { "name": "Structure", "icon": "../icons/navigation/structure_tab.png", "visible": true, "tab": Runtime.e_StructureTab },
-                    { "name": "Notebook", "icon": "../icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure, "tab": Runtime.e_NotebookTab },
-                    { "name": "Scrited", "icon": "../icons/navigation/scrited_tab.png", "visible": Runtime.workspaceSettings.showScritedTab, "tab": Runtime.e_ScritedTab }
+                    { "name": "Screenplay", "icon": "qrc:/icons/navigation/screenplay_tab.png", "visible": true, "tab": Runtime.e_ScreenplayTab },
+                    { "name": "Structure", "icon": "qrc:/icons/navigation/structure_tab.png", "visible": true, "tab": Runtime.e_StructureTab },
+                    { "name": "Notebook", "icon": "qrc:/icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure, "tab": Runtime.e_NotebookTab },
+                    { "name": "Scrited", "icon": "qrc:/icons/navigation/scrited_tab.png", "visible": Runtime.workspaceSettings.showScritedTab, "tab": Runtime.e_ScritedTab }
                 ]
                 readonly property color activeTabColor: Runtime.colors.primary.windowColor
                 function indexOfTab(_Runtime_TabType) {
@@ -1703,18 +1703,18 @@ Item {
                                     Column {
                                         anchors.horizontalCenter: parent.horizontalCenter
 
-                                        ToolButton3 {
+                                        FlatToolButton {
                                             down: structureEditorTabs.currentTabIndex === 0
                                             visible: mainScriteDocumentView.showNotebookInStructure
-                                            iconSource: "../icons/navigation/structure_tab.png"
+                                            iconSource: "qrc:/icons/navigation/structure_tab.png"
                                             ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                                             onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
                                         }
 
-                                        ToolButton3 {
+                                        FlatToolButton {
                                             down: structureEditorTabs.currentTabIndex === 1
                                             visible: mainScriteDocumentView.showNotebookInStructure
-                                            iconSource: "../icons/navigation/notebook_tab.png"
+                                            iconSource: "qrc:/icons/navigation/notebook_tab.png"
                                             ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                                             onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                                         }

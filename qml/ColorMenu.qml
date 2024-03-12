@@ -47,7 +47,7 @@ VclMenu {
             }
 
             VclToolButton {
-                icon.source: "../icons/content/add_circle_outline.png"
+                icon.source: "qrc:/icons/content/add_circle_outline.png"
                 suggestedWidth: colorGrid.cellSize
                 suggestedHeight: colorGrid.cellSize
                 ToolTip.text: "Pick a custom color"

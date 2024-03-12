@@ -50,12 +50,12 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        source: "../images/banner.png"
+        source: "qrc:/images/banner.png"
         fillMode: Image.PreserveAspectFit
 
         Image {
             anchors.centerIn: parent
-            source: "../images/banner_logo_overlay.png"
+            source: "qrc:/images/banner_logo_overlay.png"
             width: homeScreen.width * 0.2
             fillMode: Image.PreserveAspectFit
             smooth: true; mipmap: true
@@ -324,7 +324,7 @@ Item {
 
                     LinkButton {
                         text: "Blank Document"
-                        iconSource: "../icons/filetype/document.png"
+                        iconSource: "qrc:/icons/filetype/document.png"
                         Layout.fillWidth: true
                         tooltip: "Creates a new blank Scrite document."
                         onClicked: {
@@ -380,7 +380,7 @@ Item {
     component OpenFileOptions : ColumnLayout {
         LinkButton {
             text: "Open ..."
-            iconSource: "../icons/file/folder_open.png"
+            iconSource: "qrc:/icons/file/folder_open.png"
             Layout.fillWidth: true
             tooltip: "Launches a file dialog box so you can select a .scrite file to load from disk."
             onClicked: {
@@ -392,7 +392,7 @@ Item {
 
         LinkButton {
             text: Runtime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
-            iconSource: Runtime.recentFiles.count === 0 ? "../icons/filetype/document.png" : "../icons/action/library.png"
+            iconSource: Runtime.recentFiles.count === 0 ? "qrc:/icons/filetype/document.png" : "qrc:/icons/action/library.png"
             Layout.fillWidth: true
             tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
             onClicked: stackView.push(scriptalayPage)
@@ -417,7 +417,7 @@ Item {
             width: ListView.view.width
             text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
             tooltip: fileInfo.logline
-            iconSource: fileInfo.hasCoverPage ? "" : "../icons/filetype/document.png"
+            iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
             onClicked: {
                 saveWorkflow.launch( () => {
@@ -492,7 +492,7 @@ Item {
         LinkButton {
             text: "Recover ..."
             tooltip: "Open cached files from your private on-disk vault."
-            iconSource: "../icons/file/backup_open.png"
+            iconSource: "qrc:/icons/file/backup_open.png"
             Layout.fillWidth: true
             onClicked: stackView.push(vaultPage)
         }
@@ -500,7 +500,7 @@ Item {
         LinkButton {
             text: "Import ..."
             tooltip: "Import a screenplay from Final Draft, Fountain or HTML formats."
-            iconSource: "../icons/file/import_export.png"
+            iconSource: "qrc:/icons/file/import_export.png"
             Layout.fillWidth: true
             onClicked: stackView.push(importPage)
         }
@@ -649,7 +649,7 @@ Item {
 
                 singleClick: false
                 iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
-                iconSource: fileInfo.hasCoverPage ? "" : "../icons/filetype/document.png"
+                iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
                 text: "<b>" + fileInfo.title + "</b> (" + fileInfo.sceneCount + (fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")<br/>" +
                       "<font size=\"-1\">" + fileSizeInfo + ", " + relativeTime + " on " + timestampAsString + "</font>"
                 property string fileSizeInfo: {
@@ -904,7 +904,7 @@ Item {
             title: Item {
                 Image {
                     anchors.centerIn: parent
-                    source: "../images/library.png"
+                    source: "qrc:/images/library.png"
                     height: 36
                     fillMode: Image.PreserveAspectFit
                 }

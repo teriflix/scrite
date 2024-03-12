@@ -25,37 +25,27 @@
         <file>qml/SearchBar.qml</file>
         <file>qml/Selection.qml</file>
         <file>qml/StructureView.qml</file>
-        <file>qml/TabBarTab.qml</file>
         <file>qml/TagText.qml</file>
-        <file>qml/TextAreaInput.qml</file>
         <file>qml/TextViewEdit.qml</file>
-        <file>qml/ToolButton3.qml</file>
         <file>qml/PageNumberBubble.qml</file>
         <file>qml/ZoomSlider.qml</file>
         <file>qml/SceneTypeImage.qml</file>
         <file>qml/SplashScreen.qml</file>
-        <file>qml/BoxShadow.qml</file>
         <file>qml/FileSelector.qml</file>
         <file>qml/SidePanel.qml</file>
         <file>qml/ShortcutsView.qml</file>
         <file>qml/DockWidget.qml</file>
-        <file>qml/SpecialSymbolsPanel.qml</file>
-        <file>qml/SpecialSymbolsSupport.qml</file>
-        <file>qml/TabView2.qml</file>
         <file>qml/PageView.qml</file>
         <file>qml/AnnotationPropertyEditor.qml</file>
         <file>qml/AnnotationItem.qml</file>
         <file>qml/CharacterRelationshipsGraphView.qml</file>
         <file>qml/CharacterBox.qml</file>
-        <file>qml/TabView3.qml</file>
         <file>qml/ScritedView.qml</file>
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
-        <file>qml/BusyOverlay.qml</file>
         <file>qml/LodLoader.qml</file>
         <file>qml/MarkSceneAsMenu.qml</file>
         <file>qml/BackupsDialogBox.qml</file>
-        <file>qml/AttachmentsView.qml</file>
         <file>qml/FlickableTextArea.qml</file>
         <file>qml/TextTabBar.qml</file>
         <file>qml/FormField.qml</file>
@@ -69,13 +59,11 @@
         <file>qml/CollaboratorsDialog.qml</file>
         <file>qml/RenameCharacterDialog.qml</file>
         <file>qml/PdfView.qml</file>
-        <file>qml/BusyIcon.qml</file>
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
         <file>qml/RichTextEdit.qml</file>
         <file>qml/HelpTipNotification.qml</file>
         <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
-        <file>qml/CheckListView.qml</file>
         <file>qml/HomeScreen.qml</file>
         <file>qml/SaveWorkflow.qml</file>
         <file>qml/globals/qmldir</file>
@@ -99,5 +87,15 @@
         <file>qml/components/MenuLoader.qml</file>
         <file>qml/components/SpellingSuggestionsMenu.qml</file>
         <file>qml/components/TextAreaSpellingSuggestionsMenu.qml</file>
+        <file>qml/components/RectangleTabView.qml</file>
+        <file>qml/components/TrapeziumTabView.qml</file>
+        <file>qml/components/AttachmentsView.qml</file>
+        <file>qml/components/FlatToolButton.qml</file>
+        <file>qml/components/BoxShadow.qml</file>
+        <file>qml/components/BusyIcon.qml</file>
+        <file>qml/components/BusyOverlay.qml</file>
+        <file>qml/components/CheckListView.qml</file>
+        <file>qml/components/TextAreaInput.qml</file>
+        <file>qml/components/SpecialSymbolsSupport.qml</file>
     </qresource>
 </RCC>

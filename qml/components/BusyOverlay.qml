@@ -53,7 +53,7 @@ Rectangle {
             forDarkBackground: true
         }
 
-        Text {
+        Label {
             width: parent.width
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             horizontalAlignment: Text.AlignHCenter

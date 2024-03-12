@@ -48,18 +48,18 @@ Item {
             layoutDirection: Qt.RightToLeft
             property real columnWidth: structureTabButton.width
 
-            ToolButton3 {
+            FlatToolButton {
                 id: structureTabButton
                 visible: mainScriteDocumentView.showNotebookInStructure
-                iconSource: "../icons/navigation/structure_tab.png"
+                iconSource: "qrc:/icons/navigation/structure_tab.png"
                 down: true
                 ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: notebookTabButton
                 visible: mainScriteDocumentView.showNotebookInStructure
-                iconSource: "../icons/navigation/notebook_tab.png"
+                iconSource: "qrc:/icons/navigation/notebook_tab.png"
                 ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
             }
@@ -71,12 +71,12 @@ Item {
                 opacity: 0.5
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: newSceneButton
                 down: newSceneMenu.visible
                 enabled: !Scrite.document.readOnly
                 onClicked: newSceneMenu.open()
-                iconSource: "../icons/action/add_scene.png"
+                iconSource: "qrc:/icons/action/add_scene.png"
                 ToolTip.text: "Add Scene"
                 hasMenu: true
                 property color activeColor: "white"
@@ -111,12 +111,12 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: newAnnotationButton
                 down: newAnnotationMenu.visible
                 enabled: !Scrite.document.readOnly
                 onClicked: newAnnotationMenu.open()
-                iconSource: "../icons/action/add_annotation.png"
+                iconSource: "qrc:/icons/action/add_annotation.png"
                 ToolTip.text: "Add Annotation"
                 hasMenu: true
 
@@ -152,25 +152,25 @@ Item {
                 opacity: 0.5
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: selectionModeButton
                 enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2)
-                iconSource: "../icons/action/selection_drag.png"
+                iconSource: "qrc:/icons/action/selection_drag.png"
                 ToolTip.text: "Selection mode"
                 checkable: true
                 onClicked: selection.layout(Structure.HorizontalLayout)
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 enabled: !Scrite.document.readOnly && Scrite.document.structure.elementCount >= 2
-                iconSource: "../icons/content/select_all.png"
+                iconSource: "qrc:/icons/content/select_all.png"
                 ToolTip.text: "Select All"
                 onClicked: selection.init(elementItems, canvasItemsBoundingBox.boundingBox, true)
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
-                iconSource: "../icons/action/layout_options.png"
+                iconSource: "qrc:/icons/action/layout_options.png"
                 ToolTip.text: "Layout Options"
                 down: layoutOptionsMenu.visible
                 onClicked: layoutOptionsMenu.visible = true
@@ -185,25 +185,25 @@ Item {
                         width: 250
 
                         VclMenuItem {
-                            icon.source: "../icons/action/layout_horizontally.png"
+                            icon.source: "qrc:/icons/action/layout_horizontally.png"
                             text: "Layout Horizontally"
                             onClicked: selection.layout(Structure.HorizontalLayout)
                         }
 
                         VclMenuItem {
-                            icon.source: "../icons/action/layout_vertically.png"
+                            icon.source: "qrc:/icons/action/layout_vertically.png"
                             text: "Layout Vertically"
                             onClicked: selection.layout(Structure.VerticalLayout)
                         }
 
                         VclMenuItem {
-                            icon.source: "../icons/action/layout_flow_horizontally.png"
+                            icon.source: "qrc:/icons/action/layout_flow_horizontally.png"
                             text: "Flow Horizontally"
                             onClicked: selection.layout(Structure.FlowHorizontalLayout)
                         }
 
                         VclMenuItem {
-                            icon.source: "../icons/action/layout_flow_vertically.png"
+                            icon.source: "qrc:/icons/action/layout_flow_vertically.png"
                             text: "Flow Vertically"
                             onClicked: selection.layout(Structure.FlowVerticalLayout)
                         }
@@ -211,10 +211,10 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: beatBoardLayoutToolButton
                 enabled: !Scrite.document.readOnly
-                iconSource: "../icons/action/layout_beat_sheet.png"
+                iconSource: "qrc:/icons/action/layout_beat_sheet.png"
                 ToolTip.text: "Beat Board Layout"
                 checkable: true
                 checked: false
@@ -250,8 +250,8 @@ Item {
                 }
             }
 
-            ToolButton3 {
-                iconSource: "../icons/action/layout_grouping.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/action/layout_grouping.png"
                 ToolTip.text: "Grouping Options"
                 onClicked: layoutGroupingMenu.popup()
                 down: layoutGroupingMenu.visible
@@ -280,9 +280,9 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: tagMenuOption
-                iconSource: "../icons/action/tag.png"
+                iconSource: "qrc:/icons/action/tag.png"
                 enabled: (selection.hasItems || currentElementItemBinder.get !== null) && Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
                 ToolTip.text: {
                     if(selection.hasItems)
@@ -326,7 +326,7 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: changeColorOption
                 enabled: (selection.hasItems || currentElementItemBinder.get !== null)
                 property Scene scene: currentElementItemBinder.get ? currentElementItemBinder.get.element.scene :
@@ -358,7 +358,7 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: changeSceneTypeOption
                 enabled: changeColorOption.enabled
                 readonly property var sceneTypeModel: Scrite.app.enumerationModelForType("Scene", "Type")
@@ -367,7 +367,7 @@ Item {
                 property int sceneType: (scene && scene.type !== Scene.Standard) ? scene.type : Scene.Standard
                 iconSource: {
                     if(sceneType === Scene.Standard)
-                        return "../icons/content/standard_scene.png"
+                        return "qrc:/icons/content/standard_scene.png"
                     return sceneTypeModel[sceneType].icon
                 }
                 onClicked: sceneTypeMenuLoader.popup()
@@ -395,10 +395,10 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: deleteSceneOption
                 enabled: !selection.hasItems && currentElementItemBinder.get
-                iconSource: "../icons/action/delete.png"
+                iconSource: "qrc:/icons/action/delete.png"
                 ToolTip.text: enabled ? "Delete selected scene." : ""
                 onClicked: {
                     var element = currentElementItemBinder.get.element
@@ -416,9 +416,9 @@ Item {
                 opacity: 0.5
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 enabled: !selection.hasItems && (annotationGripLoader.active || currentElementItemBinder.get !== null)
-                iconSource: "../icons/content/content_copy.png"
+                iconSource: "qrc:/icons/content/content_copy.png"
                 ToolTip.text: "Copy the selected scene or annotation."
                 onClicked: {
                     if(annotationGripLoader.active) {
@@ -439,9 +439,9 @@ Item {
                 ShortcutsModelItem.shortcut: Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste
-                iconSource: "../icons/content/content_paste.png"
+                iconSource: "qrc:/icons/content/content_paste.png"
                 ToolTip.text: "Paste from clipboard"
                 onClicked: {
                     var gpos = Scrite.app.globalMousePosition()
@@ -460,9 +460,9 @@ Item {
                 ShortcutsModelItem.shortcut: Scrite.app.polishShortcutTextForDisplay(shortcut)
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: pdfExportButton
-                iconSource: "../icons/file/generate_pdf.png"
+                iconSource: "qrc:/icons/file/generate_pdf.png"
                 ToolTip.text: "Export the contents of the structure canvas to PDF."
                 onClicked: {
                     modalDialog.closeable = false
@@ -836,7 +836,7 @@ Item {
                     height: width
                     sourceSize.width: width
                     sourceSize.height: height
-                    source: parent.what === "element" ? "../icons/action/add_scene.png" : "../icons/action/add_annotation.png"
+                    source: parent.what === "element" ? "qrc:/icons/action/add_scene.png" : "qrc:/icons/action/add_annotation.png"
                     property real halfSize: width/2
                     x: parent.mouseX - halfSize
                     y: parent.mouseY - halfSize
@@ -1577,28 +1577,28 @@ Item {
 
                         VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
-                            icon.source: "../icons/action/layout_horizontally.png"
+                            icon.source: "qrc:/icons/action/layout_horizontally.png"
                             text: "Layout Horizontally"
                             onClicked: selection.layout(Structure.HorizontalLayout)
                         }
 
                         VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
-                            icon.source: "../icons/action/layout_vertically.png"
+                            icon.source: "qrc:/icons/action/layout_vertically.png"
                             text: "Layout Vertically"
                             onClicked: selection.layout(Structure.VerticalLayout)
                         }
 
                         VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
-                            icon.source: "../icons/action/layout_flow_horizontally.png"
+                            icon.source: "qrc:/icons/action/layout_flow_horizontally.png"
                             text: "Flow Horizontally"
                             onClicked: selection.layout(Structure.FlowHorizontalLayout)
                         }
 
                         VclMenuItem {
                             enabled: !Scrite.document.readOnly && (selection.hasItems ? selection.canLayout : Scrite.document.structure.elementCount >= 2) && !Scrite.document.structure.forceBeatBoardLayout
-                            icon.source: "../icons/action/layout_flow_vertically.png"
+                            icon.source: "qrc:/icons/action/layout_flow_vertically.png"
                             text: "Flow Vertically"
                             onClicked: selection.layout(Structure.FlowVerticalLayout)
                         }
@@ -2136,8 +2136,8 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
 
-            ToolButton3 {
-                iconSource: "../icons/content/view_options.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/content/view_options.png"
                 autoRepeat: false
                 ToolTip.text: "Toggle between index-card view options."
                 checkable: false
@@ -2157,7 +2157,7 @@ Item {
                             text: "Index Cards"
                             property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
                                                     Scrite.document.structure.indexCardContent === Structure.Synopsis
-                            icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            icon.source: _checked ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                             onClicked: {
                                 if(!_checked) {
                                     if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
@@ -2175,7 +2175,7 @@ Item {
                             text: "Photo Cards"
                             property bool _checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI &&
                                                     Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
-                            icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            icon.source: _checked ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                             onClicked: {
                                 if(!_checked)
                                     if(Scrite.document.structure.canvasUIMode === Structure.IndexCardUI)
@@ -2191,7 +2191,7 @@ Item {
                         VclMenuItem {
                             text: "Synopsis Cards"
                             property bool _checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
-                            icon.source: _checked ? "../icons/navigation/check.png" : "../icons/content/blank.png"
+                            icon.source: _checked ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                             onClicked: {
                                 if(!_checked)
                                     mainUiContentLoader.reset( () => {
@@ -2203,8 +2203,8 @@ Item {
                 }
             }
 
-            ToolButton3 {
-                iconSource: "../icons/hardware/mouse.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/hardware/mouse.png"
                 autoRepeat: false
                 ToolTip.text: "Mouse wheel currently " + (checked ? "zooms" : "scrolls") + ". Click this button to make it " + (checked ? "scroll" : "zoom") + "."
                 checkable: true
@@ -2214,12 +2214,12 @@ Item {
                 suggestedHeight: parent.height
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 down: canvasPreview.visible
                 checked: canvasPreview.visible
                 checkable: true
                 onToggled: Runtime.structureCanvasSettings.showPreview = checked
-                iconSource: "../icons/action/thumbnail.png"
+                iconSource: "qrc:/icons/action/thumbnail.png"
                 ToolTip.text: "Preview"
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
@@ -2231,10 +2231,10 @@ Item {
                 color: Runtime.colors.primary.borderColor
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: cmdZoomOne
                 onClicked: click()
-                iconSource: "../icons/navigation/zoom_one.png"
+                iconSource: "qrc:/icons/navigation/zoom_one.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom One"
                 suggestedWidth: parent.height
@@ -2256,7 +2256,7 @@ Item {
                 }
             }
 
-            ToolButton3 {
+            FlatToolButton {
                 id: cmdZoomFit
                 suggestedWidth: parent.height
                 suggestedHeight: parent.height
@@ -2267,7 +2267,7 @@ Item {
                     canvasScroll.isZoomFit = true
                     canvasScroll.updateScriteDocumentUserData()
                 }
-                iconSource: "../icons/navigation/zoom_fit.png"
+                iconSource: "qrc:/icons/navigation/zoom_fit.png"
                 autoRepeat: true
                 ToolTip.text: "Zoom Fit"
             }
@@ -2490,7 +2490,7 @@ Item {
                 id: dragHandle
                 visible: !parent.editing && !Scrite.document.readOnly
                 enabled: !canvasScroll.editItem && !Scrite.document.readOnly
-                source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ? "../icons/action/view_array.png" : "../icons/content/add_circle_outline.png"
+                source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ? "qrc:/icons/action/view_array.png" : "qrc:/icons/content/add_circle_outline.png"
                 width: 18; height: 18
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
@@ -3098,8 +3098,8 @@ Item {
                     Image {
                         id: dragHandle
                         source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ?
-                               (parent.lightBackground ? "../icons/action/view_array.png" : "../icons/action/view_array_inverted.png") :
-                               (parent.lightBackground ? "../icons/content/add_circle_outline.png" : "../icons/content/add_circle_outline_inverted.png")
+                               (parent.lightBackground ? "qrc:/icons/action/view_array.png" : "qrc:/icons/action/view_array_inverted.png") :
+                               (parent.lightBackground ? "qrc:/icons/content/add_circle_outline.png" : "qrc:/icons/content/add_circle_outline_inverted.png")
                         width: 24; height: 24
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
@@ -3383,8 +3383,8 @@ Item {
                     id: annotationToolBarLayout
                     anchors.centerIn: parent
 
-                    ToolButton3 {
-                        iconSource: "../icons/action/edit.png"
+                    FlatToolButton {
+                        iconSource: "qrc:/icons/action/edit.png"
                         ToolTip.text: "Edit properties of this annotation"
                         down: floatingDockWidget.visible
                         onClicked: Runtime.structureCanvasSettings.displayAnnotationProperties = !Runtime.structureCanvasSettings.displayAnnotationProperties
@@ -3396,8 +3396,8 @@ Item {
                         }
                     }
 
-                    ToolButton3 {
-                        iconSource: "../icons/action/keyboard_arrow_up.png"
+                    FlatToolButton {
+                        iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
                         ToolTip.text: "Bring this annotation to front"
                         enabled: Scrite.document.structure.canBringToFront(annotationGripLoader.annotation)
                         onClicked: {
@@ -3407,8 +3407,8 @@ Item {
                         }
                     }
 
-                    ToolButton3 {
-                        iconSource: "../icons/action/keyboard_arrow_down.png"
+                    FlatToolButton {
+                        iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
                         ToolTip.text: "Send this annotation to back"
                         enabled: Scrite.document.structure.canSendToBack(annotationGripLoader.annotation)
                         onClicked: {
@@ -3418,8 +3418,8 @@ Item {
                         }
                     }
 
-                    ToolButton3 {
-                        iconSource: "../icons/action/delete.png"
+                    FlatToolButton {
+                        iconSource: "qrc:/icons/action/delete.png"
                         ToolTip.text: "Delete this annotation"
                         onClicked: {
                             var a = annotationGripLoader.annotation

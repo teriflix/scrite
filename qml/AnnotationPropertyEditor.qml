@@ -333,13 +333,13 @@ Item {
                     onClicked: fontListViewArea.visible = !fontListViewArea.visible
                 }
 
-                ToolButton3 {
+                FlatToolButton {
                     id: changeFontButton
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     height: parent.height
                     down: fontListViewArea.visible
-                    iconSource: fontListViewArea.visible ? "../icons/action/keyboard_arrow_up.png" : "../icons/action/keyboard_arrow_down.png"
+                    iconSource: fontListViewArea.visible ? "qrc:/icons/action/keyboard_arrow_up.png" : "qrc:/icons/action/keyboard_arrow_down.png"
                     onClicked: fontListViewArea.visible = !fontListViewArea.visible
                 }
             }

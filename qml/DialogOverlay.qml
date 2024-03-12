@@ -17,6 +17,7 @@ import QtQuick 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/components"
 
 Rectangle {
     id: dialogOverlay
@@ -168,7 +169,7 @@ Rectangle {
         anchors.margins: -width/2
         width: 36
         height: 36
-        source: "../icons/action/dialog_close_button.png"
+        source: "qrc:/icons/action/dialog_close_button.png"
         smooth: true
         fillMode: Image.PreserveAspectFit
         opacity: tAnimation.running ? 0 : (closeButtonMouseArea.containsMouse ? 1 : 0.8)

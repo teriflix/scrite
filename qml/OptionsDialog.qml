@@ -55,7 +55,7 @@ Item {
         }
     }
 
-    TabView2 {
+    RectangleTabView {
         id: tabView
         anchors.fill: parent
         currentIndex: 0
@@ -426,9 +426,9 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        ToolButton3 {
+                        FlatToolButton {
                             id: resetFlickSpeedButton
-                            iconSource: "../icons/action/reset.png"
+                            iconSource: "qrc:/icons/action/reset.png"
                             anchors.verticalCenter: parent.verticalCenter
                             onClicked: Runtime.workspaceSettings.flickScrollSpeedFactor = 1
                             ToolTip.text: "Reset flick/scroll speed to 100%"
@@ -1981,7 +1981,7 @@ Item {
                     }
 
                     VclToolButton {
-                        icon.source: "../icons/action/done_all.png"
+                        icon.source: "qrc:/icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this font size to all '" + pageData.elementName + "' paragraphs."
                         ToolTip.delay: 1000
@@ -2045,7 +2045,7 @@ Item {
                     }
 
                     VclToolButton {
-                        icon.source: "../icons/action/done_all.png"
+                        icon.source: "qrc:/icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this font style to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
@@ -2086,7 +2086,7 @@ Item {
                     }
 
                     VclToolButton {
-                        icon.source: "../icons/action/done_all.png"
+                        icon.source: "qrc:/icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this line height to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
@@ -2156,7 +2156,7 @@ Item {
                     }
 
                     VclToolButton {
-                        icon.source: "../icons/action/done_all.png"
+                        icon.source: "qrc:/icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply these colors to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000
@@ -2235,7 +2235,7 @@ Item {
                     }
 
                     VclToolButton {
-                        icon.source: "../icons/action/done_all.png"
+                        icon.source: "qrc:/icons/action/done_all.png"
                         anchors.verticalCenter: parent.verticalCenter
                         ToolTip.text: "Apply this alignment to all '" + pageData.group + "' paragraphs."
                         ToolTip.delay: 1000

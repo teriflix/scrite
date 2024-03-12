@@ -167,7 +167,7 @@ VclMenu {
                                     }
                                     return 0
                                 }
-                                source: "../icons/navigation/check.png"
+                                source: "qrc:/icons/navigation/check.png"
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: 24; height: 24
                             }

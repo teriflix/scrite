@@ -19,6 +19,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Rectangle {
     property bool showFilterBox: true
@@ -41,9 +42,9 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: parent.top
 
-        ToolButton3 {
+        FlatToolButton {
             id: filterButton
-            iconSource: "../icons/action/filter.png"
+            iconSource: "qrc:/icons/action/filter.png"
             ToolTip.text: "Filter character names by their tags."
             enabled: charactersModel.availableTags.length > 0
             onClicked: tagsMenu.open()

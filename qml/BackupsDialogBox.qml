@@ -19,6 +19,7 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     width: 640
@@ -37,7 +38,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
 
             Image {
-                source: "../icons/file/backup_open.png"
+                source: "qrc:/icons/file/backup_open.png"
                 width: 36; height: width; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
             }

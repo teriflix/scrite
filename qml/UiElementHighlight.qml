@@ -19,6 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/components"
 
 /**
   This item is used for highlighting UI elements to educate users about where
@@ -27,6 +28,7 @@ import "qrc:/qml/globals"
 
 Item {
     id: uiElementHighlight
+
     property Item uiElement
     property string description
     property int descriptionPosition: Item.Right
@@ -89,13 +91,13 @@ Item {
                     source: {
                         switch(descriptionPosition) {
                         case Item.Right:
-                            return "../icons/navigation/arrow_left_inverted.png"
+                            return "qrc:/icons/navigation/arrow_left_inverted.png"
                         case Item.Right:
-                            return "../icons/navigation/arrow_right_inverted.png"
+                            return "qrc:/icons/navigation/arrow_right_inverted.png"
                         case Item.Top:
-                            return "../icons/navigation/arrow_down_inverted.png"
+                            return "qrc:/icons/navigation/arrow_down_inverted.png"
                         case Item.Bottom:
-                            return "../icons/navigation/arrow_up_inverted.png"
+                            return "qrc:/icons/navigation/arrow_up_inverted.png"
                         }
                     }
                 }

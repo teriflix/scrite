@@ -97,7 +97,7 @@ Item {
 
         fillMode: Image.PreserveAspectFit
         opacity: iconImage.opacity
-        source: menuArrow === Qt.RightArrow ? "../icons/navigation/arrow_right.png" : "../icons/navigation/arrow_down.png"
+        source: menuArrow === Qt.RightArrow ? "qrc:/icons/navigation/arrow_right.png" : "qrc:/icons/navigation/arrow_down.png"
     }
 
     Shortcut {

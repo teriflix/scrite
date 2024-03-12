@@ -22,6 +22,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     width: 1280
@@ -210,7 +211,7 @@ Item {
             anchors.centerIn: parent
 
             VclToolButton {
-                icon.source: "../icons/action/close.png"
+                icon.source: "qrc:/icons/action/close.png"
                 ToolTip.text: "Closes the PDF View"
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: closeRequest()
@@ -274,7 +275,7 @@ Item {
 
             VclToolButton {
                 visible: displayRefreshButton
-                icon.source: "../icons/navigation/refresh.png"
+                icon.source: "qrc:/icons/navigation/refresh.png"
                 ToolTip.text: "Refresh"
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: refreshRequest()
@@ -283,7 +284,7 @@ Item {
             VclToolButton {
                 id: saveFileButton
                 visible: (allowFileSave || saveFeatureDisabled)
-                icon.source: "../icons/file/file_download.png"
+                icon.source: "qrc:/icons/file/file_download.png"
                 ToolTip.text: "Save PDF"
                 anchors.verticalCenter: parent.verticalCenter
                 down: saveMenu.visible
@@ -363,7 +364,7 @@ Item {
             VclToolButton {
                 id: revealFileButton
                 visible: allowFileReveal
-                icon.source: "../icons/file/folder_open.png"
+                icon.source: "qrc:/icons/file/folder_open.png"
                 ToolTip.text: "Reveal the location of this PDF on your computer."
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked: Scrite.app.revealFileOnDesktop( Scrite.app.urlToLocalFile(pdfDoc.source) )

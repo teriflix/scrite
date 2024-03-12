@@ -19,6 +19,7 @@ import QtQuick.Layouts 1.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     property Item scritedView
@@ -31,15 +32,15 @@ Item {
         sourceComponent: Row {
             spacing: 1
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/movie.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/movie.png"
                 ToolTip.text: "Load a video file for this screenplay."
                 enabled: scritedView.screenplaySplitsCount > 0
                 onClicked: scritedView.loadMedia()
             }
 
-            ToolButton3 {
-                iconSource: scritedView.mediaIsPlaying ? "../icons/mediaplayer/pause.png" : "../icons/mediaplayer/play_arrow.png"
+            FlatToolButton {
+                iconSource: scritedView.mediaIsPlaying ? "qrc:/icons/mediaplayer/pause.png" : "qrc:/icons/mediaplayer/play_arrow.png"
                 ToolTip.text: "Toggle media playback.\t(Space)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.togglePlayback()
@@ -51,8 +52,8 @@ Item {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/rewind_10.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/rewind_10.png"
                 ToolTip.text: "Rewind 10 seconds.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + " + ←)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.rewind()
@@ -64,8 +65,8 @@ Item {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/fast_rewind.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/fast_rewind.png"
                 ToolTip.text: "Rewind half second.\t(←)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.miniRewind()
@@ -77,8 +78,8 @@ Item {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/fast_forward.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/fast_forward.png"
                 ToolTip.text: "Forward half second.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+→)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.miniForward()
@@ -90,8 +91,8 @@ Item {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/forward_10.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/forward_10.png"
                 ToolTip.text: "Forward 10 seconds.\t(→)"
                 enabled: scritedView.mediaIsLoaded
                 onClicked: scritedView.forward()
@@ -103,8 +104,8 @@ Item {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
-                iconSource: "../icons/action/keyboard_arrow_up.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
                 ToolTip.text: "Previous Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↑)"
                 enabled: scritedView.previousSceneAvailable
                 onClicked: scritedView.scrollPreviousScene()
@@ -116,8 +117,8 @@ Item {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
-                iconSource: "../icons/action/keyboard_arrow_down.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
                 ToolTip.text: "Next Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↓)"
                 enabled: scritedView.nextSceneAvailable
                 onClicked: scritedView.scrollNextScene()
@@ -161,8 +162,8 @@ Item {
                 ShortcutsModelItem.enabled: scritedView.canScrollDown
             }
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/sync_with_screenplay.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/sync_with_screenplay.png"
                 ToolTip.text: "Use video time as current scene time offset.\t(> or .)"
                 enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
                 onClicked: scritedView.syncVideoTimeWithScreenplayOffsets(true)
@@ -182,15 +183,15 @@ Item {
                 ShortcutsModelItem.enabled: enabled
             }
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/reset_screenplay_offsets.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/reset_screenplay_offsets.png"
                 ToolTip.text: "Reset time offset of all scenes."
                 enabled: scritedView.screenplaySplitsCount > 0
                 onClicked: scritedView.resetScreenplayOffsets()
             }
 
-            ToolButton3 {
-                iconSource: "../icons/mediaplayer/time_column.png"
+            FlatToolButton {
+                iconSource: "qrc:/icons/mediaplayer/time_column.png"
                 ToolTip.text: "Toggle time column."
                 enabled: scritedView.screenplaySplitsCount > 0
                 down: scritedView.timeOffsetVisible

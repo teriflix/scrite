@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: searchBar
@@ -100,7 +101,7 @@ Item {
                 anchors.rightMargin: 5
 
                 VclToolButton {
-                    icon.source: "../icons/action/search.png"
+                    icon.source: "qrc:/icons/action/search.png"
                     anchors.verticalCenter: parent.verticalCenter
                     suggestedHeight: 40
                     onClicked: txtSearch.triggerSearch()
@@ -136,7 +137,7 @@ Item {
                 }
 
                 VclToolButton {
-                    icon.source: "../icons/action/keyboard_arrow_up.png"
+                    icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
                     anchors.verticalCenter: parent.verticalCenter
                     enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex > 0
                     onClicked: searchEngine.previousSearchResult()
@@ -145,7 +146,7 @@ Item {
                 }
 
                 VclToolButton {
-                    icon.source: "../icons/action/keyboard_arrow_down.png"
+                    icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
                     anchors.verticalCenter: parent.verticalCenter
                     enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex < searchEngine.searchResultCount
                     onClicked: searchEngine.nextSearchResult()
@@ -154,7 +155,7 @@ Item {
                 }
 
                 VclToolButton {
-                    icon.source: "../icons/navigation/close.png"
+                    icon.source: "qrc:/icons/navigation/close.png"
                     anchors.verticalCenter: parent.verticalCenter
                     enabled: txtSearch.canClear
                     onClicked: txtSearch.clearSearch()
@@ -163,7 +164,7 @@ Item {
                 }
 
                 VclToolButton {
-                    icon.source: "../icons/action/find_replace.png"
+                    icon.source: "qrc:/icons/action/find_replace.png"
                     anchors.verticalCenter: parent.verticalCenter
                     down: checked
                     checked: replaceUiRect.visible

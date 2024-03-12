@@ -49,10 +49,10 @@ Item {
                     visible: parent.selected
                 }
 
-                Text {
+                Label {
                     id: tabText
                     anchors.centerIn: parent
-                    font.pixelSize: 16
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     text: tabTitleRole === "" ? modelData : modelData[tabTitleRole]
                 }
 

@@ -15,12 +15,13 @@ import QtQml 2.15
 import QtQuick 2.15
 
 Item {
+    property alias running: busyIcon.visible
+    property bool forDarkBackground: false
+
     id: busyIcon
     width: 48
     height: 48
     visible: false
-    property alias running: busyIcon.visible
-    property bool forDarkBackground: false
 
     Image {
         id: busyIconImage
@@ -28,7 +29,7 @@ Item {
         height: 48
         smooth: true
         mipmap: true
-        source: forDarkBackground ? "../icons/content/time_inverted.png" : "../icons/content/time.png"
+        source: forDarkBackground ? "qrc:/icons/content/time_inverted.png" : "qrc:/icons/content/time.png"
         anchors.centerIn: parent
 
         RotationAnimator {
