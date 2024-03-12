@@ -19,7 +19,7 @@ import QtQuick.Layouts 1.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/controls"
-import "qrc:/qml/components"
+import "qrc:/qml/helpers"
 
 Item {
     property Item scritedView

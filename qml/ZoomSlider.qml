@@ -16,7 +16,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/qml/components"
+import "qrc:/qml/helpers"
 
 Row {
     id: zoomSliderBox

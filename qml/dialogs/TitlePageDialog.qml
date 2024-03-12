@@ -22,10 +22,10 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
-import "qrc:/qml/components"
+import "qrc:/qml/helpers"
 
 VclDialog {
-    id: titlePageDialog
+    id: root
 
     title: "Title Page"
     width: Math.min(Scrite.window.width-80, 1050)
@@ -52,7 +52,7 @@ VclDialog {
                   At best we can paint a 464x261 point photo on the cover page. Nothing more.
                   So, we need to provide a image preview in this aspect ratio.
                   */
-                color: titlePageDialog.background.item.color
+                color: root.background.item.color
                 border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
                 border.color: "black"
                 Layout.preferredWidth: 400

@@ -17,7 +17,7 @@ import QtQuick 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
-import "qrc:/qml/components"
+import "qrc:/qml/helpers"
 
 Rectangle {
     id: dialogOverlay

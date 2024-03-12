@@ -25,7 +25,7 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
-import "qrc:/qml/components"
+import "qrc:/qml/helpers"
 
 Item {
     id: scritedView

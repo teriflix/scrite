@@ -8,7 +8,6 @@
         <file>main.qml</file>
         <file>qml/AlphabetMappings.qml</file>
         <file>qml/CharactersView.qml</file>
-        <file>qml/ColorMenu.qml</file>
         <file>qml/DialogOverlay.qml</file>
         <file>qml/ExporterConfiguration.qml</file>
         <file>qml/FocusIndicator.qml</file>
@@ -45,7 +44,6 @@
         <file>qml/StructureGroupsMenu.qml</file>
         <file>qml/LodLoader.qml</file>
         <file>qml/MarkSceneAsMenu.qml</file>
-        <file>qml/BackupsDialogBox.qml</file>
         <file>qml/FlickableTextArea.qml</file>
         <file>qml/TextTabBar.qml</file>
         <file>qml/FormField.qml</file>
@@ -82,20 +80,22 @@
         <file>qml/controls/VclTextField.qml</file>
         <file>qml/controls/VclToolButton.qml</file>
         <file>qml/controls/VclRadioButton.qml</file>
-        <file>qml/components/qmldir</file>
-        <file>qml/components/AttachmentsDropArea.qml</file>
-        <file>qml/components/MenuLoader.qml</file>
-        <file>qml/components/SpellingSuggestionsMenu.qml</file>
-        <file>qml/components/TextAreaSpellingSuggestionsMenu.qml</file>
-        <file>qml/components/RectangleTabView.qml</file>
-        <file>qml/components/TrapeziumTabView.qml</file>
-        <file>qml/components/AttachmentsView.qml</file>
-        <file>qml/components/FlatToolButton.qml</file>
-        <file>qml/components/BoxShadow.qml</file>
-        <file>qml/components/BusyIcon.qml</file>
-        <file>qml/components/BusyOverlay.qml</file>
-        <file>qml/components/CheckListView.qml</file>
-        <file>qml/components/TextAreaInput.qml</file>
-        <file>qml/components/SpecialSymbolsSupport.qml</file>
+        <file>qml/helpers/qmldir</file>
+        <file>qml/helpers/AttachmentsDropArea.qml</file>
+        <file>qml/helpers/MenuLoader.qml</file>
+        <file>qml/helpers/SpellingSuggestionsMenu.qml</file>
+        <file>qml/helpers/TextAreaSpellingSuggestionsMenu.qml</file>
+        <file>qml/helpers/RectangleTabView.qml</file>
+        <file>qml/helpers/TrapeziumTabView.qml</file>
+        <file>qml/helpers/AttachmentsView.qml</file>
+        <file>qml/helpers/FlatToolButton.qml</file>
+        <file>qml/helpers/BoxShadow.qml</file>
+        <file>qml/helpers/BusyIcon.qml</file>
+        <file>qml/helpers/BusyOverlay.qml</file>
+        <file>qml/helpers/CheckListView.qml</file>
+        <file>qml/helpers/TextAreaInput.qml</file>
+        <file>qml/helpers/SpecialSymbolsSupport.qml</file>
+        <file>qml/helpers/ColorMenu.qml</file>
+        <file>qml/dialogs/BackupsDialog.qml</file>
     </qresource>
 </RCC>

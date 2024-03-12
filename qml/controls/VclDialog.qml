@@ -43,7 +43,7 @@ Dialog {
 
     // Assign a component whose instance may be shown as background
     property Component backdrop: Rectangle {
-        color: Runtime.colors.primary.c100.background
+        color: Runtime.colors.primary.window
     }
 
     // Assign a component whose instance may be shown in the content

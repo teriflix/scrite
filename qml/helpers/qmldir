@@ -4,6 +4,7 @@ BoxShadow 1.0 BoxShadow.qml
 BusyIcon 1.0 BusyIcon.qml
 BusyOverlay 1.0 BusyOverlay.qml
 CheckListView 1.0 CheckListView.qml
+ColorMenu 1.0 ColorMenu.qml
 FlatToolButton 1.0 FlatToolButton.qml
 MenuLoader 1.0 MenuLoader.qml
 RectangleTabView 1.0 RectangleTabView.qml

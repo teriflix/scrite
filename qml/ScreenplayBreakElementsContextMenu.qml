@@ -22,7 +22,9 @@ import "qrc:/qml/controls"
 
 VclMenu {
     id: breakElementContextMenu
+
     property ScreenplayElement element
+
     onClosed: element = null
 
     VclMenuItem {

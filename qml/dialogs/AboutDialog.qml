@@ -23,7 +23,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 VclDialog {
-    id: aboutDialog
+    id: root
 
     title: "About Scrite"
     width: {
@@ -79,7 +79,7 @@ VclDialog {
 
             Image {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: aboutDialog.width * 0.3
+                Layout.preferredWidth: root.width * 0.3
                 Layout.preferredHeight: sourceSize.height * Layout.preferredWidth/sourceSize.width
 
                 source: "../../images/scrite_logo_for_report_header.png"
@@ -120,7 +120,7 @@ VclDialog {
 
             Rectangle {
                 Layout.alignment: Qt.AlignHCenter
-                Layout.preferredWidth: aboutDialog.width * 0.5
+                Layout.preferredWidth: root.width * 0.5
                 Layout.preferredHeight: (Runtime.minimumFontMetrics.height+creditsView.spacing) * (creditsView.model.count+1) + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
 
                 // color: creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)
@@ -286,8 +286,8 @@ VclDialog {
         id: licenseTermsDialog
 
         title: "Terms Of Use"
-        width: aboutDialog.width * 0.9
-        height: aboutDialog.height * 0.9
+        width: root.width * 0.9
+        height: root.height * 0.9
 
         content: TextEdit {
             padding: 40

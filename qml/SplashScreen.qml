@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
-import "qrc:/qml/components"
+import "qrc:/qml/helpers"
 
 Item {
     property bool animationsEnabled: Scrite.app.isWindowsPlatform ? !Scrite.app.isNotWindows10 : true

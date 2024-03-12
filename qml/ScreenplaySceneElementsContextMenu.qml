@@ -19,9 +19,11 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/helpers"
 
 VclMenu {
     id: screenplayContextMenu
+
     property ScreenplayElement element
 
     SceneGroup {
