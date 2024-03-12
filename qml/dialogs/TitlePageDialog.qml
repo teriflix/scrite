@@ -19,11 +19,10 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "../../js/utils.js" as Utils
-import "../globals"
-import "../controls"
-import "../" // Refactoring QML TODO: This is bad, there needs to be a proper module for this.
-import "./"  // Refactoring QML TODO: This is bad, there needs to be a proper module for this.
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 VclDialog {
     id: titlePageDialog
@@ -118,7 +117,7 @@ VclDialog {
                     onClicked: fileDialog.open()
                 }
 
-                AttachmentsDropArea2 {
+                AttachmentsDropArea {
                     anchors.fill: parent
                     attachmentNoticeSuffix: "Drop to set as cover page photo."
                     visible: !Scrite.document.readOnly
@@ -242,7 +241,7 @@ VclDialog {
                             width: parent.width
                             spacing: 10
 
-                            Text {
+                            Label {
                                 width: _private.fieldLabelWidth
                                 horizontalAlignment: Text.AlignRight
                                 text: name
@@ -323,7 +322,7 @@ VclDialog {
 
         }
 
-        Text {
+        Label {
             id: defaultsSavedNotice
             anchors.top: titlePageSettingsLayout.bottom
             anchors.topMargin: 10

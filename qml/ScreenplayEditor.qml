@@ -22,10 +22,11 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "../js/utils.js" as Utils
-import "./globals"
-import "./dialogs"
-import "./controls"
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
@@ -1751,7 +1752,7 @@ Rectangle {
                                 enabled: !Scrite.document.readOnly
                             }
 
-                            SpellingSuggestionsMenu2 { }
+                            TextAreaSpellingSuggestionsMenu { }
 
                             Item {
                                 x: parent.cursorRectangle.x
@@ -1851,7 +1852,7 @@ Rectangle {
                             placeholderText: "Enter the synopsis of your scene here."
                             background: Item { }
 
-                            SpellingSuggestionsMenu2 { }
+                            TextAreaSpellingSuggestionsMenu { }
 
                             onActiveFocusChanged: {
                                 if(activeFocus) {

@@ -18,7 +18,8 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
+import "qrc:/qml/globals"
+import "qrc:/qml/components"
 
 Column {
     id: formField
@@ -154,7 +155,7 @@ Column {
                     onUndoRequest: answerText.undo()
                     onRedoRequest: answerText.redo()
                 }
-                SpellingSuggestionsMenu2 { }
+                TextAreaSpellingSuggestionsMenu { }
                 onActiveFocusChanged: {
                     if(!activeFocus && !persistentSelection) {
                         if(dialogUnderlay.visible)

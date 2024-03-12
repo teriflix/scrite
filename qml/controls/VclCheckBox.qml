@@ -17,7 +17,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "../globals"
+import "qrc:/qml/globals"
 
 CheckBox {
     Material.accent: Runtime.colors.primary.key

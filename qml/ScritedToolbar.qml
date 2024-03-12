@@ -18,7 +18,7 @@ import QtQuick.Layouts 1.15
 
 import io.scrite.components 1.0
 
-import "./controls"
+import "qrc:/qml/controls"
 
 Item {
     property Item scritedView

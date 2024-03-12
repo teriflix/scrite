@@ -15,7 +15,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
-import "./globals"
+import "qrc:/qml/globals"
 
 Rectangle {
     property var mappings: Scrite.app.transliterationEngine.alphabetMappings

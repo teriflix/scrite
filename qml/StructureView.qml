@@ -18,9 +18,10 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "../js/utils.js" as Utils
-import "./globals"
-import "./controls"
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: structureView
@@ -2053,7 +2054,7 @@ Item {
         }
     }
 
-    AttachmentsDropArea {
+    BasicAttachmentsDropArea {
         id: annotationAttachmentDropArea
         z: -10
         allowedType: Attachments.PhotosOnly
@@ -2845,7 +2846,7 @@ Item {
                                                       result.accepted = false
                                                   }
 
-                            SpellingSuggestionsMenu2 { }
+                            TextAreaSpellingSuggestionsMenu { }
                         }
 
                         Component.onCompleted: synopsisFieldLoader.hasFocus = false
@@ -2908,7 +2909,7 @@ Item {
                                     textEditorHasCursorInterface: true
                                     enabled: !Scrite.document.readOnly
                                 }
-                                SpellingSuggestionsMenu2 { }
+                                TextAreaSpellingSuggestionsMenu { }
                                 onCursorRectangleChanged: {
                                     var y1 = cursorRectangle.y
                                     var y2 = cursorRectangle.y + cursorRectangle.height
@@ -3002,7 +3003,7 @@ Item {
                         Loader {
                             anchors.fill: parent
                             active: !parent.featuredAttachment
-                            sourceComponent: AttachmentsDropArea2 {
+                            sourceComponent: AttachmentsDropArea {
                                 allowedType: Attachments.PhotosOnly
                                 target: lowLodfeaturedImageField.sceneAttachments
                                 onDropped: {

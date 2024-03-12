@@ -15,8 +15,10 @@ import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
+
 import io.scrite.components 1.0
-import "../js/utils.js" as Utils
+
+import "qrc:/js/utils.js" as Utils
 
 Loader {
     id: menuLoader
@@ -28,20 +30,23 @@ Loader {
     function show() {
         if(!enabled)
             return
-        itemInitMode = "show"
+
+        _private.itemInitMode = "show"
         active = true
     }
 
     function popup() {
         if(!enabled)
             return
-        itemInitMode = "popup"
+
+        _private.itemInitMode = "popup"
         active = true
     }
 
     function dismiss() {
         if(item)
             item.dismiss()
+
         Utils.execLater( menuLoader, 0, function() { menuLoader.active = false } )
     }
 
@@ -49,16 +54,16 @@ Loader {
 
     onActiveChanged: {
         if(active === false)
-            itemInitMode = "show"
+            _private.itemInitMode = "show"
     }
 
     onItemChanged: {
         if( item ) {
             if( Scrite.app.verifyType(item, "QQuickMenu") ) {
                 item.enabled = false
-                if(itemInitMode === "popup")
+                if(_private.itemInitMode === "popup")
                     item.popup()
-                else if(itemInitMode === "show")
+                else if(_private.itemInitMode === "show")
                     item.visible = true
             } else
                 console.log("Using MenuLoader for anything other than Menu {} item is prohibited.")
@@ -81,5 +86,9 @@ Loader {
         function onVisibleChanged() { menuLoader.dismiss() }
     }
 
-    property string itemInitMode: "show"
+    QtObject {
+        id: _private
+
+        property string itemInitMode: "show"
+    }
 }

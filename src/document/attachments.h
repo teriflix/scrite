@@ -191,7 +191,7 @@ private:
 class AttachmentsDropArea : public QQuickItem
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(BasicAttachmentsDropArea)
 
 public:
     explicit AttachmentsDropArea(QQuickItem *parent = nullptr);

@@ -22,9 +22,10 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "../js/utils.js" as Utils
-import "./globals"
-import "./controls"
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: scritedView
@@ -1446,7 +1447,7 @@ Item {
         busyMessage: "Computing offsets & preparing screenplay for continuous scroll ..."
     }
 
-    AttachmentsDropArea2 {
+    AttachmentsDropArea {
         anchors.fill: parent
         enabled: !mediaIsLoaded && !Scrite.document.empty
         allowedType: Attachments.VideosOnly

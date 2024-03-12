@@ -12,12 +12,13 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
+import "qrc:/qml/globals"
 
-AttachmentsDropArea {
+BasicAttachmentsDropArea {
     id: attachmentsDropArea
     enabled: !Scrite.document.readOnly
     property real noticeWidthFactor: 0.5
@@ -36,7 +37,7 @@ AttachmentsDropArea {
             color: Runtime.colors.primary.c700.background
         }
 
-        Text {
+        Label {
             id: attachmentNotice
             anchors.centerIn: parent
             width: parent.width * noticeWidthFactor

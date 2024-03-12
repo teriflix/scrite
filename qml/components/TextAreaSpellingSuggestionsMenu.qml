@@ -36,20 +36,19 @@ SpellingSuggestionsMenu {
         property int cursorPosition: -1
 
         function update() {
+            if(root.textArea === null)
+                root.textArea = Scrite.app.findFirstParentOfType(root, "QQuickTextArea")
+
             transliterator = root.textArea ? root.textArea.Transliterator : null
             if(transliterator)
                 highlighter = transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
+
             cursorPosition = -1
         }
     }
 
     onTextAreaChanged: Qt.callLater(_private.update)
-    Component.onCompleted: {
-        if(!textArea && Scrite.app.verifyType(parent, "QQuickTextArea"))
-            textArea = parent
-
-        Qt.callLater(_private.update)
-    }
+    Component.onCompleted: { Qt.callLater(_private.update) }
 
     onMenuAboutToShow: () => {
                            _private.cursorPosition = textArea.cursorPosition

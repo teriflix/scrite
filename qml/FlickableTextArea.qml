@@ -17,8 +17,9 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
-import "./controls"
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Flickable {
     property Item textArea: __textArea
@@ -91,7 +92,7 @@ Flickable {
             onUndoRequest: __textArea.undo()
             onRedoRequest: __textArea.redo()
         }
-        SpellingSuggestionsMenu2 { }
+        TextAreaSpellingSuggestionsMenu { }
         onCursorRectangleChanged: {
             var cr = cursorRectangle
             cr = Qt.rect(cr.x, cr.y-4, cr.width, cr.height+8)

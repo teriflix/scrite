@@ -35,9 +35,10 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "../js/utils.js" as Utils
-import "./globals"
-import "./controls"
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: homeScreen
@@ -702,7 +703,7 @@ Item {
             property string folder: info.absolutePath
         }
 
-        AttachmentsDropArea {
+        BasicAttachmentsDropArea {
             id: importDropArea
             anchors.fill: parent
             enabled: Runtime.appFeatures.importer.enabled

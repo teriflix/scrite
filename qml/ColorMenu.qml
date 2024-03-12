@@ -16,8 +16,8 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
-import "./controls"
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 VclMenu {
     id: colorMenu

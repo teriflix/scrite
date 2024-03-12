@@ -12,7 +12,6 @@
         <file>qml/DialogOverlay.qml</file>
         <file>qml/ExporterConfiguration.qml</file>
         <file>qml/FocusIndicator.qml</file>
-        <file>qml/MenuLoader.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
         <file>qml/OptionsDialog.qml</file>
@@ -58,7 +57,6 @@
         <file>qml/BackupsDialogBox.qml</file>
         <file>qml/AttachmentsView.qml</file>
         <file>qml/FlickableTextArea.qml</file>
-        <file>qml/AttachmentsDropArea2.qml</file>
         <file>qml/TextTabBar.qml</file>
         <file>qml/FormField.qml</file>
         <file>qml/FormView.qml</file>
@@ -76,8 +74,6 @@
         <file>qml/SceneFeaturedImage.qml</file>
         <file>qml/RichTextEdit.qml</file>
         <file>qml/HelpTipNotification.qml</file>
-        <file>qml/SpellingSuggestionsMenu.qml</file>
-        <file>qml/SpellingSuggestionsMenu2.qml</file>
         <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/CheckListView.qml</file>
         <file>qml/HomeScreen.qml</file>
@@ -98,5 +94,10 @@
         <file>qml/controls/VclTextField.qml</file>
         <file>qml/controls/VclToolButton.qml</file>
         <file>qml/controls/VclRadioButton.qml</file>
+        <file>qml/components/qmldir</file>
+        <file>qml/components/AttachmentsDropArea.qml</file>
+        <file>qml/components/MenuLoader.qml</file>
+        <file>qml/components/SpellingSuggestionsMenu.qml</file>
+        <file>qml/components/TextAreaSpellingSuggestionsMenu.qml</file>
     </qresource>
 </RCC>

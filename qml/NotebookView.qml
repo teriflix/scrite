@@ -22,9 +22,10 @@ import QtQuick.Controls 1.4 as OldControls
 
 import io.scrite.components 1.0
 
-import "../js/utils.js" as Utils
-import "./globals"
-import "./controls"
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Rectangle {
     id: notebookView
@@ -1165,7 +1166,7 @@ Rectangle {
                         attachments: scene ? scene.attachments : null
                     }
 
-                    AttachmentsDropArea2 {
+                    AttachmentsDropArea {
                         id: sceneAttachmentsDropArea
                         target: scene ? scene.attachments : null
                         allowMultiple: true
@@ -1555,7 +1556,7 @@ Rectangle {
                 attachments: checkListNoteItem.note ? checkListNoteItem.note.attachments : null
             }
 
-            AttachmentsDropArea2 {
+            AttachmentsDropArea {
                 id: checkListAttachmentsDropArea
                 anchors.fill: parent
                 allowMultiple: true
@@ -1657,7 +1658,7 @@ Rectangle {
                 }
             }
 
-            AttachmentsDropArea2 {
+            AttachmentsDropArea {
                 id: attachmentsDropArea
                 anchors.fill: parent
                 allowMultiple: true
@@ -2815,7 +2816,7 @@ Rectangle {
                                     flickable: characterQuickInfoView
                                 }
 
-                                AttachmentsDropArea2 {
+                                AttachmentsDropArea {
                                     anchors.fill: parent
                                     attachmentNoticeSuffix: "Drop here to capture as character pic(s)."
                                     allowedType: Attachments.PhotosOnly
@@ -2832,7 +2833,7 @@ Rectangle {
                                 width: parent.width - characterQuickInfoArea.width
                                 height: parent.height
 
-                                AttachmentsDropArea2 {
+                                AttachmentsDropArea {
                                     anchors.fill: parent
                                     allowMultiple: true
                                     target: character ? character.attachments : null
@@ -2869,7 +2870,7 @@ Rectangle {
                         anchors.bottom: parent.bottom
                         attachments: character ? character.attachments : null
 
-                        AttachmentsDropArea2 {
+                        AttachmentsDropArea {
                             anchors.fill: parent
                             noticeWidthFactor: 0.8
                             allowMultiple: true

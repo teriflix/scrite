@@ -17,8 +17,9 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
-import "./controls"
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 TextArea {
     id: txtAreaInput
@@ -70,7 +71,7 @@ TextArea {
         onRedoRequest: txtAreaInput.redo()
     }
 
-    SpellingSuggestionsMenu2 { }
+    TextAreaSpellingSuggestionsMenu { }
 
     property var spellChecker: Transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
     ContextMenuEvent.active: spellChecker ? !spellChecker.wordUnderCursorIsMisspelled : true

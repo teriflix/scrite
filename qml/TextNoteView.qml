@@ -18,8 +18,9 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
-import "./controls"
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: textNoteView
@@ -101,7 +102,7 @@ Item {
         anchors.bottom: parent.bottom
     }
 
-    AttachmentsDropArea2 {
+    AttachmentsDropArea {
         id: attachmentsDropArea
         anchors.fill: parent
         allowMultiple: true

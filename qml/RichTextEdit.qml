@@ -21,8 +21,8 @@ import Qt.labs.settings 1.0
 
 import io.scrite.components 1.0
 
-import "./globals"
-import "./controls"
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 Item {
     // RichTextEdit is intented to be used as a drop-in-replacement for FlickableTextArea

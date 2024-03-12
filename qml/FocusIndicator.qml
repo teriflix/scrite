@@ -13,7 +13,7 @@
 
 import QtQuick 2.15
 
-import "./globals"
+import "qrc:/qml/globals"
 
 Rectangle {
     id: focusIndicator

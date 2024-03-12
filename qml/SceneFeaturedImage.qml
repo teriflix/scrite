@@ -19,8 +19,9 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "./globals"
-import "./controls"
+import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: sceneFeaturedPhotoItem
@@ -131,7 +132,7 @@ Item {
         }
     }
 
-    AttachmentsDropArea2 {
+    AttachmentsDropArea {
         anchors.fill: parent
         allowedType: Attachments.PhotosOnly
         target: sceneAttachments

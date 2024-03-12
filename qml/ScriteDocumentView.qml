@@ -22,10 +22,11 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "../js/utils.js" as Utils
-import "./globals"
-import "./dialogs"
-import "./controls"
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
+import "qrc:/qml/controls"
+import "qrc:/qml/components"
 
 Item {
     id: scriteDocumentViewItem
@@ -1522,7 +1523,7 @@ Item {
                     Announcement.shout("41EE5E06-FF97-4DB6-B32D-F938418C9529", undefined)
             }
 
-            AttachmentsDropArea {
+            BasicAttachmentsDropArea {
                 id: fileOpenDropArea
                 anchors.fill: parent
                 enabled: !modalDialog.active
