@@ -55,6 +55,7 @@ Rectangle {
             width: contentWidth
             height: contentHeight
             color: Runtime.colors.primary.c10.text
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
         }
     }
 

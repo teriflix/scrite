@@ -16,7 +16,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/qml/helpers"
+import "qrc:/qml/globals"
 
 Row {
     id: zoomSliderBox
@@ -79,12 +79,13 @@ Row {
 
     Item { width: parent.height/3; height: parent.height }
 
-    Text {
+    Label {
         id: percentText
         anchors.verticalCenter: parent.verticalCenter
         text: Math.round(zoomSlider.zoomLevel * 100) + "%"
         horizontalAlignment: Text.AlignRight
         width: fontMetrics.advanceWidth("999%")
+        font.pointSize: Runtime.idealFontPointSize.font.pointSize
 
         FontMetrics {
             id: fontMetrics

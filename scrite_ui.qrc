@@ -10,42 +10,28 @@
         <file>qml/CharactersView.qml</file>
         <file>qml/DialogOverlay.qml</file>
         <file>qml/ExporterConfiguration.qml</file>
-        <file>qml/FocusIndicator.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
         <file>qml/OptionsDialog.qml</file>
         <file>qml/ReportGeneratorConfiguration.qml</file>
-        <file>qml/RubberBand.qml</file>
         <file>qml/ScreenplayEditorToolbar.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
         <file>qml/ScreenplayView.qml</file>
         <file>qml/ScriteDocumentView.qml</file>
-        <file>qml/ScrollArea.qml</file>
         <file>qml/SearchBar.qml</file>
-        <file>qml/Selection.qml</file>
         <file>qml/StructureView.qml</file>
-        <file>qml/TagText.qml</file>
-        <file>qml/TextViewEdit.qml</file>
         <file>qml/PageNumberBubble.qml</file>
-        <file>qml/ZoomSlider.qml</file>
         <file>qml/SceneTypeImage.qml</file>
         <file>qml/SplashScreen.qml</file>
-        <file>qml/FileSelector.qml</file>
-        <file>qml/SidePanel.qml</file>
         <file>qml/ShortcutsView.qml</file>
         <file>qml/DockWidget.qml</file>
-        <file>qml/PageView.qml</file>
         <file>qml/AnnotationPropertyEditor.qml</file>
         <file>qml/AnnotationItem.qml</file>
         <file>qml/CharacterRelationshipsGraphView.qml</file>
-        <file>qml/CharacterBox.qml</file>
         <file>qml/ScritedView.qml</file>
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
-        <file>qml/LodLoader.qml</file>
         <file>qml/MarkSceneAsMenu.qml</file>
-        <file>qml/FlickableTextArea.qml</file>
-        <file>qml/TextTabBar.qml</file>
         <file>qml/FormField.qml</file>
         <file>qml/FormView.qml</file>
         <file>qml/FormMenu.qml</file>
@@ -53,13 +39,11 @@
         <file>qml/TextNoteView.qml</file>
         <file>qml/UserLogin.qml</file>
         <file>qml/DisabledFeatureNotice.qml</file>
-        <file>qml/Link.qml</file>
         <file>qml/CollaboratorsDialog.qml</file>
         <file>qml/RenameCharacterDialog.qml</file>
         <file>qml/PdfView.qml</file>
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
-        <file>qml/RichTextEdit.qml</file>
         <file>qml/HelpTipNotification.qml</file>
         <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/HomeScreen.qml</file>
@@ -97,5 +81,19 @@
         <file>qml/helpers/SpecialSymbolsSupport.qml</file>
         <file>qml/helpers/ColorMenu.qml</file>
         <file>qml/dialogs/BackupsDialog.qml</file>
+        <file>qml/helpers/PageView.qml</file>
+        <file>qml/helpers/FileSelector.qml</file>
+        <file>qml/helpers/Link.qml</file>
+        <file>qml/helpers/LodLoader.qml</file>
+        <file>qml/helpers/RubberBand.qml</file>
+        <file>qml/helpers/ScrollArea.qml</file>
+        <file>qml/helpers/Selection.qml</file>
+        <file>qml/helpers/TagText.qml</file>
+        <file>qml/helpers/TextTabBar.qml</file>
+        <file>qml/helpers/TextViewEdit.qml</file>
+        <file>qml/helpers/ZoomSlider.qml</file>
+        <file>qml/helpers/RichTextEdit.qml</file>
+        <file>qml/helpers/SidePanel.qml</file>
+        <file>qml/helpers/FlickableTextArea.qml</file>
     </qresource>
 </RCC>

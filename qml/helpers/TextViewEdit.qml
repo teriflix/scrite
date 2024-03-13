@@ -55,7 +55,7 @@ Loader {
     Component {
         id: textViewComponent
 
-        Text {
+        Label {
             property string markupText
             text: markupText !== "" ? markupText : textViewEdit.text
             font: textViewEdit.font

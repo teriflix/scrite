@@ -105,6 +105,7 @@ Rectangle {
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
         ScrollBar.vertical: VclScrollBar { flickable: pageContentArea }
+
         Loader {
             id: pageContentLoader
             width: pageContentArea.showScrollBars ? pageContentArea.width-17 : pageContentArea.width
