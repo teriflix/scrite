@@ -902,15 +902,12 @@ Rectangle {
                             toggleLock()
                     }
 
-                    Component {
+                    CollaboratorsDialog {
                         id: collaboratorsDialog
-                        CollaboratorsDialog { }
                     }
 
                     function editCollaborators() {
-                        modalDialog.sourceComponent = collaboratorsDialog
-                        modalDialog.popupSource = parent
-                        modalDialog.active = true
+                        collaboratorsDialog.open()
                     }
 
                     function toggleLock() {
