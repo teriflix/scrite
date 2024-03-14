@@ -4026,27 +4026,22 @@ Rectangle {
             model: characterMenu.characterReports.length > 0 ? 1 : 0
 
             VclMenuItem {
-                text: "Rename Character"
+                text: "Rename CBharacter"
                 icon.source: "qrc:/icons/screenplay/character.png"
 
                 onTriggered: {
                     const character = Scrite.document.structure.addCharacter(characterMenu.characterName)
                     if(character) {
-                        modalDialog.popupSource = characterMenu.popupSource
-                        modalDialog.arguments = character
-                        modalDialog.sourceComponent = renameCharacterDialog
-                        modalDialog.active = true
-                        characterMenu.close()
+                        renameCharacterDialog.character = character
+                        renameCharacterDialog.open()
                     }
                 }
             }
         }
     }
 
-    Component {
+    RenameCharacterDialog {
         id: renameCharacterDialog
-
-        RenameCharacterDialog { }
     }
 
     Component {

@@ -48,6 +48,8 @@ Dialog {
 
     // Assign a component whose instance may be shown in the content
     property Component content: Item { }
+    property alias contentImplicitWidth: contentItemLoader.implicitWidth
+    property alias contentImplicitHeight: contentItemLoader.implicitHeight
 
     // Customise the buttons to show on the tilebar on the right side.
     // By default a check-mark is shown.
@@ -55,6 +57,8 @@ Dialog {
         width: 32; height: 32
         source: "qrc:/icons/action/dialog_close_button.png"
         smooth: true; mipmap: true
+        visible: titleBarHasCloseButton
+        enabled: titleBarHasCloseButton
 
         MouseArea {
             anchors.fill: parent

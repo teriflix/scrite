@@ -39,7 +39,6 @@
         <file>qml/TextNoteView.qml</file>
         <file>qml/UserLogin.qml</file>
         <file>qml/DisabledFeatureNotice.qml</file>
-        <file>qml/RenameCharacterDialog.qml</file>
         <file>qml/PdfView.qml</file>
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
@@ -95,5 +94,6 @@
         <file>qml/helpers/SidePanel.qml</file>
         <file>qml/helpers/FlickableTextArea.qml</file>
         <file>qml/dialogs/CollaboratorsDialog.qml</file>
+        <file>qml/dialogs/RenameCharacterDialog.qml</file>
     </qresource>
 </RCC>

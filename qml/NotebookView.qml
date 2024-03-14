@@ -26,6 +26,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 
 Rectangle {
     id: notebookView
@@ -3253,11 +3254,8 @@ Rectangle {
         VclMenuItem {
             text: "Rename Character"
             onClicked: {
-                modalDialog.arguments = characterContextMenu.character
-                modalDialog.popupSource = characterContextMenu.characterItem
-                modalDialog.sourceComponent = renameCharacterDialog
-                modalDialog.active = true
-                characterContextMenu.close()
+                renameCharacterDialog.character = character
+                renameCharacterDialog.open()
             }
         }
 
@@ -3299,10 +3297,8 @@ Rectangle {
         }
     }
 
-    Component {
+    RenameCharacterDialog {
         id: renameCharacterDialog
-
-        RenameCharacterDialog { }
     }
 
     Component {
