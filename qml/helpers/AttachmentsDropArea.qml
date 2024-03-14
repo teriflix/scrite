@@ -17,6 +17,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 BasicAttachmentsDropArea {
     id: attachmentsDropArea
@@ -37,7 +38,7 @@ BasicAttachmentsDropArea {
             color: Runtime.colors.primary.c700.background
         }
 
-        Label {
+        VclText {
             id: attachmentNotice
             anchors.centerIn: parent
             width: parent.width * noticeWidthFactor

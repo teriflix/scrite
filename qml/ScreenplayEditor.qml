@@ -472,7 +472,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 spacing: 13
 
-                                Text {
+                                VclText {
                                     id: logLineFieldHeading
                                     text: logLineField.activeFocus ? ("Logline: (" + (loglineLimiter.limitReached ? "WARNING: " : "") + loglineLimiter.wordCount + "/" + loglineLimiter.maxWordCount + " words, " +
                                           loglineLimiter.letterCount + "/" + loglineLimiter.maxLetterCount + " letters)") : "Logline: "
@@ -976,7 +976,7 @@ Rectangle {
                 }
             }
 
-            Text {
+            VclText {
                 font.pixelSize: statusBar.height * 0.5
                 text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentPage + " of " + Runtime.screenplayTextDocument.pageCount)
                 anchors.verticalCenter: parent.verticalCenter
@@ -1008,7 +1008,7 @@ Rectangle {
                 }
             }
 
-            Text {
+            VclText {
                 font.pixelSize: statusBar.height * 0.5
                 text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentTimeAsString + " of " + (Runtime.screenplayTextDocument.pageCount > 1 ? Runtime.screenplayTextDocument.totalTimeAsString : Runtime.screenplayTextDocument.timePerPageAsString))
                 anchors.verticalCenter: parent.verticalCenter
@@ -1022,7 +1022,7 @@ Rectangle {
                 visible: wordCountLabel.visible
             }
 
-            Text {
+            VclText {
                 id: wordCountLabel
                 font.pixelSize: statusBar.height * 0.5
                 text: {
@@ -1089,7 +1089,7 @@ Rectangle {
                 property Scene currentScene: currentSceneElement ? currentSceneElement.scene : null
                 property SceneHeading currentSceneHeading: currentScene && currentScene.heading.enabled ? currentScene.heading : null
 
-                Text {
+                VclText {
                     id: currentSceneNumber
                     anchors.verticalCenter: currentSceneHeadingText.verticalCenter
                     anchors.left: currentSceneHeadingText.left
@@ -1099,7 +1099,7 @@ Rectangle {
                     property real recommendedMargin: headingFontMetrics.averageCharacterWidth*5 + ruler.leftMarginPx*0.075
                 }
 
-                Text {
+                VclText {
                     id: currentSceneHeadingText
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -1391,7 +1391,7 @@ Rectangle {
                 active: parent.evaluateSuggestedSceneHeight && !parent.screenplayElement.omitted
             }
 
-            Text {
+            VclText {
                 font: sceneHeadingText.font
                 anchors.verticalCenter: sceneHeadingText.verticalCenter
                 anchors.right: sceneHeadingText.left
@@ -1401,7 +1401,7 @@ Rectangle {
                 text: screenplayElement.resolvedSceneNumber
             }
 
-            Text {
+            VclText {
                 id: sceneHeadingText
                 anchors.left: parent.left
                 anchors.leftMargin: ruler.leftMarginPx
@@ -1828,7 +1828,7 @@ Rectangle {
                         anchors.leftMargin: ruler.leftMarginPx
                         anchors.rightMargin: ruler.rightMarginPx
 
-                        Text {
+                        VclText {
                             id: synopsisEditorHeading
                             text: (contentItem.theScene.structureElement.hasNativeTitle ? contentItem.theScene.structureElement.nativeTitle : "Synopsis") + ":"
                             font.bold: true
@@ -2251,7 +2251,7 @@ Rectangle {
                                 ScrollBar.vertical: VclScrollBar {
                                     flickable: completionView
                                 }
-                                delegate: Text {
+                                delegate: VclText {
                                     width: completionView.width-(completionView.contentHeight > completionView.height ? 20 : 1)
                                     text: string
                                     padding: 5
@@ -3293,7 +3293,7 @@ Rectangle {
                     }
                 }
 
-                Text {
+                VclText {
                     id: sceneGroupTagsText
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -3344,7 +3344,7 @@ Rectangle {
 
             signal newCharacterAdded(string characterName, int curPosition)
 
-            Text {
+            VclText {
                 id: sceneCharactersListHeading
                 text: "Characters: "
                 font.bold: true
@@ -3478,14 +3478,14 @@ Rectangle {
             z: expanded ? 1 : 0
 
             content: Item {
-                Text {
+                VclText {
                     id: dragHotspotItem
                     font.family: "Courier Prime"
                     font.pixelSize: Runtime.idealFontMetrics.font.pointSize + 4
                     visible: false
                 }
 
-                Text {
+                VclText {
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
@@ -3536,7 +3536,7 @@ Rectangle {
                     property bool hasEpisodes: Runtime.screenplayAdapter.isSourceScreenplay ? Runtime.screenplayAdapter.screenplay.episodeCount > 0 : false
 
                     FocusTracker.window: Scrite.window
-                    FocusTracker.indicator.target: mainUndoStack
+                    FocusTracker.indicator.target: Runtime.undoStack
                     FocusTracker.indicator.property: "sceneListPanelActive"
 
                     headerPositioning: ListView.OverlayHeader
@@ -3553,7 +3553,7 @@ Rectangle {
                             anchors.right: parent.right
                             anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height) ? 10 : 0
 
-                            Text {
+                            VclText {
                                 id: headingText
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
@@ -3692,7 +3692,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 5
 
-                            Text {
+                            VclText {
                                 id: delegateText
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
@@ -3733,7 +3733,7 @@ Rectangle {
                                 elide: Text.ElideMiddle
                             }
 
-                            Text {
+                            VclText {
                                 id: sceneLengthText
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-3
                                 color: Runtime.colors.primary.c10.text
@@ -4134,7 +4134,7 @@ Rectangle {
                     width: parent.width
                     spacing: 0
 
-                    Text {
+                    VclText {
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize
                         width: parent.width
@@ -4586,7 +4586,7 @@ Rectangle {
                         height: width
                         anchors.centerIn: parent
 
-                        Text {
+                        VclText {
                             anchors.centerIn: parent
                             font.pixelSize: parent.height * 0.70
                             font.bold: true
@@ -4618,7 +4618,7 @@ Rectangle {
                         height: width
                         anchors.centerIn: parent
 
-                        Text {
+                        VclText {
                             anchors.centerIn: parent
                             font.pixelSize: parent.height * 0.70
                             font.bold: true
@@ -4683,7 +4683,7 @@ Rectangle {
                     ToolTip.visible: containsMouse
                     ToolTip.text: "All CAPS\t" + Scrite.app.polishShortcutTextForDisplay("Shift+F3")
 
-                    Text {
+                    VclText {
                         anchors.centerIn: parent
                         font.pixelSize: parent.height*0.5
                         text: "AB"
@@ -4698,7 +4698,7 @@ Rectangle {
                     ToolTip.visible: containsMouse
                     ToolTip.text: "All small\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F3")
 
-                    Text {
+                    VclText {
                         anchors.centerIn: parent
                         font.pixelSize: parent.height*0.5
                         text: "ab"

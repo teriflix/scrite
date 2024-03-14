@@ -58,7 +58,7 @@ Item {
         modalDialog.arguments = undefined
     }
 
-    Text {
+    VclText {
         id: notice
         anchors.centerIn: parent
         visible: exporter === null
@@ -99,7 +99,7 @@ Item {
                     width: formView.width - (formView.scrollBarRequired ? 17 : 0)
                     spacing: 10
 
-                    Text {
+                    VclText {
                         font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
                         font.bold: true
                         text: isPdfExport ? "Generate PDF" : (exporter.formatName + " - Export")
@@ -123,7 +123,7 @@ Item {
                         active: exporter.canBundleFonts
                         sourceComponent: GroupBox {
                             width: parent.width
-                            label: Text {
+                            label: VclText {
                                 text: "Export fonts for the following languages"
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
@@ -268,7 +268,7 @@ Item {
             property var fieldInfo
             spacing: 10
 
-            Text {
+            VclText {
                 text: fieldInfo.label
                 width: parent.width
                 wrapMode: Text.WordWrap
@@ -307,7 +307,7 @@ Item {
                 TabSequenceItem.manager: tabSequence
             }
 
-            Text {
+            VclText {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
@@ -326,7 +326,7 @@ Item {
             property var fieldInfo
             spacing: 5
 
-            Text {
+            VclText {
                 text: fieldInfo.name
                 font.capitalization: Font.Capitalize
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -345,7 +345,7 @@ Item {
     Component {
         id: editor_Unknown
 
-        Text {
+        VclText {
             property var fieldInfo
             textFormat: Text.RichText
             text: "Do not know how to configure <strong>" + fieldInfo.name + "</strong>"

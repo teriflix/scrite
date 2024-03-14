@@ -85,7 +85,7 @@ Flickable {
                         Layout.fillWidth: true
                         spacing: 20
 
-                        Label {
+                        VclText {
                             Layout.fillWidth: true
                             text: notification.title
                             wrapMode: Text.WordWrap
@@ -95,7 +95,7 @@ Flickable {
                             color: notification.textColor
                         }
 
-                        Label {
+                        VclText {
                             Layout.fillWidth: true
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             text: notification.text

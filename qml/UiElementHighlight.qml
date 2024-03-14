@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 /**
   This item is used for highlighting UI elements to educate users about where
@@ -72,7 +73,7 @@ Item {
             border.width: 1
             border.color: Runtime.colors.accent.borderColor
 
-            Label {
+            VclText {
                 id: descLabel
                 text: description
                 font.bold: true

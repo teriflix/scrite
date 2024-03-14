@@ -6,5 +6,6 @@ VclMenu 1.0 VclMenu.qml
 VclMenuItem 1.0 VclMenuItem.qml
 VclRadioButton 1.0 VclRadioButton.qml
 VclScrollBar 1.0 VclScrollBar.qml
+VclText 1.0 VclText.qml
 VclTextField 1.0 VclTextField.qml
 VclToolButton 1.0 VclToolButton.qml

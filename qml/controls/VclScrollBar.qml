@@ -22,10 +22,14 @@ import "qrc:/qml/globals"
 ScrollBar {
     id: scrollBar
 
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    Material.theme: Runtime.colors.theme
+
     property Flickable flickable
     property int contentSize: flickable ? (orientation === Qt.Vertical ? flickable.contentHeight : flickable.contentWidth) : 0
     property int actualSize: flickable ? (orientation === Qt.Vertical ? flickable.height : flickable.width) : 0
-    property bool needed: contentSize > actualSize
+    property bool needed: false
 
     policy: needed ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
     minimumSize: 0.1
@@ -43,5 +47,11 @@ ScrollBar {
     Component.onCompleted: {
         if(flickable === null)
             flickable = Scrite.app.findFirstParentOfType(scrollBar, "QQuickFlickable")
+    }
+
+    DelayedPropertyBinder {
+        initial: false
+        set: parent.contentSize > parent.actualSize
+        onGetChanged: parent.needed = get
     }
 }

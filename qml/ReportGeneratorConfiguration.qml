@@ -70,7 +70,7 @@ Item {
         modalDialog.arguments = undefined
     }
 
-    Text {
+    VclText {
         id: notice
         anchors.centerIn: parent
         visible: generator === null
@@ -90,7 +90,7 @@ Item {
                 spacing: 10
                 y: 20
 
-                Text {
+                VclText {
                     font.pointSize: Screen.devicePixelRatio > 1 ? 24 : 20
                     font.bold: true
                     text: formInfo.title
@@ -98,7 +98,7 @@ Item {
                     color: Runtime.colors.primary.c300.text
                 }
 
-                Text {
+                VclText {
                     text: formInfo.description
                     font.pointSize:  Screen.devicePixelRatio > 1 ? 14 : 10
                     width: parent.width * 0.9
@@ -140,7 +140,7 @@ Item {
                                 height: 60
                                 color: pageList.currentIndex === index ? contentPanel.color : Runtime.colors.primary.c10.background
 
-                                Text {
+                                VclText {
                                     anchors.verticalCenter: parent.verticalCenter
                                     font.pixelSize: 18
                                     font.bold: pageList.currentIndex === index
@@ -416,7 +416,7 @@ Item {
                 characterNameListView.visible = characterNameListView.selectedCharacters.length === 0
             }
 
-            Text {
+            VclText {
                 id: fieldLabelText
                 text: fieldInfo.label
                 width: parent.width
@@ -435,7 +435,7 @@ Item {
                     spacing: 5
                     flow: Flow.LeftToRight
 
-                    Text {
+                    VclText {
                         id: charactersPrefix
                         text: characterNames.length === 0 ? "No Characters Selected" : "»"
                         topPadding: 0
@@ -535,7 +535,7 @@ Item {
                 width: parent.width-20
                 spacing: 5
 
-                Text {
+                VclText {
                     text: fieldInfo.label
                     width: parent.width
                     wrapMode: Text.WordWrap
@@ -544,7 +544,7 @@ Item {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 }
 
-                Text {
+                VclText {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     text: fieldInfo.note
@@ -599,13 +599,13 @@ Item {
             property var fieldInfo
             spacing: 5
 
-            Text {
+            VclText {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: fieldInfo.label
             }
 
-            Text {
+            VclText {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text:fieldInfo.note ? (fieldInfo.note + ". Filter by: ") : "Filter by: "
@@ -783,7 +783,7 @@ Item {
                     }
                 }
 
-                Text {
+                VclText {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
                     anchors.verticalCenter: parent.verticalCenter
@@ -800,13 +800,13 @@ Item {
             property var fieldInfo
             spacing: 5
 
-            Text {
+            VclText {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: fieldInfo.label
             }
 
-            Text {
+            VclText {
                 width: parent.width
                 wrapMode: Text.WordWrap
                 text: fieldInfo.note
@@ -856,7 +856,7 @@ Item {
                         width: episodeListView.width-1
                         height: index > 0 ? 40 : (Scrite.document.screenplay.episodeCount === 0 ? 40 : 0)
 
-                        Text {
+                        VclText {
                             text: "No espisodes in this screenplay"
                             visible: Scrite.document.screenplay.episodeCount === 0
                             anchors.centerIn: parent
@@ -884,14 +884,14 @@ Item {
             spacing: 5
             property var fieldInfo
 
-            Text {
+            VclText {
                 id: labelText
                 width: parent.width-20
                 wrapMode: Text.WordWrap
                 text: fieldInfo.label
             }
 
-            Text {
+            VclText {
                 id: noteText
                 width: parent.width-20
                 wrapMode: Text.WordWrap
@@ -925,7 +925,7 @@ Item {
                             anchors.fill: parent
                             anchors.margins: 3
                             color: Runtime.colors.primary.windowColor
-                            Text {
+                            VclText {
                                 text: section
                                 topPadding: 5
                                 bottomPadding: 5
@@ -974,7 +974,7 @@ Item {
             property var fieldInfo
             spacing: 5
 
-            Text {
+            VclText {
                 text: fieldInfo.label + ": "
                 width: parent.width - 30
             }
@@ -998,7 +998,7 @@ Item {
             property var fieldInfo
             spacing: 5
 
-            Text {
+            VclText {
                 text: fieldInfo.name
                 width: parent.width
                 wrapMode: Text.WordWrap
@@ -1006,7 +1006,7 @@ Item {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
             }
 
-            Text {
+            VclText {
                 text: fieldInfo.note
                 width: parent.width
                 wrapMode: Text.WordWrap
@@ -1035,7 +1035,7 @@ Item {
             property var fieldInfo
             spacing: 6
 
-            Text {
+            VclText {
                 text: fieldInfo.label
                 width: parent.width
                 wrapMode: Text.WordWrap
@@ -1044,7 +1044,7 @@ Item {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
-            Text {
+            VclText {
                 text: fieldInfo.note
                 width: parent.width-10
                 wrapMode: Text.WordWrap
@@ -1068,7 +1068,7 @@ Item {
     Component {
         id: editor_Unknown
 
-        Text {
+        VclText {
             property var fieldInfo
             textFormat: Text.RichText
             text: "Do not know how to configure <strong>" + fieldInfo.name + "</strong>"

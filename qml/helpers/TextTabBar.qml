@@ -17,6 +17,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 Item {
     id: textTabBar
@@ -31,7 +32,7 @@ Item {
         width: parent.width
         spacing: 16
 
-        Label {
+        VclText {
             id: nameText
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             font.family: Runtime.idealFontMetrics.font.family
@@ -45,7 +46,7 @@ Item {
             id: tabsRepeater
             model: tabs
 
-            Label {
+            VclText {
                 font: Runtime.idealFontMetrics.font
                 color: textTabBar.tabIndex === index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
                 text: modelData

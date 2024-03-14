@@ -41,7 +41,7 @@ VclDialog {
                 Layout.fillWidth: true
                 spacing: 10
 
-                Label {
+                VclText {
                     Layout.alignment: Qt.AlignVCenter
                     Layout.fillWidth: true
 
@@ -123,7 +123,7 @@ VclDialog {
                             width: parent.width-5
                             anchors.centerIn: parent
 
-                            Label {
+                            VclText {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
 

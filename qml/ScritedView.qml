@@ -312,7 +312,7 @@ Item {
                         visible: urlOverlay.visible
                     }
 
-                    Text {
+                    VclText {
                         id: urlOverlay
                         text: "scrite.io"
                         font.family: "Courier Prime"
@@ -327,7 +327,7 @@ Item {
                         visible: logoOverlay.visible
                     }
 
-                    Text {
+                    VclText {
                         width: parent.width * 0.75
                         wrapMode: Text.WordWrap
                         font.pointSize: 16
@@ -435,7 +435,7 @@ Item {
                                     focusPolicy: Qt.NoFocus
                                 }
 
-                                Text {
+                                VclText {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignVCenter
                                     width: parent.width
@@ -511,7 +511,7 @@ Item {
                                 width: titleText.width
                                 height: titleText.height
 
-                                Text {
+                                VclText {
                                     id: titleText
                                     padding: 8
                                     font.family: "Arial"
@@ -528,7 +528,7 @@ Item {
                                 height: subtitleText.height
                                 visible: subtitleText.text !== ""
 
-                                Text {
+                                VclText {
                                     id: subtitleText
                                     padding: 6
                                     font.family: "Arial"
@@ -545,7 +545,7 @@ Item {
                                 height: authorsText.height
                                 visible: authorsText.text !== ""
 
-                                Text {
+                                VclText {
                                     id: authorsText
                                     padding: 6
                                     font.family: "Arial"
@@ -606,7 +606,7 @@ Item {
                             }
                         }
 
-                        Text {
+                        VclText {
                             anchors.centerIn: parent
                             text: "scrite.io"
                             font.family: "Courier Prime"
@@ -915,7 +915,7 @@ Item {
                     height: parent.height * 0.9
                     anchors.centerIn: parent
 
-                    Text {
+                    VclText {
                         text: "Script » Screen"
                         color: "#f1be41"
                         font.pointSize: closingFrameOverlay.height * 0.025
@@ -931,7 +931,7 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                     }
 
-                    Text {
+                    VclText {
                         font.pointSize: closingFrameOverlay.height * 0.05
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
@@ -941,7 +941,7 @@ Item {
                         text: Scrite.document.screenplay.title
                     }
 
-                    Text {
+                    VclText {
                         font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
@@ -952,7 +952,7 @@ Item {
                         visible: text !== ""
                     }
 
-                    Text {
+                    VclText {
                         font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
@@ -1115,7 +1115,7 @@ Item {
                 visible: screenplayOffsetsView.count > 0
                 x: 40
 
-                Text {
+                VclText {
                     padding: 5
                     width: parent.width * 0.1
                     text: "#"
@@ -1127,7 +1127,7 @@ Item {
                     clip: true
                 }
 
-                Text {
+                VclText {
                     padding: 5
                     width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
                     font.bold: true
@@ -1138,7 +1138,7 @@ Item {
                     clip: true
                 }
 
-                Text {
+                VclText {
                     padding: 5
                     width: parent.width * 0.1
                     font.bold: true
@@ -1150,7 +1150,7 @@ Item {
                     clip: true
                 }
 
-                Text {
+                VclText {
                     padding: 5
                     width: parent.width * 0.2
                     font.bold: true
@@ -1263,7 +1263,7 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
 
-                        Text {
+                        VclText {
                             padding: 5
                             width: parent.width * 0.1
                             text: isSceneItem ? arrayItem.number : ""
@@ -1274,7 +1274,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        Text {
+                        VclText {
                             padding: 5
                             width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
                             text: arrayItem.snippet
@@ -1285,7 +1285,7 @@ Item {
                             elide: Text.ElideMiddle
                         }
 
-                        Text {
+                        VclText {
                             padding: 5
                             width: parent.width * 0.1
                             text: isSceneItem ? arrayItem.pageNumber : ""
@@ -1296,7 +1296,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        Text {
+                        VclText {
                             padding: 5
                             width: parent.width * 0.2
                             text: screenplayOffsetsModel.timestampToString(arrayItem.timestamp)

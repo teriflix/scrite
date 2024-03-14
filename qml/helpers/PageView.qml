@@ -32,11 +32,15 @@ Rectangle {
     property int pageContentSpacing: 20
     property real maxPageListWidth: 220
     property real pageListWidth: Math.max(width * 0.2, maxPageListWidth)
+    property real availablePageContentWidth: pageContentLoader.width
+    property real availablePageContentHeight: pageContentArea.height
+
+    color: Runtime.colors.primary.c50.background
 
     Rectangle {
         id: pageList
         width: pageListWidth
-        color: Runtime.colors.accent.c500.background // Runtime.colors.primary.c700.background
+        color: Runtime.colors.accent.c500.background
         height: parent.height
         anchors.left: parent.left
         property int currentIndex: -1
@@ -46,23 +50,36 @@ Rectangle {
             width: parent.width
             anchors.top: parent.top
             anchors.right: parent.right
+            anchors.topMargin: 20
+            clip: true
 
             Repeater {
                 id: pageRepeater
 
-                Rectangle {
+                Item {
                     width: parent.width
                     height: 60
-                    color: pageList.currentIndex === index ? pageView.color : Runtime.colors.primary.c10.background
 
-                    Text {
+                    Rectangle {
+                        width: parent.width
+                        height: parent.height - 15
+                        radius: height/2
+                        color: Runtime.colors.primary.c100.background
+                        opacity: 0.8
+                        visible: pageList.currentIndex === index
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.right: parent.right
+                        anchors.margins: -height/2
+                    }
+
+                    VclText {
                         anchors.right: parent.right
                         anchors.rightMargin: 40
                         anchors.verticalCenter: parent.verticalCenter
-                        font.pixelSize: 18
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         font.bold: pageList.currentIndex === index
                         text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
-                        color: pageList.currentIndex === index ? "black" : Runtime.colors.primary.c700.text
+                        color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c500.text
                     }
 
                     Image {
@@ -103,6 +120,7 @@ Rectangle {
         contentWidth: pageContentLoader.width
         contentHeight: pageContentLoader.height
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+        clip: showScrollBars
 
         ScrollBar.vertical: VclScrollBar { flickable: pageContentArea }
 

@@ -41,9 +41,13 @@ import "qrc:/qml/globals"
 Dialog {
     id: dialog
 
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    Material.theme: Runtime.colors.theme
+
     // Assign a component whose instance may be shown as background
     property Component backdrop: Rectangle {
-        color: Runtime.colors.primary.window
+        color: Runtime.colors.primary.c100.background
     }
 
     // Assign a component whose instance may be shown in the content
@@ -57,8 +61,6 @@ Dialog {
         width: 32; height: 32
         source: "qrc:/icons/action/dialog_close_button.png"
         smooth: true; mipmap: true
-        visible: titleBarHasCloseButton
-        enabled: titleBarHasCloseButton
 
         MouseArea {
             anchors.fill: parent
@@ -77,7 +79,7 @@ Dialog {
     anchors.centerIn: parent
 
     modal: true
-    closePolicy: Popup.NoAutoClose
+    closePolicy: Popup.CloseOnEscape
 
     topPadding: 0
     leftPadding: 0
@@ -137,7 +139,7 @@ Dialog {
             spacing: 2
             width: parent.width
 
-            Label {
+            VclText {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
 

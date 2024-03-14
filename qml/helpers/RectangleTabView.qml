@@ -15,6 +15,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 Item {
     property alias tabsArray: tabRepeater.model
@@ -49,7 +50,7 @@ Item {
                     visible: parent.selected
                 }
 
-                Label {
+                VclText {
                     id: tabText
                     anchors.centerIn: parent
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize

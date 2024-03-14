@@ -15,7 +15,9 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
+
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 Rectangle {
     property var mappings: Scrite.app.transliterationEngine.alphabetMappings
@@ -61,7 +63,7 @@ Rectangle {
                     height: 30
                     color: Runtime.colors.primary.c600.background
 
-                    Text {
+                    VclText {
                         text: modelData.heading
                         padding: 8
                         font.pointSize: normalFontMetrics.font.pointSize
@@ -80,7 +82,7 @@ Rectangle {
                         model: modelData.array
 
                         Row {
-                            Text {
+                            VclText {
                                 width: textCellWidth
                                 padding: 8
                                 font: normalFontMetrics.font
@@ -90,7 +92,7 @@ Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.verticalCenterOffset: (normalFontMetrics.height-languageFontMetrics.height)*0.3
                             }
-                            Text {
+                            VclText {
                                 width: textCellWidth
                                 padding: 8
                                 font: languageFontMetrics.font

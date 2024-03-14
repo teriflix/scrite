@@ -44,7 +44,7 @@ VclDialog {
     content: Item {
         implicitHeight: aboutInfoLayout.implicitHeight + 40
 
-        Text {
+        VclText {
             id: versionText
             anchors.top: parent.top
             anchors.right: parent.right
@@ -63,7 +63,7 @@ VclDialog {
             }
         }
 
-        Text {
+        VclText {
             font.pixelSize: 12
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Build Timestamp:\n" + Scrite.app.buildTimestamp
@@ -92,7 +92,7 @@ VclDialog {
                 Layout.preferredHeight: 14
             }
 
-            Text {
+            VclText {
                 Layout.alignment: Qt.AlignHCenter
 
                 text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
@@ -111,7 +111,7 @@ VclDialog {
                 Layout.preferredHeight: 14
             }
 
-            Text {
+            VclText {
                 Layout.alignment: Qt.AlignHCenter
 
                 text: "The app uses:"
@@ -169,7 +169,7 @@ VclDialog {
                         }
                     }
                     ScrollBar.vertical: ScrollBar { }
-                    delegate: Label {
+                    delegate: VclText {
                         required property string credits
                         required property url url
 
@@ -208,7 +208,7 @@ VclDialog {
                     source: "../../icons/action/share.png"
                 }
 
-                Text {
+                VclText {
                     Layout.alignment: Qt.AlignVCenter
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -294,8 +294,6 @@ VclDialog {
             readOnly: true
             font.family: "Courier Prime"
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            topPadding: backButton.y
-            bottomPadding: backButton.y
             text: Scrite.app.fileContents(":/LICENSE.txt")
             selectByMouse: true
         }

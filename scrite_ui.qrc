@@ -95,5 +95,23 @@
         <file>qml/helpers/FlickableTextArea.qml</file>
         <file>qml/dialogs/CollaboratorsDialog.qml</file>
         <file>qml/dialogs/RenameCharacterDialog.qml</file>
+        <file>qml/dialogs/SettingsDialog.qml</file>
+        <file>qml/dialogs/settingsdialog/qmldir</file>
+        <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageFontsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageTransiliterationPage.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageSettingsTab.qml</file>
+        <file>qml/controls/VclText.qml</file>
+        <file>qml/dialogs/settingsdialog/ApplicationSettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureSettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureStoryBeatsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayFormattingRulesPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayPageSetupPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplaySettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/ApplicationOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/NotebookOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/NotebookSettingsTab.qml</file>
     </qresource>
 </RCC>

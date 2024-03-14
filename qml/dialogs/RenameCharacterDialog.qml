@@ -38,7 +38,7 @@ VclDialog {
     Component {
         id: characterNotSpecifiedError
 
-        Label {
+        VclText {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -105,7 +105,7 @@ VclDialog {
                     character.clearRenameError()
                 }
 
-                content: Label {
+                content: VclText {
                     id: renameProgressDialogContent
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     verticalAlignment: Text.AlignVCenter

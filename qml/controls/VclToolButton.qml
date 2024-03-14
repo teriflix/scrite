@@ -29,8 +29,9 @@ ToolButton {
     property string shortcut
     property string shortcutText: shortcut
 
-    Material.background: Runtime.colors.accent.key
-    Material.foreground: Runtime.colors.primary.key
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    Material.theme: Runtime.colors.theme
 
     ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
     ToolTip.visible: ToolTip.text === "" ? false : hovered
@@ -67,7 +68,7 @@ ToolButton {
                 spacing: parent.spacing/2
                 anchors.verticalCenter: parent.verticalCenter
 
-                Text {
+                VclText {
                     text: toolButton.action.text
                     font.pixelSize: toolButton.font.pixelSize
                     font.bold: toolButton.down
@@ -78,7 +79,7 @@ ToolButton {
                     visible: toolButton.display !== AbstractButton.IconOnly
                 }
 
-                Text {
+                VclText {
                     font.pixelSize: 9
                     anchors.horizontalCenter: parent.horizontalCenter
                     text: "[" + toolButton.shortcutText + "]"

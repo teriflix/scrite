@@ -64,7 +64,7 @@ Item {
         spacing: 5
         width: parent.width
 
-        Text {
+        VclText {
             id: labelText
             width: parent.width
             wrapMode: Text.WordWrap

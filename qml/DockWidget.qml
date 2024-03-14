@@ -17,6 +17,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 Item {
     id: dockWidget
@@ -130,7 +131,7 @@ Item {
             height: 40
             color: Runtime.colors.primary.c300.background
 
-            Text {
+            VclText {
                 id: titleText
                 anchors.centerIn: parent
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize

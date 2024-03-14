@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 Item {
     property bool animationsEnabled: Scrite.app.isWindowsPlatform ? !Scrite.app.isNotWindows10 : true
@@ -49,7 +50,7 @@ Item {
                 asynchronous: true
             }
 
-            Text {
+            VclText {
                 id: versionText
                 x: parent.width - width - ((35 / splashImage.sourceSize.height) * parent.height)
                 y: (750 / splashImage.sourceSize.height) * parent.height
@@ -103,7 +104,7 @@ Item {
             }
         }
 
-        Text {
+        VclText {
             id: footnoteText
             anchors.top: splashImageArea.bottom
             anchors.topMargin: 40
@@ -142,7 +143,7 @@ Item {
             done()
     }
 
-    Label {
+    VclText {
         anchors.centerIn: parent
         text: "Welcome to Scrite"
         opacity: 0.01

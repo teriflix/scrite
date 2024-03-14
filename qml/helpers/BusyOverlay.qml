@@ -18,6 +18,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 Rectangle {
     id: busyOverlay
@@ -53,7 +54,7 @@ Rectangle {
             forDarkBackground: true
         }
 
-        Label {
+        VclText {
             width: parent.width
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             horizontalAlignment: Text.AlignHCenter

@@ -63,7 +63,7 @@ Item {
             Component.onCompleted: Utils.execLater(banner, 50, () => { visible = true } )
         }
 
-        Text {
+        VclText {
             id: appVersionLabel
             property real ratio: parent.height / parent.sourceSize.height
             anchors.right: parent.right
@@ -75,7 +75,7 @@ Item {
             color: "white"
         }
 
-        Text {
+        VclText {
             id: commonToolTip
             width: parent.width * 0.75
             anchors.left: parent.left
@@ -106,7 +106,7 @@ Item {
             }
         }
 
-        Text {
+        VclText {
             anchors.left: commonToolTip.left
             anchors.bottom: commonToolTip.bottom
             padding: commonToolTip.padding
@@ -276,7 +276,7 @@ Item {
                 }
             }
 
-            Text {
+            VclText {
                 id: buttonLabel
                 padding: 3
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -303,7 +303,7 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
-            Text {
+            VclText {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: "New File"
             }
@@ -454,7 +454,7 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
-            Text {
+            VclText {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: scriptalayMode ? "Scriptalay" : "Recent Files"
             }
@@ -669,7 +669,7 @@ Item {
             }
         }
 
-        Text {
+        VclText {
             anchors.centerIn: parent
             width: parent.width * 0.8
             visible: Scrite.vault.documentCount === 0
@@ -757,7 +757,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 20
 
-                    Text {
+                    VclText {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -765,7 +765,7 @@ Item {
                         text: importDropArea.active ? importDropArea.attachment.originalFileName : "Drop a file on to this area to import it."
                     }
 
-                    Text {
+                    VclText {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -800,7 +800,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 20
 
-                    Text {
+                    VclText {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -810,7 +810,7 @@ Item {
                         text: fileToImport.name
                     }
 
-                    Text {
+                    VclText {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -818,7 +818,7 @@ Item {
                         text: "Click on 'Import' button to import this file."
                     }
 
-                    Text {
+                    VclText {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
@@ -923,7 +923,7 @@ Item {
         StackPage {
             id: vaultPageItem
             content: VaultPage { }
-            title: Text {
+            title: VclText {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 text: Scrite.vault.documentCount > 0 ? "Select a file to restore from the vault." : ""

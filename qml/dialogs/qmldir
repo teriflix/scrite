@@ -3,3 +3,5 @@ BackupsDialog 1.0 BackupsDialog.qml
 CollaboratorsDialog 1.0 CollaboratorsDialog.qml
 RenameCharacterDialog 1.0 RenameCharacterDialog.qml
 TitlePageDialog 1.0 TitlePageDialog.qml
+SettingsDialog 1.0 SettingsDialog.qml
+

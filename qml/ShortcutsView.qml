@@ -53,7 +53,7 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 4
 
-                Text {
+                VclText {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.leftMargin: 5
@@ -76,7 +76,7 @@ Item {
                 anchors.leftMargin: 20
                 anchors.right: parent.right
 
-                Text {
+                VclText {
                     anchors.verticalCenter: parent.verticalCenter
                     // font.family: "Courier Prime"
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -85,7 +85,7 @@ Item {
                     elide: Text.ElideRight
                 }
 
-                Text {
+                VclText {
                     anchors.verticalCenter: parent.verticalCenter
                     font.family: "Courier Prime"
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-2

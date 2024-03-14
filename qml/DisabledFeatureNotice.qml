@@ -72,7 +72,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            Text {
+            VclText {
                 text: featureName
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 8
                 font.bold: true
@@ -80,7 +80,7 @@ Rectangle {
                 visible: text !== ""
             }
 
-            Text {
+            VclText {
                 id: reasonSuggestion
                 text: [reason, suggestion].join(" ").trim()
                 width: parent.width

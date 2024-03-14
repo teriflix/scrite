@@ -24,6 +24,11 @@ import "qrc:/js/utils.js" as Utils
 Item {
     id: scriteRuntime
 
+    // Global variables
+    property bool canShowNotebookInStructure: width > 1600
+    property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
+    property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
+
     // Persistent Settings
     readonly property Settings scrollAreaSettings: Settings {
         fileName: Scrite.app.settingsFilePath
@@ -42,6 +47,14 @@ Item {
         property bool displayAnnotationProperties: true
         property bool showPullHandleAnimation: true
         property real lineWidthOfConnectors: 1.5
+
+        function restoreDefaultGridColor() {
+            gridColor = Runtime.colors.accent.c400.background
+        }
+
+        function restoreDefaultCanvasColor() {
+            canvasColor = Runtime.colors.accent.c50.background
+        }
     }
 
     readonly property Settings timelineViewSettings: Settings {
@@ -357,6 +370,8 @@ Item {
     }
 
     readonly property Item colors: Item {
+        readonly property int theme: Material.Light
+
         readonly property Colors primary: Colors {
             key: Material.Grey
         }
@@ -486,6 +501,12 @@ Item {
     readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {
         screenplay: Scrite.document.screenplay
         Component.onCompleted: Scrite.app.registerObject(screenplayTracks, "screenplayTracks")
+    }
+
+    // Announcement IDs
+    readonly property QtObject announcementIds: QtObject {
+        readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
+        readonly property string reloadMainUiRequest: "9a7f0f35-346f-461d-bb85-f5c6dc08a01d"
     }
 
     // Private objects

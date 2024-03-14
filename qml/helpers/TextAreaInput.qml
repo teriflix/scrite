@@ -72,7 +72,7 @@ TextArea {
 
     TextAreaSpellingSuggestionsMenu { }
 
-    property var spellChecker: Transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
+    property var spellChecker: Transliterator.highlighter ? Transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate") : null
     ContextMenuEvent.active: spellChecker ? !spellChecker.wordUnderCursorIsMisspelled : true
     ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
     ContextMenuEvent.onPopup: (mouse) => {

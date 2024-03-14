@@ -314,7 +314,7 @@ Rectangle {
                                 anchors.verticalCenterOffset: 5
                                 spacing: 40
 
-                                Text {
+                                VclText {
                                     text: "<b>Are you sure you want to delete this relationship?</b><br/><br/>NOTE: This action cannot be undone!!"
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                     width: parent.width
@@ -431,7 +431,7 @@ Rectangle {
         anchors.fill: parent
         visible: crGraph.dirty
 
-        Text {
+        VclText {
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.margins: 25
@@ -475,7 +475,7 @@ Rectangle {
                 width: parent.width - 50
                 anchors.centerIn: parent
 
-                Text {
+                VclText {
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                     text: "Edit Relationship"
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -509,7 +509,7 @@ Rectangle {
                             }
                         }
 
-                        Text {
+                        VclText {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -559,7 +559,7 @@ Rectangle {
                             }
                         }
 
-                        Text {
+                        VclText {
                             width: parent.width
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -653,7 +653,7 @@ Rectangle {
                     border.color: node.marked ? Runtime.colors.accent.a700.text : "black"
                 }
 
-                Text {
+                VclText {
                     id: infoLabel
                     width: parent.width - 30
                     anchors.bottom: parent.bottom
@@ -741,7 +741,7 @@ Rectangle {
                 height: nameLabel.height + 4
                 color: nameLabelMouseArea.containsMouse ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
 
-                Text {
+                VclText {
                     id: nameLabel
                     text: modelData.relationship.name
                     font.pointSize: Math.floor(Runtime.idealFontMetrics.font.pointSize*0.75)

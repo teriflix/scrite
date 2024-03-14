@@ -124,7 +124,7 @@ Item {
                         height: 40
                         color: symbolsPanel.currentIndex === index ? Runtime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
 
-                        Text {
+                        VclText {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 10
@@ -160,7 +160,7 @@ Item {
                 width: symbolsGridView.width-14
                 height: symbolsPanel.currentIndexIsEmoji ? 35 : 0
 
-                Text {
+                VclText {
                     visible: symbolsPanel.currentIndexIsEmoji
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter
@@ -184,7 +184,7 @@ Item {
                     opacity: 0.5
                 }
 
-                Text {
+                VclText {
                     anchors.centerIn: parent
                     text: modelData
                     font.pixelSize: parent.height * 0.6

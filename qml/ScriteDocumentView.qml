@@ -37,12 +37,14 @@ Item {
 
     enabled: !Scrite.document.loading
 
-    property bool canShowNotebookInStructure: width > 1600
-    property bool showNotebookInStructure: Runtime.workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
-    onShowNotebookInStructureChanged: {
-        Utils.execLater(Runtime.workspaceSettings, 100, function() {
-            mainTabBar.currentIndex = mainTabBar.currentIndex % (showNotebookInStructure ? 2 : 3)
-        })
+    Connections {
+        target: Runtime
+
+        function onShowNotebookInStructureChanged() {
+            Utils.execLater(mainTabBar, 100, function() {
+                mainTabBar.currentIndex = mainTabBar.currentIndex % (Runtime.showNotebookInStructure ? 2 : 3)
+            })
+        }
     }
 
     Shortcut {
@@ -206,7 +208,7 @@ Item {
         ShortcutsModelItem.shortcut: sequence
         onActivated: {
             mainTabBar.activateTab(1)
-            if(showNotebookInStructure)
+            if(Runtime.showNotebookInStructure)
                 Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
         }
     }
@@ -219,7 +221,7 @@ Item {
         ShortcutsModelItem.title: "Notebook"
         ShortcutsModelItem.shortcut: sequence
         onActivated: {
-            if(showNotebookInStructure) {
+            if(Runtime.showNotebookInStructure) {
                 if(mainTabBar.currentIndex === 1)
                     Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
                 else {
@@ -232,7 +234,7 @@ Item {
                 mainTabBar.activateTab(2)
         }
 
-        property bool notebookTabVisible: mainTabBar.currentIndex === (showNotebookInStructure ? 1 : 2)
+        property bool notebookTabVisible: mainTabBar.currentIndex === (Runtime.showNotebookInStructure ? 1 : 2)
 
         function showBookmarkedNotes() {
             showNotes("Notebook Bookmarks")
@@ -247,7 +249,7 @@ Item {
         }
 
         function showNotes(type) {
-            var nbt = showNotebookInStructure ? 1 : 2
+            var nbt = Runtime.showNotebookInStructure ? 1 : 2
             if(mainTabBar.currentIndex !== nbt) {
                 mainTabBar.activateTab(nbt)
                 Utils.execLater(mainTabBar, 250, function() {
@@ -397,7 +399,7 @@ Item {
 
                 ToolTip.text: "Open any of the " + Scrite.document.backupFilesModel.count + " backup(s) available for this file."
 
-                Text {
+                VclText {
                     id: backupCountHint
                     font.pixelSize: parent.height * 0.2
                     font.bold: true
@@ -574,9 +576,7 @@ Item {
                             enabled: appToolBar.visible
 
                             function activate() {
-                                modalDialog.popupSource = settingsAndShortcutsButton
-                                modalDialog.sourceComponent = optionsDialogComponent
-                                modalDialog.active = true
+                                settingsDialog.open()
                             }
 
                             ShortcutsModelItem.group: "Application"
@@ -640,10 +640,6 @@ Item {
                                     else
                                         showAboutDialog()
                                 }
-                            }
-
-                            AboutDialog {
-                                id: aboutDialog
                             }
 
                             function showAboutDialog() {
@@ -815,7 +811,7 @@ Item {
                                     opacity: 0.9
                                     anchors.fill: parent
 
-                                    Text {
+                                    VclText {
                                         width: parent.width * 0.75
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                                         anchors.centerIn: parent
@@ -834,7 +830,7 @@ Item {
                 }
             }
 
-            Text {
+            VclText {
                 id: languageDescLabel
                 anchors.verticalCenter: parent.verticalCenter
                 text: Scrite.app.transliterationEngine.languageAsString
@@ -991,7 +987,7 @@ Item {
                                 text: "Notebook (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                                 onTriggered: mainTabBar.activateTab(2)
                                 font.bold: mainTabBar.currentIndex === 2
-                                enabled: !showNotebookInStructure
+                                enabled: !Runtime.showNotebookInStructure
                             }
 
                             VclMenuItem {
@@ -1041,7 +1037,7 @@ Item {
                 editor: sceneEditor ? sceneEditor.editor : null
                 visible: {
                     var min = 0
-                    var max = showNotebookInStructure ? 1 : 2
+                    var max = Runtime.showNotebookInStructure ? 1 : 2
                     return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
                 }
             }
@@ -1054,7 +1050,7 @@ Item {
                 readonly property var tabs: [
                     { "name": "Screenplay", "icon": "qrc:/icons/navigation/screenplay_tab.png", "visible": true, "tab": Runtime.e_ScreenplayTab },
                     { "name": "Structure", "icon": "qrc:/icons/navigation/structure_tab.png", "visible": true, "tab": Runtime.e_StructureTab },
-                    { "name": "Notebook", "icon": "qrc:/icons/navigation/notebook_tab.png", "visible": !showNotebookInStructure, "tab": Runtime.e_NotebookTab },
+                    { "name": "Notebook", "icon": "qrc:/icons/navigation/notebook_tab.png", "visible": !Runtime.showNotebookInStructure, "tab": Runtime.e_NotebookTab },
                     { "name": "Scrited", "icon": "qrc:/icons/navigation/scrited_tab.png", "visible": Runtime.workspaceSettings.showScritedTab, "tab": Runtime.e_ScritedTab }
                 ]
                 readonly property color activeTabColor: Runtime.colors.primary.windowColor
@@ -1242,6 +1238,20 @@ Item {
         property bool allowContent: true
         property string sessionId
 
+        Announcement.onIncoming: (type, data) => {
+                                               if(type === Runtime.announcementIds.reloadMainUiRequest) {
+                                                    mainUiContentLoader.active = false
+
+                                                    const delay = data && typeof data === "number" ? data : 100
+                                                    Utils.execLater(mainUiContentLoader, delay, () => {
+                                                                        mainUiContentLoader.active = true
+                                                                    })
+                                                }
+                                           }
+
+
+        // Recfactor QML: Get rid of this function, unless its called from this file itself.
+        // It encourages usage of leap-of-faith IDs, which is a bad idea.
         function reset(callback) {
             active = false
             Qt.callLater( (callback) => {
@@ -1261,7 +1271,7 @@ Item {
         visible: pdfViewer.active
         enabled: visible && !notificationsView.visible
 
-        Text {
+        VclText {
             text: pdfViewer.pdfTitle
             color: Runtime.colors.accent.c50.text
             elide: Text.ElideMiddle
@@ -1493,7 +1503,7 @@ Item {
 
             additionalCharacterMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
-                    if(showNotebookInStructure)
+                    if(Runtime.showNotebookInStructure)
                         return [
                                     {
                                         "name": "Character Notes",
@@ -1506,7 +1516,7 @@ Item {
             }
             additionalSceneMenuItems: {
                 if(mainTabBar.currentIndex === 1) {
-                    if(showNotebookInStructure)
+                    if(Runtime.showNotebookInStructure)
                         return ["Scene Notes"]
                 }
                 return []
@@ -1519,7 +1529,7 @@ Item {
             enableSceneListPanel: mainTabBar.currentIndex === 0
 
             onAdditionalCharacterMenuItemClicked: (characterName,menuItemName) => {
-                if(menuItemName === "Character Notes" && showNotebookInStructure) {
+                if(menuItemName === "Character Notes" && Runtime.showNotebookInStructure) {
                     var ch = Scrite.document.structure.findCharacter(characterName)
                     if(ch === null)
                         Scrite.document.structure.addCharacter(characterName)
@@ -1571,7 +1581,7 @@ Item {
                             width: parent.width * 0.5
                             spacing: 20
 
-                            Text {
+                            VclText {
                                 wrapMode: Text.WordWrap
                                 width: parent.width
                                 color: Runtime.colors.primary.c700.text
@@ -1581,7 +1591,7 @@ Item {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
-                            Text {
+                            VclText {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 color: Runtime.colors.primary.c700.text
@@ -1590,7 +1600,7 @@ Item {
                                 text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
                             }
 
-                            Text {
+                            VclText {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 color: Runtime.colors.primary.c700.text
@@ -1653,7 +1663,7 @@ Item {
                         SplitView.minimumWidth: 80
                         color: Runtime.colors.primary.c10.background
                         border {
-                            width: showNotebookInStructure ? 0 : 1
+                            width: Runtime.showNotebookInStructure ? 0 : 1
                             color: Runtime.colors.primary.borderColor
                         }
 
@@ -1665,7 +1675,7 @@ Item {
                             Announcement.onIncoming: (type,data) => {
                                 var sdata = "" + data
                                 var stype = "" + type
-                                if(showNotebookInStructure) {
+                                if(Runtime.showNotebookInStructure) {
                                     if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C") {
                                         if(sdata === "Structure")
                                             structureEditorTabs.currentTabIndex = 0
@@ -1696,12 +1706,12 @@ Item {
                                 anchors.left: parent.left
                                 anchors.top: parent.top
                                 anchors.bottom: parent.bottom
-                                // active: !Runtime.appFeatures.structure.enabled && ui.showNotebookInStructure
+                                // active: !Runtime.appFeatures.structure.enabled && Runtime.showNotebookInStructure
                                 active: {
                                     if(structureEditorTabs.currentTabIndex === 0)
-                                        return !Runtime.appFeatures.structure.enabled && mainScriteDocumentView.showNotebookInStructure
+                                        return !Runtime.appFeatures.structure.enabled && Runtime.showNotebookInStructure
                                     else if(structureEditorTabs.currentTabIndex === 1)
-                                        return !Runtime.appFeatures.notebook.enabled && mainScriteDocumentView.showNotebookInStructure
+                                        return !Runtime.appFeatures.notebook.enabled && Runtime.showNotebookInStructure
                                     return false
                                 }
                                 visible: active
@@ -1714,7 +1724,7 @@ Item {
 
                                         FlatToolButton {
                                             down: structureEditorTabs.currentTabIndex === 0
-                                            visible: mainScriteDocumentView.showNotebookInStructure
+                                            visible: Runtime.showNotebookInStructure
                                             iconSource: "qrc:/icons/navigation/structure_tab.png"
                                             ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                                             onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
@@ -1722,7 +1732,7 @@ Item {
 
                                         FlatToolButton {
                                             down: structureEditorTabs.currentTabIndex === 1
-                                            visible: mainScriteDocumentView.showNotebookInStructure
+                                            visible: Runtime.showNotebookInStructure
                                             iconSource: "qrc:/icons/navigation/notebook_tab.png"
                                             ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                                             onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
@@ -1744,7 +1754,7 @@ Item {
                                 anchors.left: structureEditorTabBar.active ? structureEditorTabBar.right : parent.left
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
-                                visible: !showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
+                                visible: !Runtime.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                 active: Runtime.appFeatures.structure.enabled
                                 sourceComponent: StructureView {
                                     HelpTipNotification {
@@ -1766,7 +1776,7 @@ Item {
                                 anchors.left: structureEditorTabBar.active ? structureEditorTabBar.right : parent.left
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
-                                visible: showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+                                visible: Runtime.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
                                 active: visible && Runtime.appFeatures.notebook.enabled
                                 sourceComponent: NotebookView {
                                     toolbarSize: appToolBar.height+4
@@ -1826,7 +1836,7 @@ Item {
                                         visible: screenplayEditorHandleAnimation.running
                                     }
 
-                                    Text {
+                                    VclText {
                                         color: Runtime.colors.primary.c50.background
                                         text: "Pull this handle to view the screenplay editor."
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
@@ -1875,7 +1885,7 @@ Item {
                                         visible: timelineViewHandleAnimation.running
                                     }
 
-                                    Text {
+                                    VclText {
                                         color: Runtime.colors.primary.c50.background
                                         text: "Pull this handle to get the timeline view."
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -1942,7 +1952,7 @@ Item {
 
                     ScreenplayView {
                         anchors.fill: parent
-                        showNotesIcon: showNotebookInStructure
+                        showNotesIcon: Runtime.showNotebookInStructure
                     }
 
                     Rectangle {
@@ -2274,6 +2284,14 @@ Item {
             if(onCompleted)
                 onCompleted()
         })
+    }
+
+    AboutDialog {
+        id: aboutDialog
+    }
+
+    SettingsDialog {
+        id: settingsDialog
     }
 
     FileDialog {

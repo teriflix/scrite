@@ -17,6 +17,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 Loader {
     id: textViewEdit
@@ -55,7 +56,7 @@ Loader {
     Component {
         id: textViewComponent
 
-        Label {
+        VclText {
             property string markupText
             text: markupText !== "" ? markupText : textViewEdit.text
             font: textViewEdit.font
@@ -173,7 +174,7 @@ Loader {
                     model: completionModel
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     keyNavigationEnabled: false
-                    delegate: Text {
+                    delegate: VclText {
                         width: completionView.width-1
                         text: string
                         padding: 5

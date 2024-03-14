@@ -231,7 +231,7 @@ Item {
                 }
             }
 
-            Text {
+            VclText {
                 text: "View: "
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 anchors.verticalCenter: parent.verticalCenter
@@ -382,7 +382,7 @@ Item {
         border.width: 1
         border.color: Runtime.colors.primary.c400.background
 
-        Text {
+        VclText {
             text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
             font.pixelSize: statusBar.height * 0.5
             anchors.verticalCenter: parent.verticalCenter

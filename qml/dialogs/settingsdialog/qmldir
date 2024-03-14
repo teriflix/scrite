@@ -1,0 +1,15 @@
+ApplicationOptionsPage 1.0 ApplicationOptionsPage.qml
+ApplicationSettingsTab 1.0 ApplicationSettingsTab.qml
+LanguageFontsPage 1.0 LanguageFontsPage.qml
+LanguageOptionsPage 1.0 LanguageOptionsPage.qml
+LanguageSettingsTab 1.0 LanguageSettingsTab.qml
+LanguageTransiliterationPage 1.0 LanguageTransiliterationPage.qml
+NotebookOptionsPage 1.0 NotebookOptionsPage.qml
+NotebookSettingsTab 1.0 NotebookSettingsTab.qml
+ScreenplayFormattingRulesPage 1.0 ScreenplayFormattingRulesPage.qml
+ScreenplayOptionsPage 1.0 ScreenplayOptionsPage.qml
+ScreenplayPageSetupPage 1.0 ScreenplayPageSetupPage.qml
+ScreenplaySettingsTab 1.0 ScreenplaySettingsTab.qml
+StructureOptionsPage 1.0 StructureOptionsPage.qml
+StructureSettingsTab 1.0 StructureSettingsTab.qml
+StructureStoryBeatsPage 1.0 StructureStoryBeatsPage.qml

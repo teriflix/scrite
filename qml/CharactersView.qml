@@ -50,7 +50,7 @@ Rectangle {
             onClicked: tagsMenu.open()
             down: tagsMenu.visible
 
-            Text {
+            VclText {
                 font.pixelSize: parent.height * 0.2
                 font.bold: true
                 text: charactersModel.tags.length > 0 ? charactersModel.tags.length : ""

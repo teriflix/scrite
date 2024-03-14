@@ -21,9 +21,9 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 Menu {
-    Material.accent: Runtime.colors.primary.key
-    Material.background: Runtime.colors.primary.c100.background
-    Material.foreground: Runtime.colors.primary.c50.text
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    Material.theme: Runtime.colors.theme
 
-    objectName: title
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

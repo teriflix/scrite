@@ -144,7 +144,7 @@ Rectangle {
 
             FlatToolButton {
                 id: structureTabButton
-                visible: mainScriteDocumentView.showNotebookInStructure
+                visible: Runtime.showNotebookInStructure
                 iconSource: "qrc:/icons/navigation/structure_tab.png"
                 ToolTip.text: "Structure Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
@@ -154,7 +154,7 @@ Rectangle {
 
             FlatToolButton {
                 id: notebookTabButton
-                visible: mainScriteDocumentView.showNotebookInStructure
+                visible: Runtime.showNotebookInStructure
                 iconSource: "qrc:/icons/navigation/notebook_tab.png"
                 down: true
                 ToolTip.text: "Notebook\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
@@ -454,7 +454,7 @@ Rectangle {
                             }
                         }
 
-                        Text {
+                        VclText {
                             id: itemDelegateText
                             padding: 5
                             font.family: fontMetrics.font.family
@@ -737,7 +737,7 @@ Rectangle {
                         anchors.centerIn: parent
                         spacing: 40
 
-                        Text {
+                        VclText {
                             text: {
                                 if(notebookTree.currentNote)
                                     return "Are you sure you want to delete this note?"
@@ -874,7 +874,7 @@ Rectangle {
                                     }
                                 }
 
-                                Text {
+                                VclText {
                                     id: headingText
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                     font.bold: true
@@ -886,7 +886,7 @@ Rectangle {
                                 }
                             }
 
-                            Text {
+                            VclText {
                                 width: parent.width
                                 height: parent.height - headingText.height - parent.spacing
                                 wrapMode: Text.WordWrap
@@ -1012,7 +1012,7 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             flow: Flow.LeftToRight
 
-                            Text {
+                            VclText {
                                 id: sceneCharactersListHeading
                                 text: "Characters: "
                                 font.bold: true
@@ -1357,7 +1357,7 @@ Rectangle {
                                     anchors.margins: 16
                                     spacing: 8
 
-                                    Text {
+                                    VclText {
                                         id: headingText
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                         font.bold: true
@@ -1368,7 +1368,7 @@ Rectangle {
                                         color: Scrite.app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
                                     }
 
-                                    Text {
+                                    VclText {
                                         width: parent.width
                                         height: parent.height - headingText.height - parent.spacing
                                         wrapMode: Text.WordWrap
@@ -1601,7 +1601,7 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 10
 
-                            Text {
+                            VclText {
                                 id: headingLabel
                                 text: breakElement.breakTitle + ": "
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
@@ -1666,7 +1666,7 @@ Rectangle {
                 target: breakElement ? breakElement.attachments : null
             }
 
-            Text {
+            VclText {
                 width: parent.width * 0.6
                 anchors.centerIn: parent
                 horizontalAlignment: Text.AlignHCenter
@@ -1762,7 +1762,7 @@ Rectangle {
                                 anchors.horizontalCenter: parent.horizontalCenter
                             }
 
-                            Text {
+                            VclText {
                                 font.family: screenplayFontMetrics.font.family
                                 font.pointSize: screenplayFontMetrics.font.pointSize + 2
                                 font.bold: true
@@ -1772,7 +1772,7 @@ Rectangle {
                                 text: Scrite.document.screenplay.title === "" ? "<untitled>" : Scrite.document.screenplay.title
                             }
 
-                            Text {
+                            VclText {
                                 font.family: screenplayFontMetrics.font.family
                                 font.pointSize: screenplayFontMetrics.font.pointSize
                                 font.bold: true
@@ -1787,7 +1787,7 @@ Rectangle {
                                 width: parent.width
                                 spacing: 0
 
-                                Text {
+                                VclText {
                                     font: screenplayFontMetrics.font
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -1795,7 +1795,7 @@ Rectangle {
                                     text: "Written By"
                                 }
 
-                                Text {
+                                VclText {
                                     font: screenplayFontMetrics.font
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -1804,7 +1804,7 @@ Rectangle {
                                 }
                             }
 
-                            Text {
+                            VclText {
                                 font: screenplayFontMetrics.font
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -1812,7 +1812,7 @@ Rectangle {
                                 text: Scrite.document.screenplay.version === "" ? "Initial Version" : Scrite.document.screenplay.version
                             }
 
-                            Text {
+                            VclText {
                                 font: screenplayFontMetrics.font
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -1829,7 +1829,7 @@ Rectangle {
                                 anchors.right: parent.horizontalCenter
                                 anchors.rightMargin: -width*0.25
 
-                                Text {
+                                VclText {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     width: parent.width
@@ -1838,7 +1838,7 @@ Rectangle {
                                     visible: text !== ""
                                 }
 
-                                Text {
+                                VclText {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     width: parent.width
@@ -1847,7 +1847,7 @@ Rectangle {
                                     visible: text !== ""
                                 }
 
-                                Text {
+                                VclText {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     width: parent.width
@@ -1856,7 +1856,7 @@ Rectangle {
                                     visible: text !== ""
                                 }
 
-                                Text {
+                                VclText {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     font.underline: true
@@ -1873,7 +1873,7 @@ Rectangle {
                                     }
                                 }
 
-                                Text {
+                                VclText {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
                                     font.underline: true
@@ -1959,7 +1959,7 @@ Rectangle {
                             x: Math.max(0, (parent.width-width)/2)
                             width: Math.min(Runtime.idealFontMetrics.averageCharacterWidth*50, parent.width-20)
 
-                            Label {
+                            VclText {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -1996,7 +1996,7 @@ Rectangle {
                                 Component.onCompleted: syntaxHighlighter.addDelegate(textLimitHighlighter)
                             }
 
-                            Label {
+                            VclText {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -2047,7 +2047,7 @@ Rectangle {
         Item {
             property var componentData
 
-            Text {
+            VclText {
                 anchors.fill: parent
                 anchors.margins: 20
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -2165,7 +2165,7 @@ Rectangle {
                                         spacing: parent.spacing/2
                                         anchors.verticalCenter: parent.verticalCenter
 
-                                        Text {
+                                        VclText {
                                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                             font.bold: true
                                             text: character.name
@@ -2173,7 +2173,7 @@ Rectangle {
                                             elide: Text.ElideRight
                                         }
 
-                                        Text {
+                                        VclText {
                                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                                             text: "Role: " + polishStr(character.designation, "-")
                                             width: parent.width
@@ -2181,7 +2181,7 @@ Rectangle {
                                             opacity: 0.75
                                         }
 
-                                        Text {
+                                        VclText {
                                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                                             text: ["Age: " + polishStr(character.age, "-"), "Gender: " + polishStr(character.gender, "-")].join(", ")
                                             width: parent.width
@@ -2640,7 +2640,7 @@ Rectangle {
                                         Column {
                                             width: parent.width
 
-                                            Text {
+                                            VclText {
                                                 function priority(val) {
                                                     var ret = ""
                                                     if(val >= -2 && val <= 2)
@@ -2966,7 +2966,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 20
 
-                Text {
+                VclText {
                     id: title
                     width: parent.width
                     anchors.top: parent.top
@@ -3042,7 +3042,7 @@ Rectangle {
                                         opacity: relationshipName.length > 0 ? 1 : 0.05
                                     }
 
-                                    Text {
+                                    VclText {
                                         id: characterRowLabel1
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                         text: thisCharacterName + ": "
@@ -3073,7 +3073,7 @@ Rectangle {
                                         }
                                     }
 
-                                    Text {
+                                    VclText {
                                         id: characterRowLabel2
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                         text: Scrite.app.camelCased(otherCharacterName) + "."
@@ -3282,7 +3282,7 @@ Rectangle {
 
     Loader {
         id: structureIconAnimator
-        active: Runtime.workspaceSettings.animateStructureIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
+        active: Runtime.workspaceSettings.animateStructureIcon && !modalDialog.active && Runtime.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: structureTabButton

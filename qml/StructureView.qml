@@ -50,7 +50,7 @@ Item {
 
             FlatToolButton {
                 id: structureTabButton
-                visible: mainScriteDocumentView.showNotebookInStructure
+                visible: Runtime.showNotebookInStructure
                 iconSource: "qrc:/icons/navigation/structure_tab.png"
                 down: true
                 ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
@@ -58,7 +58,7 @@ Item {
 
             FlatToolButton {
                 id: notebookTabButton
-                visible: mainScriteDocumentView.showNotebookInStructure
+                visible: Runtime.showNotebookInStructure
                 iconSource: "qrc:/icons/navigation/notebook_tab.png"
                 ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
                 onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
@@ -587,7 +587,7 @@ Item {
                     var item = currentElementItemBinder.get
                     if(item === null)
                         item = elementItems.itemAt(0)
-                    if(Runtime.screenplayEditorSettings.firstSwitchToStructureTab)
+                    if(Runtime.firstSwitchToStructureTab)
                         canvasScroll.zoomOneToItem(item)
                     else
                         canvasScroll.ensureItemVisible(item, canvas.scale)
@@ -601,6 +601,7 @@ Item {
 
             updateScriteDocumentUserDataEnabled = true
             Runtime.screenplayEditorSettings.firstSwitchToStructureTab = false
+            Runtime.firstSwitchToStructureTab = false
         }
 
         function updateFromScriteDocumentUserDataLater() {
@@ -813,7 +814,7 @@ Item {
             }
 
             FocusTracker.window: Scrite.window
-            FocusTracker.indicator.target: mainUndoStack
+            FocusTracker.indicator.target: Runtime.undoStack
             FocusTracker.indicator.property: "structureEditorActive"
 
             MouseArea {
@@ -940,7 +941,7 @@ Item {
                     }
 
                     Connections {
-                        target: structureCanvasSettings
+                        target: Runtime.structureCanvasSettings
                         function onDisplayAnnotationPropertiesChanged() {
                             if(Runtime.structureCanvasSettings.displayAnnotationProperties)
                                 floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
@@ -1203,7 +1204,7 @@ Item {
                         color: Runtime.colors.accent.c200.background
                     }
 
-                    Text {
+                    VclText {
                         id: episodeNameText
                         anchors.left: parent.left
                         anchors.top: parent.top
@@ -1338,7 +1339,7 @@ Item {
                         }
                     }
 
-                    Text {
+                    VclText {
                         id: beatLabel
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
@@ -2078,7 +2079,7 @@ Item {
             color: Runtime.colors.primary.c700.background
         }
 
-        Text {
+        VclText {
             id: attachmentNotice
             anchors.centerIn: parent
             width: parent.width * 0.5 /* noticeWidthFactor */
@@ -2101,7 +2102,7 @@ Item {
         border.color: Runtime.colors.primary.borderColor
         clip: true
 
-        Text {
+        VclText {
             anchors.left: parent.left
             anchors.right: statusBarControls.left
             anchors.margins: 10
@@ -2897,7 +2898,7 @@ Item {
                                         elementItem.select()
                                         cursorFocusAnimation.active = true
                                     } else
-                                        element.scene.trimTitle()
+                                        elementItem.element.scene.trimSynopsis()
                                     synopsisFieldLoader.hasFocus = activeFocus
                                 }
                                 Keys.onEscapePressed: canvasTabSequence.releaseFocus()
@@ -3012,7 +3013,7 @@ Item {
                                 }
                                 attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this scene."
 
-                                Text {
+                                VclText {
                                     width: parent.width
                                     horizontalAlignment: Text.AlignHCenter
                                     anchors.centerIn: parent
@@ -3069,7 +3070,7 @@ Item {
                         y: Math.max(0, (parent.height-height)/2)
                         spacing: 5
 
-                        Text {
+                        VclText {
                             id: groupsLabel
                             x: characterList.x
                             text: Scrite.document.structure.presentableGroupNames(element.scene.groups)
@@ -3080,7 +3081,7 @@ Item {
                             color: footerRow.lightBackground ? "black" : "white"
                         }
 
-                        Text {
+                        VclText {
                             id: characterList
                             font.pointSize: Scrite.app.idealAppFontSize - 2
                             width: parent.width
@@ -3270,7 +3271,7 @@ Item {
                         anchors.centerIn: parent
                         spacing: 40
 
-                        Text {
+                        VclText {
                             text: "Are you sure you want to delete this index card?"
                             font.bold: true
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -3327,7 +3328,7 @@ Item {
                 color: Qt.tint(parent.outlineColor, "#E0FFFFFF")
                 visible: !canvasPreview.updatingThumbnail
 
-                Text {
+                VclText {
                     id: labelItem
                     anchors.centerIn: parent
                     font.pixelSize: 12
@@ -3739,7 +3740,7 @@ Item {
         AnnotationItem {
             id: textAnnotationItem
 
-            Text {
+            VclText {
                 anchors.centerIn: parent
                 horizontalAlignment: {
                     switch(annotation.attributes.hAlign) {
@@ -3860,7 +3861,7 @@ Item {
                         }
                     }
 
-                    Text {
+                    VclText {
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                         text: annotation.attributes.title
@@ -3870,7 +3871,7 @@ Item {
                         elide: Text.ElideRight
                     }
 
-                    Text {
+                    VclText {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: annotation.attributes.description
                         width: parent.width
@@ -3879,7 +3880,7 @@ Item {
                         maximumLineCount: 3
                     }
 
-                    Text {
+                    VclText {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                         color: urlAttribs.status === UrlAttributes.Error ? "red" : "blue"
                         text: annotation.attributes.url
@@ -3903,7 +3904,7 @@ Item {
                 running: urlAttribs.status === UrlAttributes.Loading
             }
 
-            Text {
+            VclText {
                 anchors.fill: parent
                 anchors.margins: 10
                 horizontalAlignment: Text.AlignHCenter
@@ -3965,7 +3966,7 @@ Item {
                 }
             }
 
-            Text {
+            VclText {
                 width: image.width
                 height: Math.max(parent.height - image.height - 10, 0)
                 visible: height > 0
@@ -4030,7 +4031,7 @@ Item {
     Component {
         id: unknownAnnotationComponent
 
-        Text {
+        VclText {
             text: "Unknown annotation: <strong>" + annotation.type + "</strong>"
             x: annotation.geometry.x
             y: annotation.geometry.y
@@ -4043,7 +4044,7 @@ Item {
 
     Loader {
         id: notebookIconAnimator
-        active: Runtime.workspaceSettings.animateNotebookIcon && !modalDialog.active && mainScriteDocumentView.showNotebookInStructure
+        active: Runtime.workspaceSettings.animateNotebookIcon && !modalDialog.active && Runtime.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: notebookTabButton

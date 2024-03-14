@@ -96,7 +96,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 40
 
-                    Text {
+                    VclText {
                         text: "Are you sure you want to remove this photo?"
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -149,7 +149,7 @@ Item {
             spacing: 10
             visible: !parent.active
 
-            Text {
+            VclText {
                 width: parent.width
                 horizontalAlignment: Text.AlignHCenter
                 wrapMode: Text.WordWrap

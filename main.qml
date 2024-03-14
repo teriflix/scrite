@@ -56,7 +56,7 @@ Rectangle {
                 text = ""
         }
         sourceComponent: Item {
-            Text {
+            VclText {
                 id: textItem
                 anchors.centerIn: parent
                 font.pixelSize: parent.height * 0.075
@@ -245,7 +245,7 @@ Rectangle {
                 spacing: 40
                 anchors.centerIn: parent
 
-                Text {
+                VclText {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     font.pixelSize: 16
@@ -301,7 +301,7 @@ Rectangle {
                 spacing: 40
                 anchors.centerIn: parent
 
-                Text {
+                VclText {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     font.pixelSize: 16
@@ -361,7 +361,7 @@ Rectangle {
                     forDarkBackground: true
                 }
 
-                Text {
+                VclText {
                     width: Math.min(parent.maxWidth - busyIndicator.width - parent.spacing, contentWidth)
                     anchors.verticalCenter: parent.verticalCenter
                     wrapMode: Text.WordWrap

@@ -119,7 +119,7 @@ Item {
                 anchors.right: parent.right
                 height: 80
 
-                Text {
+                VclText {
                     width: parent.width-25
                     horizontalAlignment: Text.AlignHCenter
                     anchors.verticalCenter: parent.verticalCenter
@@ -223,7 +223,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 40
 
-                    Text {
+                    VclText {
                         width: parent.width
                         wrapMode: Text.WordWrap
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
@@ -275,7 +275,7 @@ Item {
                             onClicked: parent.requestActivationCode()
                         }
 
-                        Text {
+                        VclText {
                             id: errorText
                             width: parent.width
                             anchors.top: continueLink.bottom
@@ -374,7 +374,7 @@ Item {
                         }
                     }
 
-                    Text {
+                    VclText {
                         width: parent.width * 0.8
                         wrapMode: Text.WordWrap
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -466,7 +466,7 @@ Item {
                     }
                 }
 
-                Text {
+                VclText {
                     id: errorMessageText
                     width: parent.width
                     anchors.centerIn: parent
@@ -576,7 +576,7 @@ Item {
                         width: parent.width
                         spacing: 5
 
-                        Text {
+                        VclText {
                             width: parent.width
                             wrapMode: Text.WordWrap
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -761,7 +761,7 @@ Item {
                 anchors.leftMargin: 20
                 anchors.rightMargin: 20
 
-                Text {
+                VclText {
                     id: errorText
                     width: parent.width
                     anchors.centerIn: parent
@@ -964,7 +964,7 @@ Item {
                 }
                 spacing: 20
                 property real availableDelegateWidth: width - (contentHeight > height ? 20 : 0)
-                header: Text {
+                header: VclText {
                     width: installationsView.availableDelegateWidth
                     wrapMode: Text.WordWrap
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -993,7 +993,7 @@ Item {
                             anchors.rightMargin: 30
                             spacing: 4
 
-                            Text {
+                            VclText {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 font.bold: true
                                 text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
@@ -1002,7 +1002,7 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            Text {
+                            VclText {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 text: "Runs Scrite " + modelData.appVersions[0]
                                 color: colors.text
@@ -1010,7 +1010,7 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            Text {
+                            VclText {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-4
                                 text: "Since: " + Scrite.app.relativeTime(new Date(modelData.firstActivationDate))
                                 color: colors.text
@@ -1019,7 +1019,7 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            Text {
+                            VclText {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-4
                                 text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastActivationDate))
                                 color: colors.text

@@ -146,7 +146,7 @@ Item {
         ColumnLayout {
             spacing: 40
 
-            Text {
+            VclText {
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -175,7 +175,7 @@ Item {
                 absoluteFilePath: Scrite.document.fileName
             }
 
-            Text {
+            VclText {
                 Layout.alignment: Qt.AlignHCenter
                 horizontalAlignment: Text.AlignHCenter
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize

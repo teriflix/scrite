@@ -18,6 +18,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 Item {
     id: tabView
@@ -126,7 +127,7 @@ Item {
             renderingMechanism: PainterPathItem.UseAntialiasedQPainter
             painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)
 
-            Text {
+            VclText {
                 id: tabText
                 anchors.centerIn: parent
                 anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0

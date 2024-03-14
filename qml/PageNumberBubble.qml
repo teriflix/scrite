@@ -17,12 +17,13 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
 
 PainterPathItem {
     property string pageNumber: "-1"
     readonly property var colors: Runtime.colors.primary.c600
 
-    Text {
+    VclText {
         id: sceneNumberText
         anchors.centerIn: parent
         font: defaultFontMetrics.font

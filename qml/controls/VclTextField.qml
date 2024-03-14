@@ -25,6 +25,7 @@
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
@@ -33,6 +34,10 @@ import "qrc:/qml/helpers"
 
 TextField {
     id: textField
+
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    Material.theme: Material.Light
 
     signal requestCompletion(string string)
     signal editingComplete()
@@ -178,7 +183,7 @@ TextField {
         textEditorHasCursorInterface: true
     }
 
-    Text {
+    VclText {
         id: labelText
         text: parent.placeholderText
         font.pointSize: 2*Runtime.idealFontMetrics.font.pointSize/3
@@ -199,7 +204,7 @@ TextField {
         x: 0
         y: parent.height
         width: parent.width
-        height: completionView.height + topInset + bottomInset + topPadding + bottomPadding
+        height: visible ? completionView.height + topInset + bottomInset + topPadding + bottomPadding : 100
         focus: false
         closePolicy: textField.length === 0 ? Popup.CloseOnPressOutside : Popup.NoAutoClose
         contentItem: ListView {
@@ -211,7 +216,7 @@ TextField {
             highlightResizeDuration: 0
             keyNavigationEnabled: false
             property real delegateHeight: fontMetrics.lineSpacing + 10
-            delegate: Text {
+            delegate: VclText {
                 width: completionView.width - (completionView.contentHeight > completionView.height ? 20 : 1)
                 height: completionView.delegateHeight
                 text: string

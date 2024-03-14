@@ -123,7 +123,7 @@ Item {
             }
 
             GroupBox {
-                label: Text { text: "Active Languages" }
+                label: VclText { text: "Active Languages" }
                 width: parent.width - 60
                 anchors.horizontalCenter: parent.horizontalCenter
 
@@ -155,7 +155,7 @@ Item {
                 GroupBox {
                     id: fileSaveSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: "Saving Files" }
+                    label: VclText { text: "Saving Files" }
                     clip: true
 
                     Column {
@@ -224,7 +224,7 @@ Item {
                     id: screenplayEditorSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
                     height: fileSaveSettingsGroupBox.height
-                    label: Text {
+                    label: VclText {
                         text: "Screenplay Editor"
                     }
 
@@ -308,13 +308,13 @@ Item {
                 GroupBox {
                     id: timelineSettingsGroupBox
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: "Timeline" }
+                    label: VclText { text: "Timeline" }
 
                     Column {
                         spacing: 20
                         width: parent.width
 
-                        Text {
+                        VclText {
                             width: parent.width
                             text: "What text do you want to display on cards in the timeline?"
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -335,13 +335,13 @@ Item {
 
                 GroupBox {
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: "Structure" }
+                    label: VclText { text: "Structure" }
 
                     Column {
                         spacing: 20
                         width: parent.width
 
-                        Text {
+                        VclText {
                             width: parent.width
                             text: "Turn on/off pull handle animations on the structure canvas."
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -363,7 +363,7 @@ Item {
 
                 GroupBox {
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: "Normal Font Size" }
+                    label: VclText { text: "Normal Font Size" }
 
                     Row {
                         spacing: 10
@@ -391,7 +391,7 @@ Item {
                             }
                         }
 
-                        Text {
+                        VclText {
                             text: "pt"
                             anchors.verticalCenter: parent.verticalCenter
                         }
@@ -400,7 +400,7 @@ Item {
 
                 GroupBox {
                     width: (parent.width - parent.spacing)/2
-                    label: Text { text: Scrite.app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
+                    label: VclText { text: Scrite.app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
                     enabled: !Scrite.app.isMacOSPlatform
                     opacity: enabled ? 1 : 0.5
 
@@ -420,7 +420,7 @@ Item {
                             ToolTip.text: "Configure the scroll sensitivity of your mouse and trackpad."
                         }
 
-                        Label {
+                        VclText {
                             id: flickSpeedLabel
                             text: Math.round( flickSpeedSlider.value*100 ) + "%"
                             anchors.verticalCenter: parent.verticalCenter
@@ -450,7 +450,7 @@ Item {
 
         Item {
 
-            Text {
+            VclText {
                 id: fontSettingsTip
                 width: parent.width-20
                 anchors.bottom: fontSettingsComboBox.top
@@ -511,7 +511,7 @@ Item {
                     width: parent.width - 20
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    Text {
+                    VclText {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: modelData.key
@@ -535,7 +535,7 @@ Item {
                         }
                     }
 
-                    Text {
+                    VclText {
                         id: previewText
                         anchors.verticalCenter: parent.verticalCenter
                         font.family: Scrite.app.transliterationEngine.preferredFontFamilyForLanguage(modelData.value)
@@ -559,7 +559,7 @@ Item {
 
             Item { width: parent.width; height: 10 }
 
-            Text {
+            VclText {
                 id: titleText
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 wrapMode: Text.WordWrap
@@ -576,7 +576,7 @@ Item {
                     width: parent.width - 20
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    Text {
+                    VclText {
                         anchors.verticalCenter: parent.verticalCenter
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: modelData.key + ": "
@@ -655,7 +655,7 @@ Item {
                             spacing: 10
                             width: parent.width
 
-                            Text {
+                            VclText {
                                 font.pixelSize: 14
                                 text: "Background Color"
                                 horizontalAlignment: Text.AlignRight
@@ -676,7 +676,7 @@ Item {
                                 }
                             }
 
-                            Text {
+                            VclText {
                                 text: "Grid Color"
                                 font.pixelSize: 14
                                 horizontalAlignment: Text.AlignRight
@@ -703,7 +703,7 @@ Item {
                             width: parent.width
                             visible: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
 
-                            Text {
+                            VclText {
                                 id: wzfText
                                 text: "Zoom Speed"
                                 anchors.verticalCenter: parent.verticalCenter
@@ -725,7 +725,7 @@ Item {
                     Column {
                         width: (parent.width-parent.spacing)/2
 
-                        Text {
+                        VclText {
                             width: parent.width
                             wrapMode: Text.WordWrap
                             text: "Starting with version 0.5.5, Scrite documents use Index Card UI by default. Older projects continue to use synopsis editor as before."
@@ -753,7 +753,7 @@ Item {
                 GroupBox {
                     id: graphicsGroup
                     width: (parent.width - parent.spacing)/2
-                    label: Text {
+                    label: VclText {
                         text: "Graphics"
                     }
 
@@ -785,7 +785,7 @@ Item {
                             width: parent.width
                             spacing: 10
 
-                            Text {
+                            VclText {
                                 id: themeLabel
                                 text: "Theme: "
                                 leftPadding: 10
@@ -822,7 +822,7 @@ Item {
                 }
 
                 GroupBox {
-                    label: Text { text: "Display" }
+                    label: VclText { text: "Display" }
                     width: (parent.width - parent.spacing)/2
                     clip: true
 
@@ -833,7 +833,7 @@ Item {
                         Row {
                             width: parent.width
 
-                            Text {
+                            VclText {
                                 width: parent.width * 0.2
                                 wrapMode: Text.WordWrap
                                 padding: 5
@@ -859,7 +859,7 @@ Item {
                             width: parent.width
                             enabled: Scrite.app.isWindowsPlatform
 
-                            Text {
+                            VclText {
                                 width: parent.width * 0.2
                                 wrapMode: Text.WordWrap
                                 padding: 5
@@ -901,7 +901,7 @@ Item {
                         width: parent.width
                         spacing: 5
 
-                        Text {
+                        VclText {
                             id: windowTabsExplainerText
                             width: parent.width
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
@@ -910,8 +910,8 @@ Item {
                         }
 
                         VclCheckBox {
-                            checked: mainScriteDocumentView.showNotebookInStructure
-                            enabled: mainScriteDocumentView.canShowNotebookInStructure
+                            checked: Runtime.showNotebookInStructure
+                            enabled: Runtime.canShowNotebookInStructure
                             text: "Move Notebook into the Structure tab"
                             onToggled: {
                                 Runtime.workspaceSettings.showNotebookInStructure = checked
@@ -947,7 +947,7 @@ Item {
                         width: parent.width
                         spacing: 5
 
-                        Text {
+                        VclText {
                             width: parent.width
                             height: windowTabsExplainerText.height
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
@@ -988,7 +988,7 @@ Item {
                 anchors.top: parent.top
                 anchors.topMargin: 40
                 anchors.horizontalCenter: parent.horizontalCenter
-                label: Text {
+                label: VclText {
                     text: "Relationship Graph"
                 }
 
@@ -1014,14 +1014,14 @@ Item {
                         Column {
                             width: (parent.width - parent.spacing)/2
 
-                            Text {
+                            VclText {
                                 font.bold: true
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 text: "Max Time In Milliseconds"
                                 width: parent.width
                             }
 
-                            Text {
+                            VclText {
                                 font.bold: false
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
                                 text: "Default: 1000"
@@ -1049,14 +1049,14 @@ Item {
                         Column {
                             width: (parent.width - parent.spacing)/2
 
-                            Text {
+                            VclText {
                                 font.bold: true
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 text: "Max Iterations"
                                 width: parent.width
                             }
 
-                            Text {
+                            VclText {
                                 font.bold: false
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
                                 text: "Default: 50000"
@@ -1107,7 +1107,7 @@ Item {
                         spacing: 20
                         width: (parent.width-parent.spacing)/2
 
-                        Text {
+                        VclText {
                             id: paperSizeLabel
                             text: "Paper Size"
                             anchors.verticalCenter: parent.verticalCenter
@@ -1131,7 +1131,7 @@ Item {
                         spacing: 20
                         width: (parent.width-parent.spacing)/2
 
-                        Text {
+                        VclText {
                             id: timePerPageLabel
                             text: "Time Per Page:"
                             anchors.verticalCenter: parent.verticalCenter
@@ -1146,7 +1146,7 @@ Item {
                             width: Runtime.sceneEditorFontMetrics.averageCharacterWidth*3
                         }
 
-                        Text {
+                        VclText {
                             anchors.verticalCenter: parent.verticalCenter
                             text: "seconds per page."
                         }
@@ -1159,7 +1159,7 @@ Item {
 
                     GroupBox {
                         width: (parent.width-parent.spacing)/2
-                        label: Text { text: "Header" }
+                        label: VclText { text: "Header" }
 
                         Row {
                             width: parent.width
@@ -1174,7 +1174,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     spacing: 10
 
-                                    Text {
+                                    VclText {
                                         text: "Left"
                                     }
 
@@ -1197,7 +1197,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     spacing: 10
 
-                                    Text {
+                                    VclText {
                                         text: "Center"
                                     }
 
@@ -1220,7 +1220,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     spacing: 10
 
-                                    Text {
+                                    VclText {
                                         text: "Right"
                                     }
 
@@ -1238,7 +1238,7 @@ Item {
 
                     GroupBox {
                         width: (parent.width-parent.spacing)/2
-                        label: Text { text: "Footer" }
+                        label: VclText { text: "Footer" }
 
                         Row {
                             width: parent.width
@@ -1253,7 +1253,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     spacing: 10
 
-                                    Text {
+                                    VclText {
                                         text: "Left"
                                     }
 
@@ -1276,7 +1276,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     spacing: 10
 
-                                    Text {
+                                    VclText {
                                         text: "Center"
                                     }
 
@@ -1299,7 +1299,7 @@ Item {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     spacing: 10
 
-                                    Text {
+                                    VclText {
                                         text: "Right"
                                     }
 
@@ -1319,7 +1319,7 @@ Item {
                 GroupBox {
                     width: parent.width
                     height: watermarkSettingsLayout.height + 40
-                    label: Text { text: "Watermark" }
+                    label: VclText { text: "Watermark" }
 
                     Row {
                         id: watermarkSettingsLayout
@@ -1332,7 +1332,7 @@ Item {
                             spacing: 10
                             verticalItemAlignment: Grid.AlignVCenter
 
-                            Text {
+                            VclText {
                                 text: "Enable"
                                 width: labelWidth
                                 horizontalAlignment: Text.AlignRight
@@ -1344,7 +1344,7 @@ Item {
                                 onToggled: pageSetupSettings.watermarkEnabled = checked
                             }
 
-                            Text {
+                            VclText {
                                 text: "Text"
                                 width: labelWidth
                                 horizontalAlignment: Text.AlignRight
@@ -1358,7 +1358,7 @@ Item {
                                 enableTransliteration: true
                             }
 
-                            Text {
+                            VclText {
                                 text: "Color"
                                 width: labelWidth
                                 horizontalAlignment: Text.AlignRight
@@ -1389,7 +1389,7 @@ Item {
                             spacing: 10
                             verticalItemAlignment: Grid.AlignVCenter
 
-                            Text {
+                            VclText {
                                 text: "Font Family"
                                 width: labelWidth
                                 horizontalAlignment: Text.AlignRight
@@ -1403,7 +1403,7 @@ Item {
                                 enabled: pageSetupSettings.watermarkEnabled
                             }
 
-                            Text {
+                            VclText {
                                 text: "Font Size"
                                 width: labelWidth
                                 horizontalAlignment: Text.AlignRight
@@ -1418,7 +1418,7 @@ Item {
                                 enabled: pageSetupSettings.watermarkEnabled
                             }
 
-                            Text {
+                            VclText {
                                 text: "Rotation"
                                 width: labelWidth
                                 horizontalAlignment: Text.AlignRight
@@ -1541,7 +1541,7 @@ Item {
                         }
                     }
 
-                    Text {
+                    VclText {
                         anchors.fill: parent
                         wrapMode: Text.WordWrap
                         horizontalAlignment: Text.AlignHCenter
@@ -1580,7 +1580,7 @@ Item {
                         visible: Scrite.document.screenplay.coverPagePhoto !== ""
                         enabled: visible && !Scrite.document.readOnly
 
-                        Text {
+                        VclText {
                             text: "Cover Photo Size"
                             font.bold: true
                             topPadding: 5
@@ -1682,7 +1682,7 @@ Item {
                                 width: parent.width
                                 spacing: 10
 
-                                Text {
+                                VclText {
                                     width: fieldLabelWidth
                                     horizontalAlignment: Text.AlignRight
                                     text: name
@@ -1763,7 +1763,7 @@ Item {
 
             }
 
-            Text {
+            VclText {
                 id: defaultsSavedNotice
                 anchors.top: titlePageSettingsLayout.bottom
                 anchors.topMargin: 10
@@ -1914,7 +1914,7 @@ Item {
                     width: parent.width
                     visible: pageData.elementType !== SceneElement.Heading
 
-                    Text {
+                    VclText {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
                         text: "Language"
@@ -1959,7 +1959,7 @@ Item {
                     spacing: 10
                     width: parent.width
 
-                    Text {
+                    VclText {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
                         text: "Font Size"
@@ -1997,7 +1997,7 @@ Item {
                     spacing: 10
                     width: parent.width
 
-                    Text {
+                    VclText {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
                         text: "Font Style"
@@ -2061,7 +2061,7 @@ Item {
                     spacing: 10
                     width: parent.width
 
-                    Text {
+                    VclText {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
                         text: "Line Height"
@@ -2102,7 +2102,7 @@ Item {
                     spacing: 10
                     width: parent.width
 
-                    Text {
+                    VclText {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
                         text: "Text Color"
@@ -2131,7 +2131,7 @@ Item {
                             }
                         }
 
-                        Text {
+                        VclText {
                             horizontalAlignment: Text.AlignRight
                             text: "Background Color"
                             font.pixelSize: 14
@@ -2172,7 +2172,7 @@ Item {
                     spacing: 10
                     width: parent.width
 
-                    Text {
+                    VclText {
                         width: labelWidth
                         horizontalAlignment: Text.AlignRight
                         text: "Text Alignment"
@@ -2265,7 +2265,7 @@ Item {
                 pageTitleRole:  "title"
                 currentIndex: 0
                 cornerContent: Item {
-                    Text {
+                    VclText {
                         width: parent.width-20
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 20
@@ -2398,7 +2398,7 @@ Item {
         id: unknownSettingsComponent
 
         Item {
-            Text {
+            VclText {
                 anchors.centerIn: parent
                 text: "This is embarrassing. We honestly dont know what to show here!"
             }

@@ -213,7 +213,7 @@ Item {
                             height: parent.height-4
                             anchors.verticalCenter: parent.verticalCenter
 
-                            Text {
+                            VclText {
                                 font: Runtime.minimumFontMetrics.font
                                 text: groupData.group
                                 width: parent.width-10
@@ -371,7 +371,7 @@ Item {
         }
 
         FocusTracker.window: Scrite.window
-        FocusTracker.indicator.target: mainUndoStack
+        FocusTracker.indicator.target: Runtime.undoStack
         FocusTracker.indicator.property: "timelineEditorActive"
 
         Transition {
@@ -415,7 +415,7 @@ Item {
                 opacity: parent.highlightAsDropArea ? 0.75 : 0.5
                 visible: Scrite.document.structure.elementCount > 0 && enableDragDrop
 
-                Text {
+                VclText {
                     anchors.fill: parent
                     anchors.margins: 5
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
@@ -612,7 +612,7 @@ Item {
                         anchors.rightMargin: 5
                         visible: isBreakElement || parent.width > screenplayElementList.minimumDelegateWidthForTextVisibility
 
-                        Text {
+                        VclText {
                             text: sceneTitle
                             color: element.scene ? Scrite.app.textColorFor(parent.parent.color) : colorPalette.text
                             elide: Text.ElideRight

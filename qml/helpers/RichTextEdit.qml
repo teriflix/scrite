@@ -180,7 +180,7 @@ Item {
                 width: Math.min(500, parent.width * 0.75)
                 spacing: 40
 
-                Label {
+                VclText {
                     Layout.fillWidth: true
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     text: "In here, you can only type in English or in languages for which you have configured a text input method from your OS in Scrite Settings."

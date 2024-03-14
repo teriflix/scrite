@@ -20,7 +20,9 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 ComboBox {
-    Material.background: Runtime.colors.primary.button.background
-    Material.foreground: Runtime.colors.primary.button.text
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    Material.theme: Runtime.colors.theme
+
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

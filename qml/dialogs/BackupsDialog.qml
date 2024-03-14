@@ -71,7 +71,7 @@ VclDialog {
                             width: parent.width-20
                             anchors.verticalCenter: parent.verticalCenter
 
-                            Label {
+                            VclText {
                                 width: parent.width * 0.75
                                 text: relativeTime + "<br/><font size=\"-2\">" + timestampAsString + "</font>"
                                 padding: 5
@@ -81,7 +81,7 @@ VclDialog {
                                 anchors.top: parent.top
                             }
 
-                            Label {
+                            VclText {
                                 width: parent.width * 0.25
                                 anchors.top: parent.top
                                 property string fileSizeInfo: {
@@ -156,7 +156,7 @@ VclDialog {
         titleBarButtons: null
         width: 320
         height: 100
-        content: Label {
+        content: VclText {
             text: "Opening backup file ..."
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             verticalAlignment: Text.AlignVCenter

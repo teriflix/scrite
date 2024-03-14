@@ -40,7 +40,7 @@ SpellingSuggestionsMenu {
                 root.textArea = Scrite.app.findFirstParentOfType(root, "QQuickTextArea")
 
             transliterator = root.textArea ? root.textArea.Transliterator : null
-            if(transliterator)
+            if(transliterator && transliterator.highlighter)
                 highlighter = transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
 
             cursorPosition = -1

@@ -20,6 +20,7 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 Column {
     id: formField
@@ -59,7 +60,7 @@ Column {
 
         spacing: 10
 
-        Label {
+        VclText {
             id: questionNumberText
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
@@ -68,7 +69,7 @@ Column {
             anchors.top: parent.top
         }
 
-        Label {
+        VclText {
             id: questionText
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
