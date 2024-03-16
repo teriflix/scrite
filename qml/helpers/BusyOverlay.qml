@@ -25,7 +25,7 @@ Rectangle {
     color: Runtime.colors.primary.windowColor
     opacity: 0.9
     visible: false
-    onVisibleChanged: parent.enabled = !visible
+    onVisibleChanged: if(parent) parent.enabled = !visible
 
     property string busyMessage: "Busy Doing Something..."
 

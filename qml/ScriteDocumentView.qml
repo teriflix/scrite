@@ -632,15 +632,9 @@ Item {
                             onClicked: showAboutDialog()
 
                             Announcement.onIncoming: (type,data) => {
-                                const stype = "" + type
-                                const idata = data
-                                if(stype === "72892ED6-BA58-47EC-B045-E92D9EC1C47A") {
-                                    if(idata && typeof idata === "number")
-                                        Utils.execLater(mainScriteDocumentView, idata, showAboutDialog)
-                                    else
-                                        showAboutDialog()
-                                }
-                            }
+                                                         if(type === Runtime.announcementIds.aboutDialogRequest)
+                                                            showAboutDialog()
+                                                      }
 
                             function showAboutDialog() {
                                 aboutDialog.open()

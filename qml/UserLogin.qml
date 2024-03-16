@@ -66,76 +66,50 @@ Item {
         }
     }
 
-    QtObject {
-        id: privateData
-        property bool showLoginWizardOnForceLoginRequest: true
-        property bool receivedForceLoginRequest: true
-    }
-
     Connections {
         target: Scrite.user
-        enabled: privateData.showLoginWizardOnForceLoginRequest
+        enabled: _private.showLoginWizardOnForceLoginRequest
         function onForceLoginRequest() {
-            if(privateData.showLoginWizardOnForceLoginRequest) {
+            if(_private.showLoginWizardOnForceLoginRequest) {
                 if(splashLoader.active)
                     splashLoader.activeChanged.connect( () => {
                         showLoginWizard(null)
                     })
                 else
                     showLoginWizard(null)
-                privateData.showLoginWizardOnForceLoginRequest = false
+                _private.showLoginWizardOnForceLoginRequest = false
             }
         }
     }
 
     function showLoginWizard(ps) {
-        modalDialog.sourceComponent = loginWizard
-        modalDialog.popupSource = ps === undefined ? profilePic : ps
-        modalDialog.active = true
+       loginWizard.open()
     }
 
-    Announcement.onIncoming: (type,data) => {
-        var stype = "" + type
-        if(stype === "97369507-721E-4A7F-886C-4CE09A5BCCFB") {
-            modalDialog.sourceComponent = loginWizard
-            modalDialog.popupSource = profilePic
-            modalDialog.active = true
-        }
-    }
-
-    Component {
+    VclDialog {
         id: loginWizard
 
-        Item {
+        width: 800
+        height: 520
+        title: contentInstance ? contentInstance.title : "User Profile"
+
+        property bool closeable: true
+        titleBarCloseButtonVisible: closeable
+        closePolicy: closeable ? Popup.CloseOnEscape : Popup.NoAutoClose
+
+        Announcement.onIncoming: (type,data) => {
+            if(type === Runtime.announcementIds.loginRequest)
+                showLoginWizard(null)
+        }
+
+        content: Item {
             id: loginWizardItem
-            width: 800
-            height: 520
 
-            Rectangle {
-                id: titleBar
-                color: "#65318f"
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                height: 80
-
-                VclText {
-                    width: parent.width-25
-                    horizontalAlignment: Text.AlignHCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    font.pixelSize: parent.height * 0.3
-                    text: pageLoader.item.pageTitle
-                    color: "white"
-                }
-            }
+            property string title: pageLoader.item.pageTitle
 
             Loader {
                 id: pageLoader
-                anchors.top: titleBar.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
+                anchors.fill: parent
                 property int page: e_BUSY_PAGE
 
                 sourceComponent: {
@@ -153,11 +127,9 @@ Item {
                 Component.onCompleted: page = Scrite.user.busy ? e_BUSY_PAGE : (Scrite.user.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
 
                 Announcement.onIncoming: (type,data) => {
-                    const stype = "" + type
-                    const idata = data
-                    if(stype === "93DC1133-58CA-4EDD-B803-82D9B6F2AA50")
-                        page = idata
-                    else if(stype === "76281526-A16C-4414-8129-AD8770A17F16") {
+                    if(type === _private.pageRequest)
+                        page = data
+                    else if(type === _private.reloadLoginWizardPage) {
                         active = false
                         Qt.callLater( function() { pageLoader.active = true } )
                     }
@@ -199,7 +171,7 @@ Item {
             Timer {
                 running: !Scrite.user.busy
                 interval: 100
-                onTriggered: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", Scrite.user.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
+                onTriggered: Announcement.shout(_private.pageRequest, Scrite.user.loggedIn ? e_USER_PROFILE_PAGE : e_LOGIN_EMAIL_PAGE)
             }
         }
     }
@@ -209,14 +181,14 @@ Item {
 
         Item {
             property string pageTitle: "Sign Up / Login"
-            Component.onCompleted: modalDialog.closeable = false
+            Component.onCompleted: loginWizard.closeable = false
 
             Item {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: releaseNotesLink.bottom
-                anchors.bottomMargin: Math.max(releaseNotesLink.height, noLoginContinueLink.height)
+                anchors.bottomMargin: releaseNotesLink.height
 
                 Column {
                     width: parent.width*0.8
@@ -282,7 +254,7 @@ Item {
                             anchors.topMargin: 20
                             horizontalAlignment: Text.AlignHCenter
                             wrapMode: Text.WordWrap
-                            font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
+                            // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                             maximumLineCount: 3
                             color: "red"
                             text: sendActivationCodeCall.hasError ? (sendActivationCodeCall.errorCode + ": " + sendActivationCodeCall.errorText) : ""
@@ -324,9 +296,9 @@ Item {
                         return
 
                     store("email", emailField.text)
-                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_ACTIVATION_PAGE)
+                    Announcement.shout(_private.pageRequest, e_LOGIN_ACTIVATION_PAGE)
                 }
-                onBusyChanged: modalDialog.closeable = !busy
+                onBusyChanged: loginWizard.closeable = !busy
             }
         }
     }
@@ -336,7 +308,7 @@ Item {
 
         Item {
             property string pageTitle: "Activate"
-            Component.onCompleted: modalDialog.closeable = false
+            Component.onCompleted: loginWizard.closeable = false
 
             Item {
                 anchors.top: parent.top
@@ -356,7 +328,7 @@ Item {
                         includeEmojiSymbols: false
                         tabItemUponReturn: false
                         placeholderText: text === "" ? "Paste the activation code here..." : "Activation Code: "
-                        font.pixelSize: modalDialog.height * 0.025
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                         selectByMouse: true
                         horizontalAlignment: Text.AlignHCenter
                         Keys.onReturnPressed: nextButton.click()
@@ -377,7 +349,6 @@ Item {
                     VclText {
                         width: parent.width * 0.8
                         wrapMode: Text.WordWrap
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         horizontalAlignment: resendActivationCode.visible && resendActivationCode.enabled ? Text.AlignLeft : Text.AlignHCenter
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: {
@@ -398,7 +369,7 @@ Item {
                 anchors.left: parent.left
                 anchors.verticalCenter: nextButton.verticalCenter
                 anchors.leftMargin: 30
-                onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
+                onClicked: Announcement.shout(_private.pageRequest, e_LOGIN_EMAIL_PAGE)
             }
 
             Item {
@@ -454,7 +425,7 @@ Item {
                             resendActivationCode.timeout = false
                             resendActivationCodeTimer.begin()
                         }
-                        onBusyChanged: modalDialog.closeable = !busy
+                        onBusyChanged: loginWizard.closeable = !busy
                     }
 
                     onClicked: {
@@ -471,7 +442,6 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     maximumLineCount: 3
                     color: "red"
                     visible: text !== ""
@@ -529,9 +499,9 @@ Item {
                     store("loginToken", responseData.loginToken)
                     store("sessionToken", responseData.sessionToken)
                     Scrite.user.reload()
-                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_PROFILE_PAGE)
+                    Announcement.shout(_private.pageRequest, e_USER_PROFILE_PAGE)
                 }
-                onBusyChanged: modalDialog.closeable = !busy
+                onBusyChanged: loginWizard.closeable = !busy
             }
         }
     }
@@ -553,7 +523,7 @@ Item {
             property bool userLoggedIn: Scrite.user.loggedIn
             onUserLoggedInChanged: {
                 if(!userLoggedIn)
-                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
+                    Announcement.shout(_private.pageRequest, e_LOGIN_EMAIL_PAGE)
             }
 
             TabSequenceManager {
@@ -579,7 +549,6 @@ Item {
                         VclText {
                             width: parent.width
                             wrapMode: Text.WordWrap
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             horizontalAlignment: Text.AlignHCenter
                             anchors.horizontalCenter: parent.horizontalCenter
                             visible: Scrite.user.loggedIn
@@ -590,9 +559,9 @@ Item {
                             width: parent.width
                             anchors.horizontalCenter: parent.horizontalCenter
                             horizontalAlignment: Text.AlignHCenter
-                            font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
+                            // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                             text: "Review Your Scrite Installations »"
-                            onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_INSTALLATIONS_PAGE)
+                            onClicked: Announcement.shout(_private.pageRequest, e_USER_INSTALLATIONS_PAGE)
                         }
 
                         Item {
@@ -711,8 +680,8 @@ Item {
                                        wdyhasField.text.trim() !== Scrite.user.wdyhas ||
                                        chkAnalyticsConsent.checked !== Scrite.user.info.consent.activity ||
                                        chkEmailConsent.checked !== Scrite.user.info.consent.email
-            onNeedsSavingChanged: modalDialog.closeable = !needsSaving
-            Component.onCompleted: modalDialog.closeable = !needsSaving
+            onNeedsSavingChanged: loginWizard.closeable = !needsSaving
+            Component.onCompleted: loginWizard.closeable = !needsSaving
 
             property bool allowHighlightSaveAnimation: false
             property bool animationFlags: needsSaving || allowHighlightSaveAnimation
@@ -731,15 +700,15 @@ Item {
 
                 Link {
                     text: needsSaving ? "Cancel" : "Logout"
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
+                    // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     opacity: needsSaving ? 0.85 : 1
                     onClicked: {
                         if(needsSaving) {
-                            Announcement.shout("76281526-A16C-4414-8129-AD8770A17F16", undefined)
+                            Announcement.shout(_private.reloadLoginWizardPage, undefined)
                         } else {
                             Scrite.user.logout()
                             if(!Scrite.user.loggedIn)
-                                Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
+                                Announcement.shout(_private.pageRequest, e_LOGIN_EMAIL_PAGE)
                         }
                     }
                 }
@@ -747,7 +716,7 @@ Item {
                 Link {
                     text: "Privacy Policy"
                     opacity: needsSaving ? 0.5 : 1
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
+                    // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     anchors.right: parent.right
                     onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/privacy-policy/")
                 }
@@ -766,7 +735,7 @@ Item {
                     width: parent.width
                     anchors.centerIn: parent
                     wrapMode: Text.WordWrap
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
+                    // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     maximumLineCount: 3
                     color: "red"
                     text: {
@@ -809,7 +778,7 @@ Item {
                 Link {
                     id: saveRefreshLink
                     text: needsSaving ? "Save" : "Refresh"
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
+                    // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
                     transformOrigin: Item.BottomRight
                     anchors.right: parent.right
                     property real characterSpacing: 0
@@ -902,14 +871,8 @@ Item {
                 Link {
                     text: "Feedback / About"
                     opacity: needsSaving ? 0.5 : 1
-                    font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
-                    onClicked: {
-                        modalDialog.close()
-                        var time = 100
-                        if(modalDialog.animationsEnabled)
-                            time += modalDialog.animationDuration
-                        Announcement.shout("72892ED6-BA58-47EC-B045-E92D9EC1C47A", time)
-                    }
+                    // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
+                    onClicked: Announcement.shout(Runtime.announcementIds.aboutDialogRequest, 0)
                 }
             }
 
@@ -917,7 +880,7 @@ Item {
                 anchors.fill: parent
                 visible: Scrite.user.busy
                 busyMessage: "Please wait.."
-                onVisibleChanged: modalDialog.closeable = !visible
+                onVisibleChanged: loginWizard.closeable = !visible
             }
         }
     }
@@ -931,7 +894,7 @@ Item {
             property bool userLoggedIn: Scrite.user.loggedIn
             onUserLoggedInChanged: {
                 if(!userLoggedIn)
-                    Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_LOGIN_EMAIL_PAGE)
+                    Announcement.shout(_private.pageRequest, e_LOGIN_EMAIL_PAGE)
             }
 
             Component.onCompleted: {
@@ -942,11 +905,10 @@ Item {
             Link {
                 id: backLink
                 text: "« Back"
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 20
-                onClicked: Announcement.shout("93DC1133-58CA-4EDD-B803-82D9B6F2AA50", e_USER_PROFILE_PAGE)
+                onClicked: Announcement.shout(_private.pageRequest, e_USER_PROFILE_PAGE)
             }
 
             ListView {
@@ -967,7 +929,6 @@ Item {
                 header: VclText {
                     width: installationsView.availableDelegateWidth
                     wrapMode: Text.WordWrap
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     text: "<strong>" + Scrite.user.email + "</strong> is currently logged in at " + (Scrite.user.installations.length) + " computers(s)."
                     horizontalAlignment: Text.AlignHCenter
                     padding: 10
@@ -994,7 +955,6 @@ Item {
                             spacing: 4
 
                             VclText {
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 font.bold: true
                                 text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
                                 color: colors.text
@@ -1003,7 +963,6 @@ Item {
                             }
 
                             VclText {
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 text: "Runs Scrite " + modelData.appVersions[0]
                                 color: colors.text
                                 width: parent.width
@@ -1052,6 +1011,16 @@ Item {
                 busyMessage: "Please wait ..."
             }
         }
+    }
+
+    QtObject {
+        id: _private
+
+        property bool showLoginWizardOnForceLoginRequest: true
+        property bool receivedForceLoginRequest: true
+
+        readonly property string pageRequest: "93DC1133-58CA-4EDD-B803-82D9B6F2AA50"
+        readonly property string reloadLoginWizardPage: "76281526-A16C-4414-8129-AD8770A17F16"
     }
 
     property ErrorReport userErrorReport: Aggregation.findErrorReport(Scrite.user)

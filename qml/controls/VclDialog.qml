@@ -54,13 +54,17 @@ Dialog {
     property Component content: Item { }
     property alias contentImplicitWidth: contentItemLoader.implicitWidth
     property alias contentImplicitHeight: contentItemLoader.implicitHeight
+    property alias contentInstance: contentItemLoader.item
 
     // Customise the buttons to show on the tilebar on the right side.
     // By default a check-mark is shown.
+    property bool titleBarCloseButtonVisible: true
     property Component titleBarButtons: Image {
         width: 32; height: 32
         source: "qrc:/icons/action/dialog_close_button.png"
         smooth: true; mipmap: true
+        enabled: visible
+        visible: titleBarCloseButtonVisible
 
         MouseArea {
             anchors.fill: parent

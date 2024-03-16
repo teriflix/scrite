@@ -103,7 +103,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     dfNotice.clicked()
-                    Announcement.shout("97369507-721E-4A7F-886C-4CE09A5BCCFB", null)
+                    Announcement.shout(Runtime.announcementIds.loginRequest, null)
                 }
             }
 
