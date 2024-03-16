@@ -79,17 +79,16 @@ Item {
                 ToolTip.text: "Clear the screenplay, while retaining the scenes."
                 enabled: !Scrite.document.readOnly
                 onClicked: {
-                    askQuestion({
-                        "question": "Are you sure you want to clear the screenplay?",
-                        "okButtonText": "Yes",
-                        "cancelButtonText": "No",
-                        "callback": function(val) {
-                            if(val) {
+                    MessageBox.askQuestion("Clear Confirmation",
+                        "Are you sure you want to clear the screenplay?",
+                        ["Yes", "No"],
+                        (buttonText) => {
+                            if(buttonText === "Yes") {
                                 screenplayElementList.forceActiveFocus()
                                 Scrite.document.screenplay.clearElements()
                             }
                         }
-                    }, this)
+                    )
                 }
             }
 

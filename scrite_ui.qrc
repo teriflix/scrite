@@ -113,5 +113,6 @@
         <file>qml/dialogs/settingsdialog/ApplicationOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/NotebookOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/NotebookSettingsTab.qml</file>
+        <file>qml/dialogs/MessageBox.qml</file>
     </qresource>
 </RCC>

@@ -65,33 +65,41 @@ VclDialog {
             color: Runtime.colors.primary.c50.background
 
             StackLayout {
+                id: settingsDialogContent
                 anchors.fill: parent
 
                 currentIndex: settingsDialogTabBar.currentIndex
 
+                property real pageListWidth: (width/count)
+
                 SettingsDialogTabs.ApplicationSettingsTab {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    pageListWidth: settingsDialogContent.pageListWidth
                 }
 
                 SettingsDialogTabs.StructureSettingsTab {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    pageListWidth: settingsDialogContent.pageListWidth
                 }
 
                 SettingsDialogTabs.ScreenplaySettingsTab {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    pageListWidth: settingsDialogContent.pageListWidth
                 }
 
                 SettingsDialogTabs.NotebookSettingsTab {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    pageListWidth: settingsDialogContent.pageListWidth
                 }
 
                 SettingsDialogTabs.LanguageSettingsTab {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
+                    pageListWidth: settingsDialogContent.pageListWidth
                 }
             }
         }

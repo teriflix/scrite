@@ -2136,24 +2136,23 @@ Item {
                     }
 
                     close.accepted = false
-                    askQuestion({
-                        "question": "Do you want to save your current project before closing?",
-                        "okButtonText": "Yes",
-                        "cancelButtonText": "No",
-                        "abortButtonText": "Cancel",
-                        "callback": function(val) {
-                            if(val) {
+                    MessageBox.askQuestion("Save Confirmation",
+                        "Do you want to save your current project before closing?",
+                        ["Yes", "No", "Cancel"],
+                        (buttonText) => {
+                            if(buttonText === "Yes") {
                                 if(Scrite.document.fileName !== "")
                                     Scrite.document.save()
                                 else {
                                     saveFileDialog.launch()
                                     return
                                 }
+                            } else if(buttonText === "No") {
+                                closeEventHandler.handleCloseEvent = false
+                                Scrite.window.close()
                             }
-                            closeEventHandler.handleCloseEvent = false
-                            Scrite.window.close()
                         }
-                    }, closeEventHandler)
+                    )
                 } else
                     close.accepted = true
             }

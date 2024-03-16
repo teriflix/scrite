@@ -26,6 +26,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 
 Item {
     id: scritedView
@@ -46,9 +47,9 @@ Item {
         scritedToolbar.scritedView = scritedView
         if(!Runtime.scritedSettings.experimentalFeatureNoticeDisplayed) {
             Utils.execLater(scritedView, 250, function() {
-                showInformation({
-                    "message": "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!",
-                })
+                MessageBox.showInformation("Experimental Feature",
+                    "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!"
+                )
                 Runtime.scritedSettings.experimentalFeatureNoticeDisplayed = true
             })
         }

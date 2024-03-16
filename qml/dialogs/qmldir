@@ -1,7 +1,7 @@
 AboutDialog 1.0 AboutDialog.qml
 BackupsDialog 1.0 BackupsDialog.qml
 CollaboratorsDialog 1.0 CollaboratorsDialog.qml
+singleton MessageBox 1.0 MessageBox.qml
 RenameCharacterDialog 1.0 RenameCharacterDialog.qml
-TitlePageDialog 1.0 TitlePageDialog.qml
 SettingsDialog 1.0 SettingsDialog.qml
-
+TitlePageDialog 1.0 TitlePageDialog.qml

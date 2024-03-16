@@ -920,7 +920,7 @@ Rectangle {
                         else
                             message = "Document unlocked. You will be able to edit it on this and any other computer."
 
-                        showInformation({"message": message}, this)
+                        MessageBox.showInformation("Document Lock Status", message)
                     }
                 }
             }
@@ -2802,10 +2802,9 @@ Rectangle {
             }
 
             function showCantMergeSceneMessage() {
-                showInformation({
-                    "message": "Scene can be merged only when cursor is placed at the start of the first paragraph in a scene.",
-                    "closeOnEscape": true
-                })
+                MessageBox.showInformation("Merge Scene Error",
+                    "Scene can be merged only when cursor is placed at the start of the first paragraph in a scene."
+                )
             }
 
             function splitScene() {
@@ -2830,10 +2829,8 @@ Rectangle {
             }
 
             function showCantSplitSceneMessage() {
-                showInformation({
-                    "message": "Scene can be split only when cursor is placed at the start of a paragraph.",
-                    "closeOnEscape": true
-                })
+                MessageBox.showInformation("Split Scene Error",
+                    "Scene can be split only when cursor is placed at the start of a paragraph.")
             }
 
             function assumeFocus() {

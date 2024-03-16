@@ -125,9 +125,9 @@ VclDialog {
                     ToolTip.visible: hovered
                     ToolTip.text: "Closes the current document and loads the selected backup."
                     onClicked: {
-                        messageBox.open()
+                        progressDialog.open()
                         root.openInThisWindow(backupFilesView.currentBackupFilePath)
-                        messageBox.closeLater(100)
+                        progressDialog.closeLater(100)
                     }
                 }
 
@@ -138,18 +138,17 @@ VclDialog {
                     ToolTip.visible: hovered
                     ToolTip.text: "Loads the selected backup in a new window."
                     onClicked: {
-                        messageBox.open()
+                        progressDialog.open()
                         root.openInNewWindow(backupFilesView.currentBackupFilePath)
-                        messageBox.closeLater(1500)
+                        progressDialog.closeLater(1500)
                     }
                 }
             }
         }
     }
 
-    // QML Refactor TODO: Use the common message box after this.
     VclDialog {
-        id: messageBox
+        id: progressDialog
 
         title: "Please wait ..."
         closePolicy: Popup.NoAutoClose
@@ -164,8 +163,8 @@ VclDialog {
         }
 
         function closeLater(delay) {
-            Utils.execLater(messageBox, delay ? delay : 1500, () => {
-                                messageBox.close()
+            Utils.execLater(progressDialog, delay ? delay : 1500, () => {
+                                progressDialog.close()
                                 root.close()
                             })
         }

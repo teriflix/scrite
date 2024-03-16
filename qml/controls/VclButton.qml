@@ -28,8 +28,8 @@ Button {
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-    width: Math.max(_private.textRect.width + 40, 120)
-    height: Math.max(_private.textRect.height + 20, 50)
+    implicitWidth: Math.max(_private.textRect.width + 40, 120)
+    implicitHeight: Math.max(_private.textRect.height + 20, 50)
 
     Component {
         id: backgroundComponent
@@ -53,6 +53,6 @@ Button {
     QtObject {
         id: _private
 
-        property rect textRect: Scrite.app.boundingRect(text, font)
+        property rect textRect: Scrite.app.boundingRect(button.text, button.font)
     }
 }

@@ -60,11 +60,11 @@ bool QtApplicationEventNotificationCallback(void **cbdata);
 void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &context,
                                  const QString &message)
 {
-    // #ifdef QT_NO_DEBUG_OUTPUT
-    //     Q_UNUSED(type)
-    //     Q_UNUSED(context)
-    //     Q_UNUSED(message)
-    // #else
+#ifdef QT_NO_DEBUG_OUTPUT
+    Q_UNUSED(type)
+    Q_UNUSED(context)
+    Q_UNUSED(message)
+#else
     QString logMessage;
 
     QTextStream ts(&logMessage, QIODevice::WriteOnly);
@@ -96,7 +96,7 @@ void ApplicationQtMessageHandler(QtMsgType type, const QMessageLogContext &conte
     ts.flush();
 
     fprintf(stderr, "%s\n", qPrintable(logMessage));
-    // #endif
+#endif
 }
 
 Application *Application::instance()

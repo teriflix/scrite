@@ -1507,9 +1507,9 @@ Item {
                 onDropped: (drop) => {
                     var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                     if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
-                        showInformation({
-                            "message": "Scenes must be added to the timeline before they can be stacked."
-                        })
+                        MessageBox.showInformation("",
+                            "Scenes must be added to the timeline before they can be stacked."
+                        )
                         drop.ignore()
                         return
                     }
@@ -3174,9 +3174,9 @@ Item {
                     onDropped: (drop) => {
                         var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                         if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
-                            showInformation({
-                                "message": "Scenes must be added to the timeline before they can be stacked."
-                            })
+                            MessageBox.showInformation("",
+                                "Scenes must be added to the timeline before they can be stacked."
+                            )
                             drop.ignore()
                             return
                         }
@@ -3194,17 +3194,17 @@ Item {
                         }
 
                         if(element.scene.actIndex < 0 || otherElement.scene.actIndex < 0) {
-                            showInformation({
-                                "message": "Scenes must be added to the timeline before they can be stacked."
-                            })
+                            MessageBox.showInformation("",
+                                "Scenes must be added to the timeline before they can be stacked."
+                            )
                             drop.ignore()
                             return
                         }
 
                         if(element.scene.actIndex !== otherElement.scene.actIndex) {
-                            showInformation({
-                                "message": "Scenes must belong to the same act for them to be stacked."
-                            })
+                            MessageBox.showInformation("",
+                                "Scenes must belong to the same act for them to be stacked."
+                            )
                             drop.ignore()
                             return
                         }

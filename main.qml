@@ -23,6 +23,7 @@ import "qrc:/qml" as UI
 import "qrc:/qml/controls"
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 
 Rectangle {
     id: mainWindow
@@ -138,66 +139,6 @@ Rectangle {
         }
     }
 
-    function showInformation(params, popupSource) {
-        var okCallback = function() {
-            if(params.callback)
-                params.callback(true)
-            modalDialog.closeable = true
-            modalDialog.initItemCallback = undefined
-        }
-
-        modalDialog.initItemCallback = function(item) {
-            if(params.message)
-                item.message = params.message
-            if(params.okButtonText)
-                item.okButtonText = params.okButtonText
-            item.okCallback = okCallback
-        }
-
-        modalDialog.sourceComponent = infoDialogComponent
-        if(popupSource)
-            modalDialog.popupSource = popupSource
-        modalDialog.closeable = false
-        if(params.closeOnEscape !== undefined)
-            modalDialog.closeOnEscape = params.closeOnEscape
-        modalDialog.active = true
-    }
-
-    function askQuestion(params, popupSource) {
-        var okCallback = function() {
-            if(params.callback)
-                params.callback(true)
-            modalDialog.closeable = true
-            modalDialog.initItemCallback = undefined
-        }
-
-        var cancelCallback = function() {
-            if(params.callback)
-                params.callback(false)
-            modalDialog.closeable = true
-            modalDialog.initItemCallback = undefined
-        }
-
-        modalDialog.initItemCallback = function(item) {
-            if(params.question)
-                item.question = params.question
-            if(params.okButtonText)
-                item.okButtonText = params.okButtonText
-            if(params.cancelButtonText)
-                item.cancelButtonText = params.cancelButtonText
-            if(params.abortButtonText)
-                item.abortButtonText = params.abortButtonText
-            item.okCallback = okCallback
-            item.cancelCallback = cancelCallback
-        }
-
-        modalDialog.sourceComponent = okCancelDialogComponent
-        if(popupSource)
-            modalDialog.popupSource = popupSource
-        modalDialog.closeable = false
-        modalDialog.active = true
-    }
-
     UI.DialogOverlay {
         id: modalDialog
         active: false
@@ -223,106 +164,6 @@ Rectangle {
             target: Runtime.applicationSettings
             function onEnableAnimationsChanged() {
                 modalDialog.animationsEnabled = Runtime.applicationSettings.enableAnimations
-            }
-        }
-    }
-
-    Component {
-        id: okCancelDialogComponent
-
-        Item {
-            width: 500
-            height: 250
-            property string question: "Press Ok to continue."
-            property string okButtonText: "Ok"
-            property string cancelButtonText: "Cancel"
-            property string abortButtonText
-            property var    okCallback
-            property var    cancelCallback
-
-            Column {
-                width: parent.width*0.8
-                spacing: 40
-                anchors.centerIn: parent
-
-                VclText {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    font.pixelSize: 16
-                    text: question
-                    horizontalAlignment: Text.AlignHCenter
-                    color: Runtime.colors.accent.c50.text
-                }
-
-                Row {
-                    spacing: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    VclButton {
-                        text: okButtonText
-                        onClicked: {
-                            if(okCallback)
-                                okCallback()
-                            modalDialog.closeRequest()
-                        }
-                    }
-
-                    VclButton {
-                        text: cancelButtonText
-                        onClicked: {
-                            if(cancelCallback)
-                                cancelCallback()
-                            modalDialog.closeRequest()
-                        }
-                    }
-
-                    VclButton {
-                        visible: text !== ""
-                        text: abortButtonText
-                        onClicked: modalDialog.closeRequest()
-                    }
-                }
-            }
-        }
-    }
-
-    Component {
-        id: infoDialogComponent
-
-        Item {
-            width: 500
-            height: 250
-            property string message: "Press Ok to continue."
-            property string okButtonText: "Ok"
-            property var    okCallback
-
-            Column {
-                width: parent.width*0.8
-                spacing: 40
-                anchors.centerIn: parent
-
-                VclText {
-                    width: parent.width
-                    wrapMode: Text.WordWrap
-                    font.pixelSize: 16
-                    text: message
-                    horizontalAlignment: Text.AlignHCenter
-                    color: Runtime.colors.accent.c50.text
-                }
-
-                Row {
-                    spacing: 20
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    VclButton {
-                        text: okButtonText
-                        onClicked: {
-                            if(okCallback)
-                                okCallback()
-                            modalDialog.closeRequest()
-                        }
-                    }
-                }
             }
         }
     }
@@ -430,10 +271,10 @@ Rectangle {
                 }
                 splashLoader.active = false
                 if(Scrite.app.isWindowsPlatform && Scrite.app.isNotWindows10)
-                    showInformation({
-                        "message": "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
-                        "callback": function(value) { launchHomeScreen() }
-                    })
+                    MessageBox.showInformation("",
+                        "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
+                        () => { launchHomeScreen() }
+                    )
                 else
                     launchHomeScreen()
                 if(fileNameToOpen !== "")
