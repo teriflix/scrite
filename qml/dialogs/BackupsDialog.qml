@@ -157,7 +157,6 @@ VclDialog {
         height: 100
         content: VclText {
             text: "Opening backup file ..."
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
         }

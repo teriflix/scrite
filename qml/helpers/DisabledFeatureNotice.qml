@@ -19,7 +19,6 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
 
 Rectangle {
     id: dfNotice
@@ -119,5 +118,4 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
     }
-
 }

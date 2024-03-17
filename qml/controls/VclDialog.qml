@@ -75,6 +75,8 @@ Dialog {
         }
     }
 
+    property Component bottomBar
+
     // This signal is emitted after the dialog box has been dismissed.
     signal dismissed()
 
@@ -124,11 +126,21 @@ Dialog {
             Loader {
                 id: contentItemLoader
                 sourceComponent: content
-                active: dialog.visible
+                active: false
                 property real itemImplicitWidth: item ? item.implicitWidth : 0
                 property real itemImplicitHeight: item ? item.implicitHeight : 0
                 width: (itemImplicitWidth === 0) ? contentItemScroll.width : Math.max(contentItemScroll.width,itemImplicitWidth)
                 height: (itemImplicitHeight === 0) ? contentItemScroll.height : Math.max(contentItemScroll.height,itemImplicitHeight)
+
+                Connections {
+                    target: root
+                    function onAboutToShow() {
+                        contentItemLoader.active = true
+                    }
+                    function onClosed() {
+                        contentItemLoader.active = false
+                    }
+                }
             }
         }
     }
@@ -160,6 +172,18 @@ Dialog {
                 sourceComponent: titleBarButtons
                 active: dialog.visible
             }
+        }
+    }
+
+    footer: Rectangle {
+        color: Runtime.colors.primary.c200.background
+        height: footerLoader.item ? footerLoader.height : 0
+        visible: height > 0
+
+        Loader {
+            id: footerLoader
+            width: parent.width
+            sourceComponent: bottomBar
         }
     }
 

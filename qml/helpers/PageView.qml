@@ -74,7 +74,7 @@ Rectangle {
 
                     VclText {
                         anchors.right: parent.right
-                        anchors.rightMargin: 40
+                        anchors.rightMargin: 24
                         anchors.verticalCenter: parent.verticalCenter
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         font.bold: pageList.currentIndex === index
@@ -88,7 +88,6 @@ Rectangle {
                         visible: pageList.currentIndex === index
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
-                        anchors.rightMargin: 10
                     }
 
                     MouseArea {

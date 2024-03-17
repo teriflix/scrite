@@ -30,8 +30,8 @@ Item {
     property alias nameFilters: folderPathDialog.nameFilters
     property TabSequenceManager tabSequenceManager
 
-    width: 400
-    height: layout.height
+    implicitWidth: 400
+    implicitHeight: layout.height
 
     onAllowedExtensionsChanged: {
         if(allowedExtensions.length > 0)
@@ -61,7 +61,7 @@ Item {
 
     Column {
         id: layout
-        spacing: 5
+        spacing: 10
         width: parent.width
 
         VclText {
@@ -70,9 +70,9 @@ Item {
             wrapMode: Text.WordWrap
             lineHeight: 1.2
             lineHeightMode: Text.ProportionalHeight
-            text: label + ":<br/><font size=\"-2\">(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
+            text: "<b>" + label + ":</b><br/>(" + filePathPrefix + "<u>" + fileInfo.absoluteFilePath + "</u>. <a href=\"change\">Change path</a>.)</font>"
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF
+            visible: selectedExtension && selectedExtension.value !== AbstractReportGenerator.AdobePDF
             enabled: visible
 
             MouseArea {
@@ -90,7 +90,6 @@ Item {
             placeholderText: "File Name"
             text: fileInfo.baseName
             width: parent.width
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             onTextChanged: fileInfo.baseName = text
             TabSequenceItem.manager: tabSequenceManager
             visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF

@@ -9,7 +9,6 @@
         <file>qml/AlphabetMappings.qml</file>
         <file>qml/CharactersView.qml</file>
         <file>qml/DialogOverlay.qml</file>
-        <file>qml/ExporterConfiguration.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
         <file>qml/OptionsDialog.qml</file>
@@ -38,7 +37,6 @@
         <file>qml/UiElementHighlight.qml</file>
         <file>qml/TextNoteView.qml</file>
         <file>qml/UserLogin.qml</file>
-        <file>qml/DisabledFeatureNotice.qml</file>
         <file>qml/PdfView.qml</file>
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
@@ -114,5 +112,7 @@
         <file>qml/dialogs/settingsdialog/NotebookOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/NotebookSettingsTab.qml</file>
         <file>qml/dialogs/MessageBox.qml</file>
+        <file>qml/dialogs/ExportConfigurationDialog.qml</file>
+        <file>qml/helpers/DisabledFeatureNotice.qml</file>
     </qresource>
 </RCC>

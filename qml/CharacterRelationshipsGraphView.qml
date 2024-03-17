@@ -21,6 +21,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 
 Rectangle {
     id: crGraphView
@@ -41,11 +42,12 @@ Rectangle {
 
     function resetGraph() { crGraph.reset() }
     function exportToPdf(popupSource) {
-        modalDialog.closeable = false
-        modalDialog.arguments = crGraph.createExporterObject()
-        modalDialog.sourceComponent = exporterConfigurationComponent
-        modalDialog.popupSource = popupSource
-        modalDialog.active = true
+        graphExportDialog.exporter = crGraph.createExporterObject()
+        graphExportDialog.open()
+    }
+
+    ExportConfigurationDialog {
+        id: graphExportDialog
     }
 
     CharacterRelationshipGraph {

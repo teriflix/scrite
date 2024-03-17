@@ -99,7 +99,7 @@ Item {
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Export To PDF"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: showExportWorkflow("Screenplay/Adobe PDF")
+        onActivated: exportDialog.launch("Screenplay/Adobe PDF")
     }
 
     Shortcut {
@@ -464,7 +464,7 @@ Item {
                                 required property var modelData
                                 text: modelData.name
                                 icon.source: "qrc" + modelData.icon
-                                onClicked: showExportWorkflow(modelData.key)
+                                onClicked: exportDialog.launch(modelData.key)
 
                                 ToolTip {
                                     text: modelData.description + "\n\nCategory: " + modelData.category
@@ -888,7 +888,7 @@ Item {
                                     required property var modelData
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
-                                    onClicked: showExportWorkflow(modelData.key)
+                                    onClicked: exportDialog.launch(modelData.key)
                                 }
                             }
 
@@ -1082,7 +1082,7 @@ Item {
                 }
 
                 function activateTab(index) {
-                    if(index < 0 || index >= tabs.length || pdfViewer.active)
+                    if(index < 0 || index >= tabs.length || pdfViewer.active || index === mainTabBar.currentIndex)
                         return
                     var tab = tabs[index]
                     if(!tab.visible)
@@ -1306,6 +1306,12 @@ Item {
                 pdfTitle = ""
             }
         }
+
+        Announcement.onIncoming: (type,data) => {
+                                     if(type === Runtime.announcementIds.showPdfRequest) {
+                                         show(data.title, data.filePath, data.dlFilePath, data.pagesPerRow, data.allowSave)
+                                     }
+                                 }
 
         function show(title, filePath, dlFilePath, pagesPerRow, allowSave) {
             active = false
@@ -2053,13 +2059,14 @@ Item {
         modalDialog.active = true
     }
 
-    function showExportWorkflow(formatName) {
-        if(formatName !== "") {
-            modalDialog.closeable = false
-            modalDialog.arguments = formatName
-            modalDialog.sourceComponent = exporterConfigurationComponent
-            modalDialog.popupSource = cmdExport
-            modalDialog.active = true
+    ExportConfigurationDialog {
+        id: exportDialog
+
+        function launch(formatName) {
+            if(formatName !== "") {
+                exporter = Scrite.document.createExporter(formatName)
+                open()
+            }
         }
     }
 
@@ -2097,12 +2104,6 @@ Item {
         id: reportGeneratorConfigurationComponent
 
         ReportGeneratorConfiguration { }
-    }
-
-    Component {
-        id: exporterConfigurationComponent
-
-        ExporterConfiguration { }
     }
 
     Item {

@@ -509,6 +509,12 @@ Item {
         readonly property string reloadMainUiRequest: "9a7f0f35-346f-461d-bb85-f5c6dc08a01d"
         readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
         readonly property string aboutDialogRequest: "72892ED6-BA58-47EC-B045-E92D9EC1C47A"
+        readonly property string showPdfRequest: "288E7DFB-9B14-4FE8-8846-14DD2974B486"
+    }
+
+    // Global file-manager
+    readonly property FileManager fileNamager: FileManager {
+
     }
 
     // Private objects

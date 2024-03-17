@@ -22,6 +22,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 
 Item {
     id: structureView
@@ -465,11 +466,12 @@ Item {
                 iconSource: "qrc:/icons/file/generate_pdf.png"
                 ToolTip.text: "Export the contents of the structure canvas to PDF."
                 onClicked: {
-                    modalDialog.closeable = false
-                    modalDialog.arguments = Scrite.document.structure.createExporterObject()
-                    modalDialog.sourceComponent = exporterConfigurationComponent
-                    modalDialog.popupSource = pdfExportButton
-                    modalDialog.active = true
+                    structureExportDialog.exporter = Scrite.document.structure.createExporterObject()
+                    structureExportDialog.open()
+                }
+
+                ExportConfigurationDialog {
+                    id: structureExportDialog
                 }
             }
         }
