@@ -27,7 +27,7 @@ void BasicFileInfo::setAbsoluteFilePath(const QString &val)
 
 void BasicFileInfo::setAbsolutePath(const QString &val)
 {
-    if (m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty() || val == m_fileInfo.absolutePath())
         return;
 
     const QString afp = val + QStringLiteral("/") + m_fileInfo.fileName();
@@ -36,7 +36,7 @@ void BasicFileInfo::setAbsolutePath(const QString &val)
 
 void BasicFileInfo::setFileName(const QString &val)
 {
-    if (m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty() || val == m_fileInfo.fileName())
         return;
 
     const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + val;
@@ -45,7 +45,7 @@ void BasicFileInfo::setFileName(const QString &val)
 
 void BasicFileInfo::setSuffix(const QString &val)
 {
-    if (m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty() || val == m_fileInfo.suffix())
         return;
 
     QString ext = val.trimmed();
@@ -62,7 +62,7 @@ void BasicFileInfo::setSuffix(const QString &val)
 
 void BasicFileInfo::setBaseName(const QString &val)
 {
-    if (m_fileInfo == QFileInfo() || val.isEmpty())
+    if (m_fileInfo == QFileInfo() || val.isEmpty() || val == m_fileInfo.completeBaseName())
         return;
 
     const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + val + QStringLiteral(".")
@@ -72,6 +72,9 @@ void BasicFileInfo::setBaseName(const QString &val)
 
 void BasicFileInfo::setFileInfo(const QFileInfo &val)
 {
+    if (val == m_fileInfo)
+        return;
+
     m_fileInfo = val;
     emit fileInfoChanged();
 }

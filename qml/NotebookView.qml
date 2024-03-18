@@ -641,12 +641,13 @@ Rectangle {
                         if(!rgen)
                             return
 
-                        modalDialog.closeable = false
-                        modalDialog.arguments = rgen
-                        modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-                        modalDialog.popupSource = pdfExportButton
-                        modalDialog.active = true
+                        reportDialog.report = rgen
+                        reportDialog.open()
                     }
+                }
+
+                ReportConfigurationDialog {
+                    id: reportDialog
                 }
 
                 ResetOnChange {

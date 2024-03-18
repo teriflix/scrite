@@ -22,6 +22,7 @@ import "qrc:/qml/controls"
 Rectangle {
     id: pageView
 
+    property alias pageListVisible: pageList.visible
     property alias pagesArray: pageRepeater.model
     property alias currentIndex: pageList.currentIndex
     property string pageTitleRole
@@ -40,7 +41,7 @@ Rectangle {
     Rectangle {
         id: pageList
         width: pageListWidth
-        color: Runtime.colors.accent.c500.background
+        color: Runtime.colors.accent.c600.background
         height: parent.height
         anchors.left: parent.left
         property int currentIndex: -1
@@ -79,7 +80,7 @@ Rectangle {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         font.bold: pageList.currentIndex === index
                         text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
-                        color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c500.text
+                        color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
                     }
 
                     Image {
@@ -110,7 +111,7 @@ Rectangle {
 
     Flickable {
         id: pageContentArea
-        anchors.left: pageList.right
+        anchors.left: pageList.visible ? pageList.right : parent.left
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.bottom: parent.bottom

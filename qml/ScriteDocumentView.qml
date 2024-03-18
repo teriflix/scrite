@@ -512,7 +512,7 @@ Item {
                                 required property var modelData
                                 text: modelData.name
                                 icon.source: "qrc" + modelData.icon
-                                onClicked: showReportWorkflow(modelData.name)
+                                onClicked: reportDialog.launch(modelData.name)
 
                                 ToolTip {
                                     text: modelData.description
@@ -2070,13 +2070,28 @@ Item {
         }
     }
 
-    function showReportWorkflow(reportName) {
-        if(reportName !== "") {
-            modalDialog.closeable = false
-            modalDialog.arguments = reportName
-            modalDialog.sourceComponent = reportGeneratorConfigurationComponent
-            modalDialog.popupSource = cmdReports
-            modalDialog.active = true
+    ReportConfigurationDialog {
+        id: reportDialog
+
+        Announcement.onIncoming: (type, data) => {
+                                     if(type === Runtime.announcementIds.reportConfigurationDialogRequest) {
+                                         const reportName = data.reportName
+                                         const initialProperties = data.initialProperties
+                                         reportDialog.launch(reportName, initialProperties)
+                                     }
+                                 }
+
+        function launch(reportName, initialProperties) {
+            if(reportName !== "") {
+                report = Scrite.document.createReportGenerator(reportName)
+                if(initialProperties) {
+                    for(var member in initialProperties) {
+                        report.setConfigurationValue(member, initialProperties[member])
+                    }
+                }
+
+                open()
+            }
         }
     }
 
@@ -2098,12 +2113,6 @@ Item {
         Notification.title: "Scrite Error"
         Notification.text: applicationErrors ? applicationErrors.errorMessage : ""
         Notification.autoClose: false
-    }
-
-    Component {
-        id: reportGeneratorConfigurationComponent
-
-        ReportGeneratorConfiguration { }
     }
 
     Item {

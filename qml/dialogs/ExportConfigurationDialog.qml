@@ -16,8 +16,6 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
-import Qt.labs.qmlmodels 1.0
-
 import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
@@ -37,6 +35,7 @@ VclDialog {
     content: visible ? (_private.exportEnabled ? exportConfigContent : exportFeatureDisabledContent) : null
     bottomBar: visible && _private.exportEnabled ? exportButtonFooter : null
 
+    // Show this component if the exporter feature is disabled for the user
     Component {
         id: exportFeatureDisabledContent
 
@@ -46,7 +45,7 @@ VclDialog {
         }
     }
 
-    // Show this component if its enabled for the current user
+    // Show this component if the exporter is enabled for the current user
     Component {
         id: exportConfigContent
 
@@ -118,8 +117,12 @@ VclDialog {
                         required property var modelData
 
                         Layout.fillWidth: true
-                        sourceComponent: delegateChooser.chooseDelegate(modelData.editor)
-                        onLoaded: item.fieldInfo = modelData
+                        source: delegateChooser.delegateSource(modelData.editor)
+                        onLoaded: {
+                            item.exporter = exporter
+                            item.tabSequence = tabSequence
+                            item.fieldInfo = modelData
+                        }
                     }
                 }
 
@@ -225,113 +228,24 @@ VclDialog {
     QtObject {
         id: delegateChooser
 
-        function chooseDelegate(kind) {
-            if(kind === "IntegerSpinBox")
-                return editor_IntegerSpinBox
-            if(kind === "CheckBox")
-                return editor_CheckBox
-            if(kind === "TextBox")
-                return editor_TextBox
-            return editor_Unknown
+        readonly property var knownEditors: [
+            "IntegerSpinBox",
+            "CheckBox",
+            "TextBox"
+        ]
+
+        function delegateSource(kind) {
+            var ret = "./exportconfigurationdialog/editor_"
+            if(knownEditors.indexOf(kind) >= 0)
+                ret += kind
+            else
+                ret += "Unknown"
+            ret += ".qml"
+            return ret
         }
     }
 
-    // Various kinds of editors that can show up in an export configuration dialog box
-    Component {
-        id: editor_IntegerSpinBox
-
-        Column {
-            property var fieldInfo
-
-            spacing: 10
-
-            VclText {
-                text: fieldInfo.label
-                width: parent.width
-                wrapMode: Text.WordWrap
-                maximumLineCount: 2
-                elide: Text.ElideRight
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            }
-
-            SpinBox {
-                from: fieldInfo.min
-                to: fieldInfo.max
-                value: exporter ? exporter.getConfigurationValue(fieldInfo.name) : 0
-                onValueModified: {
-                    if(exporter)
-                        exporter.setConfigurationValue(fieldInfo.name, value)
-                }
-                TabSequenceItem.manager: tabSequence
-            }
-        }
-    }
-
-    Component {
-        id: editor_CheckBox
-
-        Column {
-            property var fieldInfo
-
-            VclCheckBox {
-                id: checkBox
-                width: parent.width
-                text: fieldInfo.label
-                checkable: true
-                checked: exporter ? exporter.getConfigurationValue(fieldInfo.name) : false
-                onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                TabSequenceItem.manager: tabSequence
-            }
-
-            VclText {
-                width: parent.width
-                wrapMode: Text.WordWrap
-                leftPadding: 2*checkBox.leftPadding + checkBox.implicitIndicatorWidth
-                text: fieldInfo.note
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
-                color: Runtime.colors.primary.c600.background
-                visible: fieldInfo.note !== ""
-            }
-        }
-    }
-
-    Component {
-        id: editor_TextBox
-
-        Column {
-            property var fieldInfo
-
-            spacing: 5
-
-            VclText {
-                text: fieldInfo.name
-                font.capitalization: Font.Capitalize
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            }
-
-            VclTextField {
-                width: parent.width-30
-                label: ""
-                placeholderText: fieldInfo.label
-                onTextChanged: exporter.setConfigurationValue(fieldInfo.name, text)
-                TabSequenceItem.manager: tabSequence
-            }
-        }
-    }
-
-    Component {
-        id: editor_Unknown
-
-        VclText {
-            property var fieldInfo
-
-            textFormat: Text.RichText
-            text: "Do not know how to configure <strong>" + fieldInfo.name + "</strong>"
-        }
-    }
-
-    // Private data
+    // Private section
     QtObject {
         id: _private
 

@@ -3993,14 +3993,13 @@ Rectangle {
 
             VclMenuItem {
                 required property var modelData
+
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
 
                 onTriggered: {
-                    const reportArgs = {"reportName": modelData.name, "configuration": {"characterNames": [characterMenu.characterName]}}
-                    Utils.execLater(screenplayEditor, 100, (reportArgs) => {
-                                        showReportWorkflow(reportArgs)
-                                    }, reportArgs)
+                    const args = {"reportName": modelData.name, "initialProperties": {"characterNames": [characterMenu.characterName]}}
+                    Announcement.shout(Runtime.announcementIds.reportConfigurationDialogRequest, args)
                     characterMenu.close()
                     characterMenu.characterName = ""
                 }
@@ -4023,7 +4022,7 @@ Rectangle {
             model: characterMenu.characterReports.length > 0 ? 1 : 0
 
             VclMenuItem {
-                text: "Rename CBharacter"
+                text: "Rename Character"
                 icon.source: "qrc:/icons/screenplay/character.png"
 
                 onTriggered: {

@@ -39,7 +39,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 
 Dialog {
-    id: dialog
+    id: root
 
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
@@ -71,7 +71,7 @@ Dialog {
             hoverEnabled: true
             onEntered: parent.scale = 1.2
             onExited: parent.scale = 1
-            onClicked: dialog.close()
+            onClicked: root.close()
         }
     }
 
@@ -103,15 +103,15 @@ Dialog {
     bottomInset: 0
 
     background: Loader {
-        width: dialog.width
-        height: dialog.height
+        width: root.width
+        height: root.height
         sourceComponent: backdrop
-        active: dialog.visible
+        active: root.visible
     }
 
     contentItem: Item {
-        width: dialog.width
-        height: dialog.height - dialog.header.height
+        width: root.width
+        height: root.height - root.header.height
         clip: contentItemScroll.contentWidth > contentItemScroll.width ||
               contentItemScroll.contentHeight > contentItemScroll.height
 
@@ -147,7 +147,7 @@ Dialog {
 
     header: Rectangle {
         color: Runtime.colors.accent.c600.background
-        width: dialog.width
+        width: root.width
         height: dialogHeaderLayout.height
 
         RowLayout {
@@ -163,14 +163,14 @@ Dialog {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 color: Runtime.colors.accent.c600.text
                 padding: 16
-                text: dialog.title
+                text: root.title
             }
 
             Loader {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: 8
                 sourceComponent: titleBarButtons
-                active: dialog.visible
+                active: root.visible
             }
         }
     }
@@ -187,5 +187,5 @@ Dialog {
         }
     }
 
-    onClosed: Utils.execLater(dialog, 50, dismissed)
+    onClosed: Utils.execLater(root, 50, dismissed)
 }

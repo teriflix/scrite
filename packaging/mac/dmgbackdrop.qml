@@ -28,7 +28,7 @@ Item {
         fillMode: Image.PreserveAspectFit
     }
 
-    VclText {
+    Text {
         text: "https://www.scrite.io"
         anchors.left: parent.left
         anchors.bottom: parent.bottom
@@ -38,7 +38,7 @@ Item {
         color: "#65318f"
     }
 
-    VclText {
+    Text {
         text: "You're so close to writing your next blockbuster on Scrite!\nDrag the Scrite icon to the Applications folder."
         horizontalAlignment: Text.AlignHCenter
         anchors.horizontalCenter: parent.horizontalCenter
@@ -49,7 +49,7 @@ Item {
         color: "gray"
     }
 
-    VclText {
+    Text {
         text: "{{VERSION}}"
         font.pixelSize: 18
         font.family: "Rubik"

@@ -51,19 +51,22 @@ Rectangle {
             down: tagsMenu.visible
 
             VclText {
-                font.pixelSize: parent.height * 0.2
-                font.bold: true
-                text: charactersModel.tags.length > 0 ? charactersModel.tags.length : ""
-                padding: 2
-                color: Runtime.colors.primary.highlight.text
-                anchors.bottom: parent.bottom
                 anchors.right: parent.right
+                anchors.bottom: parent.bottom
+
+                padding: 2
+                font.bold: true
+                font.pixelSize: parent.height * 0.2
+                color: Runtime.colors.primary.highlight.text
+
+                text: charactersModel.tags.length > 0 ? charactersModel.tags.length : ""
             }
 
             Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
+
                 height: 1
 
                 VclMenu {
@@ -90,7 +93,7 @@ Rectangle {
         }
     }
 
-    ScrollArea {
+    Flickable {
         id: charactersListView
         anchors.left: parent.left
         anchors.right: parent.right
@@ -100,9 +103,8 @@ Rectangle {
         clip: true
         contentWidth: charactersListLayout.width
         contentHeight: height
-        ScrollBar.vertical.policy: ScrollBar.AlwaysOff
-        ScrollBar.horizontal.policy: charactersListLayout.width > width ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-        ScrollBar.horizontal.opacity: active ? 1 : 0.2
+        interactive: false
+        ScrollBar.horizontal: VclScrollBar { }
 
         Flow {
             id: charactersListLayout

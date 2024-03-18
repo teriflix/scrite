@@ -47,6 +47,7 @@ Item {
         if(msgDlg) {
             if(callback)
                 msgDlg.buttonClicked.connect(callback)
+            msgDlg.closed.connect(msgDlg.destroy)
             msgDlg.open()
         }
     }
@@ -73,6 +74,7 @@ Item {
         if(msgDlg) {
             if(callback)
                 msgDlg.buttonClicked.connect(callback)
+            msgDlg.closed.connect(msgDlg.destroy)
             msgDlg.open()
         }
     }

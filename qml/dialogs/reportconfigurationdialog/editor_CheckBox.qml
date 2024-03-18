@@ -11,21 +11,27 @@
 **
 ****************************************************************************/
 
-import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
+import "qrc:/qml/controls"
+import "qrc:/qml/helpers"
 
-Menu {
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
-    Material.theme: Runtime.colors.theme
+VclCheckBox {
+    property var fieldInfo
+    property AbstractReportGenerator report
 
+    checked: report ? report.getConfigurationValue(fieldInfo.name) : false
+    checkable: true
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-    closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
+    text: fieldInfo.label
+
+    onToggled: report ? report.setConfigurationValue(fieldInfo.name, checked) : false
 }

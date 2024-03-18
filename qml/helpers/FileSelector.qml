@@ -22,8 +22,10 @@ import "qrc:/qml/controls"
 
 Item {
     id: fileSelector
+
     property string label: "Select a file to export into"
     property alias absoluteFilePath: fileInfo.absoluteFilePath
+    property alias folder: folderPathDialog.folder
     property var allowedExtensions: []
     property var selectedExtension
     property string filePathPrefix: "File will be saved as: "
@@ -32,11 +34,6 @@ Item {
 
     implicitWidth: 400
     implicitHeight: layout.height
-
-    onAllowedExtensionsChanged: {
-        if(allowedExtensions.length > 0)
-            selectedExtension = allowedExtensions[0]
-    }
 
     BasicFileInfo {
         id: fileInfo
@@ -51,8 +48,7 @@ Item {
             }
             return Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadFolder))
         }
-        onFolderChanged: fileSelector.folder = folder
-        selectFolder: true
+        selectFolder: false
         selectMultiple: false
         selectExisting: false
         onAccepted: fileInfo.absolutePath = Scrite.app.urlToLocalFile(fileUrl)
@@ -90,7 +86,7 @@ Item {
             placeholderText: "File Name"
             text: fileInfo.baseName
             width: parent.width
-            onTextChanged: fileInfo.baseName = text
+            onTextChanged: Qt.callLater( () => { fileInfo.baseName = text } )
             TabSequenceItem.manager: tabSequenceManager
             visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF
             enabled: visible
@@ -103,6 +99,8 @@ Item {
                 model: allowedExtensions
 
                 VclRadioButton {
+                    required property var modelData
+
                     text: modelData.label + " (." + modelData.suffix + ")"
                     checked: selectedExtension.value === modelData.value
                     onClicked: {

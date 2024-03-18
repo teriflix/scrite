@@ -24,10 +24,10 @@ Loader {
     property bool readOnly: true
     property string text
     property alias font: fontMetrics.font
-    property var horizontalAlignment: Text.AlignHCenter
-    property var verticalAlignment: Text.AlignTop
-    property var wrapMode: Text.WordWrap
-    property var elide: Text.ElideNone
+    property int horizontalAlignment: Text.AlignHCenter
+    property int verticalAlignment: Text.AlignTop
+    property int wrapMode: Text.WordWrap
+    property int elide: Text.ElideNone
     property SearchEngine searchEngine
     property int searchSequenceNumber: -1
     property bool hasFocus: item ? item.activeFocus : false

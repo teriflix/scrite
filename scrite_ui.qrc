@@ -6,18 +6,14 @@
         <file>js/utils.js</file>
         <file>LICENSE.txt</file>
         <file>main.qml</file>
-        <file>qml/AlphabetMappings.qml</file>
-        <file>qml/CharactersView.qml</file>
         <file>qml/DialogOverlay.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
         <file>qml/OptionsDialog.qml</file>
-        <file>qml/ReportGeneratorConfiguration.qml</file>
         <file>qml/ScreenplayEditorToolbar.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
         <file>qml/ScreenplayView.qml</file>
         <file>qml/ScriteDocumentView.qml</file>
-        <file>qml/SearchBar.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/PageNumberBubble.qml</file>
         <file>qml/SceneTypeImage.qml</file>
@@ -34,13 +30,11 @@
         <file>qml/FormField.qml</file>
         <file>qml/FormView.qml</file>
         <file>qml/FormMenu.qml</file>
-        <file>qml/UiElementHighlight.qml</file>
         <file>qml/TextNoteView.qml</file>
         <file>qml/UserLogin.qml</file>
         <file>qml/PdfView.qml</file>
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
-        <file>qml/HelpTipNotification.qml</file>
         <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/HomeScreen.qml</file>
         <file>qml/SaveWorkflow.qml</file>
@@ -114,5 +108,25 @@
         <file>qml/dialogs/MessageBox.qml</file>
         <file>qml/dialogs/ExportConfigurationDialog.qml</file>
         <file>qml/helpers/DisabledFeatureNotice.qml</file>
+        <file>qml/helpers/AlphabetMappings.qml</file>
+        <file>qml/helpers/HelpTipNotification.qml</file>
+        <file>qml/helpers/UiElementHighlight.qml</file>
+        <file>qml/dialogs/ReportConfigurationDialog.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleCharacterNameSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleLocationSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleSceneSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleEpisodeSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleTagGroupSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_CheckBox.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_EnumSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_TextBox.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_IntegerSpinBox.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_Unknown.qml</file>
+        <file>qml/helpers/SearchBar.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_IntegerSpinBox.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_CheckBox.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
     </qresource>
 </RCC>
