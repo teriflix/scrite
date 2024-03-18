@@ -9,7 +9,6 @@
         <file>qml/DialogOverlay.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
-        <file>qml/OptionsDialog.qml</file>
         <file>qml/ScreenplayEditorToolbar.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
         <file>qml/ScreenplayView.qml</file>
@@ -88,7 +87,6 @@
         <file>qml/dialogs/CollaboratorsDialog.qml</file>
         <file>qml/dialogs/RenameCharacterDialog.qml</file>
         <file>qml/dialogs/SettingsDialog.qml</file>
-        <file>qml/dialogs/settingsdialog/qmldir</file>
         <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageFontsPage.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageTransiliterationPage.qml</file>
@@ -128,5 +126,10 @@
         <file>qml/dialogs/exportconfigurationdialog/editor_CheckBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
+        <file>qml/dialogs/TermsOfUseDialog.qml</file>
+        <file>qml/dialogs/WaitDialog.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/impl_ReportConfigurationDialog.qml</file>
+        <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
     </qresource>
 </RCC>

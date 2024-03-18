@@ -32,13 +32,13 @@ Item {
     /**
       Usage:
 
-      MessageBox.showInformation("some title ...", "some message ....", () => { ... })
+      MessageBox.information("some title ...", "some message ....", () => { ... })
 
       This function shows a dialog box with title, message and Ok button. The callback
       will be invoked whenever the user discards the dialog box by clicking on the Ok
       button.
       */
-    function showInformation(title, message, callback) {
+    function information(title, message, callback) {
         const params = {
             "title": title,
             "message": message
@@ -55,7 +55,7 @@ Item {
     /**
       Usage:
 
-      MessageBox.askQuestion("some title ...", "some question ...?", ["Yes", "No", "Cancel"], (buttonText) => {
+      MessageBox.question("some title ...", "some question ...?", ["Yes", "No", "Cancel"], (buttonText) => {
             if(buttonText === "Yes")
                 ...
             else if(buttonText === "No")
@@ -64,7 +64,7 @@ Item {
                 ...
         })
       */
-    function askQuestion(title, question, answerButtons, callback) {
+    function question(title, question, answerButtons, callback) {
         const params = {
             "title": title,
             "message": question,

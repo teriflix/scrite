@@ -429,6 +429,8 @@ Item {
     property int mainWindowTab: e_ScreenplayTab
     signal activateMainWindowTab(int tabType)
 
+    property bool loadMainUiContent: true
+
     // This model provides access to recently accessed files. It is updated from
     // different parts of the UI where opening / saving of files is triggered.
     // Contents of this model is listed in the HomeScreen.
@@ -508,9 +510,7 @@ Item {
         readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
         readonly property string reloadMainUiRequest: "9a7f0f35-346f-461d-bb85-f5c6dc08a01d"
         readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
-        readonly property string aboutDialogRequest: "72892ED6-BA58-47EC-B045-E92D9EC1C47A"
         readonly property string showPdfRequest: "288E7DFB-9B14-4FE8-8846-14DD2974B486"
-        readonly property string reportConfigurationDialogRequest: "4D11E838-DD39-43AA-A53D-BDADCB80436D"
     }
 
     // Global file-manager

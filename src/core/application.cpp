@@ -818,6 +818,16 @@ bool Application::isMouseOverItem(QQuickItem *item)
     return item->boundingRect().contains(pos);
 }
 
+void Application::installOverrideCursor(Qt::CursorShape cursorShape)
+{
+    QtApplicationClass::setOverrideCursor(QCursor(cursorShape));
+}
+
+void Application::rollbackOverrideCursor()
+{
+    QtApplicationClass::restoreOverrideCursor();
+}
+
 QColor Application::translucent(const QColor &input, qreal alpha)
 {
     QColor ret = input;

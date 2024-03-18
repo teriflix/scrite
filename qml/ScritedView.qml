@@ -47,7 +47,7 @@ Item {
         scritedToolbar.scritedView = scritedView
         if(!Runtime.scritedSettings.experimentalFeatureNoticeDisplayed) {
             Utils.execLater(scritedView, 250, function() {
-                MessageBox.showInformation("Experimental Feature",
+                MessageBox.information("Experimental Feature",
                     "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!"
                 )
                 Runtime.scritedSettings.experimentalFeatureNoticeDisplayed = true

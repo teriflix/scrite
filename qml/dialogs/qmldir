@@ -1,9 +1,11 @@
-AboutDialog 1.0 AboutDialog.qml
-BackupsDialog 1.0 BackupsDialog.qml
-CollaboratorsDialog 1.0 CollaboratorsDialog.qml
-ExportConfigurationDialog 1.0 ExportConfigurationDialog.qml
-RenameCharacterDialog 1.0 RenameCharacterDialog.qml
-SettingsDialog 1.0 SettingsDialog.qml
-TitlePageDialog 1.0 TitlePageDialog.qml
-
+singleton AboutDialog 1.0 AboutDialog.qml
+singleton BackupsDialog 1.0 BackupsDialog.qml
+singleton CollaboratorsDialog 1.0 CollaboratorsDialog.qml
+singleton ExportConfigurationDialog 1.0 ExportConfigurationDialog.qml
 singleton MessageBox 1.0 MessageBox.qml
+singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
+singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml
+singleton TermsOfUseDialog 1.0 TermsOfUseDialog.qml
+singleton WaitDialog 1.0 WaitDialog.qml
+singleton SettingsDialog 1.0 SettingsDialog.qml
+singleton TitlePageDialog 1.0 TitlePageDialog.qml

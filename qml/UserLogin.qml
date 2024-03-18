@@ -22,6 +22,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 
 Item {
     id: userLogin
@@ -872,7 +873,7 @@ Item {
                     text: "Feedback / About"
                     opacity: needsSaving ? 0.5 : 1
                     // font.pointSize: (Scrite.app.isMacOSPlatform ? Runtime.idealFontMetrics.font.pointSize-2 : Runtime.idealFontMetrics.font.pointSize)
-                    onClicked: Announcement.shout(Runtime.announcementIds.aboutDialogRequest, 0)
+                    onClicked: AboutDialog.launch()
                 }
             }
 

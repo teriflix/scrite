@@ -11,6 +11,8 @@
 **
 ****************************************************************************/
 
+pragma Singleton
+
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
@@ -21,87 +23,32 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs/settingsdialog" as SettingsDialogTabs
 
-VclDialog {
+Item {
     id: root
 
-    title: "Settings"
-    width: Math.min(Scrite.window.width-80, 1050)
-    height: Math.min(Scrite.window.height-80, 750)
+    parent: Scrite.window.contentItem
 
-    content: ColumnLayout {
-        spacing: 0
-
-        TabBar {
-            id: settingsDialogTabBar
-            Layout.fillWidth: true
-
-            TabButton {
-                text: "Application"
-            }
-
-            TabButton {
-                text: "Structure"
-            }
-
-            TabButton {
-                text: "Screenplay"
-            }
-
-            TabButton {
-                text: "Notebook"
-            }
-
-            TabButton {
-                text: "Language"
-            }
+    function launch(exporter) {
+        if(_private.dialogImpl.status !== Component.Ready) {
+            Scrite.app.log("SettingsDialog is not ready!")
+            return null
         }
 
-        Rectangle {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            color: Runtime.colors.primary.c50.background
-
-            StackLayout {
-                id: settingsDialogContent
-                anchors.fill: parent
-
-                currentIndex: settingsDialogTabBar.currentIndex
-
-                property real pageListWidth: (width/count)
-
-                SettingsDialogTabs.ApplicationSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                SettingsDialogTabs.StructureSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                SettingsDialogTabs.ScreenplaySettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                SettingsDialogTabs.NotebookSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                SettingsDialogTabs.LanguageSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-            }
+        var settingsDlg = _private.dialogImpl.createObject(root)
+        if(settingsDlg) {
+            settingsDlg.closed.connect(settingsDlg.destroy)
+            settingsDlg.open()
+            return settingsDlg
         }
+
+        Scrite.app.log("Couldn't launch SettingsDialog")
+        return null
+    }
+
+    QtObject {
+        id: _private
+
+        property Component dialogImpl: Qt.createComponent("./settingsdialog/impl_SettingsDialog.qml", Component.PreferSynchronous, root)
     }
 }

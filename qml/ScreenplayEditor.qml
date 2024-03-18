@@ -393,19 +393,11 @@ Rectangle {
                             visible: Runtime.screenplayAdapter.elementCount > 0 && contentView.spacing > 0 && Runtime.screenplayAdapter.isSourceScreenplay
                         }
 
-                        function editTitlePage(source) {
-                            titlePageDialog.open()
-                        }
-
-                        TitlePageDialog {
-                            id: titlePageDialog
-                        }
-
                         Connections {
                             target: titleCardLoader.item
 
                             function onEditTitlePageRequest(sourceItem) {
-                                contentViewHeaderItem.editTitlePage(sourceItem)
+                                TitlePageDialog.launch()
                             }
                         }
 
@@ -421,7 +413,7 @@ Rectangle {
                                 anchors.right: parent.right
                                 anchors.rightMargin: ruler.rightMarginPx
                                 iconSource: "qrc:/icons/action/edit_title_page.png"
-                                onClicked: editTitlePage(this)
+                                onClicked: TitlePageDialog.launch()
                                 visible: parent.active && enabled
                                 enabled: !Scrite.document.readOnly
                             }
@@ -438,7 +430,7 @@ Rectangle {
                             opacity: hovered ? 1 : 0.75
                             anchors.centerIn: parent
                             anchors.verticalCenterOffset: Runtime.screenplayAdapter.elementCount > 0 ? -contentView.spacing/2 : 0
-                            onClicked: editTitlePage(this)
+                            onClicked: TitlePageDialog.launch()
                             enabled: !Scrite.document.readOnly
                         }
 
@@ -897,17 +889,9 @@ Rectangle {
 
                     onClicked: {
                         if(Scrite.user.loggedIn)
-                            editCollaborators()
+                            CollaboratorsDialog.launch()
                         else
                             toggleLock()
-                    }
-
-                    CollaboratorsDialog {
-                        id: collaboratorsDialog
-                    }
-
-                    function editCollaborators() {
-                        collaboratorsDialog.open()
                     }
 
                     function toggleLock() {
@@ -920,7 +904,7 @@ Rectangle {
                         else
                             message = "Document unlocked. You will be able to edit it on this and any other computer."
 
-                        MessageBox.showInformation("Document Lock Status", message)
+                        MessageBox.information("Document Lock Status", message)
                     }
                 }
             }
@@ -2802,7 +2786,7 @@ Rectangle {
             }
 
             function showCantMergeSceneMessage() {
-                MessageBox.showInformation("Merge Scene Error",
+                MessageBox.information("Merge Scene Error",
                     "Scene can be merged only when cursor is placed at the start of the first paragraph in a scene."
                 )
             }
@@ -2829,7 +2813,7 @@ Rectangle {
             }
 
             function showCantSplitSceneMessage() {
-                MessageBox.showInformation("Split Scene Error",
+                MessageBox.information("Split Scene Error",
                     "Scene can be split only when cursor is placed at the start of a paragraph.")
             }
 
@@ -3998,8 +3982,7 @@ Rectangle {
                 icon.source: "qrc" + modelData.icon
 
                 onTriggered: {
-                    const args = {"reportName": modelData.name, "initialProperties": {"characterNames": [characterMenu.characterName]}}
-                    Announcement.shout(Runtime.announcementIds.reportConfigurationDialogRequest, args)
+                    ReportConfigurationDialog.launch(modelData.name, {"characterNames": [characterMenu.characterName]})
                     characterMenu.close()
                     characterMenu.characterName = ""
                 }
@@ -4027,17 +4010,11 @@ Rectangle {
 
                 onTriggered: {
                     const character = Scrite.document.structure.addCharacter(characterMenu.characterName)
-                    if(character) {
-                        renameCharacterDialog.character = character
-                        renameCharacterDialog.open()
-                    }
+                    if(character)
+                        RenameCharacterDialog.launch(character)
                 }
             }
         }
-    }
-
-    RenameCharacterDialog {
-        id: renameCharacterDialog
     }
 
     Component {

@@ -11,6 +11,8 @@
 **
 ****************************************************************************/
 
+pragma Singleton
+
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
@@ -23,155 +25,149 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
-VclDialog {
+Item {
     id: root
 
-    property Character character
-    property bool renameWasSuccessful: false
+    parent: Scrite.window.contentItem
 
-    width: 640
-    height: 300
-    title: "Rename Character: " + _private.orignalCharacterName
-
-    content: character ? renameCharacterDialogContent : characterNotSpecifiedError
-
-    Component {
-        id: characterNotSpecifiedError
-
-        VclText {
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            text: "No character was supplied for renaming."
+    function launch(character) {
+        if(!character || !Scrite.app.verifyType(character, "Character")) {
+            Scrite.app.log("Couldn't launch RenameCharacterDialog: invalid character specified.")
+            return null
         }
+
+        var renameDlg = renameCharacterDialogComponent.createObject(root, {"character": character})
+        if(renameDlg) {
+            renameDlg.closed.connect(renameDlg.destroy)
+            renameDlg.open()
+            return renameDlg
+        }
+
+        Scrite.app.log("Couldn't launch RenameCharacterDialog")
+        return null
     }
 
     Component {
-        id: renameCharacterDialogContent
+        id: renameCharacterDialogComponent
 
-        Item {
-            ColumnLayout {
-                anchors.fill: parent
-                anchors.margins: 20
-                spacing: 20
+        VclDialog {
+            id: renameCharacterDialog
 
-                VclTextField {
-                    id: newNameField
-                    Layout.fillWidth: true
+            property Character character
 
-                    placeholderText: "New name"
-                    label: ""
-                    focus: true
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-                    onReturnPressed: renameButton.click()
-                }
+            width: 680
+            height: 300
+            title: "Rename Character: " + _private.orignalCharacterName
 
-                RowLayout {
-                    Layout.fillWidth: true
+            content: Item {
+                ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: 20
                     spacing: 20
 
-                    VclCheckBox {
-                        id: chkNotice
+                    VclTextField {
+                        id: newNameField
                         Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignVCenter
-                        padding: 0
-                        text: "I understand that the rename operation cannot be undone."
+
+                        placeholderText: "New name"
+                        label: ""
+                        focus: true
+                        horizontalAlignment: Text.AlignHCenter
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+                        font.capitalization: Font.AllUppercase
+                        onReturnPressed: renameButton.click()
                     }
 
-                    VclButton {
-                        id: renameButton
+                    RowLayout {
                         Layout.fillWidth: true
-                        Layout.alignment: Qt.AlignVCenter
-                        text: "Rename"
-                        enabled: chkNotice.checked && newNameField.length > 0 && newNameField.text.toUpperCase() !== character.name
-                        onClicked: {
-                            _private.newCharacterName = newNameField.text.toUpperCase()
-                            renameProgressDialog.open()
+                        spacing: 20
+
+                        VclCheckBox {
+                            id: chkNotice
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter
+                            padding: 0
+                            text: "I understand that the rename operation cannot be undone."
+                        }
+
+                        VclButton {
+                            id: renameButton
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignVCenter
+                            text: "Rename"
+                            enabled: chkNotice.checked && newNameField.length > 0 && newNameField.text.toUpperCase() !== character.name
+                            onClicked: {
+                                _private.newCharacterName = newNameField.text.toUpperCase()
+                                renameJob.start()
+                            }
+                        }
+                    }
+                }
+
+                SequentialAnimation {
+                    id: renameJob
+
+                    running: false
+
+                    // Launch wait dialog ..
+                    ScriptAction {
+                        script: {
+                            _private.waitDialog = WaitDialog.launch("Renaming '" + _private.orignalCharacterName + "' to '" + _private.newCharacterName + "' ...")
+                        }
+                    }
+
+                    // Wait for it to show up on the UI ...
+                    PauseAnimation {
+                        duration: 200
+                    }
+
+                    // Perform the rename ...
+                    ScriptAction {
+                        script: {
+                            renameCharacterDialog.character.clearRenameError()
+                            _private.renameWasSuccessful = renameCharacterDialog.character.rename(_private.newCharacterName)
+                        }
+                    }
+
+                    // Wait for the UI to update after renaming was done ...
+                    PauseAnimation {
+                        duration: 200
+                    }
+
+                    // Cleanup and complete
+                    ScriptAction {
+                        script: {
+                            Qt.callLater(_private.waitDialog.close)
+                            _private.waitDialog = null
+
+                            if(_private.renameWasSuccessful)
+                                Qt.callLater(renameCharacterDialog.close)
+                            else
+                                MessageBox.information("Rename Error", renameCharacterDialog.character.renameError, () => {
+                                                           renameCharacterDialog.character.clearRenameError()
+                                                           Qt.callLater(renameCharacterDialog.close)
+                                                       } )
                         }
                     }
                 }
             }
 
-            VclDialog {
-                id: renameProgressDialog
+            onCharacterChanged: {
+                if(character)
+                    _private.orignalCharacterName = character.name
+                else
+                    _private.orignalCharacterName = "<unknown>"
+                _private.newCharacterName = ""
+            }
 
-                width: root.width * 0.8
-                height: root.height * 0.8
-                title: "Renaming ..."
-                titleBarButtons: null
+            QtObject {
+                id: _private
 
-                onDismissed: {
-                    character.clearRenameError()
-                }
-
-                content: VclText {
-                    id: renameProgressDialogContent
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    verticalAlignment: Text.AlignVCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Renaming '" + _private.orignalCharacterName + "' to '" + _private.newCharacterName + "', please wait ..."
-                    wrapMode: Text.WordWrap
-
-                    Component.onCompleted: {
-                        renameWasSuccessful = root.character.rename(_private.newCharacterName)
-                        if(renameWasSuccessful) {
-                            closeLater()
-                        } else {
-                            color = "red"
-                            text = character.renameError
-                        }
-                    }
-
-                    SequentialAnimation {
-                        id: renameAnimation
-                        running: true
-
-                        PauseAnimation {
-                            duration: 200
-                        }
-
-                        ScriptAction {
-                            script: {
-                                root.renameWasSuccessful = root.character.rename(_private.newCharacterName)
-                            }
-                        }
-
-                        PauseAnimation {
-                            duration: 200
-                        }
-
-                        ScriptAction {
-                            script: {
-                                if(root.renameWasSuccessful) {
-                                    Qt.callLater(root.close)
-                                    renameProgressDialogContent.close()
-                                } else {
-                                    renameProgressDialogContent.color = "red"
-                                    renameProgressDialogContent.text = character.renameError
-                                }
-                            }
-                        }
-                    }
-                }
+                property string orignalCharacterName
+                property string newCharacterName
+                property bool renameWasSuccessful: false
+                property VclDialog waitDialog
             }
         }
-    }
-
-    onCharacterChanged: {
-        if(character)
-            _private.orignalCharacterName = character.name
-        else
-            _private.orignalCharacterName = "<unknown>"
-        _private.newCharacterName = ""
-    }
-
-    onClosed: character = null
-
-    QtObject {
-        id: _private
-
-        property string orignalCharacterName
-        property string newCharacterName
     }
 }

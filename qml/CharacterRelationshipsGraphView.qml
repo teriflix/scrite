@@ -42,12 +42,7 @@ Rectangle {
 
     function resetGraph() { crGraph.reset() }
     function exportToPdf(popupSource) {
-        graphExportDialog.exporter = crGraph.createExporterObject()
-        graphExportDialog.open()
-    }
-
-    ExportConfigurationDialog {
-        id: graphExportDialog
+        ExportConfigurationDialog.launch(crGraph.createExporterObject())
     }
 
     CharacterRelationshipGraph {

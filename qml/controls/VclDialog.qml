@@ -45,6 +45,15 @@ Dialog {
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
 
+    // If this property is set to false, then the main-window's close button on
+    // the title bar is disabled whenever the dialog box is active.
+    property bool appCloseButtonVisible: true
+
+    // If set, then it will be used as application's override cursor whenever
+    // the dialog box is active. The cursor will be restored as soon as the dialog
+    // box is closed.
+    property int appOverrideCursor: -1
+
     // Assign a component whose instance may be shown as background
     property Component backdrop: Rectangle {
         color: Runtime.colors.primary.c100.background
@@ -187,5 +196,27 @@ Dialog {
         }
     }
 
+    // Private section
+    QtObject {
+        id: _private
+
+        property bool overrideCursorMustBeRestored: false
+    }
+
+    onAboutToShow: {
+        Scrite.window.closeButtonVisible = appCloseButtonVisible
+        if(appOverrideCursor >= 0) {
+            Scrite.app.installOverrideCursor(appOverrideCursor);
+            _private.overrideCursorMustBeRestored = true
+        }
+    }
+    onAboutToHide: {
+        Scrite.window.closeButtonVisible = true
+        if(_private.overrideCursorMustBeRestored) {
+            Scrite.app.rollbackOverrideCursor()
+            _private.overrideCursorMustBeRestored = false
+        }
+    }
+    onAppCloseButtonVisibleChanged: Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
     onClosed: Utils.execLater(root, 50, dismissed)
 }

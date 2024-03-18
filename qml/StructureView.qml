@@ -465,14 +465,7 @@ Item {
                 id: pdfExportButton
                 iconSource: "qrc:/icons/file/generate_pdf.png"
                 ToolTip.text: "Export the contents of the structure canvas to PDF."
-                onClicked: {
-                    structureExportDialog.exporter = Scrite.document.structure.createExporterObject()
-                    structureExportDialog.open()
-                }
-
-                ExportConfigurationDialog {
-                    id: structureExportDialog
-                }
+                onClicked: ExportConfigurationDialog.launch(Scrite.document.structure.createExporterObject())
             }
         }
 
@@ -1509,7 +1502,7 @@ Item {
                 onDropped: (drop) => {
                     var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                     if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
-                        MessageBox.showInformation("",
+                        MessageBox.information("",
                             "Scenes must be added to the timeline before they can be stacked."
                         )
                         drop.ignore()
@@ -3176,7 +3169,7 @@ Item {
                     onDropped: (drop) => {
                         var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                         if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
-                            MessageBox.showInformation("",
+                            MessageBox.information("",
                                 "Scenes must be added to the timeline before they can be stacked."
                             )
                             drop.ignore()
@@ -3196,7 +3189,7 @@ Item {
                         }
 
                         if(element.scene.actIndex < 0 || otherElement.scene.actIndex < 0) {
-                            MessageBox.showInformation("",
+                            MessageBox.information("",
                                 "Scenes must be added to the timeline before they can be stacked."
                             )
                             drop.ignore()
@@ -3204,7 +3197,7 @@ Item {
                         }
 
                         if(element.scene.actIndex !== otherElement.scene.actIndex) {
-                            MessageBox.showInformation("",
+                            MessageBox.information("",
                                 "Scenes must belong to the same act for them to be stacked."
                             )
                             drop.ignore()

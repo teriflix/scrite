@@ -99,7 +99,7 @@ Item {
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Export To PDF"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: exportDialog.launch("Screenplay/Adobe PDF")
+        onActivated: ExportConfigurationDialog.launch("Screenplay/Adobe PDF")
     }
 
     Shortcut {
@@ -395,7 +395,7 @@ Item {
                 iconSource: "qrc:/icons/file/backup_open.png"
                 text: "Open Backup"
                 visible: Scrite.document.backupFilesModel.count > 0
-                onClicked: backupsDialog.open()
+                onClicked: BackupsDialog.launch()
 
                 ToolTip.text: "Open any of the " + Scrite.document.backupFilesModel.count + " backup(s) available for this file."
 
@@ -408,21 +408,6 @@ Item {
                     color: Runtime.colors.primary.highlight.text
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
-                }
-
-                BackupsDialog {
-                    id: backupsDialog
-
-                    onOpenInThisWindow: (filePath) => {
-                                            mainUiContentLoader.allowContent = false
-                                            Scrite.document.openAnonymously(filePath)
-                                            Utils.execLater(mainUiContentLoader, 50, function() {
-                                                mainUiContentLoader.allowContent = true
-                                            })
-                                        }
-                    onOpenInNewWindow: (filePath) => {
-                                           Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                                       }
                 }
             }
 
@@ -464,7 +449,7 @@ Item {
                                 required property var modelData
                                 text: modelData.name
                                 icon.source: "qrc" + modelData.icon
-                                onClicked: exportDialog.launch(modelData.key)
+                                onClicked: ExportConfigurationDialog.launch(modelData.key)
 
                                 ToolTip {
                                     text: modelData.description + "\n\nCategory: " + modelData.category
@@ -512,7 +497,7 @@ Item {
                                 required property var modelData
                                 text: modelData.name
                                 icon.source: "qrc" + modelData.icon
-                                onClicked: reportDialog.launch(modelData.name)
+                                onClicked: ReportConfigurationDialog.launch(modelData.name)
 
                                 ToolTip {
                                     text: modelData.description
@@ -569,15 +554,10 @@ Item {
                         width: 300
 
                         VclMenuItem {
-                            id: settingsMenuItem
                             text: "Settings\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+,")
                             icon.source: "qrc:/icons/action/settings_applications.png"
-                            onClicked: activate()
+                            onClicked: SettingsDialog.launch()
                             enabled: appToolBar.visible
-
-                            function activate() {
-                                settingsDialog.open()
-                            }
 
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: "Settings"
@@ -587,7 +567,7 @@ Item {
                             Shortcut {
                                 context: Qt.ApplicationShortcut
                                 sequence: "Ctrl+,"
-                                onActivated: settingsMenuItem.activate()
+                                onActivated: SettingsDialog.launch()
                             }
                         }
 
@@ -629,16 +609,7 @@ Item {
                         VclMenuItem {
                             icon.source: "qrc:/icons/action/info.png"
                             text: "About"
-                            onClicked: showAboutDialog()
-
-                            Announcement.onIncoming: (type,data) => {
-                                                         if(type === Runtime.announcementIds.aboutDialogRequest)
-                                                            showAboutDialog()
-                                                      }
-
-                            function showAboutDialog() {
-                                aboutDialog.open()
-                            }
+                            onClicked: AboutDialog.launch()
                         }
 
                         VclMenuItem {
@@ -888,7 +859,7 @@ Item {
                                     required property var modelData
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
-                                    onClicked: exportDialog.launch(modelData.key)
+                                    onClicked: ExportConfigurationDialog.launch(modelData.key)
                                 }
                             }
 
@@ -912,7 +883,7 @@ Item {
                                     required property var modelData
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
-                                    onClicked: reportsMenu.itemAt(index).click()
+                                    onClicked: ReportConfigurationDialog.launch(modelData.name)
                                     // enabled: scriteDocumentViewItem.width >= 800
                                 }
                             }
@@ -996,7 +967,7 @@ Item {
                         VclMenuItem {
                             text: "Settings"
                             // enabled: scriteDocumentViewItem.width >= 1100
-                            onTriggered: settingsMenuItem.activate()
+                            onTriggered: SettingsDialog.launch()
                         }
 
                         VclMenuItem {
@@ -1229,7 +1200,7 @@ Item {
             globalScreenplayEditorToolbar.sceneEditor = null
         }
 
-        property bool allowContent: true
+        property bool allowContent: Runtime.loadMainUiContent
         property string sessionId
 
         Announcement.onIncoming: (type, data) => {
@@ -1242,7 +1213,6 @@ Item {
                                                                     })
                                                 }
                                            }
-
 
         // Recfactor QML: Get rid of this function, unless its called from this file itself.
         // It encourages usage of leap-of-faith IDs, which is a bad idea.
@@ -2059,52 +2029,10 @@ Item {
         modalDialog.active = true
     }
 
-    ExportConfigurationDialog {
-        id: exportDialog
-
-        function launch(formatName) {
-            if(formatName !== "") {
-                exporter = Scrite.document.createExporter(formatName)
-                open()
-            }
-        }
-    }
-
-    ReportConfigurationDialog {
-        id: reportDialog
-
-        Announcement.onIncoming: (type, data) => {
-                                     if(type === Runtime.announcementIds.reportConfigurationDialogRequest) {
-                                         const reportName = data.reportName
-                                         const initialProperties = data.initialProperties
-                                         reportDialog.launch(reportName, initialProperties)
-                                     }
-                                 }
-
-        function launch(reportName, initialProperties) {
-            if(reportName !== "") {
-                report = Scrite.document.createReportGenerator(reportName)
-                if(initialProperties) {
-                    for(var member in initialProperties) {
-                        report.setConfigurationValue(member, initialProperties[member])
-                    }
-                }
-
-                open()
-            }
-        }
-    }
-
     Component {
         id: homeScreenComponent
 
         HomeScreen { }
-    }
-
-    Component {
-        id: optionsDialogComponent
-
-        OptionsDialog { }
     }
 
     Item {
@@ -2140,23 +2068,24 @@ Item {
                     }
 
                     close.accepted = false
-                    MessageBox.askQuestion("Save Confirmation",
-                        "Do you want to save your current project before closing?",
-                        ["Yes", "No", "Cancel"],
-                        (buttonText) => {
-                            if(buttonText === "Yes") {
-                                if(Scrite.document.fileName !== "")
-                                    Scrite.document.save()
-                                else {
-                                    saveFileDialog.launch()
-                                    return
-                                }
-                            } else if(buttonText === "No") {
-                                closeEventHandler.handleCloseEvent = false
-                                Scrite.window.close()
-                            }
-                        }
-                    )
+                    MessageBox.question("Save Confirmation",
+                                        "Do you want to save your current project before closing?",
+                                        ["Yes", "No", "Cancel"],
+                                        (buttonText) => {
+                                            if(buttonText === "Yes") {
+                                                if(Scrite.document.fileName !== "") {
+                                                    Scrite.document.save()
+                                                    close.accepted = true
+                                                    Scrite.window.close()
+                                                } else {
+                                                    saveFileDialog.launch()
+                                                    return
+                                                }
+                                            } else if(buttonText === "No") {
+                                                closeEventHandler.handleCloseEvent = false
+                                                Scrite.window.close()
+                                            }
+                                        })
                 } else
                     close.accepted = true
             }
@@ -2279,22 +2208,15 @@ Item {
         }
     }
 
+    // Refactoring QML TODO: Get rid of this!!
     function openAnonymously(filePath, onCompleted) {
-        mainUiContentLoader.allowContent = false
+        Runtime.loadMainUiContent = false
         Scrite.document.openAnonymously(filePath)
         Utils.execLater(mainUiContentLoader, 50, function() {
-            mainUiContentLoader.allowContent = true
+            Runtime.loadMainUiContent = true
             if(onCompleted)
                 onCompleted()
         })
-    }
-
-    AboutDialog {
-        id: aboutDialog
-    }
-
-    SettingsDialog {
-        id: settingsDialog
     }
 
     FileDialog {

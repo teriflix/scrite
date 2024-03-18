@@ -160,11 +160,11 @@ Item {
 
         onImportStarted: (index) => {
                              homeScreen.enabled = false
-                             mainUiContentLoader.allowContent = false
+                             Runtime.loadMainUiContent = false
                          }
 
         onImportFinished: (index) => {
-                              mainUiContentLoader.allowContent = true
+                              Runtime.loadMainUiContent = true
                               Utils.execLater(libraryService, 250, function() {
                                   modalDialog.close()
                               })
@@ -613,9 +613,9 @@ Item {
             saveWorkflow.launch( () => {
                                     homeScreenBusyOverlay.visible = true
                                     homeScreen.enabled = false
-                                    mainUiContentLoader.allowContent = false
+                                    Runtime.loadMainUiContent = false
                                     Scrite.document.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
-                                    mainUiContentLoader.allowContent = true
+                                    Runtime.loadMainUiContent = true
                                     modalDialog.close()
                                 } )
         }
@@ -788,9 +788,9 @@ Item {
 
                     Runtime.workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
 
-                    mainUiContentLoader.allowContent = false
+                    Runtime.loadMainUiContent = false
                     Scrite.document.openOrImport(fileToImport.path)
-                    mainUiContentLoader.allowContent = true
+                    Runtime.loadMainUiContent = true
 
                     modalDialog.close()
                 }
@@ -996,10 +996,10 @@ Item {
 
             homeScreen.enabled = false
 
-            mainUiContentLoader.allowContent = false
+            Runtime.loadMainUiContent = false
             Runtime.recentFiles.add(path)
             Scrite.document.open(path)
-            mainUiContentLoader.allowContent = true
+            Runtime.loadMainUiContent = true
 
             modalDialog.close()
         }

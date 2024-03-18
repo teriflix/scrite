@@ -641,13 +641,8 @@ Rectangle {
                         if(!rgen)
                             return
 
-                        reportDialog.report = rgen
-                        reportDialog.open()
+                        ReportConfigurationDialog.launch(rgen)
                     }
-                }
-
-                ReportConfigurationDialog {
-                    id: reportDialog
                 }
 
                 ResetOnChange {
@@ -3254,10 +3249,7 @@ Rectangle {
 
         VclMenuItem {
             text: "Rename Character"
-            onClicked: {
-                renameCharacterDialog.character = character
-                renameCharacterDialog.open()
-            }
+            onClicked: RenameCharacterDialog.launch(character)
         }
 
         MenuSeparator { }
@@ -3296,10 +3288,6 @@ Rectangle {
                     Runtime.workspaceSettings.animateStructureIcon = false
             }
         }
-    }
-
-    RenameCharacterDialog {
-        id: renameCharacterDialog
     }
 
     Component {

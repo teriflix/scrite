@@ -25,14 +25,28 @@ class AppWindow : public QQuickView
 
 public:
     static AppWindow *instance();
+
     explicit AppWindow();
     ~AppWindow();
+
+    // By default, this is true and close button on the title bar is visible.
+    // When set to false, it becomes invisible or disabled. Please ensure
+    // that the flag is turned back to true as soon as the utility of this
+    // flag is over.
+    Q_PROPERTY(bool closeButtonVisible READ isCloseButtonVisible WRITE setCloseButtonVisible NOTIFY closeButtonVisibleChanged)
+    void setCloseButtonVisible(bool val);
+    bool isCloseButtonVisible() const { return m_closeButtonVisible; }
+    Q_SIGNAL void closeButtonVisibleChanged();
+    bool m_closeButtonVisible;
 
 protected:
     void showEvent(QShowEvent *);
 
 private:
     void initializeFileNameToOpen();
+
+private:
+    Qt::WindowFlags m_defaultWindowFlags;
 };
 
 #endif // APPWINDOW_H

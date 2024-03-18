@@ -271,7 +271,7 @@ Rectangle {
                 }
                 splashLoader.active = false
                 if(Scrite.app.isWindowsPlatform && Scrite.app.isNotWindows10)
-                    MessageBox.showInformation("",
+                    MessageBox.information("",
                         "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
                         () => { launchHomeScreen() }
                     )

@@ -214,6 +214,9 @@ public:
     Q_INVOKABLE static QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos);
     Q_INVOKABLE static bool isMouseOverItem(QQuickItem *item);
 
+    Q_INVOKABLE static void installOverrideCursor(Qt::CursorShape cursorShape);
+    Q_INVOKABLE static void rollbackOverrideCursor();
+
     QSettings *settings() const { return m_settings; }
 
     Q_PROPERTY(AutoUpdate *autoUpdate READ autoUpdate CONSTANT)

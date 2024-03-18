@@ -99,11 +99,28 @@ AppWindow::AppWindow()
     const char *uri = "io.scrite.models";
     qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "Model",
                                                    "Base type of models (QAbstractItemModel)");
+
+    m_defaultWindowFlags = this->flags();
 }
 
 AppWindow::~AppWindow()
 {
     ::AppWindowInstance = nullptr;
+}
+
+void AppWindow::setCloseButtonVisible(bool val)
+{
+    if (m_closeButtonVisible == val)
+        return;
+
+    m_closeButtonVisible = val;
+
+    Qt::WindowFlags newFlags = m_defaultWindowFlags;
+    if (!val)
+        newFlags |= Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint;
+    this->setFlags(newFlags);
+
+    emit closeButtonVisibleChanged();
 }
 
 void AppWindow::showEvent(QShowEvent *se)
