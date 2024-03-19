@@ -102,18 +102,6 @@ Item {
                                 required property string modelData
                                 required property int index
 
-                                width: charactersListView.width
-                                height: characterRow.height*1.15
-
-                                SearchAgent.engine: searchBar.searchEngine
-                                SearchAgent.onSearchRequest: {
-                                    SearchAgent.searchResultCount = SearchAgent.indexesOf(string, otherCharacterName).length > 0 ? 1 : 0
-                                }
-                                SearchAgent.onCurrentSearchResultIndexChanged: {
-                                    highlight = SearchAgent.currentSearchResultIndex >= 0
-                                    charactersListView.currentIndex = index
-                                }
-
                                 property string thisCharacterName: Scrite.app.camelCased(character.name)
                                 property string otherCharacterName: modelData
                                 property bool   checked: relationshipName.length > 0
@@ -123,7 +111,18 @@ Item {
                                 property color backgroundColor: highlight ? Runtime.colors.accent.c100.background : Runtime.colors.primary.c10.background
                                 property color foregroundColor: highlight ? Runtime.colors.accent.c100.text : Runtime.colors.primary.c10.text
 
+                                width: charactersListView.width
+                                height: characterRow.height*1.15
                                 color: backgroundColor
+
+                                SearchAgent.engine: searchBar.searchEngine
+                                SearchAgent.onSearchRequest: {
+                                    SearchAgent.searchResultCount = SearchAgent.indexesOf(string, otherCharacterName).length > 0 ? 1 : 0
+                                }
+                                SearchAgent.onCurrentSearchResultIndexChanged: {
+                                    highlight = SearchAgent.currentSearchResultIndex >= 0
+                                    charactersListView.currentIndex = index
+                                }
 
                                 RowLayout {
                                     id: characterRow
@@ -199,8 +198,8 @@ Item {
 
                     ScriptAction {
                         script: {
-                            for(var i=0; i<otherCharacterItems.count; i++) {
-                                var item = otherCharacterItems.itemAt(i)
+                            for(var i=0; i<charactersListView.count; i++) {
+                                var item = charactersListView.itemAtIndex(i)
                                 if(item.checked) {
                                     var otherCharacter = Scrite.document.structure.addCharacter(item.otherCharacterName)
                                     if(otherCharacter) {

@@ -21,14 +21,10 @@
         <file>qml/DockWidget.qml</file>
         <file>qml/AnnotationPropertyEditor.qml</file>
         <file>qml/AnnotationItem.qml</file>
-        <file>qml/CharacterRelationshipsGraphView.qml</file>
         <file>qml/ScritedView.qml</file>
         <file>qml/ScritedToolbar.qml</file>
         <file>qml/StructureGroupsMenu.qml</file>
         <file>qml/MarkSceneAsMenu.qml</file>
-        <file>qml/FormField.qml</file>
-        <file>qml/FormView.qml</file>
-        <file>qml/FormMenu.qml</file>
         <file>qml/TextNoteView.qml</file>
         <file>qml/UserLogin.qml</file>
         <file>qml/PdfView.qml</file>
@@ -133,5 +129,10 @@
         <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
         <file>qml/notebook/AddRelationshipDialog.qml</file>
         <file>qml/notebook/qmldir</file>
+        <file>qml/notebook/CharacterRelationshipsGraphView.qml</file>
+        <file>qml/notebook/RelationshipNameEditorDialog.qml</file>
+        <file>qml/notebook/FormField.qml</file>
+        <file>qml/notebook/FormView.qml</file>
+        <file>qml/notebook/FormMenu.qml</file>
     </qresource>
 </RCC>
