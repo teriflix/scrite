@@ -13,6 +13,7 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Layouts 1.0
 import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
@@ -450,55 +451,52 @@ Rectangle {
         anchors.centerIn: parent
     }
 
-    Component {
+    VclDialog {
         id: relationshipNameEditorDialog
 
-        Rectangle {
-            property Relationship relationship
-            property Character ofCharacter: relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter
-            property Character withCharacter: relationship.direction === Relationship.OfWith ? relationship.withCharacter : relationship.ofCharacter
-            width: 800
-            height: dialogLayout.height + 50
+        property Relationship relationship
+        property Character ofCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter) : null
+        property Character withCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.withCharacter : relationship.ofCharacter) : null
 
+        title: "Edit Relationship"
+        width: 800
+        height: 400
+
+        content: Item {
             Component.onCompleted: {
                 Utils.execLater(dialogLayout, 100, function() {
                     txtRelationshipName.forceActiveFocus()
                 })
             }
 
-            Column {
+            ColumnLayout {
                 id: dialogLayout
-                spacing: 30
-                width: parent.width - 50
+                width: parent.width-40
                 anchors.centerIn: parent
+                spacing: 20
 
-                VclText {
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
-                    text: "Edit Relationship"
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    font.bold: true
-                }
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
 
-                Row {
                     spacing: 10
-                    anchors.horizontalCenter: parent.horizontalCenter
 
-                    Column {
+                    ColumnLayout {
                         spacing: 10
-                        width: 180
 
                         Rectangle {
-                            width: 150; height: 150
-                            color: ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
-                            anchors.horizontalCenter: parent.horizontalCenter
+                            Layout.preferredWidth: 150
+                            Layout.preferredHeight: 150
+                            Layout.alignment: Qt.AlignHCenter
+
+                            color: relationshipNameEditorDialog.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
                             border.width: 1
                             border.color: "black"
 
                             Image {
                                 anchors.fill: parent
                                 source: {
-                                    if(ofCharacter.hasKeyPhoto > 0)
-                                        return "file:///" + ofCharacter.keyPhoto
+                                    if(relationshipNameEditorDialog.ofCharacter.hasKeyPhoto > 0)
+                                        return "file:///" + relationshipNameEditorDialog.ofCharacter.keyPhoto
                                     return "qrc:/icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -507,48 +505,51 @@ Rectangle {
                         }
 
                         VclText {
-                            width: parent.width
-                            horizontalAlignment: Text.AlignHCenter
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 180
+
+                            elide: Text.ElideRight
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             maximumLineCount: 2
-                            elide: Text.ElideRight
-                            text: Scrite.app.camelCased(ofCharacter.name)
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            horizontalAlignment: Text.AlignHCenter
+
+                            text: Scrite.app.camelCased(relationshipNameEditorDialog.ofCharacter.name)
                         }
                     }
 
                     VclTextField {
                         id: txtRelationshipName
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: relationship.name
-                        label: "Relationship:"
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        placeholderText: "husband of, wife of, friends with, reports to ..."
-                        maximumLength: 50
-                        width: 300
-                        enableTransliteration: true
-                        readOnly: Scrite.document.readOnly
-                        onReturnPressed: doneButton.click()
+
+                        Layout.fillWidth: true
+
                         focus: true
+                        text: relationshipNameEditorDialog.relationship.name
+                        label: "Relationship:"
+                        maximumLength: 50
+                        placeholderText: "husband of, wife of, friends with, reports to ..."
+
+                        readOnly: Scrite.document.readOnly
+                        enableTransliteration: true
+                        onReturnPressed: doneButton.click()
                     }
 
-                    Column {
+                    ColumnLayout {
                         spacing: 10
-                        width: 180
 
                         Rectangle {
-                            width: 150; height: 150
+                            Layout.preferredWidth: 150
+                            Layout.preferredHeight: 150
+                            Layout.alignment: Qt.AlignHCenter
+
                             color: withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
-                            anchors.horizontalCenter: parent.horizontalCenter
                             border.width: 1
                             border.color: "black"
 
                             Image {
                                 anchors.fill: parent
-                                anchors.margins: 1
                                 source: {
-                                    if(withCharacter.hasKeyPhoto > 0)
-                                        return "file:///" + withCharacter.keyPhoto
+                                    if(relationshipNameEditorDialog.withCharacter.hasKeyPhoto > 0)
+                                        return "file:///" + relationshipNameEditorDialog.withCharacter.keyPhoto
                                     return "qrc:/icons/content/character_icon.png"
                                 }
                                 fillMode: Image.PreserveAspectCrop
@@ -557,45 +558,45 @@ Rectangle {
                         }
 
                         VclText {
-                            width: parent.width
-                            horizontalAlignment: Text.AlignHCenter
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 180
+
+                            elide: Text.ElideRight
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             maximumLineCount: 2
-                            elide: Text.ElideRight
-                            text: Scrite.app.camelCased(withCharacter.name)
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            horizontalAlignment: Text.AlignHCenter
+
+                            text: Scrite.app.camelCased(relationshipNameEditorDialog.withCharacter.name)
                         }
                     }
                 }
 
-                Item {
-                    width: parent.width
-                    height: Math.max(revertButton.height, doneButton.height)
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 20
 
-                    Button {
+                    VclButton {
                         id: revertButton
                         text: "Revert"
-                        enabled: txtRelationshipName.text !== relationship.name
-                        onClicked: {
-                            txtRelationshipName.text = relationship.name
-                        }
-                        anchors.left: parent.left
+                        enabled: txtRelationshipName.text !== relationshipNameEditorDialog.relationship.name
+                        onClicked: txtRelationshipName.text = relationshipNameEditorDialog.relationship.name
                     }
 
-                    Button {
+                    VclButton {
                         id: doneButton
-                        text: revertButton.enabled ? "Change" : "Ok"
+                        text: "Change"
                         enabled: txtRelationshipName.length > 0
                         onClicked: click()
                         function click() {
-                            relationship.name = txtRelationshipName.text.trim()
-                            modalDialog.close()
+                            relationshipNameEditorDialog.relationship.name = txtRelationshipName.text.trim()
+                            relationshipNameEditorDialog.close()
                         }
-                        anchors.right: parent.right
                     }
                 }
             }
         }
+
+        onClosed: relationship = null
     }
 
     Component {
@@ -754,13 +755,8 @@ Rectangle {
                     enabled: !Scrite.document.readOnly
                     cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
                     onClicked: {
-                        modalDialog.closeable = false
-                        modalDialog.popupSource = parent
-                        modalDialog.initItemCallback = function(item) {
-                            item.relationship = modelData.relationship
-                        }
-                        modalDialog.sourceComponent = relationshipNameEditorDialog
-                        modalDialog.active = true
+                        relationshipNameEditorDialog.relationship = modelData.relationship
+                        relationshipNameEditorDialog.open()
                     }
                 }
             }
