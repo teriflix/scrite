@@ -565,7 +565,7 @@ Rectangle {
 
                         Loader {
                             id: addButtonsAnimator
-                            active: Runtime.mainWindowTab === Runtime.e_ScreenplayTab && contentView.count === 1 && !modalDialog.active && !splashLoader.active && !Runtime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown
+                            active: Runtime.mainWindowTab === Runtime.e_ScreenplayTab && contentView.count === 1 && !splashLoader.active && !Runtime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown
                             anchors.fill: parent
                             sourceComponent: UiElementHighlight {
                                 uiElement: addButtonsRow
@@ -4273,14 +4273,6 @@ Rectangle {
         color: Qt.rgba(0,0,0,0)
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
-    }
-
-    Connections {
-        target: modalDialog
-        function onActiveChanged() {
-            if(modalDialog.active === false && Runtime.mainWindowTab === Runtime.e_ScreenplayTab && contentView.count === 1)
-                contentView.itemAtIndex(0).item.assumeFocus()
-        }
     }
 
     Connections {

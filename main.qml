@@ -139,35 +139,6 @@ Rectangle {
         }
     }
 
-    UI.DialogOverlay {
-        id: modalDialog
-        active: false
-        anchors.fill: parent
-        enabled: Scrite.notifications.count === 0
-        animationsEnabled: Runtime.applicationSettings.enableAnimations
-        onCloseRequest: {
-            active = false
-            closeable = true
-            closeUponClickOutsideContentArea = false
-            closeOnEscape = Qt.binding( function() { return closeable || closeUponClickOutsideContentArea } )
-        }
-        property var arguments
-        property var initItemCallback
-        onDialogItemChanged: {
-            if(initItemCallback)
-                initItemCallback(dialogItem)
-            initItemCallback = undefined
-        }
-        opacity: !enabled || Scrite.document.busy ? 0.5 : 1
-
-        Connections {
-            target: Runtime.applicationSettings
-            function onEnableAnimationsChanged() {
-                modalDialog.animationsEnabled = Runtime.applicationSettings.enableAnimations
-            }
-        }
-    }
-
     Loader {
         active: Scrite.document.busy
         onActiveChanged: {
@@ -267,7 +238,7 @@ Rectangle {
             onDone: {
                 const launchHomeScreen = function() {
                     if(Scrite.user.loggedIn)
-                        mainScriteDocumentView.showHomeScreen(null)
+                        HomeScreenDialog.launch()
                 }
                 splashLoader.active = false
                 if(Scrite.app.isWindowsPlatform && Scrite.app.isNotWindows10)

@@ -42,8 +42,16 @@ import "qrc:/qml/helpers"
 
 Item {
     id: homeScreen
-    width: Math.min(800, scriteDocumentViewItem.height*0.9)
-    height: banner.height * 2.2
+
+    property string mode
+    signal closeRequest()
+
+    Component.onCompleted: {
+        Utils.execLater(homeScreen, 500, () => {
+                            if(mode === "Scriptalay")
+                                stackView.push(scriptalayPage)
+                        })
+    }
 
     Image {
         id: banner
@@ -52,6 +60,7 @@ Item {
         anchors.right: parent.right
         source: "qrc:/images/banner.png"
         fillMode: Image.PreserveAspectFit
+        visible: banner.height <= homeScreen.height * 0.5
 
         Image {
             anchors.centerIn: parent
@@ -119,11 +128,11 @@ Item {
 
     StackView {
         id: stackView
-        anchors.top: banner.bottom
+        anchors.top: banner.visible ? banner.bottom : parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        onDepthChanged: modalDialog.closeable = depth === 1
+        clip: true
 
         initialItem: ContentPage1 { }
     }
@@ -166,7 +175,7 @@ Item {
         onImportFinished: (index) => {
                               Runtime.loadMainUiContent = true
                               Utils.execLater(libraryService, 250, function() {
-                                  modalDialog.close()
+                                  closeRequest()
                               })
                           }
     }
@@ -331,7 +340,7 @@ Item {
                             saveWorkflow.launch( () => {
                                                     homeScreen.enabled = false
                                                     Scrite.document.reset()
-                                                    modalDialog.close()
+                                                    closeRequest()
                                                 } )
                         }
                     }
@@ -397,13 +406,6 @@ Item {
             tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
             onClicked: stackView.push(scriptalayPage)
             enabled: Runtime.recentFiles.count > 0
-
-            Announcement.onIncoming: (type,data) => {
-                                         if(type === "710A08E7-9F60-4D36-9DEA-0993EEBA7DCA") {
-                                             if(data === "Scriptalay" && enabled)
-                                                stackView.push(scriptalayPage)
-                                         }
-                                     }
         }
     }
 
@@ -588,11 +590,17 @@ Item {
                         readOnly: true
                         background: Item { }
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        text: "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
+                        text: {
+                            var ret =
+                              "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
                               "<strong>Pages:</strong> " + record.pageCount + "<br/>" +
                               "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
                               "<strong>Copyright:</strong> " + record.copyright + "<br/>" +
                               "<strong>Source:</strong> " + record.source
+                            if(!banner.visible)
+                                ret += "<br/><br/><strong>Logline:</strong> " + record.logline
+                            return ret
+                        }
                         onRecordChanged: commonToolTip.show(screenplayDetailsText, record.logline)
                         Component.onDestruction: commonToolTip.hide(screenplayDetailsText)
                     }
@@ -616,7 +624,7 @@ Item {
                                     Runtime.loadMainUiContent = false
                                     Scrite.document.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
                                     Runtime.loadMainUiContent = true
-                                    modalDialog.close()
+                                    closeRequest()
                                 } )
         }
 
@@ -792,7 +800,7 @@ Item {
                     Scrite.document.openOrImport(fileToImport.path)
                     Runtime.loadMainUiContent = true
 
-                    modalDialog.close()
+                    closeRequest()
                 }
 
                 ColumnLayout {
@@ -1001,7 +1009,7 @@ Item {
             Scrite.document.open(path)
             Runtime.loadMainUiContent = true
 
-            modalDialog.close()
+            closeRequest()
         }
     }
 }

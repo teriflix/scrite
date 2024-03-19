@@ -2,6 +2,7 @@ singleton AboutDialog 1.0 AboutDialog.qml
 singleton BackupsDialog 1.0 BackupsDialog.qml
 singleton CollaboratorsDialog 1.0 CollaboratorsDialog.qml
 singleton ExportConfigurationDialog 1.0 ExportConfigurationDialog.qml
+singleton HomeScreenDialog 1.0 HomeScreenDialog.qml
 singleton MessageBox 1.0 MessageBox.qml
 singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
 singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml

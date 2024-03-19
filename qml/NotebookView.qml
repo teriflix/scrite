@@ -3055,7 +3055,7 @@ Rectangle {
 
     Loader {
         id: structureIconAnimator
-        active: Runtime.workspaceSettings.animateStructureIcon && !modalDialog.active && Runtime.showNotebookInStructure
+        active: Runtime.workspaceSettings.animateStructureIcon && Runtime.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: structureTabButton

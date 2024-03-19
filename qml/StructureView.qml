@@ -1051,7 +1051,7 @@ Item {
                 }
 
                 EventFilter.target: Scrite.app
-                EventFilter.active: !Scrite.document.readOnly && visible && opacity === 1 && !modalDialog.active && !createItemMouseHandler.enabled
+                EventFilter.active: !Scrite.document.readOnly && visible && opacity === 1 && !createItemMouseHandler.enabled
                 EventFilter.events: [EventFilter.KeyPress]
                 EventFilter.onFilter: {
                     var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
@@ -3445,7 +3445,7 @@ Item {
             }
 
             EventFilter.target: Scrite.app
-            EventFilter.active: !Scrite.document.readOnly && !floatingDockWidget.contentHasFocus && !modalDialog.active && !createItemMouseHandler.enabled
+            EventFilter.active: !Scrite.document.readOnly && !floatingDockWidget.contentHasFocus && !createItemMouseHandler.enabled
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
@@ -4039,7 +4039,7 @@ Item {
 
     Loader {
         id: notebookIconAnimator
-        active: Runtime.workspaceSettings.animateNotebookIcon && !modalDialog.active && Runtime.showNotebookInStructure
+        active: Runtime.workspaceSettings.animateNotebookIcon && Runtime.showNotebookInStructure
         anchors.fill: parent
         sourceComponent: UiElementHighlight {
             uiElement: notebookTabButton

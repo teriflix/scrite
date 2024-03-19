@@ -60,7 +60,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+N"
-        onActivated: showHomeScreen(homeButton)
+        onActivated: HomeScreenDialog.launch()
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "New"
@@ -70,7 +70,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+O"
-        onActivated: showHomeScreen(homeButton)
+        onActivated: HomeScreenDialog.launch()
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Open"
@@ -80,12 +80,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+O"
-        onActivated: {
-            showHomeScreen(homeButton)
-            Utils.execLater(modalDialog, 500, () => {
-                                Announcement.shout("710A08E7-9F60-4D36-9DEA-0993EEBA7DCA", "Scriptalay")
-                            })
-        }
+        onActivated: HomeScreenDialog.launch("Scriptalay")
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Scriptalay"
@@ -387,7 +382,7 @@ Item {
                 id: homeButton
                 iconSource: "qrc:/icons/action/home.png"
                 text: "Home"
-                onClicked: showHomeScreen()
+                onClicked: HomeScreenDialog.launch()
             }
 
             FlatToolButton {
@@ -837,7 +832,7 @@ Item {
 
                         VclMenuItem {
                             text: "Home"
-                            onTriggered: showHomeScreen()
+                            onTriggered: HomeScreenDialog.launch()
                         }
 
                         VclMenuItem {
@@ -1515,7 +1510,7 @@ Item {
             BasicAttachmentsDropArea {
                 id: fileOpenDropArea
                 anchors.fill: parent
-                enabled: !modalDialog.active
+                enabled: true
                 allowedType: Attachments.NoMedia
                 allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
                 property string droppedFilePath
@@ -2014,25 +2009,6 @@ Item {
                 featureName: "Scrited"
             }
         }
-    }
-
-    function showHomeScreenLater(ps, delay) {
-        Utils.execLater(scriteDocumentViewItem, delay, () => {
-                            showHomeScreen(ps)
-                        })
-    }
-
-    function showHomeScreen(ps) {
-        modalDialog.popupSource = ps === undefined ? homeButton : ps
-        modalDialog.sourceComponent = homeScreenComponent
-        modalDialog.closeable = true
-        modalDialog.active = true
-    }
-
-    Component {
-        id: homeScreenComponent
-
-        HomeScreen { }
     }
 
     Item {

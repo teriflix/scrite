@@ -173,7 +173,7 @@ Item {
     }
 
     EventFilter.target: Scrite.app
-    EventFilter.active: hasItems && !modalDialog.active && !floatingDockWidget.contentHasFocus
+    EventFilter.active: hasItems && !floatingDockWidget.contentHasFocus
     EventFilter.events: [EventFilter.KeyPress]
     EventFilter.onFilter: {
         if(interactive) {

@@ -1328,7 +1328,7 @@ Item {
         }
     }
 
-    EventFilter.active: !modalDialog.active && !notificationsView.visible
+    EventFilter.active: !notificationsView.visible
     EventFilter.target: Scrite.window
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {
@@ -1433,7 +1433,7 @@ Item {
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && !modalDialog.active && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
+        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
         Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)

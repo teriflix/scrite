@@ -103,7 +103,7 @@ Item {
     Shortcut {
         id: toolButtonShortcut
         context: Qt.ApplicationShortcut
-        enabled: !modalDialog.active
+        enabled: true
         onActivated: toolButton.click()
     }
 

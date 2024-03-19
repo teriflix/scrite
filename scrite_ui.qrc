@@ -6,7 +6,6 @@
         <file>js/utils.js</file>
         <file>LICENSE.txt</file>
         <file>main.qml</file>
-        <file>qml/DialogOverlay.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
         <file>qml/ScreenplayEditorToolbar.qml</file>
@@ -31,8 +30,6 @@
         <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/SceneFeaturedImage.qml</file>
         <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
-        <file>qml/HomeScreen.qml</file>
-        <file>qml/SaveWorkflow.qml</file>
         <file>qml/globals/qmldir</file>
         <file>qml/globals/Runtime.qml</file>
         <file>qml/dialogs/qmldir</file>
@@ -134,5 +131,9 @@
         <file>qml/notebook/FormField.qml</file>
         <file>qml/notebook/FormView.qml</file>
         <file>qml/notebook/FormMenu.qml</file>
+        <file>qml/dialogs/homescreen/HomeScreen.qml</file>
+        <file>qml/dialogs/homescreen/SaveWorkflow.qml</file>
+        <file>qml/dialogs/HomeScreenDialog.qml</file>
+        <file>qml/dialogs/homescreen/qmldir</file>
     </qresource>
 </RCC>

@@ -25,7 +25,7 @@ QtObject {
 
     Notification.title: helpTip ? helpTip.title : ""
     Notification.image: helpTip ? helpTip.image.url : ""
-    Notification.active: enabled && helpTip && !tipShown && !splashLoader.active && !modalDialog.active
+    Notification.active: enabled && helpTip && !tipShown && !splashLoader.active
     Notification.text: helpTip ? helpTip.text : ""
     Notification.autoClose: false
     Notification.closeOnButtonClick: false

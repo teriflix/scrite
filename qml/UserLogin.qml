@@ -152,7 +152,7 @@ Item {
             }
             Component.onDestruction: {
                 if(showHomeScreenUponLogin && Scrite.user.loggedIn)
-                    showHomeScreenLater(null, 500)
+                    HomeScreenDialog.launch()
             }
         }
     }
