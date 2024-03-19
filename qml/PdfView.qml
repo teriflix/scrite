@@ -289,12 +289,9 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 down: saveMenu.visible
                 onClicked: {
-                    if(saveFeatureDisabled) {
-                        modalDialog.closeable = true
-                        modalDialog.popupSource = saveFileButton
-                        modalDialog.sourceComponent = saveDisabledNotice
-                        modalDialog.active = true
-                    } else
+                    if(saveFeatureDisabled)
+                        saveDisabledNotice.open()
+                    else
                         saveMenu.open()
                 }
 
@@ -402,17 +399,15 @@ Item {
         }
     }
 
-    Component {
+    VclDialog {
         id: saveDisabledNotice
 
-        Rectangle {
-            width: 640
-            height: 480
+        width: 640
+        height: 480
+        title: "Feature Missing"
 
-            DisabledFeatureNotice {
-                featureName: "Saving PDF Files"
-                anchors.fill: parent
-            }
+        content: DisabledFeatureNotice {
+            featureName: "Saving PDF Files"
         }
     }
 }

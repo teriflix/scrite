@@ -131,5 +131,7 @@
         <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/impl_ReportConfigurationDialog.qml</file>
         <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
+        <file>qml/notebook/AddRelationshipDialog.qml</file>
+        <file>qml/notebook/qmldir</file>
     </qresource>
 </RCC>

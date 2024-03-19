@@ -24,12 +24,16 @@ import "qrc:/qml/helpers"
 
 Item {
     id: searchBar
-    width: 300
-    height: searchBarLayout.height
+
     property real borderWidth: 0
     property bool hasFocus: txtSearch.activeFocus || txtReplace.activeFocus
     property bool allowReplace: false
     property bool showReplace: false
+
+    implicitWidth: 300
+    implicitHeight: searchBarLayout.height
+    width: implicitWidth
+    height: implicitHeight
     clip: true
 
     Behavior on height {

@@ -27,6 +27,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
+import "qrc:/qml/notebook"
 
 Rectangle {
     id: notebookView
@@ -1894,12 +1895,7 @@ Rectangle {
                         anchors.right: parent.right
                         anchors.rightMargin: titlePageFlickable.vscrollBarRequired ? 20 : 0
                         iconSource: "qrc:/icons/action/edit_title_page.png"
-                        onClicked: {
-                            modalDialog.arguments = {"activeTabIndex": 2}
-                            modalDialog.popupSource = this
-                            modalDialog.sourceComponent = optionsDialogComponent
-                            modalDialog.active = true
-                        }
+                        onClicked: TitlePageDialog.launch()
                         enabled: !Scrite.document.readOnly
                     }
 
@@ -2889,7 +2885,7 @@ Rectangle {
                         editRelationshipsEnabled: !Scrite.document.readOnly
                         onCharacterDoubleClicked:  {
                             if(characterNotes.character.name === characterName) {
-                                doAddNewRelationship(chNodeItem)
+                                AddRelationshipDialog.launch(character)
                                 return
                             }
 
@@ -2897,18 +2893,10 @@ Rectangle {
                             if(ch)
                                 switchTo(ch.notes)
                         }
-                        onAddNewRelationshipRequest: doAddNewRelationship(sourceItem)
+                        onAddNewRelationshipRequest: AddRelationshipDialog.launch(character)
                         onRemoveRelationshipWithRequest: {
                             var relationship = character.findRelationship(otherCharacter)
                             character.removeRelationship(relationship)
-                        }
-
-                        function doAddNewRelationship(psitem) {
-                            modalDialog.closeable = false
-                            modalDialog.popupSource = psitem
-                            modalDialog.arguments = character
-                            modalDialog.sourceComponent = addRelationshipDialogComponent
-                            modalDialog.active = true
                         }
 
                         function prepare() {
@@ -2938,214 +2926,6 @@ Rectangle {
                     onLoaded: item.componentData = characterNotes.componentData
                     visible: characterTabBar.tabIndex === 2
                 }
-            }
-        }
-    }
-
-    Component {
-        id: addRelationshipDialogComponent
-
-        Rectangle {
-            width: Math.max(maxTextAreaSize, mainScriteDocumentView.width*0.5)
-            height: Math.min(mainScriteDocumentView.height*0.85, Math.min(charactersList.height, 500) + title.height + searchBar.height + addRelationshipDialogButtons.height + 80)
-            color: Runtime.colors.primary.c10.background
-
-            Component.onCompleted: {
-                character = modalDialog.arguments
-                modalDialog.arguments = undefined
-            }
-
-            property Character character
-            property var unrelatedCharacterNames: [] // Loaded after 160 ms
-
-            Item {
-                anchors.fill: parent
-                anchors.margins: 20
-
-                VclText {
-                    id: title
-                    width: parent.width
-                    anchors.top: parent.top
-                    font.pixelSize: 18
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Name applicable relationships between <strong>" + character.name + "</strong> and others in the screenplay."
-                    wrapMode: Text.WordWrap
-                }
-
-                Rectangle {
-                    anchors.fill: charactersListScroll
-                    anchors.margins: -1
-                    border.width: 1
-                    border.color: Runtime.colors.primary.borderColor
-                    visible: charactersListScroll.height >= 600
-                }
-
-                SearchBar {
-                    id: searchBar
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.top: title.bottom
-                    anchors.topMargin: 10
-                    searchEngine.objectName: "Characters Search Engine"
-                    visible: charactersList.height > charactersListScroll.height
-                }
-
-                TabSequenceManager {
-                    id: characterListTabManager
-                }
-
-                ScrollArea {
-                    id: charactersListScroll
-                    anchors.top: searchBar.bottom
-                    anchors.bottom: addRelationshipDialogButtons.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.topMargin: 10
-                    anchors.bottomMargin: 10
-                    contentWidth: charactersList.width
-                    contentHeight: charactersList.height
-                    ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-                    ScrollBar.vertical.policy: charactersList.height > height ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
-                    ScrollBar.vertical.opacity: active ? 1 : 0.2
-
-                    Column {
-                        id: charactersList
-                        width: charactersListScroll.width-20
-
-                        Repeater {
-                            id: otherCharacterItems
-                            model: unrelatedCharacterNames
-
-                            Rectangle {
-                                id: characterRowItem
-                                property string thisCharacterName: Scrite.app.camelCased(character.name)
-                                property string otherCharacterName: modelData
-                                property bool checked: relationshipName.length > 0
-                                property string relationship: relationshipName.text
-                                width: charactersList.width
-                                height: characterRow.height*1.15
-
-                                Row {
-                                    id: characterRow
-                                    width: parent.width - 20
-                                    anchors.right: parent.right
-                                    spacing: 10
-
-                                    Image {
-                                        width: 24; height: 24
-                                        source: "qrc:/icons/navigation/check.png"
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        opacity: relationshipName.length > 0 ? 1 : 0.05
-                                    }
-
-                                    VclText {
-                                        id: characterRowLabel1
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                        text: thisCharacterName + ": "
-                                        color: foregroundColor
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                        width: Math.min(implicitWidth, (parent.width-100)/3)
-                                        horizontalAlignment: Text.AlignRight
-                                    }
-
-                                    VclTextField {
-                                        id: relationshipName
-                                        enableTransliteration: true
-                                        width: parent.width - 32 - characterRowLabel1.width - characterRowLabel2.width - 3*parent.spacing
-                                        label: ""
-                                        color: foregroundColor
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                        placeholderText: "husband of, wife of, friends with, reports to ..."
-                                        Material.background: backgroundColor
-                                        Material.foreground: foregroundColor
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        TabSequenceItem.manager: characterListTabManager
-                                        TabSequenceItem.sequence: index
-                                        maximumLength: 50
-                                        onActiveFocusChanged: {
-                                            if(activeFocus)
-                                                charactersListScroll.ensureItemVisible(characterRowItem)
-                                        }
-                                    }
-
-                                    VclText {
-                                        id: characterRowLabel2
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                        text: Scrite.app.camelCased(otherCharacterName) + "."
-                                        color: foregroundColor
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                        width: Math.min(implicitWidth, (parent.width-100)/3)
-                                        rightPadding: 10
-                                    }
-                                }
-
-                                color: backgroundColor
-                                property bool highlight: false
-                                property color backgroundColor: highlight ? Runtime.colors.accent.c100.background : Runtime.colors.primary.c10.background
-                                property color foregroundColor: highlight ? Runtime.colors.accent.c100.text : Runtime.colors.primary.c10.text
-
-                                SearchAgent.engine: searchBar.searchEngine
-                                SearchAgent.onSearchRequest: {
-                                    SearchAgent.searchResultCount = SearchAgent.indexesOf(string, otherCharacterName).length > 0 ? 1 : 0
-                                }
-                                SearchAgent.onCurrentSearchResultIndexChanged: {
-                                    highlight = SearchAgent.currentSearchResultIndex >= 0
-                                    charactersListScroll.ensureItemVisible(characterRowItem,1,10)
-                                }
-                            }
-                        }
-                    }
-                }
-
-                Row {
-                    id: addRelationshipDialogButtons
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    spacing: 10
-
-                    VclButton {
-                        text: "Cancel"
-                        onClicked: modalDialog.close()
-                    }
-
-                    VclButton {
-                        text: "Create Relationships"
-                        onClicked: {
-                            for(var i=0; i<otherCharacterItems.count; i++) {
-                                var item = otherCharacterItems.itemAt(i)
-                                if(item.checked) {
-                                    var otherCharacter = Scrite.document.structure.addCharacter(item.otherCharacterName)
-                                    if(otherCharacter) {
-                                        character.addRelationship(item.relationship, otherCharacter)
-                                        character.characterRelationshipGraph = {}
-                                    }
-                                }
-                            }
-                            modalDialog.close()
-                        }
-                    }
-                }
-            }
-
-            BusyOverlay {
-                anchors.fill: parent
-                busyMessage: "Querying Characters ..."
-                visible: unrelatedCharacterNamesTimer.running
-            }
-
-            Behavior on height {
-                enabled: Runtime.applicationSettings.enableAnimations
-                NumberAnimation { duration: 250 }
-            }
-
-            Timer {
-                id: unrelatedCharacterNamesTimer
-                running: true
-                interval: 160
-                repeat: false
-                onTriggered: unrelatedCharacterNames = character.unrelatedCharacterNames()
             }
         }
     }
