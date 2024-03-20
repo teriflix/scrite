@@ -23,6 +23,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/screenplay"
 
 Item {
     id: screenplayView

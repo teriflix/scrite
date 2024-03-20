@@ -24,6 +24,7 @@ import "qrc:/qml/helpers"
 
 Row {
     id: screenplayEditorToolbar
+
     property SceneDocumentBinder binder
     property TextArea editor
     property alias showFind: findButton.checked

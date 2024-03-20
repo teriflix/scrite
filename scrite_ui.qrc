@@ -6,134 +6,138 @@
         <file>js/utils.js</file>
         <file>LICENSE.txt</file>
         <file>main.qml</file>
-        <file>qml/NotebookView.qml</file>
-        <file>qml/NotificationsView.qml</file>
-        <file>qml/ScreenplayEditorToolbar.qml</file>
-        <file>qml/ScreenplayEditor.qml</file>
-        <file>qml/ScreenplayView.qml</file>
-        <file>qml/ScriteDocumentView.qml</file>
-        <file>qml/StructureView.qml</file>
-        <file>qml/PageNumberBubble.qml</file>
-        <file>qml/SceneTypeImage.qml</file>
-        <file>qml/SplashScreen.qml</file>
-        <file>qml/ShortcutsView.qml</file>
-        <file>qml/DockWidget.qml</file>
-        <file>qml/AnnotationPropertyEditor.qml</file>
-        <file>qml/AnnotationItem.qml</file>
-        <file>qml/ScritedView.qml</file>
-        <file>qml/ScritedToolbar.qml</file>
-        <file>qml/StructureGroupsMenu.qml</file>
-        <file>qml/MarkSceneAsMenu.qml</file>
-        <file>qml/TextNoteView.qml</file>
-        <file>qml/UserLogin.qml</file>
-        <file>qml/PdfView.qml</file>
-        <file>qml/ScreenplaySceneElementsContextMenu.qml</file>
-        <file>qml/SceneFeaturedImage.qml</file>
-        <file>qml/ScreenplayBreakElementsContextMenu.qml</file>
-        <file>qml/globals/qmldir</file>
-        <file>qml/globals/Runtime.qml</file>
-        <file>qml/dialogs/qmldir</file>
-        <file>qml/dialogs/AboutDialog.qml</file>
-        <file>qml/dialogs/TitlePageDialog.qml</file>
         <file>qml/controls/qmldir</file>
-        <file>qml/controls/VclDialog.qml</file>
         <file>qml/controls/VclButton.qml</file>
-        <file>qml/controls/VclComboBox.qml</file>
         <file>qml/controls/VclCheckBox.qml</file>
-        <file>qml/controls/VclScrollBar.qml</file>
+        <file>qml/controls/VclComboBox.qml</file>
+        <file>qml/controls/VclDialog.qml</file>
         <file>qml/controls/VclMenu.qml</file>
         <file>qml/controls/VclMenuItem.qml</file>
+        <file>qml/controls/VclRadioButton.qml</file>
+        <file>qml/controls/VclScrollBar.qml</file>
+        <file>qml/controls/VclText.qml</file>
         <file>qml/controls/VclTextField.qml</file>
         <file>qml/controls/VclToolButton.qml</file>
-        <file>qml/controls/VclRadioButton.qml</file>
-        <file>qml/helpers/qmldir</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_CheckBox.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_IntegerSpinBox.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
+        <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
+        <file>qml/dialogs/homescreen/HomeScreen.qml</file>
+        <file>qml/dialogs/homescreen/qmldir</file>
+        <file>qml/dialogs/homescreen/SaveWorkflow.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_CheckBox.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_EnumSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_IntegerSpinBox.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleCharacterNameSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleEpisodeSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleLocationSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleSceneSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleTagGroupSelector.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_TextBox.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_Unknown.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/impl_ReportConfigurationDialog.qml</file>
+        <file>qml/dialogs/settingsdialog/ApplicationOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ApplicationSettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageFontsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageSettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageTransiliterationPage.qml</file>
+        <file>qml/dialogs/settingsdialog/NotebookOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/NotebookSettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayFormattingRulesPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplayPageSetupPage.qml</file>
+        <file>qml/dialogs/settingsdialog/ScreenplaySettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureOptionsPage.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureSettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureStoryBeatsPage.qml</file>
+        <file>qml/dialogs/AboutDialog.qml</file>
+        <file>qml/dialogs/BackupsDialog.qml</file>
+        <file>qml/dialogs/CollaboratorsDialog.qml</file>
+        <file>qml/dialogs/ExportConfigurationDialog.qml</file>
+        <file>qml/dialogs/HomeScreenDialog.qml</file>
+        <file>qml/dialogs/MessageBox.qml</file>
+        <file>qml/dialogs/qmldir</file>
+        <file>qml/dialogs/RenameCharacterDialog.qml</file>
+        <file>qml/dialogs/ReportConfigurationDialog.qml</file>
+        <file>qml/dialogs/SettingsDialog.qml</file>
+        <file>qml/dialogs/TermsOfUseDialog.qml</file>
+        <file>qml/dialogs/TitlePageDialog.qml</file>
+        <file>qml/dialogs/WaitDialog.qml</file>
+        <file>qml/globals/qmldir</file>
+        <file>qml/globals/Runtime.qml</file>
+        <file>qml/helpers/AlphabetMappings.qml</file>
         <file>qml/helpers/AttachmentsDropArea.qml</file>
-        <file>qml/helpers/MenuLoader.qml</file>
-        <file>qml/helpers/SpellingSuggestionsMenu.qml</file>
-        <file>qml/helpers/TextAreaSpellingSuggestionsMenu.qml</file>
-        <file>qml/helpers/RectangleTabView.qml</file>
-        <file>qml/helpers/TrapeziumTabView.qml</file>
         <file>qml/helpers/AttachmentsView.qml</file>
-        <file>qml/helpers/FlatToolButton.qml</file>
         <file>qml/helpers/BoxShadow.qml</file>
         <file>qml/helpers/BusyIcon.qml</file>
         <file>qml/helpers/BusyOverlay.qml</file>
         <file>qml/helpers/CheckListView.qml</file>
-        <file>qml/helpers/TextAreaInput.qml</file>
-        <file>qml/helpers/SpecialSymbolsSupport.qml</file>
         <file>qml/helpers/ColorMenu.qml</file>
-        <file>qml/dialogs/BackupsDialog.qml</file>
-        <file>qml/helpers/PageView.qml</file>
+        <file>qml/helpers/DisabledFeatureNotice.qml</file>
         <file>qml/helpers/FileSelector.qml</file>
+        <file>qml/helpers/FlatToolButton.qml</file>
+        <file>qml/helpers/FlickableTextArea.qml</file>
+        <file>qml/helpers/HelpTipNotification.qml</file>
         <file>qml/helpers/Link.qml</file>
         <file>qml/helpers/LodLoader.qml</file>
+        <file>qml/helpers/MarkSceneAsMenu.qml</file>
+        <file>qml/helpers/MenuLoader.qml</file>
+        <file>qml/helpers/PageView.qml</file>
+        <file>qml/helpers/qmldir</file>
+        <file>qml/helpers/RectangleTabView.qml</file>
+        <file>qml/helpers/RichTextEdit.qml</file>
         <file>qml/helpers/RubberBand.qml</file>
+        <file>qml/helpers/SceneFeaturedImage.qml</file>
+        <file>qml/helpers/SceneTypeImage.qml</file>
         <file>qml/helpers/ScrollArea.qml</file>
+        <file>qml/helpers/SearchBar.qml</file>
         <file>qml/helpers/Selection.qml</file>
+        <file>qml/helpers/SidePanel.qml</file>
+        <file>qml/helpers/SpecialSymbolsSupport.qml</file>
+        <file>qml/helpers/SpellingSuggestionsMenu.qml</file>
         <file>qml/helpers/TagText.qml</file>
+        <file>qml/helpers/TextAreaInput.qml</file>
+        <file>qml/helpers/TextAreaSpellingSuggestionsMenu.qml</file>
         <file>qml/helpers/TextTabBar.qml</file>
         <file>qml/helpers/TextViewEdit.qml</file>
-        <file>qml/helpers/ZoomSlider.qml</file>
-        <file>qml/helpers/RichTextEdit.qml</file>
-        <file>qml/helpers/SidePanel.qml</file>
-        <file>qml/helpers/FlickableTextArea.qml</file>
-        <file>qml/dialogs/CollaboratorsDialog.qml</file>
-        <file>qml/dialogs/RenameCharacterDialog.qml</file>
-        <file>qml/dialogs/SettingsDialog.qml</file>
-        <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/LanguageFontsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/LanguageTransiliterationPage.qml</file>
-        <file>qml/dialogs/settingsdialog/LanguageSettingsTab.qml</file>
-        <file>qml/controls/VclText.qml</file>
-        <file>qml/dialogs/settingsdialog/ApplicationSettingsTab.qml</file>
-        <file>qml/dialogs/settingsdialog/StructureOptionsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/StructureSettingsTab.qml</file>
-        <file>qml/dialogs/settingsdialog/StructureStoryBeatsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/ScreenplayOptionsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/ScreenplayFormattingRulesPage.qml</file>
-        <file>qml/dialogs/settingsdialog/ScreenplayPageSetupPage.qml</file>
-        <file>qml/dialogs/settingsdialog/ScreenplaySettingsTab.qml</file>
-        <file>qml/dialogs/settingsdialog/ApplicationOptionsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/NotebookOptionsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/NotebookSettingsTab.qml</file>
-        <file>qml/dialogs/MessageBox.qml</file>
-        <file>qml/dialogs/ExportConfigurationDialog.qml</file>
-        <file>qml/helpers/DisabledFeatureNotice.qml</file>
-        <file>qml/helpers/AlphabetMappings.qml</file>
-        <file>qml/helpers/HelpTipNotification.qml</file>
+        <file>qml/helpers/TrapeziumTabView.qml</file>
         <file>qml/helpers/UiElementHighlight.qml</file>
-        <file>qml/dialogs/ReportConfigurationDialog.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleCharacterNameSelector.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleLocationSelector.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleSceneSelector.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleEpisodeSelector.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_MultipleTagGroupSelector.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_CheckBox.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_EnumSelector.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_TextBox.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_IntegerSpinBox.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/editor_Unknown.qml</file>
-        <file>qml/helpers/SearchBar.qml</file>
-        <file>qml/dialogs/exportconfigurationdialog/editor_IntegerSpinBox.qml</file>
-        <file>qml/dialogs/exportconfigurationdialog/editor_CheckBox.qml</file>
-        <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
-        <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
-        <file>qml/dialogs/TermsOfUseDialog.qml</file>
-        <file>qml/dialogs/WaitDialog.qml</file>
-        <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
-        <file>qml/dialogs/reportconfigurationdialog/impl_ReportConfigurationDialog.qml</file>
-        <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
+        <file>qml/helpers/ZoomSlider.qml</file>
         <file>qml/notebook/AddRelationshipDialog.qml</file>
-        <file>qml/notebook/qmldir</file>
         <file>qml/notebook/CharacterRelationshipsGraphView.qml</file>
-        <file>qml/notebook/RelationshipNameEditorDialog.qml</file>
         <file>qml/notebook/FormField.qml</file>
-        <file>qml/notebook/FormView.qml</file>
         <file>qml/notebook/FormMenu.qml</file>
-        <file>qml/dialogs/homescreen/HomeScreen.qml</file>
-        <file>qml/dialogs/homescreen/SaveWorkflow.qml</file>
-        <file>qml/dialogs/HomeScreenDialog.qml</file>
-        <file>qml/dialogs/homescreen/qmldir</file>
+        <file>qml/notebook/FormView.qml</file>
+        <file>qml/notebook/qmldir</file>
+        <file>qml/notebook/RelationshipNameEditorDialog.qml</file>
+        <file>qml/notebook/TextNoteView.qml</file>
+        <file>qml/screenplay/PageNumberBubble.qml</file>
+        <file>qml/screenplay/ScreenplayBreakElementsContextMenu.qml</file>
+        <file>qml/screenplay/ScreenplayEditorToolbar.qml</file>
+        <file>qml/screenplay/ScreenplaySceneElementsContextMenu.qml</file>
+        <file>qml/scrited/ScritedToolbar.qml</file>
+        <file>qml/structure/AnnotationItem.qml</file>
+        <file>qml/structure/AnnotationPropertyEditor.qml</file>
+        <file>qml/structure/qmldir</file>
+        <file>qml/structure/StructureGroupsMenu.qml</file>
+        <file>qml/DockWidget.qml</file>
+        <file>qml/NotebookView.qml</file>
+        <file>qml/NotificationsView.qml</file>
+        <file>qml/ScreenplayEditor.qml</file>
+        <file>qml/ScriteMainWindow.qml</file>
+        <file>qml/ScritedView.qml</file>
+        <file>qml/ShortcutsView.qml</file>
+        <file>qml/SplashScreen.qml</file>
+        <file>qml/StructureView.qml</file>
+        <file>qml/TimelineView.qml</file>
+        <file>qml/screenplay/qmldir</file>
+        <file>qml/scrited/qmldir</file>
+        <file>qml/modules/PdfView.qml</file>
+        <file>qml/modules/UserAccountToolButton.qml</file>
+        <file>qml/modules/qmldir</file>
     </qresource>
 </RCC>

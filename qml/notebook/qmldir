@@ -5,3 +5,4 @@ CharacterRelationshipsGraphView 1.0 CharacterRelationshipsGraphView.qml
 FormField 1.0 FormField.qml
 FormMenu 1.0 FormMenu.qml
 FormView 1.0 FormView.qml
+TextNoteView 1.0 TextNoteView.qml

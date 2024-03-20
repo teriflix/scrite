@@ -27,6 +27,8 @@ import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/structure"
+import "qrc:/qml/screenplay"
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter

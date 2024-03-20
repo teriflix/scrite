@@ -13,11 +13,15 @@ FlickableTextArea 1.0 FlickableTextArea.qml
 HelpTipNotification 1.0 HelpTipNotification.qml
 Link 1.0 Link.qml
 LodLoader 1.0 LodLoader.qml
+MarkSceneAsMenu 1.0 MarkSceneAsMenu.qml
 MenuLoader 1.0 MenuLoader.qml
 PageView 1.0 PageView.qml
+qmldir 1.0 qmldir
 RectangleTabView 1.0 RectangleTabView.qml
 RichTextEdit 1.0 RichTextEdit.qml
 RubberBand 1.0 RubberBand.qml
+SceneFeaturedImage 1.0 SceneFeaturedImage.qml
+SceneTypeImage 1.0 SceneTypeImage.qml
 ScrollArea 1.0 ScrollArea.qml
 SearchBar 1.0 SearchBar.qml
 Selection 1.0 Selection.qml

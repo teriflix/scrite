@@ -25,8 +25,11 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/scrited"
+import "qrc:/qml/modules"
+import "qrc:/qml/controls"
+import "qrc:/qml/screenplay"
 
 Item {
     id: scriteDocumentViewItem
@@ -1175,7 +1178,7 @@ Item {
             }
         }
 
-        UserLogin {
+        UserAccountToolButton {
             id: userLogin
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
@@ -1885,7 +1888,7 @@ Item {
 
                     Loader {
                         id: screenplayEditor2
-                        SplitView.preferredWidth: mainScriteDocumentView.width * 0.5
+                        SplitView.preferredWidth: scriteMainWindow.width * 0.5
                         SplitView.minimumWidth: 16
                         onWidthChanged: Runtime.workspaceSettings.screenplayEditorWidth = width
                         active: width >= 50
@@ -1915,7 +1918,7 @@ Item {
                         ColorAnimation { duration: 250 }
                     }
 
-                    ScreenplayView {
+                    TimelineView {
                         anchors.fill: parent
                         showNotesIcon: Runtime.showNotebookInStructure
                     }

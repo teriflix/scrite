@@ -36,8 +36,8 @@ Rectangle {
     Material.theme: Material.Light
     Material.background: Runtime.colors.accent.c700.background
 
-    UI.ScriteDocumentView {
-        id: mainScriteDocumentView
+    UI.ScriteMainWindow {
+        id: scriteMainWindow
         anchors.fill: parent
         enabled: !dialogUnderlay.visible && !notificationsView.visible
     }
@@ -99,7 +99,7 @@ Rectangle {
 
     Item {
         id: dialogUnderlay
-        anchors.fill: mainScriteDocumentView
+        anchors.fill: scriteMainWindow
         property color color: Runtime.colors.primary.windowColor
 
         property int visibilityCounter: 0
