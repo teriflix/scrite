@@ -37,6 +37,7 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
 
 Dialog {
     id: root
@@ -57,6 +58,9 @@ Dialog {
     // Assign a component whose instance may be shown as background
     property Component backdrop: Rectangle {
         color: Runtime.colors.primary.c100.background
+        BoxShadow {
+            anchors.fill: parent
+        }
     }
 
     // Assign a component whose instance may be shown in the content
