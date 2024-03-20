@@ -31,11 +31,11 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch() {
-        var collabDlg = collaboratorsDialogComponent.createObject(root)
-        if(collabDlg) {
-            collabDlg.closed.connect(collabDlg.destroy)
-            collabDlg.open()
-            return collabDlg
+        var dlg = dialogComponent.createObject(root)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch CollaboratorsDialog")
@@ -43,10 +43,10 @@ Item {
     }
 
     Component {
-        id: collaboratorsDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: collaboratorsDialog
+            id: dialog
 
             width: 640
             height: 550

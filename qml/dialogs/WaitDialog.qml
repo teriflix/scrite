@@ -30,11 +30,11 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch(message) {
-        var waitDlg = waitDialogComponent.createObject(root, (message && typeof message === "string" ? {"message": message} : undefined))
-        if(waitDlg) {
-            waitDlg.closed.connect(waitDlg.destroy)
-            waitDlg.open()
-            return waitDlg
+        var dlg = dialogComponent.createObject(root, (message && typeof message === "string" ? {"message": message} : undefined))
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch ProgressDialog")
@@ -42,10 +42,10 @@ Item {
     }
 
     Component {
-        id: waitDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: waitDialog
+            id: dialog
 
             property string message: "Please wait ..."
 
@@ -57,7 +57,7 @@ Item {
             appOverrideCursor: Qt.WaitCursor
             appCloseButtonVisible: false
             contentItem: VclText {
-                text: waitDialog.message
+                text: dialog.message
                 padding: 16
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 maximumLineCount: 5
@@ -67,7 +67,7 @@ Item {
             }
 
             function closeLater(delay) {
-                Utils.execLater(waitDialog, delay ? delay : 1500, close)
+                Utils.execLater(dialog, delay ? delay : 1500, close)
             }
         }
     }

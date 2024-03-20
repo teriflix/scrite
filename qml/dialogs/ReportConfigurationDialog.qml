@@ -29,8 +29,8 @@ Item {
 
     parent: Scrite.window.contentItem
 
-    function launch(report, reportInitialProperties) {
-        if(_private.dialogImpl.status !== Component.Ready) {
+    function launch(report, initalProps) {
+        if(_private.dialogComponent.status !== Component.Ready) {
             Scrite.app.log("ReportConfigurationDialog is not ready!")
             return null
         }
@@ -53,17 +53,17 @@ Item {
             return null
         }
 
-        if(reportInitialProperties) {
-            for(var member in reportInitialProperties) {
-                args.report.setConfigurationValue(member, reportInitialProperties[member])
+        if(initalProps) {
+            for(var member in initalProps) {
+                args.report.setConfigurationValue(member, initalProps[member])
             }
         }
 
-        var exportConfigDlg = _private.dialogImpl.createObject(root, args)
-        if(exportConfigDlg) {
-            exportConfigDlg.closed.connect(exportConfigDlg.destroy)
-            exportConfigDlg.open()
-            return exportConfigDlg
+        var dlg = _private.dialogComponent.createObject(root, args)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch ReportConfigurationDialog")
@@ -73,6 +73,6 @@ Item {
     QtObject {
         id: _private
 
-        property Component dialogImpl: Qt.createComponent("./reportconfigurationdialog/impl_ReportConfigurationDialog.qml", Component.PreferSynchronous, root)
+        property Component dialogComponent: Qt.createComponent("./reportconfigurationdialog/impl_ReportConfigurationDialog.qml", Component.PreferSynchronous, root)
     }
 }

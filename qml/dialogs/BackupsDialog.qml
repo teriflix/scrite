@@ -31,11 +31,11 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch() {
-        var backupsDlg = backupDialogComponent.createObject(root)
-        if(backupsDlg) {
-            backupsDlg.closed.connect(backupsDlg.destroy)
-            backupsDlg.open()
-            return backupsDlg
+        var dlg = dialogComponent.createObject(root)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch BackupsDialog")
@@ -43,10 +43,10 @@ Item {
     }
 
     Component {
-        id: backupDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: backupsDialog
+            id: dialog
 
             title: "Select a Backup to Load"
             width: 640
@@ -151,7 +151,7 @@ Item {
                                 Scrite.document.openAnonymously(filePath)
                                 waitDialog.closed.connect( () => {
                                                                  Runtime.loadMainUiContent = true
-                                                                 backupsDialog.close()
+                                                                 dialog.close()
                                                              } )
                                 waitDialog.closeLater(50)
                             }
@@ -169,7 +169,7 @@ Item {
                                 var waitDialog = WaitDialog.launch()
                                 Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
                                 waitDialog.closed.connect( () => {
-                                                                 backupsDialog.close()
+                                                                 dialog.close()
                                                              } )
                                 waitDialog.closeLater(1500)
                             }

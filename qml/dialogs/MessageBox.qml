@@ -43,12 +43,12 @@ Item {
             "title": title,
             "message": message
         }
-        var msgDlg = messageDialogComponent.createObject(root, params)
-        if(msgDlg) {
+        var dlg = dialogComponent.createObject(root, params)
+        if(dlg) {
             if(callback)
-                msgDlg.buttonClicked.connect(callback)
-            msgDlg.closed.connect(msgDlg.destroy)
-            msgDlg.open()
+                dlg.buttonClicked.connect(callback)
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
         }
     }
 
@@ -70,20 +70,20 @@ Item {
             "message": question,
             "buttons": answerButtons ? answerButtons : ["Yes", "No", "Cancel"]
         }
-        var msgDlg = messageDialogComponent.createObject(root, params)
-        if(msgDlg) {
+        var dlg = dialogComponent.createObject(root, params)
+        if(dlg) {
             if(callback)
-                msgDlg.buttonClicked.connect(callback)
-            msgDlg.closed.connect(msgDlg.destroy)
-            msgDlg.open()
+                dlg.buttonClicked.connect(callback)
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
         }
     }
 
     Component {
-        id: messageDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: messageDialog
+            id: dialog
 
             property string message
             property var buttons: ["Ok"]
@@ -105,7 +105,7 @@ Item {
                     VclText {
                         Layout.fillWidth: true
                         horizontalAlignment: Text.AlignHCenter
-                        text: messageDialog.message
+                        text: dialog.message
                         wrapMode: Text.WordWrap
                     }
 
@@ -114,7 +114,7 @@ Item {
                         spacing: 20
 
                         Repeater {
-                            model: messageDialog.buttons
+                            model: dialog.buttons
 
                             VclButton {
                                 id: button
@@ -123,8 +123,8 @@ Item {
                                 text: modelData
 
                                 onClicked: {
-                                    messageDialog.buttonClicked(text)
-                                    Qt.callLater(messageDialog.close)
+                                    dialog.buttonClicked(text)
+                                    Qt.callLater(dialog.close)
                                 }
                             }
                         }

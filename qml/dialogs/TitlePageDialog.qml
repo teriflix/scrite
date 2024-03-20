@@ -32,11 +32,11 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch() {
-        var titlePageDlg = titlePageDialogComponent.createObject(root)
-        if(titlePageDlg) {
-            titlePageDlg.closed.connect(titlePageDlg.destroy)
-            titlePageDlg.open()
-            return titlePageDlg
+        var dlg = dialogComponent.createObject(root)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch TitlePageDialog")
@@ -44,10 +44,10 @@ Item {
     }
 
     Component {
-        id: titlePageDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: titlePageDialog
+            id: dialog
 
             title: "Title Page"
             width: Math.min(Scrite.window.width-80, 1050)
@@ -74,7 +74,7 @@ Item {
                           At best we can paint a 464x261 point photo on the cover page. Nothing more.
                           So, we need to provide a image preview in this aspect ratio.
                           */
-                        color: titlePageDialog.background.item.color
+                        color: dialog.background.item.color
                         border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
                         border.color: "black"
                         Layout.preferredWidth: 400

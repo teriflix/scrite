@@ -30,7 +30,7 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch(exporter) {
-        if(_private.dialogImpl.status !== Component.Ready) {
+        if(_private.dialogComponent.status !== Component.Ready) {
             Scrite.app.log("ExportConfigurationDialog is not ready!")
             return null
         }
@@ -53,11 +53,11 @@ Item {
             return null
         }
 
-        var exportConfigDlg = _private.dialogImpl.createObject(root, args)
-        if(exportConfigDlg) {
-            exportConfigDlg.closed.connect(exportConfigDlg.destroy)
-            exportConfigDlg.open()
-            return exportConfigDlg
+        var dlg = _private.dialogComponent.createObject(root, args)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch ExportConfigurationDialog")
@@ -67,6 +67,6 @@ Item {
     QtObject {
         id: _private
 
-        property Component dialogImpl: Qt.createComponent("./exportconfigurationdialog/impl_ExportConfigurationDialog.qml", Component.PreferSynchronous, root)
+        property Component dialogComponent: Qt.createComponent("./exportconfigurationdialog/impl_ExportConfigurationDialog.qml", Component.PreferSynchronous, root)
     }
 }

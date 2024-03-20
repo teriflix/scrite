@@ -30,11 +30,11 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch() {
-        var aboutDlg = aboutDialogComponent.createObject(root)
-        if(aboutDlg) {
-            aboutDlg.closed.connect(aboutDlg.destroy)
-            aboutDlg.open()
-            return aboutDlg
+        var dlg = dialogComponent.createObject(root)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch AboutDialog")
@@ -42,10 +42,10 @@ Item {
     }
 
     Component {
-        id: aboutDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: aboutDialog
+            id: dialog
 
             title: "About Scrite"
             width: {
@@ -101,7 +101,7 @@ Item {
 
                     Image {
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: aboutDialog.width * 0.3
+                        Layout.preferredWidth: dialog.width * 0.3
                         Layout.preferredHeight: sourceSize.height * Layout.preferredWidth/sourceSize.width
 
                         source: "../../images/scrite_logo_for_report_header.png"
@@ -142,7 +142,7 @@ Item {
 
                     Rectangle {
                         Layout.alignment: Qt.AlignHCenter
-                        Layout.preferredWidth: aboutDialog.width * 0.5
+                        Layout.preferredWidth: dialog.width * 0.5
                         Layout.preferredHeight: (Runtime.minimumFontMetrics.height+creditsView.spacing) * (creditsView.model.count+1) + creditsView.anchors.topMargin + creditsView.anchors.bottomMargin
 
                         // color: creditsView.ScrollBar.vertical.needed ? Runtime.colors.primary.c100.background : Qt.rgba(0,0,0,0)

@@ -31,7 +31,7 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch(mode) {
-        var dlg = homeScreenDialogComponent.createObject(root, {"mode": mode})
+        var dlg = dialogComponent.createObject(root, {"mode": mode})
         if(dlg) {
             dlg.closed.connect(dlg.destroy)
             dlg.open()
@@ -43,10 +43,10 @@ Item {
     }
 
     Component {
-        id: homeScreenDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: homeScreenDialog
+            id: dialog
 
             property string mode
 
@@ -55,8 +55,8 @@ Item {
             title: "Home"
 
             contentItem: HomeScreen {
-                mode: homeScreenDialog.mode
-                onCloseRequest: Qt.callLater(homeScreenDialog.close)
+                mode: dialog.mode
+                onCloseRequest: Qt.callLater(dialog.close)
             }
         }
     }

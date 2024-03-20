@@ -36,11 +36,11 @@ Item {
             return null
         }
 
-        var renameDlg = renameCharacterDialogComponent.createObject(root, {"character": character})
-        if(renameDlg) {
-            renameDlg.closed.connect(renameDlg.destroy)
-            renameDlg.open()
-            return renameDlg
+        var dlg = dialogComponent.createObject(root, {"character": character})
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch RenameCharacterDialog")
@@ -48,10 +48,10 @@ Item {
     }
 
     Component {
-        id: renameCharacterDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: renameCharacterDialog
+            id: dialog
 
             property Character character
 
@@ -124,8 +124,8 @@ Item {
                     // Perform the rename ...
                     ScriptAction {
                         script: {
-                            renameCharacterDialog.character.clearRenameError()
-                            _private.renameWasSuccessful = renameCharacterDialog.character.rename(_private.newCharacterName)
+                            dialog.character.clearRenameError()
+                            _private.renameWasSuccessful = dialog.character.rename(_private.newCharacterName)
                         }
                     }
 
@@ -141,11 +141,11 @@ Item {
                             _private.waitDialog = null
 
                             if(_private.renameWasSuccessful)
-                                Qt.callLater(renameCharacterDialog.close)
+                                Qt.callLater(dialog.close)
                             else
-                                MessageBox.information("Rename Error", renameCharacterDialog.character.renameError, () => {
-                                                           renameCharacterDialog.character.clearRenameError()
-                                                           Qt.callLater(renameCharacterDialog.close)
+                                MessageBox.information("Rename Error", dialog.character.renameError, () => {
+                                                           dialog.character.clearRenameError()
+                                                           Qt.callLater(dialog.close)
                                                        } )
                         }
                     }

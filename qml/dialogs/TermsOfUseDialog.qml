@@ -30,11 +30,11 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch() {
-        var touDlg = termsOfUseDialogComponent.createObject(root)
-        if(touDlg) {
-            touDlg.closed.connect(touDlg.destroy)
-            touDlg.open()
-            return touDlg
+        var dlg = dialogComponent.createObject(root)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch TermsOfUseDialog")
@@ -42,9 +42,11 @@ Item {
     }
 
     Component {
-        id: termsOfUseDialogComponent
+        id: dialogComponent
 
         VclDialog {
+            id: dialog
+
             title: "Terms Of Use"
             width: {
                 const bgImageAspectRatio = 1464.0/978.0

@@ -30,16 +30,16 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch(exporter) {
-        if(_private.dialogImpl.status !== Component.Ready) {
+        if(_private.dialogComponent.status !== Component.Ready) {
             Scrite.app.log("SettingsDialog is not ready!")
             return null
         }
 
-        var settingsDlg = _private.dialogImpl.createObject(root)
-        if(settingsDlg) {
-            settingsDlg.closed.connect(settingsDlg.destroy)
-            settingsDlg.open()
-            return settingsDlg
+        var dlg = _private.dialogComponent.createObject(root)
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         Scrite.app.log("Couldn't launch SettingsDialog")
@@ -49,6 +49,6 @@ Item {
     QtObject {
         id: _private
 
-        property Component dialogImpl: Qt.createComponent("./settingsdialog/impl_SettingsDialog.qml", Component.PreferSynchronous, root)
+        property Component dialogComponent: Qt.createComponent("./settingsdialog/impl_SettingsDialog.qml", Component.PreferSynchronous, root)
     }
 }
