@@ -32,7 +32,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/screenplay"
 
 Item {
-    id: scriteDocumentViewItem
+    id: scriteMainWindow
     width: 1350
     height: 700
 
@@ -379,7 +379,7 @@ Item {
                     mainTabBar.activateTab(0)
             }
 
-            // spacing: scriteDocumentViewItem.width >= 1440 ? 2 : 0
+            // spacing: Scrite.window.width >= 1440 ? 2 : 0
 
             FlatToolButton {
                 id: homeButton
@@ -477,7 +477,7 @@ Item {
                 checked: false
                 onClicked: reportsMenu.open()
                 down: reportsMenu.visible
-                // visible: scriteDocumentViewItem.width >= 1400 || !appToolBar.visible
+                // visible: Scrite.window.width >= 1400 || !appToolBar.visible
 
                 Item {
                     anchors.left: parent.left
@@ -579,7 +579,7 @@ Item {
                                     return "qrc:/icons/navigation/shortcuts_windows.png"
                                 return "qrc:/icons/navigation/shortcuts_linux.png"
                             }
-                            onClicked: activate()
+                            onClicked: Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
                             enabled: appToolBar.visible
 
                             ShortcutsModelItem.group: "Application"
@@ -587,14 +587,10 @@ Item {
                             ShortcutsModelItem.shortcut: "Ctrl+E"
                             ShortcutsModelItem.enabled: appToolBar.visible
 
-                            function activate() {
-                                shortcutsDockWidget.toggle()
-                            }
-
                             Shortcut {
                                 context: Qt.ApplicationShortcut
                                 sequence: "Ctrl+E"
-                                onActivated: shortcutsMenuItem.activate()
+                                onActivated: Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
                             }
                         }
 
@@ -882,7 +878,7 @@ Item {
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
                                     onClicked: ReportConfigurationDialog.launch(modelData.name)
-                                    // enabled: scriteDocumentViewItem.width >= 800
+                                    // enabled: Scrite.window.width >= 800
                                 }
                             }
                         }
@@ -964,7 +960,7 @@ Item {
 
                         VclMenuItem {
                             text: "Settings"
-                            // enabled: scriteDocumentViewItem.width >= 1100
+                            // enabled: Scrite.window.width >= 1100
                             onTriggered: SettingsDialog.launch()
                         }
 
@@ -993,7 +989,7 @@ Item {
             spacing: 20
 
             ScreenplayEditorToolbar {
-                id: globalScreenplayEditorToolbar
+                id: screenplayEditorToolbar
                 property Item sceneEditor
                 anchors.verticalCenter: parent.verticalCenter
                 binder: sceneEditor ? sceneEditor.binder : null
@@ -1003,6 +999,8 @@ Item {
                     var max = Runtime.showNotebookInStructure ? 1 : 2
                     return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
                 }
+
+                Component.onCompleted: Runtime.screenplayEditorToolbar = screenplayEditorToolbar
             }
 
             Row {
@@ -1194,9 +1192,7 @@ Item {
         anchors.right: parent.right
         anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
         anchors.bottom: parent.bottom
-        onActiveChanged: {
-            globalScreenplayEditorToolbar.sceneEditor = null
-        }
+        onActiveChanged: screenplayEditorToolbar.sceneEditor = null
 
         property bool allowContent: Runtime.loadMainUiContent
         property string sessionId
@@ -2079,70 +2075,6 @@ Item {
         ShortcutsModelItem.shortcut: "F3"
     }
 
-    DockWidget {
-        id: shortcutsDockWidget
-        title: "Shortcuts"
-        anchors.fill: parent
-        contentX: Runtime.shortcutsDockWidgetSettings.contentX
-        contentY: Runtime.shortcutsDockWidgetSettings.contentY
-        contentWidth: 375
-        contentHeight: (parent.height - appToolBarArea.height - 30) * 0.85
-        visible: Runtime.shortcutsDockWidgetSettings.visible
-        sourceItem: settingsAndShortcutsButton
-        content: ShortcutsView { }
-        onCloseRequest: hide()
-
-        onContentXChanged: Runtime.shortcutsDockWidgetSettings.contentX = contentX
-        onContentYChanged: Runtime.shortcutsDockWidgetSettings.contentY = contentY
-        onVisibleChanged: Runtime.shortcutsDockWidgetSettings.visible = visible
-
-        PropertyAlias {
-            sourceObject: Runtime
-            sourceProperty: "mainWindowTab"
-            onValueChanged: {
-                if(value !== Runtime.e_ScreenplayTab)
-                    shortcutsDockWidget.hide()
-            }
-        }
-
-        Connections {
-            target: splashLoader
-            function onActiveChanged() {
-                if(splashLoader.active)
-                    return
-                if(shortcutsDockWidget.contentX < 0 || shortcutsDockWidget.contentX + shortcutsDockWidget.contentWidth > scriteDocumentViewItem.width)
-                    shortcutsDockWidget.contentX = scriteDocumentViewItem.width - 40 - shortcutsDockWidget.contentWidth
-                if(shortcutsDockWidget.contentY < 0 || shortcutsDockWidget.contentY + shortcutsDockWidget.contentHeight > scriteDocumentViewItem.height)
-                    shortcutsDockWidget.contentY = (scriteDocumentViewItem.height - shortcutsDockWidget.contentHeight)/2
-            }
-        }
-    }
-
-    DockWidget {
-        id: floatingDockWidget
-        title: "Floating"
-        anchors.fill: parent
-        visible: false
-        contentX: -1
-        contentY: -1
-        contentWidth: 375
-        contentHeight: scriteDocumentViewItem.height * 0.6
-        onCloseRequest: hide()
-
-        function display(titleText, contentComponent) {
-            title = titleText
-            content = contentComponent
-            show()
-        }
-
-        onVisibleChanged: {
-            if(visible === false) {
-                title = "Floating"
-                content = null
-            }
-        }
-    }
-
     Component.onCompleted: {
         if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
             Runtime.workspaceSettings.screenplayEditorWidth = -1
@@ -2185,17 +2117,6 @@ Item {
                              }
                          })
         }
-    }
-
-    // Refactoring QML TODO: Get rid of this!!
-    function openAnonymously(filePath, onCompleted) {
-        Runtime.loadMainUiContent = false
-        Scrite.document.openAnonymously(filePath)
-        Utils.execLater(mainUiContentLoader, 50, function() {
-            Runtime.loadMainUiContent = true
-            if(onCompleted)
-                onCompleted()
-        })
     }
 
     FileDialog {

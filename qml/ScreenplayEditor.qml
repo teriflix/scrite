@@ -29,6 +29,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/structure"
 import "qrc:/qml/screenplay"
+import "qrc:/qml/floatingdockpanels"
 
 Rectangle {
     // This editor has to specialize in rendering scenes within a ScreenplayAdapter
@@ -195,7 +196,7 @@ Rectangle {
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
         visible: opacity > 0
-        opacity: globalScreenplayEditorToolbar.showFind ? 1 : 0
+        opacity: Runtime.screenplayEditorToolbar.showFind ? 1 : 0
         Behavior on opacity {
             enabled: Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
@@ -211,9 +212,9 @@ Rectangle {
             searchEngine.objectName: "Screenplay Search Engine"
             anchors.horizontalCenter: parent.horizontalCenter
             allowReplace: !Scrite.document.readOnly
-            showReplace: globalScreenplayEditorToolbar.showReplace
+            showReplace: Runtime.screenplayEditorToolbar.showReplace
             width: toolbar.width * 0.6
-            onShowReplaceRequest: globalScreenplayEditorToolbar.showReplace = flag
+            onShowReplaceRequest: Runtime.screenplayEditorToolbar.showReplace = flag
 
             Repeater {
                 id: searchAgents
@@ -1951,14 +1952,14 @@ Rectangle {
                             completionModel.actuallyEnable = true
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             privateData.changeCurrentIndexTo(contentItem.theIndex)
-                            globalScreenplayEditorToolbar.sceneEditor = contentItem
-                            markupTools.sceneDocumentBinder = sceneDocumentBinder
+                            Runtime.screenplayEditorToolbar.sceneEditor = contentItem
+                            FloatingMarkupToolsDock.sceneDocumentBinder = sceneDocumentBinder
                             justReceivedFocus = true
                         } else {
-                            if(globalScreenplayEditorToolbar.sceneEditor === contentItem)
-                                globalScreenplayEditorToolbar.sceneEditor = null
-                            if(markupTools.sceneDocumentBinder === sceneDocumentBinder)
-                                markupTools.sceneDocumentBinder = null
+                            if(Runtime.screenplayEditorToolbar.sceneEditor === contentItem)
+                                Runtime.screenplayEditorToolbar.sceneEditor = null
+                            if(FloatingMarkupToolsDock.sceneDocumentBinder === sceneDocumentBinder)
+                                FloatingMarkupToolsDock.sceneDocumentBinder = null
                         }
                     }
 
@@ -2220,13 +2221,6 @@ Rectangle {
                             height: completionView.height + topInset + bottomInset + topPadding + bottomPadding
                             focus: false
                             closePolicy: Popup.NoAutoClose
-                            Connections {
-                                target: dialogUnderlay
-                                function onVisibleChanged() {
-                                    if(dialogUnderlay.visible)
-                                        completionViewPopup.close()
-                                }
-                            }
                             contentItem: ListView {
                                 id: completionView
                                 model: completionModel
@@ -4402,403 +4396,6 @@ Rectangle {
                     Profiler.active = false
             }
             */
-        }
-    }
-
-    DockWidget {
-        id: markupTools
-        property SceneDocumentBinder sceneDocumentBinder
-        property TextFormat textFormat: sceneDocumentBinder ? sceneDocumentBinder.textFormat : null
-        property SceneElement sceneElement: sceneDocumentBinder ? sceneDocumentBinder.currentElement : null
-        contentX: 20
-        contentY: 20
-        contentPadding: 20
-        contentWidth: 426
-        contentHeight: 70
-        titleBarHeight: 32
-        title: "Markup Tools"
-        anchors.fill: parent
-        closable: true
-        visible: false
-        onCloseRequest: Runtime.screenplayEditorSettings.markupToolsDockVisible = false
-
-        function adjustCoordinates() {
-            const cx = Runtime.markupToolsSettings.contentX
-            const cy = Runtime.markupToolsSettings.contentY
-            contentX = Math.round(Math.min(Math.max(20, cx), parent.width-contentWidth-20))
-            contentY = Math.round(Math.min(Math.max(20, cy), parent.height-contentHeight-20))
-            visible = Qt.binding( () => { return Runtime.screenplayEditorSettings.markupToolsDockVisible } )
-        }
-
-        Component.onCompleted: Utils.execLater(markupTools, 200, adjustCoordinates)
-        Component.onDestruction: {
-            Runtime.markupToolsSettings.contentX = Math.round(contentX)
-            Runtime.markupToolsSettings.contentY = Math.round(contentY)
-        }
-
-        Shortcut {
-            sequence: "Ctrl+B"
-            context: Qt.ApplicationShortcut
-            enabled: markupTools.textFormat
-            ShortcutsModelItem.title: "Bold"
-            ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Markup Tools"
-            ShortcutsModelItem.enabled: enabled
-            onActivated: markupTools.textFormat.toggleBold()
-        }
-
-        Shortcut {
-            sequence: "Ctrl+I"
-            context: Qt.ApplicationShortcut
-            enabled: markupTools.textFormat
-            ShortcutsModelItem.title: "Italics"
-            ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Markup Tools"
-            ShortcutsModelItem.enabled: enabled
-            onActivated: markupTools.textFormat.toggleItalics()
-        }
-
-        Shortcut {
-            sequence: "Ctrl+U"
-            context: Qt.ApplicationShortcut
-            enabled: markupTools.textFormat
-            ShortcutsModelItem.title: "Underline"
-            ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Markup Tools"
-            ShortcutsModelItem.enabled: enabled
-            onActivated: markupTools.textFormat.toggleUnderline()
-        }
-
-        Shortcut {
-            sequence: "Shift+F3"
-            context: Qt.ApplicationShortcut
-            enabled: markupTools.sceneDocumentBinder
-            ShortcutsModelItem.title: "All CAPS"
-            ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Markup Tools"
-            ShortcutsModelItem.enabled: enabled
-            onActivated: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
-        }
-
-        Shortcut {
-            sequence: "Ctrl+Shift+F3"
-            context: Qt.ApplicationShortcut
-            enabled: markupTools.sceneDocumentBinder
-            ShortcutsModelItem.title: "All small"
-            ShortcutsModelItem.shortcut: sequence
-            ShortcutsModelItem.group: "Markup Tools"
-            ShortcutsModelItem.enabled: enabled
-            onActivated: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
-        }
-
-        content: Rectangle {
-            id: toolsContainer
-
-            Row {
-                id: toolsLayout
-                anchors.centerIn: parent
-                spacing: 2
-                height: 48
-                enabled: !Scrite.document.readOnly
-
-                SimpleToolButton {
-                    iconSource: "qrc:/icons/editor/format_bold.png"
-                    enabled: markupTools.textFormat
-                    checked: markupTools.textFormat ? markupTools.textFormat.bold : false
-                    onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleBold()
-                    anchors.verticalCenter: parent.verticalCenter
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Bold\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+B")
-                }
-
-                SimpleToolButton {
-                    iconSource: "qrc:/icons/editor/format_italics.png"
-                    checked: markupTools.textFormat ? markupTools.textFormat.italics : false
-                    enabled: markupTools.textFormat
-                    onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleItalics()
-                    anchors.verticalCenter: parent.verticalCenter
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Italics\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+I")
-                }
-
-                SimpleToolButton {
-                    iconSource: "qrc:/icons/editor/format_underline.png"
-                    checked: markupTools.textFormat ? markupTools.textFormat.underline : false
-                    enabled: markupTools.textFormat
-                    onClicked: if(markupTools.textFormat) markupTools.textFormat.toggleUnderline()
-                    anchors.verticalCenter: parent.verticalCenter
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Underline\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+U")
-                }
-
-                ColorButton {
-                    id: textColorButton
-                    anchors.verticalCenter: parent.verticalCenter
-                    selectedColor: markupTools.textFormat ? markupTools.textFormat.textColor : transparentColor
-                    enabled: markupTools.textFormat
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Text Color"
-                    onColorPicked: (newColor) => {
-                                       if(markupTools.textFormat)
-                                            markupTools.textFormat.textColor = newColor
-                                   }
-
-                    Rectangle {
-                        color: "white"
-                        width: Math.min(parent.width,parent.height) * 0.8
-                        height: width
-                        anchors.centerIn: parent
-
-                        VclText {
-                            anchors.centerIn: parent
-                            font.pixelSize: parent.height * 0.70
-                            font.bold: true
-                            font.underline: true
-                            text: "A"
-                            color: textColorButton.selectedColor === transparentColor ? "black" : textColorButton.selectedColor
-                        }
-                    }
-                }
-
-                ColorButton {
-                    id: bgColorButton
-                    anchors.verticalCenter: parent.verticalCenter
-                    selectedColor: markupTools.textFormat ? markupTools.textFormat.backgroundColor : transparentColor
-                    enabled: markupTools.textFormat
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Background Color"
-                    onColorPicked: (newColor) => {
-                                       if(markupTools.textFormat)
-                                            markupTools.textFormat.backgroundColor = newColor
-                                   }
-
-                    Rectangle {
-                        border.width: 1
-                        border.color: "black"
-                        color: bgColorButton.selectedColor === transparentColor ? "white" : bgColorButton.selectedColor
-                        width: Math.min(parent.width,parent.height) * 0.8
-                        height: width
-                        anchors.centerIn: parent
-
-                        VclText {
-                            anchors.centerIn: parent
-                            font.pixelSize: parent.height * 0.70
-                            font.bold: true
-                            text: "A"
-                            color: textColorButton.selectedColor === transparentColor ? "black" : textColorButton.selectedColor
-                        }
-                    }
-                }
-
-                SimpleToolButton {
-                    iconSource: "qrc:/icons/editor/format_clear.png"
-                    checked: false
-                    enabled: markupTools.textFormat
-                    onClicked: if(markupTools.textFormat) markupTools.textFormat.reset()
-                    anchors.verticalCenter: parent.verticalCenter
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Clear formatting"
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: Runtime.colors.primary.borderColor
-                }
-
-                SimpleToolButton {
-                    iconSource: "qrc:/icons/editor/format_align_left.png"
-                    checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignLeft : false
-                    enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
-                    anchors.verticalCenter: parent.verticalCenter
-                    onClicked: markupTools.sceneElement.alignment = markupTools.sceneElement.alignment === Qt.AlignLeft ? 0 : Qt.AlignLeft
-                }
-
-                SimpleToolButton {
-                    iconSource: "qrc:/icons/editor/format_align_center.png"
-                    checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignHCenter : false
-                    enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
-                    anchors.verticalCenter: parent.verticalCenter
-                    onClicked: markupTools.sceneElement.alignment = markupTools.sceneElement.alignment === Qt.AlignHCenter ? 0 : Qt.AlignHCenter
-                }
-
-                SimpleToolButton {
-                    iconSource: "qrc:/icons/editor/format_align_right.png"
-                    checked: enabled ? markupTools.sceneElement.alignment === Qt.AlignRight : false
-                    enabled: markupTools.sceneElement && markupTools.sceneElement.type === SceneElement.Action
-                    anchors.verticalCenter: parent.verticalCenter
-                    onClicked: markupTools.sceneElement.alignment = markupTools.sceneElement.alignment === Qt.AlignRight ? 0 : Qt.AlignRight
-                }
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: Runtime.colors.primary.borderColor
-                }
-
-                SimpleToolButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: markupTools.sceneDocumentBinder
-                    onClicked: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "All CAPS\t" + Scrite.app.polishShortcutTextForDisplay("Shift+F3")
-
-                    VclText {
-                        anchors.centerIn: parent
-                        font.pixelSize: parent.height*0.5
-                        text: "AB"
-                    }
-                }
-
-                SimpleToolButton {
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: markupTools.sceneDocumentBinder
-                    onClicked: markupTools.sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "All small\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F3")
-
-                    VclText {
-                        anchors.centerIn: parent
-                        font.pixelSize: parent.height*0.5
-                        text: "ab"
-                    }
-                }
-            }
-        }
-    }
-
-    readonly property color transparentColor: "transparent"
-    readonly property var availableColors: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
-
-    component SimpleToolButton : Rectangle {
-        width: 36
-        height: 36
-        radius: 4
-        color: tbMouseArea.pressed || down ? Runtime.colors.primary.button.background : (checked ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0))
-        opacity: enabled ? 1 : 0.5
-
-        property bool down: false
-        property bool checked: false
-        property alias pressed: tbMouseArea.pressed
-        property alias hoverEnabled: tbMouseArea.hoverEnabled
-        property alias containsMouse: tbMouseArea.containsMouse
-        property alias iconSource: tbIcon.source
-        signal clicked()
-
-        Image {
-            id: tbIcon
-            anchors.fill: parent
-            anchors.margins: 4
-            mipmap: true
-        }
-
-        MouseArea {
-            id: tbMouseArea
-            anchors.fill: parent
-            onClicked: parent.clicked()
-        }
-    }
-
-    component AvailableColorsPalette : Grid {
-        id: colorsGrid
-        property int cellSize: width/columns
-        readonly property int suggestedWidth: 280
-        readonly property int suggestedHeight: 200
-        columns: 7
-        opacity: enabled ? 1 : 0.25
-
-        property color selectedColor: transparentColor
-        signal colorPicked(color newColor)
-
-        Item {
-            width: colorsGrid.cellSize
-            height: colorsGrid.cellSize
-
-            Image {
-                source: "qrc:/icons/navigation/close.png"
-                anchors.fill: parent
-                anchors.margins: 5
-                mipmap: true
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: colorPicked(transparentColor)
-            }
-        }
-
-        Repeater {
-            model: availableColors
-
-            Item {
-                required property color modelData
-                required property int index
-                width: colorsGrid.cellSize
-                height: colorsGrid.cellSize
-
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 3
-                    border.width: colorsGrid.selectedColor === modelData ? 3 : 0.5
-                    border.color: "black"
-                    color: modelData
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: colorPicked(modelData)
-                }
-            }
-        }
-    }
-
-    component ColorButton : Item {
-        id: colorButton
-        width: 36
-        height: 36
-        property color selectedColor: transparentColor
-        opacity: enabled ? 1 : 0.5
-        property alias hoverEnabled: cbMouseArea.hoverEnabled
-        property alias containsMouse: cbMouseArea.containsMouse
-
-        signal colorPicked(color newColor)
-
-        MouseArea {
-            id: cbMouseArea
-            anchors.fill: parent
-            onClicked: colorsMenuLoader.active = true
-        }
-
-        Loader {
-            id: colorsMenuLoader
-            x: 0; y: parent.height
-            active: false
-            sourceComponent: Popup {
-                id: colorsMenu
-                x: 0; y: 0
-                width: availableColorsPalette.suggestedWidth
-                height: availableColorsPalette.suggestedHeight
-
-                Component.onCompleted: open()
-                onClosed: Qt.callLater(() => { colorsMenuLoader.active = false})
-
-                contentItem: AvailableColorsPalette {
-                    id: availableColorsPalette
-                    selectedColor: colorButton.selectedColor
-                    onColorPicked: (newColor) => {
-                                       colorButton.colorPicked(newColor)
-                                       colorsMenu.close()
-                                   }
-                }
-            }
         }
     }
 

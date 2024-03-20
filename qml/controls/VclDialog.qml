@@ -94,8 +94,9 @@ Dialog {
     signal dismissed()
 
     // Configure built-in properties of the Dialog
-    parent: Overlay.overlay
+    parent: Scrite.window.contentItem
     anchors.centerIn: parent
+    Component.onCompleted: parent = Overlay.overlay
 
     modal: true
     closePolicy: Popup.CloseOnEscape

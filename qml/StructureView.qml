@@ -923,42 +923,11 @@ Item {
                     property Annotation annotation
                     sourceComponent: annotationGripComponent
                     active: annotation !== null
-                    onActiveChanged: {
-                        if(!active)
-                            floatingDockWidget.hide()
-                    }
-
                     Component.onDestruction: reset()
 
                     function reset() {
-                        floatingDockWidget.hide()
                         annotation = null
                         annotationItem = null
-                    }
-
-                    Connections {
-                        target: Runtime.structureCanvasSettings
-                        function onDisplayAnnotationPropertiesChanged() {
-                            if(Runtime.structureCanvasSettings.displayAnnotationProperties)
-                                floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
-                            else
-                                floatingDockWidget.close()
-                        }
-                    }
-
-                    onAnnotationChanged: {
-                        if(annotation === null)
-                            floatingDockWidget.hide()
-                        else {
-                            if(floatingDockWidget.contentX < 0) {
-                                var maxContentX = (scriteDocumentViewItem.width - floatingDockWidget.contentWidth - 20)
-                                floatingDockWidget.contentX = Math.min(scriteDocumentViewItem.mapFromItem(structureView, 0, 0).x + structureView.width + 40, maxContentX)
-                                floatingDockWidget.contentY = (scriteDocumentViewItem.height - floatingDockWidget.contentHeight)/2
-                            }
-
-                            if(Runtime.structureCanvasSettings.displayAnnotationProperties)
-                                floatingDockWidget.display("Annotation Properties", annotationPropertyEditorComponent)
-                        }
                     }
 
                     Connections {
@@ -3383,14 +3352,8 @@ Item {
                     FlatToolButton {
                         iconSource: "qrc:/icons/action/edit.png"
                         ToolTip.text: "Edit properties of this annotation"
-                        down: floatingDockWidget.visible
+                        down: annotationPropertyEditor.visible
                         onClicked: Runtime.structureCanvasSettings.displayAnnotationProperties = !Runtime.structureCanvasSettings.displayAnnotationProperties
-                        Connections {
-                            target: floatingDockWidget
-                            function onCloseRequest() {
-                                Runtime.structureCanvasSettings.displayAnnotationProperties = false
-                            }
-                        }
                     }
 
                     FlatToolButton {
@@ -3446,7 +3409,7 @@ Item {
             }
 
             EventFilter.target: Scrite.app
-            EventFilter.active: !Scrite.document.readOnly && !floatingDockWidget.contentHasFocus && !createItemMouseHandler.enabled
+            EventFilter.active: !Scrite.document.readOnly && !createItemMouseHandler.enabled
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
@@ -3641,11 +3604,23 @@ Item {
         }
     }
 
-    Component {
-        id: annotationPropertyEditorComponent
+    VclFloatingDock {
+        id: annotationPropertyEditor
 
-        AnnotationPropertyEditor {
+        x: 80
+        y: Scrite.window.height * 0.15
+        width: 375
+        height: Scrite.window.height * 0.6
+        visible: Runtime.structureCanvasSettings.displayAnnotationProperties && annotationGripLoader.annotation
+
+        title: "Annotation Properties"
+
+        content: AnnotationPropertyEditor {
             annotation: annotationGripLoader.annotation
+        }
+
+        onCloseRequest: {
+            Runtime.structureCanvasSettings.displayAnnotationProperties = false
         }
     }
 

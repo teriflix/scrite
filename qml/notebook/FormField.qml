@@ -159,8 +159,6 @@ Column {
                 TextAreaSpellingSuggestionsMenu { }
                 onActiveFocusChanged: {
                     if(!activeFocus && !persistentSelection) {
-                        if(dialogUnderlay.visible)
-                            return
                         answerItemLoader.lod = answerItemLoader.eLOW
                     }
                 }

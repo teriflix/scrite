@@ -124,13 +124,11 @@
         <file>qml/structure/AnnotationPropertyEditor.qml</file>
         <file>qml/structure/qmldir</file>
         <file>qml/structure/StructureGroupsMenu.qml</file>
-        <file>qml/DockWidget.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/NotificationsView.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
         <file>qml/ScriteMainWindow.qml</file>
         <file>qml/ScritedView.qml</file>
-        <file>qml/ShortcutsView.qml</file>
         <file>qml/SplashScreen.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
@@ -139,5 +137,9 @@
         <file>qml/modules/PdfView.qml</file>
         <file>qml/modules/UserAccountToolButton.qml</file>
         <file>qml/modules/qmldir</file>
+        <file>qml/controls/VclFloatingDock.qml</file>
+        <file>qml/floatingdockpanels/qmldir</file>
+        <file>qml/floatingdockpanels/FloatingShortcutsDock.qml</file>
+        <file>qml/floatingdockpanels/FloatingMarkupToolsDock.qml</file>
     </qresource>
 </RCC>

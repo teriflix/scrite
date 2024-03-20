@@ -1288,7 +1288,7 @@ Rectangle {
             id: notesSummary
             property var componentData
             property Notes notes: componentData.notebookItemObject
-            property real minimumNoteSize: Math.max(200, scriteMainWindow.width*0.15)
+            property real minimumNoteSize: Math.max(200, Scrite.window.width*0.15)
             property real noteSize: notesFlick.width > minimumNoteSize ? notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize) : notesFlick.width
             clip: true
             color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
@@ -2400,7 +2400,7 @@ Rectangle {
 
                             Rectangle {
                                 id: characterQuickInfoArea
-                                width: Runtime.workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, scriteMainWindow.width*0.3)
+                                width: Runtime.workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, Scrite.window.width*0.3)
                                 height: parent.height
                                 color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
 

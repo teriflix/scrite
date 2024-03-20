@@ -24,9 +24,10 @@ import "qrc:/qml/controls"
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
+import "qrc:/qml/floatingdockpanels"
 
 Rectangle {
-    id: mainWindow
+    id: scriteRoot
     width: 1366
     height: 700
     color: Runtime.colors.primary.windowColor
@@ -39,7 +40,21 @@ Rectangle {
     UI.ScriteMainWindow {
         id: scriteMainWindow
         anchors.fill: parent
-        enabled: !dialogUnderlay.visible && !notificationsView.visible
+        enabled: !notificationsView.visible
+    }
+
+    Item {
+        id: floatingDockLayer
+        anchors.fill: parent
+        Component.onCompleted: {
+            Runtime.floatingDockLayer = floatingDockLayer
+            Qt.callLater(initFloatingDockPanels)
+        }
+
+        function initFloatingDockPanels() {
+            FloatingMarkupToolsDock.init()
+            FloatingShortcutsDock.init()
+        }
     }
 
     Loader {
@@ -97,58 +112,8 @@ Rectangle {
         }
     }
 
-    Item {
-        id: dialogUnderlay
-        anchors.fill: scriteMainWindow
-        property color color: Runtime.colors.primary.windowColor
-
-        property int visibilityCounter: 0
-        function show() {
-            visibilityCounter = Math.max(visibilityCounter+1,1)
-            visible = true
-        }
-
-        function hide() {
-            visibilityCounter = visibilityCounter-1
-            if(visibilityCounter <= 0)
-                visible = false
-        }
-
-        property real maxRadius: 32
-        property real radius: maxRadius
-        visible: false
-        onVisibleChanged: {
-            if(!visible) {
-                color = Runtime.colors.primary.windowColor
-                visibilityCounter = 0
-            }
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            color: parent.color
-            opacity: 0.9 * (parent.radius/parent.maxRadius)
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            preventStealing: true
-            propagateComposedEvents: false
-            enabled: parent.visible
-        }
-    }
-
     Loader {
         active: Scrite.document.busy
-        onActiveChanged: {
-            if(active) {
-                dialogUnderlay.radius = dialogUnderlay.maxRadius
-                dialogUnderlay.show()
-            } else {
-                dialogUnderlay.hide()
-            }
-        }
         anchors.fill: parent
         sourceComponent: Item {
             Rectangle {
@@ -233,8 +198,6 @@ Rectangle {
         id: splashLoader
         anchors.fill: parent
         sourceComponent: UI.SplashScreen {
-            Component.onCompleted: dialogUnderlay.show()
-            Component.onDestruction: dialogUnderlay.hide()
             onDone: {
                 const launchHomeScreen = function() {
                     if(Scrite.user.loggedIn)

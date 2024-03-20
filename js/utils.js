@@ -11,3 +11,7 @@ function execLater(contextObject, delay, callback, args) {
                             })
     timer.start()
 }
+
+function bounded(min, val, max) {
+    return Math.min( Math.max(min, val), max )
+}

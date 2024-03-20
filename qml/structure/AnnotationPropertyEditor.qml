@@ -30,6 +30,7 @@ Item {
 
     Flickable {
         id: propertyEditorView
+        clip: true
         anchors.fill: parent
         anchors.leftMargin: 10
         anchors.rightMargin: scrollBarVisible ? 0 : 10
