@@ -23,7 +23,9 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
+import "qrc:/qml/overlays"
 import "qrc:/qml/structure"
+import "qrc:/qml/floatingdockpanels"
 
 Item {
     id: structureView
@@ -425,12 +427,12 @@ Item {
                 onClicked: {
                     if(annotationGripLoader.active) {
                         Scrite.document.structure.copy(annotationGripLoader.annotation)
-                        statusText.show("Annotation Copied")
+                        AnimatedTextOverlay.show("Annotation Copied")
                     } else {
                         var spe = Scrite.document.structure.elementAt(Scrite.document.structure.currentElementIndex)
                         if(spe !== null) {
                             Scrite.document.structure.copy(spe)
-                            statusText.show("Scene Copied")
+                            AnimatedTextOverlay.show("Scene Copied")
                         }
                     }
                 }
@@ -3604,7 +3606,7 @@ Item {
         }
     }
 
-    VclFloatingDock {
+    FloatingDock {
         id: annotationPropertyEditor
 
         x: 80

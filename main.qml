@@ -24,6 +24,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
+import "qrc:/qml/overlays"
 import "qrc:/qml/floatingdockpanels"
 
 Rectangle {
@@ -41,76 +42,6 @@ Rectangle {
         id: scriteMainWindow
         anchors.fill: parent
         enabled: !notificationsView.visible
-    }
-
-    Item {
-        id: floatingDockLayer
-        anchors.fill: parent
-        Component.onCompleted: {
-            Runtime.floatingDockLayer = floatingDockLayer
-            Qt.callLater(initFloatingDockPanels)
-        }
-
-        function initFloatingDockPanels() {
-            FloatingMarkupToolsDock.init()
-            FloatingShortcutsDock.init()
-        }
-    }
-
-    // Refactoring QML TODO: Move this to singleton
-    Loader {
-        id: statusText
-        active: false
-        anchors.fill: parent
-        property string text
-        property bool animationsEnabled: Runtime.applicationSettings.enableAnimations
-        function show(t) {
-            text = t
-            active = true
-        }
-        onActiveChanged: {
-            if(!active)
-                text = ""
-        }
-        sourceComponent: Item {
-            VclText {
-                id: textItem
-                anchors.centerIn: parent
-                font.pixelSize: parent.height * 0.075
-                text: statusText.text
-                property real t: statusText.animationsEnabled ? 0 : 1
-                scale: 0.5 + t/1.0
-                opacity: statusText.animationsEnabled ? (1.0 - t*0.75) : 0.8
-            }
-
-            SequentialAnimation {
-                running: true
-
-                NumberAnimation {
-                    target: textItem
-                    properties: "t"
-                    from: 0
-                    to: 1
-                    duration: statusText.animationsEnabled ? 250 : 0
-                    easing.type: Easing.OutQuint
-                }
-
-                PauseAnimation {
-                    duration: statusText.animationsEnabled ? 0 : 250
-                }
-
-                ScriptAction {
-                    script: statusText.active = false
-                }
-            }
-        }
-
-        Connections {
-            target: Runtime.applicationSettings
-            function onEnableAnimationsChanged() {
-                statusText.animationsEnabled = Runtime.applicationSettings.enableAnimations
-            }
-        }
     }
 
     // Refactoring QML TODO: Move this to a singleton
@@ -213,8 +144,14 @@ Rectangle {
         id: _private
 
         function initialize() {
+            // Initialize layers
+            FloatingDockLayer.init(scriteRoot)
+            OverlaysLayer.init(scriteRoot)
+
+            // Raise window
             Scrite.window.raise()
 
+            // Show initial UI
             if(Scrite.user.loggedIn)
                 showHomeScreenOrOpenFile()
             else {
@@ -246,10 +183,17 @@ Rectangle {
                 Scrite.document.open(Scrite.fileNameToOpen)
 
             Scrite.user.forceLoginRequest.connect(userForceLoginRequest)
+
+            initFloatingDockPanels()
         }
 
         function userForceLoginRequest() {
             Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
+        }
+
+        function initFloatingDockPanels() {
+            FloatingMarkupToolsDock.init()
+            FloatingShortcutsDock.init()
         }
     }
 }

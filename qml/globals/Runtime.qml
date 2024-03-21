@@ -478,9 +478,6 @@ Item {
     // This property holds reference to the global screenplay editor toolbar
     property Item screenplayEditorToolbar
 
-    // This property holds reference to the item on which all floating-dock-panels will be shown.
-    property Item floatingDockLayer
-
     // This model provides access to the paginated-text-document constructed from the screenplay
     // of the current Scrite file.
     readonly property ScreenplayTextDocument screenplayTextDocument: ScreenplayTextDocument {

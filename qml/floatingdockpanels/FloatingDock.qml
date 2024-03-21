@@ -11,11 +11,6 @@
 **
 ****************************************************************************/
 
-/**
-  This QML component extends VclDialog to support floating dock panels that can
-  be dragged and moved around in the UI.
-  */
-
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
@@ -26,6 +21,7 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 Item {
     id: root
@@ -56,7 +52,7 @@ Item {
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
 
-    parent: Runtime.floatingDockLayer
+    parent: FloatingDockLayer.item
     x: 20
     y: 20
     width: 200
@@ -140,6 +136,12 @@ Item {
         y: titleBar.height
         sourceComponent: content
         active: root.visible
+    }
+
+    // Private section
+    Component.onCompleted: {
+        if(!FloatingDockLayer.valid)
+            Scrite.app.log("FloatingDockLayer is not initialized!")
     }
 
     QtObject {

@@ -24,7 +24,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
-VclFloatingDock {
+FloatingDock {
     id: root
 
     property SceneDocumentBinder sceneDocumentBinder

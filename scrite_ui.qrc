@@ -136,10 +136,14 @@
         <file>qml/modules/PdfView.qml</file>
         <file>qml/modules/UserAccountToolButton.qml</file>
         <file>qml/modules/qmldir</file>
-        <file>qml/controls/VclFloatingDock.qml</file>
         <file>qml/floatingdockpanels/qmldir</file>
         <file>qml/floatingdockpanels/FloatingShortcutsDock.qml</file>
         <file>qml/floatingdockpanels/FloatingMarkupToolsDock.qml</file>
         <file>qml/dialogs/SplashScreen.qml</file>
+        <file>qml/overlays/AnimatedTextOverlay.qml</file>
+        <file>qml/overlays/qmldir</file>
+        <file>qml/floatingdockpanels/FloatingDock.qml</file>
+        <file>qml/floatingdockpanels/FloatingDockLayer.qml</file>
+        <file>qml/overlays/OverlaysLayer.qml</file>
     </qresource>
 </RCC>
