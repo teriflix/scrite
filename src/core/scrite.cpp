@@ -31,72 +31,79 @@ Scrite::~Scrite()
     qDebug() << "Warning: Scrite namespace being destroyed.";
 }
 
-QObject *Scrite::appObject() const
+QObject *Scrite::appObject()
 {
-    return this->app();
+    return Scrite::app();
 }
 
-Application *Scrite::app() const
+Application *Scrite::app()
 {
     return Application::instance();
 }
 
-QObject *Scrite::windowObject() const
+QObject *Scrite::windowObject()
 {
-    return this->window();
+    return Scrite::window();
 }
 
-AppWindow *Scrite::window() const
+AppWindow *Scrite::window()
 {
     return AppWindow::instance();
 }
 
-QObject *Scrite::userObject() const
+QObject *Scrite::userObject()
 {
-    return this->user();
+    return Scrite::user();
 }
 
-User *Scrite::user() const
+User *Scrite::user()
 {
     return User::instance();
 }
 
-QObject *Scrite::documentObject() const
+QObject *Scrite::documentObject()
 {
-    return this->document();
+    return Scrite::document();
 }
 
-ScriteDocument *Scrite::document() const
+ScriteDocument *Scrite::document()
 {
     return ScriteDocument::instance();
 }
 
-QObject *Scrite::vaultObject() const
+QObject *Scrite::vaultObject()
 {
     return ScriteDocumentVault::instance();
 }
 
-ScriteDocumentVault *Scrite::vault() const
+ScriteDocumentVault *Scrite::vault()
 {
     return ScriteDocumentVault::instance();
 }
 
-QObject *Scrite::shortcutsObject() const
+QObject *Scrite::shortcutsObject()
 {
-    return this->shortcuts();
+    return Scrite::shortcuts();
 }
 
-ShortcutsModel *Scrite::shortcuts() const
+ShortcutsModel *Scrite::shortcuts()
 {
     return ShortcutsModel::instance();
 }
 
-QObject *Scrite::notificationsObject() const
+QObject *Scrite::notificationsObject()
 {
-    return this->notifications();
+    return Scrite::notifications();
 }
 
-NotificationManager *Scrite::notifications() const
+NotificationManager *Scrite::notifications()
 {
     return NotificationManager::instance();
+}
+
+QString Scrite::m_fileNameToOpen;
+void Scrite::setFileNameToOpen(const QString &val)
+{
+    if (m_fileNameToOpen.isEmpty())
+        m_fileNameToOpen = val;
 }

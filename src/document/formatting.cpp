@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "appwindow.h"
 #include "formatting.h"
 #include "application.h"
 #include "scritedocument.h"
@@ -645,6 +646,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
             });
 
     QTimer::singleShot(0, this, &ScreenplayFormat::resetToUserDefaults);
+    QTimer::singleShot(0, this, &ScreenplayFormat::resetScreenFromAppWindow);
 }
 
 ScreenplayFormat::~ScreenplayFormat() { }
@@ -1078,6 +1080,11 @@ void ScreenplayFormat::evaluateFontZoomLevels()
 
     m_fontZoomLevelIndex = m_fontPointSizes.indexOf(defaultFontInfo.pointSize());
     emit fontZoomLevelIndexChanged();
+}
+
+void ScreenplayFormat::resetScreenFromAppWindow()
+{
+    this->setSreeenFromWindow(AppWindow::instance());
 }
 
 SceneElementFormat *

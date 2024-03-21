@@ -30,6 +30,7 @@ import "qrc:/qml/scrited"
 import "qrc:/qml/modules"
 import "qrc:/qml/controls"
 import "qrc:/qml/screenplay"
+import "qrc:/qml/floatingdockpanels"
 
 Item {
     id: scriteMainWindow
@@ -63,7 +64,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+N"
-        onActivated: HomeScreenDialog.launch()
+        onActivated: HomeScreen.launch()
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "New"
@@ -73,7 +74,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+O"
-        onActivated: HomeScreenDialog.launch()
+        onActivated: HomeScreen.launch()
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Open"
@@ -83,7 +84,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+O"
-        onActivated: HomeScreenDialog.launch("Scriptalay")
+        onActivated: HomeScreen.launch("Scriptalay")
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Scriptalay"
@@ -385,7 +386,7 @@ Item {
                 id: homeButton
                 iconSource: "qrc:/icons/action/home.png"
                 text: "Home"
-                onClicked: HomeScreenDialog.launch()
+                onClicked: HomeScreen.launch()
             }
 
             FlatToolButton {
@@ -583,7 +584,7 @@ Item {
                             enabled: appToolBar.visible
 
                             ShortcutsModelItem.group: "Application"
-                            ShortcutsModelItem.title: shortcutsDockWidget.visible ? "Hide Shortcuts" : "Show Shortcuts"
+                            ShortcutsModelItem.title: FloatingShortcutsDock.visible ? "Hide Shortcuts" : "Show Shortcuts"
                             ShortcutsModelItem.shortcut: "Ctrl+E"
                             ShortcutsModelItem.enabled: appToolBar.visible
 
@@ -831,7 +832,7 @@ Item {
 
                         VclMenuItem {
                             text: "Home"
-                            onTriggered: HomeScreenDialog.launch()
+                            onTriggered: HomeScreen.launch()
                         }
 
                         VclMenuItem {
@@ -2078,8 +2079,6 @@ Item {
     Component.onCompleted: {
         if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
             Runtime.workspaceSettings.screenplayEditorWidth = -1
-        if(Scrite.app.maybeOpenAnonymously())
-            splashLoader.active = false
         Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
         Qt.callLater( function() {
             Announcement.shout("{f4048da2-775d-11ec-90d6-0242ac120003}", "restoreWindowGeometryDone")

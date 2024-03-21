@@ -22,13 +22,15 @@ import "qrc:/qml/controls"
 
 Rectangle {
     id: dfNotice
+
     property string reason: Scrite.user.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
     property string suggestion: Scrite.user.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
     property string featureName
-    color: Runtime.colors.primary.c100.background
-    clip: true
 
     signal clicked()
+
+    color: Runtime.colors.primary.c100.background
+    clip: true
 
     QtObject {
         id: privateData
@@ -102,7 +104,7 @@ Rectangle {
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     dfNotice.clicked()
-                    Announcement.shout(Runtime.announcementIds.loginRequest, null)
+                    Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
                 }
             }
 

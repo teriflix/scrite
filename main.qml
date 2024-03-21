@@ -57,6 +57,7 @@ Rectangle {
         }
     }
 
+    // Refactoring QML TODO: Move this to singleton
     Loader {
         id: statusText
         active: false
@@ -112,6 +113,7 @@ Rectangle {
         }
     }
 
+    // Refactoring QML TODO: Move this to a singleton
     Loader {
         active: Scrite.document.busy
         anchors.fill: parent
@@ -161,6 +163,7 @@ Rectangle {
         }
     }
 
+    // Refactoring QML TODO: Move this to a singleton
     Item {
         property AutoUpdate autoUpdate: Scrite.app.autoUpdate
 
@@ -188,35 +191,7 @@ Rectangle {
         }
     }
 
-    Connections {
-        target: Scrite.window
-        function onScreenChanged() { Scrite.document.formatting.setSreeenFromWindow(Scrite.window) }
-        // function onActiveFocusItemChanged() { console.log("PA: " + Scrite.window.activeFocusItem) }
-    }
-
-    Loader {
-        id: splashLoader
-        anchors.fill: parent
-        sourceComponent: UI.SplashScreen {
-            onDone: {
-                const launchHomeScreen = function() {
-                    if(Scrite.user.loggedIn)
-                        HomeScreenDialog.launch()
-                }
-                splashLoader.active = false
-                if(Scrite.app.isWindowsPlatform && Scrite.app.isNotWindows10)
-                    MessageBox.information("",
-                        "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
-                        () => { launchHomeScreen() }
-                    )
-                else
-                    launchHomeScreen()
-                if(fileNameToOpen !== "")
-                    Scrite.document.open(fileNameToOpen)
-            }
-        }
-    }
-
+    // Refactoring QML TODO: Move this to a singleton
     Rectangle {
         anchors.fill: parent
         visible: Scrite.notifications.count > 0
@@ -231,29 +206,51 @@ Rectangle {
         }
     }
 
-    property int lastSnapshotTimestamp: 0
-    EventFilter.active: Scrite.app.getEnvironmentVariable("SCRITE_SNAPSHOT_CAPTURE") === "YES"
-    EventFilter.target: Scrite.app
-    EventFilter.events: [6]
-    EventFilter.onFilter: {
-        if(event.key === Qt.Key_F6) {
-            var timestamp = (new Date()).getTime()
-            if(timestamp - lastSnapshotTimestamp > 500) {
-                lastSnapshotTimestamp = timestamp
-                windowCapture.capture()
+    // Private Section
+    Component.onCompleted: _private.initialize()
+
+    QtObject {
+        id: _private
+
+        function initialize() {
+            Scrite.window.raise()
+
+            if(Scrite.user.loggedIn)
+                showHomeScreenOrOpenFile()
+            else {
+                var splashScreen = SplashScreen.launch()
+                if(splashScreen)
+                    splashScreen.closed.connect(_private.splashScreenWasClosed)
+                else
+                    splashScreenWasClosed()
             }
         }
-    }
 
-    WindowCapture {
-        id: windowCapture
-        fileName: "scrite-window-capture.jpg"
-        format: WindowCapture.JPGFormat
-        forceCounterInFileName: true
-        window: Scrite.window
-        captureMode: WindowCapture.FileAndClipboard
-    }
+        function splashScreenWasClosed() {
+            if(Scrite.app.isWindowsPlatform && Scrite.app.isNotWindows10) {
+                MessageBox.information("",
+                    "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
+                    _private.showHomeScreenOrOpenFile
+                )
+            } else if(Scrite.user.loggedIn)
+                showHomeScreenOrOpenFile()
+            else
+                Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
+        }
 
-    Component.onCompleted: Scrite.window.raise()
+        function showHomeScreenOrOpenFile() {
+            if(Scrite.fileNameToOpen === "") {
+                if(!Scrite.app.maybeOpenAnonymously())
+                    HomeScreen.launch()
+            } else
+                Scrite.document.open(Scrite.fileNameToOpen)
+
+            Scrite.user.forceLoginRequest.connect(userForceLoginRequest)
+        }
+
+        function userForceLoginRequest() {
+            Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
+        }
+    }
 }
 

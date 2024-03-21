@@ -37,7 +37,6 @@ public:
     void setCloseButtonVisible(bool val);
     bool isCloseButtonVisible() const { return m_closeButtonVisible; }
     Q_SIGNAL void closeButtonVisibleChanged();
-    bool m_closeButtonVisible;
 
 protected:
     void showEvent(QShowEvent *);
@@ -46,6 +45,7 @@ private:
     void initializeFileNameToOpen();
 
 private:
+    bool m_closeButtonVisible = true;
     Qt::WindowFlags m_defaultWindowFlags;
 };
 

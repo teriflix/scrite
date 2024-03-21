@@ -58,7 +58,7 @@
         <file>qml/dialogs/BackupsDialog.qml</file>
         <file>qml/dialogs/CollaboratorsDialog.qml</file>
         <file>qml/dialogs/ExportConfigurationDialog.qml</file>
-        <file>qml/dialogs/HomeScreenDialog.qml</file>
+        <file>qml/dialogs/HomeScreen.qml</file>
         <file>qml/dialogs/MessageBox.qml</file>
         <file>qml/dialogs/qmldir</file>
         <file>qml/dialogs/RenameCharacterDialog.qml</file>
@@ -129,7 +129,6 @@
         <file>qml/ScreenplayEditor.qml</file>
         <file>qml/ScriteMainWindow.qml</file>
         <file>qml/ScritedView.qml</file>
-        <file>qml/SplashScreen.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
         <file>qml/screenplay/qmldir</file>
@@ -141,5 +140,6 @@
         <file>qml/floatingdockpanels/qmldir</file>
         <file>qml/floatingdockpanels/FloatingShortcutsDock.qml</file>
         <file>qml/floatingdockpanels/FloatingMarkupToolsDock.qml</file>
+        <file>qml/dialogs/SplashScreen.qml</file>
     </qresource>
 </RCC>

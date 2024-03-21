@@ -54,32 +54,39 @@ public:
     Q_ENUM(AppFeature)
 
     Q_PROPERTY(QObject *app READ appObject CONSTANT)
-    QObject *appObject() const;
-    Application *app() const;
+    static QObject *appObject();
+    static Application *app();
 
     Q_PROPERTY(QObject *window READ windowObject CONSTANT)
-    QObject *windowObject() const;
-    AppWindow *window() const;
+    static QObject *windowObject();
+    static AppWindow *window();
 
     Q_PROPERTY(QObject *user READ userObject CONSTANT)
-    QObject *userObject() const;
-    User *user() const;
+    static QObject *userObject();
+    static User *user();
 
     Q_PROPERTY(QObject *document READ documentObject CONSTANT)
-    QObject *documentObject() const;
-    ScriteDocument *document() const;
+    static QObject *documentObject();
+    static ScriteDocument *document();
 
     Q_PROPERTY(QObject *vault READ vaultObject CONSTANT)
-    QObject *vaultObject() const;
-    ScriteDocumentVault *vault() const;
+    static QObject *vaultObject();
+    static ScriteDocumentVault *vault();
 
     Q_PROPERTY(QObject *shortcuts READ shortcutsObject CONSTANT)
-    QObject *shortcutsObject() const;
-    ShortcutsModel *shortcuts() const;
+    static QObject *shortcutsObject();
+    static ShortcutsModel *shortcuts();
 
     Q_PROPERTY(QObject *notifications READ notificationsObject CONSTANT)
-    QObject *notificationsObject() const;
-    NotificationManager *notifications() const;
+    static QObject *notificationsObject();
+    static NotificationManager *notifications();
+
+    Q_PROPERTY(QString fileNameToOpen READ fileNameToOpen CONSTANT)
+    static QString fileNameToOpen() { return m_fileNameToOpen; }
+    static void setFileNameToOpen(const QString &val);
+
+private:
+    static QString m_fileNameToOpen;
 };
 
 #endif // SCRITE_NAMESPACE_H

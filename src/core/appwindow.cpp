@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "scrite.h"
 #include "appwindow.h"
 #include "automation.h"
 #include "application.h"
@@ -162,5 +163,6 @@ void AppWindow::initializeFileNameToOpen()
         }
     }
 #endif
-    this->rootContext()->setContextProperty(QStringLiteral("fileNameToOpen"), fileNameToOpen);
+
+    Scrite::setFileNameToOpen(fileNameToOpen);
 }

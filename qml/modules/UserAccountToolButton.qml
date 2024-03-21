@@ -23,6 +23,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
+import "qrc:/qml/modules"
 
 Item {
     id: userLogin
@@ -63,28 +64,8 @@ Item {
             onEntered: parent.ToolTip.visible = true
             onExited: parent.ToolTip.visible = false
             enabled: appToolBar.visible
-            onClicked: showLoginWizard()
+            onClicked: loginWizard.open()
         }
-    }
-
-    Connections {
-        target: Scrite.user
-        enabled: _private.showLoginWizardOnForceLoginRequest
-        function onForceLoginRequest() {
-            if(_private.showLoginWizardOnForceLoginRequest) {
-                if(splashLoader.active)
-                    splashLoader.activeChanged.connect( () => {
-                        showLoginWizard(null)
-                    })
-                else
-                    showLoginWizard(null)
-                _private.showLoginWizardOnForceLoginRequest = false
-            }
-        }
-    }
-
-    function showLoginWizard(ps) {
-       loginWizard.open()
     }
 
     VclDialog {
@@ -100,7 +81,7 @@ Item {
 
         Announcement.onIncoming: (type,data) => {
             if(type === Runtime.announcementIds.loginRequest)
-                showLoginWizard(null)
+                loginWizard.open()
         }
 
         content: Item {
@@ -152,7 +133,7 @@ Item {
             }
             Component.onDestruction: {
                 if(showHomeScreenUponLogin && Scrite.user.loggedIn)
-                    HomeScreenDialog.launch()
+                    HomeScreen.launch()
             }
         }
     }
@@ -1016,9 +997,6 @@ Item {
 
     QtObject {
         id: _private
-
-        property bool showLoginWizardOnForceLoginRequest: true
-        property bool receivedForceLoginRequest: true
 
         readonly property string pageRequest: "93DC1133-58CA-4EDD-B803-82D9B6F2AA50"
         readonly property string reloadLoginWizardPage: "76281526-A16C-4414-8129-AD8770A17F16"
