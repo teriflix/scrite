@@ -28,13 +28,13 @@ import "qrc:/qml/controls"
 QtObject {
     function init() {
         if(!OverlaysLayer.valid) {
-            Scrite.app.log("Overlays layer not initialized. Cannot initialize DocumentBusyOverlay.")
+            console.log("Overlays layer not initialized. Cannot initialize DocumentBusyOverlay.")
             return null
         }
 
         Scrite.document.busyChanged.connect( () => {
                                                 if(!OverlaysLayer.valid) {
-                                                    Scrite.app.log("Overlays layer not initialized. Cannot create DocumentBusyOverlay.")
+                                                    console.log("Overlays layer not initialized. Cannot create DocumentBusyOverlay.")
                                                     return null
                                                 }
 

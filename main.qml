@@ -25,6 +25,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/overlays"
+import "qrc:/qml/notifications"
 import "qrc:/qml/floatingdockpanels"
 
 Rectangle {
@@ -41,50 +42,7 @@ Rectangle {
     UI.ScriteMainWindow {
         id: scriteMainWindow
         anchors.fill: parent
-        enabled: !notificationsView.visible
-    }
-
-    // Refactoring QML TODO: Move this to a singleton
-    Item {
-        property AutoUpdate autoUpdate: Scrite.app.autoUpdate
-
-        Notification.active: autoUpdate.updateAvailable || autoUpdate.surveyAvailable
-        Notification.title: autoUpdate.updateAvailable ? "Update Available" : (autoUpdate.surveyAvailable ? autoUpdate.surveyInfo.title : "")
-        Notification.text: {
-            if(autoUpdate.updateAvailable)
-                return "Scrite " + autoUpdate.updateInfo.versionString + " is now available for download. <font size=\"-1\"><i>[<strong>What's new?</strong> " + autoUpdate.updateInfo.changeLog + "]</i></font>"
-            if(autoUpdate.surveyAvailable)
-                return autoUpdate.surveyInfo.text
-            return ""
-        }
-        Notification.buttons: autoUpdate.updateAvailable ? ["Download", "Ignore"] : ["Participate", "Not Now", "Dont Ask Again"]
-        Notification.onButtonClicked: (index) => {
-            if(autoUpdate.updateAvailable) {
-                if(index === 0)
-                    Qt.openUrlExternally(autoUpdate.updateDownloadUrl)
-            } else if(autoUpdate.surveyAvailable) {
-                if(index === 0) {
-                    Qt.openUrlExternally(autoUpdate.surveyUrl)
-                    autoUpdate.dontAskForSurveyAgain(true)
-                } else if(index === 2)
-                    autoUpdate.dontAskForSurveyAgain(true)
-            }
-        }
-    }
-
-    // Refactoring QML TODO: Move this to a singleton
-    Rectangle {
-        anchors.fill: parent
-        visible: Scrite.notifications.count > 0
-        color: Scrite.app.translucent(Runtime.colors.primary.borderColor, 0.6)
-
-        UI.NotificationsView {
-            id: notificationsView
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.topMargin: -1
-            width: parent.width * 0.7
-        }
+        enabled: !NotificationsView.visible
     }
 
     // Private Section
@@ -100,6 +58,7 @@ Rectangle {
             // Initialize layers
             FloatingDockLayer.init(scriteRoot)
             OverlaysLayer.init(scriteRoot)
+            NotificationsLayer.init(scriteRoot)
 
             // Raise window
             Scrite.window.raise()

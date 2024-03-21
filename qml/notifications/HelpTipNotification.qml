@@ -19,7 +19,7 @@ import "qrc:/qml/globals"
 
 QtObject {
     property string tipName
-    property var helpTip: Scrite.user.helpTips[tipName]
+    property var helpTip: Scrite.user.helpTipsAvailable ? Scrite.user.helpTips[tipName] : undefined
     property bool tipShown: Runtime.helpNotificationSettings.isTipShown(tipName)
     property bool enabled: true
 

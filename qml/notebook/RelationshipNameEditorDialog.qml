@@ -39,7 +39,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch RelationshipNameEditorDialog")
+        console.log("Couldn't launch RelationshipNameEditorDialog")
         return null
     }
 

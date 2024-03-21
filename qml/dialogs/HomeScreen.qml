@@ -38,7 +38,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch HomeScreen")
+        console.log("Couldn't launch HomeScreen")
         return null
     }
 

@@ -31,12 +31,12 @@ Item {
 
     function launch(exporter) {
         if(_private.dialogComponent.status !== Component.Ready) {
-            Scrite.app.log("ExportConfigurationDialog is not ready!")
+            console.log("ExportConfigurationDialog is not ready!")
             return null
         }
 
         if(!exporter) {
-            Scrite.app.log("No exporter supplied.")
+            console.log("No exporter supplied.")
             return null
         }
 
@@ -49,7 +49,7 @@ Item {
         else if(Scrite.app.verifyType(exporter, "AbstractExporter"))
             args.exporter = exporter
         else {
-            Scrite.app.log("No exporter supplied.")
+            console.log("No exporter supplied.")
             return null
         }
 
@@ -60,7 +60,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch ExportConfigurationDialog")
+        console.log("Couldn't launch ExportConfigurationDialog")
         return null
     }
 

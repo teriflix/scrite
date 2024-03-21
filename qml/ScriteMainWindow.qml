@@ -30,6 +30,7 @@ import "qrc:/qml/scrited"
 import "qrc:/qml/modules"
 import "qrc:/qml/controls"
 import "qrc:/qml/screenplay"
+import "qrc:/qml/notifications"
 import "qrc:/qml/floatingdockpanels"
 
 Item {
@@ -1228,7 +1229,7 @@ Item {
         height: 53
         color: Runtime.colors.primary.c50.background
         visible: pdfViewer.active
-        enabled: visible && !notificationsView.visible
+        enabled: visible && !NotificationsView.visible
 
         VclText {
             text: pdfViewer.pdfTitle
@@ -1262,7 +1263,7 @@ Item {
         property string pdfTitle
         property int pdfPagesPerRow: 2
         property bool pdfSaveAllowed: true
-        enabled: !notificationsView.visible
+        enabled: !NotificationsView.visible
         onActiveChanged: {
             if(!active) {
                 pdfPagesPerRow = 2

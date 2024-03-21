@@ -29,6 +29,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/notebook"
 import "qrc:/qml/modules"
+import "qrc:/qml/notifications"
 
 Rectangle {
     id: notebookView

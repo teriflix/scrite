@@ -38,7 +38,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch BackupsDialog")
+        console.log("Couldn't launch BackupsDialog")
         return null
     }
 

@@ -81,7 +81,6 @@
         <file>qml/helpers/FileSelector.qml</file>
         <file>qml/helpers/FlatToolButton.qml</file>
         <file>qml/helpers/FlickableTextArea.qml</file>
-        <file>qml/helpers/HelpTipNotification.qml</file>
         <file>qml/helpers/Link.qml</file>
         <file>qml/helpers/LodLoader.qml</file>
         <file>qml/helpers/MarkSceneAsMenu.qml</file>
@@ -125,7 +124,6 @@
         <file>qml/structure/qmldir</file>
         <file>qml/structure/StructureGroupsMenu.qml</file>
         <file>qml/NotebookView.qml</file>
-        <file>qml/NotificationsView.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
         <file>qml/ScriteMainWindow.qml</file>
         <file>qml/ScritedView.qml</file>
@@ -147,5 +145,10 @@
         <file>qml/overlays/OverlaysLayer.qml</file>
         <file>qml/overlays/DocumentBusyOverlay.qml</file>
         <file>qml/structure/AnnotationPropertyEditorDock.qml</file>
+        <file>qml/notifications/AutoUpdateNotifications.qml</file>
+        <file>qml/notifications/qmldir</file>
+        <file>qml/notifications/NotificationsLayer.qml</file>
+        <file>qml/notifications/HelpTipNotification.qml</file>
+        <file>qml/notifications/NotificationsView.qml</file>
     </qresource>
 </RCC>

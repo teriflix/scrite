@@ -72,6 +72,9 @@ public:
     QJsonObject helpTips() const { return m_helpTips; }
     Q_SIGNAL void helpTipsChanged();
 
+    Q_PROPERTY(bool helpTipsAvailable READ helpTipsAvailable NOTIFY helpTipsChanged)
+    bool helpTipsAvailable() const { return !m_helpTips.isEmpty(); }
+
     Q_PROPERTY(QStringList locations READ locations CONSTANT)
     Q_INVOKABLE static QStringList locations();
 

@@ -38,7 +38,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch CollaboratorsDialog")
+        console.log("Couldn't launch CollaboratorsDialog")
         return null
     }
 

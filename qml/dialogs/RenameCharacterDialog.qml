@@ -32,7 +32,7 @@ Item {
 
     function launch(character) {
         if(!character || !Scrite.app.verifyType(character, "Character")) {
-            Scrite.app.log("Couldn't launch RenameCharacterDialog: invalid character specified.")
+            console.log("Couldn't launch RenameCharacterDialog: invalid character specified.")
             return null
         }
 
@@ -43,7 +43,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch RenameCharacterDialog")
+        console.log("Couldn't launch RenameCharacterDialog")
         return null
     }
 

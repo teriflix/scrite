@@ -37,7 +37,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch AboutDialog")
+        console.log("Couldn't launch AboutDialog")
         return null
     }
 

@@ -31,12 +31,12 @@ Item {
 
     function launch(report, initalProps) {
         if(_private.dialogComponent.status !== Component.Ready) {
-            Scrite.app.log("ReportConfigurationDialog is not ready!")
+            console.log("ReportConfigurationDialog is not ready!")
             return null
         }
 
         if(!report) {
-            Scrite.app.log("No report supplied.")
+            console.log("No report supplied.")
             return null
         }
 
@@ -49,7 +49,7 @@ Item {
         else if(Scrite.app.verifyType(report, "AbstractReportGenerator"))
             args.report = report
         else {
-            Scrite.app.log("No report supplied.")
+            console.log("No report supplied.")
             return null
         }
 
@@ -66,7 +66,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch ReportConfigurationDialog")
+        console.log("Couldn't launch ReportConfigurationDialog")
         return null
     }
 

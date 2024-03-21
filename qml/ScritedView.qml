@@ -1329,7 +1329,7 @@ Item {
         }
     }
 
-    EventFilter.active: !notificationsView.visible
+    EventFilter.active: !NotificationsView.visible
     EventFilter.target: Scrite.window
     EventFilter.events: [6] // KeyPress
     EventFilter.onFilter: {

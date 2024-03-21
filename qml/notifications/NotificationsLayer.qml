@@ -11,13 +11,12 @@
 **
 ****************************************************************************/
 
-/**
-  This QML item provides a layer on which all floating docks will be shown
-  */
-
 pragma Singleton
 
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
@@ -31,12 +30,12 @@ QtObject {
             _parent = Scrite.window.contentItem
 
         item = Qt.createQmlObject("import QtQuick 2.15; Item { }", _parent)
-        item.objectName = "FloatingDockLayer"
+        item.objectName = "NotificationsLayer"
         item.anchors.fill = _parent
         item.visible = _parent
 
-        // Init dock panels within this module
-        FloatingMarkupToolsDock.init()
-        FloatingShortcutsDock.init()
+        NotificationsView.init()
+        AutoUpdateNotifications.init()
     }
+
 }

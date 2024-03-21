@@ -31,7 +31,7 @@ Item {
 
     function launch(exporter) {
         if(_private.dialogComponent.status !== Component.Ready) {
-            Scrite.app.log("SettingsDialog is not ready!")
+            console.log("SettingsDialog is not ready!")
             return null
         }
 
@@ -42,7 +42,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch SettingsDialog")
+        console.log("Couldn't launch SettingsDialog")
         return null
     }
 

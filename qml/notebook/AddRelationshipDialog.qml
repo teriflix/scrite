@@ -39,7 +39,7 @@ Item {
             return addRelationshipDlg
         }
 
-        Scrite.app.log("Couldn't launch AddRelationshipDialog")
+        console.log("Couldn't launch AddRelationshipDialog")
         return null
     }
 

@@ -37,7 +37,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch TermsOfUseDialog")
+        console.log("Couldn't launch TermsOfUseDialog")
         return null
     }
 

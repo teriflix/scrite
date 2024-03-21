@@ -30,7 +30,7 @@ QtObject {
 
     function show(text) {
         if(!OverlaysLayer.valid) {
-            Scrite.app.log("Overlays layer not initialized. Cannot create AnimatedTextOverlay for '" + text + "'")
+            console.log("Overlays layer not initialized. Cannot create AnimatedTextOverlay for '" + text + "'")
             return null
         }
 
@@ -41,7 +41,7 @@ QtObject {
             return olay
         }
 
-        Scrite.app.log("Could not create AnimatedTextOverlay for '" + text + "'")
+        console.log("Could not create AnimatedTextOverlay for '" + text + "'")
         return null
     }
 

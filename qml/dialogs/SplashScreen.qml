@@ -39,7 +39,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch SplashScreen")
+        console.log("Couldn't launch SplashScreen")
         return null
     }
 
@@ -92,8 +92,6 @@ Item {
                     anchors.right: parent.right
                     anchors.topMargin: parent.height * (_dialogPrivate.scriteUrlTextPos.y / _dialogPrivate.splashImageSize.height)
                     anchors.rightMargin: parent.width * (_dialogPrivate.scriteUrlTextPos.x / _dialogPrivate.splashImageSize.width)
-
-                    Component.onCompleted: Scrite.app.log(anchors.topMargin + "/" + anchors.rightMargin)
 
                     color: "white"
                     font.bold: true

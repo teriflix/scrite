@@ -39,7 +39,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch TitlePageDialog")
+        console.log("Couldn't launch TitlePageDialog")
         return null
     }
 

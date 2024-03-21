@@ -37,7 +37,7 @@ Item {
             return dlg
         }
 
-        Scrite.app.log("Couldn't launch ProgressDialog")
+        console.log("Couldn't launch ProgressDialog")
         return null
     }
 

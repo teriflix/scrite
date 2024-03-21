@@ -227,7 +227,7 @@ Item {
                             try {
                                 Runtime.activateMainWindowTab(Runtime.e_ScreenplayTab)
                             } catch(e) {
-                                Scrite.app.log(e)
+                                console.log(e)
                             }
                         }
                     }
