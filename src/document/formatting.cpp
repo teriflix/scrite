@@ -646,7 +646,6 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
             });
 
     QTimer::singleShot(0, this, &ScreenplayFormat::resetToUserDefaults);
-    QTimer::singleShot(0, this, &ScreenplayFormat::resetScreenFromAppWindow);
 }
 
 ScreenplayFormat::~ScreenplayFormat() { }
@@ -669,7 +668,12 @@ void ScreenplayFormat::setScreen(QScreen *val)
 
 void ScreenplayFormat::setSreeenFromWindow(QObject *windowObject)
 {
-    this->setScreen(Application::instance()->windowScreen(windowObject));
+    QScreen *screen = Application::instance()->windowScreen(windowObject);
+    if (screen) {
+        this->setScreen(screen);
+        connect(windowObject, SIGNAL(screenChanged(QScreen *)), this,
+                SLOT(resetScreenFromAppWindow()), Qt::UniqueConnection);
+    }
 }
 
 qreal ScreenplayFormat::devicePixelRatio() const

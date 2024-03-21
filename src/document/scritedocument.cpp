@@ -15,8 +15,9 @@
 
 #include "form.h"
 #include "user.h"
-#include "filelocker.h"
+#include "scrite.h"
 #include "undoredo.h"
+#include "filelocker.h"
 #include "hourglass.h"
 #include "aggregation.h"
 #include "application.h"
@@ -26,7 +27,6 @@
 #include "textexporter.h"
 #include "notification.h"
 #include "htmlimporter.h"
-#include "timeprofiler.h"
 #include "notebookreport.h"
 #include "qobjectfactory.h"
 #include "locationreport.h"
@@ -35,7 +35,6 @@
 #include "statisticsreport.h"
 #include "fountainimporter.h"
 #include "fountainexporter.h"
-#include "structureexporter.h"
 #include "qobjectserializer.h"
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
@@ -2024,6 +2023,7 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
         GarbageCollector::instance()->add(m_formatting);
 
     m_formatting = val;
+    m_formatting->setSreeenFromWindow(Scrite::windowObject());
 
     if (m_formatting != nullptr)
         m_formatting->setParent(this);

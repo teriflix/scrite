@@ -417,7 +417,7 @@ private:
     void evaluateFontPointSizeDelta();
     void evaluateFontZoomLevels();
     void countTransactionChange() { ++m_nrChangesDuringTransation; }
-    void resetScreenFromAppWindow();
+    Q_SLOT void resetScreenFromAppWindow();
 
 private:
     char m_padding[4];
