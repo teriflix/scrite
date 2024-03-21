@@ -45,56 +45,6 @@ Rectangle {
     }
 
     // Refactoring QML TODO: Move this to a singleton
-    Loader {
-        active: Scrite.document.busy
-        anchors.fill: parent
-        sourceComponent: Item {
-            Rectangle {
-                anchors.fill: indication
-                anchors.margins: -30
-                radius: 4
-                color: Runtime.colors.primary.c600.background
-            }
-
-            Row {
-                id: indication
-                anchors.centerIn: parent
-                spacing: 20
-                width: Math.min(parent.width * 0.4, implicitWidth)
-                property real maxWidth: parent.width*0.4
-
-                BusyIcon {
-                    id: busyIndicator
-                    anchors.verticalCenter: parent.verticalCenter
-                    running: true
-                    width: 50; height: 50
-                    forDarkBackground: true
-                }
-
-                VclText {
-                    width: Math.min(parent.maxWidth - busyIndicator.width - parent.spacing, contentWidth)
-                    anchors.verticalCenter: parent.verticalCenter
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                    text: Scrite.document.busyMessage
-                    font.pixelSize: 16
-                    color: Runtime.colors.primary.c600.text
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-            }
-
-            EventFilter.target: Scrite.app
-            EventFilter.events: [6,7]
-            EventFilter.onFilter: {
-                result.filter = true
-            }
-        }
-    }
-
-    // Refactoring QML TODO: Move this to a singleton
     Item {
         property AutoUpdate autoUpdate: Scrite.app.autoUpdate
 

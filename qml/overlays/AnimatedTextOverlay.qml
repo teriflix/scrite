@@ -25,7 +25,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
-Item {
+QtObject {
     id: root
 
     function show(text) {
@@ -37,6 +37,7 @@ Item {
         var olay = overlayComponent.createObject(OverlaysLayer.item, {"text": text})
         if(olay) {
             olay.done.connect(olay.destroy)
+            olay.visible = true
             return olay
         }
 
@@ -44,50 +45,46 @@ Item {
         return null
     }
 
-    Component {
-        id: overlayComponent
+    readonly property Component overlayComponent: Item {
+        id: overlay
 
-        Item {
-            id: overlay
+        required property string text
 
-            required property string text
+        signal done()
 
-            signal done()
+        anchors.fill: parent
 
-            anchors.fill: parent
+        VclText {
+            id: textItem
+            anchors.centerIn: parent
 
-            VclText {
-                id: textItem
-                anchors.centerIn: parent
+            font.pixelSize: parent.height * 0.075
 
-                font.pixelSize: parent.height * 0.075
+            text: parent.text
 
-                text: parent.text
+            property real t: Runtime.applicationSettings.enableAnimations ? 0 : 1
+            scale: 0.5 + t/1.0
+            opacity: Runtime.applicationSettings.enableAnimations ? (1.0 - t*0.75) : 0.8
+        }
 
-                property real t: Runtime.applicationSettings.enableAnimations ? 0 : 1
-                scale: 0.5 + t/1.0
-                opacity: Runtime.applicationSettings.enableAnimations ? (1.0 - t*0.75) : 0.8
+        SequentialAnimation {
+            running: true
+
+            NumberAnimation {
+                target: textItem
+                properties: "t"
+                from: 0
+                to: 1
+                duration: Runtime.applicationSettings.enableAnimations ? 250 : 0
+                easing.type: Easing.OutQuint
             }
 
-            SequentialAnimation {
-                running: true
+            PauseAnimation {
+                duration: Runtime.applicationSettings.enableAnimations ? 0 : 250
+            }
 
-                NumberAnimation {
-                    target: textItem
-                    properties: "t"
-                    from: 0
-                    to: 1
-                    duration: Runtime.applicationSettings.enableAnimations ? 250 : 0
-                    easing.type: Easing.OutQuint
-                }
-
-                PauseAnimation {
-                    duration: Runtime.applicationSettings.enableAnimations ? 0 : 250
-                }
-
-                ScriptAction {
-                    script: overlay.done()
-                }
+            ScriptAction {
+                script: overlay.done()
             }
         }
     }

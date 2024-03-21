@@ -1,2 +1,3 @@
 singleton OverlaysLayer 1.0 OverlaysLayer.qml
 singleton AnimatedTextOverlay 1.0 AnimatedTextOverlay.qml
+singleton DocumentBusyOverlay 1.0 DocumentBusyOverlay.qml
