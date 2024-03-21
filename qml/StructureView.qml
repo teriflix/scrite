@@ -25,7 +25,6 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/overlays"
 import "qrc:/qml/structure"
-import "qrc:/qml/floatingdockpanels"
 
 Item {
     id: structureView
@@ -3354,7 +3353,7 @@ Item {
                     FlatToolButton {
                         iconSource: "qrc:/icons/action/edit.png"
                         ToolTip.text: "Edit properties of this annotation"
-                        down: annotationPropertyEditor.visible
+                        down: AnnotationPropertyEditorDock.visible
                         onClicked: Runtime.structureCanvasSettings.displayAnnotationProperties = !Runtime.structureCanvasSettings.displayAnnotationProperties
                     }
 
@@ -3603,26 +3602,6 @@ Item {
                     onPressed: canvas.forceActiveFocus()
                 }
             }
-        }
-    }
-
-    FloatingDock {
-        id: annotationPropertyEditor
-
-        x: 80
-        y: Scrite.window.height * 0.15
-        width: 375
-        height: Scrite.window.height * 0.6
-        visible: Runtime.structureCanvasSettings.displayAnnotationProperties && annotationGripLoader.annotation
-
-        title: "Annotation Properties"
-
-        content: AnnotationPropertyEditor {
-            annotation: annotationGripLoader.annotation
-        }
-
-        onCloseRequest: {
-            Runtime.structureCanvasSettings.displayAnnotationProperties = false
         }
     }
 
@@ -4032,5 +4011,8 @@ Item {
         }
     }
 
-    Component.onCompleted: Scrite.user.logActivity1("structure")
+    Component.onCompleted: {
+        AnnotationPropertyEditorDock.annotation = Qt.binding( () => { return annotationGripLoader.annotation } )
+        Scrite.user.logActivity1("structure")
+    }
 }

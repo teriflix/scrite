@@ -139,11 +139,6 @@ Item {
     }
 
     // Private section
-    Component.onCompleted: {
-        if(!FloatingDockLayer.valid)
-            Scrite.app.log("FloatingDockLayer is not initialized!")
-    }
-
     QtObject {
         id: _private
 

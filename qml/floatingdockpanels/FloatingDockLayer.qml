@@ -33,5 +33,9 @@ QtObject {
         item = Qt.createQmlObject("import QtQuick 2.15; Item { }", _parent)
         item.anchors.fill = _parent
         item.visible = _parent
+
+        // Init dock panels within this module
+        FloatingMarkupToolsDock.init()
+        FloatingShortcutsDock.init()
     }
 }

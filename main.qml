@@ -94,6 +94,9 @@ Rectangle {
         id: _private
 
         function initialize() {
+            // Determine font size provided by QML
+            determineDefaultFontSize()
+
             // Initialize layers
             FloatingDockLayer.init(scriteRoot)
             OverlaysLayer.init(scriteRoot)
@@ -110,6 +113,16 @@ Rectangle {
                     splashScreen.closed.connect(_private.splashScreenWasClosed)
                 else
                     splashScreenWasClosed()
+            }
+        }
+
+        function determineDefaultFontSize() {
+            if( Scrite.app.customFontPointSize === 0) {
+                var textItem = Qt.createQmlObject("import QtQuick 2.15; Text { text: \"Welcome to Scrite\" }", scriteRoot)
+                if(textItem) {
+                    Scrite.app.customFontPointSize = textItem.font.pointSize
+                    textItem.destroy()
+                }
             }
         }
 
@@ -133,17 +146,10 @@ Rectangle {
                 Scrite.document.open(Scrite.fileNameToOpen)
 
             Scrite.user.forceLoginRequest.connect(userForceLoginRequest)
-
-            initFloatingDockPanels()
         }
 
         function userForceLoginRequest() {
             Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
-        }
-
-        function initFloatingDockPanels() {
-            FloatingMarkupToolsDock.init()
-            FloatingShortcutsDock.init()
         }
     }
 }

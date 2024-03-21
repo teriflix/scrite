@@ -146,5 +146,6 @@
         <file>qml/floatingdockpanels/FloatingDockLayer.qml</file>
         <file>qml/overlays/OverlaysLayer.qml</file>
         <file>qml/overlays/DocumentBusyOverlay.qml</file>
+        <file>qml/structure/AnnotationPropertyEditorDock.qml</file>
     </qresource>
 </RCC>
