@@ -149,11 +149,12 @@ Item {
                                 Runtime.loadMainUiContent = false
                                 var waitDialog = WaitDialog.launch()
                                 Scrite.document.openAnonymously(filePath)
-                                waitDialog.closed.connect( () => {
-                                                                 Runtime.loadMainUiContent = true
-                                                                 dialog.close()
-                                                             } )
-                                waitDialog.closeLater(50)
+                                Utils.execLater(dialog, 50, () => {
+                                                    Runtime.loadMainUiContent = true
+                                                    Qt.callLater(dialog.close)
+                                                    if(waitDialog)
+                                                        waitDialog.close()
+                                                } )
                             }
                         }
 
@@ -168,10 +169,11 @@ Item {
 
                                 var waitDialog = WaitDialog.launch()
                                 Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                                waitDialog.closed.connect( () => {
-                                                                 dialog.close()
-                                                             } )
-                                waitDialog.closeLater(1500)
+                                Utils.execLater(dialog, 1500, () => {
+                                                    Qt.callLater(dialog.close)
+                                                    if(waitDialog)
+                                                        waitDialog.close()
+                                                } )
                             }
                         }
                     }

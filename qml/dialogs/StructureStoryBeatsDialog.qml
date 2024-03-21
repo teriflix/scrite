@@ -21,6 +21,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/helpers"
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -29,21 +30,15 @@ Item {
 
     parent: Scrite.window.contentItem
 
-    function launch(message) {
-        var initialProps = {
-            "message": "Please wait ..."
-        }
-        if(message && typeof message === "string")
-            initialProps.message = message
-
-        var dlg = dialogComponent.createObject(root, initialProps)
+    function launch() {
+        var dlg = dialogComponent.createObject(root)
         if(dlg) {
             dlg.closed.connect(dlg.destroy)
             dlg.open()
             return dlg
         }
 
-        console.log("Couldn't launch WaitDialog")
+        console.log("Couldn't launch StructureStoryBeatsDialog")
         return null
     }
 
@@ -53,23 +48,20 @@ Item {
         VclDialog {
             id: dialog
 
-            property string message
+            title: "Customise Story Beats"
+            width: Math.min(Scrite.window.width-80, 1050)
+            height: Math.min(Scrite.window.height-80, 750)
 
-            title: "Please wait ..."
-            closePolicy: Popup.NoAutoClose
-            titleBarButtons: null
-            width: Math.min(500, Scrite.window.width*0.5)
-            height: Math.min(200, Scrite.window.height*0.3)
-            appOverrideCursor: Qt.WaitCursor
-            appCloseButtonVisible: false
-            contentItem: VclText {
-                text: dialog.message
-                padding: 16
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                maximumLineCount: 5
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
+            content: PageView {
+                id: pageView
+                pagesArray: ["This Document", "Default Global"]
+                currentIndex: 0
+                pageContent: Loader {
+                    width: pageView.availablePageContentWidth
+                    height: pageView.availablePageContentHeight
+                    source: "./settingsdialog/StructureStoryBeatsPage.qml"
+                    onLoaded: item.target = Qt.binding( () => { return pageView.currentIndex })
+                }
             }
         }
     }

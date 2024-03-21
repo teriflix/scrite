@@ -269,8 +269,6 @@ Item {
                         onTriggered: canvas.groupCategory = ""
                     }
 
-                    MenuSeparator { }
-
                     Repeater {
                         model: Scrite.document.structure.groupCategories
 
@@ -279,6 +277,13 @@ Item {
                             font.bold: canvas.groupCategory === modelData
                             onTriggered: canvas.groupCategory = modelData
                         }
+                    }
+
+                    MenuSeparator { }
+
+                    VclMenuItem {
+                        text: "Customise"
+                        onTriggered: StructureStoryBeatsDialog.launch()
                     }
                 }
             }
