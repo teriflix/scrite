@@ -60,7 +60,7 @@ Item {
         anchors.right: parent.right
         source: "qrc:/images/banner.png"
         fillMode: Image.PreserveAspectFit
-        visible: banner.height <= homeScreen.height * 0.5
+        visible: banner.height <= homeScreen.height * 0.6
 
         Image {
             anchors.centerIn: parent

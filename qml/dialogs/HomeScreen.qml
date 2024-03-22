@@ -51,7 +51,7 @@ Item {
             property string mode
 
             width: Math.min(800, Scrite.window.width*0.9)
-            height: Math.min(width, Scrite.window.height*0.9)
+            height: Math.min(width*1.2, Scrite.window.height*0.9)
             title: "Home"
 
             contentItem: HomeScreenImpl {
