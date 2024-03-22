@@ -23,7 +23,7 @@
         <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
-        <file>qml/dialogs/homescreen/HomeScreen.qml</file>
+        <file>qml/dialogs/homescreen/HomeScreenImpl.qml</file>
         <file>qml/dialogs/homescreen/qmldir</file>
         <file>qml/dialogs/homescreen/SaveWorkflow.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>

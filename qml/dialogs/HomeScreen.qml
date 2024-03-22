@@ -54,7 +54,7 @@ Item {
             height: Math.min(width, Scrite.window.height*0.9)
             title: "Home"
 
-            contentItem: HomeScreen {
+            contentItem: HomeScreenImpl {
                 mode: dialog.mode
                 onCloseRequest: Qt.callLater(dialog.close)
             }
