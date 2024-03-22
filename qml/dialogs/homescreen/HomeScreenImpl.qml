@@ -77,28 +77,15 @@ Item {
         }
 
         VclText {
-            id: appVersionLabel
-            property real ratio: parent.height / parent.sourceSize.height
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.rightMargin: 30 * ratio
-            anchors.bottomMargin: 10 * ratio
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            padding: 5
-            text: Scrite.app.applicationVersion
-            color: "white"
-        }
-
-        VclText {
             id: commonToolTip
             width: parent.width * 0.75
             anchors.left: parent.left
             anchors.bottom: parent.bottom
-            anchors.leftMargin: 30 * appVersionLabel.ratio
-            anchors.bottomMargin: 10 * appVersionLabel.ratio
+            anchors.leftMargin: 20
+            anchors.bottomMargin: 20
 
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            padding: 5
+            padding: 8
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
             wrapMode: Text.WordWrap
@@ -118,16 +105,6 @@ Item {
                 if(source === _source)
                     text = ""
             }
-        }
-
-        VclText {
-            anchors.left: commonToolTip.left
-            anchors.bottom: commonToolTip.bottom
-            padding: commonToolTip.padding
-            visible: !commonToolTip.visible
-            text: "scrite.io"
-            color: commonToolTip.color
-            font.pointSize: commonToolTip.font.pointSize
         }
 
         Poster {

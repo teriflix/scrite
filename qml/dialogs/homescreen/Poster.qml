@@ -108,8 +108,8 @@ Item {
 
         anchors.left: parent.left
         anchors.bottom: parent.bottom
-        anchors.leftMargin: 50 * appVersionLabel.ratio
-        anchors.bottomMargin: 50 * appVersionLabel.ratio
+        anchors.leftMargin: 20
+        anchors.bottomMargin: 20
 
         color: "white"
         visible: text !== ""
