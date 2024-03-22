@@ -92,7 +92,7 @@ Item {
             anchors.leftMargin: 30 * appVersionLabel.ratio
             anchors.bottomMargin: 10 * appVersionLabel.ratio
 
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
             padding: 5
             horizontalAlignment: Text.AlignLeft
             verticalAlignment: Text.AlignBottom
@@ -123,6 +123,26 @@ Item {
             text: "scrite.io"
             color: commonToolTip.color
             font.pointSize: commonToolTip.font.pointSize
+        }
+
+        Poster {
+            id: poster
+            anchors.fill: parent
+
+            property Item sourceItem
+
+            function show(_source, _image, _logline) {
+                sourceItem = _source
+                source = _image
+                logline = _logline
+            }
+
+            function hide(_source) {
+                if(sourceItem === _source) {
+                    source = undefined
+                    logline = ""
+                }
+            }
         }
     }
 
@@ -253,6 +273,7 @@ Item {
         property string iconSource
         property var iconImage // has to be QImage
         property bool singleClick: true
+        property bool showPoster: false
 
         signal clicked()
         signal doubleClicked()
@@ -303,8 +324,23 @@ Item {
             cursorShape: singleClick ? Qt.PointingHandCursor : Qt.ArrowCursor
             onClicked: button.clicked()
             onDoubleClicked: button.doubleClicked()
-            onEntered: commonToolTip.show(parent, parent.tooltip)
-            onExited: commonToolTip.hide(parent)
+            onEntered: {
+                if(hoverEnabled) {
+                    commonToolTip.show(parent, parent.tooltip)
+                    if(parent.showPoster) {
+                        if(parent.iconSource !== "")
+                            poster.show(parent, parent.iconSource, parent.tooltip)
+                        else
+                            poster.show(parent, parent.iconImage, parent.tooltip)
+                    }
+                }
+            }
+            onExited: {
+                if(hoverEnabled) {
+                    commonToolTip.hide(parent)
+                    poster.hide(parent)
+                }
+            }
         }
     }
 
@@ -375,6 +411,7 @@ Item {
                         text: record.name
                         tooltip: record.description
                         iconSource: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
+                        showPoster: index > 0
                         onClicked: {
                             saveWorkflow.launch( () => {
                                                     libraryService.openTemplateAt(index)
@@ -421,6 +458,7 @@ Item {
             tooltip: fileInfo.logline
             iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
+            showPoster: fileInfo.hasCoverPage
             onClicked: {
                 saveWorkflow.launch( () => {
                                       _private.openScriteDocument(fileInfo.filePath)
@@ -440,6 +478,7 @@ Item {
             text: record.name
             tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline
             iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
+            showPoster: true
             onClicked: {
                 saveWorkflow.launch( () => {
                                         libraryService.openScreenplayAt(index)
@@ -592,17 +631,23 @@ Item {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: {
                             var ret =
-                              "<strong>Authors:</strong> " + record.authors + "<br/><br/>" +
+                              "<strong>Author(s):</strong> " + record.authors + "<br/><br/>" +
                               "<strong>Pages:</strong> " + record.pageCount + "<br/>" +
                               "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
-                              "<strong>Copyright:</strong> " + record.copyright + "<br/>" +
+                              "<strong>Copyright:</strong> " + record.copyright + "<br/><br/>" +
                               "<strong>Source:</strong> " + record.source
                             if(!banner.visible)
                                 ret += "<br/><br/><strong>Logline:</strong> " + record.logline
                             return ret
                         }
-                        onRecordChanged: commonToolTip.show(screenplayDetailsText, record.logline)
-                        Component.onDestruction: commonToolTip.hide(screenplayDetailsText)
+                        onRecordChanged: {
+                            commonToolTip.show(screenplaysView.currentItem, record.logline)
+                            poster.show(screenplaysView.currentItem, screenplaysView.currentItem.iconSource, record.logline)
+                        }
+                        Component.onDestruction: {
+                            commonToolTip.hide(screenplayDetailsText)
+                            poster.hide(screenplaysView.currentItem)
+                        }
                     }
                 }
             }

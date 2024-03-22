@@ -89,7 +89,7 @@ ScriteFileInfo ScriteFileInfo::load(const QFileInfo &fileInfo)
 
     const QString coverPagePath = dfs.absolutePath(Screenplay::standardCoverPathPhotoPath());
     ret.coverPageImage = QFile::exists(coverPagePath)
-            ? QImage(coverPagePath).scaled(256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation)
+            ? QImage(coverPagePath).scaled(512, 512, Qt::KeepAspectRatio, Qt::SmoothTransformation)
             : QImage();
     ret.hasCoverPage = !ret.coverPageImage.isNull();
 

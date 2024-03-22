@@ -109,6 +109,7 @@ QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *)
 
     QSGTexture *texture = this->window()->createTextureFromImage(m_image);
     texture->setFiltering(QSGTexture::Linear);
+    texture->setMipmapFiltering(QSGTexture::Linear);
 
     QSGOpaqueTextureMaterial *textureMaterial = new QSGOpaqueTextureMaterial;
     textureMaterial->setFlag(QSGMaterial::Blending);

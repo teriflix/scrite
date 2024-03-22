@@ -151,5 +151,6 @@
         <file>qml/notifications/HelpTipNotification.qml</file>
         <file>qml/notifications/NotificationsView.qml</file>
         <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
+        <file>qml/dialogs/homescreen/Poster.qml</file>
     </qresource>
 </RCC>

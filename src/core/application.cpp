@@ -471,17 +471,27 @@ void Application::setBaseWindowTitle(const QString &val)
     emit baseWindowTitleChanged();
 }
 
-QString Application::typeName(QObject *object) const
+QString Application::typeName(const QVariant &value) const
 {
-    if (object == nullptr)
-        return QString();
+    if (value.userType() == QMetaType::QObjectStar) {
+        QObject *object = value.value<QObject *>();
+        if (object == nullptr)
+            return QString();
 
-    return QString::fromLatin1(object->metaObject()->className());
+        return QString::fromLatin1(object->metaObject()->className());
+    }
+
+    return QString::fromLatin1(value.typeName());
 }
 
-bool Application::verifyType(QObject *object, const QString &name) const
+bool Application::verifyType(const QVariant &value, const QString &name) const
 {
-    return object && object->inherits(qPrintable(name));
+    if (value.userType() == QMetaType::QObjectStar) {
+        QObject *object = value.value<QObject *>();
+        return object && object->inherits(qPrintable(name));
+    }
+
+    return QString::fromLatin1(value.typeName()) == name;
 }
 
 bool Application::isTextInputItem(QQuickItem *item) const

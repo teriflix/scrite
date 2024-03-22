@@ -149,8 +149,8 @@ public:
     Q_PROPERTY(QString qtVersion READ qtVersion CONSTANT)
     QString qtVersion() const { return QString::fromLatin1(QT_VERSION_STR); }
 
-    Q_INVOKABLE QString typeName(QObject *object) const;
-    Q_INVOKABLE bool verifyType(QObject *object, const QString &name) const;
+    Q_INVOKABLE QString typeName(const QVariant &value) const;
+    Q_INVOKABLE bool verifyType(const QVariant &value, const QString &name) const;
     Q_INVOKABLE bool isTextInputItem(QQuickItem *item) const;
 
     Q_INVOKABLE QVariant objectProperty(QObject *object, const QString &name) const;
