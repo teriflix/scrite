@@ -320,7 +320,7 @@ public:
 
     Q_PROPERTY(QScreen *screen READ screen WRITE setScreen NOTIFY screenChanged RESET resetScreen
                        STORED false)
-    void setScreen(QScreen *val);
+    Q_INVOKABLE void setScreen(QScreen *val);
     QScreen *screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();
 
@@ -417,7 +417,6 @@ private:
     void evaluateFontPointSizeDelta();
     void evaluateFontZoomLevels();
     void countTransactionChange() { ++m_nrChangesDuringTransation; }
-    Q_SLOT void resetScreenFromAppWindow();
 
 private:
     char m_padding[4];

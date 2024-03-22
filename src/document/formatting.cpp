@@ -671,8 +671,8 @@ void ScreenplayFormat::setSreeenFromWindow(QObject *windowObject)
     QScreen *screen = Application::instance()->windowScreen(windowObject);
     if (screen) {
         this->setScreen(screen);
-        connect(windowObject, SIGNAL(screenChanged(QScreen *)), this,
-                SLOT(resetScreenFromAppWindow()), Qt::UniqueConnection);
+        connect(windowObject, SIGNAL(screenChanged(QScreen *)), this, SLOT(setScreen(QScreen *)),
+                Qt::UniqueConnection);
     }
 }
 
@@ -1084,11 +1084,6 @@ void ScreenplayFormat::evaluateFontZoomLevels()
 
     m_fontZoomLevelIndex = m_fontPointSizes.indexOf(defaultFontInfo.pointSize());
     emit fontZoomLevelIndexChanged();
-}
-
-void ScreenplayFormat::resetScreenFromAppWindow()
-{
-    this->setSreeenFromWindow(AppWindow::instance());
 }
 
 SceneElementFormat *
