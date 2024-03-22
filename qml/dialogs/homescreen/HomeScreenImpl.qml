@@ -58,13 +58,17 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        source: "qrc:/images/banner.png"
+        source: {
+            if(stackView.currentItem && stackView.currentItem.bannerImage)
+                return stackView.currentItem.bannerImage
+            return _private.defaultBannerImage
+        }
         fillMode: Image.PreserveAspectFit
         visible: banner.height <= homeScreen.height * 0.6
 
         Image {
             anchors.centerIn: parent
-            source: "qrc:/images/banner_logo_overlay.png"
+            source: (stackView.currentItem && stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
             width: homeScreen.width * 0.2
             fillMode: Image.PreserveAspectFit
             smooth: true; mipmap: true
@@ -79,7 +83,8 @@ Item {
             anchors.bottom: parent.bottom
             anchors.rightMargin: 30 * ratio
             anchors.bottomMargin: 10 * ratio
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            padding: 5
             text: Scrite.app.applicationVersion
             color: "white"
         }
@@ -549,6 +554,8 @@ Item {
 
     component ScriptalayPage : Item {
         // Show contents of Scriptalay
+        property bool hasSelection: screenplaysView.currentIndex >= 0
+
         function openSelected() {
             saveWorkflow.launch( () => {
                                     if(screenplaysView.currentIndex >= 0)
@@ -558,7 +565,7 @@ Item {
 
         RowLayout {
             anchors.fill: parent
-            spacing: 10
+            spacing: 30
 
             Rectangle {
                 Layout.fillWidth: true
@@ -573,7 +580,7 @@ Item {
                     anchors.margins: 1
                     clip: true
                     model: libraryService.screenplays
-                    currentIndex: count ? 0 : -1
+                    currentIndex: -1
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     highlight: Rectangle {
                         color: Runtime.colors.primary.highlight.background
@@ -612,8 +619,8 @@ Item {
                     anchors.margins: 1
                     contentWidth: screenplayDetailsText.width
                     contentHeight: screenplayDetailsText.height
-                    visible: screenplaysView.currentIndex >= 0
                     clip: true
+                    flickableDirection: Flickable.VerticalFlick
 
                     ScrollBar.vertical: VclScrollBar {
                         flickable: screenplayDetailsFlick
@@ -622,32 +629,39 @@ Item {
                     TextArea {
                         id: screenplayDetailsText
                         width: screenplayDetailsFlick.width-20
-                        property var record: libraryService.screenplays.recordAt(screenplaysView.currentIndex)
-                        textFormat: TextArea.RichText
+                        property var record: screenplaysView.currentIndex >= 0 ? libraryService.screenplays.recordAt(screenplaysView.currentIndex) : undefined
+                        textFormat: record ? TextArea.RichText : TextArea.MarkdownText
                         wrapMode: Text.WordWrap
-                        padding: 4
+                        padding: 8
                         readOnly: true
                         background: Item { }
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        text: {
-                            var ret =
-                              "<strong>Author(s):</strong> " + record.authors + "<br/><br/>" +
-                              "<strong>Pages:</strong> " + record.pageCount + "<br/>" +
-                              "<strong>Revision:</strong> " + record.revision + "<br/><br/>" +
-                              "<strong>Copyright:</strong> " + record.copyright + "<br/><br/>" +
-                              "<strong>Source:</strong> " + record.source
-                            if(!banner.visible)
-                                ret += "<br/><br/><strong>Logline:</strong> " + record.logline
-                            return ret
-                        }
+                        text: record ? composeTextFromRecord(record) : defaultText
+
                         onRecordChanged: {
-                            commonToolTip.show(screenplaysView.currentItem, record.logline)
-                            poster.show(screenplaysView.currentItem, screenplaysView.currentItem.iconSource, record.logline)
+                            if(record) {
+                                commonToolTip.show(screenplaysView.currentItem, record.logline)
+                                poster.show(screenplaysView.currentItem, screenplaysView.currentItem.iconSource, record.logline)
+                            }
                         }
                         Component.onDestruction: {
                             commonToolTip.hide(screenplayDetailsText)
                             poster.hide(screenplaysView.currentItem)
                         }
+
+                        function composeTextFromRecord(_record) {
+                            var ret =
+                              "<strong>Author(s):</strong> " + _record.authors + "<br/><br/>" +
+                              "<strong>Pages:</strong> " + _record.pageCount + "<br/>" +
+                              "<strong>Revision:</strong> " + _record.revision + "<br/><br/>" +
+                              "<strong>Copyright:</strong> " + _record.copyright + "<br/><br/>" +
+                              "<strong>Source:</strong> " + _record.source
+                            if(!banner.visible)
+                                ret += "<br/><br/><strong>Logline:</strong> " + record._record
+                            return ret
+                        }
+
+                        readonly property string defaultText: Scrite.app.fileContents(":/misc/scriptalay_info.md")
                     }
                 }
             }
@@ -889,13 +903,13 @@ Item {
         id: stackPage
 
         property Component content
-        property alias contentItem: contentLoader.item
+        property QtObject contentItem: contentLoader.item
 
         property Component title
-        property alias titleItem: titleLoader.item
+        property QtObject titleItem: titleLoader.item
 
         property Component buttons
-        property alias buttonsItem: buttonsLoader.item
+        property QtObject buttonsItem: buttonsLoader.item
 
         Item {
             anchors.fill: parent
@@ -937,12 +951,12 @@ Item {
                     id: titleLoader
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    sourceComponent: title
+                    sourceComponent: stackPage.title
                 }
 
                 Loader {
                     id: buttonsLoader
-                    sourceComponent: buttons
+                    sourceComponent: stackPage.buttons
                 }
             }
         }
@@ -953,6 +967,7 @@ Item {
 
         StackPage {
             id: scriptalayPageItem
+            readonly property string bannerImage: "qrc:/images/homescreen_scriptalay_banner.png"
             content: ScriptalayPage { }
             title: Item {
                 Image {
@@ -964,7 +979,7 @@ Item {
             }
             buttons: VclButton {
                 text: "Open"
-                enabled: libraryService.screenplays.count > 0
+                enabled: scriptalayPageItem.contentItem.hasSelection && libraryService.screenplays.count > 0
                 onClicked: scriptalayPageItem.contentItem.openSelected()
             }
         }
@@ -1042,6 +1057,8 @@ Item {
 
     QtObject {
         id: _private
+
+        readonly property string defaultBannerImage: "qrc:/images/homescreen_banner.png"
 
         function openScriteDocument(path) {
             homeScreenBusyOverlay.busyMessage = "Opening document ..."

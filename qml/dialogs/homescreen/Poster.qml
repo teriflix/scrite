@@ -15,6 +15,7 @@ import QtQuick 2.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
@@ -29,7 +30,7 @@ Item {
     property alias source: _private.posterSource // can be a string path, url or QImage
     property string logline
 
-    visible: ((_private.posterSourceUrl !== "" && posterImageBg.status === Image.Ready && posterImageFg.status === Image.Ready) || _private.posterQImage !== undefined)
+    visible: (_private.posterSourceUrl !== "" || _private.posterQImage !== undefined)
 
     // Background
     Item {
@@ -64,6 +65,14 @@ Item {
             anchors.fill: parent
             color: "black"
             opacity: 0.75
+        }
+
+        BusyIndicator {
+            anchors.centerIn: parent
+
+            Material.theme: Material.Dark
+
+            running: posterImageBg.status === Image.Loading || posterImageFg.status === Image.Loading
         }
     }
 

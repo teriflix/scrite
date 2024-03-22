@@ -152,5 +152,6 @@
         <file>qml/notifications/NotificationsView.qml</file>
         <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
         <file>qml/dialogs/homescreen/Poster.qml</file>
+        <file>misc/scriptalay_info.md</file>
     </qresource>
 </RCC>

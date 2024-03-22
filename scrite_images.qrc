@@ -13,7 +13,8 @@
         <file>images/scrite_logo_for_report_header.png</file>
         <file>images/scrite_discord_button.png</file>
         <file>images/feature_locked.png</file>
-        <file>images/banner.png</file>
         <file>images/banner_logo_overlay.png</file>
+        <file>images/homescreen_banner.png</file>
+        <file>images/homescreen_scriptalay_banner.png</file>
     </qresource>
 </RCC>
