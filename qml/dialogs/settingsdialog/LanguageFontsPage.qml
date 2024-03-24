@@ -38,41 +38,6 @@ Item {
         spacing: 10
 
         GroupBox {
-            Layout.fillWidth: true
-
-            label: VclText {
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                text: "Custom Font Usage Options"
-            }
-
-            ColumnLayout {
-                width: parent.width
-                spacing: 10
-
-                VclText {
-                    Layout.fillWidth: true
-
-                    wrapMode: Text.WordWrap
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-
-                    text: "Please choose where you want custom fonts configured here to be used."
-                }
-
-                VclRadioButton {
-                    text: "PDF & HTML Only"
-                    checked: !Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-                    onToggled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts = !checked
-                }
-
-                VclRadioButton {
-                    text: "Display, PDF & HTML"
-                    checked: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-                    onToggled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts = checked
-                }
-            }
-        }
-
-        GroupBox {
             Layout.fillHeight: true
 
             label: VclText {
@@ -139,6 +104,41 @@ Item {
                             text: _private.languagePreviewString[value]
                         }
                     }
+                }
+            }
+        }
+
+        GroupBox {
+            Layout.fillWidth: true
+
+            label: VclText {
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                text: "Custom Font Usage Options"
+            }
+
+            ColumnLayout {
+                width: parent.width
+                spacing: 10
+
+                VclText {
+                    Layout.fillWidth: true
+
+                    wrapMode: Text.WordWrap
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+                    text: "Please choose where you want custom fonts configured here to be used."
+                }
+
+                VclRadioButton {
+                    text: "PDF & HTML Only"
+                    checked: !Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                    onToggled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts = !checked
+                }
+
+                VclRadioButton {
+                    text: "Display, PDF & HTML"
+                    checked: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                    onToggled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts = checked
                 }
             }
         }
