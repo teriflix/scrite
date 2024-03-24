@@ -305,5 +305,7 @@
         <file>icons/exporter/structure_pdf.png</file>
         <file>icons/exporter/text.png</file>
         <file>icons/exporter/scrite.png</file>
+        <file>icons/editor/format_align_justify.png</file>
+        <file>icons/editor/format_align_justify_inverted.png</file>
     </qresource>
 </RCC>

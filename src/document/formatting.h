@@ -147,7 +147,8 @@ public:
         FontStyle,
         LineHeight,
         LineSpacingBefore,
-        TextAndBackgroundColors
+        TextAndBackgroundColors,
+        AllProperties
     };
     Q_ENUM(Properties)
     Q_INVOKABLE void applyToAll(SceneElementFormat::Properties properties);
@@ -634,6 +635,9 @@ public:
     Q_PROPERTY(int currentElementCursorPosition READ currentElementCursorPosition NOTIFY
                        cursorPositionChanged)
     int currentElementCursorPosition() const { return m_currentElementCursorPosition; }
+
+    Q_INVOKABLE SceneElement *sceneElementAt(int cursorPosition) const;
+    Q_INVOKABLE QRectF sceneElementBoundingRect(SceneElement *sceneElement) const;
 
     Q_PROPERTY(bool forceSyncDocument READ isForceSyncDocument WRITE setForceSyncDocument NOTIFY
                        forceSyncDocumentChanged)

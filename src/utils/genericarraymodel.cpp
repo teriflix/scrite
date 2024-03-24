@@ -92,6 +92,33 @@ QJsonValue GenericArrayModel::at(int row) const
     return row < 0 || row >= m_array.size() ? QJsonValue() : m_array.at(row);
 }
 
+int GenericArrayModel::firstIndexOf(const QString &member, const QVariant &value) const
+{
+    for (int i = 0; i < m_array.size(); i++) {
+        QVariant itemValue;
+
+        const QJsonValue item = m_array.at(i);
+        if (item.isArray()) {
+            const QJsonArray array = item.toArray();
+
+            bool ok = true;
+            const int idx = member.toInt(&ok);
+            if (ok && idx >= 0 && idx < array.size())
+                itemValue = array.at(idx).toVariant();
+            else
+                itemValue = QVariant();
+        } else if (item.isObject()) {
+            const QJsonObject object = item.toObject();
+            itemValue = object.value(member).toVariant();
+        }
+
+        if (itemValue == value)
+            return i;
+    }
+
+    return -1;
+}
+
 int GenericArrayModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_array.size();

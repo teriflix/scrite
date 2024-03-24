@@ -59,6 +59,8 @@ public:
 
     Q_INVOKABLE QJsonValue at(int row) const;
 
+    Q_INVOKABLE int firstIndexOf(const QString &member, const QVariant &value) const;
+
     // QAbstractItemModel interface
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;

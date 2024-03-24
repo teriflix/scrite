@@ -221,10 +221,12 @@ void SceneElementFormat::setBackgroundColor(const QColor &val)
 
 void SceneElementFormat::setLineHeight(qreal val)
 {
-    if (qFuzzyCompare(m_lineHeight, val))
+    qreal val2 = qBound(0.1, val, 2.0);
+    if (qFuzzyCompare(m_lineHeight, val2))
         return;
 
-    m_lineHeight = val;
+    m_lineHeight = val2;
+
     emit lineHeightChanged();
     emit elementFormatChanged();
 }
@@ -369,7 +371,11 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
 
 void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
 {
-    m_format->applyToAll(this, properties);
+    if (properties == AllProperties) {
+        for (int i = FontFamily; i <= TextAndBackgroundColors; i++)
+            m_format->applyToAll(this, SceneElementFormat::Properties(i));
+    } else
+        m_format->applyToAll(this, properties);
 }
 
 void SceneElementFormat::beginTransaction()
@@ -782,6 +788,8 @@ void ScreenplayFormat::applyToAll(const SceneElementFormat *from,
         case SceneElementFormat::TextAndBackgroundColors:
             format->setTextColor(from->textColor());
             format->setBackgroundColor(from->backgroundColor());
+            break;
+        default:
             break;
         }
     }
@@ -2059,6 +2067,44 @@ void SceneDocumentBinder::setShots(const QStringList &val)
 
     m_shots = val;
     emit shotsChanged();
+}
+
+SceneElement *SceneDocumentBinder::sceneElementAt(int cursorPosition) const
+{
+    QTextDocument *doc = m_textDocument ? m_textDocument->textDocument() : nullptr;
+    if (doc == nullptr || cursorPosition < 0)
+        return nullptr;
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(cursorPosition);
+
+    QTextBlock block = cursor.block();
+    SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+    if (userData)
+        return userData->sceneElement();
+
+    return nullptr;
+}
+
+QRectF SceneDocumentBinder::sceneElementBoundingRect(SceneElement *sceneElement) const
+{
+    if (sceneElement == nullptr)
+        return QRectF();
+
+    QTextDocument *doc = m_textDocument->textDocument();
+
+    QTextBlock block = doc->firstBlock();
+    while (block.isValid()) {
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData && userData->sceneElement() == sceneElement) {
+            QAbstractTextDocumentLayout *layout = doc->documentLayout();
+            return layout->blockBoundingRect(block);
+        }
+
+        block = block.next();
+    }
+
+    return QRectF();
 }
 
 void SceneDocumentBinder::setForceSyncDocument(bool val)

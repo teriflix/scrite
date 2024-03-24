@@ -22,6 +22,7 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
 FloatingDock {
@@ -144,15 +145,15 @@ FloatingDock {
                 onClicked: if(_private.textFormat) _private.textFormat.toggleUnderline()
             }
 
-            ColorButton {
-                id: textColorButton
+            ColorToolButton {
+                id: textColorToolButton
 
                 ToolTip.text: "Text Color"
                 ToolTip.visible: containsMouse
 
                 enabled: _private.textFormat
                 hoverEnabled: true
-                selectedColor: _private.textFormat ? _private.textFormat.textColor : _private.transparentColor
+                selectedColor: _private.textFormat ? _private.textFormat.textColor : Runtime.colors.transparent
 
                 onColorPicked: (newColor) => {
                                    if(_private.textFormat)
@@ -170,7 +171,7 @@ FloatingDock {
                     VclText {
                         anchors.centerIn: parent
 
-                        color: textColorButton.selectedColor === _private.transparentColor ? "black" : textColorButton.selectedColor
+                        color: textColorToolButton.selectedColor === Runtime.colors.transparent ? "black" : textColorToolButton.selectedColor
 
                         font.bold: true
                         font.pixelSize: parent.height * 0.70
@@ -181,15 +182,15 @@ FloatingDock {
                 }
             }
 
-            ColorButton {
-                id: bgColorButton
+            ColorToolButton {
+                id: bgColorToolButton
 
                 ToolTip.text: "Background Color"
                 ToolTip.visible: containsMouse
 
                 enabled: _private.textFormat
                 hoverEnabled: true
-                selectedColor: _private.textFormat ? _private.textFormat.backgroundColor : _private.transparentColor
+                selectedColor: _private.textFormat ? _private.textFormat.backgroundColor : Runtime.colors.transparent
 
                 onColorPicked: (newColor) => {
                                    if(_private.textFormat)
@@ -204,12 +205,12 @@ FloatingDock {
 
                     border.width: 1
                     border.color: "black"
-                    color: bgColorButton.selectedColor === _private.transparentColor ? "white" : bgColorButton.selectedColor
+                    color: bgColorToolButton.selectedColor === Runtime.colors.transparent ? "white" : bgColorToolButton.selectedColor
 
                     VclText {
                         anchors.centerIn: parent
 
-                        color: textColorButton.selectedColor === _private.transparentColor ? "black" : textColorButton.selectedColor
+                        color: textColorToolButton.selectedColor === Runtime.colors.transparent ? "black" : textColorToolButton.selectedColor
 
                         font.bold: true
                         font.pixelSize: parent.height * 0.70
@@ -332,146 +333,8 @@ FloatingDock {
         }
     }
 
-    // Reusable components, only accessed from within this dock
-    component SimpleToolButton : Rectangle {
-
-        property bool down: false
-        property bool checked: false
-        property alias pressed: tbMouseArea.pressed
-        property alias hoverEnabled: tbMouseArea.hoverEnabled
-        property alias containsMouse: tbMouseArea.containsMouse
-        property alias iconSource: tbIcon.source
-
-        signal clicked()
-
-        width: implicitWidth
-        height: implicitHeight
-        implicitWidth: 36
-        implicitHeight: 36
-
-        radius: 4
-        opacity: enabled ? 1 : 0.5
-        color: tbMouseArea.pressed || down ? Runtime.colors.primary.button.background : (checked ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0))
-
-        Image {
-            id: tbIcon
-            anchors.fill: parent
-            anchors.margins: 4
-            mipmap: true
-        }
-
-        MouseArea {
-            id: tbMouseArea
-            anchors.fill: parent
-            onClicked: parent.clicked()
-        }
-    }
-
-    component ColorButton : Item {
-        id: colorButton
-        property color selectedColor: _private.transparentColor
-        property alias hoverEnabled: cbMouseArea.hoverEnabled
-        property alias containsMouse: cbMouseArea.containsMouse
-
-        signal colorPicked(color newColor)
-
-        width: implicitWidth
-        height: implicitHeight
-        implicitWidth: 36
-        implicitHeight: 36
-
-        opacity: enabled ? 1 : 0.5
-
-        MouseArea {
-            id: cbMouseArea
-            anchors.fill: parent
-            onClicked: colorsMenuLoader.active = true
-        }
-
-        Loader {
-            id: colorsMenuLoader
-            x: 0; y: parent.height
-            active: false
-            sourceComponent: Popup {
-                id: colorsMenu
-                x: 0; y: 0
-                width: availableColorsPalette.suggestedWidth
-                height: availableColorsPalette.suggestedHeight
-                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-
-                Component.onCompleted: open()
-                onClosed: Qt.callLater(() => { colorsMenuLoader.active = false})
-
-                contentItem: AvailableColorsPalette {
-                    id: availableColorsPalette
-                    selectedColor: colorButton.selectedColor
-                    onColorPicked: (newColor) => {
-                                       colorButton.colorPicked(newColor)
-                                       colorsMenu.close()
-                                   }
-                }
-            }
-        }
-    }
-
-    component AvailableColorsPalette : Grid {
-        id: colorsGrid
-        property int cellSize: width/columns
-        readonly property int suggestedWidth: 280
-        readonly property int suggestedHeight: 200
-        columns: 7
-        opacity: enabled ? 1 : 0.25
-
-        property color selectedColor: _private.transparentColor
-        signal colorPicked(color newColor)
-
-        Item {
-            width: colorsGrid.cellSize
-            height: colorsGrid.cellSize
-
-            Image {
-                source: "qrc:/icons/navigation/close.png"
-                anchors.fill: parent
-                anchors.margins: 5
-                mipmap: true
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: colorPicked(_private.transparentColor)
-            }
-        }
-
-        Repeater {
-            model: _private.availableColors
-
-            Item {
-                required property color modelData
-                required property int index
-                width: colorsGrid.cellSize
-                height: colorsGrid.cellSize
-
-                Rectangle {
-                    anchors.fill: parent
-                    anchors.margins: 3
-                    border.width: colorsGrid.selectedColor === modelData ? 3 : 0.5
-                    border.color: "black"
-                    color: modelData
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    onClicked: colorPicked(modelData)
-                }
-            }
-        }
-    }
-
     QtObject {
         id: _private
-
-        readonly property color transparentColor: "transparent"
-        readonly property var availableColors: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
 
         property TextFormat textFormat: sceneDocumentBinder ? sceneDocumentBinder.textFormat : null
         property SceneElement sceneElement: sceneDocumentBinder ? sceneDocumentBinder.currentElement : null

@@ -153,5 +153,7 @@
         <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
         <file>qml/dialogs/homescreen/Poster.qml</file>
         <file>misc/scriptalay_info.md</file>
+        <file>qml/helpers/SimpleToolButton.qml</file>
+        <file>qml/helpers/ColorToolButton.qml</file>
     </qresource>
 </RCC>
