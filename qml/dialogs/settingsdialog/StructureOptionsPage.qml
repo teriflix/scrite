@@ -26,41 +26,48 @@ import "qrc:/qml/helpers"
 Item {
     id: root
 
-    ColumnLayout {
+    GridLayout {
         id: layout
 
-        height: parent.height-30
-        width: Math.min(parent.width-15, 300)
-        anchors.fill: parent
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.right: parent.right
         anchors.margins: 15
         anchors.leftMargin: 0
 
-        spacing: 10
+        columns: 2
+        rowSpacing: 10
+        columnSpacing: 10
 
         GroupBox {
-            Layout.fillWidth: true
+            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
-            label: CheckBox {
-                text: "Show Grid in Structure Canvas"
-                checked: Runtime.structureCanvasSettings.showGrid
-                onToggled: Runtime.structureCanvasSettings.showGrid = checked
+            label: VclText {
+                text: "Canvas Grid"
             }
 
-            RowLayout {
-                enabled: Runtime.structureCanvasSettings.showGrid
-                opacity: enabled ? 1 : 0.5
+            ColumnLayout {
                 width: parent.width
-                spacing: 20
 
-                RowLayout {
+                VclCheckBox {
                     Layout.fillWidth: true
+
+                    text: "Show Grid in Structure Canvas"
+                    checked: Runtime.structureCanvasSettings.showGrid
+                    onToggled: Runtime.structureCanvasSettings.showGrid = checked
+                }
+
+                GridLayout {
                     Layout.alignment: Qt.AlignHCenter
 
-                    spacing: parent.spacing/2
+                    enabled: Runtime.structureCanvasSettings.showGrid
+                    opacity: enabled ? 1 : 0.5
 
-                    VclText {
-                        text: "Background Color"
-                    }
+                    columns: 3
+                    rowSpacing: 10
+                    columnSpacing: 10
 
                     Rectangle {
                         Layout.preferredWidth: 30
@@ -76,21 +83,14 @@ Item {
                         }
                     }
 
+                    VclText {
+                        text: "Background Color"
+                    }
+
                     FlatToolButton {
                         iconSource: "qrc:/icons/action/reset.png"
                         onClicked: Runtime.structureCanvasSettings.restoreDefaultCanvasColor()
                         ToolTip.text: "Reset canvas color"
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.alignment: Qt.AlignHCenter
-
-                    spacing: parent.spacing/2
-
-                    VclText {
-                        text: "Grid Color"
                     }
 
                     Rectangle {
@@ -107,6 +107,10 @@ Item {
                         }
                     }
 
+                    VclText {
+                        text: "Grid Color"
+                    }
+
                     FlatToolButton {
                         iconSource: "qrc:/icons/action/reset.png"
                         onClicked: Runtime.structureCanvasSettings.restoreDefaultGridColor()
@@ -117,7 +121,9 @@ Item {
         }
 
         GroupBox {
-            Layout.fillWidth: true
+            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             label: VclText {
                 text: "Parameters"
@@ -125,6 +131,7 @@ Item {
 
             ColumnLayout {
                 width: parent.width
+                spacing: 10
 
                 VclCheckBox {
                     Layout.fillWidth: true
@@ -146,41 +153,22 @@ Item {
                     checked: Runtime.structureCanvasSettings.showPullHandleAnimation
                     onToggled: Runtime.structureCanvasSettings.showPullHandleAnimation = checked
                 }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 1
-                    color: Runtime.colors.primary.borderColor
-                }
-
-                VclText {
-                    Layout.fillWidth: true
-                    text: "Zoom Speed"
-                }
-
-                Slider {
-                    Layout.fillWidth: true
-
-                    from: 1
-                    to: 100
-                    orientation: Qt.Horizontal
-                    snapMode: Slider.SnapAlways
-                    value: Runtime.scrollAreaSettings.zoomFactor * 100
-                    onMoved: Runtime.scrollAreaSettings.zoomFactor = value / 100
-                }
             }
         }
 
         GroupBox {
-            Layout.fillWidth: true
+            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
 
             label: VclText {
                 text: "Timeline"
             }
 
             ColumnLayout {
-                spacing: 20
                 width: parent.width
+
+                spacing: 10
 
                 VclText {
                     Layout.fillWidth: true
@@ -202,9 +190,88 @@ Item {
             }
         }
 
-        Item {
-            Layout.fillWidth: true
+        GroupBox {
+            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
             Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
+
+            label: VclText {
+                text: "Zoom Speed"
+            }
+
+            ColumnLayout {
+                width: parent.width
+
+                spacing: 10
+
+                VclText {
+                    Layout.fillWidth: true
+
+                    text: "Configure how fast/slow you want zoom in/out to be on the structure canvas while using mouse wheel."
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                }
+
+                Slider {
+                    Layout.fillWidth: true
+
+                    from: 1
+                    to: 100
+                    orientation: Qt.Horizontal
+                    snapMode: Slider.SnapAlways
+                    value: Runtime.scrollAreaSettings.zoomFactor * 100
+                    onMoved: Runtime.scrollAreaSettings.zoomFactor = value / 100
+                }
+            }
+        }
+
+        GroupBox {
+            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
+
+            label: VclText {
+                text: "Defaults"
+            }
+
+            GridLayout {
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                enabled: Runtime.structureCanvasSettings.showGrid
+                opacity: enabled ? 1 : 0.5
+
+                columns: 3
+                rowSpacing: 10
+                columnSpacing: 10
+
+                Rectangle {
+                    Layout.preferredWidth: 30
+                    Layout.preferredHeight: 30
+                    border.width: 1
+                    border.color: Runtime.colors.primary.borderColor
+                    color: Runtime.workspaceSettings.defaultSceneColor
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: defaultSceneColorMenu.open()
+                    }
+
+                    ColorMenu {
+                        id: defaultSceneColorMenu
+                        onMenuItemClicked: (color) => { Runtime.workspaceSettings.defaultSceneColor = color }
+                    }
+                }
+
+                VclText {
+                    text: "Default Scene Color"
+                }
+
+                FlatToolButton {
+                    iconSource: "qrc:/icons/action/reset.png"
+                    onClicked: Runtime.workspaceSettings.defaultSceneColor = Scrite.app.standardColors[0]
+                    ToolTip.text: "Reset default scene color"
+                }
+            }
         }
     }
 }

@@ -50,6 +50,9 @@ Item {
     signal toggled()
     signal clicked()
 
+    implicitWidth: suggestedWidth
+    implicitHeight: suggestedHeight
+
     width: suggestedWidth
     height: suggestedHeight
 

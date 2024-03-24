@@ -120,15 +120,6 @@ Item {
                 width: parent.width
                 spacing: 10
 
-                VclText {
-                    Layout.fillWidth: true
-
-                    wrapMode: Text.WordWrap
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-
-                    text: "Please choose where you want custom fonts configured here to be used."
-                }
-
                 VclRadioButton {
                     text: "PDF & HTML Only"
                     checked: !Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts

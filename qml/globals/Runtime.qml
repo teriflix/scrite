@@ -233,6 +233,7 @@ Item {
         property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
         property var customColors: []
+        property var defaultSceneColor: Scrite.app.standardColors[0]
         property bool autoOpenLastFile: false
     }
 

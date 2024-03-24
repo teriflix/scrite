@@ -422,7 +422,7 @@ Item {
             text: Runtime.recentFiles.count === 0 ? "Recent files ..." : "Scriptalay"
             iconSource: Runtime.recentFiles.count === 0 ? "qrc:/icons/filetype/document.png" : "qrc:/icons/action/library.png"
             Layout.fillWidth: true
-            tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online-library of screenplays."
+            tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online library."
             onClicked: stackView.push(scriptalayPage)
             enabled: Runtime.recentFiles.count > 0
         }
@@ -628,7 +628,7 @@ Item {
 
                         function composeTextFromRecord(_record) {
                             var ret =
-                              "<strong>Author(s):</strong> " + _record.authors + "<br/><br/>" +
+                              "<strong>Written By:</strong> " + _record.authors + "<br/><br/>" +
                               "<strong>Pages:</strong> " + _record.pageCount + "<br/>" +
                               "<strong>Revision:</strong> " + _record.revision + "<br/><br/>" +
                               "<strong>Copyright:</strong> " + _record.copyright + "<br/><br/>" +

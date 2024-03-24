@@ -1018,8 +1018,13 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
 
     Scene *activeScene = structureElement ? structureElement->scene() : nullptr;
 
+    const QSettings *settings = Application::instance()->settings();
+    const QString defaultSceneColor =
+            settings->value(QStringLiteral("Workspace/defaultSceneColor")).toString();
+
     const QVector<QColor> standardColors = Application::standardColors(QVersionNumber());
-    const QColor defaultColor = standardColors.first();
+    const QColor defaultColor =
+            defaultSceneColor.isEmpty() ? standardColors.first() : QColor(defaultSceneColor);
 
     Scene *scene = new Scene(m_structure);
     scene->setColor(activeScene ? activeScene->color() : defaultColor);
