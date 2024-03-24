@@ -337,20 +337,10 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            Rectangle {
-                anchors.fill: previewText
-                anchors.margins: -40
-
-                color: Runtime.colors.primary.c10.background
-
-                BoxShadow {
-                    anchors.fill: parent
-                }
-            }
-
             TextArea {
                 id: previewText
 
+                scale: (parent.width-100)/width
                 width: Scrite.document.printFormat.pageLayout.contentWidth
                 anchors.centerIn: parent
 
