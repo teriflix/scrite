@@ -26,16 +26,17 @@ Item {
     id: root
     height: layout.height + 2*layout.margin
 
-    ColumnLayout {
+    GridLayout {
         id: layout
 
         readonly property real margin: 10
 
-        width: parent.width-2*margin
-        y: 10
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width-margin
+        y: margin
 
-        spacing: 10
+        rowSpacing: 10
+        columnSpacing: 20
+        columns: width > 700 ? 2 : 1
 
         Repeater {
             model: GenericArrayModel {
@@ -48,13 +49,13 @@ Item {
                 required property string key
                 required property int value
 
+                Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.spacing)/layout.columns
+
                 spacing: 10
-                Layout.fillWidth: true
 
                 VclText {
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 175
-                    horizontalAlignment: Text.AlignRight
+                    Layout.preferredWidth: parent.width * 0.25
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     font.bold: tisSourceCombo.down
@@ -66,7 +67,7 @@ Item {
                     id: tisSourceCombo
 
                     Layout.alignment: Qt.AlignVCenter
-                    Layout.preferredWidth: 400
+                    Layout.fillWidth: true
 
                     property var sources: []
                     model: sources

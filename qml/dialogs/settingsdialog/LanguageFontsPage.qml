@@ -31,78 +31,71 @@ Item {
 
         readonly property real margin: 10
 
-        width: parent.width-2*margin
-        y: 10
-        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width-margin
+        y: margin
 
-        spacing: 10
+        spacing: 40
 
-        GroupBox {
-            Layout.fillHeight: true
+        GridLayout {
+            id: fontOptionsLayout
+            Layout.fillWidth: true
 
-            label: VclText {
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                text: "Language Font Options"
-            }
+            rowSpacing: 10
+            columnSpacing: 20
+            columns: width > 700 ? 2 : 1
 
-            ColumnLayout {
-                width: parent.width
-                spacing: 10
+            Repeater {
+                model: GenericArrayModel {
+                    array: Scrite.app.enumerationModelForType("TransliterationEngine", "Language")
+                    objectMembers: ["key", "value"]
+                }
 
-                Repeater {
-                    model: GenericArrayModel {
-                        array: Scrite.app.enumerationModelForType("TransliterationEngine", "Language")
-                        objectMembers: ["key", "value"]
+                RowLayout {
+                    required property int index
+                    required property string key
+                    required property int value
+
+                    Layout.preferredWidth: (fontOptionsLayout.width-(fontOptionsLayout.columns-1)*fontOptionsLayout.spacing)/fontOptionsLayout.columns
+
+                    spacing: 10
+
+                    VclText {
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.preferredWidth: parent.width * 0.2
+
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                        font.bold: fontCombo.down
+
+                        text: key
                     }
 
-                    RowLayout {
-                        required property int index
-                        required property string key
-                        required property int value
-
-                        spacing: 10
+                    VclComboBox {
+                        id: fontCombo
                         Layout.fillWidth: true
 
-                        VclText {
-                            Layout.alignment: Qt.AlignVCenter
-                            Layout.preferredWidth: 175
+                        property var fontFamilies: Scrite.app.transliterationEngine.availableLanguageFontFamilies(value)
+                        model: fontFamilies.families
 
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                            font.bold: fontCombo.down
+                        currentIndex: fontFamilies.preferredFamilyIndex
 
-                            horizontalAlignment: Text.AlignRight
-
-                            text: key
+                        onActivated: {
+                            var family = fontFamilies.families[index]
+                            Scrite.app.transliterationEngine.setPreferredFontFamilyForLanguage(value, family)
+                            previewText.font.family = family
                         }
+                    }
 
-                        VclComboBox {
-                            id: fontCombo
-                            Layout.preferredWidth: 400
+                    VclText {
+                        id: previewText
 
-                            property var fontFamilies: Scrite.app.transliterationEngine.availableLanguageFontFamilies(value)
-                            model: fontFamilies.families
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.preferredWidth: parent.width * 0.2
 
-                            currentIndex: fontFamilies.preferredFamilyIndex
+                        font.family: Scrite.app.transliterationEngine.preferredFontFamilyForLanguage(value)
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                        font.bold: fontCombo.down
 
-                            onActivated: {
-                                var family = fontFamilies.families[index]
-                                Scrite.app.transliterationEngine.setPreferredFontFamilyForLanguage(value, family)
-                                previewText.font.family = family
-                            }
-                        }
-
-                        VclText {
-                            id: previewText
-
-                            Layout.alignment: Qt.AlignVCenter
-                            Layout.preferredWidth: 150
-
-                            font.family: Scrite.app.transliterationEngine.preferredFontFamilyForLanguage(value)
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                            font.bold: fontCombo.down
-
-                            text: _private.languagePreviewString[value]
-                        }
+                        text: _private.languagePreviewString[value]
                     }
                 }
             }

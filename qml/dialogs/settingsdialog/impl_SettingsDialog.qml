@@ -63,42 +63,17 @@ VclDialog {
             Layout.fillHeight: true
             color: Runtime.colors.primary.c50.background
 
-            StackLayout {
+            Loader {
                 id: settingsDialogContent
                 anchors.fill: parent
 
-                currentIndex: settingsDialogTabBar.currentIndex
+                property real pageListWidth: (width/settingsDialogTabBar.count)
 
-                property real pageListWidth: (width/count)
-
-                ApplicationSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                StructureSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                ScreenplaySettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                NotebookSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
-                }
-
-                LanguageSettingsTab {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    pageListWidth: settingsDialogContent.pageListWidth
+                source: "./" + settingsDialogTabBar.currentItem.text + "SettingsTab.qml"
+                onItemChanged: {
+                    if(item) {
+                        item.pageListWidth = Qt.binding( () => { return pageListWidth } )
+                    }
                 }
             }
         }

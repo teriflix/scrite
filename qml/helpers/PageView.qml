@@ -40,18 +40,23 @@ Rectangle {
 
     Rectangle {
         id: pageList
+
+        property int currentIndex: -1
+
         width: pageListWidth
-        color: Runtime.colors.accent.c600.background
         height: parent.height
         anchors.left: parent.left
-        property int currentIndex: -1
+
+        color: Runtime.colors.accent.c600.background
 
         Column {
             id: pageRepeaterLayout
+
             width: parent.width
             anchors.top: parent.top
             anchors.right: parent.right
             anchors.topMargin: 20
+
             clip: true
 
             Repeater {
@@ -64,16 +69,18 @@ Rectangle {
                     Rectangle {
                         width: parent.width
                         height: parent.height - 15
-                        radius: height/2
+
                         color: Runtime.colors.primary.c100.background
                         opacity: 0.8
                         visible: pageList.currentIndex === index
+
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: parent.right
-                        anchors.margins: -height/2
                     }
 
                     VclText {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 5
                         anchors.right: parent.right
                         anchors.rightMargin: 24
                         anchors.verticalCenter: parent.verticalCenter
@@ -81,6 +88,8 @@ Rectangle {
                         font.bold: pageList.currentIndex === index
                         text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
                         color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
+                        elide: Text.ElideMiddle
+                        horizontalAlignment: Text.AlignRight
                     }
 
                     Image {
