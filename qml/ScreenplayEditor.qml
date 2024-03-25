@@ -3103,7 +3103,7 @@ Rectangle {
                             anchors.bottom: parent.bottom
 
                             menu: StructureGroupsMenu {
-                                height: 300
+                                height: 400
                                 sceneGroup: SceneGroup {
                                     structure: Scrite.document.structure
                                 }
