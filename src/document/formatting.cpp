@@ -2098,7 +2098,17 @@ QRectF SceneDocumentBinder::sceneElementBoundingRect(SceneElement *sceneElement)
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
         if (userData && userData->sceneElement() == sceneElement) {
             QAbstractTextDocumentLayout *layout = doc->documentLayout();
-            return layout->blockBoundingRect(block);
+            QRectF blockRect = layout->blockBoundingRect(block);
+
+            SceneElementFormat *elementFormat =
+                    m_screenplayFormat->elementFormat(sceneElement->type());
+
+            const qreal dpr = m_screenplayFormat->devicePixelRatio();
+            const qreal contentWidth = doc->textWidth();
+            const qreal leftMargin = contentWidth * elementFormat->leftMargin() * dpr;
+            blockRect.moveLeft(blockRect.left() + leftMargin);
+
+            return blockRect;
         }
 
         block = block.next();

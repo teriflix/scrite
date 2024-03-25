@@ -447,9 +447,9 @@ Item {
 
                         property bool valid: sceneElementRect.width > 0 && sceneElementRect.height > 0
                         visible: valid
-                        x: 0
+                        x: valid ? previewText.leftInset + previewText.leftPadding + sceneElementRect.x : 0
                         y: valid ? previewText.topInset + previewText.topPadding + sceneElementRect.y : 0
-                        width: parent.width
+                        width: valid ? sceneElementRect.width : 0
                         height: valid ? sceneElementRect.height : 0
 
                         Rectangle {
