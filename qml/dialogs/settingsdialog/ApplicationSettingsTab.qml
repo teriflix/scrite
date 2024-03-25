@@ -26,10 +26,10 @@ import "qrc:/qml/helpers"
 PageView {
     id: root
 
-    pagesArray: ["Options"]
+    pagesArray: ["Options", "Theme"]
     currentIndex: 0
     pageContent: Loader {
         width: root.availablePageContentWidth
-        source: "./ApplicationOptionsPage.qml"
+        source: "./Application" + root.pagesArray[root.currentIndex] + "Page.qml"
     }
 }

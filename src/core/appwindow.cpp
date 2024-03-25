@@ -102,6 +102,8 @@ AppWindow::AppWindow()
                                                    "Base type of models (QAbstractItemModel)");
 
     m_defaultWindowFlags = this->flags();
+
+    this->setMinimumSize(QSize(800, 600));
 }
 
 AppWindow::~AppWindow()

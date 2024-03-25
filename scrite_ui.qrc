@@ -155,5 +155,6 @@
         <file>misc/scriptalay_info.md</file>
         <file>qml/helpers/SimpleToolButton.qml</file>
         <file>qml/helpers/ColorToolButton.qml</file>
+        <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
     </qresource>
 </RCC>

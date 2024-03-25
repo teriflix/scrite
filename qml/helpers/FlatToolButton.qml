@@ -55,6 +55,7 @@ Item {
 
     width: suggestedWidth
     height: suggestedHeight
+    opacity: enabled ? 1 : 0.5
 
     Rectangle {
         id: downIndicator

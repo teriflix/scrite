@@ -256,6 +256,8 @@ Item {
         property bool enableAnimations: true
         property bool useSoftwareRenderer: false
         property string theme: "Material"
+        property int primaryColor: colors.defaultPrimaryColor
+        property int accentColor: colors.defaultAccentColor
     }
 
     // Global undo-redo object
@@ -383,13 +385,15 @@ Item {
 
     readonly property QtObject colors: Item {
         readonly property int theme: Material.Light
+        readonly property int defaultPrimaryColor: Material.Grey
+        readonly property int defaultAccentColor: Material.DeepPurple
 
         readonly property Colors primary: Colors {
-            key: Material.Grey
+            key: applicationSettings.primaryColor
         }
 
         readonly property Colors accent: Colors {
-            key: Material.DeepPurple
+            key: applicationSettings.accentColor
         }
 
         readonly property color transparent: "transparent"

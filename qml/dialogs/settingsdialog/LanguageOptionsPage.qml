@@ -31,8 +31,8 @@ Item {
 
         readonly property real margin: 10
 
-        width: parent.width-2*margin
-        y: 10
+        width: parent.width-margin
+        y: margin
 
         spacing: 10
 
