@@ -24,6 +24,17 @@ import "qrc:/js/utils.js" as Utils
 Item {
     id: scriteRuntime
 
+    visible: false
+
+    function init(_parent) {
+        if( !(_parent && Scrite.app.verifyType(_parent, "QQuickItem")) )
+            _parent = Scrite.window.contentItem
+
+        parent = _parent
+        visible = false
+        anchors.fill = parent
+    }
+
     // Global variables
     property bool canShowNotebookInStructure: width > 1600
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure

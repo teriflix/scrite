@@ -52,6 +52,9 @@ Rectangle {
         id: _private
 
         function initialize() {
+            // Initialize runtime
+            Runtime.init(scriteRoot)
+
             // Determine font size provided by QML
             determineDefaultFontSize()
 
