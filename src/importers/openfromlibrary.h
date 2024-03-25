@@ -62,6 +62,7 @@ signals:
     void importFinished(int index);
 
 private:
+    friend class LibraryServiceOpenRecordTask;
     bool m_importing = false;
 };
 

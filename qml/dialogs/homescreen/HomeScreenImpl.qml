@@ -1044,11 +1044,14 @@ Item {
             homeScreen.enabled = false
 
             Runtime.loadMainUiContent = false
-            Runtime.recentFiles.add(path)
-            Scrite.document.open(path)
-            Runtime.loadMainUiContent = true
 
-            closeRequest()
+            Utils.execLater(_private, 100, () => {
+                                Runtime.recentFiles.add(path)
+                                Scrite.document.open(path)
+                                Runtime.loadMainUiContent = true
+
+                                closeRequest()
+                            })
         }
     }
 }

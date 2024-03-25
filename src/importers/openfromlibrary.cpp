@@ -69,6 +69,29 @@ void LibraryService::openTemplateAt(int index)
     this->openLibraryRecordAt(this->templates(), index);
 }
 
+class LibraryServiceOpenRecordTask : public QObject
+{
+public:
+    LibraryServiceOpenRecordTask(Library *library, int index, LibraryService *parent = nullptr)
+        : QObject(parent), m_index(index), m_library(library), m_parent(parent)
+    {
+        QTimer::singleShot(0, this, &LibraryServiceOpenRecordTask::start);
+    }
+    ~LibraryServiceOpenRecordTask() { }
+
+private:
+    void start();
+    void openRecord();
+    void complete();
+
+    void recordFetched(const QString &name, const QByteArray &bytes);
+
+private:
+    int m_index = -1;
+    Library *m_library = nullptr;
+    LibraryService *m_parent = nullptr;
+};
+
 void LibraryService::openLibraryRecordAt(Library *library, int index)
 {
     if (m_importing || library == nullptr)
@@ -77,83 +100,7 @@ void LibraryService::openLibraryRecordAt(Library *library, int index)
     if (library != this->templates() && library != this->screenplays())
         return;
 
-    this->error()->clear();
-    this->progress()->start();
-
-    m_importing = true;
-    emit importStarted(index);
-
-    if (library == this->templates() && index == 0) {
-        ScriteDocument::instance()->reset();
-        this->progress()->finish();
-
-        m_importing = false;
-        emit importFinished(0);
-        return;
-    }
-
-    QNetworkAccessManager &nam = ::LibraryNetworkAccess();
-
-    const QJsonObject record = library->recordAt(index);
-    const QString name = record.value("name").toString();
-
-    QUrl url;
-    if (record.value("url_kind").toString() == "relative")
-        url = QUrl(library->baseUrl().toString() + "/" + record.value("url").toString());
-    else
-        url = QUrl(record.value("url").toString());
-
-    const QNetworkRequest request(url);
-
-    this->progress()->setProgressText(QStringLiteral("Downloading \"") + name
-                                      + QStringLiteral("\" from library..."));
-    qApp->setOverrideCursor(Qt::WaitCursor);
-
-    QNetworkReply *reply = nam.get(request);
-    connect(reply, &QNetworkReply::finished, this, [=]() {
-        const QByteArray bytes = reply->readAll();
-        reply->deleteLater();
-
-        if (bytes.isEmpty()) {
-            this->progress()->finish();
-            qApp->restoreOverrideCursor();
-            this->error()->setErrorMessage(QStringLiteral("Error downloading ") + name
-                                           + QStringLiteral(". Please try again later."));
-            return;
-        }
-
-        QTemporaryFile tmpFile;
-        tmpFile.setAutoRemove(true);
-        tmpFile.open();
-        tmpFile.write(bytes);
-        tmpFile.close();
-
-        ScriteDocument::instance()->openAnonymously(tmpFile.fileName());
-        ScriteDocument::instance()->screenplay()->setCurrentElementIndex(-1);
-
-        if (library->type() == Library::Templates) {
-            ScriteDocument::instance()->structure()->setCurrentElementIndex(-1);
-            ScriteDocument::instance()->screenplay()->setCurrentElementIndex(
-                    ScriteDocument::instance()->screenplay()->firstSceneIndex());
-            ScriteDocument::instance()->structure()->setForceBeatBoardLayout(true);
-
-            ScriteDocument::instance()->printFormat()->resetToUserDefaults();
-            ScriteDocument::instance()->formatting()->resetToUserDefaults();
-        }
-
-        if (library == this->screenplays())
-            ScriteDocument::instance()->setFromScriptalay(true);
-
-        this->progress()->finish();
-        qApp->restoreOverrideCursor();
-
-        m_importing = false;
-        emit importFinished(index);
-    });
-
-    const QString activity = library == this->templates() ? QStringLiteral("template")
-                                                          : QStringLiteral("scriptalay");
-    User::instance()->logActivity2(activity, name);
+    new LibraryServiceOpenRecordTask(library, index, this);
 }
 
 bool LibraryService::doImport(QIODevice *device)
@@ -270,4 +217,100 @@ void Library::setBusy(bool val)
         qApp->restoreOverrideCursor();
 
     emit busyChanged();
+}
+
+void LibraryServiceOpenRecordTask::start()
+{
+    m_parent->error()->clear();
+    m_parent->progress()->start();
+
+    m_parent->m_importing = true;
+
+    emit m_parent->importStarted(m_index);
+
+    QTimer::singleShot(100, this, &LibraryServiceOpenRecordTask::openRecord);
+}
+
+void LibraryServiceOpenRecordTask::openRecord()
+{
+    if (m_library == m_parent->templates() && m_index == 0) {
+        // Blank document is being requested from templates lit
+        ScriteDocument::instance()->reset();
+        QTimer::singleShot(100, this, &LibraryServiceOpenRecordTask::complete);
+        return;
+    }
+
+    QNetworkAccessManager &nam = ::LibraryNetworkAccess();
+
+    const QJsonObject record = m_library->recordAt(m_index);
+    const QString name = record.value("name").toString();
+
+    QUrl url;
+    if (record.value("url_kind").toString() == "relative")
+        url = QUrl(m_library->baseUrl().toString() + "/" + record.value("url").toString());
+    else
+        url = QUrl(record.value("url").toString());
+
+    const QNetworkRequest request(url);
+
+    m_parent->progress()->setProgressText(QStringLiteral("Downloading \"") + name
+                                          + QStringLiteral("\" from library..."));
+    qApp->setOverrideCursor(Qt::WaitCursor);
+
+    QNetworkReply *reply = nam.get(request);
+    connect(reply, &QNetworkReply::finished, this, [=]() {
+        this->recordFetched(name, reply->readAll());
+        reply->deleteLater();
+    });
+
+    const QString activity = m_library == m_parent->templates() ? QStringLiteral("template")
+                                                                : QStringLiteral("scriptalay");
+    User::instance()->logActivity2(activity, name);
+}
+
+void LibraryServiceOpenRecordTask::complete()
+{
+    m_parent->progress()->finish();
+
+    m_parent->m_importing = false;
+
+    emit m_parent->importFinished(m_index);
+
+    qApp->restoreOverrideCursor();
+
+    this->deleteLater();
+}
+
+void LibraryServiceOpenRecordTask::recordFetched(const QString &name, const QByteArray &bytes)
+{
+    if (bytes.isEmpty()) {
+        m_parent->error()->setErrorMessage(QStringLiteral("Error downloading ") + name
+                                           + QStringLiteral(". Please try again later."));
+        QTimer::singleShot(0, this, &LibraryServiceOpenRecordTask::complete);
+        return;
+    }
+
+    QTemporaryFile tmpFile;
+    tmpFile.setAutoRemove(true);
+    tmpFile.open();
+    tmpFile.write(bytes);
+    tmpFile.close();
+
+    ScriteDocument::instance()->openAnonymously(tmpFile.fileName());
+    ScriteDocument::instance()->screenplay()->setCurrentElementIndex(-1);
+
+    if (m_library->type() == Library::Templates) {
+        ScriteDocument::instance()->structure()->setCurrentElementIndex(-1);
+        ScriteDocument::instance()->screenplay()->setCurrentElementIndex(
+                ScriteDocument::instance()->screenplay()->firstSceneIndex());
+        ScriteDocument::instance()->structure()->setForceBeatBoardLayout(true);
+
+        ScriteDocument::instance()->printFormat()->resetToUserDefaults();
+        ScriteDocument::instance()->formatting()->resetToUserDefaults();
+    }
+
+    if (m_library->type() == Library::Screenplays)
+        ScriteDocument::instance()->setFromScriptalay(true);
+
+    QTimer::singleShot(100, this, &LibraryServiceOpenRecordTask::complete);
 }
