@@ -77,19 +77,31 @@ Item {
             onTextChanged: cmdApplyButton.enabled = true
         }
 
-        VclButton {
-            id: cmdApplyButton
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 10
 
-            Layout.alignment: Qt.AlignRight
+            VclButton {
+                text: "Help"
+                onClicked: Qt.openUrlExternally("https://www.youtube.com/watch?v=Ql_BjMVpjNc")
+            }
 
-            text: "Apply"
-            enabled: false
-            onClicked: {
-                if(target === e_CurrentDocumentTarget)
-                    Scrite.document.structure.groupsData = storyBeatsEditor.text
-                else
-                    Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
-                enabled = false
+            Item {
+                Layout.fillWidth: true
+            }
+
+            VclButton {
+                id: cmdApplyButton
+
+                text: "Apply"
+                enabled: false
+                onClicked: {
+                    if(target === e_CurrentDocumentTarget)
+                        Scrite.document.structure.groupsData = storyBeatsEditor.text
+                    else
+                        Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
+                    enabled = false
+                }
             }
         }
     }
