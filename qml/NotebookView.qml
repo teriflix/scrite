@@ -1759,27 +1759,48 @@ Rectangle {
                                 smooth: true; mipmap: true
                                 fillMode: Image.PreserveAspectFit
                                 anchors.horizontalCenter: parent.horizontalCenter
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    anchors.margins: -border.width - 4
+                                    color: Qt.rgba(1,1,1,0.1)
+                                    border { width: 2; color: titleLink.hoverColor }
+                                    visible: coverPicMouseArea.containsMouse
+                                }
+
+                                MouseArea {
+                                    id: coverPicMouseArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: TitlePageDialog.launch()
+                                }
                             }
 
-                            VclText {
+                            Link {
+                                id: titleLink
                                 font.family: screenplayFontMetrics.font.family
                                 font.pointSize: screenplayFontMetrics.font.pointSize + 2
                                 font.bold: true
+                                font.underline: containsMouse
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
                                 text: Scrite.document.screenplay.title === "" ? "<untitled>" : Scrite.document.screenplay.title
+                                onClicked: TitlePageDialog.launch()
                             }
 
-                            VclText {
+                            Link {
                                 font.family: screenplayFontMetrics.font.family
                                 font.pointSize: screenplayFontMetrics.font.pointSize
                                 font.bold: true
+                                font.underline: containsMouse
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
                                 text: Scrite.document.screenplay.subtitle
                                 visible: Scrite.document.screenplay.subtitle !== ""
+                                onClicked: TitlePageDialog.launch()
                             }
 
                             Column {
@@ -1794,30 +1815,39 @@ Rectangle {
                                     text: "Written By"
                                 }
 
-                                VclText {
-                                    font: screenplayFontMetrics.font
+                                Link {
+                                    font.family: screenplayFontMetrics.font.family
+                                    font.pointSize: screenplayFontMetrics.font.pointSize
+                                    font.underline: containsMouse
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     horizontalAlignment: Text.AlignHCenter
                                     text: (Scrite.document.screenplay.author === "" ? "<unknown author>" : Scrite.document.screenplay.author)
+                                    onClicked: TitlePageDialog.launch()
                                 }
                             }
 
-                            VclText {
-                                font: screenplayFontMetrics.font
+                            Link {
+                                font.family: screenplayFontMetrics.font.family
+                                font.pointSize: screenplayFontMetrics.font.pointSize
+                                font.underline: containsMouse
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
                                 text: Scrite.document.screenplay.version === "" ? "Initial Version" : Scrite.document.screenplay.version
+                                onClicked: TitlePageDialog.launch()
                             }
 
-                            VclText {
-                                font: screenplayFontMetrics.font
+                            Link {
+                                font.family: screenplayFontMetrics.font.family
+                                font.pointSize: screenplayFontMetrics.font.pointSize
+                                font.underline: containsMouse
                                 width: parent.width
                                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                 horizontalAlignment: Text.AlignHCenter
                                 text: Scrite.document.screenplay.basedOn
                                 visible: Scrite.document.screenplay.basedOn !== ""
+                                onClicked: TitlePageDialog.launch()
                             }
 
                             Item { width: parent.width; height: parent.spacing/2 }
@@ -1828,65 +1858,61 @@ Rectangle {
                                 anchors.right: parent.horizontalCenter
                                 anchors.rightMargin: -width*0.25
 
-                                VclText {
+                                Link {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    font.underline: containsMouse
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     text: Scrite.document.screenplay.contact
                                     visible: text !== ""
+                                    onClicked: TitlePageDialog.launch()
                                 }
 
-                                VclText {
+                                Link {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    font.underline: containsMouse
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     text: Scrite.document.screenplay.address
                                     visible: text !== ""
+                                    onClicked: TitlePageDialog.launch()
                                 }
 
-                                VclText {
+                                Link {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
+                                    font.underline: containsMouse
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     text: Scrite.document.screenplay.phoneNumber
                                     visible: text !== ""
+                                    onClicked: TitlePageDialog.launch()
                                 }
 
-                                VclText {
+                                Link {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
-                                    font.underline: true
+                                    font.underline: containsMouse
                                     color: "blue"
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                                     text: Scrite.document.screenplay.email
                                     visible: text !== ""
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: Qt.openUrlExternally("mailto:" + parent.text)
-                                        cursorShape: Qt.PointingHandCursor
-                                    }
+                                    onClicked: TitlePageDialog.launch()
                                 }
 
-                                VclText {
+                                Link {
                                     font.family: screenplayFontMetrics.font.family
                                     font.pointSize: screenplayFontMetrics.font.pointSize-2
-                                    font.underline: true
+                                    font.underline: containsMouse
                                     color: "blue"
                                     width: parent.width
                                     elide: Text.ElideRight
                                     text: Scrite.document.screenplay.website
                                     visible: text !== ""
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: Qt.openUrlExternally(parent.text)
-                                        cursorShape: Qt.PointingHandCursor
-                                    }
+                                    onClicked: TitlePageDialog.launch()
                                 }
                             }
                         }
