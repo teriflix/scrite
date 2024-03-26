@@ -322,14 +322,11 @@ Item {
 
             SimpleToolButton {
                 ToolTip.visible: containsMouse
-                ToolTip.text: "Copy " + paragraphTypeComboBox.currentText + " properties to other paragraph types."
+                ToolTip.text: "Copy one or more attributes of " + paragraphTypeComboBox.currentText + " to other paragraph types."
 
                 hoverEnabled: true
                 iconSource: "qrc:/icons/action/done_all.png"
-                onClicked: {
-                    displayElementFormat.applyToAll(SceneElementFormat.AllProperties)
-                    printElementFormat.applyToAll(SceneElementFormat.AllProperties)
-                }
+                onClicked: copyAttribsDialog.open()
             }
         }
 
@@ -503,6 +500,167 @@ Item {
     }
 
     // Private implementation
+    VclDialog {
+        id: copyAttribsDialog
+
+        title: "Copy Attributes"
+        width: 640
+        height: 480
+
+        content: Item {
+            ColumnLayout {
+                width: parent.width-40
+                anchors.centerIn: parent
+                spacing: 20
+
+                VclText {
+                    Layout.fillWidth: true
+                    wrapMode: Text.WordWrap
+                    text: "Select attributes of <b>" + paragraphTypeComboBox.currentText + "</b> you want to copy to all other paragraph types."
+                }
+
+                ColumnLayout {
+                    Layout.alignment: Qt.AlignHCenter
+
+                    spacing: 5
+
+                    VclCheckBox {
+                        id: copyFontFamilyAttrib
+                        text: "Font Family: " + _private.displayElementFormat.font.family
+                        checked: false
+                    }
+
+                    VclCheckBox {
+                        id: copyFontSizeAttrib
+                        text: "Font Size: " + _private.displayElementFormat.font.pointSize + " pt"
+                        checked: false
+                    }
+
+                    VclCheckBox {
+                        id: copyFontStyleAttrib
+                        text: "Font Style: (" + fontStyle + ")"
+                        checked: false
+                        visible: fontStyle !== ""
+
+                        property string fontStyle: {
+                            var styles = []
+                            if(_private.displayElementFormat.font.bold)
+                                styles.push("<b>B</b>")
+                            if(_private.displayElementFormat.font.italic)
+                                styles.push("<i>I</i>")
+                            if(_private.displayElementFormat.font.underline)
+                                styles.push("<u>U</u>")
+                            return styles.join(", ")
+                        }
+                    }
+
+                    VclCheckBox {
+                        id: copyTextAlignmentAttrib
+                        text: "Alignment: " + alignment
+                        checked: false
+
+                        property string alignment: {
+                            if(_private.displayElementFormat.textAlignment === Qt.AlignLeft)
+                                return "Left Align"
+                            if(_private.displayElementFormat.textAlignment === Qt.AlignRight)
+                                return "Right Align"
+                            if(_private.displayElementFormat.textAlignment === Qt.AlignHCenter)
+                                return "Center Align"
+                            if(_private.displayElementFormat.textAlignment === Qt.AlignJustify)
+                                return "Justify"
+                            return "Left Align"
+                        }
+                    }
+
+                    VclCheckBox {
+                        id: copyLineHeightAttrib
+                        text: "Line Height: " + Math.round(_private.displayElementFormat.lineHeight*100) + "%"
+                        checked: false
+                    }
+
+                    RowLayout {
+                        spacing: 0
+
+                        VclCheckBox {
+                            id: copyColorAttribs
+                            text: "Colors"
+                            checked: false
+                        }
+
+                        Rectangle {
+                            implicitWidth: 30
+                            implicitHeight: 30
+                            color: _private.displayElementFormat.backgroundColor
+                            border.width: 1
+                            border.color: Runtime.colors.primary.borderColor
+
+                            Text {
+                                font.pixelSize: parent.height * 0.7
+                                color: _private.displayElementFormat.textColor
+                                anchors.centerIn: parent
+                                text: "A"
+                            }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 20
+
+                    VclButton {
+                        text: "Select All"
+                        onClicked: {
+                            copyFontFamilyAttrib.checked = true
+                            copyFontSizeAttrib.checked = true
+                            copyFontStyleAttrib.checked = true
+                            copyLineHeightAttrib.checked = true
+                            copyTextAlignmentAttrib.checked = true
+                            copyColorAttribs.checked = true
+                        }
+                    }
+
+                    VclButton {
+                        text: "Unselect All"
+                        onClicked: {
+                            copyFontFamilyAttrib.checked = false
+                            copyFontSizeAttrib.checked = false
+                            copyFontStyleAttrib.checked = false
+                            copyLineHeightAttrib.checked = false
+                            copyTextAlignmentAttrib.checked = false
+                            copyColorAttribs.checked = false
+                        }
+                    }
+
+                    VclButton {
+                        text: "Apply"
+                        onClicked: {
+                            var applyToAll = (props) => {
+                                _private.displayElementFormat.applyToAll(props)
+                                _private.printElementFormat.applyToAll(props)
+                            }
+
+                            if(copyFontFamilyAttrib.checked)
+                                applyToAll(SceneElementFormat.FontFamily)
+                            if(copyFontSizeAttrib.checked)
+                                applyToAll(SceneElementFormat.FontSize)
+                            if(copyFontStyleAttrib.checked)
+                                applyToAll(SceneElementFormat.FontStyle)
+                            if(copyLineHeightAttrib.checked)
+                                applyToAll(SceneElementFormat.LineHeight)
+                            if(copyTextAlignmentAttrib.checked)
+                                applyToAll(SceneElementFormat.TextAlignment)
+                            if(copyColorAttribs.checked)
+                                applyToAll(SceneElementFormat.TextAndBackgroundColors)
+
+                            copyAttribsDialog.close()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     QtObject {
         id: _private
 

@@ -785,6 +785,9 @@ void ScreenplayFormat::applyToAll(const SceneElementFormat *from,
         case SceneElementFormat::LineSpacingBefore:
             format->setLineSpacingBefore(from->lineSpacingBefore());
             break;
+        case SceneElementFormat::TextAlignment:
+            format->setTextAlignment(from->textAlignment());
+            break;
         case SceneElementFormat::TextAndBackgroundColors:
             format->setTextColor(from->textColor());
             format->setBackgroundColor(from->backgroundColor());

@@ -147,6 +147,7 @@ public:
         FontStyle,
         LineHeight,
         LineSpacingBefore,
+        TextAlignment,
         TextAndBackgroundColors,
         AllProperties
     };
