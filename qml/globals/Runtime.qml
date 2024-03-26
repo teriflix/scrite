@@ -258,7 +258,17 @@ Item {
         property string theme: "Material"
         property int primaryColor: colors.defaultPrimaryColor
         property int accentColor: colors.defaultAccentColor
+
+        Component.onCompleted: {
+            Qt.callLater( () => {
+                             Runtime.currentTheme = theme
+                             Runtime.currentUseSoftwareRenderer = useSoftwareRenderer
+                         })
+        }
     }
+
+    property string currentTheme
+    property bool currentUseSoftwareRenderer
 
     // Global undo-redo object
     readonly property UndoStack undoStack: UndoStack {

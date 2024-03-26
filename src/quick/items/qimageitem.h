@@ -16,9 +16,9 @@
 
 #include <QIcon>
 #include <QImage>
-#include <QQuickItem>
+#include <QQuickPaintedItem>
 
-class QImageItem : public QQuickItem
+class QImageItem : public QQuickPaintedItem
 {
     Q_OBJECT
     QML_ELEMENT
@@ -26,6 +26,11 @@ class QImageItem : public QQuickItem
 public:
     QImageItem(QQuickItem *parentItem = nullptr);
     ~QImageItem();
+
+    Q_PROPERTY(bool useSoftwareRenderer READ useSoftwareRenderer WRITE setUseSoftwareRenderer NOTIFY useSoftwareRendererChanged)
+    void setUseSoftwareRenderer(bool val);
+    bool useSoftwareRenderer() const { return m_useSoftwareRenderer; }
+    Q_SIGNAL void useSoftwareRendererChanged();
 
     enum FillMode { Stretch, PreserveAspectFit, PreserveAspectCrop };
     Q_ENUM(FillMode)
@@ -43,12 +48,17 @@ public:
     Q_SIGNAL void imageChanged();
 
 protected:
+    // QQuickPaintedItem interface
+    void paint(QPainter *painter);
+
     // QQuickItem interface
     QSGNode *updatePaintNode(QSGNode *, UpdatePaintNodeData *);
 
 private:
     QImage m_image;
     FillMode m_fillMode = PreserveAspectFit;
+    bool m_useSoftwareRenderer = false;
+    enum { UnknownPaintMode, SceneGraphPaintMode, PainterPaintMode } lastPaintMode = UnknownPaintMode;
 };
 
 #endif // QIMAGEITEM_H

@@ -20,8 +20,9 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
+import "qrc:/qml/controls"
 
 Item {
     id: root
@@ -57,14 +58,50 @@ Item {
                     checked: Runtime.applicationSettings.useSoftwareRenderer
                     onToggled: {
                         Runtime.applicationSettings.useSoftwareRenderer = checked
-                        Notification.active = true
+
+                        if(Runtime.currentUseSoftwareRenderer !== checked) {
+                            const msg = checked ? "Software renderer will be used when you restart Scrite." : "Accelerated graphics renderer will be used when you restart Scrite."
+                            MessageBox.information("Requires Restart", msg)
+                        }
                     }
-                    Notification.title: "Requires Restart"
-                    Notification.text: checked ? "Software renderer will be used when you restart Scrite." : "Accelerated graphics renderer will be used when you restart Scrite."
-                    Notification.autoClose: false
                     ToolTip.text: "If you feel that Scrite is not responding fast enough, then you may want to switch to using a Software Renderer to speed things up. Otherwise, keep this option unchecked for best experience."
                     ToolTip.visible: hovered
                     ToolTip.delay: 1000
+                }
+
+                // Move this to ApplicationsThemePage.qml when we open up that
+                RowLayout {
+                    spacing: 10
+
+                    VclText {
+                        id: themeLabel
+                        text: "Theme: "
+                        leftPadding: 10
+                    }
+
+                    VclComboBox {
+                        id: themesComboBox
+
+                        enabled: Runtime.currentUseSoftwareRenderer === false
+
+                        model: Scrite.app.availableThemes
+                        readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
+                        currentIndex: {
+                            const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.theme)
+                            if(idx < 0)
+                                return materialStyleIndex
+                            return idx
+                        }
+                        onCurrentTextChanged: {
+                            Runtime.applicationSettings.theme = currentText
+                            if(Runtime.currentTheme !== currentText)
+                                MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
+                        }
+
+                        ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
+                        ToolTip.visible: hovered
+                        ToolTip.delay: 1000
+                    }
                 }
             }
         }

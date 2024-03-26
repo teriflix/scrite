@@ -18,15 +18,25 @@
 #include <QSGTexture>
 #include <QQuickWindow>
 #include <QSGOpaqueTextureMaterial>
+#include <QPainter>
 
-QImageItem::QImageItem(QQuickItem *parentItem) : QQuickItem(parentItem)
+QImageItem::QImageItem(QQuickItem *parentItem) : QQuickPaintedItem(parentItem)
 {
-    this->setFlag(QQuickItem::ItemHasContents);
     connect(this, &QImageItem::imageChanged, this, &QQuickItem::update);
     connect(this, &QImageItem::fillModeChanged, this, &QQuickItem::update);
+    connect(this, &QImageItem::useSoftwareRendererChanged, this, &QQuickItem::update);
 }
 
 QImageItem::~QImageItem() { }
+
+void QImageItem::setUseSoftwareRenderer(bool val)
+{
+    if (m_useSoftwareRenderer == val)
+        return;
+
+    m_useSoftwareRenderer = val;
+    emit useSoftwareRendererChanged();
+}
 
 void QImageItem::setFillMode(FillMode val)
 {
@@ -34,7 +44,9 @@ void QImageItem::setFillMode(FillMode val)
         return;
 
     m_fillMode = val;
+
     this->setClip(m_fillMode == PreserveAspectCrop);
+
     emit fillModeChanged();
 }
 
@@ -52,8 +64,52 @@ void QImageItem::setImage(const QImage &val)
     emit imageChanged();
 }
 
-QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *)
+void QImageItem::paint(QPainter *painter)
 {
+    if (m_image.isNull())
+        return;
+
+    QRectF sourceRect, targetRect;
+
+    switch (m_fillMode) {
+    case Stretch:
+        sourceRect = m_image.rect();
+        targetRect = this->boundingRect();
+        break;
+    case PreserveAspectFit:
+        sourceRect = m_image.rect();
+        targetRect =
+                QRectF(QPointF(0, 0), sourceRect.size().scaled(this->size(), Qt::KeepAspectRatio));
+        targetRect.moveCenter(this->boundingRect().center());
+        break;
+    case PreserveAspectCrop:
+        sourceRect = m_image.rect();
+        targetRect = QRectF(QPointF(0, 0),
+                            sourceRect.size().scaled(this->size(), Qt::KeepAspectRatioByExpanding));
+        targetRect.moveCenter(this->boundingRect().center());
+        break;
+    }
+
+    painter->setRenderHint(QPainter::SmoothPixmapTransform);
+    painter->drawImage(targetRect, m_image, sourceRect);
+}
+
+QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *data)
+{
+    if (m_useSoftwareRenderer) {
+        if (lastPaintMode == SceneGraphPaintMode) {
+            if (oldRoot)
+                delete oldRoot;
+
+            oldRoot = nullptr;
+        }
+
+        lastPaintMode = PainterPaintMode;
+        return QQuickPaintedItem::updatePaintNode(oldRoot, data);
+    }
+
+    lastPaintMode = SceneGraphPaintMode;
+
     if (oldRoot)
         delete oldRoot;
 

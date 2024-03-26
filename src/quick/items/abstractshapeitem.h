@@ -100,6 +100,12 @@ private:
     RenderType m_renderType = OutlineAndFill;
     OutlineStyle m_outlineStyle = SolidLine;
     RenderingMechanism m_renderingMechanism = UseOpenGL;
+
+    enum {
+        UnknownPaintMode,
+        SceneGraphPaintMode,
+        PainterPaintMode
+    } lastPaintMode = UnknownPaintMode;
 };
 
 #endif // ABSTRACTSHAPEITEM_H

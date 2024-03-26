@@ -38,43 +38,6 @@ Item {
 
         spacing: 20
 
-        RowLayout {
-            spacing: 10
-
-            VclText {
-                id: themeLabel
-                text: "Theme: "
-                leftPadding: 10
-            }
-
-            VclComboBox {
-                id: themesComboBox
-
-                model: Scrite.app.availableThemes
-                readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
-                currentIndex: {
-                    const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.theme)
-                    if(idx < 0)
-                        return materialStyleIndex
-                    return idx
-                }
-                onCurrentTextChanged: {
-                    const oldTheme = Runtime.applicationSettings.theme
-                    Runtime.applicationSettings.theme = currentText
-                    if(oldTheme !== currentText && !restartRequiredShown)
-                        MessageBox.information("Requires Restart", "The newly selected theme will be applied only after Scrite app is restarted.", () => {
-                                                    themesComboBox.restartRequiredShown = true
-                                               })
-                }
-
-                property bool restartRequiredShown: false
-
-                ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
-                ToolTip.visible: hovered
-                ToolTip.delay: 1000
-            }
-        }
-
         GroupBox {
             Layout.fillWidth: true
 

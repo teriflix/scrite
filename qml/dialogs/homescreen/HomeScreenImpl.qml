@@ -245,6 +245,7 @@ Item {
 
         QImageItem {
             fillMode: QImageItem.PreserveAspectFit
+            useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
         }
     }
 

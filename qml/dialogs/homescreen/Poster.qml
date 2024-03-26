@@ -56,6 +56,7 @@ Item {
             visible: _private.posterQImage !== undefined
 
             fillMode: QImageItem.PreserveAspectCrop
+            useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
             image: _private.posterQImage
         }
@@ -98,6 +99,7 @@ Item {
             visible: _private.posterQImage !== undefined
 
             fillMode: QImageItem.PreserveAspectFit
+            useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
             image: _private.posterQImage
         }

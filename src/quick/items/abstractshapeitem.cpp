@@ -143,13 +143,29 @@ QSGNode *AbstractShapeItem::updatePaintNode(QSGNode *oldNode,
     static const bool isSoftwareContext =
             qgetenv("QMLSCENE_DEVICE") == QByteArray("softwarecontext");
     if (isSoftwareContext || m_renderingMechanism == UseQPainter
-        || m_renderingMechanism == UseAntialiasedQPainter)
+        || m_renderingMechanism == UseAntialiasedQPainter) {
+        if (lastPaintMode == SceneGraphPaintMode && oldNode) {
+            delete oldNode;
+            oldNode = nullptr;
+        }
+
+        lastPaintMode = PainterPaintMode;
         return QQuickPaintedItem::updatePaintNode(oldNode, nodeData);
+    }
 
     QQuickWindow *qmlWindow = this->window();
     if (qmlWindow
-        && qmlWindow->rendererInterface()->graphicsApi() == QSGRendererInterface::Software)
+        && qmlWindow->rendererInterface()->graphicsApi() == QSGRendererInterface::Software) {
+        if (lastPaintMode == SceneGraphPaintMode && oldNode) {
+            delete oldNode;
+            oldNode = nullptr;
+        }
+
+        lastPaintMode = PainterPaintMode;
         return QQuickPaintedItem::updatePaintNode(oldNode, nodeData);
+    }
+
+    lastPaintMode = SceneGraphPaintMode;
 
     if (pathUpdated) {
         if (oldNode)
