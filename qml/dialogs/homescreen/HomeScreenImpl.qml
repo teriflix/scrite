@@ -635,7 +635,7 @@ Item {
                               "<strong>Copyright:</strong> " + _record.copyright + "<br/><br/>" +
                               "<strong>Source:</strong> " + _record.source
                             if(!banner.visible)
-                                ret += "<br/><br/><strong>Logline:</strong> " + record._record
+                                ret += "<br/><br/><strong>Logline:</strong> " + _record.logline
                             return ret
                         }
 
