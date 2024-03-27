@@ -2028,7 +2028,7 @@ void ScriteDocument::setFormatting(ScreenplayFormat *val)
         GarbageCollector::instance()->add(m_formatting);
 
     m_formatting = val;
-    m_formatting->setSreeenFromWindow(Scrite::windowObject());
+    m_formatting->setSreeenFromWindow(Scrite::window());
 
     if (m_formatting != nullptr)
         m_formatting->setParent(this);

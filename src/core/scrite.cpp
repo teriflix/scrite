@@ -31,19 +31,9 @@ Scrite::~Scrite()
     qDebug() << "Warning: Scrite namespace being destroyed.";
 }
 
-QObject *Scrite::appObject()
-{
-    return Scrite::app();
-}
-
 Application *Scrite::app()
 {
     return Application::instance();
-}
-
-QObject *Scrite::windowObject()
-{
-    return Scrite::window();
 }
 
 AppWindow *Scrite::window()
@@ -51,19 +41,9 @@ AppWindow *Scrite::window()
     return AppWindow::instance();
 }
 
-QObject *Scrite::userObject()
-{
-    return Scrite::user();
-}
-
 User *Scrite::user()
 {
     return User::instance();
-}
-
-QObject *Scrite::documentObject()
-{
-    return Scrite::document();
 }
 
 ScriteDocument *Scrite::document()
@@ -71,29 +51,15 @@ ScriteDocument *Scrite::document()
     return ScriteDocument::instance();
 }
 
-QObject *Scrite::vaultObject()
-{
-    return ScriteDocumentVault::instance();
-}
 
 ScriteDocumentVault *Scrite::vault()
 {
     return ScriteDocumentVault::instance();
 }
 
-QObject *Scrite::shortcutsObject()
-{
-    return Scrite::shortcuts();
-}
-
 ShortcutsModel *Scrite::shortcuts()
 {
     return ShortcutsModel::instance();
-}
-
-QObject *Scrite::notificationsObject()
-{
-    return Scrite::notifications();
 }
 
 NotificationManager *Scrite::notifications()

@@ -14,15 +14,15 @@
 #ifndef SCRITE_NAMESPACE_H
 #define SCRITE_NAMESPACE_H
 
-#include <QQmlEngine>
+#include "user.h"
+#include "appwindow.h"
+#include "application.h"
+#include "scritedocument.h"
+#include "shortcutsmodel.h"
+#include "notificationmanager.h"
+#include "scritedocumentvault.h"
 
-class User;
-class AppWindow;
-class Application;
-class ScriteDocument;
-class ShortcutsModel;
-class NotificationManager;
-class ScriteDocumentVault;
+#include <QQmlEngine>
 
 class Scrite : public QObject
 {
@@ -53,32 +53,25 @@ public:
     };
     Q_ENUM(AppFeature)
 
-    Q_PROPERTY(QObject *app READ appObject CONSTANT)
-    static QObject *appObject();
+    Q_PROPERTY(Application *app READ app CONSTANT)
     static Application *app();
 
-    Q_PROPERTY(QObject *window READ windowObject CONSTANT)
-    static QObject *windowObject();
+    Q_PROPERTY(AppWindow *window READ window CONSTANT)
     static AppWindow *window();
 
-    Q_PROPERTY(QObject *user READ userObject CONSTANT)
-    static QObject *userObject();
+    Q_PROPERTY(User *user READ user CONSTANT)
     static User *user();
 
-    Q_PROPERTY(QObject *document READ documentObject CONSTANT)
-    static QObject *documentObject();
+    Q_PROPERTY(ScriteDocument *document READ document CONSTANT)
     static ScriteDocument *document();
 
-    Q_PROPERTY(QObject *vault READ vaultObject CONSTANT)
-    static QObject *vaultObject();
+    Q_PROPERTY(ScriteDocumentVault *vault READ vault CONSTANT)
     static ScriteDocumentVault *vault();
 
-    Q_PROPERTY(QObject *shortcuts READ shortcutsObject CONSTANT)
-    static QObject *shortcutsObject();
+    Q_PROPERTY(ShortcutsModel *shortcuts READ shortcuts CONSTANT)
     static ShortcutsModel *shortcuts();
 
-    Q_PROPERTY(QObject *notifications READ notificationsObject CONSTANT)
-    static QObject *notificationsObject();
+    Q_PROPERTY(NotificationManager *notifications READ notifications CONSTANT)
     static NotificationManager *notifications();
 
     Q_PROPERTY(QString fileNameToOpen READ fileNameToOpen CONSTANT)
