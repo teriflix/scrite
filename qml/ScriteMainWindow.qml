@@ -375,13 +375,11 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: 5
-            visible: appToolBarArea.width >= 1150
+            visible: appToolBarArea.width >= 1200
             onVisibleChanged: {
                 if(enabled && !visible)
                     mainTabBar.activateTab(0)
             }
-
-            // spacing: Scrite.window.width >= 1440 ? 2 : 0
 
             FlatToolButton {
                 id: homeButton
