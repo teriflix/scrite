@@ -16,7 +16,6 @@ LodLoader 1.0 LodLoader.qml
 MarkSceneAsMenu 1.0 MarkSceneAsMenu.qml
 MenuLoader 1.0 MenuLoader.qml
 PageView 1.0 PageView.qml
-qmldir 1.0 qmldir
 RectangleTabView 1.0 RectangleTabView.qml
 RichTextEdit 1.0 RichTextEdit.qml
 RubberBand 1.0 RubberBand.qml

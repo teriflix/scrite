@@ -156,5 +156,6 @@
         <file>qml/helpers/SimpleToolButton.qml</file>
         <file>qml/helpers/ColorToolButton.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
+        <file>qml/dialogs/homescreen/OpenFileTask.qml</file>
     </qresource>
 </RCC>

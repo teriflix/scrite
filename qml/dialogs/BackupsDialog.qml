@@ -22,8 +22,9 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
+import "qrc:/qml/dialogs/homescreen"
 
 Item {
     id: root
@@ -144,17 +145,8 @@ Item {
                             ToolTip.visible: hovered
                             ToolTip.text: "Closes the current document and loads the selected backup."
                             onClicked: {
-                                const filePath = backupFilesView.currentBackupFilePath
-
-                                Runtime.loadMainUiContent = false
-                                var waitDialog = WaitDialog.launch()
-                                Scrite.document.openAnonymously(filePath)
-                                Utils.execLater(dialog, 50, () => {
-                                                    Runtime.loadMainUiContent = true
-                                                    Qt.callLater(dialog.close)
-                                                    if(waitDialog)
-                                                        waitDialog.close()
-                                                } )
+                                var task = OpenFileTask.openAnonymously(backupFilesView.currentBackupFilePath)
+                                task.finished.connect(dialog.close)
                             }
                         }
 

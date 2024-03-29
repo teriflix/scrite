@@ -22,7 +22,7 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 
 Item {
-    id: scriteRuntime
+    id: root
 
     visible: false
 
@@ -481,10 +481,10 @@ Item {
         property string sessionId
         source: {
             if(Scrite.document.sessionId !== sessionId)
-                return null
+            return null
 
             if(mainWindowTab === e_ScreenplayTab)
-                return Scrite.document.screenplay
+            return Scrite.document.screenplay
 
             if(Scrite.document.screenplay.currentElementIndex < 0) {
                 var index = Scrite.document.structure.currentElementIndex

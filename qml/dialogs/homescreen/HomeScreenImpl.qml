@@ -176,6 +176,7 @@ Item {
 
         onImportFinished: (index) => {
                               Runtime.loadMainUiContent = true
+                              Qt.callLater(Scrite.document.justLoaded)
                               Utils.execLater(libraryService, 250, function() {
                                   closeRequest()
                               })
@@ -444,7 +445,8 @@ Item {
             showPoster: fileInfo.hasCoverPage
             onClicked: {
                 saveWorkflow.launch( () => {
-                                      _private.openScriteDocument(fileInfo.filePath)
+                                        var task = OpenFileTask.open(fileInfo.filePath)
+                                        task.finished.connect(closeRequest)
                                     } )
             }
         }
@@ -658,10 +660,9 @@ Item {
             saveWorkflow.launch( () => {
                                     homeScreenBusyOverlay.visible = true
                                     homeScreen.enabled = false
-                                    Runtime.loadMainUiContent = false
-                                    Scrite.document.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
-                                    Runtime.loadMainUiContent = true
-                                    closeRequest()
+
+                                    var task = OpenFileTask.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
+                                    task.finished.connect(closeRequest)
                                 } )
         }
 
@@ -833,11 +834,8 @@ Item {
 
                     Runtime.workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
 
-                    Runtime.loadMainUiContent = false
-                    Scrite.document.openOrImport(fileToImport.path)
-                    Runtime.loadMainUiContent = true
-
-                    closeRequest()
+                    var task = OpenFileTask.openOrImport(fileToImport.path)
+                    task.finished.connect(closeRequest)
                 }
 
                 ColumnLayout {
@@ -1029,7 +1027,9 @@ Item {
             Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
             const path = Scrite.app.urlToLocalFile(fileUrl)
-            _private.openScriteDocument(path)
+
+            var task = OpenFileTask.open(path)
+            task.finished.connect(closeRequest)
         }
     }
 
