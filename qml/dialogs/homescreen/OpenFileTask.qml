@@ -91,7 +91,7 @@ QtObject {
                 Scrite.document.justLoaded()
                 if(theTaskInstance.waitDialog)
                     theTaskInstance.waitDialog.close()
-                Qt.callLater(theTaskInstance.done)
+                Qt.callLater(theTaskInstance.destroy)
             }
         }
     }
