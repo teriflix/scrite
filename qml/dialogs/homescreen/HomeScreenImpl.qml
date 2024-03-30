@@ -146,26 +146,6 @@ Item {
         visible: libraryService.busy
     }
 
-    Loader {
-        id: saveWorkflow
-        anchors.fill: parent
-        active: false
-        property var operation: null
-
-        function launch(op) {
-            operation = op
-            active = true
-        }
-
-        sourceComponent: SaveWorkflow {
-            onDone: {
-                saveWorkflow.operation = null
-                saveWorkflow.active = false
-            }
-            operation: saveWorkflow.operation
-        }
-    }
-
     LibraryService {
         id: libraryService
 
@@ -357,7 +337,7 @@ Item {
                         Layout.fillWidth: true
                         tooltip: "Creates a new blank Scrite document."
                         onClicked: {
-                            saveWorkflow.launch( () => {
+                            SaveFileTask.save( () => {
                                                     homeScreen.enabled = false
                                                     Scrite.document.reset()
                                                     closeRequest()
@@ -397,7 +377,7 @@ Item {
                         iconSource: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
                         showPoster: index > 0
                         onClicked: {
-                            saveWorkflow.launch( () => {
+                            SaveFileTask.save( () => {
                                                     libraryService.openTemplateAt(index)
                                                 } )
                         }
@@ -414,7 +394,7 @@ Item {
             Layout.fillWidth: true
             tooltip: "Launches a file dialog box so you can select a .scrite file to load from disk."
             onClicked: {
-                saveWorkflow.launch( () => {
+                SaveFileTask.save( () => {
                                         openFileDialog.open()
                                     } )
             }
@@ -444,7 +424,7 @@ Item {
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
             showPoster: fileInfo.hasCoverPage
             onClicked: {
-                saveWorkflow.launch( () => {
+                SaveFileTask.save( () => {
                                         var task = OpenFileTask.open(fileInfo.filePath)
                                         task.finished.connect(closeRequest)
                                     } )
@@ -465,7 +445,7 @@ Item {
             iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
             showPoster: true
             onClicked: {
-                saveWorkflow.launch( () => {
+                SaveFileTask.save( () => {
                                         libraryService.openScreenplayAt(index)
                                     } )
             }
@@ -537,7 +517,7 @@ Item {
         property bool hasSelection: screenplaysView.currentIndex >= 0
 
         function openSelected() {
-            saveWorkflow.launch( () => {
+            SaveFileTask.save( () => {
                                     if(screenplaysView.currentIndex >= 0)
                                         libraryService.openScreenplayAt(screenplaysView.currentIndex)
                                 } )
@@ -657,7 +637,7 @@ Item {
             if(vaultFilesView.currentIndex < 0)
                 return
 
-            saveWorkflow.launch( () => {
+            SaveFileTask.save( () => {
                                     homeScreenBusyOverlay.visible = true
                                     homeScreen.enabled = false
 
@@ -732,7 +712,7 @@ Item {
             if(importPageStackLayout.currentIndex === 1)
                 dropBrowseItem.doBrowse()
             else if(importPageStackLayout.currentIndex === 2) {
-                saveWorkflow.launch( () => {
+                SaveFileTask.save( () => {
                                         homeScreen.enabled = false
                                         importDroppedFileItem.doImport()
                                     } )

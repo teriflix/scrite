@@ -31,7 +31,6 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch() {
-
         var dlg = dialogComponent.createObject(root)
         if(dlg) {
             dlg.closed.connect(dlg.destroy)

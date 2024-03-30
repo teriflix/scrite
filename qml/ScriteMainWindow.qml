@@ -2011,14 +2011,6 @@ Item {
     }
 
     Item {
-        property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
-        Notification.active: applicationErrors ? applicationErrors.hasError : false
-        Notification.title: "Scrite Error"
-        Notification.text: applicationErrors ? applicationErrors.errorMessage : ""
-        Notification.autoClose: false
-    }
-
-    Item {
         id: closeEventHandler
         width: 100
         height: 100
@@ -2168,17 +2160,30 @@ Item {
     }
 
     QtObject {
-        id: documentLoadErrors
+        property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
+        property bool errorReportHasError: applicationErrors.hasError
+        onErrorReportHasErrorChanged: {
+            if(errorReportHasError)
+                MessageBox.information("Scrite Error", applicationErrors.errorMessage, applicationErrors.clear)
+        }
+    }
 
-        property ErrorReport errorReport: Aggregation.findErrorReport(Scrite.document)
-        Notification.title: "Document Error"
-        Notification.text: errorReport.errorMessage
-        Notification.active: errorReport.hasError
-        Notification.autoClose: false
-        Notification.onDismissed: {
-            if(errorReport.details && errorReport.details.revealOnDesktopRequest)
-                Scrite.app.revealFileOnDesktop(errorReport.details.revealOnDesktopRequest)
-            errorReport.clear()
+    QtObject {
+        property ErrorReport documentErrors: Aggregation.findErrorReport(Scrite.document)
+        property bool errorReportHasError: documentErrors.hasError
+        onErrorReportHasErrorChanged: {
+            if(errorReportHasError) {
+                var msg = documentErrors.errorMessage;
+
+                if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
+                    msg += "<br/><br/>Click Ok to reveal <u>" + documentErrors.details.revealOnDesktopRequest + "</u> on your computer."
+
+                MessageBox.information("Scrite Document Error", msg, () => {
+                                           if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
+                                               Scrite.app.revealFileOnDesktop(documentErrors.details.revealOnDesktopRequest)
+                                           documentErrors.clear()
+                                       })
+            }
         }
     }
 }

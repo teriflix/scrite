@@ -1,5 +1,5 @@
 HomeScreen 1.0 HomeScreen.qml
-SaveWorkflow 1.0 SaveWorkflow.qml
 Poster 1.0 Poster.qml
 
 singleton OpenFileTask 1.0 OpenFileTask.qml
+singleton SaveFileTask 1.0 SaveFileTask.qml

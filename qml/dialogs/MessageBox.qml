@@ -104,7 +104,7 @@ Item {
 
                     VclText {
                         Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
+                        horizontalAlignment: lineCount > 2 ? Text.AlignLeft : Text.AlignHCenter
                         text: dialog.message
                         wrapMode: Text.WordWrap
                     }

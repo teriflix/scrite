@@ -25,7 +25,7 @@
         <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
         <file>qml/dialogs/homescreen/HomeScreenImpl.qml</file>
         <file>qml/dialogs/homescreen/qmldir</file>
-        <file>qml/dialogs/homescreen/SaveWorkflow.qml</file>
+        <file>qml/dialogs/homescreen/SaveFileTask.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_CheckBox.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_EnumSelector.qml</file>
