@@ -352,31 +352,15 @@ public:
 
     Q_INVOKABLE void trimSynopsis();
 
-    Q_PROPERTY(QString emotionalChange READ emotionalChange WRITE setEmotionalChange NOTIFY
-                       emotionalChangeChanged)
-    void setEmotionalChange(const QString &val);
-    QString emotionalChange() const { return m_emotionalChange; }
-    Q_SIGNAL void emotionalChangeChanged();
-
-    Q_PROPERTY(QString charactersInConflict READ charactersInConflict WRITE setCharactersInConflict
-                       NOTIFY charactersInConflictChanged)
-    void setCharactersInConflict(const QString &val);
-    QString charactersInConflict() const { return m_charactersInConflict; }
-    Q_SIGNAL void charactersInConflictChanged();
+    Q_PROPERTY(QStringList indexCardFieldValues READ indexCardFieldValues WRITE setIndexCardFieldValues NOTIFY indexCardFieldValuesChanged)
+    void setIndexCardFieldValues(const QStringList &val);
+    QStringList indexCardFieldValues() const { return m_indexCardFieldValues; }
+    Q_SIGNAL void indexCardFieldValuesChanged();
 
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
     void setColor(const QColor &val);
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
-
-    // Stored as a string, but it must be either a page number or a page range.
-    // Valid values will be of the form "20", "30-50", "10,20,30", "35 45" etc..
-    Q_PROPERTY(QString pageTarget READ pageTarget WRITE setPageTarget NOTIFY pageTargetChanged)
-    void setPageTarget(const QString &val);
-    QString pageTarget() const { return m_pageTarget; }
-    Q_SIGNAL void pageTargetChanged();
-
-    Q_INVOKABLE bool validatePageTarget(int pageNumber) const;
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     void setEnabled(bool val);
@@ -590,9 +574,7 @@ private:
     QString m_synopsis;
     QString m_comments;
     QStringList m_groups;
-    QString m_emotionalChange;
-    QString m_charactersInConflict;
-    QString m_pageTarget;
+    QStringList m_indexCardFieldValues;
     int m_actIndex = -1;
     int m_episodeIndex = -1;
     int m_wordCount = 0;

@@ -26,7 +26,7 @@ import "qrc:/qml/helpers"
 PageView {
     id: root
 
-    pagesArray: ["Options", "Story Beats"]
+    pagesArray: ["Options", "Story Beats", "Index Cards"]
     currentIndex: 0
     pageContent: Loader {
         width: root.availablePageContentWidth
@@ -39,6 +39,9 @@ PageView {
                 break
             case 1:
                 ret += "StoryBeats"
+                break
+            case 2:
+                ret += "IndexCardFields"
                 break
             }
             ret += "Page.qml"

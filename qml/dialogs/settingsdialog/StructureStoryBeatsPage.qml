@@ -37,7 +37,7 @@ Item {
         anchors.margins: 15
         anchors.leftMargin: 0
 
-        spacing: 10
+        spacing: 20
 
         VclText {
             Layout.fillWidth: true
@@ -45,36 +45,44 @@ Item {
             font.bold: true
             wrapMode: Text.WordWrap
 
-            text: target === e_CurrentDocumentTarget ? "Current Document Story Beats" : "Default Global Story Beats"
+            text: target === e_CurrentDocumentTarget ? "Story beats used in the currently open document" : "Default story beats for use in all new documents created in the future"
         }
 
         VclText {
+            property string note: root.target === root.e_DefaultGlobalTarget ? "<br/><br/><b>NOTE:</b> Story beats configured here will not affect the currently open document." : ""
+
             Layout.fillWidth: true
 
             wrapMode: Text.WordWrap
 
-            text: "Customize categories & groups you use for tagging index cards on the structure canvas."
+            text: "Customize categories & groups you use for tagging index cards on the structure canvas. " + note
         }
 
-        FlickableTextArea {
-            id: storyBeatsEditor
+        Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            clip: true
+            color: Runtime.colors.primary.c50.background
 
-            font.family: "Courier Prime"
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            color: Runtime.colors.primary.c50.text
+            border.width: 1
+            border.color: Runtime.colors.primary.borderColor
 
-            text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
-            background: Rectangle {
-                color: Runtime.colors.primary.c50.background
-                border.width: 1
-                border.color: Runtime.colors.primary.borderColor
+            FlickableTextArea {
+                id: storyBeatsEditor
+
+                anchors.fill: parent
+                anchors.margins: 1
+
+                clip: true
+
+                font.family: "Courier Prime"
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                color: Runtime.colors.primary.c50.text
+
+                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
+
+                onTextChanged: cmdApplyButton.enabled = true
             }
-
-            onTextChanged: cmdApplyButton.enabled = true
         }
 
         RowLayout {

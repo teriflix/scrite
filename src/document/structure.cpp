@@ -2609,6 +2609,9 @@ Structure::Structure(QObject *parent)
 
     m_transitions = defaultTransitions();
     m_shots = defaultShots();
+
+    this->loadDefaultIndexCardFields();
+    m_indexCardFields = m_defaultIndexCardFields;
 }
 
 Structure::~Structure()
@@ -4253,6 +4256,61 @@ QString Structure::presentableGroupNames(const QStringList &groups) const
     }
 
     return ret;
+}
+
+inline static QJsonArray cleanupIndexCardFieldsArray(const QJsonArray &val)
+{
+    QJsonArray ret;
+
+    for (int i = 0; i < val.size(); i++) {
+        const QJsonObject item = val.at(i).toObject();
+        if (item.empty())
+            continue;
+
+        const QString name = item.value("name").toString().trimmed();
+        if (name.isEmpty())
+            continue;
+
+        ret.append(item);
+    }
+
+    return ret;
+}
+
+void Structure::setIndexCardFields(const QJsonArray &val)
+{
+    const QJsonArray val2 = cleanupIndexCardFieldsArray(val);
+    if (m_indexCardFields == val2)
+        return;
+
+    m_indexCardFields = val2;
+    emit indexCardFieldsChanged();
+}
+
+void Structure::setDefaultIndexCardFields(const QJsonArray &val)
+{
+    const QJsonArray val2 = cleanupIndexCardFieldsArray(val);
+    if (m_defaultIndexCardFields == val2)
+        return;
+
+    m_defaultIndexCardFields = val2;
+    emit defaultIndexCardFieldsChanged();
+
+    const QByteArray bytes = QJsonDocument(val2).toJson();
+    Application::writeToFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                                     + QStringLiteral("/index_card_fields.json"),
+                             bytes);
+}
+
+void Structure::loadDefaultIndexCardFields()
+{
+    const QByteArray bytes = Application::fileContents(QStandardPaths::writableLocation(
+                                                               QStandardPaths::AppDataLocation)
+                                                       + QStringLiteral("/index_card_fields.json"))
+                                     .toLatin1();
+
+    m_defaultIndexCardFields = QJsonDocument::fromJson(bytes).array();
+    emit defaultIndexCardFieldsChanged();
 }
 
 Annotation *Structure::createAnnotation(const QString &type)

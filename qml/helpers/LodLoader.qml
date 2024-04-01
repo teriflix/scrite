@@ -52,10 +52,16 @@ Loader {
         else
             sourceComponent = defaultDetailComponent
 
-        active = Qt.binding( () => { return sanctioned } )
-        if(resetWidthBeforeLodChange)
+        if(resetWidthBeforeLodChange) {
             Scrite.app.resetObjectProperty(lodLoader, "width")
-        if(resetHeightBeforeLodChange)
+            Scrite.app.resetObjectProperty(lodLoader, "implicitWidth")
+        }
+
+        if(resetHeightBeforeLodChange) {
             Scrite.app.resetObjectProperty(lodLoader, "height")
+            Scrite.app.resetObjectProperty(lodLoader, "implicitHeight")
+        }
+
+        active = Qt.binding( () => { return sanctioned } )
     }
 }

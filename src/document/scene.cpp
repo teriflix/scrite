@@ -1131,9 +1131,7 @@ Scene *Scene::clone(QObject *parent) const
 
     newScene->setGroups(m_groups);
     newScene->setComments(m_comments);
-    newScene->setPageTarget(m_pageTarget);
-    newScene->setEmotionalChange(m_emotionalChange);
-    newScene->setCharactersInConflict(m_charactersInConflict);
+    newScene->setIndexCardFieldValues(m_indexCardFieldValues);
     newScene->setCharacterRelationshipGraph(m_characterRelationshipGraph);
 
     newScene->m_characterElementMap = m_characterElementMap;
@@ -1278,32 +1276,13 @@ void Scene::trimSynopsis()
     }
 }
 
-void Scene::setEmotionalChange(const QString &val)
+void Scene::setIndexCardFieldValues(const QStringList &val)
 {
-    if (m_emotionalChange == val)
+    if (m_indexCardFieldValues == val)
         return;
 
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "emotionalChange");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if (!info->isLocked() && m_undoRedoEnabled)
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
-
-    m_emotionalChange = val;
-    emit emotionalChangeChanged();
-}
-
-void Scene::setCharactersInConflict(const QString &val)
-{
-    if (m_charactersInConflict == val)
-        return;
-
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "charactersInConflict");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if (!info->isLocked() && m_undoRedoEnabled)
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
-
-    m_charactersInConflict = val;
-    emit charactersInConflictChanged();
+    m_indexCardFieldValues = val;
+    emit indexCardFieldValuesChanged();
 }
 
 void Scene::setColor(const QColor &val)
@@ -1318,43 +1297,6 @@ void Scene::setColor(const QColor &val)
 
     m_color = val;
     emit colorChanged();
-}
-
-void Scene::setPageTarget(const QString &val)
-{
-    if (m_pageTarget == val)
-        return;
-
-    ObjectPropertyInfo *info = ObjectPropertyInfo::get(this, "pageTarget");
-    QScopedPointer<PushObjectPropertyUndoCommand> cmd;
-    if (!info->isLocked() && m_undoRedoEnabled)
-        cmd.reset(new PushObjectPropertyUndoCommand(this, info->property));
-
-    m_pageTarget = val;
-    emit pageTargetChanged();
-}
-
-bool Scene::validatePageTarget(int pageNumber) const
-{
-    if (m_pageTarget.isEmpty())
-        return true;
-
-    if (pageNumber < 0)
-        return false;
-
-    const QStringList fields = m_pageTarget.split(QStringLiteral(","), Qt::SkipEmptyParts);
-    for (const QString &field : fields) {
-        const QStringList nos = field.trimmed().split(QStringLiteral("-"), Qt::SkipEmptyParts);
-        if (nos.isEmpty())
-            continue;
-
-        const int nr1 = nos.first().trimmed().toInt();
-        const int nr2 = nos.size() == 1 ? nr1 : nos.last().trimmed().toInt();
-        if (pageNumber >= qMin(nr1, nr2) && pageNumber <= qMax(nr1, nr2))
-            return true;
-    }
-
-    return false;
 }
 
 void Scene::setEnabled(bool val)

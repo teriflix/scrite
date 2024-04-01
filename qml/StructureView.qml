@@ -14,6 +14,7 @@
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Window 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
@@ -1868,6 +1869,12 @@ Item {
                     onClosed: sceneGroup.clearScenes()
                 }
 
+                VclMenuItem {
+                    text: "Index Card Fields"
+                    enabled: elementContextMenu.element
+                    onClicked: StructureIndexCardFieldsDialog.launch()
+                }
+
                 MenuSeparator { }
 
                 VclMenuItem {
@@ -2507,7 +2514,6 @@ Item {
 
     // This is the new style structure element delegate, where we are showing index cards like UI
     // on the structure canvas.
-    readonly property real minIndexCardHeight: 350
     Component {
         id: structureElementIndexCardUIDelegate
 
@@ -2604,7 +2610,14 @@ Item {
             }
 
             width: 350
-            height: Math.max(indexCardLayout.height+10, minIndexCardHeight)
+            height: 300 + Scrite.document.structure.indexCardFields.length * 50
+
+            property int nrFocusFieldCount: {
+                const nrHeadingFields = 1
+                const nrSynopsisFields = Scrite.document.structure.indexCardContent === Structure.Synopsis ? 1 : 0
+                const nrIndexCardFields = Scrite.document.structure.indexCardContent === Structure.Synopsis ? Scrite.document.structure.indexCardFields.length : 0
+                return nrHeadingFields + nrSynopsisFields + nrIndexCardFields
+            }
 
             Rectangle {
                 id: background
@@ -2666,82 +2679,104 @@ Item {
                     canvasScroll.editItem = null
             }
 
-            Column {
+            ColumnLayout {
                 id: indexCardLayout
-                width: parent.width - 14
-                anchors.top: parent.top
-                anchors.topMargin: 3
-                anchors.horizontalCenter: parent.horizontalCenter
+
+                readonly property real margin: 7
+
+                anchors.fill: parent
+                anchors.margins: margin
+
                 spacing: 10
 
                 LodLoader {
                     id: headingFieldLoader
-                    width: parent.width
-                    lod: elementItem.selected && !canvas.scaleIsLessForEdit ? eHIGH : eLOW
+
+                    property bool hasFocus: false
+
+                    Layout.fillWidth: true
 
                     TabSequenceItem.enabled: elementItem.stackedOnTop
                     TabSequenceItem.manager: canvasTabSequence
                     TabSequenceItem.sequence: {
                         var indexes = element.scene.screenplayElementIndexList
                         if(indexes.length === 0)
-                            return elementIndex * 2 + 0
-                        return (indexes[0] + Scrite.document.structure.elementCount) * 2 + 0
+                            return elementIndex * elementItem.nrFocusFieldCount + 0
+                        return (indexes[0] + Scrite.document.structure.elementCount) * elementItem.nrFocusFieldCount + 0
                     }
                     TabSequenceItem.onAboutToReceiveFocus: {
                         Scrite.document.structure.currentElementIndex = elementIndex
                         Qt.callLater(maybeAssumeFocus)
                     }
 
-                    property bool hasFocus: false
+                    lod: elementItem.selected && !canvas.scaleIsLessForEdit ? eHIGH : eLOW
 
                     lowDetailComponent: TextEdit {
                         id: basicHeadingField
-                        text: element.hasTitle ? element.title : "Index Card Title"
-                        color: element.hasTitle ? "black" : "gray"
-                        topPadding: 8
-                        bottomPadding: 16
-                        readOnly: true
-                        selectByKeyboard: false
-                        selectByMouse: false
+
                         Transliterator.defaultFont: font
                         Transliterator.textDocument: textDocument
                         Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+
+                        Component.onCompleted: headingFieldLoader.hasFocus = false
+
+                        text: element.hasTitle ? element.title : "Index Card Title"
+                        color: element.hasTitle ? "black" : "gray"
+                        enabled: false
+                        readOnly: true
+
+                        topPadding: 4
+                        leftPadding: 4
+                        rightPadding: 4
+                        bottomPadding: 4
+
+                        selectByMouse: false
+                        selectByKeyboard: false
+
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         font.capitalization: Font.AllUppercase
+
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        Component.onCompleted: headingFieldLoader.hasFocus = false
-                        EventFilter.events: [EventFilter.MouseButtonPress,EventFilter.MouseButtonRelease,EventFilter.MouseButtonDblClick,EventFilter.MouseMove,EventFilter.Wheel]
-                        EventFilter.onFilter: (object,event,result) => {
-                                                  result.filter = true
-                                                  result.accepted = false
-                                              }
                     }
 
                     highDetailComponent: VclTextField {
                         id: headingField
+
+                        property var currentLanguage: Scrite.app.transliterationEngine.language
+
+                        Component.onCompleted: headingFieldLoader.hasFocus = activeFocus
+                        Keys.onEscapePressed: canvasTabSequence.releaseFocus()
+
                         width: parent.width
+
                         text: element.title
-                        enabled: true
                         label: ""
-                        labelAlwaysVisible: true
-                        placeholderText: "Scene Heading / Name"
+                        enabled: !readOnly
+                        readOnly: Scrite.document.readOnly
+                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         maximumLength: 140
+                        placeholderText: "Scene Heading / Name"
+                        labelAlwaysVisible: true
+                        enableTransliteration: true
+
+                        topPadding: 4
+                        leftPadding: 4
+                        rightPadding: 4
+                        bottomPadding: 4
+
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         font.capitalization: Font.AllUppercase
-                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                        readOnly: Scrite.document.readOnly
+
                         onEditingComplete: { element.title = text; TabSequenceItem.focusNext() }
+
                         onActiveFocusChanged: {
                             if(activeFocus)
                                 elementItem.select()
                             headingFieldLoader.hasFocus = activeFocus
                         }
-                        Component.onCompleted: headingFieldLoader.hasFocus = activeFocus
-                        Keys.onEscapePressed: canvasTabSequence.releaseFocus()
-                        enableTransliteration: true
-                        property var currentLanguage: Scrite.app.transliterationEngine.language
+
                         onCurrentLanguageChanged: {
                             if(currentLanguage !== TransliterationEngine.English)
                                 font.capitalization = Font.MixedCase
@@ -2750,8 +2785,8 @@ Item {
                         }
                     }
 
-                    onFocusChanged: Qt.callLater(maybeAssumeFocus)
                     onItemChanged: Qt.callLater(maybeAssumeFocus)
+                    onFocusChanged: Qt.callLater(maybeAssumeFocus)
 
                     function maybeAssumeFocus() {
                         if(focus && lod === eHIGH && item) {
@@ -2761,352 +2796,429 @@ Item {
                     }
                 }
 
-                LodLoader {
-                    id: synopsisFieldLoader
-                    width: parent.width
-                    lod: elementItem.selected && !canvas.scaleIsLessForEdit ? eHIGH : eLOW
-                    sanctioned: Scrite.document.structure.indexCardContent === Structure.Synopsis
-                    visible: sanctioned
+                StackLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-                    TabSequenceItem.enabled: elementItem.stackedOnTop
-                    TabSequenceItem.manager: canvasTabSequence
-                    TabSequenceItem.sequence: {
-                        var indexes = element.scene.screenplayElementIndexList
-                        if(indexes.length === 0)
-                            return elementIndex * 2 + 1
-                        return (indexes[0] + Scrite.document.structure.elementCount) * 2 + 1
-                    }
-                    TabSequenceItem.onAboutToReceiveFocus: {
-                        Scrite.document.structure.currentElementIndex = elementIndex
-                        Qt.callLater(maybeAssumeFocus)
-                    }
+                    currentIndex: Scrite.document.structure.indexCardContent === Structure.Synopsis ? 0 : 1
 
-                    property real idealHeight: Math.max(minIndexCardHeight-headingFieldLoader.height-footerRow.height-2*parent.spacing, 200)
+                    ColumnLayout {
+                        spacing: 10
+                        visible: parent.currentIndex === 0
 
-                    property bool hasFocus: false
+                        LodLoader {
+                            id: synopsisFieldLoader
 
-                    lowDetailComponent: Rectangle {
-                        clip: true
-                        height: synopsisFieldLoader.idealHeight
-                        border.width: synopsisTextDisplay.truncated ? 1 : 0
-                        border.color: Runtime.colors.primary.borderColor
-                        color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
 
-                        TextEdit {
-                            id: synopsisTextDisplay
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            width: parent.width
-                            topPadding: 8
-                            leftPadding: 4
-                            rightPadding: 4
-                            bottomPadding: 4
-                            text: element.scene.hasSynopsis ? element.scene.synopsis : "Describe what happens in this scene."
-                            readOnly: true
-                            selectByKeyboard: false
-                            selectByMouse: false
-                            Transliterator.defaultFont: font
-                            Transliterator.textDocument: textDocument
-                            Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-                            Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                            color: element.scene.hasTitle ? "black" : "gray"
-                            // maximumLineCount: Math.max(1, (parent.height / Runtime.idealFontMetrics.lineSpacing)-1)
-                            // elide: Text.ElideRight
-                            EventFilter.events: [EventFilter.MouseButtonPress,EventFilter.MouseButtonRelease,EventFilter.MouseButtonDblClick,EventFilter.MouseMove,EventFilter.Wheel]
-                            EventFilter.onFilter: (object,event,result) => {
-                                                      result.filter = true
-                                                      result.accepted = false
-                                                  }
+                            TabSequenceItem.enabled: elementItem.stackedOnTop
+                            TabSequenceItem.manager: canvasTabSequence
+                            TabSequenceItem.sequence: {
+                                var indexes = element.scene.screenplayElementIndexList
+                                if(indexes.length === 0)
+                                    return elementIndex * elementItem.nrFocusFieldCount + 1
+                                return (indexes[0] + Scrite.document.structure.elementCount) * elementItem.nrFocusFieldCount + 1
+                            }
+                            TabSequenceItem.onAboutToReceiveFocus: {
+                                Scrite.document.structure.currentElementIndex = elementIndex
+                                Qt.callLater(maybeAssumeFocus)
+                            }
 
-                            TextAreaSpellingSuggestionsMenu { }
-                        }
+                            property bool hasFocus: false
 
-                        Component.onCompleted: synopsisFieldLoader.hasFocus = false
-                    }
+                            lod: elementItem.selected && !canvas.scaleIsLessForEdit ? eHIGH : eLOW
+                            sanctioned: parent.visible
+                            resetWidthBeforeLodChange: false
+                            resetHeightBeforeLodChange: false
 
-                    highDetailComponent: Item {
-                        width: synopsisFieldLoader.width
-                        height: synopsisFieldLoader.idealHeight
+                            lowDetailComponent: Rectangle {
+                                clip: true
+                                height: synopsisFieldLoader.height
+                                border.width: synopsisTextDisplay.truncated ? 1 : 0
+                                border.color: Runtime.colors.primary.borderColor
+                                color: synopsisTextDisplay.truncated ? Qt.rgba(1,1,1,0.1) : Qt.rgba(0,0,0,0)
 
-                        function assumeFocus() {
-                            synopsisField.forceActiveFocus()
-                            synopsisField.cursorPosition = synopsisField.length
-                        }
+                                TextEdit {
+                                    id: synopsisTextDisplay
 
-                        Flickable {
-                            id: synopsisFieldFlick
-                            clip: true
-                            width: parent.width
-                            height: parent.height-5
-                            contentWidth: synopsisField.width
-                            contentHeight: synopsisField.height
-                            interactive: synopsisField.activeFocus && scrollBarVisible
-                            property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
-                            ScrollBar.vertical: VclScrollBar { flickable: synopsisFieldFlick }
-                            flickableDirection: Flickable.VerticalFlick
-                            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                            TextArea {
-                                id: synopsisField
-                                width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
-                                height: synopsisField.contentHeight+100
-                                background: Item { }
-                                selectByMouse: true
-                                selectByKeyboard: true
-                                Transliterator.defaultFont: font
-                                Transliterator.textDocument: textDocument
-                                Transliterator.cursorPosition: cursorPosition
-                                Transliterator.hasActiveFocus: activeFocus
-                                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-                                Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
-                                placeholderText: "Describe what happens in this scene."
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                readOnly: Scrite.document.readOnly
-                                text: element.scene.synopsis
-                                onTextChanged: element.scene.synopsis = text
-                                onActiveFocusChanged: {
-                                    if(activeFocus) {
-                                        elementItem.select()
-                                        cursorFocusAnimation.active = true
-                                    } else
-                                        elementItem.element.scene.trimSynopsis()
-                                    synopsisFieldLoader.hasFocus = activeFocus
-                                }
-                                Keys.onEscapePressed: canvasTabSequence.releaseFocus()
-                                Component.onCompleted: synopsisFieldLoader.hasFocus = activeFocus
-                                SpecialSymbolsSupport {
-                                    anchors.top: parent.bottom
-                                    anchors.left: parent.left
-                                    textEditor: synopsisField
-                                    textEditorHasCursorInterface: true
-                                    enabled: !Scrite.document.readOnly
-                                }
-                                TextAreaSpellingSuggestionsMenu { }
-                                onCursorRectangleChanged: {
-                                    var y1 = cursorRectangle.y
-                                    var y2 = cursorRectangle.y + cursorRectangle.height
-                                    if(y1 < synopsisFieldFlick.contentY)
-                                        synopsisFieldFlick.contentY = Math.max(y1-10, 0)
-                                    else if(y2 > synopsisFieldFlick.contentY + synopsisFieldFlick.height)
-                                        synopsisFieldFlick.contentY = y2+10 - synopsisFieldFlick.height
+                                    anchors.fill: parent
+
+                                    Transliterator.defaultFont: font
+                                    Transliterator.textDocument: textDocument
+                                    Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                    Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
+
+                                    topPadding: 4
+                                    leftPadding: 4
+                                    rightPadding: 4
+                                    bottomPadding: 4
+
+                                    text: element.scene.hasSynopsis ? element.scene.synopsis : "Describe what happens in this scene."
+                                    color: element.scene.hasTitle ? "black" : "gray"
+                                    enabled: false
+                                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                    readOnly: true
+                                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+                                    selectByMouse: false
+                                    selectByKeyboard: false
+
+                                    TextAreaSpellingSuggestionsMenu { }
                                 }
 
-                                Loader {
-                                    id: cursorFocusAnimation
-                                    active: false
-                                    x: synopsisField.cursorRectangle.x
-                                    y: synopsisField.cursorRectangle.y
-                                    width: synopsisField.cursorRectangle.width
-                                    height: synopsisField.cursorRectangle.height
-                                    sourceComponent: Item {
-                                        Rectangle {
-                                            id: cursorFocusRect
-                                            width: t*parent.width
-                                            height: Math.max(t*parent.height*0.5, parent.height)
-                                            anchors.centerIn: parent
-                                            opacity: 1.0 - (t/10)*0.8
-                                            visible: false
-                                            color: "black"
-                                            property real t: 10
-                                            property bool scaledDown: t <= 1
-                                            onScaledDownChanged: {
-                                                if(scaledDown)
-                                                    cursorFocusAnimation.active = false
-                                            }
-                                            Behavior on t {
-                                                NumberAnimation { duration: 500 }
-                                            }
+                                Component.onCompleted: synopsisFieldLoader.hasFocus = false
+                            }
+
+                            highDetailComponent: Item {
+                                width: synopsisFieldLoader.width
+                                height: synopsisFieldLoader.height
+
+                                function assumeFocus() {
+                                    synopsisField.forceActiveFocus()
+                                    synopsisField.cursorPosition = synopsisField.length
+                                }
+
+                                Flickable {
+                                    id: synopsisFieldFlick
+
+                                    property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
+
+                                    ScrollBar.vertical: VclScrollBar { flickable: synopsisFieldFlick }
+
+                                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+                                    clip: true
+                                    width: parent.width
+                                    height: parent.height-5
+                                    interactive: synopsisField.activeFocus && scrollBarVisible
+                                    contentWidth: synopsisField.width
+                                    contentHeight: synopsisField.height + 100
+                                    flickableDirection: Flickable.VerticalFlick
+
+                                    TextArea {
+                                        id: synopsisField
+
+                                        Transliterator.defaultFont: font
+                                        Transliterator.textDocument: textDocument
+                                        Transliterator.cursorPosition: cursorPosition
+                                        Transliterator.hasActiveFocus: activeFocus
+                                        Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                        Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
+
+                                        Keys.onEscapePressed: canvasTabSequence.releaseFocus()
+                                        Component.onCompleted: synopsisFieldLoader.hasFocus = activeFocus
+
+                                        width: synopsisFieldFlick.scrollBarVisible ? synopsisFieldFlick.width-20 : synopsisFieldFlick.width
+
+                                        background: Item { }
+
+                                        topPadding: 4
+                                        leftPadding: 4
+                                        rightPadding: 4
+                                        bottomPadding: 4
+
+                                        selectByMouse: true
+                                        selectByKeyboard: true
+
+                                        text: element.scene.synopsis
+                                        readOnly: Scrite.document.readOnly
+                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                        placeholderText: "Describe what happens in this scene."
+
+                                        onTextChanged: element.scene.synopsis = text
+
+                                        onActiveFocusChanged: {
+                                            if(activeFocus) {
+                                                elementItem.select()
+                                                cursorFocusAnimation.active = true
+                                            } else
+                                                elementItem.element.scene.trimSynopsis()
+                                            synopsisFieldLoader.hasFocus = activeFocus
                                         }
 
-                                        Component.onCompleted: Utils.execLater(cursorFocusRect, 250, function() {
-                                            cursorFocusRect.visible = true
-                                            cursorFocusRect.t = 1
-                                        })
+                                        onCursorRectangleChanged: {
+                                            var y1 = cursorRectangle.y
+                                            var y2 = cursorRectangle.y + cursorRectangle.height
+                                            if(y1 < synopsisFieldFlick.contentY)
+                                                synopsisFieldFlick.contentY = Math.max(y1-10, 0)
+                                            else if(y2 > synopsisFieldFlick.contentY + synopsisFieldFlick.height)
+                                                synopsisFieldFlick.contentY = y2+10 - synopsisFieldFlick.height
+                                        }
+
+                                        SpecialSymbolsSupport {
+                                            anchors.top: parent.bottom
+                                            anchors.left: parent.left
+                                            textEditor: synopsisField
+                                            textEditorHasCursorInterface: true
+                                            enabled: !Scrite.document.readOnly
+                                        }
+
+                                        TextAreaSpellingSuggestionsMenu { }
+
+                                        Loader {
+                                            id: cursorFocusAnimation
+                                            x: synopsisField.cursorRectangle.x
+                                            y: synopsisField.cursorRectangle.y
+                                            width: synopsisField.cursorRectangle.width
+                                            height: synopsisField.cursorRectangle.height
+                                            active: false
+                                            sourceComponent: Item {
+                                                Rectangle {
+                                                    id: cursorFocusRect
+                                                    width: t*parent.width
+                                                    height: Math.max(t*parent.height*0.5, parent.height)
+                                                    anchors.centerIn: parent
+                                                    opacity: 1.0 - (t/10)*0.8
+                                                    visible: false
+                                                    color: "black"
+                                                    property real t: 10
+                                                    property bool scaledDown: t <= 1
+                                                    onScaledDownChanged: {
+                                                        if(scaledDown)
+                                                            cursorFocusAnimation.active = false
+                                                    }
+                                                    Behavior on t {
+                                                        NumberAnimation { duration: 500 }
+                                                    }
+                                                }
+
+                                                Component.onCompleted: Utils.execLater(cursorFocusRect, 250, function() {
+                                                    cursorFocusRect.visible = true
+                                                    cursorFocusRect.t = 1
+                                                })
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Rectangle {
+                                    anchors.bottom: parent.bottom
+                                    width: parent.width
+                                    height: synopsisField.hovered || synopsisField.activeFocus ? 2 : 1
+                                    color: Runtime.colors.primary.c500.background
+                                }
+                            }
+
+                            onFocusChanged: Qt.callLater(maybeAssumeFocus)
+                            onItemChanged: Qt.callLater(maybeAssumeFocus)
+
+                            function maybeAssumeFocus() {
+                                if(focus && lod === eHIGH && item)
+                                    item.assumeFocus()
+                            }
+                        }
+
+                        IndexCardFields {
+                            Layout.fillWidth: true
+
+                            lod: synopsisFieldLoader.lod
+                            visible: hasFields
+                            sanctioned: parent.visible
+
+                            structureElement: elementItem.element
+
+                            tabSequenceEnabled: elementItem.stackedOnTop
+                            tabSequenceManager: canvasTabSequence
+                            startTabSequence: {
+                                var indexes = element.scene.screenplayElementIndexList
+                                if(indexes.length === 0)
+                                    return elementIndex * elementItem.nrFocusFieldCount + 2
+                                return (indexes[0] + Scrite.document.structure.elementCount) * elementItem.nrFocusFieldCount + 2
+                            }
+
+                            onFieldAboutToReceiveFocus: Scrite.document.structure.currentElementIndex = elementIndex
+                        }
+                    }
+
+                    LodLoader {
+                        id: featuredImageFieldLoader
+
+                        lod: synopsisFieldLoader.lod
+                        visible: sanctioned
+                        sanctioned: parent.currentIndex === 1
+                        resetWidthBeforeLodChange: false
+                        resetHeightBeforeLodChange: false
+
+                        lowDetailComponent: Image {
+                            id: lowLodfeaturedImageField
+
+                            property Attachments sceneAttachments: element.scene.attachments
+                            property Attachment featuredAttachment: sceneAttachments.featuredAttachment
+                            property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
+                            property string fillModeAttrib: "indexCardFillMode"
+                            property int defaultFillMode: Image.PreserveAspectCrop
+
+                            fillMode: {
+                                if(!featuredImage)
+                                    return defaultFillMode
+                                const ud = featuredImage.userData
+                                if(ud[fillModeAttrib])
+                                    return ud[fillModeAttrib] === "fit" ? Image.PreserveAspectFit : Image.PreserveAspectCrop
+                                return defaultFillMode
+                            }
+                            source: featuredImage ? featuredImage.fileSource : ""
+                            mipmap: !(canvasScroll.moving || canvasScroll.flicking)
+
+                            Loader {
+                                anchors.fill: parent
+                                active: !parent.featuredAttachment
+                                sourceComponent: AttachmentsDropArea {
+                                    allowedType: Attachments.PhotosOnly
+                                    target: lowLodfeaturedImageField.sceneAttachments
+                                    onDropped: {
+                                        attachment.featured = true
+                                        allowDrop()
+                                    }
+                                    attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this scene."
+
+                                    VclText {
+                                        width: parent.width
+                                        horizontalAlignment: Text.AlignHCenter
+                                        anchors.centerIn: parent
+                                        wrapMode: Text.WordWrap
+                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                        text: "Drag & Drop a Photo"
+                                        visible: !parent.active
                                     }
                                 }
                             }
                         }
 
-                        Rectangle {
-                            anchors.bottom: parent.bottom
-                            width: parent.width
-                            height: synopsisField.hovered || synopsisField.activeFocus ? 2 : 1
-                            color: Runtime.colors.primary.c500.background
+                        highDetailComponent: SceneFeaturedImage {
+                            scene: element.scene
+                            fillModeAttrib: "indexCardFillMode"
+                            defaultFillMode: Image.PreserveAspectCrop
+                            mipmap: !(canvasScroll.moving || canvasScroll.flicking)
                         }
-                    }
-
-                    onFocusChanged: Qt.callLater(maybeAssumeFocus)
-                    onItemChanged: Qt.callLater(maybeAssumeFocus)
-
-                    function maybeAssumeFocus() {
-                        if(focus && lod === eHIGH && item)
-                            item.assumeFocus()
-                    }
-                }
-
-                LodLoader {
-                    id: featuredImageFieldLoader
-                    width: parent.width
-                    height: synopsisFieldLoader.idealHeight
-                    lod: synopsisFieldLoader.lod
-                    sanctioned: Scrite.document.structure.indexCardContent === Structure.FeaturedPhoto
-                    visible: sanctioned
-                    resetWidthBeforeLodChange: false
-                    resetHeightBeforeLodChange: false
-                    lowDetailComponent: Image {
-                        id: lowLodfeaturedImageField
-                        property Attachments sceneAttachments: element.scene.attachments
-                        property Attachment featuredAttachment: sceneAttachments.featuredAttachment
-                        property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
-                        property string fillModeAttrib: "indexCardFillMode"
-                        property int defaultFillMode: Image.PreserveAspectCrop
-
-                        fillMode: {
-                            if(!featuredImage)
-                                return defaultFillMode
-                            const ud = featuredImage.userData
-                            if(ud[fillModeAttrib])
-                                return ud[fillModeAttrib] === "fit" ? Image.PreserveAspectFit : Image.PreserveAspectCrop
-                            return defaultFillMode
-                        }
-                        source: featuredImage ? featuredImage.fileSource : ""
-                        mipmap: !(canvasScroll.moving || canvasScroll.flicking)
-
-                        Loader {
-                            anchors.fill: parent
-                            active: !parent.featuredAttachment
-                            sourceComponent: AttachmentsDropArea {
-                                allowedType: Attachments.PhotosOnly
-                                target: lowLodfeaturedImageField.sceneAttachments
-                                onDropped: {
-                                    attachment.featured = true
-                                    allowDrop()
-                                }
-                                attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this scene."
-
-                                VclText {
-                                    width: parent.width
-                                    horizontalAlignment: Text.AlignHCenter
-                                    anchors.centerIn: parent
-                                    wrapMode: Text.WordWrap
-                                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                    text: "Drag & Drop a Photo"
-                                    visible: !parent.active
-                                }
-                            }
-                        }
-                    }
-
-                    highDetailComponent: SceneFeaturedImage {
-                        scene: element.scene
-                        fillModeAttrib: "indexCardFillMode"
-                        defaultFillMode: Image.PreserveAspectCrop
-                        mipmap: !(canvasScroll.moving || canvasScroll.flicking)
                     }
                 }
 
                 Item {
                     id: footerRow
-                    width: parent.width
-                    height: Math.max(Math.max(sceneTypeImage.height, dragHandle.height), footerLabels.height)
-                    readonly property real spacing: 5
-                    property bool lightBackground: Scrite.app.isLightColor(footerBackgrund.color)
+
+                    property bool lightBackground: Scrite.app.isLightColor(footerBg.color)
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: footerRowLayout.height
 
                     Rectangle {
-                        id: footerBackgrund
+                        id: footerBg
+
                         anchors.fill: parent
                         anchors.margins: -5
+
                         property color baseColor: background.border.color
                         color: Qt.tint(baseColor, elementItem.selected ? "#70FFFFFF" : "#A0FFFFFF")
                     }
 
-                    SceneTypeImage {
-                        id: sceneTypeImage
-                        width: 24; height: 24
-                        opacity: 0.5
-                        showTooltip: false
-                        sceneType: elementItem.element.scene.type
-                        anchors.left: parent.left
-                        anchors.bottom: parent.bottom
-                        visible: sceneType !== Scene.Standard
-                        lightBackground: parent.lightBackground
-                    }
+                    RowLayout {
+                        id: footerRowLayout
 
-                    Column {
-                        id: footerLabels
-                        anchors.left: sceneTypeImage.visible ? sceneTypeImage.right : parent.left
-                        anchors.right: dragHandle.left
-                        anchors.leftMargin: sceneTypeImage.visible ? parent.spacing : 0
-                        anchors.rightMargin: parent.spacing
-                        y: Math.max(0, (parent.height-height)/2)
+                        width: parent.width
                         spacing: 5
 
-                        VclText {
-                            id: groupsLabel
-                            x: characterList.x
-                            text: Scrite.document.structure.presentableGroupNames(element.scene.groups)
-                            width: parent.width
-                            visible: element.scene.groups.length > 0 || !element.scene.hasCharacters
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            font.pointSize: Scrite.app.idealAppFontSize - 2
-                            color: footerRow.lightBackground ? "black" : "white"
+                        SceneTypeImage {
+                            id: sceneTypeImage
+
+                            Layout.alignment: Qt.AlignBottom
+                            Layout.preferredWidth: 24
+                            Layout.preferredHeight: 24
+
+                            opacity: 0.5
+                            visible: sceneType !== Scene.Standard
+                            sceneType: elementItem.element.scene.type
+                            showTooltip: false
+
+                            lightBackground: footerRow.lightBackground
                         }
 
-                        VclText {
-                            id: characterList
-                            font.pointSize: Scrite.app.idealAppFontSize - 2
-                            width: parent.width
-                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                            visible: element.scene.hasCharacters
-                            text: {
-                                if(element.scene.hasCharacters)
-                                    return "<b>Characters</b>: " + element.scene.characterNames.join(", ")
-                                return ""
+                        ColumnLayout {
+                            Layout.fillWidth: true
+
+                            spacing: parent.spacing
+
+                            VclText {
+                                id: groupsLabel
+
+                                Layout.fillWidth: true
+
+                                text: Scrite.document.structure.presentableGroupNames(element.scene.groups)
+                                color: footerRow.lightBackground ? "black" : "white"
+                                visible: element.scene.groups.length > 0 || !element.scene.hasCharacters
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                font.pointSize: Scrite.app.idealAppFontSize - 2
                             }
-                            color: footerRow.lightBackground ? "black" : "white"
-                        }
-                    }
 
-                    Image {
-                        id: dragHandle
-                        source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ?
-                               (parent.lightBackground ? "qrc:/icons/action/view_array.png" : "qrc:/icons/action/view_array_inverted.png") :
-                               (parent.lightBackground ? "qrc:/icons/content/add_circle_outline.png" : "qrc:/icons/content/add_circle_outline_inverted.png")
-                        width: 24; height: 24
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-                        scale: dragHandleMouseArea.pressed ? 2 : 1
-                        opacity: elementItem.selected ? 1 : 0.1
-                        Behavior on scale {
-                            enabled: Runtime.applicationSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
+                            VclText {
+                                id: characterList
+
+                                Layout.fillWidth: true
+
+                                text: {
+                                    if(element.scene.hasCharacters)
+                                        return "<b>Characters</b>: " + element.scene.characterNames.join(", ")
+                                    return ""
+                                }
+                                color: footerRow.lightBackground ? "black" : "white"
+                                visible: element.scene.hasCharacters
+                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                font.pointSize: Scrite.app.idealAppFontSize - 2
+                            }
                         }
 
-                        MouseArea {
-                            id: dragHandleMouseArea
-                            anchors.fill: parent
-                            hoverEnabled: !canvasScroll.flicking && !canvasScroll.moving && elementItem.selected
-                            drag.target: parent
-                            drag.onActiveChanged: {
-                                if(drag.active)
+                        Item {
+                            id: dragHandle
+
+                            Layout.preferredWidth: 24
+                            Layout.preferredHeight: 24
+                            Layout.alignment: Qt.AlignBottom
+
+                            Image {
+                                id: dragHandleImage
+
+                                anchors.fill: parent
+
+                                source: elementItem.element.scene.addedToScreenplay || elementItem.Drag.active ?
+                                            (footerRow.lightBackground ? "qrc:/icons/action/view_array.png" : "qrc:/icons/action/view_array_inverted.png") :
+                                            (footerRow.lightBackground ? "qrc:/icons/content/add_circle_outline.png" : "qrc:/icons/content/add_circle_outline_inverted.png")
+
+                                scale: dragHandleMouseArea.pressed ? 2 : 1
+                                opacity: elementItem.selected ? 1 : 0.1
+
+                                Behavior on scale {
+                                    enabled: Runtime.applicationSettings.enableAnimations
+                                    NumberAnimation { duration: 250 }
+                                }
+                            }
+
+                            MouseArea {
+                                id: dragHandleMouseArea
+                                anchors.fill: parent
+                                hoverEnabled: !canvasScroll.flicking && !canvasScroll.moving && elementItem.selected
+                                drag.target: dragHandleImage
+                                drag.onActiveChanged: {
+                                    if(drag.active)
+                                        canvas.forceActiveFocus()
+                                    else if(canvasScroll.maybeDragItem === elementItem)
+                                        canvasScroll.maybeDragItem = null
+                                }
+                                onPressed: {
                                     canvas.forceActiveFocus()
-                                else if(canvasScroll.maybeDragItem === elementItem)
-                                    canvasScroll.maybeDragItem = null
-                            }
-                            onPressed: {
-                                canvas.forceActiveFocus()
-                                canvasScroll.maybeDragItem = elementItem
-                                elementItem.grabToImage(function(result) {
-                                    elementItem.Drag.imageSource = result.url
-                                }, elementItem.dragImageSize)
-                            }
-                            onReleased: {
-                                if(canvasScroll.maybeDragItem === elementItem)
-                                    canvasScroll.maybeDragItem = null
-                            }
-                            onClicked: {
-                                if(!elementItem.element.scene.addedToScreenplay)
-                                    Scrite.document.screenplay.addScene(elementItem.element.scene)
+                                    canvasScroll.maybeDragItem = elementItem
+                                    elementItem.grabToImage(function(result) {
+                                        elementItem.Drag.imageSource = result.url
+                                    }, elementItem.dragImageSize)
+                                }
+                                onReleased: {
+                                    if(canvasScroll.maybeDragItem === elementItem)
+                                        canvasScroll.maybeDragItem = null
+                                }
+                                onClicked: {
+                                    if(!elementItem.element.scene.addedToScreenplay)
+                                        Scrite.document.screenplay.addScene(elementItem.element.scene)
+                                }
                             }
                         }
                     }

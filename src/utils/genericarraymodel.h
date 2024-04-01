@@ -58,12 +58,27 @@ public:
     Q_SIGNAL void countChanged();
 
     Q_INVOKABLE QJsonValue at(int row) const;
+    Q_INVOKABLE void clear() { this->setArray(QJsonArray()); }
+    Q_INVOKABLE QJsonValue get(int row) const { return this->at(row); }
+    Q_INVOKABLE bool append(const QJsonValue &value);
+    Q_INVOKABLE bool insert(int row, const QJsonValue &value);
+    Q_INVOKABLE bool remove(int row, int count);
+    Q_INVOKABLE bool set(int row, const QJsonValue &value);
+    Q_INVOKABLE bool setProperty(int row, const QString &member, const QVariant &value);
 
     Q_INVOKABLE int firstIndexOf(const QString &member, const QVariant &value) const;
 
+    Q_PROPERTY(bool editable READ isEditable WRITE setEditable NOTIFY editableChanged)
+    void setEditable(bool val);
+    bool isEditable() const { return m_editable; }
+    Q_SIGNAL void editableChanged();
+
     // QAbstractItemModel interface
+    enum { ArrayItemRole = Qt::UserRole, FirstMemberRole };
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    Qt::ItemFlags flags(const QModelIndex &index) const;
     QHash<int, QByteArray> roleNames() const;
 
 protected:
@@ -71,6 +86,7 @@ protected:
     const QJsonArray &internalArray() const { return m_array; }
 
 private:
+    bool m_editable = false;
     QJsonArray m_array;
     QStringList m_objectMembers;
 };

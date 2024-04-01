@@ -157,5 +157,8 @@
         <file>qml/helpers/ColorToolButton.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
         <file>qml/dialogs/homescreen/OpenFileTask.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureIndexCardFieldsPage.qml</file>
+        <file>qml/structure/IndexCardFields.qml</file>
+        <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
     </qresource>
 </RCC>

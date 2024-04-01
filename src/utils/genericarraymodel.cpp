@@ -21,6 +21,9 @@ GenericArrayModel::GenericArrayModel(QObject *parent) : QAbstractListModel(paren
     connect(this, &GenericArrayModel::rowsInserted, this, &GenericArrayModel::countChanged);
     connect(this, &GenericArrayModel::rowsRemoved, this, &GenericArrayModel::countChanged);
     connect(this, &GenericArrayModel::modelReset, this, &GenericArrayModel::countChanged);
+
+    connect(this, &GenericArrayModel::countChanged, this, &GenericArrayModel::arrayChanged);
+    connect(this, &GenericArrayModel::dataChanged, this, &GenericArrayModel::arrayChanged);
 }
 
 GenericArrayModel::~GenericArrayModel() { }
@@ -70,8 +73,8 @@ QString GenericArrayModel::roleNameOf(int role) const
 
 int GenericArrayModel::objectMemberRole(const QString &objectMember) const
 {
-    const int index = m_objectMembers.indexOf(objectMember);
-    return index < 0 ? Qt::DisplayRole : (Qt::UserRole + index + 1);
+    const int memberIndex = m_objectMembers.indexOf(objectMember);
+    return memberIndex < 0 ? ArrayItemRole : (FirstMemberRole + memberIndex);
 }
 
 QJsonArray GenericArrayModel::stringListArray(const QStringList &list) const
@@ -90,6 +93,76 @@ QJsonArray GenericArrayModel::arrayFromCsv(const QString &text) const
 QJsonValue GenericArrayModel::at(int row) const
 {
     return row < 0 || row >= m_array.size() ? QJsonValue() : m_array.at(row);
+}
+
+bool GenericArrayModel::append(const QJsonValue &value)
+{
+    this->beginInsertRows(QModelIndex(), m_array.size(), m_array.size());
+    m_array.append(value);
+    this->endInsertRows();
+
+    return true;
+}
+
+bool GenericArrayModel::insert(int row, const QJsonValue &value)
+{
+    const int idx = qMin(qMax(0, row), m_array.size());
+    if (idx != row)
+        return false;
+
+    this->beginInsertRows(QModelIndex(), row, row);
+    m_array.insert(row, value);
+    this->endInsertRows();
+
+    return true;
+}
+
+bool GenericArrayModel::remove(int row, int count)
+{
+    if (count < 0 || row < 0 || row + count - 1 >= m_array.size())
+        return false;
+
+    this->beginRemoveRows(QModelIndex(), row, row + count - 1);
+    while (count) {
+        m_array.removeAt(row);
+        --count;
+    }
+    this->endRemoveRows();
+
+    return true;
+}
+
+bool GenericArrayModel::set(int row, const QJsonValue &value)
+{
+    if (row < 0 || row >= m_array.size())
+        return false;
+
+    const QModelIndex index = this->index(row);
+
+    m_array.replace(row, value);
+    emit dataChanged(index, index);
+
+    return true;
+}
+
+bool GenericArrayModel::setProperty(int row, const QString &member, const QVariant &value)
+{
+    if (row < 0 || row >= m_array.size())
+        return false;
+
+    const QModelIndex index = this->index(row);
+
+    QJsonObject item = m_array.at(row).toObject();
+    item.insert(member, value.toJsonValue());
+    m_array.replace(row, item);
+
+    const int memberIndex = m_objectMembers.indexOf(member);
+    if (memberIndex < 0)
+        emit dataChanged(index, index);
+    else
+        emit dataChanged(index, index, { FirstMemberRole + memberIndex });
+
+    return true;
 }
 
 int GenericArrayModel::firstIndexOf(const QString &member, const QVariant &value) const
@@ -119,6 +192,18 @@ int GenericArrayModel::firstIndexOf(const QString &member, const QVariant &value
     return -1;
 }
 
+void GenericArrayModel::setEditable(bool val)
+{
+    if (m_editable == val)
+        return;
+
+    this->beginResetModel();
+    m_editable = val;
+    this->endResetModel();
+
+    emit editableChanged();
+}
+
 int GenericArrayModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_array.size();
@@ -129,21 +214,54 @@ QVariant GenericArrayModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || index.row() < 0 || index.row() >= m_array.size())
         return QVariant();
 
-    if (role == Qt::DisplayRole)
+    if (role == ArrayItemRole)
         return m_array.at(index.row());
 
     const QJsonObject item = m_array.at(index.row()).toObject();
-    const int memberIndex = role - (Qt::UserRole + 1);
+    const int memberIndex = role - FirstMemberRole;
     if (memberIndex < 0 || memberIndex >= m_objectMembers.size())
         return QVariant();
 
     return item.value(m_objectMembers.at(memberIndex));
 }
 
+bool GenericArrayModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!index.isValid() || index.row() < 0 || index.row() >= m_array.size())
+        return false;
+
+    if (role == ArrayItemRole) {
+        m_array[index.row()] = value.toJsonValue();
+        emit dataChanged(index, index, { ArrayItemRole });
+        return true;
+    }
+
+    QJsonObject item = m_array.at(index.row()).toObject();
+
+    const int memberIndex = role - FirstMemberRole;
+    if (memberIndex < 0 || memberIndex >= m_objectMembers.size())
+        return false;
+
+    const QString member = m_objectMembers.at(memberIndex);
+    item.insert(member, value.toJsonValue());
+    emit dataChanged(index, index, { role });
+
+    return true;
+}
+
+Qt::ItemFlags GenericArrayModel::flags(const QModelIndex & /*index*/) const
+{
+    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    if (m_editable)
+        flags.setFlag(Qt::ItemIsEditable);
+
+    return flags;
+}
+
 QHash<int, QByteArray> GenericArrayModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[Qt::DisplayRole] = QByteArrayLiteral("arrayItem");
+    roles[ArrayItemRole] = QByteArrayLiteral("arrayItem");
 
     for (const QString &objectMember : m_objectMembers)
         roles[this->objectMemberRole(objectMember)] = objectMember.toLatin1();
