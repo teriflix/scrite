@@ -132,7 +132,8 @@ Item {
 
             placeholderText: text === "" ? description : ""
 
-            onTextChanged: _private.setFieldValue(index, text)
+            text: value
+            onTextEdited: _private.setFieldValue(index, text)
 
             function assumeFocus() {
                 selectAll()

@@ -20,9 +20,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
@@ -47,14 +45,28 @@ QtObject {
 
         property VclDialog waitDialog
         property string filePath
-        property string mode
+        property string mode // can be one of ["open", "openAnonymously", "openOrImport"]
 
         running: true
+
+        PauseAnimation {
+            duration: 10
+        }
+
+        ScriptAction {
+            script: {
+                Runtime.activateMainWindowTab(Runtime.e_ScreenplayTab)
+                theTaskInstance.waitDialog = WaitDialog.launch()
+            }
+        }
+
+        PauseAnimation {
+            duration: 200
+        }
 
         ScriptAction {
             script: {
                 Runtime.loadMainUiContent = false
-                theTaskInstance.waitDialog = WaitDialog.launch()
             }
         }
 

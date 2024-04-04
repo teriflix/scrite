@@ -35,6 +35,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/qml/tasks"
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
@@ -139,28 +140,8 @@ Item {
         initialItem: ContentPage1 { }
     }
 
-    BusyOverlay {
-        id: homeScreenBusyOverlay
-        anchors.fill: parent
-        busyMessage: "Fetching content ..."
-        visible: libraryService.busy
-    }
-
     LibraryService {
         id: libraryService
-
-        onImportStarted: (index) => {
-                             homeScreen.enabled = false
-                             Runtime.loadMainUiContent = false
-                         }
-
-        onImportFinished: (index) => {
-                              Runtime.loadMainUiContent = true
-                              Qt.callLater(Scrite.document.justLoaded)
-                              Utils.execLater(libraryService, 250, function() {
-                                  closeRequest()
-                              })
-                          }
     }
 
     component ContentPage1 : Item {
@@ -378,7 +359,8 @@ Item {
                         showPoster: index > 0
                         onClicked: {
                             SaveFileTask.save( () => {
-                                                    libraryService.openTemplateAt(index)
+                                                    var task = OpenFromLibraryTask.openTemplateAt(libraryService, index)
+                                                    task.finished.connect(closeRequest)
                                                 } )
                         }
                     }
@@ -446,7 +428,8 @@ Item {
             showPoster: true
             onClicked: {
                 SaveFileTask.save( () => {
-                                        libraryService.openScreenplayAt(index)
+                                        var task = OpenFromLibraryTask.openScreenplayAt(libraryService, index)
+                                        task.finished.connect(closeRequest)
                                     } )
             }
         }
@@ -518,8 +501,10 @@ Item {
 
         function openSelected() {
             SaveFileTask.save( () => {
-                                    if(screenplaysView.currentIndex >= 0)
-                                        libraryService.openScreenplayAt(screenplaysView.currentIndex)
+                                    if(screenplaysView.currentIndex >= 0) {
+                                         var task = OpenFromLibraryTask.openScreenplayAt(libraryService, screenplaysView.currentIndex)
+                                         task.finished.connect(closeRequest)
+                                     }
                                 } )
         }
 
@@ -638,7 +623,6 @@ Item {
                 return
 
             SaveFileTask.save( () => {
-                                    homeScreenBusyOverlay.visible = true
                                     homeScreen.enabled = false
 
                                     var task = OpenFileTask.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
@@ -809,9 +793,6 @@ Item {
                 color: Qt.rgba(0,0,0,0)
 
                 function doImport() {
-                    homeScreenBusyOverlay.busyMessage = "Importing screenplay ..."
-                    homeScreenBusyOverlay.visible = true
-
                     Runtime.workspaceSettings.lastOpenImportFolderUrl = "file://" + fileToImport.folder
 
                     var task = OpenFileTask.openOrImport(fileToImport.path)
@@ -1017,22 +998,5 @@ Item {
         id: _private
 
         readonly property string defaultBannerImage: "qrc:/images/homescreen_banner.png"
-
-        function openScriteDocument(path) {
-            homeScreenBusyOverlay.busyMessage = "Opening document ..."
-            homeScreenBusyOverlay.visible = true
-
-            homeScreen.enabled = false
-
-            Runtime.loadMainUiContent = false
-
-            Utils.execLater(_private, 100, () => {
-                                Runtime.recentFiles.add(path)
-                                Scrite.document.open(path)
-                                Runtime.loadMainUiContent = true
-
-                                closeRequest()
-                            })
-        }
     }
 }

@@ -24,8 +24,8 @@
         <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
         <file>qml/dialogs/homescreen/HomeScreenImpl.qml</file>
+        <file>qml/dialogs/homescreen/Poster.qml</file>
         <file>qml/dialogs/homescreen/qmldir</file>
-        <file>qml/dialogs/homescreen/SaveFileTask.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_CheckBox.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_EnumSelector.qml</file>
@@ -40,6 +40,7 @@
         <file>qml/dialogs/reportconfigurationdialog/impl_ReportConfigurationDialog.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationSettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
         <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageFontsPage.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
@@ -51,6 +52,7 @@
         <file>qml/dialogs/settingsdialog/ScreenplayOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/ScreenplayPageSetupPage.qml</file>
         <file>qml/dialogs/settingsdialog/ScreenplaySettingsTab.qml</file>
+        <file>qml/dialogs/settingsdialog/StructureIndexCardFieldsPage.qml</file>
         <file>qml/dialogs/settingsdialog/StructureOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/StructureSettingsTab.qml</file>
         <file>qml/dialogs/settingsdialog/StructureStoryBeatsPage.qml</file>
@@ -64,9 +66,17 @@
         <file>qml/dialogs/RenameCharacterDialog.qml</file>
         <file>qml/dialogs/ReportConfigurationDialog.qml</file>
         <file>qml/dialogs/SettingsDialog.qml</file>
+        <file>qml/dialogs/SplashScreen.qml</file>
+        <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
+        <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
         <file>qml/dialogs/TermsOfUseDialog.qml</file>
         <file>qml/dialogs/TitlePageDialog.qml</file>
         <file>qml/dialogs/WaitDialog.qml</file>
+        <file>qml/floatingdockpanels/FloatingDock.qml</file>
+        <file>qml/floatingdockpanels/FloatingDockLayer.qml</file>
+        <file>qml/floatingdockpanels/FloatingMarkupToolsDock.qml</file>
+        <file>qml/floatingdockpanels/FloatingShortcutsDock.qml</file>
+        <file>qml/floatingdockpanels/qmldir</file>
         <file>qml/globals/qmldir</file>
         <file>qml/globals/Runtime.qml</file>
         <file>qml/helpers/AlphabetMappings.qml</file>
@@ -77,6 +87,7 @@
         <file>qml/helpers/BusyOverlay.qml</file>
         <file>qml/helpers/CheckListView.qml</file>
         <file>qml/helpers/ColorMenu.qml</file>
+        <file>qml/helpers/ColorToolButton.qml</file>
         <file>qml/helpers/DisabledFeatureNotice.qml</file>
         <file>qml/helpers/FileSelector.qml</file>
         <file>qml/helpers/FlatToolButton.qml</file>
@@ -96,6 +107,7 @@
         <file>qml/helpers/SearchBar.qml</file>
         <file>qml/helpers/Selection.qml</file>
         <file>qml/helpers/SidePanel.qml</file>
+        <file>qml/helpers/SimpleToolButton.qml</file>
         <file>qml/helpers/SpecialSymbolsSupport.qml</file>
         <file>qml/helpers/SpellingSuggestionsMenu.qml</file>
         <file>qml/helpers/TagText.qml</file>
@@ -106,6 +118,9 @@
         <file>qml/helpers/TrapeziumTabView.qml</file>
         <file>qml/helpers/UiElementHighlight.qml</file>
         <file>qml/helpers/ZoomSlider.qml</file>
+        <file>qml/modules/PdfView.qml</file>
+        <file>qml/modules/qmldir</file>
+        <file>qml/modules/UserAccountToolButton.qml</file>
         <file>qml/notebook/AddRelationshipDialog.qml</file>
         <file>qml/notebook/CharacterRelationshipsGraphView.qml</file>
         <file>qml/notebook/FormField.qml</file>
@@ -114,51 +129,37 @@
         <file>qml/notebook/qmldir</file>
         <file>qml/notebook/RelationshipNameEditorDialog.qml</file>
         <file>qml/notebook/TextNoteView.qml</file>
+        <file>qml/notifications/AutoUpdateNotifications.qml</file>
+        <file>qml/notifications/HelpTipNotification.qml</file>
+        <file>qml/notifications/NotificationsLayer.qml</file>
+        <file>qml/notifications/NotificationsView.qml</file>
+        <file>qml/notifications/qmldir</file>
+        <file>qml/overlays/AnimatedTextOverlay.qml</file>
+        <file>qml/overlays/DocumentBusyOverlay.qml</file>
+        <file>qml/overlays/OverlaysLayer.qml</file>
+        <file>qml/overlays/qmldir</file>
         <file>qml/screenplay/PageNumberBubble.qml</file>
+        <file>qml/screenplay/qmldir</file>
         <file>qml/screenplay/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/screenplay/ScreenplayEditorToolbar.qml</file>
         <file>qml/screenplay/ScreenplaySceneElementsContextMenu.qml</file>
+        <file>qml/scrited/qmldir</file>
         <file>qml/scrited/ScritedToolbar.qml</file>
         <file>qml/structure/AnnotationItem.qml</file>
         <file>qml/structure/AnnotationPropertyEditor.qml</file>
+        <file>qml/structure/AnnotationPropertyEditorDock.qml</file>
+        <file>qml/structure/IndexCardFields.qml</file>
         <file>qml/structure/qmldir</file>
         <file>qml/structure/StructureGroupsMenu.qml</file>
+        <file>qml/tasks/OpenFileTask.qml</file>        
+        <file>qml/tasks/OpenFromLibraryTask.qml</file>
+        <file>qml/tasks/qmldir</file>
+        <file>qml/tasks/SaveFileTask.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
-        <file>qml/ScriteMainWindow.qml</file>
         <file>qml/ScritedView.qml</file>
+        <file>qml/ScriteMainWindow.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
-        <file>qml/screenplay/qmldir</file>
-        <file>qml/scrited/qmldir</file>
-        <file>qml/modules/PdfView.qml</file>
-        <file>qml/modules/UserAccountToolButton.qml</file>
-        <file>qml/modules/qmldir</file>
-        <file>qml/floatingdockpanels/qmldir</file>
-        <file>qml/floatingdockpanels/FloatingShortcutsDock.qml</file>
-        <file>qml/floatingdockpanels/FloatingMarkupToolsDock.qml</file>
-        <file>qml/dialogs/SplashScreen.qml</file>
-        <file>qml/overlays/AnimatedTextOverlay.qml</file>
-        <file>qml/overlays/qmldir</file>
-        <file>qml/floatingdockpanels/FloatingDock.qml</file>
-        <file>qml/floatingdockpanels/FloatingDockLayer.qml</file>
-        <file>qml/overlays/OverlaysLayer.qml</file>
-        <file>qml/overlays/DocumentBusyOverlay.qml</file>
-        <file>qml/structure/AnnotationPropertyEditorDock.qml</file>
-        <file>qml/notifications/AutoUpdateNotifications.qml</file>
-        <file>qml/notifications/qmldir</file>
-        <file>qml/notifications/NotificationsLayer.qml</file>
-        <file>qml/notifications/HelpTipNotification.qml</file>
-        <file>qml/notifications/NotificationsView.qml</file>
-        <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
-        <file>qml/dialogs/homescreen/Poster.qml</file>
-        <file>misc/scriptalay_info.md</file>
-        <file>qml/helpers/SimpleToolButton.qml</file>
-        <file>qml/helpers/ColorToolButton.qml</file>
-        <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
-        <file>qml/dialogs/homescreen/OpenFileTask.qml</file>
-        <file>qml/dialogs/settingsdialog/StructureIndexCardFieldsPage.qml</file>
-        <file>qml/structure/IndexCardFields.qml</file>
-        <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
     </qresource>
 </RCC>
