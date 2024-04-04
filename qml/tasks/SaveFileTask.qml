@@ -49,6 +49,10 @@ Item {
         return taskComp.createObject(root, {"callback": callback})
     }
 
+    function saveAs(callback) {
+        return documentSaveAs.createObject(root, {"callback": callback})
+    }
+
     component AbstractSaveFileTask : Item {
         id: saveFileTaskItem
 
@@ -56,7 +60,7 @@ Item {
 
         function finish(success) {
             if(!errorReportHasError) {
-                if(success && success === true && callback)
+                if((success === undefined || success === true) && callback)
                     callback()
             }
 
@@ -98,6 +102,17 @@ Item {
                 finish(true)
             } else
                 finish(false)
+        }
+    }
+
+    readonly property Component documentSaveAs : AbstractSaveFileTask {
+        id: documentSaveAsTask
+
+        Component.onCompleted: {
+            var saveDlg = saveFileDialog.createObject(root)
+            saveDlg.finished.connect(finish)
+            saveDlg.finished.connect(saveDlg.destroy)
+            saveDlg.open()
         }
     }
 

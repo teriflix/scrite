@@ -22,6 +22,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/qml/tasks"
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
@@ -55,7 +56,7 @@ Item {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+S"
-        onActivated: saveFileDialog.launch("SAVE_AS")
+        onActivated: SaveFileTask.saveAs()
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Save As"
@@ -415,7 +416,7 @@ Item {
                 text: "Save"
                 shortcut: "Ctrl+S"
                 enabled: Scrite.document.modified && !Scrite.document.readOnly
-                onClicked: saveFileDialog.launch()
+                onClicked: SaveFileTask.save()
 
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text
@@ -463,7 +464,7 @@ Item {
                         VclMenuItem {
                             text: "Scrite"
                             icon.source: "qrc:/icons/exporter/scrite.png"
-                            onClicked: saveFileDialog.launch("SAVE_AS")
+                            onClicked: SaveFileTask.saveAs()
                         }
                     }
                 }
@@ -862,7 +863,7 @@ Item {
                             VclMenuItem {
                                 text: "Scrite"
                                 icon.source: "qrc:/icons/exporter/scrite.png"
-                                onClicked: saveFileDialog.launch("SAVE_AS")
+                                onClicked: SaveFileTask.saveAs()
                             }
                         }
 
@@ -2021,38 +2022,14 @@ Item {
             target: Scrite.window
             function onClosing(close) {
                 if(closeEventHandler.handleCloseEvent) {
+                    close.accepted = false
+
                     Scrite.app.saveWindowGeometry(Scrite.window, "Workspace")
 
-                    if(!Scrite.document.modified || Scrite.document.empty) {
-                        close.accepted = true
-                        return
-                    }
-
-                    if(Scrite.document.autoSave && Scrite.document.fileName !== "") {
-                        Scrite.document.save()
-                        close.accepted = true
-                        return
-                    }
-
-                    close.accepted = false
-                    MessageBox.question("Save Confirmation",
-                                        "Do you want to save your current project before closing?",
-                                        ["Yes", "No", "Cancel"],
-                                        (buttonText) => {
-                                            if(buttonText === "Yes") {
-                                                if(Scrite.document.fileName !== "") {
-                                                    Scrite.document.save()
-                                                    close.accepted = true
-                                                    Scrite.window.close()
-                                                } else {
-                                                    saveFileDialog.launch()
-                                                    return
-                                                }
-                                            } else if(buttonText === "No") {
-                                                closeEventHandler.handleCloseEvent = false
-                                                Scrite.window.close()
-                                            }
-                                        })
+                    SaveFileTask.save( () => {
+                                          closeEventHandler.handleCloseEvent = false
+                                          Scrite.window.close()
+                                      } )
                 } else
                     close.accepted = true
             }
@@ -2106,56 +2083,6 @@ Item {
                                      htNotification.tipName = "subscription"
                              }
                          })
-        }
-    }
-
-    FileDialog {
-        id: saveFileDialog
-
-        title: "Save Scrite Document As"
-        nameFilters: ["Scrite Documents (*.scrite)"]
-        selectFolder: false
-        selectMultiple: false
-        objectName: "Save File Dialog"
-        dirUpAction.shortcut: "Ctrl+Shift+U"
-        folder: Runtime.workspaceSettings.lastOpenFolderUrl
-        onFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
-        sidebarVisible: true
-        selectExisting: false
-
-        function launch(mode) {
-            if(Scrite.document.empty)
-                return
-
-            if(mode === "SAVE_AS") {
-                open()
-                return
-            }
-
-            if(!Scrite.document.modified || Scrite.document.readOnly)
-                 return;
-
-            if(Scrite.document.fileName === "") {
-                open()
-                return
-            }
-
-            Scrite.document.save()
-
-            const fileName = Scrite.document.fileName
-            const fileInfo = Scrite.app.fileInfo(fileName)
-            Runtime.recentFiles.add(fileInfo.filePath)
-            return
-        }
-
-        onAccepted: {
-            const path = Scrite.app.urlToLocalFile(fileUrl)
-            Scrite.document.saveAs(path)
-
-            Runtime.recentFiles.add(path)
-
-            const fileInfo = Scrite.app.fileInfo(path)
-            Runtime.workspaceSettings.lastOpenFolderUrl = folder
         }
     }
 
