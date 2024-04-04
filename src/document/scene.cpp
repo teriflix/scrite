@@ -1086,6 +1086,7 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
     connect(this, &Scene::elementCountChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::characterRelationshipGraphChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::commentsChanged, this, &Scene::sceneChanged);
+    connect(this, &Scene::indexCardFieldValuesChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::textChanged, this, &Scene::sceneChanged);
     connect(m_heading, &SceneHeading::enabledChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::sceneChanged, [=]() { this->markAsModified(); });
