@@ -227,8 +227,24 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
             headingTextItem->mapToParent(headingTextItem->boundingRect()).boundingRect();
     const QRectF tagsTextRect =
             tagsTextItem->mapToParent(tagsTextItem->boundingRect()).boundingRect();
-    const QRectF cardContentRect =
+    QRectF cardContentRect =
             QRectF(headingTextRect.bottomLeft(), tagsTextRect.topRight()).adjusted(0, 10, 0, -10);
+
+    // If index card fields exist, then lets place them just above tags
+    const bool hasIndexCardFields = exporter->document()->structure()->indexCardFields().size() > 0;
+    StructureIndexCardFields *indexCardFieldsItem = hasIndexCardFields
+            ? new StructureIndexCardFields(element, contentRect.width())
+            : nullptr;
+    if (indexCardFieldsItem) {
+        indexCardFieldsItem->setParentItem(this);
+        indexCardFieldsItem->setPos(tagsTextRect.topLeft()
+                                    - QPointF(0, indexCardFieldsItem->rect().height() + 10));
+
+        QRectF indexCardFieldsItemRect =
+                indexCardFieldsItem->mapToParent(indexCardFieldsItem->boundingRect())
+                        .boundingRect();
+        cardContentRect.setBottom(indexCardFieldsItemRect.top() - 10);
+    }
 
     // Content in between. The content may be synopsis text or featured image.
     QGraphicsRectItem *cardContentRectItem = new QGraphicsRectItem(this);
@@ -273,6 +289,90 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
 }
 
 StructureIndexCard::~StructureIndexCard() { }
+
+///////////////////////////////////////////////////////////////////////////////
+
+StructureIndexCardFields::StructureIndexCardFields(const StructureElement *element,
+                                                   const qreal availableWidth)
+{
+    const QStringList fieldValues = element->scene()->indexCardFieldValues();
+    const QJsonArray fields = element->structure()->indexCardFields();
+    if (fields.isEmpty())
+        return;
+
+    const QFont normalFont = ::applicationFont();
+    const QFont normalItalicFont = [normalFont]() {
+        QFont ret = normalFont;
+        ret.setItalic(true);
+        return ret;
+    }();
+
+    // Generate text items for keys and values
+    QList<QGraphicsTextItem *> keyItems, valueItems;
+    for (int i = 0; i < fields.size(); i++) {
+        const QJsonObject field = fields.at(i).toObject();
+        const QString key = field.value(QStringLiteral("name")).toString();
+        const QString desc = field.value(QStringLiteral("description")).toString();
+        const QString value = i < fieldValues.size() ? fieldValues.at(i) : QString();
+
+        QGraphicsTextItem *keyItem = new QGraphicsTextItem;
+        keyItem->setPlainText(key);
+        keyItem->setFont(normalFont);
+        keyItems.append(keyItem);
+
+        QGraphicsTextItem *valueItem = new QGraphicsTextItem;
+        if (value.isEmpty()) {
+            valueItem->setPlainText(desc);
+            valueItem->setFont(normalItalicFont);
+            valueItem->setOpacity(0.5);
+        } else {
+            valueItem->setPlainText(value);
+            valueItem->setFont(normalFont);
+        }
+    }
+
+    // Determine column widths
+    const qreal keyColumnWidth = [keyItems, availableWidth]() {
+        qreal ret = 0;
+        for (const QGraphicsTextItem *keyItem : keyItems)
+            ret = qMax(ret, keyItem->boundingRect().width());
+        return qMin(ret * 1.1, availableWidth * 0.5);
+    }();
+    const qreal valueColumnWidth = availableWidth - keyColumnWidth;
+
+    const qreal rowHeight = QFontMetrics(normalFont).lineSpacing();
+
+    // Now layout key and value items in a 2 column grid
+    QRectF keyItemRect(0, 0, keyColumnWidth, rowHeight),
+            valueItemRect(keyColumnWidth, 0, valueColumnWidth, rowHeight);
+    for (int i = 0; i < fields.size(); i++) {
+        QGraphicsRectItem *keyCell = new QGraphicsRectItem(this);
+        keyCell->setBrush(Qt::NoBrush);
+        keyCell->setPen(Qt::NoPen);
+        keyCell->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
+        keyCell->setRect(keyItemRect);
+
+        QGraphicsTextItem *keyItem = keyItems.at(i);
+        keyItem->setParentItem(keyCell);
+
+        QGraphicsRectItem *valueCell = new QGraphicsRectItem(this);
+        valueCell->setBrush(Qt::NoBrush);
+        valueCell->setPen(Qt::NoPen);
+        valueCell->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
+        valueCell->setRect(valueItemRect);
+
+        QGraphicsTextItem *valueItem = valueItems.at(i);
+        valueItem->setParentItem(valueCell);
+
+        keyItemRect.moveTop(keyItemRect.top() + rowHeight + 1);
+        valueItemRect.moveTop(valueItemRect.top() + rowHeight + 1);
+    }
+
+    const QRectF ibr = this->childrenBoundingRect();
+    this->setRect(ibr);
+}
+
+StructureIndexCardFields::~StructureIndexCardFields() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 

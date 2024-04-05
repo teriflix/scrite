@@ -38,6 +38,13 @@ public:
     ~StructureIndexCard();
 };
 
+class StructureIndexCardFields : public QGraphicsRectItem
+{
+public:
+    explicit StructureIndexCardFields(const StructureElement *element, const qreal availableWidth);
+    ~StructureIndexCardFields();
+};
+
 class StructureIndexCardConnector : public QGraphicsPathItem
 {
 public:
