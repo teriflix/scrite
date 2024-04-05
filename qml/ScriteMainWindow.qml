@@ -416,7 +416,7 @@ Item {
                 text: "Save"
                 shortcut: "Ctrl+S"
                 enabled: Scrite.document.modified && !Scrite.document.readOnly
-                onClicked: SaveFileTask.save()
+                onClicked: SaveFileTask.saveSilently()
 
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text
