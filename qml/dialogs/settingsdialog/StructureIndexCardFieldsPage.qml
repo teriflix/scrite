@@ -160,6 +160,33 @@ Item {
             }
 
             VclButton {
+                visible: target === e_CurrentDocumentTarget
+                enabled: JSON.stringify(Scrite.document.structure.defaultIndexCardFields) !== JSON.stringify(indexCardFieldsModel.array)
+
+                text: "Use Defaults"
+                ToolTip.text: "Click this button to use your global default index card fields in this document."
+
+                onClicked: {
+                    if(Scrite.document.structure.indexCardFields.length > 0) {
+                        MessageBox.question("Confirmation",
+                                            "Are you sure you want to replace index card fields in this document with global defaults set on this computer?",
+                                            ["Yes", "No"],
+                                            (answer) => {
+                                                if(answer === "Yes")
+                                                    useDefaults()
+                                            })
+                    } else
+                        useDefaults()
+                }
+
+
+                function useDefaults() {
+                    Scrite.document.structure.indexCardFields = Scrite.document.structure.defaultIndexCardFields
+                    indexCardFieldsModel.reset()
+                }
+            }
+
+            VclButton {
                 enabled: indexCardFieldsModel.count < indexCardFieldsModel.maxCount
 
                 text: "Add Field"
@@ -208,13 +235,19 @@ Item {
         Component.onCompleted: {
             reset()
             dataChanged.connect(markModified)
+            rowsInserted.connect(markModified)
+            rowsRemoved.connect(markModified)
+            modelReset.connect(markModified)
         }
 
         function markModified() {
             modified = true
         }
 
-        function reset() { array = source }
+        function reset() {
+            array = source
+            modified = false
+        }
 
         function commit() {
             if(modified) {
