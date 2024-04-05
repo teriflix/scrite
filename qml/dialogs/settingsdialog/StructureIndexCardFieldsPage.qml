@@ -199,14 +199,20 @@ Item {
         readonly property int maxCount: 5
 
         property bool modified: false
-        onDataChanged: modified = true
 
         property var source: root.target === root.e_CurrentDocumentTarget ? Scrite.document.structure.indexCardFields : Scrite.document.structure.defaultIndexCardFields
         property bool canReset: JSON.stringify(source) !== JSON.stringify(array) // Generally this is expensive, but in here our array size is limited.
 
         objectMembers: ["name", "description"]
 
-        Component.onCompleted: reset()
+        Component.onCompleted: {
+            reset()
+            dataChanged.connect(markModified)
+        }
+
+        function markModified() {
+            modified = true
+        }
 
         function reset() { array = source }
 
