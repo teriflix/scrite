@@ -62,7 +62,8 @@ Item {
             VclLabel {
                 required property string name
 
-                Layout.alignment: Qt.AlignVCenter
+                Layout.topMargin: root.lod === root.eLOW ? 0 : 8
+                Layout.alignment: Qt.AlignTop
 
                 text: name
             }
@@ -118,7 +119,10 @@ Item {
             property string value
 
             text: value === "" ? description : value
+            elide: Text.ElideRight
             opacity: value === "" ? 0.5 : 1
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            maximumLineCount: 2
         }
     }
 
@@ -133,6 +137,7 @@ Item {
             placeholderText: text === "" ? description : ""
 
             text: value
+            wrapMode: TextInput.Wrap
             onTextEdited: _private.setFieldValue(index, text)
 
             function assumeFocus() {
