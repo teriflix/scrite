@@ -329,6 +329,7 @@ StructureIndexCardFields::StructureIndexCardFields(const StructureElement *eleme
             valueItem->setPlainText(value);
             valueItem->setFont(normalFont);
         }
+        valueItems.append(valueItem);
     }
 
     // Determine column widths
@@ -338,9 +339,17 @@ StructureIndexCardFields::StructureIndexCardFields(const StructureElement *eleme
             ret = qMax(ret, keyItem->boundingRect().width());
         return qMin(ret * 1.1, availableWidth * 0.5);
     }();
+
     const qreal valueColumnWidth = availableWidth - keyColumnWidth;
 
-    const qreal rowHeight = QFontMetrics(normalFont).lineSpacing();
+    const qreal rowHeight = [keyItems, valueItems]() {
+        qreal ret = 0;
+        for (const QGraphicsTextItem *keyItem : keyItems)
+            ret = qMax(ret, keyItem->boundingRect().height());
+        for (const QGraphicsTextItem *valueItem : valueItems)
+            ret = qMax(ret, valueItem->boundingRect().height());
+        return ret;
+    }();
 
     // Now layout key and value items in a 2 column grid
     QRectF keyItemRect(0, 0, keyColumnWidth, rowHeight),
@@ -350,7 +359,8 @@ StructureIndexCardFields::StructureIndexCardFields(const StructureElement *eleme
         keyCell->setBrush(Qt::NoBrush);
         keyCell->setPen(Qt::NoPen);
         keyCell->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
-        keyCell->setRect(keyItemRect);
+        keyCell->setPos(keyItemRect.topLeft());
+        keyCell->setRect(0, 0, keyItemRect.width(), keyItemRect.height());
 
         QGraphicsTextItem *keyItem = keyItems.at(i);
         keyItem->setParentItem(keyCell);
@@ -359,17 +369,20 @@ StructureIndexCardFields::StructureIndexCardFields(const StructureElement *eleme
         valueCell->setBrush(Qt::NoBrush);
         valueCell->setPen(Qt::NoPen);
         valueCell->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
-        valueCell->setRect(valueItemRect);
+        valueCell->setPos(valueItemRect.topLeft());
+        valueCell->setRect(0, 0, valueItemRect.width(), valueItemRect.height());
 
         QGraphicsTextItem *valueItem = valueItems.at(i);
         valueItem->setParentItem(valueCell);
 
-        keyItemRect.moveTop(keyItemRect.top() + rowHeight + 1);
-        valueItemRect.moveTop(valueItemRect.top() + rowHeight + 1);
+        keyItemRect.moveTop(keyItemRect.bottom() + 1);
+        valueItemRect.moveTop(valueItemRect.bottom() + 1);
     }
 
     const QRectF ibr = this->childrenBoundingRect();
     this->setRect(ibr);
+    this->setBrush(Qt::NoBrush);
+    this->setPen(Qt::NoPen);
 }
 
 StructureIndexCardFields::~StructureIndexCardFields() { }
