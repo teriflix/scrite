@@ -47,6 +47,9 @@ public:
     QImage image() const { return m_image; }
     Q_SIGNAL void imageChanged();
 
+    Q_PROPERTY(bool imageIsEmpty READ imageIsEmpty NOTIFY imageChanged)
+    bool imageIsEmpty() const { return m_image.isNull() || m_image.size().isEmpty(); }
+
 protected:
     // QQuickPaintedItem interface
     void paint(QPainter *painter);
@@ -58,7 +61,11 @@ private:
     QImage m_image;
     FillMode m_fillMode = PreserveAspectFit;
     bool m_useSoftwareRenderer = false;
-    enum { UnknownPaintMode, SceneGraphPaintMode, PainterPaintMode } lastPaintMode = UnknownPaintMode;
+    enum {
+        UnknownPaintMode,
+        SceneGraphPaintMode,
+        PainterPaintMode
+    } lastPaintMode = UnknownPaintMode;
 };
 
 #endif // QIMAGEITEM_H

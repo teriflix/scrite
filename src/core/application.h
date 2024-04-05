@@ -297,6 +297,9 @@ public:
     Q_PROPERTY(Forms *forms READ forms CONSTANT)
     Forms *forms() const;
 
+    Q_PROPERTY(QImage emptyQImage READ emptyQImage CONSTANT)
+    static QImage emptyQImage() { return QImage(); }
+
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 

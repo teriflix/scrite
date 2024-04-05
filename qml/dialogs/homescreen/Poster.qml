@@ -41,26 +41,23 @@ Item {
 
             anchors.fill: parent
 
-            visible: _private.posterSourceUrl !== ""
-
             cache: false
+            visible: _private.posterSourceKind === _private.e_ImageKind
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
 
-            source: _private.posterSourceUrl
+            source: visible ? _private.posterSourceUrl : ""
         }
 
         QImageItem {
             anchors.fill: parent
 
-            visible: _private.posterQImage !== undefined
-
+            visible: _private.posterSourceKind === _private.e_QImageKind
             fillMode: QImageItem.PreserveAspectCrop
             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
-            image: _private.posterQImage
+            image: visible ? _private.posterQImage : Scrite.app.emptyQImage
         }
-
 
         Rectangle {
             anchors.fill: parent
@@ -85,23 +82,23 @@ Item {
             id: posterImageFg
 
             anchors.fill: parent
-            visible: _private.posterSourceUrl !== ""
 
             cache: false
+            visible: _private.posterSourceKind === _private.e_ImageKind
             fillMode: Image.PreserveAspectFit
             asynchronous: true
 
-            source: _private.posterSourceUrl
+            source: visible ? _private.posterSourceUrl : ""
         }
 
         QImageItem {
             anchors.fill: parent
-            visible: _private.posterQImage !== undefined
 
+            visible: _private.posterSourceKind === _private.e_QImageKind
             fillMode: QImageItem.PreserveAspectFit
             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
-            image: _private.posterQImage
+            image: visible ? _private.posterQImage : Scrite.app.emptyQImage
         }
     }
 
@@ -137,17 +134,24 @@ Item {
         id: _private
 
         property string posterSourceUrl
-        property var posterQImage
+        property var posterQImage: Scrite.app.blankQImage
         property var posterSource
+
+        readonly property int e_ImageKind: 0
+        readonly property int e_QImageKind: 1
+        property int posterSourceKind: e_ImageKind
 
         onPosterSourceChanged: {
             posterSourceUrl = ""
-            posterQImage = undefined
+            posterQImage = Scrite.app.blankQImage
 
-            if(typeof posterSource === "string" || typeof posterSource === "url")
+            if(typeof posterSource === "string" || typeof posterSource === "url") {
                 posterSourceUrl = posterSource
-            else if(typeof posterSource === "object" && Scrite.app.verifyType(posterSource, "QImage"))
+                posterSourceKind = e_ImageKind
+            } else if(typeof posterSource === "object" && Scrite.app.verifyType(posterSource, "QImage")) {
                 posterQImage = posterSource
+                posterSourceKind = e_QImageKind
+            }
         }
     }
 }

@@ -216,7 +216,7 @@ Item {
         property string text
         property string tooltip
         property string iconSource
-        property var iconImage // has to be QImage
+        property var iconImage: Scrite.app.emptyQImage // has to be QImage
         property bool singleClick: true
         property bool showPoster: false
 
@@ -247,7 +247,7 @@ Item {
                     if(iconSource !== "")
                         item.source = Qt.binding( () => { return iconSource } )
                     else
-                        item.image = Qt.binding( () => { return iconImage } )
+                        item.image = Qt.binding( () => { return iconImage ? iconImage : Scrite.app.emptyQImage } )
                 }
             }
 
