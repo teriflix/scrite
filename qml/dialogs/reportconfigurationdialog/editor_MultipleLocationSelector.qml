@@ -32,7 +32,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight
@@ -43,7 +43,7 @@ ColumnLayout {
         text: fieldInfo.label
     }
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap

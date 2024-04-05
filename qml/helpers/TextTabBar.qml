@@ -32,7 +32,7 @@ Item {
         width: parent.width
         spacing: 16
 
-        VclText {
+        VclLabel {
             id: nameText
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             font.family: Runtime.idealFontMetrics.font.family
@@ -46,7 +46,7 @@ Item {
             id: tabsRepeater
             model: tabs
 
-            VclText {
+            VclLabel {
                 font: Runtime.idealFontMetrics.font
                 color: textTabBar.tabIndex === index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
                 text: modelData

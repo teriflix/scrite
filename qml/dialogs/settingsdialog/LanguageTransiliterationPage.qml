@@ -53,7 +53,7 @@ Item {
 
                 spacing: 10
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignVCenter
                     Layout.preferredWidth: parent.width * 0.25
 

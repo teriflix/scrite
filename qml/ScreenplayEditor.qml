@@ -467,7 +467,7 @@ Rectangle {
                                 anchors.centerIn: parent
                                 spacing: 13
 
-                                VclText {
+                                VclLabel {
                                     id: logLineFieldHeading
                                     text: logLineField.activeFocus ? ("Logline: (" + (loglineLimiter.limitReached ? "WARNING: " : "") + loglineLimiter.wordCount + "/" + loglineLimiter.maxWordCount + " words, " +
                                           loglineLimiter.letterCount + "/" + loglineLimiter.maxLetterCount + " letters)") : "Logline: "
@@ -1076,7 +1076,7 @@ Rectangle {
                 property Scene currentScene: currentSceneElement ? currentSceneElement.scene : null
                 property SceneHeading currentSceneHeading: currentScene && currentScene.heading.enabled ? currentScene.heading : null
 
-                VclText {
+                VclLabel {
                     id: currentSceneNumber
                     anchors.verticalCenter: currentSceneHeadingText.verticalCenter
                     anchors.left: currentSceneHeadingText.left
@@ -1378,7 +1378,7 @@ Rectangle {
                 active: parent.evaluateSuggestedSceneHeight && !parent.screenplayElement.omitted
             }
 
-            VclText {
+            VclLabel {
                 font: sceneHeadingText.font
                 anchors.verticalCenter: sceneHeadingText.verticalCenter
                 anchors.right: sceneHeadingText.left
@@ -1388,7 +1388,7 @@ Rectangle {
                 text: screenplayElement.resolvedSceneNumber
             }
 
-            VclText {
+            VclLabel {
                 id: sceneHeadingText
                 anchors.left: parent.left
                 anchors.leftMargin: ruler.leftMarginPx
@@ -1815,7 +1815,7 @@ Rectangle {
                         anchors.leftMargin: ruler.leftMarginPx
                         anchors.rightMargin: ruler.rightMarginPx
 
-                        VclText {
+                        VclLabel {
                             id: synopsisEditorHeading
                             text: (contentItem.theScene.structureElement.hasNativeTitle ? contentItem.theScene.structureElement.nativeTitle : "Synopsis") + ":"
                             font.bold: true
@@ -2231,7 +2231,7 @@ Rectangle {
                                 ScrollBar.vertical: VclScrollBar {
                                     flickable: completionView
                                 }
-                                delegate: VclText {
+                                delegate: VclLabel {
                                     width: completionView.width-(completionView.contentHeight > completionView.height ? 20 : 1)
                                     text: string
                                     padding: 5
@@ -3270,7 +3270,7 @@ Rectangle {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     id: sceneGroupTagsText
                     width: parent.width
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -3321,7 +3321,7 @@ Rectangle {
 
             signal newCharacterAdded(string characterName, int curPosition)
 
-            VclText {
+            VclLabel {
                 id: sceneCharactersListHeading
                 text: "Characters: "
                 font.bold: true
@@ -3455,18 +3455,10 @@ Rectangle {
             z: expanded ? 1 : 0
 
             content: Item {
-                VclText {
-                    id: dragHotspotItem
-                    font.family: "Courier Prime"
-                    font.pixelSize: Runtime.idealFontMetrics.font.pointSize + 4
-                    visible: false
-                }
-
-                VclText {
+                VclLabel {
                     width: parent.width * 0.9
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Runtime.idealFontMetrics.font.pointSize
                     text: "Scene headings will be listed here as you add them into your screenplay."
                     anchors.horizontalCenter: sceneListView.horizontalCenter
                     anchors.top: parent.top
@@ -3669,7 +3661,7 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 5
 
-                            VclText {
+                            VclLabel {
                                 id: delegateText
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
@@ -3710,7 +3702,7 @@ Rectangle {
                                 elide: Text.ElideMiddle
                             }
 
-                            VclText {
+                            VclLabel {
                                 id: sceneLengthText
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-3
                                 color: Runtime.colors.primary.c10.text
@@ -3811,8 +3803,6 @@ Rectangle {
                         Drag.active: delegateMouseArea.drag.active
                         Drag.dragType: Drag.Automatic
                         Drag.supportedActions: Qt.MoveAction
-                        Drag.hotSpot.x: dragHotspotItem.width/2
-                        Drag.hotSpot.y: dragHotspotItem.height/2
                         Drag.source: screenplayElement
                         Drag.mimeData: {
                             "sceneListView/sceneID": screenplayElement.sceneID
@@ -4103,7 +4093,7 @@ Rectangle {
                     width: parent.width
                     spacing: 0
 
-                    VclText {
+                    VclLabel {
                         font.family: Scrite.document.formatting.defaultFont.family
                         font.pointSize: defaultFontSize
                         width: parent.width

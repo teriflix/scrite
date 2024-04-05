@@ -771,7 +771,7 @@ Item {
                                     opacity: 0.9
                                     anchors.fill: parent
 
-                                    VclText {
+                                    VclLabel {
                                         width: parent.width * 0.75
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                                         anchors.centerIn: parent
@@ -790,7 +790,7 @@ Item {
                 }
             }
 
-            VclText {
+            VclLabel {
                 id: languageDescLabel
                 anchors.verticalCenter: parent.verticalCenter
                 text: Scrite.app.transliterationEngine.languageAsString
@@ -1230,7 +1230,7 @@ Item {
         visible: pdfViewer.active
         enabled: visible && !NotificationsView.visible
 
-        VclText {
+        VclLabel {
             text: pdfViewer.pdfTitle
             color: Runtime.colors.accent.c50.text
             elide: Text.ElideMiddle
@@ -1546,7 +1546,7 @@ Item {
                             width: parent.width * 0.5
                             spacing: 20
 
-                            VclText {
+                            VclLabel {
                                 wrapMode: Text.WordWrap
                                 width: parent.width
                                 color: Runtime.colors.primary.c700.text
@@ -1556,7 +1556,7 @@ Item {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
-                            VclText {
+                            VclLabel {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 color: Runtime.colors.primary.c700.text
@@ -1565,7 +1565,7 @@ Item {
                                 text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
                             }
 
-                            VclText {
+                            VclLabel {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 color: Runtime.colors.primary.c700.text
@@ -1801,7 +1801,7 @@ Item {
                                         visible: screenplayEditorHandleAnimation.running
                                     }
 
-                                    VclText {
+                                    VclLabel {
                                         color: Runtime.colors.primary.c50.background
                                         text: "Pull this handle to view the screenplay editor."
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
@@ -1850,7 +1850,7 @@ Item {
                                         visible: timelineViewHandleAnimation.running
                                     }
 
-                                    VclText {
+                                    VclLabel {
                                         color: Runtime.colors.primary.c50.background
                                         text: "Pull this handle to get the timeline view."
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize

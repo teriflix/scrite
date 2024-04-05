@@ -53,7 +53,7 @@ VclDialog {
         ColumnLayout {
             spacing: 0
 
-            VclText {
+            VclLabel {
                 Layout.fillWidth: true
 
                 background: Rectangle {

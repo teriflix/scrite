@@ -41,7 +41,7 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclText {
+            label: VclLabel {
                 text: "Colors"
             }
 
@@ -61,7 +61,7 @@ Item {
                         RowLayout {
                             Layout.alignment: Qt.AlignHCenter
 
-                            VclText {
+                            VclLabel {
                                 text: "Primary"
                             }
 
@@ -94,7 +94,7 @@ Item {
 
                                     color: Material.color(modelData)
 
-                                    VclText {
+                                    VclLabel {
                                         anchors.centerIn: parent
                                         text: "✓"
                                         color: Scrite.app.textColorFor(parent.color)
@@ -127,7 +127,7 @@ Item {
                         RowLayout {
                             Layout.alignment: Qt.AlignHCenter
 
-                            VclText {
+                            VclLabel {
                                 text: "Accent"
                             }
 
@@ -160,7 +160,7 @@ Item {
 
                                     color: Material.color(modelData)
 
-                                    VclText {
+                                    VclLabel {
                                         anchors.centerIn: parent
                                         text: "✓"
                                         color: Scrite.app.textColorFor(parent.color)
@@ -185,14 +185,14 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclText {
+            label: VclLabel {
                 text: "UI Mode"
             }
 
             ColumnLayout {
                 width: parent.width
 
-                VclText {
+                VclLabel {
                     Layout.fillWidth: true
 
                     text: "This feature is in the works, the options below will get enabled whenever its fully implemented."

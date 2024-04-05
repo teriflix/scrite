@@ -102,7 +102,7 @@ Item {
                     anchors.margins: 20
                     spacing: 20
 
-                    VclText {
+                    VclLabel {
                         Layout.fillWidth: true
                         horizontalAlignment: lineCount > 2 ? Text.AlignLeft : Text.AlignHCenter
                         text: dialog.message

@@ -51,7 +51,7 @@ FloatingDock {
         ScrollBar.vertical: VclScrollBar { }
         section.property: "itemGroup"
         section.criteria: ViewSection.FullString
-        section.delegate: VclText {
+        section.delegate: VclLabel {
             required property string section
 
             width: shortcutsView.width-15
@@ -88,14 +88,14 @@ FloatingDock {
                 anchors.leftMargin: 20
                 anchors.right: parent.right
 
-                VclText {
+                VclLabel {
                     anchors.verticalCenter: parent.verticalCenter
                     text: itemTitle
                     width: parent.width * 0.65
                     elide: Text.ElideRight
                 }
 
-                VclText {
+                VclLabel {
                     anchors.verticalCenter: parent.verticalCenter
                     font.family: "Courier Prime"
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-2

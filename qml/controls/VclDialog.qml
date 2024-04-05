@@ -170,7 +170,7 @@ Dialog {
             spacing: 2
             width: parent.width
 
-            VclText {
+            VclLabel {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
 

@@ -50,7 +50,7 @@ Item {
                 width: parent.width
                 spacing: parent.spacing/4
 
-                VclText {
+                VclLabel {
                     width: parent.width
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                     font.bold: true
@@ -59,7 +59,7 @@ Item {
                     text: annotation.type.toUpperCase()
                 }
 
-                VclText {
+                VclLabel {
                     width: parent.width
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
@@ -83,7 +83,7 @@ Item {
                     width: propertyEditorView.width - (propertyEditorView.scrollBarVisible ? 20 : 0)
                     visible: propertyInfo.visible === true
 
-                    VclText {
+                    VclLabel {
                         width: parent.width
                         text: propertyInfo.title
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -219,7 +219,7 @@ Item {
                 }
             }
 
-            VclText {
+            VclLabel {
                 anchors.verticalCenter: parent.verticalCenter
                 text: propertyValue
                 font.capitalization: Font.AllUppercase
@@ -304,7 +304,7 @@ Item {
                 width: parent.width
             }
 
-            VclText {
+            VclLabel {
                 width: parent.width
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
                 visible: propertyValue != urlField.text
@@ -319,7 +319,7 @@ Item {
         Column {
             id: fontFamilyEditorItem
 
-            VclText {
+            VclLabel {
                 rightPadding: changeFontButton.width + 5
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: propertyValue
@@ -406,7 +406,7 @@ Item {
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
                     keyNavigationEnabled: false
-                    delegate: VclText {
+                    delegate: VclLabel {
                         font.family: modelData
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: modelData
@@ -543,7 +543,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 20
 
-                VclText {
+                VclLabel {
                     text: propertyValue == "" ? "Set" : "Change"
                     color: "blue"
                     font.underline: true
@@ -556,7 +556,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     text: "Remove"
                     color: "blue"
                     font.underline: true

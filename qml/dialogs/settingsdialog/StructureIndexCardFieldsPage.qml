@@ -40,7 +40,7 @@ Item {
 
         spacing: 20
 
-        VclText {
+        VclLabel {
             Layout.fillWidth: true
 
             font.bold: true
@@ -49,7 +49,7 @@ Item {
             text: target === e_CurrentDocumentTarget ? "Fields on index cards in the currently open document" : "Default fields on index cards in all new documents created in the future"
         }
 
-        VclText {
+        VclLabel {
             property string note: root.target === root.e_DefaultGlobalTarget ? "<br/><br/><b>NOTE: </b>Fields configured here will not affect index cards in the currently open document!" : ""
 
             Layout.fillWidth: true
@@ -75,7 +75,7 @@ Item {
                 columnSpacing: 20
 
                 // Column 1: labels
-                VclText {
+                VclLabel {
                     font.bold: true
 
                     text: "Label"
@@ -101,7 +101,7 @@ Item {
                 }
 
                 // Column 2: description
-                VclText {
+                VclLabel {
                     Layout.fillWidth: true
 
                     font.bold: true

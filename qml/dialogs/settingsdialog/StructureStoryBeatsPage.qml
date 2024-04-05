@@ -39,7 +39,7 @@ Item {
 
         spacing: 20
 
-        VclText {
+        VclLabel {
             Layout.fillWidth: true
 
             font.bold: true
@@ -48,7 +48,7 @@ Item {
             text: target === e_CurrentDocumentTarget ? "Story beats used in the currently open document" : "Default story beats for use in all new documents created in the future"
         }
 
-        VclText {
+        VclLabel {
             property string note: root.target === root.e_DefaultGlobalTarget ? "<br/><br/><b>NOTE:</b> Story beats configured here will not affect the currently open document." : ""
 
             Layout.fillWidth: true

@@ -44,7 +44,7 @@ ColumnLayout {
         onToggled: exporter ? exporter.setConfigurationValue(fieldInfo.name, checked) : false
     }
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         color: Runtime.colors.primary.c600.background

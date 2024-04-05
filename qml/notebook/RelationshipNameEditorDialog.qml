@@ -99,7 +99,7 @@ Item {
                                 }
                             }
 
-                            VclText {
+                            VclLabel {
                                 Layout.alignment: Qt.AlignHCenter
                                 Layout.preferredWidth: 180
 
@@ -152,7 +152,7 @@ Item {
                                 }
                             }
 
-                            VclText {
+                            VclLabel {
                                 Layout.alignment: Qt.AlignHCenter
                                 Layout.preferredWidth: 180
 

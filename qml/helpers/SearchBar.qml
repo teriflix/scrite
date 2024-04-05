@@ -131,7 +131,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     text: {
                         if(searchEngine.searchResultCount > 0)
                             return "  " +  (searchEngine.currentSearchResultIndex+1) + "/" + searchEngine.searchResultCount + "  "

@@ -15,7 +15,7 @@
         <file>qml/controls/VclMenuItem.qml</file>
         <file>qml/controls/VclRadioButton.qml</file>
         <file>qml/controls/VclScrollBar.qml</file>
-        <file>qml/controls/VclText.qml</file>
+        <file>qml/controls/VclLabel.qml</file>
         <file>qml/controls/VclTextField.qml</file>
         <file>qml/controls/VclToolButton.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_CheckBox.qml</file>
@@ -151,7 +151,7 @@
         <file>qml/structure/IndexCardFields.qml</file>
         <file>qml/structure/qmldir</file>
         <file>qml/structure/StructureGroupsMenu.qml</file>
-        <file>qml/tasks/OpenFileTask.qml</file>        
+        <file>qml/tasks/OpenFileTask.qml</file>
         <file>qml/tasks/OpenFromLibraryTask.qml</file>
         <file>qml/tasks/qmldir</file>
         <file>qml/tasks/SaveFileTask.qml</file>
@@ -161,5 +161,6 @@
         <file>qml/ScriteMainWindow.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
+        <file>qml/controls/VclText.qml</file>
     </qresource>
 </RCC>

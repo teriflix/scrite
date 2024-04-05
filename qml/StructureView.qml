@@ -1176,7 +1176,7 @@ Item {
                         color: Runtime.colors.accent.c200.background
                     }
 
-                    VclText {
+                    VclLabel {
                         id: episodeNameText
                         anchors.left: parent.left
                         anchors.top: parent.top
@@ -1311,7 +1311,7 @@ Item {
                         }
                     }
 
-                    VclText {
+                    VclLabel {
                         id: beatLabel
                         text: "<b>" + modelData.name + "</b><font size=\"-2\">: " + modelData.sceneCount + (modelData.sceneCount === 1 ? " Scene": " Scenes") + "</font>"
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
@@ -2057,7 +2057,7 @@ Item {
             color: Runtime.colors.primary.c700.background
         }
 
-        VclText {
+        VclLabel {
             id: attachmentNotice
             anchors.centerIn: parent
             width: parent.width * 0.5 /* noticeWidthFactor */
@@ -3073,7 +3073,7 @@ Item {
                                     }
                                     attachmentNoticeSuffix: "Drop this photo to tag it as featured image for this scene."
 
-                                    VclText {
+                                    VclLabel {
                                         width: parent.width
                                         horizontalAlignment: Text.AlignHCenter
                                         anchors.centerIn: parent
@@ -3139,7 +3139,7 @@ Item {
 
                             spacing: parent.spacing
 
-                            VclText {
+                            VclLabel {
                                 id: groupsLabel
 
                                 Layout.fillWidth: true
@@ -3151,7 +3151,7 @@ Item {
                                 font.pointSize: Scrite.app.idealAppFontSize - 2
                             }
 
-                            VclText {
+                            VclLabel {
                                 id: characterList
 
                                 Layout.fillWidth: true
@@ -3354,7 +3354,7 @@ Item {
                         anchors.centerIn: parent
                         spacing: 40
 
-                        VclText {
+                        VclLabel {
                             text: "Are you sure you want to delete this index card?"
                             font.bold: true
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -3809,7 +3809,7 @@ Item {
         AnnotationItem {
             id: textAnnotationItem
 
-            VclText {
+            VclLabel {
                 anchors.centerIn: parent
                 horizontalAlignment: {
                     switch(annotation.attributes.hAlign) {
@@ -3930,7 +3930,7 @@ Item {
                         }
                     }
 
-                    VclText {
+                    VclLabel {
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                         text: annotation.attributes.title
@@ -3940,7 +3940,7 @@ Item {
                         elide: Text.ElideRight
                     }
 
-                    VclText {
+                    VclLabel {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: annotation.attributes.description
                         width: parent.width
@@ -3949,7 +3949,7 @@ Item {
                         maximumLineCount: 3
                     }
 
-                    VclText {
+                    VclLabel {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                         color: urlAttribs.status === UrlAttributes.Error ? "red" : "blue"
                         text: annotation.attributes.url
@@ -3973,7 +3973,7 @@ Item {
                 running: urlAttribs.status === UrlAttributes.Loading
             }
 
-            VclText {
+            VclLabel {
                 anchors.fill: parent
                 anchors.margins: 10
                 horizontalAlignment: Text.AlignHCenter
@@ -4035,7 +4035,7 @@ Item {
                 }
             }
 
-            VclText {
+            VclLabel {
                 width: image.width
                 height: Math.max(parent.height - image.height - 10, 0)
                 visible: height > 0
@@ -4100,7 +4100,7 @@ Item {
     Component {
         id: unknownAnnotationComponent
 
-        VclText {
+        VclLabel {
             text: "Unknown annotation: <strong>" + annotation.type + "</strong>"
             x: annotation.geometry.x
             y: annotation.geometry.y

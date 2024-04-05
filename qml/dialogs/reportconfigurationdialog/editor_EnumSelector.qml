@@ -29,7 +29,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         text: fieldInfo.label + ": "

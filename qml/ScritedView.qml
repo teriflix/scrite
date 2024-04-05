@@ -329,7 +329,7 @@ Item {
                         visible: logoOverlay.visible
                     }
 
-                    VclText {
+                    VclLabel {
                         width: parent.width * 0.75
                         wrapMode: Text.WordWrap
                         font.pointSize: 16
@@ -437,7 +437,7 @@ Item {
                                     focusPolicy: Qt.NoFocus
                                 }
 
-                                VclText {
+                                VclLabel {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignVCenter
                                     width: parent.width
@@ -513,7 +513,7 @@ Item {
                                 width: titleText.width
                                 height: titleText.height
 
-                                VclText {
+                                VclLabel {
                                     id: titleText
                                     padding: 8
                                     font.family: "Arial"
@@ -530,7 +530,7 @@ Item {
                                 height: subtitleText.height
                                 visible: subtitleText.text !== ""
 
-                                VclText {
+                                VclLabel {
                                     id: subtitleText
                                     padding: 6
                                     font.family: "Arial"
@@ -547,7 +547,7 @@ Item {
                                 height: authorsText.height
                                 visible: authorsText.text !== ""
 
-                                VclText {
+                                VclLabel {
                                     id: authorsText
                                     padding: 6
                                     font.family: "Arial"
@@ -917,7 +917,7 @@ Item {
                     height: parent.height * 0.9
                     anchors.centerIn: parent
 
-                    VclText {
+                    VclLabel {
                         text: "Script » Screen"
                         color: "#f1be41"
                         font.pointSize: closingFrameOverlay.height * 0.025
@@ -933,7 +933,7 @@ Item {
                         Layout.alignment: Qt.AlignHCenter
                     }
 
-                    VclText {
+                    VclLabel {
                         font.pointSize: closingFrameOverlay.height * 0.05
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
@@ -943,7 +943,7 @@ Item {
                         text: Scrite.document.screenplay.title
                     }
 
-                    VclText {
+                    VclLabel {
                         font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
@@ -954,7 +954,7 @@ Item {
                         visible: text !== ""
                     }
 
-                    VclText {
+                    VclLabel {
                         font.pointSize: closingFrameOverlay.height * 0.0225
                         horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
@@ -1117,7 +1117,7 @@ Item {
                 visible: screenplayOffsetsView.count > 0
                 x: 40
 
-                VclText {
+                VclLabel {
                     padding: 5
                     width: parent.width * 0.1
                     text: "#"
@@ -1129,7 +1129,7 @@ Item {
                     clip: true
                 }
 
-                VclText {
+                VclLabel {
                     padding: 5
                     width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
                     font.bold: true
@@ -1140,7 +1140,7 @@ Item {
                     clip: true
                 }
 
-                VclText {
+                VclLabel {
                     padding: 5
                     width: parent.width * 0.1
                     font.bold: true
@@ -1152,7 +1152,7 @@ Item {
                     clip: true
                 }
 
-                VclText {
+                VclLabel {
                     padding: 5
                     width: parent.width * 0.2
                     font.bold: true
@@ -1265,7 +1265,7 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
 
-                        VclText {
+                        VclLabel {
                             padding: 5
                             width: parent.width * 0.1
                             text: isSceneItem ? arrayItem.number : ""
@@ -1276,7 +1276,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        VclText {
+                        VclLabel {
                             padding: 5
                             width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
                             text: arrayItem.snippet
@@ -1287,7 +1287,7 @@ Item {
                             elide: Text.ElideMiddle
                         }
 
-                        VclText {
+                        VclLabel {
                             padding: 5
                             width: parent.width * 0.1
                             text: isSceneItem ? arrayItem.pageNumber : ""
@@ -1298,7 +1298,7 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
-                        VclText {
+                        VclLabel {
                             padding: 5
                             width: parent.width * 0.2
                             text: screenplayOffsetsModel.timestampToString(arrayItem.timestamp)

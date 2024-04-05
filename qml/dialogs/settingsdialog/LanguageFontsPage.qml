@@ -59,7 +59,7 @@ Item {
 
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         Layout.alignment: Qt.AlignVCenter
                         Layout.preferredWidth: parent.width * 0.2
 
@@ -85,7 +85,7 @@ Item {
                         }
                     }
 
-                    VclText {
+                    VclLabel {
                         id: previewText
 
                         Layout.alignment: Qt.AlignVCenter
@@ -104,7 +104,7 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclText {
+            label: VclLabel {
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: "Custom Font Usage Options"
             }

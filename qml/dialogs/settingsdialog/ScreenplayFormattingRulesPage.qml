@@ -513,7 +513,7 @@ Item {
                 anchors.centerIn: parent
                 spacing: 20
 
-                VclText {
+                VclLabel {
                     Layout.fillWidth: true
                     wrapMode: Text.WordWrap
                     text: "Select attributes of <b>" + paragraphTypeComboBox.currentText + "</b> you want to copy to all other paragraph types."
@@ -594,7 +594,7 @@ Item {
                             border.width: 1
                             border.color: Runtime.colors.primary.borderColor
 
-                            Text {
+                            VclText {
                                 font.pixelSize: parent.height * 0.7
                                 color: _private.displayElementFormat.textColor
                                 anchors.centerIn: parent

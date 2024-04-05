@@ -50,7 +50,7 @@ Item {
                     visible: parent.selected
                 }
 
-                VclText {
+                VclLabel {
                     id: tabText
                     anchors.centerIn: parent
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize

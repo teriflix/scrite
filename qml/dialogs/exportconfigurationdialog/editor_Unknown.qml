@@ -23,7 +23,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
-VclText {
+VclLabel {
     property var fieldInfo
     property AbstractExporter exporter
     property TabSequenceManager tabSequence

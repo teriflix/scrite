@@ -60,7 +60,7 @@ Column {
 
         spacing: 10
 
-        VclText {
+        VclLabel {
             id: questionNumberText
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
@@ -69,7 +69,7 @@ Column {
             anchors.top: parent.top
         }
 
-        VclText {
+        VclLabel {
             id: questionText
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2

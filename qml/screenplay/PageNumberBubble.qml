@@ -23,7 +23,7 @@ PainterPathItem {
     property string pageNumber: "-1"
     readonly property var colors: Runtime.colors.primary.c600
 
-    VclText {
+    VclLabel {
         id: sceneNumberText
         anchors.centerIn: parent
         font: defaultFontMetrics.font

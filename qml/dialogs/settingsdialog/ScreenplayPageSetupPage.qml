@@ -41,7 +41,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
-            label: VclText { text: "Paper Size" }
+            label: VclLabel { text: "Paper Size" }
 
             VclComboBox {
                 width: parent.width
@@ -61,7 +61,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
-            label: VclText { text: "Time Per Page" }
+            label: VclLabel { text: "Time Per Page" }
 
             RowLayout {
                 width: parent.width
@@ -77,7 +77,7 @@ Item {
                     onTextEdited: Scrite.document.printFormat.secondsPerPage = parseInt(text)
                 }
 
-                VclText {
+                VclLabel {
                     text: "seconds per page."
                 }
             }
@@ -87,7 +87,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
-            label: VclText { text: "Header" }
+            label: VclLabel { text: "Header" }
 
             RowLayout {
                 width: parent.width
@@ -98,7 +98,7 @@ Item {
 
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         text: "Left"
                     }
 
@@ -117,7 +117,7 @@ Item {
 
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         text: "Center"
                     }
 
@@ -136,7 +136,7 @@ Item {
 
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         text: "Right"
                     }
 
@@ -156,7 +156,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
 
-            label: VclText { text: "Footer" }
+            label: VclLabel { text: "Footer" }
 
             RowLayout {
                 width: parent.width
@@ -167,7 +167,7 @@ Item {
 
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         text: "Left"
                     }
 
@@ -186,7 +186,7 @@ Item {
 
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         text: "Center"
                     }
 
@@ -205,7 +205,7 @@ Item {
 
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         text: "Right"
                     }
 
@@ -226,7 +226,7 @@ Item {
             Layout.preferredWidth: layout.width
             Layout.preferredHeight: watermarkOptionsLayout.height+50 // !!!
 
-            label: VclText { text: "Watermark" }
+            label: VclLabel { text: "Watermark" }
 
             GridLayout {
                 id: watermarkOptionsLayout
@@ -236,7 +236,7 @@ Item {
                 rowSpacing: 10
                 enabled: Runtime.appFeatures.watermark.enabled
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Enable"
@@ -249,7 +249,7 @@ Item {
                 }
 
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Font Family"
@@ -264,7 +264,7 @@ Item {
                     enabled: _private.pageSetupSettings.watermarkEnabled
                 }
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Text"
@@ -279,7 +279,7 @@ Item {
                     enableTransliteration: true
                 }
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Font Size"
@@ -294,7 +294,7 @@ Item {
                     enabled:  _private.pageSetupSettings.watermarkEnabled
                 }
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignRight
 
                     text: "Color"
@@ -316,7 +316,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignRight
                     text: "Rotation"
                 }

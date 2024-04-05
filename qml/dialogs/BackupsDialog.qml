@@ -91,7 +91,7 @@ Item {
                                     width: parent.width-20
                                     anchors.verticalCenter: parent.verticalCenter
 
-                                    VclText {
+                                    VclLabel {
                                         width: parent.width * 0.75
                                         text: relativeTime + "<br/><font size=\"-2\">" + timestampAsString + "</font>"
                                         padding: 5
@@ -101,7 +101,7 @@ Item {
                                         anchors.top: parent.top
                                     }
 
-                                    VclText {
+                                    VclLabel {
                                         width: parent.width * 0.25
                                         anchors.top: parent.top
                                         property string fileSizeInfo: {

@@ -42,7 +42,7 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclText { text: "Graphics" }
+            label: VclLabel { text: "Graphics" }
 
             ColumnLayout {
                 width: parent.width
@@ -73,7 +73,7 @@ Item {
                 RowLayout {
                     spacing: 10
 
-                    VclText {
+                    VclLabel {
                         id: themeLabel
                         text: "Theme: "
                         leftPadding: 10
@@ -111,14 +111,14 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclText { text: "Display" }
+            label: VclLabel { text: "Display" }
             clip: true
 
             GridLayout {
                 width: parent.width
                 columns: 2
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignVCenter
                     text: "DPI:"
                     padding: 5
@@ -137,7 +137,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignVCenter
                     text: "Scale:"
                     padding: 5
@@ -161,7 +161,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     Layout.alignment: Qt.AlignVCenter
                     text: "Font Size:"
                     padding: 5
@@ -191,13 +191,13 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclText { text: "Window Tabs" }
+            label: VclLabel { text: "Window Tabs" }
 
             ColumnLayout {
                 width: parent.width
                 spacing: 5
 
-                VclText {
+                VclLabel {
                     Layout.fillWidth: true
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
                     text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. (Note: This works when Scrite window size is atleast 1600 px wide.)"
@@ -243,7 +243,7 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclText { text: "Saving Files" }
+            label: VclLabel { text: "Saving Files" }
             clip: true
 
             GridLayout {
@@ -298,13 +298,13 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclText { text: "PDF Export" }
+            label: VclLabel { text: "PDF Export" }
 
             ColumnLayout {
                 spacing: 5
                 width: parent.width
 
-                VclText {
+                VclLabel {
                     Layout.fillWidth: true
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
                     text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
@@ -332,7 +332,7 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclText { text: Scrite.app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
+            label: VclLabel { text: Scrite.app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
             enabled: !Scrite.app.isMacOSPlatform
             opacity: enabled ? 1 : 0.5
 
@@ -352,7 +352,7 @@ Item {
                     ToolTip.text: "Configure the scroll sensitivity of your mouse and trackpad."
                 }
 
-                VclText {
+                VclLabel {
                     text: Math.round( flickSpeedSlider.value*100 ) + "%"
                 }
 

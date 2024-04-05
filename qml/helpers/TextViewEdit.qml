@@ -56,7 +56,7 @@ Loader {
     Component {
         id: textViewComponent
 
-        VclText {
+        VclLabel {
             property string markupText
             text: markupText !== "" ? markupText : textViewEdit.text
             font: textViewEdit.font
@@ -174,7 +174,7 @@ Loader {
                     model: completionModel
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
                     keyNavigationEnabled: false
-                    delegate: VclText {
+                    delegate: VclLabel {
                         width: completionView.width-1
                         text: string
                         padding: 5

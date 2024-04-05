@@ -127,7 +127,7 @@ Item {
             renderingMechanism: PainterPathItem.UseAntialiasedQPainter
             painterPath: tabBarTab.alignment === Qt.AlignRight ? rightPainterPath.createObject(tabShapeItem) : topPainterPath.createObject(tabShapeItem)
 
-            VclText {
+            VclLabel {
                 id: tabText
                 anchors.centerIn: parent
                 anchors.horizontalCenterOffset: tabBarTab.alignment === Qt.AlignRight ? -tabText.height*0.1 : 0

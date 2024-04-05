@@ -115,7 +115,7 @@ Rectangle {
                             Layout.fillWidth: true
                             spacing: 20
 
-                            VclText {
+                            VclLabel {
                                 Layout.fillWidth: true
                                 text: notification.title
                                 wrapMode: Text.WordWrap
@@ -125,7 +125,7 @@ Rectangle {
                                 color: notification.textColor
                             }
 
-                            VclText {
+                            VclLabel {
                                 Layout.fillWidth: true
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                 text: notification.text

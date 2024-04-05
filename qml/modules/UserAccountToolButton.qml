@@ -177,7 +177,7 @@ Item {
                     anchors.centerIn: parent
                     spacing: 40
 
-                    VclText {
+                    VclLabel {
                         width: parent.width
                         wrapMode: Text.WordWrap
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
@@ -229,7 +229,7 @@ Item {
                             onClicked: parent.requestActivationCode()
                         }
 
-                        VclText {
+                        VclLabel {
                             id: errorText
                             width: parent.width
                             anchors.top: continueLink.bottom
@@ -328,7 +328,7 @@ Item {
                         }
                     }
 
-                    VclText {
+                    VclLabel {
                         width: parent.width * 0.8
                         wrapMode: Text.WordWrap
                         horizontalAlignment: resendActivationCode.visible && resendActivationCode.enabled ? Text.AlignLeft : Text.AlignHCenter
@@ -419,7 +419,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     id: errorMessageText
                     width: parent.width
                     anchors.centerIn: parent
@@ -528,7 +528,7 @@ Item {
                         width: parent.width
                         spacing: 5
 
-                        VclText {
+                        VclLabel {
                             width: parent.width
                             wrapMode: Text.WordWrap
                             horizontalAlignment: Text.AlignHCenter
@@ -712,7 +712,7 @@ Item {
                 anchors.leftMargin: 20
                 anchors.rightMargin: 20
 
-                VclText {
+                VclLabel {
                     id: errorText
                     width: parent.width
                     anchors.centerIn: parent
@@ -908,7 +908,7 @@ Item {
                 }
                 spacing: 20
                 property real availableDelegateWidth: width - (contentHeight > height ? 20 : 0)
-                header: VclText {
+                header: VclLabel {
                     width: installationsView.availableDelegateWidth
                     wrapMode: Text.WordWrap
                     text: "<strong>" + Scrite.user.email + "</strong> is currently logged in at " + (Scrite.user.installations.length) + " computers(s)."
@@ -936,7 +936,7 @@ Item {
                             anchors.rightMargin: 30
                             spacing: 4
 
-                            VclText {
+                            VclLabel {
                                 font.bold: true
                                 text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
                                 color: colors.text
@@ -944,14 +944,14 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            VclText {
+                            VclLabel {
                                 text: "Runs Scrite " + modelData.appVersions[0]
                                 color: colors.text
                                 width: parent.width
                                 elide: Text.ElideRight
                             }
 
-                            VclText {
+                            VclLabel {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-4
                                 text: "Since: " + Scrite.app.relativeTime(new Date(modelData.firstActivationDate))
                                 color: colors.text
@@ -960,7 +960,7 @@ Item {
                                 elide: Text.ElideRight
                             }
 
-                            VclText {
+                            VclLabel {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-4
                                 text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastActivationDate))
                                 color: colors.text

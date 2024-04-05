@@ -63,7 +63,7 @@ Rectangle {
                     height: 30
                     color: Runtime.colors.primary.c600.background
 
-                    VclText {
+                    VclLabel {
                         text: modelData.heading
                         padding: 8
                         font.pointSize: normalFontMetrics.font.pointSize
@@ -82,7 +82,7 @@ Rectangle {
                         model: modelData.array
 
                         Row {
-                            VclText {
+                            VclLabel {
                                 width: textCellWidth
                                 padding: 8
                                 font: normalFontMetrics.font
@@ -92,7 +92,7 @@ Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 anchors.verticalCenterOffset: (normalFontMetrics.height-languageFontMetrics.height)*0.3
                             }
-                            VclText {
+                            VclLabel {
                                 width: textCellWidth
                                 padding: 8
                                 font: languageFontMetrics.font

@@ -38,7 +38,7 @@ BasicAttachmentsDropArea {
             color: Runtime.colors.primary.c700.background
         }
 
-        VclText {
+        VclLabel {
             id: attachmentNotice
             anchors.centerIn: parent
             width: parent.width * noticeWidthFactor

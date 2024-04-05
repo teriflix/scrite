@@ -77,13 +77,12 @@ QtObject {
                 forDarkBackground: true
             }
 
-            VclText {
+            VclLabel {
                 width: Math.min(parent.maxWidth - busyIndicator.width - parent.spacing, contentWidth)
                 anchors.verticalCenter: parent.verticalCenter
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
                 text: Scrite.document.busyMessage
-                font.pixelSize: 16
                 color: Runtime.colors.primary.c600.text
             }
         }

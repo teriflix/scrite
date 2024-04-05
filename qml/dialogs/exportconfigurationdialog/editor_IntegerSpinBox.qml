@@ -30,7 +30,7 @@ ColumnLayout {
 
     spacing: 10
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         elide: Text.ElideRight

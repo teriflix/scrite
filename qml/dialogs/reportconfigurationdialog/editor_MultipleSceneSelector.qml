@@ -36,7 +36,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -44,7 +44,7 @@ ColumnLayout {
         text: fieldInfo.label
     }
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -239,7 +239,7 @@ ColumnLayout {
             }
         }
 
-        VclText {
+        VclLabel {
             Layout.fillWidth: true
 
             text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")

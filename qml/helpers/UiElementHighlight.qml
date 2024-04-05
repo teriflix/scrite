@@ -73,7 +73,7 @@ Item {
             border.width: 1
             border.color: Runtime.colors.accent.borderColor
 
-            VclText {
+            VclLabel {
                 id: descLabel
                 text: description
                 font.bold: true

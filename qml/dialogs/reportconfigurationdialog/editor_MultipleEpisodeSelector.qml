@@ -29,7 +29,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -37,7 +37,7 @@ ColumnLayout {
         text: fieldInfo.label
     }
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -88,7 +88,7 @@ ColumnLayout {
                 width: episodeListView.width-1
                 height: index > 0 ? 40 : (Scrite.document.screenplay.episodeCount === 0 ? 40 : 0)
 
-                VclText {
+                VclLabel {
                     text: "No espisodes in this screenplay"
                     visible: Scrite.document.screenplay.episodeCount === 0
                     anchors.centerIn: parent

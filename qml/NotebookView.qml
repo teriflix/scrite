@@ -457,7 +457,7 @@ Rectangle {
                             }
                         }
 
-                        VclText {
+                        VclLabel {
                             id: itemDelegateText
                             padding: 5
                             font.family: fontMetrics.font.family
@@ -736,7 +736,7 @@ Rectangle {
                         anchors.centerIn: parent
                         spacing: 40
 
-                        VclText {
+                        VclLabel {
                             text: {
                                 if(notebookTree.currentNote)
                                     return "Are you sure you want to delete this note?"
@@ -873,7 +873,7 @@ Rectangle {
                                     }
                                 }
 
-                                VclText {
+                                VclLabel {
                                     id: headingText
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                     font.bold: true
@@ -885,7 +885,7 @@ Rectangle {
                                 }
                             }
 
-                            VclText {
+                            VclLabel {
                                 width: parent.width
                                 height: parent.height - headingText.height - parent.spacing
                                 wrapMode: Text.WordWrap
@@ -1011,7 +1011,7 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             flow: Flow.LeftToRight
 
-                            VclText {
+                            VclLabel {
                                 id: sceneCharactersListHeading
                                 text: "Characters: "
                                 font.bold: true
@@ -1356,7 +1356,7 @@ Rectangle {
                                     anchors.margins: 16
                                     spacing: 8
 
-                                    VclText {
+                                    VclLabel {
                                         id: headingText
                                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                         font.bold: true
@@ -1367,7 +1367,7 @@ Rectangle {
                                         color: Scrite.app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
                                     }
 
-                                    VclText {
+                                    VclLabel {
                                         width: parent.width
                                         height: parent.height - headingText.height - parent.spacing
                                         wrapMode: Text.WordWrap
@@ -1600,7 +1600,7 @@ Rectangle {
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 10
 
-                            VclText {
+                            VclLabel {
                                 id: headingLabel
                                 text: breakElement.breakTitle + ": "
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
@@ -1665,7 +1665,7 @@ Rectangle {
                 target: breakElement ? breakElement.attachments : null
             }
 
-            VclText {
+            VclLabel {
                 width: parent.width * 0.6
                 anchors.centerIn: parent
                 horizontalAlignment: Text.AlignHCenter
@@ -1807,7 +1807,7 @@ Rectangle {
                                 width: parent.width
                                 spacing: 0
 
-                                VclText {
+                                VclLabel {
                                     font: screenplayFontMetrics.font
                                     width: parent.width
                                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -1979,7 +1979,7 @@ Rectangle {
                             x: Math.max(0, (parent.width-width)/2)
                             width: Math.min(Runtime.idealFontMetrics.averageCharacterWidth*50, parent.width-20)
 
-                            VclText {
+                            VclLabel {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -2016,7 +2016,7 @@ Rectangle {
                                 Component.onCompleted: syntaxHighlighter.addDelegate(textLimitHighlighter)
                             }
 
-                            VclText {
+                            VclLabel {
                                 width: parent.width
                                 wrapMode: Text.WordWrap
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -2067,7 +2067,7 @@ Rectangle {
         Item {
             property var componentData
 
-            VclText {
+            VclLabel {
                 anchors.fill: parent
                 anchors.margins: 20
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -2185,7 +2185,7 @@ Rectangle {
                                         spacing: parent.spacing/2
                                         anchors.verticalCenter: parent.verticalCenter
 
-                                        VclText {
+                                        VclLabel {
                                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                             font.bold: true
                                             text: character.name
@@ -2193,7 +2193,7 @@ Rectangle {
                                             elide: Text.ElideRight
                                         }
 
-                                        VclText {
+                                        VclLabel {
                                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                                             text: "Role: " + polishStr(character.designation, "-")
                                             width: parent.width
@@ -2201,7 +2201,7 @@ Rectangle {
                                             opacity: 0.75
                                         }
 
-                                        VclText {
+                                        VclLabel {
                                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                                             text: ["Age: " + polishStr(character.age, "-"), "Gender: " + polishStr(character.gender, "-")].join(", ")
                                             width: parent.width
@@ -2660,7 +2660,7 @@ Rectangle {
                                         Column {
                                             width: parent.width
 
-                                            VclText {
+                                            VclLabel {
                                                 function priority(val) {
                                                     var ret = ""
                                                     if(val >= -2 && val <= 2)

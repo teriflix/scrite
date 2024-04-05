@@ -71,7 +71,7 @@ VclMenu {
                         visible: innerTitleText.visible
                     }
 
-                    VclText {
+                    VclLabel {
                         id: innerTitleText
                         width: parent.width - 8
                         anchors.horizontalCenter: parent.horizontalCenter
@@ -112,7 +112,7 @@ VclMenu {
                             width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
                             height: 30
                             color: Runtime.colors.primary.windowColor
-                            VclText {
+                            VclLabel {
                                 id: categoryLabel
                                 text: section
                                 topPadding: 5
@@ -182,7 +182,7 @@ VclMenu {
                                     width: 24; height: 24
                                 }
 
-                                VclText {
+                                VclLabel {
                                     text: arrayItem.label
                                     width: parent.width - parent.spacing - 24
                                     anchors.verticalCenter: parent.verticalCenter

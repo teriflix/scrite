@@ -92,7 +92,7 @@ Item {
 
             spacing: 2
 
-            VclText {
+            VclLabel {
                 id: titleText
 
                 Layout.alignment: Qt.AlignVCenter

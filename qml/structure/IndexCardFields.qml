@@ -59,7 +59,7 @@ Item {
         Repeater {
             model: indexCardFieldsModel
 
-            VclText {
+            VclLabel {
                 required property string name
 
                 Layout.alignment: Qt.AlignVCenter
@@ -112,7 +112,7 @@ Item {
     Component {
         id: viewerField
 
-        VclText {
+        VclLabel {
             property int index
             property string description
             property string value

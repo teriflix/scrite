@@ -44,7 +44,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclText {
+            label: VclLabel {
                 text: "Canvas Grid"
             }
 
@@ -83,7 +83,7 @@ Item {
                         }
                     }
 
-                    VclText {
+                    VclLabel {
                         text: "Background Color"
                     }
 
@@ -107,7 +107,7 @@ Item {
                         }
                     }
 
-                    VclText {
+                    VclLabel {
                         text: "Grid Color"
                     }
 
@@ -125,7 +125,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclText {
+            label: VclLabel {
                 text: "Parameters"
             }
 
@@ -161,7 +161,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclText {
+            label: VclLabel {
                 text: "Timeline"
             }
 
@@ -170,7 +170,7 @@ Item {
 
                 spacing: 10
 
-                VclText {
+                VclLabel {
                     Layout.fillWidth: true
                     text: "What text do you want to display on cards in the timeline?"
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -195,7 +195,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclText {
+            label: VclLabel {
                 text: "Zoom Speed"
             }
 
@@ -204,7 +204,7 @@ Item {
 
                 spacing: 10
 
-                VclText {
+                VclLabel {
                     Layout.fillWidth: true
 
                     text: "Configure how fast/slow you want zoom in/out to be on the structure canvas while using mouse wheel."
@@ -229,7 +229,7 @@ Item {
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignTop
 
-            label: VclText {
+            label: VclLabel {
                 text: "Defaults"
             }
 
@@ -262,7 +262,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     text: "Default Scene Color"
                 }
 

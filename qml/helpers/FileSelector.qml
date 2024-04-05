@@ -60,7 +60,7 @@ Item {
         spacing: 10
         width: parent.width
 
-        VclText {
+        VclLabel {
             id: labelText
             width: parent.width
             wrapMode: Text.WordWrap

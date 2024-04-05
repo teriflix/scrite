@@ -27,6 +27,10 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 
-Text {
-    color: Runtime.colors.primary.regular.text
+Label {
+    Material.primary: Runtime.colors.primary.key
+    Material.accent: Runtime.colors.accent.key
+    Material.theme: Runtime.colors.theme
+
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

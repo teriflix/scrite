@@ -124,7 +124,7 @@ Item {
                         height: 40
                         color: symbolsPanel.currentIndex === index ? Runtime.colors.primary.windowColor : Qt.rgba(0,0,0,0)
 
-                        VclText {
+                        VclLabel {
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
                             anchors.rightMargin: 10
@@ -160,7 +160,7 @@ Item {
                 width: symbolsGridView.width-14
                 height: symbolsPanel.currentIndexIsEmoji ? 35 : 0
 
-                VclText {
+                VclLabel {
                     visible: symbolsPanel.currentIndexIsEmoji
                     width: parent.width
                     horizontalAlignment: Text.AlignHCenter

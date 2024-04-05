@@ -127,7 +127,7 @@ Item {
                     }
                 }
 
-                VclText {
+                VclLabel {
                     width: parent.width
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
@@ -141,7 +141,7 @@ Item {
             Row {
                 spacing: 10
 
-                VclText {
+                VclLabel {
                     text: "View"
                     anchors.verticalCenter: parent.verticalCenter
                 }

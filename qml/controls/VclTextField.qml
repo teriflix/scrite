@@ -183,7 +183,7 @@ TextField {
         textEditorHasCursorInterface: true
     }
 
-    VclText {
+    VclLabel {
         id: labelText
         text: parent.placeholderText
         font.pointSize: 2*Runtime.idealFontMetrics.font.pointSize/3
@@ -216,7 +216,7 @@ TextField {
             highlightResizeDuration: 0
             keyNavigationEnabled: false
             property real delegateHeight: fontMetrics.lineSpacing + 10
-            delegate: VclText {
+            delegate: VclLabel {
                 width: completionView.width - (completionView.contentHeight > completionView.height ? 20 : 1)
                 height: completionView.delegateHeight
                 text: string

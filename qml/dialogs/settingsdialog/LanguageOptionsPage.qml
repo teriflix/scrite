@@ -40,7 +40,7 @@ Item {
             Layout.fillWidth: true
             Layout.preferredHeight: 250
 
-            label: VclText {
+            label: VclLabel {
                 text: "Active Languages"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }

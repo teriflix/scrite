@@ -63,7 +63,7 @@ Item {
                         Layout.fillWidth: true
                         spacing: 10
 
-                        VclText {
+                        VclLabel {
                             Layout.alignment: Qt.AlignVCenter
                             Layout.fillWidth: true
 
@@ -145,7 +145,7 @@ Item {
                                     width: parent.width-5
                                     anchors.centerIn: parent
 
-                                    VclText {
+                                    VclLabel {
                                         Layout.fillWidth: true
                                         Layout.alignment: Qt.AlignVCenter
 

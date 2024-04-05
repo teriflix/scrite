@@ -231,7 +231,7 @@ Item {
                 }
             }
 
-            VclText {
+            VclLabel {
                 text: "View: "
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 anchors.verticalCenter: parent.verticalCenter

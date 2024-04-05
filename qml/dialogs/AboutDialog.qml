@@ -66,7 +66,7 @@ Item {
             content: Item {
                 implicitHeight: aboutInfoLayout.implicitHeight + 40
 
-                VclText {
+                VclLabel {
                     id: versionText
                     anchors.top: parent.top
                     anchors.right: parent.right
@@ -114,7 +114,7 @@ Item {
                         Layout.preferredHeight: 14
                     }
 
-                    VclText {
+                    VclLabel {
                         Layout.alignment: Qt.AlignHCenter
 
                         text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
@@ -133,7 +133,7 @@ Item {
                         Layout.preferredHeight: 14
                     }
 
-                    VclText {
+                    VclLabel {
                         Layout.alignment: Qt.AlignHCenter
 
                         text: "The app uses:"
@@ -191,7 +191,7 @@ Item {
                                 }
                             }
                             ScrollBar.vertical: ScrollBar { }
-                            delegate: VclText {
+                            delegate: VclLabel {
                                 required property string credits
                                 required property url url
 
@@ -230,7 +230,7 @@ Item {
                             source: "../../icons/action/share.png"
                         }
 
-                        VclText {
+                        VclLabel {
                             Layout.alignment: Qt.AlignVCenter
 
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize

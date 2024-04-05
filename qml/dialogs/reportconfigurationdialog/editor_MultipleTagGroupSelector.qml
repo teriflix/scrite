@@ -29,7 +29,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -37,7 +37,7 @@ ColumnLayout {
         text: fieldInfo.label
     }
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -74,7 +74,7 @@ ColumnLayout {
                     anchors.fill: parent
                     anchors.margins: 3
                     color: Runtime.colors.primary.windowColor
-                    VclText {
+                    VclLabel {
                         text: section
                         topPadding: 5
                         bottomPadding: 5

@@ -29,7 +29,7 @@ ColumnLayout {
 
     spacing: 5
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         wrapMode: Text.WordWrap
@@ -39,7 +39,7 @@ ColumnLayout {
         text: fieldInfo.name
     }
 
-    VclText {
+    VclLabel {
         Layout.fillWidth: true
 
         visible: text !== ""

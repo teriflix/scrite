@@ -120,7 +120,7 @@ Item {
                             }
                         }
 
-                        VclText {
+                        VclLabel {
                             anchors.fill: parent
                             wrapMode: Text.WordWrap
                             horizontalAlignment: Text.AlignHCenter
@@ -160,7 +160,7 @@ Item {
                             visible: Scrite.document.screenplay.coverPagePhoto !== ""
                             enabled: visible && !Scrite.document.readOnly
 
-                            VclText {
+                            VclLabel {
                                 text: "Cover Photo Size"
                                 font.bold: true
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -263,7 +263,7 @@ Item {
                                     width: parent.width
                                     spacing: 10
 
-                                    VclText {
+                                    VclLabel {
                                         width: _private.fieldLabelWidth
                                         horizontalAlignment: Text.AlignRight
                                         text: name
@@ -344,7 +344,7 @@ Item {
 
                 }
 
-                VclText {
+                VclLabel {
                     id: defaultsSavedNotice
                     anchors.top: titlePageSettingsLayout.bottom
                     anchors.topMargin: 10

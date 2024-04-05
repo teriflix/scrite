@@ -38,7 +38,7 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclText {
+            label: VclLabel {
                 text: "Screenplay Editor"
             }
 

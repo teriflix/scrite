@@ -78,7 +78,7 @@ Rectangle {
                         anchors.right: parent.right
                     }
 
-                    VclText {
+                    VclLabel {
                         anchors.left: parent.left
                         anchors.leftMargin: 5
                         anchors.right: parent.right

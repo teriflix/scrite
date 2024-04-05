@@ -312,7 +312,7 @@ Rectangle {
                                 anchors.verticalCenterOffset: 5
                                 spacing: 40
 
-                                VclText {
+                                VclLabel {
                                     text: "<b>Are you sure you want to delete this relationship?</b><br/><br/>NOTE: This action cannot be undone!!"
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                                     width: parent.width
@@ -429,7 +429,7 @@ Rectangle {
         anchors.fill: parent
         visible: crGraph.dirty
 
-        VclText {
+        VclLabel {
             anchors.left: parent.left
             anchors.bottom: parent.bottom
             anchors.margins: 25
@@ -591,7 +591,7 @@ Rectangle {
                 height: nameLabel.height + 4
                 color: nameLabelMouseArea.containsMouse ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
 
-                VclText {
+                VclLabel {
                     id: nameLabel
                     text: modelData.relationship.name
                     font.pointSize: Math.floor(Runtime.idealFontMetrics.font.pointSize*0.75)

@@ -54,7 +54,7 @@ Rectangle {
             forDarkBackground: true
         }
 
-        VclText {
+        VclLabel {
             width: parent.width
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             horizontalAlignment: Text.AlignHCenter

@@ -62,7 +62,7 @@ Item {
             height: Math.min(200, Scrite.window.height*0.3)
             appOverrideCursor: Qt.WaitCursor
             appCloseButtonVisible: false
-            contentItem: VclText {
+            contentItem: VclLabel {
                 text: dialog.message
                 padding: 16
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere

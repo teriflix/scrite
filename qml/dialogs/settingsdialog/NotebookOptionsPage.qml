@@ -39,7 +39,7 @@ Item {
         GroupBox {
             Layout.fillWidth: true
 
-            label: VclText {
+            label: VclLabel {
                 text: "Relationship Graph"
             }
 
@@ -68,7 +68,7 @@ Item {
                     ColumnLayout {
                         Layout.preferredWidth: (parent.width-parent.spacing)/2
 
-                        VclText {
+                        VclLabel {
                             Layout.fillWidth: true
 
                             font.bold: true
@@ -76,7 +76,7 @@ Item {
                             text: "Max Time In Milliseconds"
                         }
 
-                        VclText {
+                        VclLabel {
                             Layout.fillWidth: true
 
                             font.bold: false
@@ -108,7 +108,7 @@ Item {
                     ColumnLayout {
                         Layout.preferredWidth: (parent.width-parent.spacing)/2
 
-                        VclText {
+                        VclLabel {
                             Layout.fillWidth: true
 
                             font.bold: true
@@ -116,7 +116,7 @@ Item {
                             text: "Max Iterations"
                         }
 
-                        VclText {
+                        VclLabel {
                             Layout.fillWidth: true
 
                             font.bold: false

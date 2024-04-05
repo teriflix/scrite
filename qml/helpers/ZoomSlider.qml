@@ -80,7 +80,7 @@ Row {
 
     Item { width: parent.height/3; height: parent.height }
 
-    VclText {
+    VclLabel {
         id: percentText
         anchors.verticalCenter: parent.verticalCenter
         text: Math.round(zoomSlider.zoomLevel * 100) + "%"

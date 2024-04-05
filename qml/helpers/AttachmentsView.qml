@@ -46,7 +46,7 @@ ListView {
         border.color: Runtime.colors.primary.borderColor
         z: -1
 
-        VclText {
+        VclLabel {
             anchors.fill: parent
             anchors.margins: 10
             anchors.leftMargin: attachmentsView.delegateSize
@@ -77,7 +77,7 @@ ListView {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
-            VclText {
+            VclLabel {
                 id: ofnLabel
                 width: parent.width
                 elide: Text.ElideMiddle

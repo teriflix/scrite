@@ -137,7 +137,7 @@ Item {
                                         opacity: relationshipName.length > 0 ? 1 : 0.05
                                     }
 
-                                    VclText {
+                                    VclLabel {
                                         text: thisCharacterName + ": "
                                         color: foregroundColor
                                     }
@@ -165,7 +165,7 @@ Item {
                                         }
                                     }
 
-                                    VclText {
+                                    VclLabel {
                                         text: Scrite.app.camelCased(otherCharacterName) + "."
                                         color: foregroundColor
                                     }
