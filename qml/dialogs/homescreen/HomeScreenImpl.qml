@@ -219,6 +219,7 @@ Item {
         property var iconImage: Scrite.app.emptyQImage // has to be QImage
         property bool singleClick: true
         property bool showPoster: false
+        property bool containsMouse: buttonMouseArea.containsMouse
 
         signal clicked()
         signal doubleClicked()
@@ -399,7 +400,11 @@ Item {
             required property int index
             required property var fileInfo
 
+            ToolTip.text: fileInfo.filePath
+            ToolTip.visible: containsMouse
+
             width: ListView.view.width
+
             text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
             tooltip: fileInfo.logline
             iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
