@@ -238,8 +238,15 @@ Item {
 
                 Connections {
                     target: Scrite.document.structure
+
                     function onForceBeatBoardLayoutChanged() {
                         beatBoardLayoutToolButton.checked = Scrite.document.structure.forceBeatBoardLayout
+                    }
+
+                    function onIndexCardFieldsChanged() {
+                        Qt.callLater( function() {
+                            Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
+                        })
                     }
                 }
 
