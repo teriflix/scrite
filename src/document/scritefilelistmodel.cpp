@@ -71,7 +71,9 @@ void ScriteFileListModel::setFiles(const QStringList &filePaths)
     if (newList == m_files)
         return;
 
-    m_watcher->removePaths(m_watcher->files());
+    const QStringList files = m_watcher->files();
+    if (!files.isEmpty())
+        m_watcher->removePaths(files);
 
     this->beginResetModel();
     m_files = newList.mid(0, m_maxCount);
