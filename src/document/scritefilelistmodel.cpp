@@ -122,6 +122,9 @@ void ScriteFileListModel::setMaxCount(int val)
 
 void ScriteFileListModel::add(const QString &filePath)
 {
+    if (filePath.isEmpty())
+        return;
+
     // Right now, we are only doing a quick load of ScriteFileInfo object for the given filePath
     ScriteFileInfo sfi = ScriteFileInfo::quickLoad(filePath);
     if (!sfi.fileInfo.exists())
@@ -156,6 +159,9 @@ void ScriteFileListModel::add(const QString &filePath)
 
 void ScriteFileListModel::update(const QString &filePath)
 {
+    if (filePath.isEmpty())
+        return;
+
     // Check if this path already existed in the model
     int idx = -1;
     for (int i = 0; i < m_files.size(); i++) {

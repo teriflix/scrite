@@ -821,16 +821,6 @@ Item {
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         text: "Click on 'Import' button to import this file."
                     }
-
-                    VclText {
-                        Layout.fillWidth: true
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
-                        color: Runtime.colors.accent.c700.background
-                        text: "<b>NOTE</b>: Unsaved changes in the current document will be discarded."
-                        visible: !Scrite.document.empty
-                    }
                 }
             }
         }

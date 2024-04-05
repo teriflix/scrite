@@ -467,14 +467,28 @@ Item {
     readonly property ScriteFileListModel recentFiles: ScriteFileListModel {
         id: _recentFiles
 
-        function addLater(filePath) {
-            Utils.execLater(_recentFiles, 50, () => { _recentFiles.add(filePath) } )
+        onFilesChanged: _recentFilesSettings.files = files
+        Component.onCompleted: {
+            files = _recentFilesSettings.files
+
+            Scrite.document.justLoaded.connect(onDocumentJustLoaded)
+            Scrite.document.justSaved.connect(onDocumentJustSaved)
         }
 
-        onFilesChanged: _recentFilesSettings.files = files
-        Component.onCompleted: files = _recentFilesSettings.files
-    }
+        function onDocumentJustSaved() {
+            Qt.callLater(addDocumentFile)
+        }
 
+        function onDocumentJustLoaded() {
+            Qt.callLater(addDocumentFile)
+        }
+
+        function addDocumentFile() {
+            const docFilePath = Scrite.document.fileName
+            if(docFilePath !== "")
+                add(docFilePath)
+        }
+    }
 
     // This model is how the screenplay of the current ScriteDocument is accessed.
     readonly property ScreenplayAdapter screenplayAdapter: ScreenplayAdapter {

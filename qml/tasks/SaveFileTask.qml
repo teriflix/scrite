@@ -126,7 +126,6 @@ Item {
             fileInfo.absoluteFilePath = Scrite.document.fileName
 
             Scrite.document.save()
-            Runtime.recentFiles.add(fileInfo.absoluteFilePath)
 
             finish(true)
         }
@@ -149,7 +148,6 @@ Item {
 
         function questionAnswered(answer) {
             if(answer === "Yes") {
-                Runtime.recentFiles.add(fileInfo.absoluteFilePath)
                 Scrite.document.save()
                 finish(true)
             } else if(answer === "No") {
@@ -176,8 +174,6 @@ Item {
         onAccepted: {
             const path = Scrite.app.urlToLocalFile(fileUrl)
             Scrite.document.saveAs(path)
-
-            Runtime.recentFiles.add(path)
 
             const fileInfo = Scrite.app.fileInfo(path)
             Runtime.workspaceSettings.lastOpenFolderUrl = folder
