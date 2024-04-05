@@ -24,6 +24,7 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/helpers"
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/dialogs/settingsdialog"
 
 Item {
     id: root
@@ -59,10 +60,25 @@ Item {
                 pageContent: Loader {
                     width: pageView.availablePageContentWidth
                     height: pageView.availablePageContentHeight
-                    source: "./settingsdialog/StructureStoryBeatsPage.qml"
-                    onLoaded: item.target = Qt.binding( () => { return pageView.currentIndex })
+                    sourceComponent: pageView.currentIndex === 0 ? thisDocumentPage : defaultGlobalPage
                 }
             }
+        }
+    }
+
+    Component {
+        id: thisDocumentPage
+
+        StructureStoryBeatsPage {
+            target: e_CurrentDocumentTarget
+        }
+    }
+
+    Component {
+        id: defaultGlobalPage
+
+        StructureStoryBeatsPage {
+            target: e_DefaultGlobalTarget
         }
     }
 }
