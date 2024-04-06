@@ -2889,7 +2889,7 @@ Item {
                                 Flickable {
                                     id: synopsisFieldFlick
 
-                                    property bool scrollBarVisible: synopsisField.height > synopsisFieldFlick.height
+                                    property bool scrollBarVisible: contentHeight > height
 
                                     ScrollBar.vertical: VclScrollBar { flickable: synopsisFieldFlick }
 
