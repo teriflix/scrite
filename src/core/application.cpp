@@ -277,6 +277,7 @@ QVersionNumber Application::prepare()
                 QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QDir().mkpath(newAppDataPath);
         copyFilesRecursively(oldAppDataFolder, QDir(newAppDataPath));
+        QDir(oldAppDataFolder).removeRecursively();
     }
 
 #ifdef Q_OS_MAC
