@@ -411,10 +411,13 @@ Item {
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
             showPoster: fileInfo.hasCoverPage
             onClicked: {
-                SaveFileTask.save( () => {
-                                        var task = OpenFileTask.open(fileInfo.filePath)
-                                        task.finished.connect(closeRequest)
-                                    } )
+                if(fileInfo.filePath === Scrite.document.fileName)
+                    closeRequest()
+                else
+                    SaveFileTask.save( () => {
+                                            var task = OpenFileTask.open(fileInfo.filePath)
+                                            task.finished.connect(closeRequest)
+                                        } )
             }
         }
     }
