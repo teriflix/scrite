@@ -3665,11 +3665,13 @@ bool Structure::renameCharacter(const QString &from, const QString &to, QString 
         return false;
     }
 
+#if 0
     // Make sure that the to character doesnt exist
     if (m_characterElementMap.containsCharacter(to2) || this->findCharacter(to2)) {
         setError(QStringLiteral("Character name '%1' already exists.").arg(to2));
         return false;
     }
+#endif
 
     // Replace character names in all scenes
     for (StructureElement *element : m_elements.constList())

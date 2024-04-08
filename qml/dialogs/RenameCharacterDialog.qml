@@ -98,7 +98,19 @@ Item {
                             enabled: chkNotice.checked && newNameField.length > 0 && newNameField.text.toUpperCase() !== character.name
                             onClicked: {
                                 _private.newCharacterName = newNameField.text.toUpperCase()
-                                renameJob.start()
+
+                                const allCharacterNames = Scrite.document.structure.allCharacterNames()
+                                if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
+                                    MessageBox.question("Rename Confirmation",
+                                                        "There is already a character by name <b>" + _private.newCharacterName + "</b>. Are you sure you want to merge that with <i>" + _private.orignalCharacterName + "</i>?",
+                                                        ["Yes", "No", "Cancel"],
+                                                        (answer) => {
+                                                            if(answer === "Yes")
+                                                                renameJob.start()
+                                                        })
+                                }
+                                else
+                                    renameJob.start()
                             }
                         }
                     }
