@@ -38,8 +38,9 @@ import io.scrite.components 1.0
 import "qrc:/qml/tasks"
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
+import "qrc:/qml/controls"
 
 Item {
     id: homeScreen
@@ -639,7 +640,16 @@ Item {
         }
 
         function clearVault() {
-            Scrite.vault.clearAllDocuments()
+            if(Scrite.vault.documentCount === 0)
+                return
+
+            MessageBox.question("Clear Confirmation",
+                                "Are you sure you want to purge all documents in your vault?",
+                                ["Yes", "No"],
+                                (answer) => {
+                                    if(answer === "Yes")
+                                        Scrite.vault.clearAllDocuments()
+                                })
         }
 
         ListView {
