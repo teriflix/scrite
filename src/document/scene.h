@@ -560,6 +560,7 @@ private:
     void setWordCount(int val);
     void evaluateWordCount();
     void evaluateWordCountLater();
+    void trimIndexCardFieldValues();
 
 private:
     friend class Structure;

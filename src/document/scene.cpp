@@ -1077,7 +1077,7 @@ void DistinctElementValuesMap::include(const DistinctElementValuesMap &other)
 Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
-    m_structureElement = qobject_cast<StructureElement *>(parent);
+    this->setStructureElement(qobject_cast<StructureElement *>(parent));
 
     connect(this, &Scene::synopsisChanged, this, &Scene::sceneChanged);
     connect(this, &Scene::colorChanged, this, &Scene::sceneChanged);
@@ -2371,7 +2371,13 @@ void Scene::setStructureElement(StructureElement *ptr)
         return;
 
     m_structureElement = ptr;
+
     this->setParent(m_structureElement);
+
+    if (m_structureElement->structure())
+        connect(m_structureElement->structure(), &Structure::indexCardFieldsChanged, this,
+                &Scene::trimIndexCardFieldValues);
+
     emit structureElementChanged();
 }
 
@@ -2531,6 +2537,23 @@ void Scene::evaluateWordCount()
 void Scene::evaluateWordCountLater()
 {
     m_wordCountTimer.start(100, this);
+}
+
+void Scene::trimIndexCardFieldValues()
+{
+    if (m_indexCardFieldValues.isEmpty())
+        return;
+
+    const int length = m_structureElement && m_structureElement->structure()
+            ? m_structureElement->structure()->indexCardFields().size()
+            : 0;
+
+    if (m_indexCardFieldValues.size() > length) {
+        while (m_indexCardFieldValues.size() > length)
+            m_indexCardFieldValues.takeLast();
+
+        emit indexCardFieldValuesChanged();
+    }
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)
