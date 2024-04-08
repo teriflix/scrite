@@ -13,38 +13,39 @@
 
 //#define DISPLAY_DOCUMENT_IN_TEXTEDIT
 
-#include "hourglass.h"
+#include "screenplaytextdocument.h"
+
+#include <QAbstractTextDocumentLayout>
+#include <QDate>
+#include <QDateTime>
+#include <QDir>
+#include <QGraphicsRectItem>
+#include <QGraphicsScene>
+#include <QJsonDocument>
+#include <QPaintEngine>
+#include <QPainter>
+#include <QPdfWriter>
+#include <QPropertyAnimation>
+#include <QQmlEngine>
+#include <QScopedValueRollback>
+#include <QSettings>
+#include <QTextBlock>
+#include <QTextBlockFormat>
+#include <QTextBlockUserData>
+#include <QTextCharFormat>
+#include <QTextCursor>
+#include <QTextTable>
+#include <QUrl>
+#include <QtDebug>
+#include <QtMath>
+
 #include "application.h"
-#include "timeprofiler.h"
+#include "garbagecollector.h"
+#include "hourglass.h"
+#include "pdfexportablegraphicsscene.h"
 #include "printerobject.h"
 #include "scritedocument.h"
-#include "garbagecollector.h"
-#include "screenplaytextdocument.h"
-#include "pdfexportablegraphicsscene.h"
-
-#include <QDir>
-#include <QUrl>
-#include <QDate>
-#include <QtMath>
-#include <QtDebug>
-#include <QPainter>
-#include <QDateTime>
-#include <QQmlEngine>
-#include <QTextBlock>
-#include <QPdfWriter>
-#include <QTextTable>
-#include <QTextCursor>
-#include <QPaintEngine>
-#include <QJsonDocument>
-#include <QGraphicsScene>
-#include <QTextCharFormat>
-#include <QTextBlockFormat>
-#include <QGraphicsRectItem>
-#include <QPropertyAnimation>
-#include <QTextBlockUserData>
-#include <QScopedValueRollback>
-#include <QAbstractTextDocumentLayout>
-#include <QSettings>
+#include "timeprofiler.h"
 
 inline QTime secondsToTime(int seconds)
 {
@@ -624,8 +625,9 @@ QList<QPair<int, int>> ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *
     int paragraphStart = block.position();
     int paragraphEnd = frame->lastPosition();
 
-    // This method includes 'pageBorderPosition' and 'pageNumber' in the returned list
-    // If pageBorderPosition lies within the frame, then it is included in the list.
+    // This method includes 'pageBorderPosition' and 'pageNumber' in the returned
+    // list If pageBorderPosition lies within the frame, then it is included in
+    // the list.
     auto checkAndAdd = [sceneHeadingStart, paragraphStart, paragraphEnd,
                         &ret](int pageBorderPosition, int pageNumber) {
         if (pageBorderPosition >= sceneHeadingStart && pageBorderPosition <= paragraphEnd) {
@@ -639,7 +641,8 @@ QList<QPair<int, int>> ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *
     if (element == m_screenplay->elementAt(0))
         checkAndAdd(sceneHeadingStart, 1);
 
-    // Now loop through all pages and gather all pages that lie within the scene boundaries
+    // Now loop through all pages and gather all pages that lie within the scene
+    // boundaries
     for (int i = 0; i < m_pageBoundaries.count(); i++) {
         const QPair<int, int> pgBoundary = m_pageBoundaries.at(i);
         if (pgBoundary.first > paragraphEnd)
@@ -737,12 +740,12 @@ void ScreenplayTextDocument::syncNow()
 }
 
 /*
-This function is experiemental, which is the reason why we dont make it accessible via a button
-or menu option on the GUI. This function can be invoked only from the scripting interface, which
-is also an experimental feature.
+This function is experiemental, which is the reason why we dont make it
+accessible via a button or menu option on the GUI. This function can be invoked
+only from the scripting interface, which is also an experimental feature.
 
-If you ran the following script, then you would be able to get a fairly good super-imposition of
-the save the cat structure on an existing screenplay.
+If you ran the following script, then you would be able to get a fairly good
+super-imposition of the save the cat structure on an existing screenplay.
 
 var structure = {
  "name": "Save The Cat",
@@ -750,7 +753,8 @@ var structure = {
  "elements": [
      {"name": "Opening Image", "page": 1, "act": "ACT 1" },
      {"name": "Setup", "page": "1-10", "act": "ACT 1" },
-     {"name": "Theme Stated", "page": 5, "act": "ACT 1", "allowMultiple": true },
+     {"name": "Theme Stated", "page": 5, "act": "ACT 1", "allowMultiple": true
+},
      {"name": "Catalyst", "page": 12, "act": "ACT 1" },
      {"name": "Debate", "page": "12-25", "act": "ACT 1"},
      {"name": "Break Into Two", "page": "25-30", "act": "ACT 1" },
@@ -874,7 +878,8 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
 
     QList<_Episode> episodes;
 
-    // First lets gather all episodes from the screenplay. There will always be atleast one episode.
+    // First lets gather all episodes from the screenplay. There will always be
+    // atleast one episode.
     QList<ScreenplayElement *> actBreaksToRemove;
     const int nrElements = m_screenplay->elementCount();
     for (int i = 0; i < nrElements; i++) {
@@ -923,7 +928,8 @@ void ScreenplayTextDocument::superImposeStructure(const QJsonObject &model)
     const qreal bottomMargin = rootFrameFormat.bottomMargin();
     const qreal pageLength = m_textDocument->pageSize().height() - topMargin - bottomMargin;
 
-    // Now lets compute page extents of each episode and each scene in those episodes.
+    // Now lets compute page extents of each episode and each scene in those
+    // episodes.
     QAbstractTextDocumentLayout *layout = m_textDocument->documentLayout();
     for (_Episode &episode : episodes) {
         if (episode.sceneFrames.isEmpty())
@@ -1185,7 +1191,8 @@ void ScreenplayTextDocument::loadScreenplay()
         }
     }
 
-    // const QTextFrameFormat rootFrameFormat = m_textDocument->rootFrame()->frameFormat();
+    // const QTextFrameFormat rootFrameFormat =
+    // m_textDocument->rootFrame()->frameFormat();
 
     // So that QTextDocumentPrinter can pick up this for header and footer fields.
     m_textDocument->setProperty("#title", m_screenplay->title());
@@ -1380,10 +1387,11 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
 
        1. Slug line or Scene Heading cannot come on the last line of the page
        2. Character name cannot be on the last line of the page
-       3. If only one line of the dialogue can be squeezed into the last line of the page, then
-          we must move it to the next page along with the charactername.
-       4. If a dialogue spans across page break, then we must insert MORE and CONT'D markers, with
-       character name.
+       3. If only one line of the dialogue can be squeezed into the last line of
+      the page, then we must move it to the next page along with the
+      charactername.
+       4. If a dialogue spans across page break, then we must insert MORE and
+      CONT'D markers, with character name.
        */
     const ScreenplayPageLayout *pageLayout = m_formatting->pageLayout();
     const QMarginsF pageMargins = pageLayout->margins();
@@ -1840,7 +1848,8 @@ void ScreenplayTextDocument::onSceneRemoved(ScreenplayElement *element, int inde
         return;
 #else
     Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument",
-               "Attempting to remove a scene before it was included in the text document.");
+               "Attempting to remove a scene before it was included in the text "
+               "document.");
 #endif
 
     ScreenplayTextDocumentUpdate update(this);
@@ -1998,8 +2007,9 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para,
 
     const int paraIndex = scene->indexOfElement(para);
     if (paraIndex < 0)
-        return; // This can happen when the paragraph is not part of the scene text, but
-                // it exists as a way to capture a mute-character in the scene.
+        return; // This can happen when the paragraph is not part of the scene
+                // text, but it exists as a way to capture a mute-character in the
+                // scene.
 
     ScreenplayTextDocumentUpdate update(this);
 
@@ -2014,7 +2024,8 @@ void ScreenplayTextDocument::onSceneElementChanged(SceneElement *para,
             continue;
 #else
         Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument",
-                   "Attempting to update a scene before it was included in the text document.");
+                   "Attempting to update a scene before it was included in the "
+                   "text document.");
 #endif
         const int nrBlocks = paraIndex + (scene->heading()->isEnabled() ? 1 : 0);
 
@@ -2186,8 +2197,8 @@ void ScreenplayTextDocument::evaluateCurrentPageAndPosition()
         }
     }
 
-    // If we are here, then the cursor position was not found anywhere in the pageBoundaries.
-    // So, we estimate the current page to be the last page.
+    // If we are here, then the cursor position was not found anywhere in the
+    // pageBoundaries. So, we estimate the current page to be the last page.
     this->setCurrentPageAndPosition(m_pageCount, 1.0);
 }
 
@@ -2430,7 +2441,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
     static const QString newline = QStringLiteral("\n");
 
     Q_ASSERT_X(cursor.currentFrame() == this->findTextFrame(element), "ScreenplayTextDocument",
-               "Screenplay element can be loaded only after a frame for it has been created");
+               "Screenplay element can be loaded only after a frame for it has "
+               "been created");
 
     QTextCharFormat highlightCharFormat;
     highlightCharFormat.setBackground(Qt::yellow);
@@ -2518,9 +2530,9 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     cursor.insertText(QStringLiteral(" - "));
                     TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
                                                                            heading->moment());
-                } else {
+                } /*else {
                     cursor.insertText(QStringLiteral("NO SCENE HEADING"));
-                }
+                }*/
             } else {
                 if (heading->isEnabled()) {
                     if (m_sceneNumbers)
@@ -2950,7 +2962,8 @@ void ScreenplayTextDocument::processSceneResetList()
                 continue;
 #else
             Q_ASSERT_X(frame != nullptr, "ScreenplayTextDocument",
-                       "Attempting to update a scene before it was included in the text document.");
+                       "Attempting to update a scene before it was included in the "
+                       "text document.");
 #endif
             if (m_purpose == ForDisplay) {
                 if (this->updateFromScreenplayElement(element))
@@ -3111,9 +3124,8 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         EMAIL
         URL
 
-       On the bottom right, we will have the third frame with the following information
-       Written or Generated using Scrite
-       https://www.scrite.io
+       On the bottom right, we will have the third frame with the following
+      information Written or Generated using Scrite https://www.scrite.io
        */
     auto evaluateCenteredPaintRect = [=]() {
         const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
@@ -3545,8 +3557,9 @@ void SceneElementBlockTextUpdater::update()
 
     const int paraIndex = scene->indexOfElement(m_sceneElement);
     if (paraIndex < 0)
-        return; // This can happen when the paragraph is not part of the scene text, but
-                // it exists as a way to capture a mute-character in the scene.
+        return; // This can happen when the paragraph is not part of the scene
+                // text, but it exists as a way to capture a mute-character in the
+                // scene.
 
     QList<ScreenplayElement *> elements = screenplay->sceneElements(scene);
     for (ScreenplayElement *element : qAsConst(elements)) {
