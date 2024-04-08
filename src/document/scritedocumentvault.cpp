@@ -20,12 +20,13 @@
 #include "qobjectserializer.h"
 
 #include <QDir>
+#include <QSettings>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QFutureWatcher>
+#include <QStandardPaths>
 #include <QtConcurrentRun>
 #include <QFileSystemWatcher>
-#include <QFutureWatcher>
-#include <QSettings>
 
 ScriteDocumentVault *ScriteDocumentVault::instance()
 {
@@ -40,10 +41,8 @@ ScriteDocumentVault::ScriteDocumentVault(QObject *parent) : QAbstractListModel(p
     connect(Application::instance(), &Application::aboutToQuit, this,
             &ScriteDocumentVault::cleanup);
 
-    const QString settingsPath = Application::instance()->settingsFilePath();
     const QString vault = QStringLiteral("vault");
-
-    QDir dir = QFileInfo(settingsPath).dir();
+    QDir dir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
     if (!dir.cd(vault)) {
         dir.mkdir(vault);
         dir.cd(vault);

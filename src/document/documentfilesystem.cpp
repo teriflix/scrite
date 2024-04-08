@@ -209,6 +209,10 @@ bool DocumentFileSystem::load(const QString &fileName, Format *format)
 {
     QMutexLocker mutexLocker(&d->folderMutex);
 
+#ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
+    qDebug() << "PA: DocumentFileSystem.Load " << fileName;
+#endif
+
     this->reset();
     if (format)
         *format = UnknownFormat;
