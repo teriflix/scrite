@@ -3438,7 +3438,9 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     if (iconFile.isEmpty())
         return;
 
-    iconFile.replace(0, 2, ':');
+    if (iconFile.startsWith(QStringLiteral("qrc:/")))
+        iconFile.remove(0, 3);
+
     const QImage icon(iconFile);
     if (icon.isNull())
         return;
