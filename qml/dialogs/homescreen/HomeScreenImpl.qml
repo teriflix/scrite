@@ -70,7 +70,7 @@ Item {
         Image {
             anchors.centerIn: parent
             source: (stackView.currentItem && stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
-            width: homeScreen.width * 0.2
+            width: homeScreen.width * 0.3
             fillMode: Image.PreserveAspectFit
             smooth: true; mipmap: true
             visible: false
@@ -755,7 +755,7 @@ Item {
                     id: importFileDialog
                     title: "Import Screenplay"
                     objectName: "Import Dialog Box"
-                    nameFilters: ["*.scrite *.fdx *.fountain *.txt *.fountain *.html"]
+                    nameFilters: ["*.scrite *.fdx *.fountain *.txt *.html"]
                     selectFolder: false
                     selectMultiple: false
                     sidebarVisible: true
