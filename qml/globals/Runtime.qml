@@ -469,10 +469,10 @@ Item {
 
         onFilesChanged: _recentFilesSettings.files = files
         Component.onCompleted: {
-            files = _recentFilesSettings.files
-
             Scrite.document.justLoaded.connect(onDocumentJustLoaded)
             Scrite.document.justSaved.connect(onDocumentJustSaved)
+
+            files = _recentFilesSettings.files
         }
 
         function onDocumentJustSaved() {
@@ -571,6 +571,6 @@ Item {
         fileName: Scrite.app.settingsFilePath
         category: "RecentFiles"
 
-        property var files
+        property var files: []
     }
 }
