@@ -36,7 +36,8 @@ Item {
     }
 
     // Global variables
-    property bool canShowNotebookInStructure: width > 1600
+    readonly property real minWindowWidthForShowingNotebookInStructure: 1600
+    property bool canShowNotebookInStructure: width > minWindowWidthForShowingNotebookInStructure
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
 

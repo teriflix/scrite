@@ -198,9 +198,15 @@ Item {
                 spacing: 5
 
                 VclLabel {
+                    property string secondSentence: {
+                        if(Runtime.canShowNotebookInStructure)
+                            return ""
+                        return "(Expand the window by " + 10*Math.ceil((Runtime.minWindowWidthForShowingNotebookInStructure - Runtime.width)/10) + " pixels to enable this option)"
+                    }
+
                     Layout.fillWidth: true
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
-                    text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. (Note: This works when Scrite window size is atleast 1600 px wide.)"
+                    text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. " + secondSentence
                     wrapMode: Text.WordWrap
                 }
 
