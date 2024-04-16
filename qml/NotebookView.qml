@@ -3057,7 +3057,7 @@ Rectangle {
 
         VclMenuItem {
             text: "Rename Character"
-            onClicked: RenameCharacterDialog.launch(character)
+            onClicked: RenameCharacterDialog.launch(characterContextMenu.character)
         }
 
         MenuSeparator { }
