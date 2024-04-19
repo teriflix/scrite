@@ -24,11 +24,12 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
-import "qrc:/qml/notebook"
 import "qrc:/qml/modules"
+import "qrc:/qml/controls"
+import "qrc:/qml/notebook"
+import "qrc:/qml/structure"
 import "qrc:/qml/notifications"
 
 Rectangle {
@@ -956,6 +957,11 @@ Rectangle {
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
 
+                    TabSequenceManager {
+                        id: sceneTabSequence
+                        enabled: parent.visible
+                    }
+
                     Column {
                         anchors.top: parent.top
                         anchors.left: parent.left
@@ -974,6 +980,10 @@ Rectangle {
 
                         VclTextField {
                             id: sceneHeadingField
+
+                            TabSequenceItem.manager: sceneTabSequence
+                            TabSequenceItem.sequence: 0
+
                             text: scene.heading.text
                             label: ""
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
@@ -982,7 +992,6 @@ Rectangle {
                             readOnly: Scrite.document.readOnly
                             enabled: scene.heading.enabled
                             onEditingComplete: scene.heading.parseFrom(text)
-                            tabItem: sceneTitleField
                             font.capitalization: Font.AllUppercase
                             font.family: Scrite.document.formatting.elementFormat(SceneElement.Heading).font.family
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
@@ -991,6 +1000,10 @@ Rectangle {
 
                         VclTextField {
                             id: sceneTitleField
+
+                            TabSequenceItem.manager: sceneTabSequence
+                            TabSequenceItem.sequence: 1
+
                             text: scene.structureElement.nativeTitle
                             label: ""
                             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
@@ -998,7 +1011,6 @@ Rectangle {
                             placeholderText: "Scene Title"
                             readOnly: Scrite.document.readOnly
                             onEditingComplete: scene.structureElement.title = text
-                            tabItem: synopsisContentTabView.currentTabIndex === 0 ? synopsisContentTabView.currentTabItem.textArea : null
                             backTabItem: sceneHeadingField
                             font.capitalization: Font.AllUppercase
                             anchors.horizontalCenter: parent.horizontalCenter
@@ -1112,35 +1124,56 @@ Rectangle {
                             Component {
                                 id: sceneSynopsisFieldComponent
 
-                                Item {
+                                ColumnLayout {
                                     property alias textArea: sceneSynopsisField.textArea
 
                                     FlickableTextArea {
                                         id: sceneSynopsisField
-                                        anchors.fill: parent
-                                        anchors.rightMargin: sceneSynopsisVScrollBar.visible ? sceneSynopsisVScrollBar.width : 0
+
+                                        Layout.fillWidth: true
+                                        Layout.fillHeight: true
+
+                                        TabSequenceItem.manager: sceneTabSequence
+                                        TabSequenceItem.sequence: 2
+                                        TabSequenceItem.onAboutToReceiveFocus: Qt.callLater(textArea.forceActiveFocus)
+
+                                        // Unfortunately, focus scope doesnt really work!
+                                        EventFilter.target: textArea
+                                        EventFilter.events: [EventFilter.KeyPress]
+                                        EventFilter.active: textArea.activeFocus
+                                        EventFilter.onFilter: (watched, event) => {
+                                                                  if(event.key === Qt.Key_Tab)
+                                                                    TabSequenceItem.focusNext()
+                                                                  else if(event.key === Qt.Key_Backtab)
+                                                                    TabSequenceItem.focusPrevious()
+                                                              }
+
                                         text: scene.synopsis
-                                        placeholderText: "Scene Synopsis"
                                         readOnly: Scrite.document.readOnly
-                                        onTextChanged: scene.synopsis = text
-                                        undoRedoEnabled: true
-                                        backTabItem: sceneTitleField
-                                        adjustTextWidthBasedOnScrollBar: false
-                                        ScrollBar.vertical: sceneSynopsisVScrollBar
-                                        anchors.horizontalCenter: parent.horizontalCenter
                                         background: Rectangle {
                                             color: Runtime.colors.primary.windowColor
                                             opacity: 0.15
                                         }
+                                        placeholderText: "Scene Synopsis"
+                                        undoRedoEnabled: true
+                                        adjustTextWidthBasedOnScrollBar: false
+
+                                        onTextChanged: scene.synopsis = text
                                     }
 
-                                    VclScrollBar {
-                                        id: sceneSynopsisVScrollBar
-                                        orientation: Qt.Vertical
-                                        flickable: sceneSynopsisField
-                                        anchors.top: parent.top
-                                        anchors.right: parent.right
-                                        anchors.bottom: parent.bottom
+                                    IndexCardFields {
+                                        id: indexCardFields
+
+                                        Layout.fillWidth: true
+
+                                        lod: eHIGH
+                                        visible: hasFields
+
+                                        structureElement: scene.structureElement
+
+                                        startTabSequence: 3
+                                        tabSequenceEnabled: true
+                                        tabSequenceManager: sceneTabSequence
                                     }
                                 }
                             }
