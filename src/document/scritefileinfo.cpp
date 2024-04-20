@@ -80,6 +80,7 @@ ScriteFileInfo ScriteFileInfo::load(const QFileInfo &fileInfo)
     ret.subtitle = screenplayObj.value("subtitle").toString().trimmed();
     ret.author = screenplayObj.value("author").toString().trimmed();
     ret.logline = screenplayObj.value("logline").toString().trimmed();
+    ret.version = screenplayObj.value("version").toString().trimmed();
     ret.sceneCount = std::count_if(screenplayElementsArr.begin(), screenplayElementsArr.end(),
                                    [](const QJsonValue &item) {
                                        const QJsonObject &itemObj = item.toObject();

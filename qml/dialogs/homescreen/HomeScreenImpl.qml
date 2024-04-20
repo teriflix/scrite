@@ -406,7 +406,7 @@ Item {
 
             width: ListView.view.width
 
-            text: fileInfo.title === "" ? fileInfo.baseFileName : fileInfo.title
+            text: fileInfo.title === "" ? fileInfo.baseFileName : composeTextFromTitleAndVersion(fileInfo)
             tooltip: fileInfo.logline
             iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
@@ -419,6 +419,10 @@ Item {
                                             var task = OpenFileTask.open(fileInfo.filePath)
                                             task.finished.connect(closeRequest)
                                         } )
+            }
+
+            function composeTextFromTitleAndVersion(fi) {
+                return fi.version === "" ? fi.title : (fi.title + " <font size=\"-1\">(" + fi.version + ")</font>")
             }
         }
     }

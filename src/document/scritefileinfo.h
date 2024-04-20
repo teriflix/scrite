@@ -67,6 +67,10 @@ public:
     Q_PROPERTY(QString logline MEMBER logline)
     QString logline;
 
+    // Screenplay version (if specified)
+    Q_PROPERTY(QString version MEMBER version)
+    QString version;
+
     // Screenplay cover-page-image if available (if specified)
     Q_PROPERTY(QImage coverPageImage MEMBER coverPageImage)
     QImage coverPageImage;
