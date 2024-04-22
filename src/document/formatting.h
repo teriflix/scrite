@@ -787,6 +787,7 @@ private:
     void setDocumentLoadCount(int val);
     void setCurrentElement(SceneElement *val);
     void resetCurrentElement();
+    void activateCurrentElementDefaultLanguage();
     void onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type);
     Q_SLOT void onSpellCheckUpdated();
     void onContentsChange(int from, int charsRemoved, int charsAdded);

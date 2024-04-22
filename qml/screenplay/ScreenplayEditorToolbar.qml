@@ -23,7 +23,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
 Row {
-    id: screenplayEditorToolbar
+    id: root
 
     property SceneDocumentBinder binder
     property TextArea editor
@@ -31,6 +31,17 @@ Row {
     property bool showReplace: false
 
     signal requestScreenplayEditor()
+
+    function set(_editor, _binder) {
+        editor = _editor
+        binder = _binder
+    }
+    function reset(_editor, _binder) {
+        if(editor === _editor)
+            editor = null
+        if(binder === _binder)
+            binder = null
+    }
 
     height: 45
     clip: true
@@ -321,31 +332,21 @@ Row {
         opacity: 0.5
     }
 
-    property bool formattable: {
-        if(Scrite.document.readOnly)
-            return false
-        if(!binder)
-            return false
-        if(!binder.currentElement)
-            return false
-        return true
-    }
-
     Repeater {
-        model: screenplayEditorToolbar.tools
+        model: root.tools
 
         FlatToolButton {
             iconSource: modelData.icon
             shortcut: "Ctrl+" + index
             ToolTip.visible: containsMouse
             ToolTip.text: Scrite.app.polishShortcutTextForDisplay(modelData.display + "\t" + shortcut)
-            enabled: screenplayEditorToolbar.formattable
+            enabled: _private.formattable
             down: binder ? (binder.currentElement ? binder.currentElement.type === modelData.value : false) : false
             onClicked: {
                 if(index === 0) {
                     if(!binder.scene.heading.enabled)
                         binder.scene.heading.enabled = true
-                    Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Scene Heading")
+                    Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneHeading)
                 } else
                     binder.currentElement.type = modelData.value
             }
@@ -362,35 +363,41 @@ Row {
         sequence: "Ctrl+7"
 
         ShortcutsModelItem.group: "Formatting"
-        ShortcutsModelItem.title: "Add Mute Character"
+        ShortcutsModelItem.title: Runtime.announcementData.focusOptions.addMuteCharacter
         ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && Runtime.screenplayEditorSettings.displaySceneCharacters
+        ShortcutsModelItem.enabled: _private.formattable && Runtime.screenplayEditorSettings.displaySceneCharacters
         ShortcutsModelItem.priority: -7
 
-        onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Add Mute Character")
+        onActivated: Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.addMuteCharacter)
     }
 
     Shortcut {
         sequence: "Ctrl+8"
 
         ShortcutsModelItem.group: "Formatting"
-        ShortcutsModelItem.title: "Synopsis"
+        ShortcutsModelItem.title: Runtime.announcementData.focusOptions.sceneSynopsis
         ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.enabled: screenplayEditorToolbar.formattable && Runtime.screenplayEditorSettings.displaySceneSynopsis
+        ShortcutsModelItem.enabled: _private.formattable && Runtime.screenplayEditorSettings.displaySceneSynopsis
         ShortcutsModelItem.priority: -8
 
-        onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Scene Synopsis")
+        onActivated: Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneSynopsis)
     }
 
     Shortcut {
         sequence: "Ctrl+9"
 
         ShortcutsModelItem.group: "Formatting"
-        ShortcutsModelItem.title: "Scene Number"
+        ShortcutsModelItem.title: Runtime.announcementData.focusOptions.sceneNumber
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.enabled: binder && binder.currentElement && binder.currentElement.scene.heading.enabled
         ShortcutsModelItem.priority: -9
 
-        onActivated: Announcement.shout("2E3BBE4F-05FE-49EE-9C0E-3332825B72D8", "Scene Number")
+        onActivated: Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneNumber)
+    }
+
+    QtObject {
+        id: _private
+
+        property bool formattable: Scrite.document.readOnly ? false : (binder && binder.currentElement)
     }
 }

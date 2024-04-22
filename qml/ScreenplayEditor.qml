@@ -1790,7 +1790,7 @@ Rectangle {
                             return
                         var stype = "" + type
                         var sdata = "" + data
-                        if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8") {
+                        if(stype === Runtime.announcementIds.focusRequest) {
                             if(sdata === "Scene Heading")
                                 sceneHeadingAreaLoader.edit()
                             else if(sdata === "Scene Number")
@@ -1864,7 +1864,7 @@ Rectangle {
                                     return
                                 var sdata = "" + data
                                 var stype = "" + type
-                                if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Scene Synopsis") {
+                                if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.sceneSynopsis) {
                                     synopsisEditorField.sceneTextEditorCursorPosition = sceneTextEditor.cursorPosition
                                     synopsisEditorField.forceActiveFocus()
                                 }
@@ -1952,12 +1952,11 @@ Rectangle {
                             completionModel.actuallyEnable = true
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
                             privateData.changeCurrentIndexTo(contentItem.theIndex)
-                            Runtime.screenplayEditorToolbar.sceneEditor = contentItem
+                            Runtime.screenplayEditorToolbar.set(sceneTextEditor, sceneDocumentBinder)
                             FloatingMarkupToolsDock.sceneDocumentBinder = sceneDocumentBinder
                             justReceivedFocus = true
                         } else {
-                            if(Runtime.screenplayEditorToolbar.sceneEditor === contentItem)
-                                Runtime.screenplayEditorToolbar.sceneEditor = null
+                            Runtime.screenplayEditorToolbar.reset(sceneTextEditor, sceneDocumentBinder)
                             if(FloatingMarkupToolsDock.sceneDocumentBinder === sceneDocumentBinder)
                                 FloatingMarkupToolsDock.sceneDocumentBinder = null
                         }
@@ -3427,7 +3426,7 @@ Rectangle {
 
                     var sdata = "" + data
                     var stype = "" + type
-                    if(stype === "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8" && sdata === "Add Mute Character") {
+                    if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.addMuteCharacter) {
                         newCharacterInput.sceneTextEditorCursorPosition = sceneEditorCursorPosition
                         newCharacterInput.active = true
                     }

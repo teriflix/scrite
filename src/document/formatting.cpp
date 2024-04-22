@@ -1668,6 +1668,10 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
             &SceneDocumentBinder::nextTabFormatChanged);
     connect(m_textFormat, &TextFormat::formatChanged, this,
             &SceneDocumentBinder::onTextFormatChanged);
+    connect(this, &SceneDocumentBinder::currentElementChanged, this,
+            &SceneDocumentBinder::activateCurrentElementDefaultLanguage);
+    connect(m_textFormat, &TextFormat::formatChanged, this,
+            &SceneDocumentBinder::activateCurrentElementDefaultLanguage);
 }
 
 SceneDocumentBinder::~SceneDocumentBinder() { }
@@ -1896,11 +1900,17 @@ void SceneDocumentBinder::setCursorPosition(int val)
         return;
     }
 
-    if (this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount()) {
+#if 1
+    // Even if the document is empty, it should have one block for action or character
+    // or whatever else default paragraph type, unless the document associated with
+    // the scene is yet to be loaded from the scene content itself.
+    if ((this->document()->isEmpty() || m_cursorPosition > this->document()->characterCount())
+        && m_initializeDocumentTimer.isActive()) {
         m_textFormat->reset();
         emit cursorPositionChanged();
         return;
     }
+#endif
 
     this->setWordUnderCursorIsMisspelled(false);
     this->setSpellingSuggestions(QStringList());
@@ -2914,10 +2924,6 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
                 &SceneDocumentBinder::resetCurrentElement);
         connect(m_currentElement, &SceneElement::typeChanged, this,
                 &SceneDocumentBinder::nextTabFormatChanged);
-
-        SceneElementFormat *format = m_screenplayFormat->elementFormat(m_currentElement->type());
-        if (format != nullptr)
-            format->activateDefaultLanguage();
     }
 
     emit currentElementChanged();
@@ -2937,6 +2943,15 @@ void SceneDocumentBinder::resetCurrentElement()
     this->evaluateAutoCompleteHintsAndCompletionPrefix();
 
     emit currentFontChanged();
+}
+
+void SceneDocumentBinder::activateCurrentElementDefaultLanguage()
+{
+    if (m_currentElement && m_screenplayFormat) {
+        SceneElementFormat *format = m_screenplayFormat->elementFormat(m_currentElement->type());
+        if (format != nullptr)
+            format->activateDefaultLanguage();
+    }
 }
 
 class ForceCursorPositionHack : public QObject

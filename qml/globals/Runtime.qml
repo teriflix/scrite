@@ -559,6 +559,16 @@ Item {
         readonly property string reloadMainUiRequest: "9a7f0f35-346f-461d-bb85-f5c6dc08a01d"
         readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
         readonly property string showPdfRequest: "288E7DFB-9B14-4FE8-8846-14DD2974B486"
+        readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
+    }
+
+    readonly property QtObject announcementData: QtObject {
+        readonly property QtObject focusOptions: QtObject {
+            readonly property string sceneSynopsis: "Scene Synopsis"
+            readonly property string addMuteCharacter: "Add Mute Character"
+            readonly property string sceneHeading: "Scene Heading"
+            readonly property string sceneNumber: "Scene Number"
+        }
     }
 
     // Global file-manager
