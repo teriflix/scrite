@@ -45,6 +45,13 @@ public:
     ~StructureIndexCardFields();
 };
 
+class StructureIndexCardFieldsLegend : public QGraphicsRectItem
+{
+public:
+    explicit StructureIndexCardFieldsLegend(const Structure *structure);
+    ~StructureIndexCardFieldsLegend();
+};
+
 class StructureIndexCardConnector : public QGraphicsPathItem
 {
 public:

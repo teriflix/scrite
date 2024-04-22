@@ -1548,7 +1548,6 @@ Rectangle {
                                         })
                     else if(cp >= 0)
                         contentItem.assumeFocusLater(cp, 100)
-
                 }
 
                 property var currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action

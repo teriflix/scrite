@@ -136,16 +136,32 @@ StructureExporterScene::StructureExporterScene(const StructureExporter *exporter
     }
 
     QRectF contentsRect = this->itemsBoundingRect();
+    QRectF titleCardRect;
 
     if (exporter->isInsertTitleCard()) {
         StructureTitleCard *titleCard = new StructureTitleCard(structure, exporter->comment());
-        QRectF titleCardRect = titleCard->boundingRect();
+        titleCardRect = titleCard->boundingRect();
         titleCardRect.setLeft(indexCardsBox.left() + 20);
         titleCardRect.moveBottom(indexCardsBox.top() - 20);
         if (!this->items(titleCardRect).isEmpty())
             titleCardRect.moveBottom(contentsRect.top() - 20);
         titleCard->setPos(titleCardRect.topLeft());
         this->addItem(titleCard);
+
+        titleCardRect = titleCard->mapRectToParent(titleCard->boundingRect());
+    }
+
+    if (!structure->indexCardFields().isEmpty()) {
+        StructureIndexCardFieldsLegend *icfLegend = new StructureIndexCardFieldsLegend(structure);
+
+        QRectF icfLegendRect = icfLegend->boundingRect();
+        if (titleCardRect.isEmpty())
+            icfLegendRect.moveBottomLeft(contentsRect.topLeft() - QPointF(0, 20));
+        else
+            icfLegendRect.moveBottomLeft(titleCardRect.bottomRight() + QPointF(20, 0));
+
+        icfLegend->setPos(icfLegendRect.topLeft());
+        this->addItem(icfLegend);
     }
 
     this->addStandardItems(WatermarkOverlayLayer
@@ -386,6 +402,78 @@ StructureIndexCardFields::StructureIndexCardFields(const StructureElement *eleme
 }
 
 StructureIndexCardFields::~StructureIndexCardFields() { }
+
+//////////////////////////////////////////////////////////////////////////////
+
+StructureIndexCardFieldsLegend::StructureIndexCardFieldsLegend(const Structure *structure)
+{
+    this->setPen(QPen(Qt::black));
+    this->setBrush(Qt::NoBrush);
+
+    QList<QGraphicsSimpleTextItem *> keyItems, descItems;
+    const QJsonArray fields = structure->indexCardFields();
+    const QFont normalFont = ::applicationFont();
+    const QFont normalBoldFont = [normalFont]() {
+        QFont ret = normalFont;
+        ret.setBold(true);
+        return ret;
+    }();
+    const QFont bigNormalBoldFont = [normalFont]() {
+        QFont ret = normalFont;
+        ret.setPointSize(normalFont.pointSize() + 2);
+        ret.setBold(true);
+        return ret;
+    }();
+    const qreal spacing = 5;
+
+    QGraphicsSimpleTextItem *headingItem = new QGraphicsSimpleTextItem(this);
+    headingItem->setFont(bigNormalBoldFont);
+    headingItem->setText(QStringLiteral("Index Card Fields"));
+    headingItem->setPos(spacing, spacing);
+
+    QRectF headingItemRect = headingItem->mapRectToParent(headingItem->boundingRect());
+
+    // Create key and desc items
+    for (int i = 0; i < fields.size(); i++) {
+        const QJsonObject field = fields.at(i).toObject();
+        const QString key = field.value(QStringLiteral("name")).toString();
+        const QString desc = field.value(QStringLiteral("description")).toString();
+
+        QGraphicsSimpleTextItem *keyItem = new QGraphicsSimpleTextItem(this);
+        keyItem->setText(key);
+        keyItem->setFont(normalBoldFont);
+        keyItems.append(keyItem);
+
+        QGraphicsSimpleTextItem *descItem = new QGraphicsSimpleTextItem(this);
+        descItem->setText(desc);
+        descItem->setFont(normalFont);
+        descItems.append(descItem);
+    }
+
+    // Layout all key items
+    QRectF lastKeyItemRect = headingItemRect.adjusted(0, spacing, 0, spacing);
+    qreal keyColumnWidth = 0;
+    for (int i = 0; i < keyItems.size(); i++) {
+        QGraphicsSimpleTextItem *keyItem = keyItems.at(i);
+        keyItem->setPos(lastKeyItemRect.bottomLeft() + QPointF(0, spacing));
+        lastKeyItemRect = keyItem->mapRectToParent(keyItem->boundingRect());
+        keyColumnWidth = qMax(keyColumnWidth, lastKeyItemRect.width());
+    }
+    keyColumnWidth += 4 * spacing;
+
+    QRectF lastDescItemRect = headingItemRect.adjusted(0, spacing, 0, spacing);
+    lastDescItemRect.moveLeft(keyColumnWidth);
+    for (int i = 0; i < descItems.size(); i++) {
+        QGraphicsSimpleTextItem *descItem = descItems.at(i);
+        descItem->setPos(lastDescItemRect.bottomLeft() + QPointF(0, spacing));
+        lastDescItemRect = descItem->mapRectToParent(descItem->boundingRect());
+    }
+
+    const QRectF cbr = this->childrenBoundingRect();
+    this->setRect(cbr.adjusted(-spacing, -spacing, spacing, spacing));
+}
+
+StructureIndexCardFieldsLegend::~StructureIndexCardFieldsLegend() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
