@@ -2179,10 +2179,15 @@ Item {
                             property bool _checked: Scrite.document.structure.canvasUIMode === Structure.SynopsisEditorUI
                             icon.source: _checked ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                             onClicked: {
-                                if(!_checked)
-                                    mainUiContentLoader.reset( () => {
-                                        Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
-                                    } )
+                                if(!_checked) {
+                                    if(Scrite.document.structure.elementCount > 0)
+                                        MessageBox.information("Cannot Switch to Synopsis Cards",
+                                                               "Switching to Synopsis Cards is only possible when the structure canvas is empty.")
+                                    else
+                                        mainUiContentLoader.reset( () => {
+                                            Scrite.document.structure.canvasUIMode = Structure.SynopsisEditorUI
+                                        } )
+                                }
                             }
                         }
                     }
