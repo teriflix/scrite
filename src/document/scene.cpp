@@ -2879,14 +2879,8 @@ QSGNode *SceneSizeHintItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
     if (m_documentImage.isNull())
         return rootNode; // nothing to show
 
-    QSGOpacityNode *opacityNode = new QSGOpacityNode;
-    opacityNode->setFlag(QSGNode::OwnedByParent);
-    opacityNode->setOpacity(this->opacity());
-    rootNode->appendChildNode(opacityNode);
-
     QSGGeometryNode *geoNode = new QSGGeometryNode;
     geoNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial | QSGNode::OwnedByParent);
-    opacityNode->appendChildNode(geoNode);
 
     QSGGeometry *rectGeo = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 6);
     rectGeo->setDrawingMode(QSGGeometry::DrawTriangles);
@@ -2908,6 +2902,13 @@ QSGNode *SceneSizeHintItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeDat
     textureMaterial->setFiltering(QSGTexture::Nearest);
     textureMaterial->setTexture(texture);
     geoNode->setMaterial(textureMaterial);
+
+    QSGOpacityNode *opacityNode = new QSGOpacityNode;
+    opacityNode->setFlag(QSGNode::OwnedByParent);
+    opacityNode->setOpacity(this->opacity());
+    rootNode->appendChildNode(opacityNode);
+
+    opacityNode->appendChildNode(geoNode);
 
     return rootNode;
 }

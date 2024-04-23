@@ -117,14 +117,8 @@ QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *data
     if (m_image.isNull())
         return rootNode;
 
-    QSGOpacityNode *opacityNode = new QSGOpacityNode;
-    opacityNode->setFlag(QSGNode::OwnedByParent);
-    opacityNode->setOpacity(this->opacity());
-    rootNode->appendChildNode(opacityNode);
-
     QSGGeometryNode *geoNode = new QSGGeometryNode;
     geoNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial | QSGNode::OwnedByParent);
-    opacityNode->appendChildNode(geoNode);
 
     QSGGeometry *rectGeo = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 6);
     rectGeo->setDrawingMode(QSGGeometry::DrawTriangles);
@@ -172,6 +166,13 @@ QSGNode *QImageItem::updatePaintNode(QSGNode *oldRoot, UpdatePaintNodeData *data
     textureMaterial->setFiltering(QSGTexture::Linear);
     textureMaterial->setTexture(texture);
     geoNode->setMaterial(textureMaterial);
+
+    QSGOpacityNode *opacityNode = new QSGOpacityNode;
+    opacityNode->setFlag(QSGNode::OwnedByParent);
+    opacityNode->setOpacity(this->opacity());
+    rootNode->appendChildNode(opacityNode);
+
+    opacityNode->appendChildNode(geoNode);
 
     return rootNode;
 }
