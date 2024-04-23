@@ -536,6 +536,7 @@ public:
         int headingLevel = 3;
         bool includeFeaturedPhoto = true;
         bool includeSynopsis = true;
+        bool includeIndexCardFields = true;
         bool includeComments = true;
         bool includeContent = false;
         bool includeTextNotes = true;

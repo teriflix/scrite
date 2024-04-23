@@ -71,9 +71,6 @@ protected:
 
 private:
     void evaluateTitleAndSubtitle();
-    void writeStoryNotes(Structure *structure);
-    void writeScreenplayNotes(Screenplay *notes);
-    void writeCharacterNotes(Character *character);
 
 private:
     Note *m_noteSection = nullptr;

@@ -26,21 +26,22 @@
 #include <QUuid>
 #include <QFuture>
 #include <QSGNode>
+#include <QPainter>
 #include <QDateTime>
 #include <QByteArray>
 #include <QJsonArray>
+#include <QTextTable>
 #include <QJsonObject>
+#include <QQuickWindow>
 #include <QUndoCommand>
-#include <QTextDocument>
 #include <QJsonDocument>
+#include <QTextDocument>
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
 #include <QTextBoundaryFinder>
 #include <QScopedValueRollback>
-#include <QAbstractTextDocumentLayout>
-#include <QQuickWindow>
 #include <QSGOpaqueTextureMaterial>
-#include <QPainter>
+#include <QAbstractTextDocumentLayout>
 
 static QDataStream &operator<<(QDataStream &ds, const QTextLayout::FormatRange &formatRange)
 {
@@ -2269,6 +2270,49 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             cursor.insertBlock(blockFormat, charFormat);
 
             TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+        }
+    }
+
+    // Index Card Fields
+    if (options.includeIndexCardFields) {
+        const QJsonArray fields = m_structureElement->structure()->indexCardFields();
+        if (!fields.isEmpty() && !m_indexCardFieldValues.isEmpty()) {
+            QTextTableFormat tableFormat;
+            tableFormat.setCellPadding(2);
+            tableFormat.setCellSpacing(0);
+            tableFormat.setLeftMargin(cursor.document()->indentWidth() * 2);
+            tableFormat.setTopMargin(10);
+            tableFormat.setBottomMargin(10);
+
+            QTextFrame *frame = cursor.currentFrame();
+            QTextTable *table = cursor.insertTable(fields.size(), 3, tableFormat);
+            QTextTableCellFormat cellFormat; // = table->cellAt(0, 0).format();
+            cellFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+            for (int tr = 0; tr < table->rows(); tr++) {
+                for (int tc = 0; tc < table->columns(); tc++) {
+                    table->cellAt(tr, tc).setFormat(cellFormat);
+                }
+            }
+
+            for (int i = 0; i < fields.size(); i++) {
+                const QJsonObject field = fields.at(i).toObject();
+                const QString key = field.value(QStringLiteral("name")).toString();
+                const QString desc = field.value(QStringLiteral("description")).toString();
+                const QString value = i < m_indexCardFieldValues.size()
+                        ? m_indexCardFieldValues.at(i)
+                        : QString();
+
+                cursor = table->cellAt(i, 0).firstCursorPosition();
+                cursor.insertText(key);
+
+                cursor = table->cellAt(i, 1).firstCursorPosition();
+                cursor.insertText(desc);
+
+                cursor = table->cellAt(i, 2).firstCursorPosition();
+                cursor.insertText(value);
+            }
+
+            cursor = frame->lastCursorPosition();
         }
     }
 
