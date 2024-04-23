@@ -1605,6 +1605,7 @@ Rectangle {
                             property Attachment sceneFeaturedImage: sceneFeaturedAttachment && sceneFeaturedAttachment.type === Attachment.Photo ? sceneFeaturedAttachment : null
                             property string sceneComments: contentItem.theScene.comments
                             property bool hasSceneComments: sceneComments !== ""
+                            property bool hasIndexCardFields: Scrite.document.structure.indexCardFields.length > 0
                             width: Math.max((hasSceneComments ? 14 : 12), Math.min(parent.width,parent.height)-(hasSceneComments ? 6 : 10))
                             height: width
                             y: 2
@@ -1620,6 +1621,9 @@ Rectangle {
                                 if(sceneFeaturedImage)
                                     return "qrc:/icons/filetype/photo.png"
 
+                                if(hasIndexCardFields)
+                                    return "qrc:/icons/content/form.png"
+
                                 return ""
                             }
                         }
@@ -1630,7 +1634,7 @@ Rectangle {
                     id: commentsExpandedSidePanelCornerComponent
 
                     Column {
-                        spacing: 8
+                        spacing: 1
 
                         FlatToolButton {
                             iconSource: down ? "qrc:/icons/content/comments_panel_inverted.png" : "qrc:/icons/content/comments_panel.png"
@@ -1652,6 +1656,22 @@ Rectangle {
                             onClicked: contentView.commentsPanelTabIndex = 1
                             ToolTip.visible: hovered
                             ToolTip.text: "View/edit scene featured image."
+                        }
+
+                        FlatToolButton {
+                            iconSource: down ? "qrc:/icons/content/form_inverted.png" : "qrc:/icons/content/form.png"
+                            suggestedWidth: parent.width
+                            suggestedHeight: parent.width
+                            visible: Runtime.screenplayEditorSettings.displayIndexCardFields
+                            down: contentView.commentsPanelTabIndex === 2
+                            downIndicatorColor: commentsSidePanel.theSceneDarkColor
+                            onClicked: contentView.commentsPanelTabIndex = 2
+                            ToolTip.visible: hovered
+                            ToolTip.text: "View/edit index card fields."
+                            onVisibleChanged: {
+                                if(!visible && contentView.commentsPanelTabIndex === 2)
+                                    contentView.commentsPanelTabIndex = 0
+                            }
                         }
                     }
                 }
@@ -1680,7 +1700,7 @@ Rectangle {
                 maxPanelWidth: Math.min(contentView.spaceForComments, 400)
                 width: maxPanelWidth
                 clip: true
-                visible: width >= 100 && Runtime.screenplayEditorSettings.displaySceneComments
+                visible: width >= 100 && Runtime.screenplayEditorSettings.displaySceneComments && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
                 opacity: expanded ? (Runtime.screenplayAdapter.currentIndex < 0 || Runtime.screenplayAdapter.currentIndex === contentItem.theIndex ? 1 : 0.75) : 1
                 Behavior on opacity {
                     enabled: Runtime.applicationSettings.enableAnimations
@@ -1690,8 +1710,8 @@ Rectangle {
                     id: commentsSidePanelTabView
                     tabBarVisible: false
                     tabColor: commentsSidePanel.theSceneDarkColor
-                    currentTabContent: currentTabIndex === 0 ? commentsEditComponent : featuredPhotoComponent
                     currentTabIndex: contentView.commentsPanelTabIndex
+                    currentTabContent: [featuredPhotoComponent,commentsEditComponent,indexCardFieldsComponent][currentTabIndex%3]
 
                     Component {
                         id: featuredPhotoComponent
@@ -1747,6 +1767,127 @@ Rectangle {
                                 ToolTip.visible: parent.height < parent.contentHeight
                                 ToolTip.text: "Please consider capturing long comments as scene notes in the notebook tab."
                                 ToolTip.delay: 1000
+                            }
+                        }
+                    }
+
+                    Component {
+                        id: indexCardFieldsComponent
+
+                        Item {
+                            id: icfItem
+
+                            property Scene scene: contentItem.theScene
+                            property int sceneIndex: contentItem.theIndex
+
+                            TabSequenceManager {
+                                id: icfTabSequence
+                                wrapAround: true
+                                enabled: Runtime.appFeatures.structure.enabled
+                            }
+
+                            Flickable {
+                                id: icfFlickable
+                                anchors.fill: parent
+                                anchors.margins: 5
+                                anchors.rightMargin: 0
+
+                                contentY: 0
+                                contentWidth: icfLayout.width
+                                contentHeight: icfLayout.height
+                                flickableDirection: Flickable.VerticalFlick
+
+                                ScrollBar.vertical: VclScrollBar { }
+
+                                ColumnLayout {
+                                    id: icfLayout
+
+                                    width: icfFlickable.ScrollBar.vertical.needed ? icfFlickable.width-20 : icfFlickable.width
+
+                                    enabled: Runtime.appFeatures.structure.enabled
+                                    opacity: enabled ? true : false
+
+                                    TextAreaInput {
+                                        id: icfSynopsis
+
+                                        Layout.fillWidth: true
+                                        Layout.preferredHeight: Math.max(icfItem.height * 0.5, icfFlickable.height-icfIcf.height-parent.spacing)
+
+                                        visible: !Runtime.screenplayEditorSettings.displaySceneSynopsis
+
+                                        TabSequenceItem.manager: icfTabSequence
+                                        TabSequenceItem.enabled: visible
+                                        TabSequenceItem.sequence: 0
+
+                                        text: icfItem.scene.synopsis
+                                        wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                                        placeholderText: "Synopsis"
+                                        background: Item { }
+
+                                        onTextChanged: Qt.callLater(commitSynopsis)
+
+                                        function commitSynopsis() {
+                                            icfItem.scene.synopsis = text
+                                        }
+                                    }
+
+                                    IndexCardFields {
+                                        id: icfIcf
+
+                                        Layout.fillWidth: true
+
+                                        lod: eHIGH
+                                        wrapMode: TextInput.WrapAtWordBoundaryOrAnywhere
+                                        structureElement: icfItem.scene.structureElement
+                                        startTabSequence: 1
+                                        tabSequenceManager: icfTabSequence
+                                        tabSequenceEnabled: true
+                                    }
+
+                                    VclButton {
+                                        Layout.alignment: Qt.AlignHCenter
+
+                                        text: "Index Card Fields"
+                                        visible: icfFlickable.FocusTracker.hasFocus
+
+                                        onClicked: StructureIndexCardFieldsDialog.launch()
+                                    }
+                                }
+
+                                FocusTracker.window: Scrite.window
+                                FocusTracker.onHasFocusChanged: {
+                                    if(FocusTracker.hasFocus)
+                                        privateData.changeCurrentIndexTo(sceneIndex)
+                                }
+
+                                property Item activeFocusItem: Scrite.window.activeFocusItem
+                                onActiveFocusItemChanged: {
+                                    if(FocusTracker.hasFocus && activeFocusItem)
+                                        ensureVisible(activeFocusItem)
+                                    else
+                                        contentY = 0
+                                }
+
+                                function ensureVisible(item) {
+                                    const cr = item.mapToItem(icfLayout, 0,0,item.width,item.height)
+                                    let cy = contentY
+                                    let ch = height
+                                    if(cr.y < cy)
+                                        cy = Math.max(cr.y, 0)
+                                    else if(cr.y + cr.height > cy + ch)
+                                        cy = Math.min(cr.y + cr.height - ch, contentHeight-ch)
+                                    else
+                                        return
+
+                                    contentY = cy
+                                }
+                            }
+
+                            DisabledFeatureNotice {
+                                color: Qt.rgba(0,0,0,0)
+                                anchors.fill: parent
+                                visible: !Runtime.appFeatures.structure.enabled
+                                featureName: "Index Card Fields"
                             }
                         }
                     }
@@ -1965,6 +2106,15 @@ Rectangle {
                         Utils.execLater(sceneDocumentBinder, 1000, function() {
                             sceneDocumentBinder.preserveScrollAndReload()
                         } )
+                    }
+
+                    Announcement.onIncoming: (type,data) => {
+                        if(sceneTextEditor.activeFocus && contentItem.isCurrent)
+                            return
+                        var sdata = "" + data
+                        var stype = "" + type
+                        if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.scene)
+                            synopsisEditorField.forceActiveFocus()
                     }
 
                     Connections {
@@ -3085,7 +3235,7 @@ Rectangle {
                     FlatToolButton {
                         id: sceneTaggingButton
                         iconSource: "qrc:/icons/action/tag.png"
-                        visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+                        visible: Runtime.appFeatures.structure.enabled && Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
                         down: sceneTagMenuLoader.active
                         onClicked: sceneTagMenuLoader.show()
                         anchors.verticalCenter: parent.verticalCenter

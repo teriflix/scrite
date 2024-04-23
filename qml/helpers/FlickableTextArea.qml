@@ -40,6 +40,7 @@ Flickable {
     property bool spellCheckEnabled: true
     property TabSequenceManager tabSequenceManager
     property int tabSequenceIndex: 0
+    property bool tabSequenceEnabled: true
     property alias syntaxHighlighter: __textArea.syntaxHighlighter
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
@@ -108,6 +109,7 @@ Flickable {
         }
         onEditingFinished: textAreaFlickable.editingFinished()
         TabSequenceItem.manager: tabSequenceManager
+        TabSequenceItem.enabled: tabSequenceEnabled
         TabSequenceItem.sequence: tabSequenceIndex
     }
 

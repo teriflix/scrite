@@ -185,13 +185,11 @@ int TabSequenceManager::fetchItemIndex(int from, int direction, bool enabledOnly
     int idx = from;
     while (1) {
         idx += direction;
-        if (idx == from)
-            break;
         if (idx >= m_tabSequenceItems.size())
             idx = 0;
         else if (idx < 0)
             idx = m_tabSequenceItems.size() - 1;
-        if (!enabledOnly)
+        if (idx == from || !enabledOnly)
             break;
         TabSequenceItem *item = m_tabSequenceItems.at(idx);
         if (item->isEnabled())
@@ -349,6 +347,11 @@ TabSequenceItem *TabSequenceItem::qmlAttachedProperties(QObject *object)
     return new TabSequenceItem(object);
 }
 
+QQuickItem *TabSequenceItem::item() const
+{
+    return qobject_cast<QQuickItem *>(this->parent());
+}
+
 void TabSequenceItem::setEnabled(bool val)
 {
     if (m_enabled == val)
@@ -449,7 +452,7 @@ void TabSequenceItem::onQmlItemFocusChanged()
     if (!m_manager.isNull()) {
         if (this->hasFocus())
             m_manager->setCurrentItem(this);
-        else if (m_manager->m_currentItem == this)
+        else if (m_manager->currentItem() == this)
             m_manager->setCurrentItem(nullptr);
     }
 }

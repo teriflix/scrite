@@ -23,7 +23,7 @@ import "qrc:/qml/controls"
 TextArea {
     id: txtAreaInput
     property bool undoRedoEnabled: false
-    property bool spellCheckEnabled: false
+    property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
 
     palette: Scrite.app.palette
     selectByKeyboard: true

@@ -15,6 +15,7 @@
 #define TABSEQUENCEMANAGER_H
 
 #include <QObject>
+#include <QQuickItem>
 #include <QQmlEngine>
 
 #include "execlatertimer.h"
@@ -136,6 +137,9 @@ public:
     ~TabSequenceItem();
 
     static TabSequenceItem *qmlAttachedProperties(QObject *object);
+
+    Q_PROPERTY(QQuickItem *item READ item CONSTANT)
+    QQuickItem *item() const;
 
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     void setEnabled(bool val);

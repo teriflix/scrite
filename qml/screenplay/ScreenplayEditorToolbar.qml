@@ -161,6 +161,12 @@ Row {
                 }
 
                 VclMenuItem {
+                    text: "Show Index Card Fields"
+                    icon.source: Runtime.screenplayEditorSettings.displayIndexCardFields && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                    onTriggered: Runtime.screenplayEditorSettings.displayIndexCardFields = !Runtime.screenplayEditorSettings.displayIndexCardFields
+                }
+
+                VclMenuItem {
                     text: "Show Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.displaySceneCharacters ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters

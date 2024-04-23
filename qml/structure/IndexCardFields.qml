@@ -41,6 +41,8 @@ Item {
 
     property bool sanctioned: true
 
+    property int wrapMode: TextInput.WordWrap
+
     implicitHeight: hasFields ? layout.height : 0
 
     GridLayout {
@@ -137,7 +139,9 @@ Item {
             placeholderText: text === "" ? description : ""
 
             text: value
-            wrapMode: TextInput.Wrap
+            wrapMode: root.wrapMode
+            maximumLength: 80
+
             onTextEdited: _private.setFieldValue(index, text)
 
             function assumeFocus() {

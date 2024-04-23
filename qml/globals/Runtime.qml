@@ -89,6 +89,7 @@ Item {
         property bool displaySceneComments: false
         property bool displayEmptyTitleCard: true
         property bool displayAddSceneBreakButtons: true
+        property bool displayIndexCardFields: true
         property int mainEditorZoomValue: -1
         property int embeddedEditorZoomValue: -1
         property bool autoAdjustEditorWidthInScreenplayEditor: true
@@ -568,6 +569,7 @@ Item {
             readonly property string addMuteCharacter: "Add Mute Character"
             readonly property string sceneHeading: "Scene Heading"
             readonly property string sceneNumber: "Scene Number"
+            readonly property string scene: "Scene"
         }
     }
 
