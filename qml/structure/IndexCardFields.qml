@@ -140,6 +140,7 @@ Item {
 
             text: value
             wrapMode: root.wrapMode
+            readOnly: Scrite.document.readOnly
             maximumLength: 80
 
             onTextEdited: _private.setFieldValue(index, text)

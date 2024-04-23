@@ -1662,7 +1662,7 @@ Rectangle {
                             iconSource: down ? "qrc:/icons/content/form_inverted.png" : "qrc:/icons/content/form.png"
                             suggestedWidth: parent.width
                             suggestedHeight: parent.width
-                            visible: Runtime.screenplayEditorSettings.displayIndexCardFields
+                            visible: Runtime.screenplayEditorSettings.displayIndexCardFields && Scrite.document.structure.indexCardFields.length > 0
                             down: contentView.commentsPanelTabIndex === 2
                             downIndicatorColor: commentsSidePanel.theSceneDarkColor
                             onClicked: contentView.commentsPanelTabIndex = 2
@@ -1796,6 +1796,7 @@ Rectangle {
                                 contentWidth: icfLayout.width
                                 contentHeight: icfLayout.height
                                 flickableDirection: Flickable.VerticalFlick
+                                interactive: contentHeight > height
 
                                 ScrollBar.vertical: VclScrollBar { }
 
@@ -1811,9 +1812,10 @@ Rectangle {
                                         id: icfSynopsis
 
                                         Layout.fillWidth: true
-                                        Layout.preferredHeight: Math.max(icfItem.height * 0.5, icfFlickable.height-icfIcf.height-parent.spacing)
+                                        Layout.preferredHeight: Math.max(icfItem.height * 0.5, contentHeight + Runtime.idealFontMetrics.lineSpacing*2, icfFlickable.height-icfIcf.height-parent.spacing)
 
                                         visible: !Runtime.screenplayEditorSettings.displaySceneSynopsis
+                                        readOnly: Scrite.document.readOnly
 
                                         TabSequenceItem.manager: icfTabSequence
                                         TabSequenceItem.enabled: visible
@@ -1848,7 +1850,7 @@ Rectangle {
                                         Layout.alignment: Qt.AlignHCenter
 
                                         text: "Index Card Fields"
-                                        visible: icfFlickable.FocusTracker.hasFocus
+                                        visible: icfItem.sceneIndex === Runtime.screenplayAdapter.currentIndex
 
                                         onClicked: StructureIndexCardFieldsDialog.launch()
                                     }
