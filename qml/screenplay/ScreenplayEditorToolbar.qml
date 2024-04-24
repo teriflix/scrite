@@ -162,6 +162,7 @@ Row {
 
                 VclMenuItem {
                     text: "Show Index Card Fields"
+                    enabled: Runtime.screenplayEditorSettings.displaySceneComments
                     icon.source: Runtime.screenplayEditorSettings.displayIndexCardFields && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                     onTriggered: Runtime.screenplayEditorSettings.displayIndexCardFields = !Runtime.screenplayEditorSettings.displayIndexCardFields
                 }
