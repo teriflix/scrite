@@ -1849,6 +1849,8 @@ Rectangle {
                                     VclToolButton {
                                         Layout.alignment: Qt.AlignRight
 
+                                        ToolTip.text: "Edit Index Card Fields"
+
                                         icon.source: "qrc:/icons/action/edit.png"
                                         visible: icfItem.sceneIndex === Runtime.screenplayAdapter.currentIndex
 
