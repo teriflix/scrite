@@ -425,12 +425,12 @@ Item {
             }
 
             FlatToolButton {
-                id: cmdExport
-                text: "Export to ..."
+                id: cmdShare
+                text: "Share"
                 iconSource: "qrc:/icons/action/share.png"
                 enabled: appToolsMenu.visible === false
-                onClicked: exportMenu.open()
-                down: exportMenu.visible
+                onClicked: shareMenu.open()
+                down: shareMenu.visible
 
                 Item {
                     anchors.left: parent.left
@@ -438,71 +438,60 @@ Item {
                     anchors.bottom: parent.bottom
 
                     VclMenu {
-                        id: exportMenu
-                        width: 300
+                        id: shareMenu
 
-                        Repeater {
-                            model: Scrite.document.supportedExportFormats
+                        VclMenu {
+                            id: exportMenu
+                            width: 300
+                            title: "Export"
+
+                            Repeater {
+                                model: Scrite.document.supportedExportFormats
+
+                                VclMenuItem {
+                                    required property var modelData
+                                    text: modelData.name
+                                    icon.source: "qrc" + modelData.icon
+                                    onClicked: ExportConfigurationDialog.launch(modelData.key)
+
+                                    ToolTip {
+                                        text: modelData.description + "\n\nCategory: " + modelData.category
+                                        width: 300
+                                        visible: parent.hovered
+                                        delay: Qt.styleHints.mousePressAndHoldInterval
+                                    }
+                                }
+                            }
+
+                            MenuSeparator { }
 
                             VclMenuItem {
-                                required property var modelData
-                                text: modelData.name
-                                icon.source: "qrc" + modelData.icon
-                                onClicked: ExportConfigurationDialog.launch(modelData.key)
-
-                                ToolTip {
-                                    text: modelData.description + "\n\nCategory: " + modelData.category
-                                    width: 300
-                                    visible: parent.hovered
-                                    delay: Qt.styleHints.mousePressAndHoldInterval
-                                }
+                                text: "Scrite"
+                                icon.source: "qrc:/icons/exporter/scrite.png"
+                                onClicked: SaveFileTask.saveAs()
                             }
                         }
 
-                        MenuSeparator { }
+                        VclMenu {
+                            id: reportsMenu
+                            width: 350
+                            title: "Reports"
 
-                        VclMenuItem {
-                            text: "Scrite"
-                            icon.source: "qrc:/icons/exporter/scrite.png"
-                            onClicked: SaveFileTask.saveAs()
-                        }
-                    }
-                }
-            }
+                            Repeater {
+                                model: Scrite.document.supportedReports
 
-            FlatToolButton {
-                id: cmdReports
-                iconSource: "qrc:/icons/reports/reports_menu_item.png"
-                ToolTip.text: "Reports"
-                checkable: false
-                checked: false
-                onClicked: reportsMenu.open()
-                down: reportsMenu.visible
-                // visible: Scrite.window.width >= 1400 || !appToolBar.visible
+                                VclMenuItem {
+                                    required property var modelData
+                                    text: modelData.name
+                                    icon.source: "qrc" + modelData.icon
+                                    onClicked: ReportConfigurationDialog.launch(modelData.name)
 
-                Item {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-
-                    VclMenu {
-                        id: reportsMenu
-                        width: 350
-
-                        Repeater {
-                            model: Scrite.document.supportedReports
-
-                            VclMenuItem {
-                                required property var modelData
-                                text: modelData.name
-                                icon.source: "qrc" + modelData.icon
-                                onClicked: ReportConfigurationDialog.launch(modelData.name)
-
-                                ToolTip {
-                                    text: modelData.description
-                                    width: 300
-                                    visible: parent.hovered
-                                    delay: Qt.styleHints.mousePressAndHoldInterval
+                                    ToolTip {
+                                        text: modelData.description
+                                        width: 300
+                                        visible: parent.hovered
+                                        delay: Qt.styleHints.mousePressAndHoldInterval
+                                    }
                                 }
                             }
                         }
