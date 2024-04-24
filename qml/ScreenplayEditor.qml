@@ -1846,10 +1846,10 @@ Rectangle {
                                         tabSequenceEnabled: true
                                     }
 
-                                    VclButton {
-                                        Layout.alignment: Qt.AlignHCenter
+                                    VclToolButton {
+                                        Layout.alignment: Qt.AlignRight
 
-                                        text: "Index Card Fields"
+                                        icon.source: "qrc:/icons/action/edit.png"
                                         visible: icfItem.sceneIndex === Runtime.screenplayAdapter.currentIndex
 
                                         onClicked: StructureIndexCardFieldsDialog.launch()
