@@ -27,8 +27,6 @@ Row {
 
     property SceneDocumentBinder binder
     property TextArea editor
-    property alias showFind: findButton.checked
-    property bool showReplace: false
 
     signal requestScreenplayEditor()
 
@@ -59,32 +57,27 @@ Row {
     FlatToolButton {
         id: findButton
         iconSource: "qrc:/icons/action/search.png"
-        shortcut: "Ctrl+F"
         ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
-        checkable: true
-        checked: false
+        down: Runtime.screenplayEditor ? Runtime.screenplayEditor.searchBarVisible : false
         enabled: Runtime.screenplayEditor
-        onToggled: {
-            if(!checked)
-                showReplace = false
-        }
+        onClicked: Runtime.screenplayEditor.searchBarVisible = !Runtime.screenplayEditor.searchBarVisible
+    }
+
+    Shortcut {
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+F"
+        onActivated: Runtime.screenplayEditor.toggleSearchBar(false)
+        enabled: Runtime.screenplayEditor
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find"
-        ShortcutsModelItem.shortcut: shortcut
+        ShortcutsModelItem.shortcut: sequence
     }
 
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+F"
-        onActivated: {
-            if(showReplace)
-                showReplace = false
-            else {
-                findButton.checked = true
-                showReplace = !showReplace
-            }
-        }
+        onActivated: Runtime.screenplayEditor.toggleSearchBar(true)
         enabled: Runtime.screenplayEditor
 
         ShortcutsModelItem.group: "Edit"

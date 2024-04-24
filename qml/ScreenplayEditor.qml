@@ -42,7 +42,7 @@ Rectangle {
     property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
     property alias source: sourcePropertyAlias.value
-    property bool toolBarVisible: toolbar.visible
+    property alias searchBarVisible: searchBarArea.visible
     property bool commentsPanelAllowed: true
     property alias enableSceneListPanel: sceneListSidePanel.visible
     property alias sceneListPanelExpanded: sceneListSidePanel.expanded
@@ -56,6 +56,21 @@ Rectangle {
 
     function zoomLevelModifierToApply() {
         return zoomSlider.zoomLevelModifierToApply()
+    }
+
+    function toggleSearchBar(showReplace) {
+        if(typeof showReplace === "boolean")
+            searchBar.showReplace = showReplace
+
+        if(searchBarArea.visible) {
+            if(searchBar.hasFocus)
+                searchBarArea.visible = false
+            else
+                searchBar.assumeFocus()
+        } else {
+            searchBarArea.visible = true
+            searchBar.assumeFocus()
+        }
     }
 
     color: Runtime.colors.primary.windowColor
@@ -184,37 +199,37 @@ Rectangle {
     }
 
     Rectangle {
-        id: toolbar
+        id: searchBarArea
+
+        width: ruler.width
+        height: searchBar.height * opacity
+
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 1
+
         color: Runtime.colors.primary.c100.background
-        width: ruler.width
-        height: screenplaySearchBar.height * opacity
-        enabled: Runtime.screenplayAdapter.screenplay
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
-        visible: opacity > 0
-        opacity: Runtime.screenplayEditorToolbar.showFind ? 1 : 0
-        Behavior on opacity {
-            enabled: Runtime.applicationSettings.enableAnimations
-            NumberAnimation { duration: 100 }
-        }
 
-        onVisibleChanged: {
-            if(visible)
-                screenplaySearchBar.assumeFocus()
-        }
+        visible: false
+
+        enabled: Runtime.screenplayAdapter.screenplay
 
         SearchBar {
-            id: screenplaySearchBar
-            searchEngine.objectName: "Screenplay Search Engine"
+            id: searchBar
+
+            width: searchBarArea.width * 0.6
+
             anchors.horizontalCenter: parent.horizontalCenter
+
+            searchEngine.objectName: "Screenplay Search Engine"
+
+            showReplace: false
             allowReplace: !Scrite.document.readOnly
-            showReplace: Runtime.screenplayEditorToolbar.showReplace
-            width: toolbar.width * 0.6
-            onShowReplaceRequest: Runtime.screenplayEditorToolbar.showReplace = flag
+
+            onShowReplaceRequest: showReplace = flag
 
             Repeater {
                 id: searchAgents
@@ -234,7 +249,7 @@ Rectangle {
                     }
                     SearchAgent.onReplaceCurrent: replaceCurrentRequest(replacementText)
 
-                    SearchAgent.engine: screenplaySearchBar.searchEngine
+                    SearchAgent.engine: searchBar.searchEngine
 
                     SearchAgent.onSearchRequest: {
                         searchString = string
@@ -284,7 +299,7 @@ Rectangle {
 
     Item {
         id: screenplayEditorWorkspace
-        anchors.top: toolbar.visible ? toolbar.bottom : parent.top
+        anchors.top: searchBarArea.visible ? searchBarArea.bottom : parent.top
         anchors.left: sidePanels.right
         anchors.right: parent.right
         anchors.bottom: statusBar.top

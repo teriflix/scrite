@@ -36,8 +36,10 @@ int main(int argc, char **argv)
     ScriteDocumentVault::instance();
 
     AppWindow scriteWindow;
-    scriteWindow.setSource(QUrl("qrc:/main.qml"));
-    scriteWindow.show();
+    QTimer::singleShot(0, &scriteWindow, [&scriteWindow]() {
+        scriteWindow.setSource(QUrl("qrc:/main.qml"));
+        scriteWindow.show();
+    });
 
     return scriteApp.exec();
 }
