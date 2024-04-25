@@ -157,7 +157,7 @@ static inline QString getFileNameToOpenFromAppArgs()
             removeArgs(index, 5);
 
 #ifdef Q_OS_WIN
-        fileNameToOpen = appArgs.last();
+        ret = appArgs.last();
 #else
         QStringList args = appArgs;
         args.takeFirst();
@@ -174,8 +174,6 @@ static inline QString getFileNameToOpenFromAppArgs()
 
 void AppWindow::initializeFileNameToOpen()
 {
-    Application &scriteApp = *Application::instance();
-
     QString fileNameToOpen;
 
 #ifdef Q_OS_MAC
