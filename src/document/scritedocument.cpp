@@ -2105,7 +2105,7 @@ void ScriteDocument::evaluateStructureElementSequenceLater()
 
 void ScriteDocument::markAsModified()
 {
-    this->setModified(!this->isEmpty());
+    this->setModified(m_loading ? true : !this->isEmpty());
     emit documentChanged();
 }
 

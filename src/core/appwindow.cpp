@@ -134,36 +134,58 @@ void AppWindow::showEvent(QShowEvent *se)
     TransliterationEngine::instance()->determineEnabledLanguages();
 }
 
+static inline QString getFileNameToOpenFromAppArgs()
+{
+    QString ret;
+
+    QStringList appArgs = qApp->arguments();
+    if (appArgs.size() > 1) {
+        if (appArgs.contains("--openAnonymously"))
+            return ret;
+
+        auto removeArgs = [&appArgs](int from, int count) {
+            for (int i = 0; i < count; i++)
+                appArgs.removeAt(from);
+        };
+
+        int index = appArgs.indexOf("--sessionToken");
+        if (index >= 0)
+            removeArgs(index, 2);
+
+        index = appArgs.indexOf("--windowGeometry");
+        if (index >= 0)
+            removeArgs(index, 5);
+
+#ifdef Q_OS_WIN
+        fileNameToOpen = appArgs.last();
+#else
+        QStringList args = appArgs;
+        args.takeFirst();
+        ret = args.join(QStringLiteral(" "));
+#endif
+    }
+
+    QFileInfo fi(ret);
+    if (fi.exists() && fi.isReadable())
+        return ret;
+
+    return QString();
+}
+
 void AppWindow::initializeFileNameToOpen()
 {
     Application &scriteApp = *Application::instance();
 
     QString fileNameToOpen;
+
 #ifdef Q_OS_MAC
-    if (!scriteApp.fileToOpen().isEmpty())
+    if (scriteApp.fileToOpen().isEmpty())
+        fileNameToOpen = getFileNameToOpenFromAppArgs();
+    else
         fileNameToOpen = scriteApp.fileToOpen();
     scriteApp.setHandleFileOpenEvents(true);
 #else
-    const QStringList appArgs = scriteApp.arguments();
-    if (appArgs.size() > 1) {
-        bool hasOptions = false;
-        for (const QString &arg : appArgs) {
-            if (arg.startsWith(QStringLiteral("--"))) {
-                hasOptions = true;
-                break;
-            }
-        }
-
-        if (!hasOptions) {
-#ifdef Q_OS_WIN
-            fileNameToOpen = appArgs.last();
-#else
-            QStringList args = appArgs;
-            args.takeFirst();
-            fileNameToOpen = args.join(QStringLiteral(" "));
-#endif
-        }
-    }
+    fileNameToOpen = getFileNameToOpenFromAppArgs();
 #endif
 
     Scrite::setFileNameToOpen(fileNameToOpen);

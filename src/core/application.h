@@ -279,6 +279,8 @@ public:
     Q_INVOKABLE bool restoreWindowGeometry(QWindow *window, const QString &group);
     Q_INVOKABLE void launchNewInstance(QWindow *window);
     Q_INVOKABLE void launchNewInstanceAndOpenAnonymously(QWindow *window, const QString &filePath);
+    Q_INVOKABLE void launchNewInstanceAndOpen(QWindow *window, const QString &filePath);
+    Q_INVOKABLE void startNewInstance(QWindow *window, const QString &filePath, bool anonymously);
     Q_INVOKABLE bool maybeOpenAnonymously();
     Q_INVOKABLE void toggleFullscreen(QWindow *window);
     Q_INVOKABLE bool hasActiveFocus(QQuickWindow *window, QQuickItem *item);

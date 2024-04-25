@@ -561,6 +561,7 @@ Item {
         readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
         readonly property string showPdfRequest: "288E7DFB-9B14-4FE8-8846-14DD2974B486"
         readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
+        readonly property string closeHomeScreenRequest: "4F8F6B5B-5BEB-4D01-97BA-B0018241BD38"
     }
 
     readonly property QtObject announcementData: QtObject {

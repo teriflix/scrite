@@ -20,10 +20,10 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml" as UI
-import "qrc:/qml/controls"
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
+import "qrc:/qml/controls"
 import "qrc:/qml/overlays"
 import "qrc:/qml/notifications"
 import "qrc:/qml/floatingdockpanels"

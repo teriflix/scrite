@@ -58,6 +58,11 @@ Item {
                 mode: dialog.mode
                 onCloseRequest: Qt.callLater(dialog.close)
             }
+
+            Announcement.onIncoming: (type, data) => {
+                if(type === Runtime.announcementIds.closeHomeScreenRequest)
+                    Qt.callLater(dialog.close)
+            }
         }
     }
 }

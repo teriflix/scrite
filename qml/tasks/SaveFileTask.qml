@@ -133,9 +133,6 @@ Item {
             // The document has already been saved to disk, and auto save is enabled.
             // So we simply auto-save the document and move on.
             Component.onCompleted: {
-                var fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", autoSaveIsEnabledItem)
-                fileInfo.absoluteFilePath = Scrite.document.fileName
-
                 Scrite.document.save()
 
                 finish(true)

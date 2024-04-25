@@ -1265,6 +1265,15 @@ void Application::log(const QString &message)
 {
     fprintf(stdout, "%s\n", qPrintable(message));
     fflush(stdout);
+
+#if 0
+    QFile file(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/scrite.log");
+    if (file.open(QFile::Append)) {
+        const QString line = "[" + QDateTime::currentDateTime().toString() + "]: " + message + "\n";
+        file.write(line.toLatin1());
+        file.flush();
+    }
+#endif
 }
 
 bool Application::event(QEvent *event)
@@ -1773,16 +1782,29 @@ bool Application::restoreWindowGeometry(QWindow *window, const QString &group)
 
 void Application::launchNewInstance(QWindow *window)
 {
-    this->launchNewInstanceAndOpenAnonymously(window, QString());
+    startNewInstance(window, QString(), false);
 }
 
 void Application::launchNewInstanceAndOpenAnonymously(QWindow *window, const QString &filePath)
 {
+    startNewInstance(window, filePath, true);
+}
+
+void Application::launchNewInstanceAndOpen(QWindow *window, const QString &filePath)
+{
+    startNewInstance(window, filePath, false);
+}
+
+void Application::startNewInstance(QWindow *window, const QString &filePath, bool anonymously)
+{
     const QString appPath = this->applicationFilePath();
 
     QStringList args;
-    if (!filePath.isEmpty() && QFile::exists(filePath))
-        args = QStringList({ QStringLiteral("--openAnonymously"), filePath });
+    if (!filePath.isEmpty() && QFile::exists(filePath)) {
+        args = QStringList({ filePath });
+        if (anonymously)
+            args.prepend(QStringLiteral("--openAnonymously"));
+    }
 
     if (window != nullptr) {
         const QRect geometry = window->geometry();

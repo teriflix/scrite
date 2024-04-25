@@ -2102,4 +2102,37 @@ Item {
             }
         }
     }
+
+    QtObject {
+        id: _private
+
+        function handleOpenFileRequest(fileName) {
+            if(Scrite.app.isMacOSPlatform) {
+                if(Scrite.document.empty) {
+                    Announcement.shout(Runtime.announcementIds.closeHomeScreenRequest, undefined)
+                    OpenFileTask.open(fileName)
+                } else {
+                    let fileInfo = Qt.createQmlObject("import io.scrite.components 1.0; BasicFileInfo { }", _private)
+                    fileInfo.absoluteFilePath = fileName
+
+                    const justFileName = fileInfo.baseName
+                    fileInfo.destroy()
+
+                    MessageBox.question("Open Options",
+                                        "How do you want to open <b>" + justFileName + "</b>?",
+                                        ["This Window", "New Window"], (answer) => {
+                                            if(answer === "This Window")
+                                                OpenFileTask.open(fileName)
+                                            else
+                                                Scrite.app.launchNewInstanceAndOpen(Scrite.window, fileName);
+                                        })
+                }
+            }
+        }
+
+        Component.onCompleted: {
+            if(Scrite.app.isMacOSPlatform)
+                Scrite.app.openFileRequest.connect(handleOpenFileRequest)
+        }
+    }
 }

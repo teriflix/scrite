@@ -3012,6 +3012,10 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
             element->setActIndex(actIndex);
             element->setEpisodeIndex(episodeIndex);
 
+            // This should never happen!
+            if (element->scene() == nullptr)
+                element->setScene(new Scene(element));
+
             Scene *scene = element->scene();
             scene->setAct(lastActElement ? lastActElement->breakTitle() : QStringLiteral("ACT 1"));
             scene->setActIndex(actIndex);
