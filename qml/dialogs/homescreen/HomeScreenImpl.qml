@@ -43,115 +43,325 @@ import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
 Item {
-    id: homeScreen
+    id: root
 
     property string mode
     signal closeRequest()
 
     Component.onCompleted: {
-        Utils.execLater(homeScreen, 500, () => {
+        Utils.execLater(root, 500, () => {
                             if(mode === "Scriptalay")
-                                stackView.push(scriptalayPage)
+                                _private.showScriptalay()
                         })
-    }
-
-    Image {
-        id: banner
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        source: {
-            if(stackView.currentItem && stackView.currentItem.bannerImage)
-                return stackView.currentItem.bannerImage
-            return _private.defaultBannerImage
-        }
-        fillMode: Image.PreserveAspectFit
-        visible: banner.height <= homeScreen.height * 0.6
-
-        Image {
-            anchors.centerIn: parent
-            source: (stackView.currentItem && stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
-            width: homeScreen.width * 0.3
-            fillMode: Image.PreserveAspectFit
-            smooth: true; mipmap: true
-            visible: false
-            Component.onCompleted: Utils.execLater(banner, 50, () => { visible = true } )
-        }
-
-        VclLabel {
-            id: commonToolTip
-            width: parent.width * 0.75
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-            anchors.leftMargin: 20
-            anchors.bottomMargin: 20
-
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            padding: 8
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignBottom
-            wrapMode: Text.WordWrap
-            color: "white"
-            visible: text !== ""
-            maximumLineCount: 4
-            elide: Text.ElideRight
-
-            property Item source
-
-            function show(_source, _text) {
-                source = _source
-                text = _text
-            }
-
-            function hide(_source) {
-                if(source === _source)
-                    text = ""
-            }
-        }
-
-        Poster {
-            id: poster
-            anchors.fill: parent
-
-            property Item sourceItem
-
-            function show(_source, _image, _logline) {
-                sourceItem = _source
-                source = _image
-                logline = _logline
-            }
-
-            function hide(_source) {
-                if(sourceItem === _source) {
-                    source = undefined
-                    logline = ""
-                }
-            }
-        }
-    }
-
-    StackView {
-        id: stackView
-        anchors.top: banner.visible ? banner.bottom : parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        clip: true
-
-        initialItem: ContentPage1 { }
     }
 
     LibraryService {
         id: libraryService
     }
 
-    component ContentPage1 : Item {
+    Loader {
+        anchors.fill: parent
+        sourceComponent: {
+            switch(_private.layoutType) {
+            case 1: return homeScreenLayout1
+            case 2: return homeScreenLayout2
+            default:
+            }
+            return homeScreenLayout2
+        }
+    }
+
+    // Use this if the scaled banner height is less than 60% of the home screen height
+    Component {
+        id: homeScreenLayout1
+
+        ColumnLayout {
+            spacing: 0
+
+            TopBanner {
+                Layout.fillWidth: true
+                Layout.preferredHeight: (_private.bannerSize.height / _private.bannerSize.width) * width
+            }
+
+            StackView {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                clip: true
+
+                initialItem: ContentPageLayout1 { }
+
+                function onShowScriptalay() {
+                    push(scriptalayPage)
+                }
+
+                Component.onCompleted: _private.showScriptalay.connect(onShowScriptalay)
+            }
+        }
+    }
+
+    // Use this otherwise
+    Component {
+        id: homeScreenLayout2
+
+        StackView {
+            clip: true
+
+            initialItem: ContentPageLayout2 { }
+        }
+    }
+
+    component TopBanner : Image {
+        id: banner
+
+        readonly property StackView stackView: Aggregation.firstSibling("QQuickStackView")
+
+        source: {
+            if(stackView.currentItem && stackView.currentItem.bannerImage)
+                return stackView.currentItem.bannerImage
+            return _private.defaultBannerImage
+        }
+        fillMode: Image.PreserveAspectFit
+
+        Image {
+            anchors.centerIn: parent
+            source: (banner.stackView.currentItem && banner.stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
+            width: root.width * 0.3
+            fillMode: Image.PreserveAspectFit
+            smooth: true; mipmap: true
+            visible: false
+            Component.onCompleted: Utils.execLater(banner, 50, () => { visible = true } )
+        }
+
+        RowLayout {
+            spacing: 20
+
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 20
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: !topBannerToolTip.visible
+
+            LinkButton {
+                Layout.fillWidth: true
+
+                text: "Learning Guides"
+                color: Qt.rgba(0,0,0,0)
+                textColor: "white"
+                iconSource: "qrc:/icons/action/help_inverted.png"
+
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
+            }
+
+            LinkButton {
+                Layout.fillWidth: true
+
+                text: "Discord Community"
+                color: Qt.rgba(0,0,0,0)
+                textColor: "white"
+                iconSource: "qrc:/icons/action/forum_inverted.png"
+
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
+            }
+        }
+
+        VclLabel {
+            id: topBannerToolTip
+
+            width: parent.width * 0.75
+
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+            anchors.leftMargin: 20
+            anchors.bottomMargin: 20
+
+            color: "white"
+            elide: Text.ElideRight
+            padding: 8
+            visible: text !== ""
+            wrapMode: Text.WordWrap
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            maximumLineCount: 4
+            verticalAlignment: Text.AlignBottom
+            horizontalAlignment: Text.AlignLeft
+
+            property Item source
+
+            Connections {
+                target: _private
+
+                function onShowTooltipRequest(_source, _text) {
+                    topBannerToolTip.source = _source
+                    topBannerToolTip.text = _text
+                }
+
+                function onHideTooltipRequest(_source) {
+                    if(topBannerToolTip.source === _source) {
+                        topBannerToolTip.source = null
+                        topBannerToolTip.text = ""
+                    }
+                }
+            }
+        }
+
+        Poster {
+            id: topBannerPoster
+
+            anchors.fill: parent
+
+            property Item sourceItem
+
+            Connections {
+                target: _private
+
+                function onShowPosterRequest(_source, _image, _logline) {
+                    topBannerPoster.sourceItem = _source
+                    topBannerPoster.source = _image
+                    topBannerPoster.logline = _logline
+                }
+
+                function onHidePosterRequest(_source) {
+                    if(topBannerPoster.sourceItem === _source) {
+                        topBannerPoster.sourceItem = null
+                        topBannerPoster.source = undefined
+                        topBannerPoster.logline = ""
+                    }
+                }
+            }
+        }
+    }
+
+    component SideBanner : ColumnLayout {
+        spacing: 20
+
+        Image {
+            Layout.fillWidth: true
+            Layout.preferredHeight: (_private.bannerSize.height / _private.bannerSize.width) * width
+
+            source: _private.defaultBannerImage
+            fillMode: Image.PreserveAspectFit
+
+            Image {
+                readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+
+                anchors.centerIn: parent
+                source: (stackView.currentItem && stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
+                width: parent.width * 0.3
+                fillMode: Image.PreserveAspectFit
+                smooth: true; mipmap: true
+                visible: false
+                Component.onCompleted: Utils.execLater(parent, 50, () => { visible = true } )
+            }
+
+            Poster {
+                id: sideBannerPoster
+
+                anchors.fill: parent
+
+                property Item sourceItem
+
+                Connections {
+                    target: _private
+
+                    function onShowPosterRequest(_source, _image, _logline) {
+                        sideBannerPoster.sourceItem = _source
+                        sideBannerPoster.source = _image
+                    }
+
+                    function onHidePosterRequest(_source) {
+                        if(sideBannerPoster.sourceItem === _source) {
+                            sideBannerPoster.sourceItem = null
+                            sideBannerPoster.source = undefined
+                        }
+                    }
+                }
+            }
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 10
+
+                VclLabel {
+                    id: sideBannerTooltip
+
+                    Layout.fillWidth: true
+                    Layout.fillHeight: source ? true : false
+
+                    text: defaultText
+                    padding: 8
+
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+                    elide: Text.ElideRight
+                    wrapMode: Text.WordWrap
+
+                    property Item source
+
+                    Connections {
+                        target: _private
+
+                        function onShowTooltipRequest(_source, _text) {
+                            sideBannerTooltip.source = _source
+                            sideBannerTooltip.text = _text
+                            sideBannerHelpButtons.visible = false
+                        }
+
+                        function onHideTooltipRequest(_source) {
+                            if(sideBannerTooltip.source === _source) {
+                                sideBannerTooltip.source = null
+                                sideBannerTooltip.text = sideBannerTooltip.defaultText
+                                sideBannerHelpButtons.visible = true
+                            }
+                        }
+                    }
+
+                    readonly property string defaultText: Scrite.app.fileContents(":/misc/homescreen_info.md")
+                }
+
+                ColumnLayout {
+                    id: sideBannerHelpButtons
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    LinkButton {
+                        Layout.fillWidth: true
+
+                        text: "Learning Guides"
+                        iconSource: "qrc:/icons/action/help.png"
+
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
+                    }
+
+                    LinkButton {
+                        Layout.fillWidth: true
+
+                        text: "Discord Community"
+                        iconSource: "qrc:/icons/action/forum.png"
+
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+                }
+            }
+        }
+    }
+
+    component ContentPageLayout1 : Item {
         RowLayout {
             anchors.fill: parent
             anchors.topMargin: 25
             anchors.leftMargin: 50
             anchors.rightMargin: 50
             anchors.bottomMargin: 25
+
             spacing: 20
 
             Item {
@@ -194,6 +404,60 @@ Item {
         }
     }
 
+    component ContentPageLayout2 : Item {
+        RowLayout {
+            anchors.fill: parent
+            anchors.topMargin: 25
+            anchors.leftMargin: 50
+            anchors.rightMargin: 50
+            anchors.bottomMargin: 25
+
+            spacing: 20
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 20
+
+                    NewFileOptions {
+                        Layout.fillWidth: true
+                    }
+
+                    QuickFileOpenOptions {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+
+                    OpenFileOptions {
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                ColumnLayout {
+                    anchors.fill: parent
+                    spacing: 20
+
+                    SideBanner {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                    }
+
+                    ImportOptions {
+                        Layout.fillWidth: true
+                    }
+                }
+            }
+        }
+    }
+
     Component {
         id: iconFromSource
 
@@ -217,10 +481,11 @@ Item {
         property string text
         property string tooltip
         property string iconSource
-        property var iconImage: Scrite.app.emptyQImage // has to be QImage
-        property bool singleClick: true
-        property bool showPoster: false
-        property bool containsMouse: buttonMouseArea.containsMouse
+        property color  textColor: Runtime.colors.primary.regular.text
+        property var    iconImage: Scrite.app.emptyQImage // has to be QImage
+        property bool   singleClick: true
+        property bool   showPoster: false
+        property bool   containsMouse: buttonMouseArea.containsMouse
 
         signal clicked()
         signal doubleClicked()
@@ -228,6 +493,9 @@ Item {
         width: 100
         height: buttonLayout.height + 6
         color: buttonMouseArea.containsMouse ? Runtime.colors.primary.highlight.background : Qt.rgba(0,0,0,0)
+
+        implicitWidth: buttonIcon.implicitWidth + buttonLabel.implicitWidth + buttonLayout.spacing
+        implicitHeight: buttonLayout.height + 10
 
         RowLayout {
             id: buttonLayout
@@ -237,14 +505,19 @@ Item {
             opacity: enabled ? 1 : 0.6
 
             Loader {
+                id: buttonIcon
+
                 property real h: buttonLabel.contentHeight * 1.5
+
                 Layout.preferredWidth: h
                 Layout.preferredHeight: h
+
                 sourceComponent: {
                     if(iconSource !== "")
                         return iconFromSource
                     return iconFromImage
                 }
+
                 onLoaded: {
                     if(iconSource !== "")
                         item.source = Qt.binding( () => { return iconSource } )
@@ -255,12 +528,15 @@ Item {
 
             VclLabel {
                 id: buttonLabel
+
+                Layout.fillWidth: true
+
+                text: button.text
+                color: button.textColor
+                elide: Text.ElideRight
                 padding: 3
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 font.underline: singleClick ? buttonMouseArea.containsMouse : false
-                text: button.text
-                Layout.fillWidth: true
-                elide: Text.ElideRight
             }
         }
 
@@ -273,29 +549,34 @@ Item {
             onDoubleClicked: button.doubleClicked()
             onEntered: {
                 if(hoverEnabled) {
-                    commonToolTip.show(parent, parent.tooltip)
+                    if(parent.tooltip !== "")
+                        _private.showTooltipRequest(parent, parent.tooltip)
+
                     if(parent.showPoster) {
                         if(parent.iconSource !== "")
-                            poster.show(parent, parent.iconSource, parent.tooltip)
+                            _private.showPosterRequest(parent, parent.iconSource, parent.tooltip)
                         else
-                            poster.show(parent, parent.iconImage, parent.tooltip)
+                            _private.showPosterRequest(parent, parent.iconImage, parent.tooltip)
                     }
                 }
             }
             onExited: {
                 if(hoverEnabled) {
-                    commonToolTip.hide(parent)
-                    poster.hide(parent)
+                    _private.hideTooltipRequest(parent)
+                    _private.hidePosterRequest(parent)
                 }
             }
         }
     }
 
     component NewFileOptions : Item {
+        implicitHeight: Math.max(newFileLabel.height + templatesView.contentHeight, 220)
+
         ColumnLayout {
             anchors.fill: parent
 
             VclLabel {
+                id: newFileLabel
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: "New File"
             }
@@ -321,7 +602,7 @@ Item {
                         tooltip: "Creates a new blank Scrite document."
                         onClicked: {
                             SaveFileTask.save( () => {
-                                                    homeScreen.enabled = false
+                                                    root.enabled = false
                                                     Scrite.document.reset()
                                                     closeRequest()
                                                 } )
@@ -367,11 +648,18 @@ Item {
                         }
                     }
                 }
+
+                BusyIndicator {
+                    anchors.centerIn: parent
+                    running: libraryService.busy
+                }
             }
         }
     }
 
     component OpenFileOptions : ColumnLayout {
+        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+
         LinkButton {
             text: "Open ..."
             iconSource: "qrc:/icons/file/folder_open.png"
@@ -389,7 +677,7 @@ Item {
             iconSource: Runtime.recentFiles.count === 0 ? "qrc:/icons/filetype/document.png" : "qrc:/icons/action/library.png"
             Layout.fillWidth: true
             tooltip: Runtime.recentFiles.count === 0 ? "Reopen a recently opened file." : "Download a screenplay from our online library."
-            onClicked: stackView.push(scriptalayPage)
+            onClicked: parent.stackView.push(scriptalayPage)
             enabled: Runtime.recentFiles.count > 0
         }
     }
@@ -402,12 +690,22 @@ Item {
             required property var fileInfo
 
             ToolTip.text: fileInfo.filePath
-            ToolTip.visible: containsMouse
+            ToolTip.visible: containsMouse && _private.layoutType === 1
 
             width: ListView.view.width
 
             text: fileInfo.title === "" ? fileInfo.baseFileName : composeTextFromTitleAndVersion(fileInfo)
-            tooltip: fileInfo.logline
+            tooltip: {
+                let ret = fileInfo.logline
+                if(_private.layoutType === 2) {
+                    const fp = "<font size=\"-1\">" + fileInfo.filePath + "</font>"
+                    if(ret === "")
+                        ret = fp
+                    else
+                        ret += "<br/><br/>" + fp
+                }
+                return ret
+            }
             iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
             iconImage: fileInfo.hasCoverPage ? fileInfo.coverPageImage : null
             showPoster: fileInfo.hasCoverPage
@@ -465,7 +763,7 @@ Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 // Layout.leftMargin: 20
-                Layout.rightMargin: 20
+                // Layout.rightMargin: 20
                 color: Qt.rgba(0,0,0,0)
                 border.width: quickFilesView.interactive ? 1 : 0
                 border.color: Runtime.colors.primary.borderColor
@@ -490,13 +788,15 @@ Item {
     }
 
     component ImportOptions : ColumnLayout {
+        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+
         // Show restore and import options
         LinkButton {
             text: "Recover ..."
             tooltip: "Open cached files from your private on-disk vault."
             iconSource: "qrc:/icons/file/backup_open.png"
             Layout.fillWidth: true
-            onClicked: stackView.push(vaultPage)
+            onClicked: parent.stackView.push(vaultPage)
         }
 
         LinkButton {
@@ -504,7 +804,7 @@ Item {
             tooltip: "Import a screenplay from Final Draft, Fountain or HTML formats."
             iconSource: "qrc:/icons/file/import_export.png"
             Layout.fillWidth: true
-            onClicked: stackView.push(importPage)
+            onClicked: parent.stackView.push(importPage)
         }
     }
 
@@ -528,6 +828,7 @@ Item {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+
                 color: Qt.rgba(0,0,0,0)
                 border.width: 1
                 border.color: Runtime.colors.primary.borderColor
@@ -564,62 +865,108 @@ Item {
                 }
             }
 
-            Rectangle {
+            Item {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                color: Qt.rgba(0,0,0,0)
-                border.width: 1
-                border.color: Runtime.colors.primary.borderColor
 
-                Flickable {
-                    id: screenplayDetailsFlick
+                ColumnLayout {
                     anchors.fill: parent
-                    anchors.margins: 1
-                    contentWidth: screenplayDetailsText.width
-                    contentHeight: screenplayDetailsText.height
-                    clip: true
-                    flickableDirection: Flickable.VerticalFlick
+                    spacing: 20
 
-                    ScrollBar.vertical: VclScrollBar {
-                        flickable: screenplayDetailsFlick
-                    }
+                    Image {
+                        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
 
-                    TextArea {
-                        id: screenplayDetailsText
-                        width: screenplayDetailsFlick.width-20
-                        property var record: screenplaysView.currentIndex >= 0 ? libraryService.screenplays.recordAt(screenplaysView.currentIndex) : undefined
-                        textFormat: record ? TextArea.RichText : TextArea.MarkdownText
-                        wrapMode: Text.WordWrap
-                        padding: 8
-                        readOnly: true
-                        background: Item { }
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        text: record ? composeTextFromRecord(record) : defaultText
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: (_private.bannerSize.height / _private.bannerSize.width) * width
 
-                        onRecordChanged: {
-                            if(record) {
-                                commonToolTip.show(screenplaysView.currentItem, record.logline)
-                                poster.show(screenplaysView.currentItem, screenplaysView.currentItem.iconSource, record.logline)
+                        visible: _private.layoutType === 2
+                        source: stackView.currentItem.bannerImage
+                        fillMode: Image.PreserveAspectFit
+
+                        Poster {
+                            id: scriptalayPoster
+
+                            anchors.fill: parent
+
+                            property Item sourceItem
+
+                            Connections {
+                                target: _private
+
+                                function onShowPosterRequest(_source, _image, _logline) {
+                                    scriptalayPoster.sourceItem = _source
+                                    scriptalayPoster.source = _image
+                                }
+
+                                function onHidePosterRequest(_source) {
+                                    if(scriptalayPoster.sourceItem === _source) {
+                                        scriptalayPoster.sourceItem = null
+                                        scriptalayPoster.source = undefined
+                                    }
+                                }
                             }
                         }
-                        Component.onDestruction: {
-                            commonToolTip.hide(screenplayDetailsText)
-                            poster.hide(screenplaysView.currentItem)
-                        }
+                    }
 
-                        function composeTextFromRecord(_record) {
-                            var ret =
-                              "<strong>Written By:</strong> " + _record.authors + "<br/><br/>" +
-                              "<strong>Pages:</strong> " + _record.pageCount + "<br/>" +
-                              "<strong>Revision:</strong> " + _record.revision + "<br/><br/>" +
-                              "<strong>Copyright:</strong> " + _record.copyright + "<br/><br/>" +
-                              "<strong>Source:</strong> " + _record.source
-                            if(!banner.visible)
-                                ret += "<br/><br/><strong>Logline:</strong> " + _record.logline
-                            return ret
-                        }
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
 
-                        readonly property string defaultText: Scrite.app.fileContents(":/misc/scriptalay_info.md")
+                        color: Qt.rgba(0,0,0,0)
+                        border.width: 1
+                        border.color: Runtime.colors.primary.borderColor
+
+                        Flickable {
+                            id: screenplayDetailsFlick
+                            anchors.fill: parent
+                            anchors.margins: 1
+                            contentWidth: screenplayDetailsText.width
+                            contentHeight: screenplayDetailsText.height
+                            clip: true
+                            flickableDirection: Flickable.VerticalFlick
+
+                            ScrollBar.vertical: VclScrollBar {
+                                flickable: screenplayDetailsFlick
+                            }
+
+                            TextArea {
+                                id: screenplayDetailsText
+                                width: screenplayDetailsFlick.width-20
+                                property var record: screenplaysView.currentIndex >= 0 ? libraryService.screenplays.recordAt(screenplaysView.currentIndex) : undefined
+                                textFormat: record ? TextArea.RichText : TextArea.MarkdownText
+                                wrapMode: Text.WordWrap
+                                padding: 8
+                                readOnly: true
+                                background: Item { }
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                text: record ? composeTextFromRecord(record) : defaultText
+
+                                onRecordChanged: {
+                                    if(record) {
+                                        _private.showTooltipRequest(screenplaysView.currentItem, record.logline)
+                                        _private.showPosterRequest(screenplaysView.currentItem, screenplaysView.currentItem.iconSource, record.logline)
+                                    }
+                                }
+                                Component.onDestruction: {
+                                    _private.hideTooltipRequest(screenplayDetailsText)
+                                    _private.hidePosterRequest(screenplaysView.currentItem)
+                                }
+
+                                function composeTextFromRecord(_record) {
+                                    var ret =
+                                            "<strong>Written By:</strong> " + _record.authors + "<br/><br/>" +
+                                            "<strong>Pages:</strong> " + _record.pageCount + "<br/>" +
+                                            "<strong>Revision:</strong> " + _record.revision + "<br/><br/>" +
+                                            "<strong>Copyright:</strong> " + _record.copyright + "<br/><br/>" +
+                                            "<strong>Source:</strong> " + _record.source
+                                    if(_private.layoutType === 2)
+                                        ret += "<br/><br/><strong>Logline:</strong> " + _record.logline
+                                    return ret
+                                }
+
+                                readonly property string defaultText: Scrite.app.fileContents(":/misc/scriptalay_info.md")
+                            }
+                        }
                     }
                 }
             }
@@ -636,7 +983,7 @@ Item {
                 return
 
             SaveFileTask.save( () => {
-                                    homeScreen.enabled = false
+                                    root.enabled = false
 
                                     var task = OpenFileTask.openAnonymously(vaultFilesView.currentItem.fileInfo.filePath)
                                     task.finished.connect(closeRequest)
@@ -719,7 +1066,7 @@ Item {
                 dropBrowseItem.doBrowse()
             else if(importPageStackLayout.currentIndex === 2) {
                 SaveFileTask.save( () => {
-                                        homeScreen.enabled = false
+                                        root.enabled = false
                                         importDroppedFileItem.doImport()
                                     } )
             }
@@ -860,6 +1207,8 @@ Item {
         property Component buttons
         property QtObject buttonsItem: buttonsLoader.item
 
+        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+
         Item {
             anchors.fill: parent
             anchors.topMargin: 25
@@ -883,7 +1232,7 @@ Item {
 
                 VclButton {
                     text: "< Back"
-                    onClicked: stackView.pop()
+                    onClicked: stackPage.stackView.pop()
 
                     EventFilter.target: Scrite.app
                     EventFilter.events: [EventFilter.KeyPress,EventFilter.KeyRelease,EventFilter.Shortcut]
@@ -891,7 +1240,7 @@ Item {
                                               if(event.key === Qt.Key_Escape) {
                                                   result.acceptEvent = true
                                                   result.filter = true
-                                                  stackView.pop()
+                                                  stackPage.stackView.pop()
                                               }
                                           }
                 }
@@ -1009,6 +1358,19 @@ Item {
     QtObject {
         id: _private
 
+        readonly property size bannerSize: Qt.size(1920, 1080)
         readonly property string defaultBannerImage: "qrc:/images/homescreen_banner.png"
+
+        property int layoutType: {
+            const s = root.width / bannerSize.width
+            const h = bannerSize.height * s
+            return (h <= root.height * 0.6) ? 1 : 2
+        }
+
+        signal showTooltipRequest(Item _source, string _text)
+        signal hideTooltipRequest(Item _source)
+        signal showPosterRequest(Item _source, var _image, string _logline)
+        signal hidePosterRequest(Item _source)
+        signal showScriptalay()
     }
 }

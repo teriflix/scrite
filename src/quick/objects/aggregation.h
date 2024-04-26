@@ -23,17 +23,23 @@ class Aggregation : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
-    QML_SINGLETON
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(Aggregation)
 
 public:
     explicit Aggregation(QObject *parent = nullptr);
     ~Aggregation();
 
+    static Aggregation *qmlAttachedProperties(QObject *object);
+
     Q_INVOKABLE static QObject *find(QObject *object, const QString &className,
                                      const QString &objectName = QString());
     Q_INVOKABLE static ErrorReport *findErrorReport(QObject *object);
     Q_INVOKABLE static ProgressReport *findProgressReport(QObject *object);
+
+    Q_INVOKABLE QObject *firstChild(const QString &className);
+    Q_INVOKABLE QObject *firstParent(const QString &className);
+    Q_INVOKABLE QObject *firstSibling(const QString &className);
 };
 
 #endif // AGGREGATION_H

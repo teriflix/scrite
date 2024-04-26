@@ -10,5 +10,7 @@
         <file alias="richtexteditor.html">misc/richtexteditor.html</file>
         <file alias="qwebchannel.js">misc/qwebchannel.js</file>
         <file alias="richtexttransform.html">misc/richtexttransform.html</file>
+        <file>misc/scriptalay_info.md</file>
+        <file>misc/homescreen_info.md</file>
     </qresource>
 </RCC>

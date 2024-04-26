@@ -12,10 +12,16 @@
 ****************************************************************************/
 
 #include "aggregation.h"
+#include "application.h"
 
 Aggregation::Aggregation(QObject *parent) : QObject(parent) { }
 
 Aggregation::~Aggregation() { }
+
+Aggregation *Aggregation::qmlAttachedProperties(QObject *object)
+{
+    return new Aggregation(object);
+}
 
 QObject *Aggregation::find(QObject *object, const QString &className, const QString &objectName)
 {
@@ -44,4 +50,19 @@ ErrorReport *Aggregation::findErrorReport(QObject *object)
 ProgressReport *Aggregation::findProgressReport(QObject *object)
 {
     return object->findChild<ProgressReport *>(QString(), Qt::FindDirectChildrenOnly);
+}
+
+QObject *Aggregation::firstChild(const QString &className)
+{
+    return Application::findFirstChildOfType(this->parent(), className);
+}
+
+QObject *Aggregation::firstParent(const QString &className)
+{
+    return Application::findFirstParentOfType(this->parent(), className);
+}
+
+QObject *Aggregation::firstSibling(const QString &className)
+{
+    return Application::findFirstSiblingOfType(this->parent(), className);
 }

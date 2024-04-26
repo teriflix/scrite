@@ -352,6 +352,7 @@ public:
 
     Q_INVOKABLE static QObject *findFirstChildOfType(QObject *object, const QString &className);
     Q_INVOKABLE static QObject *findFirstParentOfType(QObject *object, const QString &className);
+    Q_INVOKABLE static QObject *findFirstSiblingOfType(QObject *object, const QString &className);
 
 private:
     bool loadScript();

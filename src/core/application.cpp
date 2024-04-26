@@ -1377,6 +1377,32 @@ QObject *Application::findFirstParentOfType(QObject *object, const QString &clas
         parent = getObjectParent(parent);
     }
 
+    parent = object->parent();
+    while (parent != nullptr) {
+        if (parent->inherits(qPrintable(className)))
+            return parent;
+
+        parent = parent->parent();
+    }
+
+    return nullptr;
+}
+
+QObject *Application::findFirstSiblingOfType(QObject *object, const QString &className)
+{
+    if (object == nullptr || object->parent() == nullptr)
+        return nullptr;
+
+    QObject *parent = object->parent();
+    QObjectList siblings = parent->children();
+    siblings.removeOne(object);
+
+    while (!siblings.isEmpty()) {
+        QObject *sibling = siblings.takeFirst();
+        if (sibling->inherits(qPrintable(className)))
+            return sibling;
+    }
+
     return nullptr;
 }
 

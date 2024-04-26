@@ -307,5 +307,7 @@
         <file>icons/exporter/scrite.png</file>
         <file>icons/editor/format_align_justify.png</file>
         <file>icons/editor/format_align_justify_inverted.png</file>
+        <file>icons/action/forum.png</file>
+        <file>icons/action/forum_inverted.png</file>
     </qresource>
 </RCC>

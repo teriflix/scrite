@@ -298,7 +298,7 @@ Item {
 
                         Button {
                             text: "Discord"
-                            onClicked: Qt.openUrlExternally("https://discord.gg/bGHquFX5jK")
+                            onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
                         }
                     }
                 }
