@@ -232,7 +232,7 @@ static void copyFilesRecursively(const QDir &from, const QDir &to)
 QVersionNumber Application::prepare()
 {
     const QVersionNumber applicationVersion =
-            QVersionNumber::fromString(QStringLiteral("0.9.4.18"));
+            QVersionNumber::fromString(QStringLiteral("0.9.4.19"));
     const QString applicationVersionString = [applicationVersion]() -> QString {
         const QVector<int> segments = applicationVersion.segments();
 
