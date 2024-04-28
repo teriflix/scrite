@@ -280,8 +280,11 @@ Item {
         Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
+            clip: toolTipLayout.implicitHeight > height
 
             ColumnLayout {
+                id: toolTipLayout
+
                 anchors.fill: parent
                 spacing: 10
 

@@ -177,11 +177,11 @@ void AppWindow::initializeFileNameToOpen()
     QString fileNameToOpen;
 
 #ifdef Q_OS_MAC
-    if (scriteApp.fileToOpen().isEmpty())
+    if (Application::instance()->fileToOpen().isEmpty())
         fileNameToOpen = getFileNameToOpenFromAppArgs();
     else
-        fileNameToOpen = scriteApp.fileToOpen();
-    scriteApp.setHandleFileOpenEvents(true);
+        fileNameToOpen = Application::instance()->fileToOpen();
+    Application::instance()->setHandleFileOpenEvents(true);
 #else
     fileNameToOpen = getFileNameToOpenFromAppArgs();
 #endif
