@@ -2319,9 +2319,9 @@ Rectangle {
                                     }
 
                                     FlatToolButton {
-                                        id: multipleCharacterAddButton
+                                        id: addExistingCharactersButton
                                         iconSource: "qrc:/icons/content/persons_add.png"
-                                        ToolTip.text: "Add Multiple Characters"
+                                        ToolTip.text: "Add Existing Characters"
                                         onClicked: AddCharactersDialog.launch()
                                     }
                                 }
