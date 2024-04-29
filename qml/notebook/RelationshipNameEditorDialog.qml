@@ -32,7 +32,7 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch(relationship) {
-        var dlg = relationshipNameEditorDialogComponent.createObject(root, {"relationship": relationship})
+        var dlg = dialogComponent.createObject(root, {"relationship": relationship})
         if(dlg) {
             dlg.closed.connect(dlg.destroy)
             dlg.open()
@@ -44,10 +44,10 @@ Item {
     }
 
     Component {
-        id: relationshipNameEditorDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: relationshipNameEditorDialog
+            id: dialog
 
             property Relationship relationship
             property Character ofCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter) : null
@@ -83,15 +83,15 @@ Item {
                                 Layout.preferredHeight: 150
                                 Layout.alignment: Qt.AlignHCenter
 
-                                color: relationshipNameEditorDialog.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                                color: dialog.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
                                 border.width: 1
                                 border.color: "black"
 
                                 Image {
                                     anchors.fill: parent
                                     source: {
-                                        if(relationshipNameEditorDialog.ofCharacter.hasKeyPhoto > 0)
-                                            return "file:///" + relationshipNameEditorDialog.ofCharacter.keyPhoto
+                                        if(dialog.ofCharacter.hasKeyPhoto > 0)
+                                            return "file:///" + dialog.ofCharacter.keyPhoto
                                         return "qrc:/icons/content/character_icon.png"
                                     }
                                     fillMode: Image.PreserveAspectCrop
@@ -108,7 +108,7 @@ Item {
                                 maximumLineCount: 2
                                 horizontalAlignment: Text.AlignHCenter
 
-                                text: Scrite.app.camelCased(relationshipNameEditorDialog.ofCharacter.name)
+                                text: Scrite.app.camelCased(dialog.ofCharacter.name)
                             }
                         }
 
@@ -118,7 +118,7 @@ Item {
                             Layout.fillWidth: true
 
                             focus: true
-                            text: relationshipNameEditorDialog.relationship.name
+                            text: dialog.relationship.name
                             label: "Relationship:"
                             maximumLength: 50
                             placeholderText: "husband of, wife of, friends with, reports to ..."
@@ -143,8 +143,8 @@ Item {
                                 Image {
                                     anchors.fill: parent
                                     source: {
-                                        if(relationshipNameEditorDialog.withCharacter.hasKeyPhoto > 0)
-                                            return "file:///" + relationshipNameEditorDialog.withCharacter.keyPhoto
+                                        if(dialog.withCharacter.hasKeyPhoto > 0)
+                                            return "file:///" + dialog.withCharacter.keyPhoto
                                         return "qrc:/icons/content/character_icon.png"
                                     }
                                     fillMode: Image.PreserveAspectCrop
@@ -161,7 +161,7 @@ Item {
                                 maximumLineCount: 2
                                 horizontalAlignment: Text.AlignHCenter
 
-                                text: Scrite.app.camelCased(relationshipNameEditorDialog.withCharacter.name)
+                                text: Scrite.app.camelCased(dialog.withCharacter.name)
                             }
                         }
                     }
@@ -173,8 +173,8 @@ Item {
                         VclButton {
                             id: revertButton
                             text: "Revert"
-                            enabled: txtRelationshipName.text !== relationshipNameEditorDialog.relationship.name
-                            onClicked: txtRelationshipName.text = relationshipNameEditorDialog.relationship.name
+                            enabled: txtRelationshipName.text !== dialog.relationship.name
+                            onClicked: txtRelationshipName.text = dialog.relationship.name
                         }
 
                         VclButton {
@@ -183,8 +183,8 @@ Item {
                             enabled: txtRelationshipName.length > 0
                             onClicked: click()
                             function click() {
-                                relationshipNameEditorDialog.relationship.name = txtRelationshipName.text.trim()
-                                relationshipNameEditorDialog.close()
+                                dialog.relationship.name = txtRelationshipName.text.trim()
+                                dialog.close()
                             }
                         }
                     }

@@ -1,3 +1,4 @@
+singleton AddCharactersDialog 1.0 AddCharactersDialog.qml
 singleton AddRelationshipDialog 1.0 AddRelationshipDialog.qml
 singleton RelationshipNameEditorDialog 1.0 RelationshipNameEditorDialog.qml
 

@@ -2288,15 +2288,15 @@ Rectangle {
                                 color: Scrite.app.translucent(Runtime.colors.primary.windowColor, 0.5)
                                 border { width: 1; color: Runtime.colors.primary.borderColor }
 
-                                Row {
+                                RowLayout {
                                     spacing: 10
                                     width: parent.width-20
                                     anchors.centerIn: parent
 
                                     VclTextField {
                                         id: characterNameField
+                                        Layout.fillWidth: true
                                         completionStrings: Scrite.document.structure.characterNames
-                                        width: parent.width - characterAddButton.width - parent.spacing
                                         placeholderText: Scrite.document.readOnly ? "Enter character name to search." : "Enter character name to search/add."
                                         label: ""
                                         onReturnPressed: characterAddButton.click()
@@ -2316,6 +2316,13 @@ Rectangle {
                                                 notebookModel.preferredItem = ch.notes
                                             }
                                         }
+                                    }
+
+                                    FlatToolButton {
+                                        id: multipleCharacterAddButton
+                                        iconSource: "qrc:/icons/content/persons_add.png"
+                                        ToolTip.text: "Add Multiple Characters"
+                                        onClicked: AddCharactersDialog.launch()
                                     }
                                 }
                             }

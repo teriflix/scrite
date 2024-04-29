@@ -32,11 +32,11 @@ Item {
     parent: Scrite.window.contentItem
 
     function launch(character) {
-        var addRelationshipDlg = addRelationshipDialogComponent.createObject(root, {"character": character})
-        if(addRelationshipDlg) {
-            addRelationshipDlg.closed.connect(addRelationshipDlg.destroy)
-            addRelationshipDlg.open()
-            return addRelationshipDlg
+        var dlg = dialogComponent.createObject(root, {"character": character})
+        if(dlg) {
+            dlg.closed.connect(dlg.destroy)
+            dlg.open()
+            return dlg
         }
 
         console.log("Couldn't launch AddRelationshipDialog")
@@ -44,10 +44,10 @@ Item {
     }
 
     Component {
-        id: addRelationshipDialogComponent
+        id: dialogComponent
 
         VclDialog {
-            id: addRelationshipDialog
+            id: dialog
 
             property Character character
 
@@ -95,7 +95,7 @@ Item {
                             highlightMoveDuration: 0
                             highlightResizeDuration: 0
 
-                            model: addRelationshipDialog.character.unrelatedCharacterNames()
+                            model: dialog.character.unrelatedCharacterNames()
                             delegate: Rectangle {
                                 id: characterRowItem
 
@@ -212,7 +212,7 @@ Item {
                             _private.waitDialog.close()
                             _private.waitDialog = null
 
-                            Qt.callLater(addRelationshipDialog.close)
+                            Qt.callLater(dialog.close)
                         }
                     }
                 }
