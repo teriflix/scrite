@@ -3089,7 +3089,7 @@ Rectangle {
         }
 
         VclMenuItem {
-            text: "Rename Character"
+            text: "Rename/Merge Character"
             onClicked: RenameCharacterDialog.launch(characterContextMenu.character)
         }
 

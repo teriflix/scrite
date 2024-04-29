@@ -4158,7 +4158,7 @@ Rectangle {
             model: characterMenu.characterReports.length > 0 ? 1 : 0
 
             VclMenuItem {
-                text: "Rename Character"
+                text: "Rename/Merge Character"
                 icon.source: "qrc:/icons/screenplay/character.png"
 
                 onTriggered: {

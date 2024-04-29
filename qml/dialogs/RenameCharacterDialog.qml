@@ -57,7 +57,7 @@ Item {
 
             width: 680
             height: 300
-            title: "Rename Character: " + _private.orignalCharacterName
+            title: "Rename/Merge Character: " + _private.orignalCharacterName
 
             content: Item {
                 ColumnLayout {
@@ -102,11 +102,13 @@ Item {
                                 const allCharacterNames = Scrite.document.structure.allCharacterNames()
                                 if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
                                     MessageBox.question("Rename Confirmation",
-                                                        "There is already a character by name <b>" + _private.newCharacterName + "</b>. Are you sure you want to merge that with <i>" + _private.orignalCharacterName + "</i>?",
+                                                        "Are you sure you want to merge " + _private.orignalCharacterName + " with <b>" + _private.newCharacterName + "</b>?",
                                                         ["Yes", "No", "Cancel"],
                                                         (answer) => {
                                                             if(answer === "Yes")
                                                                 renameJob.start()
+                                                            else if(answer === "Cancel")
+                                                                Qt.callLater(dialog.close)
                                                         })
                                 }
                                 else
