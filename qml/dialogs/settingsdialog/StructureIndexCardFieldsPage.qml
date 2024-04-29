@@ -142,7 +142,7 @@ Item {
 
             VclButton {
                 text: "Help"
-                onClicked: MessageBox.information("Sorry!", "No help information available for this feature yet.")
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/index-card-fields/")
             }
 
             Item {
