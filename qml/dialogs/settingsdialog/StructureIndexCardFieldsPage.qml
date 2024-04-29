@@ -50,14 +50,12 @@ Item {
         }
 
         VclLabel {
-            property string note: root.target === root.e_DefaultGlobalTarget ? "<br/><br/><b>NOTE: </b>Fields configured here will not affect index cards in the currently open document!" : ""
-
             Layout.fillWidth: true
 
             wrapMode: Text.WordWrap
             bottomPadding: parent.spacing
 
-            text: "Customise fields that show up on the index cards. For best experience, we have limited the number of fields you can add to " + indexCardFieldsModel.maxCount + ". " + note
+            text: "Customise fields that show up on the index cards."
         }
 
         Item {
@@ -209,7 +207,20 @@ Item {
             VclButton {
                 text: "Apply"
                 enabled: indexCardFieldsModel.modified
-                onClicked: indexCardFieldsModel.commit()
+                onClicked: {
+                    indexCardFieldsModel.commit()
+
+                    if(root.target === root.e_DefaultGlobalTarget) {
+                        MessageBox.question("Index card fields in the current document",
+                                            "Do you want to use these index card fields in the current document as well?",
+                                            ["Yes", "No"],
+                                            (answer) => {
+                                                if(answer === "Yes") {
+                                                    Scrite.document.structure.indexCardFields = Scrite.document.structure.defaultIndexCardFields
+                                                }
+                                            })
+                    }
+                }
             }
         }
     }

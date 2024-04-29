@@ -20,8 +20,9 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
+import "qrc:/qml/controls"
 
 Item {
     id: root
@@ -49,13 +50,11 @@ Item {
         }
 
         VclLabel {
-            property string note: root.target === root.e_DefaultGlobalTarget ? "<br/><br/><b>NOTE:</b> Story beats configured here will not affect the currently open document." : ""
-
             Layout.fillWidth: true
 
             wrapMode: Text.WordWrap
 
-            text: "Customize categories & groups you use for tagging index cards on the structure canvas. " + note
+            text: "Customize categories & groups you use for tagging index cards on the structure canvas."
         }
 
         Rectangle {
@@ -106,8 +105,18 @@ Item {
                 onClicked: {
                     if(target === e_CurrentDocumentTarget)
                         Scrite.document.structure.groupsData = storyBeatsEditor.text
-                    else
+                    else {
                         Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
+
+                        MessageBox.question("Story beats in the current document",
+                                            "Do you want to use these story beats in the current document as well?",
+                                            ["Yes", "No"],
+                                            (answer) => {
+                                                if(answer === "Yes") {
+                                                    Scrite.document.structure.groupsData = storyBeatsEditor.text
+                                                }
+                                            })
+                    }
                     enabled = false
                 }
             }
