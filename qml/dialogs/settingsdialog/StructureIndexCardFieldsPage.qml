@@ -68,73 +68,65 @@ Item {
                 width: parent.width
 
                 flow: GridLayout.TopToBottom
-                rows: indexCardFieldsModel.count + 1
+                rows: indexCardFieldsModel.maxCount
                 columns: 3
                 columnSpacing: 20
 
                 // Column 1: labels
-                VclLabel {
-                    font.bold: true
-
-                    text: "Label"
-                }
-
                 Repeater {
-                    model: indexCardFieldsModel
+                    model: indexCardFieldsModel.maxCount
 
                     VclTextField {
                         required property int index
-                        required property string name
 
                         Layout.preferredWidth: Runtime.idealFontMetrics.averageCharacterWidth * (maximumLength+2)
 
-                        text: name
-                        onTextChanged: indexCardFieldsModel.setProperty(index, "name", text)
+                        text: index < indexCardFieldsModel.count ? indexCardFieldsModel.get(index).name : ""
+                        enabled: index <= indexCardFieldsModel.count
+                        opacity: enabled ? 1 : 0.5
+                        placeholderText: text === "" && enabled ? "Label" : ""
+
+                        onTextChanged: indexCardFieldsModel.capture(index, "name", text)
 
                         maximumLength: 5
 
+                        TabSequenceItem.enabled: enabled
                         TabSequenceItem.manager: tabSequenceManager
                         TabSequenceItem.sequence: index * 2
                     }
                 }
 
                 // Column 2: description
-                VclLabel {
-                    Layout.fillWidth: true
-
-                    font.bold: true
-
-                    text: "Description"
-                }
-
                 Repeater {
-                    model: indexCardFieldsModel
+                    model: indexCardFieldsModel.maxCount
 
                     VclTextField {
                         required property int index
-                        required property string description
 
                         Layout.fillWidth: true
-                        text: description
-                        onTextChanged: indexCardFieldsModel.setProperty(index, "description", text)
 
+                        text: index < indexCardFieldsModel.count ? indexCardFieldsModel.get(index).description : ""
+                        enabled: index <= indexCardFieldsModel.count
+                        opacity: enabled ? 1 : 0.5
+                        placeholderText: text === "" && enabled ? "Description" : ""
+
+                        onTextChanged: indexCardFieldsModel.capture(index, "description", text)
+
+                        TabSequenceItem.enabled: enabled
                         TabSequenceItem.manager: tabSequenceManager
                         TabSequenceItem.sequence: index * 2 + 1
                     }
                 }
 
                 // Column 3: delete icon
-                Item {
-                    Layout.preferredWidth: 10
-                    Layout.preferredHeight: 10
-                }
-
                 Repeater {
-                    model: indexCardFieldsModel
+                    model: indexCardFieldsModel.maxCount
 
                     VclToolButton {
                         required property int index
 
+                        enabled: index < indexCardFieldsModel.count
+                        opacity: enabled ? 1 : 0.05
                         icon.source: "qrc:/icons/action/delete.png"
 
                         onClicked: indexCardFieldsModel.remove(index, 1)
@@ -185,20 +177,6 @@ Item {
             }
 
             VclButton {
-                enabled: indexCardFieldsModel.count < indexCardFieldsModel.maxCount
-
-                text: "Add Field"
-
-                onClicked: {
-                    const newItem = {"name": "", "description": ""}
-                    indexCardFieldsModel.append(newItem)
-                    Utils.execLater(tabSequenceManager, 50, () => {
-                                        tabSequenceManager.assumeFocusAt( (indexCardFieldsModel.count-1)*2 )
-                                    } )
-                }
-            }
-
-            VclButton {
                 text: "Revert"
                 enabled: indexCardFieldsModel.canReset
                 onClicked: indexCardFieldsModel.reset()
@@ -211,7 +189,7 @@ Item {
                     indexCardFieldsModel.commit()
 
                     if(root.target === root.e_DefaultGlobalTarget) {
-                        MessageBox.question("Index card fields in the current document",
+                        MessageBox.question("Index Card Fields",
                                             "Do you want to use these index card fields in the current document as well?",
                                             ["Yes", "No"],
                                             (answer) => {
@@ -234,7 +212,7 @@ Item {
     GenericArrayModel {
         id: indexCardFieldsModel
 
-        readonly property int maxCount: 5
+        property int maxCount: 5
 
         property bool modified: false
 
@@ -245,10 +223,21 @@ Item {
 
         Component.onCompleted: {
             reset()
+
             dataChanged.connect(markModified)
+
             rowsInserted.connect(markModified)
             rowsRemoved.connect(markModified)
             modelReset.connect(markModified)
+
+            let zeroMaxCount = () => { maxCount = 0 }
+            let fullMaxCount = () => { maxCount = 5 }
+
+            modelAboutToBeReset.connect(zeroMaxCount)
+            modelReset.connect(fullMaxCount)
+
+            rowsAboutToBeRemoved.connect(zeroMaxCount)
+            rowsRemoved.connect(fullMaxCount)
         }
 
         function markModified() {
@@ -269,6 +258,20 @@ Item {
                 array = source
                 modified = false
             }
+        }
+
+        function capture(row, key, value) {
+            if(row < count)
+                return setProperty(row, key, value)
+
+            if(row === count) {
+                let newItem = {"name": "", "description": ""}
+                newItem[key] = value
+                append(newItem)
+                return
+            }
+
+            return false
         }
     }
 }

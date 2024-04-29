@@ -108,7 +108,7 @@ Item {
                     else {
                         Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
 
-                        MessageBox.question("Story beats in the current document",
+                        MessageBox.question("Story Beats",
                                             "Do you want to use these story beats in the current document as well?",
                                             ["Yes", "No"],
                                             (answer) => {
