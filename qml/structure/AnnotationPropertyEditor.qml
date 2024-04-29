@@ -27,6 +27,7 @@ import "qrc:/qml/helpers"
 
 Item {
     property Annotation annotation
+    property BoundingBoxEvaluator itemsBoundingBox
 
     Flickable {
         id: propertyEditorView
@@ -63,7 +64,7 @@ Item {
                     width: parent.width
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
-                    text: "<b>Position:</b> " + Math.round(annotation.geometry.x-canvasItemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-canvasItemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
+                    text: "<b>Position:</b> " + Math.round(annotation.geometry.x-itemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-itemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
                 }
             }
 
@@ -140,18 +141,18 @@ Item {
                 VclButton {
                     text: "Bring To Front"
                     onClicked: {
-                        var a = annotationGripLoader.annotation
-                        annotationGripLoader.reset()
-                        Scrite.document.structure.bringToFront(a)
+                        // var a = annotationGripLoader.annotation
+                        // annotationGripLoader.reset()
+                        Scrite.document.structure.bringToFront(annotation)
                     }
                 }
 
                 VclButton {
                     text: "Send To Back"
                     onClicked: {
-                        var a = annotationGripLoader.annotation
-                        annotationGripLoader.reset()
-                        Scrite.document.structure.sendToBack(a)
+                        // var a = annotationGripLoader.annotation
+                        // annotationGripLoader.reset()
+                        Scrite.document.structure.sendToBack(annotation)
                     }
                 }
             }
@@ -160,9 +161,9 @@ Item {
                 text: "Delete Annotation"
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
-                    var a = annotationGripLoader.annotation
-                    annotationGripLoader.reset()
-                    Scrite.document.structure.removeAnnotation(a)
+                    // var a = annotationGripLoader.annotation
+                    // annotationGripLoader.reset()
+                    Scrite.document.structure.removeAnnotation(annotation)
                 }
             }
 
