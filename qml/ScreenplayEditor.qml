@@ -1681,7 +1681,7 @@ Rectangle {
                             iconSource: down ? "qrc:/icons/content/form_inverted.png" : "qrc:/icons/content/form.png"
                             suggestedWidth: parent.width
                             suggestedHeight: parent.width
-                            visible: Runtime.screenplayEditorSettings.displayIndexCardFields && Scrite.document.structure.indexCardFields.length > 0
+                            visible: Runtime.screenplayEditorSettings.displayIndexCardFields
                             down: contentView.commentsPanelTabIndex === 2
                             downIndicatorColor: commentsSidePanel.theSceneDarkColor
                             onClicked: contentView.commentsPanelTabIndex = 2
@@ -1868,9 +1868,12 @@ Rectangle {
 
                                     VclToolButton {
                                         Layout.alignment: Qt.AlignRight
+                                        Layout.fillWidth: !icfIcf.hasFields
 
+                                        ToolTip.visible: icfIcf.hasFields ? hovered : false
                                         ToolTip.text: "Edit Index Card Fields"
 
+                                        text: icfIcf.hasFields ? "" : ToolTip.text
                                         icon.source: "qrc:/icons/action/edit.png"
                                         visible: icfItem.sceneIndex === Runtime.screenplayAdapter.currentIndex
 
