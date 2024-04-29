@@ -1595,18 +1595,22 @@ Rectangle {
 
             SidePanel {
                 id: commentsSidePanel
-                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? Runtime.colors.primary.c500.background : contentItem.theScene.color
-                buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
-                backgroundColor: buttonColor
-                borderColor: expanded ? Runtime.colors.primary.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
-                z: contentItem.isCurrent ? 1 : 0
-                borderWidth: contentItem.isCurrent ? 2 : 1
-                anchors.top: parent.top
-                anchors.left: parent.right
 
+                property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? Runtime.colors.primary.c500.background : contentItem.theScene.color
                 property real screenY: screenplayEditor.mapFromItem(parent, 0, 0).y
                 property real maxTopMargin: contentItem.height-height-20
+
+                z: contentItem.isCurrent ? 1 : 0
+
+                anchors.top: parent.top
+                anchors.left: parent.right
                 anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : -1
+
+                buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
+                backgroundColor: buttonColor
+
+                borderColor: expanded ? Runtime.colors.primary.borderColor : (contentView.spacing > 0 ? Scrite.app.translucent(theSceneDarkColor,0.25) : Qt.rgba(0,0,0,0))
+                borderWidth: 0 // contentItem.isCurrent ? 2 : 1
 
                 cornerComponent: expanded ? commentsExpandedSidePanelCornerComponent : commentsCollapsedSidePanelCornerComponent
 
@@ -1620,7 +1624,7 @@ Rectangle {
                             property Attachment sceneFeaturedImage: sceneFeaturedAttachment && sceneFeaturedAttachment.type === Attachment.Photo ? sceneFeaturedAttachment : null
                             property string sceneComments: contentItem.theScene.comments
                             property bool hasSceneComments: sceneComments !== ""
-                            property bool hasIndexCardFields: Scrite.document.structure.indexCardFields.length > 0
+                            property bool hasIndexCardFields: contentItem.theScene.indexCardFieldValues.length > 0
                             width: Math.max((hasSceneComments ? 14 : 12), Math.min(parent.width,parent.height)-(hasSceneComments ? 6 : 10))
                             height: width
                             y: 2
@@ -1726,7 +1730,7 @@ Rectangle {
                     tabBarVisible: false
                     tabColor: commentsSidePanel.theSceneDarkColor
                     currentTabIndex: contentView.commentsPanelTabIndex
-                    currentTabContent: [featuredPhotoComponent,commentsEditComponent,indexCardFieldsComponent][currentTabIndex%3]
+                    currentTabContent: [commentsEditComponent,featuredPhotoComponent,indexCardFieldsComponent][currentTabIndex%3]
 
                     Component {
                         id: featuredPhotoComponent
@@ -1807,6 +1811,7 @@ Rectangle {
                                 anchors.margins: 5
                                 anchors.rightMargin: 0
 
+                                clip: interactive
                                 contentY: 0
                                 contentWidth: icfLayout.width
                                 contentHeight: icfLayout.height
