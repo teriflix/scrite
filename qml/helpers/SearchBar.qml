@@ -70,7 +70,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: searchButtonsRow.left
                 anchors.margins: 5
-                placeholderText: "search"
+                placeholderText: "Search"
                 KeyNavigation.tab: replaceUiRect.visible ? txtReplace : null
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 Keys.onReturnPressed: triggerSearch()
@@ -198,7 +198,7 @@ Item {
                 anchors.left: parent.left
                 anchors.right: replaceButtonsRow.left
                 anchors.margins: 5
-                placeholderText: "replace"
+                placeholderText: "Replace"
                 KeyNavigation.backtab: txtSearch
                 KeyNavigation.priority: KeyNavigation.BeforeItem
                 Keys.onReturnPressed: cmdReplace.click()
