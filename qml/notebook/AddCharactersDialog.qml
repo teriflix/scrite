@@ -157,13 +157,26 @@ Item {
                         VclButton {
                             text: "Add Selected"
                             onClicked: {
+                                let count = 0
                                 for(let i=0; i<charactersCheckBoxes.count; i++) {
                                     let checkBox = charactersCheckBoxes.itemAt(i)
-                                    if(checkBox.checked)
-                                        Scrite.document.structure.addCharacter(checkBox.text)
+                                    if(checkBox.checked) {
+                                        const ch = Scrite.document.structure.addCharacter(checkBox.text)
+                                        if(ch)
+                                            count = count+1
+                                    }
                                 }
+
+                                if(count > 0)
+                                    MessageBox.information("Characters Added",
+                                                           "A total of " + (count === 1 ? "one character was" : count + " characters were") + " added.",
+                                                           dialog.close)
+                                else
+                                    MessageBox.information("No Characters Added",
+                                                           "No characters were added.",
+                                                           dialog.close)
+
                                 _private.switchToCharactersTabLater()
-                                Qt.callLater(dialog.close)
                             }
                         }
                     }
