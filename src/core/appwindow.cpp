@@ -139,7 +139,9 @@ static inline QString getFileNameToOpenFromAppArgs()
     QString ret;
 
     QStringList appArgs = qApp->arguments();
-    if (appArgs.size() > 1) {
+    appArgs.takeFirst(); // Get rid of application file name
+
+    if (!appArgs.isEmpty()) {
         if (appArgs.contains("--openAnonymously"))
             return ret;
 
@@ -157,17 +159,17 @@ static inline QString getFileNameToOpenFromAppArgs()
             removeArgs(index, 5);
 
 #ifdef Q_OS_WIN
-        ret = appArgs.last();
+        ret = appArgs.isEmpty() ? QString() : appArgs.last();
 #else
-        QStringList args = appArgs;
-        args.takeFirst();
-        ret = args.join(QStringLiteral(" "));
+        ret = appArgs.join(QStringLiteral(" "));
 #endif
     }
 
-    QFileInfo fi(ret);
-    if (fi.exists() && fi.isReadable())
-        return ret;
+    if (!ret.isEmpty()) {
+        QFileInfo fi(ret);
+        if (fi.exists() && fi.isReadable())
+            return ret;
+    }
 
     return QString();
 }
