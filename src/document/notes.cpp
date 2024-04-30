@@ -773,6 +773,16 @@ void Notes::setNotes(const QList<Note *> &list)
     this->assign(list);
 }
 
+void Notes::moveNotes(Notes *target)
+{
+    if (this->isEmpty() || target == nullptr)
+        return;
+
+    QList<Note *> &list = this->list();
+    while (!list.isEmpty())
+        target->addNote(list.takeFirst());
+}
+
 void Notes::removeNote(Note *ptr)
 {
     if (ptr == nullptr)

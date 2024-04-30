@@ -58,6 +58,12 @@ public:
     QList<T> &list() { return m_list; }
     const QList<T> &list() const { return m_list; }
     const QList<T> &constList() const { return m_list; }
+    const QList<T> sortedList(std::function<bool(T, T)> lessThanFunc) const
+    {
+        QList<T> ret = m_list;
+        std::sort(ret.begin(), ret.end(), lessThanFunc);
+        return ret;
+    }
 
     bool empty() const { return m_list.empty(); }
     bool isEmpty() const { return m_list.isEmpty(); }

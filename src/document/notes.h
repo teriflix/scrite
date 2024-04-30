@@ -252,6 +252,7 @@ private:
     void setId(const QString &val);
     void addNote(Note *ptr);
     void setNotes(const QList<Note *> &list);
+    void moveNotes(Notes *target);
     void renameCharacter(const QString &from, const QString &to);
 
 private:

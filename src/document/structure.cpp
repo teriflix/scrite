@@ -1164,6 +1164,8 @@ Character::Character(QObject *parent)
     });
 
     if (m_structure) {
+        connect(this, &Character::nameChanged, m_structure,
+                &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
         connect(this, &Character::tagsChanged, m_structure,
                 &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
         connect(this, &Character::priorityChanged, m_structure,
@@ -1182,35 +1184,105 @@ void Character::setName(const QString &val)
     emit nameChanged();
 }
 
-bool Character::rename(const QString &name)
+bool Character::rename(const QString &givenName)
 {
     if (m_structure == nullptr)
         return false;
+
+    const QString newNameUpper = givenName.trimmed().toUpper();
+    const QString newNameCamel = Application::camelCased(newNameUpper);
 
     HourGlass hourGlass;
 
     this->clearRenameError();
 
     QString errMsg;
-    const bool ret = m_structure->renameCharacter(m_name, name, &errMsg);
+    const bool ret = m_structure->renameCharacter(m_name, newNameUpper, &errMsg);
 
     if (ret) {
         if (m_notes)
-            m_notes->renameCharacter(m_name, name);
+            m_notes->renameCharacter(m_name, newNameCamel);
 
         {
             int nrReplacements = 0;
             const QJsonObject newSummary = Application::replaceCharacterName(
-                    m_name, name, m_summary.toObject(), &nrReplacements);
+                    m_name, newNameCamel, m_summary.toObject(), &nrReplacements);
             if (nrReplacements > 0) {
                 m_summary = newSummary;
                 emit summaryChanged();
             }
         }
 
+        const bool merging = m_structure->allCharacterNames().contains(newNameUpper);
+
+        if (merging) {
+            Character *mergeWith = m_structure->findCharacter(newNameUpper);
+            if (mergeWith == nullptr)
+                mergeWith = m_structure->addCharacter(newNameUpper);
+
+            if (mergeWith) {
+                // Merge notes
+                m_notes->moveNotes(mergeWith->notes());
+
+                // Merge attachments
+                m_attachments->moveAttachments(mergeWith->attachments());
+
+                // Merge photos
+                mergeWith->m_photos += m_photos;
+
+                // Create summary of this character as a note in the merged character
+                const QString newLine = QStringLiteral("\n");
+
+                QString metaDataNoteContent;
+                QTextStream ts(&metaDataNoteContent, QIODevice::WriteOnly);
+                if (!m_type.isEmpty())
+                    ts << "Type: " << m_type << newLine;
+                if (!m_designation.isEmpty())
+                    ts << "Designation: " << m_designation << newLine;
+                if (!m_gender.isEmpty())
+                    ts << "Gender: " << m_gender << newLine;
+                if (!m_age.isEmpty())
+                    ts << "Age: " << m_age << newLine;
+                if (!m_height.isEmpty())
+                    ts << "Height: " << m_height << newLine;
+                if (!m_weight.isEmpty())
+                    ts << "Weight: " << m_weight << newLine;
+                if (!m_bodyType.isEmpty())
+                    ts << "Body Type: " << m_bodyType << newLine;
+                if (!m_aliases.isEmpty())
+                    ts << "Aliases: " << m_aliases.join(", ") << newLine;
+                ts.flush();
+
+                if (!metaDataNoteContent.isEmpty()) {
+                    Note *metaDataNote = mergeWith->notes()->addTextNote();
+                    metaDataNote->setTitle(QStringLiteral("Meta data merged from ") + m_name);
+                    metaDataNote->setContent(metaDataNoteContent);
+                }
+
+                if (!m_summary.isUndefined()) {
+                    Note *summaryNote = mergeWith->notes()->addTextNote();
+                    summaryNote->setTitle(QStringLiteral("Summary merged from ") + m_name);
+                    summaryNote->setContent(m_summary);
+                }
+
+                // Create relationships in the merged character, that mimic those in this one.
+                for (int i = 0; i < m_relationships.objectCount(); i++) {
+                    Relationship *relationship = m_relationships.at(i);
+                    if (relationship->of() == this)
+                        mergeWith->addRelationship(relationship->name(), relationship->with());
+                    else
+                        relationship->with()->addRelationship(relationship->name(), mergeWith);
+                }
+            }
+
+            // Since this character is merged, we won't need this object to stick around
+            // anymore.
+            QTimer::singleShot(100, this, [=]() { m_structure->removeCharacter(this); });
+        }
+
         this->setCharacterRelationshipGraph(QJsonObject());
         m_structure->setCharacterRelationshipGraph(QJsonObject());
-        m_name = name.toUpper().trimmed();
+        m_name = newNameUpper;
         emit nameChanged();
     }
 
@@ -1866,11 +1938,18 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
     }
 }
 
+bool Character::LessThan(Character *a, Character *b)
+{
+    return a->name().localeAwareCompare(b->name()) < 0;
+}
+
 bool Character::event(QEvent *event)
 {
     if (event->type() == QEvent::ParentChange) {
         m_structure = qobject_cast<Structure *>(this->parent());
         if (m_structure) {
+            connect(this, &Character::nameChanged, m_structure,
+                    &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
             connect(this, &Character::tagsChanged, m_structure,
                     &Structure::updateCharacterNamesShotsTransitionsAndTagsLater);
             connect(this, &Character::priorityChanged, m_structure,
@@ -3679,7 +3758,7 @@ bool Structure::renameCharacter(const QString &from, const QString &to, QString 
 
     // Rename in notes
     if (m_notes)
-        m_notes->renameCharacter(from, to);
+        m_notes->renameCharacter(from2, to2);
 
     return true;
 }
@@ -4735,7 +4814,7 @@ void Structure::write(QTextCursor &cursor, const WriteOptions &options) const
 {
     if (options.includeTextNotes || options.includeFormNotes) {
         if (options.charactersOnly) {
-            const QList<Character *> characters = m_characters.list();
+            const QList<Character *> characters = m_characters.sortedList(&Character::LessThan);
             const QStringList allCharacterNames = m_characterNames;
             const QStringList infoLessCharacterNames = [=]() -> QStringList {
                 QStringList ret = allCharacterNames;

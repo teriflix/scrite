@@ -1487,13 +1487,13 @@ Item {
                     var ch = Scrite.document.structure.findCharacter(characterName)
                     if(ch === null)
                         Scrite.document.structure.addCharacter(characterName)
-                    Announcement.shout("7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8", characterName)
+                    Announcement.shout(Runtime.announcementIds.characterNotesRequest, characterName)
                 }
             }
 
             onAdditionalSceneMenuItemClicked: {
                 if(menuItemName === "Scene Notes")
-                    Announcement.shout("41EE5E06-FF97-4DB6-B32D-F938418C9529", undefined)
+                    Announcement.shout(Runtime.announcementIds.sceneNotesRequest, undefined)
             }
 
             BasicAttachmentsDropArea {
@@ -1640,13 +1640,13 @@ Item {
                                                     notebookViewLoader.item.switchTo(sdata)
                                                 })
                                         }
-                                    } else if(stype === "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8") {
+                                    } else if(stype === Runtime.announcementIds.characterNotesRequest) {
                                         structureEditorTabs.currentTabIndex = 1
                                         Utils.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToCharacterTab(data)
                                         })
                                     }
-                                    else if(stype === "41EE5E06-FF97-4DB6-B32D-F938418C9529") {
+                                    else if(stype === Runtime.announcementIds.sceneNotesRequest) {
                                         structureEditorTabs.currentTabIndex = 1
                                         Utils.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToSceneTab(data)

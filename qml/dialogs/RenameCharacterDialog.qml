@@ -101,8 +101,60 @@ Item {
 
                                 const allCharacterNames = Scrite.document.structure.allCharacterNames()
                                 if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
-                                    MessageBox.question("Rename Confirmation",
-                                                        "Are you sure you want to merge " + _private.orignalCharacterName + " with <b>" + _private.newCharacterName + "</b>?",
+
+                                    let question = "Merging " + _private.orignalCharacterName + " with <b>" + _private.newCharacterName + "</b>"
+
+                                    const originalCh = Scrite.document.structure.findCharacter(_private.orignalCharacterName)
+                                    const newCh = Scrite.document.structure.findCharacter(_private.newCharacterName)
+                                    if(originalCh) {
+                                        let points = []
+
+                                        const ntos = (number) => {
+                                            const nos = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+                                            if(number > 10)
+                                                return ""+number
+                                            return nos[number]
+                                        }
+
+                                        if(originalCh.notes.noteCount > 0)
+                                            points.push(ntos(originalCh.notes.noteCount) + " note(s)")
+                                        if(originalCh.attachments.attachmentCount > 0)
+                                            points.push(ntos(originalCh.attachments.attachmentCount) + " attachment(s)")
+                                        if(originalCh.photos.length > 0)
+                                            points.push(ntos(originalCh.photos.length) + " photo(s)")
+                                        if(originalCh.relationshipCount > 0)
+                                            points.push(ntos(originalCh.relationshipCount) + " relationship(s)")
+
+                                        if(points.length > 0) {
+                                            question += ", along with "
+
+                                            if(points.length > 1) {
+                                                question += "<br/><ul>"
+
+                                                for(let p=0; p<points.length; p++) {
+                                                    let suffix = "."
+                                                    if(points.length > 1) {
+                                                        if(p < points.length-2)
+                                                            suffix = ","
+                                                        else if(p === points.length-2)
+                                                            suffix = ", and"
+                                                    }
+                                                    question += "<li>" + points[p] + suffix + "</li>"
+                                                }
+                                                question += "</ul>"
+                                            } else
+                                                question += points[0] + ".<br/>"
+                                        } else {
+                                            question += ".<br/>"
+                                        }
+                                    } else {
+                                        question += ".<br/>"
+                                    }
+
+                                    question += "<br/>Are you sure you want to do this?"
+
+                                    MessageBox.question("Merge Confirmation",
+                                                        question,
                                                         ["Yes", "No", "Cancel"],
                                                         (answer) => {
                                                             if(answer === "Yes")
@@ -154,9 +206,10 @@ Item {
                             Qt.callLater(_private.waitDialog.close)
                             _private.waitDialog = null
 
-                            if(_private.renameWasSuccessful)
+                            if(_private.renameWasSuccessful) {
+                                Announcement.shout(Runtime.announcementIds.characterNotesRequest, _private.newCharacterName)
                                 Qt.callLater(dialog.close)
-                            else
+                            } else
                                 MessageBox.information("Rename Error", dialog.character.renameError, () => {
                                                            dialog.character.clearRenameError()
                                                            Qt.callLater(dialog.close)

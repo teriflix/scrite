@@ -527,6 +527,16 @@ void Attachments::evaluateFeaturedAttachmentLater()
     m_evalutateFeaturedAttachmentTimer->start();
 }
 
+void Attachments::moveAttachments(Attachments *target)
+{
+    if (this->isEmpty() || target == nullptr)
+        return;
+
+    QList<Attachment *> list = this->list();
+    while (!list.isEmpty())
+        target->includeAttachment(list.takeFirst());
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 AttachmentsDropArea::AttachmentsDropArea(QQuickItem *parent) : QQuickItem(parent)

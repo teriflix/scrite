@@ -104,7 +104,7 @@ Item {
 
                     VclLabel {
                         Layout.fillWidth: true
-                        horizontalAlignment: lineCount > 2 ? Text.AlignLeft : Text.AlignHCenter
+                        horizontalAlignment: lineCount > 3 ? Text.AlignLeft : Text.AlignHCenter
                         text: dialog.message
                         wrapMode: Text.WordWrap
                     }

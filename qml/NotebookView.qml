@@ -74,6 +74,28 @@ Rectangle {
             notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(item) )
     }
 
+    Announcement.onIncoming: (type, data) => {
+                                 if(type === Runtime.announcementIds.characterNotesRequest) {
+                                     switchToCharacterTab(data)
+                                 } else if(type === Runtime.announcementIds.sceneNotesRequest) {
+                                     switchToSceneTab()
+                                 } else if(type === Runtime.announcementIds.notebookNodeRequest) {
+                                     if(typeof data === "string") {
+                                         switch(data) {
+                                             case "Story":
+                                                switchToStoryTab()
+                                                break
+                                             case "Screenplay":
+                                                switchTo("Notebook Story");
+                                                break
+                                             case "Characters":
+                                                switchTo("Notebook Characters");
+                                                break
+                                         }
+                                     }
+                                 }
+                             }
+
     NotebookModel {
         id: notebookModel
         document: Scrite.document.loading ? null : Scrite.document
@@ -2296,9 +2318,11 @@ Rectangle {
                                     VclTextField {
                                         id: characterNameField
                                         Layout.fillWidth: true
-                                        completionStrings: Scrite.document.structure.characterNames
-                                        placeholderText: Scrite.document.readOnly ? "Enter character name to search." : "Enter character name to search/add."
+
                                         label: ""
+                                        placeholderText: Scrite.document.readOnly ? "Enter character name to search." : "Enter character name to search/add."
+                                        completionStrings: Scrite.document.structure.characterNames
+
                                         onReturnPressed: characterAddButton.click()
                                     }
 
@@ -3081,8 +3105,11 @@ Rectangle {
 
     VclMenu {
         id: characterContextMenu
+
         property Character character
         property Item characterItem
+
+        width: 250
         enabled: character
 
         onAboutToHide: character = null
@@ -3098,6 +3125,25 @@ Rectangle {
         VclMenuItem {
             text: "Rename/Merge Character"
             onClicked: RenameCharacterDialog.launch(characterContextMenu.character)
+        }
+
+        VclMenu {
+            title: "Reports"
+
+            width: 250
+
+            Repeater {
+                model: Runtime.characterReports
+
+                VclMenuItem {
+                    required property var modelData
+
+                    text: modelData.name
+                    icon.source: "qrc" + modelData.icon
+
+                    onTriggered: ReportConfigurationDialog.launch(modelData.name, {"characterNames": [characterContextMenu.character.name]})
+                }
+            }
         }
 
         MenuSeparator { }

@@ -94,9 +94,9 @@ TextField {
         property bool allowEnable: true
         property string suggestion: currentCompletion
         property bool hasSuggestion: count > 0
-        enabled: allowEnable && textField.activeFocus
+        enabled: allowEnable && textField.activeFocus && textField.length >= textField.minimumCompletionPrefixLength
         sortStrings: false
-        completionPrefix: textField.length >= textField.minimumCompletionPrefixLength ? textField.text : ""
+        completionPrefix: textField.text
         filterKeyStrokes: textField.activeFocus
         onRequestCompletion: autoCompleteOrFocusNext(tabItemUponReturn)
         property bool hasItems: count > 0

@@ -559,6 +559,8 @@ public:
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
+    static bool LessThan(Character *a, Character *b);
+
 protected:
     bool event(QEvent *event);
 

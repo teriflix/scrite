@@ -14,7 +14,6 @@
 #ifndef ATTACHMENTS_H
 #define ATTACHMENTS_H
 
-#include "qobjectproperty.h"
 #include "qobjectserializer.h"
 #include "qobjectlistmodel.h"
 
@@ -22,6 +21,8 @@
 #include <QMimeType>
 #include <QQuickItem>
 #include <QQmlEngine>
+
+class Character;
 
 class Attachment : public QObject, public QObjectSerializer::Interface
 {
@@ -181,7 +182,10 @@ private:
     void evaluateFeaturedAttachment();
     void evaluateFeaturedAttachmentLater();
 
+    void moveAttachments(Attachments *target);
+
 private:
+    friend class Character;
     AllowedType m_allowedType = DocumentsOfAnyType;
     QStringList m_nameFilters;
     Attachment *m_featuredAttachment = nullptr;

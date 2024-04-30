@@ -161,12 +161,25 @@ Item {
                                     let checkBox = charactersCheckBoxes.itemAt(i)
                                     Scrite.document.structure.addCharacter(checkBox.text)
                                 }
+                                _private.switchToCharactersTabLater()
                                 Qt.callLater(dialog.close)
                             }
                         }
                     }
                 }
             }
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        function switchToCharactersTabLater() {
+            Utils.execLater(_private, 200, switchToCharactersTabNow)
+        }
+
+        function switchToCharactersTabNow() {
+            Announcement.shout(Runtime.announcementIds.notebookNodeRequest, "Characters")
         }
     }
 }

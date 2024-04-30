@@ -204,7 +204,8 @@ bool NotebookReport::doGenerate(QTextDocument *doc)
         }
 
         addSection(QLatin1String("Character Notes"));
-        const QList<Character *> characters = structure->charactersModel()->list();
+        const QList<Character *> characters =
+                structure->charactersModel()->sortedList(&Character::LessThan);
         for (Character *character : characters)
             character->write(cursor);
     }
