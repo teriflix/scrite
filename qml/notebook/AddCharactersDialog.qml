@@ -159,7 +159,8 @@ Item {
                             onClicked: {
                                 for(let i=0; i<charactersCheckBoxes.count; i++) {
                                     let checkBox = charactersCheckBoxes.itemAt(i)
-                                    Scrite.document.structure.addCharacter(checkBox.text)
+                                    if(checkBox.checked)
+                                        Scrite.document.structure.addCharacter(checkBox.text)
                                 }
                                 _private.switchToCharactersTabLater()
                                 Qt.callLater(dialog.close)
