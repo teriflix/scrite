@@ -1867,7 +1867,7 @@ Rectangle {
                                     }
 
                                     VclToolButton {
-                                        Layout.alignment: Qt.AlignRight
+                                        Layout.alignment: Qt.AlignLeft
                                         Layout.fillWidth: !icfIcf.hasFields
 
                                         ToolTip.visible: icfIcf.hasFields ? hovered : false
