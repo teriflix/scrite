@@ -57,13 +57,14 @@ Row {
     FlatToolButton {
         id: findButton
         iconSource: "qrc:/icons/action/search.png"
-        ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + Scrite.app.polishShortcutTextForDisplay(shortcut) + ")"
+        ToolTip.text: "Toggles the search & replace panel in screenplay editor.\t(" + Scrite.app.polishShortcutTextForDisplay(findShortcut.sequence) + ")"
         down: Runtime.screenplayEditor ? Runtime.screenplayEditor.searchBarVisible : false
         enabled: Runtime.screenplayEditor
         onClicked: Runtime.screenplayEditor.searchBarVisible = !Runtime.screenplayEditor.searchBarVisible
     }
 
     Shortcut {
+        id: findShortcut
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+F"
         onActivated: Runtime.screenplayEditor.toggleSearchBar(false)
