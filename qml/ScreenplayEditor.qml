@@ -1832,7 +1832,14 @@ Rectangle {
                                         id: icfSynopsis
 
                                         Layout.fillWidth: true
-                                        Layout.preferredHeight: Math.max(icfItem.height * 0.5, contentHeight + Runtime.idealFontMetrics.lineSpacing*2, icfFlickable.height-icfIcf.height-parent.spacing)
+                                        Layout.preferredHeight: {
+                                            if(icfIcf.hasFields)
+                                                return Math.max(icfItem.height * 0.5,
+                                                         contentHeight + Runtime.idealFontMetrics.lineSpacing*2,
+                                                         icfFlickable.height-icfIcf.height-parent.spacing)
+                                            return Math.max(contentHeight + Runtime.idealFontMetrics.lineSpacing*2,
+                                                        icfFlickable.height-icfEditButton.height-parent.spacing)
+                                        }
 
                                         visible: !Runtime.screenplayEditorSettings.displaySceneSynopsis
                                         readOnly: Scrite.document.readOnly
@@ -1859,6 +1866,7 @@ Rectangle {
                                         Layout.fillWidth: true
 
                                         lod: eHIGH
+                                        visible: hasFields
                                         wrapMode: TextInput.WrapAtWordBoundaryOrAnywhere
                                         structureElement: icfItem.scene.structureElement
                                         startTabSequence: 1
@@ -1867,6 +1875,8 @@ Rectangle {
                                     }
 
                                     VclToolButton {
+                                        id: icfEditButton
+
                                         Layout.alignment: Qt.AlignLeft
                                         Layout.fillWidth: !icfIcf.hasFields
 
