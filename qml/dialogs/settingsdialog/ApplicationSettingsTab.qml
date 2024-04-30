@@ -26,7 +26,7 @@ import "qrc:/qml/helpers"
 PageView {
     id: root
 
-    pagesArray: ["Options"] // , "Theme"]
+    pagesArray: ["Options", "Theme"]
     currentIndex: 0
     pageContent: Loader {
         width: root.availablePageContentWidth

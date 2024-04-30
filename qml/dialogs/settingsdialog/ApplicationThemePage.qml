@@ -57,9 +57,12 @@ Item {
 
                     ColumnLayout {
                         spacing: 10
+                        enabled: false
 
                         RowLayout {
                             Layout.alignment: Qt.AlignHCenter
+
+                            opacity: 0.75
 
                             VclLabel {
                                 text: "Primary"
@@ -79,6 +82,7 @@ Item {
                         }
 
                         GridLayout {
+                            opacity: 0.25
                             columns: 4
                             rowSpacing: 6
                             columnSpacing: 6
