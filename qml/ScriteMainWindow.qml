@@ -1176,6 +1176,7 @@ Item {
     Loader {
         id: mainUiContentLoader
         active: allowContent && !Scrite.document.loading
+        opacity: 0
         visible: !pdfViewer.active
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
@@ -1208,6 +1209,8 @@ Item {
                              mainUiContentLoader.active = true
                          }, callback )
         }
+
+        Component.onCompleted: Utils.execLater(mainUiContentLoader, 200, () => { mainUiContentLoader.opacity = 1 } )
     }
 
     Rectangle {
