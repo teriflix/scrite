@@ -401,7 +401,7 @@ Item {
         readonly property int defaultAccentColor: Material.DeepPurple
 
         readonly property Colors primary: Colors {
-            key: applicationSettings.primaryColor
+            key: Material.Grey // applicationSettings.primaryColor
         }
 
         readonly property Colors accent: Colors {

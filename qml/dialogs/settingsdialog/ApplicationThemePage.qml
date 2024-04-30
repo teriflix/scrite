@@ -28,18 +28,62 @@ Item {
     id: root
     height: layout.height + 2*layout.margin
 
-    ColumnLayout {
+    GridLayout {
         id: layout
 
         readonly property real margin: 10
 
-        width: parent.width-margin
-        y: margin
+        width: parent.width-2*margin
+        y: margin*2
 
-        spacing: 20
+        columns: 2
+        rowSpacing: margin*2
+        columnSpacing: margin*2
+
+        RowLayout {
+            Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
+            spacing: 10
+
+            VclLabel {
+                id: themeLabel
+                text: "Theme: "
+            }
+
+            VclComboBox {
+                id: themesComboBox
+
+                Layout.fillWidth: true
+
+                enabled: Runtime.currentUseSoftwareRenderer === false
+
+                model: Scrite.app.availableThemes
+                readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
+                currentIndex: {
+                    const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.theme)
+                    if(idx < 0)
+                        return materialStyleIndex
+                    return idx
+                }
+                onCurrentTextChanged: {
+                    Runtime.applicationSettings.theme = currentText
+                    if(Runtime.currentTheme !== currentText)
+                        MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
+                }
+
+                ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
+                ToolTip.visible: hovered
+                ToolTip.delay: 1000
+            }
+        }
+
+        Item {
+            Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
+            Layout.fillHeight: true
+        }
 
         GroupBox {
-            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop
+            Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
 
             label: VclLabel {
                 text: "Colors"
@@ -47,147 +91,64 @@ Item {
 
             ColumnLayout {
                 width: parent.width
+                spacing: 10
 
-                spacing: 20
-
-                RowLayout {
+                GridLayout {
                     Layout.alignment: Qt.AlignHCenter
 
-                    spacing: parent.spacing * 2
+                    columns: 4
+                    rowSpacing: 6
+                    columnSpacing: 6
 
-                    ColumnLayout {
-                        spacing: 10
-                        enabled: false
+                    Repeater {
+                        model: _private.availableColorOptions
 
-                        RowLayout {
-                            Layout.alignment: Qt.AlignHCenter
+                        Rectangle {
+                            required property int modelData
 
-                            opacity: 0.75
+                            implicitWidth: _private.colorSelectorSize
+                            implicitHeight: _private.colorSelectorSize
+
+                            color: Material.color(modelData)
 
                             VclLabel {
-                                text: "Primary"
+                                anchors.centerIn: parent
+                                text: "✓"
+                                color: Scrite.app.textColorFor(parent.color)
+                                visible: Runtime.colors.accent.key === modelData
                             }
 
-                            FlatToolButton {
-                                ToolTip.text: "Reset default accent color"
-
-                                iconSource: "qrc:/icons/action/reset.png"
-                                enabled: Runtime.colors.primary.key !== Runtime.colors.defaultPrimaryColor
-
+                            MouseArea {
+                                anchors.fill: parent
                                 onClicked: {
-                                    Runtime.colors.primary.key = Runtime.colors.defaultPrimaryColor
-                                    Runtime.applicationSettings.primaryColor = Runtime.colors.defaultPrimaryColor
-                                }
-                            }
-                        }
-
-                        GridLayout {
-                            opacity: 0.25
-                            columns: 4
-                            rowSpacing: 6
-                            columnSpacing: 6
-
-                            Repeater {
-                                model: _private.availableColorOptions
-
-                                Rectangle {
-                                    required property int modelData
-
-                                    implicitWidth: _private.colorSelectorSize
-                                    implicitHeight: _private.colorSelectorSize
-
-                                    color: Material.color(modelData)
-
-                                    VclLabel {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        color: Scrite.app.textColorFor(parent.color)
-                                        visible: Runtime.colors.primary.key === modelData
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            Runtime.colors.primary.key = modelData
-                                            Runtime.applicationSettings.primaryColor = modelData
-                                        }
-                                    }
+                                    Runtime.colors.accent.key = modelData
+                                    Runtime.applicationSettings.accentColor = modelData
                                 }
                             }
                         }
                     }
+                }
 
-                    Rectangle {
-                        Layout.fillHeight: true
+                ToolButton {
+                    Layout.alignment: Qt.AlignHCenter
 
-                        implicitWidth: 1
+                    text: "Reset"
+                    enabled: Runtime.colors.accent.key !== Runtime.colors.defaultAccentColor
+                    icon.source: "qrc:/icons/action/reset.png"
 
-                        color: Runtime.colors.primary.borderColor
-                    }
-
-                    ColumnLayout {
-                        spacing: 10
-
-                        RowLayout {
-                            Layout.alignment: Qt.AlignHCenter
-
-                            VclLabel {
-                                text: "Accent"
-                            }
-
-                            FlatToolButton {
-                                ToolTip.text: "Reset default accent color"
-
-                                iconSource: "qrc:/icons/action/reset.png"
-                                enabled: Runtime.colors.accent.key !== Runtime.colors.defaultAccentColor
-
-                                onClicked: {
-                                    Runtime.colors.accent.key = Runtime.colors.defaultAccentColor
-                                    Runtime.applicationSettings.accentColor = Runtime.colors.defaultAccentColor
-                                }
-                            }
-                        }
-
-                        GridLayout {
-                            columns: 4
-                            rowSpacing: 6
-                            columnSpacing: 6
-
-                            Repeater {
-                                model: _private.availableColorOptions
-
-                                Rectangle {
-                                    required property int modelData
-
-                                    implicitWidth: _private.colorSelectorSize
-                                    implicitHeight: _private.colorSelectorSize
-
-                                    color: Material.color(modelData)
-
-                                    VclLabel {
-                                        anchors.centerIn: parent
-                                        text: "✓"
-                                        color: Scrite.app.textColorFor(parent.color)
-                                        visible: Runtime.colors.accent.key === modelData
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            Runtime.colors.accent.key = modelData
-                                            Runtime.applicationSettings.accentColor = modelData
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                    onClicked: {
+                        Runtime.colors.accent.key = Runtime.colors.defaultAccentColor
+                        Runtime.applicationSettings.accentColor = Runtime.colors.defaultAccentColor
                     }
                 }
             }
         }
 
         GroupBox {
-            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop
+            Layout.preferredWidth: (parent.width-(parent.columns-1)*parent.columnSpacing)/parent.columns
+
+            enabled: false
 
             label: VclLabel {
                 text: "UI Mode"
@@ -203,23 +164,16 @@ Item {
                     wrapMode: Text.WordWrap
                 }
 
-                RowLayout {
-                    enabled: false
-                    Layout.alignment: Qt.AlignHCenter
+                VclRadioButton {
+                    text: "Light"
+                }
 
-                    spacing: 10
+                VclRadioButton {
+                    text: "Dark"
+                }
 
-                    VclRadioButton {
-                        text: "Light"
-                    }
-
-                    VclRadioButton {
-                        text: "Dark"
-                    }
-
-                    VclRadioButton {
-                        text: "System"
-                    }
+                VclRadioButton {
+                    text: "System"
                 }
             }
         }
@@ -229,22 +183,26 @@ Item {
         id: _private
 
         readonly property var availableColorOptions: [
-                Material.Red,
+                // Material.Red,
                 Material.Pink,
                 Material.Purple,
                 Material.DeepPurple,
+
                 Material.Indigo,
                 Material.Blue,
                 Material.LightBlue,
                 Material.Cyan,
+
                 Material.Teal,
                 Material.Green,
                 Material.LightGreen,
-                Material.Lime,
-                Material.Yellow,
-                Material.Amber	,
-                Material.Orange,
-                Material.DeepOrange,
+                // Material.Lime,
+
+                // Material.Yellow,
+                // Material.Amber,
+                // Material.Orange,
+                // Material.DeepOrange,
+
                 Material.Brown,
                 Material.Grey,
                 Material.BlueGrey

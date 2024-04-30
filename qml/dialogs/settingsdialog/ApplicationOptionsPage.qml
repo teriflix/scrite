@@ -68,41 +68,6 @@ Item {
                     ToolTip.visible: hovered
                     ToolTip.delay: 1000
                 }
-
-                // Move this to ApplicationsThemePage.qml when we open up that
-                RowLayout {
-                    spacing: 10
-
-                    VclLabel {
-                        id: themeLabel
-                        text: "Theme: "
-                        leftPadding: 10
-                    }
-
-                    VclComboBox {
-                        id: themesComboBox
-
-                        enabled: Runtime.currentUseSoftwareRenderer === false
-
-                        model: Scrite.app.availableThemes
-                        readonly property int materialStyleIndex: Scrite.app.availableThemes.indexOf("Material");
-                        currentIndex: {
-                            const idx = Scrite.app.availableThemes.indexOf(Runtime.applicationSettings.theme)
-                            if(idx < 0)
-                                return materialStyleIndex
-                            return idx
-                        }
-                        onCurrentTextChanged: {
-                            Runtime.applicationSettings.theme = currentText
-                            if(Runtime.currentTheme !== currentText)
-                                MessageBox.information("Requires Restart", "Scrite will use <b>" + currentText + "</b> theme upon restart.")
-                        }
-
-                        ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
-                        ToolTip.visible: hovered
-                        ToolTip.delay: 1000
-                    }
-                }
             }
         }
 
