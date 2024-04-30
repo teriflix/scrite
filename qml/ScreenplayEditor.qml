@@ -4111,16 +4111,6 @@ Rectangle {
     }
 
     function requestCharacterMenu(characterName, popupSource) {
-        if(characterMenu.characterReports.length === 0) {
-            var reports = Scrite.document.supportedReports
-            var chReports = []
-            reports.forEach( function(item) {
-                if(item.name.indexOf('Character') >= 0)
-                    chReports.push(item)
-            })
-            characterMenu.characterReports = chReports
-        }
-
         characterMenu.popupSource = popupSource
         characterMenu.characterName = characterName
         characterMenu.popup()
@@ -4128,13 +4118,19 @@ Rectangle {
 
     VclMenu {
         id: characterMenu
-        width: 350
+
         property Item popupSource
         property string characterName
-        property var characterReports: []
+
+        width: 350
+
+        onAboutToHide: {
+            popupSource = null
+            characterName = ""
+        }
 
         Repeater {
-            model: characterMenu.characterReports
+            model: Runtime.characterReports
 
             VclMenuItem {
                 required property var modelData
@@ -4142,16 +4138,12 @@ Rectangle {
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
 
-                onTriggered: {
-                    ReportConfigurationDialog.launch(modelData.name, {"characterNames": [characterMenu.characterName]})
-                    characterMenu.close()
-                    characterMenu.characterName = ""
-                }
+                onTriggered: ReportConfigurationDialog.launch(modelData.name, {"characterNames": [characterMenu.characterName]})
             }
         }
 
         Repeater {
-            model: characterMenu.characterReports.length > 0 ? additionalCharacterMenuItems : []
+            model: Runtime.characterReports.length > 0 ? additionalCharacterMenuItems : []
 
             VclMenuItem {
                 required property var modelData
@@ -4163,7 +4155,7 @@ Rectangle {
         }
 
         Repeater {
-            model: characterMenu.characterReports.length > 0 ? 1 : 0
+            model: Runtime.characterReports.length > 0 ? 1 : 0
 
             VclMenuItem {
                 text: "Rename/Merge Character"

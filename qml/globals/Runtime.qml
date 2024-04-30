@@ -463,6 +463,16 @@ Item {
 
     property bool loadMainUiContent: true
 
+    readonly property var characterReports: {
+        let reports = Scrite.document.supportedReports
+        let ret = []
+        reports.forEach( function(item) {
+            if(item.name.indexOf('Character') >= 0)
+                ret.push(item)
+        })
+        return ret
+    }
+
     // This model provides access to recently accessed files. It is updated from
     // different parts of the UI where opening / saving of files is triggered.
     // Contents of this model is listed in the HomeScreen.
