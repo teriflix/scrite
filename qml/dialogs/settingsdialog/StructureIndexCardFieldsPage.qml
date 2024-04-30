@@ -86,7 +86,7 @@ Item {
                         opacity: enabled ? 1 : 0.5
                         placeholderText: text === "" && enabled ? "Label" : ""
 
-                        onTextChanged: indexCardFieldsModel.capture(index, "name", text)
+                        onTextChanged: indexCardFieldsModel.capture(index, "name", text.trim())
 
                         maximumLength: 5
 
@@ -110,7 +110,7 @@ Item {
                         opacity: enabled ? 1 : 0.5
                         placeholderText: text === "" && enabled ? "Description" : ""
 
-                        onTextChanged: indexCardFieldsModel.capture(index, "description", text)
+                        onTextChanged: indexCardFieldsModel.capture(index, "description", text.trim())
 
                         TabSequenceItem.enabled: enabled
                         TabSequenceItem.manager: tabSequenceManager
