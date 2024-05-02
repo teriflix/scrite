@@ -26,172 +26,159 @@ import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 
-Item {
+DialogLauncher {
     id: root
 
-    parent: Scrite.window.contentItem
+    function launch(relationship) { return doLaunch({"relationship": relationship}) }
 
-    function launch(relationship) {
-        var dlg = dialogComponent.createObject(root, {"relationship": relationship})
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
-        }
+    name: "RelationshipNameEditorDialog"
+    singleInstanceOnly: true
 
-        console.log("Couldn't launch RelationshipNameEditorDialog")
-        return null
-    }
+    dialogComponent: VclDialog {
+        id: dialog
 
-    Component {
-        id: dialogComponent
+        property Relationship relationship
+        property Character ofCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter) : null
+        property Character withCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.withCharacter : relationship.ofCharacter) : null
 
-        VclDialog {
-            id: dialog
+        title: "Edit Relationship"
+        width: 800
+        height: 400
 
-            property Relationship relationship
-            property Character ofCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.ofCharacter : relationship.withCharacter) : null
-            property Character withCharacter: relationship ? (relationship.direction === Relationship.OfWith ? relationship.withCharacter : relationship.ofCharacter) : null
+        content: Item {
+            Component.onCompleted: {
+                Utils.execLater(dialogLayout, 100, function() {
+                    txtRelationshipName.forceActiveFocus()
+                })
+            }
 
-            title: "Edit Relationship"
-            width: 800
-            height: 400
+            ColumnLayout {
+                id: dialogLayout
+                width: parent.width-40
+                anchors.centerIn: parent
+                spacing: 20
 
-            content: Item {
-                Component.onCompleted: {
-                    Utils.execLater(dialogLayout, 100, function() {
-                        txtRelationshipName.forceActiveFocus()
-                    })
-                }
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
 
-                ColumnLayout {
-                    id: dialogLayout
-                    width: parent.width-40
-                    anchors.centerIn: parent
-                    spacing: 20
+                    spacing: 10
 
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-
+                    ColumnLayout {
                         spacing: 10
 
-                        ColumnLayout {
-                            spacing: 10
+                        Rectangle {
+                            Layout.preferredWidth: 150
+                            Layout.preferredHeight: 150
+                            Layout.alignment: Qt.AlignHCenter
 
-                            Rectangle {
-                                Layout.preferredWidth: 150
-                                Layout.preferredHeight: 150
-                                Layout.alignment: Qt.AlignHCenter
+                            color: dialog.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            border.width: 1
+                            border.color: "black"
 
-                                color: dialog.ofCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
-                                border.width: 1
-                                border.color: "black"
-
-                                Image {
-                                    anchors.fill: parent
-                                    source: {
-                                        if(dialog.ofCharacter.hasKeyPhoto > 0)
-                                            return "file:///" + dialog.ofCharacter.keyPhoto
-                                        return "qrc:/icons/content/character_icon.png"
-                                    }
-                                    fillMode: Image.PreserveAspectCrop
-                                    mipmap: true; smooth: true
+                            Image {
+                                anchors.fill: parent
+                                source: {
+                                    if(dialog.ofCharacter.hasKeyPhoto > 0)
+                                    return "file:///" + dialog.ofCharacter.keyPhoto
+                                    return "qrc:/icons/content/character_icon.png"
                                 }
-                            }
-
-                            VclLabel {
-                                Layout.alignment: Qt.AlignHCenter
-                                Layout.preferredWidth: 180
-
-                                elide: Text.ElideRight
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                maximumLineCount: 2
-                                horizontalAlignment: Text.AlignHCenter
-
-                                text: Scrite.app.camelCased(dialog.ofCharacter.name)
+                                fillMode: Image.PreserveAspectCrop
+                                mipmap: true; smooth: true
                             }
                         }
 
-                        VclTextField {
-                            id: txtRelationshipName
+                        VclLabel {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 180
 
-                            Layout.fillWidth: true
+                            elide: Text.ElideRight
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            maximumLineCount: 2
+                            horizontalAlignment: Text.AlignHCenter
 
-                            focus: true
-                            text: dialog.relationship.name
-                            label: "Relationship:"
-                            maximumLength: 50
-                            placeholderText: "husband of, wife of, friends with, reports to ..."
-
-                            readOnly: Scrite.document.readOnly
-                            enableTransliteration: true
-                            onReturnPressed: doneButton.click()
-                        }
-
-                        ColumnLayout {
-                            spacing: 10
-
-                            Rectangle {
-                                Layout.preferredWidth: 150
-                                Layout.preferredHeight: 150
-                                Layout.alignment: Qt.AlignHCenter
-
-                                color: withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
-                                border.width: 1
-                                border.color: "black"
-
-                                Image {
-                                    anchors.fill: parent
-                                    source: {
-                                        if(dialog.withCharacter.hasKeyPhoto > 0)
-                                            return "file:///" + dialog.withCharacter.keyPhoto
-                                        return "qrc:/icons/content/character_icon.png"
-                                    }
-                                    fillMode: Image.PreserveAspectCrop
-                                    mipmap: true; smooth: true
-                                }
-                            }
-
-                            VclLabel {
-                                Layout.alignment: Qt.AlignHCenter
-                                Layout.preferredWidth: 180
-
-                                elide: Text.ElideRight
-                                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                                maximumLineCount: 2
-                                horizontalAlignment: Text.AlignHCenter
-
-                                text: Scrite.app.camelCased(dialog.withCharacter.name)
-                            }
+                            text: Scrite.app.camelCased(dialog.ofCharacter.name)
                         }
                     }
 
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: 20
+                    VclTextField {
+                        id: txtRelationshipName
 
-                        VclButton {
-                            id: revertButton
-                            text: "Revert"
-                            enabled: txtRelationshipName.text !== dialog.relationship.name
-                            onClicked: txtRelationshipName.text = dialog.relationship.name
+                        Layout.fillWidth: true
+
+                        focus: true
+                        text: dialog.relationship.name
+                        label: "Relationship:"
+                        maximumLength: 50
+                        placeholderText: "husband of, wife of, friends with, reports to ..."
+
+                        readOnly: Scrite.document.readOnly
+                        enableTransliteration: true
+                        onReturnPressed: doneButton.click()
+                    }
+
+                    ColumnLayout {
+                        spacing: 10
+
+                        Rectangle {
+                            Layout.preferredWidth: 150
+                            Layout.preferredHeight: 150
+                            Layout.alignment: Qt.AlignHCenter
+
+                            color: withCharacter.photos.length === 0 ? "white" : Qt.rgba(0,0,0,0)
+                            border.width: 1
+                            border.color: "black"
+
+                            Image {
+                                anchors.fill: parent
+                                source: {
+                                    if(dialog.withCharacter.hasKeyPhoto > 0)
+                                    return "file:///" + dialog.withCharacter.keyPhoto
+                                    return "qrc:/icons/content/character_icon.png"
+                                }
+                                fillMode: Image.PreserveAspectCrop
+                                mipmap: true; smooth: true
+                            }
                         }
 
-                        VclButton {
-                            id: doneButton
-                            text: "Change"
-                            enabled: txtRelationshipName.length > 0
-                            onClicked: click()
-                            function click() {
-                                dialog.relationship.name = txtRelationshipName.text.trim()
-                                dialog.close()
-                            }
+                        VclLabel {
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredWidth: 180
+
+                            elide: Text.ElideRight
+                            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                            maximumLineCount: 2
+                            horizontalAlignment: Text.AlignHCenter
+
+                            text: Scrite.app.camelCased(dialog.withCharacter.name)
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 20
+
+                    VclButton {
+                        id: revertButton
+                        text: "Revert"
+                        enabled: txtRelationshipName.text !== dialog.relationship.name
+                        onClicked: txtRelationshipName.text = dialog.relationship.name
+                    }
+
+                    VclButton {
+                        id: doneButton
+                        text: "Change"
+                        enabled: txtRelationshipName.length > 0
+                        onClicked: click()
+                        function click() {
+                            dialog.relationship.name = txtRelationshipName.text.trim()
+                            dialog.close()
                         }
                     }
                 }
             }
-
-            onClosed: relationship = null
         }
+
+        onClosed: relationship = null
     }
 }

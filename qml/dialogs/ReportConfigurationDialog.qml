@@ -44,11 +44,23 @@ Item {
             report: null
         }
 
-        if(typeof report === "string")
+        if(typeof report === "string") {
+            if(_private.dialog) {
+                if(_private.dialog.report.title === report)
+                    return _private.dialog
+                _private.dialog.close()
+            }
             args.report = Scrite.document.createReportGenerator(report)
-        else if(Scrite.app.verifyType(report, "AbstractReportGenerator"))
+        } else if(Scrite.app.verifyType(report, "AbstractReportGenerator")) {
+            if(_private.dialog) {
+                if(_private.dialog.report === report)
+                    return _private.dialog
+                _private.dialog.close()
+            }
             args.report = report
-        else {
+        } else {
+            if(_private.dialog)
+                _private.dialog.close()
             console.log("No report supplied.")
             return null
         }
@@ -61,6 +73,7 @@ Item {
 
         var dlg = _private.dialogComponent.createObject(root, args)
         if(dlg) {
+            _private.dialog = dlg
             dlg.closed.connect(dlg.destroy)
             dlg.open()
             return dlg
@@ -74,5 +87,6 @@ Item {
         id: _private
 
         property Component dialogComponent: Qt.createComponent("./reportconfigurationdialog/impl_ReportConfigurationDialog.qml", Component.PreferSynchronous, root)
+        property VclDialog dialog
     }
 }

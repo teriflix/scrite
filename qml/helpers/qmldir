@@ -6,6 +6,8 @@ BusyIcon 1.0 BusyIcon.qml
 BusyOverlay 1.0 BusyOverlay.qml
 CheckListView 1.0 CheckListView.qml
 ColorMenu 1.0 ColorMenu.qml
+ColorToolButton 1.0 ColorToolButton.qml
+DialogLauncher 1.0 DialogLauncher.qml
 DisabledFeatureNotice 1.0 DisabledFeatureNotice.qml
 FileSelector 1.0 FileSelector.qml
 FlatToolButton 1.0 FlatToolButton.qml

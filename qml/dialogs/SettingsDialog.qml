@@ -23,32 +23,14 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/helpers"
 
-Item {
+DialogLauncher {
     id: root
 
-    parent: Scrite.window.contentItem
+    function launch() { return doLaunch() }
 
-    function launch(exporter) {
-        if(_private.dialogComponent.status !== Component.Ready) {
-            console.log("SettingsDialog is not ready!")
-            return null
-        }
-
-        var dlg = _private.dialogComponent.createObject(root)
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
-        }
-
-        console.log("Couldn't launch SettingsDialog")
-        return null
-    }
-
-    QtObject {
-        id: _private
-
-        property Component dialogComponent: Qt.createComponent("./settingsdialog/impl_SettingsDialog.qml", Component.PreferSynchronous, root)
-    }
+    name: "SettingsDialog"
+    singleInstanceOnly: true
+    dialogComponent: Qt.createComponent("./settingsdialog/impl_SettingsDialog.qml", Component.PreferSynchronous, root)
 }

@@ -26,158 +26,145 @@ import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 
-Item {
+DialogLauncher {
     id: root
 
-    parent: Scrite.window.contentItem
+    function launch() { return doLaunch() }
 
-    function launch() {
-        var dlg = dialogComponent.createObject(root)
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
-        }
+    name: "AddCharactersDialog"
+    singleInstanceOnly: true
 
-        console.log("Couldn't launch AddCharactersDialog")
-        return null
-    }
+    dialogComponent: VclDialog {
+        id: dialog
 
-    Component {
-        id: dialogComponent
+        width: Math.min(750, Scrite.window.width*0.8)
+        height: Math.min(600, Scrite.window.height*0.9)
+        title: "Add Existing Characters"
 
-        VclDialog {
-            id: dialog
+        contentItem: Item {
+            enabled: !Scrite.document.readOnly
 
-            width: Math.min(750, Scrite.window.width*0.8)
-            height: Math.min(600, Scrite.window.height*0.9)
-            title: "Add Existing Characters"
+            GenericArrayModel {
+                id: charactersModel
 
-            contentItem: Item {
-                enabled: !Scrite.document.readOnly
+                Component.onCompleted: {
+                    const allCharacters = Scrite.document.structure.allCharacterNames()
+                    let characters = []
+                    allCharacters.forEach( (character) => {
+                                              const ch = Scrite.document.structure.findCharacter(character)
+                                              if(!ch)
+                                              characters.push(character)
+                                          })
+                    array = characters
+                }
+            }
 
-                GenericArrayModel {
-                    id: charactersModel
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 10
 
-                    Component.onCompleted: {
-                        const allCharacters = Scrite.document.structure.allCharacterNames()
-                        let characters = []
-                        allCharacters.forEach( (character) => {
-                                                const ch = Scrite.document.structure.findCharacter(character)
-                                                if(!ch)
-                                                  characters.push(character)
-                                              })
-                        array = characters
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: "Here are characters in your screenplay who don't already have a page in the Notebook."
+                    wrapMode: Text.WordWrap
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    color: Runtime.colors.primary.c100.background
+                    border.color: Runtime.colors.primary.borderColor
+                    border.width: 1
+
+                    Flickable {
+                        id: charactersFlick
+
+                        anchors.fill: parent
+                        anchors.margins: 1
+
+                        ScrollBar.vertical: VclScrollBar { }
+
+                        clip: contentHeight > height
+                        contentWidth: charactersComboBoxLayout.width
+                        contentHeight: charactersComboBoxLayout.height
+                        flickableDirection: Flickable.VerticalFlick
+
+                        GridLayout {
+                            id: charactersComboBoxLayout
+
+                            width: charactersFlick.ScrollBar.vertical.needed ? charactersFlick.width-20 : charactersFlick.width
+                            columns: 2
+                            rowSpacing: 10
+                            columnSpacing: 10
+
+                            Repeater {
+                                id: charactersCheckBoxes
+                                model: charactersModel
+
+                                VclCheckBox {
+                                    required property string modelData
+
+                                    text: modelData
+                                }
+                            }
+                        }
                     }
                 }
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 20
-                    spacing: 10
+                RowLayout {
+                    Layout.fillWidth: true
+                    spacing: 20
 
-                    VclLabel {
-                        Layout.fillWidth: true
-
-                        text: "Here are characters in your screenplay who don't already have a page in the Notebook."
-                        wrapMode: Text.WordWrap
-                    }
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-
-                        color: Runtime.colors.primary.c100.background
-                        border.color: Runtime.colors.primary.borderColor
-                        border.width: 1
-
-                        Flickable {
-                            id: charactersFlick
-
-                            anchors.fill: parent
-                            anchors.margins: 1
-
-                            ScrollBar.vertical: VclScrollBar { }
-
-                            clip: contentHeight > height
-                            contentWidth: charactersComboBoxLayout.width
-                            contentHeight: charactersComboBoxLayout.height
-                            flickableDirection: Flickable.VerticalFlick
-
-                            GridLayout {
-                                id: charactersComboBoxLayout
-
-                                width: charactersFlick.ScrollBar.vertical.needed ? charactersFlick.width-20 : charactersFlick.width
-                                columns: 2
-                                rowSpacing: 10
-                                columnSpacing: 10
-
-                                Repeater {
-                                    id: charactersCheckBoxes
-                                    model: charactersModel
-
-                                    VclCheckBox {
-                                        required property string modelData
-
-                                        text: modelData
-                                    }
-                                }
+                    VclButton {
+                        text: "Select All"
+                        onClicked: {
+                            for(let i=0; i<charactersCheckBoxes.count; i++) {
+                                let checkBox = charactersCheckBoxes.itemAt(i)
+                                checkBox.checked = true
                             }
                         }
                     }
 
-                    RowLayout {
+                    VclButton {
+                        text: "Unselect All"
+                        onClicked: {
+                            for(let i=0; i<charactersCheckBoxes.count; i++) {
+                                let checkBox = charactersCheckBoxes.itemAt(i)
+                                checkBox.checked = false
+                            }
+                        }
+                    }
+
+                    Item {
                         Layout.fillWidth: true
-                        spacing: 20
+                    }
 
-                        VclButton {
-                            text: "Select All"
-                            onClicked: {
-                                for(let i=0; i<charactersCheckBoxes.count; i++) {
-                                    let checkBox = charactersCheckBoxes.itemAt(i)
-                                    checkBox.checked = true
+                    VclButton {
+                        text: "Add Selected"
+                        onClicked: {
+                            let count = 0
+                            for(let i=0; i<charactersCheckBoxes.count; i++) {
+                                let checkBox = charactersCheckBoxes.itemAt(i)
+                                if(checkBox.checked) {
+                                    const ch = Scrite.document.structure.addCharacter(checkBox.text)
+                                    if(ch)
+                                    count = count+1
                                 }
                             }
-                        }
 
-                        VclButton {
-                            text: "Unselect All"
-                            onClicked: {
-                                for(let i=0; i<charactersCheckBoxes.count; i++) {
-                                    let checkBox = charactersCheckBoxes.itemAt(i)
-                                    checkBox.checked = false
-                                }
-                            }
-                        }
+                            if(count > 0)
+                            MessageBox.information("Characters Added",
+                                                   "A total of " + (count === 1 ? "one character was" : count + " characters were") + " added.",
+                                                   dialog.close)
+                            else
+                            MessageBox.information("No Characters Added",
+                                                   "No characters were added.",
+                                                   dialog.close)
 
-                        Item {
-                            Layout.fillWidth: true
-                        }
-
-                        VclButton {
-                            text: "Add Selected"
-                            onClicked: {
-                                let count = 0
-                                for(let i=0; i<charactersCheckBoxes.count; i++) {
-                                    let checkBox = charactersCheckBoxes.itemAt(i)
-                                    if(checkBox.checked) {
-                                        const ch = Scrite.document.structure.addCharacter(checkBox.text)
-                                        if(ch)
-                                            count = count+1
-                                    }
-                                }
-
-                                if(count > 0)
-                                    MessageBox.information("Characters Added",
-                                                           "A total of " + (count === 1 ? "one character was" : count + " characters were") + " added.",
-                                                           dialog.close)
-                                else
-                                    MessageBox.information("No Characters Added",
-                                                           "No characters were added.",
-                                                           dialog.close)
-
-                                _private.switchToCharactersTabLater()
-                            }
+                            _private.switchToCharactersTabLater()
                         }
                     }
                 }

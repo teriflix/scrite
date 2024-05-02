@@ -23,46 +23,34 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs/homescreen"
 
-Item {
+DialogLauncher {
     id: root
 
-    parent: Scrite.window.contentItem
+    function launch(mode) { return doLaunch({"mode": mode}) }
 
-    function launch(mode) {
-        var dlg = dialogComponent.createObject(root, {"mode": mode})
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
+    name: "HomeScreen"
+    singleInstanceOnly: true
+
+    dialogComponent: VclDialog {
+        id: dialog
+
+        property string mode
+
+        width: Math.min(800, Scrite.window.width*0.9)
+        height: Math.min(width*1.2, Scrite.window.height*0.9)
+        title: "scrite.io"
+
+        contentItem: HomeScreenImpl {
+            mode: dialog.mode
+            onCloseRequest: Qt.callLater(dialog.close)
         }
 
-        console.log("Couldn't launch HomeScreen")
-        return null
-    }
-
-    Component {
-        id: dialogComponent
-
-        VclDialog {
-            id: dialog
-
-            property string mode
-
-            width: Math.min(800, Scrite.window.width*0.9)
-            height: Math.min(width*1.2, Scrite.window.height*0.9)
-            title: "scrite.io"
-
-            contentItem: HomeScreenImpl {
-                mode: dialog.mode
-                onCloseRequest: Qt.callLater(dialog.close)
-            }
-
-            Announcement.onIncoming: (type, data) => {
-                if(type === Runtime.announcementIds.closeHomeScreenRequest)
-                    Qt.callLater(dialog.close)
-            }
+        Announcement.onIncoming: (type, data) => {
+            if(type === Runtime.announcementIds.closeHomeScreenRequest)
+            Qt.callLater(dialog.close)
         }
     }
 }

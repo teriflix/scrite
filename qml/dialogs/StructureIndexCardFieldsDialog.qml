@@ -26,42 +26,29 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/dialogs/settingsdialog"
 
-Item {
+DialogLauncher {
     id: root
 
-    parent: Scrite.window.contentItem
+    function launch() { return doLaunch() }
 
-    function launch() {
-        var dlg = dialogComponent.createObject(root)
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
-        }
+    name: "StructureIndexCardFieldsDialog"
+    singleInstanceOnly: true
 
-        console.log("Couldn't launch StructureIndexCardFieldsDialog")
-        return null
-    }
+    dialogComponent: VclDialog {
+        id: dialog
 
-    Component {
-        id: dialogComponent
+        title: "Customise Index Card Fields"
+        width: Math.min(Scrite.window.width-80, 1050)
+        height: Math.min(Scrite.window.height-80, 750)
 
-        VclDialog {
-            id: dialog
-
-            title: "Customise Index Card Fields"
-            width: Math.min(Scrite.window.width-80, 1050)
-            height: Math.min(Scrite.window.height-80, 750)
-
-            content: PageView {
-                id: pageView
-                pagesArray: ["This Document", "Default Global"]
-                currentIndex: 0
-                pageContent: Loader {
-                    width: pageView.availablePageContentWidth
-                    height: pageView.availablePageContentHeight
-                    sourceComponent: pageView.currentIndex === 0 ? thisDocumentPage : defaultGlobalPage
-                }
+        content: PageView {
+            id: pageView
+            pagesArray: ["This Document", "Default Global"]
+            currentIndex: 0
+            pageContent: Loader {
+                width: pageView.availablePageContentWidth
+                height: pageView.availablePageContentHeight
+                sourceComponent: pageView.currentIndex === 0 ? thisDocumentPage : defaultGlobalPage
             }
         }
     }
@@ -80,5 +67,11 @@ Item {
         StructureIndexCardFieldsPage {
             target: e_DefaultGlobalTarget
         }
+    }
+
+    QtObject {
+        id: _private
+
+        property VclDialog dialog
     }
 }

@@ -22,49 +22,37 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
-Item {
+DialogLauncher {
     id: root
 
-    parent: Scrite.window.contentItem
+    function launch() { return doLaunch() }
 
-    function launch() {
-        var dlg = dialogComponent.createObject(root)
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
+    name: "TermsOfUseDialog"
+    singleInstanceOnly: true
+
+    dialogComponent: VclDialog {
+        id: dialog
+
+        title: "Terms Of Use"
+        width: {
+            const bgImageAspectRatio = 1464.0/978.0
+            return height * bgImageAspectRatio * 0.9
+        }
+        height: {
+            const bgImageHeight = 978
+            return Math.min(bgImageHeight*0.8, Scrite.window.height * 0.8) * 0.9
         }
 
-        console.log("Couldn't launch TermsOfUseDialog")
-        return null
-    }
-
-    Component {
-        id: dialogComponent
-
-        VclDialog {
-            id: dialog
-
-            title: "Terms Of Use"
-            width: {
-                const bgImageAspectRatio = 1464.0/978.0
-                return height * bgImageAspectRatio * 0.9
-            }
-            height: {
-                const bgImageHeight = 978
-                return Math.min(bgImageHeight*0.8, Scrite.window.height * 0.8) * 0.9
-            }
-
-            content: TextEdit {
-                padding: 40
-                readOnly: true
-                font.family: "Courier Prime"
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                text: Scrite.app.fileContents(":/LICENSE.txt")
-                selectByMouse: true
-            }
+        content: TextEdit {
+            padding: 40
+            readOnly: true
+            font.family: "Courier Prime"
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            text: Scrite.app.fileContents(":/LICENSE.txt")
+            selectByMouse: true
         }
     }
 }

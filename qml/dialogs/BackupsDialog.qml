@@ -26,147 +26,134 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
-Item {
+DialogLauncher {
     id: root
 
-    parent: Scrite.window.contentItem
+    function launch() { return doLaunch() }
 
-    function launch() {
-        var dlg = dialogComponent.createObject(root)
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
-        }
+    name: "BackupsDialog"
+    singleInstanceOnly: true
 
-        console.log("Couldn't launch BackupsDialog")
-        return null
-    }
+    dialogComponent: VclDialog {
+        id: dialog
 
-    Component {
-        id: dialogComponent
+        title: "Select a Backup to Load"
+        width: 640
+        height: Math.min(Scrite.window.height*0.9, 550)
 
-        VclDialog {
-            id: dialog
+        content: Item {
+            ColumnLayout {
+                spacing: 20
+                anchors.fill: parent
+                anchors.margins: 20
 
-            title: "Select a Backup to Load"
-            width: 640
-            height: Math.min(Scrite.window.height*0.9, 550)
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
 
-            content: Item {
-                ColumnLayout {
-                    spacing: 20
-                    anchors.fill: parent
-                    anchors.margins: 20
+                    color: Runtime.colors.primary.c200.background
+                    border.width: 1
+                    border.color: Runtime.colors.primary.borderColor
 
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
+                    ListView {
+                        id: backupFilesView
+                        clip: true
+                        anchors.fill: parent
+                        anchors.margins: 1
+                        model: Scrite.document.backupFilesModel
+                        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+                        currentIndex: -1
+                        ScrollBar.vertical: VclScrollBar { flickable: backupFilesView }
+                        highlight: Rectangle {
+                            color: Runtime.colors.primary.highlight.background
+                        }
+                        highlightMoveDuration: 0
+                        highlightResizeDuration: 0
+                        property string currentBackupFilePath
+                        delegate: Item {
+                            width: backupFilesView.width
+                            height: rowLayout.height + 10
 
-                        color: Runtime.colors.primary.c200.background
-                        border.width: 1
-                        border.color: Runtime.colors.primary.borderColor
+                            Row {
+                                id: rowLayout
+                                width: parent.width-20
+                                anchors.verticalCenter: parent.verticalCenter
 
-                        ListView {
-                            id: backupFilesView
-                            clip: true
-                            anchors.fill: parent
-                            anchors.margins: 1
-                            model: Scrite.document.backupFilesModel
-                            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                            currentIndex: -1
-                            ScrollBar.vertical: VclScrollBar { flickable: backupFilesView }
-                            highlight: Rectangle {
-                                color: Runtime.colors.primary.highlight.background
-                            }
-                            highlightMoveDuration: 0
-                            highlightResizeDuration: 0
-                            property string currentBackupFilePath
-                            delegate: Item {
-                                width: backupFilesView.width
-                                height: rowLayout.height + 10
-
-                                Row {
-                                    id: rowLayout
-                                    width: parent.width-20
-                                    anchors.verticalCenter: parent.verticalCenter
-
-                                    VclLabel {
-                                        width: parent.width * 0.75
-                                        text: relativeTime + "<br/><font size=\"-2\">" + timestampAsString + "</font>"
-                                        padding: 5
-                                        leftPadding: 12
-                                        elide: Text.ElideRight
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                        anchors.top: parent.top
-                                    }
-
-                                    VclLabel {
-                                        width: parent.width * 0.25
-                                        anchors.top: parent.top
-                                        property string fileSizeInfo: {
-                                            if(fileSize < 1024)
-                                            return fileSize + " B"
-                                            if(fileSize < 1024*1024)
-                                            return Math.round(fileSize / 1024, 2) + " KB"
-                                            return Math.round(fileSize / (1024*1024), 2) + " MB"
-                                        }
-                                        property string metaDataInfo: {
-                                            if(metaData.loaded)
-                                            return metaData.sceneCount + (metaData.sceneCount === 1 ? " Scene" : " Scenes");
-                                            return "Loading metadata ..."
-                                        }
-                                        text: metaDataInfo + "<br/><font size=\"-2\">" + fileSizeInfo + "</font>"
-                                        padding: 5
-                                        elide: Text.ElideRight
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                    }
+                                VclLabel {
+                                    width: parent.width * 0.75
+                                    text: relativeTime + "<br/><font size=\"-2\">" + timestampAsString + "</font>"
+                                    padding: 5
+                                    leftPadding: 12
+                                    elide: Text.ElideRight
+                                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                    anchors.top: parent.top
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: {
-                                        backupFilesView.currentBackupFilePath = filePath
-                                        backupFilesView.currentIndex = index
+                                VclLabel {
+                                    width: parent.width * 0.25
+                                    anchors.top: parent.top
+                                    property string fileSizeInfo: {
+                                        if(fileSize < 1024)
+                                        return fileSize + " B"
+                                        if(fileSize < 1024*1024)
+                                        return Math.round(fileSize / 1024, 2) + " KB"
+                                        return Math.round(fileSize / (1024*1024), 2) + " MB"
                                     }
+                                    property string metaDataInfo: {
+                                        if(metaData.loaded)
+                                        return metaData.sceneCount + (metaData.sceneCount === 1 ? " Scene" : " Scenes");
+                                        return "Loading metadata ..."
+                                    }
+                                    text: metaDataInfo + "<br/><font size=\"-2\">" + fileSizeInfo + "</font>"
+                                    padding: 5
+                                    elide: Text.ElideRight
+                                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                                }
+                            }
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    backupFilesView.currentBackupFilePath = filePath
+                                    backupFilesView.currentIndex = index
                                 }
                             }
                         }
                     }
+                }
 
-                    RowLayout {
-                        Layout.alignment: Qt.AlignHCenter
-                        spacing: 20
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+                    spacing: 20
 
-                        VclButton {
-                            text: "Open in This Window"
-                            enabled: backupFilesView.currentIndex >= 0
-                            hoverEnabled: true
-                            ToolTip.visible: hovered
-                            ToolTip.text: "Closes the current document and loads the selected backup."
-                            onClicked: {
-                                var task = OpenFileTask.openAnonymously(backupFilesView.currentBackupFilePath)
-                                task.finished.connect(dialog.close)
-                            }
+                    VclButton {
+                        text: "Open in This Window"
+                        enabled: backupFilesView.currentIndex >= 0
+                        hoverEnabled: true
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Closes the current document and loads the selected backup."
+                        onClicked: {
+                            var task = OpenFileTask.openAnonymously(backupFilesView.currentBackupFilePath)
+                            task.finished.connect(dialog.close)
                         }
+                    }
 
-                        VclButton {
-                            text: "Open in New Window"
-                            enabled: backupFilesView.currentIndex >= 0
-                            hoverEnabled: true
-                            ToolTip.visible: hovered
-                            ToolTip.text: "Loads the selected backup in a new window."
-                            onClicked: {
-                                const filePath = backupFilesView.currentBackupFilePath
+                    VclButton {
+                        text: "Open in New Window"
+                        enabled: backupFilesView.currentIndex >= 0
+                        hoverEnabled: true
+                        ToolTip.visible: hovered
+                        ToolTip.text: "Loads the selected backup in a new window."
+                        onClicked: {
+                            const filePath = backupFilesView.currentBackupFilePath
 
-                                var waitDialog = WaitDialog.launch()
-                                Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                                Utils.execLater(dialog, 1500, () => {
-                                                    Qt.callLater(dialog.close)
-                                                    if(waitDialog)
-                                                        waitDialog.close()
-                                                } )
-                            }
+                            var waitDialog = WaitDialog.launch()
+                            Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
+                            Utils.execLater(dialog, 1500, () => {
+                                                Qt.callLater(dialog.close)
+                                                if(waitDialog)
+                                                waitDialog.close()
+                                            } )
                         }
                     }
                 }

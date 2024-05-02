@@ -1405,6 +1405,21 @@ QObject *Application::findFirstSiblingOfType(QObject *object, const QString &cla
     return nullptr;
 }
 
+QObject *Application::parentOf(QObject *object)
+{
+    return object ? object->parent() : nullptr;
+}
+
+bool Application::reparent(QObject *object, QObject *newParent)
+{
+    if (object) {
+        object->setParent(newParent);
+        return true;
+    }
+
+    return false;
+}
+
 QColor Application::pickStandardColor(int counter)
 {
     const QVector<QColor> colors = Application::standardColors();

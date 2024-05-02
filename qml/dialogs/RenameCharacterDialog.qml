@@ -25,216 +25,205 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
-Item {
+DialogLauncher {
     id: root
-
-    parent: Scrite.window.contentItem
 
     function launch(character) {
         if(!character || !Scrite.app.verifyType(character, "Character")) {
-            console.log("Couldn't launch RenameCharacterDialog: invalid character specified.")
+            console.log("Couldn't launch " + name + ": invalid character specified.")
             return null
         }
 
-        var dlg = dialogComponent.createObject(root, {"character": character})
-        if(dlg) {
-            dlg.closed.connect(dlg.destroy)
-            dlg.open()
-            return dlg
-        }
-
-        console.log("Couldn't launch RenameCharacterDialog")
-        return null
+        return doLaunch({"character": character})
     }
 
-    Component {
-        id: dialogComponent
+    name: "RenameCharacterDialog"
+    singleInstanceOnly: true
 
-        VclDialog {
-            id: dialog
+    dialogComponent: VclDialog {
+        id: dialog
 
-            property Character character
+        property Character character
 
-            width: 680
-            height: 300
-            title: "Rename/Merge Character: " + _private.orignalCharacterName
+        width: 680
+        height: 300
+        title: "Rename/Merge Character: " + _private.orignalCharacterName
 
-            content: Item {
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 20
+        content: Item {
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+                spacing: 20
+
+                VclTextField {
+                    id: newNameField
+                    Layout.fillWidth: true
+
+                    placeholderText: "New name"
+                    label: ""
+                    focus: true
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+                    font.capitalization: Font.AllUppercase
+                    onReturnPressed: renameButton.click()
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
                     spacing: 20
 
-                    VclTextField {
-                        id: newNameField
+                    VclCheckBox {
+                        id: chkNotice
                         Layout.fillWidth: true
-
-                        placeholderText: "New name"
-                        label: ""
-                        focus: true
-                        horizontalAlignment: Text.AlignHCenter
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-                        font.capitalization: Font.AllUppercase
-                        onReturnPressed: renameButton.click()
+                        Layout.alignment: Qt.AlignVCenter
+                        padding: 0
+                        text: "I understand that the rename operation cannot be undone."
                     }
 
-                    RowLayout {
+                    VclButton {
+                        id: renameButton
                         Layout.fillWidth: true
-                        spacing: 20
+                        Layout.alignment: Qt.AlignVCenter
+                        text: "Rename"
+                        enabled: chkNotice.checked && newNameField.length > 0 && newNameField.text.toUpperCase() !== character.name
+                        onClicked: {
+                            _private.newCharacterName = newNameField.text.toUpperCase()
 
-                        VclCheckBox {
-                            id: chkNotice
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter
-                            padding: 0
-                            text: "I understand that the rename operation cannot be undone."
-                        }
+                            const allCharacterNames = Scrite.document.structure.allCharacterNames()
+                            if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
 
-                        VclButton {
-                            id: renameButton
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignVCenter
-                            text: "Rename"
-                            enabled: chkNotice.checked && newNameField.length > 0 && newNameField.text.toUpperCase() !== character.name
-                            onClicked: {
-                                _private.newCharacterName = newNameField.text.toUpperCase()
+                                let question = "Merging " + _private.orignalCharacterName + " with <b>" + _private.newCharacterName + "</b>"
 
-                                const allCharacterNames = Scrite.document.structure.allCharacterNames()
-                                if(allCharacterNames.indexOf(_private.newCharacterName) >= 0) {
+                                const originalCh = Scrite.document.structure.findCharacter(_private.orignalCharacterName)
+                                const newCh = Scrite.document.structure.findCharacter(_private.newCharacterName)
+                                if(originalCh) {
+                                    let points = []
 
-                                    let question = "Merging " + _private.orignalCharacterName + " with <b>" + _private.newCharacterName + "</b>"
+                                    const ntos = (number) => {
+                                        const nos = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+                                        if(number > 10)
+                                        return ""+number
+                                        return nos[number]
+                                    }
 
-                                    const originalCh = Scrite.document.structure.findCharacter(_private.orignalCharacterName)
-                                    const newCh = Scrite.document.structure.findCharacter(_private.newCharacterName)
-                                    if(originalCh) {
-                                        let points = []
+                                    if(originalCh.notes.noteCount > 0)
+                                    points.push(ntos(originalCh.notes.noteCount) + " note(s)")
+                                    if(originalCh.attachments.attachmentCount > 0)
+                                    points.push(ntos(originalCh.attachments.attachmentCount) + " attachment(s)")
+                                    if(originalCh.photos.length > 0)
+                                    points.push(ntos(originalCh.photos.length) + " photo(s)")
+                                    if(originalCh.relationshipCount > 0)
+                                    points.push(ntos(originalCh.relationshipCount) + " relationship(s)")
 
-                                        const ntos = (number) => {
-                                            const nos = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
-                                            if(number > 10)
-                                                return ""+number
-                                            return nos[number]
-                                        }
+                                    if(points.length > 0) {
+                                        question += ", along with "
 
-                                        if(originalCh.notes.noteCount > 0)
-                                            points.push(ntos(originalCh.notes.noteCount) + " note(s)")
-                                        if(originalCh.attachments.attachmentCount > 0)
-                                            points.push(ntos(originalCh.attachments.attachmentCount) + " attachment(s)")
-                                        if(originalCh.photos.length > 0)
-                                            points.push(ntos(originalCh.photos.length) + " photo(s)")
-                                        if(originalCh.relationshipCount > 0)
-                                            points.push(ntos(originalCh.relationshipCount) + " relationship(s)")
+                                        if(points.length > 1) {
+                                            question += "<br/><ul>"
 
-                                        if(points.length > 0) {
-                                            question += ", along with "
-
-                                            if(points.length > 1) {
-                                                question += "<br/><ul>"
-
-                                                for(let p=0; p<points.length; p++) {
-                                                    let suffix = "."
-                                                    if(points.length > 1) {
-                                                        if(p < points.length-2)
-                                                            suffix = ","
-                                                        else if(p === points.length-2)
-                                                            suffix = ", and"
-                                                    }
-                                                    question += "<li>" + points[p] + suffix + "</li>"
+                                            for(let p=0; p<points.length; p++) {
+                                                let suffix = "."
+                                                if(points.length > 1) {
+                                                    if(p < points.length-2)
+                                                    suffix = ","
+                                                    else if(p === points.length-2)
+                                                    suffix = ", and"
                                                 }
-                                                question += "</ul>"
-                                            } else
-                                                question += points[0] + ".<br/>"
-                                        } else {
-                                            question += ".<br/>"
-                                        }
+                                                question += "<li>" + points[p] + suffix + "</li>"
+                                            }
+                                            question += "</ul>"
+                                        } else
+                                        question += points[0] + ".<br/>"
                                     } else {
                                         question += ".<br/>"
                                     }
-
-                                    question += "<br/>Are you sure you want to do this?"
-
-                                    MessageBox.question("Merge Confirmation",
-                                                        question,
-                                                        ["Yes", "No", "Cancel"],
-                                                        (answer) => {
-                                                            if(answer === "Yes")
-                                                                renameJob.start()
-                                                            else if(answer === "Cancel")
-                                                                Qt.callLater(dialog.close)
-                                                        })
+                                } else {
+                                    question += ".<br/>"
                                 }
-                                else
-                                    renameJob.start()
+
+                                question += "<br/>Are you sure you want to do this?"
+
+                                MessageBox.question("Merge Confirmation",
+                                                    question,
+                                                    ["Yes", "No", "Cancel"],
+                                                    (answer) => {
+                                                        if(answer === "Yes")
+                                                        renameJob.start()
+                                                        else if(answer === "Cancel")
+                                                        Qt.callLater(dialog.close)
+                                                    })
                             }
-                        }
-                    }
-                }
-
-                SequentialAnimation {
-                    id: renameJob
-
-                    running: false
-
-                    // Launch wait dialog ..
-                    ScriptAction {
-                        script: {
-                            _private.waitDialog = WaitDialog.launch("Renaming '" + _private.orignalCharacterName + "' to '" + _private.newCharacterName + "' ...")
-                        }
-                    }
-
-                    // Wait for it to show up on the UI ...
-                    PauseAnimation {
-                        duration: 200
-                    }
-
-                    // Perform the rename ...
-                    ScriptAction {
-                        script: {
-                            dialog.character.clearRenameError()
-                            _private.renameWasSuccessful = dialog.character.rename(_private.newCharacterName)
-                        }
-                    }
-
-                    // Wait for the UI to update after renaming was done ...
-                    PauseAnimation {
-                        duration: 200
-                    }
-
-                    // Cleanup and complete
-                    ScriptAction {
-                        script: {
-                            Qt.callLater(_private.waitDialog.close)
-                            _private.waitDialog = null
-
-                            if(_private.renameWasSuccessful) {
-                                Announcement.shout(Runtime.announcementIds.characterNotesRequest, _private.newCharacterName)
-                                Qt.callLater(dialog.close)
-                            } else
-                                MessageBox.information("Rename Error", dialog.character.renameError, () => {
-                                                           dialog.character.clearRenameError()
-                                                           Qt.callLater(dialog.close)
-                                                       } )
+                            else
+                            renameJob.start()
                         }
                     }
                 }
             }
 
-            onCharacterChanged: {
-                if(character)
-                    _private.orignalCharacterName = character.name
-                else
-                    _private.orignalCharacterName = "<unknown>"
-                _private.newCharacterName = ""
-            }
+            SequentialAnimation {
+                id: renameJob
 
-            QtObject {
-                id: _private
+                running: false
 
-                property string orignalCharacterName
-                property string newCharacterName
-                property bool renameWasSuccessful: false
-                property VclDialog waitDialog
+                // Launch wait dialog ..
+                ScriptAction {
+                    script: {
+                        _private.waitDialog = WaitDialog.launch("Renaming '" + _private.orignalCharacterName + "' to '" + _private.newCharacterName + "' ...")
+                    }
+                }
+
+                // Wait for it to show up on the UI ...
+                PauseAnimation {
+                    duration: 200
+                }
+
+                // Perform the rename ...
+                ScriptAction {
+                    script: {
+                        dialog.character.clearRenameError()
+                        _private.renameWasSuccessful = dialog.character.rename(_private.newCharacterName)
+                    }
+                }
+
+                // Wait for the UI to update after renaming was done ...
+                PauseAnimation {
+                    duration: 200
+                }
+
+                // Cleanup and complete
+                ScriptAction {
+                    script: {
+                        Qt.callLater(_private.waitDialog.close)
+                        _private.waitDialog = null
+
+                        if(_private.renameWasSuccessful) {
+                            Announcement.shout(Runtime.announcementIds.characterNotesRequest, _private.newCharacterName)
+                            Qt.callLater(dialog.close)
+                        } else
+                        MessageBox.information("Rename Error", dialog.character.renameError, () => {
+                                                   dialog.character.clearRenameError()
+                                                   Qt.callLater(dialog.close)
+                                               } )
+                    }
+                }
             }
+        }
+
+        onCharacterChanged: {
+            if(character)
+            _private.orignalCharacterName = character.name
+            else
+            _private.orignalCharacterName = "<unknown>"
+            _private.newCharacterName = ""
+        }
+
+        QtObject {
+            id: _private
+
+            property string orignalCharacterName
+            property string newCharacterName
+            property bool renameWasSuccessful: false
+            property VclDialog waitDialog
         }
     }
 }

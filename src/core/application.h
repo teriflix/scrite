@@ -354,6 +354,9 @@ public:
     Q_INVOKABLE static QObject *findFirstParentOfType(QObject *object, const QString &className);
     Q_INVOKABLE static QObject *findFirstSiblingOfType(QObject *object, const QString &className);
 
+    Q_INVOKABLE static QObject *parentOf(QObject *object);
+    Q_INVOKABLE static bool reparent(QObject *object, QObject *newParent);
+
 private:
     bool loadScript();
     bool registerFileTypes();

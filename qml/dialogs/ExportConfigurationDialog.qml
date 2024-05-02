@@ -44,17 +44,30 @@ Item {
             exporter: null
         }
 
-        if(typeof exporter === "string")
+        if(typeof exporter === "string") {
+            if(_private.dialog) {
+                if(_private.dialog.exporter.format === exporter)
+                    return _private.dialog
+                _private.dialog.close()
+            }
             args.exporter = Scrite.document.createExporter(exporter)
-        else if(Scrite.app.verifyType(exporter, "AbstractExporter"))
+        } else if(Scrite.app.verifyType(exporter, "AbstractExporter")) {
+            if(_private.dialog) {
+                if(_private.dialog.exporter === exporter)
+                    return _private.dialog
+                _private.dialog.close()
+            }
             args.exporter = exporter
-        else {
+        } else {
+            if(_private.dialog)
+                _private.dialog.close()
             console.log("No exporter supplied.")
             return null
         }
 
         var dlg = _private.dialogComponent.createObject(root, args)
         if(dlg) {
+            _private.dialog = dlg
             dlg.closed.connect(dlg.destroy)
             dlg.open()
             return dlg
@@ -68,5 +81,6 @@ Item {
         id: _private
 
         property Component dialogComponent: Qt.createComponent("./exportconfigurationdialog/impl_ExportConfigurationDialog.qml", Component.PreferSynchronous, root)
+        property VclDialog dialog
     }
 }

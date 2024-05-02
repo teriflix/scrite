@@ -49,10 +49,8 @@ Item {
     signal closeRequest()
 
     Component.onCompleted: {
-        Utils.execLater(root, 500, () => {
-                            if(mode === "Scriptalay")
-                                _private.showScriptalay()
-                        })
+        _private.switchMode()
+        root.modeChanged.connect(_private.switchMode)
     }
 
     LibraryService {
@@ -1375,5 +1373,12 @@ Item {
         signal showPosterRequest(Item _source, var _image, string _logline)
         signal hidePosterRequest(Item _source)
         signal showScriptalay()
+
+        function switchMode() {
+            Utils.execLater(root, 500, () => {
+                                if(root.mode === "Scriptalay")
+                                    _private.showScriptalay()
+                            })
+        }
     }
 }

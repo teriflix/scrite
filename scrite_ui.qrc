@@ -163,5 +163,6 @@
         <file>qml/TimelineView.qml</file>
         <file>qml/controls/VclText.qml</file>
         <file>qml/notebook/AddCharactersDialog.qml</file>
+        <file>qml/helpers/DialogLauncher.qml</file>
     </qresource>
 </RCC>
