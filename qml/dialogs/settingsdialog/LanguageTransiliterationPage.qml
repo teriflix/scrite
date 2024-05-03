@@ -75,7 +75,7 @@ Item {
 
                     onActivated: {
                         var item = sources[currentIndex]
-                        Scrite.app.transliterationEngine.setTextInputSourceIdForLanguage(modelData.value, item.id)
+                        Scrite.app.transliterationEngine.setTextInputSourceIdForLanguage(value, item.id)
                     }
 
                     Component.onCompleted: {
