@@ -56,6 +56,15 @@ DialogLauncher {
                                               characters.push(character)
                                           })
                     array = characters
+
+                    if(count === 0)
+                        Qt.callLater(reportAllCharactersAlreadyAdded)
+                }
+
+                function reportAllCharactersAlreadyAdded() {
+                    MessageBox.information("No characters to add",
+                                           "All existing characters have already been added to the notebook.",
+                                           () => { Qt.callLater(dialog.close) })
                 }
             }
 
@@ -120,6 +129,7 @@ DialogLauncher {
 
                     VclButton {
                         text: "Select All"
+                        enabled: charactersModel.count > 0
                         onClicked: {
                             for(let i=0; i<charactersCheckBoxes.count; i++) {
                                 let checkBox = charactersCheckBoxes.itemAt(i)
@@ -130,6 +140,7 @@ DialogLauncher {
 
                     VclButton {
                         text: "Unselect All"
+                        enabled: charactersModel.count > 0
                         onClicked: {
                             for(let i=0; i<charactersCheckBoxes.count; i++) {
                                 let checkBox = charactersCheckBoxes.itemAt(i)
@@ -144,6 +155,7 @@ DialogLauncher {
 
                     VclButton {
                         text: "Add Selected"
+                        enabled: charactersModel.count > 0
                         onClicked: {
                             let count = 0
                             for(let i=0; i<charactersCheckBoxes.count; i++) {
