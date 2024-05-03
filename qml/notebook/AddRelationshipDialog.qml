@@ -76,7 +76,7 @@ DialogLauncher {
                         anchors.leftMargin: 5
 
                         clip: true
-                        cacheBuffer: Number.MAX_SAFE_INTEGER
+                        reuseItems: false
 
                         ScrollBar.vertical: VclScrollBar { }
 
@@ -151,7 +151,7 @@ DialogLauncher {
 
                                     onActiveFocusChanged: {
                                         if(activeFocus)
-                                        charactersListView.currentIndex = index
+                                            charactersListView.currentIndex = index
                                     }
                                 }
 
@@ -161,6 +161,14 @@ DialogLauncher {
                                 }
                             }
                         }
+
+                        function initializeCacheBuffer() {
+                            let firstDelegate = itemAtIndex(0)
+                            const heightEstimate = firstDelegate ? Math.ceil(firstDelegate.height*1.1) : 75
+                            cacheBuffer = heightEstimate * count
+                        }
+
+                        Component.onCompleted: Qt.callLater(initializeCacheBuffer)
                     }
                 }
 
@@ -188,16 +196,22 @@ DialogLauncher {
 
                 ScriptAction {
                     script: {
-                        for(var i=0; i<charactersListView.count; i++) {
-                            var item = charactersListView.itemAtIndex(i)
+                        let nrRelationshipsAdded = 0
+                        for(let i=0; i<charactersListView.count; i++) {
+                            charactersListView.positionViewAtIndex(i, ListView.Visible)
+                            let item = charactersListView.itemAtIndex(i)
                             if(item.checked) {
-                                var otherCharacter = Scrite.document.structure.addCharacter(item.otherCharacterName)
+                                let otherCharacter = Scrite.document.structure.addCharacter(item.otherCharacterName)
                                 if(otherCharacter) {
-                                    character.addRelationship(item.relationship, otherCharacter)
-                                    character.characterRelationshipGraph = {}
+                                    const rel = character.addRelationship(item.relationship, otherCharacter)
+                                    if(rel)
+                                        ++nrRelationshipsAdded
                                 }
                             }
                         }
+
+                        if(nrRelationshipsAdded > 0)
+                            character.characterRelationshipGraph = {}
 
                         _private.waitDialog.close()
                         _private.waitDialog = null
