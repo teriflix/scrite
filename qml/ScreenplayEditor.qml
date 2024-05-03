@@ -3204,8 +3204,8 @@ Rectangle {
                                 if(activeFocus) {
                                     privateData.changeCurrentIndexTo(headingItem.theElementIndex)
                                     previouslyActiveLanguage = Scrite.app.transliterationEngine.language
-                                    const headingFormat = Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
-                                    headingFormat.activateDefaultLanguage()
+
+                                    Utils.execLater(sceneHeadingField, 50, sceneHeadingField.acctivateSceneHeadingLanguage)
                                 } else {
                                     updateSceneHeading(text)
                                     Scrite.app.transliterationEngine.language = previouslyActiveLanguage
@@ -3265,6 +3265,11 @@ Rectangle {
                                 }
 
                                 return suggestion
+                            }
+
+                            function acctivateSceneHeadingLanguage() {
+                                let headingFormat = Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
+                                headingFormat.activateDefaultLanguage()
                             }
                         }
                     }
