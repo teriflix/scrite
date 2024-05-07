@@ -3539,7 +3539,7 @@ Item {
             }
 
             EventFilter.target: Scrite.app
-            EventFilter.active: !Scrite.document.readOnly && !createItemMouseHandler.enabled
+            EventFilter.active: !Scrite.document.readOnly && !createItemMouseHandler.enabled && !AnnotationPropertyEditorDock.visible
             EventFilter.events: [6]
             EventFilter.onFilter: {
                 var dist = (event.controlModifier ? 5 : 1) * canvas.tickDistance
