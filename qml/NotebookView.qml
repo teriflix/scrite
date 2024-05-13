@@ -2940,7 +2940,7 @@ Rectangle {
                                         opacity: 0.15
                                     }
                                     adjustTextWidthBasedOnScrollBar: false
-                                    ScrollBar.vertical: characterSummaryVScrollBar
+                                    // ScrollBar.vertical: characterSummaryVScrollBar
                                 }
                             }
                         }

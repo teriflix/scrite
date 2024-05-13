@@ -59,10 +59,10 @@ Item {
                 if(note)
                     note.title = text
             }
-            onActiveFocusChanged: {
-                if(activeFocus)
-                    noteFlickable.contentY = 0
-            }
+            // onActiveFocusChanged: {
+            //     if(activeFocus)
+            //         noteFlickable.contentY = 0
+            // }
         }
 
         RichTextEdit {
@@ -76,7 +76,7 @@ Item {
             tabSequenceManager: noteTabManager
             tabSequenceIndex: 1
             adjustTextWidthBasedOnScrollBar: false
-            ScrollBar.vertical: noteVScrollBar
+            // ScrollBar.vertical: noteVScrollBar
             onTextChanged: {
                 if(note)
                     note.content = text
