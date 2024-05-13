@@ -2516,6 +2516,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     cursor.insertText(element->resolvedSceneNumber() + QStringLiteral(". "));
 
                 cursor.insertText(QStringLiteral("[OMITTED] "));
+
+                insertBlock = true;
             }
         }
 
@@ -2530,6 +2532,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     cursor.insertText(QStringLiteral(" - "));
                     TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
                                                                            heading->moment());
+
+                    insertBlock = true;
                 } /*else {
                     cursor.insertText(QStringLiteral("NO SCENE HEADING"));
                 }*/
@@ -2542,13 +2546,15 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     cursor.insertText(heading->location());
                     cursor.insertText(QStringLiteral(" - "));
                     cursor.insertText(heading->moment());
+
+                    insertBlock = true;
                 } else {
                     cursor.insertText(QStringLiteral("NO SCENE HEADING"));
+
+                    insertBlock = true;
                 }
             }
         }
-
-        insertBlock = true;
 
         if (element->isOmitted())
             return;
