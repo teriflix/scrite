@@ -505,10 +505,13 @@ Item {
 
         title: "Copy Attributes"
         width: 640
-        height: 480
+        height: Math.min(480, root.height*0.8)
 
         content: Item {
+            implicitHeight: copyAttribsDialogLayout.height + 40
+
             ColumnLayout {
+                id: copyAttribsDialogLayout
                 width: parent.width-40
                 anchors.centerIn: parent
                 spacing: 20
@@ -527,18 +530,21 @@ Item {
                     VclCheckBox {
                         id: copyFontFamilyAttrib
                         text: "Font Family: " + _private.displayElementFormat.font.family
+                        padding: 0
                         checked: false
                     }
 
                     VclCheckBox {
                         id: copyFontSizeAttrib
                         text: "Font Size: " + _private.displayElementFormat.font.pointSize + " pt"
+                        padding: 0
                         checked: false
                     }
 
                     VclCheckBox {
                         id: copyFontStyleAttrib
                         text: "Font Style: (" + fontStyle + ")"
+                        padding: 0
                         checked: false
                         visible: fontStyle !== ""
 
@@ -557,6 +563,7 @@ Item {
                     VclCheckBox {
                         id: copyTextAlignmentAttrib
                         text: "Alignment: " + alignment
+                        padding: 0
                         checked: false
 
                         property string alignment: {
@@ -575,21 +582,23 @@ Item {
                     VclCheckBox {
                         id: copyLineHeightAttrib
                         text: "Line Height: " + Math.round(_private.displayElementFormat.lineHeight*100) + "%"
+                        padding: 0
                         checked: false
                     }
 
                     RowLayout {
-                        spacing: 0
+                        spacing: 10
 
                         VclCheckBox {
                             id: copyColorAttribs
                             text: "Colors"
+                            padding: 0
                             checked: false
                         }
 
                         Rectangle {
                             implicitWidth: 30
-                            implicitHeight: 30
+                            implicitHeight: copyColorAttribs.height
                             color: _private.displayElementFormat.backgroundColor
                             border.width: 1
                             border.color: Runtime.colors.primary.borderColor
