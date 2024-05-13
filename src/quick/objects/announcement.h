@@ -30,11 +30,11 @@ public:
 
     static Announcement *qmlAttachedProperties(QObject *object);
 
-    Q_INVOKABLE void shout(const QString &type, const QJsonValue &data);
-    Q_SIGNAL void incoming(const QString &type, const QJsonValue &data);
+    Q_INVOKABLE void shout(const QString &type, const QJSValue &data);
+    Q_SIGNAL void incoming(const QString &type, const QJSValue &data);
 
 private:
-    void hearing(Announcement *from, const QString &type, const QJsonValue &data);
+    void hearing(Announcement *from, const QString &type, const QJSValue &data);
 };
 
 class AnnouncementBroadcast : public QObject
@@ -45,8 +45,8 @@ public:
     static AnnouncementBroadcast *instance();
     ~AnnouncementBroadcast();
 
-    void doShout(Announcement *from, const QString &type, const QJsonValue &data);
-    Q_SIGNAL void shout(Announcement *from, const QString &type, const QJsonValue &data);
+    void doShout(Announcement *from, const QString &type, const QJSValue &data);
+    Q_SIGNAL void shout(Announcement *from, const QString &type, const QJSValue &data);
 
 private:
     AnnouncementBroadcast(QObject *parent = nullptr);

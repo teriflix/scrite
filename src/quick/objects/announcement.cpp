@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "announcement.h"
-#include "application.h"
+#include <QCoreApplication>
 
 Announcement::Announcement(QObject *parent) : QObject(parent)
 {
@@ -27,12 +27,12 @@ Announcement *Announcement::qmlAttachedProperties(QObject *object)
     return new Announcement(object);
 }
 
-void Announcement::shout(const QString &type, const QJsonValue &data)
+void Announcement::shout(const QString &type, const QJSValue &data)
 {
     AnnouncementBroadcast::instance()->doShout(this, type, data);
 }
 
-void Announcement::hearing(Announcement *from, const QString &type, const QJsonValue &data)
+void Announcement::hearing(Announcement *from, const QString &type, const QJSValue &data)
 {
     if (from == this)
         return;
@@ -52,7 +52,7 @@ AnnouncementBroadcast::AnnouncementBroadcast(QObject *parent) : QObject(parent) 
 
 AnnouncementBroadcast::~AnnouncementBroadcast() { }
 
-void AnnouncementBroadcast::doShout(Announcement *from, const QString &type, const QJsonValue &data)
+void AnnouncementBroadcast::doShout(Announcement *from, const QString &type, const QJSValue &data)
 {
     emit shout(from, type, data);
 }
