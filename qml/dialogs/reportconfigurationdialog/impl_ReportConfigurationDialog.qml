@@ -253,14 +253,7 @@ VclDialog {
 
                         if(success) {
                             if(_private.isPdfExport) {
-                                const params = {
-                                    "title": report.title,
-                                    "filePath": report.fileName,
-                                    "dlFilePath": dlFileName,
-                                    "pagesPerRow": report.singlePageReport ? 1 : 2,
-                                    "allowSave": _private.reportSaveFeature.enabled
-                                }
-                                Announcement.shout(Runtime.announcementIds.showPdfRequest, params)
+                                PdfDialog.launch(report.title, report.fileName, dlFileName, report.singlePageReport ? 1 : 2, _private.reportSaveFeature.enabled)
                             } else
                                 Scrite.app.revealFileOnDesktop(report.fileName)
                             Qt.callLater(root.close)

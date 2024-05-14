@@ -4,6 +4,7 @@ singleton CollaboratorsDialog 1.0 CollaboratorsDialog.qml
 singleton ExportConfigurationDialog 1.0 ExportConfigurationDialog.qml
 singleton HomeScreen 1.0 HomeScreen.qml
 singleton MessageBox 1.0 MessageBox.qml
+singleton PdfDialog 1.0 PdfDialog.qml
 singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
 singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml
 singleton SplashScreen 1.0 SplashScreen.qml

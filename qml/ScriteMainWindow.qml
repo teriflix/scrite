@@ -368,7 +368,6 @@ Item {
         anchors.right: parent.right
         height: 53
         color: Runtime.colors.primary.c50.background
-        visible: !pdfViewer.active
         enabled: visible
 
         Row {
@@ -1039,7 +1038,7 @@ Item {
                 }
 
                 function activateTab(index) {
-                    if(index < 0 || index >= tabs.length || pdfViewer.active || index === mainTabBar.currentIndex)
+                    if(index < 0 || index >= tabs.length || index === mainTabBar.currentIndex)
                         return
                     var tab = tabs[index]
                     if(!tab.visible)
@@ -1177,7 +1176,6 @@ Item {
         id: mainUiContentLoader
         active: allowContent && !Scrite.document.loading
         opacity: 0
-        visible: !pdfViewer.active
         sourceComponent: uiLayoutComponent
         anchors.left: parent.left
         anchors.right: parent.right
@@ -1211,115 +1209,6 @@ Item {
         }
 
         Component.onCompleted: Utils.execLater(mainUiContentLoader, 200, () => { mainUiContentLoader.opacity = 1 } )
-    }
-
-    Rectangle {
-        id: pdfViewerToolBar
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 53
-        color: Runtime.colors.primary.c50.background
-        visible: pdfViewer.active
-        enabled: visible && !NotificationsView.visible
-
-        VclLabel {
-            text: pdfViewer.pdfTitle
-            color: Runtime.colors.accent.c50.text
-            elide: Text.ElideMiddle
-            anchors.centerIn: parent
-            width: parent.width * 0.8
-            horizontalAlignment: Text.AlignHCenter
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-            font.bold: true
-        }
-
-        Rectangle {
-            width: parent.width
-            height: 1
-            color: Runtime.colors.primary.borderColor
-            anchors.bottom: parent.bottom
-        }
-    }
-
-    Loader {
-        id: pdfViewer
-        active: false
-        visible: active
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: pdfViewerToolBar.visible ? pdfViewerToolBar.bottom : parent.top
-        anchors.bottom: parent.bottom
-        property string pdfFilePath
-        property string pdfDownloadFilePath
-        property string pdfTitle
-        property int pdfPagesPerRow: 2
-        property bool pdfSaveAllowed: true
-        enabled: !NotificationsView.visible
-        onActiveChanged: {
-            if(!active) {
-                pdfPagesPerRow = 2
-                pdfDownloadFilePath = ""
-                pdfFilePath = ""
-                pdfTitle = ""
-            }
-        }
-
-        Announcement.onIncoming: (type,data) => {
-                                     if(type === Runtime.announcementIds.showPdfRequest) {
-                                         show(data.title, data.filePath, data.dlFilePath, data.pagesPerRow, data.allowSave)
-                                     }
-                                 }
-
-        function show(title, filePath, dlFilePath, pagesPerRow, allowSave) {
-            active = false
-            pdfTitle = title
-            pdfPagesPerRow = pagesPerRow
-            pdfDownloadFilePath = dlFilePath
-            pdfFilePath = filePath
-            pdfSaveAllowed = allowSave === undefined ? true : allowSave
-            Qt.callLater( function() {
-                pdfViewer.active = true
-            })
-        }
-
-        Connections {
-            target: Scrite.document
-            function onAboutToReset() {
-                pdfViewer.active = false
-            }
-        }
-
-        sourceComponent: PdfView {
-            source: Scrite.app.localFileToUrl(pdfViewer.pdfFilePath)
-            saveFilePath: pdfViewer.pdfDownloadFilePath
-            allowFileSave: pdfViewer.pdfSaveAllowed
-            saveFeatureDisabled: !pdfViewer.pdfSaveAllowed
-            pagesPerRow: pdfViewer.pdfPagesPerRow
-            allowFileReveal: false
-
-            Component.onCompleted: forceActiveFocus()
-
-            // While this PDF view is active, we don't want shortcuts to be
-            // processed by any other part of the application.
-            EventFilter.target: Scrite.app
-            EventFilter.events: [EventFilter.KeyPress,EventFilter.Shortcut,EventFilter.ShortcutOverride]
-            EventFilter.onFilter: (object,event,result) => {
-                                      result.filter = true
-                                      result.acceptEvent = true
-                                      if(event.type === EventFilter.KeyPress) {
-                                          if(event.key === Qt.Key_Escape) {
-                                              pdfViewer.active = false
-                                              return
-                                          }
-                                      }
-                                  }
-
-            FileManager {
-                autoDeleteList: [pdfViewer.pdfFilePath]
-            }
-
-            onCloseRequest: pdfViewer.active = false
-        }
     }
 
     Component {

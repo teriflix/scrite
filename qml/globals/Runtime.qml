@@ -569,7 +569,6 @@ Item {
         readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
         readonly property string reloadMainUiRequest: "9a7f0f35-346f-461d-bb85-f5c6dc08a01d"
         readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
-        readonly property string showPdfRequest: "288E7DFB-9B14-4FE8-8846-14DD2974B486"
         readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
         readonly property string closeHomeScreenRequest: "4F8F6B5B-5BEB-4D01-97BA-B0018241BD38"
         readonly property string characterNotesRequest: "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8"

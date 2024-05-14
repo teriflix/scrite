@@ -11,21 +11,33 @@
         <file>qml/controls/VclCheckBox.qml</file>
         <file>qml/controls/VclComboBox.qml</file>
         <file>qml/controls/VclDialog.qml</file>
+        <file>qml/controls/VclLabel.qml</file>
         <file>qml/controls/VclMenu.qml</file>
         <file>qml/controls/VclMenuItem.qml</file>
         <file>qml/controls/VclRadioButton.qml</file>
         <file>qml/controls/VclScrollBar.qml</file>
-        <file>qml/controls/VclLabel.qml</file>
+        <file>qml/controls/VclText.qml</file>
         <file>qml/controls/VclTextField.qml</file>
         <file>qml/controls/VclToolButton.qml</file>
+        <file>qml/dialogs/AboutDialog.qml</file>
+        <file>qml/dialogs/BackupsDialog.qml</file>
+        <file>qml/dialogs/CollaboratorsDialog.qml</file>
+        <file>qml/dialogs/ExportConfigurationDialog.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_CheckBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_IntegerSpinBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
+        <file>qml/dialogs/HomeScreen.qml</file>
         <file>qml/dialogs/homescreen/HomeScreenImpl.qml</file>
         <file>qml/dialogs/homescreen/Poster.qml</file>
         <file>qml/dialogs/homescreen/qmldir</file>
+        <file>qml/dialogs/MessageBox.qml</file>
+        <file>qml/dialogs/PdfDialog.qml</file>
+        <file>qml/dialogs/pdfdialog/PdfDialogImpl.qml</file>
+        <file>qml/dialogs/qmldir</file>
+        <file>qml/dialogs/RenameCharacterDialog.qml</file>
+        <file>qml/dialogs/ReportConfigurationDialog.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_CheckBox.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_EnumSelector.qml</file>
@@ -38,6 +50,7 @@
         <file>qml/dialogs/reportconfigurationdialog/editor_TextBox.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_Unknown.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/impl_ReportConfigurationDialog.qml</file>
+        <file>qml/dialogs/SettingsDialog.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationSettingsTab.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
@@ -56,16 +69,6 @@
         <file>qml/dialogs/settingsdialog/StructureOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/StructureSettingsTab.qml</file>
         <file>qml/dialogs/settingsdialog/StructureStoryBeatsPage.qml</file>
-        <file>qml/dialogs/AboutDialog.qml</file>
-        <file>qml/dialogs/BackupsDialog.qml</file>
-        <file>qml/dialogs/CollaboratorsDialog.qml</file>
-        <file>qml/dialogs/ExportConfigurationDialog.qml</file>
-        <file>qml/dialogs/HomeScreen.qml</file>
-        <file>qml/dialogs/MessageBox.qml</file>
-        <file>qml/dialogs/qmldir</file>
-        <file>qml/dialogs/RenameCharacterDialog.qml</file>
-        <file>qml/dialogs/ReportConfigurationDialog.qml</file>
-        <file>qml/dialogs/SettingsDialog.qml</file>
         <file>qml/dialogs/SplashScreen.qml</file>
         <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
         <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
@@ -88,6 +91,7 @@
         <file>qml/helpers/CheckListView.qml</file>
         <file>qml/helpers/ColorMenu.qml</file>
         <file>qml/helpers/ColorToolButton.qml</file>
+        <file>qml/helpers/DialogLauncher.qml</file>
         <file>qml/helpers/DisabledFeatureNotice.qml</file>
         <file>qml/helpers/FileSelector.qml</file>
         <file>qml/helpers/FlatToolButton.qml</file>
@@ -121,6 +125,7 @@
         <file>qml/modules/PdfView.qml</file>
         <file>qml/modules/qmldir</file>
         <file>qml/modules/UserAccountToolButton.qml</file>
+        <file>qml/notebook/AddCharactersDialog.qml</file>
         <file>qml/notebook/AddRelationshipDialog.qml</file>
         <file>qml/notebook/CharacterRelationshipsGraphView.qml</file>
         <file>qml/notebook/FormField.qml</file>
@@ -129,6 +134,7 @@
         <file>qml/notebook/qmldir</file>
         <file>qml/notebook/RelationshipNameEditorDialog.qml</file>
         <file>qml/notebook/TextNoteView.qml</file>
+        <file>qml/NotebookView.qml</file>
         <file>qml/notifications/AutoUpdateNotifications.qml</file>
         <file>qml/notifications/HelpTipNotification.qml</file>
         <file>qml/notifications/NotificationsLayer.qml</file>
@@ -143,26 +149,22 @@
         <file>qml/screenplay/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/screenplay/ScreenplayEditorToolbar.qml</file>
         <file>qml/screenplay/ScreenplaySceneElementsContextMenu.qml</file>
+        <file>qml/ScreenplayEditor.qml</file>
         <file>qml/scrited/qmldir</file>
         <file>qml/scrited/ScritedToolbar.qml</file>
+        <file>qml/ScritedView.qml</file>
+        <file>qml/ScriteMainWindow.qml</file>
         <file>qml/structure/AnnotationItem.qml</file>
         <file>qml/structure/AnnotationPropertyEditor.qml</file>
         <file>qml/structure/AnnotationPropertyEditorDock.qml</file>
         <file>qml/structure/IndexCardFields.qml</file>
         <file>qml/structure/qmldir</file>
         <file>qml/structure/StructureGroupsMenu.qml</file>
+        <file>qml/StructureView.qml</file>
         <file>qml/tasks/OpenFileTask.qml</file>
         <file>qml/tasks/OpenFromLibraryTask.qml</file>
         <file>qml/tasks/qmldir</file>
         <file>qml/tasks/SaveFileTask.qml</file>
-        <file>qml/NotebookView.qml</file>
-        <file>qml/ScreenplayEditor.qml</file>
-        <file>qml/ScritedView.qml</file>
-        <file>qml/ScriteMainWindow.qml</file>
-        <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
-        <file>qml/controls/VclText.qml</file>
-        <file>qml/notebook/AddCharactersDialog.qml</file>
-        <file>qml/helpers/DialogLauncher.qml</file>
     </qresource>
 </RCC>

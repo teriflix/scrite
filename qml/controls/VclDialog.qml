@@ -86,6 +86,7 @@ Dialog {
     }
 
     property Component bottomBar
+    property alias bottomBarInstance: footerLoader.item
 
     // This signal is emitted after the dialog box has been dismissed.
     signal dismissed()

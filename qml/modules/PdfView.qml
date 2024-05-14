@@ -13,20 +13,20 @@
 
 import QtQuick 2.15
 import QtQuick.Pdf 5.15
-import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.15
+import QtQuick.Dialogs 1.3
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 Item {
-    width: 1280
-    height: 720
+    id: root
 
     property alias source: pdfDoc.source
     property alias pagesPerRow: pdfDoc.pagesPerRow
@@ -41,210 +41,159 @@ Item {
     signal closeRequest()
     signal refreshRequest()
 
-    function getRefreshButton() { return refreshButton }
-
-    // Catch all mouse-area, which doesnt let mouse events
-    // propagate to layers underneath this item.
-    MouseArea {
+    ColumnLayout {
         anchors.fill: parent
-        hoverEnabled: true
-    }
+        spacing: 0
 
-    Rectangle {
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: statusBar.top
-        color: Runtime.colors.primary.windowColor
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        PdfDocument {
-            id: pdfDoc
-            property int  pagesPerRow: 1
-            property real minPageScale: evaluatePageScale(4)
-            property real idealPageScale: evaluatePageScale(Math.min(pageCount,2))
-            property real maxPageScale: evaluatePageScale(0.5)
-            onIdealPageScaleChanged: pageScaleSlider.value = idealPageScale
-            onStatusChanged: Qt.callLater( function() {
-                if(pageCount === 1 && pagesPerRow > 1)
-                    pageScaleSlider.value = pdfView.height/maxPageHeight
-                else
-                    pageScaleSlider.value = pdfDoc.evaluatePageScale(Math.min(pagesPerRow,pageCount))
-            })
+            color: Runtime.colors.primary.c300.background
 
-            function evaluatePageScale(nrPages) {
-                return status === PdfDocument.Ready ?
-                        Math.max(0.0000001,
-                                 ((pdfView.width/nrPages)-(2+nrPages-1)*pdfView.spacing)/maxPageWidth) :
-                        1
-            }
-        }
+            TableView {
+                id: pdfView
+                clip: true
+                anchors.fill: parent
+                model: Math.ceil(pdfDoc.pageCount / pdfPagesPerRow)
+                property real pdfPageScale: pageScaleSlider.value
+                property real pdfPageWidth: pdfDoc.maxPageWidth * pdfPageScale
+                property real pdfPageHeight: pdfDoc.maxPageHeight * pdfPageScale
+                property real pdfPageCellWidth: pdfPageWidth + spacing
+                property real pdfPageCellHeight: pdfPageHeight + spacing
+                property real spacing: Math.min( width*0.05, 30 )
+                property int  pdfPagesPerRow: Math.max(1,Math.floor(width/pdfPageCellWidth))
+                onPdfPageCellWidthChanged: Qt.callLater(forceLayout)
+                onPdfPageCellHeightChanged: Qt.callLater(forceLayout)
+                rowHeightProvider: () => { return pdfPageCellHeight }
+                columnWidthProvider: () => { return Math.max(width,pdfPageCellWidth*pdfPagesPerRow) }
+                reuseItems: false
+                ScrollBar.vertical: VclScrollBar {
+                    flickable: pdfView
+                }
+                ScrollBar.horizontal: VclScrollBar {
+                    flickable: pdfView
+                }
+                FlickScrollSpeedControl.flickable: pdfView
+                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-        TableView {
-            id: pdfView
-            clip: true
-            anchors.fill: parent
-            model: Math.ceil(pdfDoc.pageCount / pdfPagesPerRow)
-            property real pdfPageScale: pageScaleSlider.value
-            property real pdfPageWidth: pdfDoc.maxPageWidth * pdfPageScale
-            property real pdfPageHeight: pdfDoc.maxPageHeight * pdfPageScale
-            property real pdfPageCellWidth: pdfPageWidth + spacing
-            property real pdfPageCellHeight: pdfPageHeight + spacing
-            property real spacing: Math.min( width*0.05, 30 )
-            property int  pdfPagesPerRow: Math.max(1,Math.floor(width/pdfPageCellWidth))
-            onPdfPageCellWidthChanged: Qt.callLater(forceLayout)
-            onPdfPageCellHeightChanged: Qt.callLater(forceLayout)
-            rowHeightProvider: () => { return pdfPageCellHeight }
-            columnWidthProvider: () => { return Math.max(width,pdfPageCellWidth*pdfPagesPerRow) }
-            reuseItems: false
-            ScrollBar.vertical: VclScrollBar {
-                flickable: pdfView
-            }
-            ScrollBar.horizontal: VclScrollBar {
-                flickable: pdfView
-            }
-            FlickScrollSpeedControl.flickable: pdfView
-            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+                onPdfPageScaleChanged: Qt.callLater(returnToBounds)
 
-            onPdfPageScaleChanged: Qt.callLater(returnToBounds)
+                delegate: Item {
+                    width: pdfView.width
+                    height: pdfView.pdfPageCellHeight
 
-            delegate: Item {
-                width: pdfView.width
-                height: pdfView.pdfPageCellHeight
+                    property int startPageIndex: index*pdfView.pdfPagesPerRow
+                    property int endPageIndex: Math.min(startPageIndex+pdfView.pdfPagesPerRow-1, pdfDoc.pageCount-1)
 
-                property int startPageIndex: index*pdfView.pdfPagesPerRow
-                property int endPageIndex: Math.min(startPageIndex+pdfView.pdfPagesPerRow-1, pdfDoc.pageCount-1)
+                    Row {
+                        height: pdfView.pdfPageHeight
+                        anchors.centerIn: parent
+                        spacing: pdfView.spacing
 
-                Row {
-                    height: pdfView.pdfPageHeight
-                    anchors.centerIn: parent
-                    spacing: pdfView.spacing
+                        Repeater {
+                            model: Math.max(1,(endPageIndex-startPageIndex)+1)
 
-                    Repeater {
-                        model: Math.max(1,(endPageIndex-startPageIndex)+1)
+                            Rectangle {
+                                width: pdfView.pdfPageWidth
+                                height: pdfView.pdfPageHeight
 
-                        Rectangle {
-                            width: pdfView.pdfPageWidth
-                            height: pdfView.pdfPageHeight
-
-                            Image {
-                                id: pdfPage
-                                anchors.fill: parent
-                                sourceSize {
-                                    width: pdfDoc.maPageWidth
-                                    height: pdfDoc.maxPageHeight
-                                }
-                                asynchronous: true
-                                fillMode: Image.PreserveAspectFit
-                                smooth: true
-                                mipmap: true
-                                source: pdfDoc.source
-                                currentFrame: startPageIndex+index
-
-                                Component.onCompleted: configureSourceSize()
-                                function configureSourceSize() {
-                                    const bound = (min, val, max) => {
-                                        return Math.min(max, Math.max(min,val))
+                                Image {
+                                    id: pdfPage
+                                    anchors.fill: parent
+                                    sourceSize {
+                                        width: pdfDoc.maPageWidth
+                                        height: pdfDoc.maxPageHeight
                                     }
-                                    const dpr = Scrite.app.isMacOSPlatform ? Scrite.document.displayFormat.devicePixelRatio : 1.0
-                                    sourceSize = Qt.size(dpr*bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
-                                                         dpr*bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
-                                }
+                                    asynchronous: true
+                                    fillMode: Image.PreserveAspectFit
+                                    smooth: true
+                                    mipmap: true
+                                    source: pdfDoc.source
+                                    currentFrame: startPageIndex+index
 
-                                Connections {
-                                    target: pageScaleSlider
-                                    function onPressedChanged() {
-                                        if(!pageScaleSlider.pressed)
-                                            pdfPage.configureSourceSize()
+                                    Component.onCompleted: configureSourceSize()
+                                    function configureSourceSize() {
+                                        const bound = (min, val, max) => {
+                                            return Math.min(max, Math.max(min,val))
+                                        }
+                                        const dpr = Scrite.app.isMacOSPlatform ? Scrite.document.displayFormat.devicePixelRatio : 1.0
+                                        sourceSize = Qt.size(dpr*bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
+                                                             dpr*bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
                                     }
-                                }
 
-                                BusyIcon {
-                                    anchors.centerIn: parent
-                                    running: pdfPage.status !== Image.Ready
-                                    opacity: 0.5
+                                    Connections {
+                                        target: pageScaleSlider
+                                        function onPressedChanged() {
+                                            if(!pageScaleSlider.pressed)
+                                                pdfPage.configureSourceSize()
+                                        }
+                                    }
+
+                                    BusyIcon {
+                                        anchors.centerIn: parent
+                                        running: pdfPage.status !== Image.Ready
+                                        opacity: 0.5
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
-
-        Item {
-            id: pinchScaler
-            scale: pageScaleSlider.value
-            width: parent.width
-            height: parent.height
-        }
-
-        PinchHandler {
-            id: pinchHandler
-            target: pinchScaler
-
-            minimumScale: pageScaleSlider.from
-            maximumScale: pageScaleSlider.to
-            minimumRotation: 0
-            maximumRotation: 0
-            minimumPointCount: 2
-
-            onScaleChanged: pageScaleSlider.value = activeScale
-        }
-    }
-
-    BoxShadow {
-        anchors.fill: floatingToolBar
-    }
-
-    Rectangle {
-        id: floatingToolBar
-        color: Runtime.colors.primary.c100.background
-        border.width: 1
-        border.color: Runtime.colors.primary.c500.background
-        width: floatingButtonsRow.width + 10
-        height: floatingButtonsRow.height + 20
-        anchors.bottom: statusBar.top
-        anchors.bottomMargin: height
-        anchors.horizontalCenter: parent.horizontalCenter
-
-        Row {
-            id: floatingButtonsRow
-            anchors.centerIn: parent
-
-            VclToolButton {
-                icon.source: "qrc:/icons/action/close.png"
-                ToolTip.text: "Closes the PDF View"
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked: closeRequest()
-                visible: closable
-            }
 
             Item {
-                width: 12
+                id: pinchScaler
+                scale: pageScaleSlider.value
+                width: parent.width
                 height: parent.height
-                visible: closable && pdfDoc.pageCount > 1
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    anchors.left: parent.left
-                    color: Runtime.colors.primary.c400.background
-                }
             }
 
+            PinchHandler {
+                id: pinchHandler
+                target: pinchScaler
+
+                minimumScale: pageScaleSlider.from
+                maximumScale: pageScaleSlider.to
+                minimumRotation: 0
+                maximumRotation: 0
+                minimumPointCount: 2
+
+                onScaleChanged: pageScaleSlider.value = activeScale
+            }
+        }
+
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 1
+
+            color: Runtime.colors.primary.separatorColor
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.leftMargin: 20
+            Layout.rightMargin: 20
+
+            spacing: 20
+
+            // Page Count
             VclLabel {
-                text: "View: "
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                anchors.verticalCenter: parent.verticalCenter
-                color: Runtime.colors.primary.c300.text
-                visible: pdfDoc.pageCount > 1
-                rightPadding: 10
+                text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
             }
 
-            VclComboBox {
-                Material.foreground: Runtime.colors.primary.c300.text
-                Material.background: Runtime.colors.primary.c300.background
-                currentIndex: Math.max(pdfDoc.pagesPerRow-1,0)
+            Rectangle {
+                Layout.preferredWidth: 1
+                Layout.preferredHeight: 30
+
+                color: Runtime.colors.primary.separatorColor
                 visible: pdfDoc.pageCount > 1
+            }
+
+            // Pages per row:
+            VclComboBox {
+                Layout.preferredWidth: Runtime.idealFontMetrics.boundingRect("View 3 Page(s)").width + 40
+
                 model: {
                     const nrPages = Math.min(3, pdfDoc.pageCount)
                     var ret = ["1 Page"]
@@ -252,42 +201,38 @@ Item {
                         ret.push("" + (i+1) + " Pages")
                     return ret
                 }
+                visible: pdfDoc.pageCount > 1
+                displayText: "View: " + currentText
+
                 onModelChanged: Qt.callLater( function() {
                     currentIndex = Qt.binding( function() { return Math.max(pdfDoc.pagesPerRow-1,0) } )
                 })
                 onCurrentIndexChanged: pageScaleSlider.value = pdfDoc.evaluatePageScale(currentIndex+1,pdfDoc.pageCount)
-                anchors.verticalCenter: parent.verticalCenter
             }
 
             Item {
-                width: 12
-                height: parent.height
-                visible: pdfDoc.pageCount > 1
-
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    anchors.right: parent.right
-                    color: Runtime.colors.primary.c400.background
-                    visible: displayRefreshButton.visible || saveFileButton.visible || revealFileButton.visible
-                }
+                Layout.fillWidth: true
             }
 
+            // Download & Refresh buttons
             VclToolButton {
+                ToolTip.text: "Regenerates this PDF and refreshes its content."
+
+                text: "Refresh"
                 visible: displayRefreshButton
                 icon.source: "qrc:/icons/navigation/refresh.png"
-                ToolTip.text: "Refresh"
-                anchors.verticalCenter: parent.verticalCenter
+
                 onClicked: refreshRequest()
             }
 
             VclToolButton {
-                id: saveFileButton
+                ToolTip.text: "Save this PDF to your computer."
+
+                text: "Save PDF"
+                down: saveMenu.visible
                 visible: (allowFileSave || saveFeatureDisabled)
                 icon.source: "qrc:/icons/file/file_download.png"
-                ToolTip.text: "Save PDF"
-                anchors.verticalCenter: parent.verticalCenter
-                down: saveMenu.visible
+
                 onClicked: {
                     if(saveFeatureDisabled)
                         saveDisabledNotice.open()
@@ -300,102 +245,109 @@ Item {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.topMargin: -saveMenu.height
-                    height: 1
 
-                    FileDialog {
-                        id: saveFileDialog
-                        nameFilters: ["Adobe PDF Files (*.pdf)"]
-                        folder: Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
-                        selectFolder: false
-                        selectMultiple: false
-                        selectExisting: false
-                        sidebarVisible: true
-                        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
-                        onAccepted: {
-                            const targetFilePath = Scrite.app.urlToLocalFile(saveFileDialog.fileUrl)
-                            const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath )
-                            if(downloadedFilePath !== "")
-                                Scrite.app.revealFileOnDesktop(downloadedFilePath)
-                        }
-                    }
+                    height: 1
 
                     VclMenu {
                         id: saveMenu
+
                         width: 325
 
                         VclMenuItem {
                             text: "To 'Downloads' folder"
                             property string targetFolder: StandardPaths.writableLocation(StandardPaths.DownloadLocation)
-                            onClicked: saveFileButton.savePdf(targetFolder)
+
+                            onClicked: _private.savePdf(targetFolder)
                         }
 
                         VclMenuItem {
                             text: Scrite.document.fileName === "" ?
-                                  "To 'Desktop' folder" :
-                                  "To the Scrite document folder"
+                                      "To 'Desktop' folder" :
+                                      "To the Scrite document folder"
                             property string targetFolder: Scrite.document.fileName === "" ? StandardPaths.writableLocation(StandardPaths.DesktopLocation) : Scrite.app.filePath(Scrite.document.fileName)
-                            onClicked: saveFileButton.savePdf(targetFolder)
+
+                            onClicked: _private.savePdf(targetFolder)
                         }
 
                         VclMenuItem {
                             text: "Other ..."
+
                             onClicked: saveFileDialog.open()
                         }
                     }
-                }
-
-                function savePdf(folderPath) {
-                    var targetFilePath = ""
-                    if(saveFilePath !== "")
-                        targetFilePath = Scrite.app.fileName(saveFilePath) + ".pdf"
-                    else
-                        targetFilePath = saveFileName
-                    targetFilePath = folderPath + "/" + targetFilePath
-
-                    const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath)
-                    if(downloadedFilePath !== "")
-                        Scrite.app.revealFileOnDesktop(downloadedFilePath)
                 }
             }
 
             VclToolButton {
                 id: revealFileButton
+
+                ToolTip.text: "Reveal the location of this PDF on your computer."
+
+                text: "Reveal"
                 visible: allowFileReveal
                 icon.source: "qrc:/icons/file/folder_open.png"
-                ToolTip.text: "Reveal the location of this PDF on your computer."
-                anchors.verticalCenter: parent.verticalCenter
+
                 onClicked: Scrite.app.revealFileOnDesktop( Scrite.app.urlToLocalFile(pdfDoc.source) )
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            // Zoom Slider
+            ZoomSlider {
+                id: pageScaleSlider
+
+                Layout.preferredHeight: 20
+                Layout.preferredWidth: implicitWidth
+
+                from: pdfDoc.minPageScale
+                to: pdfDoc.maxPageScale
+                value: 1
             }
         }
     }
 
-    Rectangle {
-        id: statusBar
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 30
-        color: Runtime.colors.primary.c300.background
-        border.width: 1
-        border.color: Runtime.colors.primary.c400.background
+    // Private Stuff
+    PdfDocument {
+        id: pdfDoc
+        property int  pagesPerRow: 1
+        property real minPageScale: evaluatePageScale(4)
+        property real idealPageScale: evaluatePageScale(Math.min(pageCount,2))
+        property real maxPageScale: evaluatePageScale(0.5)
 
-        VclText {
-            text: pdfDoc.pageCount + (pdfDoc.pageCount > 1 ? " Pages" : " Page")
-            font.pixelSize: statusBar.height * 0.5
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            color: Runtime.colors.accent.c300.text
+        source: root.source
+
+        onIdealPageScaleChanged: pageScaleSlider.value = idealPageScale
+        onStatusChanged: Qt.callLater( function() {
+            if(pageCount === 1 && pagesPerRow > 1)
+                pageScaleSlider.value = pdfView.height/maxPageHeight
+            else
+                pageScaleSlider.value = pdfDoc.evaluatePageScale(Math.min(pagesPerRow,pageCount))
+        })
+
+        function evaluatePageScale(nrPages) {
+            return status === PdfDocument.Ready ?
+                        Math.max(0.0000001,
+                                 ((pdfView.width/nrPages)-(2+nrPages-1)*pdfView.spacing)/maxPageWidth) :
+                        1
         }
+    }
 
-        ZoomSlider {
-            id: pageScaleSlider
-            from: pdfDoc.minPageScale
-            to: pdfDoc.maxPageScale
-            value: 1
-            height: parent.height-6
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
+    FileDialog {
+        id: saveFileDialog
+        nameFilters: ["Adobe PDF Files (*.pdf)"]
+        folder: Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
+        selectFolder: false
+        selectMultiple: false
+        selectExisting: false
+        sidebarVisible: true
+        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+        onAccepted: {
+            const targetFilePath = Scrite.app.urlToLocalFile(saveFileDialog.fileUrl)
+            const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath )
+            if(downloadedFilePath !== "")
+                Scrite.app.revealFileOnDesktop(downloadedFilePath)
         }
     }
 
@@ -408,6 +360,23 @@ Item {
 
         content: DisabledFeatureNotice {
             featureName: "Saving PDF Files"
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        function savePdf(folderPath) {
+            var targetFilePath = ""
+            if(saveFilePath !== "")
+                targetFilePath = Scrite.app.fileName(saveFilePath) + ".pdf"
+            else
+                targetFilePath = saveFileName
+            targetFilePath = folderPath + "/" + targetFilePath
+
+            const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath)
+            if(downloadedFilePath !== "")
+                Scrite.app.revealFileOnDesktop(downloadedFilePath)
         }
     }
 }
