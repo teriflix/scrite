@@ -37,5 +37,4 @@ QtObject {
         NotificationsView.init()
         AutoUpdateNotifications.init()
     }
-
 }

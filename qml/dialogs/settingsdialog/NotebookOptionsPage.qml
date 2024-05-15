@@ -40,6 +40,34 @@ Item {
             Layout.fillWidth: true
 
             label: VclLabel {
+                text: "Text Notes"
+            }
+
+            ColumnLayout {
+                width: parent.width
+
+                TextArea {
+                    Layout.fillWidth: true
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                    wrapMode: Text.WordWrap
+                    textFormat: TextArea.RichText
+                    readOnly: true
+                    background: Item { }
+                    text: "If you are unable to open scene, story or character notes, then uncheck this option. Scrite uses a web-based text editor for accepting rich formatted text notes. However, on some computers this may fail to launch causing Scrite to crash. In such cases unchecking the option below allows you to capture plain text notes."
+                }
+
+                VclCheckBox {
+                    text: "Use Rich Text Notes"
+                    checked: Runtime.notebookSettings.richTextNotesEnabled
+                    onToggled: Runtime.notebookSettings.richTextNotesEnabled = checked
+                }
+            }
+        }
+
+        GroupBox {
+            Layout.fillWidth: true
+
+            label: VclLabel {
                 text: "Relationship Graph"
             }
 

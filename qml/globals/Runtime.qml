@@ -209,6 +209,7 @@ Item {
         property int graphLayoutMaxTime: 1000
         property int graphLayoutMaxIterations: 50000
         property bool showAllFormQuestions: true
+        property bool richTextNotesEnabled: true
     }
 
     readonly property Settings paragraphLanguageSettings: Settings {

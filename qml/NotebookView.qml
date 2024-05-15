@@ -2919,28 +2919,59 @@ Rectangle {
                                 height: parent.height
 
                                 AttachmentsDropArea {
+                                    id: characterAttachments
                                     anchors.fill: parent
                                     allowMultiple: true
                                     target: character ? character.attachments : null
                                 }
 
-                                RichTextEdit {
-                                    id: characterSummaryField
+                                LodLoader {
+                                    id: summaryLoader
+
+                                    property Character character: characterNotes.character
+
                                     width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
                                     height: parent.height
                                     anchors.centerIn: parent
                                     anchors.horizontalCenterOffset: -5
-                                    text: character.summary
-                                    onTextChanged: character.summary = text
-                                    placeholderText: "Character Summary"
-                                    tabSequenceIndex: 10
-                                    tabSequenceManager: characterInfoTabSequence
-                                    background: Rectangle {
-                                        color: Runtime.colors.primary.windowColor
-                                        opacity: 0.15
+
+                                    lod: Runtime.notebookSettings.richTextNotesEnabled ? eHIGH : eLOW
+                                    sanctioned: character
+                                    resetWidthBeforeLodChange: false
+                                    resetHeightBeforeLodChange: false
+
+                                    lowDetailComponent: FlickableTextArea {
+                                        DeltaDocument {
+                                            id: summaryContent
+                                            content: summaryLoader.character.summary
+                                        }
+
+                                        text: summaryContent.plainText
+                                        placeholderText: "Character Summary"
+                                        tabSequenceIndex: 10
+                                        tabSequenceManager: characterInfoTabSequence
+                                        background: Rectangle {
+                                            color: Runtime.colors.primary.windowColor
+                                            opacity: 0.15
+                                        }
+
+                                        onTextChanged: if(textArea.activeFocus) summaryLoader.character.summary = text
                                     }
-                                    adjustTextWidthBasedOnScrollBar: false
-                                    // ScrollBar.vertical: characterSummaryVScrollBar
+
+                                    highDetailComponent: RichTextEdit {
+                                        text: summaryLoader.character.summary
+                                        placeholderText: "Character Summary"
+                                        tabSequenceIndex: 10
+                                        tabSequenceManager: characterInfoTabSequence
+                                        background: Rectangle {
+                                            color: Runtime.colors.primary.windowColor
+                                            opacity: 0.15
+                                        }
+                                        adjustTextWidthBasedOnScrollBar: false
+                                        // ScrollBar.vertical: characterSummaryVScrollBar
+
+                                        onTextChanged: summaryLoader.character.summary = text
+                                    }
                                 }
                             }
                         }

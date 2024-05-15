@@ -29,7 +29,7 @@ Item {
 
     EventFilter.events: [EventFilter.Wheel]
     EventFilter.onFilter: {
-        EventFilter.forwardEventTo(contentField)
+        EventFilter.forwardEventTo(contentFieldLoader.item)
         result.filter = true
         result.accepted = true
     }
@@ -59,31 +59,67 @@ Item {
                 if(note)
                     note.title = text
             }
-            // onActiveFocusChanged: {
-            //     if(activeFocus)
-            //         noteFlickable.contentY = 0
-            // }
+            onActiveFocusChanged: {
+                if(activeFocus) {
+                    if(contentFieldLoader.item && contentFieldLoader.lod === contentFieldLoader.eLOW)
+                        contentFieldLoader.item.contentY = 0
+                }
+            }
         }
 
-        RichTextEdit {
-            id: contentField
-            text: note ? note.content : ""
-            placeholderText: "Content"
+        LodLoader {
+            id: contentFieldLoader
+
             width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
-            readOnly: Scrite.document.readOnly
-            anchors.horizontalCenter: parent.horizontalCenter
             height: parent.height - titleField.height - parent.spacing
-            tabSequenceManager: noteTabManager
-            tabSequenceIndex: 1
-            adjustTextWidthBasedOnScrollBar: false
-            // ScrollBar.vertical: noteVScrollBar
-            onTextChanged: {
-                if(note)
-                    note.content = text
+
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            lod: Runtime.notebookSettings.richTextNotesEnabled ? eHIGH : eLOW
+            sanctioned: note
+            resetWidthBeforeLodChange: false
+            resetHeightBeforeLodChange: false
+
+            lowDetailComponent: FlickableTextArea {
+                DeltaDocument {
+                    id: noteContent
+                    content: note.content
+                }
+
+                text: noteContent.plainText
+                placeholderText: "Content"
+                tabSequenceIndex: 1
+                tabSequenceManager: noteTabManager
+
+                background: Rectangle {
+                    color: Runtime.colors.primary.windowColor
+                    opacity: 0.15
+                }
+
+                onTextChanged: if(textArea.activeFocus) note.content = text
+
+                function assumeFocus() {
+                    textArea.forceActiveFocus()
+                }
             }
-            background: Rectangle {
-                color: Runtime.colors.primary.windowColor
-                opacity: 0.15
+
+            highDetailComponent: RichTextEdit {
+                text: note.content
+                placeholderText: "Content"
+                tabSequenceIndex: 1
+                tabSequenceManager: noteTabManager
+                adjustTextWidthBasedOnScrollBar: false
+
+                background: Rectangle {
+                    color: Runtime.colors.primary.windowColor
+                    opacity: 0.15
+                }
+
+                onTextChanged: note.content = text
+
+                function assumeFocus() {
+                    textArea.forceActiveFocus()
+                }
             }
         }
     }
@@ -112,8 +148,10 @@ Item {
     onNoteChanged: {
         if(note.objectName === "_newNote")
             titleField.forceActiveFocus()
-        else if(note.objectName === "_focusNote")
-            contentField.textArea.forceActiveFocus()
+        else if(note.objectName === "_focusNote") {
+            if(contentFieldLoader.item)
+                contentFieldLoader.item.assumeFocus()
+        }
         note.objectName = ""
     }
 }
