@@ -1113,7 +1113,7 @@ Item {
                     importFileDialog.open()
                 }
 
-                FileDialog {
+                VclFileDialog {
                     id: importFileDialog
                     title: "Import Screenplay"
                     objectName: "Import Dialog Box"
@@ -1123,7 +1123,7 @@ Item {
                     sidebarVisible: true
                     selectExisting: true
                     folder: Runtime.workspaceSettings.lastOpenImportFolderUrl
-                    dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+                     // The default Ctrl+U interfers with underline
                     onFolderChanged: Runtime.workspaceSettings.lastOpenImportFolderUrl = folder
 
                     onAccepted: {
@@ -1332,7 +1332,7 @@ Item {
         }
     }
 
-    FileDialog {
+    VclFileDialog {
         id: openFileDialog
 
         title: "Open Scrite Document"
@@ -1340,7 +1340,7 @@ Item {
         selectFolder: false
         selectMultiple: false
         objectName: "Open File Dialog"
-        dirUpAction.shortcut: "Ctrl+Shift+U"
+
         folder: Runtime.workspaceSettings.lastOpenFolderUrl
         onFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
         sidebarVisible: true

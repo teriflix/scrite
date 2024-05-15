@@ -2,6 +2,7 @@ VclButton 1.0 VclButton.qml
 VclCheckBox 1.0 VclCheckBox.qml
 VclComboBox 1.0 VclComboBox.qml
 VclDialog 1.0 VclDialog.qml
+VclFileDialog 1.0 VclFileDialog.qml
 VclLabel 1.0 VclLabel.qml
 VclMenu 1.0 VclMenu.qml
 VclMenuItem 1.0 VclMenuItem.qml

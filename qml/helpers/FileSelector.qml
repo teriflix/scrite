@@ -39,7 +39,7 @@ Item {
         id: fileInfo
     }
 
-    FileDialog {
+    VclFileDialog {
         id: folderPathDialog
         folder: {
             if(fileInfo.absolutePath !== "") {
@@ -52,7 +52,7 @@ Item {
         selectMultiple: false
         selectExisting: false
         onAccepted: fileInfo.absolutePath = Scrite.app.urlToLocalFile(fileUrl)
-        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+         // The default Ctrl+U interfers with underline
     }
 
     Column {

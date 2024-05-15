@@ -176,13 +176,13 @@ Item {
     Component {
         id: saveFileDialog
 
-        FileDialog {
+        VclFileDialog {
             title: "Save Scrite Document As"
             nameFilters: ["Scrite Documents (*.scrite)"]
             selectFolder: false
             selectMultiple: false
             objectName: "Save File Dialog"
-            dirUpAction.shortcut: "Ctrl+Shift+U"
+            
             folder: Runtime.workspaceSettings.lastOpenFolderUrl
             onFolderChanged: Runtime.workspaceSettings.lastOpenFolderUrl = folder
             sidebarVisible: true

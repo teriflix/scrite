@@ -334,7 +334,7 @@ Item {
         }
     }
 
-    FileDialog {
+    VclFileDialog {
         id: saveFileDialog
         nameFilters: ["Adobe PDF Files (*.pdf)"]
         folder: Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
@@ -342,7 +342,7 @@ Item {
         selectMultiple: false
         selectExisting: false
         sidebarVisible: true
-        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+         // The default Ctrl+U interfers with underline
         onAccepted: {
             const targetFilePath = Scrite.app.urlToLocalFile(saveFileDialog.fileUrl)
             const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath )

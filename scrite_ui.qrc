@@ -166,5 +166,6 @@
         <file>qml/tasks/qmldir</file>
         <file>qml/tasks/SaveFileTask.qml</file>
         <file>qml/TimelineView.qml</file>
+        <file>qml/controls/VclFileDialog.qml</file>
     </qresource>
 </RCC>

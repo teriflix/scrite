@@ -152,7 +152,7 @@ Item {
         screenplayOffsetsModel.fileName = screenplayOffsetsModel.fileNameFrom(fileUrl)
     }
 
-    FileDialog {
+    VclFileDialog {
         id: fileDialog
         folder: Runtime.scritedSettings.lastOpenScritedFolderUrl
         onFolderChanged: Qt.callLater( function() { Runtime.scritedSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
@@ -160,7 +160,7 @@ Item {
         selectMultiple: false
         selectExisting: true
         onAccepted: loadMediaUrl(fileUrl)
-        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+         // The default Ctrl+U interfers with underline
     }
 
     SplitView {

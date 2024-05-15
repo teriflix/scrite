@@ -123,14 +123,14 @@ ListView {
     property bool scrollBarVisible: contentWidth > width
     ScrollBar.horizontal: VclScrollBar { flickable: attachmentsView }
 
-    FileDialog {
+    VclFileDialog {
         id: fileDialog
         nameFilters: attachments ? attachments.nameFilters : ["All Types (*.*)"]
         selectFolder: false
         selectMultiple: false
         sidebarVisible: true
         selectExisting: true
-        dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+         // The default Ctrl+U interfers with underline
         onAccepted: {
             if(attachments === null)
                 return

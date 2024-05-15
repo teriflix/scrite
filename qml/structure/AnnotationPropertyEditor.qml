@@ -502,14 +502,14 @@ Item {
             border.width: 1
             border.color: Runtime.colors.primary.borderColor
 
-            FileDialog {
+            VclFileDialog {
                 id: fileDialog
                 nameFilters: ["Photos (*.jpg *.png *.bmp *.jpeg)"]
                 selectFolder: false
                 selectMultiple: false
                 sidebarVisible: true
                 selectExisting: true
-                dirUpAction.shortcut: "Ctrl+Shift+U" // The default Ctrl+U interfers with underline
+                 // The default Ctrl+U interfers with underline
                 onAccepted: {
                     if(fileUrl != "") {
                         if(propertyValue != "")
