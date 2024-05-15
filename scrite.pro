@@ -336,6 +336,10 @@ win32 {
     LIBS += User32.lib
 }
 
+linux {
+    CONFIG+=use_gold_linker
+}
+
 include($$PWD/3rdparty/sonnet/sonnet.pri)
 include($$PWD/3rdparty/quazip/quazip.pri)
 include($$PWD/3rdparty/simplecrypt/simplecrypt.pri)
