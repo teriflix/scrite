@@ -2449,7 +2449,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         block = block.next();
     }
 
-    const QByteArray contentJson = QJsonDocument(content).toJson();
+    const QByteArray contentJson = QJsonDocument(content).toJson(QJsonDocument::Compact);
 
     QClipboard *clipboard = Application::instance()->clipboard();
     QMimeData *mimeData = new QMimeData;
@@ -2531,7 +2531,7 @@ int SceneDocumentBinder::paste(int fromPosition)
     for (int i = 0; i < paragraphs.size(); i++) {
         const Paragraph paragraph = paragraphs.at(i);
         if (i > 0)
-            cursor.insertBlock();
+            cursor.insertBlock(QTextBlockFormat(), QTextCharFormat());
 
         const int bstart = cursor.position();
         cursor.insertText(paragraph.text);
