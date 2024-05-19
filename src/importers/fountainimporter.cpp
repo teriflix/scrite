@@ -14,6 +14,7 @@
 #include "fountainimporter.h"
 #include "application.h"
 
+#include <QBuffer>
 #include <QRegExp>
 
 FountainImporter::FountainImporter(QObject *parent) : AbstractImporter(parent) { }
@@ -64,7 +65,6 @@ bool FountainImporter::doImport(QIODevice *device)
     };
 
     const QChar space(' ');
-    const QByteArray bytes = device->readAll();
     const QRegExp multipleSpaces(QStringLiteral("\\s+"));
     const QString singleSpace = QStringLiteral(" ");
     const QString pound = QStringLiteral("#");
@@ -79,7 +79,11 @@ bool FountainImporter::doImport(QIODevice *device)
     const QString gt = QStringLiteral(">");
     const QString lt = QStringLiteral("<");
 
-    QTextStream ts(bytes);
+    QByteArray bytes = device->readAll();
+    QBuffer bytesBuffer(&bytes);
+    bytesBuffer.open(QIODevice::ReadWrite);
+
+    QTextStream ts(&bytesBuffer);
     ts.setCodec("utf-8");
     ts.setAutoDetectUnicode(true);
 
@@ -91,6 +95,17 @@ bool FountainImporter::doImport(QIODevice *device)
         ++lineNr;
 
         QString line = ts.readLine();
+
+        auto checkIfLineIsEmpty = [&]() {
+            if (line.isEmpty()) {
+                inCharacter = false;
+                hasParaBreak = true;
+                character = nullptr;
+                mergeWithLastPara = false;
+                return true;
+            }
+            return false;
+        };
 
         nrWhiteSpacesInPrevLine = nrWhiteSpaces;
         nrWhiteSpaces = 0;
@@ -105,13 +120,8 @@ bool FountainImporter::doImport(QIODevice *device)
         line = line.trimmed();
         line.replace(multipleSpaces, singleSpace);
 
-        if (line.isEmpty()) {
-            inCharacter = false;
-            hasParaBreak = true;
-            character = nullptr;
-            mergeWithLastPara = false;
+        if (checkIfLineIsEmpty())
             continue;
-        }
 
         if (inCharacter && nrWhiteSpacesInPrevLine > 0 && nrWhiteSpaces == 0) {
             inCharacter = false;
@@ -143,10 +153,30 @@ bool FountainImporter::doImport(QIODevice *device)
         line = line.remove(QStringLiteral("*"));
         line = line.remove(QStringLiteral("^"));
 
+        if (checkIfLineIsEmpty())
+            continue;
+
+        // Sometimes, fountain files contain scene heading right after a
+        // transition.
+        bool isTransition = false;
+        {
+            const QStringList transitions = this->document()->structure()->transitions();
+            for (const QString &transition : transitions) {
+                if (line.startsWith(transition + ":")) {
+                    const QString pendingLine = line.mid(transition.length() + 1);
+                    bytes.insert(ts.pos(), pendingLine.toUtf8());
+
+                    line = line.left(transition.length() + 1);
+                    isTransition = true;
+                    break;
+                }
+            }
+        }
+
         // detect if ths line contains a header.
         bool isHeader = false;
         //        if(!inCharacter && !isHeader)
-        {
+        if (!isTransition) {
             if (line.length() >= 2) {
                 if (line.at(0) == dot[0] && line.at(1) != dot[0])
                     isHeader = true;
@@ -168,22 +198,21 @@ bool FountainImporter::doImport(QIODevice *device)
         }
 
         if (isHeader) {
-            ++sceneCounter;
-            screenplay->setCurrentElementIndex(-1);
-            currentScene = this->createScene(QString());
-
-            SceneHeading *heading = currentScene->heading();
             if (line.at(0) == dot[0])
                 line = line.remove(0, 1);
-            heading->parseFrom(line);
 
+            ++sceneCounter;
+            screenplay->setCurrentElementIndex(-1);
+            currentScene = this->createScene(line);
+
+            SceneHeading *heading = currentScene->heading();
             QString locationForTitle = heading->location();
             if (locationForTitle.length() > 25)
                 locationForTitle = locationForTitle.left(22) + "...";
 
             currentScene->setSynopsis(QStringLiteral("Scene number #%1 at %2")
-                                           .arg(sceneCounter + 1)
-                                           .arg(locationForTitle));
+                                              .arg(sceneCounter + 1)
+                                              .arg(locationForTitle));
             continue;
         }
 

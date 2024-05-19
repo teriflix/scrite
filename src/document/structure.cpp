@@ -2604,14 +2604,14 @@ void Annotation::onDfsAuction(const QString &filePath, int *claims)
 
 static QStringList defaultTransitions()
 {
-    return QStringList({ QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"),
-                         QStringLiteral("FADE IN"), QStringLiteral("FADE OUT"),
-                         QStringLiteral("FADE TO"), QStringLiteral("FLASH CUT TO"),
-                         QStringLiteral("FREEZE FRAME"), QStringLiteral("IRIS IN"),
-                         QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"),
-                         QStringLiteral("MATCH CUT TO"), QStringLiteral("MATCH DISSOLVE TO"),
-                         QStringLiteral("SMASH CUT TO"), QStringLiteral("STOCK SHOT"),
-                         QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
+    return QStringList(
+            { QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"), QStringLiteral("FADE IN"),
+              QStringLiteral("FADE OUT"), QStringLiteral("FADE TO"), QStringLiteral("FLASHBACK"),
+              QStringLiteral("FLASH CUT TO"), QStringLiteral("FREEZE FRAME"),
+              QStringLiteral("IRIS IN"), QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"),
+              QStringLiteral("MATCH CUT TO"), QStringLiteral("MATCH DISSOLVE TO"),
+              QStringLiteral("SMASH CUT TO"), QStringLiteral("STOCK SHOT"),
+              QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
 }
 
 static QStringList defaultShots()
