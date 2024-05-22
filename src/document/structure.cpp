@@ -11,15 +11,12 @@
 **
 ****************************************************************************/
 
+#include "scrite.h"
 #include "undoredo.h"
 #include "structure.h"
 #include "hourglass.h"
-#include "aggregation.h"
-#include "errorreport.h"
 #include "filemanager.h"
 #include "application.h"
-#include "focustracker.h"
-#include "timeprofiler.h"
 #include "deltadocument.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
@@ -2602,29 +2599,6 @@ void Annotation::onDfsAuction(const QString &filePath, int *claims)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static QStringList defaultTransitions()
-{
-    return QStringList(
-            { QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"), QStringLiteral("FADE IN"),
-              QStringLiteral("FADE OUT"), QStringLiteral("FADE TO"), QStringLiteral("FLASHBACK"),
-              QStringLiteral("FLASH CUT TO"), QStringLiteral("FREEZE FRAME"),
-              QStringLiteral("IRIS IN"), QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"),
-              QStringLiteral("MATCH CUT TO"), QStringLiteral("MATCH DISSOLVE TO"),
-              QStringLiteral("SMASH CUT TO"), QStringLiteral("STOCK SHOT"),
-              QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
-}
-
-static QStringList defaultShots()
-{
-    return QStringList({ QStringLiteral("AIR"), QStringLiteral("CLOSE ON"),
-                         QStringLiteral("CLOSER ON"), QStringLiteral("CLOSEUP"),
-                         QStringLiteral("ESTABLISHING"), QStringLiteral("EXTREME CLOSEUP"),
-                         QStringLiteral("INSERT"), QStringLiteral("POV"), QStringLiteral("SURFACE"),
-                         QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"),
-                         QStringLiteral("UNDERWATER"), QStringLiteral("WIDE"),
-                         QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
-}
-
 Structure::Structure(QObject *parent)
     : QObject(parent),
       m_scriteDocument(qobject_cast<ScriteDocument *>(parent)),
@@ -2686,8 +2660,8 @@ Structure::Structure(QObject *parent)
 
     this->loadDefaultGroupsData();
 
-    m_transitions = defaultTransitions();
-    m_shots = defaultShots();
+    m_transitions = Scrite::defaultTransitions();
+    m_shots = Scrite::defaultShots();
 
     this->loadDefaultIndexCardFields();
     m_indexCardFields = m_defaultIndexCardFields;
@@ -5091,7 +5065,7 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
 
     const QStringList shots = [=]() {
         QSet<QString> set = QSet<QString>::fromList(m_shotElementMap.shots());
-        set += QSet<QString>::fromList(defaultShots());
+        set += QSet<QString>::fromList(Scrite::defaultShots());
         QStringList ret = QStringList::fromSet(set);
         std::sort(ret.begin(), ret.end());
         return ret;
@@ -5103,7 +5077,7 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
 
     const QStringList transitions = [=]() {
         QSet<QString> set = QSet<QString>::fromList(m_transitionElementMap.transitions());
-        set += QSet<QString>::fromList(defaultTransitions());
+        set += QSet<QString>::fromList(Scrite::defaultTransitions());
         QStringList ret = QStringList::fromSet(set);
         std::sort(ret.begin(), ret.end());
         return ret;

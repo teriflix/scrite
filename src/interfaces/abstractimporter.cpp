@@ -81,6 +81,10 @@ bool AbstractImporter::read()
     document->reset();
 
     // Remove any blank scenes created in reset()
+    Screenplay *screenplay = document->screenplay();
+    while (screenplay->elementCount())
+        screenplay->removeElement(screenplay->elementAt(0));
+
     Structure *structure = document->structure();
     while (structure->elementCount())
         structure->removeElement(structure->elementAt(0));
@@ -101,14 +105,10 @@ bool AbstractImporter::read()
     const QMetaClassInfo classInfo = mo->classInfo(mo->indexOfClassInfo("Format"));
     this->progress()->setProgressText(QString("Importing from \"%1\"").arg(classInfo.value()));
 
-    ScriteDocument *doc = this->document();
-    Screenplay *screenplay = doc->screenplay();
-
     this->progress()->start();
     UndoStack::ignoreUndoCommands = true;
     const bool ret = this->doImport(&file);
     if (ret) {
-        Structure *structure = doc->structure();
         for (int i = 0; i < structure->elementCount(); i++) {
             StructureElement *element = structure->elementAt(i);
             if (element != nullptr && element->scene() != nullptr)

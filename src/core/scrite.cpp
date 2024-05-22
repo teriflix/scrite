@@ -73,3 +73,26 @@ void Scrite::setFileNameToOpen(const QString &val)
     if (m_fileNameToOpen.isEmpty())
         m_fileNameToOpen = val;
 }
+
+QStringList Scrite::defaultTransitions()
+{
+    return QStringList(
+            { QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"), QStringLiteral("FADE IN"),
+              QStringLiteral("FADE OUT"), QStringLiteral("FADE TO"), QStringLiteral("FLASHBACK"),
+              QStringLiteral("FLASH CUT TO"), QStringLiteral("FREEZE FRAME"),
+              QStringLiteral("IRIS IN"), QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"),
+              QStringLiteral("MATCH CUT TO"), QStringLiteral("MATCH DISSOLVE TO"),
+              QStringLiteral("SMASH CUT TO"), QStringLiteral("STOCK SHOT"),
+              QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
+}
+
+QStringList Scrite::defaultShots()
+{
+    return QStringList({ QStringLiteral("AIR"), QStringLiteral("CLOSE ON"),
+                         QStringLiteral("CLOSER ON"), QStringLiteral("CLOSEUP"),
+                         QStringLiteral("ESTABLISHING"), QStringLiteral("EXTREME CLOSEUP"),
+                         QStringLiteral("INSERT"), QStringLiteral("POV"), QStringLiteral("SURFACE"),
+                         QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"),
+                         QStringLiteral("UNDERWATER"), QStringLiteral("WIDE"),
+                         QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
+}

@@ -126,6 +126,7 @@ HEADERS += \
     src/reports/statisticsreport.h \
     src/reports/statisticsreport_p.h \
     src/utils/execlatertimer.h \
+    src/utils/fountain.h \
     src/utils/graphlayout.h \
     src/utils/timeprofiler.h \
     src/utils/garbagecollector.h \
@@ -258,6 +259,7 @@ SOURCES += \
     src/reports/statisticsreport.cpp \
     src/reports/statisticsreport_p.cpp \
     src/utils/execlatertimer.cpp \
+    src/utils/fountain.cpp \
     src/utils/genericarraymodel.cpp \
     src/utils/graphlayout.cpp \
     src/utils/timeprofiler.cpp \

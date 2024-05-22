@@ -78,6 +78,12 @@ public:
     static QString fileNameToOpen() { return m_fileNameToOpen; }
     static void setFileNameToOpen(const QString &val);
 
+    Q_PROPERTY(QStringList defaultTransitions READ defaultTransitions CONSTANT)
+    static QStringList defaultTransitions();
+
+    Q_PROPERTY(QStringList defaultShots READ defaultShots CONSTANT)
+    static QStringList defaultShots();
+
 private:
     static QString m_fileNameToOpen;
 };
