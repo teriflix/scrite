@@ -2397,10 +2397,26 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
     QJsonArray content;
 
+    Fountain::Body fBody;
+
+    if (fromPosition == 0 && m_scene->heading()->isEnabled()) {
+        Fountain::Element fElement;
+        fElement.text = m_scene->heading()->displayText();
+        fElement.sceneNumber =
+                m_screenplayElement ? m_screenplayElement->userSceneNumber() : QString();
+        fElement.type = Fountain::Element::SceneHeading;
+        fBody.append(fElement);
+
+        fElement = Fountain::Element();
+        if (!m_scene->synopsis().isEmpty()) {
+            fElement.text = m_scene->synopsis();
+            fElement.type = Fountain::Element::Synopsis;
+            fBody.append(fElement);
+        }
+    }
+
     QTextCursor cursor(this->document());
     cursor.setPosition(fromPosition);
-
-    QStringList lines;
 
     QTextBlock block = cursor.block();
     while (block.isValid() && toPosition > block.position()) {
@@ -2420,6 +2436,33 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         cursor.setPosition(qMin(toPosition, bend), QTextCursor::KeepAnchor);
 
         SceneElement *element = userData->sceneElement();
+
+        Fountain::Element fElement;
+        fElement.text = element->formattedText();
+        fElement.formats = element->textFormats();
+        switch (element->type()) {
+        default:
+        case SceneElement::Action:
+            fElement.type = Fountain::Element::Action;
+            break;
+        case SceneElement::Character:
+            fElement.type = Fountain::Element::Character;
+            break;
+        case SceneElement::Dialogue:
+            fElement.type = Fountain::Element::Dialogue;
+            break;
+        case SceneElement::Parenthetical:
+            fElement.type = Fountain::Element::Parenthetical;
+            break;
+        case SceneElement::Shot:
+            fElement.type = Fountain::Element::Shot;
+            break;
+        case SceneElement::Transition:
+            fElement.type = Fountain::Element::Transition;
+            break;
+        }
+
+        fBody.append(fElement);
 
         QJsonObject para;
         para.insert(QStringLiteral("type"), element->type());
@@ -2445,8 +2488,6 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
         content.append(para);
 
-        lines += cursor.selectedText();
-
         block = block.next();
     }
 
@@ -2455,7 +2496,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     QClipboard *clipboard = Application::instance()->clipboard();
     QMimeData *mimeData = new QMimeData;
     mimeData->setData(QStringLiteral("scrite/screenplay"), contentJson);
-    mimeData->setText(lines.join("\n"));
+    mimeData->setText(Fountain::Writer(fBody).toString());
     clipboard->setMimeData(mimeData);
 }
 
@@ -2505,6 +2546,8 @@ int SceneDocumentBinder::paste(int fromPosition)
                     case Fountain::Element::SceneHeading:
                         if (fromPosition == 0 && !sceneHeadingChanged) {
                             m_scene->heading()->parseFrom(element.text);
+                            if (!element.sceneNumber.isEmpty() && m_screenplayElement != nullptr)
+                                m_screenplayElement->setUserSceneNumber(element.sceneNumber);
                             sceneHeadingChanged = true;
                             includeParagraph = false;
                         } else {
