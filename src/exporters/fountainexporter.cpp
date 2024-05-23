@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "fountainexporter.h"
+#include "fountain.h"
 
 #include <QFileInfo>
 
@@ -21,108 +22,98 @@ FountainExporter::~FountainExporter() { }
 
 bool FountainExporter::doExport(QIODevice *device)
 {
-    // Have tried to generate the Fountain file as closely as possible to
-    // the syntax described here: https://fountain.io/syntax
     const Screenplay *screenplay = this->document()->screenplay();
     const int nrElements = screenplay->elementCount();
 
-    QTextStream ts(device);
-    ts.setCodec("utf-8");
-    ts.setAutoDetectUnicode(true);
+    using GetterType = QString (Screenplay::*)() const;
+    const QList<QPair<QString, GetterType>> titlePageGetters = {
+        { "Title", &Screenplay::title },
+        { "Subtitle", &Screenplay::subtitle },
+        { "Based On", &Screenplay::basedOn },
+        { "Authors", &Screenplay::author },
+        { "Contact", &Screenplay::contact },
+        { "Address", &Screenplay::address },
+        { "Phone Number", &Screenplay::phoneNumber },
+        { "Website", &Screenplay::website },
+        { "Email", &Screenplay::email },
+        { "Logline", &Screenplay::logline }
+    };
 
-    bool hasTitleSegment = false;
-    if (!screenplay->title().isEmpty()) {
-        ts << "Title: " << screenplay->title();
-        if (!screenplay->subtitle().isEmpty())
-            ts << " (" << screenplay->subtitle() << ")\n";
-        else
-            ts << "\n";
-        hasTitleSegment = true;
+    Fountain::TitlePage fTitlePage;
+    for (const auto &titlePageGetter : titlePageGetters) {
+        const QString value = ((*screenplay).*titlePageGetter.second)();
+        if (!value.isEmpty())
+            fTitlePage.append(qMakePair(titlePageGetter.first, value));
     }
 
-    if (!screenplay->author().isEmpty()) {
-        ts << "Author: " << screenplay->author() << "\n";
-        hasTitleSegment = true;
-    }
-
-    if (!screenplay->contact().isEmpty()) {
-        ts << "Contact: " << screenplay->contact() << "\n";
-        hasTitleSegment = true;
-    }
-
-    if (!screenplay->version().isEmpty()) {
-        ts << "Version: " << screenplay->version() << "\n";
-        hasTitleSegment = true;
-    }
-
-    if (hasTitleSegment)
-        ts << "\n\n";
+    Fountain::Body fBody;
 
     for (int i = 0; i < nrElements; i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        if (element->elementType() == ScreenplayElement::BreakElementType)
-            ts << "#" << element->sceneID() << "\n\n";
-        else {
-            const Scene *scene = element->scene();
-            const SceneHeading *heading = scene->heading();
-            if (heading->isEnabled()) {
-                ts << ".";
-                if (element->isOmitted())
-                    ts << "[OMITTED] ";
-                ts << heading->text() << "\n\n";
-            } else {
-                if (element->isOmitted())
-                    ts << ".[OMITTED]\n\n";
+
+        if (element->elementType() == ScreenplayElement::BreakElementType) {
+            Fountain::Element fElement;
+            fElement.type = Fountain::Element::Section;
+            fElement.sectionDepth = 1;
+            fElement.text = element->sceneID();
+            fBody.append(fElement);
+            continue;
+        }
+
+        const Scene *scene = element->scene();
+        const SceneHeading *heading = scene->heading();
+
+        Fountain::Element fSceneHeading;
+        fSceneHeading.type = Fountain::Element::SceneHeading;
+        fSceneHeading.text = heading->isEnabled() ? heading->text() : QString();
+        fSceneHeading.sceneNumber = element->userSceneNumber();
+        fBody.append(fSceneHeading);
+
+        if (element->isOmitted()) {
+            Fountain::Element fOmittedPara;
+            fOmittedPara.type = Fountain::Element::Action;
+            fOmittedPara.notes << "Omitted";
+            fBody.append(fOmittedPara);
+            continue;
+        }
+
+        const int nrParas = scene->elementCount();
+        for (int j = 0; j < nrParas; j++) {
+            const SceneElement *para = scene->elementAt(j);
+
+            Fountain::Element fPara;
+            fPara.text = para->formattedText();
+            fPara.formats = para->textFormats();
+
+            switch (para->type()) {
+            case SceneElement::Shot:
+                fPara.type = Fountain::Element::Shot;
+                break;
+            case SceneElement::Transition:
+                fPara.type = Fountain::Element::Transition;
+                break;
+            case SceneElement::Character:
+                fPara.type = Fountain::Element::Character;
+                break;
+            case SceneElement::Action:
+                fPara.type = Fountain::Element::Action;
+                break;
+            case SceneElement::Dialogue:
+                fPara.type = Fountain::Element::Dialogue;
+                break;
+            case SceneElement::Parenthetical:
+                fPara.type = Fountain::Element::Parenthetical;
+                break;
+            default:
+                break;
             }
 
-            if (element->isOmitted())
-                continue;
-
-            const int nrParas = scene->elementCount();
-            for (int j = 0; j < nrParas; j++) {
-                const SceneElement *para = scene->elementAt(j);
-
-                switch (para->type()) {
-                case SceneElement::All:
-                    break;
-                case SceneElement::Shot:
-                case SceneElement::Transition:
-                    ts << "> ";
-                    break;
-                case SceneElement::Heading:
-                    ts << ".";
-                    break;
-                case SceneElement::Character:
-                    ts << "@";
-                    break;
-                case SceneElement::Action:
-                case SceneElement::Dialogue:
-                case SceneElement::Parenthetical:
-                    break;
-                }
-
-                ts << para->formattedText();
-
-                switch (para->type()) {
-                case SceneElement::All:
-                    break;
-                case SceneElement::Transition:
-                case SceneElement::Heading:
-                case SceneElement::Action:
-                case SceneElement::Dialogue:
-                    ts << "\n\n";
-                    break;
-                case SceneElement::Shot:
-                    ts << "<\n\n";
-                    break;
-                case SceneElement::Character:
-                case SceneElement::Parenthetical:
-                    ts << "\n";
-                    break;
-                }
-            }
+            if (fPara.type != fPara.None)
+                fBody.append(fPara);
         }
     }
 
-    return true;
+    Fountain::Writer writer(fTitlePage, fBody);
+
+    return writer.write(device);
 }

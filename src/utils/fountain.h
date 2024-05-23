@@ -56,6 +56,10 @@ struct Element
     QJsonObject toJson() const;
 };
 
+typedef QPair<QString, QString> TitlePageField;
+typedef QList<TitlePageField> TitlePage;
+typedef QList<Element> Body;
+
 class Parser
 {
 public:
@@ -108,6 +112,47 @@ private:
     int m_options = DefaultOptions;
     QList<Element> m_body;
     QList<QPair<QString, QString>> m_titlePage;
+};
+
+class Writer
+{
+public:
+    enum Options { NoOption = 0, StrictSyntaxOption = 1, DefaultOptions = StrictSyntaxOption };
+
+    Writer(QList<QPair<QString, QString>> &titlePage, const QList<Element> &body,
+           int options = DefaultOptions);
+    Writer(const QList<Element> &body, int options = DefaultOptions);
+    ~Writer();
+
+    bool write(const QString &fileName) const;
+    bool write(QIODevice *device) const;
+
+    bool writeInto(QString &text) const;
+    bool writeInto(QByteArray &text) const;
+
+    QString toString() const;
+    QByteArray toByteArray() const;
+
+private:
+    void writeSceneHeading(QTextStream &ts, const Element &element) const;
+    void writeAction(QTextStream &ts, const Element &element) const;
+    void writeCharacter(QTextStream &ts, const Element &element) const;
+    void writeParenthetical(QTextStream &ts, const Element &element) const;
+    void writeDialogue(QTextStream &ts, const Element &element) const;
+    void writeShotOrTransition(QTextStream &ts, const Element &element) const;
+    void writeLyrics(QTextStream &ts, const Element &element) const;
+    void writePageBreak(QTextStream &ts, const Element &element) const;
+    void writeLineBreak(QTextStream &ts, const Element &element) const;
+    void writeSection(QTextStream &ts, const Element &element) const;
+    void writeSynopsis(QTextStream &ts, const Element &element) const;
+
+private:
+    QString emphasisedText(const Element &element) const;
+
+private:
+    QList<QPair<QString, QString>> m_titlePage;
+    QList<Element> m_body;
+    int m_options = DefaultOptions;
 };
 
 } // namespace Fountain

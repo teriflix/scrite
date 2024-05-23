@@ -23,6 +23,8 @@
 namespace Fountain {
 static bool resolveEmphasis(const QString &input, QString &plainText,
                             QVector<QTextLayout::FormatRange> &formats);
+static bool encodeEmphasis(const QString &plainText,
+                           const QVector<QTextLayout::FormatRange> &formats, QString &mdText);
 
 static QStringList sceneHeadingPrefixes();
 } // namespace Fountain
@@ -369,7 +371,7 @@ void Fountain::Parser::processShotsAndTransitions()
 
         if (element.text.startsWith('>') && !element.text.endsWith('<')) {
             element.text = element.text.mid(1).toUpper().simplified();
-            element.text = Fountain::Element::Transition;
+            element.type = Fountain::Element::Transition;
             continue;
         }
 
@@ -452,7 +454,7 @@ void Fountain::Parser::processCharacters()
 
             if (simplifiedText.startsWith('@')) {
                 element.type = Fountain::Element::Character;
-                element.text = simplifiedText;
+                element.text = simplifiedText.mid(1).trimmed();
                 continue;
             }
 
@@ -736,7 +738,410 @@ static bool Fountain::resolveEmphasis(const QString &input, QString &plainText,
     return true;
 }
 
+static bool Fountain::encodeEmphasis(const QString &plainText,
+                                     const QVector<QTextLayout::FormatRange> &formats,
+                                     QString &mdText)
+{
+    if (formats.isEmpty()) {
+        mdText = plainText;
+        return true;
+    }
+
+    QTextDocument document;
+
+    QTextCursor cursor(&document);
+    cursor.insertText(plainText);
+    for (const QTextLayout::FormatRange &format : formats) {
+        cursor.setPosition(format.start);
+        cursor.setPosition(format.start + format.length, QTextCursor::KeepAnchor);
+        cursor.mergeCharFormat(format.format);
+        cursor.clearSelection();
+    }
+    cursor.setPosition(0);
+
+    const QTextBlock block = cursor.block();
+
+    QTextBlock::iterator it = block.begin();
+    while (it != block.end()) {
+        const QTextFragment fragment = it.fragment();
+        if (fragment.isValid()) {
+            QString text = fragment.text();
+            if (text.isEmpty()) {
+                ++it;
+                continue;
+            }
+
+            QString leftOver;
+            while (text.length() > 0 && text.at(text.length() - 1).isSpace()) {
+                leftOver = text.at(text.length() - 1) + leftOver;
+                text = text.remove(text.length() - 1, 1);
+            }
+
+            if (text.isEmpty()) {
+                mdText += leftOver;
+                ++it;
+                continue;
+            }
+
+            const QTextCharFormat charFormat = fragment.charFormat();
+            const bool bold = charFormat.fontWeight() == QFont::Bold;
+            const bool italic = charFormat.fontItalic();
+            const bool underline = charFormat.fontUnderline();
+
+            if (italic)
+                mdText += "*";
+            if (bold)
+                mdText += "**";
+            if (underline)
+                mdText += "_";
+
+            mdText += text;
+
+            if (underline)
+                mdText += "_";
+            if (bold)
+                mdText += "**";
+            if (italic)
+                mdText += "*";
+
+            mdText += leftOver;
+        }
+
+        ++it;
+    }
+
+    return true;
+}
+
 static QStringList Fountain::sceneHeadingPrefixes()
 {
     return { "INT", "EXT", "EST", "INT./EXT", "INT/EXT", "I/E" };
+}
+
+Fountain::Writer::Writer(QList<QPair<QString, QString>> &titlePage, const QList<Element> &body,
+                         int options)
+    : m_titlePage(titlePage), m_body(body), m_options(options)
+{
+}
+
+Fountain::Writer::Writer(const QList<Element> &body, int options) : m_body(body), m_options(options)
+{
+}
+
+Fountain::Writer::~Writer() { }
+
+bool Fountain::Writer::write(const QString &fileName) const
+{
+    QFile file(fileName);
+    return this->write(&file);
+}
+
+bool Fountain::Writer::write(QIODevice *device) const
+{
+    if (device == nullptr)
+        return false;
+
+    if (!device->isOpen()) {
+        if (!device->open(QFile::WriteOnly))
+            return false;
+    }
+
+    if (!device->isWritable())
+        return false;
+
+    const QByteArray bytes = this->toByteArray();
+
+    bool success = device->write(bytes) == qint64(bytes.size());
+
+    device->close();
+
+    return success;
+}
+
+bool Fountain::Writer::writeInto(QString &text) const
+{
+    text = this->toString();
+    return true;
+}
+
+bool Fountain::Writer::writeInto(QByteArray &text) const
+{
+    text = this->toByteArray();
+    return true;
+}
+
+static const char *newline = "\n";
+static const char *colon = ":";
+
+/*
+I could go on with the following too. But they are not referenced as much as newline and colon.
+
+static const char *ampersat = "@";
+static const char *bracketOpen = "(";
+static const char *bracketClose = ")";
+static const char *noteOpen = "[[";
+static const char *noteClose = "]]";
+static const char *pound = "#";
+static const char *exclamation = "!";
+static const char *greaterThan = ">";
+static const char *lessThan = "<";
+static const char *dot = ".";
+static const char *singleSpace = " ";
+*/
+
+QString Fountain::Writer::toString() const
+{
+    QString ret;
+
+    QTextStream ts(&ret, QIODevice::WriteOnly);
+    ts.setCodec("utf-8");
+    ts.setAutoDetectUnicode(true);
+
+    for (const QPair<QString, QString> &item : m_titlePage) {
+        if (item.second.contains(newline)) {
+            ts << item.first << colon << newline;
+
+            const QStringList lines = item.second.split(newline, Qt::SkipEmptyParts);
+            for (const QString &line : lines)
+                ts << "    " << line << newline;
+        } else
+            ts << item.first << ": " << item.second << newline;
+    }
+
+    if (!m_titlePage.isEmpty())
+        ts << newline;
+
+    for (const Fountain::Element &element : m_body) {
+        switch (element.type) {
+        case Fountain::Element::SceneHeading:
+            writeSceneHeading(ts, element);
+            break;
+        case Fountain::Element::Action:
+            writeAction(ts, element);
+            break;
+        case Fountain::Element::Character:
+            writeCharacter(ts, element);
+            break;
+        case Fountain::Element::Dialogue:
+            writeDialogue(ts, element);
+            break;
+        case Fountain::Element::Parenthetical:
+            writeParenthetical(ts, element);
+            break;
+        case Fountain::Element::Shot:
+        case Fountain::Element::Transition:
+            writeShotOrTransition(ts, element);
+            break;
+        case Fountain::Element::PageBreak:
+            writePageBreak(ts, element);
+            break;
+        case Fountain::Element::Lyrics:
+            writeLyrics(ts, element);
+            break;
+        case Fountain::Element::LineBreak:
+            writeLineBreak(ts, element);
+            break;
+        case Fountain::Element::Section:
+            writeSection(ts, element);
+            break;
+        case Fountain::Element::Synopsis:
+            writeSynopsis(ts, element);
+            break;
+        default:
+            ts << "/* " << element.text << " */" << newline;
+            break;
+        }
+    }
+
+    ts.flush();
+
+    static const QRegularExpression multipleNewlines("\\n{3,}");
+    ret = ret.replace(multipleNewlines, "\n\n");
+
+    return ret;
+}
+
+QByteArray Fountain::Writer::toByteArray() const
+{
+    const QString text = this->toString();
+    return text.toUtf8();
+}
+
+void Fountain::Writer::writeSceneHeading(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#action
+    // A Scene Heading always has at least one blank line preceding it.
+    ts << newline;
+
+    // You can force a Scene Heading by starting the line with a single period.
+    if (m_options & StrictSyntaxOption)
+        ts << ".";
+
+    ts << this->emphasisedText(element).toUpper();
+
+    // Scene Headings can optionally be appended with Scene Numbers. Scene numbers are any
+    // alphanumerics (plus dashes and periods), wrapped in #.
+    if (!element.sceneNumber.isEmpty())
+        ts << " #" << element.sceneNumber << "#";
+
+    ts << newline;
+
+    // Second newline, thought not required, is added anyway to make the resulting file look good as
+    // a plain text document also
+    ts << newline;
+}
+
+void Fountain::Writer::writeAction(QTextStream &ts, const Element &element) const
+{
+    ts << newline;
+
+    // http://fountain.io/syntax/#action
+
+    // You can force an Action element can by preceding it with an exclamation point !.
+    if (m_options & StrictSyntaxOption)
+        ts << "!";
+
+    // Centered text constitutes an Action element, and is bracketed with greater/less-than:
+    if (element.isCentered)
+        ts << ">";
+
+    ts << this->emphasisedText(element);
+
+    if (element.isCentered)
+        ts << "<";
+
+    // A Note is created by enclosing some text with double brackets. Notes can be inserted between
+    // lines, or in the middle of a line.
+    if (!element.notes.isEmpty()) {
+        if (element.isCentered)
+            ts << newline;
+
+        for (const QString &note : element.notes)
+            ts << "[[" << note << "]]";
+    }
+
+    ts << newline;
+}
+
+void Fountain::Writer::writeCharacter(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#character
+
+    // A Character element is any line entirely in uppercase, with one empty line before it and
+    // without an empty line after it.
+
+    ts << newline;
+
+    // You can force a Character element by preceding it with the “at” symbol @.
+    if (m_options & StrictSyntaxOption)
+        ts << "@";
+
+    ts << this->emphasisedText(element).toUpper() << newline;
+}
+
+void Fountain::Writer::writeParenthetical(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#parenthetical
+
+    // Parentheticals follow a Character or Dialogue element, and are wrapped in parentheses ().
+    if (!element.text.startsWith('('))
+        ts << "(";
+
+    ts << this->emphasisedText(element);
+
+    if (!element.text.endsWith(')'))
+        ts << ")";
+
+    ts << newline;
+}
+
+void Fountain::Writer::writeDialogue(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#dialogue
+
+    // Dialogue is any text following a Character or Parenthetical element.
+
+    ts << this->emphasisedText(element) << newline;
+}
+
+void Fountain::Writer::writeShotOrTransition(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#transition
+
+    // The requirements for Transition elements are:
+    //  - Uppercase
+    //  - Preceded by and followed by an empty line
+    //  - Ending in TO:
+
+    // In Scrite: We don't need transitions to end with TO:
+    // But we do, want them to end with :
+
+    // You can force any line to be a transition by beginning it with a greater-than symbol >.
+
+    ts << newline;
+
+    if (element.type == Fountain::Element::Transition) {
+        if (m_options & StrictSyntaxOption)
+            ts << ">";
+    }
+
+    ts << this->emphasisedText(element).toUpper();
+
+    if (!element.text.endsWith(':'))
+        ts << ":";
+
+    ts << newline;
+}
+
+void Fountain::Writer::writeLyrics(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#lyrics
+    // You create a Lyric by starting with a line with a tilde ~.
+
+    ts << "~" << this->emphasisedText(element) << newline;
+}
+
+void Fountain::Writer::writePageBreak(QTextStream &ts, const Element &element) const
+{
+    Q_UNUSED(element);
+
+    // http://fountain.io/syntax/#page-breaks
+
+    // Page Breaks are indicated by a line containing three or more consecutive equals signs, and
+    // nothing more.
+
+    ts << newline << "===" << newline;
+}
+
+void Fountain::Writer::writeLineBreak(QTextStream &ts, const Element &element) const
+{
+    Q_UNUSED(element);
+
+    ts << newline;
+}
+
+void Fountain::Writer::writeSection(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#sections-synopses
+    // Create a Section by preceding a line with one or more pound-sign # characters:
+
+    ts << QString(element.sectionDepth, '#') << " " << this->emphasisedText(element) << newline;
+}
+
+void Fountain::Writer::writeSynopsis(QTextStream &ts, const Element &element) const
+{
+    // http://fountain.io/syntax/#sections-synopses
+    // Synopses are single lines prefixed by an equals sign =. They can be located anywhere within
+    // the screenplay.
+
+    ts << "= " << this->emphasisedText(element) << newline;
+}
+
+QString Fountain::Writer::emphasisedText(const Element &element) const
+{
+    QString ret;
+    if (Fountain::encodeEmphasis(element.text, element.formats, ret))
+        return ret;
+
+    return element.text;
 }
