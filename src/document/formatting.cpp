@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "fountain.h"
 #include "appwindow.h"
 #include "formatting.h"
 #include "application.h"
@@ -2487,11 +2488,68 @@ int SceneDocumentBinder::paste(int fromPosition)
     const QByteArray contentJson = mimeData->data(QStringLiteral("scrite/screenplay"));
     if (contentJson.isEmpty()) {
         if (mimeData->hasText()) {
-            const QStringList lines =
-                    mimeData->text().split(QStringLiteral("\n"), Qt::SkipEmptyParts);
-            for (const QString &line : lines) {
+            const QString text = mimeData->text();
+            if (text.contains('\n')) {
+                Fountain::Parser parser(text);
+
+                bool sceneHeadingChanged = false;
+
+                const Fountain::Body fBody = parser.body();
+                for (const Fountain::Element &element : fBody) {
+                    Paragraph paragraph;
+                    paragraph.text = element.text;
+                    paragraph.formats = element.formats;
+
+                    bool includeParagraph = true;
+                    switch (element.type) {
+                    case Fountain::Element::SceneHeading:
+                        if (fromPosition == 0 && !sceneHeadingChanged) {
+                            m_scene->heading()->parseFrom(element.text);
+                            sceneHeadingChanged = true;
+                            includeParagraph = false;
+                        } else {
+                            paragraph.type = SceneElement::Action;
+                        }
+                        break;
+                    case Fountain::Element::Action:
+                        paragraph.type = SceneElement::Action;
+                        break;
+                    case Fountain::Element::Character:
+                        paragraph.type = SceneElement::Character;
+                        break;
+                    case Fountain::Element::Parenthetical:
+                        paragraph.type = SceneElement::Parenthetical;
+                        break;
+                    case Fountain::Element::Dialogue:
+                        paragraph.type = SceneElement::Dialogue;
+                        break;
+                    case Fountain::Element::Shot:
+                        paragraph.type = SceneElement::Shot;
+                        break;
+                    case Fountain::Element::Transition:
+                        paragraph.type = SceneElement::Transition;
+                        break;
+                    case Fountain::Element::Synopsis:
+                        includeParagraph = false;
+                        if (!element.text.isEmpty()) {
+                            QString synopsis = m_scene->synopsis();
+                            if (!synopsis.isEmpty())
+                                synopsis += "\n\n";
+                            synopsis += element.text;
+                            m_scene->setSynopsis(element.text);
+                        }
+                        break;
+                    default:
+                        includeParagraph = false;
+                        break;
+                    }
+
+                    if (includeParagraph)
+                        paragraphs.append(paragraph);
+                }
+            } else {
                 Paragraph paragraph;
-                paragraph.text = line;
+                paragraph.text = text;
                 paragraphs.append(paragraph);
             }
         }
