@@ -69,8 +69,9 @@ void populateBody(const Scene *scene, Body &body, const ScreenplayElement *eleme
 void populateBody(const Screenplay *screenplay, Body &body);
 void populateBody(const ScreenplayElement *element, Body &body);
 
-void loadScene(const Body &body, Scene *scene);
-void loadScreenplay(const Body &body, Screenplay *screenplay);
+void loadTitlePage(const TitlePage &titlePage, Screenplay *screenplay);
+
+void loadScene(const Body &body, Scene *scene, ScreenplayElement *element = nullptr);
 
 class Parser
 {

@@ -13,11 +13,10 @@
 
 #include "user.h"
 #include "undoredo.h"
+#include "fountain.h"
 #include "hourglass.h"
 #include "screenplay.h"
 #include "application.h"
-#include "textlimiter.h"
-#include "timeprofiler.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 
@@ -2581,6 +2580,8 @@ void Screenplay::copySelection()
     QJsonArray data;
     QJsonObject scenes;
 
+    Fountain::Body fBody;
+
     for (const ScreenplayElement *element : qAsConst(m_elements)) {
         if (!element->isSelected())
             continue;
@@ -2592,6 +2593,8 @@ void Screenplay::copySelection()
             const QJsonObject sceneJson = QObjectSerializer::toJson(element->scene());
             scenes.insert(element->sceneID(), sceneJson);
         }
+
+        Fountain::populateBody(element, fBody);
     }
     clipboardJson.insert(QLatin1String("data"), data);
     clipboardJson.insert(QLatin1String("scenes"), scenes);
@@ -2600,9 +2603,7 @@ void Screenplay::copySelection()
 
     QMimeData *mimeData = new QMimeData;
     mimeData->setData(QLatin1String("scrite/screenplay"), clipboardText);
-#ifndef QT_NO_DEBUG_OUTPUT
-    mimeData->setData(QLatin1String("text/plain"), clipboardText);
-#endif
+    mimeData->setText(Fountain::Writer(fBody).toString());
 
     QClipboard *clipboard = qApp->clipboard();
     clipboard->setMimeData(mimeData);

@@ -2495,7 +2495,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
     QClipboard *clipboard = Application::instance()->clipboard();
     QMimeData *mimeData = new QMimeData;
-    mimeData->setData(QStringLiteral("scrite/screenplay"), contentJson);
+    mimeData->setData(QStringLiteral("scrite/scene"), contentJson);
     mimeData->setText(Fountain::Writer(fBody).toString());
     clipboard->setMimeData(mimeData);
 }
@@ -2526,7 +2526,7 @@ int SceneDocumentBinder::paste(int fromPosition)
     const QClipboard *clipboard = Application::instance()->clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
 
-    const QByteArray contentJson = mimeData->data(QStringLiteral("scrite/screenplay"));
+    const QByteArray contentJson = mimeData->data(QStringLiteral("scrite/scene"));
     if (contentJson.isEmpty()) {
         if (mimeData->hasText()) {
             const QString text = mimeData->text();

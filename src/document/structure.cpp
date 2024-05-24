@@ -13,6 +13,7 @@
 
 #include "scrite.h"
 #include "undoredo.h"
+#include "fountain.h"
 #include "structure.h"
 #include "hourglass.h"
 #include "filemanager.h"
@@ -4422,9 +4423,13 @@ void Structure::copy(QObject *elementOrAnnotation)
 
         QMimeData *mimeData = new QMimeData;
         mimeData->setData(QStringLiteral("scrite/structure"), clipboardText);
-#ifndef QT_NO_DEBUG_OUTPUT
-        mimeData->setData(QStringLiteral("text/plain"), clipboardText);
-#endif
+
+        if (element != nullptr) {
+            Fountain::Body fBody;
+            Fountain::populateBody(element->scene(), fBody);
+            mimeData->setText(Fountain::Writer(fBody).toString());
+        }
+
         clipboard->setMimeData(mimeData);
         return;
     }

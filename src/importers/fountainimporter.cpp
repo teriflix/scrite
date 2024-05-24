@@ -34,28 +34,7 @@ bool FountainImporter::doImport(QIODevice *device)
     Screenplay *screenplay = doc->screenplay();
 
     Fountain::Parser parser(device);
-
-    const QMap<QString, QString> titlePage = [parser]() -> QMap<QString, QString> {
-        QMap<QString, QString> ret;
-
-        const auto tp = parser.titlePage();
-        for (const auto &tpitem : tp)
-            ret[tpitem.first] = tpitem.second;
-
-        return ret;
-    }();
-
-    screenplay->setTitle(titlePage.value("title"));
-    screenplay->setSubtitle(titlePage.value("subtitle"));
-    screenplay->setLogline(titlePage.value("logline"));
-    screenplay->setBasedOn(titlePage.value("basedon"));
-    screenplay->setAuthor(titlePage.value("authors"));
-    screenplay->setContact(titlePage.value("contact"));
-    screenplay->setAddress(titlePage.value("address"));
-    screenplay->setPhoneNumber(titlePage.value("phone"));
-    screenplay->setEmail(titlePage.value("email"));
-    screenplay->setWebsite(titlePage.value("website"));
-    screenplay->setVersion(titlePage.value("version"));
+    Fountain::loadTitlePage(parser.titlePage(), screenplay);
 
     const auto body = parser.body();
 
