@@ -2437,33 +2437,6 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
         SceneElement *element = userData->sceneElement();
 
-        Fountain::Element fElement;
-        fElement.text = element->formattedText();
-        fElement.formats = element->textFormats();
-        switch (element->type()) {
-        default:
-        case SceneElement::Action:
-            fElement.type = Fountain::Element::Action;
-            break;
-        case SceneElement::Character:
-            fElement.type = Fountain::Element::Character;
-            break;
-        case SceneElement::Dialogue:
-            fElement.type = Fountain::Element::Dialogue;
-            break;
-        case SceneElement::Parenthetical:
-            fElement.type = Fountain::Element::Parenthetical;
-            break;
-        case SceneElement::Shot:
-            fElement.type = Fountain::Element::Shot;
-            break;
-        case SceneElement::Transition:
-            fElement.type = Fountain::Element::Transition;
-            break;
-        }
-
-        fBody.append(fElement);
-
         QJsonObject para;
         para.insert(QStringLiteral("type"), element->type());
         para.insert(QStringLiteral("alignment"), (int)element->alignment());
@@ -2487,6 +2460,33 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         para.insert(QStringLiteral("formats"), jformats);
 
         content.append(para);
+
+        Fountain::Element fElement;
+        fElement.text = cursor.selectedText();
+        fElement.formats = formatsToCopy;
+        switch (element->type()) {
+        default:
+        case SceneElement::Action:
+            fElement.type = Fountain::Element::Action;
+            break;
+        case SceneElement::Character:
+            fElement.type = Fountain::Element::Character;
+            break;
+        case SceneElement::Dialogue:
+            fElement.type = Fountain::Element::Dialogue;
+            break;
+        case SceneElement::Parenthetical:
+            fElement.type = Fountain::Element::Parenthetical;
+            break;
+        case SceneElement::Shot:
+            fElement.type = Fountain::Element::Shot;
+            break;
+        case SceneElement::Transition:
+            fElement.type = Fountain::Element::Transition;
+            break;
+        }
+
+        fBody.append(fElement);
 
         block = block.next();
     }
