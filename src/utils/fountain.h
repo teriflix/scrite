@@ -22,7 +22,10 @@
 #include <QTextLayout>
 #include <QVector>
 
+class Scene;
 class QIODevice;
+class Screenplay;
+class ScreenplayElement;
 
 namespace Fountain {
 
@@ -59,6 +62,15 @@ struct Element
 typedef QPair<QString, QString> TitlePageField;
 typedef QList<TitlePageField> TitlePage;
 typedef QList<Element> Body;
+
+void populateTitlePage(const Screenplay *screenplay, TitlePage &titlePage);
+
+void populateBody(const Scene *scene, Body &body, const ScreenplayElement *element = nullptr);
+void populateBody(const Screenplay *screenplay, Body &body);
+void populateBody(const ScreenplayElement *element, Body &body);
+
+void loadScene(const Body &body, Scene *scene);
+void loadScreenplay(const Body &body, Screenplay *screenplay);
 
 class Parser
 {
@@ -122,6 +134,9 @@ public:
     Writer(QList<QPair<QString, QString>> &titlePage, const QList<Element> &body,
            int options = DefaultOptions);
     Writer(const QList<Element> &body, int options = DefaultOptions);
+    Writer(const Screenplay *screenplay, int options = DefaultOptions);
+    Writer(const ScreenplayElement *element, int options = DefaultOptions);
+    Writer(const Scene *scene, const ScreenplayElement *element, int options = DefaultOptions);
     ~Writer();
 
     bool write(const QString &fileName) const;

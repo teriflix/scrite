@@ -828,6 +828,23 @@ Fountain::Writer::Writer(const QList<Element> &body, int options) : m_body(body)
 {
 }
 
+Fountain::Writer::Writer(const Screenplay *screenplay, int options) : m_options(options)
+{
+    Fountain::populateTitlePage(screenplay, m_titlePage);
+    Fountain::populateBody(screenplay, m_body);
+}
+
+Fountain::Writer::Writer(const ScreenplayElement *element, int options) : m_options(options)
+{
+    Fountain::populateBody(element, m_body);
+}
+
+Fountain::Writer::Writer(const Scene *scene, const ScreenplayElement *element, int options)
+    : m_options(options)
+{
+    Fountain::populateBody(scene, m_body, element);
+}
+
 Fountain::Writer::~Writer() { }
 
 bool Fountain::Writer::write(const QString &fileName) const
@@ -1144,4 +1161,117 @@ QString Fountain::Writer::emphasisedText(const Element &element) const
         return ret;
 
     return element.text;
+}
+
+#include "scene.h"
+#include "structure.h"
+#include "screenplay.h"
+#include "scritedocument.h"
+
+void Fountain::populateTitlePage(const Screenplay *screenplay, TitlePage &titlePage)
+{
+    using GetterType = QString (Screenplay::*)() const;
+    const QList<QPair<QString, GetterType>> titlePageGetters = {
+        { "Title", &Screenplay::title },
+        { "Subtitle", &Screenplay::subtitle },
+        { "Based On", &Screenplay::basedOn },
+        { "Authors", &Screenplay::author },
+        { "Contact", &Screenplay::contact },
+        { "Address", &Screenplay::address },
+        { "Phone Number", &Screenplay::phoneNumber },
+        { "Website", &Screenplay::website },
+        { "Email", &Screenplay::email },
+        { "Logline", &Screenplay::logline }
+    };
+
+    for (const auto &titlePageGetter : titlePageGetters) {
+        const QString value = ((*screenplay).*titlePageGetter.second)();
+        if (!value.isEmpty())
+            titlePage.append(qMakePair(titlePageGetter.first, value));
+    }
+}
+
+void Fountain::populateBody(const Scene *scene, Body &body, const ScreenplayElement *element)
+{
+    if (scene == nullptr)
+        return;
+
+    const SceneHeading *heading = scene->heading();
+
+    Fountain::Element fSceneHeading;
+    fSceneHeading.type = Fountain::Element::SceneHeading;
+    fSceneHeading.text = heading->isEnabled() ? heading->text() : QString();
+    fSceneHeading.sceneNumber = element ? element->userSceneNumber() : QString();
+    body.append(fSceneHeading);
+
+    if (element->isOmitted()) {
+        Fountain::Element fOmittedPara;
+        fOmittedPara.type = Fountain::Element::Action;
+        fOmittedPara.notes << "Omitted";
+        body.append(fOmittedPara);
+        return;
+    }
+
+    const int nrParas = scene->elementCount();
+    for (int j = 0; j < nrParas; j++) {
+        const SceneElement *para = scene->elementAt(j);
+
+        Fountain::Element fPara;
+        fPara.text = para->formattedText();
+        fPara.formats = para->textFormats();
+
+        switch (para->type()) {
+        case SceneElement::Shot:
+            fPara.type = Fountain::Element::Shot;
+            break;
+        case SceneElement::Transition:
+            fPara.type = Fountain::Element::Transition;
+            break;
+        case SceneElement::Character:
+            fPara.type = Fountain::Element::Character;
+            break;
+        case SceneElement::Action:
+            fPara.type = Fountain::Element::Action;
+            break;
+        case SceneElement::Dialogue:
+            fPara.type = Fountain::Element::Dialogue;
+            break;
+        case SceneElement::Parenthetical:
+            fPara.type = Fountain::Element::Parenthetical;
+            break;
+        default:
+            break;
+        }
+
+        if (fPara.type != fPara.None)
+            body.append(fPara);
+    }
+}
+
+void Fountain::populateBody(const Screenplay *screenplay, Body &body)
+{
+    if (screenplay == nullptr)
+        return;
+
+    const int nrElements = screenplay->elementCount();
+    for (int i = 0; i < nrElements; i++) {
+        const ScreenplayElement *element = screenplay->elementAt(i);
+
+        if (element->elementType() == ScreenplayElement::BreakElementType) {
+            Fountain::Element fElement;
+            fElement.type = Fountain::Element::Section;
+            fElement.sectionDepth = 1;
+            fElement.text = element->sceneID();
+            body.append(fElement);
+            continue;
+        }
+
+        Fountain::populateBody(element->scene(), body, element);
+    }
+}
+
+void Fountain::populateBody(const ScreenplayElement *element, Body &body)
+{
+    if (element != nullptr)
+        Fountain::populateBody(element->scene(), body, element);
 }
