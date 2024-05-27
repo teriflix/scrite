@@ -2567,7 +2567,18 @@ bool Screenplay::capitalizeSentences()
 bool Screenplay::canPaste() const
 {
     QJsonObject clipboardJson;
-    return this->getPasteDataFromClipboard(clipboardJson);
+    if (this->getPasteDataFromClipboard(clipboardJson))
+        return true;
+
+    const QClipboard *clipboard = qApp->clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    if (mimeData && mimeData->hasText()) {
+        const QString maybeFountainText = mimeData->text();
+        Fountain::Body fBody = Fountain::Parser(maybeFountainText).body();
+        return !fBody.isEmpty();
+    }
+
+    return false;
 }
 
 void Screenplay::copySelection()
@@ -2696,18 +2707,99 @@ void ScreenplayPasteUndoCommand::undo()
     m_scenes.clear();
 }
 
+class ScreenplayPasteFromFountainUndoCommand : public QUndoCommand
+{
+public:
+    explicit ScreenplayPasteFromFountainUndoCommand(Screenplay *screenplay, Structure *structure,
+                                                    const Fountain::Body &body, int pasteAfter);
+    ~ScreenplayPasteFromFountainUndoCommand();
+
+    void redo();
+    void undo();
+
+private:
+    Structure *m_structure = nullptr;
+    Screenplay *m_screenplay = nullptr;
+    int m_pasteAfter = -1;
+    Fountain::Body m_body;
+    QList<Scene *> m_scenes;
+    QList<ScreenplayElement *> m_screenplayElements;
+};
+
+ScreenplayPasteFromFountainUndoCommand::ScreenplayPasteFromFountainUndoCommand(
+        Screenplay *screenplay, Structure *structure, const Fountain::Body &body, int pasteAfter)
+    : m_structure(structure), m_screenplay(screenplay), m_pasteAfter(pasteAfter), m_body(body)
+{
+}
+
+ScreenplayPasteFromFountainUndoCommand::~ScreenplayPasteFromFountainUndoCommand() { }
+
+void ScreenplayPasteFromFountainUndoCommand::redo()
+{
+    for (const Fountain::Element &fElement : qAsConst(m_body)) {
+        if (fElement.type == Fountain::Element::SceneHeading || m_scenes.isEmpty()) {
+            StructureElement *newStructureElement = new StructureElement(m_structure);
+            Scene *newScene = new Scene(newStructureElement);
+            newStructureElement->setScene(newScene);
+            m_structure->addElement(newStructureElement);
+
+            ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
+            newScreenplayElement->setScene(newScene);
+            m_screenplayElements.append(newScreenplayElement);
+
+            m_scenes.append(newScene);
+        }
+
+        Fountain::loadIntoScene(fElement, m_scenes.last(), m_screenplayElements.last());
+    }
+
+    if (m_screenplayElements.isEmpty())
+        return;
+
+    m_screenplay->insertElementsAt(m_screenplayElements, m_pasteAfter + 1);
+    m_screenplay->setSelection(m_screenplayElements);
+}
+
+void ScreenplayPasteFromFountainUndoCommand::undo()
+{
+    // Same as ScreenplayPasteUndoCommand::undo()
+    m_screenplay->removeElements(m_screenplayElements);
+    m_screenplayElements.clear();
+
+    QList<StructureElement *> structureElements;
+    for (Scene *scene : qAsConst(m_scenes))
+        structureElements.append(scene->structureElement());
+    m_structure->removeElements(structureElements);
+    m_scenes.clear();
+}
+
 void Screenplay::pasteAfter(int index)
 {
     ScriteDocument *sdoc = ScriteDocument::instance();
     Structure *structure = sdoc->structure();
-    QJsonObject clipboardJson;
-    if (!this->getPasteDataFromClipboard(clipboardJson))
-        return;
 
-    const QJsonObject scenes = clipboardJson.value(QLatin1String("scenes")).toObject();
-    const QJsonArray elements = clipboardJson.value(QLatin1String("data")).toArray();
-    ScreenplayPasteUndoCommand *cmd =
-            new ScreenplayPasteUndoCommand(this, structure, elements, scenes, index);
+    QUndoCommand *cmd = nullptr;
+
+    QJsonObject clipboardJson;
+    if (this->getPasteDataFromClipboard(clipboardJson)) {
+        // If scenes were copied from screenplay editor, then we will get
+        // structured JSON data.
+        const QJsonObject scenes = clipboardJson.value(QLatin1String("scenes")).toObject();
+        const QJsonArray elements = clipboardJson.value(QLatin1String("data")).toArray();
+        cmd = new ScreenplayPasteUndoCommand(this, structure, elements, scenes, index);
+    } else {
+        // If scenes were copied from fountain file, web-browser or other software,
+        // then we will get fountain-text, which we will have to parse and then paste.
+        const QClipboard *clipboard = qApp->clipboard();
+        const QMimeData *mimeData = clipboard->mimeData();
+        if (mimeData && mimeData->hasText()) {
+            const QString maybeFountainText = mimeData->text();
+
+            Fountain::Body fBody = Fountain::Parser(maybeFountainText).body();
+            if (!fBody.isEmpty())
+                cmd = new ScreenplayPasteFromFountainUndoCommand(this, structure, fBody, index);
+        }
+    }
 
     if (UndoStack::active()) {
         UndoStack::active()->push(cmd);

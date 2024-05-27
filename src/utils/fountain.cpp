@@ -27,6 +27,7 @@ static bool encodeEmphasis(const QString &plainText,
                            const QVector<QTextLayout::FormatRange> &formats, QString &mdText);
 
 static QStringList sceneHeadingPrefixes();
+
 } // namespace Fountain
 
 QJsonObject Fountain::Element::toJson() const
@@ -1299,56 +1300,64 @@ void Fountain::loadTitlePage(const TitlePage &titlePage, Screenplay *screenplay)
     screenplay->setVersion(keyValuePairs.value("version"));
 }
 
-void Fountain::loadScene(const Body &body, Scene *scene, ScreenplayElement *element)
+void Fountain::loadIntoScene(const Body &body, Scene *scene, ScreenplayElement *element)
 {
     if (scene == nullptr)
         return;
 
-    for (const Fountain::Element &fPara : body) {
-        if (fPara.type == Fountain::Element::SceneHeading && scene->elementCount() == 0) {
-            scene->heading()->parseFrom(fPara.text);
-            if (element && !fPara.sceneNumber.isEmpty())
-                element->setUserSceneNumber(fPara.sceneNumber);
-            continue;
-        }
+    for (const Fountain::Element &fPara : body)
+        Fountain::loadIntoScene(fPara, scene, element);
+}
 
-        if (fPara.type == Fountain::Element::Synopsis) {
-            QString synopsis = scene->synopsis();
-            if (!synopsis.isEmpty())
-                synopsis += "\n\n";
-            synopsis += fPara.text;
-            scene->setSynopsis(synopsis);
-            continue;
-        }
+bool Fountain::loadIntoScene(const Element &fPara, Scene *scene, ScreenplayElement *element)
+{
+    if (scene == nullptr)
+        return false;
 
-        SceneElement *para = new SceneElement(scene);
-        para->setText(fPara.text);
-        para->setTextFormats(fPara.formats);
-        if (fPara.isCentered)
-            para->setAlignment(Qt::AlignHCenter);
-
-        switch (fPara.type) {
-        default:
-        case Fountain::Element::Action:
-            para->setType(SceneElement::Action);
-            break;
-        case Fountain::Element::Character:
-            para->setType(SceneElement::Character);
-            break;
-        case Fountain::Element::Parenthetical:
-            para->setType(SceneElement::Parenthetical);
-            break;
-        case Fountain::Element::Dialogue:
-            para->setType(SceneElement::Dialogue);
-            break;
-        case Fountain::Element::Shot:
-            para->setType(SceneElement::Shot);
-            break;
-        case Fountain::Element::Transition:
-            para->setType(SceneElement::Transition);
-            break;
-        }
-
-        scene->addElement(para);
+    if (fPara.type == Fountain::Element::SceneHeading && scene->elementCount() == 0) {
+        scene->heading()->parseFrom(fPara.text);
+        if (element && !fPara.sceneNumber.isEmpty())
+            element->setUserSceneNumber(fPara.sceneNumber);
+        return true;
     }
+
+    if (fPara.type == Fountain::Element::Synopsis) {
+        QString synopsis = scene->synopsis();
+        if (!synopsis.isEmpty())
+            synopsis += "\n\n";
+        synopsis += fPara.text;
+        scene->setSynopsis(synopsis);
+        return true;
+    }
+
+    SceneElement *para = new SceneElement(scene);
+    para->setText(fPara.text);
+    para->setTextFormats(fPara.formats);
+    if (fPara.isCentered)
+        para->setAlignment(Qt::AlignHCenter);
+
+    switch (fPara.type) {
+    default:
+    case Fountain::Element::Action:
+        para->setType(SceneElement::Action);
+        break;
+    case Fountain::Element::Character:
+        para->setType(SceneElement::Character);
+        break;
+    case Fountain::Element::Parenthetical:
+        para->setType(SceneElement::Parenthetical);
+        break;
+    case Fountain::Element::Dialogue:
+        para->setType(SceneElement::Dialogue);
+        break;
+    case Fountain::Element::Shot:
+        para->setType(SceneElement::Shot);
+        break;
+    case Fountain::Element::Transition:
+        para->setType(SceneElement::Transition);
+        break;
+    }
+
+    scene->addElement(para);
+    return true;
 }

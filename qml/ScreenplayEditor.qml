@@ -3373,11 +3373,25 @@ Rectangle {
                                     }
                                 }
 
-                                Repeater {
-                                    model: headingItem.theElement.omitted ? 0 : additionalSceneMenuItems.length ? 1 : 0
+                                MenuSeparator { }
 
-                                    MenuSeparator { }
+                                VclMenuItem {
+                                    text: "Copy"
+                                    enabled: Runtime.screenplayAdapter.isSourceScreenplay
+                                    onClicked: {
+                                        Scrite.document.screenplay.clearSelection()
+                                        headingItem.theElement.selected = true
+                                        Scrite.document.screenplay.copySelection()
+                                    }
                                 }
+
+                                VclMenuItem {
+                                    text: "Paste After"
+                                    enabled: Runtime.screenplayAdapter.isSourceScreenplay && Scrite.document.screenplay.canPaste
+                                    onClicked: Scrite.document.screenplay.pasteAfter( headingItem.theElementIndex )
+                                }
+
+                                MenuSeparator { }
 
                                 VclMenuItem {
                                     text: headingItem.theElement.omitted ? "Include" : "Omit"
