@@ -248,6 +248,14 @@ void Fountain::Parser::parseBody(const QString &content)
                                                       : Fountain::Element::Unknown;
                        if (element.type == Fountain::Element::Unknown)
                            element.text = line;
+
+                       for (const QChar &ch : qAsConst(element.text)) {
+                           if (ch.script() != QChar::Script_Latin) {
+                               element.type = Fountain::Element::Action;
+                               break;
+                           }
+                       }
+
                        return element;
                    });
 
@@ -606,10 +614,13 @@ void Fountain::Parser::joinAdjacentElements()
      * single paragraph.
      */
     if (m_options & JoinAdjacentElementOption) {
+        const QList<Fountain::Element::Type> joinableTypes = { Fountain::Element::Action,
+                                                               Fountain::Element::Dialogue };
+
         for (int i = m_body.size() - 1; i >= 1; i--) {
             Fountain::Element &current = m_body[i];
             Fountain::Element &previous = m_body[i - 1];
-            if (current.type == previous.type) {
+            if (joinableTypes.contains(current.type) && current.type == previous.type) {
                 previous.text = previous.text + " " + current.text;
                 previous.text = previous.text.trimmed();
 
