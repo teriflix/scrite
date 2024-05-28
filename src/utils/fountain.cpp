@@ -25,7 +25,6 @@ static bool resolveEmphasis(const QString &input, QString &plainText,
                             QVector<QTextLayout::FormatRange> &formats);
 static bool encodeEmphasis(const QString &plainText,
                            const QVector<QTextLayout::FormatRange> &formats, QString &mdText);
-
 static QStringList sceneHeadingPrefixes();
 
 } // namespace Fountain
@@ -231,33 +230,46 @@ void Fountain::Parser::parseBody(const QString &content)
     // element.
     std::transform(lines.begin(), lines.end(), std::back_inserter(m_body),
                    [=](const QString &line) {
-                       QString line2 = line;
-                       line2.remove("\n");
-
-                       // Remove leading and trailing white spaces, if that option is turned on
+                       static const QRegularExpression regex("[\r\n]+$");
                        static const QRegularExpression leadingWhitespaceRegex("^\\s+");
                        static const QRegularExpression trailingWhitespaceRegex("\\s+$");
+
+                       QString endingNewLinesRemoved = line;
+                       endingNewLinesRemoved.remove(regex);
+
+                       QString whiteSpacesRemoved = endingNewLinesRemoved;
                        if (m_options & IgnoreLeadingWhitespaceOption)
-                           line2 = line2.remove(leadingWhitespaceRegex);
+                           whiteSpacesRemoved = whiteSpacesRemoved.remove(leadingWhitespaceRegex);
                        if (m_options & IgnoreTrailingWhiteSpaceOption)
-                           line2 = line2.remove(trailingWhitespaceRegex);
+                           whiteSpacesRemoved = whiteSpacesRemoved.remove(trailingWhitespaceRegex);
 
                        Fountain::Element element;
-                       element.type = line2.isEmpty() ? Fountain::Element::LineBreak
-                               : isPageBreak(line2)   ? Fountain::Element::PageBreak
-                                                      : Fountain::Element::Unknown;
-                       if (element.type == Fountain::Element::Unknown)
-                           element.text = line;
+                       element.type = whiteSpacesRemoved.isEmpty() ? Fountain::Element::LineBreak
+                               : isPageBreak(whiteSpacesRemoved)   ? Fountain::Element::PageBreak
+                                                                   : Fountain::Element::Unknown;
+                       if (element.type == Fountain::Element::Unknown) {
+                           element.text = endingNewLinesRemoved;
 
-                       for (const QChar &ch : qAsConst(element.text)) {
-                           if (ch.script() != QChar::Script_Latin) {
-                               element.type = Fountain::Element::Action;
-                               break;
-                           }
-                       }
+                           element.trimmedText = line.trimmed();
+                           element.simplifiedText = line.simplified();
+                           element.containsNonLatinChars = [](const QString &text) {
+                               for (const QChar &ch : text) {
+                                   if (ch.isLetter() && ch.script() != QChar::Script_Latin)
+                                       return true;
+                               }
+                               return false;
+                           }(line);
+                       } else
+                           element.text = QString();
 
                        return element;
                    });
+
+    // Remove starting and trailing newlines.
+    while (m_body.size() && m_body.last().type == Fountain::Element::LineBreak)
+        m_body.takeLast();
+    while (m_body.size() && m_body.first().type == Fountain::Element::LineBreak)
+        m_body.takeFirst();
 
     this->processSectionsAndSynopsis();
     this->processLyrics();
@@ -275,6 +287,11 @@ void Fountain::Parser::parseBody(const QString &content)
     this->processEmphasis();
 
     this->removeEmptyLines();
+
+    std::for_each(m_body.begin(), m_body.end(), [](Fountain::Element &element) {
+        element.trimmedText = QString();
+        element.simplifiedText = QString();
+    });
 }
 
 void Fountain::Parser::processFormalAction()
@@ -288,7 +305,7 @@ void Fountain::Parser::processFormalAction()
         if (element.type != Fountain::Element::Unknown)
             continue;
 
-        const QString trimmedText = element.text.trimmed();
+        const QString trimmedText = element.trimmedText;
         if (trimmedText.startsWith('!')) {
             element.type = Fountain::Element::Action;
             element.text = trimmedText.mid(1);
@@ -308,8 +325,6 @@ void Fountain::Parser::processSceneHeadings()
             continue;
 
         auto extractSceneNumber = [](QString &sceneHeading) -> QString {
-            sceneHeading = sceneHeading.simplified();
-
             /*
              * Power user: Scene Headings can optionally be appended with Scene
              * Numbers. Scene numbers are any alphanumerics (plus dashes and periods),
@@ -326,9 +341,9 @@ void Fountain::Parser::processSceneHeadings()
         };
 
         // If the line is forced into being a scene heading
-        if (element.text.startsWith('.') && element.text.length() >= 2
-            && element.text.at(1) != QChar('.')) {
-            element.text = element.text.mid(1).toUpper().simplified();
+        if (element.trimmedText.startsWith('.') && element.trimmedText.length() >= 2
+            && element.trimmedText.at(1) != QChar('.')) {
+            element.text = element.trimmedText.mid(1).toUpper().simplified();
             element.sceneNumber = extractSceneNumber(element.text);
             element.type = Fountain::Element::SceneHeading;
             continue;
@@ -343,7 +358,7 @@ void Fountain::Parser::processSceneHeadings()
             // Otherwise it should begin with one of the following
             // INT, EXT, EST, INT./EXT, INT/EXT, I/E
             const QStringList prefixes = Fountain::sceneHeadingPrefixes();
-            const QString simplifiedText = element.text.simplified();
+            const QString simplifiedText = element.simplifiedText;
             for (const QString &prefix : prefixes) {
                 if (simplifiedText.startsWith(prefix + ".", Qt::CaseSensitive)) {
                     element.text = simplifiedText;
@@ -378,14 +393,14 @@ void Fountain::Parser::processShotsAndTransitions()
         const bool prevLineIsEmpty =
                 i == 0 || m_body.at(i - 1).type == Fountain::Element::LineBreak;
 
-        if (element.text.startsWith('>') && !element.text.endsWith('<')) {
-            element.text = element.text.mid(1).toUpper().simplified();
+        if (element.trimmedText.startsWith('>') && !element.trimmedText.endsWith('<')) {
+            element.text = element.trimmedText.mid(1).toUpper().simplified();
             element.type = Fountain::Element::Transition;
             continue;
         }
 
         if (prevLineIsEmpty && nextLineIsEmpty && element.text.toUpper() == element.text) {
-            const QString simplifiedText = element.text.simplified();
+            const QString simplifiedText = element.simplifiedText;
             if (simplifiedText.endsWith("TO:")) {
                 element.text = simplifiedText;
                 element.type = Fountain::Element::Transition;
@@ -410,7 +425,8 @@ void Fountain::Parser::processShotsAndTransitions()
                                                           QStringLiteral("TIME CUT"),
                                                           QStringLiteral("WIPE TO") };
             for (const QString &knownTransition : knownTransitions) {
-                if (simplifiedText == knownTransition || simplifiedText == knownTransition + ":") {
+                if (simplifiedText == knownTransition || simplifiedText == knownTransition + ":"
+                    || simplifiedText == knownTransition + ".") {
                     element.text = knownTransition + ":";
                     element.type = Fountain::Element::Transition;
                     continue;
@@ -429,7 +445,8 @@ void Fountain::Parser::processShotsAndTransitions()
             };
 
             for (const QString &knownShot : knownShots) {
-                if (simplifiedText == knownShot || simplifiedText == knownShot + ":") {
+                if (simplifiedText == knownShot || simplifiedText == knownShot + ":"
+                    || simplifiedText == knownShot + ".") {
                     element.text = knownShot + ":";
                     element.type = Fountain::Element::Shot;
                     continue;
@@ -455,8 +472,8 @@ void Fountain::Parser::processCharacters()
         const bool prevLineIsEmpty =
                 i == 0 || m_body.at(i - 1).type == Fountain::Element::LineBreak;
 
-        if (prevLineIsEmpty && !nextLineIsEmpty) {
-            const QString simplifiedText = element.text.simplified();
+        if (prevLineIsEmpty && !nextLineIsEmpty && i + 1 < m_body.size()) {
+            const QString simplifiedText = element.simplifiedText;
             if (simplifiedText.endsWith('.') || simplifiedText.endsWith(':')
                 || simplifiedText.startsWith('>') || simplifiedText.endsWith('<'))
                 continue;
@@ -476,7 +493,8 @@ void Fountain::Parser::processCharacters()
                     isCharacter = (maybeCharacterName.toUpper() == maybeCharacterName);
                 }
             } else {
-                isCharacter = simplifiedText.toUpper() == simplifiedText;
+                isCharacter = !element.containsNonLatinChars
+                        && simplifiedText.toUpper() == simplifiedText;
             }
 
             if (isCharacter) {
@@ -513,19 +531,19 @@ void Fountain::Parser::processDialogueAndParentheticals()
                 break;
             }
 
-            const QString trimmedText = dpElement.text.simplified();
-            dpElement.text = trimmedText;
+            const QString simplifiedText = dpElement.simplifiedText;
+            dpElement.text = simplifiedText;
 
-            if (trimmedText.startsWith('(')) {
+            if (simplifiedText.startsWith('(')) {
                 ++nrParentheticals;
 
                 dpElement.type = Fountain::Element::Parenthetical;
-                if (trimmedText.endsWith(')'))
+                if (simplifiedText.endsWith(')'))
                     --nrParentheticals;
             } else {
                 if (nrParentheticals > 0) {
                     dpElement.type = Fountain::Element::Parenthetical;
-                    if (trimmedText.endsWith(')'))
+                    if (simplifiedText.endsWith(')'))
                         --nrParentheticals;
                 } else
                     dpElement.type = Fountain::Element::Dialogue;
@@ -544,7 +562,7 @@ void Fountain::Parser::processLyrics()
         if (element.type != Fountain::Element::Unknown)
             continue;
 
-        const QString trimmedText = element.text.trimmed();
+        const QString trimmedText = element.trimmedText;
 
         if (trimmedText.startsWith('~')) {
             element.type = Fountain::Element::Lyrics;
@@ -564,7 +582,7 @@ void Fountain::Parser::processSectionsAndSynopsis()
         if (element.type != Fountain::Element::Unknown)
             continue;
 
-        QString trimmedText = element.text.trimmed();
+        QString trimmedText = element.trimmedText;
 
         if (trimmedText.startsWith('=')) {
             element.type = Fountain::Element::Synopsis;
@@ -596,7 +614,7 @@ void Fountain::Parser::processAction()
             element.type = Fountain::Element::Action;
 
         if (element.type == Fountain::Element::Action) {
-            QString trimmedText = element.text.trimmed();
+            QString trimmedText = element.trimmedText;
             if (trimmedText.startsWith('>') && trimmedText.endsWith('<')) {
                 trimmedText = trimmedText.mid(1, trimmedText.length() - 2);
                 element.text = trimmedText.trimmed();
@@ -1327,6 +1345,7 @@ bool Fountain::loadIntoScene(const Element &fPara, Scene *scene, ScreenplayEleme
 
     if (fPara.type == Fountain::Element::SceneHeading && scene->elementCount() == 0) {
         scene->heading()->parseFrom(fPara.text);
+        scene->heading()->setEnabled(true);
         if (element && !fPara.sceneNumber.isEmpty())
             element->setUserSceneNumber(fPara.sceneNumber);
         return true;

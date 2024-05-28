@@ -29,6 +29,8 @@ class ScreenplayElement;
 
 namespace Fountain {
 
+class Parser;
+
 struct Element
 {
     enum Type {
@@ -57,6 +59,13 @@ struct Element
     QVector<QTextLayout::FormatRange> formats;
 
     QJsonObject toJson() const;
+
+private:
+    // Extra data that's only useful while parsing.
+    friend class Parser;
+    bool containsNonLatinChars = false;
+    QString simplifiedText;
+    QString trimmedText;
 };
 
 typedef QPair<QString, QString> TitlePageField;
