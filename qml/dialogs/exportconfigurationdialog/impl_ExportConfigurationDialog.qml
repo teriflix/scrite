@@ -157,19 +157,36 @@ VclDialog {
 
             RowLayout {
                 id: footerLayout
-                width: parent.width-32
-                anchors.centerIn: parent
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: parent.right
+                anchors.rightMargin: 16
+
+                spacing: 20
 
                 VclButton {
-                    Layout.alignment: Qt.AlignRight
+                    enabled: exporter.canCopyToClipboard
+                    visible: exporter.canCopyToClipboard
+                    text: "Copy to Clipboard"
+                    onClicked: {
+                        exportJob.copyToClipboard = true
+                        exportJob.start()
+                    }
+                }
+
+                VclButton {
                     enabled: exporter.fileName !== "" && _private.exportEnabled
                     text: _private.isPdfExport ? "Generate PDF" : "Export"
-                    onClicked: exportJob.start()
+                    onClicked: {
+                        exportJob.copyToClipboard = false
+                        exportJob.start()
+                    }
                 }
             }
 
             SequentialAnimation {
                 id: exportJob
+
+                property bool copyToClipboard: false
 
                 running: false
 
@@ -195,12 +212,19 @@ VclDialog {
                             Runtime.fileNamager.addToAutoDeleteList(exporter.fileName)
                         }
 
-                        const success = exporter.write()
+                        const success = exporter.write(exportJob.copyToClipboard ? AbstractExporter.ClipboardTarget : AbstractExporter.FileTarget)
 
                         Qt.callLater(_private.waitDialog.close)
                         _private.waitDialog = null
 
                         if(success) {
+                            if(exportJob.copyToClipboard) {
+                                MessageBox.information(exporter.formatName + " - Export", "Successfully copied text to clipboard.", () => {
+                                                            Qt.callLater(root.close)
+                                                       })
+                                return
+                            }
+
                             if(_private.isPdfExport) {
                                 PdfDialog.launch("Screenplay", exporter.fileName, dlFileName, 2, _private.exportSaveFeature.enabled)
                             } else

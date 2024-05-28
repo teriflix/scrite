@@ -57,6 +57,8 @@ bool AbstractImporter::isFeatureEnabled() const
 
 bool AbstractImporter::read()
 {
+    GarbageCollector::instance()->add(this);
+
     QString fileName = this->fileName();
     ScriteDocument *document = this->document();
 
@@ -119,8 +121,6 @@ bool AbstractImporter::read()
     UndoStack::ignoreUndoCommands = false;
     UndoStack::clearAllStacks();
     this->progress()->finish();
-
-    GarbageCollector::instance()->add(this);
 
     return ret;
 }

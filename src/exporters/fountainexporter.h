@@ -28,6 +28,7 @@ public:
     Q_INVOKABLE explicit FountainExporter(QObject *parent = nullptr);
     ~FountainExporter();
 
+    bool canCopyToClipboard() const { return true; }
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return false; }
 

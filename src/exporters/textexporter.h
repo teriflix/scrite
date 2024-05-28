@@ -28,6 +28,7 @@ public:
     Q_INVOKABLE explicit TextExporter(QObject *parent = nullptr);
     ~TextExporter();
 
+    bool canCopyToClipboard() const { return true; }
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return true; }
 

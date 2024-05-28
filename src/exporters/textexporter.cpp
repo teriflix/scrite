@@ -16,6 +16,67 @@
 #include <QtMath>
 #include <QFileInfo>
 
+#include <QString>
+#include <QStringList>
+
+static QStringList breakStringIntoLines(const QString &inputString, int maxCharactersPerLine)
+{
+    QStringList lines;
+    QString currentLine;
+
+    const QStringList words = inputString.split(' ', Qt::SkipEmptyParts);
+
+    for (const QString &word : words) {
+        if (currentLine.length() + word.length() + 1 <= maxCharactersPerLine) {
+            if (!currentLine.isEmpty())
+                currentLine.append(' ');
+            currentLine.append(word);
+        } else {
+            lines.append(currentLine);
+            currentLine.clear();
+
+            if (word.length() > maxCharactersPerLine) {
+                int startIndex = 0;
+                while (startIndex < word.length()) {
+                    QString chunk = word.mid(startIndex, maxCharactersPerLine - 1) + "-";
+                    lines.append(chunk);
+                    startIndex += maxCharactersPerLine - 1;
+                }
+            } else
+                currentLine.append(word);
+        }
+    }
+
+    if (!currentLine.isEmpty())
+        lines.append(currentLine);
+
+    return lines;
+}
+
+QString adjustSpacesToLength(const QString &inputString, int maxLength)
+{
+    QString simplifiedText = inputString.simplified();
+    if (simplifiedText.length() == maxLength)
+        return simplifiedText;
+
+    QStringList words = simplifiedText.split(' ', Qt::SkipEmptyParts);
+    int totalSpaces = maxLength - simplifiedText.length();
+    int spacesPerWord = totalSpaces / (words.size() - 1);
+    QString adjustedString = words.join(QString(1 + spacesPerWord, ' '));
+    int extraSpaces = maxLength - adjustedString.length();
+
+    int insertIndex = 0;
+    for (int i = 0; i < extraSpaces; ++i) {
+        insertIndex = adjustedString.indexOf(' ', insertIndex) + 1;
+        if (insertIndex == -1)
+            break;
+        adjustedString.insert(insertIndex, ' ');
+        insertIndex += 2;
+    }
+
+    return adjustedString;
+}
+
 TextExporter::TextExporter(QObject *parent) : AbstractExporter(parent) { }
 
 TextExporter::~TextExporter() { }
@@ -34,7 +95,7 @@ bool TextExporter::doExport(QIODevice *device)
     const ScreenplayFormat *screenplayFormat = this->document()->formatting();
     const Screenplay *screenplay = this->document()->screenplay();
     const int nrScenes = screenplay->elementCount();
-    const int maxChars = m_maxLettersPerLine - 1;
+    const int maxChars = m_maxLettersPerLine;
 
     QTextStream ts(device);
     ts.setCodec("utf-8");
@@ -46,60 +107,29 @@ bool TextExporter::doExport(QIODevice *device)
 
         const qreal blockWidth = 1.0 - format->leftMargin() - format->rightMargin();
         const int maxCharsInBlock = int(qreal(maxChars) * blockWidth);
-        const QString rightAlignPrefix(maxChars - maxCharsInBlock, ' ');
-        const QString centerAlignPrefix(int(qreal(maxChars - maxCharsInBlock) / 2.0), ' ');
 
-        QStringList words = text.trimmed().split(" ", Qt::SkipEmptyParts);
-        QStringList lines;
-        QString line;
-        while (!words.isEmpty()) {
-            const QString word = words.takeFirst();
-            if (line.length() + word.length() + 1 > maxCharsInBlock) {
-                lines.append(line);
-                line.clear();
-            }
-            if (!line.isEmpty())
-                line += " ";
-            line += word;
-        }
-        if (!line.isEmpty())
-            lines.append(line);
+        const QStringList lines = breakStringIntoLines(text.simplified(), maxCharsInBlock);
 
         for (int i = 0; i < lines.size(); i++) {
             QString line = lines.at(i);
-            if (line.length() < maxCharsInBlock) {
-                words = line.split(" ");
 
-                if (format->textAlignment() == Qt::AlignJustify && i < lines.size() - 1) {
-                    const qreal extraSpacePerWord =
-                            qreal(maxCharsInBlock - line.length()) / qreal(words.size() - 1);
-                    qreal space = 0;
-                    line.clear();
-                    for (int j = 0; j < words.size(); j++) {
-                        int nrSpaceChars = qRound(space);
-                        if (j == words.size() - 1)
-                            nrSpaceChars += maxCharsInBlock
-                                    - (line.length() + words.at(j).length() + nrSpaceChars);
-                        if (nrSpaceChars > 0)
-                            space -= qreal(nrSpaceChars);
-                        if (!line.isEmpty())
-                            line += QString(nrSpaceChars + 1, ' ');
-                        line += words.at(j);
-                        space += extraSpacePerWord;
-                    }
-                } else if (format->textAlignment() == Qt::AlignRight) {
-                    line = QString(maxCharsInBlock - line.length(), ' ') + line;
-                } else if (format->textAlignment() & Qt::AlignHCenter) {
-                    const int nrSpaceChars = qFloor(qreal(maxCharsInBlock - line.length()) / 2.0);
-                    line = QString(nrSpaceChars, ' ') + line;
-                }
+            if (format->textAlignment().testFlag(Qt::AlignJustify)) {
+                if (i < lines.size() - 1)
+                    line = adjustSpacesToLength(line, maxCharsInBlock);
             }
 
-            ts << line << "\n";
+            QString prefix;
+            if (format->textAlignment().testFlag(Qt::AlignRight))
+                prefix = QString(maxCharsInBlock - line.length(), ' ');
+
+            if (format->textAlignment().testFlag(Qt::AlignHCenter))
+                prefix = QString(qCeil(qreal(maxCharsInBlock - line.length()) / 2.0), ' ');
+
+            const int leftMarginChars = int(format->leftMargin() * maxChars);
+            ts << QString(leftMarginChars, ' ') << prefix << line << "\n";
         }
     };
 
-    int nrHeadings = 0;
     for (int i = 0; i < nrScenes; i++) {
         const ScreenplayElement *screenplayElement = screenplay->elementAt(i);
         if (screenplayElement->elementType() != ScreenplayElement::SceneElementType)
@@ -108,7 +138,6 @@ bool TextExporter::doExport(QIODevice *device)
         const Scene *scene = screenplayElement->scene();
         const SceneHeading *heading = scene->heading();
         if (heading->isEnabled()) {
-            ++nrHeadings;
             ts << "\n[" << screenplayElement->resolvedSceneNumber() << "] " << heading->text()
                << "\n";
         }

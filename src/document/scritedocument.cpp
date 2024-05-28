@@ -1775,6 +1775,7 @@ void ScriteDocument::setupExporter(AbstractExporter *exporter)
         exporter->setFileName(path + QStringLiteral("/") + suggestedName);
     }
 
+#if 0
     ProgressReport *progressReport = exporter->findChild<ProgressReport *>();
     if (progressReport) {
         connect(progressReport, &ProgressReport::statusChanged, this,
@@ -1785,6 +1786,7 @@ void ScriteDocument::setupExporter(AbstractExporter *exporter)
                         this->clearBusyMessage();
                 });
     }
+#endif
 }
 
 void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerator)
@@ -1828,6 +1830,7 @@ void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerat
         reportGenerator->setFileName(path + QStringLiteral("/") + suggestedName);
     }
 
+#if 0
     ProgressReport *progressReport = reportGenerator->findChild<ProgressReport *>();
     if (progressReport) {
         connect(progressReport, &ProgressReport::statusChanged, this,
@@ -1839,6 +1842,7 @@ void ScriteDocument::setupReportGenerator(AbstractReportGenerator *reportGenerat
                         this->clearBusyMessage();
                 });
     }
+#endif
 }
 
 QAbstractListModel *ScriteDocument::structureElementConnectors() const

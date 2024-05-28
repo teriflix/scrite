@@ -44,6 +44,9 @@ public:
     Q_PROPERTY(bool canBundleFonts READ canBundleFonts CONSTANT)
     virtual bool canBundleFonts() const { return false; }
 
+    Q_PROPERTY(bool canCopyToClipboard READ canCopyToClipboard CONSTANT)
+    virtual bool canCopyToClipboard() const { return false; }
+
     Q_INVOKABLE void bundleFontForLanguage(int language, bool on = true)
     {
         m_languageBundleMap[TransliterationEngine::Language(language)] = on;
@@ -67,7 +70,10 @@ public:
 
     Q_INVOKABLE QJsonObject configurationFormInfo() const;
 
-    Q_INVOKABLE bool write();
+    enum Target { FileTarget, ClipboardTarget };
+    Q_ENUM(Target)
+
+    Q_INVOKABLE bool write(Target target = FileTarget);
 
     Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }
 

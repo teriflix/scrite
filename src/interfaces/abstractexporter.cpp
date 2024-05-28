@@ -16,6 +16,8 @@
 #include "scrite.h"
 #include "user.h"
 
+#include <QBuffer>
+#include <QClipboard>
 #include <QScopeGuard>
 
 AbstractExporter::AbstractExporter(QObject *parent) : AbstractDeviceIO(parent)
@@ -68,8 +70,10 @@ QJsonObject AbstractExporter::configurationFormInfo() const
             this, &AbstractExporter::staticMetaObject);
 }
 
-bool AbstractExporter::write()
+bool AbstractExporter::write(AbstractExporter::Target target)
 {
+    GarbageCollector::instance()->add(this);
+
     QString fileName = this->fileName();
     ScriteDocument *document = this->document();
 
@@ -80,21 +84,37 @@ bool AbstractExporter::write()
         return false;
     }
 
-    if (fileName.isEmpty()) {
-        this->error()->setErrorMessage(QStringLiteral("Cannot export to an empty file."));
-        return false;
-    }
+    QScopedPointer<QIODevice> device;
 
-    if (document == nullptr) {
-        this->error()->setErrorMessage(QStringLiteral("No document available to export."));
-        return false;
-    }
+    if (target == FileTarget) {
+        if (fileName.isEmpty()) {
+            this->error()->setErrorMessage(QStringLiteral("Cannot export to an empty file."));
+            return false;
+        }
 
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly)) {
-        this->error()->setErrorMessage(
-                QStringLiteral("Could not open file '%1' for writing.").arg(fileName));
-        return false;
+        if (document == nullptr) {
+            this->error()->setErrorMessage(QStringLiteral("No document available to export."));
+            return false;
+        }
+
+        device.reset(new QFile(fileName));
+        if (!device->open(QFile::WriteOnly)) {
+            this->error()->setErrorMessage(
+                    QStringLiteral("Could not open file '%1' for writing.").arg(fileName));
+            return false;
+        }
+    } else if (target == ClipboardTarget) {
+        if (!this->canCopyToClipboard()) {
+            this->error()->setErrorMessage(QStringLiteral("Export to clipboard is not supported."));
+            return false;
+        }
+
+        device.reset(new QBuffer);
+        if (!device->open(QBuffer::WriteOnly)) {
+            this->error()->setErrorMessage(
+                    QStringLiteral("Could not open clipboard for writing!."));
+            return false;
+        }
     }
 
     auto guard = qScopeGuard([=]() {
@@ -107,10 +127,26 @@ bool AbstractExporter::write()
     this->progress()->setProgressText(QStringLiteral("Generating \"%1\"").arg(classInfo.value()));
 
     this->progress()->start();
-    const bool ret = this->doExport(&file);
+    const bool ret = this->doExport(device.get());
     this->progress()->finish();
 
-    GarbageCollector::instance()->add(this);
+    if (target == ClipboardTarget) {
+        QBuffer *buffer = qobject_cast<QBuffer *>(device.get());
+        if (buffer) {
+
+            const QByteArray bytes = buffer->data();
+            const QString text = QString::fromUtf8(bytes);
+
+            QClipboard *clipboard = qApp->clipboard();
+            clipboard->setText(text);
+        } else {
+            if (!device->open(QBuffer::WriteOnly)) {
+                this->error()->setErrorMessage(
+                        QStringLiteral("Could not copy exported contents to clipboard!."));
+                return false;
+            }
+        }
+    }
 
     return ret;
 }
