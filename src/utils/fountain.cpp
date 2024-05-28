@@ -1290,9 +1290,17 @@ void Fountain::populateBody(const Screenplay *screenplay, Body &body)
         if (element->elementType() == ScreenplayElement::BreakElementType) {
             Fountain::Element fElement;
             fElement.type = Fountain::Element::Section;
-            fElement.sectionDepth = 1;
-            fElement.text = element->sceneID();
+            fElement.sectionDepth = element->breakType() == Screenplay::Act ? 1 : 2;
+            fElement.text = (element->breakTitle() + " " + element->breakSubtitle()).simplified();
             body.append(fElement);
+
+            if (!element->breakSummary().isEmpty()) {
+                fElement = Fountain::Element();
+                fElement.type = Fountain::Element::Synopsis;
+                fElement.text = element->breakSummary();
+                body.append(fElement);
+            }
+
             continue;
         }
 
