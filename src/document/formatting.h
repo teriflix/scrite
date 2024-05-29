@@ -337,13 +337,13 @@ public:
     ScreenplayPageLayout *pageLayout() const { return m_pageLayout; }
 
     Q_PROPERTY(TransliterationEngine::Language defaultLanguage READ defaultLanguage WRITE
-                       setDefaultLanguage NOTIFY defaultLanguageChanged)
+                       setDefaultLanguage NOTIFY defaultLanguageChanged STORED false)
     void setDefaultLanguage(TransliterationEngine::Language val);
     TransliterationEngine::Language defaultLanguage() const { return m_defaultLanguage; }
     Q_SIGNAL void defaultLanguageChanged();
 
     Q_PROPERTY(int defaultLanguageInt READ defaultLanguageInt WRITE setDefaultLanguageInt NOTIFY
-                       defaultLanguageChanged)
+                       defaultLanguageChanged STORED false)
     int defaultLanguageInt() const { return int(m_defaultLanguage); }
     void setDefaultLanguageInt(int val)
     {
