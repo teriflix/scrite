@@ -2497,7 +2497,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     QMimeData *mimeData = new QMimeData;
     mimeData->setData(QStringLiteral("scrite/scene"), contentJson);
     mimeData->setText(Fountain::Writer(fBody,
-                                       fBody.size() > 1 ? Fountain::Writer::StrictSyntaxOption
+                                       fBody.size() > 1 ? Screenplay::fountainCopyOptions()
                                                         : Fountain::Writer::NoOption)
                               .toString());
     clipboard->setMimeData(mimeData);
@@ -2534,7 +2534,7 @@ int SceneDocumentBinder::paste(int fromPosition)
         if (mimeData->hasText()) {
             const QString text = mimeData->text();
             if (text.contains('\n')) {
-                Fountain::Parser parser(text);
+                Fountain::Parser parser(text, Screenplay::fountainPasteOptions());
 
                 bool sceneHeadingChanged = false;
 

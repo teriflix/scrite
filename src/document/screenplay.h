@@ -534,6 +534,9 @@ public:
     };
     void write(QTextCursor &cursor, const WriteOptions &options = WriteOptions()) const;
 
+    static int fountainCopyOptions();
+    static int fountainPasteOptions();
+
 protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *te);

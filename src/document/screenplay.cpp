@@ -2572,7 +2572,7 @@ bool Screenplay::canPaste() const
 
     const QClipboard *clipboard = qApp->clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
-    if (mimeData && mimeData->hasText()) {
+    if (mimeData && mimeData->hasText() && Screenplay::fountainPasteOptions() != 0) {
         const QString maybeFountainText = mimeData->text();
         Fountain::Body fBody = Fountain::Parser(maybeFountainText).body();
         return !fBody.isEmpty();
@@ -2788,18 +2788,25 @@ void Screenplay::pasteAfter(int index)
         const QJsonArray elements = clipboardJson.value(QLatin1String("data")).toArray();
         cmd = new ScreenplayPasteUndoCommand(this, structure, elements, scenes, index);
     } else {
-        // If scenes were copied from fountain file, web-browser or other software,
-        // then we will get fountain-text, which we will have to parse and then paste.
-        const QClipboard *clipboard = qApp->clipboard();
-        const QMimeData *mimeData = clipboard->mimeData();
-        if (mimeData && mimeData->hasText()) {
-            const QString maybeFountainText = mimeData->text();
+        const int pasteOptions = Screenplay::fountainPasteOptions();
 
-            Fountain::Body fBody = Fountain::Parser(maybeFountainText).body();
-            if (!fBody.isEmpty())
-                cmd = new ScreenplayPasteFromFountainUndoCommand(this, structure, fBody, index);
+        if (pasteOptions != 0) {
+            // If scenes were copied from fountain file, web-browser or other software,
+            // then we will get fountain-text, which we will have to parse and then paste.
+            const QClipboard *clipboard = qApp->clipboard();
+            const QMimeData *mimeData = clipboard->mimeData();
+            if (mimeData && mimeData->hasText()) {
+                const QString maybeFountainText = mimeData->text();
+
+                Fountain::Body fBody = Fountain::Parser(maybeFountainText, pasteOptions).body();
+                if (!fBody.isEmpty())
+                    cmd = new ScreenplayPasteFromFountainUndoCommand(this, structure, fBody, index);
+            }
         }
     }
+
+    if (cmd == nullptr)
+        return;
 
     if (UndoStack::active()) {
         UndoStack::active()->push(cmd);
@@ -2992,6 +2999,42 @@ void Screenplay::write(QTextCursor &cursor, const WriteOptions &options) const
             }
         }
     }
+}
+
+int Screenplay::fountainCopyOptions()
+{
+    int options = 0;
+
+    const QString group = QStringLiteral("Screenplay Editor/");
+
+    const QSettings *settings = Application::instance()->settings();
+    if (settings->value(group + QStringLiteral("copyAsFountain")).toBool()) {
+        if (settings->value(group + QStringLiteral("copyFountainUsingStrictSyntax")).toBool())
+            options += Fountain::Writer::StrictSyntaxOption;
+        if (settings->value(group + QStringLiteral("copyFountainWithEmphasis")).toBool())
+            options += Fountain::Writer::EmphasisOption;
+    }
+
+    return options;
+}
+
+int Screenplay::fountainPasteOptions()
+{
+    int options = 0;
+
+    const QString group = QStringLiteral("Screenplay Editor/");
+
+    const QSettings *settings = Application::instance()->settings();
+    if (settings->value(group + QStringLiteral("pasteAsFountain")).toBool()) {
+        options += Fountain::Parser::IgnoreLeadingWhitespaceOption;
+        options += Fountain::Parser::IgnoreTrailingWhiteSpaceOption;
+        if (settings->value(group + QStringLiteral("pasteByMergingAdjacentElements")).toBool())
+            options += Fountain::Parser::JoinAdjacentElementOption;
+        if (settings->value(group + QStringLiteral("pasteAfterResolvingEmphasis")).toBool())
+            options += Fountain::Parser::ResolveEmphasisOption;
+    }
+
+    return options;
 }
 
 bool Screenplay::event(QEvent *event)

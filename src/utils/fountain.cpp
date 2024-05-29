@@ -159,6 +159,18 @@ void Fountain::Parser::parseContents(const QString &givenContent)
     m_body.clear();
     m_titlePage.clear();
 
+    if (m_options == 0) {
+        const QStringList lines = givenContent.split("\n", Qt::SkipEmptyParts);
+        std::transform(lines.begin(), lines.end(), std::back_inserter(m_body),
+                       [](const QString &line) {
+                           Fountain::Element fElement;
+                           fElement.type = Fountain::Element::Action;
+                           fElement.text = line.trimmed();
+                           return fElement;
+                       });
+        return;
+    }
+
     // Remove leading whitespaces in each line, standardize all new-lines
     const QString content = this->cleanup(givenContent);
 

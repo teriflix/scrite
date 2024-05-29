@@ -25,13 +25,13 @@ import "qrc:/qml/helpers"
 
 Item {
     id: root
+    height: layout.height+30
 
     ColumnLayout {
         id: layout
 
-        anchors.fill: parent
-        anchors.margins: 15
-        anchors.leftMargin: 0
+        y: 10
+        width: parent.width-20
 
         spacing: 10
 
@@ -45,7 +45,6 @@ Item {
             GridLayout {
                 width: parent.width
                 columns: 2
-                rowSpacing: 10
                 columnSpacing: 10
 
                 VclCheckBox {
@@ -118,9 +117,80 @@ Item {
             }
         }
 
-        Item {
+        GroupBox {
             Layout.fillWidth: true
-            Layout.fillHeight: true
+
+            label: VclText {
+                text: "Copy Options"
+            }
+
+            ColumnLayout {
+                width: parent.width
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    text: "Copy text in Fountain format."
+                    checked: Runtime.screenplayEditorSettings.copyAsFountain
+                    onToggled: Runtime.screenplayEditorSettings.copyAsFountain = checked
+                }
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    enabled: Runtime.screenplayEditorSettings.copyAsFountain
+                    text: "Explicitly mark headings, character, action and transition paragraphs in copied text."
+                    checked: Runtime.screenplayEditorSettings.copyFountainUsingStrictSyntax
+                    onToggled: Runtime.screenplayEditorSettings.copyFountainUsingStrictSyntax = checked
+                }
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    enabled: Runtime.screenplayEditorSettings.copyAsFountain
+                    text: "Copy bold, italics and underline formatting."
+                    checked: Runtime.screenplayEditorSettings.copyFountainWithEmphasis
+                    onToggled: Runtime.screenplayEditorSettings.copyFountainWithEmphasis = checked
+                }
+            }
+        }
+
+        GroupBox {
+            Layout.fillWidth: true
+
+            label: VclText {
+                text: "Paste Options"
+            }
+
+            ColumnLayout {
+                width: parent.width
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    text: "Interpret plaintext in Fountain format."
+                    checked: Runtime.screenplayEditorSettings.pasteAsFountain
+                    onToggled: Runtime.screenplayEditorSettings.pasteAsFountain = checked
+                }
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    enabled: Runtime.screenplayEditorSettings.pasteAsFountain
+                    text: "Merge adjacent action and dialogue paragraphs."
+                    checked: Runtime.screenplayEditorSettings.pasteByMergingAdjacentElements
+                    onToggled: Runtime.screenplayEditorSettings.pasteByMergingAdjacentElements = checked
+                }
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    enabled: Runtime.screenplayEditorSettings.pasteAsFountain
+                    text: "Paste with bold, italics and underline formatting."
+                    checked: Runtime.screenplayEditorSettings.pasteAfterResolvingEmphasis
+                    onToggled: Runtime.screenplayEditorSettings.pasteAfterResolvingEmphasis = checked
+                }
+            }
         }
     }
 }

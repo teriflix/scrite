@@ -29,8 +29,6 @@ PageView {
     pagesArray: ["Options", "Formatting Rules", "Page Setup"]
     currentIndex: 0
     pageContent: Loader {
-        width: root.availablePageContentWidth
-        height: root.availablePageContentHeight
         source: {
             var ret = "./Screenplay"
             switch(root.currentIndex) {
@@ -46,6 +44,12 @@ PageView {
             }
             ret += "Page.qml"
             return ret
+        }
+        onItemChanged: {
+            if(root.currentIndex == 1) {
+                item.width = root.availablePageContentWidth
+                item.height = root.availablePageContentHeight
+            }
         }
     }
 }

@@ -112,6 +112,14 @@ Item {
         property bool highlightCurrentLine: true
         property bool applyUserDefinedLanguageFonts: true
         property bool optimiseScrolling: false
+
+        property bool copyAsFountain: true
+        property bool copyFountainUsingStrictSyntax: true
+        property bool copyFountainWithEmphasis: true
+
+        property bool pasteAsFountain: true
+        property bool pasteByMergingAdjacentElements: true
+        property bool pasteAfterResolvingEmphasis: true
     }
 
     readonly property Settings pdfExportSettings: Settings {
