@@ -90,6 +90,15 @@ void TextExporter::setMaxLettersPerLine(int val)
     emit maxLettersPerLineChanged();
 }
 
+void TextExporter::setIncludeSceneNumbers(bool val)
+{
+    if (m_includeSceneNumbers == val)
+        return;
+
+    m_includeSceneNumbers = val;
+    emit includeSceneNumbersChanged();
+}
+
 bool TextExporter::doExport(QIODevice *device)
 {
     const ScreenplayFormat *screenplayFormat = this->document()->formatting();
@@ -138,8 +147,12 @@ bool TextExporter::doExport(QIODevice *device)
         const Scene *scene = screenplayElement->scene();
         const SceneHeading *heading = scene->heading();
         if (heading->isEnabled()) {
-            ts << "\n[" << screenplayElement->resolvedSceneNumber() << "] " << heading->text()
-               << "\n";
+            ts << "\n";
+
+            if (m_includeSceneNumbers)
+                ts << "[" << screenplayElement->resolvedSceneNumber() << "] ";
+
+            ts << heading->text() << "\n";
         }
 
         const int nrElements = scene->elementCount();

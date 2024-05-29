@@ -32,7 +32,7 @@ public:
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return true; }
 
-    Q_CLASSINFO("maxLettersPerLine_FieldLabel", "Number of characters per line")
+    Q_CLASSINFO("maxLettersPerLine_FieldLabel", "Number of characters per line:")
     Q_CLASSINFO("maxLettersPerLine_FieldEditor", "IntegerSpinBox")
     Q_CLASSINFO("maxLettersPerLine_FieldMinValue", "30")
     Q_CLASSINFO("maxLettersPerLine_FieldMaxValue", "150")
@@ -42,12 +42,20 @@ public:
     int maxLettersPerLine() const { return m_maxLettersPerLine; }
     Q_SIGNAL void maxLettersPerLineChanged();
 
+    Q_CLASSINFO("includeSceneNumbers_FieldLabel", "Include scene numbers.")
+    Q_CLASSINFO("includeSceneNumbers_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneNumbers READ isIncludeSceneNumbers WRITE setIncludeSceneNumbers NOTIFY includeSceneNumbersChanged)
+    void setIncludeSceneNumbers(bool val);
+    bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
+    Q_SIGNAL void includeSceneNumbersChanged();
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString fileNameExtension() const { return QStringLiteral("txt"); }
 
 private:
     int m_maxLettersPerLine = 60;
+    bool m_includeSceneNumbers = false;
 };
 
 #endif // TEXTEXPORTER_H
