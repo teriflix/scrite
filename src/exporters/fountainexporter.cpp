@@ -20,9 +20,34 @@ FountainExporter::FountainExporter(QObject *parent) : AbstractExporter(parent) {
 
 FountainExporter::~FountainExporter() { }
 
+void FountainExporter::setFollowStrictSyntax(bool val)
+{
+    if (m_followStrictSyntax == val)
+        return;
+
+    m_followStrictSyntax = val;
+    emit followStrictSyntaxChanged();
+}
+
+void FountainExporter::setUseEmphasis(bool val)
+{
+    if (m_useEmphasis == val)
+        return;
+
+    m_useEmphasis = val;
+    emit useEmphasisChanged();
+}
+
 bool FountainExporter::doExport(QIODevice *device)
 {
     const Screenplay *screenplay = this->document()->screenplay();
-    Fountain::Writer writer(screenplay);
+
+    int options = 0;
+    if (m_useEmphasis)
+        options += Fountain::Writer::EmphasisOption;
+    if (m_followStrictSyntax)
+        options += Fountain::Writer::StrictSyntaxOption;
+
+    Fountain::Writer writer(screenplay, options);
     return writer.write(device);
 }

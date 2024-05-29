@@ -140,7 +140,12 @@ private:
 class Writer
 {
 public:
-    enum Options { NoOption = 0, StrictSyntaxOption = 1, DefaultOptions = StrictSyntaxOption };
+    enum Options {
+        NoOption = 0,
+        StrictSyntaxOption = 1,
+        EmphasisOption = 2,
+        DefaultOptions = StrictSyntaxOption | EmphasisOption
+    };
 
     Writer(QList<QPair<QString, QString>> &titlePage, const QList<Element> &body,
            int options = DefaultOptions);

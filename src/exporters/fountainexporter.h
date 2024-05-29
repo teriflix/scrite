@@ -28,6 +28,20 @@ public:
     Q_INVOKABLE explicit FountainExporter(QObject *parent = nullptr);
     ~FountainExporter();
 
+    Q_CLASSINFO("followStrictSyntax_FieldLabel", "Use ., @, !, > to explicitly mark scene heading, character, action and transisitions.")
+    Q_CLASSINFO("followStrictSyntax_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool followStrictSyntax READ isFollowStrictSyntax WRITE setFollowStrictSyntax NOTIFY followStrictSyntaxChanged)
+    void setFollowStrictSyntax(bool val);
+    bool isFollowStrictSyntax() const { return m_followStrictSyntax; }
+    Q_SIGNAL void followStrictSyntaxChanged();
+
+    Q_CLASSINFO("useEmphasis_FieldLabel", "Use *, ** and _ to highlight italics, bold and underlined text.")
+    Q_CLASSINFO("useEmphasis_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool useEmphasis READ isUseEmphasis WRITE setUseEmphasis NOTIFY useEmphasisChanged)
+    void setUseEmphasis(bool val);
+    bool isUseEmphasis() const { return m_useEmphasis; }
+    Q_SIGNAL void useEmphasisChanged();
+
     bool canCopyToClipboard() const { return true; }
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return false; }
@@ -35,6 +49,10 @@ public:
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString fileNameExtension() const { return QStringLiteral("fountain"); }
+
+private:
+    bool m_useEmphasis = true;
+    bool m_followStrictSyntax = true;
 };
 
 #endif // FOUNTAINEXPORTER_H

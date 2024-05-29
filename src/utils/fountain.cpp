@@ -1187,7 +1187,7 @@ void Fountain::Writer::writeSynopsis(QTextStream &ts, const Element &element) co
 QString Fountain::Writer::emphasisedText(const Element &element) const
 {
     QString ret;
-    if (Fountain::encodeEmphasis(element.text, element.formats, ret))
+    if (m_options & EmphasisOption && Fountain::encodeEmphasis(element.text, element.formats, ret))
         return ret;
 
     return element.text;
@@ -1196,7 +1196,6 @@ QString Fountain::Writer::emphasisedText(const Element &element) const
 #include "scene.h"
 #include "structure.h"
 #include "screenplay.h"
-#include "scritedocument.h"
 
 void Fountain::populateTitlePage(const Screenplay *screenplay, TitlePage &titlePage)
 {
