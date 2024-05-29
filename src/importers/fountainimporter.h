@@ -16,6 +16,10 @@
 
 #include "abstractimporter.h"
 
+namespace Fountain {
+class Parser;
+}
+
 class FountainImporter : public AbstractImporter
 {
     Q_OBJECT
@@ -28,8 +32,11 @@ public:
 
     bool canImport(const QString &fileName) const;
 
+    bool importFromClipboard();
+
 protected:
     bool doImport(QIODevice *device); // AbstractImporter interface
+    bool doImport(const Fountain::Parser &parser);
 };
 
 #endif // FOUNTAINIMPORTER_H

@@ -597,10 +597,28 @@ Item {
                     visible: !Runtime.appFeatures.templates.enabled
 
                     LinkButton {
+                        Layout.fillWidth: true
+
+                        text: "From Clipboard"
+                        enabled: Scrite.document.canImportFromClipboard
+                        tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
+                        iconSource: "qrc:/icons/content/content_paste.png"
+
+                        onClicked: {
+                            SaveFileTask.save( () => {
+                                                  Scrite.document.importFromClipboard()
+                                                  root.closeRequest()
+                                              } )
+                        }
+                    }
+
+                    LinkButton {
+                        Layout.fillWidth: true
+
                         text: "Blank Document"
                         iconSource: "qrc:/icons/filetype/document.png"
-                        Layout.fillWidth: true
-                        tooltip: "Creates a new blank Scrite document."
+                        tooltip: "A crisp and clean new document to write your next blockbuster!"
+
                         onClicked: {
                             SaveFileTask.save( () => {
                                                     root.enabled = false
@@ -633,6 +651,23 @@ Item {
                     }
                     highlightMoveDuration: 0
                     interactive: height < contentHeight
+                    header: LinkButton {
+                        width: templatesView.width
+
+                        text: "From Clipboard"
+                        enabled: Scrite.document.canImportFromClipboard
+                        tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
+                        showPoster: false
+                        iconSource: "qrc:/icons/content/content_paste.png"
+
+                        onClicked: {
+                            SaveFileTask.save( () => {
+                                                    Scrite.document.importFromClipboard()
+                                                    root.closeRequest()
+                                                } )
+                        }
+                    }
+
                     delegate: LinkButton {
                         required property int index
                         required property var record

@@ -12,11 +12,15 @@
 ****************************************************************************/
 
 #include "fountainimporter.h"
-#include "application.h"
 #include "fountain.h"
+#include "user.h"
 
 #include <QBuffer>
 #include <QRegExp>
+#include <QMimeData>
+#include <QClipboard>
+#include <QScopeGuard>
+#include <QGuiApplication>
 
 FountainImporter::FountainImporter(QObject *parent) : AbstractImporter(parent) { }
 
@@ -28,12 +32,42 @@ bool FountainImporter::canImport(const QString &fileName) const
     return suffixes.contains(QFileInfo(fileName).suffix().toLower());
 }
 
+bool FountainImporter::importFromClipboard()
+{
+    ScriteDocument *document = this->document();
+    document->reset();
+
+    // Remove any blank scenes created in reset()
+    Screenplay *screenplay = document->screenplay();
+    while (screenplay->elementCount())
+        screenplay->removeElement(screenplay->elementAt(0));
+
+    Structure *structure = document->structure();
+    while (structure->elementCount())
+        structure->removeElement(structure->elementAt(0));
+
+    auto guard = qScopeGuard([=]() {
+        const QString importerName = QString::fromLatin1(this->metaObject()->className());
+        User::instance()->logActivity2(QStringLiteral("import"), importerName + "-Clipboard");
+    });
+
+    const QString text = qApp->clipboard()->mimeData()->text();
+
+    Fountain::Parser parser(text);
+    return this->doImport(parser);
+}
+
 bool FountainImporter::doImport(QIODevice *device)
+{
+    Fountain::Parser parser(device);
+    return this->doImport(parser);
+}
+
+bool FountainImporter::doImport(const Fountain::Parser &parser)
 {
     ScriteDocument *doc = this->document();
     Screenplay *screenplay = doc->screenplay();
 
-    Fountain::Parser parser(device);
     Fountain::loadTitlePage(parser.titlePage(), screenplay);
 
     const auto body = parser.body();

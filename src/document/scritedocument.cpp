@@ -17,6 +17,7 @@
 #include "user.h"
 #include "scrite.h"
 #include "undoredo.h"
+#include "fountain.h"
 #include "filelocker.h"
 #include "hourglass.h"
 #include "aggregation.h"
@@ -46,10 +47,12 @@
 #include <QUuid>
 #include <QFuture>
 #include <QPainter>
+#include <QMimeData>
 #include <QDateTime>
 #include <QFileInfo>
 #include <QSettings>
 #include <QDateTime>
+#include <QClipboard>
 #include <QScopeGuard>
 #include <QElapsedTimer>
 #include <QJsonDocument>
@@ -727,6 +730,8 @@ ScriteDocument::ScriteDocument(QObject *parent)
             &ScriteDocument::updateDocumentWindowTitle);
     connect(this, &ScriteDocument::fileNameChanged,
             [=]() { m_documentBackupsModel.setDocumentFilePath(m_fileName); });
+    connect(qApp->clipboard(), &QClipboard::dataChanged, this,
+            &ScriteDocument::canImportFromClipboardChanged);
 
     const QVariant ase = Application::instance()->settings()->value("AutoSave/autoSaveEnabled");
     this->setAutoSave(ase.isValid() ? ase.toBool() : m_autoSave);
@@ -1126,6 +1131,22 @@ void ScriteDocument::setMaxBackupCount(int val)
     settings->setValue(QStringLiteral("Installation/maxBackupCount"), m_maxBackupCount);
 }
 
+bool ScriteDocument::canImportFromClipboard() const
+{
+    const QClipboard *clipboard = qApp->clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+
+    const QString clipboardText = mimeData->text();
+    const int nrLines = clipboardText.isEmpty() ? 0 : clipboardText.count("\n");
+
+    if (nrLines >= 2) {
+        const Fountain::Parser parser(mimeData->text(), Screenplay::fountainPasteOptions());
+        return !parser.body().isEmpty();
+    }
+
+    return false;
+}
+
 void ScriteDocument::reset()
 {
     HourGlass hourGlass;
@@ -1269,6 +1290,39 @@ bool ScriteDocument::openOrImport(const QString &fileName)
     }
 
     return false;
+}
+
+bool ScriteDocument::importFromClipboard()
+{
+    HourGlass hourGlass;
+
+    m_errorReport->clear();
+
+    if (!this->canImportFromClipboard()) {
+        m_errorReport->setErrorMessage("No text in clipboard to import from.");
+        return false;
+    }
+
+    QScopedPointer<FountainImporter> importer(new FountainImporter(this));
+
+    if (importer.isNull()) {
+        m_errorReport->setErrorMessage("Couldn't load fountain importer.");
+        return false;
+    }
+
+    this->setLoading(true);
+
+    m_errorReport->setProxyFor(Aggregation::findErrorReport(importer.get()));
+    m_progressReport->setProxyFor(Aggregation::findProgressReport(importer.get()));
+
+    importer->setDocument(this);
+    this->setBusyMessage("Importing from clipboard ...");
+    const bool success = importer->importFromClipboard();
+    this->clearBusyMessage();
+
+    this->setLoading(false);
+
+    return success;
 }
 
 bool ScriteDocument::open(const QString &fileName)

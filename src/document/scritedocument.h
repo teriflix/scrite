@@ -490,9 +490,14 @@ public:
     int maxBackupCount() const { return m_maxBackupCount; }
     Q_SIGNAL void maxBackupCountChanged();
 
+    Q_PROPERTY(bool canImportFromClipboard READ canImportFromClipboard NOTIFY canImportFromClipboardChanged)
+    bool canImportFromClipboard() const;
+    Q_SIGNAL void canImportFromClipboardChanged();
+
     Q_INVOKABLE void reset();
 
     Q_INVOKABLE bool openOrImport(const QString &fileName);
+    Q_INVOKABLE bool importFromClipboard();
 
     Q_INVOKABLE bool open(const QString &fileName);
     Q_INVOKABLE bool openAnonymously(const QString &fileName);
