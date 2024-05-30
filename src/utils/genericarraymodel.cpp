@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "genericarraymodel.h"
+#include "application.h"
 
 #include <QJSValue>
 #include <QtDebug>
@@ -294,6 +295,26 @@ QHash<int, QByteArray> GenericArraySortFilterProxyModel::roleNames() const
         return QSortFilterProxyModel::roleNames();
 
     return m_arrayModel->roleNames();
+}
+
+bool GenericArraySortFilterProxyModel::filterAcceptsRow(int source_row,
+                                                        const QModelIndex &source_parent) const
+{
+    GenericArraySortFilterProxyModel *ncThis = const_cast<GenericArraySortFilterProxyModel *>(this);
+
+    BooleanResult result;
+    emit ncThis->filterRow(source_row, &result);
+    return result.value();
+}
+
+bool GenericArraySortFilterProxyModel::lessThan(const QModelIndex &source_left,
+                                                const QModelIndex &source_right) const
+{
+    GenericArraySortFilterProxyModel *ncThis = const_cast<GenericArraySortFilterProxyModel *>(this);
+
+    BooleanResult result;
+    emit ncThis->compare(source_left.row(), source_right.row(), &result);
+    return result.value();
 }
 
 void GenericArraySortFilterProxyModel::resetArrayModel()

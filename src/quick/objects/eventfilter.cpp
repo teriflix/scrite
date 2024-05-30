@@ -16,12 +16,13 @@
 
 #include <QEvent>
 #include <QtDebug>
+#include <QMimeData>
 #include <QMetaEnum>
 #include <QKeyEvent>
 #include <QMetaObject>
 #include <QMouseEvent>
 #include <QWheelEvent>
-#include <QMimeData>
+#include <QJsonDocument>
 
 // #define POST_CLONED_EVENTS_WHILE_FORWARDING
 
@@ -390,6 +391,7 @@ bool EventFilter::eventFilter(QObject *watched, QEvent *event)
                     dndEvent->ignore();
             } else
                 event->setAccepted(result.acceptEvent());
+
             return true;
         }
     }

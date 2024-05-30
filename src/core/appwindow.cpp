@@ -100,6 +100,8 @@ AppWindow::AppWindow()
     const char *uri = "io.scrite.models";
     qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "Model",
                                                    "Base type of models (QAbstractItemModel)");
+    qmlRegisterUncreatableType<QFontDatabase>(uri, 1, 0, "FontDatabase",
+                                              "Refers to a QFontDatabase instance.");
 
     m_defaultWindowFlags = this->flags();
 

@@ -148,6 +148,8 @@ Dialog {
                 width: (itemImplicitWidth === 0) ? contentItemScroll.width : Math.max(contentItemScroll.width,itemImplicitWidth)
                 height: (itemImplicitHeight === 0) ? contentItemScroll.height : Math.max(contentItemScroll.height,itemImplicitHeight)
 
+                onLoaded: item.focus = true
+
                 Connections {
                     target: root
                     function onAboutToShow() {

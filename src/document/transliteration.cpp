@@ -680,6 +680,9 @@ TransliterationEngine::availableLanguageFontFamilies(TransliterationEngine::Lang
         m_availableLanguageFontFamilies[language] = filteredLanguageFontFamilies;
     }
 
+    if (!filteredLanguageFontFamilies.contains(preferredFontFamily))
+        filteredLanguageFontFamilies.append(preferredFontFamily);
+
     ret.insert("families", QJsonArray::fromStringList(filteredLanguageFontFamilies));
     ret.insert("preferredFamily", preferredFontFamily);
     ret.insert("preferredFamilyIndex", filteredLanguageFontFamilies.indexOf(preferredFontFamily));
@@ -705,11 +708,13 @@ void TransliterationEngine::setPreferredFontFamilyForLanguage(
             && fontFamily == builtInFontFamily))
         m_languageFontFamily[language] = builtInFontFamily;
     else {
+#if 0
         const QFontDatabase &fontDb = ::Application::fontDatabase();
         const QList<QFontDatabase::WritingSystem> writingSystems =
                 fontDb.writingSystems(fontFamily);
         if (writingSystems.contains(writingSystemForLanguage(language)))
-            m_languageFontFamily[language] = fontFamily;
+#endif
+        m_languageFontFamily[language] = fontFamily;
     }
 
     const QString after = m_languageFontFamily.value(language);

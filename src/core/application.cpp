@@ -549,7 +549,7 @@ QJsonObject Application::systemFontInfo()
         // Load all fonts, we will need it at some point anyway
         fontdb.families();
 
-        const QStringList allFamilies = fontdb.families(QFontDatabase::Latin);
+        const QStringList allFamilies = fontdb.families();
         QStringList families;
         std::copy_if(allFamilies.begin(), allFamilies.end(), std::back_inserter(families),
                      [fontdb](const QString &family) { return !fontdb.isPrivateFamily(family); });

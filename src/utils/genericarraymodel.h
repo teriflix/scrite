@@ -91,6 +91,31 @@ private:
     QStringList m_objectMembers;
 };
 
+class BooleanResult : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Only for accessing created instances.")
+
+public:
+    BooleanResult(QObject *parent = nullptr) : QObject(parent) { }
+    ~BooleanResult() { }
+
+    Q_PROPERTY(bool value READ value WRITE setValue NOTIFY valueChanged)
+    void setValue(bool val)
+    {
+        if (m_value == val)
+            return;
+        m_value = val;
+        emit valueChanged();
+    }
+    bool value() const { return m_value; }
+    Q_SIGNAL void valueChanged();
+
+private:
+    bool m_value = false;
+};
+
 class GenericArraySortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
@@ -106,6 +131,18 @@ public:
     Q_SIGNAL void arrayModelChanged();
 
     QHash<int, QByteArray> roleNames() const;
+
+    Q_INVOKABLE void refilter() { this->invalidateFilter(); }
+    Q_INVOKABLE void resort() { this->invalidate(); }
+
+signals:
+    void filterRow(int source_row, BooleanResult *result);
+    void compare(int source_left, int source_right, BooleanResult *result);
+
+protected:
+    // QSortFilterProxyModel interface
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
 
 private:
     void resetArrayModel();

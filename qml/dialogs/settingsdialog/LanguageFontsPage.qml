@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
@@ -20,6 +21,7 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
 Item {
@@ -73,16 +75,36 @@ Item {
                         id: fontCombo
                         Layout.fillWidth: true
 
-                        property var fontFamilies: Scrite.app.transliterationEngine.availableLanguageFontFamilies(value)
+                        property var fontFamilies
                         model: fontFamilies.families
 
                         currentIndex: fontFamilies.preferredFamilyIndex
 
-                        onActivated: {
-                            var family = fontFamilies.families[index]
-                            Scrite.app.transliterationEngine.setPreferredFontFamilyForLanguage(value, family)
-                            previewText.font.family = family
+                        function applyFontFamily(family) {
+                            if(family !== "") {
+                                Scrite.app.transliterationEngine.setPreferredFontFamilyForLanguage(value, family)
+                                previewText.font.family = family
+                            }
+                            loadAvailableFontFamilies()
                         }
+
+                        function loadAvailableFontFamilies() {
+                            let ff = Scrite.app.transliterationEngine.availableLanguageFontFamilies(value)
+                            if(value > 0)
+                                ff.families.push("-- Other --")
+                            fontFamilies = ff
+                        }
+
+                        onActivated: {
+                            if(index == count-1) {
+                                FontSelectionDialog.launchWithTitleForLanguage("Select a font for " + key, value, fontCombo.applyFontFamily)
+                            } else {
+                                let family = fontFamilies.families[index]
+                                applyFontFamily(family)
+                            }
+                        }
+
+                        Component.onCompleted: loadAvailableFontFamilies()
                     }
 
                     VclLabel {
