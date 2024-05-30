@@ -1519,6 +1519,7 @@ Rectangle {
 
             SceneDocumentBinder {
                 id: sceneDocumentBinder
+                objectName: "ScreenplayEditor.Scene" + contentItem.theElement.resolvedSceneNumber + ""
                 scene: contentItem.theScene
                 textDocument: sceneTextEditor.textDocument
                 applyTextFormat: true

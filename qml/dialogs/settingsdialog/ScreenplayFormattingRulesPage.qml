@@ -90,21 +90,22 @@ Item {
                 }
                 textRole: "key"
                 valueRole: "value"
-                onCurrentValueChanged: {
-                    _private.printElementFormat.defaultLanguage = currentValue
-                    _private.displayElementFormat.defaultLanguage = currentValue
-                }
+                onActivated: (index) => {
+                                 const lang = model.at(index).value
+                                 _private.printElementFormat.defaultLanguage = lang
+                                 _private.displayElementFormat.defaultLanguage = lang
+                             }
             }
 
             VclComboBox {
                 id: fontSizesComboBox
                 readonly property var systemFonts: Scrite.app.systemFontInfo()
                 model: systemFonts.standardSizes
-                onCurrentIndexChanged: {
-                    const fontSize = model[currentIndex]
-                    _private.printElementFormat.setFontPointSize(fontSize)
-                    _private.displayElementFormat.setFontPointSize(fontSize)
-                }
+                onActivated: (index) => {
+                                 const fontSize = model[index]
+                                 _private.printElementFormat.setFontPointSize(fontSize)
+                                 _private.displayElementFormat.setFontPointSize(fontSize)
+                             }
             }
 
             RowLayout {

@@ -216,6 +216,7 @@ Dialog {
             Scrite.app.installOverrideCursor(appOverrideCursor);
             _private.overrideCursorMustBeRestored = true
         }
+        focus = true
     }
     onAboutToHide: {
         Scrite.window.closeButtonVisible = true

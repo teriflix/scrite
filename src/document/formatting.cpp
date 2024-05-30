@@ -272,17 +272,30 @@ void SceneElementFormat::setDefaultLanguage(SceneElementFormat::DefaultLanguage 
 
     m_defaultLanguage = val;
     emit defaultLanguageChanged();
+
+#if 0
+    Application::log("SceneElementFormat(" + QString::number(m_elementType)
+                     + ") changed default language to " + QString::number(int(val) - 1));
+#endif
 }
 
 void SceneElementFormat::activateDefaultLanguage()
 {
     if (m_defaultLanguage == Default) {
+#if 0
+        Application::log("SceneElementFormat(" + QString::number(m_elementType)
+                         + ") activating default " + QString::number(m_format->defaultLanguage()));
+#endif
         TransliterationEngine::instance()->setLanguage(m_format->defaultLanguage());
         return;
     }
 
     TransliterationEngine::Language language =
             TransliterationEngine::Language(int(m_defaultLanguage) - 1);
+#if 0
+    Application::log("SceneElementFormat(" + QString::number(m_elementType)
+                     + ") activating explicitly " + QString::number(language));
+#endif
     TransliterationEngine::instance()->setLanguage(language);
 }
 
@@ -697,6 +710,9 @@ qreal ScreenplayFormat::devicePixelRatio() const
 
 void ScreenplayFormat::setDefaultLanguage(TransliterationEngine::Language val)
 {
+#if 0
+    Application::log("ScreenplayFormat Default Language: " + QString::number(val));
+#endif
     if (m_defaultLanguage == val)
         return;
 
@@ -1868,6 +1884,10 @@ void SceneDocumentBinder::setTextWidth(qreal val)
 
 void SceneDocumentBinder::setCursorPosition(int val)
 {
+#if 0
+    Application::log("SceneDocumentBinder(" + this->objectName() + ") cursorPosition: "
+                     + QString::number(m_cursorPosition) + " to " + QString::number(val));
+#endif
     if (m_initializingDocument || m_pastingContent || m_cursorPosition == val)
         return;
 
@@ -3053,8 +3073,14 @@ void SceneDocumentBinder::activateCurrentElementDefaultLanguage()
 {
     if (m_currentElement && m_screenplayFormat) {
         SceneElementFormat *format = m_screenplayFormat->elementFormat(m_currentElement->type());
-        if (format != nullptr)
+        if (format != nullptr) {
+#if 0
+            Application::log("SceneDocumentBinder(" + this->objectName()
+                             + ") activating default language for "
+                             + QString::number(m_currentElement->type()));
+#endif
             format->activateDefaultLanguage();
+        }
     }
 }
 
