@@ -599,16 +599,18 @@ Item {
                     LinkButton {
                         Layout.fillWidth: true
 
-                        text: "From Clipboard"
-                        enabled: Scrite.document.canImportFromClipboard
+                        text: "New from Clipboard"
                         tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
-                        iconSource: "qrc:/icons/content/content_paste.png"
+                        iconSource: "qrc:/icons/filetype/document.png"
 
                         onClicked: {
-                            SaveFileTask.save( () => {
-                                                  Scrite.document.importFromClipboard()
-                                                  root.closeRequest()
-                                              } )
+                            if(Scrite.document.canImportFromClipboard)
+                                SaveFileTask.save( () => {
+                                                        Scrite.document.importFromClipboard()
+                                                        root.closeRequest()
+                                                    } )
+                            else
+                                MessageBox.information("Clipboard Empty", "No text is available in the system clipboard to import.")
                         }
                     }
 
@@ -654,17 +656,19 @@ Item {
                     header: LinkButton {
                         width: templatesView.width
 
-                        text: "From Clipboard"
-                        enabled: Scrite.document.canImportFromClipboard
+                        text: "New from Clipboard"
                         tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
                         showPoster: false
-                        iconSource: "qrc:/icons/content/content_paste.png"
+                        iconSource: "qrc:/icons/filetype/document.png"
 
                         onClicked: {
-                            SaveFileTask.save( () => {
-                                                    Scrite.document.importFromClipboard()
-                                                    root.closeRequest()
-                                                } )
+                            if(Scrite.document.canImportFromClipboard)
+                                SaveFileTask.save( () => {
+                                                        Scrite.document.importFromClipboard()
+                                                        root.closeRequest()
+                                                    } )
+                            else
+                                MessageBox.information("Clipboard Empty", "No text is available in the system clipboard to import.")
                         }
                     }
 
