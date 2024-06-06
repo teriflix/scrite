@@ -2125,7 +2125,12 @@ Rectangle {
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     font: screenplayFormat.defaultFont2
                     placeholderText: activeFocus ? "" : "Click here to type your scene content..."
-                    onActiveFocusChanged: {
+                    onActiveFocusChanged: Qt.callLater(respondToActiveFocusChange)
+
+                    function respondToActiveFocusChange() {
+                        if(!Scrite.window.active)
+                            return
+
                         if(activeFocus) {
                             completionModel.actuallyEnable = true
                             contentView.ensureVisible(sceneTextEditor, cursorRectangle)
@@ -2134,6 +2139,7 @@ Rectangle {
                             FloatingMarkupToolsDock.sceneDocumentBinder = sceneDocumentBinder
                             justReceivedFocus = true
                         } else {
+                            select(0,0)
                             Runtime.screenplayEditorToolbar.reset(sceneTextEditor, sceneDocumentBinder)
                             if(FloatingMarkupToolsDock.sceneDocumentBinder === sceneDocumentBinder)
                                 FloatingMarkupToolsDock.sceneDocumentBinder = null
