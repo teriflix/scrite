@@ -275,7 +275,7 @@ DialogLauncher {
 
                     onClicked: {
                         _private.fontWasSelected = true
-                        dialog.fontSelected(fontList.currentItem.modelData)
+                        dialog.fontSelected(fontList.currentItem.family)
                         Qt.callLater(dialog.close)
                     }
                 }
