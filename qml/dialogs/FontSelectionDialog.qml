@@ -213,7 +213,7 @@ DialogLauncher {
                         clip: true
                         model: fontFamiliesFilterModel
                         spacing: 5
-                        currentIndex: 0
+                        currentIndex: -1
                         keyNavigationEnabled: false
 
                         highlight: Rectangle {

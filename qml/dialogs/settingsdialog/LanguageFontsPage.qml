@@ -96,7 +96,7 @@ Item {
                         }
 
                         onActivated: {
-                            if(index == count-1) {
+                            if(value != TransliterationEngine.English && index === count-1) {
                                 FontSelectionDialog.launchWithTitleForLanguage("Select a font for " + key, value, fontCombo.applyFontFamily)
                             } else {
                                 let family = fontFamilies.families[index]
