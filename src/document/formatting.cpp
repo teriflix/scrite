@@ -2559,59 +2559,69 @@ int SceneDocumentBinder::paste(int fromPosition)
                 bool sceneHeadingChanged = false;
 
                 const Fountain::Body fBody = parser.body();
-                for (const Fountain::Element &element : fBody) {
-                    Paragraph paragraph;
-                    paragraph.text = element.text;
-                    paragraph.formats = element.formats;
-
-                    bool includeParagraph = true;
-                    switch (element.type) {
-                    case Fountain::Element::SceneHeading:
-                        if (fromPosition == 0 && !sceneHeadingChanged) {
-                            m_scene->heading()->parseFrom(element.text);
-                            if (!element.sceneNumber.isEmpty() && m_screenplayElement != nullptr)
-                                m_screenplayElement->setUserSceneNumber(element.sceneNumber);
-                            sceneHeadingChanged = true;
-                            includeParagraph = false;
-                        } else {
-                            paragraph.type = SceneElement::Action;
-                        }
-                        break;
-                    case Fountain::Element::Action:
-                        paragraph.type = SceneElement::Action;
-                        break;
-                    case Fountain::Element::Character:
-                        paragraph.type = SceneElement::Character;
-                        break;
-                    case Fountain::Element::Parenthetical:
-                        paragraph.type = SceneElement::Parenthetical;
-                        break;
-                    case Fountain::Element::Dialogue:
-                        paragraph.type = SceneElement::Dialogue;
-                        break;
-                    case Fountain::Element::Shot:
-                        paragraph.type = SceneElement::Shot;
-                        break;
-                    case Fountain::Element::Transition:
-                        paragraph.type = SceneElement::Transition;
-                        break;
-                    case Fountain::Element::Synopsis:
-                        includeParagraph = false;
-                        if (!element.text.isEmpty()) {
-                            QString synopsis = m_scene->synopsis();
-                            if (!synopsis.isEmpty())
-                                synopsis += "\n\n";
-                            synopsis += element.text;
-                            m_scene->setSynopsis(element.text);
-                        }
-                        break;
-                    default:
-                        includeParagraph = false;
-                        break;
-                    }
-
-                    if (includeParagraph)
+                if (fBody.size() == 1 && fBody.first().type == Fountain::Element::Action) {
+                    const QStringList lines = text.split('\n');
+                    for (const QString &line : lines) {
+                        Paragraph paragraph;
+                        paragraph.text = line;
                         paragraphs.append(paragraph);
+                    }
+                } else {
+                    for (const Fountain::Element &element : fBody) {
+                        Paragraph paragraph;
+                        paragraph.text = element.text;
+                        paragraph.formats = element.formats;
+
+                        bool includeParagraph = true;
+                        switch (element.type) {
+                        case Fountain::Element::SceneHeading:
+                            if (fromPosition == 0 && !sceneHeadingChanged) {
+                                m_scene->heading()->parseFrom(element.text);
+                                if (!element.sceneNumber.isEmpty()
+                                    && m_screenplayElement != nullptr)
+                                    m_screenplayElement->setUserSceneNumber(element.sceneNumber);
+                                sceneHeadingChanged = true;
+                                includeParagraph = false;
+                            } else {
+                                paragraph.type = SceneElement::Action;
+                            }
+                            break;
+                        case Fountain::Element::Action:
+                            paragraph.type = SceneElement::Action;
+                            break;
+                        case Fountain::Element::Character:
+                            paragraph.type = SceneElement::Character;
+                            break;
+                        case Fountain::Element::Parenthetical:
+                            paragraph.type = SceneElement::Parenthetical;
+                            break;
+                        case Fountain::Element::Dialogue:
+                            paragraph.type = SceneElement::Dialogue;
+                            break;
+                        case Fountain::Element::Shot:
+                            paragraph.type = SceneElement::Shot;
+                            break;
+                        case Fountain::Element::Transition:
+                            paragraph.type = SceneElement::Transition;
+                            break;
+                        case Fountain::Element::Synopsis:
+                            includeParagraph = false;
+                            if (!element.text.isEmpty()) {
+                                QString synopsis = m_scene->synopsis();
+                                if (!synopsis.isEmpty())
+                                    synopsis += "\n\n";
+                                synopsis += element.text;
+                                m_scene->setSynopsis(element.text);
+                            }
+                            break;
+                        default:
+                            includeParagraph = false;
+                            break;
+                        }
+
+                        if (includeParagraph)
+                            paragraphs.append(paragraph);
+                    }
                 }
             } else {
                 Paragraph paragraph;
