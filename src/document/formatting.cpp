@@ -2417,9 +2417,27 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
     QJsonArray content;
 
+    auto addParaToContent = [&content](int type, int alignment, const QString &text,
+                                       const QVector<QTextLayout::FormatRange> &formats =
+                                               QVector<QTextLayout::FormatRange>()) {
+        QJsonObject para;
+        para.insert(QStringLiteral("type"), type);
+        if (alignment >= 0)
+            para.insert(QStringLiteral("alignment"), alignment);
+        para.insert(QStringLiteral("text"), text);
+
+        if (!formats.isEmpty()) {
+            const QJsonArray jformats = SceneElement::textFormatsToJson(formats);
+            para.insert(QStringLiteral("formats"), jformats);
+        }
+
+        content.append(para);
+    };
+
     Fountain::Body fBody;
 
     if (fromPosition == 0 && m_scene->heading()->isEnabled()) {
+        // Copy the scene heading and synopsis to both fountain and JSON representations
         Fountain::Element fElement;
         fElement.text = m_scene->heading()->displayText();
         fElement.sceneNumber =
@@ -2433,6 +2451,14 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
             fElement.type = Fountain::Element::Synopsis;
             fBody.append(fElement);
         }
+
+        addParaToContent(SceneElement::Heading, 0, m_scene->heading()->displayText());
+
+        // Add scene number and synopsis to scene heading itself.
+        QJsonObject headingPara = content.last().toObject();
+        headingPara.insert(QStringLiteral("sceneNumber"), m_screenplayElement->userSceneNumber());
+        headingPara.insert(QStringLiteral("synopsis"), m_scene->synopsis());
+        content[content.size() - 1] = headingPara;
     }
 
     QTextCursor cursor(this->document());
@@ -2457,11 +2483,6 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
         SceneElement *element = userData->sceneElement();
 
-        QJsonObject para;
-        para.insert(QStringLiteral("type"), element->type());
-        para.insert(QStringLiteral("alignment"), (int)element->alignment());
-        para.insert(QStringLiteral("text"), cursor.selectedText());
-
         const QVector<QTextLayout::FormatRange> blockFormats = block.textFormats();
         QVector<QTextLayout::FormatRange> formatsToCopy;
         formatsToCopy.reserve(blockFormats.size());
@@ -2476,10 +2497,8 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
             formatsToCopy.append(fmt);
         }
 
-        const QJsonArray jformats = SceneElement::textFormatsToJson(formatsToCopy);
-        para.insert(QStringLiteral("formats"), jformats);
-
-        content.append(para);
+        addParaToContent(element->type(), element->alignment(), cursor.selectedText(),
+                         formatsToCopy);
 
         Fountain::Element fElement;
         fElement.text = cursor.selectedText();
@@ -2634,17 +2653,29 @@ int SceneDocumentBinder::paste(int fromPosition)
         if (content.isEmpty())
             return -1;
 
+        bool sceneHeadingChanged = false;
+
         for (const QJsonValue &item : content) {
             const QJsonObject itemObject = item.toObject();
             const int type = itemObject.value(QStringLiteral("type")).toInt();
             const int alignment = itemObject.value(QStringLiteral("alignment")).toInt();
+            const QString text = itemObject.value(QStringLiteral("text")).toString();
+
+            if (fromPosition == 0 && !sceneHeadingChanged && type == SceneElement::Heading) {
+                m_scene->heading()->parseFrom(text);
+                m_screenplayElement->setUserSceneNumber(
+                        itemObject.value(QStringLiteral("sceneNumber")).toString());
+                m_scene->setSynopsis(itemObject.value(QStringLiteral("synopsis")).toString());
+                sceneHeadingChanged = true;
+                continue;
+            }
 
             Paragraph paragraph;
             paragraph.type = (type < SceneElement::Min || type > SceneElement::Max
                               || type == SceneElement::Heading)
                     ? SceneElement::Action
                     : SceneElement::Type(type);
-            paragraph.text = itemObject.value(QStringLiteral("text")).toString();
+            paragraph.text = text;
             paragraph.alignment = alignment == 0 ? Qt::Alignment() : Qt::Alignment(alignment);
             paragraph.formats = SceneElement::textFormatsFromJson(
                     itemObject.value(QStringLiteral("formats")).toArray());

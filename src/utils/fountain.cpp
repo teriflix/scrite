@@ -992,19 +992,23 @@ QString Fountain::Writer::toString() const
             writeShotOrTransition(ts, element);
             break;
         case Fountain::Element::PageBreak:
-            writePageBreak(ts, element);
+            if (m_options & StrictSyntaxOption)
+                writePageBreak(ts, element);
             break;
         case Fountain::Element::Lyrics:
-            writeLyrics(ts, element);
+            if (m_options & StrictSyntaxOption)
+                writeLyrics(ts, element);
             break;
         case Fountain::Element::LineBreak:
             writeLineBreak(ts, element);
             break;
         case Fountain::Element::Section:
-            writeSection(ts, element);
+            if (m_options & StrictSyntaxOption)
+                writeSection(ts, element);
             break;
         case Fountain::Element::Synopsis:
-            writeSynopsis(ts, element);
+            if (m_options & StrictSyntaxOption)
+                writeSynopsis(ts, element);
             break;
         default:
             ts << "/* " << element.text << " */" << newline;
