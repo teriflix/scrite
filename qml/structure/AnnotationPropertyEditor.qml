@@ -14,14 +14,16 @@
 import QtQuick 2.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Window 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 
 // For use from within StructureView.qml only!
 
@@ -317,112 +319,27 @@ Item {
     Component {
         id: fontFamilyEditor
 
-        Column {
-            id: fontFamilyEditorItem
+        VclButton {
+            id: fontFamilyButton
 
-            VclLabel {
-                rightPadding: changeFontButton.width + 5
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                text: propertyValue
-                height: 42
-                verticalAlignment: Text.AlignVCenter
+            Layout.fillWidth: true
+
+            text: propertyValue
+            font.family: propertyValue
+            font.pointSize: Scrite.app.idealFontPointSize
+
+            contentItem: VclLabel {
+                text: fontFamilyButton.text
+                font: fontFamilyButton.font
                 elide: Text.ElideRight
-                width: parent.width
-
-                MouseArea {
-                    anchors.fill: parent
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: fontListViewArea.visible = !fontListViewArea.visible
-                }
-
-                FlatToolButton {
-                    id: changeFontButton
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: parent.height
-                    down: fontListViewArea.visible
-                    iconSource: fontListViewArea.visible ? "qrc:/icons/action/keyboard_arrow_up.png" : "qrc:/icons/action/keyboard_arrow_down.png"
-                    onClicked: fontListViewArea.visible = !fontListViewArea.visible
-                }
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
             }
 
-            Rectangle {
-                id: fontListViewArea
-                color: Runtime.colors.primary.c50.background
-                width: parent.width - 10
-                border.width: 1
-                border.color: Runtime.colors.primary.borderColor
-                height: 200 + fontSearchBar.height
-                visible: false
-                anchors.right: parent.right
-                onVisibleChanged: {
-                    if(visible && fontListView.systemFontInfo === undefined)
-                        fontListView.systemFontInfo = Scrite.app.systemFontInfo()
-                    if(visible)
-                        Utils.execLater(fontListViewArea, 100, adjustScroll)
-                }
-
-                function adjustScroll() {
-                    var pt = fontFamilyEditorItem.mapToItem(propertyEditorItems, 0, 0)
-                    if(pt.y < propertyEditorView.contentY)
-                        propertyEditorView.contentY = Math.max(pt.y-10, 0)
-                    else if(pt.y + fontFamilyEditorItem.height > propertyEditorView.contentY + propertyEditorView.height)
-                        propertyEditorView.contentY = (pt.y + fontFamilyEditorItem.height + 10 - propertyEditorView.height)
-                }
-
-                TextField {
-                    id: fontSearchBar
-                    width: parent.width
-                    placeholderText: "search for a font"
-                    anchors.top: parent.top
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    onTextEdited: Qt.callLater(highlightFont)
-                    function highlightFont() {
-                        var utext = text.toUpperCase()
-                        var checkFn = function(arg) {
-                            return arg.toUpperCase().indexOf(utext) === 0
-                        }
-                        var families = fontListView.systemFontInfo.families
-                        var index = families.findIndex(checkFn)
-                        if(index >= 0) {
-                            fontListView.currentIndex = index
-                            changePropertyValue(families[index])
-                        }
-                    }
-                }
-
-                ListView {
-                    id: fontListView
-                    property var systemFontInfo
-                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                    anchors.top: fontSearchBar.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    model: systemFontInfo ? systemFontInfo.families : 0
-                    highlight: Rectangle {
-                        color: Scrite.app.palette.highlight
-                    }
-                    highlightMoveDuration: 0
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
-                    keyNavigationEnabled: false
-                    delegate: VclLabel {
-                        font.family: modelData
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        text: modelData
-                        width: fontListView.width-20
-                        color: fontListView.currentIndex === index ? Scrite.app.palette.highlightedText : "black"
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: changePropertyValue(modelData)
-                        }
-                        padding: 4
-                    }
-                    ScrollBar.vertical: VclScrollBar { flickable: propertyEditorView }
-                    currentIndex: systemFontInfo ? systemFontInfo.families.indexOf(propertyValue) : -1
-                }
-            }
+            onClicked: FontSelectionDialog.launchWithTitle("Select a font for text annotation.", (family) => {
+                                                               if(family !== "")
+                                                                   changePropertyValue(family)
+                                                           })
         }
     }
 

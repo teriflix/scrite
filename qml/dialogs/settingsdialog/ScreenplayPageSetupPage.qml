@@ -20,9 +20,9 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
-import "qrc:/qml" // Refactoring QML: FIXME - DisabledFeatureNotice should be in helpers or components maybe?
+import "qrc:/qml/controls"
 
 Item {
     id: root
@@ -255,13 +255,25 @@ Item {
                     text: "Font Family"
                 }
 
-                VclComboBox {
+                VclButton {
+                    id: fontFamilyButton
                     Layout.preferredWidth: 250
 
-                    model: _private.systemFontInfo.families
-                    currentIndex: _private.systemFontInfo.families.indexOf( _private.pageSetupSettings.watermarkFont)
-                    onCurrentIndexChanged:  _private.pageSetupSettings.watermarkFont = _private.systemFontInfo.families[currentIndex]
-                    enabled: _private.pageSetupSettings.watermarkEnabled
+                    text: _private.pageSetupSettings.watermarkFont
+
+                    contentItem: VclLabel {
+                        text: fontFamilyButton.text
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignHCenter
+                        font.family: _private.pageSetupSettings.watermarkFont
+                        font.pointSize: Scrite.app.idealFontPointSize
+                    }
+
+                    onClicked: FontSelectionDialog.launchWithTitle("Select watermark font", (family) => {
+                                                                        if(family !== "")
+                                                                            _private.pageSetupSettings.watermarkFont = family
+                                                                   })
                 }
 
                 VclLabel {
