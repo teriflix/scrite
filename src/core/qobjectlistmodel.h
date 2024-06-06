@@ -256,6 +256,29 @@ private:
     QList<T> m_list;
 };
 
+class ObjectListModel : public QObjectListModel<QObject *>
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    ObjectListModel(QObject *parent = nullptr) : QObjectListModel<QObject *>(parent) { }
+    ~ObjectListModel() { }
+
+    Q_INVOKABLE void include(QObject *ptr) { this->append(ptr); }
+    Q_INVOKABLE void exclude(QObject *ptr) { this->remove(ptr); }
+
+protected:
+    void itemInsertEvent(QObject *ptr)
+    {
+        connect(ptr, &QObject::destroyed, this, &ObjectListModel::objectDestroyed);
+    }
+    void itemRemoveEvent(QObject *ptr)
+    {
+        disconnect(ptr, &QObject::destroyed, this, &ObjectListModel::objectDestroyed);
+    }
+};
+
 class SortFilterObjectListModel : public QSortFilterProxyModel
 {
     Q_OBJECT

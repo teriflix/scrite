@@ -600,6 +600,7 @@ Item {
                         Layout.fillWidth: true
 
                         text: "New from Clipboard"
+                        enabled: Scrite.document.canImportFromClipboard
                         tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
                         iconSource: "qrc:/icons/filetype/document.png"
 
@@ -657,6 +658,7 @@ Item {
                         width: templatesView.width
 
                         text: "New from Clipboard"
+                        enabled: Scrite.document.canImportFromClipboard
                         tooltip: "Create a new screenplay by interpreting text on the clipboard as fountain file."
                         showPoster: false
                         iconSource: "qrc:/icons/filetype/document.png"

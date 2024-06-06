@@ -219,6 +219,7 @@ Dialog {
             _private.overrideCursorMustBeRestored = true
         }
         focus = true
+        Runtime.dialogs.include(root)
     }
     onAboutToHide: {
         Scrite.window.closeButtonVisible = true
@@ -226,6 +227,7 @@ Dialog {
             Scrite.app.rollbackOverrideCursor()
             _private.overrideCursorMustBeRestored = false
         }
+        Runtime.dialogs.exclude(root)
     }
     onAppCloseButtonVisibleChanged: Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
     onClosed: Utils.execLater(root, 50, dismissed)

@@ -1391,7 +1391,7 @@ Item {
             BasicAttachmentsDropArea {
                 id: fileOpenDropArea
                 anchors.fill: parent
-                enabled: true
+                enabled: Runtime.dialogs.objectCount === 0
                 allowedType: Attachments.NoMedia
                 allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
                 property string droppedFilePath

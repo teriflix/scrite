@@ -40,6 +40,7 @@ Item {
     property bool canShowNotebookInStructure: width > minWindowWidthForShowingNotebookInStructure
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
+    property ObjectListModel dialogs: ObjectListModel { }
 
     // Persistent Settings
     readonly property Settings scrollAreaSettings: Settings {
