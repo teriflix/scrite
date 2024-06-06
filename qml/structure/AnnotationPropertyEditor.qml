@@ -336,7 +336,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
             }
 
-            onClicked: FontSelectionDialog.launchWithTitle("Select a font for text annotation.", (family) => {
+            onClicked: FontSelectionDialog.launchWithTitle("Select a font for annotation", (family) => {
                                                                if(family !== "")
                                                                    changePropertyValue(family)
                                                            })

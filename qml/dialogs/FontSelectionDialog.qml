@@ -30,7 +30,7 @@ DialogLauncher {
     id: root
 
     readonly property var standardPreviewText: [
-        /* English */ "The quick brown fox jumps over the lazy dog.",
+        /* English */ "The bird flies in the sky.",
         /* Bengali */ "পাখিটি আকাশে উড়ে যায়।", // The bird flies in the sky.
         /* Gujarati */ "પંખી આકાશમાં ઊડે છે.", // The bird flies in the sky.
         /* Hindi */ "पक्षी आसमान में उड़ता है।", // The bird flies in the sky.
@@ -84,7 +84,7 @@ DialogLauncher {
         signal fontSelected(string fontFamily)
 
         title: "Select a font"
-        width: 640
+        width: Math.min(750, Scrite.window.width*0.8)
         height: Math.min(Scrite.window.height*0.9, 550)
 
         content: Item {
@@ -110,7 +110,26 @@ DialogLauncher {
 
             GenericArrayModel {
                 id: fontFamiliesModel
-                array: Scrite.app.systemFontInfo().families
+                array: {
+                    const allFonts = Scrite.app.fontFamiliesFor(TransliterationEngine.English)
+                    const languageSpecificFonts = dialog.language === TransliterationEngine.English ? [] : Scrite.app.fontFamiliesFor(dialog.language)
+
+                    let ret = []
+                    languageSpecificFonts.forEach( (font) => {
+                                                    ret.push( {"category": "Suggested Fonts", "family": font} )
+                                                  })
+
+                    const cat = dialog.language === TransliterationEngine.English ? "Available Fonts" : "Other Fonts"
+                    allFonts.forEach( (font) => {
+                                                    if(languageSpecificFonts.indexOf(font) >= 0)
+                                                        return
+
+                                                    ret.push( {"category": cat, "family": font} )
+                                                  })
+
+                    return ret
+                }
+                objectMembers: ["category", "family"]
             }
 
             GenericArraySortFilterProxyModel {
@@ -122,7 +141,7 @@ DialogLauncher {
                     } else {
                         let filter = fontFilter.text.toLowerCase()
 
-                        let familyName = "" + fontFamiliesModel.get(source_row)
+                        let familyName = "" + fontFamiliesModel.get(source_row).family
                         familyName = familyName.toLowerCase()
 
                         result.value = familyName.indexOf(filter) == 0
@@ -158,6 +177,31 @@ DialogLauncher {
                     border.width: 1
                     border.color: Runtime.colors.primary.borderColor
 
+                    Component {
+                        id: fontListSectionDelegate
+
+                        Rectangle {
+                            required property string section
+
+                            width: fontList.width - (fontList.ScrollBar.vertical.needed ? 17 : 0)
+                            height: Runtime.idealFontMetrics.lineSpacing+15
+                            color: Runtime.colors.accent.highlight.background
+
+                            VclText {
+                                id: sectionLabel
+
+                                anchors.centerIn: parent
+
+                                text: section
+                                color: Runtime.colors.accent.highlight.text
+                                width: parent.width
+                                elide: Text.ElideRight
+                                padding: 3
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+                    }
+
                     ListView {
                         id: fontList
 
@@ -168,6 +212,7 @@ DialogLauncher {
 
                         clip: true
                         model: fontFamiliesFilterModel
+                        spacing: 5
                         currentIndex: 0
                         keyNavigationEnabled: false
 
@@ -178,41 +223,47 @@ DialogLauncher {
                         highlightResizeDuration: 0
                         highlightFollowsCurrentItem: true
 
-                        delegate: VclLabel {
+                        section.property: "category"
+                        section.criteria: ViewSection.FullString
+                        section.delegate: dialog.language === TransliterationEngine.English ? null : fontListSectionDelegate
+
+                        delegate: Item {
                             required property int index
-                            required property string modelData
+                            required property string family
 
                             width: fontList.width - (fontList.ScrollBar.vertical.needed ? 17 : 0)
-                            text: modelData
-                            elide: Text.ElideRight
-                            padding: 3
+                            height: delegateLayout.height
+
+                            RowLayout {
+                                id: delegateLayout
+
+                                width: parent.width-10
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                VclLabel {
+                                    Layout.preferredWidth: parent.width * 0.5
+
+                                    text: family
+                                    elide: Text.ElideRight
+                                    padding: 3
+                                }
+
+                                VclLabel {
+                                    Layout.fillWidth: true
+
+                                    text: dialog.previewText
+                                    elide: Text.ElideRight
+                                    padding: 3
+                                    wrapMode: Text.NoWrap
+                                    font.family: family
+                                }
+                            }
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: fontList.currentIndex = index
                             }
                         }
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: previewText.contentHeight + 30
-
-                    color: Runtime.colors.primary.c100.background
-                    border.width: 1
-                    border.color: Runtime.colors.primary.borderColor
-
-                    VclLabel {
-                        id: previewText
-                        width: parent.width - 30
-                        anchors.centerIn: parent
-
-                        wrapMode: Text.WordWrap
-                        text: dialog.previewText
-                        font.family: fontList.currentIndex >= 0 ? fontList.currentItem.modelData : Runtime.sceneEditorFontMetrics.font.family
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
-                        horizontalAlignment: Text.AlignHCenter
                     }
                 }
 

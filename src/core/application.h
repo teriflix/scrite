@@ -30,8 +30,8 @@
 #include "undoredo.h"
 #include "errorreport.h"
 #include "transliteration.h"
-#include "systemtextinputmanager.h"
 #include "qobjectlistmodel.h"
+#include "systemtextinputmanager.h"
 
 typedef QApplication QtApplicationClass;
 
@@ -183,6 +183,7 @@ public:
     static QFontDatabase &fontDatabase();
 
     Q_INVOKABLE static QJsonObject systemFontInfo();
+    Q_INVOKABLE QStringList fontFamiliesFor(int language);
     Q_INVOKABLE static QColor pickColor(const QColor &initial);
     Q_INVOKABLE static QString colorName(const QColor &color) { return color.name(); }
     Q_INVOKABLE static QColor tintedColor(const QColor &c, qreal factor);
