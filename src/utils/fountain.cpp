@@ -361,8 +361,9 @@ void Fountain::Parser::processSceneHeadings()
             continue;
         }
 
-        const bool nextLineIsEmpty =
-                ((i + 1) < m_body.size() && m_body.at(i + 1).type == Fountain::Element::LineBreak);
+        const bool nextLineIsEmpty = (i == m_body.size() - 1)
+                || ((i + 1) < m_body.size()
+                    && m_body.at(i + 1).type == Fountain::Element::LineBreak);
         const bool prevLineIsEmpty =
                 i == 0 || m_body.at(i - 1).type == Fountain::Element::LineBreak;
 
@@ -400,8 +401,9 @@ void Fountain::Parser::processShotsAndTransitions()
         if (element.type != Fountain::Element::Unknown)
             continue;
 
-        const bool nextLineIsEmpty =
-                ((i + 1) < m_body.size() && m_body.at(i + 1).type == Fountain::Element::LineBreak);
+        const bool nextLineIsEmpty = (i == m_body.size() - 1)
+                || ((i + 1) < m_body.size()
+                    && m_body.at(i + 1).type == Fountain::Element::LineBreak);
         const bool prevLineIsEmpty =
                 i == 0 || m_body.at(i - 1).type == Fountain::Element::LineBreak;
 
@@ -411,8 +413,8 @@ void Fountain::Parser::processShotsAndTransitions()
             continue;
         }
 
-        if (prevLineIsEmpty && nextLineIsEmpty && element.text.toUpper() == element.text) {
-            const QString simplifiedText = element.simplifiedText;
+        if (prevLineIsEmpty && nextLineIsEmpty /* && element.text.toUpper() == element.text*/) {
+            const QString simplifiedText = element.simplifiedText.toUpper();
             if (simplifiedText.endsWith("TO:")) {
                 element.text = simplifiedText;
                 element.type = Fountain::Element::Transition;
@@ -479,8 +481,9 @@ void Fountain::Parser::processCharacters()
         if (element.type != Fountain::Element::Unknown)
             continue;
 
-        const bool nextLineIsEmpty =
-                ((i + 1) < m_body.size() && m_body.at(i + 1).type == Fountain::Element::LineBreak);
+        const bool nextLineIsEmpty = (i == m_body.size() - 1)
+                || ((i + 1) < m_body.size()
+                    && m_body.at(i + 1).type == Fountain::Element::LineBreak);
         const bool prevLineIsEmpty =
                 i == 0 || m_body.at(i - 1).type == Fountain::Element::LineBreak;
 
