@@ -44,29 +44,29 @@ DialogLauncher {
         /* Telugu */ "పక్షి ఆకాశంలో ఎగురుతుంది." // The bird flies in the sky.
     ];
 
-    function launch(fontSelectedCallback) {
-        const dlg = doLaunch()
+    function launch(fontSelectedCallback, initialFontFamily) {
+        const dlg = doLaunch({"initialFontFamily": ""+initialFontFamily})
         if(dlg)
             dlg.fontSelected.connect(fontSelectedCallback)
         return dlg
     }
 
-    function launchWithTitle(title, fontSelectedCallback) {
-        const dlg = doLaunch({"title": title})
+    function launchWithTitle(title, fontSelectedCallback, initialFontFamily) {
+        const dlg = doLaunch({"title": title, "initialFontFamily": ""+initialFontFamily})
         if(dlg)
             dlg.fontSelected.connect(fontSelectedCallback)
         return dlg
     }
 
-    function launchForLanguage(language, fontSelectedCallback) {
-        const dlg = doLaunch({"language": language})
+    function launchForLanguage(language, fontSelectedCallback, initialFontFamily) {
+        const dlg = doLaunch({"language": language, "initialFontFamily": ""+initialFontFamily})
         if(dlg)
             dlg.fontSelected.connect(fontSelectedCallback)
         return dlg
     }
 
-    function launchWithTitleForLanguage(title, language, fontSelectedCallback) {
-        const dlg = doLaunch({"title": title, "language": language})
+    function launchWithTitleForLanguage(title, language, fontSelectedCallback, initialFontFamily) {
+        const dlg = doLaunch({"title": title, "language": language, "initialFontFamily": ""+initialFontFamily})
         if(dlg)
             dlg.fontSelected.connect(fontSelectedCallback)
         return dlg
@@ -80,6 +80,7 @@ DialogLauncher {
 
         property int language: TransliterationEngine.English
         property string previewText: root.standardPreviewText[language]
+        property string initialFontFamily
 
         signal fontSelected(string fontFamily)
 
@@ -127,9 +128,19 @@ DialogLauncher {
                                                     ret.push( {"category": cat, "family": font} )
                                                   })
 
+                    initialIndex = -1
+                    for(let i=0; i<ret.length; i++) {
+                        if(ret[i].family === dialog.initialFontFamily) {
+                            initialIndex = i
+                            break
+                        }
+                    }
+
                     return ret
                 }
                 objectMembers: ["category", "family"]
+
+                property int initialIndex: -1
             }
 
             GenericArraySortFilterProxyModel {
@@ -223,6 +234,10 @@ DialogLauncher {
                         highlightResizeDuration: 0
                         highlightFollowsCurrentItem: true
 
+                        highlightRangeMode: ListView.ApplyRange
+                        preferredHighlightEnd: height * 0.75
+                        preferredHighlightBegin: height * 0.25
+
                         section.property: "category"
                         section.criteria: ViewSection.FullString
                         section.delegate: dialog.language === TransliterationEngine.English ? null : fontListSectionDelegate
@@ -243,7 +258,7 @@ DialogLauncher {
                                 VclLabel {
                                     Layout.preferredWidth: parent.width * 0.5
 
-                                    text: family
+                                    text: (initialFontFamily === family ? "* " : "") + family
                                     elide: Text.ElideRight
                                     padding: 3
                                 }
@@ -263,6 +278,11 @@ DialogLauncher {
                                 anchors.fill: parent
                                 onClicked: fontList.currentIndex = index
                             }
+                        }
+
+                        Component.onCompleted: {
+                            positionViewAtIndex(fontFamiliesModel.initialIndex, ListView.Contain)
+                            currentIndex = fontFamiliesModel.initialIndex
                         }
                     }
                 }

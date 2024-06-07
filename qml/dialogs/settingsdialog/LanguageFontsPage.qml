@@ -75,6 +75,8 @@ Item {
                         id: fontCombo
                         Layout.fillWidth: true
 
+                        property string preferredFontFamily
+
                         property var fontFamilies
                         model: fontFamilies.families
 
@@ -93,11 +95,13 @@ Item {
                             if(value > 0)
                                 ff.families.push("-- Other --")
                             fontFamilies = ff
+
+                            preferredFontFamily = ff.preferredFamily
                         }
 
                         onActivated: {
                             if(value != TransliterationEngine.English && index === count-1) {
-                                FontSelectionDialog.launchWithTitleForLanguage("Select a font for " + key, value, fontCombo.applyFontFamily)
+                                FontSelectionDialog.launchWithTitleForLanguage("Select a font for " + key, value, fontCombo.applyFontFamily, preferredFontFamily)
                             } else {
                                 let family = fontFamilies.families[index]
                                 applyFontFamily(family)

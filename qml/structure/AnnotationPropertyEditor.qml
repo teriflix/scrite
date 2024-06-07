@@ -339,7 +339,7 @@ Item {
             onClicked: FontSelectionDialog.launchWithTitle("Select a font for annotation", (family) => {
                                                                if(family !== "")
                                                                    changePropertyValue(family)
-                                                           })
+                                                           }, propertyValue)
         }
     }
 

@@ -273,7 +273,7 @@ Item {
                     onClicked: FontSelectionDialog.launchWithTitle("Select watermark font", (family) => {
                                                                         if(family !== "")
                                                                             _private.pageSetupSettings.watermarkFont = family
-                                                                   })
+                                                                   }, _private.pageSetupSettings.watermarkFont)
                 }
 
                 VclLabel {
