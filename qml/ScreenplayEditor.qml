@@ -2138,8 +2138,8 @@ Rectangle {
                             Runtime.screenplayEditorToolbar.set(sceneTextEditor, sceneDocumentBinder)
                             FloatingMarkupToolsDock.sceneDocumentBinder = sceneDocumentBinder
                             justReceivedFocus = true
+                            Announcement.shout(Runtime.announcementIds.sceneTextEditorReceivedFocus, sceneTextEditor)
                         } else {
-                            select(0,0)
                             Runtime.screenplayEditorToolbar.reset(sceneTextEditor, sceneDocumentBinder)
                             if(FloatingMarkupToolsDock.sceneDocumentBinder === sceneDocumentBinder)
                                 FloatingMarkupToolsDock.sceneDocumentBinder = null
@@ -2153,13 +2153,19 @@ Rectangle {
                     }
 
                     Announcement.onIncoming: (type,data) => {
-                        if(sceneTextEditor.activeFocus && contentItem.isCurrent)
-                            return
-                        var sdata = "" + data
-                        var stype = "" + type
-                        if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.scene)
-                            synopsisEditorField.forceActiveFocus()
-                    }
+                                                 if(sceneTextEditor.activeFocus && contentItem.isCurrent)
+                                                    return
+
+                                                 if(type === Runtime.announcementIds.sceneTextEditorReceivedFocus && data !== null && data !== sceneTextEditor) {
+                                                     select(0,0)
+                                                     return
+                                                 }
+
+                                                 if(""+type === Runtime.announcementIds.focusRequest && ""+data === Runtime.announcementData.focusOptions.scene) {
+                                                     synopsisEditorField.forceActiveFocus()
+                                                     return
+                                                 }
+                                             }
 
                     Connections {
                         target: contentItem.theScene

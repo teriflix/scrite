@@ -584,6 +584,7 @@ Item {
         readonly property string characterNotesRequest: "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8"
         readonly property string sceneNotesRequest: "41EE5E06-FF97-4DB6-B32D-F938418C9529"
         readonly property string notebookNodeRequest: "1dc67418-2584-4598-a68a-de5205bbc028"
+        readonly property string sceneTextEditorReceivedFocus: "598e1699-465b-40d5-8cf4-e9753e2c16e7"
     }
 
     readonly property QtObject announcementData: QtObject {
