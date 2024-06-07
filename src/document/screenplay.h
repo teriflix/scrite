@@ -368,6 +368,10 @@ public:
     bool hasSelectedElements() const;
     Q_SIGNAL void hasSelectedElementsChanged();
 
+    Q_PROPERTY(int selectedElementsCount READ selectedElementsCount NOTIFY selectedElementsCountChanged)
+    int selectedElementsCount() const;
+    Q_SIGNAL void selectedElementsCountChanged();
+
     enum OmitStatus { Omitted, NotOmitted, PartiallyOmitted };
     Q_ENUM(OmitStatus)
 

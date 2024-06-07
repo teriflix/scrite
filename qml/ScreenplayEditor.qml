@@ -3830,23 +3830,27 @@ Rectangle {
 
                     delegate: Rectangle {
                         id: delegateItem
-                        width: sceneListView.width-1
-                        height: 40
-                        color: scene ? (Runtime.screenplayAdapter.currentIndex === index || screenplayElement.selected) ? selectedColor : normalColor
-                                     : Runtime.screenplayAdapter.currentIndex === index ? Scrite.app.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
                         property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(Runtime.colors.primary.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
                         property color normalColor: Qt.tint(scene.color, "#E7FFFFFF")
                         property int elementIndex: index
                         property bool elementIsBreak: screenplayElementType === ScreenplayElement.BreakElementType
                         property bool elementIsEpisodeBreak: screenplayElementType === ScreenplayElement.BreakElementType && breakType === Screenplay.Episode
+                        property bool elementIsSelected: (Runtime.screenplayAdapter.currentIndex === index || screenplayElement.selected)
+
+                        width: sceneListView.width-1
+                        height: 40
+                        color: scene ? elementIsSelected ? selectedColor : (Runtime.screenplayAdapter.isSourceScreenplay && Runtime.screenplayAdapter.screenplay.selectedElementsCount > 1 ? Qt.tint(normalColor, "#40FFFFFF") : normalColor)
+                                     : Runtime.screenplayAdapter.currentIndex === index ? Scrite.app.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
                         Rectangle {
                             anchors.top: parent.top
                             anchors.left: parent.left
                             anchors.bottom: parent.bottom
-                            visible: Runtime.screenplayAdapter.currentIndex === index
-                            width: 8
+                            visible: elementIsSelected
+                            width: Runtime.screenplayAdapter.isSourceScreenplay && Runtime.screenplayAdapter.screenplay.selectedElementsCount > 1 ?
+                                       (Runtime.screenplayAdapter.currentIndex === index ? 10 : 5) :
+                                       8
                             color: Runtime.colors.accent.windowColor
                         }
 

@@ -726,9 +726,20 @@ bool Screenplay::hasSelectedElements() const
     return false;
 }
 
+int Screenplay::selectedElementsCount() const
+{
+    int ret = 0;
+
+    for (ScreenplayElement *element : m_elements)
+        if (element->isSelected())
+            ++ret;
+
+    return ret;
+}
+
 void Screenplay::setSelectedElementsOmitStatus(OmitStatus val)
 {
-    for (ScreenplayElement *element : m_elements) {
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
         if (element->isSelected()) {
             switch (val) {
             case Omitted:
@@ -2213,6 +2224,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::selectedChanged, this, &Screenplay::hasSelectedElementsChanged,
             Qt::UniqueConnection);
+    connect(ptr, &ScreenplayElement::selectedChanged, this,
+            &Screenplay::selectedElementsCountChanged, Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::heightHintChanged, this,
             &Screenplay::evaluateIfHeightHintsAreAvailableLater, Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::omittedChanged, this,
@@ -2242,6 +2255,8 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
     disconnect(ptr, &ScreenplayElement::breakTitleChanged, this, &Screenplay::breakTitleChanged);
     disconnect(ptr, &ScreenplayElement::selectedChanged, this,
                &Screenplay::hasSelectedElementsChanged);
+    disconnect(ptr, &ScreenplayElement::selectedChanged, this,
+               &Screenplay::selectedElementsCountChanged);
     disconnect(ptr, &ScreenplayElement::heightHintChanged, this,
                &Screenplay::evaluateIfHeightHintsAreAvailableLater);
     disconnect(ptr, &ScreenplayElement::omittedChanged, this,
