@@ -2575,7 +2575,7 @@ int SceneDocumentBinder::paste(int fromPosition)
             if (text.contains('\n')) {
                 Fountain::Parser parser(text, Screenplay::fountainPasteOptions());
 
-                bool sceneHeadingChanged = false;
+                bool applySceneHeading = fromPosition == 0;
 
                 const Fountain::Body fBody = parser.body();
                 if (fBody.size() == 1 && fBody.first().type == Fountain::Element::Action) {
@@ -2594,34 +2594,41 @@ int SceneDocumentBinder::paste(int fromPosition)
                         bool includeParagraph = true;
                         switch (element.type) {
                         case Fountain::Element::SceneHeading:
-                            if (fromPosition == 0 && !sceneHeadingChanged) {
+                            if (applySceneHeading) {
                                 m_scene->heading()->parseFrom(element.text);
                                 if (!element.sceneNumber.isEmpty()
                                     && m_screenplayElement != nullptr)
                                     m_screenplayElement->setUserSceneNumber(element.sceneNumber);
-                                sceneHeadingChanged = true;
+                                applySceneHeading = false;
                                 includeParagraph = false;
                             } else {
                                 paragraph.type = SceneElement::Action;
+                                applySceneHeading = false;
                             }
                             break;
                         case Fountain::Element::Action:
                             paragraph.type = SceneElement::Action;
+                            applySceneHeading = false;
                             break;
                         case Fountain::Element::Character:
                             paragraph.type = SceneElement::Character;
+                            applySceneHeading = false;
                             break;
                         case Fountain::Element::Parenthetical:
                             paragraph.type = SceneElement::Parenthetical;
+                            applySceneHeading = false;
                             break;
                         case Fountain::Element::Dialogue:
                             paragraph.type = SceneElement::Dialogue;
+                            applySceneHeading = false;
                             break;
                         case Fountain::Element::Shot:
                             paragraph.type = SceneElement::Shot;
+                            applySceneHeading = false;
                             break;
                         case Fountain::Element::Transition:
                             paragraph.type = SceneElement::Transition;
+                            applySceneHeading = false;
                             break;
                         case Fountain::Element::Synopsis:
                             includeParagraph = false;
@@ -2653,7 +2660,7 @@ int SceneDocumentBinder::paste(int fromPosition)
         if (content.isEmpty())
             return -1;
 
-        bool sceneHeadingChanged = false;
+        bool applySceneHeading = fromPosition == 0;
 
         for (const QJsonValue &item : content) {
             const QJsonObject itemObject = item.toObject();
@@ -2661,12 +2668,12 @@ int SceneDocumentBinder::paste(int fromPosition)
             const int alignment = itemObject.value(QStringLiteral("alignment")).toInt();
             const QString text = itemObject.value(QStringLiteral("text")).toString();
 
-            if (fromPosition == 0 && !sceneHeadingChanged && type == SceneElement::Heading) {
+            if (applySceneHeading && type == SceneElement::Heading) {
                 m_scene->heading()->parseFrom(text);
                 m_screenplayElement->setUserSceneNumber(
                         itemObject.value(QStringLiteral("sceneNumber")).toString());
                 m_scene->setSynopsis(itemObject.value(QStringLiteral("synopsis")).toString());
-                sceneHeadingChanged = true;
+                applySceneHeading = false;
                 continue;
             }
 
@@ -2680,6 +2687,8 @@ int SceneDocumentBinder::paste(int fromPosition)
             paragraph.formats = SceneElement::textFormatsFromJson(
                     itemObject.value(QStringLiteral("formats")).toArray());
             paragraphs.append(paragraph);
+
+            applySceneHeading = false;
         }
     }
 
