@@ -1391,7 +1391,6 @@ Item {
             BasicAttachmentsDropArea {
                 id: fileOpenDropArea
                 anchors.fill: parent
-                enabled: Runtime.dialogs.objectCount === 0
                 allowedType: Attachments.NoMedia
                 allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
                 property string droppedFilePath
@@ -1403,6 +1402,8 @@ Item {
                         droppedFilePath = attachment.filePath
                         droppedFileName = attachment.originalFileName
                     }
+
+                    Announcement.shout(Runtime.announcementIds.closeDialogBoxRequest, undefined)
                 }
 
                 Loader {

@@ -55,6 +55,10 @@ Dialog {
     // box is closed.
     property int appOverrideCursor: -1
 
+    // If set, then the dialog box automatically closes whenever user drags and
+    // drops a file on the Scrite window to import it.
+    property bool closeOnDragDrop: true
+
     // Assign a component whose instance may be shown as background
     property Component backdrop: Rectangle {
         color: Runtime.colors.primary.c100.background
@@ -211,6 +215,11 @@ Dialog {
 
         property bool overrideCursorMustBeRestored: false
     }
+
+    Announcement.onIncoming: (type,data) => {
+                                 if(root.closeOnDragDrop && type === Runtime.announcementIds.closeDialogBoxRequest)
+                                    root.close()
+                             }
 
     onAboutToShow: {
         Scrite.window.closeButtonVisible = appCloseButtonVisible
