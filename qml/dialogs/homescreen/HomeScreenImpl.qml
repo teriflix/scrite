@@ -425,6 +425,7 @@ Item {
 
                     NewFileOptions {
                         Layout.fillWidth: true
+                        Layout.fillHeight: true
                     }
 
                     QuickFileOpenOptions {
@@ -571,8 +572,6 @@ Item {
     }
 
     component NewFileOptions : Item {
-        implicitHeight: Math.max(newFileLabel.height + templatesView.contentHeight, 220)
-
         ColumnLayout {
             anchors.fill: parent
 
@@ -797,6 +796,7 @@ Item {
             anchors.fill: parent
 
             VclLabel {
+                id: quickFileOptionsLabel
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 text: scriptalayMode ? "Scriptalay" : "Recent Files"
             }
