@@ -13,6 +13,7 @@
 
 #include "scritedocumentvault.h"
 
+#include "callgraph.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "scritefileinfo.h"
@@ -30,12 +31,14 @@
 
 ScriteDocumentVault *ScriteDocumentVault::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     static ScriteDocumentVault *theInstance = new ScriteDocumentVault(ScriteDocument::instance());
     return theInstance;
 }
 
 ScriteDocumentVault::ScriteDocumentVault(QObject *parent) : QAbstractListModel(parent)
 {
+    // CAPTURE_CALL_GRAPH;
     m_document = qobject_cast<ScriteDocument *>(parent);
     connect(m_document, &ScriteDocument::aboutToDelete, this, &ScriteDocumentVault::cleanup);
     connect(Application::instance(), &Application::aboutToQuit, this,

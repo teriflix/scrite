@@ -17,7 +17,7 @@ CONFIG(release, debug|release) {
     CONFIG += qtquickcompiler
 }
 
-INCLUDEPATH += ../apikeys . \
+INCLUDEPATH += ../apikeys ../profilingtools . \
         ./src \
         ./src/core \
         ./src/network \
@@ -128,7 +128,6 @@ HEADERS += \
     src/utils/execlatertimer.h \
     src/utils/fountain.h \
     src/utils/graphlayout.h \
-    src/utils/timeprofiler.h \
     src/utils/garbagecollector.h \
     src/utils/hourglass.h \
     src/utils/genericarraymodel.h \
@@ -262,7 +261,6 @@ SOURCES += \
     src/utils/fountain.cpp \
     src/utils/genericarraymodel.cpp \
     src/utils/graphlayout.cpp \
-    src/utils/timeprofiler.cpp \
     src/utils/garbagecollector.cpp \
     src/utils/qobjectserializer.cpp \
     src/document/scritedocument.cpp \
@@ -317,6 +315,16 @@ RESOURCES += \
     scrite_icons.qrc \
     scrite_images.qrc \
     scrite_ui.qrc
+
+exists(../profilingtools/timeprofiler.cpp) {
+    HEADERS += ../profilingtools/timeprofiler.h
+    SOURCES += ../profilingtools/timeprofiler.cpp
+}
+
+exists(../profilingtools/callgraph.cpp) {
+    HEADERS += ../profilingtools/callgraph.h
+    SOURCES += ../profilingtools/callgraph.cpp
+}
 
 # https://doc.qt.io/qt-5/qtwebengine-deploying.html#javascript-files-in-qt-resource-files
 QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc

@@ -14,6 +14,7 @@
 #include "user.h"
 #include "scrite.h"
 #include "appwindow.h"
+#include "callgraph.h"
 #include "automation.h"
 #include "application.h"
 #include "scritedocument.h"
@@ -29,11 +30,13 @@ static AppWindow *AppWindowInstance = nullptr;
 
 AppWindow *AppWindow::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     return ::AppWindowInstance;
 }
 
 AppWindow::AppWindow()
 {
+    // CAPTURE_CALL_GRAPH;
     ::AppWindowInstance = this;
 
     QSurfaceFormat format = QSurfaceFormat::defaultFormat();

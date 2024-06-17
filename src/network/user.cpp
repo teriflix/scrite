@@ -13,6 +13,7 @@
 
 #include "user.h"
 #include "scrite.h"
+#include "callgraph.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "peerapplookup.h"
@@ -35,29 +36,42 @@ static QString GetSessionExpiredErrorMessage(const QString &context)
 
 User *User::instance()
 {
-    User::locations(); // preload
+    // CAPTURE_FIRST_CALL_GRAPH;
+
+    static bool firstTime = true;
+    if (firstTime) {
+        User::locations();
+        PeerAppLookup::instance();
+
+        const QStringList appArgs = qApp->arguments();
+        const QString starg = QStringLiteral("--sessionToken");
+        const int stargPos = appArgs.indexOf(starg);
+        if (stargPos >= 0 && appArgs.size() >= stargPos + 2) {
+            const QString stok = appArgs.at(stargPos + 1);
+            JsonHttpRequest::store(QStringLiteral("sessionToken"), stok);
+        }
+    }
 
     static User *theUser = new User(qApp);
+
+    if (firstTime) {
+        theUser->loadStoredUserInformation();
+        theUser->firstReload(false);
+    }
+
+    firstTime = false;
+
     return theUser;
 }
 
 User::User(QObject *parent) : QObject(parent)
 {
-    PeerAppLookup::instance();
-
-    const QStringList appArgs = qApp->arguments();
-    const QString starg = QStringLiteral("--sessionToken");
-    const int stargPos = appArgs.indexOf(starg);
-    if (stargPos >= 0 && appArgs.size() >= stargPos + 2) {
-        const QString stok = appArgs.at(stargPos + 1);
-        JsonHttpRequest::store(QStringLiteral("sessionToken"), stok);
-    }
+    // CAPTURE_CALL_GRAPH;
 
     connect(this, &User::infoChanged, this, &User::loggedInChanged);
     connect(this, &User::installationsChanged, this, &User::loggedInChanged);
 
     m_touchLogTimer.setSingleShot(false);
-    // m_touchLogTimer.setInterval(5000);
     m_touchLogTimer.setInterval(10 * 60 * 1000); // 10 minutes
     connect(&m_touchLogTimer, &QTimer::timeout, this,
             [=]() { this->logActivity1(QStringLiteral("touch")); });
@@ -67,9 +81,6 @@ User::User(QObject *parent) : QObject(parent)
         else
             m_touchLogTimer.stop();
     });
-
-    this->loadStoredUserInformation();
-    QMetaObject::invokeMethod(this, "firstReload", Qt::QueuedConnection, Q_ARG(bool, false));
 }
 
 User::~User() { }
@@ -118,6 +129,7 @@ QStringList User::locations()
 {
     static QStringList ret;
     if (ret.isEmpty()) {
+        // CAPTURE_CALL_GRAPH;
         QFile ccdb(QStringLiteral(":/misc/city-country-map.json.compressed"));
         if (ccdb.open(QFile::ReadOnly)) {
             const QByteArray json = qUncompress(ccdb.readAll());

@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "peerapplookup.h"
+#include "callgraph.h"
 
 #include <QDir>
 #include <QUuid>
@@ -44,6 +45,7 @@ static QString peerInfoFilePath()
 
 PeerAppLookup::PeerAppLookup(QObject *parent) : QObject(parent)
 {
+    // CAPTURE_CALL_GRAPH;
     m_instanceId = QUuid::createUuid().toString();
 
     m_updateTimer = new QTimer(this);
@@ -55,6 +57,7 @@ PeerAppLookup::PeerAppLookup(QObject *parent) : QObject(parent)
 
 PeerAppLookup *PeerAppLookup::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     static PeerAppLookup *theInstance = new PeerAppLookup(qApp);
     return theInstance;
 }

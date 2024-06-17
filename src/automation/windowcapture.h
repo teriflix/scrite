@@ -11,8 +11,8 @@
 **
 ****************************************************************************/
 
-#ifndef WINDOWCAPTURE_H
-#define WINDOWCAPTURE_H
+#ifndef WINDOW// CAPTURE_H
+#define WINDOW// CAPTURE_H
 
 #include <QWindow>
 #include <QQmlEngine>
@@ -104,4 +104,4 @@ private:
     bool m_forceCounterInFileName = false;
 };
 
-#endif // WINDOWCAPTURE_H
+#endif // WINDOW// CAPTURE_H

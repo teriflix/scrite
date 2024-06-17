@@ -14,6 +14,7 @@
 #include "notificationmanager.h"
 #include "notification.h"
 #include "application.h"
+#include "callgraph.h"
 
 #include <QtDebug>
 
@@ -21,6 +22,7 @@ static NotificationManager *theInstance = nullptr;
 
 NotificationManager *NotificationManager::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     if (::theInstance == nullptr)
         new NotificationManager(qApp);
     return ::theInstance;
@@ -28,6 +30,7 @@ NotificationManager *NotificationManager::instance()
 
 NotificationManager::NotificationManager(QObject *parent) : QAbstractListModel(parent)
 {
+    // CAPTURE_CALL_GRAPH;
     ::theInstance = this;
 }
 

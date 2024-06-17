@@ -14,6 +14,7 @@
 #include "user.h"
 #include "hourglass.h"
 #include "appwindow.h"
+#include "callgraph.h"
 #include "application.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
@@ -73,12 +74,14 @@ static QStringList getCustomFontFilePaths()
 
 TransliterationEngine *TransliterationEngine::instance(QCoreApplication *app)
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     static TransliterationEngine *newInstance = new TransliterationEngine(app ? app : qApp);
     return newInstance;
 }
 
 TransliterationEngine::TransliterationEngine(QObject *parent) : QObject(parent)
 {
+    // CAPTURE_CALL_GRAPH;
     const QMetaObject *mo = &TransliterationEngine::staticMetaObject;
     const QMetaEnum languageEnum = mo->enumerator(mo->indexOfEnumerator("Language"));
     const QStringList customFontPaths = ::getCustomFontFilePaths();

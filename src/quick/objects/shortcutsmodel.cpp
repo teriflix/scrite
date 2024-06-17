@@ -11,8 +11,9 @@
 **
 ****************************************************************************/
 
-#include "application.h"
 #include "shortcutsmodel.h"
+
+#include <QCoreApplication>
 
 ShortcutsModel *ShortcutsModel::instance()
 {

@@ -13,6 +13,7 @@
 
 #include "systemtextinputmanager.h"
 #include "transliteration.h"
+#include "callgraph.h"
 
 #include <QtDebug>
 #include <QMetaEnum>
@@ -29,6 +30,8 @@
 
 SystemTextInputManager *SystemTextInputManager::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
+
     static SystemTextInputManager *theInstance = nullptr;
     if (theInstance == nullptr) {
         qmlRegisterUncreatableType<AbstractSystemTextInputSource>(
@@ -43,6 +46,8 @@ SystemTextInputManager *SystemTextInputManager::instance()
 
 SystemTextInputManager::SystemTextInputManager(QObject *parent) : QAbstractListModel(parent)
 {
+    // CAPTURE_CALL_GRAPH;
+
 #ifdef Q_OS_MAC
     m_backend = new SystemTextInputManagerBackend_macOS(this);
 #endif

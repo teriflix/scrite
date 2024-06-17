@@ -18,6 +18,7 @@
 #include "scrite.h"
 #include "undoredo.h"
 #include "fountain.h"
+#include "callgraph.h"
 #include "filelocker.h"
 #include "hourglass.h"
 #include "aggregation.h"
@@ -697,6 +698,7 @@ Q_GLOBAL_STATIC(DeviceIOFactories, deviceIOFactories)
 
 ScriteDocument *ScriteDocument::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     static ScriteDocument *theInstance = new ScriteDocument(qApp);
     return theInstance;
 }
@@ -715,6 +717,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
       m_evaluateStructureElementSequenceTimer(
               "ScriteDocument.m_evaluateStructureElementSequenceTimer")
 {
+    // CAPTURE_CALL_GRAPH;
     m_fileLocker = new FileLocker(this);
 
     this->reset();

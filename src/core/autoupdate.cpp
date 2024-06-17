@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "callgraph.h"
 #include "autoupdate.h"
 #include "application.h"
 #include "garbagecollector.h"
@@ -23,12 +24,14 @@
 
 AutoUpdate *AutoUpdate::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     static AutoUpdate *theInstance = new AutoUpdate(Application::instance());
     return theInstance;
 }
 
 AutoUpdate::AutoUpdate(QObject *parent) : QObject(parent), m_updateTimer("AutoUpdate.m_updateTimer")
 {
+    // CAPTURE_CALL_GRAPH;
     m_updateTimer.start(1000, this);
 }
 

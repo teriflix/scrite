@@ -11,10 +11,10 @@
 **
 ****************************************************************************/
 
-#ifndef TIME_PROFILER_H
-#define TIME_PROFILER_H
+#ifndef CALLGRAPH_H
+#define CALLGRAPH_H
 
-#define PROFILE_THIS_FUNCTION
-#define PROFILE_THIS_FUNCTION2
+#define CAPTURE_CALL_GRAPH
+#define CAPTURE_FIRST_CALL_GRAPH
 
-#endif // TIME_PROFILER_H
+#endif // CALLGRAPH_H

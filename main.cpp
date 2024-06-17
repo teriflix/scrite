@@ -11,12 +11,13 @@
 **
 ****************************************************************************/
 
-#include "application.h"
+#include "user.h"
 #include "appwindow.h"
+#include "application.h"
 #include "shortcutsmodel.h"
 #include "scritedocument.h"
-#include "scritedocumentvault.h"
 #include "documentfilesystem.h"
+#include "scritedocumentvault.h"
 #include "notificationmanager.h"
 
 #include <QQuickStyle>
@@ -27,6 +28,7 @@ int main(int argc, char **argv)
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
     Application scriteApp(argc, argv, Application::prepare());
+    User::instance();
     TransliterationEngine::instance();
     SystemTextInputManager::instance();
     NotificationManager::instance();

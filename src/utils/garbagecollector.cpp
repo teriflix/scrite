@@ -13,9 +13,11 @@
 
 #include "garbagecollector.h"
 #include "application.h"
+#include "callgraph.h"
 
 GarbageCollector *GarbageCollector::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     static GarbageCollector *theInstance = new GarbageCollector(qApp);
     return theInstance;
 }
@@ -23,6 +25,7 @@ GarbageCollector *GarbageCollector::instance()
 GarbageCollector::GarbageCollector(QObject *parent)
     : QObject(parent), m_timer("GarbageCollector.m_timer")
 {
+    // CAPTURE_CALL_GRAPH;
 }
 
 GarbageCollector::~GarbageCollector()

@@ -11,7 +11,9 @@
 **
 ****************************************************************************/
 
+#include "callgraph.h"
 #include "announcement.h"
+
 #include <QCoreApplication>
 
 Announcement::Announcement(QObject *parent) : QObject(parent)
@@ -44,11 +46,15 @@ void Announcement::hearing(Announcement *from, const QString &type, const QJSVal
 
 AnnouncementBroadcast *AnnouncementBroadcast::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     static AnnouncementBroadcast *theInstance = new AnnouncementBroadcast(qApp);
     return theInstance;
 }
 
-AnnouncementBroadcast::AnnouncementBroadcast(QObject *parent) : QObject(parent) { }
+AnnouncementBroadcast::AnnouncementBroadcast(QObject *parent) : QObject(parent)
+{
+    // CAPTURE_CALL_GRAPH;
+}
 
 AnnouncementBroadcast::~AnnouncementBroadcast() { }
 

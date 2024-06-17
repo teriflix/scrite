@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "callgraph.h"
 #include "garbagecollector.h"
 #include "networkaccessmanager.h"
 
@@ -21,6 +22,7 @@ NetworkAccessManager *NetworkAccessManager::INSTANCE = nullptr;
 
 NetworkAccessManager *NetworkAccessManager::instance()
 {
+    // CAPTURE_FIRST_CALL_GRAPH;
     if (NetworkAccessManager::INSTANCE)
         return NetworkAccessManager::INSTANCE;
 
@@ -29,6 +31,7 @@ NetworkAccessManager *NetworkAccessManager::instance()
 
 NetworkAccessManager::NetworkAccessManager(QObject *parent) : QNetworkAccessManager(parent)
 {
+    // CAPTURE_CALL_GRAPH;
     NetworkAccessManager::INSTANCE = this;
     connect(this, &QNetworkAccessManager::finished, this, &NetworkAccessManager::onReplyFinished);
     connect(this, &QNetworkAccessManager::sslErrors, this, &NetworkAccessManager::onSslErrors);
