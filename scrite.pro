@@ -2,8 +2,10 @@ QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia pri
 DESTDIR = $$PWD/../Release/
 TARGET = Scrite
 
-CONFIG += c++11
+CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
+
+VERSION = 0.9.5.9
 
 #DEFINES += SCRITE_ENABLE_AUTOMATION
 #QT += testlib
@@ -14,7 +16,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 CONFIG(release, debug|release) {
     DEFINES += QT_NO_DEBUG_OUTPUT
-    CONFIG += qtquickcompiler
+    CONFIG += qtquickcompiler console
 }
 
 INCLUDEPATH += ../apikeys ../profilingtools . \
@@ -332,6 +334,7 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
+    VERSION_INFO = "0.9.5i-beta-macos"
 
     HEADERS += src/core/systemtextinputmanager_macos.h
     OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
@@ -340,6 +343,12 @@ macx {
 }
 
 win32 {
+    contains(QT_ARCH, i386) {
+        VERSION_INFO = "0.9.5i-beta-windows-x86"
+    } else {
+        VERSION_INFO = "0.9.5i-beta-windows-x64"
+    }
+
     RC_ICONS = appicon.ico
     HEADERS += src/core/systemtextinputmanager_windows.h
     SOURCES += src/core/systemtextinputmanager_windows.cpp
@@ -348,15 +357,18 @@ win32 {
 
 linux {
     CONFIG+=use_gold_linker
+    VERSION_INFO = "0.9.5i-beta-linux"
 }
 
 include($$PWD/3rdparty/sonnet/sonnet.pri)
 include($$PWD/3rdparty/quazip/quazip.pri)
 include($$PWD/3rdparty/simplecrypt/simplecrypt.pri)
+include($$PWD/3rdparty/crashpad/crashpad.pri)
 
 DISTFILES += \
     Info.plist \
     README \
+    README.md \
     packaging/linux/package.sh \
     packaging/linux/Scrite.desktop \
     packaging/windows/FileAssociation.nsh \
