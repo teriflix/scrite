@@ -221,7 +221,7 @@ DialogLauncher {
                             ListElement { name: "Contact";    fieldSize: 100;    key: "contact"     }
                             ListElement { name: "Address";    fieldSize: 100;    key: "address"     }
                             ListElement { name: "Email";      fieldSize: 100;    key: "email"       }
-                            ListElement { name: "Phone";      fieldSize: 100;    key: "phone"       }
+                            ListElement { name: "Phone";      fieldSize: 100;    key: "phoneNumber" }
                             ListElement { name: "Website";    fieldSize: 100;    key: "website"     }
                         }
 

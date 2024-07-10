@@ -40,14 +40,14 @@ QString handlerPath();
 /** Returns the complete path of the folder where Scrite's settings.ini **/
 QString dataPath();
 
+/** Returns path to pending crash-reports **/
+QString pendingCrashReportsPath();
+
+/** Returns name of the platform on which this module is running **/
+QString platform();
+
 /** Code that crashes the app for sure, provided Crashpad is available and initialized. **/
-inline void crash()
-{
-#ifdef ENABLE_CRASHPAD_CRASH_TEST
-    if (CrashpadModule::initialize())
-        *(volatile int *)0 = 0;
-#endif
-}
+void crash();
 
 }
 
