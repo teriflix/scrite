@@ -24,16 +24,33 @@
 
 #include "ui_CrashRecoveryDialog.h"
 
+#ifdef CRASHPAD_AVAILABLE
+#include "client/crashpad_client.h"
+#endif
+
 bool CrashpadModule::prepare()
 {
+    /**
+     * If a crash was detected the last time Scrite was launched, then we present a dialog
+     * informing the user that a crash had occured, along with some options about what to
+     * do next.
+     *
+     * Option #1: Send crash reports to us
+     * Option #2: Reset login credentials and try starting the app
+     * Option #3: Reset all settings to factory defaults, and try starting the app
+     *
+     * This implementation is common to all platforms, so its implemented here in this file.
+     */
     if (!CrashpadModule::isAvailable())
         return true;
 
     // Check if there are crash-dump files generated the last time the app was launched.
-    const QString crashpadDataPath = CrashpadModule::dataPath();
+    const QString pendingCrashReportsPath = CrashpadModule::pendingCrashReportsPath();
+    if (pendingCrashReportsPath.isEmpty())
+        return true;
 
-    QDir crashpadDataDir(crashpadDataPath);
-    if (!crashpadDataDir.exists() || !crashpadDataDir.cd("reports"))
+    QDir crashpadDataDir(pendingCrashReportsPath);
+    if (!crashpadDataDir.exists())
         return true;
 
     const QFileInfoList dmpFiles = crashpadDataDir.entryInfoList(
@@ -70,13 +87,15 @@ bool CrashpadModule::prepare()
     Ui::CrashRecoveryDialog messageBoxUi;
     messageBoxUi.setupUi(&messageBox);
 
+    const QString settingsFile = CrashpadModule::dataPath() + "/../settings.ini";
+    messageBoxUi.resetLoginCredsOption->setEnabled(QFile::exists(settingsFile));
+    messageBoxUi.factoryResetOption->setEnabled(messageBoxUi.resetLoginCredsOption->isEnabled());
+
     QObject::connect(messageBoxUi.joinDiscordButton, &QPushButton::clicked, &messageBox, []() {
         QDesktopServices::openUrl(QUrl("https://www.scrite.io/index.php/forum/"));
     });
 
     if (messageBox.exec() == QDialog::Accepted) {
-        const QString settingsFile = crashpadDataPath + "/../settings.ini";
-
         if (messageBoxUi.factoryResetOption->isChecked()) {
             QFile::remove(settingsFile);
         } else if (messageBoxUi.resetLoginCredsOption->isChecked()) {
@@ -94,13 +113,58 @@ bool CrashpadModule::prepare()
     return false;
 }
 
-#ifndef CRASHPAD_AVAILABLE
-bool CrashpadModule::isAvailable()
+namespace CrashpadModule {
+#ifdef Q_OS_WINDOWS
+std::wstring toPlatformString(const QString &string)
 {
-    return false;
+    return string.toStdWString();
+}
+#else
+std::string toPlatformString(const QString &string)
+{
+    return string.toStdString();
+}
+#endif
 }
 
 bool CrashpadModule::initialize()
+{
+#ifdef CRASHPAD_AVAILABLE
+    static bool invokedOnce = false;
+    static bool initStatus = false;
+
+    if (invokedOnce)
+        return initStatus;
+
+    invokedOnce = true;
+
+    const QString crashpadHandler = QDir::toNativeSeparators(CrashpadModule::handlerPath());
+    if (crashpadHandler.isEmpty())
+        return false;
+
+    const QString dataPath = QDir::toNativeSeparators(CrashpadModule::dataPath());
+
+    const base::FilePath _handlerPath(CrashpadModule::toPlatformString(crashpadHandler));
+    const base::FilePath _crashpadPath(CrashpadModule::toPlatformString(dataPath));
+    const base::FilePath _attachmentPath(
+            CrashpadModule::toPlatformString(dataPath + "\\attachment.txt"));
+    const std::vector<base::FilePath> _attachments = { _attachmentPath };
+    const std::map<std::string, std::string> _annotations = { { "format", "minidump" } };
+    const std::vector<std::string> _args = { "--no-rate-limit" };
+    const std::string _url;
+
+    static crashpad::CrashpadClient client;
+    initStatus = client.StartHandler(_handlerPath, _crashpadPath, _crashpadPath, _url, _annotations,
+                                     _args, true, false, _attachments);
+
+    return initStatus;
+#else // CRASHPAD_AVAILABLE
+    return false;
+#endif // CRASHPAD_AVAILABLE
+}
+
+#ifndef CRASHPAD_AVAILABLE
+bool CrashpadModule::isAvailable()
 {
     return false;
 }
@@ -114,4 +178,9 @@ QString CrashpadModule::dataPath()
 {
     return QString();
 }
-#endif
+
+QString CrashpadModule::pendingCrashReportsPath()
+{
+    return QString();
+}
+#endif // CRASHPAD_AVAILABLE

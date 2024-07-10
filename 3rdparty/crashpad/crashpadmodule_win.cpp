@@ -18,8 +18,6 @@
 #include <QDir>
 #include <QtDebug>
 
-#include "client/crashpad_client.h"
-
 #define NOMINMAX
 #include <windows.h>
 
@@ -51,37 +49,6 @@ QString applicationDirPath()
 bool CrashpadModule::isAvailable()
 {
     return true;
-}
-
-bool CrashpadModule::initialize()
-{
-    static bool invokedOnce = false;
-    static bool initStatus = false;
-
-    if (invokedOnce)
-        return initStatus;
-
-    invokedOnce = true;
-
-    const QString crashpadHandler = QDir::toNativeSeparators(CrashpadModule::handlerPath());
-    if (crashpadHandler.isEmpty())
-        return false;
-
-    const QString dataPath = QDir::toNativeSeparators(CrashpadModule::dataPath());
-
-    const base::FilePath _handlerPath(crashpadHandler.toStdWString());
-    const base::FilePath _crashpadPath(dataPath.toStdWString());
-    const base::FilePath _attachmentPath((dataPath + "\\attachment.txt").toStdWString());
-    const std::vector<base::FilePath> _attachments = { _attachmentPath };
-    const std::map<std::string, std::string> _annotations = { { "format", "minidump" } };
-    const std::vector<std::string> _args = { "--no-rate-limit" };
-    const std::string _url;
-
-    static crashpad::CrashpadClient client;
-    initStatus = client.StartHandler(_handlerPath, _crashpadPath, _crashpadPath, _url, _annotations,
-                                     _args, true, false, _attachments);
-
-    return initStatus;
 }
 
 QString CrashpadModule::handlerPath()
@@ -137,4 +104,9 @@ QString CrashpadModule::dataPath()
     }
 
     return ret;
+}
+
+QString CrashpadModule::pendingCrashReportsPath()
+{
+    return CrashpadModule::dataPath() + "/reports";
 }

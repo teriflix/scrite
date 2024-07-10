@@ -15,17 +15,12 @@ CONFIG(release, debug|release) {
 
 # Uncomment the following line to enable Ctrl+Shift+Alt+R hotkey to
 # force crash Scrite and check if Crashpad works.
-# CRASHPAD_TEST_ENABLED = yes
+CRASHPAD_TEST_ENABLED = yes
+
+CRASHPAD_SDK = $$(SCRITE_CRASHPAD_ROOT)
+message("CRASHPAD_SDK at $${CRASHPAD_SDK}")
 
 win32 {
-    # contains(QT_ARCH, i386) {
-    #     SCRITE_CRASHPAD_ROOT = $$(SCRITE_CRASHPAD_ROOT)/x86/MD
-    # } else {
-    #     SCRITE_CRASHPAD_ROOT = $$(SCRITE_CRASHPAD_ROOT)/x64/MD
-    # }
-
-    CRASHPAD_SDK = $$(SCRITE_CRASHPAD_ROOT)
-
     exists($${CRASHPAD_SDK}/lib/client.lib) {
         LIBS += -L$${CRASHPAD_SDK}/lib/ -lcommon -lclient -lutil -lbase -lAdvapi32
         INCLUDEPATH += $${CRASHPAD_SDK}/include $${CRASHPAD_SDK}/include/crashpad
@@ -36,17 +31,29 @@ win32 {
 
         DEFINES += CRASHPAD_AVAILABLE
 
-        # Create symbols for dump_syms and symupload
         CONFIG += force_debug_info
         CONFIG += separate_debug_info
 
-        # Build Crashpad Support for Scrite
         SOURCES += $$PWD/crashpadmodule_win.cpp
     }
 }
 
 macx {
-    # TODO
+    exists($${CRASHPAD_SDK}/lib/libclient.a) {
+        LIBS += -L$${CRASHPAD_SDK}/lib/ -lcommon -lclient -lutil -lbase -lmig_output
+        LIBS += -L/usr/lib -lbsm -framework AppKit -framework Security
+        INCLUDEPATH += $${CRASHPAD_SDK}/include $${CRASHPAD_SDK}/include/crashpad
+
+        CRASHPAD_HANDLER.files = $${CRASHPAD_SDK}/bin/crashpad_handler
+        CRASHPAD_HANDLER.path = Contents/MacOS
+        QMAKE_BUNDLE_DATA += CRASHPAD_HANDLER
+
+        DEFINES += CRASHPAD_AVAILABLE
+
+        SOURCES += $$PWD/crashpadmodule_mac.cpp
+
+        message("Linking with Crashpad for macOS")
+    }
 }
 
 linux {
