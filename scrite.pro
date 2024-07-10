@@ -368,7 +368,6 @@ include($$PWD/3rdparty/crashpad/crashpad.pri)
 DISTFILES += \
     Info.plist \
     README \
-    README.md \
     packaging/linux/package.sh \
     packaging/linux/Scrite.desktop \
     packaging/windows/FileAssociation.nsh \

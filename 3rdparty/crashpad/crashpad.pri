@@ -1,11 +1,13 @@
 # The following project include assumes that crashpad has been setup as described
 # in the README.md file found in this folder.
 
+INCLUDEPATH += $$PWD
 HEADERS += $$PWD/crashpadmodule.h
 SOURCES += \
     $$PWD/crashpadmodule_common.cpp
 FORMS += \
     $$PWD/CrashRecoveryDialog.ui
+OTHER_FILES += $$PWD/README.md
 
 # We need to bundle crashpad only if compiled in release mode, otherwise
 # we can let it be.
@@ -39,7 +41,6 @@ win32 {
         CONFIG += separate_debug_info
 
         # Build Crashpad Support for Scrite
-        INCLUDEPATH += $$PWD
         SOURCES += $$PWD/crashpadmodule_win.cpp
     }
 }
