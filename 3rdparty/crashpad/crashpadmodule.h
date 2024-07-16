@@ -48,7 +48,6 @@ QString platform();
 
 /** Code that crashes the app for sure, provided Crashpad is available and initialized. **/
 void crash();
-
 }
 
 #endif // CRASHPADMODULE_H

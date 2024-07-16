@@ -205,4 +205,5 @@ QString platform()
 {
     return QStringLiteral("Unknown");
 }
+=======
 #endif // CRASHPAD_AVAILABLE
