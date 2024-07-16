@@ -57,7 +57,7 @@ bool AbstractImporter::isFeatureEnabled() const
 
 bool AbstractImporter::read()
 {
-    GarbageCollector::instance()->add(this);
+    auto cleanup = qScopeGuard([=]() { GarbageCollector::instance()->add(this); });
 
     QString fileName = this->fileName();
     ScriteDocument *document = this->document();

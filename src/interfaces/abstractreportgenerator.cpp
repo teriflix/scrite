@@ -120,6 +120,8 @@ QString AbstractReportGenerator::name() const
 
 bool AbstractReportGenerator::generate()
 {
+    auto cleanup = qScopeGuard([=]() { GarbageCollector::instance()->add(this); });
+
     QString fileName = this->fileName();
     ScriteDocument *document = this->document();
     Screenplay *screenplay = document->screenplay();
@@ -190,8 +192,6 @@ bool AbstractReportGenerator::generate()
 
             this->progress()->finish();
 
-            GarbageCollector::instance()->add(this);
-
             return success;
         }
     }
@@ -201,7 +201,6 @@ bool AbstractReportGenerator::generate()
             this->progress()->start();
             bool success = this->directExportToOdf(&file);
             this->progress()->finish();
-            GarbageCollector::instance()->add(this);
             return success;
         }
     }
@@ -281,8 +280,6 @@ bool AbstractReportGenerator::generate()
     }
 
     this->progress()->finish();
-
-    GarbageCollector::instance()->add(this);
 
     return ret;
 }

@@ -201,9 +201,8 @@ QString CrashpadModule::pendingCrashReportsPath()
     return QString();
 }
 
-QString platform()
+QString CrashpadModule::platform()
 {
     return QStringLiteral("Unknown");
 }
-=======
 #endif // CRASHPAD_AVAILABLE

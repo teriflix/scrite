@@ -72,7 +72,7 @@ QJsonObject AbstractExporter::configurationFormInfo() const
 
 bool AbstractExporter::write(AbstractExporter::Target target)
 {
-    GarbageCollector::instance()->add(this);
+    auto cleanup = qScopeGuard([=]() { GarbageCollector::instance()->add(this); });
 
     QString fileName = this->fileName();
     ScriteDocument *document = this->document();
