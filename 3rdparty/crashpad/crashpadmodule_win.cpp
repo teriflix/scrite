@@ -111,7 +111,7 @@ QString CrashpadModule::pendingCrashReportsPath()
     return CrashpadModule::dataPath() + "/reports";
 }
 
-QString platform()
+QString CrashpadModule::platform()
 {
     if (sizeof(int) == 4)
         return QStringLiteral("Windows-x86");

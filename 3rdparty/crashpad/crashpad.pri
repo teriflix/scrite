@@ -15,7 +15,7 @@ CONFIG(release, debug|release) {
 
 # Uncomment the following line to enable Ctrl+Shift+Alt+R hotkey to
 # force crash Scrite and check if Crashpad works.
-CRASHPAD_TEST_ENABLED = yes
+# CRASHPAD_TEST_ENABLED = yes
 
 CRASHPAD_SDK = $$(SCRITE_CRASHPAD_ROOT)
 message("CRASHPAD_SDK at $${CRASHPAD_SDK}")
