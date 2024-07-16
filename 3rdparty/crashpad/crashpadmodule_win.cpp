@@ -113,7 +113,7 @@ QString CrashpadModule::pendingCrashReportsPath()
 
 QString CrashpadModule::platform()
 {
-    if (sizeof(int) == 4)
+    if (QSysInfo::WordSize == 32)
         return QStringLiteral("Windows-x86");
     return QStringLiteral("Windows-x64");
 }
