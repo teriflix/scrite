@@ -168,5 +168,6 @@
         <file>qml/TimelineView.qml</file>
         <file>qml/controls/VclFileDialog.qml</file>
         <file>qml/dialogs/FontSelectionDialog.qml</file>
+        <file>qml/dialogs/JoinDiscordCommunity.qml</file>
     </qresource>
 </RCC>

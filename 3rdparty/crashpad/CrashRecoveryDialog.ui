@@ -2,20 +2,6 @@
 <ui version="4.0">
  <class>CrashRecoveryDialog</class>
  <widget class="QDialog" name="CrashRecoveryDialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>533</width>
-    <height>359</height>
-   </rect>
-  </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-    <horstretch>0</horstretch>
-    <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
   <property name="windowTitle">
    <string>Crash Recovery - Scrite</string>
   </property>
@@ -38,7 +24,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The last time you launched Scrite, it crashed. This is unfortunate and we would like to understand why it happened. &lt;/p&gt;&lt;p&gt;We have copied crash report(s) to the &lt;span style=&quot; font-weight:700;&quot;&gt;Scrite Crash Reports&lt;/span&gt; folder on the &lt;span style=&quot; font-weight:700;&quot;&gt;Desktop&lt;/span&gt;. When you get a chance, please post the most recent crash report on the &lt;span style=&quot; font-style:italic; text-decoration: underline;&quot;&gt;#crashreports&lt;/span&gt; channel in our Discord community.&lt;/p&gt;&lt;p&gt;If you have seen this message more than once today, then please consider resetting login credentials before continuing to Scrite.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The last time you launched Scrite, it crashed. This is unfortunate and we would like to understand why it happened. &lt;/p&gt;&lt;p&gt;We have the copied crash report(s) to a &amp;quot;&lt;span style=&quot; font-weight:700;&quot;&gt;Scrite Crash Reports&lt;/span&gt;&amp;quot; folder on the &lt;span style=&quot; font-weight:700;&quot;&gt;Desktop&lt;/span&gt;. When you get a chance, please post the most recent crash report on the &lt;span style=&quot; font-weight:700;&quot;&gt;#crashreports&lt;/span&gt; channel in our &lt;span style=&quot; font-weight:700;&quot;&gt;Discord&lt;/span&gt; community.&lt;/p&gt;&lt;p&gt;If you have seen this message more than once today, then please consider resetting login credentials before continuing to Scrite.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -52,7 +38,7 @@
        <widget class="QRadioButton" name="resetLoginCredsOption">
         <property name="font">
          <font>
-          <bold>true</bold>
+          <bold>false</bold>
          </font>
         </property>
         <property name="text">

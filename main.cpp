@@ -29,8 +29,11 @@ int main(int argc, char **argv)
         if (!CrashpadModule::prepare())
             return 0;
 
-        if (CrashpadModule::initialize())
+        if (CrashpadModule::initialize()) {
+#ifdef ENABLE_CRASHPAD_CRASH_TEST
             qInfo() << "Crashpad Initialized";
+#endif
+        }
     }
 
 #ifndef Q_OS_WINDOWS

@@ -270,6 +270,7 @@ Item {
         property string theme: "Material"
         property int primaryColor: colors.defaultPrimaryColor
         property int accentColor: colors.defaultAccentColor
+        property int joinDiscordPromptCounter: 0
 
         Component.onCompleted: {
             Qt.callLater( () => {

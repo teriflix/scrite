@@ -287,7 +287,7 @@ DialogLauncher {
 
                     Button {
                         text: "Discord"
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
+                        onClicked: JoinDiscordCommunity.launch()
                     }
                 }
             }

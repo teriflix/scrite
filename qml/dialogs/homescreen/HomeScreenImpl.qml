@@ -158,7 +158,7 @@ Item {
                 textColor: "white"
                 iconSource: "qrc:/icons/action/forum_inverted.png"
 
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
+                onClicked: JoinDiscordCommunity.launch()
             }
         }
 
@@ -343,7 +343,7 @@ Item {
                         text: "Discord Community"
                         iconSource: "qrc:/icons/action/forum.png"
 
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
+                        onClicked: JoinDiscordCommunity.launch()
                     }
 
                     Item {

@@ -101,7 +101,7 @@ Dialog {
     Component.onCompleted: parent = Overlay.overlay
 
     modal: true
-    closePolicy: Popup.CloseOnEscape
+    closePolicy: titleBarCloseButtonVisible ? Popup.CloseOnEscape : Popup.NoAutoClose
 
     topPadding: 0
     leftPadding: 0

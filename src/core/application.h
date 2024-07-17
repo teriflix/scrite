@@ -262,6 +262,8 @@ public:
     Q_INVOKABLE static QString neighbouringFilePath(const QString &filePath,
                                                     const QString &nfileName);
 
+    Q_INVOKABLE static bool copyToClipboard(const QString &text);
+
     Q_INVOKABLE static QScreen *windowScreen(QObject *window);
 
     Q_INVOKABLE static QString getEnvironmentVariable(const QString &name);

@@ -17,7 +17,6 @@
 #include "autoupdate.h"
 #include "application.h"
 #include "notification.h"
-#include "crashpadmodule.h"
 #include "scritedocument.h"
 #include "jsonhttprequest.h"
 
@@ -38,6 +37,7 @@
 #include <QMetaEnum>
 #include <QQuickItem>
 #include <QJsonArray>
+#include <QClipboard>
 #include <QQmlEngine>
 #include <QQuickStyle>
 #include <QMessageBox>
@@ -1665,6 +1665,15 @@ QString Application::neighbouringFilePath(const QString &filePath, const QString
 {
     const QFileInfo fi(filePath);
     return fi.absoluteDir().absoluteFilePath(nfileName);
+}
+
+bool Application::copyToClipboard(const QString &text)
+{
+    if (text.isEmpty())
+        return false;
+
+    Application::clipboard()->setText(text);
+    return true;
 }
 
 QScreen *Application::windowScreen(QObject *window)
