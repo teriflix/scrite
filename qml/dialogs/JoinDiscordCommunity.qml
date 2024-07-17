@@ -97,7 +97,7 @@ DialogLauncher {
                     Layout.preferredWidth: 450
                     Layout.alignment: Qt.AlignHCenter
 
-                    text: "Please note: There is <b>no email support</b> available for Scrite."
+                    text: "Please note: There is <b>no phone or email support</b> available for Scrite."
                     color: Runtime.colors.primary.c600.background
                     wrapMode: Text.WordWrap
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-2

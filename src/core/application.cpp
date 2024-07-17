@@ -20,6 +20,10 @@
 #include "scritedocument.h"
 #include "jsonhttprequest.h"
 
+#ifdef ENABLE_CRASHPAD_CRASH_TEST
+#include "crashpadmodule.h"
+#endif
+
 #include <QDir>
 #include <QUuid>
 #include <QtMath>

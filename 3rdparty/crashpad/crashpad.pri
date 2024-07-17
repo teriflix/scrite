@@ -17,7 +17,11 @@ CONFIG(release, debug|release) {
 # force crash Scrite and check if Crashpad works.
 # CRASHPAD_TEST_ENABLED = yes
 
+contains(QT_ARCH, x86_64) {
 CRASHPAD_SDK = $$(SCRITE_CRASHPAD_ROOT)
+} else {
+CRASHPAD_SDK = $$(SCRITE_CRASHPAD_ROOT)-x86
+}
 message("CRASHPAD_SDK at $${CRASHPAD_SDK}")
 
 win32 {

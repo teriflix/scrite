@@ -17,7 +17,7 @@ QML_IMPORT_MAJOR_VERSION = 1
 
 CONFIG(release, debug|release) {
     DEFINES += QT_NO_DEBUG_OUTPUT
-    CONFIG += qtquickcompiler console
+    CONFIG += qtquickcompiler
 }
 
 INCLUDEPATH += ../apikeys ../profilingtools . \

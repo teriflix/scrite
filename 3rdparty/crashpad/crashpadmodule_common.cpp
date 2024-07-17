@@ -24,14 +24,15 @@
 #include <QDesktopServices>
 #include <QOperatingSystemVersion>
 
+#ifdef CRASHPAD_AVAILABLE
 #include "ui_CrashRecoveryDialog.h"
 
-#ifdef CRASHPAD_AVAILABLE
 #include "client/crashpad_client.h"
 #endif
 
 bool CrashpadModule::prepare()
 {
+#ifdef CRASHPAD_AVAILABLE
     /**
      * If a crash was detected the last time Scrite was launched, then we present a dialog
      * informing the user that a crash had occured, along with some options about what to
@@ -118,6 +119,7 @@ bool CrashpadModule::prepare()
 
         return true;
     }
+#endif
 
     return false;
 }
@@ -130,6 +132,7 @@ void CrashpadModule::crash()
 #endif
 }
 
+#ifdef CRASHPAD_AVAILABLE
 namespace CrashpadModule {
 #ifdef Q_OS_WINDOWS
 std::wstring toPlatformString(const QString &string)
@@ -143,6 +146,7 @@ std::string toPlatformString(const QString &string)
 }
 #endif
 }
+#endif
 
 bool CrashpadModule::initialize()
 {
