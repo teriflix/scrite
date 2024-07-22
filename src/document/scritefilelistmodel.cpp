@@ -12,10 +12,12 @@
 ****************************************************************************/
 
 #include "scritefilelistmodel.h"
+#include "application.h"
 
 #include <QDir>
 #include <QTimer>
 #include <QFuture>
+#include <QSettings>
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
 #include <QtConcurrentMap>
@@ -33,6 +35,22 @@ ScriteFileListModel::ScriteFileListModel(QObject *parent) : QAbstractListModel(p
 }
 
 ScriteFileListModel::~ScriteFileListModel() { }
+
+void ScriteFileListModel::setSource(Source val)
+{
+    if (m_source == val)
+        return;
+
+    m_source = val;
+    emit sourceChanged();
+
+    if (val == RecentFiles) {
+        const QSettings *settings = Application::instance()->settings();
+        const QStringList filePaths =
+                settings->value(QStringLiteral("RecentFiles/files"), QStringList()).toStringList();
+        this->setFilesInternal(filePaths);
+    }
+}
 
 QStringList ScriteFileListModel::filesInFolder(const QString &folder)
 {
@@ -60,39 +78,10 @@ inline static ScriteFileInfo loadScriteFileInfo(const QString &filePath)
 
 void ScriteFileListModel::setFiles(const QStringList &filePaths)
 {
-    // Right now, we are only doing a quick load of ScriteFileInfo objects
-    QList<ScriteFileInfo> newList;
-    for (const QString &filePath : filePaths) {
-        const ScriteFileInfo sfi = ScriteFileInfo::quickLoad(filePath);
-        if (sfi.fileInfo.exists())
-            newList.append(sfi);
-    }
-
-    if (newList == m_files)
+    if (m_source == Custom) {
+        this->setFilesInternal(filePaths);
         return;
-
-    const QStringList files = m_watcher->files();
-    if (!files.isEmpty())
-        m_watcher->removePaths(files);
-
-    this->beginResetModel();
-    m_files = newList.mid(0, m_maxCount);
-    for (const ScriteFileInfo &sfi : qAsConst(m_files))
-        m_watcher->addPath(sfi.filePath);
-    this->endResetModel();
-
-    // At this point, we can afford to schedule a complete load of ScriteFileInfo
-    // objects in a separate thread. As and when we get results, we can update
-    // them in the model.
-    QFutureWatcher<ScriteFileInfo> *futureWatcher = new QFutureWatcher<ScriteFileInfo>(this);
-    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::resultReadyAt, this, [=](int index) {
-        const ScriteFileInfo sfi = futureWatcher->resultAt(index);
-        this->updateFromScriteFileInfo(sfi);
-    });
-    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::finished, futureWatcher,
-            &QObject::deleteLater);
-    QFuture<ScriteFileInfo> future = QtConcurrent::mapped(filePaths, loadScriteFileInfo);
-    futureWatcher->setFuture(future);
+    }
 }
 
 QStringList ScriteFileListModel::files() const
@@ -233,4 +222,41 @@ QVariant ScriteFileListModel::data(const QModelIndex &index, int role) const
 
     const ScriteFileInfo sfi = m_files.at(index.row());
     return QVariant::fromValue<ScriteFileInfo>(sfi);
+}
+
+void ScriteFileListModel::setFilesInternal(const QStringList &filePaths)
+{
+    // Right now, we are only doing a quick load of ScriteFileInfo objects
+    QList<ScriteFileInfo> newList;
+    for (const QString &filePath : filePaths) {
+        const ScriteFileInfo sfi = ScriteFileInfo::quickLoad(filePath);
+        if (sfi.fileInfo.exists())
+            newList.append(sfi);
+    }
+
+    if (newList == m_files)
+        return;
+
+    const QStringList files = m_watcher->files();
+    if (!files.isEmpty())
+        m_watcher->removePaths(files);
+
+    this->beginResetModel();
+    m_files = newList.mid(0, m_maxCount);
+    for (const ScriteFileInfo &sfi : qAsConst(m_files))
+        m_watcher->addPath(sfi.filePath);
+    this->endResetModel();
+
+    // At this point, we can afford to schedule a complete load of ScriteFileInfo
+    // objects in a separate thread. As and when we get results, we can update
+    // them in the model.
+    QFutureWatcher<ScriteFileInfo> *futureWatcher = new QFutureWatcher<ScriteFileInfo>(this);
+    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::resultReadyAt, this, [=](int index) {
+        const ScriteFileInfo sfi = futureWatcher->resultAt(index);
+        this->updateFromScriteFileInfo(sfi);
+    });
+    connect(futureWatcher, &QFutureWatcher<ScriteFileInfo>::finished, futureWatcher,
+            &QObject::deleteLater);
+    QFuture<ScriteFileInfo> future = QtConcurrent::mapped(filePaths, loadScriteFileInfo);
+    futureWatcher->setFuture(future);
 }

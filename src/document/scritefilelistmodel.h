@@ -34,6 +34,14 @@ public:
     ScriteFileListModel(QObject *parent = nullptr);
     ~ScriteFileListModel();
 
+    enum Source { RecentFiles, Custom };
+    Q_ENUM(Source)
+
+    Q_PROPERTY(Source source READ source WRITE setSource NOTIFY sourceChanged)
+    void setSource(Source val);
+    Source source() const { return m_source; }
+    Q_SIGNAL void sourceChanged();
+
     // This method returns a list of all .scrite files in a given folder
     Q_INVOKABLE static QStringList filesInFolder(const QString &folder);
 
@@ -73,10 +81,12 @@ public:
     }
 
 private:
+    void setFilesInternal(const QStringList &files);
     void updateFromScriteFileInfo(const ScriteFileInfo &sfi);
 
 private:
     int m_maxCount = 10;
+    Source m_source = Custom;
     QList<ScriteFileInfo> m_files;
     QFileSystemWatcher *m_watcher = nullptr;
 };

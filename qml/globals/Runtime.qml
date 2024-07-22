@@ -489,13 +489,12 @@ Item {
     // Contents of this model is listed in the HomeScreen.
     readonly property ScriteFileListModel recentFiles: ScriteFileListModel {
         id: _recentFiles
+        source: ScriteFileListModel.RecentFiles
 
-        onFilesChanged: _recentFilesSettings.files = files
         Component.onCompleted: {
             Scrite.document.justLoaded.connect(onDocumentJustLoaded)
             Scrite.document.justSaved.connect(onDocumentJustSaved)
-
-            files = _recentFilesSettings.files
+            filesChanged.connect(captureChangeInFiles)
         }
 
         function onDocumentJustSaved() {
@@ -510,6 +509,10 @@ Item {
             const docFilePath = Scrite.document.fileName
             if(docFilePath !== "")
                 add(docFilePath)
+        }
+
+        function captureChangeInFiles() {
+            _recentFilesSettings.files = files
         }
     }
 
