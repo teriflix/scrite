@@ -8,3 +8,6 @@ copy %SCRITE_CRASHPAD_ROOT%\bin\crashpad_handler.exe .
 fillnsi --installs-key WINDEPLOYQT_INSTALLS --uninstalls-key WINDEPLOYQT_UNINSTALLS --list files.txt --input installer-x86.nsi.in --output installer-x86.nsi
 %MakeNSISTool% installer-x86.nsi
 %CodeSignTool% sign /tr http://timestamp.sectigo.com /td sha256 /fd sha256 /a Scrite-*-Beta-32bit-Setup.exe
+mkdir ..\..\..\Release\Deploy
+copy Scrite-*-Beta-32bit-Setup.exe ..\..\..\Release\Deploy
+copy ..\..\..\Release\scrite.pdb ..\..\..\Release\Deploy\scrite-x86.pdb

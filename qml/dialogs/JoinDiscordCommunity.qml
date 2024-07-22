@@ -61,12 +61,12 @@ DialogLauncher {
                     mipmap: true
                 }
 
-                VclText {
+                VclLabel {
                     Layout.preferredWidth: 450
                     Layout.alignment: Qt.AlignHCenter
 
                     wrapMode: Text.WordWrap
-                    text: "Join our growing community of Scrite users on Discord. Interact with our team for <font color=\"" + Runtime.colors.accent.a700.background + "\"><b>support</b></font>, look for solutions to issues you may face, post <b>questions</b>, report <b>bugs</b>, request <u>features</u>, and provide <u>feedback</u>.<br/><br/>If you already have Discord installed, use the invite link below."
+                    text: "Join the Scrite community on <b>Discord</b>. It is the best place to find <font color=\"" + Runtime.colors.accent.a700.background + "\"><b>support</b></font>, to connect with the Scrite team and a growing network of Scrite users who <b>share feedback</b>, place <b>feature requests</b> and stay upto date with Scrite <b>updates</b>, <b>features</b>, <b>bug fixes</b> and more.<br/><br/>If you already have Discord installed, use the invite link below."
                 }
 
                 RowLayout {

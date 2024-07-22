@@ -13,15 +13,15 @@
     <key>CFBundleName</key>
     <string>Scrite</string>
     <key>CFBundleGetInfoString</key>
-    <string>Scrite - Version 0.9.5j Beta</string>
+    <string>Scrite - Version 0.9.5k Beta</string>
     <key>CFBundleExecutable</key>
     <string>Scrite</string>
     <key>CFBundleIdentifier</key>
-    <string>com.teriflix.scrite</string>
+    <string>io.scrite</string>
     <key>CFBundleVersion</key>
-    <string>0.9.5j</string>
+    <string>0.9.5k</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.9.5j</string>
+    <string>0.9.5k</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.productivity</string>
     <key>Vendor</key>
@@ -29,7 +29,7 @@
     <key>NOTE</key>
     <string>This product is built using Qt LGPL. Write to us for obtaining the source code.</string>
     <key>NSSupportsAutomaticGraphicsSwitching</key>
-    <false/>
+    <true/>
     <key>CFBundleDocumentTypes</key>
     <array>
         <dict>
