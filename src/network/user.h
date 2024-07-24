@@ -142,6 +142,7 @@ private:
     int m_currentInstallationIndex = -1;
     JsonHttpRequest *m_call = nullptr;
     ErrorReport *m_errorReport = new ErrorReport(this);
+    bool m_loadingStoredUserInformation = false;
 };
 
 class UserIconProvider : public QQuickImageProvider

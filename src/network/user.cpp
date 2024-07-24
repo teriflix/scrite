@@ -25,6 +25,7 @@
 #include <QDateTime>
 #include <QJsonDocument>
 #include <QCoreApplication>
+#include <QScopedValueRollback>
 
 static QString GetSessionExpiredErrorMessage(const QString &context)
 {
@@ -299,13 +300,17 @@ void User::setInstallations(const QJsonArray &val)
     }
 
     if (m_currentInstallationIndex < 0 && !m_installations.isEmpty()) {
-        const QString errContext = m_currentInstallationIndex < 0
-                ? (activationTimeout ? QStringLiteral("E_ACT_TIMEOUT")
-                                     : QStringLiteral("E_INSTALL"))
-                : QStringLiteral("E_INSTALLS");
-        m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage(errContext));
-        m_installations = QJsonArray();
-        this->logout();
+        if (m_loadingStoredUserInformation)
+            this->reset();
+        else {
+            const QString errContext = m_currentInstallationIndex < 0
+                    ? (activationTimeout ? QStringLiteral("E_ACT_TIMEOUT")
+                                         : QStringLiteral("E_INSTALL"))
+                    : QStringLiteral("E_INSTALLS");
+            m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage(errContext));
+            m_installations = QJsonArray();
+            this->logout();
+        }
     }
 
     emit installationsChanged();
@@ -359,9 +364,11 @@ void User::fetchHelpTips()
 
 void User::reset()
 {
-    ScriteDocument *document = ScriteDocument::instance();
-    if (document)
-        document->reset();
+    if (!m_loadingStoredUserInformation) {
+        ScriteDocument *document = ScriteDocument::instance();
+        if (document)
+            document->reset();
+    }
 
     this->setInstallations(QJsonArray());
     this->setInfo(QJsonObject());
@@ -459,6 +466,8 @@ void User::installationsCallDone()
 
 void User::loadStoredUserInformation()
 {
+    QScopedValueRollback<bool> rollback(m_loadingStoredUserInformation, true);
+
     // Load information stored in the previous session
     const QVariant userInfoVariant = JsonHttpRequest::fetch(QStringLiteral("userInfo"));
     if (userInfoVariant.isValid() && !userInfoVariant.isNull()
