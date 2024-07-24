@@ -32,6 +32,7 @@ DialogLauncher {
 
     readonly property url infoUrl: "https://www.scrite.io/index.php/forum/"
     readonly property url inviteUrl: "https://discord.gg/bGHquFX5jK"
+    property bool infoUrlOpened: false
 
     name: "JoinDiscordCommunity"
     singleInstanceOnly: true
@@ -113,6 +114,7 @@ DialogLauncher {
                         text: "More Info"
                         onClicked: {
                             Qt.openUrlExternally(root.infoUrl)
+                            root.infoUrlOpened = true
                             if(dialog.titleBarCloseButtonVisible)
                                 Qt.callLater(dialog.close)
                         }

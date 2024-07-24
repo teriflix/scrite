@@ -72,7 +72,10 @@ DialogLauncher {
                                     Runtime.applicationSettings.joinDiscordPromptCounter = Runtime.applicationSettings.joinDiscordPromptCounter+1
                                     let dlg = JoinDiscordCommunity.launch(Math.max(3-Runtime.applicationSettings.joinDiscordPromptCounter,0)*2000)
                                     if(Runtime.applicationSettings.joinDiscordPromptCounter < 3)
-                                        dlg.closed.connect( () => { Qt.openUrlExternally(JoinDiscordCommunity.infoUrl) })
+                                        dlg.closed.connect( () => {
+                                                               if(!dlg.infoUrlOpened)
+                                                                Qt.openUrlExternally(JoinDiscordCommunity.infoUrl)
+                                                           })
                                 })
             }
         }
