@@ -13,15 +13,15 @@
     <key>CFBundleName</key>
     <string>Scrite</string>
     <key>CFBundleGetInfoString</key>
-    <string>Scrite - Version 0.9.6 Beta</string>
+    <string>Scrite - Version 0.9.6a Beta</string>
     <key>CFBundleExecutable</key>
     <string>Scrite</string>
     <key>CFBundleIdentifier</key>
     <string>io.scrite</string>
     <key>CFBundleVersion</key>
-    <string>0.9.6</string>
+    <string>0.9.6a</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.9.6</string>
+    <string>0.9.6a</string>
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.productivity</string>
     <key>Vendor</key>
