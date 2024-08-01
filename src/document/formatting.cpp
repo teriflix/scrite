@@ -62,8 +62,8 @@ struct ParagraphMetrics
     // The following metrics are picked up from FinalDraft 12
     const qreal leftMargin = 1.5; // inches
     const qreal rightMargin = 7.69; // inches
-    const qreal topMargin = 0.70; // inches
-    const qreal bottomMargin = 0.70; // inches
+    const qreal topMargin = 0.50; // inches
+    const qreal bottomMargin = 0.50; // inches
     const qreal contentWidth = rightMargin - leftMargin;
     const QList<QVariantList> paragraphMetrics = {
         { 1.50, 7.69, 1, QFont::MixedCase, Qt::AlignLeft }, // SceneElement::Action,

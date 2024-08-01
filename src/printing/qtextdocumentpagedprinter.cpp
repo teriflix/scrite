@@ -473,6 +473,12 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
         clonedDoc->setPageSize(body.size());
     }
 
+    const QFont headerFooterFont = [=]() -> QFont {
+        QFont font = doc->defaultFont();
+        font.setPointSize(font.pointSize() - 1);
+        return font;
+    }();
+
     // At this point we are ready to print as far as QTextDocument is concerned.
 
     // Lets configure the headers and footers before we actually go ahead and print.
@@ -516,8 +522,8 @@ bool QTextDocumentPagedPrinter::print(QTextDocument *document, QPagedPaintDevice
     m_footerRect.setLeft(leftMargin);
     m_footerRect.setRight(printer->width() - rightMargin);
 
-    m_header->setFont(doc->defaultFont());
-    m_footer->setFont(doc->defaultFont());
+    m_header->setFont(headerFooterFont);
+    m_footer->setFont(headerFooterFont);
     m_header->prepare(fieldMap, m_headerRect, printer);
     m_footer->prepare(fieldMap, m_footerRect, printer);
 
