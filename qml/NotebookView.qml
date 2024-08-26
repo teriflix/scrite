@@ -1034,7 +1034,6 @@ Rectangle {
                             readOnly: Scrite.document.readOnly
                             onEditingComplete: scene.structureElement.title = text
                             backTabItem: sceneHeadingField
-                            font.capitalization: Font.AllUppercase
                             anchors.horizontalCenter: parent.horizontalCenter
                         }
 

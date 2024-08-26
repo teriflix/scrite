@@ -732,6 +732,8 @@ void NotesItem::updateText()
             else
                 idxStringList << QString::number(val + 1);
         }
+        idxStringList.removeAll(QString());
+
         StructureElement *element = m_notes->scene()->structureElement();
         QString title;
         if (element)

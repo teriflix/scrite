@@ -255,7 +255,7 @@ void StructureElement::setTitle(const QString &val)
     if (m_title == val)
         return;
 
-    m_title = val.toUpper().trimmed();
+    m_title = val;
 
     if (m_scene != nullptr) {
         SceneHeading *heading = m_scene->heading();

@@ -3931,7 +3931,9 @@ Rectangle {
                                             else
                                                 ret = "NO SCENE HEADING"
                                         } else {
-                                            let title = [scene.structureElement.nativeTitle, scene.synopsis.trim()].join("\n\n").trim()
+                                            let title = Runtime.sceneListPanelSettings.showTooltip ?
+                                                    [scene.structureElement.nativeTitle, scene.synopsis.trim()].join("\n\n").trim() :
+                                                    scene.structureElement.nativeTitle
                                             if(title === "")
                                                 title = "No title."
                                             if(scene.heading.enabled) {

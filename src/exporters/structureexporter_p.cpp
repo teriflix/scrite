@@ -223,7 +223,8 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
         headingTextItem->setPlainText(element->title());
     else
         headingTextItem->setPlainText(QStringLiteral("NO SCENE HEADING"));
-    headingTextItem->setFont(boldFont(fixedWidthFont));
+    headingTextItem->setFont(element->hasNativeTitle() ? boldFont(normalFont)
+                                                       : boldFont(fixedWidthFont));
 
     headingTextItem->setX(contentRect.x());
     headingTextItem->setY(contentRect.y());

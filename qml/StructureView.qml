@@ -2747,7 +2747,7 @@ Item {
 
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        font.capitalization: Font.AllUppercase
+                        font.capitalization: element.hasNativeTitle ? Font.MixedCase : Font.AllUppercase
 
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
@@ -2779,7 +2779,7 @@ Item {
 
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        font.capitalization: Font.AllUppercase
+                        font.capitalization: element.hasNativeTitle ? Font.MixedCase : Font.AllUppercase
 
                         onEditingComplete: { element.title = text; TabSequenceItem.focusNext() }
 
