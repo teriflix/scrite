@@ -4677,12 +4677,11 @@ QObject *Structure::createExporterObject()
 void Structure::prepareForDeserialization()
 {
     m_deserializationStage = BeingDeserialized;
+
+    m_indexCardFields = QJsonArray();
 }
 
-void Structure::serializeToJson(QJsonObject &) const
-{
-    // Do nothing
-}
+void Structure::serializeToJson(QJsonObject &) const { }
 
 void Structure::deserializeFromJson(const QJsonObject &json)
 {
