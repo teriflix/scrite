@@ -2703,34 +2703,46 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
                 QTextFrameFormat format;
                 format.setPadding(5);
-                format.setBottomMargin(5);
+                format.setBottomMargin(10);
                 format.setBorder(1);
                 format.setBorderBrush(scene->color().darker());
 
-                cursor.insertFrame(format);
-            }
-
-            if (!title.isEmpty()) {
                 QColor sceneColor = scene->color().lighter(175);
-                sceneColor.setAlphaF(0.5);
-
-                prepareCursor(cursor, SceneElement::Heading, Qt::Alignment(), false);
-
-                QTextBlockFormat format;
+                sceneColor.setAlphaF(0.25);
                 format.setBackground(sceneColor);
-                cursor.mergeBlockFormat(format);
 
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, title);
+                cursor.insertFrame(format);
 
-                cursor.insertBlock();
-            }
-
-            if (!synopsis.isEmpty()) {
                 prepareCursor(cursor, SceneElement::Action, Qt::Alignment(), false);
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
-            }
 
-            if (includingSomething) {
+                if (!title.isEmpty()) {
+                    QTextBlockFormat format;
+                    format.setTopMargin(4);
+                    format.setBottomMargin(4);
+                    cursor.mergeBlockFormat(format);
+
+                    QTextCharFormat chFormat;
+                    chFormat.setFontWeight(QFont::Bold);
+                    cursor.mergeCharFormat(chFormat);
+
+                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, title);
+
+                    cursor.insertBlock();
+                }
+
+                if (!synopsis.isEmpty()) {
+                    QTextBlockFormat format;
+                    format.setTopMargin(1);
+                    format.setBottomMargin(1);
+                    cursor.mergeBlockFormat(format);
+
+                    QTextCharFormat chFormat;
+                    chFormat.setFontWeight(QFont::Normal);
+                    cursor.mergeCharFormat(chFormat);
+
+                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+                }
+
                 cursor = frame->lastCursorPosition();
                 insertBlock = false;
             } else
