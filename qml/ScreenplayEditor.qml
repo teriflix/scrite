@@ -3753,7 +3753,7 @@ Rectangle {
 
                                 elide: Text.ElideRight
                                 font.family: "Courier Prime"
-                                // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize * 1.2)
+                                font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize * 1.2)
                                 font.bold: true
                                 text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
 
