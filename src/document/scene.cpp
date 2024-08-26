@@ -585,16 +585,16 @@ bool SceneElement::polishText(Scene *previousScene)
                     return prevElement;
             }
 
-#if 0 // Making this work across multiple scenes is rather controversial. Let's not do this right
-      // now.
-            if (previousScene != nullptr) {
+            // Making this work across multiple scenes is rather controversial. Let's not do this
+            // right now.
+            if (previousScene != nullptr && !this->scene()->heading()->isEnabled()) {
                 for (int i = previousScene->elementCount() - 1; i >= 0; i--) {
                     SceneElement *prevElement = previousScene->elementAt(i);
                     if (prevElement->type() == SceneElement::Character)
                         return prevElement;
                 }
             }
-#endif
+
             return nullptr;
         }();
 

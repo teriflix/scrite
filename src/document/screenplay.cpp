@@ -2558,7 +2558,9 @@ bool Screenplay::polishText()
                 ret |= scene->polishText(previousScene);
                 previousScene = scene;
             }
-        }
+        } else if (element->elementType() == ScreenplayElement::BreakElementType
+                   && element->breakType() == Screenplay::Episode)
+            previousScene = nullptr;
     }
 
     return ret;

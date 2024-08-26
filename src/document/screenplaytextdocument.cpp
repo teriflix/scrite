@@ -2769,11 +2769,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 QTextCharFormat charFormat;
                 charFormat.setFont(cursor.document()->defaultFont());
 
-                QString synopsis = scene->synopsis();
-                synopsis.replace(newlinesRegEx, newline);
-
                 cursor.insertBlock(blockFormat, charFormat);
-                // cursor.insertText(synopsis);
                 TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, comments);
 
                 insertBlock = true;
