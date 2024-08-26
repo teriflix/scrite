@@ -44,12 +44,7 @@ void ScriteFileListModel::setSource(Source val)
     m_source = val;
     emit sourceChanged();
 
-    if (val == RecentFiles) {
-        const QSettings *settings = Application::instance()->settings();
-        const QStringList filePaths =
-                settings->value(QStringLiteral("RecentFiles/files"), QStringList()).toStringList();
-        this->setFilesInternal(filePaths);
-    }
+    QTimer::singleShot(1000, this, &ScriteFileListModel::loadRecentFiles);
 }
 
 QStringList ScriteFileListModel::filesInFolder(const QString &folder)
@@ -222,6 +217,19 @@ QVariant ScriteFileListModel::data(const QModelIndex &index, int role) const
 
     const ScriteFileInfo sfi = m_files.at(index.row());
     return QVariant::fromValue<ScriteFileInfo>(sfi);
+}
+
+void ScriteFileListModel::loadRecentFiles()
+{
+    if (m_source == RecentFiles) {
+        const QString recentFilesKey = QStringLiteral("RecentFiles/files");
+
+        QSettings *settings = Application::instance()->settings();
+        const QStringList filePaths = settings->value(recentFilesKey, QStringList()).toStringList();
+        this->setFilesInternal(filePaths);
+
+        settings->setValue(recentFilesKey, this->files());
+    }
 }
 
 void ScriteFileListModel::setFilesInternal(const QStringList &filePaths)

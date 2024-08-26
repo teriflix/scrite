@@ -81,6 +81,7 @@ public:
     }
 
 private:
+    void loadRecentFiles();
     void setFilesInternal(const QStringList &files);
     void updateFromScriteFileInfo(const ScriteFileInfo &sfi);
 
