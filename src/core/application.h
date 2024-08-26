@@ -290,6 +290,9 @@ public:
 
     Q_INVOKABLE static bool resetObjectProperty(QObject *object, const QString &propName);
 
+    Q_INVOKABLE static bool saveObjectConfiguration(QObject *object);
+    Q_INVOKABLE static bool restoreObjectConfiguration(QObject *object);
+
     Q_INVOKABLE static int objectTreeSize(QObject *ptr);
 
     Q_INVOKABLE static QString createUniqueId();

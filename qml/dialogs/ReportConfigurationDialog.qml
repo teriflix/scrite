@@ -65,6 +65,8 @@ Item {
             return null
         }
 
+        Scrite.app.restoreObjectConfiguration(args.report)
+
         if(initalProps) {
             for(var member in initalProps) {
                 args.report.setConfigurationValue(member, initalProps[member])

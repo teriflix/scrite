@@ -33,6 +33,7 @@ public:
     Q_CLASSINFO("sceneNumbers_FieldNote",
                 "If no scenes are selected, then the report is generted for all scenes in the "
                 "screenplay.")
+    Q_CLASSINFO("sceneNumbers_IsPersistent", "false")
     Q_PROPERTY(QList<int> sceneNumbers READ sceneNumbers WRITE setSceneNumbers NOTIFY
                        sceneNumbersChanged)
     void setSceneNumbers(const QList<int> &val);

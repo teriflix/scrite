@@ -54,6 +54,7 @@ public:
 
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")
+    Q_CLASSINFO("watermark_IsPersistent", "false")
     Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
     void setWatermark(const QString &val);
     QString watermark() const { return m_watermark; }
@@ -61,6 +62,7 @@ public:
 
     Q_CLASSINFO("comment_FieldLabel", "Comment text for use in title card.")
     Q_CLASSINFO("comment_FieldEditor", "TextBox")
+    Q_CLASSINFO("comment_IsPersistent", "false")
     Q_PROPERTY(QString comment READ comment WRITE setComment NOTIFY commentChanged)
     void setComment(const QString &val);
     QString comment() const { return m_comment; }

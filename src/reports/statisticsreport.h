@@ -67,6 +67,7 @@ public:
     Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the presence graphs.")
     Q_CLASSINFO("characterNames_FieldNote", "Leave it empty to let Scrite automatically pick from most active characters.")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
+    Q_CLASSINFO("characterNames_IsPersistent", "false")
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
@@ -104,6 +105,7 @@ public:
     Q_CLASSINFO("locations_FieldLabel", "Locations to include in the presence graphs.")
     Q_CLASSINFO("locations_FieldNote", "Leave it empty to let Scrite automatically pick from most busy locations.")
     Q_CLASSINFO("locations_FieldEditor", "MultipleLocationSelector")
+    Q_CLASSINFO("locations_IsPersistent", "false")
     Q_PROPERTY(QStringList locations READ locations WRITE setLocations NOTIFY locationsChanged)
     void setLocations(const QStringList &val);
     QStringList locations() const { return m_locations; }

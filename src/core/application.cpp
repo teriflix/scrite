@@ -1968,6 +1968,96 @@ bool Application::resetObjectProperty(QObject *object, const QString &propName)
     return prop.reset(object);
 }
 
+bool Application::saveObjectConfiguration(QObject *object)
+{
+    if (object == nullptr)
+        return false;
+
+    const QMetaObject *mo = object->metaObject();
+    const QString objectClass = QLatin1String(mo->className());
+
+    QJsonObject objectJson = QObjectSerializer::toJson(object);
+
+    const QStringList keys = objectJson.keys();
+    for (const QString &key : keys) {
+        const QString cikey = key + "_IsPersistent";
+        const int cii = mo->indexOfClassInfo(qPrintable(cikey));
+        if (cii >= 0) {
+            const QMetaClassInfo ci = mo->classInfo(cii);
+            if (!qstrcmp(ci.value(), "false"))
+                objectJson.remove(key);
+        }
+    }
+
+    const QString configFilePath =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                    .absoluteFilePath("objectconfig.json");
+
+    QJsonObject configObject;
+
+    {
+        QFile configFile(configFilePath);
+        if (configFile.open(QFile::ReadOnly)) {
+            QJsonDocument configFileDoc = QJsonDocument::fromJson(configFile.readAll());
+            configObject = configFileDoc.object();
+        }
+    }
+
+    configObject.insert(objectClass, objectJson);
+
+    {
+        QFile configFile(configFilePath);
+        if (configFile.open(QFile::WriteOnly)) {
+            QJsonDocument configFileDoc(configObject);
+            configFile.write(configFileDoc.toJson(QJsonDocument::Indented));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool Application::restoreObjectConfiguration(QObject *object)
+{
+    if (object == nullptr)
+        return false;
+
+    const QString configFilePath =
+            QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation))
+                    .absoluteFilePath("objectconfig.json");
+
+    QJsonObject configObject;
+
+    QFile configFile(configFilePath);
+    if (configFile.open(QFile::ReadOnly)) {
+        QJsonDocument configFileDoc = QJsonDocument::fromJson(configFile.readAll());
+        configObject = configFileDoc.object();
+    } else
+        return false;
+
+    const QMetaObject *mo = object->metaObject();
+    const QString objectClass = QLatin1String(mo->className());
+
+    if (configObject.contains(objectClass)) {
+        QJsonObject objectJson = configObject.value(objectClass).toObject();
+
+        const QStringList keys = objectJson.keys();
+        for (const QString &key : keys) {
+            const QString cikey = key + "_IsPersistent";
+            const int cii = mo->indexOfClassInfo(qPrintable(cikey));
+            if (cii >= 0) {
+                const QMetaClassInfo ci = mo->classInfo(cii);
+                if (!qstrcmp(ci.value(), "false"))
+                    objectJson.remove(key);
+            }
+        }
+
+        return QObjectSerializer::fromJson(objectJson, object);
+    }
+
+    return false;
+}
+
 int Application::objectTreeSize(QObject *ptr)
 {
     return ptr->findChildren<QObject *>(QString(), Qt::FindChildrenRecursively).size() + 1;

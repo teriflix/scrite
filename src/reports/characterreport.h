@@ -32,6 +32,7 @@ public:
     Q_CLASSINFO("characterNames_FieldGroup", "Characters")
     Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
     Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
+    Q_CLASSINFO("characterNames_IsPersistent", "false")
     Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }

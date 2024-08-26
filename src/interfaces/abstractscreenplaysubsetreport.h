@@ -156,6 +156,7 @@ public:
     Q_CLASSINFO("episodeNumbers_FieldNote",
                 "If no episodes are selected, then the report is generted for all episodes in the "
                 "screenplay.")
+    Q_CLASSINFO("episodeNumbers_IsPersistent", "false")
     Q_PROPERTY(QList<int> episodeNumbers READ episodeNumbers WRITE setEpisodeNumbers NOTIFY
                        episodeNumbersChanged)
     void setEpisodeNumbers(const QList<int> &val);
@@ -168,6 +169,7 @@ public:
     Q_CLASSINFO(
             "tags_FieldNote",
             "If no tags are selected, then the report is generated for all tags in the screenplay.")
+    Q_CLASSINFO("tags_IsPersistent", "false")
     Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
     void setTags(const QStringList &val);
     QStringList tags() const { return m_tags; }
