@@ -49,13 +49,32 @@ public:
     bool isIncludeSceneNumbers() const { return m_includeSceneNumbers; }
     Q_SIGNAL void includeSceneNumbersChanged();
 
+    Q_CLASSINFO("includeEpisodeAndActBreaks_FieldLabel", "Include episode and act breaks.")
+    Q_CLASSINFO("includeEpisodeAndActBreaks_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeEpisodeAndActBreaks READ isIncludeEpisodeAndActBreaks WRITE setIncludeEpisodeAndActBreaks NOTIFY includeEpisodeAndActBreaksChanged)
+    void setIncludeEpisodeAndActBreaks(bool val);
+    bool isIncludeEpisodeAndActBreaks() const { return m_includeEpisodeAndActBreaks; }
+    Q_SIGNAL void includeEpisodeAndActBreaksChanged();
+
+    Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include scene synopsis.")
+    Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    void setIncludeSceneSynopsis(bool val);
+    bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
+    Q_SIGNAL void includeSceneSynopsisChanged();
+
 protected:
     bool doExport(QIODevice *device); // AbstractExporter interface
     QString fileNameExtension() const { return QStringLiteral("txt"); }
 
 private:
+    QString toString() const;
+
+private:
     int m_maxLettersPerLine = 60;
     bool m_includeSceneNumbers = false;
+    bool m_includeEpisodeAndActBreaks = false;
+    bool m_includeSceneSynopsis = false;
 };
 
 #endif // TEXTEXPORTER_H

@@ -18,6 +18,7 @@
 
 #include <QString>
 #include <QStringList>
+#include <QRegularExpression>
 
 static QStringList breakStringIntoLines(const QString &inputString, int maxCharactersPerLine)
 {
@@ -99,20 +100,53 @@ void TextExporter::setIncludeSceneNumbers(bool val)
     emit includeSceneNumbersChanged();
 }
 
+void TextExporter::setIncludeEpisodeAndActBreaks(bool val)
+{
+    if (m_includeEpisodeAndActBreaks == val)
+        return;
+
+    m_includeEpisodeAndActBreaks = val;
+    emit includeEpisodeAndActBreaksChanged();
+}
+
+void TextExporter::setIncludeSceneSynopsis(bool val)
+{
+    if (m_includeSceneSynopsis == val)
+        return;
+
+    m_includeSceneSynopsis = val;
+    emit includeSceneSynopsisChanged();
+}
+
 bool TextExporter::doExport(QIODevice *device)
+{
+    QTextStream ts(device);
+    ts.setCodec("utf-8");
+    ts.setAutoDetectUnicode(true);
+
+    ts << this->toString();
+
+    return true;
+}
+
+QString TextExporter::toString() const
 {
     const ScreenplayFormat *screenplayFormat = this->document()->formatting();
     const Screenplay *screenplay = this->document()->screenplay();
     const int nrScenes = screenplay->elementCount();
     const int maxChars = m_maxLettersPerLine;
+    const char *newline = "\n";
 
-    QTextStream ts(device);
+    QString ret;
+
+    QTextStream ts(&ret, QIODevice::WriteOnly);
     ts.setCodec("utf-8");
     ts.setAutoDetectUnicode(true);
 
-    auto writeParagraph = [&ts, maxChars](const SceneElementFormat *format, const QString &text) {
+    auto writeParagraph = [&ts, maxChars, newline](const SceneElementFormat *format,
+                                                   const QString &text) {
         for (int i = 0; i < format->lineSpacingBefore(); i++)
-            ts << "\n";
+            ts << newline;
 
         const qreal blockWidth = 1.0 - format->leftMargin() - format->rightMargin();
         const int maxCharsInBlock = int(qreal(maxChars) * blockWidth);
@@ -135,35 +169,68 @@ bool TextExporter::doExport(QIODevice *device)
                 prefix = QString(qCeil(qreal(maxCharsInBlock - line.length()) / 2.0), ' ');
 
             const int leftMarginChars = int(format->leftMargin() * maxChars);
-            ts << QString(leftMarginChars, ' ') << prefix << line << "\n";
+            ts << QString(leftMarginChars, ' ') << prefix << line << newline;
         }
     };
 
+    int lastElementType = -1;
+
     for (int i = 0; i < nrScenes; i++) {
         const ScreenplayElement *screenplayElement = screenplay->elementAt(i);
-        if (screenplayElement->elementType() != ScreenplayElement::SceneElementType)
-            continue;
+        if (lastElementType >= 0 && lastElementType != screenplayElement->elementType())
+            ts << newline;
 
-        const Scene *scene = screenplayElement->scene();
-        const SceneHeading *heading = scene->heading();
-        if (heading->isEnabled()) {
-            ts << "\n";
+        lastElementType = screenplayElement->elementType();
 
-            if (m_includeSceneNumbers)
-                ts << "[" << screenplayElement->resolvedSceneNumber() << "] ";
+        if (screenplayElement->elementType() == ScreenplayElement::SceneElementType) {
+            const Scene *scene = screenplayElement->scene();
 
-            ts << heading->text() << "\n";
-        }
+            if (m_includeSceneSynopsis) {
+                if (scene->structureElement()->hasNativeTitle() || !scene->synopsis().isEmpty()) {
+                    ts << newline;
 
-        const int nrElements = scene->elementCount();
-        for (int j = 0; j < nrElements; j++) {
-            const SceneElement *element = scene->elementAt(j);
-            const SceneElementFormat *format = screenplayFormat->elementFormat(element->type());
-            writeParagraph(format, element->formattedText());
+                    ts << QString(m_maxLettersPerLine, '=') << newline;
+                    if (scene->structureElement()->hasNativeTitle())
+                        ts << scene->structureElement()->nativeTitle() << newline;
+
+                    if (!scene->synopsis().isEmpty())
+                        writeParagraph(screenplayFormat->elementFormat(SceneElement::Action),
+                                       scene->synopsis());
+                    ts << QString(m_maxLettersPerLine, '=') << newline;
+                }
+            }
+
+            const SceneHeading *heading = scene->heading();
+            if (heading->isEnabled()) {
+                ts << newline;
+
+                if (m_includeSceneNumbers)
+                    ts << "[" << screenplayElement->resolvedSceneNumber() << "] ";
+
+                ts << heading->text() << newline;
+            }
+
+            const int nrElements = scene->elementCount();
+            for (int j = 0; j < nrElements; j++) {
+                const SceneElement *element = scene->elementAt(j);
+                const SceneElementFormat *format = screenplayFormat->elementFormat(element->type());
+                writeParagraph(format, element->formattedText());
+            }
+        } else {
+            if (m_includeEpisodeAndActBreaks) {
+                ts << screenplayElement->breakTitle();
+                if (!screenplayElement->breakSubtitle().isEmpty())
+                    ts << ": " << screenplayElement->breakSubtitle();
+                ts << newline << newline;
+            }
         }
     }
 
     ts.flush();
 
-    return true;
+    static const QRegularExpression multipleNewlines("\\n{3,}");
+    ret = ret.replace(multipleNewlines, "\n\n");
+    ret = ret.trimmed();
+
+    return ret;
 }
