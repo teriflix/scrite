@@ -3167,11 +3167,28 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
             if (element->scene() == nullptr)
                 element->setScene(new Scene(element));
 
+            const QString lastEpisodeName = [lastEpisodeElement]() -> QString {
+                if (lastEpisodeElement == nullptr)
+                    return QString();
+                QString ret = lastEpisodeElement->breakTitle();
+                if (!lastEpisodeElement->breakSubtitle().isEmpty())
+                    ret += ": " + lastEpisodeElement->breakSubtitle();
+                return ret;
+            }();
+
+            const QString lastActName = [lastActElement]() -> QString {
+                if (lastActElement == nullptr)
+                    return QString();
+                QString ret = lastActElement->breakTitle();
+                if (!lastActElement->breakSubtitle().isEmpty())
+                    ret += ": " + lastActElement->breakSubtitle();
+                return ret;
+            }();
+
             Scene *scene = element->scene();
-            scene->setAct(lastActElement ? lastActElement->breakTitle() : QStringLiteral("ACT 1"));
+            scene->setAct(lastActElement ? lastActName : QStringLiteral("ACT 1"));
             scene->setActIndex(actIndex);
-            scene->setEpisode(lastEpisodeElement ? lastEpisodeElement->breakTitle()
-                                                 : QStringLiteral("EPISODE 1"));
+            scene->setEpisode(lastEpisodeElement ? lastEpisodeName : QStringLiteral("EPISODE 1"));
             scene->setEpisodeIndex(episodeIndex);
             indexListMap[scene].append(index);
 
