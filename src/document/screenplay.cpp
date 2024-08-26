@@ -2130,10 +2130,10 @@ void Screenplay::updateBreakTitles()
 
     for (ScreenplayElement *e : qAsConst(m_elements)) {
         if (e->elementType() != ScreenplayElement::BreakElementType) {
-            if (episodeOffset == 0 && episodes.isEmpty())
+            if (episodeOffset == 0 && episodes.isEmpty() && e->scene()->heading()->isEnabled())
                 ++episodeOffset;
 
-            if (actOffset == 0 && episodeActs.isEmpty())
+            if (actOffset == 0 && episodeActs.isEmpty() && e->scene()->heading()->isEnabled())
                 ++actOffset;
 
             continue;
@@ -3141,6 +3141,8 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
 
     ScreenplayElement *lastEpisodeElement = nullptr;
     ScreenplayElement *lastActElement = nullptr;
+    QString lastEpisodeName;
+    QString lastActName;
 
     QHash<Scene *, QList<int>> indexListMap;
 
@@ -3154,9 +3156,9 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
         ++index;
 
         if (element->elementType() == ScreenplayElement::SceneElementType) {
-            if (actIndex < 0)
+            if (actIndex < 0 && element->scene()->heading()->isEnabled())
                 ++actIndex;
-            if (episodeIndex < 0)
+            if (episodeIndex < 0 && element->scene()->heading()->isEnabled())
                 ++episodeIndex;
 
             element->setElementIndex(++elementIndex);
@@ -3167,28 +3169,14 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
             if (element->scene() == nullptr)
                 element->setScene(new Scene(element));
 
-            const QString lastEpisodeName = [lastEpisodeElement]() -> QString {
-                if (lastEpisodeElement == nullptr)
-                    return QString();
-                QString ret = lastEpisodeElement->breakTitle();
-                if (!lastEpisodeElement->breakSubtitle().isEmpty())
-                    ret += ": " + lastEpisodeElement->breakSubtitle();
-                return ret;
-            }();
-
-            const QString lastActName = [lastActElement]() -> QString {
-                if (lastActElement == nullptr)
-                    return QString();
-                QString ret = lastActElement->breakTitle();
-                if (!lastActElement->breakSubtitle().isEmpty())
-                    ret += ": " + lastActElement->breakSubtitle();
-                return ret;
-            }();
-
             Scene *scene = element->scene();
-            scene->setAct(lastActElement ? lastActName : QStringLiteral("ACT 1"));
+            scene->setAct(lastActElement         ? lastActName
+                                  : actIndex < 0 ? QStringLiteral("No Act")
+                                                 : QStringLiteral("ACT 1"));
             scene->setActIndex(actIndex);
-            scene->setEpisode(lastEpisodeElement ? lastEpisodeName : QStringLiteral("EPISODE 1"));
+            scene->setEpisode(lastEpisodeElement         ? lastEpisodeName
+                                      : episodeIndex < 0 ? QStringLiteral("No Episode")
+                                                         : QStringLiteral("EPISODE 1"));
             scene->setEpisodeIndex(episodeIndex);
             indexListMap[scene].append(index);
 
@@ -3205,6 +3193,9 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
                 ++totalActIndex;
 
                 lastActElement = element;
+                lastActName = element->breakTitle();
+                if (!element->breakSubtitle().isEmpty())
+                    lastActName += ": " + element->breakSubtitle();
             } else if (element->breakType() == Screenplay::Episode) {
                 ++episodeIndex;
 
@@ -3212,6 +3203,9 @@ void Screenplay::evaluateSceneNumbers(bool minorAlso)
 
                 lastActElement = nullptr;
                 lastEpisodeElement = element;
+                lastEpisodeName = element->breakTitle();
+                if (!element->breakSubtitle().isEmpty())
+                    lastEpisodeName += ": " + element->breakSubtitle();
             }
 
             element->setActIndex(actIndex);

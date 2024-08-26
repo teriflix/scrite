@@ -3753,7 +3753,7 @@ Rectangle {
 
                                 elide: Text.ElideRight
                                 font.family: "Courier Prime"
-                                font.pixelSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize * 1.2)
+                                // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize * 1.2)
                                 font.bold: true
                                 text: Scrite.document.screenplay.title === "" ? "[#] TITLE PAGE" : Scrite.document.screenplay.title
 
@@ -3912,7 +3912,7 @@ Rectangle {
 
                                 font.family: "Courier Prime"
                                 font.bold: Runtime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
-                                font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
+                                // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                                 horizontalAlignment: Qt.AlignLeft
                                 color: Runtime.colors.primary.c10.text
                                 font.capitalization: delegateItem.elementIsBreak || Runtime.sceneListPanelSettings.sceneTextMode !== "HEADING" ? Font.MixedCase : Font.AllUppercase
