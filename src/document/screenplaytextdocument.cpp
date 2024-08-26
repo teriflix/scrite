@@ -3250,7 +3250,7 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
                 settings->value(QStringLiteral("TitlePage/includeTimestamp"), false).toBool();
         if (includeTimestamp) {
             ts << "<br/><br/>Generated on ";
-            ts << QDateTime::currentDateTime().toString(Qt::SystemLocaleShortDate);
+            ts << QDateTime::currentDateTime().toString(Qt::TextDate);
         }
 
         ts << "</center>";
@@ -3315,13 +3315,8 @@ void ScreenplayTitlePageObjectInterface::drawObject(QPainter *painter, const QRe
         QString loglineHtml;
         const QString openP = QLatin1String("<p>");
         const QString closeP = QLatin1String("</p>");
-        for (const QString &loglinePara : qAsConst(loglineParas)) {
-            if (loglineHtml.isEmpty())
-                loglineHtml =
-                        openP + QLatin1String("<strong>Logline:</strong> ") + loglinePara + closeP;
-            else
-                loglineHtml += openP + loglinePara + closeP;
-        }
+        for (const QString &loglinePara : qAsConst(loglineParas))
+            loglineHtml += openP + loglinePara + closeP;
         loglineCard->setHtml(loglineHtml);
 
         QTextDocument *loglineDoc = loglineCard->document();
