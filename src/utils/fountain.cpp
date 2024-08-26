@@ -1191,7 +1191,8 @@ void Fountain::Writer::writeSection(QTextStream &ts, const Element &element) con
     // http://fountain.io/syntax/#sections-synopses
     // Create a Section by preceding a line with one or more pound-sign # characters:
 
-    ts << QString(element.sectionDepth, '#') << " " << this->emphasisedText(element) << newline;
+    ts << newline << QString(element.sectionDepth, '#') << " " << this->emphasisedText(element)
+       << newline;
 }
 
 void Fountain::Writer::writeSynopsis(QTextStream &ts, const Element &element) const
@@ -1246,11 +1247,13 @@ void Fountain::populateBody(const Scene *scene, Body &body, const ScreenplayElem
 
     const SceneHeading *heading = scene->heading();
 
-    Fountain::Element fSceneHeading;
-    fSceneHeading.type = Fountain::Element::SceneHeading;
-    fSceneHeading.text = heading->isEnabled() ? heading->text() : QString();
-    fSceneHeading.sceneNumber = element ? element->userSceneNumber() : QString();
-    body.append(fSceneHeading);
+    if (heading->isEnabled()) {
+        Fountain::Element fSceneHeading;
+        fSceneHeading.type = Fountain::Element::SceneHeading;
+        fSceneHeading.text = heading->text();
+        fSceneHeading.sceneNumber = element ? element->userSceneNumber() : QString();
+        body.append(fSceneHeading);
+    }
 
     if (element && element->isOmitted()) {
         Fountain::Element fOmittedPara;
@@ -1258,6 +1261,21 @@ void Fountain::populateBody(const Scene *scene, Body &body, const ScreenplayElem
         fOmittedPara.notes << "Omitted";
         body.append(fOmittedPara);
         return;
+    }
+
+    const StructureElement *structureElement = scene->structureElement();
+    if (structureElement != nullptr && structureElement->hasNativeTitle()) {
+        Fountain::Element fElement;
+        fElement.type = Fountain::Element::Synopsis;
+        fElement.text = structureElement->nativeTitle();
+        body.append(fElement);
+    }
+
+    if (!scene->synopsis().isEmpty()) {
+        Fountain::Element fElement;
+        fElement.type = Fountain::Element::Synopsis;
+        fElement.text = scene->synopsis();
+        body.append(fElement);
     }
 
     const int nrParas = scene->elementCount();
