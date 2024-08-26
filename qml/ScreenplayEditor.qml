@@ -3773,21 +3773,11 @@ Rectangle {
                             }
 
                             VclToolButton {
-                                icon.source: {
-                                    switch(Runtime.sceneListPanelSettings.displaySceneLength) {
-                                    case "TIME":
-                                        return "qrc:/icons/content/time.png"
-                                    case "PAGE":
-                                        return "qrc:/icons/content/page_count.png"
-                                    default:
-                                        return "qrc:/icons/content/view_options.png"
-                                    }
-                                }
+                                icon.source: "qrc:/icons/content/view_options.png"
                                 Layout.alignment: Qt.AlignVCenter
                                 onClicked: sceneListPanelMenu.open()
                                 down: sceneListPanelMenu.visible
                                 ToolTip.text: "Scene List Options"
-                                enabled: !Runtime.screenplayTextDocument.paused
 
                                 Item {
                                     anchors.bottom: parent.bottom
@@ -3796,32 +3786,65 @@ Rectangle {
                                     VclMenu {
                                         id: sceneListPanelMenu
 
-                                        VclMenuItem {
-                                            text: "Scene Duration"
+                                        VclMenu {
+                                            title: "Text"
 
-                                            readonly property string option: "TIME"
-                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-                                            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
-                                            enabled: !Runtime.screenplayTextDocument.paused
+                                            VclMenuItem {
+                                                text: "Scene Heading"
+
+                                                readonly property string option: "HEADING"
+                                                icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                                                onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
+                                            }
+
+                                            VclMenuItem {
+                                                text: "Scene Title"
+
+                                                readonly property string option: "TITLE"
+                                                icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                                                onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
+                                            }
+
+                                            MenuSeparator { }
+
+                                            VclMenuItem {
+                                                text: "Show Tooltip"
+
+                                                icon.source: Runtime.sceneListPanelSettings.showTooltip ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                                                onClicked: Runtime.sceneListPanelSettings.showTooltip = !Runtime.sceneListPanelSettings.showTooltip
+                                            }
                                         }
 
-                                        VclMenuItem {
-                                            text: "Page Length"
+                                        VclMenu {
+                                            title: "Length"
 
-                                            readonly property string option: "PAGE"
-                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-                                            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
-                                            enabled: !Runtime.screenplayTextDocument.paused
-                                        }
+                                            VclMenuItem {
+                                                text: "Scene Duration"
 
-                                        VclMenuItem {
-                                            text: "None"
+                                                readonly property string option: "TIME"
+                                                icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                                                onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+                                                enabled: !Runtime.screenplayTextDocument.paused
+                                            }
 
-                                            readonly property string option: "NO"
-                                            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-                                            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
-                                            enabled: !Runtime.screenplayTextDocument.paused
-                                        }
+                                            VclMenuItem {
+                                                text: "Page Length"
+
+                                                readonly property string option: "PAGE"
+                                                icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                                                onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+                                                enabled: !Runtime.screenplayTextDocument.paused
+                                            }
+
+                                            VclMenuItem {
+                                                text: "None"
+
+                                                readonly property string option: "NO"
+                                                icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+                                                onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+                                                enabled: !Runtime.screenplayTextDocument.paused
+                                            }
+                                        }                                        
                                     }
                                 }
                             }
@@ -3892,22 +3915,40 @@ Rectangle {
                                 font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                                 horizontalAlignment: Qt.AlignLeft
                                 color: Runtime.colors.primary.c10.text
-                                font.capitalization: delegateItem.elementIsBreak ? Font.MixedCase : Font.AllUppercase
+                                font.capitalization: delegateItem.elementIsBreak || Runtime.sceneListPanelSettings.sceneTextMode !== "HEADING" ? Font.MixedCase : Font.AllUppercase
                                 text: {
-                                    var ret = "UNKNOWN"
+                                    let ret = "UNKNOWN"
                                     if(scene) {
-                                        if(scene.heading.enabled) {
-                                            ret = screenplayElement.resolvedSceneNumber + ". "
-                                            if(screenplayElement.omitted)
-                                                ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                                        if(Runtime.sceneListPanelSettings.sceneTextMode === "HEADING") {
+                                            if(scene.heading.enabled) {
+                                                ret = screenplayElement.resolvedSceneNumber + ". "
+                                                if(screenplayElement.omitted)
+                                                    ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                                                else
+                                                    ret += scene.heading.text
+                                            } else if(screenplayElement.omitted)
+                                                ret = "[OMITTED]"
                                             else
-                                                ret += scene.heading.text
-                                        } else if(screenplayElement.omitted)
-                                            ret = "[OMITTED]"
-                                        else
-                                            ret = "NO SCENE HEADING"
+                                                ret = "NO SCENE HEADING"
+                                        } else {
+                                            let title = [scene.structureElement.nativeTitle, scene.synopsis.trim()].join("\n\n").trim()
+                                            if(title === "")
+                                                title = "No title."
+                                            if(scene.heading.enabled) {
+                                                ret = screenplayElement.resolvedSceneNumber + ". "
+                                                if(screenplayElement.omitted)
+                                                    ret += "[OMITTED] <font color=\"gray\">" + title + "</font>"
+                                                else
+                                                    ret += title
+                                            } else if(screenplayElement.omitted)
+                                                ret = "[OMITTED]" + title
+                                            else
+                                                ret = title
+                                        }
+
                                         return ret
                                     }
+
                                     if(delegateItem.elementIsBreak) {
                                         if(delegateItem.elementIsEpisodeBreak)
                                             ret = screenplayElement.breakTitle
@@ -3915,12 +3956,16 @@ Rectangle {
                                             ret = "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
                                         else
                                             ret = screenplayElement.breakTitle
-                                        ret +=  ": " + screenplayElement.breakSubtitle
+                                        if(screenplayElement.breakSubtitle !== "")
+                                            ret +=  ": " + screenplayElement.breakSubtitle
                                         return ret
                                     }
+
                                     return ret
                                 }
-                                elide: Text.ElideMiddle
+                                elide: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING" ? Text.ElideMiddle : Text.ElideRight
+                                wrapMode: Text.NoWrap
+                                maximumLineCount: 1
                             }
 
                             VclLabel {
@@ -3968,7 +4013,7 @@ Rectangle {
                             hoverEnabled: delegateText.truncated
                             ToolTip.text: delegateText.text
                             ToolTip.delay: 1000
-                            ToolTip.visible: delegateText.truncated && containsMouse
+                            ToolTip.visible: Runtime.sceneListPanelSettings.showTooltip && delegateText.truncated && containsMouse
                             anchors.fill: parent
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onDoubleClicked: (mouse) => {

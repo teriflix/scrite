@@ -155,6 +155,8 @@ Item {
         category: "Scene List Panel"
 
         property string displaySceneLength: "NO" // can be PAGE, TIME
+        property string sceneTextMode: "HEADING" // can be TITLE also
+        property bool showTooltip: false
     }
 
     readonly property Settings markupToolsSettings: Settings {

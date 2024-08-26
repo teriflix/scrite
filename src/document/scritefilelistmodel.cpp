@@ -44,7 +44,7 @@ void ScriteFileListModel::setSource(Source val)
     m_source = val;
     emit sourceChanged();
 
-    QTimer::singleShot(1000, this, &ScriteFileListModel::loadRecentFiles);
+    QTimer::singleShot(500, this, &ScriteFileListModel::loadRecentFiles);
 }
 
 QStringList ScriteFileListModel::filesInFolder(const QString &folder)
