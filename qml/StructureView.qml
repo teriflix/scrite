@@ -2747,7 +2747,7 @@ Item {
 
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        font.capitalization: element.hasNativeTitle ? Font.MixedCase : Font.AllUppercase
+                        // font.capitalization: element.hasNativeTitle ? Font.MixedCase : Font.AllUppercase
 
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                     }
@@ -2779,7 +2779,6 @@ Item {
 
                         font.bold: true
                         font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        font.capitalization: element.hasNativeTitle ? Font.MixedCase : Font.AllUppercase
 
                         onEditingComplete: { element.title = text; TabSequenceItem.focusNext() }
 
@@ -2787,13 +2786,6 @@ Item {
                             if(activeFocus)
                                 elementItem.select()
                             headingFieldLoader.hasFocus = activeFocus
-                        }
-
-                        onCurrentLanguageChanged: {
-                            if(currentLanguage !== TransliterationEngine.English)
-                                font.capitalization = Font.MixedCase
-                            else
-                                font.capitalization = Font.AllUppercase
                         }
                     }
 
