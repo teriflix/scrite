@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "application.h"
 #include "crashpadmodule.h"
 
 #include <QDir>
@@ -108,6 +109,9 @@ bool CrashpadModule::prepare()
     if (messageBox.exec() == QDialog::Accepted) {
         if (messageBoxUi.factoryResetOption->isChecked()) {
             QFile::remove(settingsFile);
+            QFile::remove(CrashpadModule::dataPath() + "/../objectconfig.json");
+            Application::removeWindowsEnvironmentVariable("SCRITE_DPI_MODE");
+            Application::removeWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR");
         } else if (messageBoxUi.resetLoginCredsOption->isChecked()) {
             QSettings settings(settingsFile, QSettings::IniFormat);
             settings.beginGroup("Registration");
