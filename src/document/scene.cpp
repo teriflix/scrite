@@ -1106,6 +1106,12 @@ Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 
     connect(m_attachments, &Attachments::attachmentsModified, this, &Scene::sceneChanged);
     this->evaluateWordCountLater();
+
+    QTimer *summaryChangeTimer = new QTimer(this);
+    summaryChangeTimer->setSingleShot(true);
+    summaryChangeTimer->setInterval(100);
+    connect(summaryChangeTimer, &QTimer::timeout, this, &Scene::evaluateSummary);
+    connect(this, &Scene::sceneChanged, summaryChangeTimer, qOverload<>(&QTimer::start));
 }
 
 Scene::~Scene()
@@ -1800,6 +1806,15 @@ bool Scene::capitalizeSentences()
         emit sceneRefreshed();
 
     return ret;
+}
+
+void Scene::setSummary(const QString &val)
+{
+    if (m_summary == val)
+        return;
+
+    m_summary = val;
+    emit summaryChanged();
 }
 
 QHash<QString, QList<SceneElement *>> Scene::dialogueElements() const
@@ -2598,6 +2613,45 @@ void Scene::trimIndexCardFieldValues()
 
         emit indexCardFieldValuesChanged();
     }
+}
+
+void Scene::evaluateSummary()
+{
+    QString summary;
+
+    if (m_structureElement != nullptr)
+        summary = m_structureElement->nativeTitle();
+
+    if (summary.isEmpty())
+        summary = m_synopsis;
+
+    if (summary.isEmpty()) {
+        if (!m_elements.isEmpty()) {
+            // Find the first element with some text in it.
+            SceneElement *element = nullptr;
+            int elementIndex = 0;
+            while (elementIndex < m_elements.size()) {
+                element = m_elements.at(elementIndex);
+                if (!element->text().isEmpty())
+                    break;
+                ++elementIndex;
+            }
+
+            if (element != nullptr) {
+                if (element->type() == SceneElement::Character) {
+                    summary = element->text();
+                    if (elementIndex + 1 < m_elements.size())
+                        summary += ": " + m_elements.at(elementIndex + 1)->text();
+                } else
+                    summary = element->text();
+            }
+        }
+    }
+
+    if (summary.isEmpty())
+        summary = QStringLiteral("Empty scene");
+
+    this->setSummary(summary);
 }
 
 void Scene::staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr)

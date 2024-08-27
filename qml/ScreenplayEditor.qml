@@ -3798,9 +3798,9 @@ Rectangle {
                                             }
 
                                             VclMenuItem {
-                                                text: "Scene Title"
+                                                text: "Scene Summary"
 
-                                                readonly property string option: "TITLE"
+                                                readonly property string option: "SUMMARY"
                                                 icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
                                                 onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
                                             }
@@ -3931,21 +3931,17 @@ Rectangle {
                                             else
                                                 ret = "NO SCENE HEADING"
                                         } else {
-                                            let title = Runtime.sceneListPanelSettings.showTooltip ?
-                                                    [scene.structureElement.nativeTitle, scene.synopsis.trim()].join("\n\n").trim() :
-                                                    scene.structureElement.nativeTitle
-                                            if(title === "")
-                                                title = "No title."
+                                            let summary = scene.summary
                                             if(scene.heading.enabled) {
                                                 ret = screenplayElement.resolvedSceneNumber + ". "
                                                 if(screenplayElement.omitted)
-                                                    ret += "[OMITTED] <font color=\"gray\">" + title + "</font>"
+                                                    ret += "[OMITTED] <font color=\"gray\">" + summary + "</font>"
                                                 else
-                                                    ret += title
+                                                    ret += summary
                                             } else if(screenplayElement.omitted)
-                                                ret = "[OMITTED]" + title
+                                                ret = "[OMITTED]" + summary
                                             else
-                                                ret = title
+                                                ret = summary
                                         }
 
                                         return ret

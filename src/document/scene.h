@@ -497,6 +497,10 @@ public:
     Q_INVOKABLE bool polishText(Scene *previousScene = nullptr);
     Q_INVOKABLE bool capitalizeSentences();
 
+    Q_PROPERTY(QString summary READ summary NOTIFY summaryChanged)
+    QString summary() const { return m_summary; }
+    Q_SIGNAL void summaryChanged();
+
     // Used by stats report generator code.
     QHash<QString, QList<SceneElement *>> dialogueElements() const;
 
@@ -563,6 +567,9 @@ private:
     void evaluateWordCountLater();
     void trimIndexCardFieldValues();
 
+    void evaluateSummary();
+    void setSummary(const QString &val);
+
 private:
     friend class Structure;
     friend class StructureElement;
@@ -583,6 +590,7 @@ private:
     QBasicTimer m_wordCountTimer;
     QString m_episode;
     StructureElement *m_structureElement = nullptr;
+    QString m_summary;
 
     bool m_enabled = true;
     char m_padding[7];
