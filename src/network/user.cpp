@@ -22,6 +22,7 @@
 
 #include <QtDebug>
 #include <QPainter>
+#include <QLocale>
 #include <QDateTime>
 #include <QJsonDocument>
 #include <QCoreApplication>
@@ -124,6 +125,16 @@ QString User::experience() const
 QString User::wdyhas() const
 {
     return m_info.value(QStringLiteral("wdyhas")).toString();
+}
+
+QString User::country() const
+{
+    return m_info.value(QStringLiteral("country")).toString();
+}
+
+QString User::currency() const
+{
+    return m_info.value(QStringLiteral("currency")).toString();
 }
 
 QStringList User::locations()
@@ -235,6 +246,8 @@ void User::setInfo(const QJsonObject &val)
 #ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
         qDebug() << "PA: " << m_enabledFeatures << m_info;
 #endif
+
+        QTimer::singleShot(2000, this, &User::updateUserCountryAndCurrency);
     }
 
     emit infoChanged();
@@ -581,6 +594,25 @@ void User::storeInstallations()
     const QString text = QJsonDocument(m_installations).toJson();
     const QString cryptText = JsonHttpRequest::encrypt(text);
     JsonHttpRequest::store(QStringLiteral("devices"), cryptText);
+}
+
+void User::updateUserCountryAndCurrency()
+{
+    const QString countryAttrib = QStringLiteral("country");
+    const QString currencyAttrib = QStringLiteral("currency");
+    if (!m_info.contains(countryAttrib) || m_info.value(countryAttrib).toString().isEmpty()) {
+        const QString country = QLocale::countryToString(QLocale::system().country());
+        m_info.insert(countryAttrib, country);
+
+        const QString currency = QLocale::system().currencySymbol(QLocale::CurrencyIsoCode);
+        m_info.insert(currencyAttrib, currency);
+
+        QJsonObject updatedInfo;
+        updatedInfo.insert(countryAttrib, country);
+        updatedInfo.insert(currencyAttrib, currency);
+
+        this->update(updatedInfo);
+    }
 }
 
 void User::reload()

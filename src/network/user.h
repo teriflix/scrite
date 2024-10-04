@@ -60,6 +60,12 @@ public:
     Q_PROPERTY(QString wdyhas READ wdyhas NOTIFY infoChanged)
     QString wdyhas() const;
 
+    Q_PROPERTY(QString country READ country NOTIFY infoChanged)
+    QString country() const;
+
+    Q_PROPERTY(QString currency READ currency NOTIFY infoChanged)
+    QString currency() const;
+
     Q_PROPERTY(QJsonObject info READ info NOTIFY infoChanged)
     QJsonObject info() const { return m_info; }
     Q_SIGNAL void infoChanged();
@@ -130,6 +136,8 @@ private:
 
     void storeUserInfo();
     void storeInstallations();
+
+    void updateUserCountryAndCurrency();
 
 private:
     bool m_busy = false;

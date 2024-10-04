@@ -775,6 +775,7 @@ Item {
                             if(names.length > 1)
                                 names.pop()
                             const _firstName = names.join(" ")
+                            const locale = Qt.locale()
 
                             const newInfo = {
                                 firstName: _firstName,
@@ -785,7 +786,9 @@ Item {
                                 consent: {
                                     activity: chkAnalyticsConsent.checked,
                                     email: chkEmailConsent.checked
-                                }
+                                },
+                                country: locale.nativeCountryName,
+                                currency: locale.currencySymbol(Locale.CurrencyIsoCode)
                             }
                             allowHighlightSaveAnimation = false
                             Scrite.user.update(newInfo)

@@ -161,13 +161,8 @@ private:
     void onNetworkReplyFinished();
 
 private:
-#ifdef REST_API_LOCALHOST
-    QUrl m_host = QUrl(QStringLiteral("http://localhost:8934"));
-    QString m_root;
-#else
-    QUrl m_host = QUrl(QStringLiteral("https://www.scrite.io"));
-    QString m_root = QStringLiteral("api");
-#endif // REST_API_LOCALHOST
+    QUrl m_host = QUrl(QLatin1String(REST_API_URL));
+    QString m_root = QLatin1String(REST_API_ROOT);
     Type m_type = POST;
     QString m_api;
     QString m_key;
