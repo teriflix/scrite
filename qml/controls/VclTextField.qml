@@ -78,8 +78,10 @@ TextField {
     }
 
     Component.onDestruction: {
-        transliterate(true)
-        editingComplete()
+        if(activeFocus) {
+            transliterate(true)
+            editingComplete()
+        }
     }
 
     onActiveFocusChanged: {
