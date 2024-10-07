@@ -52,8 +52,8 @@ DialogLauncher {
         onClosed: _private.promptToJoinDiscordCommunity()
 
         Announcement.onIncoming: (type, data) => {
-            if(type === Runtime.announcementIds.closeHomeScreenRequest)
-            Qt.callLater(dialog.close)
+            if(type === Runtime.announcementIds.closeHomeScreenRequest || type === Runtime.announcementIds.loginRequest)
+                Qt.callLater(dialog.close)
         }
     }
 

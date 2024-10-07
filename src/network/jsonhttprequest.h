@@ -159,6 +159,7 @@ private:
     void setResponse(const QJsonObject &val);
     void onNetworkReplyError();
     void onNetworkReplyFinished();
+    void maybeAutoDelete();
 
 private:
     QUrl m_host = QUrl(QLatin1String(REST_API_URL));

@@ -74,6 +74,19 @@ public:
     QJsonArray installations() const { return m_installations; }
     Q_SIGNAL void installationsChanged();
 
+    Q_PROPERTY(QJsonArray subscriptions READ subscriptions WRITE setSubscriptions NOTIFY subscriptionsChanged)
+    QJsonArray subscriptions() const { return m_subscriptions; }
+    Q_SIGNAL void subscriptionsChanged();
+
+    Q_PROPERTY(QJsonObject activeSubscription READ activeSubscription NOTIFY subscriptionsChanged)
+    QJsonObject activeSubscription() const;
+
+    Q_PROPERTY(bool hasActiveSubscription READ hasActiveSubscription NOTIFY subscriptionsChanged)
+    bool hasActiveSubscription() const;
+
+    Q_PROPERTY(QString activeSubscriptionDescription READ activeSubscriptionDescription NOTIFY subscriptionsChanged)
+    QString activeSubscriptionDescription() const;
+
     Q_PROPERTY(QJsonObject helpTips READ helpTips NOTIFY helpTipsChanged)
     QJsonObject helpTips() const { return m_helpTips; }
     Q_SIGNAL void helpTipsChanged();
@@ -102,6 +115,7 @@ public:
     Q_SLOT void update(const QJsonObject &newInfo);
     Q_SLOT void deactivateInstallation(const QString &id);
     Q_SLOT void refreshInstallations();
+    Q_SLOT void refreshSubscriptions();
 
     Q_SLOT void logActivity1(const QString &activity)
     {
@@ -116,6 +130,7 @@ private:
     User(QObject *parent = nullptr);
     void setInfo(const QJsonObject &val);
     void setInstallations(const QJsonArray &val);
+    void setSubscriptions(const QJsonArray &val);
     void setHelpTips(const QJsonObject &val);
     void loadStoredHelpTips();
 
@@ -126,8 +141,9 @@ private:
     void activateCallDone();
     void userInfoCallDone();
     void installationsCallDone();
+    void subscriptionsCallDone();
 
-    void loadStoredUserInformation();
+    void loadStoredInformation();
 
     JsonHttpRequest *newCall();
     void onCallDestroyed();
@@ -136,6 +152,7 @@ private:
 
     void storeUserInfo();
     void storeInstallations();
+    void storeSubscriptions();
 
     void updateUserCountryAndCurrency();
 
@@ -146,6 +163,7 @@ private:
     QTimer m_touchLogTimer;
     QList<int> m_enabledFeatures;
     QJsonArray m_installations;
+    QJsonArray m_subscriptions;
     bool m_analyticsConsent = false;
     int m_currentInstallationIndex = -1;
     JsonHttpRequest *m_call = nullptr;

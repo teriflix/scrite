@@ -51,7 +51,6 @@ ScriteDocument *Scrite::document()
     return ScriteDocument::instance();
 }
 
-
 ScriteDocumentVault *Scrite::vault()
 {
     return ScriteDocumentVault::instance();
@@ -95,4 +94,34 @@ QStringList Scrite::defaultShots()
                          QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"),
                          QStringLiteral("UNDERWATER"), QStringLiteral("WIDE"),
                          QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
+}
+
+Locale Scrite::locale()
+{
+    Locale ret;
+
+    const QLocale locale = QLocale::system();
+
+    ret.currency.code = locale.currencySymbol(QLocale::CurrencyIsoCode).toLower();
+    ret.currency.symbol = locale.currencySymbol(QLocale::CurrencySymbol);
+    ret.country.code = locale.countryToString(locale.country());
+    ret.country.name = locale.nativeCountryName();
+
+    return ret;
+}
+
+QString Scrite::currencySymbol(const QString &code)
+{
+    const QString code2 = code.toLower();
+    static const QMap<QString, QString> knownValues = { { "inr", "₹" }, { "usd", "$" } };
+    if (knownValues.contains(code2))
+        return knownValues.value(code2);
+
+    for (int i = 1; i <= QLocale::LastCountry; i++) {
+        const QLocale locale(QLocale::AnyLanguage, QLocale::Country(i));
+        if (locale.currencySymbol(QLocale::CurrencyIsoCode).toLower() == code2)
+            return locale.currencySymbol(QLocale::CurrencySymbol);
+    }
+
+    return code.toUpper() + " ";
 }

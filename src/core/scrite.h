@@ -24,6 +24,102 @@
 
 #include <QQmlEngine>
 
+struct Country
+{
+    Q_GADGET
+
+public:
+    Q_PROPERTY(QString code MEMBER code)
+    QString code;
+
+    Q_PROPERTY(QString name MEMBER name)
+    QString name;
+
+    Country() { }
+    Country(const Country &other)
+    {
+        code = other.code;
+        name = other.name;
+    }
+    bool operator==(const Country &other) const { return name == other.name && code == other.code; }
+    bool operator!=(const Country &other) const { return name != other.name && code != other.code; }
+    Country &operator=(const Country &other)
+    {
+        name = other.name;
+        code = other.code;
+        return *this;
+    }
+};
+Q_DECLARE_METATYPE(Country)
+
+struct Currency
+{
+    Q_GADGET
+
+public:
+    Q_PROPERTY(QString code MEMBER code)
+    QString code;
+
+    Q_PROPERTY(QString symbol MEMBER symbol)
+    QString symbol;
+
+    Currency() { }
+    Currency(const Currency &other)
+    {
+        code = other.code;
+        symbol = other.symbol;
+    }
+    bool operator==(const Currency &other) const
+    {
+        return code == other.code && symbol == other.symbol;
+    }
+    bool operator!=(const Currency &other) const
+    {
+        return code != other.code || symbol != other.symbol;
+    }
+    Currency &operator=(const Currency &other)
+    {
+        code = other.code;
+        symbol = other.symbol;
+        return *this;
+    }
+};
+Q_DECLARE_METATYPE(Currency)
+
+struct Locale
+{
+    Q_GADGET
+
+public:
+    Q_PROPERTY(Country country MEMBER country)
+    Country country;
+
+    Q_PROPERTY(Currency currency MEMBER currency)
+    Currency currency;
+
+    Locale() { }
+    Locale(const Locale &other)
+    {
+        country = other.country;
+        currency = other.currency;
+    }
+    bool operator==(const Locale &other) const
+    {
+        return country == other.country && currency == other.currency;
+    }
+    bool operator!=(const Locale &other) const
+    {
+        return country != other.country || currency != other.currency;
+    }
+    Locale &operator=(const Locale &other)
+    {
+        country = other.country;
+        currency = other.currency;
+        return *this;
+    }
+};
+Q_DECLARE_METATYPE(Locale)
+
 class Scrite : public QObject
 {
     Q_OBJECT
@@ -83,6 +179,11 @@ public:
 
     Q_PROPERTY(QStringList defaultShots READ defaultShots CONSTANT)
     static QStringList defaultShots();
+
+    Q_PROPERTY(Locale locale READ locale CONSTANT)
+    static Locale locale();
+
+    Q_INVOKABLE static QString currencySymbol(const QString &code);
 
 private:
     static QString m_fileNameToOpen;

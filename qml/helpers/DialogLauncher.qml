@@ -69,6 +69,11 @@ Item {
         return null
     }
 
+    function closeSingleInstance() {
+        if(singleInstanceOnly && _private.dialog)
+            _private.dialog.close()
+    }
+
     onSingleInstanceOnlyChanged: {
         if(!singleInstanceOnly) {
             if(_private.dialog)

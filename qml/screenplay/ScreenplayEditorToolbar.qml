@@ -68,7 +68,7 @@ Row {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+F"
         onActivated: Runtime.screenplayEditor.toggleSearchBar(false)
-        enabled: Runtime.screenplayEditor
+        enabled: Runtime.screenplayEditor && Runtime.allowAppUsage
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find"
@@ -79,7 +79,7 @@ Row {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+F"
         onActivated: Runtime.screenplayEditor.toggleSearchBar(true)
-        enabled: Runtime.screenplayEditor
+        enabled: Runtime.screenplayEditor && Runtime.allowAppUsage
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find & Replace"
@@ -213,7 +213,7 @@ Row {
         context: Qt.ApplicationShortcut
         sequence: "Shift+F5"
         onActivated: Runtime.screenplayTextDocument.reload()
-        enabled: Runtime.screenplayEditor
+        enabled: Runtime.screenplayEditor && Runtime.allowAppUsage
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Redo Page Layout"
@@ -310,7 +310,7 @@ Row {
     Shortcut {
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+L"
-        enabled: !Scrite.document.readOnly
+        enabled: !Scrite.document.readOnly && Runtime.allowAppUsage
 
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: breakInsertIndex < 0 ? "Add Interval Break" : "Insert Interval Break"
@@ -362,6 +362,7 @@ Row {
 
     Shortcut {
         sequence: "Ctrl+7"
+        enabled: Runtime.allowAppUsage
 
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: Runtime.announcementData.focusOptions.addMuteCharacter
@@ -374,6 +375,7 @@ Row {
 
     Shortcut {
         sequence: "Ctrl+8"
+        enabled: Runtime.allowAppUsage
 
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: Runtime.announcementData.focusOptions.sceneSynopsis
@@ -386,6 +388,7 @@ Row {
 
     Shortcut {
         sequence: "Ctrl+9"
+        enabled: Runtime.allowAppUsage
 
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: Runtime.announcementData.focusOptions.sceneNumber

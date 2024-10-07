@@ -5,7 +5,7 @@ TARGET = Scrite
 CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
 
-VERSION = 0.9.6.2
+VERSION = 0.9.9.1
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
 
 #DEFINES += SCRITE_ENABLE_AUTOMATION
@@ -100,6 +100,7 @@ HEADERS += \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/propertyalias.h \
     src/quick/objects/refcounter.h \
+    src/quick/objects/session.h \
     src/quick/objects/syntaxhighlighter.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
@@ -232,6 +233,7 @@ SOURCES += \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/propertyalias.cpp \
     src/quick/objects/refcounter.cpp \
+    src/quick/objects/session.cpp \
     src/quick/objects/syntaxhighlighter.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/focustracker.cpp \
@@ -335,7 +337,7 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
-    VERSION_INFO = "0.9.6b-beta-macos"
+    VERSION_INFO = "0.9.9a-beta-macos"
 
     HEADERS += src/core/systemtextinputmanager_macos.h
     OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
@@ -345,9 +347,9 @@ macx {
 
 win32 {
     contains(QT_ARCH, i386) {
-        VERSION_INFO = "0.9.6b-beta-windows-x86"
+        VERSION_INFO = "0.9.9a-beta-windows-x86"
     } else {
-        VERSION_INFO = "0.9.6b-beta-windows-x64"
+        VERSION_INFO = "0.9.9a-beta-windows-x64"
     }
 
     RC_ICONS = appicon.ico
@@ -358,7 +360,7 @@ win32 {
 
 linux {
     CONFIG+=use_gold_linker
-    VERSION_INFO = "0.9.6b-beta-linux"
+    VERSION_INFO = "0.9.9a-beta-linux"
 }
 
 include($$PWD/3rdparty/sonnet/sonnet.pri)

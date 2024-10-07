@@ -49,7 +49,7 @@ FloatingDock {
     Shortcut {
         sequence: "Ctrl+B"
         context: Qt.ApplicationShortcut
-        enabled: _private.textFormat
+        enabled: _private.textFormat && Runtime.allowAppUsage
         ShortcutsModelItem.title: "Bold"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
@@ -60,7 +60,7 @@ FloatingDock {
     Shortcut {
         sequence: "Ctrl+I"
         context: Qt.ApplicationShortcut
-        enabled: _private.textFormat
+        enabled: _private.textFormat && Runtime.allowAppUsage
         ShortcutsModelItem.title: "Italics"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
@@ -71,7 +71,7 @@ FloatingDock {
     Shortcut {
         sequence: "Ctrl+U"
         context: Qt.ApplicationShortcut
-        enabled: _private.textFormat
+        enabled: _private.textFormat && Runtime.allowAppUsage
         ShortcutsModelItem.title: "Underline"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
@@ -82,7 +82,7 @@ FloatingDock {
     Shortcut {
         sequence: "Shift+F3"
         context: Qt.ApplicationShortcut
-        enabled: sceneDocumentBinder
+        enabled: sceneDocumentBinder && Runtime.allowAppUsage
         ShortcutsModelItem.title: "All CAPS"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
@@ -93,7 +93,7 @@ FloatingDock {
     Shortcut {
         sequence: "Ctrl+Shift+F3"
         context: Qt.ApplicationShortcut
-        enabled: sceneDocumentBinder
+        enabled: sceneDocumentBinder && Runtime.allowAppUsage
         ShortcutsModelItem.title: "All small"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"

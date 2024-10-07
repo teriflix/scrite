@@ -29,6 +29,8 @@ Item {
 
     parent: Scrite.window.contentItem
 
+    signal discardMessageBoxes()
+
     /**
       Usage:
 
@@ -94,6 +96,14 @@ Item {
             height: layout.implicitHeight + 40 + header.height
 
             titleBarButtons: null
+
+            Connections {
+                target: root
+
+                function onDiscardMessageBoxes() {
+                    Qt.callLater(dialog.close)
+                }
+            }
 
             contentItem: Item {
                 ColumnLayout {

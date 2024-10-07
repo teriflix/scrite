@@ -756,9 +756,13 @@ ScriteDocument::ScriteDocument(QObject *parent)
     // We cannot use User::instance() right now, because it will
     // refer back to ScriteDocument::instance() and cause a recusrion,
     // leading to crash.
-    QTimer::singleShot(10, this, [=]() {
+    QTimer::singleShot(0, this, [=]() {
         connect(User::instance(), &User::loggedInChanged, this,
                 &ScriteDocument::canModifyCollaboratorsChanged);
+        connect(User::instance(), &User::subscriptionsChanged, this,
+                &ScriteDocument::updateDocumentWindowTitle);
+
+        this->updateDocumentWindowTitle();
     });
 
     connect(qApp, &QApplication::aboutToQuit, this, [=]() {
@@ -2037,7 +2041,13 @@ void ScriteDocument::updateDocumentWindowTitle()
         title += QStringLiteral("[noname]");
     else
         title += QFileInfo(m_fileName).completeBaseName();
+
     title += QStringLiteral(" - ") + qApp->property("baseWindowTitle").toString();
+
+    const QString activeSubDesc = User::instance()->activeSubscriptionDescription();
+    if (!activeSubDesc.isEmpty())
+        title += " (" + activeSubDesc + ")";
+
     this->setDocumentWindowTitle(title);
 }
 

@@ -136,6 +136,10 @@ Rectangle {
         Loader {
             id: pageContentLoader
             width: pageContentArea.showScrollBars ? pageContentArea.width-17 : pageContentArea.width
+            onStatusChanged: {
+                if(status === Loader.Loading)
+                    resetObjectProperty(pageContentLoader, "height")
+            }
         }
     }
 }

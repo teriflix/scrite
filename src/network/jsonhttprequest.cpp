@@ -41,10 +41,7 @@ JsonHttpRequest::JsonHttpRequest(QObject *parent) : QObject(parent)
     this->setKey(this->defaultKey());
     this->setToken(this->sessionToken());
 
-    connect(this, &JsonHttpRequest::finished, [=]() {
-        if (!m_isQmlInstance && m_autoDelete)
-            this->deleteLater();
-    });
+    connect(this, &JsonHttpRequest::finished, this, &JsonHttpRequest::maybeAutoDelete);
 
 #ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
     qDebug() << "PA: ";
@@ -381,7 +378,7 @@ bool JsonHttpRequest::call()
 
     if (m_reply) {
 #ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
-        qDebug() << "PA: Call Issued - " << m_type << m_api;
+        qDebug() << "PA: Call Issued - " << m_type << m_api << " to " << m_host;
 #endif
 
         emit justIssuedCall();
@@ -420,8 +417,10 @@ void JsonHttpRequest::onNetworkReplyError()
 
     disconnect(m_reply, &QNetworkReply::finished, this, &JsonHttpRequest::onNetworkReplyFinished);
 
-    const QString code =
-            Application::instance()->enumerationKey(m_reply, "NetworkError", m_reply->error());
+    const QString code = "E_NETWORK_"
+            + Application::instance()
+                      ->enumerationKey(m_reply, "NetworkError", m_reply->error())
+                      .toUpper();
     const QString msg = m_reply->errorString();
 
 #ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
@@ -467,4 +466,10 @@ void JsonHttpRequest::onNetworkReplyFinished()
 
         emit finished();
     }
+}
+
+void JsonHttpRequest::maybeAutoDelete()
+{
+    if (!m_isQmlInstance && m_autoDelete)
+        this->deleteLater();
 }

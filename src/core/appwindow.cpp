@@ -67,6 +67,7 @@ AppWindow::AppWindow()
     Application &scriteApp = *Application::instance();
     QObject::connect(&scriteApp, &Application::minimizeWindowRequest, this,
                      &QQuickView::showMinimized);
+    QObject::connect(this->engine(), &QQmlEngine::quit, &scriteApp, &Application::quit);
 
     // Hook up to Scrite Document
     ScriteDocument *scriteDocument = ScriteDocument::instance();

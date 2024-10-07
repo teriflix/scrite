@@ -41,6 +41,7 @@ Item {
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
     property ObjectListModel dialogs: ObjectListModel { }
+    property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.hasActiveSubscription
 
     // Persistent Settings
     readonly property Settings scrollAreaSettings: Settings {
@@ -428,6 +429,10 @@ Item {
 
     // All the app-features
     readonly property QtObject appFeatures: QtObject {
+        readonly property AppFeature screenplay: AppFeature {
+            feature: Scrite.ScreenplayFeature
+        }
+
         readonly property AppFeature structure: AppFeature {
             feature: Scrite.StructureFeature
         }
@@ -583,15 +588,16 @@ Item {
     // Announcement IDs
     readonly property QtObject announcementIds: QtObject {
         readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
-        readonly property string reloadMainUiRequest: "9a7f0f35-346f-461d-bb85-f5c6dc08a01d"
+        readonly property string reloadMainUiRequest: "9A7F0F35-346F-461D-BB85-F5C6DC08A01D"
         readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
         readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
         readonly property string closeHomeScreenRequest: "4F8F6B5B-5BEB-4D01-97BA-B0018241BD38"
         readonly property string characterNotesRequest: "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8"
         readonly property string sceneNotesRequest: "41EE5E06-FF97-4DB6-B32D-F938418C9529"
-        readonly property string notebookNodeRequest: "1dc67418-2584-4598-a68a-de5205bbc028"
-        readonly property string sceneTextEditorReceivedFocus: "598e1699-465b-40d5-8cf4-e9753e2c16e7"
-        readonly property string closeDialogBoxRequest: "a6456a87-fc8c-405b-bdd7-7625f86272ba"
+        readonly property string notebookNodeRequest: "1DC67418-2584-4598-A68A-DE5205BBC028"
+        readonly property string sceneTextEditorReceivedFocus: "598E1699-465B-40D5-8CF4-E9753E2C16E7"
+        readonly property string closeDialogBoxRequest: "A6456A87-FC8C-405B-BDD7-7625F86272BA"
+        readonly property string loginWorkflowScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
     }
 
     readonly property QtObject announcementData: QtObject {

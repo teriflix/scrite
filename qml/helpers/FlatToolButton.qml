@@ -107,7 +107,7 @@ Item {
     Shortcut {
         id: toolButtonShortcut
         context: Qt.ApplicationShortcut
-        enabled: true
+        enabled: Runtime.allowAppUsage
         onActivated: toolButton.click()
     }
 

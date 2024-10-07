@@ -1,2 +1,4 @@
 PdfView 1.0 PdfView.qml
 UserAccountToolButton 1.0 UserAccountToolButton.qml
+
+singleton LoginWorkflow 1.0 LoginWorkflow.qml

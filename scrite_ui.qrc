@@ -11,6 +11,7 @@
         <file>qml/controls/VclCheckBox.qml</file>
         <file>qml/controls/VclComboBox.qml</file>
         <file>qml/controls/VclDialog.qml</file>
+        <file>qml/controls/VclFileDialog.qml</file>
         <file>qml/controls/VclLabel.qml</file>
         <file>qml/controls/VclMenu.qml</file>
         <file>qml/controls/VclMenuItem.qml</file>
@@ -28,10 +29,12 @@
         <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_Unknown.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/impl_ExportConfigurationDialog.qml</file>
+        <file>qml/dialogs/FontSelectionDialog.qml</file>
         <file>qml/dialogs/HomeScreen.qml</file>
         <file>qml/dialogs/homescreen/HomeScreenImpl.qml</file>
         <file>qml/dialogs/homescreen/Poster.qml</file>
         <file>qml/dialogs/homescreen/qmldir</file>
+        <file>qml/dialogs/JoinDiscordCommunity.qml</file>
         <file>qml/dialogs/MessageBox.qml</file>
         <file>qml/dialogs/PdfDialog.qml</file>
         <file>qml/dialogs/pdfdialog/PdfDialogImpl.qml</file>
@@ -166,8 +169,15 @@
         <file>qml/tasks/qmldir</file>
         <file>qml/tasks/SaveFileTask.qml</file>
         <file>qml/TimelineView.qml</file>
-        <file>qml/controls/VclFileDialog.qml</file>
-        <file>qml/dialogs/FontSelectionDialog.qml</file>
-        <file>qml/dialogs/JoinDiscordCommunity.qml</file>
+        <file>qml/modules/LoginWorkflow.qml</file>
+        <file>qml/controls/VclGroupBox.qml</file>
+        <file>qml/modules/loginworkflow/AccountEmailScreen.qml</file>
+        <file>qml/modules/loginworkflow/WelcomeScreen.qml</file>
+        <file>qml/modules/loginworkflow/JunctionScreen.qml</file>
+        <file>qml/modules/loginworkflow/ActivationCodeScreen.qml</file>
+        <file>qml/modules/loginworkflow/UserProfileScreen.qml</file>
+        <file>qml/modules/loginworkflow/ReloadUserScreen.qml</file>
+        <file>qml/modules/loginworkflow/PlanCard.qml</file>
+        <file>qml/modules/loginworkflow/SubscriptionPlansScreen.qml</file>
     </qresource>
 </RCC>

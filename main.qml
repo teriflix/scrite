@@ -13,13 +13,14 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
-// import QtGraphicalEffects 1.0
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/qml" as UI
+import "qrc:/qml"
+import "qrc:/qml/modules"
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -39,10 +40,9 @@ Rectangle {
     Material.theme: Material.Light
     Material.background: Runtime.colors.accent.c700.background
 
-    UI.ScriteMainWindow {
-        id: scriteMainWindow
+    ScriteMainWindow {
         anchors.fill: parent
-        enabled: !NotificationsView.visible
+        enabled: !NotificationsView.visible && Runtime.allowAppUsage
     }
 
     // Private Section
@@ -59,6 +59,7 @@ Rectangle {
             determineDefaultFontSize()
 
             // Initialize layers
+            LoginWorkflow.init(scriteRoot)
             FloatingDockLayer.init(scriteRoot)
             OverlaysLayer.init(scriteRoot)
             NotificationsLayer.init(scriteRoot)
