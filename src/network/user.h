@@ -87,6 +87,15 @@ public:
     Q_PROPERTY(QString activeSubscriptionDescription READ activeSubscriptionDescription NOTIFY subscriptionsChanged)
     QString activeSubscriptionDescription() const;
 
+    Q_PROPERTY(QJsonObject upcomingSubscription READ upcomingSubscription NOTIFY subscriptionsChanged)
+    QJsonObject upcomingSubscription() const;
+
+    Q_PROPERTY(bool hasUpcomingSubscription READ hasUpcomingSubscription NOTIFY subscriptionsChanged)
+    bool hasUpcomingSubscription() const;
+
+    Q_PROPERTY(QString upcomingSubscriptionDescription READ upcomingSubscriptionDescription NOTIFY subscriptionsChanged)
+    QString upcomingSubscriptionDescription() const;
+
     Q_PROPERTY(QJsonObject helpTips READ helpTips NOTIFY helpTipsChanged)
     QJsonObject helpTips() const { return m_helpTips; }
     Q_SIGNAL void helpTipsChanged();

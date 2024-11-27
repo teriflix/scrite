@@ -26,6 +26,8 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 
 Item {
+    id: root
+
     readonly property bool modal: false
     property string title: {
         if(Scrite.user.loggedIn) {
@@ -36,12 +38,18 @@ Item {
         }
         return "Hi, there."
     }
-    readonly property bool checkForRestartRequest: true
+    property bool checkForRestartRequest: true
     readonly property bool checkForUserProfileErrors: true
 
     PageView {
         id: userProfilePageView
         anchors.fill: parent
+
+        Announcement.onIncoming: (type, data) => {
+                                     if(type === Runtime.announcementIds.userProfileScreenPage) {
+                                         currentIndex = Math.max(0, pagesArray.indexOf(data))
+                                     }
+                                 }
 
         pagesArray: ["Profile", "Subscriptions", "Installations"]
         currentIndex: 0
@@ -107,10 +115,39 @@ Item {
         }
     }
 
+    SequentialAnimation {
+        id: initialAnimation
+
+        running: true
+        loops: 1
+
+        ScriptAction {
+            script: userProfilePageView.currentIndex = 0
+        }
+
+        PauseAnimation {
+            duration: 10
+        }
+
+        ScriptAction {
+            script: userProfilePageView.currentIndex = 2
+        }
+
+        PauseAnimation {
+            duration: 10
+        }
+
+        ScriptAction {
+            script: userProfilePageView.currentIndex = 0
+        }
+    }
+
     Component {
         id: userProfilePage
 
         Item {
+            visible: !initialAnimation.running
+
             TabSequenceManager {
                 id: userInfoFields
 
@@ -124,6 +161,8 @@ Item {
             }
 
             ColumnLayout {
+                id: layout
+
                 anchors.fill: parent
                 anchors.margins: 20
                 anchors.leftMargin: 0
@@ -296,9 +335,14 @@ Item {
                             text: "Logout"
 
                             onClicked: {
-                                Scrite.user.logout()
-                                if(!Scrite.user.loggedIn)
-                                    Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "AccountEmailScreen")
+                                root.checkForRestartRequest = false
+                                Utils.execLater(root, 100, () => {
+                                                    Scrite.user.logout()
+                                                    if(Scrite.user.loggedIn)
+                                                        root.checkForRestartRequest = true
+                                                    else
+                                                        Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "AccountEmailScreen")
+                                                })
                             }
                         }
                     }
@@ -359,6 +403,8 @@ Item {
 
         Item {
             height: Math.max(userSubsView.height, 100)
+
+            visible: !initialAnimation.running
 
             Item {
                 id: userSubsView
@@ -449,6 +495,7 @@ Item {
                                         Layout.fillWidth: true
 
                                         name: modelData.name
+                                        opacity: modelData.enabled ? 1 : 0.75
                                         duration: modelData.duration
                                         durationNote: {
                                             if(modelData.enabled)
@@ -464,7 +511,7 @@ Item {
                                         }
                                         priceNote: modelData.note
                                         actionLink: "Buy »"
-                                        enabled: modelData.enabled
+                                        actionLinkEnabled: modelData.enabled
                                         onActionLinkClicked: Qt.openUrlExternally(modelData.shop)
                                     }
                                 }
@@ -503,7 +550,8 @@ Item {
                                         Layout.fillWidth: true
 
                                         name: modelData.plan_name
-                                        duration: Utils.formatDateRangeAsString(new Date(modelData.start_date), new Date(modelData.end_date))
+                                        duration: Utils.dateSpanAsString(new Date(modelData.start_date), new Date(modelData.end_date))
+                                        durationNote: Utils.formatDateRangeAsString(new Date(modelData.start_date), new Date(modelData.end_date))
                                         price: Utils.toTitleCase(modelData.plan_kind)
                                         actionLink: "Details »"
                                         onActionLinkClicked: Qt.openUrlExternally(modelData.details)
@@ -588,6 +636,8 @@ Item {
         id: userInstallationsPage
 
         Item {
+            visible: !initialAnimation.running
+
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 20
@@ -685,10 +735,7 @@ Item {
                                     iconSource: "qrc:/icons/action/logout.png"
                                     enabled: index !== Scrite.user.currentInstallationIndex
                                     opacity: enabled ? 1 : 0.2
-                                    onClicked: {
-                                        busyOverlay.busyMessage = "Logging out of selected installation ..."
-                                        Scrite.user.deactivateInstallation(modelData._id)
-                                    }
+                                    onClicked: Scrite.user.deactivateInstallation(modelData._id)
                                 }
                             }
 

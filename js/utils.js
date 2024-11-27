@@ -24,7 +24,7 @@ function todayWithZeroTime()
     return today;
 }
 
-function formatDateWithOrdinal(date)
+function formatDate(date)
 {
     const months =
             [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
@@ -32,18 +32,12 @@ function formatDateWithOrdinal(date)
     const day = date.getDate();
     const month = months[date.getMonth()];
 
-    // Determine the ordinal suffix (st, nd, rd, th)
-    const ordinal = day % 10 === 1 && day !== 11 ? "st"
-            : day % 10 === 2 && day !== 12       ? "nd"
-            : day % 10 === 3 && day !== 13       ? "rd"
-                                                 : "th";
-
-    return day + ordinal + " " + month;
+    return day + " " + month;
 }
 
-function formatDateWithOrdinalIncludingYear(date)
+function formatDateIncludingYear(date)
 {
-    return formatDateWithOrdinal(date) + ", " + date.getFullYear();
+    return formatDate(date) + ", " + date.getFullYear();
 }
 
 function formatDateRangeAsString(start_date, end_date)
@@ -56,12 +50,10 @@ function formatDateRangeAsString(start_date, end_date)
     }
 
     if (start_date.getFullYear() === end_date.getFullYear()) {
-        return formatDateWithOrdinal(start_date) + " - "
-                + formatDateWithOrdinalIncludingYear(end_date)
+        return formatDate(start_date) + " - " + formatDateIncludingYear(end_date)
     }
 
-    return formatDateWithOrdinalIncludingYear(start_date) + " - "
-            + formatDateWithOrdinalIncludingYear(end_date)
+    return formatDateIncludingYear(start_date) + " - " + formatDateIncludingYear(end_date)
 }
 
 function daysSpanAsString(nrDays)

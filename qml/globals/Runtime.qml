@@ -42,8 +42,17 @@ Item {
     property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
     property ObjectListModel dialogs: ObjectListModel { }
     property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.hasActiveSubscription
+    readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
 
     // Persistent Settings
+    readonly property Settings loginWorkflowSettings: Settings {
+        fileName: Scrite.app.settingsFilePath
+        category: "LoginWorkflow"
+
+        property bool welcomeScreenShown: false
+        property string lastSubscriptionReminderDate
+    }
+
     readonly property Settings scrollAreaSettings: Settings {
         fileName: Scrite.app.settingsFilePath
         category: "ScrollArea"
@@ -598,6 +607,7 @@ Item {
         readonly property string sceneTextEditorReceivedFocus: "598E1699-465B-40D5-8CF4-E9753E2C16E7"
         readonly property string closeDialogBoxRequest: "A6456A87-FC8C-405B-BDD7-7625F86272BA"
         readonly property string loginWorkflowScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
+        readonly property string userProfileScreenPage: "D97FD221-5257-4A20-B9A2-744594E99D76"
     }
 
     readonly property QtObject announcementData: QtObject {

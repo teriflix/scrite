@@ -48,6 +48,7 @@ Item {
 
             Flickable {
                 id: textAreaFlick
+
                 Layout.fillWidth: true
                 Layout.fillHeight: true
 
@@ -69,19 +70,33 @@ Item {
                 }
             }
 
-            VclButton {
-                Layout.alignment: Qt.AlignRight
+            RowLayout {
+                Layout.fillWidth: true
 
-                text: userMessage.userMeta && userMessage.userMeta.allowUse ? "Continue »" : "View Plans"
-                onClicked: {
-                    if(userMessage.userMeta && userMessage.userMeta.allowUse) {
-                        sendActivationCodeCall.data = {
-                            "email": Session.get("email"),
-                            "request": "resendActivationCode"
+                spacing: 20
+
+                VclButton {
+                    visible: !userMessage.userMeta.isPaidUser
+
+                    text: "More Info"
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
+
+                VclButton {
+                    text: userMessage.userMeta && userMessage.userMeta.allowUse ? "Continue »" : "View Plans"
+                    onClicked: {
+                        if(userMessage.userMeta && userMessage.userMeta.allowUse) {
+                            sendActivationCodeCall.data = {
+                                "email": Session.get("email"),
+                                "request": "resendActivationCode"
+                            }
+                            sendActivationCodeCall.call()
+                        } else {
+                            Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "SubscriptionPlansScreen")
                         }
-                        sendActivationCodeCall.call()
-                    } else {
-                        Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "SubscriptionPlansScreen")
                     }
                 }
             }

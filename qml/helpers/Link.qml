@@ -28,8 +28,8 @@ VclLabel {
     font.underline: true
     color: linkMouseArea.containsMouse ? hoverColor : defaultColor
 
-    property color hoverColor: enabled ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c300.background
-    property color defaultColor: enabled ? Runtime.colors.accent.c500.background : Runtime.colors.primary.c300.background
+    property color hoverColor: enabled ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
+    property color defaultColor: enabled ? Runtime.colors.accent.c500.background : Runtime.colors.primary.c500.background
 
     MouseArea {
         id: linkMouseArea

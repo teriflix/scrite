@@ -26,13 +26,14 @@ import "qrc:/qml/controls"
 
 Item {
     id: root
+
     height: layout.height+50
 
     GridLayout {
         id: layout
 
         y: 10
-        width: parent.width-50
+        width: parent.width-20
         columns: 2
         rowSpacing: 20
         columnSpacing: 20

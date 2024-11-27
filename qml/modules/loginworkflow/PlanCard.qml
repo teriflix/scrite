@@ -22,15 +22,16 @@ import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
 RowLayout {
-    id: planCard
+    id: root
 
-    property url icon: "qrc:/images/appicon.png"
+    property url icon: "qrc:/images/prodicon.png"
     property string name
     property string duration
     property string durationNote
     property string price
     property string priceNote
     property string actionLink
+    property bool actionLinkEnabled: true
 
     signal actionLinkClicked()
 
@@ -41,25 +42,25 @@ RowLayout {
         Layout.maximumWidth: parent.width * 0.25
         Layout.preferredWidth: parent.width * 0.25
 
-        spacing: 0
+        spacing: 5
 
         Image {
             Layout.alignment: Qt.AlignVCenter
-            Layout.preferredHeight: 36
-            Layout.preferredWidth: 36
+            Layout.preferredHeight: 32
+            Layout.preferredWidth: 32
 
-            source: planCard.icon
+            source: root.icon
+            mipmap: true
+            smooth: true
+            fillMode: Image.PreserveAspectFit
         }
 
-        VclLabel {
+        LabelWithTooltip {
             Layout.fillWidth: true
             Layout.alignment: Qt.AlignVCenter
 
+            text: root.name
             padding: 5
-            text: planCard.name
-            wrapMode: Text.WordWrap
-            maximumLineCount: 2
-            elide: Text.ElideRight
         }
     }
 
@@ -68,24 +69,18 @@ RowLayout {
         Layout.maximumWidth: parent.width * 0.3
         Layout.preferredWidth: parent.width * 0.3
 
-        VclLabel {
+        LabelWithTooltip {
             Layout.fillWidth: true
 
-            text: planCard.duration
-            elide: Text.ElideRight
-            wrapMode: Text.WordWrap
-            maximumLineCount: 2
+            text: root.duration
         }
 
-        VclLabel {
+        LabelWithTooltip {
             Layout.fillWidth: true
 
-            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-            text: planCard.durationNote
+            text: root.durationNote
             visible: text !== ""
-            wrapMode: Text.WordWrap
-            maximumLineCount: 2
-            elide: Text.ElideRight
+            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
         }
     }
 
@@ -94,35 +89,43 @@ RowLayout {
         Layout.maximumWidth: parent.width * 0.3
         Layout.preferredWidth: parent.width * 0.3
 
-        VclLabel {
+        LabelWithTooltip {
             Layout.fillWidth: true
 
-            text: planCard.price
-            elide: Text.ElideRight
-            wrapMode: Text.WordWrap
-            maximumLineCount: 2
+            text: root.price
         }
 
-        VclLabel {
+        LabelWithTooltip {
             Layout.fillWidth: true
 
-            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-            text: planCard.priceNote
+            text: root.priceNote
             visible: text !== ""
-            wrapMode: Text.WordWrap
-            maximumLineCount: 2
-            elide: Text.ElideRight
+            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
         }
     }
 
     Link {
         Layout.fillWidth: true
 
-        opacity: enabled ? 1 : 0.5
-        text: planCard.actionLink
+        text: root.actionLink
+        enabled: root.actionLinkEnabled
+        font.bold: true
         horizontalAlignment: Text.AlignRight
-        font.bold: enabled
-        defaultColor: enabled ? Runtime.colors.accent.c500.background : Runtime.colors.primary.c300.background
-        onClicked: planCard.actionLinkClicked()
+
+        onClicked: root.actionLinkClicked()
+    }
+
+    component LabelWithTooltip : VclLabel {
+        elide: Text.ElideRight
+        wrapMode: Text.WordWrap
+        maximumLineCount: 2
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+
+            ToolTip.text: parent.text
+            ToolTip.visible: parent.truncated && containsMouse
+        }
     }
 }

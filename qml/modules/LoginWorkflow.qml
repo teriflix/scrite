@@ -16,6 +16,7 @@ pragma Singleton
 import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Window 2.15
+import Qt.labs.settings 1.0
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
@@ -36,14 +37,14 @@ Item {
 
     function init(_parent) { parent = _parent }
     function launch() {
-        loginWizard.screenName = Scrite.user.loggedIn ? "UserProfileScreen" : "WelcomeScreen"
+        loginWizard.screenName = Scrite.user.loggedIn ? "UserProfileScreen" : _private.startScreen
         loginWizard.open()
     }
 
     VclDialog {
         id: loginWizard
 
-        property string screenName: "WelcomeScreen"
+        property string screenName: _private.startScreen
         property Item screenItem: contentInstance ? contentInstance.item : null
 
         width: 800
@@ -62,7 +63,10 @@ Item {
 
         Announcement.onIncoming: (type, data) => {
             if(type === Runtime.announcementIds.loginRequest) {
-                screenName = "WelcomeScreen" // TODO
+                if(typeof data === "string" && data !== "")
+                    screenName = data
+                else
+                    screenName = _private.startScreen
 
                 if(!visible)
                     loginWizard.open()
@@ -70,7 +74,7 @@ Item {
                 if(data && data !== "")
                     screenName = data
                 else
-                    screenName = Scrite.user.loggedIn ? "UserProfileScreen" : "WelcomeScreen"
+                    screenName = Scrite.user.loggedIn ? "UserProfileScreen" : _private.startScreen
 
                 if(!visible)
                     loginWizard.open()
@@ -89,7 +93,11 @@ Item {
     }
 
     Loader {
-        active: loginWizard.screenItem ? loginWizard.screenItem.checkForUserProfileErrors : true
+        active: {
+            if(loginWizard.visible)
+                return loginWizard.screenItem ? loginWizard.screenItem.checkForUserProfileErrors : false
+            return Scrite.user.loggedIn
+        }
         sourceComponent: Item {
             property ErrorReport userErrorReport: Aggregation.findErrorReport(Scrite.app)
             property bool hasUserError: userErrorReport.hasError
@@ -110,18 +118,27 @@ Item {
                 target: Scrite.user
 
                 function onLoggedInChanged() {
-                    if(!Scrite.user.loggedIn) {
+                    if(Scrite.user.loggedIn)
+                        Utils.execLater(_private, 1000, _private.checkIfSubscriptionIsAboutToExpire)
+                    else
                         _private.restartRequest()
-                    }
+                }
+
+                function onSubscriptionsChanged() {
+                    Utils.execLater(_private, 1000, _private.checkIfSubscriptionIsAboutToExpire)
                 }
             }
         }
     }
 
     Loader {
-        active: loginWizard.screenItem ? loginWizard.screenItem.checkForRestartRequest : true
+        active: {
+            if(loginWizard.visible)
+                return loginWizard.screenItem ? loginWizard.screenItem.checkForRestartRequest : false
+            return Scrite.user.loggedIn
+        }
         sourceComponent: Item {
-            Component.onCompleted: requiresRestartCall.go()
+            Component.onCompleted: Utils.execLater(requiresRestartCall, 1000, requiresRestartCall.go)
 
             Timer {
                 id: requiresRestartCallTimer
@@ -156,7 +173,6 @@ Item {
 
                 onFinished: {
                     if(hasError) {
-                        MessageBox.information("Error", "An error was encountered. We recommed restarting the app.");
                         return
                     }
 
@@ -176,6 +192,12 @@ Item {
     QtObject {
         id: _private
 
+        property string startScreen: Runtime.loginWorkflowSettings.welcomeScreenShown ? "AccountEmailScreen" : "WelcomeScreen"
+        property bool subscriptionReminderShown: {
+            const today = Utils.formatDateIncludingYear(Utils.todayWithZeroTime())
+            return today === Runtime.loginWorkflowSettings.lastSubscriptionReminderDate
+        }
+
         function restartRequest(msg) {
             if(msg === undefined)
                 msg = "There has been a change in your account information. Please restart Scrite and login again."
@@ -191,6 +213,39 @@ Item {
                                        call.store("sessionToken", undefined)
                                        Qt.quit()
                                    } )
+        }
+
+        function checkIfSubscriptionIsAboutToExpire() {
+            if(subscriptionReminderShown || !Scrite.user.loggedIn)
+                return
+
+            if(Scrite.user.busy) {
+                Utils.execLater(_private, 1000, checkIfSubscriptionIsAboutToExpire)
+                return
+            }
+
+            if(Scrite.user.hasActiveSubscription) {
+                const activeSub = Scrite.user.activeSubscription
+                const nrDays = Utils.daysBetween(Utils.todayWithZeroTime(), new Date(activeSub.end_date))
+
+                if(nrDays < Runtime.subscriptionTreshold && !Scrite.user.hasUpcomingSubscription) {
+                    subscriptionReminderShown = true
+                    Runtime.loginWorkflowSettings.lastSubscriptionReminderDate = Utils.formatDateIncludingYear(Utils.todayWithZeroTime())
+
+                    let msg = "Your active subscription \"" + activeSub.plan_name + "\" is about to expire in " + nrDays + " day(s). "
+                    msg += "Please sign up for a paid subscription plan to avoid interruption."
+                    MessageBox.question("Subscribe Now!", msg, ["View Plans", "Later"],
+                                           (answer) => {
+                                                if(answer === "View Plans") {
+                                                    loginWizard.screenName = "UserProfileScreen"
+                                                    loginWizard.open()
+                                                    Utils.execLater(loginWizard, 100, () => {
+                                                                        Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
+                                                                    })
+                                                }
+                                           })
+                }
+            }
         }
     }
 }

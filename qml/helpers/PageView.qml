@@ -12,15 +12,18 @@
 ****************************************************************************/
 
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
+
+import "qrc:/js/utils.js" as Utils
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 Rectangle {
-    id: pageView
+    id: root
 
     property alias pageListVisible: pageList.visible
     property alias pagesArray: pageRepeater.model
@@ -38,107 +41,106 @@ Rectangle {
 
     color: Runtime.colors.primary.c50.background
 
-    Rectangle {
-        id: pageList
+    RowLayout {
+        anchors.fill: parent
 
-        property int currentIndex: -1
+        spacing: root.pageContentSpacing
 
-        width: pageListWidth
-        height: parent.height
-        anchors.left: parent.left
+        Rectangle {
+            id: pageList
 
-        color: Runtime.colors.accent.c600.background
+            Layout.fillHeight: true
+            Layout.minimumWidth: pageListWidth
+            Layout.maximumWidth: pageListWidth
+            Layout.preferredWidth: pageListWidth
 
-        Column {
-            id: pageRepeaterLayout
+            property int currentIndex: -1
 
-            width: parent.width
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 20
+            color: Runtime.colors.accent.c600.background
 
-            clip: true
+            ColumnLayout {
+                id: pageRepeaterLayout
 
-            Repeater {
-                id: pageRepeater
+                anchors.fill: parent
+                anchors.topMargin: 20
+
+                Repeater {
+                    id: pageRepeater
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 60
+
+                        Rectangle {
+                            width: parent.width
+                            height: parent.height - 15
+
+                            color: Runtime.colors.primary.c100.background
+                            opacity: 0.8
+                            visible: pageList.currentIndex === index
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                        }
+
+                        VclLabel {
+                            anchors.left: parent.left
+                            anchors.leftMargin: 5
+                            anchors.right: parent.right
+                            anchors.rightMargin: 24
+                            anchors.verticalCenter: parent.verticalCenter
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            font.bold: pageList.currentIndex === index
+                            text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
+                            color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
+                            elide: Text.ElideMiddle
+                            horizontalAlignment: Text.AlignRight
+                        }
+
+                        Image {
+                            width: 24; height: 24
+                            source: "qrc:/icons/navigation/arrow_right.png"
+                            visible: pageList.currentIndex === index
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.right: parent.right
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: pageList.currentIndex = index
+                        }
+                    }
+                }
 
                 Item {
-                    width: parent.width
-                    height: 60
+                    Layout.fillHeight: true
+                }
 
-                    Rectangle {
-                        width: parent.width
-                        height: parent.height - 15
+                Loader {
+                    id: cornerContentLoader
 
-                        color: Runtime.colors.primary.c100.background
-                        opacity: 0.8
-                        visible: pageList.currentIndex === index
-
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
-                    }
-
-                    VclLabel {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 5
-                        anchors.right: parent.right
-                        anchors.rightMargin: 24
-                        anchors.verticalCenter: parent.verticalCenter
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        font.bold: pageList.currentIndex === index
-                        text: pageTitleRole === "" ? modelData : modelData[pageTitleRole]
-                        color: pageList.currentIndex === index ? Runtime.colors.primary.c50.text : Runtime.colors.accent.c600.text
-                        elide: Text.ElideMiddle
-                        horizontalAlignment: Text.AlignRight
-                    }
-
-                    Image {
-                        width: 24; height: 24
-                        source: "qrc:/icons/navigation/arrow_right.png"
-                        visible: pageList.currentIndex === index
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.right: parent.right
-                    }
-
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: pageList.currentIndex = index
-                    }
+                    Layout.fillWidth: true
                 }
             }
         }
 
-        Loader {
-            id: cornerContentLoader
-            anchors.top: pageRepeaterLayout.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            clip: true
-        }
-    }
+        Flickable {
+            id: pageContentArea
 
-    Flickable {
-        id: pageContentArea
-        anchors.left: pageList.visible ? pageList.right : parent.left
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        anchors.leftMargin: pageContentSpacing
-        property bool showScrollBars: contentHeight > height
-        contentWidth: pageContentLoader.width
-        contentHeight: pageContentLoader.height
-        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-        clip: showScrollBars
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
-        ScrollBar.vertical: VclScrollBar { flickable: pageContentArea }
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-        Loader {
-            id: pageContentLoader
-            width: pageContentArea.showScrollBars ? pageContentArea.width-17 : pageContentArea.width
-            onStatusChanged: {
-                if(status === Loader.Loading)
-                    resetObjectProperty(pageContentLoader, "height")
+            clip: ScrollBar.vertical.needed
+            contentWidth: pageContentLoader.active && ScrollBar.vertical.needed ? (width-20) : width
+            contentHeight: pageContentLoader.height
+
+            ScrollBar.vertical: VclScrollBar { flickable: pageContentArea }
+
+            Loader {
+                id: pageContentLoader
+                width: pageContentArea.contentWidth
             }
         }
     }

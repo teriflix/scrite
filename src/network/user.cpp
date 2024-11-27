@@ -191,6 +191,54 @@ QString User::activeSubscriptionDescription() const
     return ret;
 }
 
+static QJsonObject findUpcomingSubscription(const QJsonArray &subscriptions)
+{
+    for (const QJsonValue &subValue : subscriptions) {
+        const QJsonObject sub = subValue.toObject();
+        if (sub.value("pending").toBool())
+            return sub;
+    }
+
+    return QJsonObject();
+}
+
+QJsonObject User::upcomingSubscription() const
+{
+    return findUpcomingSubscription(m_subscriptions);
+}
+
+bool User::hasUpcomingSubscription() const
+{
+    const QJsonObject upcomingSub = this->upcomingSubscription();
+    return !upcomingSub.isEmpty();
+}
+
+QString User::upcomingSubscriptionDescription() const
+{
+    QString ret;
+
+    if (this->hasUpcomingSubscription()) {
+        const QJsonObject upcomingSub = this->upcomingSubscription();
+        const QString planType = upcomingSub.value("plan_kind").toString();
+        const QString planName = upcomingSub.value("plan_name").toString();
+        const QDate validUntil =
+                QDate::fromString(upcomingSub.value("end_date").toString(), Qt::ISODate);
+        const int nrDays = QDate::currentDate().daysTo(validUntil) + 1;
+
+        ret += planName;
+        if (nrDays <= 30 || planType == "trial") {
+            if (nrDays == 1)
+                ret += " Expires Tomorrow";
+            else if (nrDays == 0)
+                ret += " Expires Today!";
+            else
+                ret += " - " + QString::number(nrDays) + " Days Left";
+        }
+    }
+
+    return ret;
+}
+
 QStringList User::locations()
 {
     static QStringList ret;

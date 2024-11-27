@@ -84,7 +84,12 @@ Item {
 
                 function requestActivationCode() {
                     if(Utils.validateEmail(text)) {
-                        checkUserCall.data = {"email": text}
+                        const locale = Scrite.locale
+                        checkUserCall.data = {
+                            "email": text,
+                            "country": locale.country.name,
+                            "currency": locale.currency.code
+                        }
                         checkUserCall.call()
                     }
                 }
@@ -139,7 +144,7 @@ Item {
 
     JsonHttpRequest {
         id: checkUserCall
-        type: JsonHttpRequest.GET
+        type: JsonHttpRequest.POST
         api: "app/checkUser"
         token: ""
         reportNetworkErrors: true

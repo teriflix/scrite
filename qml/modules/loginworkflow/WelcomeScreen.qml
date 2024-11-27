@@ -41,15 +41,30 @@ Item {
 
         spacing: 40
 
-        VclLabel {
-            Layout.fillWidth: true
+        Flickable {
+            id: flick
 
-            text: "Thank you for choosing Scrite as the place to bring your screenplays to life. We’re thrilled to have you on board and can’t wait to celebrate the stories you create with our powerful and intuitive writing tools.\n\n" +
-                  "In the next few screens, we’ll guide you through the simple process of logging in to your account and setting up your personalized copy of Scrite. This will only take a few moments, and by the end, you’ll be ready to dive right into your screenplay creation.\n\n" +
-                  "Please click Next to continue and get started on your writing journey. We’re here to make your experience as smooth and enjoyable as possible."
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignJustify
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            ScrollBar.vertical: VclScrollBar { }
+
+            clip: ScrollBar.vertical.needed
+            contentWidth: label.width
+            contentHeight: label.height
+
+            VclLabel {
+                id: label
+
+                width: flick.width - (flick.clip ? 20 : 0)
+
+                text: "Thank you for choosing Scrite as the place to bring your screenplays to life. We’re thrilled to have you on board and can’t wait to celebrate the stories you create with our powerful and intuitive writing tools.\n\n" +
+                      "In the next few screens, we’ll guide you through the simple process of logging in to your account and setting up your personalized copy of Scrite. This will only take a few moments, and by the end, you’ll be ready to dive right into your screenplay creation.\n\n" +
+                      "Please click Next to continue and get started on your writing journey. We’re here to make your experience as smooth and enjoyable as possible."
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignJustify
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
+            }
         }
 
         VclButton {
@@ -57,7 +72,10 @@ Item {
 
             text: "Next »"
 
-            onClicked: Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "AccountEmailScreen")
+            onClicked: {
+                Runtime.loginWorkflowSettings.welcomeScreenShown = true
+                Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "AccountEmailScreen")
+            }
         }
     }
 }
