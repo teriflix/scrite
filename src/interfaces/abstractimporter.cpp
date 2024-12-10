@@ -44,15 +44,14 @@ QString AbstractImporter::nameFilters() const
 bool AbstractImporter::isFeatureEnabled() const
 {
     if (User::instance()->isLoggedIn()) {
-        const bool allImportersEnabled = User::instance()->isFeatureEnabled(Scrite::ImportFeature);
+        const bool allImportersEnabled = AppFeature::isEnabled(Scrite::ImportFeature);
         const bool thisSpecificImporterEnabled = allImportersEnabled
-                ? User::instance()->isFeatureNameEnabled(QStringLiteral("import/") + this->format())
+                ? AppFeature::isEnabled(QStringLiteral("import/") + this->format())
                 : false;
         return allImportersEnabled && thisSpecificImporterEnabled;
     }
 
-    return QStringList({ QStringLiteral("Final Draft"), QStringLiteral("Fountain") })
-            .contains(this->format());
+    return false;
 }
 
 bool AbstractImporter::read()

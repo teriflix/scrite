@@ -191,15 +191,15 @@ Watermark::Watermark(QObject *parent) : QObject(parent)
 {
     m_padding[0] = 0;
 
-    m_enabled = !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature);
-    m_visibleFromPageOne = !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature);
+    m_enabled = !AppFeature::isEnabled(Scrite::WatermarkFeature);
+    m_visibleFromPageOne = !AppFeature::isEnabled(Scrite::WatermarkFeature);
 }
 
 Watermark::~Watermark() { }
 
 void Watermark::setEnabled(bool val)
 {
-    if (m_enabled == val || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+    if (m_enabled == val || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_enabled = val;
@@ -208,7 +208,7 @@ void Watermark::setEnabled(bool val)
 
 void Watermark::setText(const QString &val)
 {
-    if (m_text == val || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+    if (m_text == val || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_text = val;
@@ -217,7 +217,7 @@ void Watermark::setText(const QString &val)
 
 void Watermark::setFont(const QFont &val)
 {
-    if (m_font == val || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+    if (m_font == val || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_font = val;
@@ -226,7 +226,7 @@ void Watermark::setFont(const QFont &val)
 
 void Watermark::setColor(const QColor &val)
 {
-    if (m_color == val || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+    if (m_color == val || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_color = val;
@@ -236,7 +236,7 @@ void Watermark::setColor(const QColor &val)
 void Watermark::setOpacity(qreal val)
 {
     if (qFuzzyCompare(m_opacity, val)
-        || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+        || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_opacity = val;
@@ -246,7 +246,7 @@ void Watermark::setOpacity(qreal val)
 void Watermark::setRotation(qreal val)
 {
     if (qFuzzyCompare(m_rotation, val)
-        || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+        || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_rotation = val;
@@ -255,7 +255,7 @@ void Watermark::setRotation(qreal val)
 
 void Watermark::setAlignment(Qt::Alignment val)
 {
-    if (m_alignment == val || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+    if (m_alignment == val || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_alignment = val;
@@ -265,7 +265,7 @@ void Watermark::setAlignment(Qt::Alignment val)
 void Watermark::setVisibleFromPageOne(bool val)
 {
     if (m_visibleFromPageOne == val
-        || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+        || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_visibleFromPageOne = val;
@@ -274,7 +274,7 @@ void Watermark::setVisibleFromPageOne(bool val)
 
 void Watermark::setRect(const QRectF &val)
 {
-    if (m_rect == val || !User::instance()->isFeatureEnabled(Scrite::WatermarkFeature))
+    if (m_rect == val || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_rect = val;

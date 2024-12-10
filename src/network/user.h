@@ -14,15 +14,269 @@
 #ifndef USER_H
 #define USER_H
 
-#include <QTimer>
-#include <QObject>
-#include <QPointer>
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QDateTime>
+#include <QQmlEngine>
+#include <QJsonValue>
 #include <QQuickImageProvider>
 
-#include "errorreport.h"
-#include "jsonhttprequest.h"
+struct UserInstallationInfo
+{
+    Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+public:
+    UserInstallationInfo() { }
+    UserInstallationInfo(const QJsonObject &object);
+    UserInstallationInfo(const UserInstallationInfo &other);
+
+    bool operator==(const UserInstallationInfo &other) const;
+    bool operator!=(const UserInstallationInfo &other) const { return !(*this == other); }
+    UserInstallationInfo &operator=(const UserInstallationInfo &other);
+
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const { return !id.isEmpty(); }
+
+    Q_PROPERTY(QString id MEMBER id)
+    QString id;
+
+    Q_PROPERTY(QString clientId MEMBER clientId)
+    QString clientId;
+
+    Q_PROPERTY(QString deviceId MEMBER deviceId)
+    QString deviceId;
+
+    Q_PROPERTY(QString platform MEMBER platform)
+    QString platform;
+
+    Q_PROPERTY(QString platformVersion MEMBER platformVersion)
+    QString platformVersion;
+
+    Q_PROPERTY(QString platformType MEMBER platformType)
+    QString platformType;
+
+    Q_PROPERTY(QString appVersion MEMBER appVersion)
+    QString appVersion;
+
+    Q_PROPERTY(QStringList pastAppVersions MEMBER pastAppVersions)
+    QStringList pastAppVersions;
+
+    Q_PROPERTY(QDateTime creationDate MEMBER creationDate)
+    QDateTime creationDate;
+
+    Q_PROPERTY(QDateTime lastActivationDate MEMBER lastActivationDate)
+    QDateTime lastActivationDate;
+
+    Q_PROPERTY(QDateTime lastSessionDate MEMBER lastSessionDate)
+    QDateTime lastSessionDate;
+
+    Q_PROPERTY(bool activated MEMBER activated)
+    bool activated = false;
+
+    Q_PROPERTY(bool isCurrent READ isCurrent)
+    bool isCurrent() const; // TODO
+};
+Q_DECLARE_METATYPE(UserInstallationInfo)
+Q_DECLARE_METATYPE(QList<UserInstallationInfo>)
+
+struct UserSubscriptionPlanInfo
+{
+    Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+public:
+    UserSubscriptionPlanInfo() { }
+    UserSubscriptionPlanInfo(const QJsonObject &object);
+    UserSubscriptionPlanInfo(const UserSubscriptionPlanInfo &other);
+
+    bool operator==(const UserSubscriptionPlanInfo &other) const;
+    bool operator!=(const UserSubscriptionPlanInfo &other) const { return !(*this == other); }
+    UserSubscriptionPlanInfo &operator=(const UserSubscriptionPlanInfo &other);
+
+    Q_PROPERTY(QString name MEMBER name)
+    QString name;
+
+    Q_PROPERTY(QString kind MEMBER kind)
+    QString kind;
+
+    Q_PROPERTY(QString title MEMBER title)
+    QString title;
+
+    Q_PROPERTY(QString subtitle MEMBER subtitle)
+    QString subtitle;
+
+    Q_PROPERTY(int duration MEMBER duration)
+    int duration = 0;
+
+    Q_PROPERTY(QString currency MEMBER currency)
+    QString currency;
+
+    Q_PROPERTY(qreal price MEMBER price)
+    qreal price = 0;
+
+    Q_PROPERTY(QStringList features MEMBER features)
+    QStringList features;
+
+    Q_PROPERTY(QString featureNote MEMBER featureNote)
+    QString featureNote;
+
+    Q_PROPERTY(int devices MEMBER devices)
+    int devices = 1;
+};
+Q_DECLARE_METATYPE(UserSubscriptionPlanInfo)
+Q_DECLARE_METATYPE(QList<UserSubscriptionPlanInfo>)
+
+struct UserSubscriptionInfo
+{
+    Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+public:
+    UserSubscriptionInfo() { }
+    UserSubscriptionInfo(const QJsonObject &object);
+    UserSubscriptionInfo(const UserSubscriptionInfo &other);
+
+    bool operator==(const UserSubscriptionInfo &other) const;
+    bool operator!=(const UserSubscriptionInfo &other) const { return !(*this == other); }
+    UserSubscriptionInfo &operator=(const UserSubscriptionInfo &other);
+
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const { return !id.isEmpty(); }
+
+    Q_PROPERTY(QString id MEMBER id)
+    QString id;
+
+    Q_PROPERTY(QString kind MEMBER kind)
+    QString kind;
+
+    Q_PROPERTY(UserSubscriptionPlanInfo plan MEMBER plan)
+    UserSubscriptionPlanInfo plan;
+
+    Q_PROPERTY(QDateTime from MEMBER from)
+    QDateTime from;
+
+    Q_PROPERTY(QDateTime until MEMBER until)
+    QDateTime until;
+
+    Q_PROPERTY(QString wc_order_id MEMBER orderId)
+    Q_PROPERTY(QString orderId MEMBER orderId)
+    QString orderId;
+
+    Q_PROPERTY(bool isActive MEMBER isActive)
+    bool isActive = false;
+
+    Q_PROPERTY(bool isUpcoming MEMBER isUpcoming)
+    bool isUpcoming = false;
+
+    Q_PROPERTY(bool hasExpired MEMBER hasExpired)
+    bool hasExpired = false;
+
+    Q_PROPERTY(int daysToUntil READ daysToUntil)
+    int daysToUntil() const { return QDateTime::currentDateTime().daysTo(this->until); }
+
+    Q_PROPERTY(int daysToFrom READ daysToFrom)
+    int daysToFrom() const { return QDateTime::currentDateTime().daysTo(this->from); }
+
+    Q_PROPERTY(QString description READ description)
+    QString description() const;
+
+    // feature is anything from Scrite::AppFeature
+    Q_INVOKABLE bool isFeatureEnabled(int feature) const;
+    Q_INVOKABLE bool isFeatureNameEnabled(const QString &featureName) const;
+};
+Q_DECLARE_METATYPE(UserSubscriptionInfo)
+Q_DECLARE_METATYPE(QList<UserSubscriptionInfo>)
+
+struct UserInfo
+{
+    Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
+
+public:
+    UserInfo() { }
+    UserInfo(const QJsonObject &object);
+    UserInfo(const UserInfo &other);
+
+    bool operator==(const UserInfo &other) const;
+    bool operator!=(const UserInfo &other) const { return !(*this == other); }
+    UserInfo &operator=(const UserInfo &other);
+
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const { return !id.isEmpty(); }
+
+    Q_PROPERTY(QString id MEMBER id)
+    QString id;
+
+    Q_PROPERTY(QString email MEMBER email)
+    QString email;
+
+    Q_PROPERTY(QDateTime signUpDate MEMBER signUpDate)
+    QDateTime signUpDate;
+
+    Q_PROPERTY(QDateTime timestamp MEMBER timestamp)
+    QDateTime timestamp;
+
+    Q_PROPERTY(QString firstName MEMBER firstName)
+    QString firstName;
+
+    Q_PROPERTY(QString lastName MEMBER lastName)
+    QString lastName;
+
+    Q_PROPERTY(QString fullName MEMBER fullName)
+    QString fullName;
+
+    Q_PROPERTY(QString experience MEMBER experience)
+    QString experience;
+
+    Q_PROPERTY(QString city MEMBER city)
+    QString city;
+
+    Q_PROPERTY(QString country MEMBER country)
+    QString country;
+
+    Q_PROPERTY(QString wdyhas MEMBER wdyhas)
+    QString wdyhas;
+
+    Q_PROPERTY(bool consentToActivityLog MEMBER consentToActivityLog)
+    bool consentToActivityLog = false;
+
+    Q_PROPERTY(bool consentToEmail MEMBER consentToEmail)
+    bool consentToEmail = false;
+
+    Q_PROPERTY(QList<UserInstallationInfo> installations MEMBER installations)
+    QList<UserInstallationInfo> installations;
+
+    Q_PROPERTY(QList<UserSubscriptionInfo> subscriptions MEMBER subscriptions)
+    QList<UserSubscriptionInfo> subscriptions;
+
+    Q_PROPERTY(UserSubscriptionInfo publicBetaSubscription MEMBER publicBetaSubscription)
+    UserSubscriptionInfo publicBetaSubscription;
+
+    Q_PROPERTY(int activeInstallationCount MEMBER activeInstallationCount)
+    int activeInstallationCount = 0;
+
+    Q_PROPERTY(bool hasActiveSubscription MEMBER hasActiveSubscription)
+    bool hasActiveSubscription = false;
+
+    Q_PROPERTY(bool hasUpcomingSubscription MEMBER hasUpcomingSubscription)
+    bool hasUpcomingSubscription = false;
+
+    Q_PROPERTY(bool hasTrialSubscription MEMBER hasTrialSubscription)
+    bool hasTrialSubscription = false;
+
+    Q_PROPERTY(int paidSubscriptionCount MEMBER paidSubscriptionCount)
+    int paidSubscriptionCount = 0;
+
+    Q_PROPERTY(QDateTime subscribedUntil MEMBER subscribedUntil)
+    QDateTime subscribedUntil;
+
+    Q_PROPERTY(bool isEarlyAdopter MEMBER isEarlyAdopter)
+    bool isEarlyAdopter = false;
+};
+Q_DECLARE_METATYPE(UserInfo)
 
 class User : public QObject
 {
@@ -34,97 +288,13 @@ public:
     static User *instance();
     ~User();
 
-    Q_PROPERTY(bool loggedIn READ isLoggedIn NOTIFY loggedInChanged)
+    Q_PROPERTY(bool loggedIn READ isLoggedIn NOTIFY infoChanged)
     bool isLoggedIn() const;
     Q_SIGNAL void loggedInChanged();
 
-    Q_PROPERTY(QString email READ email NOTIFY infoChanged)
-    QString email() const;
-
-    Q_PROPERTY(QString firstName READ firstName NOTIFY infoChanged)
-    QString firstName() const;
-
-    Q_PROPERTY(QString lastName READ lastName NOTIFY infoChanged)
-    QString lastName() const;
-
-    Q_PROPERTY(QString fullName READ fullName NOTIFY infoChanged)
-    QString fullName() const;
-
-    Q_PROPERTY(QString location READ location NOTIFY infoChanged)
-    QString location() const;
-
-    Q_PROPERTY(QString experience READ experience NOTIFY infoChanged)
-    QString experience() const;
-
-    // Where did you hear about Scrite?
-    Q_PROPERTY(QString wdyhas READ wdyhas NOTIFY infoChanged)
-    QString wdyhas() const;
-
-    Q_PROPERTY(QString country READ country NOTIFY infoChanged)
-    QString country() const;
-
-    Q_PROPERTY(QString currency READ currency NOTIFY infoChanged)
-    QString currency() const;
-
-    Q_PROPERTY(QJsonObject info READ info NOTIFY infoChanged)
-    QJsonObject info() const { return m_info; }
+    Q_PROPERTY(UserInfo info READ info NOTIFY infoChanged)
+    UserInfo info() const { return m_info; }
     Q_SIGNAL void infoChanged();
-
-    Q_PROPERTY(QJsonArray installations READ installations NOTIFY installationsChanged)
-    QJsonArray installations() const { return m_installations; }
-    Q_SIGNAL void installationsChanged();
-
-    Q_PROPERTY(QJsonArray subscriptions READ subscriptions WRITE setSubscriptions NOTIFY subscriptionsChanged)
-    QJsonArray subscriptions() const { return m_subscriptions; }
-    Q_SIGNAL void subscriptionsChanged();
-
-    Q_PROPERTY(QJsonObject activeSubscription READ activeSubscription NOTIFY subscriptionsChanged)
-    QJsonObject activeSubscription() const;
-
-    Q_PROPERTY(bool hasActiveSubscription READ hasActiveSubscription NOTIFY subscriptionsChanged)
-    bool hasActiveSubscription() const;
-
-    Q_PROPERTY(QString activeSubscriptionDescription READ activeSubscriptionDescription NOTIFY subscriptionsChanged)
-    QString activeSubscriptionDescription() const;
-
-    Q_PROPERTY(QJsonObject upcomingSubscription READ upcomingSubscription NOTIFY subscriptionsChanged)
-    QJsonObject upcomingSubscription() const;
-
-    Q_PROPERTY(bool hasUpcomingSubscription READ hasUpcomingSubscription NOTIFY subscriptionsChanged)
-    bool hasUpcomingSubscription() const;
-
-    Q_PROPERTY(QString upcomingSubscriptionDescription READ upcomingSubscriptionDescription NOTIFY subscriptionsChanged)
-    QString upcomingSubscriptionDescription() const;
-
-    Q_PROPERTY(QJsonObject helpTips READ helpTips NOTIFY helpTipsChanged)
-    QJsonObject helpTips() const { return m_helpTips; }
-    Q_SIGNAL void helpTipsChanged();
-
-    Q_PROPERTY(bool helpTipsAvailable READ helpTipsAvailable NOTIFY helpTipsChanged)
-    bool helpTipsAvailable() const { return !m_helpTips.isEmpty(); }
-
-    Q_PROPERTY(QStringList locations READ locations CONSTANT)
-    Q_INVOKABLE static QStringList locations();
-
-    Q_PROPERTY(int currentInstallationIndex READ currentInstallationIndex NOTIFY installationsChanged)
-    int currentInstallationIndex() const { return m_currentInstallationIndex; }
-
-    QList<int> enabledFeatures() const { return m_enabledFeatures; }
-    // here feature is anything from Scrite::AppFeature enum
-    bool isFeatureEnabled(int feature) const { return m_enabledFeatures.contains(feature); }
-    bool isFeatureNameEnabled(const QString &featureName) const;
-
-    Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
-    bool busy() const { return m_call != nullptr; }
-    Q_SIGNAL void busyChanged();
-
-    Q_SLOT void refresh();
-    Q_SLOT void reload();
-    Q_SLOT void logout();
-    Q_SLOT void update(const QJsonObject &newInfo);
-    Q_SLOT void deactivateInstallation(const QString &id);
-    Q_SLOT void refreshInstallations();
-    Q_SLOT void refreshSubscriptions();
 
     Q_SLOT void logActivity1(const QString &activity)
     {
@@ -132,52 +302,28 @@ public:
     }
     Q_SLOT void logActivity2(const QString &activity, const QJsonValue &data);
 
+    Q_PROPERTY(bool busy READ isBusy NOTIFY busyChanged)
+    bool isBusy() const;
+    Q_SIGNAL void busyChanged();
+
 signals:
-    void forceLoginRequest();
+    void subscriptionAboutToExpire(int days);
 
 private:
     User(QObject *parent = nullptr);
-    void setInfo(const QJsonObject &val);
-    void setInstallations(const QJsonArray &val);
-    void setSubscriptions(const QJsonArray &val);
-    void setHelpTips(const QJsonObject &val);
-    void loadStoredHelpTips();
 
-    Q_SLOT void firstReload(bool loadStoredUserInfoAlso = true);
+    void setInfo(const UserInfo &val);
+    void checkIfSubscriptionIsAboutToExpire();
 
-    void fetchHelpTips();
-    void reset();
-    void activateCallDone();
-    void userInfoCallDone();
-    void installationsCallDone();
-    void subscriptionsCallDone();
+public: // Don't use these methods
+    void loadInfoFromStorage();
+    void loadInfoUsingRestApiCall();
 
-    void loadStoredInformation();
-
-    JsonHttpRequest *newCall();
-    void onCallDestroyed();
-    void onLogActivityCallFinished();
-    void onDeactivateInstallationFinished();
-
-    void storeUserInfo();
-    void storeInstallations();
-    void storeSubscriptions();
-
-    void updateUserCountryAndCurrency();
+protected:
+    void childEvent(QChildEvent *e);
 
 private:
-    bool m_busy = false;
-    QJsonObject m_info;
-    QJsonObject m_helpTips;
-    QTimer m_touchLogTimer;
-    QList<int> m_enabledFeatures;
-    QJsonArray m_installations;
-    QJsonArray m_subscriptions;
-    bool m_analyticsConsent = false;
-    int m_currentInstallationIndex = -1;
-    JsonHttpRequest *m_call = nullptr;
-    ErrorReport *m_errorReport = new ErrorReport(this);
-    bool m_loadingStoredUserInformation = false;
+    UserInfo m_info;
 };
 
 class UserIconProvider : public QQuickImageProvider
@@ -198,6 +344,9 @@ class AppFeature : public QObject
 public:
     explicit AppFeature(QObject *parent = nullptr);
     ~AppFeature();
+
+    static bool isEnabled(int feature);
+    static bool isEnabled(const QString &featureName);
 
     Q_PROPERTY(QString featureName READ featureName WRITE setFeatureName NOTIFY featureNameChanged)
     void setFeatureName(const QString &val);

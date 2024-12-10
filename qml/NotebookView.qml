@@ -26,7 +26,6 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
-import "qrc:/qml/modules"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebook"
 import "qrc:/qml/structure"

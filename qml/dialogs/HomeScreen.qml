@@ -30,6 +30,10 @@ DialogLauncher {
     id: root
 
     function launch(mode) { return doLaunch({"mode": mode}) }
+    function firstLaunch() {
+        if(_private.launchCounter === 0)
+            launch()
+    }
 
     name: "HomeScreen"
     singleInstanceOnly: true

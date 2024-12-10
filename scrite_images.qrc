@@ -16,7 +16,7 @@
         <file>images/banner_logo_overlay.png</file>
         <file>images/homescreen_banner.png</file>
         <file>images/homescreen_scriptalay_banner.png</file>
-        <file>images/loginworkflowbg.png</file>
+        <file>images/useraccountdialogbg.png</file>
         <file>images/prodicon.png</file>
     </qresource>
 </RCC>

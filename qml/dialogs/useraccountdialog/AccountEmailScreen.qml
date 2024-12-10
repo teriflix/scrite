@@ -28,12 +28,10 @@ import "qrc:/qml/dialogs"
 Item {
     readonly property bool modal: true
     readonly property string title: "Account Email"
-    readonly property bool checkForRestartRequest: false
-    readonly property bool checkForUserProfileErrors: false
 
     Image {
         anchors.fill: parent
-        source: "qrc:/images/loginworkflowbg.png"
+        source: "qrc:/images/useraccountdialogbg.png"
         fillMode: Image.PreserveAspectCrop
     }
 
@@ -57,16 +55,18 @@ Item {
             VclLabel {
                 Layout.fillWidth: true
 
-                text: {
-                    const email = checkUserCall.email()
-                    if(email === "")
-                        return "Please provide your email-id to activate your Scrite installation."
-                    return "Please confirm your email-id to activate your Scrite installation."
-                }
                 color: Runtime.colors.accent.c400.background
                 wrapMode: Text.WordWrap
                 font.pointSize: emailField.font.pointSize
                 horizontalAlignment: Text.AlignHCenter
+
+                Component.onCompleted: {
+                    const email = checkUserCall.email
+                    if(email === "")
+                        text = "Please provide your email-id to setup your Scrite profile."
+                    else
+                        text = "Please confirm your email-id to setup your Scrite installation."
+                }
             }
 
             TextField {
@@ -74,25 +74,13 @@ Item {
 
                 Layout.fillWidth: true
 
-                text: checkUserCall.email()
+                text: checkUserCall.email
                 selectByMouse: true
                 placeholderText: "Your Email ID"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
                 horizontalAlignment: Text.AlignHCenter
 
-                Keys.onReturnPressed: requestActivationCode()
-
-                function requestActivationCode() {
-                    if(Utils.validateEmail(text)) {
-                        const locale = Scrite.locale
-                        checkUserCall.data = {
-                            "email": text,
-                            "country": locale.country.name,
-                            "currency": locale.currency.code
-                        }
-                        checkUserCall.call()
-                    }
-                }
+                Keys.onReturnPressed: checkUserCall.check(text)
             }
 
             RowLayout {
@@ -116,7 +104,7 @@ Item {
 
                     text: "Continue »"
 
-                    onClicked: emailField.requestActivationCode()
+                    onClicked: checkUserCall.check(emailField.text)
 
                     Connections {
                         target: emailField
@@ -142,12 +130,16 @@ Item {
         }
     }
 
-    JsonHttpRequest {
+    AppCheckUserRestApiCall {
         id: checkUserCall
-        type: JsonHttpRequest.POST
-        api: "app/checkUser"
-        token: ""
-        reportNetworkErrors: true
+
+        function check(_email) {
+            if(Utils.validateEmail(_email)) {
+                email = _email
+                call()
+            }
+        }
+
         onFinished: {
             if(hasError || !hasResponse) {
                 const errMsg = hasError ? errorMessage : "Error determining information about your account. Please try again."
@@ -155,13 +147,10 @@ Item {
                 return
             }
 
-            store("email", emailField.text)
-            Session.set("email", emailField.text)
-            Session.set("userMeta", responseData)
-
-            onClicked: Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "JunctionScreen")
+            Session.set("checkUserResponse", userInfo)
+            Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "JunctionScreen")
         }
-    }
+    }    
 }
 
 

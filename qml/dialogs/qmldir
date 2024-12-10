@@ -9,10 +9,13 @@ singleton MessageBox 1.0 MessageBox.qml
 singleton PdfDialog 1.0 PdfDialog.qml
 singleton RenameCharacterDialog 1.0 RenameCharacterDialog.qml
 singleton ReportConfigurationDialog 1.0 ReportConfigurationDialog.qml
+singleton SettingsDialog 1.0 SettingsDialog.qml
 singleton SplashScreen 1.0 SplashScreen.qml
 singleton StructureIndexCardFieldsDialog 1.0 StructureIndexCardFieldsDialog.qml
 singleton StructureStoryBeatsDialog 1.0 StructureStoryBeatsDialog.qml
+singleton SubscriptionDetailsDialog 1.0 SubscriptionDetailsDialog.qml
+singleton SubscriptionPlanComparisonDialog 1.0 SubscriptionPlanComparisonDialog.qml
 singleton TermsOfUseDialog 1.0 TermsOfUseDialog.qml
-singleton WaitDialog 1.0 WaitDialog.qml
-singleton SettingsDialog 1.0 SettingsDialog.qml
 singleton TitlePageDialog 1.0 TitlePageDialog.qml
+singleton UserAccountDialog 1.0 UserAccountDialog.qml
+singleton WaitDialog 1.0 WaitDialog.qml

@@ -13,7 +13,7 @@
 
 #include "form.h"
 #include "application.h"
-#include "jsonhttprequest.h"
+#include "restapicall.h"
 #include "networkaccessmanager.h"
 
 #include <QDir>
@@ -530,14 +530,11 @@ void Forms::itemRemoveEvent(Form *ptr)
 
 void Forms::downloadForms()
 {
-    if (this->findChild<JsonHttpRequest *>() != nullptr)
+    if (this->findChild<RestApiCall *>() != nullptr)
         return;
 
-    JsonHttpRequest *call = new JsonHttpRequest(this);
-    call->setType(JsonHttpRequest::GET);
-    call->setApi(QLatin1String("scriptalay/forms"));
-    call->setAutoDelete(true);
-    connect(call, &JsonHttpRequest::finished, this, [=]() {
+    ScriptalayFormsRestApiCall *call = new ScriptalayFormsRestApiCall(this);
+    connect(call, &RestApiCall::finished, this, [=]() {
         if (call->hasError()) {
             m_errorReport->setErrorMessage(call->errorText(), call->errorData());
             return;
@@ -546,9 +543,9 @@ void Forms::downloadForms()
         if (!call->hasResponse())
             return;
 
-        QList<Form *> forms = this->list();
+        QList<Form *> forms;
 
-        const QJsonArray records = call->responseData().value(QLatin1String("records")).toArray();
+        const QJsonArray records = call->records();
         if (records.isEmpty())
             return;
 

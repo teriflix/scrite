@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "pdfexporter.h"
-#include "application.h"
+// #include "application.h"
 #include "qtextdocumentpagedprinter.h"
 
 #include <QDir>
@@ -136,6 +136,11 @@ public:
 #if 0
         if (side == RightSide)
             paint->fillRect(rect, Qt::yellow);
+#else
+        Q_UNUSED(paint)
+        Q_UNUSED(side)
+        Q_UNUSED(rect)
+        Q_UNUSED(docRect)
 #endif
     }
 };

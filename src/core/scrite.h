@@ -16,6 +16,7 @@
 
 #include "user.h"
 #include "appwindow.h"
+#include "restapicall.h"
 #include "application.h"
 #include "scritedocument.h"
 #include "shortcutsmodel.h"
@@ -149,6 +150,14 @@ public:
     };
     Q_ENUM(AppFeature)
 
+    enum ApplicationState {
+        ApplicationSuspended = Qt::ApplicationSuspended,
+        ApplicationHidden = Qt::ApplicationHidden,
+        ApplicationInactive = Qt::ApplicationInactive,
+        ApplicationActive = Qt::ApplicationActive
+    };
+    Q_ENUM(ApplicationState)
+
     Q_PROPERTY(Application *app READ app CONSTANT)
     static Application *app();
 
@@ -157,6 +166,9 @@ public:
 
     Q_PROPERTY(User *user READ user CONSTANT)
     static User *user();
+
+    Q_PROPERTY(RestApi *restApi READ restApi CONSTANT)
+    static RestApi *restApi();
 
     Q_PROPERTY(ScriteDocument *document READ document CONSTANT)
     static ScriteDocument *document();
@@ -184,6 +196,11 @@ public:
     static Locale locale();
 
     Q_INVOKABLE static QString currencySymbol(const QString &code);
+
+    Q_INVOKABLE static bool isFeatureEnabled(Scrite::AppFeature feature,
+                                             const QStringList &features);
+    Q_INVOKABLE static bool isFeatureNameEnabled(const QString &feature,
+                                                 const QStringList &features);
 
 private:
     static QString m_fileNameToOpen;

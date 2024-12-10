@@ -182,7 +182,6 @@ DialogLauncher {
                                         Scrite.document.addCollaborator(text)
                                         clear()
                                         forceActiveFocus()
-                                        queryCollaboratorsCall.fetchUsersInfo()
                                     }
                                 }
                             }

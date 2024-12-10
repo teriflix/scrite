@@ -17,38 +17,19 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 
 Item {
     readonly property bool modal: true
     readonly property string title: "Fetching Profile Data ..."
-    readonly property bool checkForRestartRequest: false
-    readonly property bool checkForUserProfileErrors: false
 
     Connections {
         target: Scrite.user
 
         function onLoggedInChanged() {
-            if(Scrite.user.loggedIn)
-                Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "UserProfileScreen")
-        }
-    }
-
-    Connections {
-        target: Aggregation.findErrorReport(Scrite.user)
-
-        function onHasErrorChanged() {
-            if(target.hasError)
-                MessageBox.question("Error",
-                                    "There was an error fetching user profile data. Please try again.\n\n" + target.errorMessage,
-                                    ["Try Again", "Quit Scrite"],
-                                   (answer) => {
-                                        if(answer === "Try Again")
-                                            Scrite.user.reload()
-                                        else
-                                            Qt.quit()
-                                   })
+            _private.maybeShowUserProfileScreen()
         }
     }
 
@@ -57,5 +38,14 @@ Item {
         running: Scrite.user.busy
     }
 
-    Component.onCompleted: Scrite.user.reload()
+    Component.onCompleted: Utils.execLater(_private, 100, _private.maybeShowUserProfileScreen)
+
+    QtObject {
+        id: _private
+
+        function maybeShowUserProfileScreen() {
+            if(Scrite.user.loggedIn)
+                Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "UserProfileScreen")
+        }
+    }
 }

@@ -20,7 +20,6 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml"
-import "qrc:/qml/modules"
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -54,12 +53,15 @@ Rectangle {
         function initialize() {
             // Initialize runtime
             Runtime.init(scriteRoot)
+            SubscriptionPlanOperations.init(scriteRoot)
 
             // Determine font size provided by QML
             determineDefaultFontSize()
 
             // Initialize layers
-            LoginWorkflow.init(scriteRoot)
+            SubscriptionDetailsDialog.init()
+            SubscriptionPlanComparisonDialog.init()
+            UserAccountDialog.init(scriteRoot)
             FloatingDockLayer.init(scriteRoot)
             OverlaysLayer.init(scriteRoot)
             NotificationsLayer.init(scriteRoot)
@@ -68,9 +70,12 @@ Rectangle {
             Scrite.window.raise()
 
             // Show initial UI
-            if(Scrite.user.loggedIn)
-                showHomeScreenOrOpenFile()
-            else {
+            if(Scrite.user.loggedIn) {
+                if(Runtime.allowAppUsage)
+                    showHomeScreenOrOpenFile()
+                else
+                    UserAccountDialog.launch()
+            } else {
                 var splashScreen = SplashScreen.launch()
                 if(splashScreen)
                     splashScreen.closed.connect(_private.splashScreenWasClosed)
@@ -95,10 +100,10 @@ Rectangle {
                     "The Windows version of Scrite works best on Windows 10 or higher. While it may work on earlier versions of Windows, we don't actively test on them. We recommend that you use Scrite on PCs with Windows 10 or higher.",
                     _private.showHomeScreenOrOpenFile
                 )
-            } else if(Scrite.user.loggedIn)
+            } else if(Runtime.allowAppUsage)
                 showHomeScreenOrOpenFile()
             else
-                Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
+                UserAccountDialog.launch()
         }
 
         function showHomeScreenOrOpenFile() {
@@ -107,12 +112,6 @@ Rectangle {
                     HomeScreen.launch()
             } else
                 Scrite.document.open(Scrite.fileNameToOpen)
-
-            Scrite.user.forceLoginRequest.connect(userForceLoginRequest)
-        }
-
-        function userForceLoginRequest() {
-            Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
         }
     }
 }

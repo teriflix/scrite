@@ -1,1 +1,2 @@
 singleton Runtime 1.0 Runtime.qml
+singleton SubscriptionPlanOperations 1.0 SubscriptionPlanOperations.qml

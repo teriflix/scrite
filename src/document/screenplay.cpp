@@ -568,7 +568,7 @@ QString Screenplay::author() const
 {
     if (m_author.isEmpty()) {
         if (User::instance()->isLoggedIn())
-            return User::instance()->fullName();
+            return User::instance()->info().fullName;
         return QSysInfo::machineHostName();
     }
 

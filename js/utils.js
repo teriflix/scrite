@@ -37,7 +37,7 @@ function formatDate(date)
 
 function formatDateIncludingYear(date)
 {
-    return formatDate(date) + ", " + date.getFullYear();
+    return formatDate(date) + " " + date.getFullYear();
 }
 
 function formatDateRangeAsString(start_date, end_date)

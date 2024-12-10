@@ -12,6 +12,7 @@
         <file>qml/controls/VclComboBox.qml</file>
         <file>qml/controls/VclDialog.qml</file>
         <file>qml/controls/VclFileDialog.qml</file>
+        <file>qml/controls/VclGroupBox.qml</file>
         <file>qml/controls/VclLabel.qml</file>
         <file>qml/controls/VclMenu.qml</file>
         <file>qml/controls/VclMenuItem.qml</file>
@@ -77,6 +78,14 @@
         <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
         <file>qml/dialogs/TermsOfUseDialog.qml</file>
         <file>qml/dialogs/TitlePageDialog.qml</file>
+        <file>qml/dialogs/UserAccountDialog.qml</file>
+        <file>qml/dialogs/useraccountdialog/AccountEmailScreen.qml</file>
+        <file>qml/dialogs/useraccountdialog/ActivationCodeScreen.qml</file>
+        <file>qml/dialogs/useraccountdialog/JunctionScreen.qml</file>
+        <file>qml/dialogs/useraccountdialog/PlanCard.qml</file>
+        <file>qml/dialogs/useraccountdialog/ReloadUserScreen.qml</file>
+        <file>qml/dialogs/useraccountdialog/UserProfileScreen.qml</file>
+        <file>qml/dialogs/useraccountdialog/WelcomeScreen.qml</file>
         <file>qml/dialogs/WaitDialog.qml</file>
         <file>qml/floatingdockpanels/FloatingDock.qml</file>
         <file>qml/floatingdockpanels/FloatingDockLayer.qml</file>
@@ -104,6 +113,7 @@
         <file>qml/helpers/MarkSceneAsMenu.qml</file>
         <file>qml/helpers/MenuLoader.qml</file>
         <file>qml/helpers/PageView.qml</file>
+        <file>qml/helpers/PdfView.qml</file>
         <file>qml/helpers/qmldir</file>
         <file>qml/helpers/RectangleTabView.qml</file>
         <file>qml/helpers/RichTextEdit.qml</file>
@@ -124,10 +134,8 @@
         <file>qml/helpers/TextViewEdit.qml</file>
         <file>qml/helpers/TrapeziumTabView.qml</file>
         <file>qml/helpers/UiElementHighlight.qml</file>
+        <file>qml/helpers/UserAccountToolButton.qml</file>
         <file>qml/helpers/ZoomSlider.qml</file>
-        <file>qml/modules/PdfView.qml</file>
-        <file>qml/modules/qmldir</file>
-        <file>qml/modules/UserAccountToolButton.qml</file>
         <file>qml/notebook/AddCharactersDialog.qml</file>
         <file>qml/notebook/AddRelationshipDialog.qml</file>
         <file>qml/notebook/CharacterRelationshipsGraphView.qml</file>
@@ -169,15 +177,8 @@
         <file>qml/tasks/qmldir</file>
         <file>qml/tasks/SaveFileTask.qml</file>
         <file>qml/TimelineView.qml</file>
-        <file>qml/modules/LoginWorkflow.qml</file>
-        <file>qml/controls/VclGroupBox.qml</file>
-        <file>qml/modules/loginworkflow/AccountEmailScreen.qml</file>
-        <file>qml/modules/loginworkflow/WelcomeScreen.qml</file>
-        <file>qml/modules/loginworkflow/JunctionScreen.qml</file>
-        <file>qml/modules/loginworkflow/ActivationCodeScreen.qml</file>
-        <file>qml/modules/loginworkflow/UserProfileScreen.qml</file>
-        <file>qml/modules/loginworkflow/ReloadUserScreen.qml</file>
-        <file>qml/modules/loginworkflow/PlanCard.qml</file>
-        <file>qml/modules/loginworkflow/SubscriptionPlansScreen.qml</file>
+        <file>qml/dialogs/SubscriptionPlanComparisonDialog.qml</file>
+        <file>qml/globals/SubscriptionPlanOperations.qml</file>
+        <file>qml/dialogs/SubscriptionDetailsDialog.qml</file>
     </qresource>
 </RCC>

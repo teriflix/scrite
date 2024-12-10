@@ -41,6 +41,7 @@ RowLayout {
         Layout.minimumWidth: parent.width * 0.25
         Layout.maximumWidth: parent.width * 0.25
         Layout.preferredWidth: parent.width * 0.25
+        z: 1
 
         spacing: 5
 
@@ -68,6 +69,7 @@ RowLayout {
         Layout.minimumWidth: parent.width * 0.3
         Layout.maximumWidth: parent.width * 0.3
         Layout.preferredWidth: parent.width * 0.3
+        z: 1
 
         LabelWithTooltip {
             Layout.fillWidth: true
@@ -88,6 +90,7 @@ RowLayout {
         Layout.minimumWidth: parent.width * 0.3
         Layout.maximumWidth: parent.width * 0.3
         Layout.preferredWidth: parent.width * 0.3
+        z: 1
 
         LabelWithTooltip {
             Layout.fillWidth: true

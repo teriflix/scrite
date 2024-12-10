@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/helpers"
-import "qrc:/qml/modules"
+import "qrc:/qml/dialogs"
 
 Item {
     id: userLogin
@@ -54,7 +54,7 @@ Item {
             onEntered: parent.ToolTip.visible = true
             onExited: parent.ToolTip.visible = false
             enabled: appToolBar.visible
-            onClicked: LoginWorkflow.launch()
+            onClicked: UserAccountDialog.launch()
         }
     }
 }

@@ -29,11 +29,11 @@ Item {
     readonly property bool modal: true
     readonly property string title: "Activation"
     readonly property bool checkForRestartRequest: false
-    readonly property bool checkForUserProfileErrors: false
+    readonly property bool checkForSessionStatus: false
 
     Image {
         anchors.fill: parent
-        source: "qrc:/images/loginworkflowbg.png"
+        source: "qrc:/images/useraccountdialogbg.png"
         fillMode: Image.PreserveAspectCrop
     }
 
@@ -57,7 +57,7 @@ Item {
             VclLabel {
                 Layout.fillWidth: true
 
-                text: "An activation code was sent to <b>" + Session.get("email") + "</b>. Please paste it in the text field below, and click Activate."
+                text: "An activation code was sent to <b>" + _private.userMeta.email + "</b>. Please paste it in the text field below, and click Activate."
                 wrapMode: Text.WordWrap
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
             }
@@ -71,7 +71,7 @@ Item {
                 placeholderText: "Activation Code"
                 horizontalAlignment: Text.AlignHCenter
 
-                Keys.onReturnPressed: activateCall.go()
+                Keys.onReturnPressed: activateCall.call()
             }
 
             RowLayout {
@@ -81,16 +81,16 @@ Item {
                     text: "Resend" + (resendTimer.running ? " (" + resendTimer.secondsLeft + ")" : "")
                     enabled: !resendTimer.running
 
-                    onClicked: sendActivationCodeCall.go()
+                    onClicked: sendActivationCodeCall.call()
 
                     Timer {
                         id: resendTimer
 
                         property int secondsLeft: 30
 
-                        interval: 1000
-                        running: true
                         repeat: true
+                        running: true
+                        interval: 1000
 
                         onTriggered: {
                             secondsLeft = secondsLeft-1
@@ -109,11 +109,9 @@ Item {
                 VclButton {
                     id:activateButton
 
-                    enabled: activationCodeField.text.length == 20
-
                     text: "Activate »"
-
-                    onClicked: activateCall.go()
+                    enabled: activationCodeField.text.length == 20
+                    onClicked: activateCall.call()
                 }
             }
         }
@@ -124,12 +122,9 @@ Item {
         }
     }
 
-    JsonHttpRequest {
+    AppActivateDeviceRestApiCall {
         id: activateCall
-        type: JsonHttpRequest.POST
-        api: "app/activate"
-        token: ""
-        reportNetworkErrors: true
+        activationCode: activationCodeField.text.trim()
         onFinished: {
             if(hasError) {
                 MessageBox.information("Error", errorMessage)
@@ -141,36 +136,13 @@ Item {
                 return
             }
 
-            store("loginToken", responseData.loginToken)
-            store("sessionToken", responseData.sessionToken)
-
-            Session.unset("email")
-            Session.unset("userMeta")
-
-            Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "ReloadUserScreen")
-        }
-
-        function go() {
-            data = {
-                "email": Session.get("email"),
-                "activationCode": activationCodeField.text.trim(),
-                "clientId": clientId(),
-                "deviceId": deviceId(),
-                "platform": platform(),
-                "platformType": platformType(),
-                "platformVersion": platformVersion(),
-                "appVersion": appVersion()
-            }
-            call()
+            Session.unset("checkUserResponse")
+            Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "ReloadUserScreen")
         }
     }
 
-    JsonHttpRequest {
+    AppRequestActivationCodeRestApiCall {
         id: sendActivationCodeCall
-        type: JsonHttpRequest.POST
-        api: "app/activate"
-        token: ""
-        reportNetworkErrors: true
         onFinished: {
             if(hasError) {
                 MessageBox.information("Error", errorMessage)
@@ -187,13 +159,11 @@ Item {
                                         resendTimer.start()
                                    })
         }
+    }
 
-        function go() {
-            data = {
-                "email": Session.get("email"),
-                "request": "resendActivationCode"
-            }
-            call()
-        }
+    QtObject {
+        id: _private
+
+        readonly property var userMeta: Session.get("checkUserResponse")
     }
 }

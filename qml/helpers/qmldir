@@ -18,6 +18,7 @@ LodLoader 1.0 LodLoader.qml
 MarkSceneAsMenu 1.0 MarkSceneAsMenu.qml
 MenuLoader 1.0 MenuLoader.qml
 PageView 1.0 PageView.qml
+PdfView 1.0 PdfView.qml
 RectangleTabView 1.0 RectangleTabView.qml
 RichTextEdit 1.0 RichTextEdit.qml
 RubberBand 1.0 RubberBand.qml
@@ -36,4 +37,5 @@ TextTabBar 1.0 TextTabBar.qml
 TextViewEdit 1.0 TextViewEdit.qml
 TrapeziumTabView 1.0 TrapeziumTabView.qml
 UiElementHighlight 1.0 UiElementHighlight.qml
+UserAccountToolButton 1.0 UserAccountToolButton.qml
 ZoomSlider 1.0 ZoomSlider.qml

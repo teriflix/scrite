@@ -41,16 +41,15 @@ Item {
     property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
     property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
     property ObjectListModel dialogs: ObjectListModel { }
-    property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.hasActiveSubscription
+    property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
 
     // Persistent Settings
-    readonly property Settings loginWorkflowSettings: Settings {
+    readonly property Settings userAccountDialogSettings: Settings {
         fileName: Scrite.app.settingsFilePath
-        category: "LoginWorkflow"
+        category: "UserAccountDialog"
 
         property bool welcomeScreenShown: false
-        property string lastSubscriptionReminderDate
     }
 
     readonly property Settings scrollAreaSettings: Settings {
@@ -197,6 +196,7 @@ Item {
         property bool visible: true
     }
 
+    property var helpTips: undefined
     readonly property Settings helpNotificationSettings: Settings {
         fileName: Scrite.app.settingsFilePath
         category: "Help"
@@ -606,7 +606,7 @@ Item {
         readonly property string notebookNodeRequest: "1DC67418-2584-4598-A68A-DE5205BBC028"
         readonly property string sceneTextEditorReceivedFocus: "598E1699-465B-40D5-8CF4-E9753E2C16E7"
         readonly property string closeDialogBoxRequest: "A6456A87-FC8C-405B-BDD7-7625F86272BA"
-        readonly property string loginWorkflowScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
+        readonly property string userAccountDialogScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
         readonly property string userProfileScreenPage: "D97FD221-5257-4A20-B9A2-744594E99D76"
     }
 
@@ -632,5 +632,23 @@ Item {
         category: "RecentFiles"
 
         property var files: []
+    }
+
+    Connections {
+        enabled: root.helpTips === undefined
+
+        target: Scrite.user
+
+        function onLoggedInChanged() {
+            if(Scrite.user.loggedIn) {
+                let api = Qt.createQmlObject("import io.scrite.components 1.0; UserHelpTipsRestApiCall {}", root)
+                api.finished.connect( () => {
+                                          root.helpTip = api.helpTips
+                                          api.destroy()
+                                      })
+                if(!api.call())
+                    api.destroy()
+            }
+        }
     }
 }

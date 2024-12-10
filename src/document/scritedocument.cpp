@@ -25,6 +25,7 @@
 #include "application.h"
 #include "pdfexporter.h"
 #include "odtexporter.h"
+#include "localstorage.h"
 #include "htmlexporter.h"
 #include "textexporter.h"
 #include "notification.h"
@@ -33,7 +34,7 @@
 #include "qobjectfactory.h"
 #include "locationreport.h"
 #include "characterreport.h"
-#include "jsonhttprequest.h"
+#include "restapicall.h"
 #include "statisticsreport.h"
 #include "fountainimporter.h"
 #include "fountainexporter.h"
@@ -759,7 +760,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
     QTimer::singleShot(0, this, [=]() {
         connect(User::instance(), &User::loggedInChanged, this,
                 &ScriteDocument::canModifyCollaboratorsChanged);
-        connect(User::instance(), &User::subscriptionsChanged, this,
+        connect(User::instance(), &User::infoChanged, this,
                 &ScriteDocument::updateDocumentWindowTitle);
 
         this->updateDocumentWindowTitle();
@@ -817,7 +818,7 @@ void ScriteDocument::setCollaborators(const QStringList &val)
     if (val.isEmpty())
         m_collaborators = val;
     else {
-        QStringList newCollaborators({ User::instance()->email() });
+        QStringList newCollaborators({ User::instance()->info().email });
         for (const QString &item : val) {
             const QString item2 = item.trimmed().toLower();
             if (item2.isEmpty())
@@ -835,8 +836,12 @@ void ScriteDocument::setCollaborators(const QStringList &val)
 
 bool ScriteDocument::canModifyCollaborators() const
 {
+    if (!User::instance()->isLoggedIn())
+        return false;
+
     return m_collaborators.isEmpty()
-            || m_collaborators.first().compare(User::instance()->email(), Qt::CaseInsensitive) == 0;
+            || m_collaborators.first().compare(User::instance()->info().email, Qt::CaseInsensitive)
+            == 0;
 }
 
 void ScriteDocument::addCollaborator(const QString &email)
@@ -884,7 +889,7 @@ void ScriteDocument::enableCollaboration()
         return;
 
     if (User::instance()->isLoggedIn()) {
-        this->setCollaborators(QStringList({ User::instance()->email() }));
+        this->setCollaborators(QStringList({ User::instance()->info().email }));
         User::instance()->logActivity2(
                 QStringLiteral("collaboration"),
                 QJsonObject({
@@ -2044,9 +2049,10 @@ void ScriteDocument::updateDocumentWindowTitle()
 
     title += QStringLiteral(" - ") + qApp->property("baseWindowTitle").toString();
 
-    const QString activeSubDesc = User::instance()->activeSubscriptionDescription();
-    if (!activeSubDesc.isEmpty())
-        title += " (" + activeSubDesc + ")";
+    if (User::instance()->isLoggedIn() && User::instance()->info().hasActiveSubscription) {
+        const UserSubscriptionInfo activeSub = User::instance()->info().subscriptions.first();
+        title += " [" + activeSub.description() + "]";
+    }
 
     this->setDocumentWindowTitle(title);
 }
@@ -2330,10 +2336,10 @@ bool ScriteDocument::load(const QString &fileName)
                 return false;
             }
 
-            const QString infoEmail = User::instance()->email();
-            const QString jhrEmail = JsonHttpRequest::email();
-            if (infoEmail.isEmpty() || jhrEmail.isEmpty() || infoEmail != jhrEmail
-                || !m_collaborators.contains(jhrEmail, Qt::CaseInsensitive)) {
+            const QString infoEmail = User::instance()->info().email;
+            const QString lsEmail = LocalStorage::load("email").toString();
+            if (infoEmail.isEmpty() || lsEmail.isEmpty() || infoEmail != lsEmail
+                || !m_collaborators.contains(lsEmail, Qt::CaseInsensitive)) {
                 m_collaborators.clear();
                 m_errorReport->setErrorMessage(QStringLiteral(
                         "This document is protected. You are not authorized to view it."));
@@ -3107,9 +3113,8 @@ void ScriteDocumentCollaborators::fetchUsersInfo()
     if (collaborators.isEmpty())
         return;
 
-    const QString callObjectName = QStringLiteral("call");
-    JsonHttpRequest *call =
-            this->findChild<JsonHttpRequest *>(callObjectName, Qt::FindDirectChildrenOnly);
+    UserCheckRestApiCall *call =
+            this->findChild<UserCheckRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
     if (call != nullptr) {
         ++m_pendingFetchUsersInfoRequests;
         return;
@@ -3125,16 +3130,10 @@ void ScriteDocumentCollaborators::fetchUsersInfo()
     if (pendingCollaborators.isEmpty())
         return;
 
-    call = new JsonHttpRequest(this);
-    call->setObjectName(callObjectName);
-    call->setAutoDelete(true);
-    call->setType(JsonHttpRequest::POST);
-    call->setApi(QStringLiteral("app/users"));
-    QJsonObject data;
-    data.insert(QStringLiteral("emailIds"), QJsonValue::fromVariant(pendingCollaborators));
-    call->setData(data);
-
-    connect(call, &JsonHttpRequest::finished, this, &ScriteDocumentCollaborators::onCallFinished);
+    call = new UserCheckRestApiCall(this);
+    call->setEmails(pendingCollaborators);
+    connect(call, &UserCheckRestApiCall::finished, this,
+            &ScriteDocumentCollaborators::onCallFinished);
     call->call();
 }
 
@@ -3146,11 +3145,9 @@ void ScriteDocumentCollaborators::updateModelAndFetchUsersInfoIfRequired()
 
 void ScriteDocumentCollaborators::onCallFinished()
 {
-    JsonHttpRequest *call = qobject_cast<JsonHttpRequest *>(this->sender());
+    UserCheckRestApiCall *call = qobject_cast<UserCheckRestApiCall *>(this->sender());
     if (call == nullptr)
-        call = this->findChild<JsonHttpRequest *>(QStringLiteral("call"),
-                                                  Qt::FindDirectChildrenOnly);
-    ;
+        call = this->findChild<UserCheckRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
     if (call == nullptr)
         return;
 
@@ -3167,8 +3164,6 @@ void ScriteDocumentCollaborators::onCallFinished()
 
     this->updateModel();
 
-    if (m_pendingFetchUsersInfoRequests > 0) {
-        ExecLaterTimer::call("ScriteDocumentCollaborators::fetchUsersInfo", this,
-                             [=]() { this->fetchUsersInfo(); });
-    }
+    if (m_pendingFetchUsersInfoRequests > 0)
+        QTimer::singleShot(100, this, &ScriteDocumentCollaborators::fetchUsersInfo);
 }

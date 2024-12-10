@@ -52,6 +52,7 @@ public:
     explicit Application(int &argc, char **argv, const QVersionNumber &version);
     ~Application();
 
+    QString deviceId() const;
     QString installationId() const;
     QDateTime installationTimestamp() const;
 
@@ -89,6 +90,9 @@ public:
     Q_PROPERTY(Platform platform READ platform CONSTANT)
     Platform platform() const;
 
+    Q_PROPERTY(QString platformAsString READ platformAsString CONSTANT)
+    QString platformAsString() const;
+
     Q_PROPERTY(bool isMacOSPlatform READ isMacOSPlatform CONSTANT)
 #ifdef Q_OS_MAC
     bool isMacOSPlatform() const { return true; }
@@ -120,6 +124,12 @@ public:
     bool isLinuxPlatform() const { return false; }
 #endif
 #endif
+
+    Q_PROPERTY(QString platformVersion READ platformVersion CONSTANT)
+    QString platformVersion() const;
+
+    Q_PROPERTY(QString platformType READ platformType CONSTANT)
+    QString platformType() const;
 
     Q_PROPERTY(QStringList availableThemes READ availableThemes CONSTANT)
     static QStringList availableThemes();

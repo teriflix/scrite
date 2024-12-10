@@ -58,6 +58,7 @@ HEADERS += \
     src/automation/windowcapture.h \
     src/core/appwindow.h \
     src/core/filelocker.h \
+    src/core/localstorage.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/peerapplookup.h \
     src/core/printerobject.h \
@@ -78,8 +79,8 @@ HEADERS += \
     src/exporters/characterrelationshipsgraphexporter_p.h \
     src/exporters/structureexporter_p.h \
     src/importers/openfromlibrary.h \
-    src/network/jsonhttprequest.h \
     src/network/networkaccessmanager.h \
+    src/network/restapicall.h \
     src/network/user.h \
     src/printing/qtextdocumentpagedprinter.h \
     src/quick/items/boundingboxevaluator.h \
@@ -100,7 +101,6 @@ HEADERS += \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/propertyalias.h \
     src/quick/objects/refcounter.h \
-    src/quick/objects/session.h \
     src/quick/objects/syntaxhighlighter.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
@@ -192,6 +192,7 @@ SOURCES += \
     src/core/application_build_timestamp.cpp \
     src/core/appwindow.cpp \
     src/core/filelocker.cpp \
+    src/core/localstorage.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/peerapplookup.cpp \
     src/core/qobjectlistmodel.cpp \
@@ -211,8 +212,8 @@ SOURCES += \
     src/exporters/characterrelationshipsgraphexporter_p.cpp \
     src/exporters/structureexporter_p.cpp \
     src/importers/openfromlibrary.cpp \
-    src/network/jsonhttprequest.cpp \
     src/network/networkaccessmanager.cpp \
+    src/network/restapicall.cpp \
     src/network/user.cpp \
     src/printing/qtextdocumentpagedprinter.cpp \
     src/quick/items/boundingboxevaluator.cpp \
@@ -233,7 +234,6 @@ SOURCES += \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/propertyalias.cpp \
     src/quick/objects/refcounter.cpp \
-    src/quick/objects/session.cpp \
     src/quick/objects/syntaxhighlighter.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/focustracker.cpp \

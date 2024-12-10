@@ -300,6 +300,8 @@ QHash<int, QByteArray> GenericArraySortFilterProxyModel::roleNames() const
 bool GenericArraySortFilterProxyModel::filterAcceptsRow(int source_row,
                                                         const QModelIndex &source_parent) const
 {
+    Q_UNUSED(source_parent);
+
     GenericArraySortFilterProxyModel *ncThis = const_cast<GenericArraySortFilterProxyModel *>(this);
 
     BooleanResult result;

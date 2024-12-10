@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "restapicall.h"
 #include "openfromlibrary.h"
 #include "networkaccessmanager.h"
 
@@ -160,25 +161,23 @@ void Library::fetchRecords()
 
     this->setBusy(true);
 
-    JsonHttpRequest *call = new JsonHttpRequest(this);
-    call->setType(JsonHttpRequest::GET);
-    call->setApi(m_type == Screenplays ? QLatin1String("scriptalay/screenplays")
-                                       : QLatin1String("scriptalay/templates"));
-    call->setAutoDelete(true);
-    connect(call, &JsonHttpRequest::finished, this, [=]() {
+    AbstractScriptalayRestApiCall *call = m_type == Screenplays
+            ? (AbstractScriptalayRestApiCall *)(new ScriptalayScreenplaysRestApiCall(this))
+            : (AbstractScriptalayRestApiCall *)(new ScriptalayTemplatesRestApiCall(this));
+
+    connect(call, &RestApiCall::finished, this, [=]() {
         if (call->hasError() || !call->hasResponse()) {
             this->setBusy(false);
             return;
         }
 
-        const QJsonObject response = call->responseData();
-
-        m_baseUrl = response.value(QLatin1String("baseUrl")).toString();
+        m_baseUrl = call->baseUrl();
         emit baseUrlChanged();
 
-        this->setRecords(response.value(QLatin1String("records")).toArray());
+        this->setRecords(call->records());
         this->setBusy(false);
     });
+
     call->call();
 }
 

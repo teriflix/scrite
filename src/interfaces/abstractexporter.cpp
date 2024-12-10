@@ -52,16 +52,14 @@ QString AbstractExporter::nameFilters() const
 bool AbstractExporter::isFeatureEnabled() const
 {
     if (User::instance()->isLoggedIn()) {
-        const bool allReportsEnabled = User::instance()->isFeatureEnabled(Scrite::ExportFeature);
+        const bool allReportsEnabled = AppFeature::isEnabled(Scrite::ExportFeature);
         const bool thisSpecificReportEnabled = allReportsEnabled
-                ? User::instance()->isFeatureNameEnabled(QStringLiteral("export/")
-                                                         + this->formatName())
+                ? AppFeature::isEnabled(QStringLiteral("export/") + this->formatName())
                 : false;
         return allReportsEnabled && thisSpecificReportEnabled;
     }
 
-    return this->formatName() == QStringLiteral("Adobe PDF"); // this is the only exporter we enable
-                                                              // by default when not logged in.
+    return false;
 }
 
 QJsonObject AbstractExporter::configurationFormInfo() const

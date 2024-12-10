@@ -13,42 +13,282 @@
 
 #include "user.h"
 #include "scrite.h"
-#include "callgraph.h"
 #include "application.h"
-#include "timeprofiler.h"
+#include "restapicall.h"
+#include "localstorage.h"
 #include "peerapplookup.h"
-#include "scritedocument.h"
-#include "jsonhttprequest.h"
 
-#include <QtDebug>
+#include <QImage>
 #include <QPainter>
-#include <QLocale>
-#include <QSettings>
-#include <QDateTime>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QJsonDocument>
-#include <QCoreApplication>
-#include <QScopedValueRollback>
+#include <QMetaClassInfo>
 
-static QString GetSessionExpiredErrorMessage(const QString &context)
+inline QStringList JsonArrayToStringList(const QJsonArray &array)
 {
-    if (context == "E_ACTIVE_SUBSCRIPTION")
-        return context
-                + QStringLiteral(": No active subscription was found. Please subscribe to a plan "
-                                 "to continue using Scrite.");
-
-    return context
-            + QStringLiteral(": Your login session has expired and therefore your device is "
-                             "deactivated. Please connect to the Internet and "
-                             "login/reactivate your installation of Scrite.");
+    QStringList ret;
+    for (const QJsonValue &item : array)
+        ret << item.toString();
+    return ret;
 }
+
+inline bool DeepCopyGadget(const QMetaObject *mo, const void *from, void *to)
+{
+    bool success = true;
+    for (int i = 0; i < mo->propertyCount(); i++) {
+        const QMetaProperty prop = mo->property(i);
+        const QVariant propValue = prop.readOnGadget(from);
+        success &= prop.writeOnGadget(to, propValue);
+    }
+    return success;
+}
+
+inline bool DeepCompareGadget(const QMetaObject *mo, const void *a, const void *b)
+{
+    for (int i = 0; i < mo->propertyCount(); i++) {
+        const QMetaProperty prop = mo->property(i);
+        const QVariant aValue = prop.readOnGadget(a);
+        const QVariant bValue = prop.readOnGadget(b);
+        int result = 0;
+        bool compareSuccess = QMetaType::compare(aValue.constData(), bValue.constData(),
+                                                 prop.userType(), &result);
+        if (compareSuccess) {
+            if (result != 0)
+                return false;
+        } else {
+            if (aValue != bValue)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserInstallationInfo::UserInstallationInfo(const QJsonObject &object)
+{
+    this->id = object.value("_id").toString();
+    this->clientId = object.value("clientId").toString();
+    this->deviceId = object.value("deviceId").toString();
+    this->platform = object.value("platform").toString();
+    this->platformVersion = object.value("platformVersion").toString();
+    this->platformType = object.value("platformType").toString();
+    this->appVersion = object.value("appVersion").toString();
+    this->pastAppVersions = JsonArrayToStringList(object.value("appVersions").toArray());
+    this->creationDate =
+            QDateTime::fromString(object.value("creationDate").toString(), Qt::ISODateWithMs);
+    this->lastActivationDate =
+            QDateTime::fromString(object.value("lastActivationDate").toString(), Qt::ISODateWithMs);
+    this->lastSessionDate =
+            QDateTime::fromString(object.value("lastSessionDate").toString(), Qt::ISODateWithMs);
+    this->activated = object.value("activated").toBool();
+}
+
+UserInstallationInfo::UserInstallationInfo(const UserInstallationInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserInstallationInfo::operator==(const UserInstallationInfo &other) const
+{
+    return DeepCompareGadget(&staticMetaObject, static_cast<const void *>(&other),
+                             static_cast<const void *>(this));
+}
+
+UserInstallationInfo &UserInstallationInfo::operator=(const UserInstallationInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+bool UserInstallationInfo::isCurrent() const
+{
+    return this->clientId == Application::instance()->installationId()
+            && this->deviceId == Application::instance()->deviceId();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserSubscriptionPlanInfo::UserSubscriptionPlanInfo(const QJsonObject &object)
+{
+    this->name = object.value("name").toString();
+    this->kind = object.value("kind").toString();
+    this->title = object.value("title").toString();
+    this->subtitle = object.value("subtitle").toString();
+    this->duration = object.value("duration").toInt();
+
+    const QJsonObject pricing = object.value("pricing").toObject();
+    this->currency = pricing.value("currency").toString();
+    this->price = pricing.value("price").toDouble();
+
+    this->features = JsonArrayToStringList(object.value("features").toArray());
+    this->featureNote = object.value("featureNote").toString();
+
+    this->devices = object.value("devices").toInt();
+}
+
+UserSubscriptionPlanInfo::UserSubscriptionPlanInfo(const UserSubscriptionPlanInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserSubscriptionPlanInfo::operator==(const UserSubscriptionPlanInfo &other) const
+{
+    return DeepCompareGadget(&staticMetaObject, static_cast<const void *>(&other),
+                             static_cast<const void *>(this));
+}
+
+UserSubscriptionPlanInfo &UserSubscriptionPlanInfo::operator=(const UserSubscriptionPlanInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserSubscriptionInfo::UserSubscriptionInfo(const QJsonObject &object)
+{
+    this->id = object.value("_id").toString();
+    this->kind = object.value("kind").toString();
+    this->plan = UserSubscriptionPlanInfo(object.value("plan").toObject());
+    this->from = QDateTime::fromString(object.value("from").toString(), Qt::ISODateWithMs);
+    this->until = QDateTime::fromString(object.value("until").toString(), Qt::ISODateWithMs);
+    this->orderId = object.value("wc_order_id").toString();
+    this->isActive = object.value("isActive").toBool();
+    this->isUpcoming = object.value("isUpcoming").toBool();
+    this->hasExpired = object.value("hasExpired").toBool();
+}
+
+UserSubscriptionInfo::UserSubscriptionInfo(const UserSubscriptionInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserSubscriptionInfo::operator==(const UserSubscriptionInfo &other) const
+{
+    return DeepCompareGadget(&staticMetaObject, static_cast<const void *>(&other),
+                             static_cast<const void *>(this));
+}
+
+UserSubscriptionInfo &UserSubscriptionInfo::operator=(const UserSubscriptionInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+QString UserSubscriptionInfo::description() const
+{
+    auto describeDays = [](int nrDays) -> QString {
+        if (nrDays == 0)
+            return "today";
+        else if (nrDays == 1)
+            return "tomorrow";
+        return "in " + QString::number(nrDays) + " days";
+    };
+
+    QString ret = this->plan.title;
+    if (this->isActive) {
+        const int nrDays = this->daysToUntil();
+        if (nrDays <= 30)
+            ret += " (Expires " + describeDays(nrDays) + ")";
+    } else if (this->isUpcoming) {
+        const int nrDays = this->daysToFrom();
+        if (nrDays <= 30)
+            ret += " (Starts " + describeDays(nrDays) + ")";
+        else
+            ret += " (Upcoming)";
+    } else if (this->hasExpired) {
+        ret += " (Expired)";
+    }
+
+    return ret;
+}
+
+bool UserSubscriptionInfo::isFeatureEnabled(int feature) const
+{
+    return Scrite::isFeatureEnabled(Scrite::AppFeature(feature), this->plan.features);
+}
+
+bool UserSubscriptionInfo::isFeatureNameEnabled(const QString &featureName) const
+{
+    return Scrite::isFeatureNameEnabled(featureName, this->plan.features);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+UserInfo::UserInfo(const QJsonObject &object)
+{
+    this->id = object.value("_id").toString();
+    this->email = object.value("email").toString();
+    this->signUpDate =
+            QDateTime::fromString(object.value("signUpDate").toString(), Qt::ISODateWithMs);
+    this->timestamp =
+            QDateTime::fromString(object.value("timestamp").toString(), Qt::ISODateWithMs);
+    this->firstName = object.value("firstName").toString();
+    this->lastName = object.value("lastName").toString();
+    this->fullName = object.value("fullName").toString();
+    this->experience = object.value("experience").toString();
+    this->city = object.value("city").toString();
+    this->country = object.value("country").toString();
+    this->wdyhas = object.value("wdyhas").toString();
+    this->consentToActivityLog = object.value("consentToActivityLog").toBool();
+    this->consentToEmail = object.value("consentToEmail").toBool();
+
+    const QJsonArray _installations = object.value("installations").toArray();
+    for (const QJsonValue &_installation : _installations) {
+        UserInstallationInfo info(_installation.toObject());
+        this->installations << info;
+    }
+
+    const QJsonArray _subscriptions = object.value("subscriptions").toArray();
+    for (const QJsonValue &_subscription : _subscriptions) {
+        UserSubscriptionInfo info(_subscription.toObject());
+        this->subscriptions << info;
+    }
+
+    const QJsonValue pbs = object.value("publicBetaSubscription");
+    if (pbs.isObject())
+        this->publicBetaSubscription = UserSubscriptionInfo(pbs.toObject());
+
+    this->activeInstallationCount = object.value("activeInstallationCount").toInt();
+    this->hasActiveSubscription = object.value("hasActiveSubscription").toBool();
+    this->hasUpcomingSubscription = object.value("hasUpcomingSubscription").toBool();
+    this->hasTrialSubscription = object.value("hasTrialSubscription").toBool();
+    this->paidSubscriptionCount = object.value("paidSubscriptionCount").toBool();
+    this->subscribedUntil =
+            QDateTime::fromString(object.value("subscribedUntil").toString(), Qt::ISODateWithMs);
+    this->isEarlyAdopter = object.value("isEarlyAdopter").toBool();
+}
+
+UserInfo::UserInfo(const UserInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserInfo::operator==(const UserInfo &other) const
+{
+    return DeepCompareGadget(&staticMetaObject, static_cast<const void *>(&other),
+                             static_cast<const void *>(this));
+}
+
+UserInfo &UserInfo::operator=(const UserInfo &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 User *User::instance()
 {
-    // CAPTURE_FIRST_CALL_GRAPH;
 
     static bool firstTime = true;
+
+    bool refreshSessionToken = firstTime;
+
     if (firstTime) {
-        User::locations();
         PeerAppLookup::instance();
 
         const QStringList appArgs = qApp->arguments();
@@ -56,15 +296,24 @@ User *User::instance()
         const int stargPos = appArgs.indexOf(starg);
         if (stargPos >= 0 && appArgs.size() >= stargPos + 2) {
             const QString stok = appArgs.at(stargPos + 1);
-            JsonHttpRequest::store(QStringLiteral("sessionToken"), stok);
+            LocalStorage::store("sessionToken", stok);
+            refreshSessionToken = false;
         }
     }
 
     static User *theUser = new User(qApp);
 
     if (firstTime) {
-        theUser->loadStoredInformation();
-        theUser->firstReload(false);
+        if (refreshSessionToken && LocalStorage::load("loginToken").isValid()) {
+            SessionNewRestApiCall *newSession = new SessionNewRestApiCall(theUser);
+            if (!newSession->call()) {
+                newSession->deleteLater();
+            }
+        } else if (LocalStorage::load("sessionToken").isValid()) {
+            QTimer::singleShot(0, theUser, &User::loadInfoUsingRestApiCall);
+        }
+
+        theUser->loadInfoFromStorage();
     }
 
     firstTime = false;
@@ -74,860 +323,113 @@ User *User::instance()
 
 User::User(QObject *parent) : QObject(parent)
 {
-    // CAPTURE_CALL_GRAPH;
-
     connect(this, &User::infoChanged, this, &User::loggedInChanged);
-    connect(this, &User::installationsChanged, this, &User::loggedInChanged);
-
-    m_touchLogTimer.setSingleShot(false);
-    m_touchLogTimer.setInterval(10 * 60 * 1000); // 10 minutes
-    connect(&m_touchLogTimer, &QTimer::timeout, this,
-            [=]() { this->logActivity1(QStringLiteral("touch")); });
-    connect(this, &User::loggedInChanged, this, [=]() {
-        if (this->isLoggedIn())
-            m_touchLogTimer.start();
-        else
-            m_touchLogTimer.stop();
-    });
 }
 
 User::~User() { }
 
 bool User::isLoggedIn() const
 {
-    return !m_info.isEmpty() && !m_installations.isEmpty();
+    return m_info.isValid();
 }
 
-QString User::email() const
+void User::logActivity2(const QString &activity, const QJsonValue &data)
 {
-    return m_info.value(QStringLiteral("email")).toString().toLower();
-}
-
-QString User::firstName() const
-{
-    return m_info.value(QStringLiteral("firstName")).toString();
-}
-
-QString User::lastName() const
-{
-    return m_info.value(QStringLiteral("lastName")).toString();
-}
-
-QString User::fullName() const
-{
-    return QStringList({ this->firstName(), this->lastName() }).join(QStringLiteral(" ")).trimmed();
-}
-
-QString User::location() const
-{
-    return m_info.value(QStringLiteral("location")).toString();
-}
-
-QString User::experience() const
-{
-    return m_info.value(QStringLiteral("experience")).toString();
-}
-
-QString User::wdyhas() const
-{
-    return m_info.value(QStringLiteral("wdyhas")).toString();
-}
-
-QString User::country() const
-{
-    return m_info.value(QStringLiteral("country")).toString();
-}
-
-QString User::currency() const
-{
-    return m_info.value(QStringLiteral("currency")).toString();
-}
-
-static QJsonObject findActiveSubscription(const QJsonArray &subscriptions)
-{
-    for (const QJsonValue &subValue : subscriptions) {
-        const QJsonObject sub = subValue.toObject();
-        if (sub.value("active").toBool())
-            return sub;
+    if (m_info.isValid() && !this->isBusy()) {
+        UserActivityRestApiCall *call = new UserActivityRestApiCall(qApp);
+        call->setActivity("desktop/" + activity);
+        call->setActivityData(data);
+        call->call();
     }
-
-    return QJsonObject();
 }
 
-QJsonObject User::activeSubscription() const
+bool User::isBusy() const
 {
-    return findActiveSubscription(m_subscriptions);
+    RestApiCall *apiCall = this->findChild<RestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
+    return apiCall != nullptr;
 }
 
-bool User::hasActiveSubscription() const
+void User::setInfo(const UserInfo &val)
 {
-    const QJsonObject activeSub = this->activeSubscription();
-    return !activeSub.isEmpty();
-}
+    if (m_info == val)
+        return;
 
-QString User::activeSubscriptionDescription() const
-{
-    QString ret;
-
-    if (this->hasActiveSubscription()) {
-        const QJsonObject activeSub = this->activeSubscription();
-        const QString planType = activeSub.value("plan_kind").toString();
-        const QString planName = activeSub.value("plan_name").toString();
-        const QDate validUntil =
-                QDate::fromString(activeSub.value("end_date").toString(), Qt::ISODate);
-        const int nrDays = QDate::currentDate().daysTo(validUntil) + 1;
-
-        ret += planName;
-        if (nrDays <= 30 || planType == "trial") {
-            if (nrDays == 1)
-                ret += " Expires Tomorrow";
-            else if (nrDays == 0)
-                ret += " Expires Today!";
-            else
-                ret += " - " + QString::number(nrDays) + " Days Left";
-        }
-    }
-
-    return ret;
-}
-
-static QJsonObject findUpcomingSubscription(const QJsonArray &subscriptions)
-{
-    for (const QJsonValue &subValue : subscriptions) {
-        const QJsonObject sub = subValue.toObject();
-        if (sub.value("pending").toBool())
-            return sub;
-    }
-
-    return QJsonObject();
-}
-
-QJsonObject User::upcomingSubscription() const
-{
-    return findUpcomingSubscription(m_subscriptions);
-}
-
-bool User::hasUpcomingSubscription() const
-{
-    const QJsonObject upcomingSub = this->upcomingSubscription();
-    return !upcomingSub.isEmpty();
-}
-
-QString User::upcomingSubscriptionDescription() const
-{
-    QString ret;
-
-    if (this->hasUpcomingSubscription()) {
-        const QJsonObject upcomingSub = this->upcomingSubscription();
-        const QString planType = upcomingSub.value("plan_kind").toString();
-        const QString planName = upcomingSub.value("plan_name").toString();
-        const QDate validUntil =
-                QDate::fromString(upcomingSub.value("end_date").toString(), Qt::ISODate);
-        const int nrDays = QDate::currentDate().daysTo(validUntil) + 1;
-
-        ret += planName;
-        if (nrDays <= 30 || planType == "trial") {
-            if (nrDays == 1)
-                ret += " Expires Tomorrow";
-            else if (nrDays == 0)
-                ret += " Expires Today!";
-            else
-                ret += " - " + QString::number(nrDays) + " Days Left";
-        }
-    }
-
-    return ret;
-}
-
-QStringList User::locations()
-{
-    static QStringList ret;
-    if (ret.isEmpty()) {
-        // CAPTURE_CALL_GRAPH;
-        QFile ccdb(QStringLiteral(":/misc/city-country-map.json.compressed"));
-        if (ccdb.open(QFile::ReadOnly)) {
-            const QByteArray json = qUncompress(ccdb.readAll());
-            const QJsonObject jsonMap = QJsonDocument::fromJson(json).object();
-            QJsonObject::const_iterator it = jsonMap.constBegin();
-            QJsonObject::const_iterator end = jsonMap.constEnd();
-            QSet<QString> locs;
-            while (it != end) {
-                const QString cityCountry = it.key() + QStringLiteral(", ") + it.value().toString();
-                locs << cityCountry;
-                ++it;
-            }
-
-            ret = locs.values();
-        }
-    }
-
-    return ret;
-}
-
-bool User::isFeatureNameEnabled(const QString &featureName) const
-{
-    if (m_info.isEmpty())
-        return false;
-
-    const QString lfeatureName = featureName.toLower();
-    const QJsonArray features = m_info.value(QStringLiteral("enabledAppFeatures")).toArray();
-    const auto featurePredicate = [lfeatureName](const QJsonValue &item) -> bool {
-        const QString istring = item.toString().toLower();
-        return (istring == lfeatureName);
-    };
-    const auto wildCardPredicate = [](const QJsonValue &item) -> bool {
-        return item.toString() == QStringLiteral("*");
-    };
-    const auto notFeaturePredicate = [lfeatureName](const QJsonValue &item) -> bool {
-        const QString istring = item.toString().toLower();
-        return istring.startsWith(QChar('!')) && (istring.mid(1) == lfeatureName);
-    };
-
-    const bool featureEnabled =
-            std::find_if(features.constBegin(), features.constEnd(), featurePredicate)
-            != features.constEnd();
-    const bool allFeaturesEnabled =
-            std::find_if(features.constBegin(), features.constEnd(), wildCardPredicate)
-            != features.constEnd();
-    const bool featureDisabled =
-            std::find_if(features.constBegin(), features.constEnd(), notFeaturePredicate)
-            != features.constEnd();
-    return (allFeaturesEnabled || featureEnabled) && !featureDisabled;
-}
-
-void User::refresh()
-{
-    emit infoChanged();
-    emit installationsChanged();
-}
-
-void User::setInfo(const QJsonObject &val)
-{
     m_info = val;
-    m_enabledFeatures.clear();
-    m_analyticsConsent = false;
-
-    if (!m_info.isEmpty()) {
-        // Must be in sync with Scrite.AppFeatures enumeration
-        static const QStringList availableFeatures = {
-            QStringLiteral("screenplay"), QStringLiteral("structure"),
-            QStringLiteral("notebook"),   QStringLiteral("relationshipgraph"),
-            QStringLiteral("scriptalay"), QStringLiteral("template"),
-            QStringLiteral("report"),     QStringLiteral("import"),
-            QStringLiteral("export"),     QStringLiteral("scrited"),
-            QStringLiteral("watermark")
-        };
-        const QJsonArray features = m_info.value(QStringLiteral("enabledAppFeatures")).toArray();
-        QSet<int> ifeatures;
-        for (const QJsonValue &featureItem : features) {
-            const QString feature = featureItem.toString().toLower();
-            if (feature.isEmpty())
-                continue;
-
-            if (feature == QStringLiteral("*")) {
-                for (int i = Scrite::MinFeature; i <= Scrite::MaxFeature; i++)
-                    ifeatures += i;
-            } else {
-                const bool invert = feature.startsWith(QChar('!'));
-                const int index = availableFeatures.indexOf(invert ? feature.mid(1) : feature);
-                if (index >= 0) {
-                    if (invert)
-                        ifeatures -= index;
-                    else
-                        ifeatures += index;
-                }
-            }
-        }
-
-        m_enabledFeatures = ifeatures.values();
-        std::sort(m_enabledFeatures.begin(), m_enabledFeatures.end());
-
-        const QJsonObject consentObj = m_info.value(QStringLiteral("consent")).toObject();
-        m_analyticsConsent = consentObj.value(QStringLiteral("activity")).toBool(false);
-
-#ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
-        qDebug() << "PA: " << m_enabledFeatures << m_info;
-#endif
-
-        QTimer::singleShot(2000, this, &User::updateUserCountryAndCurrency);
-    }
-
     emit infoChanged();
+
+    QTimer::singleShot(100, this, &User::checkIfSubscriptionIsAboutToExpire);
 }
 
-void User::setInstallations(const QJsonArray &val)
+void User::checkIfSubscriptionIsAboutToExpire()
 {
-    if (m_installations == val)
+    if (!m_info.isValid() || !m_info.hasActiveSubscription)
         return;
 
-    m_installations = val;
-    m_currentInstallationIndex = -1;
-
-    auto sortVersionsArray = [](QJsonObject &object, const QString &key) {
-        QJsonArray array = object.value(key).toArray();
-        if (array.isEmpty())
-            return;
-
-        QVariantList varList = array.toVariantList();
-        std::sort(varList.begin(), varList.end(), [](const QVariant &va, const QVariant &vb) {
-            const QString vas = va.toString();
-            const QString vbs = vb.toString();
-            return QVersionNumber::fromString(vas) > QVersionNumber::fromString(vbs);
-        });
-
-        array = QJsonArray::fromVariantList(varList);
-        object.insert(key, array);
-    };
-
-    // Sort version fields appVersions and pastVersions
-    for (QJsonValueRef item : m_installations) {
-        QJsonObject installation = item.toObject();
-        sortVersionsArray(installation, QStringLiteral("appVersions"));
-        sortVersionsArray(installation, QStringLiteral("pastVersions"));
-        item = installation;
-    }
-
-    int index = -1;
-    bool activationTimeout = false;
-    for (const QJsonValue &item : qAsConst(m_installations)) {
-        ++index;
-        const QJsonObject installation = item.toObject();
-        if (installation.value(QStringLiteral("deviceId")).toString()
-            == JsonHttpRequest::deviceId()) {
-            const QString dtFormat = QStringLiteral("yyyy-MM-ddThh:mm:ss.zzz");
-            const QString lastActivatedDateString =
-                    installation.value(QStringLiteral("lastActivationDate")).toString();
-            if (!lastActivatedDateString.isEmpty()) {
-                const QDateTime lastActivateDate = QDateTime::fromString(
-                        lastActivatedDateString.left(lastActivatedDateString.length() - 1),
-                        dtFormat);
-                const int nrDaysFromLastActivation =
-                        lastActivateDate.daysTo(QDateTime::currentDateTime());
-                if (nrDaysFromLastActivation > 28) {
-                    activationTimeout = true;
-                    break;
-                }
-            }
-
-            m_currentInstallationIndex = index;
-            break;
+    const bool alreadyCheckedOnceToday = []() {
+        const QString lsKey = QStringLiteral("lastSubscriptionReminderDate");
+        const QVariant lastReminderDateVal = LocalStorage::load(lsKey);
+        if (lastReminderDateVal.isValid()) {
+            const QDate dt = lastReminderDateVal.value<QDate>();
+            if (dt == QDate::currentDate())
+                return true;
         }
-    }
 
-    if (m_currentInstallationIndex < 0 && !m_installations.isEmpty()) {
-        if (m_loadingStoredUserInformation)
-            this->reset();
-        else {
-            const QString errContext = m_currentInstallationIndex < 0
-                    ? (activationTimeout ? QStringLiteral("E_ACT_TIMEOUT")
-                                         : QStringLiteral("E_INSTALL"))
-                    : QStringLiteral("E_INSTALLS");
-            m_errorReport->setErrorMessage(GetSessionExpiredErrorMessage(errContext));
-            m_installations = QJsonArray();
-            this->logout();
-        }
-    }
-
-    emit installationsChanged();
-}
-
-void User::setSubscriptions(const QJsonArray &val)
-{
-    if (m_subscriptions == val)
+        LocalStorage::store(lsKey, QDate::currentDate());
+        return false;
+    }();
+    if (alreadyCheckedOnceToday)
         return;
 
-    m_subscriptions = val;
-    emit subscriptionsChanged();
-}
-
-void User::setHelpTips(const QJsonObject &val)
-{
-    if (m_helpTips == val)
-        return;
-
-    m_helpTips = val;
-    emit helpTipsChanged();
-
-    const QByteArray json = QJsonDocument(val).toJson();
-    JsonHttpRequest::store(QStringLiteral("helpTips"), json.toBase64());
-}
-
-void User::loadStoredHelpTips()
-{
-    const QByteArray base64 = JsonHttpRequest::fetch(QStringLiteral("helpTips")).toByteArray();
-    const QByteArray json = QByteArray::fromBase64(base64);
-
-    m_helpTips = QJsonDocument::fromJson(json).object();
-    emit helpTipsChanged();
-}
-
-void User::firstReload(bool loadStoredUserInfoAlso)
-{
-    if (loadStoredUserInfoAlso)
-        this->loadStoredInformation();
-    this->fetchHelpTips();
-    this->reload();
-}
-
-void User::fetchHelpTips()
-{
-    JsonHttpRequest *call = new JsonHttpRequest(this);
-    call->setAutoDelete(true);
-
-    call->setApi(QStringLiteral("user/helpTips"));
-    call->setType(JsonHttpRequest::GET);
-    connect(call, &JsonHttpRequest::finished, this, [=]() {
-        if (call->hasError() || !call->hasResponse()) {
-            this->loadStoredHelpTips();
-            return; // Use stored credentials
-        }
-        this->setHelpTips(call->responseData());
-    });
-    call->call();
-}
-
-void User::reset()
-{
-    if (!m_loadingStoredUserInformation) {
-        ScriteDocument *document = ScriteDocument::instance();
-        if (document)
-            document->reset();
-    }
-
-    this->setSubscriptions(QJsonArray());
-    this->setInstallations(QJsonArray());
-    this->setInfo(QJsonObject());
-    JsonHttpRequest::store(QStringLiteral("devices"), QVariant());
-    JsonHttpRequest::store(QStringLiteral("subscriptions"), QVariant());
-    JsonHttpRequest::store(QStringLiteral("userInfo"), QVariant());
-    JsonHttpRequest::store(QStringLiteral("loginToken"), QVariant());
-    JsonHttpRequest::store(QStringLiteral("sessionToken"), QVariant());
-}
-
-void User::activateCallDone()
-{
-    if (m_call) {
-        if (m_call->hasError()) {
-            m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
-            this->reset();
-            emit forceLoginRequest();
-            return;
-        }
-
-        if (!m_call->hasResponse())
-            return; // Use stored credentials
-
-        const QJsonObject tokens = m_call->responseData();
-        const QString sessionTokenKey = QStringLiteral("sessionToken");
-        const QString sessionToken = tokens.value(sessionTokenKey).toString();
-        m_call->store(sessionTokenKey, sessionToken);
-    }
-
-    // Get user information
-    m_call = this->newCall();
-    connect(m_call, &JsonHttpRequest::finished, this, &User::userInfoCallDone);
-    m_call->setApi(QStringLiteral("user/me"));
-    m_call->setType(JsonHttpRequest::GET);
-    m_call->call();
-}
-
-void User::userInfoCallDone()
-{
-    if (m_call) {
-        if (m_call->hasError()) {
-            m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
-            this->reset();
-            emit forceLoginRequest();
-            return;
-        }
-
-        if (!m_call->hasResponse())
-            return; // Use stored credentials
-
-        QJsonObject userInfo = m_call->responseData();
-
-        const QString ikey = QStringLiteral("installations");
-        const QJsonValue installationsValue = userInfo.value(ikey);
-        userInfo.remove(ikey);
-
-        const QString skey = QStringLiteral("subscriptions");
-        const QJsonValue subscriptionsValue = userInfo.value(skey);
-        userInfo.remove(skey);
-
-        this->setInfo(userInfo);
-        this->storeUserInfo();
-
-        if (subscriptionsValue.isArray()) {
-            const QJsonArray subscriptions = subscriptionsValue.toArray();
-            this->setSubscriptions(subscriptions);
-            this->storeSubscriptions();
-        }
-
-        if (installationsValue.isArray()) {
-            const QJsonArray installations = installationsValue.toArray();
-            this->setInstallations(installations);
-            this->storeInstallations();
-            return;
-        }
-    }
-}
-
-void User::installationsCallDone()
-{
-    if (m_call) {
-        if (m_call->hasError()) {
-            m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
-            this->reset();
-            emit forceLoginRequest();
-            return;
-        }
-
-        if (!m_call->hasResponse())
-            return; // Use stored credentials
-
-        const QJsonObject installationsInfo = m_call->responseData();
-        const QJsonArray installations = installationsInfo.value(QStringLiteral("list")).toArray();
-        this->setInstallations(installations);
-        this->storeInstallations();
-    }
-}
-
-void User::subscriptionsCallDone()
-{
-    if (m_call) {
-        if (m_call->hasError()) {
-            m_errorReport->setErrorMessage(m_call->errorText(), m_call->error());
-            this->reset();
-            emit forceLoginRequest();
-            return;
-        }
-
-        if (!m_call->hasResponse())
-            return; // Use stored credentials
-
-        const QJsonObject subscriptionsInfo = m_call->responseData();
-        const QJsonArray subscriptions = subscriptionsInfo.value(QStringLiteral("list")).toArray();
-        this->setSubscriptions(subscriptions);
-        this->storeSubscriptions();
-    }
-}
-
-void User::loadStoredInformation()
-{
-    QScopedValueRollback<bool> rollback(m_loadingStoredUserInformation, true);
-
-    QJsonParseError parseError;
-
-    auto parse = [&parseError](const QVariant &variant) -> QJsonValue {
-        parseError.error = QJsonParseError::NoError;
-        parseError.offset = -1;
-
-        if (variant.isValid() && !variant.isNull() && variant.canConvert(QMetaType::QString)) {
-            QJsonParseError parseError;
-            const QString cryptText = variant.toString();
-            const QString crypt = JsonHttpRequest::decrypt(cryptText);
-            const QJsonDocument jsonDoc = QJsonDocument::fromJson(crypt.toUtf8(), &parseError);
-            if (parseError.error == QJsonParseError::NoError) {
-                if (jsonDoc.isArray())
-                    return jsonDoc.array();
-                if (jsonDoc.isObject())
-                    return jsonDoc.object();
-            }
-        }
-
-        return QJsonValue(QJsonValue::Undefined);
-    };
-
-    // Load information stored in the previous session
-    const QJsonObject userInfo =
-            parse(JsonHttpRequest::fetch(QStringLiteral("userInfo"))).toObject();
-    if (userInfo.isEmpty()) {
-        this->reset();
-        return;
-    } else
-        this->setInfo(userInfo);
-
-    const QJsonArray devices = parse(JsonHttpRequest::fetch(QStringLiteral("devices"))).toArray();
-    if (devices.isEmpty()) {
-        this->reset();
-        return;
-    } else
-        this->setInstallations(devices);
-
-    const QJsonArray subscriptions =
-            parse(JsonHttpRequest::fetch(QStringLiteral("subscriptions"))).toArray();
-    const QJsonObject activeSub = findActiveSubscription(subscriptions);
-    if (activeSub.isEmpty()) {
-        this->reset();
-        m_errorReport->setErrorMessage(
-                GetSessionExpiredErrorMessage(QStringLiteral("E_ACTIVE_SUBSCRIPTION")));
-        return;
-    } else
-        this->setSubscriptions(subscriptions);
-}
-
-JsonHttpRequest *User::newCall()
-{
-    if (m_call) {
-        disconnect(m_call, &JsonHttpRequest::destroyed, this, &User::onCallDestroyed);
-        m_call->deleteLater();
-        m_call = nullptr;
-    }
-
-    m_errorReport->clear();
-
-    m_call = new JsonHttpRequest(this);
-    m_call->setAutoDelete(true);
-    connect(m_call, &JsonHttpRequest::destroyed, this, &User::onCallDestroyed);
-    connect(m_call, &JsonHttpRequest::justIssuedCall, m_errorReport, &ErrorReport::clear);
-    emit busyChanged();
-    return m_call;
-}
-
-void User::onCallDestroyed()
-{
-    m_call = nullptr;
-    emit busyChanged();
-
-#ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
-    qDebug() << "PA: ";
-#endif
-}
-
-void User::onLogActivityCallFinished()
-{
-    JsonHttpRequest *call = qobject_cast<JsonHttpRequest *>(this->sender());
-    if (call == nullptr)
-        return;
-
-    if (call->hasError()) {
-        const QStringList errorCodes({ QStringLiteral("E_NO_ACTIVATION"),
-                                       QStringLiteral("E_NO_SESSION"),
-                                       QStringLiteral("E_NO_USER") });
-        if (errorCodes.contains(call->errorCode())) {
-            m_errorReport->setErrorMessage(
-                    ::GetSessionExpiredErrorMessage(QStringLiteral("E_LOG")));
-            this->logout();
-            return;
-        }
-
-        // Other error codes are fine, no issues
-    }
-}
-
-void User::onDeactivateInstallationFinished()
-{
-    JsonHttpRequest *call = qobject_cast<JsonHttpRequest *>(this->sender());
-    if (call == nullptr)
-        return;
-
-    if (call->hasError() || !call->hasResponse()) {
-        m_errorReport->setErrorMessage(QStringLiteral("Could not deactivate installation."),
-                                       call->error());
+    UserMeRestApiCall *apiCall =
+            this->findChild<UserMeRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
+    if (apiCall) {
+        QTimer::singleShot(100, this, &User::checkIfSubscriptionIsAboutToExpire);
         return;
     }
 
-    const QJsonObject response = call->responseData();
-    const QJsonArray installations = response.value(QStringLiteral("list")).toArray();
-    this->setInstallations(installations);
-    this->storeInstallations();
+    const int subscriptionTreshold = 15;
+    const int nrDays = QDate::currentDate().daysTo(m_info.subscribedUntil.date());
+    if (nrDays < subscriptionTreshold)
+        emit subscriptionAboutToExpire(nrDays);
 }
 
-void User::storeUserInfo()
+void User::loadInfoFromStorage()
 {
-    const QString text = QJsonDocument(m_info).toJson(QJsonDocument::Compact);
-    const QString cryptText = JsonHttpRequest::encrypt(text);
-    JsonHttpRequest::store(QStringLiteral("userInfo"), cryptText);
-}
+    const QString token = LocalStorage::load("loginToken").toString();
+    if (!token.isEmpty()) {
+        const QByteArray userJson = LocalStorage::load("user").toByteArray();
 
-void User::storeInstallations()
-{
-    const QString text = QJsonDocument(m_installations).toJson(QJsonDocument::Compact);
-    const QString cryptText = JsonHttpRequest::encrypt(text);
-    JsonHttpRequest::store(QStringLiteral("devices"), cryptText);
-}
-
-void User::storeSubscriptions()
-{
-    const QString text = QJsonDocument(m_subscriptions).toJson(QJsonDocument::Compact);
-    const QString cryptText = JsonHttpRequest::encrypt(text);
-    JsonHttpRequest::store(QStringLiteral("subscriptions"), cryptText);
-}
-
-void User::updateUserCountryAndCurrency()
-{
-    const QString countryAttrib = QStringLiteral("country");
-    const QString currencyAttrib = QStringLiteral("currency");
-    if (!m_info.contains(countryAttrib) || m_info.value(countryAttrib).toString().isEmpty()) {
-        const QString country = QLocale::countryToString(QLocale::system().country());
-        m_info.insert(countryAttrib, country);
-
-        const QString currency = QLocale::system().currencySymbol(QLocale::CurrencyIsoCode);
-        m_info.insert(currencyAttrib, currency);
-
-        QJsonObject updatedInfo;
-        updatedInfo.insert(countryAttrib, country);
-        updatedInfo.insert(currencyAttrib, currency);
-
-        this->update(updatedInfo);
-    }
-}
-
-void User::reload()
-{
-    if (m_call != nullptr)
-        return;
-
-    // User should have logged in once.
-    if (JsonHttpRequest::loginToken().isEmpty() || JsonHttpRequest::email().isEmpty()) {
-        this->setInfo(QJsonObject());
-        this->setInstallations(QJsonArray());
-        emit forceLoginRequest();
-        return;
-    }
-
-    if (JsonHttpRequest::sessionToken().isEmpty()) {
-        const bool resetSessionToken = PeerAppLookup::instance()->peerCount() == 0;
-
-        // Activate device to get session token
-        m_call = this->newCall();
-        connect(m_call, &JsonHttpRequest::finished, this, &User::activateCallDone);
-        m_call->setApi(QStringLiteral("app/activate"));
-        m_call->setData(QJsonObject(
-                { { QStringLiteral("email"), JsonHttpRequest::email() },
-                  { QStringLiteral("clientId"), JsonHttpRequest::clientId() },
-                  { QStringLiteral("deviceId"), JsonHttpRequest::deviceId() },
-                  { QStringLiteral("appVersion"), JsonHttpRequest::appVersion() },
-                  { QStringLiteral("loginToken"), JsonHttpRequest::loginToken() },
-                  { QStringLiteral("platform"), JsonHttpRequest::platform() },
-                  { QStringLiteral("platformType"), JsonHttpRequest::platformType() },
-                  { QStringLiteral("platformVersion"), JsonHttpRequest::platformVersion() },
-                  { QStringLiteral("resetSessionToken"), QJsonValue(resetSessionToken) } }));
-        m_call->call();
+        QJsonParseError error;
+        const QJsonObject user = QJsonDocument::fromJson(userJson, &error).object();
+        if (error.error == QJsonParseError::NoError) {
+            this->setInfo(UserInfo(user));
+        } else {
+            this->setInfo(UserInfo());
+        }
     } else {
-        // Since we have session token, we can reload user information and
-        // installation info.
-        this->activateCallDone();
+        this->setInfo(UserInfo());
     }
 }
 
-void User::logout()
+void User::loadInfoUsingRestApiCall()
 {
-    ScriteDocument *document = ScriteDocument::instance();
-    if (document && document->isModified() && !document->isEmpty()) {
-        m_errorReport->setErrorMessage(QStringLiteral(
-                "Current document is not saved. Please save the document before logging out."));
+    UserMeRestApiCall *apiCall =
+            this->findChild<UserMeRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
+    if (apiCall)
         return;
-    }
 
-    JsonHttpRequest *call = new JsonHttpRequest(this);
-    call->setAutoDelete(true);
-    call->setType(JsonHttpRequest::POST);
-    call->setApi(QStringLiteral("app/deactivate"));
-    call->call(); // Fire and forget.
+    apiCall = new UserMeRestApiCall(this);
+    connect(apiCall, &UserMeRestApiCall::destroyed, this, &User::busyChanged, Qt::QueuedConnection);
 
-    this->reset();
-
-    emit forceLoginRequest();
+    if (!apiCall->call())
+        apiCall->deleteLater();
 }
 
-void User::update(const QJsonObject &newInfo)
+void User::childEvent(QChildEvent *e)
 {
-    if (JsonHttpRequest::sessionToken().isEmpty())
-        return;
+    QTimer::singleShot(0, this, &User::busyChanged);
 
-    JsonHttpRequest *call = this->newCall();
-    call->setAutoDelete(true);
-    call->setType(JsonHttpRequest::POST);
-    call->setApi(QStringLiteral("user/me"));
-    call->setData(newInfo);
-    connect(call, &JsonHttpRequest::finished, this, [=]() {
-        if (call->hasError())
-            m_errorReport->setErrorMessage(call->errorText(), call->error());
-        else if (call->hasResponse())
-            this->setInfo(call->responseData());
-        else {
-            const QString errMsg = QStringLiteral("Couldn't update user information.");
-            m_errorReport->setErrorMessage(
-                    errMsg,
-                    QJsonObject({ { QStringLiteral("code"), QStringLiteral("E_USERINFO") },
-                                  { QStringLiteral("text"), errMsg } }));
-        }
-    });
-    call->call();
-}
-
-void User::deactivateInstallation(const QString &id)
-{
-    if (id.isEmpty() || !this->isLoggedIn())
-        return;
-
-    JsonHttpRequest *call = this->newCall();
-    call->setType(JsonHttpRequest::POST);
-    call->setApi(QStringLiteral("user/deactivateInstallation"));
-    call->setData(QJsonObject({ { QStringLiteral("installationId"), id } }));
-    connect(call, &JsonHttpRequest::finished, this, &User::onDeactivateInstallationFinished);
-    call->call();
-}
-
-void User::refreshInstallations()
-{
-    if (m_call) {
-        connect(m_call, &JsonHttpRequest::finished, this, &User::refreshInstallations,
-                Qt::UniqueConnection);
-        return;
-    }
-
-    m_call = this->newCall();
-    m_call->setAutoDelete(true);
-    m_call->setType(JsonHttpRequest::GET);
-    m_call->setApi(QStringLiteral("user/installations"));
-    connect(m_call, &JsonHttpRequest::finished, this, &User::installationsCallDone);
-    m_call->call();
-}
-
-void User::refreshSubscriptions()
-{
-    if (m_call) {
-        connect(m_call, &JsonHttpRequest::finished, this, &User::refreshSubscriptions,
-                Qt::UniqueConnection);
-        return;
-    }
-
-    m_call = this->newCall();
-    m_call->setAutoDelete(true);
-    m_call->setType(JsonHttpRequest::GET);
-    m_call->setApi(QStringLiteral("user/subscriptions"));
-    connect(m_call, &JsonHttpRequest::finished, this, &User::subscriptionsCallDone);
-    m_call->call();
-}
-
-void User::logActivity2(const QString &givenActivity, const QJsonValue &data)
-{
-    if (JsonHttpRequest::sessionToken().isEmpty() || !m_analyticsConsent)
-        return;
-
-    const QString activity = givenActivity.isEmpty() ? QStringLiteral("touch")
-                                                     : givenActivity.toLower().simplified();
-
-    // !!!NOT CALLING newCall() on PURPOSE!!!!
-    // While logging activity, we do not need User.busy to become true
-    JsonHttpRequest *call = new JsonHttpRequest(this);
-    call->setAutoDelete(true);
-    call->setType(JsonHttpRequest::POST);
-    call->setApi(QStringLiteral("activity/log"));
-    const QJsonObject callData = {
-        { QStringLiteral("appVersion"), Application::instance()->applicationVersion() },
-        { QStringLiteral("activity"), activity },
-        { QStringLiteral("data"), data },
-    };
-    call->setData(callData);
-    connect(call, &JsonHttpRequest::finished, this, &User::onLogActivityCallFinished);
-    call->call(); // Fire and Forget
-
-    // Trigger a touch log after 10 minutes
-    m_touchLogTimer.stop();
-    m_touchLogTimer.start();
+    QObject::childEvent(e);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -938,7 +440,7 @@ UserIconProvider::~UserIconProvider() { }
 
 QImage UserIconProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    Q_UNUSED(id);
+    const QStringList idFields = id.split(QStringLiteral("/"), Qt::SkipEmptyParts);
 
     const int dim = qMax(100, qMin(requestedSize.width(), requestedSize.height()));
 
@@ -947,21 +449,19 @@ QImage UserIconProvider::requestImage(const QString &id, QSize *size, const QSiz
 
     QPainter paint(&image);
 
-    QColor appPurple("#65318f");
-    paint.setPen(QPen(appPurple, 2.0));
+    QColor bgColor(idFields.isEmpty() ? "#65318f" : idFields.first());
+    paint.setPen(QPen(bgColor, 2.0));
 
-    appPurple.setAlphaF(0.9);
-    paint.setBrush(appPurple);
+    bgColor.setAlphaF(0.9);
+    paint.setBrush(bgColor);
 
     paint.setRenderHint(QPainter::Antialiasing);
     paint.drawEllipse(image.rect().adjusted(2, 2, -2, -2));
 
     if (User::instance()->isLoggedIn()) {
-        const QString email = JsonHttpRequest::email();
-        const QString firstName =
-                User::instance()->info().value(QStringLiteral("firstName")).toString();
-        const QString lastName =
-                User::instance()->info().value(QStringLiteral("lastName")).toString();
+        const QString email = LocalStorage::load("email").toString();
+        const QString firstName = User::instance()->info().firstName;
+        const QString lastName = User::instance()->info().lastName;
 
         QString initials;
 
@@ -1009,10 +509,29 @@ QImage UserIconProvider::requestImage(const QString &id, QSize *size, const QSiz
 AppFeature::AppFeature(QObject *parent) : QObject(parent)
 {
     connect(User::instance(), &User::infoChanged, this, &AppFeature::reevaluate);
-    connect(User::instance(), &User::loggedInChanged, this, &AppFeature::reevaluate);
 }
 
 AppFeature::~AppFeature() { }
+
+bool AppFeature::isEnabled(int feature)
+{
+    if (User::instance()->isLoggedIn() && User::instance()->info().hasActiveSubscription) {
+        const UserSubscriptionInfo activeSub = User::instance()->info().subscriptions.first();
+        return feature < 0 ? false : activeSub.isFeatureEnabled(Scrite::AppFeature(feature));
+    }
+
+    return false;
+}
+
+bool AppFeature::isEnabled(const QString &featureName)
+{
+    if (User::instance()->isLoggedIn() && User::instance()->info().hasActiveSubscription) {
+        const UserSubscriptionInfo activeSub = User::instance()->info().subscriptions.first();
+        return featureName.isEmpty() ? false : activeSub.isFeatureNameEnabled(featureName);
+    }
+
+    return false;
+}
 
 void AppFeature::setFeatureName(const QString &val)
 {
@@ -1036,20 +555,16 @@ void AppFeature::setFeature(int val)
 
 void AppFeature::reevaluate()
 {
-    if (User::instance()->isLoggedIn()) {
-        const bool flag1 = m_feature < 0
-                ? true
-                : User::instance()->isFeatureEnabled(Scrite::AppFeature(m_feature));
-        const bool flag2 = m_featureName.isEmpty()
-                ? true
-                : User::instance()->isFeatureNameEnabled(m_featureName);
+    if (User::instance()->isLoggedIn() && User::instance()->info().hasActiveSubscription) {
+        const UserSubscriptionInfo activeSub = User::instance()->info().subscriptions.first();
+
+        const bool flag1 =
+                m_feature < 0 ? true : activeSub.isFeatureEnabled(Scrite::AppFeature(m_feature));
+        const bool flag2 =
+                m_featureName.isEmpty() ? true : activeSub.isFeatureNameEnabled(m_featureName);
         this->setEnabled(flag1 && flag2);
     } else
         this->setEnabled(false);
-
-#ifndef QT_NO_DEBUG_OUTPUT_OUTPUT
-    qDebug() << "PA: " << m_featureName << "/" << m_feature << " = " << m_enabled;
-#endif
 }
 
 void AppFeature::setEnabled(bool val)

@@ -11,10 +11,22 @@
 **
 ****************************************************************************/
 
-#ifndef SESSION_H
-#define SESSION_H
+#ifndef LOCALSTORAGE_H
+#define LOCALSTORAGE_H
 
+#include <QString>
+#include <QVariant>
 #include <QQmlEngine>
+#include <QJsonObject>
+
+class LocalStorage
+{
+public:
+    static void store(const QString &key, const QVariant &value);
+    static QVariant load(const QString &key, const QVariant &defaultValue = QVariant());
+
+    static QJsonObject compile(const QJsonObject &object);
+};
 
 class Session : public QObject
 {
@@ -26,14 +38,11 @@ public:
     Session(QObject *parent = nullptr);
     ~Session();
 
-    Q_INVOKABLE void set(const QString &name, const QVariant &value);
-    Q_INVOKABLE QVariant get(const QString &name) const;
-    Q_INVOKABLE void unset(const QString &name);
+    Q_INVOKABLE static void set(const QString &name, const QVariant &value);
+    Q_INVOKABLE static QVariant get(const QString &name);
+    Q_INVOKABLE static void unset(const QString &name);
 
     Q_SIGNAL void changed(const QString &name, const QVariant &value);
-
-private:
-    QMap<QString, QVariant> m_variables;
 };
 
-#endif // SESSION_H
+#endif // LOCALSTORAGE_H

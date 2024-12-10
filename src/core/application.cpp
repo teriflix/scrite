@@ -17,8 +17,8 @@
 #include "autoupdate.h"
 #include "application.h"
 #include "notification.h"
+#include "localstorage.h"
 #include "scritedocument.h"
-#include "jsonhttprequest.h"
 
 #ifdef ENABLE_CRASHPAD_CRASH_TEST
 #include "crashpadmodule.h"
@@ -58,7 +58,7 @@
 #include <QOperatingSystemVersion>
 #include <QNetworkConfigurationManager>
 
-#define ENABLE_SCRIPT_HOTKEY
+// #define ENABLE_SCRIPT_HOTKEY
 
 bool QtApplicationEventNotificationCallback(void **cbdata);
 
@@ -340,6 +340,26 @@ Application::~Application()
 #endif
 }
 
+QString Application::deviceId() const
+{
+    static QString ret;
+    if (ret.isEmpty()) {
+        ret = QString::fromLatin1(QSysInfo::machineUniqueId().toHex());
+        if (!ret.isEmpty())
+            return ret;
+
+        const QString deviceIdKey = QStringLiteral("deviceId");
+        ret = LocalStorage::load(deviceIdKey).toString();
+        if (!ret.isEmpty())
+            return ret;
+
+        ret = QUuid::createUuid().toString();
+        LocalStorage::store(deviceIdKey, ret);
+    }
+
+    return ret;
+}
+
 QString Application::installationId() const
 {
     QString clientID = m_settings->value("Installation/ClientID").toString();
@@ -393,6 +413,20 @@ QUrl Application::toHttpUrl(const QUrl &url) const
     return url2;
 }
 
+QString Application::platformAsString() const
+{
+    switch (this->platform()) {
+    case Application::WindowsDesktop:
+        return QStringLiteral("Windows");
+    case Application::LinuxDesktop:
+        return QStringLiteral("Linux");
+    case Application::MacOS:
+        return QStringLiteral("macOS");
+    }
+
+    return QStringLiteral("Unknown");
+}
+
 #ifdef Q_OS_MAC
 Application::Platform Application::platform() const
 {
@@ -416,6 +450,26 @@ Application::Platform Application::platform() const
 }
 #endif
 #endif
+
+QString Application::platformVersion() const
+{
+    const auto osver = QOperatingSystemVersion::current();
+
+    return
+#ifdef Q_OS_MAC
+            osver.name() + "-" +
+#endif
+            QVersionNumber(osver.majorVersion(), osver.minorVersion(), osver.microVersion())
+                    .toString();
+}
+
+QString Application::platformType() const
+{
+    if (QSysInfo::WordSize == 32)
+        return QStringLiteral("x86");
+
+    return QStringLiteral("x64");
+}
 
 QStringList Application::availableThemes()
 {
@@ -1896,8 +1950,9 @@ void Application::startNewInstance(QWindow *window, const QString &filePath, boo
     } else
         args += { QStringLiteral("--geodelta"), QStringLiteral("30") };
 
-    if (!JsonHttpRequest::sessionToken().isEmpty())
-        args += { QStringLiteral("--sessionToken"), JsonHttpRequest::sessionToken() };
+    const QString sessionToken = LocalStorage::load("sessionToken").toString();
+    if (!sessionToken.isEmpty())
+        args += { QStringLiteral("--sessionToken"), sessionToken };
 
     QProcess::startDetached(appPath, args);
 }

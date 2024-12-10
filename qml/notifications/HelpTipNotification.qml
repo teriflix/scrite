@@ -18,10 +18,12 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 QtObject {
+    id: root
+
     property string tipName
-    property var helpTip: Scrite.user.helpTipsAvailable ? Scrite.user.helpTips[tipName] : undefined
+    property var helpTip: Runtime.helpTips === undefined ? undefined : Runtime.helpTips[tipName]
     property bool tipShown: Runtime.helpNotificationSettings.isTipShown(tipName)
-    property bool enabled: true
+    property bool enabled: helpTip !== undefined
 
     Notification.title: helpTip ? helpTip.title : ""
     Notification.image: helpTip ? helpTip.image.url : ""

@@ -23,12 +23,10 @@ import "qrc:/qml/controls"
 Item {
     readonly property bool modal: true
     readonly property string title: "Welcome to Scrite!"
-    readonly property bool checkForRestartRequest: false
-    readonly property bool checkForUserProfileErrors: false
 
     Image {
         anchors.fill: parent
-        source: "qrc:/images/loginworkflowbg.png"
+        source: "qrc:/images/useraccountdialogbg.png"
         fillMode: Image.PreserveAspectCrop
     }
 
@@ -73,8 +71,8 @@ Item {
             text: "Next »"
 
             onClicked: {
-                Runtime.loginWorkflowSettings.welcomeScreenShown = true
-                Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "AccountEmailScreen")
+                Runtime.userAccountDialogSettings.welcomeScreenShown = true
+                Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
             }
         }
     }

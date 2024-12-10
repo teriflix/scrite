@@ -28,7 +28,7 @@ import "qrc:/qml/dialogs"
 Item {
     id: root
 
-    readonly property bool modal: false
+    property bool modal: !Scrite.user.info.hasActiveSubscription
     property string title: {
         if(Scrite.user.loggedIn) {
             if(Scrite.user.info.firstName && Scrite.user.info.firstName !== "")
@@ -38,8 +38,6 @@ Item {
         }
         return "Hi, there."
     }
-    property bool checkForRestartRequest: true
-    readonly property bool checkForUserProfileErrors: true
 
     PageView {
         id: userProfilePageView
@@ -52,7 +50,7 @@ Item {
                                  }
 
         pagesArray: ["Profile", "Subscriptions", "Installations"]
-        currentIndex: 0
+        currentIndex: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription ? 0 : 1
         maxPageListWidth: {
             if(pagesArray.length < 2)
                 return 120
@@ -76,11 +74,11 @@ Item {
         }
         pageContent: {
             switch(userProfilePageView.currentIndex) {
-            case 1: return userSubscriptionsPage
-            case 2: return userInstallationsPage
+            case 1: return userSubscriptionsPageComponent
+            case 2: return userInstallationsPageComponent
             default: break
             }
-            return userProfilePage
+            return userProfilePageComponent
         }
         onPageContentItemChanged: {
             if(userProfilePageView.currentIndex !== 1)
@@ -115,38 +113,16 @@ Item {
         }
     }
 
-    SequentialAnimation {
-        id: initialAnimation
-
-        running: true
-        loops: 1
-
-        ScriptAction {
-            script: userProfilePageView.currentIndex = 0
-        }
-
-        PauseAnimation {
-            duration: 10
-        }
-
-        ScriptAction {
-            script: userProfilePageView.currentIndex = 2
-        }
-
-        PauseAnimation {
-            duration: 10
-        }
-
-        ScriptAction {
-            script: userProfilePageView.currentIndex = 0
-        }
-    }
-
     Component {
-        id: userProfilePage
+        id: userProfilePageComponent
 
         Item {
-            visible: !initialAnimation.running
+            id: userProfilePage
+
+            property var userInfo: Scrite.user.info
+            property RestApiCallList callList : RestApiCallList {
+                calls: [refreshUserCall, deactivateDeviceCall, saveUserCall]
+            }
 
             TabSequenceManager {
                 id: userInfoFields
@@ -168,13 +144,13 @@ Item {
                 anchors.leftMargin: 0
 
                 spacing: 20
-                opacity: Scrite.user.busy ? 0.5 : 1
-                enabled: !Scrite.user.busy
+                opacity: enabled ? 1 : 0.5
+                enabled: !userProfilePage.callList.busy
 
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: "You're logged in via <b>" + Scrite.user.email + "</b>."
+                    text: "You're logged in via <b>" + userProfilePage.userInfo.email + "</b>."
                 }
 
                 Item {
@@ -190,7 +166,7 @@ Item {
                     TabSequenceItem.manager: userInfoFields
                     TabSequenceItem.sequence: 0
 
-                    text: Scrite.user.fullName
+                    text: userProfilePage.userInfo.fullName
                     maximumLength: 128
                     placeholderText: "Name"
                     undoRedoEnabled: true
@@ -206,7 +182,7 @@ Item {
                     TabSequenceItem.manager: userInfoFields
                     TabSequenceItem.sequence: 1
 
-                    text: Scrite.user.experience
+                    text: userProfilePage.userInfo.experience
                     maximumLength: 128
                     maxVisibleItems: 6
                     placeholderText: "Experience"
@@ -223,23 +199,34 @@ Item {
                     onTextEdited: userInfoFields.needsSaving = true
                 }
 
-                VclTextField {
-                    id: locationField
-
+                RowLayout {
                     Layout.fillWidth: true
 
-                    TabSequenceItem.manager: userInfoFields
-                    TabSequenceItem.sequence: 2
+                    VclTextField {
+                        id: cityField
 
-                    text: Scrite.user.location
-                    maximumLength: 128
-                    placeholderText: "Location (City, Country)"
-                    undoRedoEnabled: true
-                    completionStrings: Scrite.user.locations
-                    completionAcceptsEnglishStringsOnly: false
-                    minimumCompletionPrefixLength: 0
+                        Layout.fillWidth: true
 
-                    onTextEdited: userInfoFields.needsSaving = true
+                        TabSequenceItem.manager: userInfoFields
+                        TabSequenceItem.sequence: 2
+
+                        text: userProfilePage.userInfo.city
+                        maximumLength: 128
+                        placeholderText: "City"
+                        undoRedoEnabled: true
+
+                        onTextEdited: userInfoFields.needsSaving = true
+                    }
+
+                    VclTextField {
+                        id: countryField
+
+                        Layout.fillWidth: true
+
+                        placeholderText: "Country"
+                        text: userProfilePage.userInfo.country
+                        readOnly: true
+                    }
                 }
 
                 VclTextField {
@@ -250,7 +237,7 @@ Item {
                     TabSequenceItem.manager: userInfoFields
                     TabSequenceItem.sequence: 3
 
-                    text: Scrite.user.wdyhas
+                    text: userProfilePage.userInfo.wdyhas
                     placeholderText: "Where did you hear about Scrite?"
                     maximumLength: 128
                     completionStrings: [
@@ -287,7 +274,7 @@ Item {
                         TabSequenceItem.sequence: 4
 
                         text: "Send analytics data."
-                        checked: Scrite.user.info.consent.activity
+                        checked: userProfilePage.userInfo.consentToActivityLog
                         padding: 0
 
                         onToggled: userInfoFields.needsSaving = true
@@ -300,7 +287,7 @@ Item {
                         TabSequenceItem.sequence: 5
 
                         text: "Send marketing email."
-                        checked: Scrite.user.info.consent.email
+                        checked: userProfilePage.userInfo.consentToEmail
                         padding: 0
 
                         onToggled: userInfoFields.needsSaving = true
@@ -324,7 +311,11 @@ Item {
 
                         VclButton {
                             text: "Refresh"
-                            onClicked: Scrite.user.reload()
+                            onClicked: refreshUserCall.call()
+
+                            UserMeRestApiCall {
+                                id: refreshUserCall
+                            }
                         }
 
                         Item {
@@ -334,15 +325,15 @@ Item {
                         VclButton {
                             text: "Logout"
 
-                            onClicked: {
-                                root.checkForRestartRequest = false
-                                Utils.execLater(root, 100, () => {
-                                                    Scrite.user.logout()
-                                                    if(Scrite.user.loggedIn)
-                                                        root.checkForRestartRequest = true
-                                                    else
-                                                        Announcement.shout(Runtime.announcementIds.loginWorkflowScreen, "AccountEmailScreen")
-                                                })
+                            onClicked: deactivateDeviceCall.call()
+
+                            InstallationDeactivateRestApiCall {
+                                id: deactivateDeviceCall
+
+                                onFinished: {
+                                    if(!hasError)
+                                        Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
+                                }
                             }
                         }
                     }
@@ -372,50 +363,64 @@ Item {
                                     firstName: _firstName,
                                     lastName: _lastName,
                                     experience: experienceField.text.trim(),
-                                    location: locationField.text.trim(),
-                                    wdyhas: wdyhasField.text.trim(),
-                                    consent: {
-                                        activity: chkAnalyticsConsent.checked,
-                                        email: chkEmailConsent.checked
-                                    },
+                                    city: cityField.text.trim(),
                                     country: locale.country.name,
-                                    currency: locale.currency.code
+                                    currency: locale.currency.code,
+                                    wdyhas: wdyhasField.text.trim(),
+                                    consentToActivityLog: chkAnalyticsConsent.checked,
+                                    consentToEmail: chkEmailConsent.checked,
                                 }
 
-                                Scrite.user.update(newInfo)
+                                saveUserCall.updatedFields = newInfo
+                                saveUserCall.call()
+                            }
+
+                            UserMeRestApiCall {
+                                id: saveUserCall
+                                onFinished: {
+                                    updatedFields = {}
+                                    userInfoFields.needsSaving = false
+                                }
                             }
                         }
                     }
                 }
-
             }
 
             BusyIndicator {
                 anchors.centerIn: parent
 
-                running: Scrite.user.busy
+                running: userProfilePage.callList.busy
             }
         }
     }
 
     Component {
-        id: userSubscriptionsPage
+        id: userSubscriptionsPageComponent
 
         Item {
-            height: Math.max(userSubsView.height, 100)
+            id: userSubscriptionsPage
 
-            visible: !initialAnimation.running
+            height: Math.max(userSubsView.height, userProfilePageView.availablePageContentHeight)
+
+            property RestApiCallList callList: RestApiCallList {
+                calls: [queryUserSubsCall]
+            }
 
             Item {
                 id: userSubsView
                 width: parent.width
                 height: userSubsLayout.height + 40
 
+                enabled: !userSubscriptionsPage.callList.busy
+                opacity: enabled ? 1 : 0.5
+
                 ColumnLayout {
                     id: userSubsLayout
 
                     y: 20
                     width: parent.width-20
+                    visible: !queryUserSubsCall.hasError
 
                     spacing: 30
 
@@ -434,13 +439,14 @@ Item {
 
                                 width: parent.width
 
-                                name: activeSub.plan_name
-                                duration: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(activeSub.end_date))
-                                durationNote: "(" + Utils.formatDateRangeAsString(new Date(activeSub.start_date), new Date(activeSub.end_date)) + ")"
+                                name: activeSub.plan.title
+                                duration: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(activeSub.until))
+                                durationNote: "(" + Utils.formatDateRangeAsString(new Date(activeSub.from), new Date(activeSub.until)) + ")"
                                 price: "Active"
-                                priceNote: Utils.toTitleCase(activeSub.plan_kind)
+                                priceNote: Utils.toTitleCase(activeSub.kind)
                                 actionLink: "Details »"
-                                onActionLinkClicked: Qt.openUrlExternally(activeSub.details)
+                                actionLinkEnabled: SubscriptionPlanOperations.taxonomy !== undefined
+                                onActionLinkClicked: SubscriptionDetailsDialog.launch(activeSub)
                             }
                         }
                     }
@@ -460,13 +466,14 @@ Item {
 
                                 width: parent.width
 
-                                name: upcomingSub.plan_name
-                                duration: Utils.dateSpanAsString(new Date(upcomingSub.start_date), new Date(upcomingSub.end_date))
-                                durationNote: "(" + Utils.formatDateRangeAsString(new Date(upcomingSub.start_date), new Date(upcomingSub.end_date)) + ")"
-                                price: Utils.toTitleCase(upcomingSub.plan_kind)
-                                priceNote: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(upcomingSub.start_date))
+                                name: upcomingSub.plan.title
+                                duration: Utils.dateSpanAsString(new Date(upcomingSub.from), new Date(upcomingSub.until))
+                                durationNote: "(" + Utils.formatDateRangeAsString(new Date(upcomingSub.from), new Date(upcomingSub.until)) + ")"
+                                price: Utils.toTitleCase(upcomingSub.kind)
+                                priceNote: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(upcomingSub.from))
                                 actionLink: "Details »"
-                                onActionLinkClicked: Qt.openUrlExternally(upcomingSub.details)
+                                actionLinkEnabled: SubscriptionPlanOperations.taxonomy !== undefined
+                                onActionLinkClicked: SubscriptionDetailsDialog.launch(upcomingSub)
                             }
                         }
                     }
@@ -476,7 +483,7 @@ Item {
                         id: availablePlansLoader
                         Layout.fillWidth: true
 
-                        active: queryUserPlansCall.plans.length > 0
+                        active: queryUserSubsCall.availablePlans.length > 0
                         visible: active
 
                         sourceComponent: VclGroupBox {
@@ -487,44 +494,54 @@ Item {
                                 spacing: 20
 
                                 Repeater {
-                                    model: queryUserPlansCall.plans
+                                    model: queryUserSubsCall.availablePlans
 
                                     PlanCard {
                                         required property var modelData
 
                                         Layout.fillWidth: true
 
-                                        name: modelData.name
-                                        opacity: modelData.enabled ? 1 : 0.75
-                                        duration: modelData.duration
-                                        durationNote: {
-                                            if(modelData.enabled)
-                                            return "(" + Utils.formatDateRangeAsString(Utils.todayWithZeroTime(), modelData.durationInDays) + ")"
-                                            return modelData.reason
-                                        }
+                                        name: modelData.title
+                                        duration: Utils.daysSpanAsString(modelData.duration)
+                                        durationNote: modelData.featureNote
                                         price: {
-                                            const currencySymbol = Scrite.currencySymbol(Scrite.user.currency)
-                                            if(modelData.regularPrice && modelData.regularPrice !== modelData.price)
-                                                return "<s>" + currencySymbol + modelData.regularPrice + "</s>&nbsp;&nbsp;&nbsp;" +
-                                                       "<b>" + currencySymbol + modelData.price + "</b> *"
-                                            return currencySymbol + modelData.price + " *"
+                                            if(modelData.pricing.price === 0)
+                                                return "FREE"
+
+                                            const currencySymbol = Scrite.currencySymbol(modelData.pricing.currency)
+                                            return currencySymbol + modelData.pricing.price + " *"
                                         }
-                                        priceNote: modelData.note
-                                        actionLink: "Buy »"
-                                        actionLinkEnabled: modelData.enabled
-                                        onActionLinkClicked: Qt.openUrlExternally(modelData.shop)
+                                        priceNote: modelData.subtitle
+                                        actionLink: Utils.toTitleCase(modelData.action.kind) + " »"
+                                        onActionLinkClicked: SubscriptionPlanOperations.subscribeTo(modelData)
                                     }
                                 }
                             }
                         }
                     }
 
-                    VclLabel {
+                    RowLayout {
                         Layout.fillWidth: true
 
-                        visible: availablePlansLoader.active
-                        text: "* All prices are subject to change without notice."
-                        wrapMode: Text.WordWrap
+                        visible: queryUserSubsCall.availablePlans.length > 0
+
+                        VclLabel {
+                            Layout.fillWidth: true
+
+                            text: "* All prices are subject to change without notice."
+                            wrapMode: Text.WordWrap
+                        }
+
+                        Link {
+                            enabled: SubscriptionPlanOperations.taxonomy !== undefined
+                            text: queryUserSubsCall.availablePlans.length > 1 ? "Compare Plans »" : "Feature Details »"
+                            font.bold: true
+                            onClicked: {
+                                const name = Scrite.user.info.fullName === "" ? Scrite.user.info.email : Scrite.user.info.fullName
+                                const title = (queryUserSubsCall.availablePlans.length > 1 ? "Plan Comparison for " : "Plan Details for ") + name
+                                SubscriptionPlanComparisonDialog.launch(queryUserSubsCall.availablePlans, title)
+                            }
+                        }
                     }
 
                     // Subscrition History
@@ -549,94 +566,93 @@ Item {
 
                                         Layout.fillWidth: true
 
-                                        name: modelData.plan_name
-                                        duration: Utils.dateSpanAsString(new Date(modelData.start_date), new Date(modelData.end_date))
-                                        durationNote: Utils.formatDateRangeAsString(new Date(modelData.start_date), new Date(modelData.end_date))
-                                        price: Utils.toTitleCase(modelData.plan_kind)
+                                        name: modelData.plan.title
+                                        duration: Utils.dateSpanAsString(new Date(modelData.from), new Date(modelData.until))
+                                        durationNote: Utils.formatDateRangeAsString(new Date(modelData.from), new Date(modelData.until))
+                                        price: Utils.toTitleCase(modelData.kind)
+                                        priceNote: modelData.plan.featureNote
                                         actionLink: "Details »"
-                                        onActionLinkClicked: Qt.openUrlExternally(modelData.details)
+                                        actionLinkEnabled: SubscriptionPlanOperations.taxonomy !== undefined
+                                        onActionLinkClicked: SubscriptionDetailsDialog.launch(modelData)
                                     }
                                 }
                             }
                         }
                     }
                 }
+
+                VclButton {
+                    anchors.centerIn: parent
+
+                    text: "Reload"
+                    visible: queryUserSubsCall.hasError
+                    onClicked: queryUserSubsCall.go()
+                }
             }
 
             BusyIndicator {
                 anchors.centerIn: parent
-                running: queryUserSubsCall.busy || queryUserPlansCall.busy
+                running: !queryUserSubsCall.ready || queryUserSubsCall.busy
             }
 
-            JsonHttpRequest {
+            Connections {
+                target: Scrite.restApi
+
+                function onSessionTokenAvailable() {
+                    queryUserSubsCall.go()
+                }
+            }
+
+            SubscriptionPlansRestApiCall {
                 id: queryUserSubsCall
 
+                property bool ready: false
                 property var activeSubscription
                 property var upcomingSubscription
                 property var pastSubscriptions: []
+                property var availablePlans: []
 
-                type: JsonHttpRequest.GET
-                api: "user/subscriptions"
-                reportNetworkErrors: true
                 onFinished: {
                     if(hasError) {
-                        MessageBox.information("Error", errorMessage, () => {
-                                                    Announcement.shout(_private.userProfilePageRequest, undefined)
-                                               })
+                        MessageBox.information("Error", errorMessage, () => { userProfilePageView.currentIndex = 0 })
+                        return
                     }
 
-                    if(hasResponse) {
-                        const list = responseData.list
-                        const today = Utils.todayWithZeroTime()
-                        let subHistory = []
-                        list.forEach( (item) => {
-                                        if(item.active)
-                                            activeSubscription = item
-                                        else if(new Date(item.start_date) > today)
-                                             upcomingSubscription = item
-                                        else
-                                            subHistory.push(item)
-                                     })
-                        pastSubscriptions = subHistory
-                        clearResponse()
-                    }
+                    const result = responseData
+                    if(result.hasActiveSubscription)
+                        activeSubscription = result.subscriptions[0]
+                    if(result.hasUpcomingSubscription)
+                        upcomingSubscription = result.subscriptions[1]
+
+                    let history = []
+                    result.subscriptions.forEach( (sub) => {
+                                                    if(sub.hasExpired)
+                                                     history.push(sub)
+                                                 })
+                    if(result.publicBetaSubscription)
+                        history.push(result.publicBetaSubscription)
+
+                    pastSubscriptions = history
+
+                    availablePlans = result.plans
                 }
-                Component.onCompleted: call()
-            }
 
-            JsonHttpRequest {
-                id: queryUserPlansCall
-
-                property var plans: []
-
-                type: JsonHttpRequest.GET
-                api: "plans/list"
-                reportNetworkErrors: true
-                onFinished: {
-                    if(hasError) {
-                        MessageBox.information("Error", errorMessage, () => {
-                                                    userProfilePageView.currentIndex = 0
-                                               })
-                    }
-
-                    if(hasResponse) {
-                        const response = responseData
-                        if(response.upcomingPlan === null) {
-                            plans = response.plans
-                        }
-                        clearResponse()
-                    }
+                function go() {
+                    ready = call()
+                    if(!ready)
+                        Utils.execLater(queryUserSubsCall, 500, go)
                 }
-                Component.onCompleted: call()
+
+                Component.onCompleted: go()
             }
         }
     }
 
     Component {
-        id: userInstallationsPage
+        id: userInstallationsPageComponent
 
         Item {
-            visible: !initialAnimation.running
+            id: userInstallationsPage
 
             ColumnLayout {
                 anchors.fill: parent
@@ -656,6 +672,9 @@ Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
+                    enabled: !deactivateOtherCall.busy && !Scrite.user.busy
+                    opacity: enabled ? 1 : 0.5
+
                     color: Runtime.colors.primary.c10.background
                     border.width: 1
                     border.color: Runtime.colors.primary.borderColor
@@ -671,7 +690,7 @@ Item {
                         }
 
                         clip: true
-                        model: Scrite.user.installations
+                        model: Scrite.user.info.installations
                         spacing: 20
                         currentIndex: -1
 
@@ -688,6 +707,11 @@ Item {
                             width: installationsView.width
                             height: installationsViewDelegateLayout.height + 20
 
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: installationsView.currentIndex = index
+                            }
+
                             RowLayout {
                                 id: installationsViewDelegateLayout
 
@@ -703,7 +727,7 @@ Item {
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        font.bold: index === Scrite.user.currentInstallationIndex
+                                        font.bold: modelData.isCurrent
                                         text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
                                         elide: Text.ElideRight
                                     }
@@ -711,21 +735,21 @@ Item {
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        text: "Runs Scrite " + modelData.appVersions[0]
+                                        text: "Runs Scrite " + modelData.appVersion
                                         elide: Text.ElideRight
                                     }
 
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        text: "Since: " + Scrite.app.relativeTime(new Date(modelData.firstActivationDate))
+                                        text: "Since: " + Scrite.app.relativeTime(new Date(modelData.creationDate))
                                         elide: Text.ElideRight
                                     }
 
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastActivationDate))
+                                        text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastSessionDate))
                                         elide: Text.ElideRight
                                     }
                                 }
@@ -733,20 +757,26 @@ Item {
                                 FlatToolButton {
                                     id: logoutButton
                                     iconSource: "qrc:/icons/action/logout.png"
-                                    enabled: index !== Scrite.user.currentInstallationIndex
+                                    enabled: modelData.activated && !modelData.isCurrent
                                     opacity: enabled ? 1 : 0.2
-                                    onClicked: Scrite.user.deactivateInstallation(modelData._id)
+                                    onClicked: {
+                                        deactivateOtherCall.installationId = modelData.id
+                                        deactivateOtherCall.call()
+                                    }
                                 }
-                            }
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: installationsView.currentIndex = index
                             }
                         }
                     }
-                }
 
+                    BusyIndicator {
+                        anchors.centerIn: parent
+                        running: deactivateOtherCall.busy || Scrite.user.busy
+                    }
+                }
+            }
+
+            InstallationDeactivateOtherRestApiCall {
+                id: deactivateOtherCall
             }
         }
     }

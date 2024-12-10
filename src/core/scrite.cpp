@@ -46,6 +46,11 @@ User *Scrite::user()
     return User::instance();
 }
 
+RestApi *Scrite::restApi()
+{
+    return RestApi::instance();
+}
+
 ScriteDocument *Scrite::document()
 {
     return ScriteDocument::instance();
@@ -124,4 +129,52 @@ QString Scrite::currencySymbol(const QString &code)
     }
 
     return code.toUpper() + " ";
+}
+
+bool Scrite::isFeatureEnabled(AppFeature feature, const QStringList &features)
+{
+    static const QMap<AppFeature, QString> featureNameMap = {
+        { Scrite::ScreenplayFeature, "screenplay" },
+        { Scrite::StructureFeature, "structure" },
+        { Scrite::NotebookFeature, "notebook" },
+        { Scrite::RelationshipGraphFeature, "relationshipgraph" },
+        { Scrite::ScriptalayFeature, "scriptalay" },
+        { Scrite::TemplateFeature, "template" },
+        { Scrite::ReportFeature, "report" },
+        { Scrite::ImportFeature, "import" },
+        { Scrite::ExportFeature, "export" },
+        { Scrite::ScritedFeature, "scrited" },
+        { Scrite::WatermarkFeature, "watermark" },
+        { Scrite::RecentFilesFeature, "recentfiles" },
+        { Scrite::VaultFilesFeature, "vaultfiles" }
+    };
+
+    return Scrite::isFeatureNameEnabled(featureNameMap.value(feature), features);
+}
+
+bool Scrite::isFeatureNameEnabled(const QString &featureName, const QStringList &features)
+{
+    const QString lfeatureName = featureName.toLower();
+    const auto featurePredicate = [lfeatureName](const QJsonValue &item) -> bool {
+        const QString istring = item.toString().toLower();
+        return (istring == lfeatureName);
+    };
+    const auto wildCardPredicate = [](const QJsonValue &item) -> bool {
+        return item.toString() == QStringLiteral("*");
+    };
+    const auto notFeaturePredicate = [lfeatureName](const QJsonValue &item) -> bool {
+        const QString istring = item.toString().toLower();
+        return istring.startsWith(QChar('!')) && (istring.mid(1) == lfeatureName);
+    };
+
+    const bool featureEnabled =
+            std::find_if(features.constBegin(), features.constEnd(), featurePredicate)
+            != features.constEnd();
+    const bool allFeaturesEnabled =
+            std::find_if(features.constBegin(), features.constEnd(), wildCardPredicate)
+            != features.constEnd();
+    const bool featureDisabled =
+            std::find_if(features.constBegin(), features.constEnd(), notFeaturePredicate)
+            != features.constEnd();
+    return (allFeaturesEnabled || featureEnabled) && !featureDisabled;
 }
