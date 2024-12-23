@@ -144,6 +144,12 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
             m_settings->setValue(QStringLiteral("Installation/path"), this->applicationFilePath());
     }
 
+    if (LocalStorage::load("email").isNull()) {
+        const QString email = m_settings->value("Registration/email").toString();
+        if (!email.isEmpty())
+            LocalStorage::store("email", email);
+    }
+
 #ifndef QT_NO_DEBUG_OUTPUT
     QInternal::registerCallback(QInternal::EventNotifyCallback,
                                 QtApplicationEventNotificationCallback);
@@ -1004,6 +1010,7 @@ QJsonObject Application::objectConfigurationFormInfo(const QObject *object, cons
         field.insert("max", queryPropertyInfo(prop, "FieldMaxValue"));
         field.insert("ideal", queryPropertyInfo(prop, "FieldDefaultValue"));
         field.insert("group", queryPropertyInfo(prop, "FieldGroup"));
+        field.insert("feature", queryPropertyInfo(prop, "Feature"));
 
         const QString fieldEnum = queryPropertyInfo(prop, "FieldEnum");
         if (!fieldEnum.isEmpty()) {

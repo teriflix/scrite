@@ -150,6 +150,8 @@ DialogLauncher {
 
                         text: "Order #" + dialog.subscription.wc_order_id + " »"
                         visible: dialog.subscription.wc_order_id !== undefined && dialog.subscription.wc_order_id !== ""
+
+                        onClicked: Qt.openUrlExternally(dialog.subscription.detailsUrl)
                     }
 
                     Item {

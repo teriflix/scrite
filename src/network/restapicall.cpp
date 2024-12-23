@@ -39,13 +39,22 @@ RestApi::~RestApi() { }
 
 void RestApi::requestNewSessionToken()
 {
-    LocalStorage::store("sessionToken", QVariant());
+    if (m_sessionTokenTimer == nullptr) {
+        m_sessionTokenTimer = new QTimer(this);
+        m_sessionTokenTimer->setInterval(500);
+        m_sessionTokenTimer->setSingleShot(true);
+        connect(m_sessionTokenTimer, &QTimer::timeout, this, &RestApi::requestNewSessionTokenNow);
+    }
 
-    emit newSessionTokenRequired();
+    if (!m_sessionTokenTimer->isActive())
+        m_sessionTokenTimer->start();
 }
 
 void RestApi::requestFreshActivation()
 {
+    if (m_sessionTokenTimer)
+        m_sessionTokenTimer->stop();
+
     LocalStorage::store("user", QVariant());
     LocalStorage::store("userId", QVariant());
     LocalStorage::store("loginToken", QVariant());
@@ -57,7 +66,16 @@ void RestApi::requestFreshActivation()
 
 void RestApi::reportInvalidApiKey()
 {
+    if (m_sessionTokenTimer)
+        m_sessionTokenTimer->stop();
+
     emit invalidApiKey();
+}
+
+void RestApi::requestNewSessionTokenNow()
+{
+    LocalStorage::store("sessionToken", QVariant());
+    emit newSessionTokenRequired();
 }
 
 RestApi::RestApi(QObject *parent) : QObject(parent) { }
@@ -682,20 +700,33 @@ QJsonArray InstallationAllRestApiCall::installationsInfo() const
 InstallationDeactivateRestApiCall::InstallationDeactivateRestApiCall(QObject *parent)
     : RestApiCall(parent)
 {
+    connect(this, &RestApiCall::finished, this,
+            &InstallationDeactivateRestApiCall::resetEverything);
 }
 
 InstallationDeactivateRestApiCall::~InstallationDeactivateRestApiCall() { }
 
-void InstallationDeactivateRestApiCall::setResponse(const QJsonObject &val)
+bool InstallationDeactivateRestApiCall::call()
+{
+    const bool ret = RestApiCall::call();
+    if (!ret)
+        this->resetEverything();
+
+    return ret;
+}
+
+void InstallationDeactivateRestApiCall::resetEverything()
 {
     LocalStorage::store("user", QVariant());
     LocalStorage::store("userId", QVariant());
     LocalStorage::store("loginToken", QVariant());
     LocalStorage::store("sessionToken", QVariant());
     User::instance()->loadInfoFromStorage();
-
     QTimer::singleShot(0, RestApi::instance(), &RestApi::freshActivationRequired);
+}
 
+void InstallationDeactivateRestApiCall::setResponse(const QJsonObject &val)
+{
     RestApiCall::setResponse(val);
 }
 

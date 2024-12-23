@@ -188,6 +188,7 @@ VclDialog {
         id: fieldEditorLoader
 
         Loader {
+            id: fieldLoader
             required property var modelData
 
             Layout.fillWidth: true
@@ -196,6 +197,18 @@ VclDialog {
             onLoaded: {
                 item.report = report
                 item.fieldInfo = modelData
+            }
+
+            opacity: enabled ? 1 : 0.5
+            enabled: {
+                if(modelData.feature !== "") {
+                    const afc = Qt.createQmlObject("import io.scrite.components 1.0; AppFeature { }", fieldLoader)
+                    afc.featureName = modelData.feature
+                    const ret = afc.enabled
+                    afc.destroy()
+                    return ret
+                }
+                return true
             }
         }
     }
@@ -304,6 +317,7 @@ VclDialog {
         property var formInfo: report ? report.configurationFormInfo() : {"title": "Unknown", "description": "", "groupedFields": []}
         property bool isPdfExport: report ? report.format === AbstractReportGenerator.AdobePDF : false
         property bool reportEnabled: report ? report.featureEnabled : false
+
         property AppFeature reportSaveFeature: AppFeature {
             featureName: report ? "report/" + report.title.toLowerCase() + "/save" : "report"
         }

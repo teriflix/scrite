@@ -23,18 +23,14 @@ import "qrc:/qml/dialogs"
 
 Item {
     id: userLogin
-    width: 32+20+10
-    height: 32
+    width: 42+14
+    height: 42
 
     Image {
         id: profilePic
         property int counter: 0
         source: Scrite.user.loggedIn ? "image://userIcon/me" + counter : "image://userIcon/default"
-        x: 20
-        height: parent.height
-        width: parent.height
-        smooth: true
-        mipmap: true
+        anchors.fill: parent
         fillMode: Image.PreserveAspectFit
         transformOrigin: Item.Right
         ToolTip.text: Scrite.user.loggedIn ? "Account Information" : "Login"

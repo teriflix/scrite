@@ -115,7 +115,11 @@ bool LibraryService::doImport(QIODevice *device)
 Library::Library(Library::Type type, QObject *parent) : QAbstractListModel(parent), m_type(type)
 {
     this->setRecords(QJsonArray());
-    this->fetchRecords();
+
+    if (User::instance()->isLoggedIn())
+        this->fetchRecords();
+
+    connect(User::instance(), &User::loggedInChanged, this, &Library::fetchRecords);
 }
 
 Library::~Library() { }
@@ -156,7 +160,7 @@ void Library::reload()
 
 void Library::fetchRecords()
 {
-    if (m_busy)
+    if (m_busy || !User::instance()->isLoggedIn())
         return;
 
     this->setBusy(true);
@@ -178,7 +182,10 @@ void Library::fetchRecords()
         this->setBusy(false);
     });
 
-    call->call();
+    if (!call->call()) {
+        call->deleteLater();
+        this->setBusy(false);
+    }
 }
 
 void Library::setRecords(const QJsonArray &array)

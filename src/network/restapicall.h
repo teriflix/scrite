@@ -46,9 +46,15 @@ signals:
 
     void sessionTokenAvailable();
 
+private:
+    void requestNewSessionTokenNow();
+
 protected:
     friend class RestApiCall;
     RestApi(QObject *parent = nullptr);
+
+private:
+    QTimer *m_sessionTokenTimer = nullptr;
 };
 
 class RestApiCall : public QObject, public QQmlParserStatus
@@ -127,7 +133,7 @@ public:
     bool isReportNetworkErrors() const { return m_reportNetworkErrors; }
     Q_SIGNAL void reportNetworkErrorsChanged();
 
-    Q_INVOKABLE bool call();
+    virtual Q_INVOKABLE bool call();
     Q_INVOKABLE void reset()
     {
         this->clearError();
@@ -466,6 +472,11 @@ public:
     bool useSessionToken() const { return true; }
     QString api() const { return "installation/deactivate"; }
 
+    bool call();
+
+private:
+    void resetEverything();
+
 protected:
     void setResponse(const QJsonObject &val);
 };
@@ -641,8 +652,8 @@ public:
     Q_SIGNAL void recordsChanged();
 
     // RestApiCall interface
-    Type type() const { return POST; }
-    bool useSessionToken() const { return false; }
+    Type type() const { return GET; }
+    bool useSessionToken() const { return true; }
     QString api() const;
 
 protected:

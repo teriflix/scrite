@@ -18,6 +18,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
 Rectangle {
@@ -96,7 +97,11 @@ Rectangle {
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 font.underline: false
                 text: "<u>Click here</u> to know more."
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/login-and-activation/")
+                visible: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
+                onClicked: {
+                    const activeSub = Scrite.user.info.subscriptions[0]
+                    SubscriptionDetailsDialog.launch(activeSub)
+                }
             }
 
             VclButton {

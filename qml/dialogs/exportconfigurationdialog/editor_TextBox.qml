@@ -47,6 +47,7 @@ ColumnLayout {
         TabSequenceItem.manager: tabSequence
 
         label: ""
+
         placeholderText: fieldInfo.label
         onTextChanged: exporter.setConfigurationValue(fieldInfo.name, text)
     }

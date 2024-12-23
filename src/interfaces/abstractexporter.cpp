@@ -53,9 +53,8 @@ bool AbstractExporter::isFeatureEnabled() const
 {
     if (User::instance()->isLoggedIn()) {
         const bool allReportsEnabled = AppFeature::isEnabled(Scrite::ExportFeature);
-        const bool thisSpecificReportEnabled = allReportsEnabled
-                ? AppFeature::isEnabled(QStringLiteral("export/") + this->formatName())
-                : false;
+        const bool thisSpecificReportEnabled =
+                allReportsEnabled ? AppFeature::isEnabled("export/" + this->format()) : false;
         return allReportsEnabled && thisSpecificReportEnabled;
     }
 

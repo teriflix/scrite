@@ -303,7 +303,7 @@ Item {
 
     }
 
-    function populateFeatureListTableModel(subscription, listModel) {
+    function populateFeatureListTableModel(subscription, listModel) {        
         let featureIndex = 0
         root.taxonomy.features.forEach( (feature) => {
                                            if(feature.group !== undefined && feature.group === true)
@@ -391,11 +391,16 @@ Item {
         function loadTaxonomy() {
             let api = Qt.createQmlObject("import io.scrite.components 1.0; AppPlanTaxonomyRestApiCall {}", _private)
             api.finished.connect( () => {
-                                     root.taxonomy = api.taxonomy
+                                     if(api.hasError || !api.hasResponse)
+                                        Utils.execLater(_private, 500, loadTaxonomy)
+                                     else
+                                        root.taxonomy = api.taxonomy
                                      api.destroy()
                                  })
-            if(!api.call())
+            if(!api.call()) {
                 api.destroy()
+                Utils.execLater(_private, 500, loadTaxonomy)
+            }
         }
 
         Component.onCompleted: loadTaxonomy()

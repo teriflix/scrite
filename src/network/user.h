@@ -14,6 +14,7 @@
 #ifndef USER_H
 #define USER_H
 
+#include <QUrl>
 #include <QDateTime>
 #include <QQmlEngine>
 #include <QJsonValue>
@@ -164,6 +165,9 @@ public:
     Q_PROPERTY(QString orderId MEMBER orderId)
     QString orderId;
 
+    Q_PROPERTY(QUrl detailsUrl MEMBER detailsUrl)
+    QUrl detailsUrl;
+
     Q_PROPERTY(bool isActive MEMBER isActive)
     bool isActive = false;
 
@@ -174,10 +178,10 @@ public:
     bool hasExpired = false;
 
     Q_PROPERTY(int daysToUntil READ daysToUntil)
-    int daysToUntil() const { return QDateTime::currentDateTime().daysTo(this->until); }
+    int daysToUntil() const { return QDateTime::currentDateTime().daysTo(this->until) + 1; }
 
     Q_PROPERTY(int daysToFrom READ daysToFrom)
-    int daysToFrom() const { return QDateTime::currentDateTime().daysTo(this->from); }
+    int daysToFrom() const { return QDateTime::currentDateTime().daysTo(this->from) + 1; }
 
     Q_PROPERTY(QString description READ description)
     QString description() const;
@@ -275,6 +279,12 @@ public:
 
     Q_PROPERTY(bool isEarlyAdopter MEMBER isEarlyAdopter)
     bool isEarlyAdopter = false;
+
+    Q_PROPERTY(QStringList availableFeatures MEMBER availableFeatures)
+    QStringList availableFeatures;
+
+    Q_INVOKABLE bool isFeatureEnabled(int feature) const;
+    Q_INVOKABLE bool isFeatureNameEnabled(const QString &featureName) const;
 };
 Q_DECLARE_METATYPE(UserInfo)
 

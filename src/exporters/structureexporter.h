@@ -55,6 +55,7 @@ public:
     Q_CLASSINFO("watermark_FieldLabel", "Watermark text, if enabled.")
     Q_CLASSINFO("watermark_FieldEditor", "TextBox")
     Q_CLASSINFO("watermark_IsPersistent", "false")
+    Q_CLASSINFO("watermark_Feature", "watermark")
     Q_PROPERTY(QString watermark READ watermark WRITE setWatermark NOTIFY watermarkChanged)
     void setWatermark(const QString &val);
     QString watermark() const { return m_watermark; }

@@ -21,6 +21,7 @@
 #include <QFile>
 #include <QDataStream>
 #include <QStandardPaths>
+#include <QSettings>
 
 class EncryptedDataStore
 {
