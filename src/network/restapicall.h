@@ -23,6 +23,7 @@
 
 #include "qobjectlistmodel.h"
 
+class QTimer;
 class QNetworkReply;
 
 class RestApi : public QObject

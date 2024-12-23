@@ -21,6 +21,7 @@
 #include "restapikey/restapikey.h"
 
 #include <QUuid>
+#include <QTimer>
 #include <QSysInfo>
 #include <QUrlQuery>
 #include <QSettings>
