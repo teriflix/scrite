@@ -190,7 +190,7 @@ private:
     QFont m_font = QFont("Courier Prime", 120, QFont::Bold);
     QString m_text = QLatin1String("Scrite");
     QColor m_color = QColor(Qt::lightGray);
-    qreal m_opacity = 0.5;
+    qreal m_opacity = 0.375;
     qreal m_rotation = -45;
     Qt::Alignment m_alignment = Qt::AlignCenter;
     bool m_enabled = false;

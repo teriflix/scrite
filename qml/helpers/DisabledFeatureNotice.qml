@@ -13,19 +13,19 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
 Rectangle {
-    id: dfNotice
+    id: root
 
-    property string reason: Scrite.user.loggedIn ? privateData.loggedInReason : privateData.loggedOutReason
-    property string suggestion: Scrite.user.loggedIn ? privateData.loggedInSuggestion : privateData.loggedOutSuggestion
     property string featureName
 
     signal clicked()
@@ -33,14 +33,18 @@ Rectangle {
     color: Runtime.colors.primary.c100.background
     clip: true
 
-    QtObject {
-        id: privateData
+    MouseArea {
+        anchors.fill: parent
+    }
 
-        readonly property string loggedInReason: "This feature is not available in your subscription plan."
-        readonly property string loggedInSuggestion: "Please review and upgrade your subscription plan."
+    Rectangle {
+        anchors.fill: contentsFlick
+        anchors.leftMargin: -20
+        anchors.rightMargin: -20
 
-        readonly property string loggedOutReason: "Some features of Scrite are user profile linked and require you to be logged in to access it."
-        readonly property string loggedOutSuggestion: "Please sign-up/login to continue."
+        color: Runtime.colors.primary.c100.background
+        border.width: 1
+        border.color: Runtime.colors.primary.borderColor
     }
 
     Flickable {
@@ -50,70 +54,80 @@ Rectangle {
         height: Math.min(contents.height, parent.height)
         contentWidth: width
         contentHeight: contents.height
+
         ScrollBar.vertical: vscrollBar
-        Component.onCompleted: {
-            Qt.callLater( () => {
-                             if(contentsFlick.height < contentsFlick.contentHeight)
-                                contentsFlick.contentY = 45
-                         })
-        }
 
-        Column {
+        ColumnLayout {
             id: contents
-            spacing: 20
+
             width: contentsFlick.width
+            spacing: 10
 
-            Item { width: parent.width; height: 30 }
-
-            Image {
-                id: icon
-                source: "qrc:/images/feature_locked.png"
-                width: 64; height: 64
-                asynchronous: false
-                fillMode: Image.PreserveAspectFit
-                anchors.horizontalCenter: parent.horizontalCenter
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 10
             }
 
-            VclLabel {
-                text: featureName
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 8
-                font.bold: true
-                anchors.horizontalCenter: parent.horizontalCenter
-                visible: text !== ""
+            RowLayout {
+                Layout.fillWidth: true
+
+                spacing: 10
+
+                Image {
+                    id: icon
+
+                    Layout.alignment: Qt.AlignHCenter
+                    Layout.preferredWidth: 24
+                    Layout.preferredHeight: 24
+
+                    source: "qrc:/images/feature_locked.png"
+                    asynchronous: false
+                    fillMode: Image.PreserveAspectFit
+                }
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: featureName
+                    visible: text !== ""
+                    wrapMode: Text.WordWrap
+
+                    font.bold: true
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                }
             }
 
             VclLabel {
                 id: reasonSuggestion
-                text: [reason, suggestion].join(" ").trim()
-                width: parent.width
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
+                Layout.fillWidth: true
+
+                text: "To enable this feature, consider upgrading your plan."
                 visible: text !== ""
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
             }
 
             Link {
-                id: link
-                width: parent.width
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                font.underline: false
-                text: "<u>Click here</u> to know more."
-                visible: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
+                Layout.alignment: Qt.AlignRight
+
+                text: "Details »"
+                enabled: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+
                 onClicked: {
-                    const activeSub = Scrite.user.info.subscriptions[0]
-                    SubscriptionDetailsDialog.launch(activeSub)
+                    UserAccountDialog.launch()
+                    Utils.execLater(root, 500, () => {
+                                        Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
+                                    })
                 }
             }
 
-            VclButton {
-                text: Scrite.user.loggedIn ? "Subscribe" : "Sign Up / Login"
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked: {
-                    dfNotice.clicked()
-                    Announcement.shout(Runtime.announcementIds.loginRequest, undefined)
-                }
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 10
             }
-
-            Item { width: parent.width; height: 30 }
         }
     }
 
