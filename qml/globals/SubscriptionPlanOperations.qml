@@ -46,11 +46,11 @@ Item {
         }
 
         if(plan.kind !== "trial" && !Scrite.user.info.hasTrialSubscription && !Scrite.user.info.isEarlyAdopter) {
-            const buttons = ["Consider Trial Plan", Utils.toTitleCase(plan.action.kind) + " " + plan.title]
+            const buttons = [Utils.toTitleCase(plan.action.kind) + " " + plan.title, "Go Back"]
             MessageBox.question("Use Trial", "We recommend that you use the app on trial first before signing up for any other plan.",
                                 buttons, (option) => {
-                                    if(option !== buttons[0])
-                                    _private.subscribeTo(plan, callList)
+                                    if(option === buttons[0])
+                                        _private.subscribeTo(plan, callList)
                                 })
         } else
             _private.subscribeTo(plan, callList)
