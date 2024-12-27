@@ -94,7 +94,6 @@ AppWindow::AppWindow()
     // Register image providers
     this->engine()->addImageProvider(QStringLiteral("color"), new ColorImageProvider);
     this->engine()->addImageProvider(QStringLiteral("fileIcon"), new BasicFileIconProvider);
-    this->engine()->addImageProvider(QStringLiteral("userIcon"), new UserIconProvider);
 
     // Force registration of QML types in io.scrite.components
     extern void qml_register_types_io_scrite_components();

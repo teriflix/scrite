@@ -385,6 +385,8 @@ Item {
         id: appToolBarArea
         anchors.left: parent.left
         anchors.right: parent.right
+
+        z: 1
         height: 53
         color: Runtime.colors.primary.c50.background
         enabled: visible

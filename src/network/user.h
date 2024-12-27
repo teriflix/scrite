@@ -283,6 +283,9 @@ public:
     Q_PROPERTY(QStringList availableFeatures MEMBER availableFeatures)
     QStringList availableFeatures;
 
+    Q_PROPERTY(QUrl badgeImageUrl MEMBER badgeImageUrl)
+    QUrl badgeImageUrl;
+
     Q_INVOKABLE bool isFeatureEnabled(int feature) const;
     Q_INVOKABLE bool isFeatureNameEnabled(const QString &featureName) const;
 };
@@ -334,16 +337,6 @@ protected:
 
 private:
     UserInfo m_info;
-};
-
-class UserIconProvider : public QQuickImageProvider
-{
-public:
-    explicit UserIconProvider();
-    ~UserIconProvider();
-
-    // QQuickImageProvider interface
-    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
 class AppFeature : public QObject

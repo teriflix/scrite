@@ -18,38 +18,124 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 
 Item {
-    id: userLogin
-    width: 42+14
-    height: 42
+    id: root
 
-    Image {
-        id: profilePic
-        property int counter: 0
-        source: Scrite.user.loggedIn ? "image://userIcon/me" + counter : "image://userIcon/default"
-        anchors.fill: parent
-        fillMode: Image.PreserveAspectFit
-        transformOrigin: Item.Right
-        ToolTip.text: Scrite.user.loggedIn ? "Account Information" : "Login"
+    width: 50+15
+    height: 50
+
+    Item {
+        anchors.top: parent.top
+        anchors.topMargin: height * 0.05
+        anchors.left: parent.left
+
+        width: Math.min(parent.width,parent.height)
+        height: width
+
+        Rectangle {
+            anchors.centerIn: parent
+
+            color: Runtime.colors.accent.c600.background
+            width: Math.min(parent.width,parent.height)
+            height: width
+            radius: width/2
+        }
+
+        Image {
+            id: profilePic
+
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            width: parent.width
+            source: Scrite.user.loggedIn ? Scrite.user.info.badgeImageUrl : ""
+            smooth: true; mipmap: true
+
+            visible: source != ""
+            fillMode: Image.PreserveAspectFit
+        }
+
+        Item {
+            width: 1; height: 1
+            anchors.centerIn: parent
+
+            Text {
+                anchors.top: initials.top
+                anchors.left: initials.left
+                anchors.margins: 1
+
+                font: initials.font
+                text: initials.text
+                color: Runtime.colors.primary.c600.background
+                opacity: 0.5
+            }
+
+            Text {
+                id: initials
+                anchors.centerIn: parent
+
+                font.bold: true
+                font.pixelSize: root.height * 0.3
+
+                color: Runtime.colors.accent.c600.text
+                text: {
+                    if(Scrite.user.loggedIn) {
+                        const firstName = Scrite.user.info.firstName
+                        if(firstName !== "")
+                            return firstName.charAt(0).toUpperCase()
+                        const lastName = Scrite.user.info.lastName
+                        if(lastName !== "")
+                            return lastName.charAt(0).toUpperCase()
+                        const email = Scrite.user.info.email
+                        return email.charAt(0).toUpperCase()
+                    }
+                    return "S"
+                }
+            }
+        }
+
+        Loader {
+            width: 1; height: 1
+
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: parent.height * 0.14
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            active: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription && Scrite.user.info.subscriptions[0].kind === "trial"
+
+            sourceComponent: Item {
+                Text {
+                    anchors.centerIn: parent
+
+                    font.pixelSize: root.height * 0.15
+
+                    text: "" + Scrite.user.info.subscriptions[0].daysToUntil
+                    color: Runtime.colors.primary.c600.text
+                }
+            }
+        }
 
         BusyIcon {
             visible: Scrite.user.busy
             running: Scrite.user.busy
             anchors.centerIn: parent
             forDarkBackground: true
-            onRunningChanged: parent.counter = parent.counter+1
         }
 
         MouseArea {
-            hoverEnabled: true
+            ToolTip.text: Scrite.user.loggedIn ? "Account Profile" : "Login"
+            ToolTip.visible: containsMouse
+
             anchors.fill: parent
+
             cursorShape: Qt.PointingHandCursor
-            onEntered: parent.ToolTip.visible = true
-            onExited: parent.ToolTip.visible = false
-            enabled: appToolBar.visible
+            hoverEnabled: true
+
             onClicked: UserAccountDialog.launch()
         }
     }
