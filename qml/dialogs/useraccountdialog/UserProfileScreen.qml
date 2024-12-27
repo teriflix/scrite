@@ -487,7 +487,90 @@ Item {
                         visible: active
 
                         sourceComponent: VclGroupBox {
+                            id: availablePlansGroupBox
+
                             title: "Available Plans"
+
+                            readonly property Component referralCodeLink : Link {
+                                anchors.right: parent.right
+                                anchors.bottom: parent.top
+                                anchors.bottomMargin: availablePlansGroupBox.topPadding/3
+
+                                text: queryUserSubsCall.responseData.referralCodeText + " »"
+                                font.bold: true
+
+                                onClicked: referralCodeDialog.open()
+
+                                VclDialog {
+                                    id: referralCodeDialog
+
+                                    width: 400
+                                    height: 240
+                                    title: queryUserSubsCall.responseData.referralCodeText
+
+                                    content: Item {
+                                        ColumnLayout {
+                                            anchors.centerIn: parent
+
+                                            enabled: !referralCodeApi.busy
+                                            opacity: enabled ? 1 : 0.5
+
+                                            width: parent.width-50
+                                            spacing: 20
+
+                                            TextField {
+                                                id: txtReferralCode
+
+                                                Layout.fillWidth: true
+
+                                                focus: true
+                                                placeholderText: queryUserSubsCall.responseData.referralCodeText
+                                                horizontalAlignment: Text.AlignHCenter
+                                            }
+
+                                            VclButton {
+                                                Layout.alignment: Qt.AlignHCenter
+
+                                                text: "Submit"
+                                                enabled: txtReferralCode.length >= queryUserSubsCall.responseData.minReferralCodeLength
+
+                                                onClicked: {
+                                                    referralCodeApi.code = txtReferralCode.text.toUpperCase().trim()
+                                                    referralCodeApi.call()
+                                                }
+                                            }
+                                        }
+
+                                        BusyIndicator {
+                                            anchors.centerIn: parent
+                                            running: referralCodeApi.busy
+                                        }
+
+                                        SubscriptionReferralCodeRestApiCall {
+                                            id: referralCodeApi
+
+                                            onBusyChanged: referralCodeDialog.titleBarCloseButtonVisible = !busy
+
+                                            onFinished: {
+                                                if(hasError) {
+                                                    MessageBox.information("Error", errorText)
+                                                    return
+                                                }
+
+                                                if(hasResponse) {
+                                                    queryUserSubsCall.go()
+                                                    referralCodeDialog.close()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            Component.onCompleted: {
+                                if(queryUserSubsCall.responseData.acceptingReferralCode === true)
+                                    referralCodeLink.createObject(background)
+                            }
 
                             ColumnLayout {
                                 width: parent.width

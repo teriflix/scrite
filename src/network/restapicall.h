@@ -617,6 +617,30 @@ public:
     QString api() const { return "subscription/plans"; }
 };
 
+class SubscriptionReferralCodeRestApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    SubscriptionReferralCodeRestApiCall(QObject *parent = nullptr);
+    ~SubscriptionReferralCodeRestApiCall();
+
+    Q_PROPERTY(QString code READ code WRITE setCode NOTIFY codeChanged)
+    void setCode(const QString &val);
+    QString code() const { return m_code; }
+    Q_SIGNAL void codeChanged();
+
+    // RestApiCall interface
+    Type type() const { return POST; }
+    bool useSessionToken() const { return true; }
+    QString api() const { return "subscription/referralCode"; }
+    QJsonObject data() const;
+
+private:
+    QString m_code;
+};
+
 class SubscriptionPlanActivationRestApiCall : public RestApiCall
 {
     Q_OBJECT

@@ -891,6 +891,29 @@ QJsonArray SubscriptionPlansRestApiCall::subscriptionHistory() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+SubscriptionReferralCodeRestApiCall::SubscriptionReferralCodeRestApiCall(QObject *parent)
+    : RestApiCall(parent)
+{
+}
+
+SubscriptionReferralCodeRestApiCall::~SubscriptionReferralCodeRestApiCall() { }
+
+void SubscriptionReferralCodeRestApiCall::setCode(const QString &val)
+{
+    if (m_code == val)
+        return;
+
+    m_code = val;
+    emit codeChanged();
+}
+
+QJsonObject SubscriptionReferralCodeRestApiCall::data() const
+{
+    return { { "code", m_code } };
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 SubscriptionPlanActivationRestApiCall::SubscriptionPlanActivationRestApiCall(QObject *parent)
     : RestApiCall(parent)
 {
