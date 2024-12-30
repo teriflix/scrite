@@ -48,18 +48,32 @@ DialogLauncher {
         height: 550
 
         content: Item {
+            AppFeature {
+                id: emailSupport
+                featureName: "support/email"
+            }
+
             ColumnLayout {
                 anchors.centerIn: parent
 
                 spacing: 20
 
-                Image {
-                    Layout.preferredHeight: 64
+                Rectangle {
+                    Layout.preferredWidth: 450
+                    Layout.preferredHeight: 74
                     Layout.alignment: Qt.AlignHCenter
 
-                    source: "qrc:/images/scrite_discord_button.png"
-                    fillMode: Image.PreserveAspectFit
-                    mipmap: true
+                    color: Runtime.colors.accent.c600.background
+
+                    Image {
+                        anchors.centerIn: parent
+
+                        height: 64
+
+                        source: "qrc:/images/scrite_discord_button.png"
+                        fillMode: Image.PreserveAspectFit
+                        mipmap: true
+                    }
                 }
 
                 VclLabel {
@@ -98,6 +112,7 @@ DialogLauncher {
                     Layout.preferredWidth: 450
                     Layout.alignment: Qt.AlignHCenter
 
+                    visible: !emailSupport.enabled
                     text: "Please note: There is <b>no phone or email support</b> available for Scrite."
                     color: Runtime.colors.primary.c600.background
                     wrapMode: Text.WordWrap
