@@ -57,7 +57,7 @@ Item {
             VclLabel {
                 Layout.fillWidth: true
 
-                text: "An activation code was sent to <b>" + _private.userMeta.email + "</b>. Please paste it in the text field below, and click Activate."
+                text: "A verification code was sent to <b>" + _private.userMeta.email + "</b>. Please paste it in the text field below, and click Verify."
                 wrapMode: Text.WordWrap
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
             }
@@ -68,7 +68,7 @@ Item {
 
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
-                placeholderText: "Activation Code"
+                placeholderText: "Verification Code"
                 horizontalAlignment: Text.AlignHCenter
 
                 Keys.onReturnPressed: activateCall.call()
@@ -109,7 +109,7 @@ Item {
                 VclButton {
                     id:activateButton
 
-                    text: "Activate »"
+                    text: "Verify »"
                     enabled: activationCodeField.text.length == 20
                     onClicked: activateCall.call()
                 }
@@ -154,7 +154,7 @@ Item {
                 return
             }
 
-            MessageBox.information("Activation Code", responseText, () => {
+            MessageBox.information("Verification Code", responseText, () => {
                                         resendTimer.secondsLeft = 30
                                         resendTimer.start()
                                    })

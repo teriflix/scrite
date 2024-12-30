@@ -31,6 +31,7 @@ RowLayout {
     property string price
     property string priceNote
     property string actionLink
+    property bool actionLinkVisible: true
     property bool actionLinkEnabled: true
 
     signal actionLinkClicked()
@@ -112,6 +113,7 @@ RowLayout {
 
         text: root.actionLink
         enabled: root.actionLinkEnabled
+        opacity: root.actionLinkVisible ? 1 : 0
         font.bold: true
         horizontalAlignment: Text.AlignRight
 

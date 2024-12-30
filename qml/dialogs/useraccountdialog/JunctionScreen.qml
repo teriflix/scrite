@@ -45,6 +45,16 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: -5
+
+                color: Runtime.colors.primary.c50.background
+                opacity: 0.5
+                border.width: plansSubsView.ScrollBar.vertical.needed ? 1 : 0
+                border.color: Runtime.colors.primary.borderColor
+            }
+
             Flickable {
                 id: plansSubsView
 
@@ -81,10 +91,12 @@ Item {
                             if(_private.userMeta.hasActiveSubscription) {
                                 ret += "You have an active subscription plan as outlined below. "
                                 if(_private.userMeta.plans.length > 0)
-                                    ret += "Upon activating this installation, you can either continue using your active subscrition or subscribe to any of the plans listed below."
+                                    ret += "Upon verifying this installation, you can either continue using your active subscrition or subscribe to any of the plans listed below."
+                                else
+                                    ret += "Upon verifying this installation, your active subscription will be enabled on this device."
                             } else {
                                 ret += "You have no active subscrition plan. "
-                                ret += "Upon activating this installation, please subscribe or activate any of the plans listed below in order to use Scrite."
+                                ret += "Upon verifying this installation, please subscribe or activate any of the plans listed below in order to use Scrite."
                             }
 
                             return ret
@@ -119,6 +131,7 @@ Item {
                                         priceNote: Utils.toTitleCase(modelData.kind)
                                         actionLink: "Details »"
                                         actionLinkEnabled: false
+                                        actionLinkVisible: false
                                     }
                                 }
                             }
@@ -159,6 +172,7 @@ Item {
                                         priceNote: modelData.subtitle
                                         actionLink: Utils.toTitleCase(modelData.action.kind) + " »"
                                         actionLinkEnabled: false
+                                        actionLinkVisible: false
                                     }
                                 }
                             }
