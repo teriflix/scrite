@@ -126,13 +126,22 @@ Item {
 
             target: Scrite.user
 
+            Notification.active: false
+            Notification.title: "Subscription Expiry"
+            Notification.text: "Your active subscription is about to expire in a few days."
+            Notification.buttons: ["View Plans", "Dismiss"]
+            Notification.onButtonClicked: (index) => {
+                if(index === 0) {
+                    root.launch()
+                    Utils.execLater(userAccountDialog, 100, () => {
+                         Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
+                      })
+                }
+            }
+
             function onSubscriptionAboutToExpire(nrDays) {
-                MessageBox.information("Subscription Expiry", "Your active subscription is about to expire in " + nrDays + " day(s).", () => {
-                                           root.launch()
-                                           Utils.execLater(userAccountDialog, 100, () => {
-                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
-                                             })
-                                       })
+                Notification.text = "Your active subscription is about to expire in " + nrDays + " day(s)."
+                Notification.active = true
             }
 
             function onInfoChanged() {
