@@ -251,6 +251,34 @@ private:
     QString m_email;
 };
 
+class AppLatestReleaseRestApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    AppLatestReleaseRestApiCall(QObject *parent = nullptr);
+    ~AppLatestReleaseRestApiCall();
+
+    Q_PROPERTY(QJsonObject latestRelease READ latestRelease NOTIFY responseChanged)
+    QJsonObject latestRelease() const { return this->responseData(); }
+
+    Q_PROPERTY(QJsonObject update READ update NOTIFY responseChanged)
+    QJsonObject update() const { return m_update; }
+
+    // RestApiCall interface
+    Type type() const { return GET; }
+    bool useSessionToken() const { return false; }
+    QString api() const { return "app/latestRelease"; }
+    QJsonObject data() const;
+
+protected:
+    void setResponse(const QJsonObject &val);
+
+private:
+    QJsonObject m_update;
+};
+
 class AppRequestActivationCodeRestApiCall : public RestApiCall
 {
     Q_OBJECT

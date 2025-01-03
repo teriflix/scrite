@@ -31,11 +31,6 @@ public:
     static AutoUpdate *instance();
     ~AutoUpdate();
 
-    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
-    void setUrl(const QUrl &val);
-    QUrl url() const { return m_url; }
-    Q_SIGNAL void urlChanged();
-
     Q_PROPERTY(bool updateAvailable READ isUpdateAvailable NOTIFY updateInfoChanged)
     bool isUpdateAvailable() const { return !m_updateInfo.isEmpty(); }
 
@@ -46,40 +41,18 @@ public:
     QJsonObject updateInfo() const { return m_updateInfo; }
     Q_SIGNAL void updateInfoChanged();
 
-    Q_PROPERTY(bool surveyAvailable READ surveyAvailable NOTIFY surveyInfoChanged)
-    bool surveyAvailable() const { return !m_surveyInfo.isEmpty(); }
-
-    Q_PROPERTY(QJsonObject surveyInfo READ surveyInfo NOTIFY surveyInfoChanged)
-    QJsonObject surveyInfo() const { return m_surveyInfo; }
-
-    Q_PROPERTY(QUrl surveyUrl READ surveyUrl NOTIFY surveyInfoChanged)
-    QUrl surveyUrl() const;
-
-    Q_SIGNAL void surveyInfoChanged();
-
-    Q_INVOKABLE void dontAskForSurveyAgain(bool val = true);
-
 private:
     AutoUpdate(QObject *parent = nullptr);
-    void setUpdateDownloadUrl(const QUrl &val);
+
     void setUpdateInfo(const QJsonObject &val);
-    void setSurveyInfo(const QJsonObject &val);
+
     void checkForUpdates();
     void checkForUpdatesAfterSometime();
-    void lookForUpdates(const QJsonObject &json);
-    void lookForSurvey(const QJsonObject &json);
-    void timerEvent(QTimerEvent *event);
-
-    QString getClientId() const;
 
 private:
-    // URL has to be a http location always. Otherwise we will have to bundle
-    // SSL libraries along with the installer and there are some legal bits
-    // to consider before we are able to do that.
-    QUrl m_url = QUrl("https://www.scrite.io/helpers/latest_release.json");
+    QUrl m_url;
     QJsonObject m_updateInfo;
     QJsonObject m_surveyInfo;
-    ExecLaterTimer m_updateTimer;
 };
 
 QML_DECLARE_TYPE(AutoUpdate)

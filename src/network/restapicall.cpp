@@ -521,6 +521,31 @@ QJsonObject AppCheckUserRestApiCall::data() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+AppLatestReleaseRestApiCall::AppLatestReleaseRestApiCall(QObject *parent) : RestApiCall(parent) { }
+
+AppLatestReleaseRestApiCall::~AppLatestReleaseRestApiCall() { }
+
+QJsonObject AppLatestReleaseRestApiCall::data() const
+{
+    return { { "platform", Application::instance()->platformAsString() } };
+}
+
+void AppLatestReleaseRestApiCall::setResponse(const QJsonObject &val)
+{
+    const QJsonObject data = val.value("data").toObject();
+
+    const QVersionNumber updateVersion =
+            QVersionNumber::fromString(data.value("version").toString());
+    if (updateVersion.isNull() || updateVersion <= Application::instance()->versionNumber())
+        m_update = QJsonObject();
+    else
+        m_update = data;
+
+    RestApiCall::setResponse(val);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 AppRequestActivationCodeRestApiCall::AppRequestActivationCodeRestApiCall(QObject *parent)
     : RestApiCall(parent)
 {

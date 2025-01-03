@@ -24,26 +24,18 @@ QtObject {
 
     property AutoUpdate autoUpdate: Scrite.app.autoUpdate
 
-    Notification.active: autoUpdate.updateAvailable || autoUpdate.surveyAvailable
-    Notification.title: autoUpdate.updateAvailable ? "Update Available" : (autoUpdate.surveyAvailable ? autoUpdate.surveyInfo.title : "")
+    Notification.active: autoUpdate.updateAvailable
+    Notification.title: "Update Available"
     Notification.text: {
         if(autoUpdate.updateAvailable)
             return "Scrite " + autoUpdate.updateInfo.versionString + " is now available for download. <font size=\"-1\"><i>[<strong>What's new?</strong> " + autoUpdate.updateInfo.changeLog + "]</i></font>"
-        if(autoUpdate.surveyAvailable)
-            return autoUpdate.surveyInfo.text
         return ""
     }
-    Notification.buttons: autoUpdate.updateAvailable ? ["Download", "Ignore"] : ["Participate", "Not Now", "Dont Ask Again"]
+    Notification.buttons: ["Download", "Ignore"]
     Notification.onButtonClicked: (index) => {
         if(autoUpdate.updateAvailable) {
             if(index === 0)
                 Qt.openUrlExternally(autoUpdate.updateDownloadUrl)
-        } else if(autoUpdate.surveyAvailable) {
-            if(index === 0) {
-                Qt.openUrlExternally(autoUpdate.surveyUrl)
-                autoUpdate.dontAskForSurveyAgain(true)
-            } else if(index === 2)
-                autoUpdate.dontAskForSurveyAgain(true)
         }
     }
 }
