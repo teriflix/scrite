@@ -110,6 +110,9 @@ public:
     Q_PROPERTY(int duration MEMBER duration)
     int duration = 0;
 
+    Q_PROPERTY(bool exclusive MEMBER exclusive)
+    bool exclusive = false;
+
     Q_PROPERTY(QString currency MEMBER currency)
     QString currency;
 

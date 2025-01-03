@@ -119,6 +119,7 @@ UserSubscriptionPlanInfo::UserSubscriptionPlanInfo(const QJsonObject &object)
     this->title = object.value("title").toString();
     this->subtitle = object.value("subtitle").toString();
     this->duration = object.value("duration").toInt();
+    this->exclusive = object.value("exclusive").toBool(false);
 
     const QJsonObject pricing = object.value("pricing").toObject();
     this->currency = pricing.value("currency").toString();

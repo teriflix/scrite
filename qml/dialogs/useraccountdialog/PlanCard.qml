@@ -24,12 +24,13 @@ import "qrc:/qml/helpers"
 RowLayout {
     id: root
 
-    property url icon: "qrc:/images/prodicon.png"
+    property url icon: exclusive ? "qrc:/images/exclprodicon.png" : "qrc:/images/prodicon.png"
     property string name
     property string duration
     property string durationNote
     property string price
     property string priceNote
+    property bool   exclusive: false
     property string actionLink
     property bool actionLinkVisible: true
     property bool actionLinkEnabled: true

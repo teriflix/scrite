@@ -126,6 +126,7 @@ Item {
 
                                         name: modelData.plan.title
                                         duration: Utils.dateSpanAsString(modelData.isActive ? Utils.todayWithZeroTime() : new Date(modelData.from), new Date(modelData.until))
+                                        exclusive: modelData.plan.exclusive
                                         durationNote: "(" + Utils.formatDateRangeAsString(new Date(modelData.from), new Date(modelData.until)) + ")"
                                         price: modelData.isActive ? "Active" : "Upcoming"
                                         priceNote: Utils.toTitleCase(modelData.kind)
@@ -161,6 +162,7 @@ Item {
 
                                         name: modelData.title
                                         duration: Utils.daysSpanAsString(modelData.duration)
+                                        exclusive: modelData.exclusive
                                         durationNote: modelData.featureNote
                                         price: {
                                             if(modelData.pricing.price === 0)

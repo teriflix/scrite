@@ -18,5 +18,6 @@
         <file>images/homescreen_scriptalay_banner.png</file>
         <file>images/useraccountdialogbg.png</file>
         <file>images/prodicon.png</file>
+        <file>images/exclprodicon.png</file>
     </qresource>
 </RCC>

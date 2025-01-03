@@ -441,6 +441,7 @@ Item {
 
                                 name: activeSub.plan.title
                                 duration: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(activeSub.until))
+                                exclusive: activeSub.plan.exclusive
                                 durationNote: "(" + Utils.formatDateRangeAsString(new Date(activeSub.from), new Date(activeSub.until)) + ")"
                                 price: "Active"
                                 priceNote: Utils.toTitleCase(activeSub.kind)
@@ -468,6 +469,7 @@ Item {
 
                                 name: upcomingSub.plan.title
                                 duration: Utils.dateSpanAsString(new Date(upcomingSub.from), new Date(upcomingSub.until))
+                                exclusive: upcomingSub.plan.exclusive
                                 durationNote: "(" + Utils.formatDateRangeAsString(new Date(upcomingSub.from), new Date(upcomingSub.until)) + ")"
                                 price: Utils.toTitleCase(upcomingSub.kind)
                                 priceNote: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(upcomingSub.from))
@@ -584,8 +586,10 @@ Item {
 
                                         Layout.fillWidth: true
 
+
                                         name: modelData.title
                                         duration: Utils.daysSpanAsString(modelData.duration)
+                                        exclusive: modelData.exclusive
                                         durationNote: modelData.featureNote
                                         price: {
                                             if(modelData.pricing.price === 0)
@@ -651,6 +655,7 @@ Item {
 
                                         name: modelData.plan.title
                                         duration: Utils.dateSpanAsString(new Date(modelData.from), new Date(modelData.until))
+                                        exclusive: modelData.plan.exclusive
                                         durationNote: Utils.formatDateRangeAsString(new Date(modelData.from), new Date(modelData.until))
                                         price: Utils.toTitleCase(modelData.kind)
                                         priceNote: modelData.plan.featureNote
