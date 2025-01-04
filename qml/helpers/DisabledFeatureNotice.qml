@@ -116,12 +116,7 @@ Rectangle {
                 enabled: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
-                onClicked: {
-                    UserAccountDialog.launch()
-                    Utils.execLater(root, 500, () => {
-                                        Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
-                                    })
-                }
+                onClicked: UserAccountDialog.launch("Subscriptions")
             }
 
             Item {

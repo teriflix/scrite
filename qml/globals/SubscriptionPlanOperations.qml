@@ -363,10 +363,7 @@ Item {
                 if(hasError) {
                     MessageBox.information("Error", errorMessage)
                 } else {
-                    UserAccountDialog.launch()
-                    Utils.execLater(_private, 100, () => {
-                                        Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
-                                    })
+                    UserAccountDialog.launch("Subscriptions")
                 }
             }
         }

@@ -49,8 +49,8 @@ Item {
                                      }
                                  }
 
-        pagesArray: ["Profile", "Subscriptions", "Installations"]
-        currentIndex: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription ? 0 : 1
+        pagesArray: ["Profile", "Messages", "Subscriptions", "Installations"]
+        currentIndex: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription ? 0 : 2
         maxPageListWidth: {
             if(pagesArray.length < 2)
                 return 120
@@ -74,8 +74,9 @@ Item {
         }
         pageContent: {
             switch(userProfilePageView.currentIndex) {
-            case 1: return userSubscriptionsPageComponent
-            case 2: return userInstallationsPageComponent
+            case 1: return userMessagesPageComponent
+            case 2: return userSubscriptionsPageComponent
+            case 3: return userInstallationsPageComponent
             default: break
             }
             return userProfilePageComponent
@@ -391,6 +392,194 @@ Item {
                 anchors.centerIn: parent
 
                 running: userProfilePage.callList.busy
+            }
+        }
+    }
+
+    Component {
+        id: userMessagesPageComponent
+
+        Item {
+            id: userMessagesPage
+
+            height: userProfilePageView.availablePageContentHeight
+
+            Component.onDestruction: Scrite.user.markMessagesAsRead()
+
+            VclLabel {
+                anchors.centerIn: parent
+
+                visible: Scrite.user.totalMessageCount === 0
+
+                text: "There are no messages for you at the moment."
+            }
+
+            ListView {
+                id: userMessagesView
+
+                anchors.fill: parent
+
+                ScrollBar.vertical: VclScrollBar { }
+                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+                clip: true
+                height: parent.height
+                visible: Scrite.user.totalMessageCount > 0
+
+                model: Scrite.user.messages
+                spacing: 20
+                boundsBehavior: Flickable.StopAtBounds
+
+                header: VclLabel {
+                    width: userMessagesView.width
+                    padding: 10
+
+                    font.bold: true
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+
+                    text: {
+                        const nrUnread = Scrite.user.unreadMessageCount
+                        const nrMessages = Scrite.user.totalMessageCount
+
+                        if(nrMessages === 0) {
+                            return "You have no messages right now."
+                        }
+
+                        if(nrUnread > 0) {
+                            if(nrUnread === nrMessages)
+                                return "You have " + nrUnread + " unread message" + (nrUnread > 1 ? "s" : "") + "."
+                            else
+                                return "You have " + nrUnread + " of " + nrMessages + " unread message" + (nrMessages > 1 ? "s" : "") + "."
+                        }
+
+                        return "You have " + nrMessages + " message" + (nrMessages > 1 ? "s" : "") + "."
+                    }
+
+                    wrapMode: Text.WordWrap
+                }
+
+                footer: Item {
+                    width: userMessagesView.width
+                    height: 20
+                }
+
+                delegate: Item {
+                    required property var modelData
+
+                    width: userMessagesView.width
+                    height: messageRect.height
+
+                    Rectangle {
+                        id: messageRect
+
+                        anchors.centerIn: parent
+
+                        width: 450
+                        height: messageLayout.implicitHeight + 30
+                        border {
+                            width: modelData.read ? 1 : 2
+                            color: Runtime.colors.primary.borderColor
+                        }
+
+                        color: Runtime.colors.primary.c200.background
+
+                        ColumnLayout {
+                            id: messageLayout
+
+                            anchors.centerIn: parent
+
+                            width: parent.width - 20
+                            spacing: 10
+
+                            VclLabel {
+                                Layout.fillWidth: true
+
+                                text: Utils.formatDateIncludingYear(modelData.timestamp)
+                                color: Runtime.colors.primary.c200.text
+                                opacity: 0.75
+                                horizontalAlignment: Text.AlignRight
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                            }
+
+                            VclLabel {
+                                Layout.fillWidth: true
+
+                                text: modelData.subject
+                                color: Runtime.colors.primary.c200.text
+                                wrapMode: Text.WordWrap
+                                font.bold: true
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            }
+
+                            Image {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: sourceSize.height * (width/sourceSize.width)
+
+                                source: modelData.image
+                                mipmap: true
+                                visible: source !== ""
+                                fillMode: Image.PreserveAspectFit
+                            }
+
+                            VclLabel {
+                                Layout.fillWidth: true
+
+                                text: modelData.body
+                                color: Runtime.colors.primary.c200.text
+                                wrapMode: Text.WordWrap
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                            }
+
+                            Rectangle {
+                                Layout.fillWidth: true
+                                Layout.preferredHeight: 1
+
+                                color: Runtime.colors.primary.borderColor
+                            }
+
+                            Repeater {
+                                model: modelData.buttons
+
+                                Link {
+                                    required property var modelData
+
+                                    Layout.fillWidth: true
+
+                                    padding: 4
+                                    text: modelData.text
+                                    horizontalAlignment: Text.AlignHCenter
+
+                                    onClicked: {
+                                        if(modelData.action === UserMessageButton.UrlAction) {
+                                            Qt.openUrlExternally(modelData.endpoint)
+                                            return
+                                        }
+
+                                        if(modelData.action === UserMessageButton.CommandAction) {
+                                            switch(modelData.endpoint) {
+                                            case "$subscribe":
+                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
+                                                return
+                                            case "$profile":
+                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Profile")
+                                                return
+                                            case "$installations":
+                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Installations")
+                                                return
+                                            case "$homescreen":
+                                                HomeScreen.launch()
+                                                return
+                                            }
+                                        }
+
+                                        // Implement API and Code in a future update
+                                        enabled = false
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -714,7 +903,7 @@ Item {
 
                     let history = []
                     result.subscriptions.forEach( (sub) => {
-                                                    if(sub.hasExpired)
+                                                     if(sub.hasExpired)
                                                      history.push(sub)
                                                  })
                     if(result.publicBetaSubscription)

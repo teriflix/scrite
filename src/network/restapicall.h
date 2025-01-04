@@ -373,6 +373,28 @@ private:
     QJsonObject m_updatedFields;
 };
 
+class UserMessagesRestApiCall : public RestApiCall
+{
+    Q_OBJECT
+
+private:
+    UserMessagesRestApiCall(QObject *parent = nullptr);
+
+public:
+    ~UserMessagesRestApiCall();
+
+    Q_PROPERTY(QJsonArray messages READ messages NOTIFY responseChanged)
+    QJsonArray messages() const { return this->response().value("data").toArray(); }
+
+    // RestApiCall interface
+    Type type() const { return GET; }
+    bool useSessionToken() const { return true; }
+    QString api() const { return "user/messages"; }
+
+private:
+    friend class User;
+};
+
 class UserHelpTipsRestApiCall : public RestApiCall
 {
     Q_OBJECT
@@ -602,6 +624,9 @@ public:
     Type type() const { return GET; }
     bool useSessionToken() const { return true; }
     QString api() const { return "session/status"; }
+
+protected:
+    void setResponse(const QJsonObject &val);
 };
 
 class SessionNewRestApiCall : public RestApiCall

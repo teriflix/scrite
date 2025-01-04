@@ -35,9 +35,15 @@ Item {
     anchors.fill: parent
 
     function init(_parent) { parent = _parent }
-    function launch() {
+    function launch(profileScreen) {
         userAccountDialog.screenName = Scrite.user.loggedIn ? "UserProfileScreen" : _private.startScreen
         userAccountDialog.open()
+
+        if(Scrite.user.loggedIn && profileScreen && profileScreen !== "") {
+            Utils.execLater(userAccountDialog, 500, () => {
+                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
+                            })
+        }
     }
 
     VclDialog {
@@ -132,10 +138,7 @@ Item {
             Notification.buttons: ["View Plans", "Dismiss"]
             Notification.onButtonClicked: (index) => {
                 if(index === 0) {
-                    root.launch()
-                    Utils.execLater(userAccountDialog, 100, () => {
-                         Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
-                      })
+                    launch("Subscriptions")
                 }
             }
 
@@ -146,11 +149,41 @@ Item {
 
             function onInfoChanged() {
                 if(!Scrite.user.info.hasActiveSubscription) {
-                    root.launch()
-                    Utils.execLater(userAccountDialog, 100, () => {
-                         Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
-                      })
+                    launch("Subscriptions")
                 }
+            }
+        }
+
+        readonly property Connections trackImportantMessages: Connections {
+            enabled: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
+
+            target: Scrite.user
+
+            Notification.active: false
+            Notification.title: "Unread Messages"
+            Notification.text: "You have one or more important unread messages. Would you like to read them now?"
+            Notification.buttons: ["View Messages", "Dismiss"]
+            Notification.onButtonClicked: (index) => {
+                if(index === 0) {
+                    launch("Messages")
+                }
+            }
+
+            function onNotifyImportantMessages(messages) {
+                Notification.title = (() => {
+                                        const count = Scrite.user.unreadMessageCount
+                                        if(count === 1)
+                                          return "You have 1 unread message"
+                                        return "You have " + count + " unread messages."
+                                      })()
+                Notification.text = (() => {
+                                         const count = Scrite.user.unreadMessageCount
+                                         let ret = messages[0].subject
+                                         if(count > 1)
+                                            ret += ", and " + (count-1) + " more .."
+                                         return ret
+                                     })()
+                Notification.active = true
             }
         }
 

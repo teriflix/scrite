@@ -296,11 +296,111 @@ bool UserInfo::isFeatureNameEnabled(const QString &featureName) const
     return Scrite::isFeatureNameEnabled(featureName, this->availableFeatures);
 }
 
+UserMessageButton::UserMessageButton(const QJsonObject &object)
+{
+    this->type = QMap<QString, Type>({ { "link", LinkType } })
+                         .value(object.value("type").toString(), OtherType);
+    this->text = object.value("text").toString();
+    this->action = QMap<QString, Action>({ { "url", UrlAction }, { "command", CommandAction } })
+                           .value(object.value("action").toString(), OtherAction);
+    this->endpoint = object.value("endpoint").toString();
+    this->params = object.value("params");
+}
+
+UserMessageButton::UserMessageButton(const UserMessageButton &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserMessageButton::operator==(const UserMessageButton &other) const
+{
+    return DeepCompareGadget(&staticMetaObject, static_cast<const void *>(&other),
+                             static_cast<const void *>(this));
+}
+
+UserMessageButton &UserMessageButton::operator=(const UserMessageButton &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+QDataStream &operator<<(QDataStream &ds, const UserMessageButton &umb)
+{
+    ds << umb.type << umb.text << umb.action << umb.endpoint << umb.params;
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, UserMessageButton &umb)
+{
+    ds >> umb.type >> umb.text >> umb.action >> umb.endpoint >> umb.params;
+    return ds;
+}
+
+UserMessage::UserMessage(const QJsonObject &object)
+{
+    this->id = object.value("_id").toString();
+    this->type = QMap<QString, Type>({ { "important", ImportantType } })
+                         .value(object.value("type").toString(), DefaultType);
+    this->timestamp = QDateTime::fromString(object.value("ts").toString(), Qt::ISODateWithMs);
+    this->expiresOn = QDateTime::fromString(object.value("expiry").toString(), Qt::ISODateWithMs);
+    this->from = object.value("from").toString();
+    this->subject = object.value("subject").toString();
+    this->body = object.value("body").toString();
+    this->image = QUrl(object.value("image").toString());
+
+    const QJsonArray buttons = object.value("buttons").toArray();
+    for (const QJsonValue &button : buttons)
+        this->buttons.append(UserMessageButton(button.toObject()));
+}
+
+UserMessage::UserMessage(const UserMessage &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+}
+
+bool UserMessage::operator==(const UserMessage &other) const
+{
+    return this->id == other.id;
+}
+
+UserMessage &UserMessage::operator=(const UserMessage &other)
+{
+    DeepCopyGadget(&staticMetaObject, static_cast<const void *>(&other), static_cast<void *>(this));
+    return *this;
+}
+
+QDataStream &operator<<(QDataStream &ds, const UserMessage &um)
+{
+    ds << um.id << um.timestamp << um.expiresOn << um.from << um.subject << um.body << um.image
+       << um.read << um.type;
+    ds << qint8(um.buttons.size());
+    for (const UserMessageButton &button : um.buttons)
+        ds << button;
+
+    return ds;
+}
+
+QDataStream &operator>>(QDataStream &ds, UserMessage &um)
+{
+    ds >> um.id >> um.timestamp >> um.expiresOn >> um.from >> um.subject >> um.body >> um.image
+            >> um.read >> um.type;
+
+    qint8 nrButtons = 0;
+    ds >> nrButtons;
+
+    for (qint8 i = 0; i < nrButtons; i++) {
+        UserMessageButton umb;
+        ds >> umb;
+        um.buttons.append(umb);
+    }
+
+    return ds;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 User *User::instance()
 {
-
     static bool firstTime = true;
 
     bool refreshSessionToken = firstTime;
@@ -341,6 +441,8 @@ User *User::instance()
 User::User(QObject *parent) : QObject(parent)
 {
     connect(this, &User::infoChanged, this, &User::loggedInChanged);
+    connect(this, &User::loggedInChanged, this, &User::loadStoredMessages);
+    connect(this, &User::messagesChanged, this, &User::storeMessages);
 }
 
 User::~User() { }
@@ -366,6 +468,68 @@ bool User::isBusy() const
     return apiCall != nullptr;
 }
 
+int User::unreadMessageCount() const
+{
+    return std::count_if(m_messages.begin(), m_messages.end(),
+                         [](const UserMessage &item) { return item.read == false; });
+}
+
+void User::checkForMessages()
+{
+    if (!this->isLoggedIn())
+        return;
+
+    UserMessagesRestApiCall *api =
+            this->findChild<UserMessagesRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
+    if (api != nullptr)
+        return;
+
+    api = new UserMessagesRestApiCall(this);
+    api->setAutoDelete(true);
+    connect(api, &UserMessagesRestApiCall::finished, this, [=]() {
+        const QJsonArray messages = api->messages();
+        if (messages.isEmpty())
+            return;
+
+        QList<UserMessage> importantMessages;
+        for (const QJsonValue &message : messages) {
+            const UserMessage msg(message.toObject());
+            if (!m_messages.contains(msg)) {
+                m_messages.prepend(UserMessage(message.toObject()));
+                if (msg.type == UserMessage::ImportantType)
+                    importantMessages.append(msg);
+            }
+        }
+
+        if (!m_messages.isEmpty())
+            m_messages.erase(
+                    std::remove_if(m_messages.begin(), m_messages.end(),
+                                   [](const UserMessage &msg) { return msg.hasExpired(); }),
+                    m_messages.end());
+
+        if (!importantMessages.isEmpty())
+            emit notifyImportantMessages(importantMessages);
+
+        emit messagesChanged();
+    });
+    if (!api->call())
+        api->deleteLater();
+}
+
+void User::markMessagesAsRead()
+{
+    int nrMessages = 0;
+    for (UserMessage &message : m_messages) {
+        if (!message.read) {
+            message.read = true;
+            ++nrMessages;
+        }
+    }
+
+    if (nrMessages > 0)
+        emit messagesChanged();
+}
+
 void User::setInfo(const UserInfo &val)
 {
     if (m_info == val)
@@ -375,6 +539,15 @@ void User::setInfo(const UserInfo &val)
     emit infoChanged();
 
     QTimer::singleShot(100, this, &User::checkIfSubscriptionIsAboutToExpire);
+}
+
+void User::setMessages(const QList<UserMessage> &val)
+{
+    if (m_messages == val)
+        return;
+
+    m_messages = val;
+    emit messagesChanged();
 }
 
 void User::checkIfSubscriptionIsAboutToExpire()
@@ -410,6 +583,59 @@ void User::checkIfSubscriptionIsAboutToExpire()
         emit subscriptionAboutToExpire(nrDays);
 }
 
+void User::storeMessages()
+{
+    if (!this->isLoggedIn())
+        return;
+
+    QByteArray messageBytes;
+    {
+        QDataStream ds(&messageBytes, QIODevice::WriteOnly);
+        ds << m_info.id << this->m_messages;
+    }
+    LocalStorage::store("userMessages", messageBytes);
+}
+
+void User::loadStoredMessages()
+{
+    if (!this->isLoggedIn())
+        return;
+
+    m_messages.clear();
+
+    const QByteArray messageBytes = LocalStorage::load("userMessages", QByteArray()).toByteArray();
+    if (!messageBytes.isEmpty()) {
+        QString userId;
+
+        QDataStream ds(messageBytes);
+        ds >> userId;
+
+        if (userId != m_info.id) {
+            LocalStorage::store("userMessages", QVariant());
+        } else {
+            ds >> m_messages;
+
+            if (!m_messages.isEmpty())
+                m_messages.erase(
+                        std::remove_if(m_messages.begin(), m_messages.end(),
+                                       [](const UserMessage &msg) { return msg.hasExpired(); }),
+                        m_messages.end());
+
+            if (!m_messages.isEmpty()) {
+                QList<UserMessage> importantMessages;
+                std::copy_if(m_messages.begin(), m_messages.end(),
+                             std::back_inserter(importantMessages), [](const UserMessage &msg) {
+                                 return !msg.read && msg.type == UserMessage::ImportantType;
+                             });
+                if (!importantMessages.isEmpty())
+                    emit notifyImportantMessages(importantMessages);
+            }
+        }
+    }
+
+    emit messagesChanged();
+}
+
 void User::loadInfoFromStorage()
 {
     const QString token = LocalStorage::load("loginToken").toString();
@@ -436,8 +662,6 @@ void User::loadInfoUsingRestApiCall()
         return;
 
     apiCall = new UserMeRestApiCall(this);
-    connect(apiCall, &UserMeRestApiCall::destroyed, this, &User::busyChanged, Qt::QueuedConnection);
-
     if (!apiCall->call())
         apiCall->deleteLater();
 }

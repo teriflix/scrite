@@ -2164,6 +2164,10 @@ QString Application::relativeTime(const QDateTime &dt)
         return QStringLiteral("Unknown Time");
 
     const QDateTime now = QDateTime::currentDateTime();
+    if (dt > now) {
+        return QLocale::system().toString(dt, QLocale::LongFormat);
+    }
+
     if (now.date() == dt.date()) {
         const int secsInMin = 60;
         const int secsInHour = secsInMin * 60;

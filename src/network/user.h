@@ -294,6 +294,103 @@ public:
 };
 Q_DECLARE_METATYPE(UserInfo)
 
+struct UserMessageButton
+{
+    Q_GADGET
+    QML_ELEMENT
+
+public:
+    UserMessageButton() { }
+    UserMessageButton(const QJsonObject &object);
+    UserMessageButton(const UserMessageButton &other);
+
+    bool operator==(const UserMessageButton &other) const;
+    bool operator!=(const UserMessageButton &other) const { return !(*this == other); }
+    UserMessageButton &operator=(const UserMessageButton &other);
+
+    enum Type { LinkType, OtherType };
+    Q_ENUM(Type)
+
+    Q_PROPERTY(Type type MEMBER type)
+    Type type = LinkType;
+
+    Q_PROPERTY(QString text MEMBER text)
+    QString text;
+
+    enum Action { UrlAction, CommandAction, OtherAction };
+    Q_ENUM(Action)
+
+    Q_PROPERTY(Action action MEMBER action)
+    Action action = UrlAction;
+
+    Q_PROPERTY(QString endpoint MEMBER endpoint)
+    QString endpoint;
+
+    Q_PROPERTY(QJsonValue params MEMBER params)
+    QJsonValue params;
+};
+Q_DECLARE_METATYPE(UserMessageButton)
+Q_DECLARE_METATYPE(QList<UserMessageButton>)
+
+struct UserMessage
+{
+    Q_GADGET
+    QML_ELEMENT
+
+public:
+    UserMessage() { }
+    UserMessage(const QJsonObject &object);
+    UserMessage(const UserMessage &other);
+
+    bool operator==(const UserMessage &other) const;
+    bool operator!=(const UserMessage &other) const { return !(*this == other); }
+    UserMessage &operator=(const UserMessage &other);
+
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const { return !id.isEmpty(); }
+
+    Q_PROPERTY(QString id MEMBER id)
+    QString id;
+
+    enum Type { DefaultType, ImportantType };
+    Q_ENUM(Type)
+
+    Q_PROPERTY(Type type MEMBER type)
+    Type type = DefaultType;
+
+    Q_PROPERTY(QString from MEMBER from)
+    QString from;
+
+    Q_PROPERTY(QDateTime timestamp MEMBER timestamp)
+    QDateTime timestamp;
+
+    Q_PROPERTY(QDateTime expiresOn MEMBER expiresOn)
+    QDateTime expiresOn;
+
+    Q_PROPERTY(bool hasExpired READ hasExpired)
+    bool hasExpired() const
+    {
+        return this->isValid() && QDateTime::currentDateTime() > this->expiresOn;
+    }
+
+    Q_PROPERTY(QString subject MEMBER subject)
+    QString subject;
+
+    Q_PROPERTY(QUrl image MEMBER image)
+    QUrl image;
+
+    Q_PROPERTY(QString body MEMBER body)
+    QString body;
+
+    Q_PROPERTY(bool read MEMBER read)
+    bool read = false;
+
+    Q_PROPERTY(QList<UserMessageButton> buttons MEMBER buttons)
+    QList<UserMessageButton> buttons;
+};
+Q_DECLARE_METATYPE(UserMessage)
+Q_DECLARE_METATYPE(QList<UserMessage>)
+
 class User : public QObject
 {
     Q_OBJECT
@@ -322,14 +419,32 @@ public:
     bool isBusy() const;
     Q_SIGNAL void busyChanged();
 
+    Q_PROPERTY(QList<UserMessage> messages READ messages WRITE setMessages NOTIFY messagesChanged)
+    QList<UserMessage> messages() const { return m_messages; }
+    Q_SIGNAL void messagesChanged();
+
+    Q_PROPERTY(int totalMessageCount READ totalMessageCount NOTIFY messagesChanged)
+    int totalMessageCount() const { return m_messages.size(); }
+
+    Q_PROPERTY(int unreadMessageCount READ unreadMessageCount NOTIFY messagesChanged)
+    int unreadMessageCount() const;
+
+    Q_INVOKABLE void checkForMessages();
+    Q_INVOKABLE void markMessagesAsRead();
+
 signals:
     void subscriptionAboutToExpire(int days);
+    void notifyImportantMessages(const QList<UserMessage> &messages);
 
 private:
     User(QObject *parent = nullptr);
 
     void setInfo(const UserInfo &val);
+    void setMessages(const QList<UserMessage> &val);
     void checkIfSubscriptionIsAboutToExpire();
+
+    void storeMessages();
+    void loadStoredMessages();
 
 public: // Don't use these methods
     void loadInfoFromStorage();
@@ -340,6 +455,7 @@ protected:
 
 private:
     UserInfo m_info;
+    QList<UserMessage> m_messages;
 };
 
 class AppFeature : public QObject

@@ -24,6 +24,7 @@ class LocalStorage
 public:
     static void store(const QString &key, const QVariant &value);
     static QVariant load(const QString &key, const QVariant &defaultValue = QVariant());
+    static void reset();
 
     static QJsonObject compile(const QJsonObject &object);
 };

@@ -105,6 +105,11 @@ QVariant LocalStorage::load(const QString &key, const QVariant &defaultValue)
     return data.value(key, defaultValue);
 }
 
+void LocalStorage::reset()
+{
+    ::DataStore->data.clear();
+}
+
 QJsonObject LocalStorage::compile(const QJsonObject &object)
 {
     QJsonObject ret;

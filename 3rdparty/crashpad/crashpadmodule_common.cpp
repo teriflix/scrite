@@ -109,6 +109,7 @@ bool CrashpadModule::prepare()
     if (messageBox.exec() == QDialog::Accepted) {
         if (messageBoxUi.factoryResetOption->isChecked()) {
             QFile::remove(settingsFile);
+            QFile::remove(CrashpadModule::dataPath() + "/../localstore.db");
             QFile::remove(CrashpadModule::dataPath() + "/../objectconfig.json");
             Application::removeWindowsEnvironmentVariable("SCRITE_DPI_MODE");
             Application::removeWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR");
@@ -119,6 +120,8 @@ bool CrashpadModule::prepare()
             settings.setValue("userInfo", QVariant());
             settings.setValue("devices", QVariant());
             settings.sync();
+
+            QFile::remove(CrashpadModule::dataPath() + "/../localstore.db");
         }
 
         return true;
