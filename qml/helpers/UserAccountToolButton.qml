@@ -60,6 +60,37 @@ Item {
             fillMode: Image.PreserveAspectFit
         }
 
+        Loader {
+            active: Scrite.user.unreadMessageCount > 0
+
+            anchors.top: parent.top
+            anchors.right: parent.right
+
+            sourceComponent: Rectangle {
+                width: Math.max(unreadMessageCountLabel.contentWidth*1.15, unreadMessageCountLabel.contentHeight*1.15)
+                height: width; radius: width/2
+
+                color: Runtime.colors.primary.a100.background
+
+                Text {
+                    id: unreadMessageCountLabel
+
+                    font.bold: true
+                    font.pixelSize: root.height * 0.25
+
+                    anchors.centerIn: parent
+
+                    text: {
+                        const count = Scrite.user.unreadMessageCount
+                        if(count >= 10)
+                            return "9+"
+                        return count
+                    }
+                    color: Runtime.colors.primary.a100.text
+                }
+            }
+        }
+
         Item {
             width: 1; height: 1
             anchors.centerIn: parent
@@ -136,7 +167,16 @@ Item {
             cursorShape: Qt.PointingHandCursor
             hoverEnabled: true
 
-            onClicked: UserAccountDialog.launch()
+            onClicked: {
+                let screenName = undefined
+
+                if(Scrite.user.unreadMessageCount > 0)
+                    screenName = "Messages"
+                else if(Scrite.user.info.hasActiveSubscription && !Scrite.user.info.hasUpcomingSubscription && Scrite.user.info.subscriptions[0].daysToUntil < 15)
+                    screenName = "Subscriptions"
+
+                UserAccountDialog.launch(screenName)
+            }
         }
     }
 }

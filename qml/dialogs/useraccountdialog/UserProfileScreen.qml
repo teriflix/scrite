@@ -497,7 +497,6 @@ Item {
                                 text: Utils.formatDateIncludingYear(modelData.timestamp)
                                 color: Runtime.colors.primary.c200.text
                                 opacity: 0.75
-                                horizontalAlignment: Text.AlignRight
                                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                             }
 
