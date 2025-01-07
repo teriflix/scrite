@@ -68,7 +68,7 @@ DialogLauncher {
 
         contentItem: Image {
             id: splashImage
-            source: "qrc:/images/splash.jpg"
+            source: "qrc:/images/splash.png"
             smooth: true; mipmap: true
             asynchronous: false
 
@@ -77,12 +77,12 @@ DialogLauncher {
 
                 anchors.top: parent.top
                 anchors.right: parent.right
-                anchors.topMargin: parent.height * (_dialogPrivate.scriteUrlTextPos.y / _dialogPrivate.splashImageSize.height)
-                anchors.rightMargin: parent.width * (_dialogPrivate.scriteUrlTextPos.x / _dialogPrivate.splashImageSize.width)
+                anchors.topMargin: parent.height * 0.05
+                anchors.rightMargin: parent.height * 0.05
 
                 color: "white"
                 font.bold: true
-                font.pixelSize: parent.height * (_dialogPrivate.scriteUrlFontPixelSize / _dialogPrivate.splashImageSize.height)
+                font.pixelSize: parent.height * 0.035
 
                 text: Scrite.app.applicationVersion
             }
@@ -120,8 +120,6 @@ DialogLauncher {
 
             readonly property size splashImageSize: Qt.size(1880, 800)
             readonly property real aspectRatio: splashImageSize.width / splashImageSize.height
-            readonly property point scriteUrlTextPos: Qt.point(35, 750)
-            readonly property real scriteUrlFontPixelSize: 24
         }
     }
 }

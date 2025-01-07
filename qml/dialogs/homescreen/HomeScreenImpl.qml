@@ -174,13 +174,19 @@ Item {
 
             color: "white"
             elide: Text.ElideRight
-            padding: 8
+            padding: 10
             visible: text !== ""
             wrapMode: Text.WordWrap
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             maximumLineCount: 4
             verticalAlignment: Text.AlignBottom
             horizontalAlignment: Text.AlignLeft
+
+            background: Rectangle {
+                color: "black"
+                opacity: 0.8
+                radius: 5
+            }
 
             property Item source
 
