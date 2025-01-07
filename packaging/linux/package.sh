@@ -1,5 +1,5 @@
-export PATH=/home/prashanthudupa/Qt/5.15.17/gcc_64/bin:/usr/lib/x86_64-linux-gnu:$PATH
-export LD_LIBRARY_PATH=/home/prashanthudupa/Qt/5.15.17/gcc_64/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
+export PATH=/home/prashanthudupa/Qt/5.15.18/gcc_64/bin:/usr/lib/x86_64-linux-gnu:$PATH
+export LD_LIBRARY_PATH=/home/prashanthudupa/Qt/5.15.18/gcc_64/lib:/usr/lib/x86_64-linux-gnu:$LD_LIBRARY_PATH
 export VERSION=0.9.9h-beta
 mkdir Scrite-0.9.9h-beta.AppImage
 cd Scrite-0.9.9h-beta.AppImage
