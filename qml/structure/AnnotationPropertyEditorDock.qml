@@ -35,7 +35,7 @@ FloatingDock {
     y: Scrite.window.height * 0.15
     width: 375
     height: Scrite.window.height * 0.6
-    visible: Runtime.structureCanvasSettings.displayAnnotationProperties && root.annotation
+    visible: false
 
     title: "Annotation Properties"
 
@@ -46,5 +46,10 @@ FloatingDock {
 
     onCloseRequest: {
         Runtime.structureCanvasSettings.displayAnnotationProperties = false
+    }
+
+    DelayedPropertyBinder {
+        set: Runtime.structureCanvasSettings.displayAnnotationProperties && root.annotation
+        onGetChanged: root.visible = get
     }
 }
