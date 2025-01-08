@@ -150,7 +150,11 @@ Item {
             function onInfoChanged() {
                 if(!Scrite.user.info.hasActiveSubscription) {
                     launch("Subscriptions")
+                    return
                 }
+
+                if(Notification.active && Scrite.user.info.hasUpcomingSubscription)
+                    Notification.active = false
             }
         }
 

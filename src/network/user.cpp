@@ -579,7 +579,7 @@ void User::checkIfSubscriptionIsAboutToExpire()
 
     const int subscriptionTreshold = 15;
     const int nrDays = QDate::currentDate().daysTo(m_info.subscribedUntil.date()) + 1;
-    if (nrDays < subscriptionTreshold)
+    if (nrDays >= 0 && nrDays < subscriptionTreshold)
         emit subscriptionAboutToExpire(nrDays);
 }
 
