@@ -49,8 +49,8 @@ Item {
                                      }
                                  }
 
-        pagesArray: ["Profile", "Messages", "Subscriptions", "Installations"]
-        currentIndex: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription ? 0 : 2
+        pagesArray: ["Profile", "Subscriptions", "Installations", "Notifications"]
+        currentIndex: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription ? 0 : 1
         maxPageListWidth: {
             if(pagesArray.length < 2)
                 return 120
@@ -74,9 +74,9 @@ Item {
         }
         pageContent: {
             switch(userProfilePageView.currentIndex) {
-            case 1: return userMessagesPageComponent
-            case 2: return userSubscriptionsPageComponent
-            case 3: return userInstallationsPageComponent
+            case 1: return userSubscriptionsPageComponent
+            case 2: return userInstallationsPageComponent
+            case 3: return userNotificationsPageComponent
             default: break
             }
             return userProfilePageComponent
@@ -397,10 +397,10 @@ Item {
     }
 
     Component {
-        id: userMessagesPageComponent
+        id: userNotificationsPageComponent
 
         Item {
-            id: userMessagesPage
+            id: userNotificationsPage
 
             height: userProfilePageView.availablePageContentHeight
 
@@ -411,7 +411,7 @@ Item {
 
                 visible: Scrite.user.totalMessageCount === 0
 
-                text: "There are no messages for you at the moment."
+                text: "There are no notifications for you at the moment."
             }
 
             ListView {
@@ -442,17 +442,17 @@ Item {
                         const nrMessages = Scrite.user.totalMessageCount
 
                         if(nrMessages === 0) {
-                            return "You have no messages right now."
+                            return "You have no notifications right now."
                         }
 
                         if(nrUnread > 0) {
                             if(nrUnread === nrMessages)
-                                return "You have " + nrUnread + " unread message" + (nrUnread > 1 ? "s" : "") + "."
+                                return "You have " + nrUnread + " unread notification" + (nrUnread > 1 ? "s" : "") + "."
                             else
-                                return "You have " + nrUnread + " of " + nrMessages + " unread message" + (nrMessages > 1 ? "s" : "") + "."
+                                return "You have " + nrUnread + " of " + nrMessages + " unread notification" + (nrMessages > 1 ? "s" : "") + "."
                         }
 
-                        return "You have " + nrMessages + " message" + (nrMessages > 1 ? "s" : "") + "."
+                        return "You have " + nrMessages + " notification" + (nrMessages > 1 ? "s" : "") + "."
                     }
 
                     wrapMode: Text.WordWrap

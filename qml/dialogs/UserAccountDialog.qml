@@ -164,12 +164,12 @@ Item {
             target: Scrite.user
 
             Notification.active: false
-            Notification.title: "Unread Messages"
-            Notification.text: "You have one or more important unread messages. Would you like to read them now?"
-            Notification.buttons: ["View Messages", "Dismiss"]
+            Notification.title: "Unread Notifications"
+            Notification.text: "You have one or more important unread notifications. Would you like to see them now?"
+            Notification.buttons: ["View Notifications", "Dismiss"]
             Notification.onButtonClicked: (index) => {
                 if(index === 0) {
-                    launch("Messages")
+                    launch("Notifications")
                 }
             }
 
@@ -177,8 +177,8 @@ Item {
                 Notification.title = (() => {
                                         const count = Scrite.user.unreadMessageCount
                                         if(count === 1)
-                                          return "You have 1 unread message"
-                                        return "You have " + count + " unread messages."
+                                          return "You have 1 unread notification"
+                                        return "You have " + count + " unread notifications."
                                       })()
                 Notification.text = (() => {
                                          const count = Scrite.user.unreadMessageCount

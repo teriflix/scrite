@@ -171,7 +171,7 @@ Item {
                 let screenName = undefined
 
                 if(Scrite.user.unreadMessageCount > 0)
-                    screenName = "Messages"
+                    screenName = "Notifications"
                 else if(Scrite.user.info.hasActiveSubscription && !Scrite.user.info.hasUpcomingSubscription && Scrite.user.info.subscriptions[0].daysToUntil < 15)
                     screenName = "Subscriptions"
 
