@@ -91,6 +91,7 @@ HEADERS += \
     src/quick/objects/basicfileiconprovider.h \
     src/quick/objects/basicfileinfo.h \
     src/quick/objects/batchchange.h \
+    src/quick/objects/clipboard.h \
     src/quick/objects/colorimageprovider.h \
     src/quick/objects/completionmodel.h \
     src/quick/objects/contextmenuevent.h \
@@ -224,6 +225,7 @@ SOURCES += \
     src/quick/objects/basicfileiconprovider.cpp \
     src/quick/objects/basicfileinfo.cpp \
     src/quick/objects/batchchange.cpp \
+    src/quick/objects/clipboard.cpp \
     src/quick/objects/colorimageprovider.cpp \
     src/quick/objects/completionmodel.cpp \
     src/quick/objects/contextmenuevent.cpp \

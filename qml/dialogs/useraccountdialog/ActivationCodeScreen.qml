@@ -104,6 +104,19 @@ Item {
 
                 Item {
                     Layout.fillWidth: true
+
+                    VclButton {
+                        anchors.centerIn: parent
+
+                        visible: Clipboard.text.length === 20
+
+                        text: "Paste"
+
+                        onClicked: {
+                            activationCodeField.text = Clipboard.text
+                            Clipboard.text = ""
+                        }
+                    }
                 }
 
                 VclButton {
