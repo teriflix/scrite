@@ -76,7 +76,6 @@
         <file>qml/dialogs/SplashScreen.qml</file>
         <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
         <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
-        <file>qml/dialogs/TermsOfUseDialog.qml</file>
         <file>qml/dialogs/TitlePageDialog.qml</file>
         <file>qml/dialogs/UserAccountDialog.qml</file>
         <file>qml/dialogs/useraccountdialog/AccountEmailScreen.qml</file>

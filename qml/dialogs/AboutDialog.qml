@@ -103,20 +103,6 @@ DialogLauncher {
                     Layout.preferredHeight: 14
                 }
 
-                VclLabel {
-                    Layout.alignment: Qt.AlignHCenter
-
-                    text: "This app is released under <strong>GPLv3</strong>.<br/><font color=\"blue\">Click here</font> to view the license terms."
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    color: "gray"
-
-                    MouseArea {
-                        anchors.fill: parent
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: TermsOfUseDialog.launch()
-                    }
-                }
-
                 Item {
                     Layout.preferredWidth: parent.width
                     Layout.preferredHeight: 14
@@ -288,6 +274,11 @@ DialogLauncher {
                     Button {
                         text: "Discord"
                         onClicked: JoinDiscordCommunity.launch()
+                    }
+
+                    Button {
+                        text: "Terms Of Use"
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/policies/")
                     }
                 }
             }

@@ -1,0 +1,14 @@
+Your use of Scrite is subject to your acceptance of the following
+
+1. Terms Of Use: https://www.scrite.io/terms-of-use/
+2. https://www.scrite.io/privacy-policy/
+
+Starting from 15th January 2025, users are required to pay for a subscription plan to continue using Scrite after a one month free trial.
+
+The feature set, device count and duration against each plan will be displayed within the app and also on our website before you get a chance to pay for the subscription.
+
+Subscriptions are non-cencellable, and are therefore non-refundable. Please read our complete refund and cancellation policy here: https://www.scrite.io/refund-and-cancellation-policy/
+
+Having said that, Scrite is an open-source project distributed under the GNU General Public License (GPL) version 3. The complete source code is available on our GitHub Repository (https://github.com/teriflix/scrite). You are free to download, modify, and distribute your own variants of the software, provided that you comply with the terms of the GPL as outlined in https://github.com/teriflix/scrite/blob/master/LICENSE.txt.
+
+Please Note: WE do not service or support binaries created by third parties from OUR source code, even if they have not modified it. Subscription benefits apply only to the latest version of official binaries offered by US on https://www.scrite.io.
