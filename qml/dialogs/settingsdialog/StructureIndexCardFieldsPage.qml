@@ -142,7 +142,7 @@ Item {
 
             VclButton {
                 text: "Help"
-                onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/index-card-fields/")
+                onClicked: Qt.openUrlExternally("https://www.scrite.io/index-card-fields/")
             }
 
             Item {

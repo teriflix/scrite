@@ -108,7 +108,7 @@ Item {
                     cursorShape: Qt.PointingHandCursor
                     hoverEnabled: true
 
-                    onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/forum/")
+                    onClicked: Qt.openUrlExternally("https://www.scrite.io/forum/")
                 }
             }
         }

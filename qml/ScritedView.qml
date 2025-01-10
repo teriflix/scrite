@@ -1438,7 +1438,7 @@ Item {
         Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
-                Qt.openUrlExternally("https://www.scrite.io/index.php/video-codecs/")
+                Qt.openUrlExternally("https://www.scrite.io/video-codecs/")
             Runtime.scritedSettings.codecsNoticeDisplayed = true
         }
     }

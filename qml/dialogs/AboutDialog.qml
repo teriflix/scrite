@@ -103,6 +103,40 @@ DialogLauncher {
                     Layout.preferredHeight: 14
                 }
 
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+
+                    spacing: 10
+
+                    Link {
+                        text: "Terms Of Use"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/terms-of-use/")
+                    }
+
+                    VclText {
+                        text: "•"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                    }
+
+                    Link {
+                        text: "Privacy Policy"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/privacy-policy/")
+                    }
+
+                    VclText {
+                        text: "•"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                    }
+
+                    Link {
+                        text: "Refund Policy"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/refund-and-cancellation-policy/")
+                    }
+                }
+
                 Item {
                     Layout.preferredWidth: parent.width
                     Layout.preferredHeight: 14
@@ -112,7 +146,7 @@ DialogLauncher {
                     Layout.alignment: Qt.AlignHCenter
 
                     text: "The app uses:"
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 }
 
                 Rectangle {
@@ -175,7 +209,7 @@ DialogLauncher {
                             color: creditLabelMouseArea.containsMouse ? "blue" : "black"
                             width: creditsView.width // - (creditsView.ScrollBar.vertical.needed ? 20 : 0)
                             wrapMode: Text.WordWrap
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
+                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             horizontalAlignment: Text.AlignHCenter
 
                             MouseArea {
@@ -268,17 +302,12 @@ DialogLauncher {
 
                     Button {
                         text: "Learning Guides"
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/index.php/help/")
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/help/")
                     }
 
                     Button {
                         text: "Discord"
                         onClicked: JoinDiscordCommunity.launch()
-                    }
-
-                    Button {
-                        text: "Terms Of Use"
-                        onClicked: Qt.openUrlExternally("https://www.scrite.io/policies/")
                     }
                 }
             }
