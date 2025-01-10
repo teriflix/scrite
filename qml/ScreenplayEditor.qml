@@ -2632,18 +2632,18 @@ Rectangle {
                         ShortcutsModelItem.priority: 1
                         ShortcutsModelItem.enabled: contentItem.canSplitScene
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
-                        ShortcutsModelItem.group: "Formatting"
+                        ShortcutsModelItem.group: "Edit"
                         ShortcutsModelItem.title: "Split Scene"
-                        ShortcutsModelItem.shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Return" : "Ctrl+Enter"
+                        ShortcutsModelItem.shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
                     }
 
                     QtObject {
                         ShortcutsModelItem.priority: 1
                         ShortcutsModelItem.enabled: contentItem.canJoinToPreviousScene
                         ShortcutsModelItem.visible: sceneTextEditor.activeFocus
-                        ShortcutsModelItem.group: "Formatting"
+                        ShortcutsModelItem.group: "Edit"
                         ShortcutsModelItem.title: "Join Previous Scene"
-                        ShortcutsModelItem.shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Delete" : "Ctrl+Backspace"
+                        ShortcutsModelItem.shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
                     }
 
                     function acceptCompletionSuggestion() {
@@ -2685,7 +2685,7 @@ Rectangle {
                             return
                         }
 
-                        if(event.modifiers & Qt.ControlModifier) {
+                        if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
                             contentItem.splitScene()
                             event.accepted = true
                             return
@@ -2764,25 +2764,20 @@ Rectangle {
                     Keys.onPressed: {
                         event.accepted = false
 
-                        if(event.modifiers === Qt.ControlModifier) {
-                            switch(event.key) {
-                            case Qt.Key_Delete:
-                                if(Scrite.app.isMacOSPlatform) {
-                                    event.accepted = true
-                                    if(sceneTextEditor.cursorPosition === 0)
-                                        contentItem.mergeWithPreviousScene()
-                                    else
-                                        contentItem.showCantMergeSceneMessage()
-                                }
-                                break
-                            case Qt.Key_Backspace:
-                                if(sceneTextEditor.cursorPosition === 0) {
-                                    event.accepted = true
+                        if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
+                            if( (Scrite.app.isMacOSPlatform && event.key === Qt.Key_Delete) || (event.key === Qt.Key_Backspace) ) {
+                                event.accepted = true
+                                if(sceneTextEditor.cursorPosition === 0)
                                     contentItem.mergeWithPreviousScene()
-                                }
                                 else
                                     contentItem.showCantMergeSceneMessage()
-                                break
+                            }
+
+                            return
+                        }
+
+                        if(event.modifiers === Qt.ControlModifier) {
+                            switch(event.key) {
                             case Qt.Key_0:
                                 event.accepted = true
                                 sceneHeadingAreaLoader.edit()
@@ -2961,6 +2956,11 @@ Rectangle {
             }
 
             function mergeWithPreviousScene() {
+                if(Scrite.document.readOnly) {
+                    event.accepted = false
+                    return
+                }
+
                 if(!contentItem.canJoinToPreviousScene) {
                     showCantMergeSceneMessage()
                     return
@@ -2970,6 +2970,11 @@ Rectangle {
             }
 
             function mergeWithPreviousSceneImpl() {
+                if(Scrite.document.readOnly) {
+                    event.accepted = false
+                    return
+                }
+
                 Runtime.screenplayTextDocument.syncEnabled = false
                 var ret = Runtime.screenplayAdapter.mergeElementWithPrevious(contentItem.theElement)
                 Runtime.screenplayTextDocument.syncEnabled = true
