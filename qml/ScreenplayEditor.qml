@@ -415,7 +415,8 @@ Rectangle {
                             target: titleCardLoader.item
 
                             function onEditTitlePageRequest(sourceItem) {
-                                TitlePageDialog.launch()
+                                const dlg = TitlePageDialog.launch()
+                                dlg.closed.connect(contentView.positionViewAtBeginning)
                             }
                         }
 
@@ -431,7 +432,10 @@ Rectangle {
                                 anchors.right: parent.right
                                 anchors.rightMargin: ruler.rightMarginPx
                                 iconSource: "qrc:/icons/action/edit_title_page.png"
-                                onClicked: TitlePageDialog.launch()
+                                onClicked: {
+                                    const dlg = TitlePageDialog.launch()
+                                    dlg.closed.connect(contentView.positionViewAtBeginning)
+                                }
                                 visible: parent.active && enabled
                                 enabled: !Scrite.document.readOnly
                             }
@@ -448,7 +452,10 @@ Rectangle {
                             opacity: hovered ? 1 : 0.75
                             anchors.centerIn: parent
                             anchors.verticalCenterOffset: Runtime.screenplayAdapter.elementCount > 0 ? -contentView.spacing/2 : 0
-                            onClicked: TitlePageDialog.launch()
+                            onClicked: {
+                                const dlg = TitlePageDialog.launch()
+                                dlg.closed.connect(contentView.positionViewAtBeginning)
+                            }
                             enabled: !Scrite.document.readOnly
                         }
 
