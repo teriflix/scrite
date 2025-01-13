@@ -2896,8 +2896,8 @@ Item {
                                     width: parent.width
                                     height: parent.height-5
                                     interactive: synopsisField.activeFocus && scrollBarVisible
-                                    contentWidth: synopsisField.width
-                                    contentHeight: synopsisField.height + 100
+                                    contentWidth: synopsisField.contentWidth
+                                    contentHeight: Math.max(height, synopsisField.contentHeight + 100)
                                     flickableDirection: Flickable.VerticalFlick
 
                                     TextArea {
