@@ -245,16 +245,13 @@ QVersionNumber Application::prepare()
     const QVersionNumber applicationVersion =
             QVersionNumber::fromString(QStringLiteral(SCRITE_VERSION));
     const QString applicationVersionString = [applicationVersion]() -> QString {
+        QStringList ret = { QString::number(applicationVersion.majorVersion()),
+                            QString::number(applicationVersion.minorVersion()) };
+
+        if (applicationVersion.microVersion() > 0)
+            ret << QString::number(applicationVersion.microVersion());
+
         const QVector<int> segments = applicationVersion.segments();
-
-        QStringList ret;
-
-        for (int i = 0; i < qMin(segments.size(), 3); i++)
-            ret << QString::number(segments.at(i));
-
-        for (int i = ret.size(); i < 3; i++)
-            ret << QStringLiteral("0");
-
         for (int i = 3; i < segments.size(); i++) {
             QString field;
             int segment = qMax(0, segments.at(i));
@@ -291,15 +288,21 @@ QVersionNumber Application::prepare()
         QDir(oldAppDataFolder).removeRecursively();
     }
 
+#ifdef Q_OS_UNIX
+    Application::setApplicationVersion(applicationVersionString + " (GNU Linux)");
+#endif
+
 #ifdef Q_OS_MAC
-    Application::setApplicationVersion(applicationVersionString + QStringLiteral("-beta"));
+    Application::setApplicationVersion(applicationVersionString + QStringLiteral(" (macOS)"));
     if (QOperatingSystemVersion::current() > QOperatingSystemVersion::MacOSCatalina)
         qputenv("QT_MAC_WANTS_LAYER", QByteArrayLiteral("1"));
-#else
+#endif
+
+#ifdef Q_OS_WIN
     if (QSysInfo::WordSize == 32)
-        Application::setApplicationVersion(applicationVersionString + "-beta-x86");
+        Application::setApplicationVersion(applicationVersionString + " (Windows 32-bit)");
     else
-        Application::setApplicationVersion(applicationVersionString + "-beta-x64");
+        Application::setApplicationVersion(applicationVersionString + " (Windows 64-bit)");
 #endif
 
 #ifdef Q_OS_WIN

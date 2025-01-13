@@ -169,6 +169,9 @@ public:
     Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
     QVersionNumber versionNumber() const { return m_versionNumber; }
 
+    Q_PROPERTY(QString qtVersionString READ qtVersionString CONSTANT)
+    QString qtVersionString() const { return QStringLiteral(QT_VERSION_STR); }
+
     Q_PROPERTY(QUndoGroup *undoGroup READ undoGroup CONSTANT)
     QUndoGroup *undoGroup() const { return m_undoGroup; }
 

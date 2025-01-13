@@ -236,7 +236,7 @@ bool RestApiCall::call()
         Application *sapp = Application::instance();
 
         const QString space = QStringLiteral(" ");
-        const QString ret = QStringLiteral("scrite-") + sapp->applicationVersion() + space
+        const QString ret = QStringLiteral("scrite-") + sapp->versionNumber().toString() + space
                 + sapp->platformAsString() + space + sapp->platformVersion() + space
                 + sapp->platformType() + space + sapp->installationId();
         return ret;

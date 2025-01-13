@@ -194,9 +194,11 @@ DialogLauncher {
                                 url: "https://quilljs.com/"
                             }
 
-                            ListElement {
-                                credits: "<strong>Qt</strong> 5.15 LTS for developing the entire app."
-                                url: "https://www.qt.io"
+                            Component.onCompleted: {
+                                append({
+                                           "credits": "<strong>Qt</strong> " + Scrite.app.qtVersionString + " as UI framework for the entire app.",
+                                           "url": "https://www.qt.io"
+                                       })
                             }
                         }
                         ScrollBar.vertical: ScrollBar { }
