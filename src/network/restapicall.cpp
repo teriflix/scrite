@@ -515,7 +515,7 @@ QJsonObject AppCheckUserRestApiCall::data() const
 {
     const Locale locale = Scrite::locale();
     return { { "email", "$email" },
-             { "country", locale.country.name },
+             { "country", locale.country.code },
              { "currency", locale.currency.code } };
 }
 
