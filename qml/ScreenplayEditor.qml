@@ -3874,7 +3874,7 @@ Rectangle {
                         property bool elementIsSelected: (Runtime.screenplayAdapter.currentIndex === index || screenplayElement.selected)
 
                         width: sceneListView.width-1
-                        height: 40
+                        height: delegateText.height + 16
                         color: scene ? elementIsSelected ? selectedColor : (Runtime.screenplayAdapter.isSourceScreenplay && Runtime.screenplayAdapter.screenplay.selectedElementsCount > 1 ? Qt.tint(normalColor, "#40FFFFFF") : normalColor)
                                      : Runtime.screenplayAdapter.currentIndex === index ? Scrite.app.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
@@ -3919,6 +3919,7 @@ Rectangle {
 
                             VclLabel {
                                 id: delegateText
+
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
 
@@ -3928,6 +3929,11 @@ Rectangle {
                                 horizontalAlignment: Qt.AlignLeft
                                 color: Runtime.colors.primary.c10.text
                                 font.capitalization: delegateItem.elementIsBreak || Runtime.sceneListPanelSettings.sceneTextMode !== "HEADING" ? Font.MixedCase : Font.AllUppercase
+
+                                elide: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING" ? Text.ElideMiddle : Text.ElideRight
+                                wrapMode: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING" ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
+                                maximumLineCount: wrapMode === Text.NoWrap ? 1 : 2
+
                                 text: {
                                     let ret = "UNKNOWN"
                                     if(scene) {
@@ -3973,9 +3979,6 @@ Rectangle {
 
                                     return ret
                                 }
-                                elide: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING" ? Text.ElideMiddle : Text.ElideRight
-                                wrapMode: Text.NoWrap
-                                maximumLineCount: 1
                             }
 
                             VclLabel {
