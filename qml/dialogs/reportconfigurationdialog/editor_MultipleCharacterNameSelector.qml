@@ -141,7 +141,7 @@ ColumnLayout {
         Layout.fillWidth: true
         Layout.leftMargin: 5
         Layout.rightMargin: 30
-        Layout.preferredHeight: 325
+        Layout.preferredHeight: 280
     }
 }
 

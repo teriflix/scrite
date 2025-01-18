@@ -53,26 +53,36 @@ ColumnLayout {
         text: fieldInfo.note
     }
 
-    ScrollView {
+    Rectangle {
         Layout.fillWidth: true
         Layout.rightMargin: 20
-        Layout.preferredHeight: 300
+        Layout.preferredHeight: 250
 
-        background: Rectangle {
-            color: Runtime.colors.primary.c50.background
-            border.width: 1
-            border.color: Runtime.colors.primary.c50.text
-        }
+        color: Runtime.colors.primary.c50.background
+        border.width: 1
+        border.color: Runtime.colors.primary.c50.text
 
         ListView {
             id: locationListView
+
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+            ScrollBar.vertical: VclScrollBar { }
+
+            anchors.fill: parent
+            anchors.margins: 1
+
             model: allLocations
             clip: true
-            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
             delegate: VclCheckBox {
-                width: locationListView.width-1
-                font.family: Scrite.document.formatting.defaultFont.family
+                required property var modelData
+
                 text: modelData
+                width: locationListView.width-1
+                checked: selectedLocations.indexOf(modelData) >= 0
+
+                font.family: Scrite.document.formatting.defaultFont.family
+
                 onToggled: {
                     var locs = selectedLocations
                     if(checked)
@@ -82,6 +92,30 @@ ColumnLayout {
                     selectedLocations = locs
                     report.setConfigurationValue(fieldInfo.name, locs)
                 }
+            }
+        }
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+
+        spacing: 20
+
+        VclButton {
+            text: "Select All"
+            enabled: selectedLocations.length < allLocations.length
+            onClicked: {
+                selectedLocations = allLocations
+                report.setConfigurationValue(fieldInfo.name, selectedLocations)
+            }
+        }
+
+        VclButton {
+            text: "Unselect All"
+            enabled: selectedLocations.length > 0
+            onClicked: {
+                selectedLocations = []
+                report.setConfigurationValue(fieldInfo.name, selectedLocations)
             }
         }
     }
