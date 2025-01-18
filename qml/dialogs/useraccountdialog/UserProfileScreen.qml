@@ -242,18 +242,17 @@ Item {
                     placeholderText: "Where did you hear about Scrite?"
                     maximumLength: 128
                     completionStrings: [
-                        "Colleague",
-                        "Email",
                         "Facebook",
-                        "Filmschool",
-                        "Friend",
+                        "Reddit",
+                        "YouTube",
+                        "Film School",
+                        "Film Workshop",
                         "Instagram",
-                        "Internet Search",
-                        "Invited to Collaborate",
+                        "Recommended by Friend",
+                        "Existing Scrite User",
                         "LinkedIn",
                         "Twitter",
-                        "Workshop",
-                        "YouTube"
+                        "Google Search"
                     ]
                     minimumCompletionPrefixLength: 0
                     maxCompletionItems: -1

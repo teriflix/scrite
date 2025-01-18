@@ -27,7 +27,7 @@ import "qrc:/qml/dialogs"
 
 Item {
     readonly property bool modal: true
-    readonly property string title: "Account Email"
+    readonly property string title: "Setup your Scrite login"
 
     Image {
         anchors.fill: parent
@@ -42,84 +42,149 @@ Item {
         anchors.rightMargin: 175
         anchors.bottomMargin: 50
 
-        ColumnLayout {
-            id: emailForm
+        TabSequenceManager {
+            id: userInfoFields
+        }
 
+        ColumnLayout {
             anchors.centerIn: parent
 
             width: parent.width
-            spacing: 50
-            enabled: !checkUserCall.busy
+            spacing: 20
+            enabled: !checkUserCall.isBusy
             opacity: enabled ? 1 : 0.5
 
             VclLabel {
                 Layout.fillWidth: true
 
-                color: Runtime.colors.accent.c400.background
+                text: "Please provide us the following information to setup your Scrite login."
+                font.bold: true
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
                 wrapMode: Text.WordWrap
-                font.pointSize: emailField.font.pointSize
-                horizontalAlignment: Text.AlignHCenter
-
-                Component.onCompleted: {
-                    const email = checkUserCall.email
-                    if(email === "")
-                        text = "Please provide your email-id to setup your Scrite profile."
-                    else
-                        text = "Please confirm your email-id to setup your Scrite installation."
-                }
             }
 
-            TextField {
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 20
+            }
+
+            VclTextField {
                 id: emailField
 
                 Layout.fillWidth: true
 
-                text: checkUserCall.email
-                selectByMouse: true
-                placeholderText: "Your Email ID"
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 4
-                horizontalAlignment: Text.AlignHCenter
+                TabSequenceItem.manager: userInfoFields
+                TabSequenceItem.sequence: 0
 
-                Keys.onReturnPressed: checkUserCall.check(text)
+                text: checkUserCall.email
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+
+                maximumLength: 128
+                selectByMouse: true
+                undoRedoEnabled: true
+                placeholderText: "Email *"
             }
 
-            RowLayout {
+            VclTextField {
+                id: nameField
+
                 Layout.fillWidth: true
 
-                spacing: 30
+                TabSequenceItem.manager: userInfoFields
+                TabSequenceItem.sequence: 1
 
-                VclButton {
-                    text: "More Info"
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
-                    // TODO:
-                    onClicked: Qt.openUrlExternally("https://www.scrite.io")
-                }
+                maximumLength: 128
+                selectByMouse: true
+                undoRedoEnabled: true
+                placeholderText: "Name"
+            }
 
-                Item {
-                    Layout.fillWidth: true
-                }
+            VclTextField {
+                id: experienceField
 
-                VclButton {
-                    id: submit
+                Layout.fillWidth: true
 
-                    text: "Continue »"
+                TabSequenceItem.manager: userInfoFields
+                TabSequenceItem.sequence: 2
 
-                    onClicked: checkUserCall.check(emailField.text)
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
-                    Connections {
-                        target: emailField
+                maximumLength: 128
+                selectByMouse: true
+                undoRedoEnabled: true
+                placeholderText: "Experience"
 
-                        function onTextChanged() {
-                            Qt.callLater(submit.determineEnabled)
-                        }
+                completionStrings: [
+                    "Hobby Writer",
+                    "Actively Pursuing a Writing Career",
+                    "Working Writer",
+                    "Have Produced Credits"
+                ]
+                minimumCompletionPrefixLength: 0
+            }
+
+            VclTextField {
+                id: wdyhasField
+
+                Layout.fillWidth: true
+
+                TabSequenceItem.manager: userInfoFields
+                TabSequenceItem.sequence: 3
+
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+
+                maximumLength: 128
+                selectByMouse: true
+                undoRedoEnabled: true
+                placeholderText: "Where did you hear about Scrite?"
+
+                completionStrings: [
+                    "From another Scrite User",
+                    "I am already a Scrite User",
+                    "Google Search",
+                    "YouTube",
+                    "Film School",
+                    "Film Workshop",
+                    "Twitter",
+                    "Recommended by a friend",
+                    "Instagram",
+                    "Reddit",
+                    "LinkedIn",
+                    "Facebook",
+                ]
+                maxVisibleItems: 11
+                minimumCompletionPrefixLength: 0
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: 20
+            }
+
+            VclButton {
+                id: submit
+
+                Layout.alignment: Qt.AlignRight
+
+                text: "Continue »"
+
+                onClicked: checkUserCall.check()
+
+                Connections {
+                    target: emailField
+
+                    function onTextChanged() {
+                        Qt.callLater(submit.determineEnabled)
                     }
-
-                    function determineEnabled() {
-                        enabled = Utils.validateEmail(emailField.text)
-                    }
-
-                    Component.onCompleted: determineEnabled()
                 }
+
+                function determineEnabled() {
+                    enabled = Utils.validateEmail(emailField.text.trim())
+                }
+
+                Component.onCompleted: determineEnabled()
             }
         }
 
@@ -133,9 +198,21 @@ Item {
     AppCheckUserRestApiCall {
         id: checkUserCall
 
-        function check(_email) {
+        function check() {
+            const _email = emailField.text.trim()
             if(Utils.validateEmail(_email)) {
                 email = _email
+
+                let nameComps = nameField.text.trim().split(" ")
+                if(nameComps.length >= 1) {
+                    firstName = nameComps[0]
+                    nameComps.shift()
+                }
+
+                lastName = nameComps.join(" ")
+                experience = experienceField.text.trim()
+                wdyhas = wdyhasField.text.trim()
+
                 call()
             }
         }

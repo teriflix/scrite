@@ -511,12 +511,62 @@ void AppCheckUserRestApiCall::setEmail(const QString &val)
     emit emailChanged();
 }
 
+void AppCheckUserRestApiCall::setFirstName(const QString &val)
+{
+    if (m_firstName == val)
+        return;
+
+    m_firstName = val;
+    emit firstNameChanged();
+}
+
+void AppCheckUserRestApiCall::setLastName(const QString &val)
+{
+    if (m_lastName == val)
+        return;
+
+    m_lastName = val;
+    emit lastNameChanged();
+}
+
+void AppCheckUserRestApiCall::setExperience(const QString &val)
+{
+    if (m_experience == val)
+        return;
+
+    m_experience = val;
+    emit experienceChanged();
+}
+
+void AppCheckUserRestApiCall::setWdyhas(const QString &val)
+{
+    if (m_wdyhas == val)
+        return;
+
+    m_wdyhas = val;
+    emit wdyhasChanged();
+}
+
 QJsonObject AppCheckUserRestApiCall::data() const
 {
     const Locale locale = Scrite::locale();
-    return { { "email", "$email" },
-             { "country", locale.country.code },
-             { "currency", locale.currency.code } };
+    QJsonObject ret = { { "email", "$email" },
+                        { "country", locale.country.code },
+                        { "currency", locale.currency.code } };
+
+    if (!m_firstName.isEmpty())
+        ret.insert("firstName", m_firstName);
+
+    if (!m_lastName.isEmpty())
+        ret.insert("lastName", m_lastName);
+
+    if (!m_experience.isEmpty())
+        ret.insert("experience", m_experience);
+
+    if (!m_wdyhas.isEmpty())
+        ret.insert("wdyhas", m_wdyhas);
+
+    return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
