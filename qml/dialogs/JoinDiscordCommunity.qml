@@ -28,7 +28,7 @@ import "qrc:/qml/helpers"
 DialogLauncher {
     id: root
 
-    function launch(allowCloseAfter) { return doLaunch({"allowCloseAfter": allowCloseAfter ? allowCloseAfter : 0}) }
+    function launch() { return doLaunch() }
 
     readonly property url infoUrl: "https://www.scrite.io/index.php/forum/"
     readonly property url inviteUrl: "https://discord.gg/bGHquFX5jK"
@@ -39,8 +39,6 @@ DialogLauncher {
 
     dialogComponent: VclDialog {
         id: dialog
-
-        property int allowCloseAfter: 0
 
         title: "Join us on Discord"
 
@@ -144,15 +142,6 @@ DialogLauncher {
                         }
                     }
                 }
-            }
-        }
-
-        Component.onCompleted: {
-            if(allowCloseAfter > 0) {
-                titleBarCloseButtonVisible = false
-                Utils.execLater(dialog, allowCloseAfter, () => {
-                                    dialog.titleBarCloseButtonVisible = true
-                                })
             }
         }
     }
