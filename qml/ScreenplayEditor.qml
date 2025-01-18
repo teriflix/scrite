@@ -3718,24 +3718,30 @@ Rectangle {
 
                 ListView {
                     id: sceneListView
-                    anchors.fill: parent
-                    clip: true
-                    model: Runtime.screenplayAdapter
-                    currentIndex: Runtime.screenplayAdapter.currentIndex
-                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
                     ScrollBar.vertical: VclScrollBar { flickable: sceneListView }
-                    highlightFollowsCurrentItem: true
-                    highlightMoveDuration: 0
-                    highlightResizeDuration: 0
-                    keyNavigationEnabled: false
-                    preferredHighlightEnd: height*0.8
-                    preferredHighlightBegin: height*0.2
-                    highlightRangeMode: ListView.NoHighlightRange
-                    property bool hasEpisodes: Runtime.screenplayAdapter.isSourceScreenplay ? Runtime.screenplayAdapter.screenplay.episodeCount > 0 : false
+                    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                     FocusTracker.window: Scrite.window
                     FocusTracker.indicator.target: Runtime.undoStack
                     FocusTracker.indicator.property: "sceneListPanelActive"
+
+                    anchors.fill: parent
+
+                    clip: true
+                    model: Runtime.screenplayAdapter
+                    currentIndex: Runtime.screenplayAdapter.currentIndex
+
+                    highlightMoveDuration: 0
+                    highlightResizeDuration: 0
+                    highlightFollowsCurrentItem: true
+
+                    highlightRangeMode: ListView.NoHighlightRange
+                    keyNavigationEnabled: false
+                    preferredHighlightEnd: height*0.8
+                    preferredHighlightBegin: height*0.2
+
+                    property bool hasEpisodes: Runtime.screenplayAdapter.isSourceScreenplay ? Runtime.screenplayAdapter.screenplay.episodeCount > 0 : false
 
                     headerPositioning: ListView.OverlayHeader
                     header: Rectangle {
@@ -3923,21 +3929,23 @@ Rectangle {
                                 Layout.fillWidth: true
                                 Layout.alignment: Qt.AlignVCenter
 
-                                font.family: "Courier Prime"
+                                property bool textIsSceneHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
+
+                                font.family: headingFontMetrics.font.family
                                 font.bold: Runtime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
                                 // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                                 horizontalAlignment: Qt.AlignLeft
                                 color: Runtime.colors.primary.c10.text
-                                font.capitalization: delegateItem.elementIsBreak || Runtime.sceneListPanelSettings.sceneTextMode !== "HEADING" ? Font.MixedCase : Font.AllUppercase
+                                font.capitalization: delegateItem.elementIsBreak ||textIsSceneHeading ? Font.AllUppercase : Font.MixedCase
 
-                                elide: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING" ? Text.ElideMiddle : Text.ElideRight
-                                wrapMode: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING" ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
+                                elide: textIsSceneHeading ? Text.ElideMiddle : Text.ElideRight
+                                wrapMode: textIsSceneHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
                                 maximumLineCount: wrapMode === Text.NoWrap ? 1 : 2
 
                                 text: {
                                     let ret = "UNKNOWN"
                                     if(scene) {
-                                        if(Runtime.sceneListPanelSettings.sceneTextMode === "HEADING") {
+                                        if(textIsSceneHeading) {
                                             if(scene.heading.enabled) {
                                                 ret = screenplayElement.resolvedSceneNumber + ". "
                                                 if(screenplayElement.omitted)
