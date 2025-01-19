@@ -267,6 +267,9 @@ UserInfo::UserInfo(const QJsonObject &object)
     this->availableFeatures = JsonArrayToStringList(object.value("availableFeatures").toArray());
 
     this->badgeImageUrl = QUrl(object.value("badge").toString());
+
+    const QString btc = object.value("badgeTextColor").toString();
+    this->badgeTextColor = btc.isEmpty() ? QColor(Qt::white) : QColor(btc);
 }
 
 UserInfo::UserInfo(const UserInfo &other)

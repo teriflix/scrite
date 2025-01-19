@@ -289,6 +289,9 @@ public:
     Q_PROPERTY(QUrl badgeImageUrl MEMBER badgeImageUrl)
     QUrl badgeImageUrl;
 
+    Q_PROPERTY(QColor badgeTextColor MEMBER badgeTextColor)
+    QColor badgeTextColor = Qt::white;
+
     Q_INVOKABLE bool isFeatureEnabled(int feature) const;
     Q_INVOKABLE bool isFeatureNameEnabled(const QString &featureName) const;
 };

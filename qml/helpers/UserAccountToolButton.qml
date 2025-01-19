@@ -113,7 +113,7 @@ Item {
                 font.bold: true
                 font.pixelSize: root.height * 0.3
 
-                color: Runtime.colors.accent.c600.text
+                color: Scrite.user.info.badgeTextColor
                 text: {
                     if(Scrite.user.loggedIn) {
                         const firstName = Scrite.user.info.firstName
