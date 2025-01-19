@@ -39,6 +39,25 @@ Item {
         anchors.fill = parent
     }
 
+    function planActionLinkText(plan) {
+        if(!plan)
+            return ""
+
+        let ret = Utils.toTitleCase(plan.action.kind) + " »"
+        if(taxonomy && taxonomy["planKinds"]) {
+            const planKinds = taxonomy["planKinds"]
+            for(let i=0; i<planKinds.length; i++) {
+                const planKind = planKinds[i]
+                if(planKind.name === plan.kind) {
+                    ret = planKind.label + " »"
+                    break
+                }
+            }
+        }
+
+        return ret
+    }
+
     function subscribeTo(plan, callList) {
         if(!Scrite.user.loggedIn) {
             MessageBox.information("Login required", "This plan can be subscribed to only after you login.")
@@ -173,7 +192,7 @@ Item {
                           listModel.append({
                                                "kind": "link",
                                                "attributes": {
-                                                   "text": Utils.toTitleCase(plan.action.kind) + " »",
+                                                   "text": root.planActionLinkText(plan),
                                                    "background": "" + Runtime.colors.primary.c100.background,
                                                    "horizontalAlignment": Text.AlignHCenter,
                                                    "font": {

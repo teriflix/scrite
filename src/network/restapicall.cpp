@@ -1006,6 +1006,29 @@ QJsonObject SubscriptionReferralCodeRestApiCall::data() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+SubscriptionTrialDeclineReasonApiCall::SubscriptionTrialDeclineReasonApiCall(QObject *parent)
+    : RestApiCall(parent)
+{
+}
+
+SubscriptionTrialDeclineReasonApiCall::~SubscriptionTrialDeclineReasonApiCall() { }
+
+void SubscriptionTrialDeclineReasonApiCall::setReason(const QString &val)
+{
+    if (m_reason == val)
+        return;
+
+    m_reason = val.left(512);
+    emit reasonChanged();
+}
+
+QJsonObject SubscriptionTrialDeclineReasonApiCall::data() const
+{
+    return { { "reason", m_reason } };
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 SubscriptionPlanActivationRestApiCall::SubscriptionPlanActivationRestApiCall(QObject *parent)
     : RestApiCall(parent)
 {

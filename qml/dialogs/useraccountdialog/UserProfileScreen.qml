@@ -786,7 +786,7 @@ Item {
                                             return currencySymbol + modelData.pricing.price + " *"
                                         }
                                         priceNote: modelData.subtitle
-                                        actionLink: Utils.toTitleCase(modelData.action.kind) + " »"
+                                        actionLink: SubscriptionPlanOperations.planActionLinkText(modelData)
                                         onActionLinkClicked: SubscriptionPlanOperations.subscribeTo(modelData)
                                     }
                                 }

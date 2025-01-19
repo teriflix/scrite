@@ -179,5 +179,6 @@
         <file>qml/dialogs/SubscriptionPlanComparisonDialog.qml</file>
         <file>qml/globals/SubscriptionPlanOperations.qml</file>
         <file>qml/dialogs/SubscriptionDetailsDialog.qml</file>
+        <file>qml/dialogs/TrialNotActivatedDialog.qml</file>
     </qresource>
 </RCC>

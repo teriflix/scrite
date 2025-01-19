@@ -98,7 +98,7 @@ Item {
                 maximumLength: 128
                 selectByMouse: true
                 undoRedoEnabled: true
-                placeholderText: "Name"
+                placeholderText: "Name " + (length > 0 ? "" : "(optional)")
             }
 
             VclTextField {
@@ -114,7 +114,7 @@ Item {
                 maximumLength: 128
                 selectByMouse: true
                 undoRedoEnabled: true
-                placeholderText: "Experience"
+                placeholderText: "Experience " + (length > 0 ? "" : "(optional)")
 
                 completionStrings: [
                     "Hobby Writer",
@@ -138,7 +138,7 @@ Item {
                 maximumLength: 128
                 selectByMouse: true
                 undoRedoEnabled: true
-                placeholderText: "Where did you hear about Scrite?"
+                placeholderText: "Where did you hear about Scrite? " + (length > 0 ? "" : "(optional)")
 
                 completionStrings: [
                     "From another Scrite User",

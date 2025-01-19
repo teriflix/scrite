@@ -1925,9 +1925,16 @@ Item {
         anchors.centerIn: parent
 
         property bool handleCloseEvent: true
+
         Connections {
             target: Scrite.window
+
             function onClosing(close) {
+                if(!Scrite.window.closeButtonVisible) {
+                    close.accepted = false
+                    return
+                }
+
                 if(closeEventHandler.handleCloseEvent) {
                     close.accepted = false
 
@@ -1935,6 +1942,12 @@ Item {
 
                     SaveFileTask.save( () => {
                                           closeEventHandler.handleCloseEvent = false
+
+                                          if(Scrite.user.loggedIn && !Scrite.user.info.hasTrialSubscription) {
+                                            if( TrialNotActivatedDialog.launch() !== null)
+                                              return
+                                          }
+
                                           Scrite.window.close()
                                       } )
                 } else

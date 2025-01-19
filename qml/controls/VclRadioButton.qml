@@ -20,9 +20,20 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 RadioButton {
+    id: root
+
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+    contentItem: VclLabel {
+        text: root.text
+        font: root.font
+        opacity: enabled ? 1.0 : 0.5
+        wrapMode: Text.WordWrap
+        leftPadding: root.indicator.width + root.spacing
+        verticalAlignment: Text.AlignTop
+    }
 }

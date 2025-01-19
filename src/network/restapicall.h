@@ -718,6 +718,30 @@ private:
     QString m_code;
 };
 
+class SubscriptionTrialDeclineReasonApiCall : public RestApiCall
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    SubscriptionTrialDeclineReasonApiCall(QObject *parent = nullptr);
+    ~SubscriptionTrialDeclineReasonApiCall();
+
+    Q_PROPERTY(QString reason READ reason WRITE setReason NOTIFY reasonChanged)
+    void setReason(const QString &val);
+    QString reason() const { return m_reason; }
+    Q_SIGNAL void reasonChanged();
+
+    // RestApiCall interface
+    Type type() const { return POST; }
+    bool useSessionToken() const { return true; }
+    QString api() const { return "subscription/trialDeclineReason"; }
+    QJsonObject data() const;
+
+private:
+    QString m_reason;
+};
+
 class SubscriptionPlanActivationRestApiCall : public RestApiCall
 {
     Q_OBJECT
