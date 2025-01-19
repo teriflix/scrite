@@ -2576,7 +2576,7 @@ void ScriteDocument::serializeToJson(QJsonObject &json) const
     metaInfo.insert(QStringLiteral("appName"), qApp->applicationName());
     metaInfo.insert(QStringLiteral("orgName"), qApp->organizationName());
     metaInfo.insert(QStringLiteral("orgDomain"), qApp->organizationDomain());
-    metaInfo.insert(QStringLiteral("appVersion"), QStringLiteral("0.9.0"));
+    metaInfo.insert(QStringLiteral("appVersion"), QStringLiteral("0.9.9"));
 
     QVersionNumber appVersion =
             QVersionNumber::fromString(Application::instance()->versionNumber().toString());
