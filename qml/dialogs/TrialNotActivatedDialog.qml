@@ -29,7 +29,7 @@ DialogLauncher {
     id: root
 
     function launch() {
-        if(Scrite.user.info.hasTrialSubscription)
+        if(!Scrite.user.loggedIn || Scrite.user.info.hasTrialSubscription || Scrite.user.info.hasActiveSubscription)
             return null
 
         return doLaunch()
@@ -54,6 +54,14 @@ DialogLauncher {
 
         onOpened: Scrite.window.closeButtonVisible = false
         onClosed: Scrite.window.closeButtonVisible = true
+
+        DelayedPropertyBinder {
+            set: Scrite.user.info.hasTrialSubscription || Scrite.user.info.hasActiveSubscription
+            onGetChanged: {
+                if(get)
+                    dialog.close()
+            }
+        }
 
         content: Item {
             ButtonGroup {
