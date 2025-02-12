@@ -101,7 +101,7 @@ DialogLauncher {
                         Layout.fillWidth: true
                         ButtonGroup.group: buttonGroup
 
-                        text: "I'll try the trial later."
+                        text: "I'll activate the trial later."
                     }
 
                     VclRadioButton {
