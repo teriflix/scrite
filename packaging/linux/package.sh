@@ -5,6 +5,9 @@ mkdir Scrite-1.0.1.AppImage
 cd Scrite-1.0.1.AppImage
 mkdir bin
 cp ../../../../Release/Scrite ./bin/
+mkdir lib
+cp ../../../../openssl/deploy/lib/*.so* ./lib
+chmod a-x ./lib/*.so*
 mkdir -p share/applications
 cp ../Scrite.desktop share/applications/Scrite.desktop
 mkdir -p share/icons/hicolor/512x512/apps/

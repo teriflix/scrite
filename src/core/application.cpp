@@ -43,6 +43,7 @@
 #include <QJsonArray>
 #include <QClipboard>
 #include <QQmlEngine>
+#include <QSslSocket>
 #include <QQuickStyle>
 #include <QMessageBox>
 #include <QJsonObject>
@@ -217,6 +218,13 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
     if (useSoftwareRenderer)
         QQuickWindow::setSceneGraphBackend(QSGRendererInterface::Software);
+
+#ifndef Q_OS_MAC
+#ifdef Q_OS_UNIX
+    const QString libPath = Application::applicationDirPath() + "/../lib";
+    Application::addLibraryPath(libPath);
+#endif
+#endif
 
     QQuickStyle::setStyle(style);
 }
@@ -582,6 +590,11 @@ bool Application::setObjectProperty(QObject *object, const QString &name, const 
         return object->setProperty(qPrintable(name), value);
 
     return false;
+}
+
+QString Application::openSslVersionString() const
+{
+    return QSslSocket::sslLibraryVersionString();
 }
 
 UndoStack *Application::findUndoStack(const QString &objectName) const

@@ -371,6 +371,8 @@ include($$PWD/3rdparty/simplecrypt/simplecrypt.pri)
 include($$PWD/3rdparty/crashpad/crashpad.pri)
 
 DISTFILES += \
+    3rdparty/openssl/README \
+    3rdparty/openssl/license.txt \
     Info.plist \
     README \
     packaging/linux/package.sh \
