@@ -211,10 +211,10 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
         surfaceFormat.setSamples(4);
     else if (envOpenGLMultisampling == QByteArrayLiteral("EXTREME"))
         surfaceFormat.setSamples(8);
-    else if (envOpenGLMultisampling == QByteArrayLiteral("NONE"))
-        surfaceFormat.setSamples(-1);
+    else if (envOpenGLMultisampling == QByteArrayLiteral("HALF"))
+        surfaceFormat.setSamples(2);
     else
-        surfaceFormat.setSamples(2); // default
+        surfaceFormat.setSamples(-1); // default
     QSurfaceFormat::setDefaultFormat(surfaceFormat);
 
     const bool useSoftwareRenderer = [=]() -> bool {
