@@ -22,6 +22,7 @@
 #include "basicfileiconprovider.h"
 
 #include <QMenuBar>
+#include <QSettings>
 #include <QQuickStyle>
 #include <QQmlContext>
 #include <QOperatingSystemVersion>
@@ -105,6 +106,19 @@ AppWindow::AppWindow()
                                                    "Base type of models (QAbstractItemModel)");
     qmlRegisterUncreatableType<QFontDatabase>(uri, 1, 0, "FontDatabase",
                                               "Refers to a QFontDatabase instance.");
+
+    const bool useNativeTextRendering = [=]() -> bool {
+#ifdef Q_OS_WIN
+        if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows10)
+            return true;
+#endif
+        const QSettings *settings = Application::instance()->settings();
+        return settings
+                ? settings->value(QStringLiteral("Application/useNativeTextRendering"), false)
+                          .toBool()
+                : true;
+    }();
+    setTextRenderType(useNativeTextRendering ? NativeTextRendering : QtTextRendering);
 
     m_defaultWindowFlags = this->flags();
 

@@ -279,6 +279,7 @@ Item {
 
         property bool enableAnimations: true
         property bool useSoftwareRenderer: false
+        property bool useNativeTextRendering: false
         property string theme: "Material"
         property int primaryColor: colors.defaultPrimaryColor
         property int accentColor: colors.defaultAccentColor

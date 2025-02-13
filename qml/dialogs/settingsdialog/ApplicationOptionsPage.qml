@@ -48,10 +48,29 @@ Item {
             ColumnLayout {
                 width: parent.width
 
+                spacing: 0
+
                 VclCheckBox {
                     text: "Enable Animations"
                     checked: Runtime.applicationSettings.enableAnimations
                     onToggled: Runtime.applicationSettings.enableAnimations = checked
+                }
+
+                VclCheckBox {
+                    text: "Use Native Text Rendering"
+                    checked: Runtime.applicationSettings.useNativeTextRendering
+                    onToggled: {
+                        Runtime.applicationSettings.useNativeTextRendering = checked
+
+                        if(Runtime.currentUseSoftwareRenderer !== checked) {
+                            const msg = checked ? "Native OS text rendering engine will be used when you restart Scrite." : "Qt's text renderning engine will be used when you restart Scrite."
+                            MessageBox.information("Requires Restart", msg)
+                        }
+                    }
+
+                    ToolTip.text: "If texts are not being rendered properly on your display, then switch to native text rendering. Otherwise, keep this setting unchecked."
+                    ToolTip.visible: hovered
+                    ToolTip.delay: 1000
                 }
 
                 VclCheckBox {
