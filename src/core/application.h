@@ -156,9 +156,6 @@ public:
     QString baseWindowTitle() const { return m_baseWindowTitle; }
     Q_SIGNAL void baseWindowTitleChanged();
 
-    Q_PROPERTY(QString qtVersion READ qtVersion CONSTANT)
-    QString qtVersion() const { return QString::fromLatin1(QT_VERSION_STR); }
-
     Q_INVOKABLE QString typeName(const QVariant &value) const;
     Q_INVOKABLE bool verifyType(const QVariant &value, const QString &name) const;
     Q_INVOKABLE bool isTextInputItem(QQuickItem *item) const;
@@ -171,6 +168,9 @@ public:
 
     Q_PROPERTY(QString qtVersionString READ qtVersionString CONSTANT)
     QString qtVersionString() const { return QStringLiteral(QT_VERSION_STR); }
+
+    Q_PROPERTY(QString openSslVersionString READ openSslVersionString CONSTANT)
+    QString openSslVersionString() const;
 
     Q_PROPERTY(QUndoGroup *undoGroup READ undoGroup CONSTANT)
     QUndoGroup *undoGroup() const { return m_undoGroup; }

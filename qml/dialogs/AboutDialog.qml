@@ -199,6 +199,14 @@ DialogLauncher {
                                            "credits": "<strong>Qt</strong> " + Scrite.app.qtVersionString + " as UI framework for the entire app.",
                                            "url": "https://www.qt.io"
                                        })
+
+                                if(Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform) {
+                                    const v = Scrite.app.openSslVersionString
+                                    append({
+                                                "credits": "<strong>" + v + "</strong> for use with https protocol.",
+                                                "url": "https://openssl-library.org/news/openssl-1.1.1-notes/index.html"
+                                           })
+                                }
                             }
                         }
                         ScrollBar.vertical: ScrollBar { }

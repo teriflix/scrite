@@ -45,6 +45,11 @@ licenses compatible with GPLv3.
    powering the rich text editor in Notebook. The original code can be found
    at https://github.com/quilljs/quill, under a BSD 3-Clause license.
 
+9. Linux AppImage of Scrite contains prebuilt binary of OpenSSL 1.1.1w runtime.
+   The OpenSSL toolkit stays under a double license, i.e. both the conditions of
+   the OpenSSL License and the original SSLeay license apply to the toolkit.
+   Read 3rdparty/openssl/license.txt for the actual license texts.
+
 ===============================================================================
 
 Scrite was originally developed by Prashanth under TERIFLIX Entertainment Spaces

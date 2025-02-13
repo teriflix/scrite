@@ -227,7 +227,7 @@ Item {
             Session.set("checkUserResponse", userInfo)
             Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "JunctionScreen")
         }
-    }    
+    }
 }
 
 
