@@ -53,6 +53,8 @@
 #include <QElapsedTimer>
 #include <QFontDatabase>
 #include <QJsonDocument>
+#include <QOpenGLContext>
+#include <QSurfaceFormat>
 #include <QStandardPaths>
 #include <QtConcurrentMap>
 #include <QtConcurrentRun>
@@ -202,11 +204,30 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     }();
     this->computeIdealFontPointSize();
 
+    QSurfaceFormat surfaceFormat = QSurfaceFormat::defaultFormat();
+    const QByteArray envOpenGLMultisampling =
+            qgetenv("SCRITE_OPENGL_MULTISAMPLING").toUpper().trimmed();
+    if (envOpenGLMultisampling == QByteArrayLiteral("FULL"))
+        surfaceFormat.setSamples(4);
+    else if (envOpenGLMultisampling == QByteArrayLiteral("EXTREME"))
+        surfaceFormat.setSamples(8);
+    else if (envOpenGLMultisampling == QByteArrayLiteral("NONE"))
+        surfaceFormat.setSamples(-1);
+    else
+        surfaceFormat.setSamples(2); // default
+    QSurfaceFormat::setDefaultFormat(surfaceFormat);
+
     const bool useSoftwareRenderer = [=]() -> bool {
 #ifdef Q_OS_WIN
         if (QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows10)
             return true;
 #endif
+
+        QOpenGLContext context;
+        context.setFormat(surfaceFormat);
+        if(!context.create())
+            return true;
+
         return m_settings->value(QStringLiteral("Application/useSoftwareRenderer"), false).toBool();
     }();
     const QString style = [=]() -> QString {

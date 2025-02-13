@@ -62,7 +62,7 @@ Item {
                     onToggled: {
                         Runtime.applicationSettings.useNativeTextRendering = checked
 
-                        if(Runtime.currentUseSoftwareRenderer !== checked) {
+                        if(Runtime.useNativeTextRendering !== checked) {
                             const msg = checked ? "Native OS text rendering engine will be used when you restart Scrite." : "Qt's text renderning engine will be used when you restart Scrite."
                             MessageBox.information("Requires Restart", msg)
                         }

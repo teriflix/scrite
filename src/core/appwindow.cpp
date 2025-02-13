@@ -40,18 +40,7 @@ AppWindow::AppWindow()
     // CAPTURE_CALL_GRAPH;
     ::AppWindowInstance = this;
 
-    QSurfaceFormat format = QSurfaceFormat::defaultFormat();
-    const QByteArray envOpenGLMultisampling =
-            qgetenv("SCRITE_OPENGL_MULTISAMPLING").toUpper().trimmed();
-    if (envOpenGLMultisampling == QByteArrayLiteral("FULL"))
-        format.setSamples(4);
-    else if (envOpenGLMultisampling == QByteArrayLiteral("EXTREME"))
-        format.setSamples(8);
-    else if (envOpenGLMultisampling == QByteArrayLiteral("NONE"))
-        format.setSamples(-1);
-    else
-        format.setSamples(2); // default
-    this->setFormat(format);
+    this->setFormat(QSurfaceFormat::defaultFormat());
 
 #ifdef Q_OS_MAC
     this->setFlag(Qt::WindowFullscreenButtonHint); // [0.5.2 All] Full Screen Mode #194
