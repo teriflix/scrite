@@ -96,8 +96,12 @@ Item {
                         case Item.Right:
                             return "qrc:/icons/navigation/arrow_right_inverted.png"
                         case Item.Top:
+                        case Item.TopLeft:
+                        case Item.TopRight:
                             return "qrc:/icons/navigation/arrow_down_inverted.png"
                         case Item.Bottom:
+                        case Item.BottomLeft:
+                        case Item.BottomRight:
                             return "qrc:/icons/navigation/arrow_up_inverted.png"
                         }
                     }
@@ -119,15 +123,43 @@ Item {
                     descIcon.anchors.right = descLabel.right
                     break
                 case Item.Top:
-                    descTip.anchors.horizontalCenter = uiElementOverlay.horizontalCenter
+                case Item.TopLeft:
+                case Item.TopRight:
+                    if(descriptionPosition === Item.Top) {
+                        descTip.anchors.horizontalCenter = uiElementOverlay.horizontalCenter
+                        descIcon.anchors.horizontalCenter = descLabel.horizontalCenter
+                    } else if(descriptionPosition === Item.TopRight) {
+                        descTip.anchors.left = uiElementOverlay.left
+                        descTip.anchors.leftMargin = descLabel.leftPadding
+                        descIcon.anchors.left = descLabel.left
+                        descIcon.anchors.leftMargin = descLabel.leftPadding
+                    } else {
+                        descTip.anchors.right = uiElementOverlay.right
+                        descTip.anchors.rightMargin = descLabel.rightPadding
+                        descIcon.anchors.right = descLabel.right
+                        descIcon.anchors.right = descLabel.rightPadding
+                    }
                     descTip.anchors.bottom = uiElementOverlay.top
-                    descIcon.anchors.horizontalCenter = descLabel.horizontalCenter
                     descIcon.anchors.bottom = descLabel.bottom
                     break
                 case Item.Bottom:
-                    descTip.anchors.horizontalCenter = uiElementOverlay.horizontalCenter
+                case Item.BottomLeft:
+                case Item.BottomRight:
+                    if(descriptionPosition === Item.Top) {
+                        descTip.anchors.horizontalCenter = uiElementOverlay.horizontalCenter
+                        descIcon.anchors.horizontalCenter = descLabel.horizontalCenter
+                    } else if(descriptionPosition === Item.BottomRight) {
+                        descTip.anchors.left = uiElementOverlay.left
+                        descTip.anchors.leftMargin = descLabel.leftPadding
+                        descIcon.anchors.left = descLabel.left
+                        descIcon.anchors.leftMargin = descLabel.leftPadding
+                    } else {
+                        descTip.anchors.right = uiElementOverlay.right
+                        descTip.anchors.rightMargin = descLabel.rightPadding
+                        descIcon.anchors.right = descLabel.right
+                        descIcon.anchors.right = descLabel.rightPadding
+                    }
                     descTip.anchors.top = uiElementOverlay.bottom
-                    descIcon.anchors.horizontalCenter = descLabel.horizontalCenter
                     descIcon.anchors.top = descLabel.top
                     break
                 }

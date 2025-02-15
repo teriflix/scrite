@@ -118,7 +118,8 @@ Item {
         property real spaceBetweenScenes: 0
         property int commentsPanelTabIndex: 1
         property bool markupToolsDockVisible: true
-        property bool pausePageAndTimeComputation: false
+        property bool pausePagination: true
+        property bool pausePaginationForEachDocument: true
         property bool highlightCurrentLine: true
         property bool applyUserDefinedLanguageFonts: true
         property bool optimiseScrolling: false
@@ -570,9 +571,9 @@ Item {
     readonly property ScreenplayTextDocument screenplayTextDocument: ScreenplayTextDocument {
         // Setting this is as good as setting the other.
         // when paused = true, page and time computation is halted.
-        property bool paused: Runtime.screenplayEditorSettings.pausePageAndTimeComputation
+        property bool paused: Runtime.screenplayEditorSettings.pausePagination
         onPausedChanged: Qt.callLater( function() {
-            Runtime.screenplayEditorSettings.pausePageAndTimeComputation = screenplayTextDocument.paused
+            Runtime.screenplayEditorSettings.pausePagination = screenplayTextDocument.paused
         })
 
         screenplay: Scrite.document.loading || paused ? null : Runtime.screenplayAdapter.screenplay

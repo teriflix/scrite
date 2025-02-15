@@ -114,6 +114,18 @@ Item {
                     ToolTip.visible: hovered
                     ToolTip.text: "Checking this option will make scrolling in screenplay editor smooth, but uses a lot of RAM and can cause application to freeze at times while scrolling is being computed."
                 }
+
+                VclCheckBox {
+                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
+
+                    text: "Remember Time & Page Count Settings"
+                    checked: !Runtime.screenplayEditorSettings.pausePaginationForEachDocument
+                    onToggled: Runtime.screenplayEditorSettings.pausePaginationForEachDocument = !checked
+                    hoverEnabled: true
+
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Time & Page counting is disabled each time a new document is loaded. Check this option to have Scrite remember your preference across documents."
+                }
             }
         }
 

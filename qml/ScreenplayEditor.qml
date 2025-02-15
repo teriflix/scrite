@@ -967,6 +967,7 @@ Rectangle {
             }
 
             Image {
+                id: pageCountButton
                 source: "qrc:/icons/content/page_count.png"
                 height: parent.height; width: height; mipmap: true
                 anchors.verticalCenter: parent.verticalCenter
@@ -4661,6 +4662,37 @@ Rectangle {
                     Profiler.active = false
             }
             */
+        }
+    }
+
+    Loader {
+        id: pausePaginationAnimator
+        anchors.fill: parent
+        active: false
+        visible: active
+        sourceComponent: UiElementHighlight {
+            uiElement: pageCountButton
+            onDone: pausePaginationAnimator.active = false
+            description: "Time & Page Count: " + (Runtime.screenplayTextDocument.paused ? "Disbled" : "Enabled")
+            descriptionPosition: Item.TopRight
+            property bool scaleDone: false
+            onScaleAnimationDone: scaleDone = true
+            Component.onDestruction: {
+                if(scaleDone)
+                    pausePaginationAnimator.active = false
+            }
+        }
+
+        Connections {
+            target: Scrite.document
+
+            function onJustLoaded() {
+                if(Runtime.screenplayEditorSettings.pausePaginationForEachDocument)
+                    Runtime.screenplayTextDocument.paused = true
+                Utils.execLater(pausePaginationAnimator, 100, () => {
+                                    pausePaginationAnimator.active = true
+                                })
+            }
         }
     }
 
