@@ -2056,8 +2056,9 @@ Item {
         }
 
         function showHelpTip(tipName) {
-            if(Runtime.helpTips[tipName] !== undefined && !Runtime.helpNotificationSettings.isTipShown(tipName))
+            if(Runtime.helpTips[tipName] !== undefined && !Runtime.helpNotificationSettings.isTipShown(tipName)) {
                 helpTipNotification.createObject(Scrite.window.contentItem, {"tipName": tipName})
+            }
         }
 
         Announcement.onIncoming: (type, data) => {
