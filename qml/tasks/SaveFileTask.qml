@@ -25,6 +25,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
+import "qrc:/qml/notifications"
 
 Item {
     id: root
@@ -198,6 +199,8 @@ Item {
                 Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
                 finished(true)
+
+                Runtime.showHelpTip("syncFiles")
             }
 
             onRejected: finished(false)

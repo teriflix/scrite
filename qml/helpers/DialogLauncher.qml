@@ -62,6 +62,9 @@ Item {
             dlg.closed.connect(dlg.destroy)
             dlg.open()
 
+            if(root.name !== "DialogLauncher")
+                Runtime.showHelpTip(root.name)
+
             return dlg
         }
 

@@ -23,6 +23,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
+import "qrc:/qml/notifications"
 
 VclDialog {
     id: root
@@ -107,6 +108,11 @@ VclDialog {
                         report.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
                         report.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                     }
+
+                    if(_private.isPdfExport)
+                        Runtime.showHelpTip("watermark")
+                    Runtime.showHelpTip("reports")
+                    Runtime.showHelpTip(Scrite.app.typeName(report))
                 }
             }
         }

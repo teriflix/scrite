@@ -2055,9 +2055,28 @@ Item {
             }
         }
 
+        function showHelpTip(tipName) {
+            if(Runtime.helpTips[tipName] !== undefined && !Runtime.helpNotificationSettings.isTipShown(tipName))
+                helpTipNotification.createObject(Scrite.window.contentItem, {"tipName": tipName})
+        }
+
+        Announcement.onIncoming: (type, data) => {
+                                     if(type === Runtime.announcementIds.showHelpTip) {
+                                         _private.showHelpTip(""+data)
+                                     }
+                                 }
+
         Component.onCompleted: {
             if(Scrite.app.isMacOSPlatform)
                 Scrite.app.openFileRequest.connect(handleOpenFileRequest)
+        }
+    }
+
+    Component {
+        id: helpTipNotification
+        HelpTipNotification {
+            id: helpTip
+            Notification.onDismissed: helpTip.destroy()
         }
     }
 }

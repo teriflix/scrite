@@ -225,7 +225,7 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 
         QOpenGLContext context;
         context.setFormat(surfaceFormat);
-        if(!context.create())
+        if (!context.create())
             return true;
 
         return m_settings->value(QStringLiteral("Application/useSoftwareRenderer"), false).toBool();

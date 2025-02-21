@@ -39,6 +39,11 @@ Item {
         return "Hi, there."
     }
 
+    Component.onCompleted: {
+        if(Scrite.user.loggedIn)
+            Runtime.showHelpTip("UserProfileDialog")
+    }
+
     PageView {
         id: userProfilePageView
         anchors.fill: parent
@@ -517,6 +522,14 @@ Item {
                                 mipmap: true
                                 visible: source !== ""
                                 fillMode: Image.PreserveAspectFit
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    enabled: buttonsRepeater.count === 1
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: buttonsRepeater.itemAt(0).handleClick()
+                                }
                             }
 
                             VclLabel {
@@ -536,6 +549,7 @@ Item {
                             }
 
                             Repeater {
+                                id: buttonsRepeater
                                 model: modelData.buttons
 
                                 Link {
@@ -547,7 +561,7 @@ Item {
                                     text: modelData.text
                                     horizontalAlignment: Text.AlignHCenter
 
-                                    onClicked: {
+                                    function handleClick() {
                                         if(modelData.action === UserMessageButton.UrlAction) {
                                             Qt.openUrlExternally(modelData.endpoint)
                                             return
@@ -573,6 +587,8 @@ Item {
                                         // Implement API and Code in a future update
                                         enabled = false
                                     }
+
+                                    onClicked: handleClick()
                                 }
                             }
                         }

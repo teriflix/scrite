@@ -223,6 +223,11 @@ Item {
         }
     }
 
+    function showHelpTip(tipName) {
+        if(helpTips !== undefined)
+            Announcement.shout(Runtime.announcementIds.showHelpTip, tipName)
+    }
+
     readonly property Settings notebookSettings: Settings {
         fileName: Scrite.app.settingsFilePath
         category: "Notebook"
@@ -610,6 +615,7 @@ Item {
         readonly property string closeDialogBoxRequest: "A6456A87-FC8C-405B-BDD7-7625F86272BA"
         readonly property string userAccountDialogScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
         readonly property string userProfileScreenPage: "D97FD221-5257-4A20-B9A2-744594E99D76"
+        readonly property string showHelpTip: "B168E17C-14CA-454F-9DF8-CAA381D9A8A2"
     }
 
     readonly property QtObject announcementData: QtObject {
