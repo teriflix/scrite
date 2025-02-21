@@ -645,7 +645,7 @@ Item {
             if(Scrite.user.loggedIn) {
                 let api = Qt.createQmlObject("import io.scrite.components 1.0; UserHelpTipsRestApiCall {}", root)
                 api.finished.connect( () => {
-                                          root.helpTip = api.helpTips
+                                          root.helpTips = api.helpTips
                                           api.destroy()
                                       })
                 if(!api.call())

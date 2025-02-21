@@ -52,9 +52,17 @@ DialogLauncher {
             onCloseRequest: Qt.callLater(dialog.close)
         }
 
+        onOpened: _private.launchCounter = _private.launchCounter+1
+
         Announcement.onIncoming: (type, data) => {
             if(type === Runtime.announcementIds.closeHomeScreenRequest || type === Runtime.announcementIds.loginRequest)
                 Qt.callLater(dialog.close)
         }
+    }
+
+    QtObject {
+        id: _private
+
+        property int launchCounter: 0
     }
 }

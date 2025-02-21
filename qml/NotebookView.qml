@@ -211,7 +211,7 @@ Rectangle {
             FlatToolButton {
                 id: refreshButton
                 iconSource: "qrc:/icons/navigation/refresh.png"
-                ToolTip.text: "Reloads the the notebook tree."
+                ToolTip.text: "Reloads the notebook tree."
                 onClicked: notebookModel.refresh()
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize

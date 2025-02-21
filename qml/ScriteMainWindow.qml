@@ -1995,8 +1995,6 @@ Item {
                              if(days >= 2) {
                                  if(!Runtime.helpNotificationSettings.isTipShown("discord"))
                                      htNotification.tipName = "discord"
-                                 else if(!Runtime.helpNotificationSettings.isTipShown("subscription") && days >= 5)
-                                     htNotification.tipName = "subscription"
                              }
                          })
         }
