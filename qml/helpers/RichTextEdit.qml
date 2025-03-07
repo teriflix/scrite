@@ -146,6 +146,10 @@ Item {
             Scrite.app.log(text)
         }
 
+        function openUrlExternally(url) {
+            Qt.openUrlExternally(url)
+        }
+
         signal requestPlaceholderText(string text)
         signal requestContentSize(var size)
         signal requestFont(var font)

@@ -659,6 +659,8 @@ class SessionNewRestApiCall : public RestApiCall
     QML_ELEMENT
 
 public:
+    static bool isCallUnderway();
+
     SessionNewRestApiCall(QObject *parent = nullptr);
     ~SessionNewRestApiCall();
 
@@ -667,6 +669,8 @@ public:
     bool useSessionToken() const { return false; }
     QString api() const { return "session/new"; }
     QJsonObject data() const;
+
+    bool call();
 
 protected:
     void setError(const QJsonObject &val);

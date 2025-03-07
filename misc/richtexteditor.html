@@ -58,6 +58,9 @@
             <select class="ql-align"></select>
           </span>
           <span class="ql-formats">
+            <button class="ql-link"></button>
+          </span>
+          <span class="ql-formats">
             <button class="ql-clean"></button>
           </span>
         </div>
@@ -97,6 +100,14 @@
                     scrite.contentUpdated(content)
                 }
             })
+
+            document.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A' && e.target.classList.contains('ql-preview')) {
+                    e.preventDefault()
+                    var linkUrl = e.target.href
+                    scrite.openUrlExternally(linkUrl)
+                }
+            });
 
             scrite.requestPlaceholderText.connect( function(text) {
                 quill.root.dataset.placeholder = text

@@ -47,7 +47,7 @@ void RestApi::requestNewSessionToken()
         connect(m_sessionTokenTimer, &QTimer::timeout, this, &RestApi::requestNewSessionTokenNow);
     }
 
-    if (!m_sessionTokenTimer->isActive())
+    if (!m_sessionTokenTimer->isActive() && !SessionNewRestApiCall::isCallUnderway())
         m_sessionTokenTimer->start();
 }
 
@@ -75,6 +75,9 @@ void RestApi::reportInvalidApiKey()
 
 void RestApi::requestNewSessionTokenNow()
 {
+    if (SessionNewRestApiCall::isCallUnderway())
+        return;
+
     LocalStorage::store("sessionToken", QVariant());
     emit newSessionTokenRequired();
 }
@@ -928,9 +931,20 @@ SessionStatusRestApiCall::Status SessionStatusRestApiCall::status() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static SessionNewRestApiCall *ActiveSessionNewRestApiCall = nullptr;
+
+bool SessionNewRestApiCall::isCallUnderway()
+{
+    return ::ActiveSessionNewRestApiCall != nullptr;
+}
+
 SessionNewRestApiCall::SessionNewRestApiCall(QObject *parent) : RestApiCall(parent) { }
 
-SessionNewRestApiCall::~SessionNewRestApiCall() { }
+SessionNewRestApiCall::~SessionNewRestApiCall()
+{
+    if (::ActiveSessionNewRestApiCall == this)
+        ::ActiveSessionNewRestApiCall = nullptr;
+}
 
 QJsonObject SessionNewRestApiCall::data() const
 {
@@ -938,6 +952,18 @@ QJsonObject SessionNewRestApiCall::data() const
              { "uid", "$userId" },
              { "did", Application::instance()->deviceId() },
              { "cid", Application::instance()->installationId() } };
+}
+
+bool SessionNewRestApiCall::call()
+{
+    if (::ActiveSessionNewRestApiCall != nullptr)
+        return false;
+
+    bool ret = RestApiCall::call();
+    if (ret)
+        ::ActiveSessionNewRestApiCall = this;
+
+    return ret;
 }
 
 void SessionNewRestApiCall::setError(const QJsonObject &val)
@@ -948,6 +974,9 @@ void SessionNewRestApiCall::setError(const QJsonObject &val)
     }
 
     RestApiCall::setError(val);
+
+    if (::ActiveSessionNewRestApiCall == this)
+        ::ActiveSessionNewRestApiCall = nullptr;
 }
 
 void SessionNewRestApiCall::setResponse(const QJsonObject &val)
@@ -962,6 +991,9 @@ void SessionNewRestApiCall::setResponse(const QJsonObject &val)
     QTimer::singleShot(0, RestApi::instance(), &RestApi::sessionTokenAvailable);
 
     RestApiCall::setResponse(val);
+
+    if (::ActiveSessionNewRestApiCall == this)
+        ::ActiveSessionNewRestApiCall = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
