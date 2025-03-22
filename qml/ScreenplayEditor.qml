@@ -3873,6 +3873,14 @@ Rectangle {
                     delegate: Rectangle {
                         id: delegateItem
 
+                        required property int index
+                        required property string id
+                        required property Scene scene
+                        required property int breakType
+                        required property var modelData
+                        required property ScreenplayElement screenplayElement
+                        required property int screenplayElementType
+
                         property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(Runtime.colors.primary.highlight.background, "#9CFFFFFF") : Qt.tint(scene.color, "#9CFFFFFF")
                         property color normalColor: Qt.tint(scene.color, "#E7FFFFFF")
                         property int elementIndex: index
@@ -3987,6 +3995,25 @@ Rectangle {
                                     }
 
                                     return ret
+                                }
+                            }
+
+                            Rectangle {
+                                width: height*0.75
+                                height: delegateText.implicitHeight
+                                radius: 2
+                                border { width: 2; color: Runtime.colors.primary.c600.background }
+                                color: Qt.rgba(0,0,0,0)
+                                visible: !scene.hasContent
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    enabled: parent.visible
+                                    hoverEnabled: enabled
+
+                                    ToolTip.text: "This scene is empty."
+                                    ToolTip.visible: containsMouse
                                 }
                             }
 

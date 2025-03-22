@@ -1151,11 +1151,22 @@ bool Scene::isEmpty() const
 {
     const bool noNotes = (m_notes == nullptr || m_notes->noteCount() == 0);
     const bool noAttachments = (m_attachments == nullptr || m_attachments->attachmentCount() == 0);
-    const bool noContent = m_elements.isEmpty()
-            || (m_elements.size() == 1 && m_elements.first()->text().isEmpty());
+    const bool noContent = !this->hasContent();
     const bool noSynopsis = m_synopsis.isEmpty();
 
     return noNotes && noAttachments && noContent && noSynopsis;
+}
+
+bool Scene::hasContent() const
+{
+    if (m_elements.size() > 0) {
+        for (const SceneElement *element : m_elements) {
+            if (!element->text().isEmpty())
+                return true;
+        }
+    }
+
+    return false;
 }
 
 void Scene::setId(const QString &val)

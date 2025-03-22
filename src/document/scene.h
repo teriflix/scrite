@@ -326,6 +326,9 @@ public:
     Q_PROPERTY(bool empty READ isEmpty NOTIFY sceneChanged)
     bool isEmpty() const;
 
+    Q_PROPERTY(bool hasContent READ hasContent NOTIFY sceneChanged)
+    bool hasContent() const;
+
     /*
      * The 'id' is a special property. It can be set only once. If it is not
      * set an ID is automatically generated whenever the property value is

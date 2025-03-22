@@ -215,7 +215,7 @@ Item {
 
             repeat: false
             running: enabled && Scrite.user.loggedIn
-            interval: 30000
+            interval: 30 * 60 * 1000
 
             onTriggered: _private.sessionStatusApi.call()
         }
