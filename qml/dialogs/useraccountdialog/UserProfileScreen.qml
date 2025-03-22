@@ -897,6 +897,8 @@ Item {
             SubscriptionPlansRestApiCall {
                 id: queryUserSubsCall
 
+                objectName: "qml_queryUserSubsCall"
+
                 property bool ready: false
                 property var activeSubscription
                 property var upcomingSubscription
@@ -929,6 +931,9 @@ Item {
                 }
 
                 function go() {
+                    if(busy)
+                        return
+
                     ready = call()
                     if(!ready)
                         Utils.execLater(queryUserSubsCall, 500, go)

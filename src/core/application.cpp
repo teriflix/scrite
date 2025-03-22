@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "form.h"
+#include "scrite.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "autoupdate.h"
@@ -248,6 +249,9 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
 #endif
 
     QQuickStyle::setStyle(style);
+
+    connect(this, SIGNAL(applicationStateChanged(Qt::ApplicationState)), this,
+            SIGNAL(appStateChanged()));
 }
 
 static void copyFilesRecursively(const QDir &from, const QDir &to)
@@ -423,6 +427,11 @@ QDateTime Application::installationTimestamp() const
     return installTimestamp;
 }
 
+int Application::appState() const
+{
+    return Scrite::ApplicationState((int)QtApplicationClass::applicationState());
+}
+
 int Application::launchCounter() const
 {
     return m_settings->value("Installation/launchCount", 0).toInt();
@@ -544,12 +553,12 @@ bool Application::isInternetAvailable() const
 
 QString Application::controlKey() const
 {
-    return this->platform() == Application::MacOS ? "⌘" : "Ctrl";
+    return this->platform() == Application::MacOS ? "Ã¢Å’Ëœ" : "Ctrl";
 }
 
 QString Application::altKey() const
 {
-    return this->platform() == Application::MacOS ? "⌥" : "Alt";
+    return this->platform() == Application::MacOS ? "Ã¢Å’Â¥" : "Alt";
 }
 
 QString Application::polishShortcutTextForDisplay(const QString &text) const

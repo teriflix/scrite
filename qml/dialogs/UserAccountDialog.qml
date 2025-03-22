@@ -97,6 +97,7 @@ Item {
         property SessionNewRestApiCall newSessionTokenCall: SessionNewRestApiCall {
             property VclDialog waitDialog
 
+            objectName: "qml_newSessionTokenCall"
             onAboutToCall: MessageBox.discardMessageBoxes()
             onJustIssuedCall: waitDialog = WaitDialog.launch("Fetching new access tokens ...")
             onFinished: waitDialog.close()
@@ -106,7 +107,7 @@ Item {
             target: Scrite.restApi
 
             function onNewSessionTokenRequired() {
-                _private.newSessionTokenCall.call()
+                _private.newSessionTokenCall.queue(Scrite.restApi.sessionApiQueue)
             }
 
             function onFreshActivationRequired() {
@@ -155,6 +156,8 @@ Item {
 
                 if(Notification.active && Scrite.user.info.hasUpcomingSubscription)
                     Notification.active = false
+
+                _private.trackSessionStatus.configure()
             }
         }
 
@@ -198,16 +201,14 @@ Item {
 
             target: Scrite.app
 
-            function onApplicationStateChanged(state) {
-                if(state === Scrite.ApplicationActive) {
-                    _private.sessionStatusApi.call()
-                    _private.trackSessionStatus.enabled = true
-                } else {
-                    _private.trackSessionStatus.enabled = false
-                }
+            function onAppStateChanged() {
+                _private.trackSessionStatus.configure()
             }
 
-            Component.onCompleted: Utils.execLater(_private, 1000, () => { _private.trackApplicationState.tracking = true })
+            Component.onCompleted: Utils.execLater(_private, 1000, () => {
+                                                       _private.trackApplicationState.tracking = true
+                                                       _private.trackSessionStatus.configure()
+                                                   })
         }
 
         readonly property Timer trackSessionStatus: Timer {
@@ -215,9 +216,36 @@ Item {
 
             repeat: false
             running: enabled && Scrite.user.loggedIn
-            interval: 30 * 60 * 1000
+            interval: (requiresFrequentChecks() ? 5 : 60)*60*1000
 
-            onTriggered: _private.sessionStatusApi.call()
+            function requiresFrequentChecks() {
+                const userInfo = Scrite.user.info
+                if(!userInfo.hasActiveSubscription || userInfo.subscriptions.length === 0)
+                    return true
+
+                if(userInfo.subscriptions[0].kind === "trial" && !userInfo.hasUpcomingSubscription)
+                    return true
+
+                if(userInfo.daysToSubscribedUntil() < Runtime.subscriptionTreshold)
+                    return true
+
+                return false
+            }
+
+            function configure() {
+                const state = Scrite.app.appState
+                if(state === Scrite.ApplicationActive) {
+                    if(requiresFrequentChecks())
+                        _private.sessionStatusApi.call()
+                    _private.trackSessionStatus.enabled = true
+                } else {
+                    _private.trackSessionStatus.enabled = false
+                }
+            }
+
+            onTriggered: {
+                _private.sessionStatusApi.queue(Scrite.restApi.sessionApiQueue)
+            }
         }
 
         readonly property SessionStatusRestApiCall sessionStatusApi: SessionStatusRestApiCall {

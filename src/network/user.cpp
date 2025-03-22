@@ -289,6 +289,11 @@ UserInfo &UserInfo::operator=(const UserInfo &other)
     return *this;
 }
 
+int UserInfo::daysToSubscribedUntil() const
+{
+    return QDate::currentDate().daysTo(this->subscribedUntil.date()) + 1;
+}
+
 bool UserInfo::isFeatureEnabled(int feature) const
 {
     return Scrite::isFeatureEnabled(Scrite::AppFeature(feature), this->availableFeatures);
@@ -426,7 +431,7 @@ User *User::instance()
     if (firstTime) {
         if (refreshSessionToken && LocalStorage::load("loginToken").isValid()) {
             SessionNewRestApiCall *newSession = new SessionNewRestApiCall(theUser);
-            if (!newSession->call()) {
+            if (!newSession->queue(RestApi::instance()->sessionApiQueue())) {
                 newSession->deleteLater();
             }
         } else if (LocalStorage::load("sessionToken").isValid()) {
@@ -479,44 +484,13 @@ int User::unreadMessageCount() const
 
 void User::checkForMessages()
 {
-    if (!this->isLoggedIn())
-        return;
-
-    UserMessagesRestApiCall *api =
-            this->findChild<UserMessagesRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
-    if (api != nullptr)
-        return;
-
-    api = new UserMessagesRestApiCall(this);
-    api->setAutoDelete(true);
-    connect(api, &UserMessagesRestApiCall::finished, this, [=]() {
-        const QJsonArray messages = api->messages();
-        if (messages.isEmpty())
-            return;
-
-        QList<UserMessage> importantMessages;
-        for (const QJsonValue &message : messages) {
-            const UserMessage msg(message.toObject());
-            if (!m_messages.contains(msg)) {
-                m_messages.prepend(UserMessage(message.toObject()));
-                if (msg.type == UserMessage::ImportantType)
-                    importantMessages.append(msg);
-            }
-        }
-
-        if (!m_messages.isEmpty())
-            m_messages.erase(
-                    std::remove_if(m_messages.begin(), m_messages.end(),
-                                   [](const UserMessage &msg) { return msg.hasExpired(); }),
-                    m_messages.end());
-
-        if (!importantMessages.isEmpty())
-            emit notifyImportantMessages(importantMessages);
-
-        emit messagesChanged();
-    });
-    if (!api->call())
-        api->deleteLater();
+    if (!m_checkForMessagesTimer) {
+        m_checkForMessagesTimer = new QTimer(this);
+        m_checkForMessagesTimer->setInterval(30000);
+        connect(m_checkForMessagesTimer, &QTimer::timeout, this, &User::checkForMessagesNow);
+        this->checkForMessagesNow();
+    } else if (!m_checkForMessagesTimer->isActive())
+        m_checkForMessagesTimer->start();
 }
 
 void User::markMessagesAsRead()
@@ -584,6 +558,48 @@ void User::checkIfSubscriptionIsAboutToExpire()
     const int nrDays = QDate::currentDate().daysTo(m_info.subscribedUntil.date()) + 1;
     if (nrDays >= 0 && nrDays < subscriptionTreshold)
         emit subscriptionAboutToExpire(nrDays);
+}
+
+void User::checkForMessagesNow()
+{
+    if (!this->isLoggedIn())
+        return;
+
+    UserMessagesRestApiCall *api =
+            this->findChild<UserMessagesRestApiCall *>(QString(), Qt::FindDirectChildrenOnly);
+    if (api != nullptr)
+        return;
+
+    api = new UserMessagesRestApiCall(this);
+    api->setAutoDelete(true);
+    connect(api, &UserMessagesRestApiCall::finished, this, [=]() {
+        const QJsonArray messages = api->messages();
+        if (messages.isEmpty())
+            return;
+
+        QList<UserMessage> importantMessages;
+        for (const QJsonValue &message : messages) {
+            const UserMessage msg(message.toObject());
+            if (!m_messages.contains(msg)) {
+                m_messages.prepend(UserMessage(message.toObject()));
+                if (msg.type == UserMessage::ImportantType)
+                    importantMessages.append(msg);
+            }
+        }
+
+        if (!m_messages.isEmpty())
+            m_messages.erase(
+                    std::remove_if(m_messages.begin(), m_messages.end(),
+                                   [](const UserMessage &msg) { return msg.hasExpired(); }),
+                    m_messages.end());
+
+        if (!importantMessages.isEmpty())
+            emit notifyImportantMessages(importantMessages);
+
+        emit messagesChanged();
+    });
+    if (!api->call())
+        api->deleteLater();
 }
 
 void User::storeMessages()

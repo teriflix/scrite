@@ -292,6 +292,7 @@ public:
     Q_PROPERTY(QColor badgeTextColor MEMBER badgeTextColor)
     QColor badgeTextColor = Qt::white;
 
+    Q_INVOKABLE int daysToSubscribedUntil() const;
     Q_INVOKABLE bool isFeatureEnabled(int feature) const;
     Q_INVOKABLE bool isFeatureNameEnabled(const QString &featureName) const;
 };
@@ -446,6 +447,7 @@ private:
     void setMessages(const QList<UserMessage> &val);
     void checkIfSubscriptionIsAboutToExpire();
 
+    void checkForMessagesNow();
     void storeMessages();
     void loadStoredMessages();
 
@@ -459,6 +461,7 @@ protected:
 private:
     UserInfo m_info;
     QList<UserMessage> m_messages;
+    QTimer *m_checkForMessagesTimer = nullptr;
 };
 
 class AppFeature : public QObject

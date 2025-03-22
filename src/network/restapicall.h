@@ -15,6 +15,7 @@
 #define RESTAPICALL_H
 
 #include <QUrl>
+#include <QQueue>
 #include <QVariant>
 #include <QJsonArray>
 #include <QQmlEngine>
@@ -24,7 +25,9 @@
 #include "qobjectlistmodel.h"
 
 class QTimer;
+class RestApiCall;
 class QNetworkReply;
+class RestApiCallQueue;
 
 class RestApi : public QObject
 {
@@ -35,6 +38,10 @@ class RestApi : public QObject
 public:
     static RestApi *instance();
     ~RestApi();
+
+    Q_PROPERTY(QObject *sessionApiQueue READ sessionApiQueueObject CONSTANT)
+    QObject *sessionApiQueueObject() const;
+    RestApiCallQueue *sessionApiQueue() const { return m_sessionApiQueue; }
 
     void requestNewSessionToken();
     void requestFreshActivation();
@@ -55,7 +62,9 @@ protected:
     RestApi(QObject *parent = nullptr);
 
 private:
+    QDateTime m_lastSessionTokenRequestTimestamp;
     QTimer *m_sessionTokenTimer = nullptr;
+    RestApiCallQueue *m_sessionApiQueue = nullptr;
 };
 
 class RestApiCall : public QObject, public QQmlParserStatus
@@ -67,6 +76,7 @@ class RestApiCall : public QObject, public QQmlParserStatus
 public:
     explicit RestApiCall(QObject *parent = nullptr);
     ~RestApiCall();
+    Q_SIGNAL void aboutToDelete(RestApiCall *call);
 
     enum Type { GET, POST };
     Q_ENUM(Type)
@@ -134,6 +144,8 @@ public:
     bool isReportNetworkErrors() const { return m_reportNetworkErrors; }
     Q_SIGNAL void reportNetworkErrorsChanged();
 
+    Q_INVOKABLE bool queue(RestApiCallQueue *queue);
+
     virtual Q_INVOKABLE bool call();
     Q_INVOKABLE void reset()
     {
@@ -177,6 +189,50 @@ private:
     bool m_reportNetworkErrors =
             false; // when false, networkError() signal is emited to report
                    // network errors. When true, they are reported via error() also.
+    QByteArray m_sessionTokenUsed;
+};
+
+class RestApiCallQueue : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    RestApiCallQueue(QObject *parent = nullptr);
+    ~RestApiCallQueue();
+
+    static RestApiCallQueue *find(RestApiCall *call);
+
+    Q_PROPERTY(RestApiCall* current READ current NOTIFY currentChanged FINAL)
+    RestApiCall *current() const { return m_current; }
+    Q_SIGNAL void currentChanged();
+
+    Q_PROPERTY(bool busy READ isBusy NOTIFY currentChanged FINAL)
+    bool isBusy() const { return m_current != nullptr; }
+
+    Q_PROPERTY(int size READ size NOTIFY sizeChanged FINAL)
+    int size() const { return m_queue.size(); }
+    Q_SIGNAL void sizeChanged();
+
+    Q_PROPERTY(bool empty READ isEmpty NOTIFY sizeChanged FINAL)
+    int isEmpty() const { return m_queue.isEmpty(); }
+
+    Q_INVOKABLE bool enqueue(RestApiCall *call);
+    Q_INVOKABLE bool remove(RestApiCall *call);
+    Q_INVOKABLE bool contains(RestApiCall *call) const { return m_queue.contains(call); }
+
+signals:
+    void called(RestApiCall *call, bool success);
+    void done(RestApiCall *call, bool success);
+
+private:
+    void onCallDone();
+    void onCallDestroyed(RestApiCall *call);
+    void callNext();
+
+private:
+    RestApiCall *m_current = nullptr;
+    QQueue<RestApiCall *> m_queue;
 };
 
 class RestApiCallList : public QObjectListModel<RestApiCall *>
@@ -624,6 +680,8 @@ public:
     bool useSessionToken() const { return true; }
     QString api() const { return "session/current"; }
 
+    bool call();
+
 protected:
     void setResponse(const QJsonObject &val);
 };
@@ -648,6 +706,8 @@ public:
     Type type() const { return GET; }
     bool useSessionToken() const { return true; }
     QString api() const { return "session/status"; }
+
+    bool call();
 
 protected:
     void setResponse(const QJsonObject &val);

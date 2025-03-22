@@ -56,6 +56,10 @@ public:
     QString installationId() const;
     QDateTime installationTimestamp() const;
 
+    Q_PROPERTY(int appState READ appState NOTIFY appStateChanged)
+    int appState() const;
+    Q_SIGNAL void appStateChanged();
+
     Q_PROPERTY(int launchCounter READ launchCounter CONSTANT)
     int launchCounter() const;
 

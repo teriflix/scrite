@@ -38,6 +38,11 @@ RestApi *RestApi::instance()
 
 RestApi::~RestApi() { }
 
+QObject *RestApi::sessionApiQueueObject() const
+{
+    return m_sessionApiQueue;
+}
+
 void RestApi::requestNewSessionToken()
 {
     if (m_sessionTokenTimer == nullptr) {
@@ -45,9 +50,8 @@ void RestApi::requestNewSessionToken()
         m_sessionTokenTimer->setInterval(500);
         m_sessionTokenTimer->setSingleShot(true);
         connect(m_sessionTokenTimer, &QTimer::timeout, this, &RestApi::requestNewSessionTokenNow);
-    }
-
-    if (!m_sessionTokenTimer->isActive() && !SessionNewRestApiCall::isCallUnderway())
+        this->requestNewSessionTokenNow();
+    } else if (!m_sessionTokenTimer->isActive())
         m_sessionTokenTimer->start();
 }
 
@@ -75,14 +79,21 @@ void RestApi::reportInvalidApiKey()
 
 void RestApi::requestNewSessionTokenNow()
 {
-    if (SessionNewRestApiCall::isCallUnderway())
-        return;
+    const QDateTime now = QDateTime::currentDateTime();
+    if (m_lastSessionTokenRequestTimestamp.isValid()) {
+        if (m_lastSessionTokenRequestTimestamp.msecsTo(now) < 1000)
+            return;
+    } else
+        m_lastSessionTokenRequestTimestamp = now;
 
     LocalStorage::store("sessionToken", QVariant());
     emit newSessionTokenRequired();
 }
 
-RestApi::RestApi(QObject *parent) : QObject(parent) { }
+RestApi::RestApi(QObject *parent) : QObject(parent)
+{
+    m_sessionApiQueue = new RestApiCallQueue(this);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +102,10 @@ RestApiCall::RestApiCall(QObject *parent) : QObject(parent)
     connect(this, &RestApiCall::finished, this, &RestApiCall::maybeAutoDelete);
 }
 
-RestApiCall::~RestApiCall() { }
+RestApiCall::~RestApiCall()
+{
+    emit aboutToDelete(this);
+}
 
 bool RestApiCall::autoDelete() const
 {
@@ -183,9 +197,17 @@ void RestApiCall::setReportNetworkErrors(bool val)
     emit reportNetworkErrorsChanged();
 }
 
+bool RestApiCall::queue(RestApiCallQueue *queue)
+{
+    if (queue)
+        return queue->enqueue(this);
+
+    return false;
+}
+
 bool RestApiCall::call()
 {
-    if (this->api().isEmpty() || m_reply != nullptr)
+    if (this->api().isEmpty() || m_reply != nullptr || this->isBusy())
         return false;
 
     this->clearError();
@@ -216,23 +238,25 @@ bool RestApiCall::call()
     QNetworkRequest req(url);
     req.setRawHeader(QByteArrayLiteral("key"), QByteArrayLiteral(REST_API_KEY));
     if (this->useSessionToken()) {
-        const QVariant sessionToken = LocalStorage::load("sessionToken");
-        const QVariant userId = LocalStorage::load("userId");
+        const QByteArray sessionToken = LocalStorage::load("sessionToken").toByteArray();
+        const QByteArray userId = LocalStorage::load("userId").toByteArray();
 
-        if (!sessionToken.isValid()) {
-            QTimer::singleShot(100, RestApi::instance(), &RestApi::requestNewSessionToken);
+        if (sessionToken.isEmpty()) {
+            QTimer::singleShot(0, RestApi::instance(), &RestApi::requestNewSessionToken);
             return false;
         }
 
-        if (!userId.isValid()) {
-            QTimer::singleShot(100, RestApi::instance(), &RestApi::requestFreshActivation);
+        if (userId.isEmpty()) {
+            QTimer::singleShot(0, RestApi::instance(), &RestApi::requestFreshActivation);
             return false;
         }
 
-        req.setRawHeader("token", sessionToken.toByteArray());
+        m_sessionTokenUsed = sessionToken;
+
+        req.setRawHeader("token", m_sessionTokenUsed);
         req.setRawHeader("did", Application::instance()->deviceId().toLatin1());
         req.setRawHeader("cid", Application::instance()->installationId().toLatin1());
-        req.setRawHeader("uid", userId.toByteArray());
+        req.setRawHeader("uid", userId);
     }
 
     static const QString userAgentString = []() {
@@ -304,7 +328,8 @@ void RestApiCall::setError(const QJsonObject &val)
     const QString errorCode = val.value("code").toString();
 
     const bool noApiKey = errorCode == "E_API_KEY";
-    const bool noSession = this->useSessionToken() && errorCode == "E_NO_SESSION";
+    const bool noSession = this->useSessionToken() && errorCode == "E_NO_SESSION"
+            && m_sessionTokenUsed == LocalStorage::load("sessionToken").toByteArray();
 
     if (noSession || noApiKey) {
         LocalStorage::store("sessionToken", QVariant());
@@ -319,12 +344,12 @@ void RestApiCall::setError(const QJsonObject &val)
 
         if (noSession) {
             if (LocalStorage::load("loginToken").isValid()
-                && LocalStorage::load("userId").isValid())
-                QTimer::singleShot(100, RestApi::instance(), &RestApi::requestNewSessionToken);
-            else
-                QTimer::singleShot(100, RestApi::instance(), &RestApi::requestFreshActivation);
+                && LocalStorage::load("userId").isValid()) {
+                QTimer::singleShot(0, RestApi::instance(), &RestApi::requestNewSessionToken);
+            } else
+                QTimer::singleShot(0, RestApi::instance(), &RestApi::requestFreshActivation);
         } else if (noApiKey)
-            QTimer::singleShot(100, RestApi::instance(), &RestApi::reportInvalidApiKey);
+            QTimer::singleShot(0, RestApi::instance(), &RestApi::reportInvalidApiKey);
     }
 
     emit errorChanged();
@@ -393,6 +418,120 @@ void RestApiCall::maybeAutoDelete()
 {
     if (!m_isQmlInstance && m_autoDelete)
         this->deleteLater();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Q_GLOBAL_STATIC(QList<RestApiCallQueue *>, RestApiCallQueues)
+
+RestApiCallQueue::RestApiCallQueue(QObject *parent) : QObject(parent)
+{
+    ::RestApiCallQueues->append(this);
+}
+
+RestApiCallQueue::~RestApiCallQueue()
+{
+    ::RestApiCallQueues->removeOne(this);
+}
+
+RestApiCallQueue *RestApiCallQueue::find(RestApiCall *call)
+{
+    for (RestApiCallQueue *queue : qAsConst(*::RestApiCallQueues)) {
+        if (queue->contains(call) || queue->current() == call)
+            return queue;
+    }
+
+    return nullptr;
+}
+
+bool RestApiCallQueue::enqueue(RestApiCall *call)
+{
+    auto callQueuedEslewhere = [](RestApiCall *call, RestApiCallQueue *except) -> bool {
+        RestApiCallQueue *queue = RestApiCallQueue::find(call);
+        if (queue != nullptr && queue != except)
+            return true;
+        return false;
+    };
+
+    if (call && !callQueuedEslewhere(call, this)) {
+        if (m_queue.contains(call))
+            return true;
+
+        connect(call, &RestApiCall::aboutToDelete, this, &RestApiCallQueue::onCallDestroyed);
+
+        m_queue.enqueue(call);
+        emit sizeChanged();
+
+        if (m_current == nullptr)
+            this->callNext();
+
+        return true;
+    }
+
+    return false;
+}
+
+bool RestApiCallQueue::remove(RestApiCall *call)
+{
+    if (call) {
+        int index = m_queue.indexOf(call);
+        if (index >= 0) {
+            m_queue.removeAt(index);
+            emit sizeChanged();
+
+            disconnect(call, 0, this, 0);
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
+void RestApiCallQueue::onCallDone()
+{
+    if (this->sender() == m_current) {
+        disconnect(m_current, 0, this, 0);
+        emit done(m_current, m_current->hasResponse());
+
+        if (m_queue.isEmpty()) {
+            m_current = nullptr;
+            emit currentChanged();
+        } else
+            this->callNext();
+    }
+}
+
+void RestApiCallQueue::onCallDestroyed(RestApiCall *call)
+{
+    if (call == nullptr)
+        return;
+
+    if (m_current == call)
+        this->onCallDone();
+    else
+        remove(call);
+}
+
+void RestApiCallQueue::callNext()
+{
+    if (m_queue.isEmpty())
+        return;
+
+    while (!m_queue.isEmpty()) {
+        m_current = m_queue.dequeue();
+
+        connect(m_current, &RestApiCall::finished, this, &RestApiCallQueue::onCallDone);
+
+        if (m_current->call())
+            break;
+
+        disconnect(m_current, 0, this, 0);
+        m_current = nullptr;
+    }
+
+    emit sizeChanged();
+    emit currentChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -890,6 +1029,15 @@ QDateTime SessionCurrentRestApiCall::since() const
     return QDateTime::fromString(this->responseData().value("since").toString(), Qt::ISODateWithMs);
 }
 
+bool SessionCurrentRestApiCall::call()
+{
+    if (!RestApiCallQueue::find(this)) {
+        qWarning("All API calls to /session/ should be queued.");
+    }
+
+    return RestApiCall::call();
+}
+
 void SessionCurrentRestApiCall::setResponse(const QJsonObject &val)
 {
     const QJsonObject data = val.value("data").toObject();
@@ -913,12 +1061,20 @@ SessionStatusRestApiCall::SessionStatusRestApiCall(QObject *parent) : RestApiCal
 
 SessionStatusRestApiCall::~SessionStatusRestApiCall() { }
 
+bool SessionStatusRestApiCall::call()
+{
+    if (!RestApiCallQueue::find(this)) {
+        qWarning("All API calls to /session/ should be queued.");
+    }
+
+    return RestApiCall::call();
+}
+
 void SessionStatusRestApiCall::setResponse(const QJsonObject &val)
 {
     RestApiCall::setResponse(val);
 
-    if (!this->hasError())
-        QTimer::singleShot(100, User::instance(), &User::checkForMessages);
+    QTimer::singleShot(100, User::instance(), &User::checkForMessages);
 }
 
 SessionStatusRestApiCall::Status SessionStatusRestApiCall::status() const
@@ -931,20 +1087,9 @@ SessionStatusRestApiCall::Status SessionStatusRestApiCall::status() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static SessionNewRestApiCall *ActiveSessionNewRestApiCall = nullptr;
-
-bool SessionNewRestApiCall::isCallUnderway()
-{
-    return ::ActiveSessionNewRestApiCall != nullptr;
-}
-
 SessionNewRestApiCall::SessionNewRestApiCall(QObject *parent) : RestApiCall(parent) { }
 
-SessionNewRestApiCall::~SessionNewRestApiCall()
-{
-    if (::ActiveSessionNewRestApiCall == this)
-        ::ActiveSessionNewRestApiCall = nullptr;
-}
+SessionNewRestApiCall::~SessionNewRestApiCall() { }
 
 QJsonObject SessionNewRestApiCall::data() const
 {
@@ -956,14 +1101,11 @@ QJsonObject SessionNewRestApiCall::data() const
 
 bool SessionNewRestApiCall::call()
 {
-    if (::ActiveSessionNewRestApiCall != nullptr)
-        return false;
+    if (!RestApiCallQueue::find(this)) {
+        qWarning("All API calls to /session/ should be queued.");
+    }
 
-    bool ret = RestApiCall::call();
-    if (ret)
-        ::ActiveSessionNewRestApiCall = this;
-
-    return ret;
+    return RestApiCall::call();
 }
 
 void SessionNewRestApiCall::setError(const QJsonObject &val)
@@ -974,9 +1116,6 @@ void SessionNewRestApiCall::setError(const QJsonObject &val)
     }
 
     RestApiCall::setError(val);
-
-    if (::ActiveSessionNewRestApiCall == this)
-        ::ActiveSessionNewRestApiCall = nullptr;
 }
 
 void SessionNewRestApiCall::setResponse(const QJsonObject &val)
@@ -991,9 +1130,6 @@ void SessionNewRestApiCall::setResponse(const QJsonObject &val)
     QTimer::singleShot(0, RestApi::instance(), &RestApi::sessionTokenAvailable);
 
     RestApiCall::setResponse(val);
-
-    if (::ActiveSessionNewRestApiCall == this)
-        ::ActiveSessionNewRestApiCall = nullptr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1073,7 +1209,7 @@ void SubscriptionPlanActivationRestApiCall::setResponse(const QJsonObject &val)
     RestApiCall::setResponse(val);
 
     SessionNewRestApiCall *api = new SessionNewRestApiCall(User::instance());
-    if (!api->call())
+    if (!api->queue(RestApi::instance()->sessionApiQueue()))
         api->deleteLater();
 }
 
