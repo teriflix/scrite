@@ -897,8 +897,6 @@ Item {
             SubscriptionPlansRestApiCall {
                 id: queryUserSubsCall
 
-                objectName: "qml_queryUserSubsCall"
-
                 property bool ready: false
                 property var activeSubscription
                 property var upcomingSubscription

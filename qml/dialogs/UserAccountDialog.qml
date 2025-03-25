@@ -97,7 +97,6 @@ Item {
         property SessionNewRestApiCall newSessionTokenCall: SessionNewRestApiCall {
             property VclDialog waitDialog
 
-            objectName: "qml_newSessionTokenCall"
             onAboutToCall: MessageBox.discardMessageBoxes()
             onJustIssuedCall: waitDialog = WaitDialog.launch("Fetching new access tokens ...")
             onFinished: waitDialog.close()

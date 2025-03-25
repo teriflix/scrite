@@ -553,12 +553,12 @@ bool Application::isInternetAvailable() const
 
 QString Application::controlKey() const
 {
-    return this->platform() == Application::MacOS ? "Ã¢Å’Ëœ" : "Ctrl";
+    return this->platform() == Application::MacOS ? QStringLiteral("\u2318") : "Ctrl";
 }
 
 QString Application::altKey() const
 {
-    return this->platform() == Application::MacOS ? "Ã¢Å’Â¥" : "Alt";
+    return this->platform() == Application::MacOS ? QStringLiteral("\u2325") : "Alt";
 }
 
 QString Application::polishShortcutTextForDisplay(const QString &text) const
