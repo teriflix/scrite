@@ -56,11 +56,10 @@ bool FinalDraftImporter::doImport(QIODevice *device)
      * we will have to simply use these deprecated classes.
      */
 
-    QXmlInputSource xmlInputSource(device);
-    QXmlSimpleReader xmlParser;
+    const QByteArray xml = device->readAll();
 
     QDomDocument doc;
-    if (!doc.setContent(&xmlInputSource, &xmlParser, &errMsg, &errLine, &errCol)) {
+    if (!doc.setContent(xml, true, &errMsg, &errLine, &errCol)) {
         const QString msg = QStringLiteral("Parse Error: %1 at Line %2, Column %3")
                                     .arg(errMsg)
                                     .arg(errLine)
@@ -77,7 +76,7 @@ bool FinalDraftImporter::doImport(QIODevice *device)
 
     const int fdxVersion = rootE.attribute("Version").toInt();
     if (rootE.attribute("DocumentType") != QStringLiteral("Script") || fdxVersion < 1
-        || fdxVersion > 5) {
+        || fdxVersion > 6) {
         this->error()->setErrorMessage("Unrecognised Final Draft file version.");
         return false;
     }
