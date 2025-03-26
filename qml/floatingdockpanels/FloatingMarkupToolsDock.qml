@@ -32,7 +32,7 @@ FloatingDock {
 
     x: adjustedX(Runtime.markupToolsSettings.contentX)
     y: adjustedY(Runtime.markupToolsSettings.contentY)
-    width: 426
+    width: 462
     height: 36 + 8 + titleBarHeight
     visible: Runtime.screenplayEditorSettings.markupToolsDockVisible && Runtime.screenplayEditor
 
@@ -143,6 +143,18 @@ FloatingDock {
                 hoverEnabled: true
 
                 onClicked: if(_private.textFormat) _private.textFormat.toggleUnderline()
+            }
+
+            SimpleToolButton {
+                ToolTip.text: "Strikeout\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+K")
+                ToolTip.visible: containsMouse
+
+                checked: _private.textFormat ? _private.textFormat.strikeout : false
+                enabled: _private.textFormat
+                iconSource: "qrc:/icons/editor/format_strikethrough.png"
+                hoverEnabled: true
+
+                onClicked: if(_private.textFormat) _private.textFormat.toggleStrikeout()
             }
 
             ColorToolButton {

@@ -476,6 +476,13 @@ public:
 
     Q_INVOKABLE void toggleUnderline() { this->setUnderline(!m_underline); }
 
+    Q_PROPERTY(bool strikeout READ isStrikeout WRITE setStrikeout NOTIFY strikeoutChanged)
+    void setStrikeout(bool val);
+    bool isStrikeout() const { return m_strikeout; }
+    Q_SIGNAL void strikeoutChanged();
+
+    Q_INVOKABLE void toggleStrikeout() { this->setStrikeout(!m_strikeout); }
+
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     void setTextColor(const QColor &val);
     QColor textColor() const { return m_textColor; }
@@ -511,6 +518,7 @@ signals:
 private:
     bool m_bold = false;
     bool m_italics = false;
+    bool m_strikeout = false;
     bool m_underline = false;
     bool m_updatingFromFormat = false;
     QColor m_textColor = Qt::transparent;

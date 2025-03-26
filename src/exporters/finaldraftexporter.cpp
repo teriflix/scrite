@@ -143,6 +143,11 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                         styles << QStringLiteral("Underline");
                 }
 
+                if (format.format.hasProperty(QTextFormat::FontStrikeOut)) {
+                    if (format.format.fontStrikeOut())
+                        styles << QStringLiteral("Strikeout");
+                }
+
                 if (!styles.isEmpty())
                     textE.setAttribute(QStringLiteral("Style"), styles.join('+'));
 

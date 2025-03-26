@@ -697,8 +697,8 @@ void Fountain::Parser::processNotes()
 void Fountain::Parser::processEmphasis()
 {
     /*
-     * Fountain follows Markdown’s rules for emphasis, except that it reserves the
-     * use of underscores for underlining, which is not interchangeable with
+     * Fountain follows MarkdownÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢s rules for emphasis, except
+     * that it reserves the use of underscores for underlining, which is not interchangeable with
      * italics in a screenplay.
      *      * *italics*
      * **bold**
@@ -762,6 +762,7 @@ static bool Fountain::resolveEmphasis(const QString &input, QString &plainText,
     static const QRegularExpression boldPattern("\\*\\*(.*?)\\*\\*");
     static const QRegularExpression boldItalicPattern("\\*\\*\\*(.*?)\\*\\*\\*");
     static const QRegularExpression underlinePattern("\\_(.*?)\\_");
+    static const QRegularExpression strikeoutPattern("~~(.*?)~~");
 
     // Apply formatting using regular expressions
     QString formattedText = input;
@@ -769,6 +770,7 @@ static bool Fountain::resolveEmphasis(const QString &input, QString &plainText,
     formattedText.replace(boldPattern, "<b>\\1</b>");
     formattedText.replace(italicPattern, "<i>\\1</i>");
     formattedText.replace(underlinePattern, "<u>\\1</u>");
+    formattedText.replace(strikeoutPattern, "<s>\\1</s>");
 
     if (formattedText == input)
         return false;
@@ -832,6 +834,7 @@ static bool Fountain::encodeEmphasis(const QString &plainText,
             const bool bold = charFormat.fontWeight() == QFont::Bold;
             const bool italic = charFormat.fontItalic();
             const bool underline = charFormat.fontUnderline();
+            const bool strikeout = charFormat.fontStrikeOut();
 
             if (italic)
                 mdText += "*";
@@ -839,6 +842,8 @@ static bool Fountain::encodeEmphasis(const QString &plainText,
                 mdText += "**";
             if (underline)
                 mdText += "_";
+            if (strikeout)
+                mdText += "~~";
 
             mdText += text;
 
@@ -848,6 +853,8 @@ static bool Fountain::encodeEmphasis(const QString &plainText,
                 mdText += "**";
             if (italic)
                 mdText += "*";
+            if (strikeout)
+                mdText += "~~";
 
             mdText += leftOver;
         }
@@ -1098,7 +1105,10 @@ void Fountain::Writer::writeCharacter(QTextStream &ts, const Element &element) c
 
     ts << newline;
 
-    // You can force a Character element by preceding it with the “at” symbol @.
+    // You can force a Character element by preceding it with the
+    // ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œatÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â
+    // symbol
+    // @.
     if (m_options & StrictSyntaxOption)
         ts << "@";
 

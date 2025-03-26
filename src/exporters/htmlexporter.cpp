@@ -266,11 +266,19 @@ bool HtmlExporter::doExport(QIODevice *device)
                 }
             }
 
-            if (format.format.hasProperty(QTextFormat::TextUnderlineStyle)) {
-                if (format.format.fontUnderline()) {
-                    startCustomStyle();
-                    ts << "text-decoration: underline; ";
-                }
+            QStringList textDecorationCss;
+
+            if (format.format.hasProperty(QTextFormat::TextUnderlineStyle)
+                && format.format.fontUnderline())
+                textDecorationCss << "underline";
+
+            if (format.format.hasProperty(QTextFormat::FontStrikeOut)
+                && format.format.fontStrikeOut())
+                textDecorationCss << "line-through";
+
+            if (!textDecorationCss.isEmpty()) {
+                startCustomStyle();
+                ts << "text-decoration: " << textDecorationCss.join(" ") << "; ";
             }
 
             if (format.format.hasProperty(QTextFormat::BackgroundBrush)) {

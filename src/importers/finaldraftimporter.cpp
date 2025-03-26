@@ -119,6 +119,8 @@ bool FinalDraftImporter::doImport(QIODevice *device)
                 format.format.setFontItalic(true);
             if (styles.contains(QStringLiteral("Underline")))
                 format.format.setFontUnderline(true);
+            if (styles.contains(QStringLiteral("Strikeout")))
+                format.format.setFontStrikeOut(true);
 
             const QString colorAttr = QStringLiteral("Color");
             const QString backgroundAttr = QStringLiteral("Background");

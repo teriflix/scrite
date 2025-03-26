@@ -806,6 +806,11 @@ QJsonArray SceneElement::textFormatsToJson(const QVector<QTextLayout::FormatRang
                 attribs.insert(QLatin1String("underline"), true);
         }
 
+        if (format.hasProperty(QTextFormat::FontStrikeOut)) {
+            if (format.fontStrikeOut())
+                attribs.insert(QLatin1String("strikeout"), true);
+        }
+
         if (format.hasProperty(QTextFormat::BackgroundBrush)) {
             const QColor color = format.background().color();
             if (!qFuzzyIsNull(color.alphaF()))
@@ -852,6 +857,8 @@ QVector<QTextLayout::FormatRange> SceneElement::textFormatsFromJson(const QJsonA
                 format.setFontItalic(true);
             if (attribs.value(QLatin1String("underline")).toBool())
                 format.setFontUnderline(true);
+            if (attribs.value(QLatin1String("strikeout")).toBool())
+                format.setFontStrikeOut(true);
 
             auto applyBrush = [&](int property, const QJsonValue &value) {
                 QColor color(Qt::transparent);

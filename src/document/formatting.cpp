@@ -356,7 +356,7 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
     format.setFontStretch(font.stretch());
     format.setFontOverline(font.overline());
     format.setFontPointSize(font.pointSize());
-    format.setFontStrikeOut(font.strikeOut());
+    // format.setFontStrikeOut(font.strikeOut());
     format.setFontFixedPitch(font.fixedPitch());
     format.setFontWordSpacing(font.wordSpacing());
     format.setFontLetterSpacing(font.letterSpacing());
@@ -1168,6 +1168,18 @@ void TextFormat::setUnderline(bool val)
         emit formatChanged({ QTextFormat::FontUnderline, QTextFormat::TextUnderlineStyle });
 }
 
+void TextFormat::setStrikeout(bool val)
+{
+    if (m_strikeout == val)
+        return;
+
+    m_strikeout = val;
+    emit strikeoutChanged();
+
+    if (!m_updatingFromFormat)
+        emit formatChanged({ QTextFormat::FontStrikeOut });
+}
+
 void TextFormat::setTextColor(const QColor &val)
 {
     if (m_textColor == val)
@@ -1239,6 +1251,11 @@ void TextFormat::updateFromCharFormat(const QTextCharFormat &format)
         this->setUnderline(format.fontUnderline());
     else
         this->setUnderline(false);
+
+    if (format.hasProperty(QTextFormat::FontStrikeOut))
+        this->setStrikeout(format.fontStrikeOut());
+    else
+        this->setStrikeout(false);
 }
 
 QTextCharFormat TextFormat::toCharFormat(const QList<int> &properties) const
@@ -1266,14 +1283,19 @@ QTextCharFormat TextFormat::toCharFormat(const QList<int> &properties) const
         if (m_underline)
             format.setFontUnderline(m_underline);
 
+    if (properties.isEmpty() || properties.contains(QTextFormat::FontStrikeOut))
+        if (m_strikeout)
+            format.setFontStrikeOut(m_strikeout);
+
     return format;
 }
 
 QList<int> TextFormat::allProperties()
 {
-    return { QTextFormat::ForegroundBrush, QTextFormat::BackgroundBrush,
-             QTextFormat::FontWeight,      QTextFormat::FontItalic,
-             QTextFormat::FontUnderline,   QTextFormat::TextUnderlineStyle };
+    return { QTextFormat::ForegroundBrush,   QTextFormat::BackgroundBrush,
+             QTextFormat::FontWeight,        QTextFormat::FontItalic,
+             QTextFormat::FontUnderline,     QTextFormat::FontStrikeOut,
+             QTextFormat::TextUnderlineStyle };
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2200,11 +2222,7 @@ QString SceneDocumentBinder::nextTabFormatAsString() const
     const QString current =
             m_currentElement ? typeToString(m_currentElement->type()) : typeToString(-1);
     const QString next = typeToString(ntf);
-#ifdef Q_OS_MAC
-    return current + QStringLiteral(" → ") + next;
-#else
-    return current + QStringLiteral(" -> ") + next;
-#endif
+    return current + QString(QChar(0x2192)) + next;
 }
 
 int SceneDocumentBinder::nextTabFormat() const
