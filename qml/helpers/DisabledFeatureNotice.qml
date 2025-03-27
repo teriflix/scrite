@@ -102,7 +102,7 @@ Rectangle {
 
                 Layout.fillWidth: true
 
-                text: "To enable this feature, consider upgrading your plan."
+                text: "This feature is not available in your current subscription plan."
                 visible: text !== ""
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 
