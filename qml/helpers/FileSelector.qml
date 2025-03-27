@@ -86,7 +86,7 @@ Item {
             placeholderText: "File Name"
             text: fileInfo.baseName
             width: parent.width
-            onTextChanged: Qt.callLater( () => { fileInfo.baseName = text } )
+            onTextEdited: fileInfo.baseName = text
             TabSequenceItem.manager: tabSequenceManager
             visible: selectedExtension.value !== AbstractReportGenerator.AdobePDF
             enabled: visible

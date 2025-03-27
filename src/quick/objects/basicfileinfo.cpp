@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "basicfileinfo.h"
+#include "application.h"
 
 BasicFileInfo::BasicFileInfo(QObject *parent) : QObject(parent) { }
 
@@ -67,12 +68,23 @@ void BasicFileInfo::setBaseName(const QString &val)
 
     const QString afp = m_fileInfo.absolutePath() + QStringLiteral("/") + val + QStringLiteral(".")
             + m_fileInfo.suffix();
+
     this->setFileInfo(QFileInfo(afp));
 }
 
 void BasicFileInfo::setFileInfo(const QFileInfo &val)
 {
-    if (val == m_fileInfo)
+#ifdef Q_OS_WIN
+    const bool fileNamesAreCaseSensitive = false;
+#else
+    const bool fileNamesAreCaseSensitive = true;
+#endif
+    const QString currentFilePath =
+            m_fileInfo.exists() ? m_fileInfo.canonicalFilePath() : m_fileInfo.absoluteFilePath();
+    const QString newFilePath = val.exists() ? val.canonicalFilePath() : val.absoluteFilePath();
+    const int comparison = currentFilePath.compare(
+            newFilePath, fileNamesAreCaseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive);
+    if (comparison == 0)
         return;
 
     m_fileInfo = val;
