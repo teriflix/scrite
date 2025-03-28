@@ -4004,7 +4004,7 @@ Rectangle {
                                 radius: 2
                                 border { width: 2; color: Runtime.colors.primary.c600.background }
                                 color: Qt.rgba(0,0,0,0)
-                                visible: !scene.hasContent
+                                visible: !delegateItem.elementIsBreak && !scene.hasContent
 
                                 MouseArea {
                                     anchors.fill: parent

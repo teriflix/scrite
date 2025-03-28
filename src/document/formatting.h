@@ -82,6 +82,11 @@ public:
     QColor backgroundColor() const { return m_backgroundColor; }
     Q_SIGNAL void backgroundColorChanged();
 
+    Q_PROPERTY(qreal textIndent READ textIndent WRITE setTextIndent NOTIFY textIndentChanged)
+    void setTextIndent(qreal val);
+    qreal textIndent() const { return m_textIndent; }
+    Q_SIGNAL void textIndentChanged();
+
     Q_PROPERTY(qreal lineHeight READ lineHeight WRITE setLineHeight NOTIFY lineHeightChanged)
     void setLineHeight(qreal val);
     qreal lineHeight() const { return m_lineHeight; }
@@ -149,6 +154,7 @@ public:
         LineSpacingBefore,
         TextAlignment,
         TextAndBackgroundColors,
+        TextIndent,
         AllProperties
     };
     Q_ENUM(Properties)
@@ -172,6 +178,7 @@ private:
 
 private:
     QFont m_font;
+    qreal m_textIndent = 0.0;
     qreal m_lineHeight = 1.0;
     qreal m_leftMargin = 0;
     qreal m_rightMargin = 0;

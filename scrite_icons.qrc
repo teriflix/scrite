@@ -313,5 +313,9 @@
         <file>icons/content/persons_add_inverted.png</file>
         <file>icons/editor/format_strikethrough.png</file>
         <file>icons/editor/format_strikethrough_inverted.png</file>
+        <file>icons/editor/format_line_spacing.png</file>
+        <file>icons/editor/format_line_spacing_inverted.png</file>
+        <file>icons/editor/format_first_line_indent.png</file>
+        <file>icons/editor/format_first_line_indent_inverted.png</file>
     </qresource>
 </RCC>

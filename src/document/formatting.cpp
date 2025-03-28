@@ -220,6 +220,18 @@ void SceneElementFormat::setBackgroundColor(const QColor &val)
     emit elementFormatChanged();
 }
 
+void SceneElementFormat::setTextIndent(qreal val)
+{
+    qreal val2 = qBound(0.0, val, 100.0);
+    if (qFuzzyCompare(m_textIndent, val2))
+        return;
+
+    m_textIndent = val2;
+    emit textIndentChanged();
+
+    emit elementFormatChanged();
+}
+
 void SceneElementFormat::setLineHeight(qreal val)
 {
     qreal val2 = qBound(0.1, val, 2.0);
@@ -321,6 +333,9 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAli
     format.setRightMargin(rightMargin);
     format.setTopMargin(topMargin);
     format.setLineHeight(m_lineHeight * 100, QTextBlockFormat::ProportionalHeight);
+
+    if (m_textIndent > 0.0)
+        format.setTextIndent(m_textIndent);
 
     if (overrideAlignment != 0)
         format.setAlignment(overrideAlignment);
@@ -428,6 +443,7 @@ void SceneElementFormat::resetToFactoryDefaults()
     this->setLeftMargin(0);
     this->setRightMargin(0);
     this->setLineSpacingBefore(0);
+    this->setTextIndent(0);
     this->setTextColor(Qt::black);
     this->setBackgroundColor(Qt::transparent);
     this->setTextAlignment(Qt::AlignLeft);
@@ -808,6 +824,9 @@ void ScreenplayFormat::applyToAll(const SceneElementFormat *from,
         case SceneElementFormat::TextAndBackgroundColors:
             format->setTextColor(from->textColor());
             format->setBackgroundColor(from->backgroundColor());
+            break;
+        case SceneElementFormat::TextIndent:
+            format->setTextIndent(from->textIndent());
             break;
         default:
             break;

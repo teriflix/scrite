@@ -290,10 +290,10 @@ Item {
                 }
             }
 
-            ToolButton {
+            SimpleToolButton {
                 id: textLineHeight
                 property real value: 0.85
-                text: "Line Height: " + Math.round(value*100) + "%"
+                iconSource: "qrc:/icons/editor/format_line_spacing.png"
                 onClicked: textLineHeightEditor.open()
                 down: textLineHeightEditor.visible
 
@@ -315,6 +315,37 @@ Item {
                                 textLineHeight.value = v
                                 _private.printElementFormat.lineHeight = v
                                 _private.displayElementFormat.lineHeight = v
+                            }
+                        }
+                    }
+                }
+            }
+
+            SimpleToolButton {
+                id: firstLineIndent
+                property real value: 0
+                iconSource: "qrc:/icons/editor/format_first_line_indent.png"
+                onClicked: firstLineIndentEditor.open()
+                down: firstLineIndentEditor.visible
+
+                Item {
+                    width: parent.width
+                    anchors.bottom: parent.bottom
+
+                    Popup {
+                        id: firstLineIndentEditor
+                        closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
+                        contentItem: SpinBox {
+                            from: 0
+                            to: 100
+                            stepSize: 5
+                            editable: true
+                            value: firstLineIndent.value
+                            onValueModified: {
+                                const v = value
+                                firstLineIndent.value = v
+                                _private.printElementFormat.textIndent = v
+                                _private.displayElementFormat.textIndent = v
                             }
                         }
                     }
@@ -587,6 +618,13 @@ Item {
                         checked: false
                     }
 
+                    VclCheckBox {
+                        id: copyTextIndentAttrib
+                        text: "First Line Indent: " + Math.round(_private.displayElementFormat.textIndent) + "pt"
+                        padding: 0
+                        checked: false
+                    }
+
                     RowLayout {
                         spacing: 10
 
@@ -627,6 +665,7 @@ Item {
                             copyLineHeightAttrib.checked = true
                             copyTextAlignmentAttrib.checked = true
                             copyColorAttribs.checked = true
+                            copyTextIndentAttrib.checked = true
                         }
                     }
 
@@ -639,6 +678,7 @@ Item {
                             copyLineHeightAttrib.checked = false
                             copyTextAlignmentAttrib.checked = false
                             copyColorAttribs.checked = false
+                            copyTextIndentAttrib.checked = false
                         }
                     }
 
@@ -662,6 +702,8 @@ Item {
                                 applyToAll(SceneElementFormat.TextAlignment)
                             if(copyColorAttribs.checked)
                                 applyToAll(SceneElementFormat.TextAndBackgroundColors)
+                            if(copyTextIndentAttrib.checked)
+                                applyToAll(SceneElementFormat.TextIndent)
 
                             copyAttribsDialog.close()
                         }
@@ -687,6 +729,7 @@ Item {
             textBackground.selectedColor = Scrite.app.translucent(printElementFormat.backgroundColor, 4)
             textAlignment.value = printElementFormat.textAlignment
             textLineHeight.value = printElementFormat.lineHeight
+            firstLineIndent.value = printElementFormat.textIndent
         }
     }
 
