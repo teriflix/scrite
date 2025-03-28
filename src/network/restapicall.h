@@ -309,6 +309,11 @@ public:
     QString experience() const { return m_experience; }
     Q_SIGNAL void experienceChanged();
 
+    Q_PROPERTY(QString phone READ phone WRITE setPhone NOTIFY phoneChanged)
+    void setPhone(const QString &val);
+    QString phone() const { return m_phone; }
+    Q_SIGNAL void phoneChanged();
+
     Q_PROPERTY(QString wdyhas READ wdyhas WRITE setWdyhas NOTIFY wdyhasChanged)
     void setWdyhas(const QString &val);
     QString wdyhas() const { return m_wdyhas; }
@@ -325,6 +330,7 @@ public:
 
 private:
     QString m_email;
+    QString m_phone;
     QString m_wdyhas;
     QString m_lastName;
     QString m_firstName;

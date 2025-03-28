@@ -102,12 +102,32 @@ Item {
             }
 
             VclTextField {
-                id: experienceField
+                id: phoneField
 
                 Layout.fillWidth: true
 
                 TabSequenceItem.manager: userInfoFields
                 TabSequenceItem.sequence: 2
+
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
+
+                maximumLength: 32
+                selectByMouse: true
+                undoRedoEnabled: true
+                placeholderText: "Phone " + (length > 0 ? "" : "(optional)")
+
+                validator: RegExpValidator {
+                    regExp: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
+                }
+            }
+
+            VclTextField {
+                id: experienceField
+
+                Layout.fillWidth: true
+
+                TabSequenceItem.manager: userInfoFields
+                TabSequenceItem.sequence: 3
 
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
@@ -131,7 +151,7 @@ Item {
                 Layout.fillWidth: true
 
                 TabSequenceItem.manager: userInfoFields
-                TabSequenceItem.sequence: 3
+                TabSequenceItem.sequence: 4
 
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
 
@@ -212,6 +232,7 @@ Item {
                 lastName = nameComps.join(" ")
                 experience = experienceField.text.trim()
                 wdyhas = wdyhasField.text.trim()
+                phone = phoneField.text.trim()
 
                 call()
             }

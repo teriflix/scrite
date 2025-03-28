@@ -233,6 +233,7 @@ UserInfo::UserInfo(const QJsonObject &object)
     this->lastName = object.value("lastName").toString();
     this->fullName = object.value("fullName").toString();
     this->experience = object.value("experience").toString();
+    this->phone = object.value("phone").toString();
     this->city = object.value("city").toString();
     this->country = object.value("country").toString();
     this->wdyhas = object.value("wdyhas").toString();

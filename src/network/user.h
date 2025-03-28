@@ -238,6 +238,9 @@ public:
     Q_PROPERTY(QString experience MEMBER experience)
     QString experience;
 
+    Q_PROPERTY(QString phone MEMBER phone)
+    QString phone;
+
     Q_PROPERTY(QString city MEMBER city)
     QString city;
 

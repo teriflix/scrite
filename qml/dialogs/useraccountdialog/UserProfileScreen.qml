@@ -164,21 +164,46 @@ Item {
                     Layout.fillHeight: true
                 }
 
-                VclTextField {
-                    id: nameField
-
+                RowLayout {
                     Layout.fillWidth: true
 
-                    TabSequenceItem.manager: userInfoFields
-                    TabSequenceItem.sequence: 0
+                    VclTextField {
+                        id: nameField
 
-                    text: userProfilePage.userInfo.fullName
-                    maximumLength: 128
-                    placeholderText: "Name"
-                    undoRedoEnabled: true
+                        Layout.fillWidth: true
 
-                    onTextEdited: userInfoFields.needsSaving = true
+                        TabSequenceItem.manager: userInfoFields
+                        TabSequenceItem.sequence: 0
+
+                        text: userProfilePage.userInfo.fullName
+                        maximumLength: 128
+                        placeholderText: "Name"
+                        undoRedoEnabled: true
+
+                        onTextEdited: userInfoFields.needsSaving = true
+                    }
+
+                    VclTextField {
+                        id: phoneField
+
+                        Layout.fillWidth: true
+
+                        TabSequenceItem.manager: userInfoFields
+                        TabSequenceItem.sequence: 1
+
+                        text: userProfilePage.userInfo.phone
+                        maximumLength: 128
+                        placeholderText: "Phone (optional)"
+                        undoRedoEnabled: true
+
+                        onTextEdited: userInfoFields.needsSaving = true
+
+                        validator: RegExpValidator {
+                            regExp: /^\+?(\d{1,3})?[\s\-]?\(?\d{1,4}\)?[\s\-]?\d{1,4}[\s\-]?\d{1,4}$/
+                        }
+                    }
                 }
+
 
                 VclTextField {
                     id: experienceField
@@ -186,12 +211,12 @@ Item {
                     Layout.fillWidth: true
 
                     TabSequenceItem.manager: userInfoFields
-                    TabSequenceItem.sequence: 1
+                    TabSequenceItem.sequence: 2
 
                     text: userProfilePage.userInfo.experience
                     maximumLength: 128
                     maxVisibleItems: 6
-                    placeholderText: "Experience"
+                    placeholderText: "Experience (optional)"
                     undoRedoEnabled: true
                     completionStrings: [
                         "Hobby Writer",
@@ -214,7 +239,7 @@ Item {
                         Layout.fillWidth: true
 
                         TabSequenceItem.manager: userInfoFields
-                        TabSequenceItem.sequence: 2
+                        TabSequenceItem.sequence: 3
 
                         text: userProfilePage.userInfo.city
                         maximumLength: 128
@@ -241,10 +266,10 @@ Item {
                     Layout.fillWidth: true
 
                     TabSequenceItem.manager: userInfoFields
-                    TabSequenceItem.sequence: 3
+                    TabSequenceItem.sequence: 4
 
                     text: userProfilePage.userInfo.wdyhas
-                    placeholderText: "Where did you hear about Scrite?"
+                    placeholderText: "Where did you hear about Scrite? (optional)"
                     maximumLength: 128
                     completionStrings: [
                         "Facebook",
@@ -276,7 +301,7 @@ Item {
                         id: chkAnalyticsConsent
 
                         TabSequenceItem.manager: userInfoFields
-                        TabSequenceItem.sequence: 4
+                        TabSequenceItem.sequence: 5
 
                         text: "Send analytics data."
                         checked: userProfilePage.userInfo.consentToActivityLog
@@ -289,7 +314,7 @@ Item {
                         id: chkEmailConsent
 
                         TabSequenceItem.manager: userInfoFields
-                        TabSequenceItem.sequence: 5
+                        TabSequenceItem.sequence: 6
 
                         text: "Send marketing email."
                         checked: userProfilePage.userInfo.consentToEmail
@@ -368,6 +393,7 @@ Item {
                                     firstName: _firstName,
                                     lastName: _lastName,
                                     experience: experienceField.text.trim(),
+                                    phone: phoneField.text.trim(),
                                     city: cityField.text.trim(),
                                     country: locale.country.name,
                                     currency: locale.currency.code,

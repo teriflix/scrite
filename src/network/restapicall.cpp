@@ -680,6 +680,15 @@ void AppCheckUserRestApiCall::setExperience(const QString &val)
     emit experienceChanged();
 }
 
+void AppCheckUserRestApiCall::setPhone(const QString &val)
+{
+    if (m_phone == val)
+        return;
+
+    m_phone = val;
+    emit phoneChanged();
+}
+
 void AppCheckUserRestApiCall::setWdyhas(const QString &val)
 {
     if (m_wdyhas == val)
@@ -707,6 +716,9 @@ QJsonObject AppCheckUserRestApiCall::data() const
 
     if (!m_wdyhas.isEmpty())
         ret.insert("wdyhas", m_wdyhas);
+
+    if (!m_phone.isEmpty())
+        ret.insert("phone", m_phone);
 
     return ret;
 }
