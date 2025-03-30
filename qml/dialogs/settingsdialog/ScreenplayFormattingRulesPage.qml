@@ -161,6 +161,11 @@ Item {
                     }
                     return "qrc:/icons/editor/format_align_left.png"
                 }
+                hoverEnabled: true
+
+                ToolTip.text: "Paragraph Indentation"
+                ToolTip.visible: containsMouse
+
                 onClicked: textAlignmentMenu.open()
 
                 Item {
@@ -293,9 +298,14 @@ Item {
             SimpleToolButton {
                 id: textLineHeight
                 property real value: 0.85
-                iconSource: "qrc:/icons/editor/format_line_spacing.png"
-                onClicked: textLineHeightEditor.open()
                 down: textLineHeightEditor.visible
+                iconSource: "qrc:/icons/editor/format_line_spacing.png"
+                hoverEnabled: true
+
+                onClicked: textLineHeightEditor.open()
+
+                ToolTip.text: "Line Spacing"
+                ToolTip.visible: containsMouse
 
                 Item {
                     width: parent.width
@@ -324,9 +334,15 @@ Item {
             SimpleToolButton {
                 id: firstLineIndent
                 property real value: 0
-                iconSource: "qrc:/icons/editor/format_first_line_indent.png"
-                onClicked: firstLineIndentEditor.open()
+
                 down: firstLineIndentEditor.visible
+                iconSource: "qrc:/icons/editor/format_first_line_indent.png"
+                hoverEnabled: true
+
+                onClicked: firstLineIndentEditor.open()
+
+                ToolTip.text: "First Line Indent"
+                ToolTip.visible: containsMouse
 
                 Item {
                     width: parent.width
