@@ -276,6 +276,10 @@ bool RestApiCall::call()
     req.setHeader(QNetworkRequest::ContentLengthHeader, 0);
     req.setRawHeader(QByteArrayLiteral("Accept"), QByteArrayLiteral("application/json"));
     req.setRawHeader(QByteArrayLiteral("Accept-Encoding"), QByteArrayLiteral("identity"));
+    req.setRawHeader(QByteArrayLiteral("client-type"), QByteArrayLiteral("desktop-app"));
+    req.setRawHeader(QByteArrayLiteral("client-version"), QByteArrayLiteral(SCRITE_VERSION));
+    req.setRawHeader(QByteArrayLiteral("client-platform"),
+                     Application::instance()->platformAsString().toLatin1());
 
     NetworkAccessManager *nam = NetworkAccessManager::instance();
     if (this->type() == GET)
