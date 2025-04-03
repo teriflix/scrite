@@ -123,7 +123,11 @@ Item {
             function onInvalidApiKey() {
                 MessageBox.discardMessageBoxes()
 
-                MessageBox.information("Unsupported Version or Build", "This version or build of Scrite you are using is not supported anymore. Please install the latest version of Scrite from our website.", () => { Qt.quit() })
+                MessageBox.information("Unsupported Version or Build", "This version or build of Scrite you are using is not supported anymore. Please install the latest version of Scrite from our website.",
+                                       () => {
+                                           Qt.openUrlExternally("https://www.scrite.io/downloads")
+                                           Qt.quit()
+                                       })
             }
         }
 

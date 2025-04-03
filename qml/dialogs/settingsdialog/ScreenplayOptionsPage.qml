@@ -202,6 +202,20 @@ Item {
                     checked: Runtime.screenplayEditorSettings.pasteAfterResolvingEmphasis
                     onToggled: Runtime.screenplayEditorSettings.pasteAfterResolvingEmphasis = checked
                 }
+
+                VclCheckBox {
+                    Layout.fillWidth: true
+
+                    text: "When possible, link scenes while pasting."
+                    enabled: true
+                    checked: Runtime.screenplayEditorSettings.pasteByLinkingScenesWhenPossible
+                    hoverEnabled: true
+
+                    onToggled: Runtime.screenplayEditorSettings.pasteByLinkingScenesWhenPossible = checked
+
+                    ToolTip.visible: hovered
+                    ToolTip.text: "Copy/pasting within the screenplay editor links scenes, without creating duplicates. Uncheck this to allow creation of duplicate scenes."
+                }
             }
         }
     }

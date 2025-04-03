@@ -131,6 +131,7 @@ Item {
         property bool pasteAsFountain: true
         property bool pasteByMergingAdjacentElements: true
         property bool pasteAfterResolvingEmphasis: true
+        property bool pasteByLinkingScenesWhenPossible: true
     }
 
     readonly property Settings pdfExportSettings: Settings {

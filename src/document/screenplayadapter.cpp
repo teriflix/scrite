@@ -325,7 +325,7 @@ bool ScreenplayAdapter::canFetchMore(const QModelIndex &parent) const
         return false;
 
     if (this->isSourceScreenplay())
-        return m_adapterRowCount < INT_MAX;
+        return m_adapterRowCount < MAX_ELEMENT_COUNT;
 
     return false;
 }

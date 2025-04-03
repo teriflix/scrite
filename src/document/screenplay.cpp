@@ -2801,8 +2801,61 @@ void Screenplay::pasteAfter(int index)
     if (this->getPasteDataFromClipboard(clipboardJson)) {
         // If scenes were copied from screenplay editor, then we will get
         // structured JSON data.
-        const QJsonObject scenes = clipboardJson.value(QLatin1String("scenes")).toObject();
-        const QJsonArray elements = clipboardJson.value(QLatin1String("data")).toArray();
+        const bool pasteByLinkingScenesWhenPossible =
+                Application::instance()
+                        ->settings()
+                        ->value("Screenplay Editor/pasteByLinkingScenesWhenPossible", true)
+                        .toBool();
+
+        const QString scenesAttr = QLatin1String("scenes");
+        const QString dataAttr = QLatin1String("data");
+        const QString sceneIdAttr = QLatin1String("sceneID");
+
+        if (!pasteByLinkingScenesWhenPossible) {
+            QMap<QString, QString> sceneIdMap;
+
+            // Change sceneID attributes for all elements
+            QJsonArray elements = clipboardJson.value(dataAttr).toArray();
+            QJsonArray::iterator it = elements.begin();
+            QJsonArray::iterator end = elements.end();
+
+            while (it != end) {
+                QJsonObject elementObj = (*it).toObject();
+                const QString oldId = elementObj.value(sceneIdAttr).toString();
+                if (!oldId.isEmpty()) {
+                    const QString newId = QUuid::createUuid().toString();
+
+                    sceneIdMap.insert(oldId, newId);
+                    elementObj.insert(sceneIdAttr, newId);
+                    *it = elementObj;
+                }
+
+                ++it;
+            }
+
+            clipboardJson.insert(dataAttr, elements);
+
+            // Ensure that changed sceneIDs are reflected in the scenes list as well
+            QJsonObject newScenes;
+            QJsonObject scenes = clipboardJson.value(scenesAttr).toObject();
+            const QStringList sceneIds = scenes.keys();
+            for (const QString &oldSceneId : sceneIds) {
+                if (sceneIdMap.contains(oldSceneId)) {
+                    const QString newSceneId = sceneIdMap.value(oldSceneId);
+                    QJsonValue scene = scenes.take(oldSceneId);
+                    QJsonObject sceneObj = scene.toObject();
+                    sceneObj.insert(QLatin1String("id"), newSceneId);
+                    newScenes.insert(newSceneId, sceneObj);
+                } else {
+                    newScenes.insert(oldSceneId, scenes.take(oldSceneId));
+                }
+            }
+
+            clipboardJson.insert(scenesAttr, newScenes);
+        }
+
+        const QJsonObject scenes = clipboardJson.value(scenesAttr).toObject();
+        const QJsonArray elements = clipboardJson.value(dataAttr).toArray();
         cmd = new ScreenplayPasteUndoCommand(this, structure, elements, scenes, index);
     } else {
         const int pasteOptions = Screenplay::fountainPasteOptions();
