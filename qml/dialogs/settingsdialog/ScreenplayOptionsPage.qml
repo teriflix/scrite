@@ -94,6 +94,18 @@ Item {
                 VclCheckBox {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
+                    text: "Capture Invisible Characters"
+                    checked: Runtime.screenplayEditorSettings.captureInvisibleCharacters
+                    onToggled: Runtime.screenplayEditorSettings.captureInvisibleCharacters = checked
+                    hoverEnabled: true
+
+                    ToolTip.visible: hovered
+                    ToolTip.text: "In a scene if a dialogues are only written in parenthesis (eg: VO, OS, etc..), then the character will be captured as invisible."
+                }
+
+                VclCheckBox {
+                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
+
                     text: "Auto Adjust Editor Width"
                     checked: Runtime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor
                     onToggled: Runtime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor = checked

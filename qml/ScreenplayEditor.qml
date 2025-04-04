@@ -3576,16 +3576,31 @@ Rectangle {
                     color: colors.background
                     textColor: colors.text
                     text: modelData
+                    enabled: !Scrite.document.readOnly
                     topPadding: Math.max(5, 5 * zoomLevel); bottomPadding: topPadding
                     leftPadding: Math.max(10, 10 * zoomLevel); rightPadding: leftPadding
                     font.family: headingFontMetrics.font.family
                     font.capitalization: headingFontMetrics.font.capitalization
                     font.pointSize: sceneHeadingFieldsFontPointSize
-                    closable: scene.isCharacterMute(modelData) && !Scrite.document.readOnly
                     onClicked: requestCharacterMenu(modelData, characterNameLabel)
                     onCloseRequest: {
                         if(!Scrite.document.readOnly)
                             scene.removeMuteCharacter(modelData)
+                    }
+
+                    function determineFlags() {
+                        const chMute = scene.isCharacterMute(modelData)
+                        closable = chMute
+
+                        const chVisible = Runtime.screenplayEditorSettings.captureInvisibleCharacters ? (chMute || scene.isCharacterVisible(modelData)) : true
+                        font.italic = !chVisible
+                        opacity = chVisible ? 1 : 0.65
+                    }
+
+                    Component.onCompleted: {
+                        determineFlags()
+                        scene.sceneChanged.connect(determineFlags)
+                        Runtime.screenplayEditorSettings.captureInvisibleCharactersChanged.connect(determineFlags)
                     }
                 }
             }

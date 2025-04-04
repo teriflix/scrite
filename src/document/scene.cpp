@@ -1439,6 +1439,20 @@ bool Scene::isCharacterMute(const QString &characterName) const
     return (value.isValid() && value.toBool());
 }
 
+bool Scene::isCharacterVisible(const QString &characterName) const
+{
+    const QList<SceneElement *> elements = m_characterElementMap.characterElements(characterName);
+    if (elements.isEmpty())
+        return false;
+
+    for (const SceneElement *element : elements) {
+        if (element->text().indexOf('(') < 0)
+            return true;
+    }
+
+    return false;
+}
+
 void Scene::scanMuteCharacters(const QStringList &characterNames)
 {
     QStringList names = characterNames;

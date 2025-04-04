@@ -419,6 +419,7 @@ public:
     Q_INVOKABLE void addMuteCharacter(const QString &characterName);
     Q_INVOKABLE void removeMuteCharacter(const QString &characterName);
     Q_INVOKABLE bool isCharacterMute(const QString &characterName) const;
+    Q_INVOKABLE bool isCharacterVisible(const QString &characterName) const;
     void scanMuteCharacters(const QStringList &characterNames = QStringList());
 
     Q_PROPERTY(QString act READ act NOTIFY actChanged STORED false)
