@@ -80,6 +80,17 @@ FloatingDock {
     }
 
     Shortcut {
+        sequence: "Ctrl+R"
+        context: Qt.ApplicationShortcut
+        enabled: _private.textFormat && Runtime.allowAppUsage
+        ShortcutsModelItem.title: "Strikeout"
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.group: "Markup Tools"
+        ShortcutsModelItem.enabled: enabled
+        onActivated: _private.textFormat.toggleStrikeout()
+    }
+
+    Shortcut {
         sequence: "Shift+F3"
         context: Qt.ApplicationShortcut
         enabled: sceneDocumentBinder && Runtime.allowAppUsage
@@ -146,7 +157,7 @@ FloatingDock {
             }
 
             SimpleToolButton {
-                ToolTip.text: "Strikeout\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+K")
+                ToolTip.text: "Strikeout\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+R")
                 ToolTip.visible: containsMouse
 
                 checked: _private.textFormat ? _private.textFormat.strikeout : false
