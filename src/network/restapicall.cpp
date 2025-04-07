@@ -981,10 +981,11 @@ InstallationUpdateRestApiCall::~InstallationUpdateRestApiCall() { }
 
 QJsonObject InstallationUpdateRestApiCall::data() const
 {
-    return { { "platform", Application::instance()->platform() },
+    return { { "platform", Application::instance()->platformAsString() },
              { "platformVersion", Application::instance()->platformVersion() },
              { "platformType", Application::instance()->platformType() },
-             { "appVersion", QStringLiteral(SCRITE_VERSION) } };
+             { "appVersion", QStringLiteral(SCRITE_VERSION) },
+             { "hostName", Application::instance()->hostName() } };
 }
 
 void InstallationUpdateRestApiCall::setResponse(const QJsonObject &val)

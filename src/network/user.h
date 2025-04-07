@@ -56,6 +56,9 @@ public:
     Q_PROPERTY(QString platformType MEMBER platformType)
     QString platformType;
 
+    Q_PROPERTY(QString hostName MEMBER hostName)
+    QString hostName;
+
     Q_PROPERTY(QString appVersion MEMBER appVersion)
     QString appVersion;
 
@@ -449,6 +452,7 @@ private:
     void setInfo(const UserInfo &val);
     void setMessages(const QList<UserMessage> &val);
     void checkIfSubscriptionIsAboutToExpire();
+    void checkIfInstallationInfoNeedsUpdate();
 
     void checkForMessagesNow();
     void storeMessages();

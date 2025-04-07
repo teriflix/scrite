@@ -40,6 +40,7 @@
 #include <QKeyEvent>
 #include <QDateTime>
 #include <QMetaEnum>
+#include <QHostInfo>
 #include <QQuickItem>
 #include <QJsonArray>
 #include <QClipboard>
@@ -501,9 +502,22 @@ Application::Platform Application::platform() const
 QString Application::platformVersion() const
 {
     const auto osver = QOperatingSystemVersion::current();
-    if (osver.majorVersion() > 0)
+    if (osver.majorVersion() > 0) {
+#ifdef Q_OS_WIN
+        if (osver.majorVersion() == 10) {
+            if (osver.minorVersion() == 0) {
+                const QString os = (osver.microVersion() >= 22000 ? "11" : " 10");
+                return os + ", Build-" + QString::number(osver.microVersion());
+            }
+
+            return QVersionNumber(osver.majorVersion(), osver.minorVersion(), osver.microVersion())
+                    .toString();
+        }
+#else
         return QVersionNumber(osver.majorVersion(), osver.minorVersion(), osver.microVersion())
                 .toString();
+#endif
+    }
 
     return QSysInfo::productVersion();
 }
@@ -514,6 +528,11 @@ QString Application::platformType() const
         return QStringLiteral("x86");
 
     return QStringLiteral("x64");
+}
+
+QString Application::hostName() const
+{
+    return QHostInfo::localHostName();
 }
 
 QStringList Application::availableThemes()

@@ -141,6 +141,9 @@ public:
     Q_PROPERTY(QString platformType READ platformType CONSTANT)
     QString platformType() const;
 
+    Q_PROPERTY(QString hostName READ hostName CONSTANT)
+    QString hostName() const;
+
     Q_PROPERTY(QStringList availableThemes READ availableThemes CONSTANT)
     static QStringList availableThemes();
     static QString queryQtQuickStyleFor(const QString &theme);

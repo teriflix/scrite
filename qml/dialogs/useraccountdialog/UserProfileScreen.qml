@@ -1048,7 +1048,13 @@ Item {
                                         Layout.fillWidth: true
 
                                         font.bold: modelData.isCurrent
-                                        text: modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
+                                        text: {
+                                            let ret = ""
+                                            if(modelData.hostName !== "")
+                                                ret = modelData.hostName + ": "
+                                            ret += modelData.platform + " " + modelData.platformVersion + " (" + modelData.platformType + ")"
+                                            return ret
+                                        }
                                         elide: Text.ElideRight
                                     }
 

@@ -77,6 +77,7 @@ UserInstallationInfo::UserInstallationInfo(const QJsonObject &object)
     this->platformVersion = object.value("platformVersion").toString();
     this->platformType = object.value("platformType").toString();
     this->appVersion = object.value("appVersion").toString();
+    this->hostName = object.value("hostName").toString();
     this->pastAppVersions = JsonArrayToStringList(object.value("appVersions").toArray());
     this->creationDate =
             QDateTime::fromString(object.value("creationDate").toString(), Qt::ISODateWithMs);
@@ -517,6 +518,7 @@ void User::setInfo(const UserInfo &val)
     emit infoChanged();
 
     QTimer::singleShot(100, this, &User::checkIfSubscriptionIsAboutToExpire);
+    QTimer::singleShot(100, this, &User::checkIfInstallationInfoNeedsUpdate);
 }
 
 void User::setMessages(const QList<UserMessage> &val)
@@ -559,6 +561,37 @@ void User::checkIfSubscriptionIsAboutToExpire()
     const int nrDays = QDate::currentDate().daysTo(m_info.subscribedUntil.date()) + 1;
     if (nrDays >= 0 && nrDays < subscriptionTreshold)
         emit subscriptionAboutToExpire(nrDays);
+}
+
+void User::checkIfInstallationInfoNeedsUpdate()
+{
+    if (m_info.isValid()) {
+        if (this->findChild<InstallationUpdateRestApiCall *>(QString(),
+                                                             Qt::FindDirectChildrenOnly)) {
+            QTimer::singleShot(100, this, &User::checkIfInstallationInfoNeedsUpdate);
+            return;
+        }
+
+        const UserInstallationInfo deviceInfo = [](const UserInfo &info) -> UserInstallationInfo {
+            for (const UserInstallationInfo &deviceInfo : info.installations) {
+                if (deviceInfo.isValid() && deviceInfo.isCurrent())
+                    return deviceInfo;
+            }
+            return UserInstallationInfo();
+        }(m_info);
+
+        if (deviceInfo.isValid()
+            && deviceInfo.appVersion == Application::instance()->versionAsString()
+            && deviceInfo.hostName == Application::instance()->hostName()
+            && deviceInfo.platform == Application::instance()->platformAsString()
+            && deviceInfo.platformVersion == Application::instance()->platformVersion()
+            && deviceInfo.platformType == Application::instance()->platformType())
+            return;
+
+        InstallationUpdateRestApiCall *call = new InstallationUpdateRestApiCall(this);
+        call->setAutoDelete(true);
+        call->queue(RestApi::instance()->sessionApiQueue());
+    }
 }
 
 void User::checkForMessagesNow()
