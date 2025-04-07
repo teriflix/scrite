@@ -764,6 +764,7 @@ AppRequestActivationCodeRestApiCall::~AppRequestActivationCodeRestApiCall() { }
 QJsonObject AppRequestActivationCodeRestApiCall::data() const
 {
     return { { "email", "$email" },
+             { "hostName", Application::instance()->hostName() },
              { "clientId", Application::instance()->installationId() },
              { "deviceId", Application::instance()->deviceId() },
              { "platform", Application::instance()->platformAsString() },

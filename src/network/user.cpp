@@ -565,6 +565,10 @@ void User::checkIfSubscriptionIsAboutToExpire()
 
 void User::checkIfInstallationInfoNeedsUpdate()
 {
+    static int checkCounter = 0;
+    if (checkCounter > 0)
+        return;
+
     if (m_info.isValid()) {
         if (this->findChild<InstallationUpdateRestApiCall *>(QString(),
                                                              Qt::FindDirectChildrenOnly)) {
@@ -586,10 +590,6 @@ void User::checkIfInstallationInfoNeedsUpdate()
             && deviceInfo.platform == Application::instance()->platformAsString()
             && deviceInfo.platformVersion == Application::instance()->platformVersion()
             && deviceInfo.platformType == Application::instance()->platformType())
-            return;
-
-        static int checkCounter = 0;
-        if (checkCounter > 0)
             return;
 
         InstallationUpdateRestApiCall *call = new InstallationUpdateRestApiCall(this);
