@@ -501,13 +501,11 @@ Application::Platform Application::platform() const
 QString Application::platformVersion() const
 {
     const auto osver = QOperatingSystemVersion::current();
+    if (osver.majorVersion() > 0)
+        return QVersionNumber(osver.majorVersion(), osver.minorVersion(), osver.microVersion())
+                .toString();
 
-    return
-#ifdef Q_OS_MAC
-            osver.name() + "-" +
-#endif
-            QVersionNumber(osver.majorVersion(), osver.minorVersion(), osver.microVersion())
-                    .toString();
+    return QSysInfo::productVersion();
 }
 
 QString Application::platformType() const

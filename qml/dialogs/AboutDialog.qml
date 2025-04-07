@@ -61,7 +61,7 @@ DialogLauncher {
                 anchors.right: parent.right
                 anchors.margins: 30
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-                text: Scrite.app.applicationVersion
+                text: "Version-"+Scrite.app.versionAsString + " for " + [Scrite.app.platformAsString, Scrite.app.platformVersion].join("-")
                 font.letterSpacing: Runtime.applicationSettings.enableAnimations ? 20 : 0
 
                 NumberAnimation {

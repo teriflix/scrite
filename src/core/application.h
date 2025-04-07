@@ -89,6 +89,12 @@ public:
     Q_INVOKABLE QString urlToLocalFile(const QUrl &url) const { return url.toLocalFile(); }
     Q_INVOKABLE QUrl toHttpUrl(const QUrl &url) const;
 
+    Q_PROPERTY(QVersionNumber version READ version CONSTANT)
+    QVersionNumber version() const { return m_versionNumber; }
+
+    Q_PROPERTY(QString versionAsString READ versionAsString CONSTANT)
+    QString versionAsString() const { return m_versionNumber.toString(); }
+
     enum Platform { LinuxDesktop, WindowsDesktop, MacOS };
     Q_ENUM(Platform)
     Q_PROPERTY(Platform platform READ platform CONSTANT)
