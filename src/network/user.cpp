@@ -588,7 +588,12 @@ void User::checkIfInstallationInfoNeedsUpdate()
             && deviceInfo.platformType == Application::instance()->platformType())
             return;
 
+        static int checkCounter = 0;
+        if (checkCounter > 0)
+            return;
+
         InstallationUpdateRestApiCall *call = new InstallationUpdateRestApiCall(this);
+        connect(call, &InstallationUpdateRestApiCall::justIssuedCall, []() { ++checkCounter; });
         call->setAutoDelete(true);
         call->queue(RestApi::instance()->sessionApiQueue());
     }
