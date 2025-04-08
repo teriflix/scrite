@@ -43,6 +43,13 @@ public:
     bool isUseScriteFonts() const { return m_useScriteFonts; }
     Q_SIGNAL void useScriteFontsChanged();
 
+    Q_CLASSINFO("includeSceneSynopsis_FieldLabel", "Include scene synopsis.")
+    Q_CLASSINFO("includeSceneSynopsis_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool includeSceneSynopsis READ isIncludeSceneSynopsis WRITE setIncludeSceneSynopsis NOTIFY includeSceneSynopsisChanged)
+    void setIncludeSceneSynopsis(bool val);
+    bool isIncludeSceneSynopsis() const { return m_includeSceneSynopsis; }
+    Q_SIGNAL void includeSceneSynopsisChanged();
+
     bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return true; }
 
@@ -57,6 +64,7 @@ private:
     bool m_markLanguagesExplicitly = true;
 #endif
     bool m_useScriteFonts = false;
+    bool m_includeSceneSynopsis = true;
 };
 
 #endif // FINALDRAFTEXPORTER_H

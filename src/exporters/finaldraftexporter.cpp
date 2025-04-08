@@ -41,6 +41,15 @@ void FinalDraftExporter::setUseScriteFonts(bool val)
     emit useScriteFontsChanged();
 }
 
+void FinalDraftExporter::setIncludeSceneSynopsis(bool val)
+{
+    if (m_includeSceneSynopsis == val)
+        return;
+
+    m_includeSceneSynopsis = val;
+    emit includeSceneSynopsisChanged();
+}
+
 static QString fdxColorCode(const QColor &color)
 {
     const QChar fillChar('0');
@@ -230,31 +239,34 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                     moments.append(heading->moment());
             }
 
-            if (scene->hasSynopsis() || (selement && selement->hasNativeTitle())) {
-                QDomElement scenePropsE = doc.createElement(QStringLiteral("SceneProperties"));
-                paragraphE.appendChild(scenePropsE);
-                if (selement && selement->hasNativeTitle())
-                    scenePropsE.setAttribute(QStringLiteral("Title"), selement->nativeTitle());
+            if (m_includeSceneSynopsis) {
+                if (scene->hasSynopsis() || (selement && selement->hasNativeTitle())) {
+                    QDomElement scenePropsE = doc.createElement(QStringLiteral("SceneProperties"));
+                    paragraphE.appendChild(scenePropsE);
+                    if (selement && selement->hasNativeTitle())
+                        scenePropsE.setAttribute(QStringLiteral("Title"), selement->nativeTitle());
 
-                const QColor sceneColor = scene->color();
-                const QColor tintColor(QStringLiteral("#E7FFFFFF"));
-                const QColor exportSceneColor =
-                        QColor::fromRgbF((sceneColor.redF() + tintColor.redF()) / 2,
-                                         (sceneColor.greenF() + tintColor.greenF()) / 2,
-                                         (sceneColor.blueF() + tintColor.blueF()) / 2,
-                                         (sceneColor.alphaF() + tintColor.alphaF()) / 2);
+                    const QColor sceneColor = scene->color();
+                    const QColor tintColor(QStringLiteral("#E7FFFFFF"));
+                    const QColor exportSceneColor =
+                            QColor::fromRgbF((sceneColor.redF() + tintColor.redF()) / 2,
+                                             (sceneColor.greenF() + tintColor.greenF()) / 2,
+                                             (sceneColor.blueF() + tintColor.blueF()) / 2,
+                                             (sceneColor.alphaF() + tintColor.alphaF()) / 2);
 
-                scenePropsE.setAttribute(QStringLiteral("Color"), fdxColorCode(exportSceneColor));
+                    scenePropsE.setAttribute(QStringLiteral("Color"),
+                                             fdxColorCode(exportSceneColor));
 
-                if (scene->hasSynopsis()) {
-                    QDomElement summaryE = doc.createElement(QStringLiteral("Summary"));
-                    scenePropsE.appendChild(summaryE);
+                    if (scene->hasSynopsis()) {
+                        QDomElement summaryE = doc.createElement(QStringLiteral("Summary"));
+                        scenePropsE.appendChild(summaryE);
 
-                    QDomElement summaryParagraphE = doc.createElement(QStringLiteral("Paragraph"));
-                    summaryE.appendChild(summaryParagraphE);
+                        QDomElement summaryParagraphE =
+                                doc.createElement(QStringLiteral("Paragraph"));
+                        summaryE.appendChild(summaryParagraphE);
 
-                    const QString synopsis = scene->synopsis();
-                    QVector<QTextLayout::FormatRange> formats;
+                        const QString synopsis = scene->synopsis();
+                        QVector<QTextLayout::FormatRange> formats;
 
 #if 0
                     // We don't need to apply scene color to synopsis text also.
@@ -266,7 +278,8 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                     format.format.setForeground(Application::textColorFor(exportSceneColor));
                     formats.append(format);
 #endif
-                    addTextToParagraph(summaryParagraphE, synopsis, Qt::Alignment(), formats);
+                        addTextToParagraph(summaryParagraphE, synopsis, Qt::Alignment(), formats);
+                    }
                 }
             }
         }
