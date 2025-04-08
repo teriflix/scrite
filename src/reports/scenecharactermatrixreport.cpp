@@ -13,9 +13,11 @@
 
 #include "scenecharactermatrixreport.h"
 #include "transliteration.h"
+#include "application.h"
 
 #include <QPrinter>
 #include <QPainter>
+#include <QSettings>
 #include <QPdfWriter>
 #include <QTextTable>
 
@@ -268,6 +270,13 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
         cursor.insertImage(resourceName);
     }
 
+    // Check if invisible characters are being captured
+    const bool invisibleCharactersCaptured =
+            Application::instance()
+                    ->settings()
+                    ->value("Screenplay Editor/captureInvisibleCharacters")
+                    .toBool();
+
     // Mark cells
     int sceneNumber = 0;
     for (const ScreenplayElement *element : qAsConst(screenplayElements)) {
@@ -275,6 +284,8 @@ bool SceneCharacterMatrixReport::doGenerate(QTextDocument *document)
         if (scene) {
             const QStringList characters = scene->characterNames();
             for (const QString &character : characters) {
+                if (invisibleCharactersCaptured && !scene->isCharacterVisible(character))
+                    continue;
                 const int row =
                         m_type == SceneVsCharacter ? sceneNumber : rowHeadings.indexOf(character);
                 const int column = m_type == SceneVsCharacter ? columnHeadings.indexOf(character)
@@ -344,8 +355,15 @@ bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
     }
     ts << "\n";
 
+    // Check if invisible characters are being captured
+    const bool invisibleCharactersCaptured =
+            Application::instance()
+                    ->settings()
+                    ->value("Screenplay Editor/captureInvisibleCharacters")
+                    .toBool();
+
     // Row contents
-    const QString checkMark = m_marker.isEmpty() ? QStringLiteral("✓") : escapeComma(m_marker);
+    const QString checkMark = m_marker.isEmpty() ? QStringLiteral("-") : escapeComma(m_marker);
     for (int i = 0; i < nrRows; i++) {
         if (m_type == SceneVsCharacter) {
             Scene *scene = screenplayElements.at(i)->scene();
@@ -373,7 +391,9 @@ bool SceneCharacterMatrixReport::directExportToOdf(QIODevice *device)
                 characterName = m_characterNames.at(i);
             }
 
-            if (scene->characterNames().contains(characterName))
+            const QStringList sceneCharacters = scene->characterNames();
+            if (sceneCharacters.contains(characterName)
+                && (invisibleCharactersCaptured ? scene->isCharacterVisible(characterName) : true))
                 ts << checkMark;
         }
 
