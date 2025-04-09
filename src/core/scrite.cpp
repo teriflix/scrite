@@ -118,7 +118,7 @@ Locale Scrite::locale()
 QString Scrite::currencySymbol(const QString &code)
 {
     const QString code2 = code.toLower();
-    static const QMap<QString, QString> knownValues = { { "inr", "₹" }, { "usd", "$" } };
+    static const QMap<QString, QString> knownValues = { { "inr", RUPEE_SYMBOL }, { "usd", "$" } };
     if (knownValues.contains(code2))
         return knownValues.value(code2);
 

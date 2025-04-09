@@ -57,3 +57,5 @@ compile_commands.json
 ~$*.pptx
 ~$*.docx
 ~$*.pdf
+
+build/*

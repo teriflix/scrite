@@ -3401,8 +3401,10 @@ void ScreenplayTextObjectInterface::drawSceneNumber(QPainter *painter, const QRe
     if (sceneNumber.isEmpty())
         return;
 
+    const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
+
     QRectF rect = givenRect;
-    rect.setLeft(rect.left() * 0.55);
+    rect.setLeft(rootFrameFormat.leftMargin() * 0.55);
 
     const QString sceneNumberText = sceneNumber + QStringLiteral(".");
     this->drawText(painter, rect, sceneNumberText);
@@ -3464,8 +3466,10 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     if (icon.isNull())
         return;
 
+    const QTextFrameFormat rootFrameFormat = doc->rootFrame()->frameFormat();
+
     QRectF rect = givenRect;
-    rect.setLeft(rect.left() * 0.45);
+    rect.setLeft(rootFrameFormat.leftMargin() * 0.45);
     rect.moveBottom(rect.bottom() + iconSize * 0.15);
     rect = QRectF(rect.left() - iconSize, rect.bottom() - iconSize, iconSize, iconSize);
 

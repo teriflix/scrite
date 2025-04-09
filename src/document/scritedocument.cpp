@@ -18,9 +18,10 @@
 #include "scrite.h"
 #include "undoredo.h"
 #include "fountain.h"
+#include "hourglass.h"
 #include "callgraph.h"
 #include "filelocker.h"
-#include "hourglass.h"
+#include "restapicall.h"
 #include "aggregation.h"
 #include "application.h"
 #include "pdfexporter.h"
@@ -33,8 +34,8 @@
 #include "notebookreport.h"
 #include "qobjectfactory.h"
 #include "locationreport.h"
+#include "twocolumnreport.h"
 #include "characterreport.h"
-#include "restapicall.h"
 #include "statisticsreport.h"
 #include "fountainimporter.h"
 #include "fountainexporter.h"
@@ -691,6 +692,7 @@ DeviceIOFactories::DeviceIOFactories()
     ReportsFactory.addClass<SceneCharacterMatrixReport>();
     ReportsFactory.addClass<StatisticsReport>();
     ReportsFactory.addClass<NotebookReport>();
+    ReportsFactory.addClass<TwoColumnReport>();
 }
 
 DeviceIOFactories::~DeviceIOFactories() { }

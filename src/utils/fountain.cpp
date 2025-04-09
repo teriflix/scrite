@@ -697,8 +697,8 @@ void Fountain::Parser::processNotes()
 void Fountain::Parser::processEmphasis()
 {
     /*
-     * Fountain follows MarkdownÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾Ãƒâ€šÃ‚Â¢s rules for emphasis, except
-     * that it reserves the use of underscores for underlining, which is not interchangeable with
+     * Fountain follows Markdown's rules for emphasis, except that it reserves the
+     * use of underscores for underlining, which is not interchangeable with
      * italics in a screenplay.
      *      * *italics*
      * **bold**
@@ -1105,10 +1105,7 @@ void Fountain::Writer::writeCharacter(QTextStream &ts, const Element &element) c
 
     ts << newline;
 
-    // You can force a Character element by preceding it with the
-    // ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œatÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â
-    // symbol
-    // @.
+    // You can force a Character element by preceding it with the "at" symbol @.
     if (m_options & StrictSyntaxOption)
         ts << "@";
 

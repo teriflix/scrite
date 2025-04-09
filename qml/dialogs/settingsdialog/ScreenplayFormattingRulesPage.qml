@@ -402,7 +402,7 @@ Item {
                         elements: [
                             SceneElement {
                                 type: SceneElement.Heading
-                                text: "INT. SOMEPLACE - DAY"
+                                text: "INT. CLUB - DAY"
                             },
                             SceneElement {
                                 type: SceneElement.Action

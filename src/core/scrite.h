@@ -25,6 +25,8 @@
 
 #include <QQmlEngine>
 
+#define RUPEE_SYMBOL "₹"
+
 struct Country
 {
     Q_GADGET

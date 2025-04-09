@@ -130,6 +130,7 @@ HEADERS += \
     src/reports/scenecharactermatrixreport.h \
     src/reports/statisticsreport.h \
     src/reports/statisticsreport_p.h \
+    src/reports/twocolumnreport.h \
     src/utils/execlatertimer.h \
     src/utils/fountain.h \
     src/utils/graphlayout.h \
@@ -264,6 +265,7 @@ SOURCES += \
     src/reports/scenecharactermatrixreport.cpp \
     src/reports/statisticsreport.cpp \
     src/reports/statisticsreport_p.cpp \
+    src/reports/twocolumnreport.cpp \
     src/utils/execlatertimer.cpp \
     src/utils/fountain.cpp \
     src/utils/genericarraymodel.cpp \

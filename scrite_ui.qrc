@@ -180,5 +180,6 @@
         <file>qml/globals/SubscriptionPlanOperations.qml</file>
         <file>qml/dialogs/SubscriptionDetailsDialog.qml</file>
         <file>qml/dialogs/TrialNotActivatedDialog.qml</file>
+        <file>qml/dialogs/reportconfigurationdialog/editor_TwoColumnLayoutSelector.qml</file>
     </qresource>
 </RCC>

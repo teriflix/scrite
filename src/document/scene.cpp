@@ -513,11 +513,12 @@ QString SceneElement::formattedText() const
     }
 
     switch (m_type) {
-    case SceneElement::Shot:
     case SceneElement::Heading:
     case SceneElement::Character:
-    case SceneElement::Transition:
         return m_text.toUpper();
+    case SceneElement::Shot:
+    case SceneElement::Transition:
+        return m_text.toUpper() + (m_text.endsWith(':') ? "" : ":");
     default:
         break;
     }

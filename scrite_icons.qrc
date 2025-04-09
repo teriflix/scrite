@@ -317,5 +317,9 @@
         <file>icons/editor/format_line_spacing_inverted.png</file>
         <file>icons/editor/format_first_line_indent.png</file>
         <file>icons/editor/format_first_line_indent_inverted.png</file>
+        <file>icons/reports/twocolumn_report.png</file>
+        <file>icons/reports/twocolumn-av-layout.png</file>
+        <file>icons/reports/twocolumn-left-layout.png</file>
+        <file>icons/reports/twocolumn-right-layout.png</file>
     </qresource>
 </RCC>
