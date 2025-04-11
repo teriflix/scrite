@@ -27,6 +27,7 @@
 #include <QScopeGuard>
 #include <QJsonObject>
 #include <QMetaObject>
+#include <QDomDocument>
 #include <QMetaClassInfo>
 #include <QTextDocumentWriter>
 
@@ -237,6 +238,8 @@ bool AbstractReportGenerator::generate()
         writer.setDevice(&file);
         this->configureWriter(&writer, &textDocument);
         writer.write(&textDocument);
+        file.close();
+        this->polishOdtContent(fileName);
     } else {
         QScopedPointer<QPdfWriter> qpdfWriter;
         QScopedPointer<QPrinter> qprinter;
@@ -317,4 +320,59 @@ bool AbstractReportGenerator::usePdfWriter() const
 #else
     return false; // Qt 5.15.7's PdfWriter is broken!
 #endif
+}
+
+void AbstractReportGenerator::polishOdtContent(const QString &fileName)
+{
+    if (m_format == OpenDocumentFormat && this->requiresOdtContentPolish()) {
+        // Unzip contents
+        const QFileInfo fi(fileName);
+
+        QTemporaryDir tmpDir;
+        tmpDir.setAutoRemove(true);
+
+        if (!Scrite::doUnzip(fi, tmpDir)) {
+            return;
+        }
+
+        // Load XML
+        const QString contentXmlFilePath = tmpDir.filePath("content.xml");
+        if (!QFile::exists(contentXmlFilePath))
+            return;
+
+        QFile contentXmlFile(contentXmlFilePath);
+        if (!contentXmlFile.open(QFile::ReadOnly))
+            return;
+
+        QDomDocument contentXmlDom;
+
+        QString errMsg;
+        int errLine = -1, errCol = -1;
+        if (!contentXmlDom.setContent(&contentXmlFile, &errMsg, &errLine, &errCol)) {
+            return;
+        }
+
+        contentXmlFile.close();
+
+        // Polish & Save
+        if (!this->polishOdtContent(contentXmlDom))
+            return;
+
+        if (!contentXmlFile.open(QFile::WriteOnly))
+            return;
+
+        QTextStream ts(&contentXmlFile);
+        ts.setCodec("utf-8");
+        ts.setAutoDetectUnicode(true);
+        ts << contentXmlDom.toString();
+        ts.flush();
+
+        contentXmlFile.close();
+
+        // Zip Contents
+        Scrite::doZip(fi, QDir(tmpDir.path()),
+                      { qMakePair<QString, int>("mimetype", 0),
+                        qMakePair<QString, int>("content.xml", -1),
+                        qMakePair<QString, int>("META-INF/manifest.xml", -1) });
+    }
 }

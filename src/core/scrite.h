@@ -23,7 +23,9 @@
 #include "notificationmanager.h"
 #include "scritedocumentvault.h"
 
+#include <QFileInfo>
 #include <QQmlEngine>
+#include <QTemporaryDir>
 
 #define RUPEE_SYMBOL "₹"
 
@@ -203,6 +205,11 @@ public:
                                              const QStringList &features);
     Q_INVOKABLE static bool isFeatureNameEnabled(const QString &feature,
                                                  const QStringList &features);
+
+    static bool doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir,
+                      const QList<QPair<QString, int>> &files);
+    static bool doZip(const QFileInfo &zipFileInfo, const QDir &rootDir);
+    static bool doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir);
 
 private:
     static QString m_fileNameToOpen;

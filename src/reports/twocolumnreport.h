@@ -99,6 +99,8 @@ public:
 
 protected:
     bool doGenerate(QTextDocument *document);
+    bool requiresOdtContentPolish() const;
+    bool polishOdtContent(QDomDocument &);
 
 private:
     Layout m_layout = VideoAudioLayout;

@@ -22,6 +22,8 @@
 #include <QTextTable>
 #include <QTextBlock>
 #include <QTextCursor>
+#include <QDomElement>
+#include <QDomDocument>
 #include <QTextDocument>
 #include <QAbstractTextDocumentLayout>
 
@@ -185,20 +187,19 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     int sceneCount = -1;
     int currentRow = 0;
 
-    // Returns true to omit the element, false otherwise
-    auto omitElement = [=](const ScreenplayElement *element) -> bool {
+    auto includeElementInReport = [=](const ScreenplayElement *element) -> bool {
         const Scene *scene = element->scene();
         if (scene == nullptr)
-            return true;
+            return false;
 
-        return false;
+        return true;
     };
 
     for (int i = 0; i < screenplay->elementCount(); i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
         // TODO: break tables and/or pages for each Act, Episode etc.
 
-        if (omitElement(element))
+        if (!includeElementInReport(element))
             continue;
 
         const Scene *scene = element->scene();
@@ -208,6 +209,12 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
         auto placeCursor = [&](Column col, bool atEnd = false) -> QTextCursor {
             QTextTableCell cell = sceneTable->cellAt(currentRow, col == LeftColumn ? 0 : 1);
+            QTextTableCellFormat cellFormat;
+            cellFormat.setLeftPadding(5);
+            cellFormat.setTopPadding(5);
+            cellFormat.setRightPadding(5);
+            cellFormat.setBottomPadding(5);
+            cell.setFormat(cellFormat);
             return atEnd ? cell.lastCursorPosition() : cell.firstCursorPosition();
         };
         auto moveToNextRow = [&]() -> QTextCursor {
@@ -229,7 +236,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
         };
 
         // Create a two column table
-        if (sceneTable == nullptr || this->format() == AdobePDF) {
+        if (sceneTable == nullptr || m_printEachSceneOnANewPage) {
             QTextTableFormat sceneTableFormat;
             sceneTableFormat.setColumns(2);
 
@@ -293,10 +300,11 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
                                                                            : (sceneNumber + ". "))
                     + scene->heading()->displayText();
 
-            cursor.setCharFormat(elementCharFormat(SceneElement::Heading));
+            QTextCharFormat headingFormat = elementCharFormat(SceneElement::Heading);
             if (element->isOmitted())
-                cursor.insertText("[OMITTED] ");
+                headingFormat.setFontStrikeOut(true);
 
+            cursor.setCharFormat(headingFormat);
             includeText(cursor, headingText, QVector<QTextLayout::FormatRange>());
 
             if (!element->isOmitted())
@@ -341,9 +349,6 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
                     includeText(cursor, text, sceneElement->textFormats());
                 }
             }
-
-            if (this->format() != AdobePDF)
-                cursor = moveToNextRow();
         } else {
             if (!element->isOmitted()) {
                 for (int j = 0; j < scene->elementCount(); j++) {
@@ -398,11 +403,56 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             }
         }
 
-        if (this->format() == AdobePDF) {
+        if (m_printEachSceneOnANewPage) {
             QTextFrame *rootFrame = document->rootFrame();
             cursor = rootFrame->lastCursorPosition();
+        } else {
+            cursor = moveToNextRow();
         }
     }
 
     return true;
+}
+
+bool TwoColumnReport::requiresOdtContentPolish() const
+{
+    return m_printEachSceneOnANewPage;
+}
+
+bool TwoColumnReport::polishOdtContent(QDomDocument &xmlDoc)
+{
+    QDomElement rootE = xmlDoc.documentElement();
+    QDomElement bodyE = rootE.firstChildElement("office:body");
+
+    const QDomNodeList tableElements = bodyE.elementsByTagName("table:table");
+    QStringList tableStyles;
+    for (int i = 0; i < tableElements.size(); i++) {
+        const QDomElement tableE = tableElements.at(i).toElement();
+        const QString styleName = tableE.attribute("table:style-name");
+        if (tableStyles.isEmpty() || tableStyles.last() != styleName)
+            tableStyles.append(styleName);
+    }
+
+    if (!tableStyles.isEmpty())
+        tableStyles.takeFirst();
+
+    if (tableStyles.isEmpty())
+        return false;
+
+    bool success = false;
+    QDomElement stylesE = rootE.firstChildElement("office:automatic-styles");
+    QDomElement styleE = stylesE.firstChildElement("style:style");
+    while (!styleE.isNull()) {
+        const QString styleName = styleE.attribute("style:name");
+        const QString styleFamily = styleE.attribute("style:family");
+        if (styleFamily == "table" && tableStyles.contains(styleName)) {
+            QDomElement stylePropsE = styleE.firstChildElement("style:table-properties");
+            stylePropsE.setAttribute("fo:break-before", "page");
+            success |= true;
+        }
+
+        styleE = styleE.nextSiblingElement(styleE.tagName());
+    }
+
+    return success;
 }

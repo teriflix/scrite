@@ -22,6 +22,7 @@
 #include <QStandardPaths>
 #include <QtConcurrentRun>
 
+#include "scrite.h"
 #include "quazip.h"
 #include "quazipfile.h"
 #include "simplecrypt.h"
@@ -150,61 +151,6 @@ void DocumentFileSystem::reset()
 #endif
 }
 
-bool doUnzip(const QFileInfo &fileInfo, const QTemporaryDir &dstDir)
-{
-    const QString zipFileName = fileInfo.absoluteFilePath();
-
-    QuaZip qzip(zipFileName);
-    qzip.setUtf8Enabled(true);
-    if (!qzip.open(QuaZip::mdUnzip)) {
-        qInfo("Could not open %s", qPrintable(zipFileName));
-        return false;
-    }
-
-    qzip.goToFirstFile();
-
-    while (1) {
-        QuaZipFileInfo qfileInfo;
-        if (!qzip.getCurrentFileInfo(&qfileInfo))
-            break;
-
-        const QFileInfo dstFileInfo = dstDir.filePath(qfileInfo.name);
-        const QString dstFileName = dstFileInfo.absoluteFilePath();
-        QDir().mkpath(dstFileInfo.absolutePath());
-
-        QuaZipFile srcFile(&qzip);
-        if (!srcFile.open(QFile::ReadOnly)) {
-            qInfo("Could not open '%s' for reading.", qPrintable(qfileInfo.name));
-            qzip.goToNextFile();
-            continue;
-        }
-
-        QFile dstFile(dstFileName);
-        if (!dstFile.open(QFile::WriteOnly)) {
-            qInfo("Could not open '%s' for writing.", qPrintable(dstFileName));
-            qzip.goToNextFile();
-            continue;
-        }
-
-        const int bufferLength = 65535;
-        char buffer[bufferLength];
-        while (!srcFile.atEnd()) {
-            const int nrBytes = srcFile.read(buffer, bufferLength);
-            dstFile.write(buffer, nrBytes);
-            if (nrBytes < bufferLength)
-                break;
-        }
-
-        dstFile.close();
-        srcFile.close();
-        qzip.goToNextFile();
-    }
-
-    qzip.close();
-
-    return true;
-}
-
 bool DocumentFileSystem::load(const QString &fileName, Format *format)
 {
     QMutexLocker mutexLocker(&d->folderMutex);
@@ -238,7 +184,7 @@ bool DocumentFileSystem::load(const QString &fileName, Format *format)
     // document as a ZIP file.
     file.close();
 
-    if (doUnzip(QFileInfo(fileName), *d->folder)) {
+    if (Scrite::doUnzip(QFileInfo(fileName), *d->folder)) {
         QString headerPath;
 
         const QString normalPath = d->folder->filePath(DocumentFileSystemData::normalHeaderFile);
@@ -268,63 +214,6 @@ bool DocumentFileSystem::load(const QString &fileName, Format *format)
     return !d->header.isEmpty();
 }
 
-void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
-{
-    const QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs,
-                                                    QDir::Name | QDir::DirsLast);
-    for (const QFileInfo &entry : entries) {
-        if (entry.isDir()) {
-            doZipRecursively(entry.absoluteFilePath(), rootDir, qzip);
-            continue;
-        }
-
-        const QString srcFilePath = entry.absoluteFilePath();
-        const QString dstFilePath = rootDir.relativeFilePath(srcFilePath);
-
-        QFile srcFile(srcFilePath);
-        if (!srcFile.open(QFile::ReadOnly)) {
-            qInfo("Could not open '%s' for reading.", qPrintable(srcFilePath));
-            continue;
-        }
-
-        QuaZipFile dstFile(&qzip);
-        if (!dstFile.open(QFile::WriteOnly, QuaZipNewInfo(dstFilePath, srcFilePath))) {
-            qInfo("Could not open '%s' for writing.", qPrintable(srcFilePath));
-            continue;
-        }
-
-        const int bufferLength = 65535;
-        char buffer[bufferLength];
-        while (!srcFile.atEnd()) {
-            const int nrBytes = srcFile.read(buffer, bufferLength);
-            dstFile.write(buffer, nrBytes);
-            if (nrBytes < bufferLength)
-                break;
-        }
-
-        dstFile.close();
-        srcFile.close();
-    }
-}
-
-bool doZip(const QFileInfo &fileInfo, const QDir &rootDir)
-{
-    const QString zipFileName = fileInfo.absoluteFilePath();
-
-    QuaZip qzip(zipFileName);
-    qzip.setUtf8Enabled(true);
-    if (!qzip.open(QuaZip::mdCreate)) {
-        qInfo("Could not create %s", qPrintable(zipFileName));
-        return false;
-    }
-
-    doZipRecursively(rootDir, rootDir, qzip);
-
-    qzip.close();
-
-    return true;
-}
-
 bool saveTask(const QByteArray &header, bool encrypt, const QDir &folder,
               const QString &targetFileName, QMutex *mutex)
 {
@@ -352,7 +241,7 @@ bool saveTask(const QByteArray &header, bool encrypt, const QDir &folder,
             + QStringLiteral("_temp.scrite");
 
     const QFileInfo fileInfo(tmpFileName);
-    bool success = doZip(fileInfo, folder);
+    bool success = Scrite::doZip(fileInfo, folder);
 
     if (success && QFile::exists(tmpFileName) && QFileInfo(tmpFileName).size() > 0) {
         if (QFile::exists(targetFileName))

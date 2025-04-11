@@ -22,6 +22,7 @@
 
 class QPrinter;
 class QPdfWriter;
+class QDomDocument;
 class QTextDocumentWriter;
 class QTextDocumentPagedPrinter;
 
@@ -113,6 +114,15 @@ protected:
     virtual bool canDirectExportToOdf() const { return false; }
     virtual bool directExportToOdf(QIODevice *) { return false; }
     virtual void polishFormInfo(QJsonObject &) const { return; }
+
+    void polishOdtContent(const QString &fileName);
+
+    // Reimplement and return true if we need to unpack the generated ODT file and further work on
+    // the content.xml
+    virtual bool requiresOdtContentPolish() const { return false; }
+
+    // Reimplement to alter content.xml
+    virtual bool polishOdtContent(QDomDocument &) { return false; }
 
 private:
     Format m_format = AdobePDF;
