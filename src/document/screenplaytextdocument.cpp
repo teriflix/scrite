@@ -2717,8 +2717,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
                 if (!title.isEmpty()) {
                     QTextBlockFormat format;
-                    format.setTopMargin(4);
-                    format.setBottomMargin(4);
+                    format.setTopMargin(m_textDocument->defaultFont().pointSize() / 4);
+                    format.setBottomMargin(m_textDocument->defaultFont().pointSize());
                     cursor.mergeBlockFormat(format);
 
                     QTextCharFormat chFormat;
@@ -2733,8 +2733,8 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
                 if (!synopsis.isEmpty()) {
                     QTextBlockFormat format;
-                    format.setTopMargin(1);
-                    format.setBottomMargin(1);
+                    format.setTopMargin(m_textDocument->defaultFont().pointSize() / 4);
+                    format.setBottomMargin(m_textDocument->defaultFont().pointSize());
                     cursor.mergeBlockFormat(format);
 
                     QTextCharFormat chFormat;

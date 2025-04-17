@@ -232,7 +232,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             else
                 TransliterationUtils::polishFontsAndInsertTextAtCursor(
                         cursor, text,
-                        m_preserveMarkupFormatting ? QVector<QTextLayout::FormatRange>() : formats);
+                        m_preserveMarkupFormatting ? formats : QVector<QTextLayout::FormatRange>());
         };
 
         // Create a two column table
