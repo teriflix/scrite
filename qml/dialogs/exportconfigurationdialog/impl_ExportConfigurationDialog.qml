@@ -75,7 +75,25 @@ VclDialog {
                     nameFilters: exporter.nameFilters
                     tabSequenceManager: tabSequence
                     visible: !_private.isPdfExport
-                    enabled: visible
+                    enabled: visible && _private.exportSaveFeature.enabled
+                    opacity: enabled ? 1 : 0.5
+                }
+
+                VclLabel {
+                    Layout.fillWidth: true
+                    Layout.rightMargin: 20
+                    Layout.bottomMargin: 24
+
+                    visible: !_private.exportSaveFeature.enabled
+                    wrapMode: Text.WordWrap
+
+                    text: "<b>NOTE:</b> Your current subscription plan allows you to preview, but not save the PDF. Click <u>here</u> to know about your subscription plan and features."
+
+                    MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: UserAccountDialog.launch("Subscriptions")
+                    }
                 }
 
                 // Show a group box for selecting fonts to export

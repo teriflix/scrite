@@ -146,7 +146,7 @@ VclDialog {
                         "label": "Open Document Format",
                         "suffix": "odt",
                         "value": AbstractReportGenerator.OpenDocumentFormat,
-                        "enabled": report.supportsFormat(AbstractReportGenerator.OpenDocumentFormat)
+                        "enabled": report.supportsFormat(AbstractReportGenerator.OpenDocumentFormat) && _private.reportSaveFeature.enabled
                     }
                 ]
                 nameFilters: {
@@ -162,6 +162,23 @@ VclDialog {
                     const aes = allowedExtensions
                     const idx = report.format === AbstractReportGenerator.AdobePDF ? 0 : 1
                     selectedExtension = aes[idx]
+                }
+            }
+
+            VclLabel {
+                Layout.fillWidth: true
+                Layout.rightMargin: 20
+                Layout.bottomMargin: 24
+
+                visible: !_private.reportSaveFeature.enabled
+                wrapMode: Text.WordWrap
+
+                text: "<b>NOTE:</b> Your current subscription plan allows you to preview, but not save the PDF or generate ODT. Click <u>here</u> to know about your subscription plan and features."
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: UserAccountDialog.launch("Subscriptions")
                 }
             }
 
