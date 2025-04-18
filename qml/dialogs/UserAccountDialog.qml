@@ -219,7 +219,7 @@ Item {
 
             repeat: false
             running: enabled && Scrite.user.loggedIn
-            interval: (requiresFrequentChecks() ? 5 : 60)*60*1000
+            interval: (requiresFrequentChecks() ? 5 : 120)*60*1000
 
             function requiresFrequentChecks() {
                 const userInfo = Scrite.user.info
