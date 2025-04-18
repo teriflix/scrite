@@ -2889,9 +2889,10 @@ void Screenplay::pasteAfter(int index)
 void Screenplay::serializeToJson(QJsonObject &json) const
 {
     json.insert("hasCoverPagePhoto", !m_coverPagePhoto.isEmpty());
+    json.insert("#currentIndex", m_currentElementIndex);
 }
 
-void Screenplay::deserializeFromJson(const QJsonObject &)
+void Screenplay::deserializeFromJson(const QJsonObject &json)
 {
     const QString cpPhotoPath =
             m_scriteDocument->fileSystem()->absolutePath(standardCoverPathPhotoPath());
@@ -2913,6 +2914,9 @@ void Screenplay::deserializeFromJson(const QJsonObject &)
 
     this->evaluateWordCountLater();
     this->evaluateIfHeightHintsAreAvailableLater();
+
+    const int currentIndex = json.value("#currentIndex").toInt();
+    QTimer::singleShot(1000, this, [=]() { this->setCurrentElementIndex(currentIndex); });
 }
 
 bool Screenplay::canSetPropertyFromObjectList(const QString &propName) const

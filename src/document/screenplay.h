@@ -461,7 +461,7 @@ public:
     Q_SIGNAL void screenplayChanged();
 
     Q_PROPERTY(int currentElementIndex READ currentElementIndex WRITE setCurrentElementIndex NOTIFY
-                       currentElementIndexChanged)
+                       currentElementIndexChanged STORED false)
     void setCurrentElementIndex(int val);
     int currentElementIndex() const { return m_currentElementIndex; }
     Q_SIGNAL void currentElementIndexChanged(int val);

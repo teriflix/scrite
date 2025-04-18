@@ -3752,7 +3752,7 @@ Rectangle {
                     highlightResizeDuration: 0
                     highlightFollowsCurrentItem: true
 
-                    highlightRangeMode: ListView.NoHighlightRange
+                    highlightRangeMode: ListView.ApplyRange
                     keyNavigationEnabled: false
                     preferredHighlightEnd: height*0.8
                     preferredHighlightBegin: height*0.2
