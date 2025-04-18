@@ -4013,13 +4013,16 @@ Rectangle {
                                 }
                             }
 
-                            Rectangle {
-                                width: height*0.75
-                                height: delegateText.implicitHeight
-                                radius: 2
-                                border { width: 2; color: Runtime.colors.primary.c600.background }
-                                color: Qt.rgba(0,0,0,0)
+                            Image {
+                                Layout.alignment: Qt.AlignVCenter
+                                Layout.preferredWidth: height
+                                Layout.preferredHeight: delegateText.height
+
+                                smooth: true
+                                mipmap: true
+                                source: "qrc:/icons/content/empty_scene.png"
                                 visible: !delegateItem.elementIsBreak && !scene.hasContent
+                                fillMode: Image.PreserveAspectFit
 
                                 MouseArea {
                                     anchors.fill: parent
@@ -4074,11 +4077,15 @@ Rectangle {
 
                         MouseArea {
                             id: delegateMouseArea
-                            hoverEnabled: delegateText.truncated
+
                             ToolTip.text: delegateText.text
                             ToolTip.delay: 1000
                             ToolTip.visible: Runtime.sceneListPanelSettings.showTooltip && delegateText.truncated && containsMouse
+
                             anchors.fill: parent
+
+                            hoverEnabled: delegateText.truncated
+                            preventStealing: true
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onDoubleClicked: (mouse) => {
                                                  Runtime.screenplayAdapter.screenplay.clearSelection()

@@ -321,5 +321,7 @@
         <file>icons/reports/twocolumn-av-layout.png</file>
         <file>icons/reports/twocolumn-left-layout.png</file>
         <file>icons/reports/twocolumn-right-layout.png</file>
+        <file>icons/content/empty_scene.png</file>
+        <file>icons/content/empty_scene_inverted.png</file>
     </qresource>
 </RCC>
