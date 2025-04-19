@@ -188,7 +188,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     int currentRow = 0;
 
     auto includeElementInReport = [=](const ScreenplayElement *element) -> bool {
-        const Scene *scene = element->scene();
+        const Scene *scene = element ? element->scene() : nullptr;
         if (scene == nullptr)
             return false;
 
@@ -197,8 +197,6 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
     for (int i = 0; i < screenplay->elementCount(); i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        // TODO: break tables and/or pages for each Act, Episode etc.
-
         if (!includeElementInReport(element))
             continue;
 

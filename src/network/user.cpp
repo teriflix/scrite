@@ -432,9 +432,9 @@ User *User::instance()
 
     if (firstTime) {
         if (refreshSessionToken && LocalStorage::load("loginToken").isValid()) {
-            SessionNewRestApiCall *newSession = new SessionNewRestApiCall(theUser);
-            if (!newSession->queue(RestApi::instance()->sessionApiQueue())) {
-                newSession->deleteLater();
+            SessionNewRestApiCall *api = new SessionNewRestApiCall(theUser);
+            if (!api->queue(RestApi::instance()->sessionApiQueue())) {
+                api->deleteLater();
             }
         } else if (LocalStorage::load("sessionToken").isValid()) {
             QTimer::singleShot(0, theUser, &User::loadInfoUsingRestApiCall);

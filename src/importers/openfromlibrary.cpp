@@ -114,12 +114,7 @@ bool LibraryService::doImport(QIODevice *device)
 
 Library::Library(Library::Type type, QObject *parent) : QAbstractListModel(parent), m_type(type)
 {
-    this->setRecords(QJsonArray());
-
-    if (User::instance()->isLoggedIn())
-        this->fetchRecords();
-
-    connect(User::instance(), &User::loggedInChanged, this, &Library::fetchRecords);
+    connect(RestApi::instance(), &RestApi::sessionTokenAvailable, this, &Library::reload);
 }
 
 Library::~Library() { }
