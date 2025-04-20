@@ -43,6 +43,16 @@ QObject *RestApi::sessionApiQueueObject() const
     return m_sessionApiQueue;
 }
 
+bool RestApi::isSessionTokenAvailable()
+{
+    const QByteArray sessionToken = LocalStorage::load("sessionToken").toByteArray();
+    const QByteArray userId = LocalStorage::load("userId").toByteArray();
+    if (sessionToken.isEmpty() || userId.isEmpty())
+        return false;
+
+    return true;
+}
+
 void RestApi::requestNewSessionToken()
 {
     if (m_sessionTokenTimer == nullptr) {

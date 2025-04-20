@@ -44,6 +44,8 @@ public:
     QObject *sessionApiQueueObject() const;
     RestApiCallQueue *sessionApiQueue() const { return m_sessionApiQueue; }
 
+    Q_INVOKABLE bool isSessionTokenAvailable();
+
     void requestNewSessionToken();
     void requestFreshActivation();
     void reportInvalidApiKey();

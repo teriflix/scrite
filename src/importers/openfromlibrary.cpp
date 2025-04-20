@@ -114,6 +114,8 @@ bool LibraryService::doImport(QIODevice *device)
 
 Library::Library(Library::Type type, QObject *parent) : QAbstractListModel(parent), m_type(type)
 {
+    this->reload();
+
     connect(RestApi::instance(), &RestApi::sessionTokenAvailable, this, &Library::reload);
 }
 
@@ -155,7 +157,8 @@ void Library::reload()
 
 void Library::fetchRecords()
 {
-    if (m_busy || !User::instance()->isLoggedIn())
+    if (m_busy || !User::instance()->isLoggedIn()
+        || !RestApi::instance()->isSessionTokenAvailable())
         return;
 
     this->setBusy(true);
