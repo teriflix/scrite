@@ -211,6 +211,9 @@ public:
     static bool doZip(const QFileInfo &zipFileInfo, const QDir &rootDir);
     static bool doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir);
 
+    Q_INVOKABLE static bool isNetworkAvailable();
+    static bool blockingMinimumVersionCheck();
+
 private:
     static QString m_fileNameToOpen;
 };

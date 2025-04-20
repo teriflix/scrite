@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "scrite.h"
 #include "appwindow.h"
 #include "application.h"
 #include "shortcutsmodel.h"
@@ -41,6 +42,9 @@ int main(int argc, char **argv)
 #endif
 
     Application scriteApp(argc, argv, Application::prepare());
+
+    if (!Scrite::blockingMinimumVersionCheck())
+        return -1;
 
     User::instance();
     TransliterationEngine::instance();

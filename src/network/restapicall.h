@@ -20,6 +20,7 @@
 #include <QJsonArray>
 #include <QQmlEngine>
 #include <QJsonObject>
+#include <QVersionNumber>
 #include <QQmlParserStatus>
 
 #include "qobjectlistmodel.h"
@@ -280,6 +281,29 @@ private:
 };
 
 // Known API calls.
+class AppMinimumVersionRestApiCall : public RestApiCall
+{
+    Q_OBJECT
+
+public:
+    AppMinimumVersionRestApiCall(QObject *parent = nullptr);
+    ~AppMinimumVersionRestApiCall();
+
+    Q_PROPERTY(QVersionNumber minimumVersion READ minimumVersion NOTIFY responseChanged)
+    QVersionNumber minimumVersion() const;
+
+    Q_PROPERTY(QVersionNumber currentVersion READ currentVersion NOTIFY responseChanged)
+    QVersionNumber currentVersion() const;
+
+    Q_PROPERTY(bool isVersionSupported READ isVersionSupported NOTIFY responseChanged)
+    bool isVersionSupported() const;
+
+    // RestApiCall interface
+    Type type() const { return GET; }
+    bool useSessionToken() const { return false; }
+    QString api() const { return "app/minimumVersion"; }
+};
+
 class AppCheckUserRestApiCall : public RestApiCall
 {
     Q_OBJECT

@@ -639,6 +639,31 @@ void RestApiCallList::evaluateBusyCount()
 
 ///////////////////////////////////////////////////////////////////////////////
 
+AppMinimumVersionRestApiCall::AppMinimumVersionRestApiCall(QObject *parent)
+    : RestApiCall(parent) { }
+
+AppMinimumVersionRestApiCall::~AppMinimumVersionRestApiCall() { }
+
+QVersionNumber AppMinimumVersionRestApiCall::minimumVersion() const
+{
+    const QJsonObject res = this->responseData();
+    return QVersionNumber::fromString(res.value("minimumVersion").toString(SCRITE_VERSION));
+}
+
+QVersionNumber AppMinimumVersionRestApiCall::currentVersion() const
+{
+    const QJsonObject res = this->responseData();
+    return QVersionNumber::fromString(res.value("currentVersion").toString(SCRITE_VERSION));
+}
+
+bool AppMinimumVersionRestApiCall::isVersionSupported() const
+{
+    const QJsonObject res = this->responseData();
+    return res.value("versionSupported").toBool(true);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 AppCheckUserRestApiCall::AppCheckUserRestApiCall(QObject *parent) : RestApiCall(parent)
 {
     m_email = LocalStorage::load("email").toString();

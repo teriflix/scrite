@@ -17,6 +17,7 @@
 #include "quazip.h"
 #include "appwindow.h"
 #include "quazipfile.h"
+#include "restapicall.h"
 #include "application.h"
 #include "scritedocument.h"
 #include "shortcutsmodel.h"
@@ -342,4 +343,69 @@ bool Scrite::doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir)
     qzip.close();
 
     return true;
+}
+
+#include <QNetworkInterface>
+#include <QHostAddress>
+
+bool Scrite::isNetworkAvailable()
+{
+    const auto allNetworkInterfaces = QNetworkInterface::allInterfaces();
+
+    foreach (const QNetworkInterface &iface, allNetworkInterfaces) {
+        if (iface.flags().testFlag(QNetworkInterface::IsUp)
+            && iface.flags().testFlag(QNetworkInterface::IsRunning)
+            && !iface.flags().testFlag(QNetworkInterface::IsLoopBack)) {
+            foreach (const QHostAddress &addr, iface.allAddresses()) {
+                if (addr.protocol() == QAbstractSocket::IPv4Protocol
+                    && addr != QHostAddress(QHostAddress::LocalHost)) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QDesktopServices>
+
+bool Scrite::blockingMinimumVersionCheck()
+{
+    bool success = true;
+
+    AppMinimumVersionRestApiCall call;
+
+    if (Scrite::isNetworkAvailable()) {
+        QEventLoop eventLoop;
+
+        QProgressDialog msgBox(nullptr, Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+        msgBox.setWindowTitle(QString("Scrite version %1").arg(SCRITE_VERSION));
+        msgBox.setLabelText("Checking if your version of Scrite is supported. Please wait ...");
+        msgBox.setValue(25);
+        msgBox.setCancelButton(nullptr);
+        msgBox.show();
+
+        connect(&call, &AppMinimumVersionRestApiCall::finished, &eventLoop, &QEventLoop::quit);
+
+        call.setReportNetworkErrors(true);
+        call.setAutoDelete(false);
+        call.call();
+
+        eventLoop.exec();
+
+        success = call.hasError() ? true : (call.hasResponse() && call.isVersionSupported());
+    }
+
+    if (!success) {
+        QMessageBox::information(nullptr, "Unsupported Version of Scrite",
+                                 QString("You are using Scrite version %1, which is no longer "
+                                         "supported. Please download the latest version.")
+                                         .arg(SCRITE_VERSION));
+        QDesktopServices::openUrl(QUrl("https://www.scrite.io/downloads"));
+    }
+
+    return success;
 }
