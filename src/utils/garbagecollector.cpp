@@ -15,11 +15,14 @@
 #include "application.h"
 #include "callgraph.h"
 
+Q_GLOBAL_STATIC(GarbageCollector *, TheGarbageCollector)
+
 GarbageCollector *GarbageCollector::instance()
 {
     // CAPTURE_FIRST_CALL_GRAPH;
-    static GarbageCollector *theInstance = new GarbageCollector(qApp);
-    return theInstance;
+    if (*TheGarbageCollector == nullptr)
+        *TheGarbageCollector = new GarbageCollector(qApp);
+    return *TheGarbageCollector;
 }
 
 GarbageCollector::GarbageCollector(QObject *parent)
@@ -32,18 +35,25 @@ GarbageCollector::~GarbageCollector()
 {
     m_timer.stop();
     qDeleteAll(m_objects);
+    *TheGarbageCollector = nullptr;
 }
 
 void GarbageCollector::avoidChildrenOf(QObject *parent)
 {
+    if (TheGarbageCollector == nullptr)
+        return;
+
     if (parent != nullptr) {
-        connect(parent, &QObject::destroyed, this, &GarbageCollector::onObjectDestroyed);
+        disconnect(parent, &QObject::destroyed, this, &GarbageCollector::onObjectDestroyed);
         m_avoidList.append(parent);
     }
 }
 
 void GarbageCollector::add(QObject *ptr)
 {
+    if (TheGarbageCollector == nullptr)
+        return;
+
     if (ptr == nullptr || m_objects.contains(ptr) || m_shredder.contains(ptr))
         return;
 
