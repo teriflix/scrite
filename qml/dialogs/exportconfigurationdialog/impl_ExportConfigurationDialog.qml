@@ -235,7 +235,7 @@ VclDialog {
                         Scrite.app.saveObjectConfiguration(exporter)
 
                         const message = _private.isPdfExport ? "Generating PDF ..." : ("Exporting to \"" + exporter.fileName + "\" ...")
-                        _private.waitDialog = WaitDialog.launch(message)
+                        _private.waitDialog = WaitDialog.launch(message, Aggregation.findProgressReport(exporter))
                     }
                 }
 
@@ -309,7 +309,7 @@ VclDialog {
         property bool exportEnabled: exporter ? exporter.featureEnabled : false
 
         property AppFeature exportSaveFeature: AppFeature {
-            featureName: exporter ? "export/" + exporter.format.toLowerCase() + "/save" : "export"
+            featureName: exporter ? "export/" + exporter.format.toLowerCase() + (_private.isPdfExport ? "/save": "") : "export"
         }
 
         property VclDialog waitDialog

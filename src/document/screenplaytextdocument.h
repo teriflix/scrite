@@ -28,6 +28,7 @@
 #include "screenplay.h"
 #include "qobjectproperty.h"
 
+class ProgressReport;
 class ScreenplayTextDocument;
 class AbstractScreenplayTextDocumentInjectionInterface
 {
@@ -253,7 +254,7 @@ public:
     QObject *injection() const { return m_injection; }
     Q_SIGNAL void injectionChanged();
 
-    void syncNow();
+    void syncNow(ProgressReport *progress = nullptr);
 
     Q_INVOKABLE void superImposeStructure(const QJsonObject &model);
 
@@ -395,6 +396,7 @@ private:
     ModificationTracker m_formattingModificationTracker;
     QMap<QObject *, const ScreenplayElement *> m_frameElementMap;
     QMap<const ScreenplayElement *, QTextFrame *> m_elementFrameMap;
+    ProgressReport *m_progressReport = nullptr;
 };
 
 class ScreenplayElementPageBreaks : public QObject

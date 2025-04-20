@@ -127,7 +127,7 @@ void AbstractTextDocumentExporter::generate(QTextDocument *textDoc, const qreal 
     stDoc.setTitlePageIsCentered(this->document()->screenplay()->isTitlePageIsCentered());
     stDoc.setTextDocument(textDoc);
     stDoc.setInjection(this);
-    stDoc.syncNow();
+    stDoc.syncNow(this->progress());
 }
 
 bool AbstractTextDocumentExporter::filterSceneElement() const

@@ -13,6 +13,10 @@
 
 #include "progressreport.h"
 
+#include <QThread>
+#include <QCoreApplication>
+#include <QAbstractEventDispatcher>
+
 ProgressReport::ProgressReport(QObject *parent) : QObject(parent), m_proxyFor(this, "proxyFor") { }
 
 ProgressReport::~ProgressReport()
@@ -98,6 +102,9 @@ void ProgressReport::setProgress(qreal val)
     emit progressChanged();
 
     this->setStatus(InProgress);
+
+    if (val > 0 && val < 1 && m_progressStep > 0)
+        this->processCurrentThreadEvents();
 }
 
 void ProgressReport::resetProxyFor()
@@ -125,6 +132,17 @@ void ProgressReport::updateStatusFromProxy()
 {
     if (m_proxyFor != nullptr)
         this->setStatus(m_proxyFor->status());
+}
+
+void ProgressReport::processCurrentThreadEvents()
+{
+    QThread *thread = QThread::currentThread();
+    if (thread) {
+        if (thread == qApp->thread())
+            qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        else if (thread->eventDispatcher())
+            thread->eventDispatcher()->processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
 }
 
 qreal ProgressReport::progressStep() const

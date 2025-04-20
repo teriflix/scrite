@@ -29,12 +29,14 @@ Item {
 
     parent: Scrite.window.contentItem
 
-    function launch(message) {
+    function launch(message, progressReport) {
         var initialProps = {
             "message": "Please wait ..."
         }
         if(message && typeof message === "string")
             initialProps.message = message
+        if(progressReport && Scrite.app.verifyType(progressReport, "ProgressReport"))
+            initialProps.progressReport = progressReport
 
         var dlg = dialogComponent.createObject(root, initialProps)
         if(dlg) {
@@ -54,22 +56,53 @@ Item {
             id: dialog
 
             property string message
+            property ProgressReport progressReport
+
+            width: Math.min(500, Scrite.window.width*0.5)
+            height: Math.min(200, Scrite.window.height*0.3)
 
             title: "Please wait ..."
             closePolicy: Popup.NoAutoClose
             titleBarButtons: null
-            width: Math.min(500, Scrite.window.width*0.5)
-            height: Math.min(200, Scrite.window.height*0.3)
             appOverrideCursor: Qt.WaitCursor
             appCloseButtonVisible: false
-            contentItem: VclLabel {
-                text: dialog.message
-                padding: 16
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                maximumLineCount: 5
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignHCenter
+
+            contentItem: ColumnLayout {
+                spacing: 20
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: dialog.message
+                    elide: dialog.progressReport ? Text.ElideMiddle : Text.ElideRight
+                    wrapMode: dialog.progressReport ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
+                    padding: 16
+                    maximumLineCount: 5
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                ProgressBar {
+                    Layout.fillWidth: true
+                    Layout.leftMargin: 20
+                    Layout.rightMargin: 20
+
+                    to: 1
+                    from: 0
+                    value: dialog.progressReport.progress
+                    visible: dialog.progressReport !== null
+                }
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: dialog.progressReport.progressText + " (" + Math.round(dialog.progressReport.progress*100,0) + "%)"
+                    elide: Text.ElideMiddle
+                    padding: 8
+                    visible: dialog.progressReport !== null
+                    bottomPadding: 16
+                    horizontalAlignment: Text.AlignHCenter
+                }
             }
         }
     }

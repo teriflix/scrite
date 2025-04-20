@@ -197,13 +197,19 @@ class ScreenplayTextDocumentUpdate
 public:
     ScreenplayTextDocumentUpdate(ScreenplayTextDocument *document) : m_document(document)
     {
-        if (m_document)
+        if (m_document) {
             m_document->setUpdating(true);
+            if (m_document->m_progressReport)
+                m_document->m_progressReport->start();
+        }
     }
     ~ScreenplayTextDocumentUpdate()
     {
-        if (m_document)
+        if (m_document) {
             m_document->setUpdating(false);
+            if (m_document->m_progressReport)
+                m_document->m_progressReport->finish();
+        }
     }
 
 private:
@@ -733,10 +739,14 @@ void ScreenplayTextDocument::setInjection(QObject *val)
     this->loadScreenplayLater();
 }
 
-void ScreenplayTextDocument::syncNow()
+void ScreenplayTextDocument::syncNow(ProgressReport *progress)
 {
+    m_progressReport = progress;
+
     m_loadScreenplayTimer.stop();
     this->loadScreenplay();
+
+    m_progressReport = nullptr;
 }
 
 /*
@@ -1159,6 +1169,10 @@ void ScreenplayTextDocument::loadScreenplay()
 
     ScreenplayTextDocumentUpdate update(this);
 
+    if (m_progressReport) {
+        m_progressReport->setProgressStep(1.0 / (m_screenplay->elementCount() + 3));
+    }
+
     // Here we discard anything we have previously loaded and load the entire
     // document fresh from the start.
     this->clearTextFrames();
@@ -1291,6 +1305,13 @@ void ScreenplayTextDocument::loadScreenplay()
     const int fsi = m_screenplay->firstSceneIndex();
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
+
+        if (m_progressReport) {
+            m_progressReport->setProgressText(QString("Processing %1 of %2 elements ...")
+                                                      .arg(i + 1)
+                                                      .arg(m_screenplay->elementCount() + 1));
+            m_progressReport->tick();
+        }
 
         if (!m_printEachSceneOnANewPage) {
             if (hasEpisdoes && element->elementType() == ScreenplayElement::BreakElementType

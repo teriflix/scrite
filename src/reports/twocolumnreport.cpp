@@ -113,6 +113,11 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     const Screenplay *screenplay = scriteDocument->screenplay();
     const ScreenplayFormat *format = scriteDocument->printFormat();
 
+    const int nrProgressSteps =
+            screenplay->elementCount() + 2; // one for title-page and another for writing to file
+    const qreal progressStep = 1.0 / qreal(nrProgressSteps);
+    this->progress()->setProgressStep(progressStep);
+
     format->pageLayout()->configure(document);
     document->setIndentWidth(10);
 
@@ -153,6 +158,8 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
         }
     }
 
+    this->progress()->tick();
+
     auto elementCharFormat = [format, document](SceneElement::Type type) -> QTextCharFormat {
         SceneElementFormat *eformat = format->elementFormat(type);
 
@@ -186,6 +193,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     QTextTable *sceneTable = nullptr;
     int sceneCount = -1;
     int currentRow = 0;
+    int nrElements = screenplay->elementCount();
 
     auto includeElementInReport = [=](const ScreenplayElement *element) -> bool {
         const Scene *scene = element ? element->scene() : nullptr;
@@ -197,6 +205,9 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
     for (int i = 0; i < screenplay->elementCount(); i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
+        this->progress()->setProgressText(
+                QString("Processing %1 of %2 elements ...").arg(i + 1).arg(nrElements));
+        this->progress()->tick();
         if (!includeElementInReport(element))
             continue;
 

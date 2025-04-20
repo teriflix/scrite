@@ -173,6 +173,10 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     ScriteDocument *document = this->document();
     Screenplay *screenplay = document->screenplay();
 
+    this->progress()->setProgressStep(0.25);
+
+    this->progress()->setProgressText("Polishing text ...");
+
     if (m_capitalizeSentences)
         screenplay->capitalizeSentences();
     if (m_polishParagraphs)
@@ -180,6 +184,9 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
 
     if (m_screenplaySubset)
         delete m_screenplaySubset;
+
+    this->progress()->setProgressText("Filtering scenes ...");
+    this->progress()->tick();
 
     const bool hasEpisodes = screenplay->episodeCount() > 0;
 
@@ -282,6 +289,9 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
         && lastElement->breakType() == Screenplay::Episode)
         m_screenplaySubset->removeElement(lastElement);
 
+    this->progress()->setProgressText("Preparing document ...");
+    this->progress()->tick();
+
     ScreenplayTextDocument stDoc;
     stDoc.setTitlePage(this->format() == AdobePDF ? m_generateTitlePage : false);
     stDoc.setIncludeLoglineInTitlePage(stDoc.hasTitlePage() ? m_includeLogline : false);
@@ -305,7 +315,14 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     stDoc.setIncludeActBreaks(m_includeActBreaks);
     stDoc.setInjection(this);
     this->configureScreenplayTextDocument(stDoc);
+
+    this->progress()->setProgressText("Paginating content ...");
+    this->progress()->tick();
+
     stDoc.syncNow();
+
+    this->progress()->setProgressText("Done!");
+    this->progress()->tick();
 
     return true;
 }

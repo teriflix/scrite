@@ -72,10 +72,11 @@ private:
     void updateProgressTextFromProxy();
     void updateProgressFromProxy();
     void updateStatusFromProxy();
+    void processCurrentThreadEvents();
 
 private:
     Status m_status = NotStarted;
-    qreal m_progress = 1.0;
+    qreal m_progress = 0.0;
     qreal m_progressStep = 0.0;
     QString m_progressText;
     QObjectProperty<ProgressReport> m_proxyFor;
