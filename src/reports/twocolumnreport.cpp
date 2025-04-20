@@ -215,6 +215,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             cell.setFormat(cellFormat);
             return atEnd ? cell.lastCursorPosition() : cell.firstCursorPosition();
         };
+
         auto moveToNextRow = [&]() -> QTextCursor {
             sceneTable->appendRows(1);
             ++currentRow;
@@ -401,12 +402,9 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             }
         }
 
-        if (m_printEachSceneOnANewPage) {
-            QTextFrame *rootFrame = document->rootFrame();
-            cursor = rootFrame->lastCursorPosition();
-        } else {
-            cursor = moveToNextRow();
-        }
+        QTextFrame *rootFrame = document->rootFrame();
+        cursor = rootFrame->lastCursorPosition();
+        sceneTable = nullptr;
     }
 
     return true;
