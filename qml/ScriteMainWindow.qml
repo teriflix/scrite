@@ -331,6 +331,7 @@ Item {
             Runtime.screenplayEditorSettings.firstSwitchToStructureTab = true
             appBusyOverlay.ref()
             Runtime.screenplayAdapter.initialLoadTreshold = 25
+            reloadScriteDocumentTimer.stop()
             Utils.execLater(Runtime.screenplayAdapter, 250, () => {
                                 appBusyOverlay.deref()
                                 Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
@@ -351,6 +352,26 @@ Item {
             MessageBox.information("Anonymous Open",
                                    "The file you want to open is backup of another file, and is therefore being opened anonymously.<br/><br/>" +
                                    "<b>NOTE:</b> Please remember to save your changes explicitly, Scrite will NOT AUTOSAVE!")
+        }
+
+        function onRequiresReload() {
+            reloadScriteDocumentTimer.start()
+        }
+    }
+
+    Timer {
+        id: reloadScriteDocumentTimer
+
+        interval: 500
+        repeat: false
+
+        onTriggered: {
+            MessageBox.question("Reload Required",
+                                "The currently open file was changed in the background by another process. Do you want to reload?",
+                                ["Yes", "No"], (answer) => {
+                                    if(answer === "Yes")
+                                        Scrite.document.reload()
+                                })
         }
     }
 
@@ -441,8 +462,13 @@ Item {
                 iconSource: "qrc:/icons/content/save.png"
                 text: "Save"
                 shortcut: "Ctrl+S"
-                enabled: Scrite.document.modified && !Scrite.document.readOnly
-                onClicked: SaveFileTask.saveSilently()
+                enabled: (Scrite.document.modified || Scrite.document.fileName === "") && !Scrite.document.readOnly
+                onClicked: {
+                    if(Scrite.document.fileName === "")
+                        SaveFileTask.saveAs()
+                    else
+                        SaveFileTask.saveSilently()
+                }
 
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text

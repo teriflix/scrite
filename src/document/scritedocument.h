@@ -495,6 +495,7 @@ public:
     Q_SIGNAL void canImportFromClipboardChanged();
 
     Q_INVOKABLE void reset();
+    Q_INVOKABLE void reload();
 
     Q_INVOKABLE bool requiresAnonymousOpen(const QString &fileName) const;
 
@@ -512,6 +513,7 @@ public:
     Q_SIGNAL void justSaved();
     Q_SIGNAL void justLoaded();
     Q_SIGNAL void openedAnonymously(const QString &fileName);
+    Q_SIGNAL void requiresReload();
 
     Q_PROPERTY(QAbstractListModel* backupFilesModel READ backupFilesModel CONSTANT STORED false)
     ScriteDocumentBackups *backupFilesModel() const
@@ -598,6 +600,9 @@ private:
     void setSessionId(QString val);
     void setDocumentId(const QString &val);
 
+    void initializeFileWatcher();
+    void watchedFileChanged(const QString &fileName);
+
 private:
     bool m_busy = false;
     bool m_locked = false;
@@ -621,6 +626,7 @@ private:
     ExecLaterTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
     ExecLaterTimer m_clearModifyTimer;
+    QFileSystemWatcher *m_fileWatcher = nullptr;
     int m_autoSaveDurationInSeconds = 60;
     DocumentFileSystem m_docFileSystem;
     QStringList m_spellCheckIgnoreList;

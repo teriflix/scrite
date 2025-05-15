@@ -772,6 +772,8 @@ ScriteDocument::ScriteDocument(QObject *parent)
         if (m_autoSave && !m_fileName.isEmpty())
             this->save();
     });
+
+    this->initializeFileWatcher();
 }
 
 ScriteDocument::~ScriteDocument()
@@ -1284,6 +1286,15 @@ void ScriteDocument::reset()
             "ScriteDocument::clearModified", this, [=]() { this->setModified(false); }, 250);
 }
 
+void ScriteDocument::reload()
+{
+    // TODO:
+    // The idea is to not save changes, but just reload the file afresh.
+    const QString fileName = m_fileName;
+    m_fileName.clear();
+    this->load(fileName);
+}
+
 bool ScriteDocument::requiresAnonymousOpen(const QString &fileName) const
 {
     // This function returns true, if the file is a backup of another one.
@@ -1485,6 +1496,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
                     }
 
                     emit justSaved();
+
                     m_progressReport->finish();
                 });
 
@@ -2862,6 +2874,39 @@ void ScriteDocument::setDocumentId(const QString &val)
 
     m_documentId = val;
     emit documentIdChanged();
+}
+
+void ScriteDocument::initializeFileWatcher()
+{
+    /** This part of the code initializes the mechanisms required to detect changes to the currently
+     * open document from another process. */
+    m_fileWatcher = new QFileSystemWatcher(this);
+    connect(m_fileWatcher, &QFileSystemWatcher::fileChanged, this,
+            &ScriteDocument::watchedFileChanged);
+    connect(this, &ScriteDocument::aboutToSave, m_fileWatcher,
+            [=]() { m_fileWatcher->blockSignals(true); });
+
+    QTimer *unblockFileWatcherTimer = new QTimer(m_fileWatcher);
+    unblockFileWatcherTimer->setInterval(250);
+    unblockFileWatcherTimer->setSingleShot(true);
+    connect(unblockFileWatcherTimer, &QTimer::timeout, m_fileWatcher,
+            [=]() { m_fileWatcher->blockSignals(false); });
+    connect(this, &ScriteDocument::justSaved, unblockFileWatcherTimer,
+            QOverload<>::of(&QTimer::start));
+
+    connect(this, &ScriteDocument::fileNameChanged, this, [=]() {
+        const QStringList files = m_fileWatcher->files();
+        m_fileWatcher->removePaths(files);
+        if (!m_fileName.isEmpty())
+            m_fileWatcher->addPath(m_fileName);
+    });
+}
+
+void ScriteDocument::watchedFileChanged(const QString &fileName)
+{
+    if (m_fileName == fileName) {
+        emit requiresReload();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
