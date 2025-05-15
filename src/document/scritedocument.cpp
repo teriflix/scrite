@@ -1284,6 +1284,39 @@ void ScriteDocument::reset()
             "ScriteDocument::clearModified", this, [=]() { this->setModified(false); }, 250);
 }
 
+bool ScriteDocument::requiresAnonymousOpen(const QString &fileName) const
+{
+    // This function returns true, if the file is a backup of another one.
+    // If file names are of the form ABC.scrite
+    // Backup file names are of the form ABC [timestamp].scrite, and is found within a ABC Backups
+    // folder.
+
+    const QFileInfo fi(fileName);
+    const QString resolvedAbsFileName = fi.absoluteFilePath();
+
+    static QRegularExpression re(R"(.*[/\\](.+) Backups[/\\]\1 \[(\d+)\]\.([a-zA-Z0-9]+)$)");
+    const QRegularExpressionMatch match = re.match(resolvedAbsFileName);
+
+    if (match.hasMatch()) {
+        // const QString baseName = match.captured(1);
+        const qint64 timestamp = match.captured(2).toLong();
+        const QString extension = match.captured(3).toLower();
+
+        // Make sure that the file is a scrite document
+        if (extension != "scrite")
+            return false;
+
+        // Timestamp in the file name should match the timestamp of the file
+        const QDateTime fiBirthTime = fi.fileTime(QFile::FileBirthTime);
+        const QDateTime fiModificationTime = fi.fileTime(QFile::FileModificationTime);
+        if (timestamp == fiBirthTime.toSecsSinceEpoch()
+            || timestamp == fiModificationTime.toSecsSinceEpoch())
+            return true;
+    }
+
+    return false;
+}
+
 bool ScriteDocument::openOrImport(const QString &fileName)
 {
     if (fileName.isEmpty())
@@ -1341,6 +1374,13 @@ bool ScriteDocument::importFromClipboard()
 
 bool ScriteDocument::open(const QString &fileName)
 {
+    if (this->requiresAnonymousOpen(fileName)) {
+        const bool ret = this->openAnonymously(fileName);
+        if (ret)
+            QTimer::singleShot(500, this, [=]() { emit openedAnonymously(fileName); });
+        return ret;
+    }
+
     if (fileName == m_fileName)
         return false;
 

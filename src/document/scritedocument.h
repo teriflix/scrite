@@ -496,6 +496,8 @@ public:
 
     Q_INVOKABLE void reset();
 
+    Q_INVOKABLE bool requiresAnonymousOpen(const QString &fileName) const;
+
     Q_INVOKABLE bool openOrImport(const QString &fileName);
     Q_INVOKABLE bool importFromClipboard();
 
@@ -509,6 +511,7 @@ public:
     Q_SIGNAL void justReset();
     Q_SIGNAL void justSaved();
     Q_SIGNAL void justLoaded();
+    Q_SIGNAL void openedAnonymously(const QString &fileName);
 
     Q_PROPERTY(QAbstractListModel* backupFilesModel READ backupFilesModel CONSTANT STORED false)
     ScriteDocumentBackups *backupFilesModel() const

@@ -346,6 +346,12 @@ Item {
                     Runtime.screenplayAdapter.initialLoadTreshold = -1
             }
         }
+
+        function onOpenedAnonymously(filePath) {
+            MessageBox.information("Anonymous Open",
+                                   "The file you want to open is backup of another file, and is therefore being opened anonymously.<br/><br/>" +
+                                   "<b>NOTE:</b> Please remember to save your changes explicitly, Scrite will NOT AUTOSAVE!")
+        }
     }
 
     // Refactor QML TODO: Get rid of this stuff when we move to overlays and ApplicationMainWindow
