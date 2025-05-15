@@ -20,6 +20,8 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
+
+import "qrc:/qml/tasks"
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -355,7 +357,13 @@ Item {
                         VclButton {
                             text: "Logout"
 
-                            onClicked: deactivateDeviceCall.call()
+                            onClicked: {
+                                SaveFileTask.save( () => {
+                                                      Scrite.document.reset()
+                                                      deactivateDeviceCall.call()
+                                                  })
+
+                            }
 
                             InstallationDeactivateRestApiCall {
                                 id: deactivateDeviceCall
