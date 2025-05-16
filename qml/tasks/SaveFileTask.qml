@@ -193,6 +193,12 @@ Item {
 
             onAccepted: {
                 const path = Scrite.app.urlToLocalFile(fileUrl)
+                if(Scrite.document.canBeBackupFileName(path)) {
+                    _private.reportSaveAsBackupNotPossible()
+                    finished(false)
+                    return
+                }
+
                 Scrite.document.saveAs(path)
 
                 const fileInfo = Scrite.app.fileInfo(path)
@@ -221,6 +227,12 @@ Item {
                 return autoSaveIsEnabled
 
             return documentSavedButHasChanges
+        }
+
+        function reportSaveAsBackupNotPossible() {
+            MessageBox.information("Save Error", "Cannot save as a backup file. Please choose another path or file name.", () => {
+                                        Utils.execLater(root, 100, root.saveAs)
+                                   })
         }
     }
 }

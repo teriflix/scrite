@@ -355,7 +355,8 @@ Item {
         }
 
         function onRequiresReload() {
-            reloadScriteDocumentTimer.start()
+            if(Runtime.applicationSettings.reloadPrompt)
+                reloadScriteDocumentTimer.start()
         }
     }
 
@@ -366,12 +367,13 @@ Item {
         repeat: false
 
         onTriggered: {
-            MessageBox.question("Reload Required",
-                                "The currently open file was changed in the background by another process. Do you want to reload?",
-                                ["Yes", "No"], (answer) => {
-                                    if(answer === "Yes")
-                                        Scrite.document.reload()
-                                })
+            if(Runtime.applicationSettings.reloadPrompt)
+                MessageBox.question("Reload Required",
+                                    "The currently open file was changed in the background by another process. Do you want to reload?",
+                                    ["Yes", "No"], (answer) => {
+                                        if(answer === "Yes")
+                                            Scrite.document.reload()
+                                    })
         }
     }
 

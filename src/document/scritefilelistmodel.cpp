@@ -13,6 +13,7 @@
 
 #include "scritefilelistmodel.h"
 #include "application.h"
+#include "scritedocument.h"
 
 #include <QDir>
 #include <QTimer>
@@ -108,7 +109,7 @@ void ScriteFileListModel::setMaxCount(int val)
 
 void ScriteFileListModel::add(const QString &filePath)
 {
-    if (filePath.isEmpty())
+    if (filePath.isEmpty() || ScriteDocument::canBeBackupFileName(filePath))
         return;
 
     // Right now, we are only doing a quick load of ScriteFileInfo object for the given filePath
@@ -237,6 +238,9 @@ void ScriteFileListModel::setFilesInternal(const QStringList &filePaths)
     // Right now, we are only doing a quick load of ScriteFileInfo objects
     QList<ScriteFileInfo> newList;
     for (const QString &filePath : filePaths) {
+        if (ScriteDocument::canBeBackupFileName(filePath))
+            continue;
+
         const ScriteFileInfo sfi = ScriteFileInfo::quickLoad(filePath);
         if (sfi.fileInfo.exists())
             newList.append(sfi);

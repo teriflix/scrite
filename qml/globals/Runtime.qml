@@ -292,6 +292,7 @@ Item {
         property int primaryColor: colors.defaultPrimaryColor
         property int accentColor: colors.defaultAccentColor
         property int joinDiscordPromptCounter: 0
+        property bool reloadPrompt: true
 
         Component.onCompleted: {
             Qt.callLater( () => {

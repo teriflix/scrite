@@ -223,8 +223,15 @@ void ScriteDocumentBackups::reloadBackupFileInformation()
         emit countChanged();
     });
     QFuture<QFileInfoList> future = QtConcurrent::run([=]() -> QFileInfoList {
-        return m_backupFilesDir.entryInfoList({ QStringLiteral("*.scrite") }, QDir::Files,
-                                              QDir::Time);
+        const QFileInfoList ret = m_backupFilesDir.entryInfoList({ QStringLiteral("*.scrite") },
+                                                                 QDir::Files, QDir::Time);
+        for (const QFileInfo &fi : ret) {
+            const QString absPath = fi.absoluteFilePath();
+            QFileDevice::Permissions permissions = QFile::permissions(absPath);
+            if (int(permissions) != int(QFileDevice::ReadUser | QFileDevice::ReadOwner))
+                QFile::setPermissions(absPath, QFileDevice::ReadUser | QFileDevice::ReadOwner);
+        }
+        return ret;
     });
     futureWatcher->setFuture(future);
 }
@@ -1295,13 +1302,8 @@ void ScriteDocument::reload()
     this->load(fileName);
 }
 
-bool ScriteDocument::requiresAnonymousOpen(const QString &fileName) const
+bool ScriteDocument::canBeBackupFileName(const QString &fileName)
 {
-    // This function returns true, if the file is a backup of another one.
-    // If file names are of the form ABC.scrite
-    // Backup file names are of the form ABC [timestamp].scrite, and is found within a ABC Backups
-    // folder.
-
     const QFileInfo fi(fileName);
     const QString resolvedAbsFileName = fi.absoluteFilePath();
 
@@ -1309,19 +1311,13 @@ bool ScriteDocument::requiresAnonymousOpen(const QString &fileName) const
     const QRegularExpressionMatch match = re.match(resolvedAbsFileName);
 
     if (match.hasMatch()) {
-        // const QString baseName = match.captured(1);
         const qint64 timestamp = match.captured(2).toLong();
         const QString extension = match.captured(3).toLower();
 
-        // Make sure that the file is a scrite document
         if (extension != "scrite")
             return false;
 
-        // Timestamp in the file name should match the timestamp of the file
-        const QDateTime fiBirthTime = fi.fileTime(QFile::FileBirthTime);
-        const QDateTime fiModificationTime = fi.fileTime(QFile::FileModificationTime);
-        if (timestamp == fiBirthTime.toSecsSinceEpoch()
-            || timestamp == fiModificationTime.toSecsSinceEpoch())
+        if (timestamp >= QDateTime(QDate(2020, 3, 20), QTime(0, 0, 0, 0)).toSecsSinceEpoch())
             return true;
     }
 
@@ -1385,7 +1381,7 @@ bool ScriteDocument::importFromClipboard()
 
 bool ScriteDocument::open(const QString &fileName)
 {
-    if (this->requiresAnonymousOpen(fileName)) {
+    if (this->canBeBackupFileName(fileName)) {
         const bool ret = this->openAnonymously(fileName);
         if (ret)
             QTimer::singleShot(500, this, [=]() { emit openedAnonymously(fileName); });
@@ -1415,7 +1411,7 @@ bool ScriteDocument::openAnonymously(const QString &fileName)
 
     this->setBusyMessage("Loading ...");
     this->reset();
-    const bool ret = this->load(fileName);
+    const bool ret = this->load(fileName, true);
     this->setModified(false);
     this->clearBusyMessage();
 
@@ -1579,6 +1575,8 @@ void ScriteDocument::save()
         const QString backupFileName = backupDirPath + "/" + fi.completeBaseName() + " ["
                 + QString::number(now) + "].scrite";
         const bool backupSuccessful = QFile::copy(m_fileName, backupFileName);
+        if (backupSuccessful)
+            QFile::setPermissions(backupFileName, QFileDevice::ReadOwner | QFileDevice::ReadUser);
 
         if (firstBackup && backupSuccessful)
             m_documentBackupsModel.loadBackupFileInformation();
@@ -2267,7 +2265,7 @@ void ScriteDocument::setFileName(const QString &val)
     m_fileLocker->setFilePath(m_fileName);
 }
 
-bool ScriteDocument::load(const QString &fileName)
+bool ScriteDocument::load(const QString &fileName, bool anonymousLoad)
 {
     m_errorReport->clear();
 
@@ -2427,7 +2425,7 @@ bool ScriteDocument::load(const QString &fileName)
     // set to false after the QML UI has finished its lazy loading.
     m_clearModifyTimer.start(100, this);
 
-    if (ro) {
+    if (ro && !anonymousLoad) {
         Notification *notification = new Notification(this);
         connect(notification, &Notification::dismissed, &Notification::deleteLater);
 

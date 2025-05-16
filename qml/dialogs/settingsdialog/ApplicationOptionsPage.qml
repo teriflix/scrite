@@ -233,6 +233,7 @@ Item {
             Layout.alignment: Qt.AlignTop
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
+            Layout.rowSpan: 2
 
             label: VclLabel { text: "Saving Files" }
             clip: true
@@ -275,14 +276,26 @@ Item {
 
                 VclCheckBox {
                     Layout.columnSpan: 2
+                    Layout.fillWidth: true
 
-                    text: "Enable Restore (" + (Scrite.document.autoSave ? "New Files Only" : "All Files") + ")"
-                    width: parent.width
+                    text: "Enable Restore (" + (Scrite.document.autoSave ? "New Files Only" : "All Files") + ")"                    
                     checked: Scrite.vault.enabled
                     onToggled: Scrite.vault.enabled = checked
                 }
+
+                VclCheckBox {
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+
+                    text: "Ask to Reload if File Changes"
+                    checked: Runtime.applicationSettings.reloadPrompt
+                    onToggled: Runtime.applicationSettings.reloadPrompt = checked
+                }
             }
         }
+
+        /*
+          // We don't enable this on any platform, so why bother showing it?
 
         GroupBox {
             Layout.alignment: Qt.AlignTop
@@ -317,6 +330,7 @@ Item {
                 }
             }
         }
+        */
 
         GroupBox {
             Layout.alignment: Qt.AlignTop

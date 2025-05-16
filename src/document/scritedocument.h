@@ -497,7 +497,7 @@ public:
     Q_INVOKABLE void reset();
     Q_INVOKABLE void reload();
 
-    Q_INVOKABLE bool requiresAnonymousOpen(const QString &fileName) const;
+    Q_INVOKABLE static bool canBeBackupFileName(const QString &fileName);
 
     Q_INVOKABLE bool openOrImport(const QString &fileName);
     Q_INVOKABLE bool importFromClipboard();
@@ -576,7 +576,7 @@ private:
     void markAsModified();
     void setModified(bool val);
     void setFileName(const QString &val);
-    bool load(const QString &fileName);
+    bool load(const QString &fileName, bool anonymousLoad = false);
     bool classicLoad(const QString &fileName);
     bool modernLoad(const QString &fileName, int *format = nullptr);
     void structureElementIndexChanged();
