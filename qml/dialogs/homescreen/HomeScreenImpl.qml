@@ -741,7 +741,11 @@ Item {
 
             width: ListView.view.width
 
-            text: fileInfo.title === "" ? fileInfo.baseFileName : composeTextFromTitleAndVersion(fileInfo)
+            text: {
+                if(Runtime.recentFiles.preferTitleVersionText)
+                    return fileInfo.title === "" ? fileInfo.baseFileName : composeTextFromTitleAndVersion(fileInfo)
+                return fileInfo.baseFileName
+            }
             tooltip: {
                 let ret = fileInfo.logline
                 if(_private.layoutType === 2) {
@@ -801,10 +805,25 @@ Item {
         ColumnLayout {
             anchors.fill: parent
 
-            VclLabel {
-                id: quickFileOptionsLabel
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                text: scriptalayMode ? "Scriptalay" : "Recent Files"
+            RowLayout {
+                Layout.fillWidth: true
+
+                VclLabel {
+                    id: quickFileOptionsLabel
+
+                    Layout.fillWidth: true
+
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                    text: scriptalayMode ? "Scriptalay" : "Recent Files"
+                }
+
+                VclToolButton {
+                    Layout.preferredHeight: quickFileOptionsLabel.height
+                    Layout.preferredWidth: quickFileOptionsLabel.height
+                    icon.source: "qrc:/icons/action/edit.png"
+
+                    onClicked: EditRecentFilesDialog.launch()
+                }
             }
 
             Rectangle {

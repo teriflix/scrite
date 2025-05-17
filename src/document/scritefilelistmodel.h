@@ -64,6 +64,12 @@ public:
     // file is deleted, the corresponding row will be removed from the model.
     Q_INVOKABLE void update(const QString &filePath);
 
+    // Remove file at a specific index in the list
+    Q_INVOKABLE bool removeAt(int index);
+
+    // Clear all files from the list
+    Q_INVOKABLE void clear();
+
     // This property returns the number of items in the model
     Q_PROPERTY(int count READ count NOTIFY filesChanged)
     int count() const { return m_files.size(); }

@@ -187,6 +187,30 @@ void ScriteFileListModel::update(const QString &filePath)
     futureWatcher->setFuture(future);
 }
 
+bool ScriteFileListModel::removeAt(int index)
+{
+    if (index < 0 || index >= m_files.size())
+        return false;
+
+    this->beginRemoveRows(QModelIndex(), index, index);
+    const ScriteFileInfo sfi = m_files.takeAt(index);
+    m_watcher->removePath(sfi.filePath);
+    this->endRemoveRows();
+
+    return true;
+}
+
+void ScriteFileListModel::clear()
+{
+    if (m_files.isEmpty())
+        return;
+
+    this->beginResetModel();
+    m_files.clear();
+    m_watcher->removePaths(m_watcher->files());
+    this->endResetModel();
+}
+
 void ScriteFileListModel::updateFromScriteFileInfo(const ScriteFileInfo &sfi)
 {
     if (sfi.filePath.isEmpty())

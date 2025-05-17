@@ -1,2 +1,4 @@
-HomeScreen 1.0 HomeScreen.qml
+HomeScreenImpl 1.0 HomeScreenImpl.qml
 Poster 1.0 Poster.qml
+
+singleton EditRecentFilesDialog 1.0 EditRecentFilesDialog.qml

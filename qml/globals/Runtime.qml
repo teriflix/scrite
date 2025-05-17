@@ -517,6 +517,8 @@ Item {
         id: _recentFiles
         source: ScriteFileListModel.RecentFiles
 
+        property bool preferTitleVersionText: true
+
         Component.onCompleted: {
             Scrite.document.justLoaded.connect(onDocumentJustLoaded)
             Scrite.document.justSaved.connect(onDocumentJustSaved)
@@ -643,6 +645,7 @@ Item {
         category: "RecentFiles"
 
         property var files: []
+        property alias preferTitleVersionText: _recentFiles.preferTitleVersionText
     }
 
     Connections {
