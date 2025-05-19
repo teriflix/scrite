@@ -3459,6 +3459,8 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
                 SceneDocumentBlockUserData *prevUserData =
                         SceneDocumentBlockUserData::get(previousBlock);
                 SceneElement *prevElement = prevUserData->sceneElement();
+                newElement->setType(prevElement->type());
+
                 switch (prevElement->type()) {
                 case SceneElement::Action:
                     newElement->setType(SceneElement::Action);
