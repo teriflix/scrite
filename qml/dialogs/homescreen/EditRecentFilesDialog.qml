@@ -61,7 +61,10 @@ DialogLauncher {
 
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-                        ScrollBar.vertical: VclScrollBar { flickable: recentFilesView }
+                        ScrollBar.vertical: VclScrollBar {
+                            id: recentFilesViewVScrollBar
+                            flickable: recentFilesView
+                        }
 
                         anchors.fill: parent
                         anchors.margins: 1
@@ -92,9 +95,11 @@ DialogLauncher {
                             RowLayout {
                                 id: delegateLayout
 
-                                anchors.centerIn: parent
+                                anchors.left: parent.left
+                                anchors.leftMargin: 10
+                                anchors.verticalCenter: parent.verticalCenter
 
-                                width: parent.width-20
+                                width: parent.width-(recentFilesViewVScrollBar.needed ? 30 : 15)
                                 spacing: 10
 
                                 Rectangle {
@@ -132,7 +137,7 @@ DialogLauncher {
 
                                         font.bold: true
                                         text: {
-                                            const title = fileInfo.title === "" ? "<Untitled Screenplay>" : fileInfo.title + ""
+                                            const title = fileInfo.title === "" ? "Untitled Screenplay" : fileInfo.title + ""
                                             const version = fileInfo.version
                                             return version === "" ? title : (title + " <font size=\"-1\">(" + version + ")</font>")
                                         }
@@ -164,6 +169,8 @@ DialogLauncher {
 
                                 VclToolButton {
                                     icon.source: "qrc:/icons/action/delete.png"
+                                    hoverEnabled: true
+                                    opacity: hovered ? 1 : 0.25
 
                                     onClicked: Runtime.recentFiles.removeAt(index)
                                 }

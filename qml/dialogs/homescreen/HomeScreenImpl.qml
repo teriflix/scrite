@@ -820,6 +820,9 @@ Item {
                 VclToolButton {
                     Layout.preferredHeight: quickFileOptionsLabel.height
                     Layout.preferredWidth: quickFileOptionsLabel.height
+
+                    icon.width: quickFileOptionsLabel.height * 0.75
+                    icon.height: quickFileOptionsLabel.height * 0.75
                     icon.source: "qrc:/icons/action/edit.png"
 
                     onClicked: EditRecentFilesDialog.launch()
