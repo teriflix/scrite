@@ -2452,6 +2452,15 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     if (this->document() == nullptr)
         return;
 
+    const bool allTextSelected = [=]() -> bool {
+        if (fromPosition > 0)
+            return false;
+
+        QTextCursor cursor(m_textDocument->textDocument());
+        cursor.movePosition(QTextCursor::End);
+        return toPosition == cursor.position();
+    }();
+
     QJsonArray content;
 
     auto addParaToContent = [&content](int type, int alignment, const QString &text,
@@ -2473,7 +2482,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
 
     Fountain::Body fBody;
 
-    if (fromPosition == 0 && m_scene->heading()->isEnabled()) {
+    if (allTextSelected && m_scene->heading()->isEnabled()) {
         // Copy the scene heading and synopsis to both fountain and JSON representations
         Fountain::Element fElement;
         fElement.text = m_scene->heading()->displayText();
@@ -2612,7 +2621,7 @@ int SceneDocumentBinder::paste(int fromPosition)
             if (text.contains('\n')) {
                 Fountain::Parser parser(text, Screenplay::fountainPasteOptions());
 
-                bool applySceneHeading = fromPosition == 0;
+                bool applySceneHeading = fromPosition == 0 && m_scene->isEmpty();
 
                 const Fountain::Body fBody = parser.body();
                 if (fBody.size() == 1 && fBody.first().type == Fountain::Element::Action) {
@@ -2697,7 +2706,7 @@ int SceneDocumentBinder::paste(int fromPosition)
         if (content.isEmpty())
             return -1;
 
-        bool applySceneHeading = fromPosition == 0;
+        bool applySceneHeading = fromPosition == 0 && m_scene->isEmpty();
 
         for (const QJsonValue &item : content) {
             const QJsonObject itemObject = item.toObject();
