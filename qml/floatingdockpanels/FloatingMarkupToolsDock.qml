@@ -267,7 +267,13 @@ FloatingDock {
                 enabled: _private.sceneElement && _private.sceneElement.type === SceneElement.Action
                 iconSource: "qrc:/icons/editor/format_align_left.png"
 
-                onClicked: _private.sceneElement.alignment = _private.sceneElement.alignment === Qt.AlignLeft ? 0 : Qt.AlignLeft
+                onClicked: {
+                    const alignment = _private.sceneElement.alignment === Qt.AlignLeft ? 0 : Qt.AlignLeft
+                    _private.sceneElement.alignment = alignment
+
+                    const selectedElements = sceneDocumentBinder.selectedElements
+                    selectedElements.forEach( (element) => { element.alignment = alignment })
+                }
             }
 
             SimpleToolButton {
@@ -275,7 +281,13 @@ FloatingDock {
                 enabled: _private.sceneElement && _private.sceneElement.type === SceneElement.Action
                 iconSource: "qrc:/icons/editor/format_align_center.png"
 
-                onClicked: _private.sceneElement.alignment = _private.sceneElement.alignment === Qt.AlignHCenter ? 0 : Qt.AlignHCenter
+                onClicked: {
+                    const alignment = _private.sceneElement.alignment === Qt.AlignHCenter ? 0 : Qt.AlignHCenter
+                    _private.sceneElement.alignment = alignment
+
+                    const selectedElements = sceneDocumentBinder.selectedElements
+                    selectedElements.forEach( (element) => { element.alignment = alignment })
+                }
             }
 
             SimpleToolButton {
@@ -283,7 +295,13 @@ FloatingDock {
                 enabled: _private.sceneElement && _private.sceneElement.type === SceneElement.Action
                 iconSource: "qrc:/icons/editor/format_align_right.png"
 
-                onClicked: _private.sceneElement.alignment = _private.sceneElement.alignment === Qt.AlignRight ? 0 : Qt.AlignRight
+                onClicked: {
+                    const alignment = _private.sceneElement.alignment === Qt.AlignRight ? 0 : Qt.AlignRight
+                    _private.sceneElement.alignment = alignment
+
+                    const selectedElements = sceneDocumentBinder.selectedElements
+                    selectedElements.forEach( (element) => { element.alignment = alignment })
+                }
             }
 
             Rectangle {

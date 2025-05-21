@@ -1730,6 +1730,10 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
             &SceneDocumentBinder::activateCurrentElementDefaultLanguage);
     connect(m_textFormat, &TextFormat::formatChanged, this,
             &SceneDocumentBinder::activateCurrentElementDefaultLanguage);
+    connect(this, &SceneDocumentBinder::selectionStartPositionChanged, this,
+            &SceneDocumentBinder::selectedElementsChanged);
+    connect(this, &SceneDocumentBinder::selectionEndPositionChanged, this,
+            &SceneDocumentBinder::selectedElementsChanged);
 }
 
 SceneDocumentBinder::~SceneDocumentBinder() { }
@@ -2142,6 +2146,35 @@ void SceneDocumentBinder::setShots(const QStringList &val)
 
     m_shots = val;
     emit shotsChanged();
+}
+
+QList<SceneElement *> SceneDocumentBinder::selectedElements() const
+{
+    QList<SceneElement *> ret;
+
+    if (m_selectionStartPosition < 0 || m_selectionEndPosition < 0
+        || m_selectionEndPosition < m_selectionStartPosition)
+        return ret;
+
+    QTextDocument *doc = m_textDocument ? m_textDocument->textDocument() : nullptr;
+
+    QTextCursor cursor(doc);
+    cursor.setPosition(m_selectionStartPosition);
+
+    while (1) {
+        QTextBlock block = cursor.block();
+        SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(block);
+        if (userData)
+            ret << userData->sceneElement();
+
+        if (!cursor.movePosition(QTextCursor::NextBlock))
+            break;
+
+        if (cursor.position() > m_selectionEndPosition)
+            break;
+    }
+
+    return ret;
 }
 
 SceneElement *SceneDocumentBinder::sceneElementAt(int cursorPosition) const

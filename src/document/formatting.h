@@ -652,6 +652,10 @@ public:
                        cursorPositionChanged)
     int currentElementCursorPosition() const { return m_currentElementCursorPosition; }
 
+    Q_PROPERTY(QList<SceneElement*> selectedElements READ selectedElements NOTIFY selectedElementsChanged)
+    QList<SceneElement *> selectedElements() const;
+    Q_SIGNAL void selectedElementsChanged();
+
     Q_INVOKABLE SceneElement *sceneElementAt(int cursorPosition) const;
     Q_INVOKABLE QRectF sceneElementBoundingRect(SceneElement *sceneElement) const;
 
