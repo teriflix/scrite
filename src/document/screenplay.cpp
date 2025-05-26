@@ -2230,8 +2230,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
             &Screenplay::evaluateIfHeightHintsAreAvailableLater, Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::omittedChanged, this,
             &Screenplay::onScreenplayElementOmittedChanged, Qt::UniqueConnection);
-    connect(ptr, &ScreenplayElement::selectedChanged, this,
-            &Screenplay::onScreenplayElementOmittedChanged, Qt::UniqueConnection);
+    // connect(ptr, &ScreenplayElement::selectedChanged, this,
+    //         &Screenplay::onScreenplayElementOmittedChanged, Qt::UniqueConnection);
 }
 
 void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
@@ -2261,8 +2261,8 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
                &Screenplay::evaluateIfHeightHintsAreAvailableLater);
     disconnect(ptr, &ScreenplayElement::omittedChanged, this,
                &Screenplay::onScreenplayElementOmittedChanged);
-    disconnect(ptr, &ScreenplayElement::selectedChanged, this,
-               &Screenplay::onScreenplayElementOmittedChanged);
+    // disconnect(ptr, &ScreenplayElement::selectedChanged, this,
+    //            &Screenplay::onScreenplayElementOmittedChanged);
 }
 
 void Screenplay::setWordCount(int val)
