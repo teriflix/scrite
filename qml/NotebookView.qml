@@ -246,7 +246,7 @@ Rectangle {
                     var ret = "Adds a new text or form note"
                     if(!enabled)
                         return ret
-                    ret += " to" + notebookTree.currentData.notebookItemTitle
+                    ret += " to " + notebookTree.currentData.notebookItemTitle
                     return ret
                 }
                 down: newNoteMenu.visible

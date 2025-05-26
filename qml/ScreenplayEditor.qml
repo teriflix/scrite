@@ -4722,7 +4722,7 @@ Rectangle {
         sourceComponent: UiElementHighlight {
             uiElement: pageCountButton
             onDone: pausePaginationAnimator.active = false
-            description: "Time & Page Count: " + (Runtime.screenplayTextDocument.paused ? "Disbled" : "Enabled")
+            description: "Time & Page Count: " + (Runtime.screenplayTextDocument.paused ? "Disabled" : "Enabled")
             descriptionPosition: Item.TopRight
             property bool scaleDone: false
             onScaleAnimationDone: scaleDone = true
