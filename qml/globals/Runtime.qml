@@ -133,6 +133,9 @@ Item {
         property bool pasteByMergingAdjacentElements: true
         property bool pasteAfterResolvingEmphasis: true
         property bool pasteByLinkingScenesWhenPossible: true
+
+        property bool longSceneWarningEnabled: true
+        property int  longSceneWordTreshold: 150
     }
 
     readonly property Settings pdfExportSettings: Settings {

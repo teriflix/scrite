@@ -3125,6 +3125,31 @@ Rectangle {
 //                    property bool headingFieldOnly: !Runtime.screenplayEditorSettings.displaySceneCharacters && !Runtime.screenplayEditorSettings.displaySceneSynopsis
 //                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
 
+                    Loader {
+                        width: headingFontMetrics.height
+                        height: width
+                        anchors.verticalCenter: sceneNumberField.verticalCenter
+                        anchors.verticalCenterOffset: -headingFontMetrics.descent
+                        active: Runtime.screenplayEditorSettings.longSceneWarningEnabled && headingItem.theScene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
+
+                        sourceComponent: Image {
+                            smooth: true
+                            mipmap: true
+                            source: "qrc:/icons/content/warning.png"
+                            fillMode: Image.PreserveAspectFit
+
+                            MouseArea {
+                                anchors.fill: parent
+
+                                enabled: parent.visible
+                                hoverEnabled: enabled
+
+                                ToolTip.text: "" + headingItem.theScene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
+                                ToolTip.visible: containsMouse
+                            }
+                        }
+                    }
+
                     SceneTypeImage {
                         width: headingFontMetrics.height
                         height: width
@@ -3132,6 +3157,7 @@ Rectangle {
                         anchors.verticalCenter: sceneNumberField.verticalCenter
                         anchors.verticalCenterOffset: -headingFontMetrics.descent
                         sceneType: headingItem.theScene.type
+                        visible: sceneType !== 0
                     }
 
                     VclTextField {
@@ -3947,6 +3973,30 @@ Rectangle {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: 5
 
+                            Loader {
+                                Layout.alignment: Qt.AlignVCenter
+                                Layout.preferredWidth: active ? height : 0
+                                Layout.preferredHeight: active ? delegateText.height : 0
+                                active: !delegateItem.elementIsBreak && !screenplayElement.omitted && Runtime.screenplayEditorSettings.longSceneWarningEnabled && scene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
+
+                                sourceComponent: Image {
+                                    smooth: true
+                                    mipmap: true
+                                    source: "qrc:/icons/content/warning.png"
+                                    fillMode: Image.PreserveAspectFit
+
+                                    MouseArea {
+                                        anchors.fill: parent
+
+                                        enabled: parent.visible
+                                        hoverEnabled: enabled
+
+                                        ToolTip.text: "" + scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
+                                        ToolTip.visible: containsMouse
+                                    }
+                                }
+                            }
+
                             VclLabel {
                                 id: delegateText
 
@@ -4013,25 +4063,27 @@ Rectangle {
                                 }
                             }
 
-                            Image {
+                            Loader {
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.preferredWidth: height
                                 Layout.preferredHeight: delegateText.height
+                                active: !delegateItem.elementIsBreak && !scene.hasContent
 
-                                smooth: true
-                                mipmap: true
-                                source: "qrc:/icons/content/empty_scene.png"
-                                visible: !delegateItem.elementIsBreak && !scene.hasContent
-                                fillMode: Image.PreserveAspectFit
+                                sourceComponent: Image {
+                                    smooth: true
+                                    mipmap: true
+                                    source: "qrc:/icons/content/empty_scene.png"
+                                    fillMode: Image.PreserveAspectFit
 
-                                MouseArea {
-                                    anchors.fill: parent
+                                    MouseArea {
+                                        anchors.fill: parent
 
-                                    enabled: parent.visible
-                                    hoverEnabled: enabled
+                                        enabled: parent.visible
+                                        hoverEnabled: enabled
 
-                                    ToolTip.text: "This scene is empty."
-                                    ToolTip.visible: containsMouse
+                                        ToolTip.text: "This scene is empty."
+                                        ToolTip.visible: containsMouse
+                                    }
                                 }
                             }
 

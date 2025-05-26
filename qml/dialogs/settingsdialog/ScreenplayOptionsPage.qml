@@ -138,6 +138,35 @@ Item {
                     ToolTip.visible: hovered
                     ToolTip.text: "Time & Page counting is disabled each time a new document is loaded. Check this option to have Scrite remember your preference across documents."
                 }
+
+                RowLayout {
+                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
+
+                    VclCheckBox {
+                        text: "Long Scene Warning"
+
+                        checked: Runtime.screenplayEditorSettings.longSceneWarningEnabled
+                        onToggled: Runtime.screenplayEditorSettings.longSceneWarningEnabled = checked
+                    }
+
+                    VclTextField {
+                        Layout.fillWidth: true
+
+                        text: Runtime.screenplayEditorSettings.longSceneWordTreshold
+                        onTextEdited: Runtime.screenplayEditorSettings.longSceneWordTreshold = parseInt(text)
+
+                        placeholderText: "Words Per Scene Treshold"
+                        validator: IntValidator {
+                            bottom: 50; top: 1000
+                        }
+                    }
+
+                    ToolButton {
+                        icon.source: "qrc:/icons/action/help.png"
+
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/advanced-editing-features/#chapter10_writing_with_scene-centric_precision_in_scrite")
+                    }
+                }
             }
         }
 
