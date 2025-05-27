@@ -3125,39 +3125,40 @@ Rectangle {
 //                    property bool headingFieldOnly: !Runtime.screenplayEditorSettings.displaySceneCharacters && !Runtime.screenplayEditorSettings.displaySceneSynopsis
 //                    onHeadingFieldOnlyChanged: to = parent.mapFromItem(sceneHeadingField, 0, sceneHeadingField.height).y - height
 
-                    Loader {
-                        width: headingFontMetrics.height
-                        height: width
+                    Row {
                         anchors.verticalCenter: sceneNumberField.verticalCenter
                         anchors.verticalCenterOffset: -headingFontMetrics.descent
-                        active: Runtime.screenplayEditorSettings.longSceneWarningEnabled && headingItem.theScene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
 
-                        sourceComponent: Image {
-                            smooth: true
-                            mipmap: true
-                            source: "qrc:/icons/content/warning.png"
-                            fillMode: Image.PreserveAspectFit
+                        Loader {
+                            width: headingFontMetrics.height
+                            height: width
+                            active: Runtime.screenplayEditorSettings.longSceneWarningEnabled && headingItem.theScene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
 
-                            MouseArea {
-                                anchors.fill: parent
+                            sourceComponent: Image {
+                                smooth: true
+                                mipmap: true
+                                source: "qrc:/icons/content/warning.png"
+                                fillMode: Image.PreserveAspectFit
 
-                                enabled: parent.visible
-                                hoverEnabled: enabled
+                                MouseArea {
+                                    anchors.fill: parent
 
-                                ToolTip.text: "" + headingItem.theScene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
-                                ToolTip.visible: containsMouse
+                                    enabled: parent.visible
+                                    hoverEnabled: enabled
+
+                                    ToolTip.text: "" + headingItem.theScene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
+                                    ToolTip.visible: containsMouse
+                                }
                             }
                         }
-                    }
 
-                    SceneTypeImage {
-                        width: headingFontMetrics.height
-                        height: width
-                        lightBackground: Scrite.app.isLightColor(headingItem.color)
-                        anchors.verticalCenter: sceneNumberField.verticalCenter
-                        anchors.verticalCenterOffset: -headingFontMetrics.descent
-                        sceneType: headingItem.theScene.type
-                        visible: sceneType !== 0
+                        SceneTypeImage {
+                            width: headingFontMetrics.height
+                            height: width
+                            lightBackground: Scrite.app.isLightColor(headingItem.color)
+                            sceneType: headingItem.theScene.type
+                            visible: sceneType !== 0
+                        }
                     }
 
                     VclTextField {

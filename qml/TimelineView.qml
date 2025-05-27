@@ -754,17 +754,45 @@ Item {
                         }
                     }
 
-                    SceneTypeImage {
+                    Row {
                         anchors.left: parent.left
                         anchors.bottom: parent.bottom
                         anchors.margins: 5
-                        width: 24; height: 24
-                        opacity: 0.5
-                        showTooltip: false
                         visible: !isBreakElement && parent.width > screenplayElementList.minimumDelegateWidthForTextVisibility
-                        sceneType: elementItemDelegate.element.scene ? elementItemDelegate.element.scene.type : Scene.Standard
-                        lightBackground: Scrite.app.isLightColor(parent.color)
+
+                        Loader {
+                            width: 24; height: 24
+                            active: !isBreakElement && Runtime.screenplayEditorSettings.longSceneWarningEnabled &&
+                                    elementItemDelegate.element.scene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
+                            visible: active
+
+                            sourceComponent: Image {
+                                smooth: true
+                                mipmap: true
+                                source: Scrite.app.isLightColor(elementItemBoxItem.color) ? "qrc:/icons/content/warning.png" : "qrc:/icons/content/warning_inverted.png"
+                                fillMode: Image.PreserveAspectFit
+
+                                MouseArea {
+                                    anchors.fill: parent
+
+                                    enabled: parent.visible
+                                    hoverEnabled: enabled
+
+                                    ToolTip.text: "" + elementItemDelegate.element.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
+                                    ToolTip.visible: containsMouse
+                                }
+                            }
+                        }
+
+                        SceneTypeImage {
+                            width: 24; height: 24
+                            showTooltip: false
+                            sceneType: elementItemDelegate.element.scene ? elementItemDelegate.element.scene.type : Scene.Standard
+                            visible: sceneType !== Scene.Standard
+                            lightBackground: Scrite.app.isLightColor(elementItemBoxItem.color)
+                        }
                     }
+
 
                     Image {
                         id: dragTriggerButton
