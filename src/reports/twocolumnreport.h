@@ -40,6 +40,14 @@ public:
     Layout layout() const { return m_layout; }
     Q_SIGNAL void layoutChanged();
 
+    Q_CLASSINFO("leftColumnWidth_FieldGroup", "Layout")
+    Q_CLASSINFO("leftColumnWidth_FieldLabel", "Column Width Distribution")
+    Q_CLASSINFO("leftColumnWidth_FieldEditor", "TwoColumnWidthDistributionEditor")
+    Q_PROPERTY(qreal leftColumnWidth READ leftColumnWidth WRITE setLeftColumnWidth NOTIFY leftColumnWidthChanged)
+    void setLeftColumnWidth(qreal val);
+    qreal leftColumnWidth() const { return m_leftColumnWidth; }
+    Q_SIGNAL void leftColumnWidthChanged();
+
     Q_CLASSINFO("generateTitlePage_FieldGroup", "Options")
     Q_CLASSINFO("generateTitlePage_FieldLabel", "Generate title page.")
     Q_CLASSINFO("generateTitlePage_FieldEditor", "CheckBox")
@@ -161,6 +169,7 @@ private:
     QStringList m_tags;
     bool m_useSingleFont = false;
     bool m_includeLogline = true;
+    qreal m_leftColumnWidth = 0.5;
     bool m_generateTitlePage = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;

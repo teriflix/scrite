@@ -33,5 +33,5 @@ VclCheckBox {
 
     text: fieldInfo.label
 
-    onToggled: report ? report.setConfigurationValue(fieldInfo.name, checked) : false
+    onToggled: if(report) report.setConfigurationValue(fieldInfo.name, checked)
 }

@@ -40,6 +40,16 @@ void TwoColumnReport::setLayout(Layout val)
     emit layoutChanged();
 }
 
+void TwoColumnReport::setLeftColumnWidth(qreal val)
+{
+    qreal val2 = qBound(0.2, val, 0.8);
+    if (qFuzzyCompare(m_leftColumnWidth, val2))
+        return;
+
+    m_leftColumnWidth = val2;
+    emit leftColumnWidthChanged();
+}
+
 void TwoColumnReport::setGenerateTitlePage(bool val)
 {
     if (m_generateTitlePage == val)
@@ -327,18 +337,22 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             sceneTableFormat.setColumns(2);
 
             if (this->format() == AdobePDF) {
+                const int lColWidth = qRound(m_leftColumnWidth * 100.0);
+                const int rColWidth = 100 - lColWidth;
                 sceneTableFormat.setColumnWidthConstraints(
-                        { QTextLength(QTextLength::PercentageLength, 50),
-                          QTextLength(QTextLength::PercentageLength, 50) });
+                        { QTextLength(QTextLength::PercentageLength, lColWidth),
+                          QTextLength(QTextLength::PercentageLength, rColWidth) });
             } else {
                 const qreal pageWidth = document->pageSize().width();
                 const QTextFrameFormat rootFrameFormat = document->rootFrame()->frameFormat();
-                const qreal availableWidth =
-                        pageWidth - rootFrameFormat.leftMargin() - rootFrameFormat.rightMargin();
-                const qreal columnWidth = availableWidth * 0.4;
+                const qreal availableWidth = 0.8
+                        * (pageWidth - rootFrameFormat.leftMargin()
+                           - rootFrameFormat.rightMargin());
+                const qreal lColWidth = availableWidth * m_leftColumnWidth;
+                const qreal rColWidth = availableWidth - lColWidth;
                 sceneTableFormat.setColumnWidthConstraints(
-                        { QTextLength(QTextLength::FixedLength, columnWidth),
-                          QTextLength(QTextLength::FixedLength, columnWidth) });
+                        { QTextLength(QTextLength::FixedLength, lColWidth),
+                          QTextLength(QTextLength::FixedLength, rColWidth) });
             }
             sceneTableFormat.setCellPadding(5);
             sceneTableFormat.setBorder(0);

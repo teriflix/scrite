@@ -320,7 +320,8 @@ VclDialog {
             "EnumSelector",
             "TextBox",
             "IntegerSpinBox",
-            "TwoColumnLayoutSelector"
+            "TwoColumnLayoutSelector",
+            "TwoColumnWidthDistributionEditor"
         ]
 
         function delegateSource(kind) {
