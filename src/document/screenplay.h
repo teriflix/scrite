@@ -245,6 +245,29 @@ private:
     QObjectProperty<Screenplay> m_screenplay;
 };
 
+struct ScreenplayBreakInfo
+{
+    Q_GADGET
+
+public:
+    Q_PROPERTY(int index MEMBER index)
+    int index = -1;
+
+    Q_PROPERTY(int number MEMBER number)
+    int number = -1;
+
+    Q_PROPERTY(QString title MEMBER title)
+    QString title;
+
+    Q_PROPERTY(QString subtitle MEMBER subtitle)
+    QString subtitle;
+
+    Q_PROPERTY(QString path MEMBER path)
+    QString path;
+};
+Q_DECLARE_METATYPE(ScreenplayBreakInfo)
+Q_DECLARE_METATYPE(QList<ScreenplayBreakInfo>)
+
 class Screenplay : public QAbstractListModel, public Modifiable, public QObjectSerializer::Interface
 {
     Q_OBJECT
@@ -457,6 +480,9 @@ public:
     Q_PROPERTY(int episodeCount READ episodeCount NOTIFY episodeCountChanged)
     int episodeCount() const { return m_episodeCount; }
     Q_SIGNAL void episodeCountChanged();
+
+    Q_PROPERTY(QList<ScreenplayBreakInfo> episodeInfoList READ episodeInfoList NOTIFY episodeCountChanged)
+    QList<ScreenplayBreakInfo> episodeInfoList() const;
 
     Q_SIGNAL void screenplayChanged();
 

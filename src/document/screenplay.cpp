@@ -2114,6 +2114,9 @@ void Screenplay::insertBreakElement(Screenplay::BreakType type, int index)
 
 void Screenplay::updateBreakTitles()
 {
+    if (this->property("#avoidUpdateBreakTitles").toBool())
+        return;
+
     QStringList actNames;
     if (this->scriteDocument() != nullptr) {
         Structure *structure = this->scriteDocument()->structure();
@@ -3183,6 +3186,31 @@ void Screenplay::onScreenplayElementOmittedChanged()
 void Screenplay::updateBreakTitlesLater()
 {
     m_updateBreakTitlesTimer.start(0, this);
+}
+
+QList<ScreenplayBreakInfo> Screenplay::episodeInfoList() const
+{
+    QList<ScreenplayBreakInfo> ret;
+    if (this->episodeCount() <= 0)
+        return ret;
+
+    int epIndex = 0;
+    for (int i = 0; i < m_elements.size(); i++) {
+        const ScreenplayElement *element = m_elements.at(i);
+        if (element->elementType() != ScreenplayElement::BreakElementType)
+            continue;
+
+        if (element->breakType() != Screenplay::Episode)
+            continue;
+
+        ScreenplayBreakInfo info({ epIndex, epIndex + 1, element->breakTitle(),
+                                   element->breakSubtitle(), QString() });
+        ret.append(info);
+
+        ++epIndex;
+    }
+
+    return ret;
 }
 
 void Screenplay::evaluateSceneNumbers(bool minorAlso)

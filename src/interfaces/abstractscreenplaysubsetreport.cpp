@@ -221,6 +221,7 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
     m_screenplaySubset->setSubtitle(subtitle);
     m_screenplaySubset->setPhoneNumber(screenplay->phoneNumber());
     m_screenplaySubset->setProperty("#useDocumentScreenplayForCoverPagePhoto", true);
+    m_screenplaySubset->setProperty("#avoidUpdateBreakTitles", true);
 
     int episodeNr = 0; // Episode number is 1+episodeIndex
     for (int i = 0; i < screenplay->elementCount(); i++) {

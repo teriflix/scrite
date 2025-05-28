@@ -97,18 +97,77 @@ public:
     bool isUseSingleFont() const { return m_useSingleFont; }
     Q_SIGNAL void useSingleFontChanged();
 
+    Q_CLASSINFO("characterNames_FieldGroup", "Characters")
+    Q_CLASSINFO("characterNames_FieldLabel", "Characters to include in the report")
+    Q_CLASSINFO("characterNames_FieldEditor", "MultipleCharacterNameSelector")
+    Q_CLASSINFO("characterNames_IsPersistent", "false")
+    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
+    void setCharacterNames(const QStringList &val);
+    QStringList characterNames() const { return m_characterNames; }
+    Q_SIGNAL void characterNamesChanged();
+
+    Q_CLASSINFO("highlightCharacterDialogues_FieldGroup", "Characters")
+    Q_CLASSINFO("highlightCharacterDialogues_FieldLabel", "Highlight dialogues of characters selected above.")
+    Q_CLASSINFO("highlightCharacterDialogues_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool highlightCharacterDialogues READ isHighlightCharacterDialogues WRITE setHighlightCharacterDialogues NOTIFY highlightCharacterDialoguesChanged)
+    void setHighlightCharacterDialogues(bool val);
+    bool isHighlightCharacterDialogues() const { return m_highlightCharacterDialogues; }
+    Q_SIGNAL void highlightCharacterDialoguesChanged();
+
+    Q_CLASSINFO("sceneIndexes_FieldGroup", "Scenes")
+    Q_CLASSINFO("sceneIndexes_FieldLabel", "Scenes to include in the report")
+    Q_CLASSINFO("sceneIndexes_FieldEditor", "MultipleSceneSelector")
+    Q_CLASSINFO("sceneIndexes_FieldNote", "If no scenes are selected, then the report is generted for all scenes in the screenplay.")
+    Q_CLASSINFO("sceneIndexes_IsPersistent", "false")
+    Q_PROPERTY(QList<int> sceneIndexes READ sceneIndexes WRITE setSceneIndexes NOTIFY sceneIndexesChanged)
+    void setSceneIndexes(const QList<int> &val);
+    QList<int> sceneIndexes() const { return m_sceneIndexes; }
+    Q_SIGNAL void sceneIndexesChanged();
+
+    Q_CLASSINFO("episodeNumbers_FieldGroup", "Episodes")
+    Q_CLASSINFO("episodeNumbers_FieldLabel", "Episodes to include in the report")
+    Q_CLASSINFO("episodeNumbers_FieldEditor", "MultipleEpisodeSelector")
+    Q_CLASSINFO("episodeNumbers_FieldNote", "If no episodes are selected, then the report is generted for all episodes in the screenplay.")
+    Q_CLASSINFO("episodeNumbers_IsPersistent", "false")
+    Q_PROPERTY(QList<int> episodeNumbers READ episodeNumbers WRITE setEpisodeNumbers NOTIFY episodeNumbersChanged)
+    void setEpisodeNumbers(const QList<int> &val);
+    QList<int> episodeNumbers() const { return m_episodeNumbers; }
+    Q_SIGNAL void episodeNumbersChanged();
+
+    Q_CLASSINFO("tags_FieldGroup", "Tags")
+    Q_CLASSINFO("tags_FieldLabel", "Groups/Tags to include in the report")
+    Q_CLASSINFO("tags_FieldEditor", "MultipleTagGroupSelector")
+    Q_CLASSINFO("tags_FieldNote", "If no tags are selected, then the report is generated for all tags in the screenplay.")
+    Q_CLASSINFO("tags_IsPersistent", "false")
+    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    void setTags(const QStringList &val);
+    QStringList tags() const { return m_tags; }
+    Q_SIGNAL void tagsChanged();
+
 protected:
     bool doGenerate(QTextDocument *document);
     bool requiresOdtContentPolish() const;
     bool polishOdtContent(QDomDocument &);
 
+    // These functions must return true if element should be included in the
+    // final report.
+    bool includeElementByTag(const ScreenplayElement *element) const;
+    bool includeElementByCharacter(const ScreenplayElement *element) const;
+    bool includeElementBySceneIndex(const ScreenplayElement *element) const;
+    bool includeElementByEpisodeNumber(const ScreenplayElement *element) const;
+
 private:
     Layout m_layout = VideoAudioLayout;
+    QStringList m_tags;
     bool m_useSingleFont = false;
     bool m_includeLogline = true;
     bool m_generateTitlePage = true;
     bool m_includeSceneIcons = true;
     bool m_includeSceneNumbers = true;
+    bool m_highlightCharacterDialogues = false;
+    QList<int> m_sceneIndexes;
+    QList<int> m_episodeNumbers;
+    QStringList m_characterNames;
     bool m_preserveMarkupFormatting = true;
     bool m_printEachSceneOnANewPage = true;
 };

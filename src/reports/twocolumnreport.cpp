@@ -103,6 +103,51 @@ void TwoColumnReport::setUseSingleFont(bool val)
     emit useSingleFontChanged();
 }
 
+void TwoColumnReport::setCharacterNames(const QStringList &val)
+{
+    if (m_characterNames == val)
+        return;
+
+    m_characterNames = val;
+    emit characterNamesChanged();
+}
+
+void TwoColumnReport::setHighlightCharacterDialogues(bool val)
+{
+    if (m_highlightCharacterDialogues == val)
+        return;
+
+    m_highlightCharacterDialogues = val;
+    emit highlightCharacterDialoguesChanged();
+}
+
+void TwoColumnReport::setSceneIndexes(const QList<int> &val)
+{
+    if (m_sceneIndexes == val)
+        return;
+
+    m_sceneIndexes = val;
+    emit sceneIndexesChanged();
+}
+
+void TwoColumnReport::setEpisodeNumbers(const QList<int> &val)
+{
+    if (m_episodeNumbers == val)
+        return;
+
+    m_episodeNumbers = val;
+    emit episodeNumbersChanged();
+}
+
+void TwoColumnReport::setTags(const QStringList &val)
+{
+    if (m_tags == val)
+        return;
+
+    m_tags = val;
+    emit tagsChanged();
+}
+
 bool TwoColumnReport::doGenerate(QTextDocument *document)
 {
     QFont defaultFont = document->defaultFont();
@@ -117,6 +162,21 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             screenplay->elementCount() + 2; // one for title-page and another for writing to file
     const qreal progressStep = 1.0 / qreal(nrProgressSteps);
     this->progress()->setProgressStep(progressStep);
+
+    const QMap<QString, QColor> dialogueColorMap = [=]() -> QMap<QString, QColor> {
+        static const QList<QColor> highlightColorOptions(
+                { QColor("#FFFF00"), QColor("#FFA500"), QColor("#FF69B4"), QColor("#00FF00"),
+                  QColor("#00BFFF"), QColor("#DA70D6"), QColor("#FF4500"), QColor("#40E0D0"),
+                  QColor("#C8A2C8"), QColor("#FFFFE0") });
+
+        QMap<QString, QColor> ret;
+        for (int i = 0; i < m_characterNames.size(); i++) {
+            ret[m_characterNames.at(i)] =
+                    highlightColorOptions.at(i % highlightColorOptions.size());
+        }
+
+        return ret;
+    }();
 
     format->pageLayout()->configure(document);
     document->setIndentWidth(10);
@@ -160,13 +220,17 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
     this->progress()->tick();
 
-    auto elementCharFormat = [format, document](SceneElement::Type type) -> QTextCharFormat {
+    auto elementCharFormat = [format, document](SceneElement::Type type,
+                                                const QColor &bgColor =
+                                                        Qt::transparent) -> QTextCharFormat {
         SceneElementFormat *eformat = format->elementFormat(type);
 
         QTextCharFormat format = eformat->createCharFormat();
         format.clearProperty(QTextFormat::FontPointSize);
         format.setFontFamily(document->defaultFont().family());
         format.setFontPointSize(document->defaultFont().pointSize());
+        if (bgColor.alpha() > 0)
+            format.setBackground(QBrush(bgColor));
 
         switch (type) {
         case SceneElement::Heading:
@@ -193,11 +257,23 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
     QTextTable *sceneTable = nullptr;
     int sceneCount = -1;
     int currentRow = 0;
-    int nrElements = screenplay->elementCount();
+    // int nrElements = screenplay->elementCount();
 
     auto includeElementInReport = [=](const ScreenplayElement *element) -> bool {
         const Scene *scene = element ? element->scene() : nullptr;
         if (scene == nullptr)
+            return false;
+
+        if (!this->includeElementByEpisodeNumber(element))
+            return false;
+
+        if (!this->includeElementByTag(element))
+            return false;
+
+        if (!this->includeElementBySceneIndex(element))
+            return false;
+
+        if (!this->includeElementByCharacter(element))
             return false;
 
         return true;
@@ -205,8 +281,8 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
     for (int i = 0; i < screenplay->elementCount(); i++) {
         const ScreenplayElement *element = screenplay->elementAt(i);
-        this->progress()->setProgressText(
-                QString("Processing %1 of %2 elements ...").arg(i + 1).arg(nrElements));
+        // this->progress()->setProgressText(
+        //         QString("Processing %1 of %2 elements ...").arg(i + 1).arg(nrElements));
         this->progress()->tick();
         if (!includeElementInReport(element))
             continue;
@@ -323,8 +399,19 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
 
         if (m_layout == EverythingRight || m_layout == EverythingLeft) {
             if (!element->isOmitted()) {
+                QString currentCharacter;
+
                 for (int j = 0; j < scene->elementCount(); j++) {
                     const SceneElement *sceneElement = scene->elementAt(j);
+
+                    if (sceneElement->type() == SceneElement::Character)
+                        currentCharacter =
+                                sceneElement->formattedText().section('(', 0, 0).trimmed();
+                    else if (QList<int>({ SceneElement::Action, SceneElement::Shot,
+                                          SceneElement::Transition })
+                                     .contains(sceneElement->type()))
+                        currentCharacter.clear();
+
                     const bool dialogueOrParenthetical =
                             QVector<SceneElement::Type>(
                                     { SceneElement::Parenthetical, SceneElement::Dialogue })
@@ -346,6 +433,11 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
                             ? QStringLiteral(": ")
                             : QString();
                     const QString text = sceneElement->formattedText() + suffix;
+                    const QColor bgColor = !m_highlightCharacterDialogues
+                                    || sceneElement->type() != SceneElement::Dialogue
+                                    || currentCharacter.isEmpty() || m_characterNames.isEmpty()
+                            ? Qt::transparent
+                            : dialogueColorMap.value(currentCharacter, Qt::transparent);
 
                     if (dialogueOrParenthetical
                         || sceneElement->type() == SceneElement::Character) {
@@ -355,14 +447,24 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
                         cursor.mergeBlockFormat(format);
                     }
 
-                    cursor.setCharFormat(elementCharFormat(sceneElement->type()));
+                    cursor.setCharFormat(elementCharFormat(sceneElement->type(), bgColor));
                     includeText(cursor, text, sceneElement->textFormats());
                 }
             }
         } else {
             if (!element->isOmitted()) {
+                QString currentCharacter;
+
                 for (int j = 0; j < scene->elementCount(); j++) {
                     const SceneElement *sceneElement = scene->elementAt(j);
+
+                    if (sceneElement->type() == SceneElement::Character)
+                        currentCharacter =
+                                sceneElement->formattedText().section('(', 0, 0).trimmed();
+                    else if (QList<int>({ SceneElement::Action, SceneElement::Shot,
+                                          SceneElement::Transition })
+                                     .contains(sceneElement->type()))
+                        currentCharacter.clear();
 
                     switch (sceneElement->type()) {
                     case SceneElement::Action:
@@ -400,8 +502,14 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
                                     sceneElement->textFormats());
                     } break;
                     case SceneElement::Dialogue: {
+                        const QColor bgColor = !m_highlightCharacterDialogues
+                                        || sceneElement->type() != SceneElement::Dialogue
+                                        || currentCharacter.isEmpty() || m_characterNames.isEmpty()
+                                ? Qt::transparent
+                                : dialogueColorMap.value(currentCharacter, Qt::transparent);
+
                         cursor = placeCursor(RightColumn);
-                        cursor.setCharFormat(elementCharFormat(sceneElement->type()));
+                        cursor.setCharFormat(elementCharFormat(sceneElement->type(), bgColor));
                         includeText(cursor, sceneElement->formattedText(),
                                     sceneElement->textFormats());
                         cursor = moveToNextRow();
@@ -462,4 +570,59 @@ bool TwoColumnReport::polishOdtContent(QDomDocument &xmlDoc)
     }
 
     return success;
+}
+
+bool TwoColumnReport::includeElementByTag(const ScreenplayElement *element) const
+{
+    if (m_tags.isEmpty())
+        return true;
+
+    const Scene *scene = element->scene();
+    const QStringList sceneTags = scene->groups();
+    if (sceneTags.isEmpty())
+        return false;
+
+    QStringList tags;
+    std::copy_if(sceneTags.begin(), sceneTags.end(), std::back_inserter(tags),
+                 [=](const QString &sceneTag) {
+                     return tags.isEmpty() ? m_tags.contains(sceneTag) : false;
+                 });
+
+    return !tags.isEmpty();
+}
+
+bool TwoColumnReport::includeElementByCharacter(const ScreenplayElement *element) const
+{
+    if (m_characterNames.isEmpty())
+        return true;
+
+    const Scene *scene = element->scene();
+    const QStringList sceneCharacters = scene->characterNames();
+    for (const QString &characterName : qAsConst(m_characterNames))
+        if (sceneCharacters.contains(characterName))
+            return true;
+
+    return false;
+}
+
+bool TwoColumnReport::includeElementBySceneIndex(const ScreenplayElement *element) const
+{
+    if (m_sceneIndexes.isEmpty())
+        return true;
+
+    const int sceneIndex = element->elementIndex();
+    return m_sceneIndexes.contains(sceneIndex);
+}
+
+bool TwoColumnReport::includeElementByEpisodeNumber(const ScreenplayElement *element) const
+{
+    if (m_episodeNumbers.isEmpty())
+        return true;
+
+    const Screenplay *screenplay = element->screenplay();
+    if (screenplay->episodeCount() <= 0)
+        return true;
+
+    const int episodeNumber = element->episodeIndex() + 1;
+    return (m_episodeNumbers.contains(episodeNumber));
 }

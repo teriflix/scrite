@@ -57,11 +57,20 @@ ColumnLayout {
             color: Runtime.colors.primary.c50.background
             border.width: 1
             border.color: Runtime.colors.primary.c50.text
+
+            VclText {
+                anchors.centerIn: parent
+
+                width: parent.width * 0.8
+                text: "No espisodes in this screenplay"
+                visible: Scrite.document.screenplay.episodeCount === 0
+                horizontalAlignment: Text.AlignHCenter
+            }
         }
 
         ListView {
             id: episodeListView
-            model: Scrite.document.screenplay.episodeCount + 1
+            model: Scrite.document.screenplay.episodeInfoList
             clip: true
             property var episodeNumbers: report.getConfigurationValue(fieldInfo.name)
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
@@ -84,25 +93,16 @@ ColumnLayout {
                 report.setConfigurationValue(fieldInfo.name, numbers)
             }
 
-            delegate: Item {
+            delegate: VclCheckBox {
+                required property var modelData // This is a gadget of type ScreenplayBreakInfo
+                property int episodeNumber: modelData.number
+                property string episodeName: modelData.title + ": " + modelData.subtitle
+
                 width: episodeListView.width-1
-                height: index > 0 ? 40 : (Scrite.document.screenplay.episodeCount === 0 ? 40 : 0)
 
-                VclLabel {
-                    text: "No espisodes in this screenplay"
-                    visible: Scrite.document.screenplay.episodeCount === 0
-                    anchors.centerIn: parent
-                }
-
-                VclCheckBox {
-                    text: "EPISODE " + index
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: index > 0
-                    font.family: Scrite.document.formatting.defaultFont.family
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    checked: episodeListView.episodeNumbers.indexOf(index) >= 0
-                    onToggled: episodeListView.select(index, checked)
-                }
+                text: episodeName
+                checked: episodeListView.episodeNumbers.indexOf(episodeNumber) >= 0
+                onToggled: episodeListView.select(episodeNumber, checked)
             }
         }
     }
