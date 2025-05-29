@@ -23,57 +23,92 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/structure"
 
 VclMenu {
-    id: screenplayContextMenu
+    id: root
 
     property ScreenplayElement element
 
     SceneGroup {
-        id: elementItemMenuSceneGroup
+        id: sceneGroup
         structure: Scrite.document.structure
     }
 
     onAboutToShow: {
         Runtime.undoStack.sceneListPanelActive = true
         if(element.selected) {
-            Scrite.document.screenplay.gatherSelectedScenes(elementItemMenuSceneGroup)
+            Scrite.document.screenplay.gatherSelectedScenes(sceneGroup)
         } else {
             Scrite.document.screenplay.clearSelection()
             element.selected = true
-            elementItemMenuSceneGroup.addScene(element.scene)
+            sceneGroup.addScene(element.scene)
         }
     }
 
     onClosed: {
         element = null
-        elementItemMenuSceneGroup.clearScenes()
+        sceneGroup.clearScenes()
+    }
+
+    VclMenuItem {
+        enabled: sceneGroup.sceneCount === 1 && root.element && root.element.scene
+
+        action: Action {
+            text: "Scene Heading"
+            checkable: true
+            checked: root.element && root.element.scene && root.element.scene.heading.enabled
+        }
+        onTriggered: root.element.scene.heading.enabled = action.checked
+    }
+
+    VclMenu {
+        enabled: sceneGroup.sceneCount === 1
+
+        title: "Page Breaks"
+
+        VclMenuItem {
+            action: Action {
+                text: "Before"
+                checkable: true
+                checked: root.element && root.element.pageBreakBefore
+            }
+            onTriggered: root.element.pageBreakBefore = action.checked
+        }
+
+        VclMenuItem {
+            action: Action {
+                text: "After"
+                checkable: true
+                checked: root.element && root.element.pageBreakAfter
+            }
+            onTriggered: root.element.pageBreakAfter = action.checked
+        }
     }
 
     ColorMenu {
         title: "Color"
-        enabled: !Scrite.document.readOnly && screenplayContextMenu.element
+        enabled: !Scrite.document.readOnly && root.element
         onMenuItemClicked: {
-            for(var i=0; i<elementItemMenuSceneGroup.sceneCount; i++) {
-                elementItemMenuSceneGroup.sceneAt(i).color = color
+            for(var i=0; i<sceneGroup.sceneCount; i++) {
+                sceneGroup.sceneAt(i).color = color
             }
-            screenplayContextMenu.close()
+            root.close()
         }
     }
 
     MarkSceneAsMenu {
         title: "Mark Scene As"
-        scene: screenplayContextMenu.element ? screenplayContextMenu.element.scene : null
+        scene: root.element ? root.element.scene : null
         enabled: !Scrite.document.readOnly && !omitIncludeMenuItem.omitted
         onTriggered: {
             Runtime.undoStack.sceneListPanelActive = true
-            for(var i=0; i<elementItemMenuSceneGroup.sceneCount; i++) {
-                elementItemMenuSceneGroup.sceneAt(i).type = scene.type
+            for(var i=0; i<sceneGroup.sceneCount; i++) {
+                sceneGroup.sceneAt(i).type = scene.type
             }
-            screenplayContextMenu.close()
+            root.close()
         }
     }
 
     StructureGroupsMenu {
-        sceneGroup: elementItemMenuSceneGroup
+        sceneGroup: sceneGroup
         enabled: !Scrite.document.readOnly
     }
 
@@ -97,7 +132,7 @@ VclMenu {
         property bool omitted: Scrite.document.screenplay.selectedElementsOmitStatus !== Screenplay.NotOmitted
         text: omitted ? "Include" : "Omit"
         onClicked: {
-            screenplayContextMenu.close()
+            root.close()
             if(omitted)
                 Scrite.document.screenplay.includeSelectedElements()
             else
@@ -109,11 +144,11 @@ VclMenu {
         text: "Remove"
         enabled: !Scrite.document.readOnly
         onClicked: {
-            if(elementItemMenuSceneGroup.sceneCount <= 1)
-                Scrite.document.screenplay.removeElement(screenplayContextMenu.element)
+            if(sceneGroup.sceneCount <= 1)
+                Scrite.document.screenplay.removeElement(root.element)
             else
                 Scrite.document.screenplay.removeSelectedElements();
-            screenplayContextMenu.close()
+            root.close()
         }
     }
 }

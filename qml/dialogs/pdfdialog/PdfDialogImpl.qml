@@ -28,7 +28,7 @@ import "qrc:/qml/controls"
 VclDialog {
     id: root
 
-    width: Scrite.window.width - 50
+    width: Scrite.window.width - 51
     height: Scrite.window.height - 50
 
     property alias source: pdfView.source

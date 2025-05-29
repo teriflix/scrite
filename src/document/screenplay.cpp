@@ -287,6 +287,24 @@ void ScreenplayElement::setBreakSummary(const QString &val)
     emit breakSummaryChanged();
 }
 
+void ScreenplayElement::setPageBreakAfter(bool val)
+{
+    if (m_pageBreakAfter == val)
+        return;
+
+    m_pageBreakAfter = val;
+    emit pageBreakAfterChanged();
+}
+
+void ScreenplayElement::setPageBreakBefore(bool val)
+{
+    if (m_pageBreakBefore == val)
+        return;
+
+    m_pageBreakBefore = val;
+    emit pageBreakBeforeChanged();
+}
+
 int ScreenplayElement::wordCount() const
 {
     return m_scene.isNull() ? 0 : m_scene->wordCount();

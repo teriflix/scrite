@@ -358,8 +358,10 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             sceneTableFormat.setBorder(0);
             sceneTableFormat.setBorderBrush(Qt::NoBrush);
             sceneTableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
-            if (m_printEachSceneOnANewPage && sceneCount > 0)
+            if ((m_printEachSceneOnANewPage && sceneCount > 0) || element->isPageBreakBefore())
                 sceneTableFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
+            if (element->isPageBreakAfter())
+                sceneTableFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
 
             sceneTable = cursor.insertTable(1, 2, sceneTableFormat);
 

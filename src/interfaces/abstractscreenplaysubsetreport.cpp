@@ -280,6 +280,9 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
                 element2->setUserSceneNumber(element->userSceneNumber());
             }
 
+            element2->setPageBreakBefore(element->isPageBreakBefore());
+            element2->setPageBreakAfter(element->isPageBreakAfter());
+
             m_screenplaySubset->addElement(element2);
         }
     }

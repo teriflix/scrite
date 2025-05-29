@@ -1279,7 +1279,7 @@ Rectangle {
                 visible: episodeBreakSubtitle.length > 0
                 font: episodeBreakSubtitle.font
                 background: Item { }
-            }
+                            }
 
             VclTextField {
                 id: episodeBreakSubtitle
@@ -1395,7 +1395,7 @@ Rectangle {
                 visible: false
                 asynchronous: false
                 width: contentWidth * zoomLevel
-                height: contentHeight * zoomLevel
+                height: contentHeight * zoomLevel + ((screenplayElement.pageBreakBefore ? 1 : 0) + (screenplayElement.pageBreakAfter ? 1 : 0))*40
                 format: Scrite.document.printFormat
                 scene: parent.scene
                 active: parent.evaluateSuggestedSceneHeight && !parent.screenplayElement.omitted
@@ -1476,16 +1476,29 @@ Rectangle {
             height: omittedContentItemLayout.height
             color: Scrite.app.isVeryLightColor(theScene.color) ? Runtime.colors.primary.highlight.background : Qt.tint(theScene.color, "#9CFFFFFF")
 
-            Column {
+            ColumnLayout {
                 id: omittedContentItemLayout
                 width: parent.width
 
                 Loader {
+                    Layout.fillWidth: true
+
+                    active: omittedContentItem.theElement.pageBreakBefore
+                    visible: active
+                    sourceComponent: PageBreakItem {
+                        placement: Qt.TopEdge
+                    }
+                }
+
+                Loader {
                     id: omittedSceneHeadingAreaLoader
-                    width: parent.width
+                    Layout.fillWidth: true
+                    Layout.maximumHeight: item ? item.height : 0
+
+                    z: 1
                     active: omittedContentItem.theScene
                     sourceComponent: sceneHeadingArea
-                    z: 1
+
                     onItemChanged: {
                         if(item) {
                             item.theElementIndex = omittedContentItem.theIndex
@@ -1496,6 +1509,16 @@ Rectangle {
                 }
 
                 // For future expansion
+
+                Loader {
+                    Layout.fillWidth: true
+
+                    active: omittedContentItem.theElement.pageBreakAfter
+                    visible: active
+                    sourceComponent: PageBreakItem {
+                        placement: Qt.BottomEdge
+                    }
+                }
             }
         }
     }
@@ -1512,7 +1535,7 @@ Rectangle {
             z: isCurrent ? 2 : 1
 
             width: contentArea.width
-            height: contentItemLayout.height
+            height: contentItemLayout.implicitHeight
             color: "white"
             readonly property var binder: sceneDocumentBinder
             readonly property var editor: sceneTextEditor
@@ -1613,7 +1636,7 @@ Rectangle {
 
                 anchors.top: parent.top
                 anchors.left: parent.right
-                anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : -1
+                anchors.topMargin: screenY < 0 ? Math.min(-screenY,maxTopMargin) : (beforePageBreakLoader.active ? beforePageBreakLoader.height : 0)
 
                 buttonColor: expanded ? Qt.tint(contentItem.theScene.color, "#C0FFFFFF") : Qt.tint(contentItem.theScene.color, "#D7EEEEEE")
                 backgroundColor: buttonColor
@@ -1944,7 +1967,18 @@ Rectangle {
 
             Column {
                 id: contentItemLayout
+
                 width: parent.width
+
+                Loader {
+                    id: beforePageBreakLoader
+                    width: parent.width
+                    visible: active
+                    active: contentItem.theElement.pageBreakBefore
+                    sourceComponent: PageBreakItem {
+                        placement: Qt.TopEdge
+                    }
+                }
 
                 Loader {
                     id: sceneHeadingAreaLoader
@@ -2951,6 +2985,16 @@ Rectangle {
                         }
                     }
                 }
+
+                Loader {
+                    id: afterPageBreakLoader
+                    width: parent.width
+                    visible: active
+                    active: contentItem.theElement.pageBreakAfter
+                    sourceComponent: PageBreakItem {
+                        placement: Qt.BottomEdge
+                    }
+                }
             }
 
             Rectangle {
@@ -2959,6 +3003,8 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
+                anchors.topMargin: beforePageBreakLoader.visible ? beforePageBreakLoader.height : 0
+                anchors.bottomMargin: afterPageBreakLoader.visible ? afterPageBreakLoader.height : 0
                 color: Scrite.app.isVeryLightColor(contentItem.theScene.color) ? Runtime.colors.primary.highlight.background : Qt.tint(contentItem.theScene.color, "#9CFFFFFF")
                 visible: Runtime.screenplayAdapter.currentIndex === contentItem.theIndex
             }
@@ -3198,7 +3244,7 @@ Rectangle {
                 anchors.leftMargin: ruler.leftMarginPx
                 anchors.rightMargin: ruler.rightMarginPx
                 anchors.verticalCenter: parent.verticalCenter
-                anchors.verticalCenterOffset: Runtime.screenplayEditorSettings.displaySceneCharacters ? 8 : 4
+                anchors.verticalCenterOffset: headingItem.theElement.omitted ? 0 : (Runtime.screenplayEditorSettings.displaySceneCharacters ? 8 : 4)
 
                 Item {
                     property real spacing: 5
@@ -3391,6 +3437,28 @@ Rectangle {
                                     onTriggered: {
                                         headingItem.theScene.heading.enabled = action.checked
                                         sceneMenu.close()
+                                    }
+                                }
+
+                                VclMenu {
+                                    title: "Page Breaks"
+
+                                    VclMenuItem {
+                                        action: Action {
+                                            text: "Before"
+                                            checkable: true
+                                            checked: headingItem.theElement.pageBreakBefore
+                                        }
+                                        onTriggered: headingItem.theElement.pageBreakBefore = action.checked
+                                    }
+
+                                    VclMenuItem {
+                                        action: Action {
+                                            text: "After"
+                                            checkable: true
+                                            checked: headingItem.theElement.pageBreakAfter
+                                        }
+                                        onTriggered: headingItem.theElement.pageBreakAfter = action.checked
                                     }
                                 }
 
@@ -3931,200 +3999,237 @@ Rectangle {
                         property bool elementIsSelected: (Runtime.screenplayAdapter.currentIndex === index || screenplayElement.selected)
 
                         width: sceneListView.width-1
-                        height: delegateText.height + 16
+                        height: delegateItemLayout.height
                         color: scene ? elementIsSelected ? selectedColor : (Runtime.screenplayAdapter.isSourceScreenplay && Runtime.screenplayAdapter.screenplay.selectedElementsCount > 1 ? Qt.tint(normalColor, "#40FFFFFF") : normalColor)
                                      : Runtime.screenplayAdapter.currentIndex === index ? Scrite.app.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
 
-                        Rectangle {
-                            anchors.top: parent.top
-                            anchors.left: parent.left
-                            anchors.bottom: parent.bottom
-                            visible: elementIsSelected
-                            width: Runtime.screenplayAdapter.isSourceScreenplay && Runtime.screenplayAdapter.screenplay.selectedElementsCount > 1 ?
-                                       (Runtime.screenplayAdapter.currentIndex === index ? 10 : 5) :
-                                       8
-                            color: Runtime.colors.accent.windowColor
-                        }
+                        ColumnLayout {
+                            id: delegateItemLayout
 
-                        SceneTypeImage {
-                            id: sceneTypeImage
-                            width: 18
-                            height: 18
-                            showTooltip: false
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 12
-                            sceneType: scene ? scene.type : Scene.Standard
-                            opacity: (Runtime.screenplayAdapter.currentIndex === index ? 1 : 0.5) * t
-                            visible: t > 0
-                            lightBackground: Scrite.app.isLightColor(delegateItem.color)
-                            property real t: Runtime.screenplayAdapter.hasNonStandardScenes ? 1 : 0
-                            Behavior on t {
-                                enabled: Runtime.applicationSettings.enableAnimations
-                                NumberAnimation { duration: 250 }
-                            }
-                        }
+                            anchors.centerIn: parent
 
-                        RowLayout {
-                            property real leftMargin: 11 + (sceneTypeImage.width+12)*sceneTypeImage.t
-                            anchors.left: parent.left
-                            anchors.leftMargin: leftMargin
-                            anchors.right: parent.right
-                            anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 5) + 5
-                            anchors.verticalCenter: parent.verticalCenter
-                            spacing: 5
+                            width: parent.width
+                            spacing: 0
 
                             Loader {
-                                Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: active ? height : 0
-                                Layout.preferredHeight: active ? delegateText.height : 0
-                                active: !delegateItem.elementIsBreak && !screenplayElement.omitted && Runtime.screenplayEditorSettings.longSceneWarningEnabled && scene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
-
-                                sourceComponent: Image {
-                                    smooth: true
-                                    mipmap: true
-                                    source: "qrc:/icons/content/warning.png"
-                                    fillMode: Image.PreserveAspectFit
-
-                                    MouseArea {
-                                        anchors.fill: parent
-
-                                        enabled: parent.visible
-                                        hoverEnabled: enabled
-
-                                        ToolTip.text: "" + scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
-                                        ToolTip.visible: containsMouse
-                                    }
-                                }
-                            }
-
-                            VclLabel {
-                                id: delegateText
-
                                 Layout.fillWidth: true
-                                Layout.alignment: Qt.AlignVCenter
 
-                                property bool textIsSceneHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
+                                visible: active
+                                active: delegateItem.screenplayElement.pageBreakBefore
+                                sourceComponent: PageBreakItem {
+                                    fullSize: false
+                                    placement: Qt.TopEdge
+                                }
+                            }
 
-                                font.family: headingFontMetrics.font.family
-                                font.bold: Runtime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
-                                // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
-                                horizontalAlignment: Qt.AlignLeft
-                                color: Runtime.colors.primary.c10.text
-                                font.capitalization: delegateItem.elementIsBreak ||textIsSceneHeading ? Font.AllUppercase : Font.MixedCase
+                            Item {
+                                Layout.fillWidth: true
 
-                                elide: textIsSceneHeading ? Text.ElideMiddle : Text.ElideRight
-                                wrapMode: textIsSceneHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
-                                maximumLineCount: wrapMode === Text.NoWrap ? 1 : 2
+                                height: delegateText.height + 16
 
-                                text: {
-                                    let ret = "UNKNOWN"
-                                    if(scene) {
-                                        if(textIsSceneHeading) {
-                                            if(scene.heading.enabled) {
-                                                ret = screenplayElement.resolvedSceneNumber + ". "
-                                                if(screenplayElement.omitted)
-                                                    ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                                Rectangle {
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    anchors.bottom: parent.bottom
+                                    visible: elementIsSelected
+                                    width: Runtime.screenplayAdapter.isSourceScreenplay && Runtime.screenplayAdapter.screenplay.selectedElementsCount > 1 ?
+                                               (Runtime.screenplayAdapter.currentIndex === index ? 10 : 5) :
+                                               8
+                                    color: Runtime.colors.accent.windowColor
+                                }
+
+                                SceneTypeImage {
+                                    id: sceneTypeImage
+                                    width: 18
+                                    height: 18
+                                    showTooltip: false
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 12
+                                    sceneType: scene ? scene.type : Scene.Standard
+                                    opacity: (Runtime.screenplayAdapter.currentIndex === index ? 1 : 0.5) * t
+                                    visible: t > 0
+                                    lightBackground: Scrite.app.isLightColor(delegateItem.color)
+                                    property real t: Runtime.screenplayAdapter.hasNonStandardScenes ? 1 : 0
+                                    Behavior on t {
+                                        enabled: Runtime.applicationSettings.enableAnimations
+                                        NumberAnimation { duration: 250 }
+                                    }
+                                }
+
+                                RowLayout {
+                                    property real leftMargin: 11 + (sceneTypeImage.width+12)*sceneTypeImage.t
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: leftMargin
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 5) + 5
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 5
+
+                                    Loader {
+                                        Layout.alignment: Qt.AlignVCenter
+                                        Layout.preferredWidth: active ? height : 0
+                                        Layout.preferredHeight: active ? delegateText.height : 0
+                                        active: !delegateItem.elementIsBreak && !screenplayElement.omitted && Runtime.screenplayEditorSettings.longSceneWarningEnabled && scene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
+
+                                        sourceComponent: Image {
+                                            smooth: true
+                                            mipmap: true
+                                            source: "qrc:/icons/content/warning.png"
+                                            fillMode: Image.PreserveAspectFit
+
+                                            MouseArea {
+                                                anchors.fill: parent
+
+                                                enabled: parent.visible
+                                                hoverEnabled: enabled
+
+                                                ToolTip.text: "" + scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
+                                                ToolTip.visible: containsMouse
+                                            }
+                                        }
+                                    }
+
+                                    VclLabel {
+                                        id: delegateText
+
+                                        Layout.fillWidth: true
+                                        Layout.alignment: Qt.AlignVCenter
+
+                                        property bool textIsSceneHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
+
+                                        font.family: headingFontMetrics.font.family
+                                        font.bold: Runtime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
+                                        // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
+                                        horizontalAlignment: Qt.AlignLeft
+                                        color: Runtime.colors.primary.c10.text
+                                        font.capitalization: delegateItem.elementIsBreak ||textIsSceneHeading ? Font.AllUppercase : Font.MixedCase
+
+                                        elide: textIsSceneHeading ? Text.ElideMiddle : Text.ElideRight
+                                        wrapMode: textIsSceneHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
+                                        maximumLineCount: wrapMode === Text.NoWrap ? 1 : 2
+
+                                        text: {
+                                            let ret = "UNKNOWN"
+                                            if(scene) {
+                                                if(textIsSceneHeading) {
+                                                    if(scene.heading.enabled) {
+                                                        ret = screenplayElement.resolvedSceneNumber + ". "
+                                                        if(screenplayElement.omitted)
+                                                            ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                                                        else
+                                                            ret += scene.heading.text
+                                                    } else if(screenplayElement.omitted)
+                                                        ret = "[OMITTED]"
+                                                    else
+                                                        ret = "NO SCENE HEADING"
+                                                } else {
+                                                    let summary = scene.summary
+                                                    if(scene.heading.enabled) {
+                                                        ret = screenplayElement.resolvedSceneNumber + ". "
+                                                        if(screenplayElement.omitted)
+                                                            ret += "[OMITTED] <font color=\"gray\">" + summary + "</font>"
+                                                        else
+                                                            ret += summary
+                                                    } else if(screenplayElement.omitted)
+                                                        ret = "[OMITTED]" + summary
+                                                    else
+                                                        ret = summary
+                                                }
+
+                                                return ret
+                                            }
+
+                                            if(delegateItem.elementIsBreak) {
+                                                if(delegateItem.elementIsEpisodeBreak)
+                                                    ret = screenplayElement.breakTitle
+                                                else if(sceneListView.hasEpisodes)
+                                                    ret = "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
                                                 else
-                                                    ret += scene.heading.text
-                                            } else if(screenplayElement.omitted)
-                                                ret = "[OMITTED]"
-                                            else
-                                                ret = "NO SCENE HEADING"
-                                        } else {
-                                            let summary = scene.summary
-                                            if(scene.heading.enabled) {
-                                                ret = screenplayElement.resolvedSceneNumber + ". "
-                                                if(screenplayElement.omitted)
-                                                    ret += "[OMITTED] <font color=\"gray\">" + summary + "</font>"
-                                                else
-                                                    ret += summary
-                                            } else if(screenplayElement.omitted)
-                                                ret = "[OMITTED]" + summary
-                                            else
-                                                ret = summary
+                                                    ret = screenplayElement.breakTitle
+                                                if(screenplayElement.breakSubtitle !== "")
+                                                    ret +=  ": " + screenplayElement.breakSubtitle
+                                                return ret
+                                            }
+
+                                            return ret
+                                        }
+                                    }
+
+                                    Loader {
+                                        Layout.alignment: Qt.AlignVCenter
+                                        Layout.preferredWidth: height
+                                        Layout.preferredHeight: delegateText.height
+                                        active: !delegateItem.elementIsBreak && !scene.hasContent
+
+                                        sourceComponent: Image {
+                                            smooth: true
+                                            mipmap: true
+                                            source: "qrc:/icons/content/empty_scene.png"
+                                            fillMode: Image.PreserveAspectFit
+
+                                            MouseArea {
+                                                anchors.fill: parent
+
+                                                enabled: parent.visible
+                                                hoverEnabled: enabled
+
+                                                ToolTip.text: "This scene is empty."
+                                                ToolTip.visible: containsMouse
+                                            }
+                                        }
+                                    }
+
+                                    VclLabel {
+                                        id: sceneLengthText
+                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-3
+                                        color: Runtime.colors.primary.c10.text
+                                        text: evaluateText()
+                                        visible: !Runtime.screenplayTextDocument.paused && (Runtime.sceneListPanelSettings.displaySceneLength === "PAGE" || Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
+                                        opacity: 0.5
+                                        Layout.alignment: Qt.AlignVCenter
+
+                                        function evaluateText() {
+                                            if(scene) {
+                                                if(Runtime.sceneListPanelSettings.displaySceneLength === "PAGE") {
+                                                    const pl = Runtime.screenplayTextDocument.lengthInPages(screenplayElement, null)
+                                                    return Math.round(pl*100,2)/100
+                                                }
+                                                if(Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
+                                                    return Runtime.screenplayTextDocument.lengthInTimeAsString(screenplayElement, null)
+                                            }
+                                            return ""
                                         }
 
-                                        return ret
-                                    }
+                                        function updateText() {
+                                            text = evaluateText()
+                                        }
 
-                                    if(delegateItem.elementIsBreak) {
-                                        if(delegateItem.elementIsEpisodeBreak)
-                                            ret = screenplayElement.breakTitle
-                                        else if(sceneListView.hasEpisodes)
-                                            ret = "Ep " + (screenplayElement.episodeIndex+1) + ": " + screenplayElement.breakTitle
-                                        else
-                                            ret = screenplayElement.breakTitle
-                                        if(screenplayElement.breakSubtitle !== "")
-                                            ret +=  ": " + screenplayElement.breakSubtitle
-                                        return ret
-                                    }
+                                        function updateTextLater() {
+                                            Qt.callLater(updateText)
+                                        }
 
-                                    return ret
+                                        Connections {
+                                            target: Runtime.screenplayTextDocument
+                                            enabled: !Runtime.screenplayTextDocument.paused
+                                            function onUpdateFinished() { sceneLengthText.updateTextLater() }
+                                        }
+
+                                        property string option: Runtime.sceneListPanelSettings.displaySceneLength
+                                        onOptionChanged: updateTextLater()
+                                    }
                                 }
                             }
 
                             Loader {
-                                Layout.alignment: Qt.AlignVCenter
-                                Layout.preferredWidth: height
-                                Layout.preferredHeight: delegateText.height
-                                active: !delegateItem.elementIsBreak && !scene.hasContent
+                                Layout.fillWidth: true
 
-                                sourceComponent: Image {
-                                    smooth: true
-                                    mipmap: true
-                                    source: "qrc:/icons/content/empty_scene.png"
-                                    fillMode: Image.PreserveAspectFit
-
-                                    MouseArea {
-                                        anchors.fill: parent
-
-                                        enabled: parent.visible
-                                        hoverEnabled: enabled
-
-                                        ToolTip.text: "This scene is empty."
-                                        ToolTip.visible: containsMouse
-                                    }
+                                visible: active
+                                active: delegateItem.screenplayElement.pageBreakAfter
+                                sourceComponent: PageBreakItem {
+                                    fullSize: false
+                                    placement: Qt.BottomEdge
                                 }
-                            }
-
-                            VclLabel {
-                                id: sceneLengthText
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize-3
-                                color: Runtime.colors.primary.c10.text
-                                text: evaluateText()
-                                visible: !Runtime.screenplayTextDocument.paused && (Runtime.sceneListPanelSettings.displaySceneLength === "PAGE" || Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
-                                opacity: 0.5
-                                Layout.alignment: Qt.AlignVCenter
-
-                                function evaluateText() {
-                                    if(scene) {
-                                        if(Runtime.sceneListPanelSettings.displaySceneLength === "PAGE") {
-                                            const pl = Runtime.screenplayTextDocument.lengthInPages(screenplayElement, null)
-                                            return Math.round(pl*100,2)/100
-                                        }
-                                        if(Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
-                                            return Runtime.screenplayTextDocument.lengthInTimeAsString(screenplayElement, null)
-                                    }
-                                    return ""
-                                }
-
-                                function updateText() {
-                                    text = evaluateText()
-                                }
-
-                                function updateTextLater() {
-                                    Qt.callLater(updateText)
-                                }
-
-                                Connections {
-                                    target: Runtime.screenplayTextDocument
-                                    enabled: !Runtime.screenplayTextDocument.paused
-                                    function onUpdateFinished() { sceneLengthText.updateTextLater() }
-                                }
-
-                                property string option: Runtime.sceneListPanelSettings.displaySceneLength
-                                onOptionChanged: updateTextLater()
                             }
                         }
 
@@ -4652,8 +4757,10 @@ Rectangle {
 
         Loader {
             id: contentViewDelegateLoader
+
             property var componentData: modelData
             property int componentIndex: index
+
             z: contentViewModel.value.currentIndex === index ? 2 : 1
             width: contentView.width
             onComponentDataChanged: {

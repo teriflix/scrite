@@ -27,7 +27,7 @@ VclDialog {
     id: root
 
     title: "Settings"
-    width: Math.min(Scrite.window.width-80, 1050)
+    width: Math.min(Scrite.window.width-80, 1049)
     height: Math.min(Scrite.window.height-80, 750)
 
     content: ColumnLayout {

@@ -183,5 +183,6 @@
         <file>qml/dialogs/reportconfigurationdialog/editor_TwoColumnLayoutSelector.qml</file>
         <file>qml/dialogs/homescreen/EditRecentFilesDialog.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_TwoColumnWidthDistributionEditor.qml</file>
+        <file>qml/screenplay/PageBreakItem.qml</file>
     </qresource>
 </RCC>

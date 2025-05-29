@@ -46,32 +46,26 @@ DialogLauncher {
             return Math.min(bgImageHeight*0.8, Scrite.window.height * 0.8)
         }
 
-        backdrop: Image {
-            source: "../../images/aboutbox.jpg"
-            fillMode: Image.PreserveAspectFit
-            smooth: true; mipmap: true
-        }
-
         content: Item {
             implicitHeight: aboutInfoLayout.implicitHeight + 40
+
+            Image {
+                anchors.fill: parent
+                source: "../../images/aboutbox.jpg"
+                fillMode: Image.PreserveAspectCrop
+                smooth: true; mipmap: true
+            }
 
             VclLabel {
                 id: versionText
                 anchors.top: parent.top
                 anchors.right: parent.right
                 anchors.margins: 30
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-                text: "Version-"+Scrite.app.versionAsString + " for " + [Scrite.app.platformAsString, Scrite.app.platformVersion].join("-")
-                font.letterSpacing: Runtime.applicationSettings.enableAnimations ? 20 : 0
 
-                NumberAnimation {
-                    target: versionText
-                    property: "font.letterSpacing"
-                    from: 20; to: 0
-                    duration: 1500
-                    running: Runtime.applicationSettings.enableAnimations
-                    easing.type: Easing.OutBack
-                }
+                text: "Version-"+Scrite.app.versionAsString + " for " + [Scrite.app.platformAsString, Scrite.app.platformVersion].join("-")
+                width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), dialog.width*0.5)
+                elide: Text.ElideLeft
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
             VclText {

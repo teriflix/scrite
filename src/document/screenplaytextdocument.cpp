@@ -1372,8 +1372,11 @@ void ScreenplayTextDocument::loadScreenplay()
             frameFormat.setTopMargin(blockFormat.topMargin());
         }
 
-        if (i > 0 && m_printEachSceneOnANewPage)
+        if ((i > 0 && m_printEachSceneOnANewPage)
+            || (m_purpose == ForPrinting && element->isPageBreakBefore()))
             frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysBefore);
+        if (m_purpose == ForPrinting && element->isPageBreakAfter())
+            frameFormat.setPageBreakPolicy(QTextFrameFormat::PageBreak_AlwaysAfter);
 
         // Each screenplay element (or scene) has its own frame. That makes
         // moving them in one bunch easy.

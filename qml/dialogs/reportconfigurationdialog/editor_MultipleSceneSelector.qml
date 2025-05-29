@@ -24,11 +24,11 @@ import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
 /**
-  Once upon a time sceneNumber was the same as element index.
-  It is no longer the case. Scene number can event be user specified.
-  So rather than using ScreenplayElement.sceneNumber we now use ScreenplayElement.elementIndex
-  to let the report generator know which scenes the user has selected.
-  */
+Once upon a time sceneNumber was the same as element index.
+It is no longer the case. Scene number can event be user specified.
+So rather than using ScreenplayElement.sceneNumber we now use ScreenplayElement.elementIndex
+to let the report generator know which scenes the user has selected.
+*/
 
 ColumnLayout {
     property var fieldInfo
@@ -130,28 +130,27 @@ ColumnLayout {
             model: Scrite.document.screenplay
             clip: true
             property var selectedSceneNumbers: []
-            property var selectedEpisodeNumbers: report.episodeNumbers
+            property var selectedEpisodeNumbers: report ? report.episodeNumbers : null
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
             function filter(scene) {
-                if(selectedEpisodeNumbers && selectedEpisodeNumbers.length > 0) {
-                    if(scene && selectedEpisodeNumbers.indexOf(scene.episodeIndex+1) < 0)
-                        return false
-                }
-
                 if(scene) {
-                    if(!scene.heading.enabled)
-                        return false
+                    if(selectedEpisodeNumbers && selectedEpisodeNumbers.length > 0) {
+                        if(scene && selectedEpisodeNumbers.indexOf(scene.episodeIndex+1) < 0)
+                            return false
+                    }
 
-                    var ret = true
-                    if(ret && locTypeFilter.items.length > 0)
-                        ret &= locTypeFilter.items.contains(scene.heading.locationType)
-                    if(ret && momentFilter.items.length > 0)
-                        ret &= momentFilter.items.contains(scene.heading.moment)
-                    if(ret && locFilter.items.length > 0)
-                        ret &= locFilter.items.contains(scene.heading.location)
+                    if(scene.heading.enabled) {
+                        var ret = true
+                        if(ret && locTypeFilter.items.length > 0)
+                            ret &= locTypeFilter.items.contains(scene.heading.locationType)
+                        if(ret && momentFilter.items.length > 0)
+                            ret &= momentFilter.items.contains(scene.heading.moment)
+                        if(ret && locFilter.items.length > 0)
+                            ret &= locFilter.items.contains(scene.heading.location)
 
-                    return ret
+                        return ret
+                    }
                 }
 
                 return locTypeFilter.items.length === 0 && momentFilter.items.length === 0 && locFilter.items.length === 0
@@ -184,7 +183,7 @@ ColumnLayout {
                     width: parent.width-1
                     font.family: Scrite.document.formatting.defaultFont.family
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    visible: sceneListView.filter(screenplayElement.scene) && screenplayElement.scene && screenplayElement.scene.heading.enabled
+                    visible: screenplayElement.scene && sceneListView.filter(screenplayElement.scene)
                     text: {
                         var scene = screenplayElement.scene
                         if(scene && scene.heading.enabled)
@@ -192,7 +191,7 @@ ColumnLayout {
                         return "NO SCENE HEADING"
                     }
                     checked: sceneListView.selectedSceneNumbers.indexOf(screenplayElement.elementIndex) >= 0
-                    enabled: screenplayElement.scene && screenplayElement.scene.heading.enabled
+                    enabled: screenplayElement.scene
                     onToggled: sceneListView.select(screenplayElement.elementIndex, checked)
                 }
             }

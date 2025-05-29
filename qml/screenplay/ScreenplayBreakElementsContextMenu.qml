@@ -21,7 +21,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 VclMenu {
-    id: breakElementContextMenu
+    id: root
 
     property ScreenplayElement element
 
@@ -31,9 +31,9 @@ VclMenu {
         text: "Paste After"
         enabled: Scrite.document.screenplay.canPaste
         onClicked: {
-            const index = Scrite.document.screenplay.indexOfElement(breakElementContextMenu.element);
+            const index = Scrite.document.screenplay.indexOfElement(root.element);
             Scrite.document.screenplay.pasteAfter(index)
-            breakElementContextMenu.close()
+            root.close()
         }
     }
 
@@ -41,8 +41,8 @@ VclMenu {
         text: "Remove"
         enabled: !Scrite.document.readOnly
         onClicked: {
-            Scrite.document.screenplay.removeElement(breakElementContextMenu.element)
-            breakElementContextMenu.close()
+            Scrite.document.screenplay.removeElement(root.element)
+            root.close()
         }
     }
 }
