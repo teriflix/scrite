@@ -66,10 +66,26 @@ ColumnLayout {
             border.color: Runtime.colors.primary.borderColor
             color: Runtime.colors.primary.c200.background
 
-            VclText {
+            VclTextField {
+                id: leftColumnWidthEditor
+
                 anchors.centerIn: parent
 
+                width: Runtime.idealFontMetrics.averageCharacterWidth * 4
+
                 text: Math.round(splitView.leftColumnWidth*100) + "%"
+                validator: IntValidator {
+                    bottom: 20
+                    top: 80
+                }
+
+                onTextEdited: {
+                    const v = parseInt(text)/100
+                    if(v >= 0.2 && v <= 0.8) {
+                        splitView.leftColumnWidth = v
+
+                    }
+                }
             }
 
             onWidthChanged: splitView.leftColumnWidth = width/splitView.availableWidth
@@ -88,7 +104,7 @@ ColumnLayout {
         }
 
         onLeftColumnWidthChanged: {
-            if(resizing && report)
+            if( (resizing || leftColumnWidthEditor.activeFocus) && report)
                 report.setConfigurationValue(fieldInfo.name, leftColumnWidth)
         }
     }
