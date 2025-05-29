@@ -2698,6 +2698,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
                 QTextBlockFormat blockFormat;
                 blockFormat.setTopMargin(10);
+                blockFormat.setAlignment(Qt::AlignHCenter);
                 cursor.insertBlock(blockFormat);
 
                 insertBlock = true;
