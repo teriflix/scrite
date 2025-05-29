@@ -88,6 +88,14 @@ public:
     bool isPrintEachSceneOnANewPage() const { return m_printEachSceneOnANewPage; }
     Q_SIGNAL void printEachSceneOnANewPageChanged();
 
+    Q_CLASSINFO("ignorePageBreaks_FieldGroup", "Options")
+    Q_CLASSINFO("ignorePageBreaks_FieldLabel", "Ignore page breaks.")
+    Q_CLASSINFO("ignorePageBreaks_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool ignorePageBreaks READ isIgnorePageBreaks WRITE setIgnorePageBreaks NOTIFY ignorePageBreaksChanged)
+    void setIgnorePageBreaks(bool val);
+    bool isIgnorePageBreaks() const { return m_ignorePageBreaks; }
+    Q_SIGNAL void ignorePageBreaksChanged();
+
     Q_CLASSINFO("preserveMarkupFormatting_FieldGroup", "Options")
     Q_CLASSINFO("preserveMarkupFormatting_FieldLabel", "Preserve bold, italics, and other formatting done using Markup tools.")
     Q_CLASSINFO("preserveMarkupFormatting_FieldEditor", "CheckBox")
@@ -180,6 +188,7 @@ private:
     QStringList m_characterNames;
     bool m_preserveMarkupFormatting = true;
     bool m_printEachSceneOnANewPage = true;
+    bool m_ignorePageBreaks = false;
 };
 
 #endif // TWOCOLUMNREPORT_H

@@ -132,6 +132,15 @@ void AbstractScreenplaySubsetReport::setIncludeActBreaks(bool val)
     emit includeActBreaksChanged();
 }
 
+void AbstractScreenplaySubsetReport::setIgnorePageBreaks(bool val)
+{
+    if (m_ignorePageBreaks == val)
+        return;
+
+    m_ignorePageBreaks = val;
+    emit ignorePageBreaksChanged();
+}
+
 void AbstractScreenplaySubsetReport::setCapitalizeSentences(bool val)
 {
     if (m_capitalizeSentences == val)
@@ -280,8 +289,10 @@ bool AbstractScreenplaySubsetReport::doGenerate(QTextDocument *textDocument)
                 element2->setUserSceneNumber(element->userSceneNumber());
             }
 
-            element2->setPageBreakBefore(element->isPageBreakBefore());
-            element2->setPageBreakAfter(element->isPageBreakAfter());
+            if (!m_ignorePageBreaks) {
+                element2->setPageBreakBefore(element->isPageBreakBefore());
+                element2->setPageBreakAfter(element->isPageBreakAfter());
+            }
 
             m_screenplaySubset->addElement(element2);
         }

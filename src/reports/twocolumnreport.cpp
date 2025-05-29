@@ -95,6 +95,15 @@ void TwoColumnReport::setPrintEachSceneOnANewPage(bool val)
     emit printEachSceneOnANewPageChanged();
 }
 
+void TwoColumnReport::setIgnorePageBreaks(bool val)
+{
+    if (m_ignorePageBreaks == val)
+        return;
+
+    m_ignorePageBreaks = val;
+    emit ignorePageBreaksChanged();
+}
+
 void TwoColumnReport::setPreserveMarkupFormatting(bool val)
 {
     if (m_preserveMarkupFormatting == val)
@@ -358,9 +367,11 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             sceneTableFormat.setBorder(0);
             sceneTableFormat.setBorderBrush(Qt::NoBrush);
             sceneTableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
-            if ((m_printEachSceneOnANewPage && sceneCount > 0) || element->isPageBreakBefore())
+            if ((m_printEachSceneOnANewPage
+                 || (!m_ignorePageBreaks && element->isPageBreakBefore()))
+                && sceneCount > 0)
                 sceneTableFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysBefore);
-            if (element->isPageBreakAfter())
+            if (!m_ignorePageBreaks && element->isPageBreakAfter())
                 sceneTableFormat.setPageBreakPolicy(QTextFormat::PageBreak_AlwaysAfter);
 
             sceneTable = cursor.insertTable(1, 2, sceneTableFormat);

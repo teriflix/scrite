@@ -136,6 +136,14 @@ public:
     bool isIncludeActBreaks() const { return m_includeActBreaks; }
     Q_SIGNAL void includeActBreaksChanged();
 
+    Q_CLASSINFO("ignorePageBreaks_FieldGroup", "Options")
+    Q_CLASSINFO("ignorePageBreaks_FieldLabel", "Ignore page breaks.")
+    Q_CLASSINFO("ignorePageBreaks_FieldEditor", "CheckBox")
+    Q_PROPERTY(bool ignorePageBreaks READ isIgnorePageBreaks WRITE setIgnorePageBreaks NOTIFY ignorePageBreaksChanged)
+    void setIgnorePageBreaks(bool val);
+    bool isIgnorePageBreaks() const { return m_ignorePageBreaks; }
+    Q_SIGNAL void ignorePageBreaksChanged();
+
     // This property is not presented to the user, because it will be consistent with
     // options configured in Settings.
     Q_PROPERTY(bool capitalizeSentences READ isCapitalizeSentences WRITE setCapitalizeSentences NOTIFY capitalizeSentencesChanged DESIGNABLE false)
@@ -209,6 +217,7 @@ private:
     bool m_includeSceneFeaturedImage = false;
     bool m_includeSceneComments = false;
     bool m_includeActBreaks = false;
+    bool m_ignorePageBreaks = false;
     bool m_polishParagraphs = false;
     bool m_capitalizeSentences = false;
     QList<int> m_episodeNumbers;
