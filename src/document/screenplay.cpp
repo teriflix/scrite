@@ -1482,6 +1482,18 @@ void Screenplay::clearSelection()
         element->setSelected(false);
 }
 
+QList<int> Screenplay::selectedElementIndexes() const
+{
+    QList<int> ret;
+
+    for (ScreenplayElement *element : qAsConst(m_elements)) {
+        if (element->isSelected())
+            ret << element->elementIndex();
+    }
+
+    return ret;
+}
+
 void Screenplay::setSelection(const QList<ScreenplayElement *> &elements)
 {
     this->clearSelection();

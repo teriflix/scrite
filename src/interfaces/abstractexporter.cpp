@@ -61,6 +61,26 @@ bool AbstractExporter::isFeatureEnabled() const
     return false;
 }
 
+bool AbstractExporter::setConfigurationValue(const QString &name, const QVariant &value)
+{
+    const QMetaProperty prop =
+            this->metaObject()->property(this->metaObject()->indexOfProperty(qPrintable(name)));
+    if (!prop.isValid())
+        return false;
+
+    QVariant value2 = value;
+    if (value2.userType() != prop.userType()) {
+        value2.convert(prop.userType());
+    }
+
+    return prop.write(this, value2);
+}
+
+QVariant AbstractExporter::getConfigurationValue(const QString &name) const
+{
+    return this->property(qPrintable(name));
+}
+
 QJsonObject AbstractExporter::configurationFormInfo() const
 {
     return Application::instance()->objectConfigurationFormInfo(

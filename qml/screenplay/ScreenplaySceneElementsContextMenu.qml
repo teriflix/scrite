@@ -21,6 +21,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/structure"
+import "qrc:/qml/dialogs"
 
 VclMenu {
     id: root
@@ -110,6 +111,27 @@ VclMenu {
     StructureGroupsMenu {
         sceneGroup: sceneGroup
         enabled: !Scrite.document.readOnly
+    }
+
+    VclMenu {
+        title: "Reports"
+
+        width: 250
+
+        Repeater {
+            model: Runtime.sceneListReports
+
+            VclMenuItem {
+                required property var modelData
+
+                text: modelData.name
+                icon.source: "qrc" + modelData.icon
+
+                onTriggered: ReportConfigurationDialog.launch(modelData.name,
+                                                              {"sceneNumbers": Scrite.document.screenplay.selectedElementIndexes()},
+                                                              {"initialPage": modelData.group})
+            }
+        }
     }
 
     MenuSeparator { }

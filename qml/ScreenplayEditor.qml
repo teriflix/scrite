@@ -3476,6 +3476,34 @@ Rectangle {
                                     enabled: !headingItem.theElement.omitted
                                 }
 
+                                VclMenu {
+                                    title: "Reports"
+
+                                    width: 250
+
+                                    Repeater {
+                                        model: Runtime.sceneListReports
+
+                                        VclMenuItem {
+                                            required property var modelData
+
+                                            text: modelData.name
+                                            icon.source: "qrc" + modelData.icon
+
+                                            onTriggered: {
+                                                var sceneNumbers = Scrite.document.screenplay.selectedElementIndexes()
+                                                if(sceneNumbers.length > 0)
+                                                    sceneNumbers.splice(0, sceneNumbers.length)
+                                                sceneNumbers.push(headingItem.theElement.elementIndex)
+
+                                                ReportConfigurationDialog.launch(modelData.name,
+                                                                                          {"sceneNumbers": sceneNumbers},
+                                                                                          {"initialPage": modelData.group})
+                                            }
+                                        }
+                                    }
+                                }
+
                                 Repeater {
                                     model: headingItem.theElement.omitted ? 0 : additionalSceneMenuItems.length ? 1 : 0
 

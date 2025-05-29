@@ -59,14 +59,8 @@ public:
     Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
     virtual bool requiresConfiguration() const { return false; }
 
-    Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value)
-    {
-        return this->setProperty(qPrintable(name), value);
-    }
-    Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const
-    {
-        return this->property(qPrintable(name));
-    }
+    Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
+    Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
 
     Q_INVOKABLE QJsonObject configurationFormInfo() const;
 

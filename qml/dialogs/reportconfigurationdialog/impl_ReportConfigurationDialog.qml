@@ -230,6 +230,8 @@ VclDialog {
             onLoaded: {
                 item.report = report
                 item.fieldInfo = modelData
+                if(item.getReady)
+                    item.getReady()
             }
 
             opacity: enabled ? 1 : 0.5

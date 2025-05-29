@@ -130,7 +130,7 @@ ColumnLayout {
             model: Scrite.document.screenplay
             clip: true
             property var selectedSceneNumbers: []
-            property var selectedEpisodeNumbers: report ? report.episodeNumbers : null
+            property var selectedEpisodeNumbers: null
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
             function filter(scene) {
@@ -244,5 +244,13 @@ ColumnLayout {
             text: sceneListView.selectedSceneNumbers.length === 0 ? "All Scenes Are Selected" : ("" + sceneListView.selectedSceneNumbers.length + " Scene(s) Are Selected")
             padding: 5
         }
+    }
+
+    function getReady() {
+        const ssn = report ? report.getConfigurationValue(fieldInfo.name) : []
+        sceneListView.selectedSceneNumbers = ssn
+        sceneListView.selectedEpisodeNumbers = report.episodeNumbers
+        const idx = ssn && ssn.length > 0 ? ssn[0] : 0
+        sceneListView.positionViewAtIndex(idx, ListView.Beginning)
     }
 }

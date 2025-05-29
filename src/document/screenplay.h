@@ -430,6 +430,7 @@ public:
     Q_INVOKABLE void omitSelectedElements();
     Q_INVOKABLE void includeSelectedElements();
     Q_INVOKABLE void clearSelection();
+    Q_INVOKABLE QList<int> selectedElementIndexes() const;
     void setSelection(const QList<ScreenplayElement *> &elements);
     Q_INVOKABLE ScreenplayElement *elementAt(int index) const;
     Q_INVOKABLE ScreenplayElement *elementWithIndex(int index) const;

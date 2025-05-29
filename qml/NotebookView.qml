@@ -3170,7 +3170,9 @@ Rectangle {
                     text: modelData.name
                     icon.source: "qrc" + modelData.icon
 
-                    onTriggered: ReportConfigurationDialog.launch(modelData.name, {"characterNames": [characterContextMenu.character.name]})
+                    onTriggered: ReportConfigurationDialog.launch(modelData.name,
+                                                                  {"characterNames": [characterContextMenu.character.name]},
+                                                                  {"initialPage": modelData.group})
                 }
             }
         }

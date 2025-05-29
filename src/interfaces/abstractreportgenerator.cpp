@@ -288,7 +288,16 @@ bool AbstractReportGenerator::generate()
 
 bool AbstractReportGenerator::setConfigurationValue(const QString &name, const QVariant &value)
 {
-    return this->setProperty(qPrintable(name), value);
+    const QMetaProperty prop =
+            this->metaObject()->property(this->metaObject()->indexOfProperty(qPrintable(name)));
+    if (!prop.isValid())
+        return false;
+
+    QVariant value2 = value;
+    if (value2.userType() != prop.userType())
+        value2.convert(prop.userType());
+
+    return prop.write(this, value2);
 }
 
 QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) const
