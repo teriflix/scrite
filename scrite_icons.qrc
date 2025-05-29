@@ -325,5 +325,6 @@
         <file>icons/content/empty_scene_inverted.png</file>
         <file>icons/content/warning.png</file>
         <file>icons/content/warning_inverted.png</file>
+        <file>icons/content/dash-line.png</file>
     </qresource>
 </RCC>

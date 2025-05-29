@@ -52,7 +52,7 @@ DialogLauncher {
 
         property var subscription
 
-        width: Math.min(650,Scrite.window.width * 0.8)
+        width: Math.min(649,Scrite.window.width * 0.8)
         height: Math.min(650,Scrite.window.height * 0.8)
         title: "Subscription Details"
 

@@ -143,6 +143,16 @@ public:
     QString breakSummary() const { return m_breakSummary; }
     Q_SIGNAL void breakSummaryChanged();
 
+    Q_PROPERTY(bool pageBreakAfter READ isPageBreakAfter WRITE setPageBreakAfter NOTIFY pageBreakAfterChanged)
+    void setPageBreakAfter(bool val);
+    bool isPageBreakAfter() const { return m_pageBreakAfter; }
+    Q_SIGNAL void pageBreakAfterChanged();
+
+    Q_PROPERTY(bool pageBreakBefore READ isPageBreakBefore WRITE setPageBreakBefore NOTIFY pageBreakBeforeChanged)
+    void setPageBreakBefore(bool val);
+    bool isPageBreakBefore() const { return m_pageBreakBefore; }
+    Q_SIGNAL void pageBreakBeforeChanged();
+
     Q_PROPERTY(Notes *notes READ notes NOTIFY notesChanged)
     Notes *notes() const { return m_notes ? m_notes : (m_scene ? m_scene->notes() : nullptr); }
     Q_SIGNAL void notesChanged();
@@ -235,6 +245,8 @@ private:
     QString m_breakTitle;
     QJsonValue m_userData;
     qreal m_heightHint = 0;
+    bool m_pageBreakAfter = false;
+    bool m_pageBreakBefore = false;
     QString m_breakSummary;
     QString m_breakSubtitle;
     int m_customSceneNumber = -1;

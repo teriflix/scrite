@@ -57,15 +57,17 @@ DialogLauncher {
         height: Math.min(_private.maxDialogHeight,Scrite.window.height * 0.8)
         title: "Subscription Plans"
 
-        backdrop: Rectangle {
-            color: Runtime.colors.accent.c600.background
-        }
-
         property var plans: []
         titleBarCloseButtonVisible: true
 
         content: Item {
             Component.onCompleted: SubscriptionPlanOperations.populateComparisonTableModel(dialog.plans, comparisonTableModel)
+
+            Rectangle {
+                anchors.fill: parent
+
+                color: Runtime.colors.accent.c600.background
+            }
 
             ListModel {
                 id: comparisonTableModel

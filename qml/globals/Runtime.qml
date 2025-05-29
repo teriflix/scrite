@@ -513,6 +513,10 @@ Item {
         return ret
     }
 
+    readonly property var sceneReports: {
+        return []
+    }
+
     // This model provides access to recently accessed files. It is updated from
     // different parts of the UI where opening / saving of files is triggered.
     // Contents of this model is listed in the HomeScreen.

@@ -60,9 +60,7 @@ Dialog {
     property bool closeOnDragDrop: true
 
     // Assign a component whose instance may be shown as background
-    property Component backdrop: Rectangle {
-        color: Runtime.colors.primary.c100.background
-    }
+    property Component backdrop: null
 
     // Assign a component whose instance may be shown in the content
     property Component content: Item { }
@@ -116,17 +114,6 @@ Dialog {
     leftInset: 0
     rightInset: 0
     bottomInset: 0
-
-    background: Loader {
-        width: root.width
-        height: root.height
-        sourceComponent: backdrop
-        active: root.visible
-
-        BoxShadow {
-            anchors.fill: parent
-        }
-    }
 
     contentItem: Item {
         width: root.width
@@ -215,10 +202,31 @@ Dialog {
         property bool overrideCursorMustBeRestored: false
     }
 
+    Component {
+      id: customBackground
+
+      Loader {
+        width: root.width
+        height: root.height
+        sourceComponent: root.backdrop
+        active: root.visible
+
+        BoxShadow {
+          anchors.fill: parent
+        }
+      }
+    }
+
     Announcement.onIncoming: (type,data) => {
                                  if(root.closeOnDragDrop && type === Runtime.announcementIds.closeDialogBoxRequest)
                                     root.close()
                              }
+
+    Component.onCompleted: {
+        if(root.backdrop) {
+            background = customBackground.createObject(root)
+        }
+    }
 
     onAboutToShow: {
         Scrite.window.closeButtonVisible = appCloseButtonVisible
