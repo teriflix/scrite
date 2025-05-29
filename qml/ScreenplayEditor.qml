@@ -4450,7 +4450,7 @@ Rectangle {
         }
 
         Repeater {
-            model: Runtime.characterReports
+            model: Runtime.characterListReports
 
             VclMenuItem {
                 required property var modelData
@@ -4458,12 +4458,14 @@ Rectangle {
                 text: modelData.name
                 icon.source: "qrc" + modelData.icon
 
-                onTriggered: ReportConfigurationDialog.launch(modelData.name, {"characterNames": [characterMenu.characterName]})
+                onTriggered: ReportConfigurationDialog.launch(modelData.name,
+                                                              {"characterNames": [characterMenu.characterName]},
+                                                              {"initialPage": modelData.group})
             }
         }
 
         Repeater {
-            model: Runtime.characterReports.length > 0 ? additionalCharacterMenuItems : []
+            model: Runtime.characterListReports.length > 0 ? additionalCharacterMenuItems : []
 
             VclMenuItem {
                 required property var modelData
@@ -4475,7 +4477,7 @@ Rectangle {
         }
 
         Repeater {
-            model: Runtime.characterReports.length > 0 ? 1 : 0
+            model: Runtime.characterListReports.length > 0 ? 1 : 0
 
             VclMenuItem {
                 text: "Rename/Merge Character"

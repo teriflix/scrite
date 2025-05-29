@@ -1652,7 +1652,7 @@ QJsonArray ScriteDocument::supportedReports() const
     static QJsonArray reports;
 
     if (reports.isEmpty()) {
-        static const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
+        const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
 
         for (const QByteArray &key : keys) {
             QJsonObject item;
@@ -1673,6 +1673,76 @@ QJsonArray ScriteDocument::supportedReports() const
     }
 
     return reports;
+}
+
+QJsonArray ScriteDocument::characterListReports() const
+{
+    static QJsonArray ret;
+
+    if (ret.isEmpty()) {
+        const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
+
+        for (const QByteArray &key : keys) {
+            const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
+            const QByteArray propName = QByteArrayLiteral("characterNames");
+            if (mo->indexOfProperty(propName) >= 0) {
+                QJsonObject item;
+                item.insert("name", QString::fromLatin1(key));
+
+                const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
+                const int d_cii = mo->indexOfClassInfo("Description");
+                item.insert("description",
+                            d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
+                                       : QString::fromLatin1(key));
+                const int i_cii = mo->indexOfClassInfo("Icon");
+                item.insert("icon",
+                            i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
+                                       : QStringLiteral(":/icons/reports/reports_menu_item.png"));
+
+                const int p_cii = mo->indexOfClassInfo(propName + "_FieldGroup");
+                item.insert("group", QString::fromLatin1(mo->classInfo(p_cii).value()));
+
+                ret.append(item);
+            }
+        }
+    }
+
+    return ret;
+}
+
+QJsonArray ScriteDocument::sceneListReports() const
+{
+    static QJsonArray ret;
+
+    if (ret.isEmpty()) {
+        const QList<QByteArray> keys = deviceIOFactories->ReportsFactory.keys();
+
+        for (const QByteArray &key : keys) {
+            const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
+            const QByteArray propName = QByteArrayLiteral("sceneNumbers");
+            if (mo->indexOfProperty(propName) >= 0) {
+                QJsonObject item;
+                item.insert("name", QString::fromLatin1(key));
+
+                const QMetaObject *mo = deviceIOFactories->ReportsFactory.find(key);
+                const int d_cii = mo->indexOfClassInfo("Description");
+                item.insert("description",
+                            d_cii >= 0 ? QString::fromLatin1(mo->classInfo(d_cii).value())
+                                       : QString::fromLatin1(key));
+                const int i_cii = mo->indexOfClassInfo("Icon");
+                item.insert("icon",
+                            i_cii >= 0 ? QString::fromLatin1(mo->classInfo(i_cii).value())
+                                       : QStringLiteral(":/icons/reports/reports_menu_item.png"));
+
+                const int p_cii = mo->indexOfClassInfo(propName + "_FieldGroup");
+                item.insert("group", QString::fromLatin1(mo->classInfo(p_cii).value()));
+
+                ret.append(item);
+            }
+        }
+    }
+
+    return ret;
 }
 
 QString ScriteDocument::reportFileSuffix() const

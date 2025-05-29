@@ -3162,7 +3162,7 @@ Rectangle {
             width: 250
 
             Repeater {
-                model: Runtime.characterReports
+                model: Runtime.characterListReports
 
                 VclMenuItem {
                     required property var modelData

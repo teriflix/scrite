@@ -29,6 +29,7 @@ VclDialog {
     id: root
 
     property AbstractReportGenerator report
+    property string initialPage
 
     width: Math.min(Scrite.window.width*0.9, 800)
     height: Math.min(Scrite.window.height*0.9, 650)
@@ -77,7 +78,16 @@ VclDialog {
                 pagesArray: _private.formInfo.groupedFields
                 pageTitleRole: "name"
                 pageListWidth: Math.max(width * 0.15, 150)
-                currentIndex: 0
+                currentIndex: {
+                     if(root.initialPage !== "") {
+                         const pa = pagesArray
+                         for(var i=0; i<pa.length; i++) {
+                             if(pa[i][pageTitleRole] === root.initialPage)
+                                return i
+                         }
+                     }
+                     return 0
+                }
                 pageListVisible: pagesArray && pagesArray.length > 1
                 pageContent: ColumnLayout {
                     width: reportConfigPageView.availablePageContentWidth

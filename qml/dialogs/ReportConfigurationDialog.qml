@@ -29,7 +29,7 @@ Item {
 
     parent: Scrite.window.contentItem
 
-    function launch(report, initalProps) {
+    function launch(report, reportProps, dialogProps) {
         if(_private.dialogComponent.status !== Component.Ready) {
             console.log("ReportConfigurationDialog is not ready!")
             return null
@@ -67,10 +67,15 @@ Item {
 
         Scrite.app.restoreObjectConfiguration(args.report)
 
-        if(initalProps) {
-            for(var member in initalProps) {
-                args.report.setConfigurationValue(member, initalProps[member])
+        if(reportProps) {
+            for(var rprop in reportProps) {
+                args.report.setConfigurationValue(rprop, reportProps[rprop])
             }
+        }
+
+        if(dialogProps) {
+            for(var dprop in dialogProps)
+                args[dprop] = dialogProps[dprop]
         }
 
         var dlg = _private.dialogComponent.createObject(root, args)

@@ -531,6 +531,12 @@ public:
     Q_PROPERTY(QJsonArray supportedReports READ supportedReports CONSTANT)
     QJsonArray supportedReports() const;
 
+    Q_PROPERTY(QJsonArray characterListReports READ characterListReports CONSTANT)
+    QJsonArray characterListReports() const;
+
+    Q_PROPERTY(QJsonArray sceneListReports READ sceneListReports CONSTANT)
+    QJsonArray sceneListReports() const;
+
     Q_INVOKABLE QString reportFileSuffix() const;
 
     Q_INVOKABLE bool importFile(const QString &fileName, const QString &format);
