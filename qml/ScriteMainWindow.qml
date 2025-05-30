@@ -350,8 +350,8 @@ Item {
 
         function onOpenedAnonymously(filePath) {
             MessageBox.information("Anonymous Open",
-                                   "The file you want to open is backup of another file, and is therefore being opened anonymously.<br/><br/>" +
-                                   "<b>NOTE:</b> Please remember to save your changes explicitly, Scrite will NOT AUTOSAVE!")
+                                   "The file you just opened is backup of another file, and is therefore being opened anonymously, and in <b>read-only mode</b>.<br/><br/>" +
+                                   "<b>NOTE:</b> In order to edit the file, you will need to first Save-As.")
         }
 
         function onRequiresReload() {

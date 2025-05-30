@@ -741,6 +741,8 @@ ScriteDocument::ScriteDocument(QObject *parent)
             &ScriteDocument::updateDocumentWindowTitle);
     connect(this, &ScriteDocument::fileNameChanged, this,
             &ScriteDocument::updateDocumentWindowTitle);
+    connect(this, &ScriteDocument::readOnlyChanged, this,
+            &ScriteDocument::updateDocumentWindowTitle);
     connect(this, &ScriteDocument::fileNameChanged,
             [=]() { m_documentBackupsModel.setDocumentFilePath(m_fileName); });
     connect(qApp->clipboard(), &QClipboard::dataChanged, this,
@@ -2162,8 +2164,13 @@ void ScriteDocument::prepareAutoSave()
 void ScriteDocument::updateDocumentWindowTitle()
 {
     QString title;
+
+    if (m_readOnly)
+        title += "READ ONLY: ";
+
     if (m_modified)
         title += QStringLiteral("* ");
+
     if (m_fileName.isEmpty())
         title += QStringLiteral("[noname]");
     else
@@ -2949,18 +2956,17 @@ void ScriteDocument::initializeFileWatcher()
     /** This part of the code initializes the mechanisms required to detect changes to the currently
      * open document from another process. */
     m_fileWatcher = new QFileSystemWatcher(this);
-    connect(m_fileWatcher, &QFileSystemWatcher::fileChanged, this,
-            &ScriteDocument::watchedFileChanged);
-    connect(this, &ScriteDocument::aboutToSave, m_fileWatcher,
-            [=]() { m_fileWatcher->blockSignals(true); });
 
     QTimer *unblockFileWatcherTimer = new QTimer(m_fileWatcher);
     unblockFileWatcherTimer->setInterval(250);
     unblockFileWatcherTimer->setSingleShot(true);
-    connect(unblockFileWatcherTimer, &QTimer::timeout, m_fileWatcher,
-            [=]() { m_fileWatcher->blockSignals(false); });
+
+    connect(this, &ScriteDocument::aboutToSave, m_fileWatcher,
+            [=]() { m_fileWatcher->blockSignals(true); });
     connect(this, &ScriteDocument::justSaved, unblockFileWatcherTimer,
             QOverload<>::of(&QTimer::start));
+    connect(unblockFileWatcherTimer, &QTimer::timeout, m_fileWatcher,
+            [=]() { m_fileWatcher->blockSignals(false); });
 
     connect(this, &ScriteDocument::fileNameChanged, this, [=]() {
         const QStringList files = m_fileWatcher->files();
@@ -2968,6 +2974,9 @@ void ScriteDocument::initializeFileWatcher()
         if (!m_fileName.isEmpty())
             m_fileWatcher->addPath(m_fileName);
     });
+
+    connect(m_fileWatcher, &QFileSystemWatcher::fileChanged, this,
+            &ScriteDocument::watchedFileChanged);
 }
 
 void ScriteDocument::watchedFileChanged(const QString &fileName)
