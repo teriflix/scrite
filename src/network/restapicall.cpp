@@ -309,9 +309,10 @@ bool RestApiCall::call()
 
         connect(m_reply, &QNetworkReply::finished, this, &RestApiCall::onNetworkReplyFinished);
         connect(m_reply, &QNetworkReply::errorOccurred, this, &RestApiCall::onNetworkReplyError);
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 void RestApiCall::clearError()
