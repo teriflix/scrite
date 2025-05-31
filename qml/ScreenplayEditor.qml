@@ -4182,6 +4182,18 @@ Rectangle {
 
                                             return ret
                                         }
+
+                                        Loader {
+                                            anchors.fill: parent
+                                            active: delegateText.truncated
+
+                                            sourceComponent: MouseArea {
+                                                ToolTip.text: delegateText.text
+                                                ToolTip.delay: 1000
+                                                ToolTip.visible: Runtime.sceneListPanelSettings.showTooltip && containsMouse
+                                                hoverEnabled: true
+                                            }
+                                        }
                                     }
 
                                     Loader {
@@ -4264,13 +4276,8 @@ Rectangle {
                         MouseArea {
                             id: delegateMouseArea
 
-                            ToolTip.text: delegateText.text
-                            ToolTip.delay: 1000
-                            ToolTip.visible: Runtime.sceneListPanelSettings.showTooltip && delegateText.truncated && containsMouse
-
                             anchors.fill: parent
 
-                            hoverEnabled: delegateText.truncated
                             preventStealing: true
                             acceptedButtons: Qt.LeftButton | Qt.RightButton
                             onDoubleClicked: (mouse) => {
