@@ -136,7 +136,6 @@ public:
     Q_CLASSINFO("sceneNumbers_FieldNote", "If no scenes are selected, then the report is generted for all scenes in the screenplay.")
     Q_CLASSINFO("sceneNumbers_IsPersistent", "false")
     Q_PROPERTY(QList<int> sceneNumbers READ sceneIndexes WRITE setSceneIndexes NOTIFY sceneIndexesChanged)
-    Q_PROPERTY(QList<int> sceneIndexes READ sceneIndexes WRITE setSceneIndexes NOTIFY sceneIndexesChanged)
     void setSceneIndexes(const QList<int> &val);
     QList<int> sceneIndexes() const { return m_sceneIndexes; }
     Q_SIGNAL void sceneIndexesChanged();
