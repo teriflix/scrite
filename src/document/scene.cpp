@@ -436,6 +436,13 @@ void SceneElement::setType(SceneElement::Type val)
     emit typeChanged();
 
     this->reportSceneElementChanged(Scene::ElementTypeChange);
+
+    /**
+     * If the type of a scene element changes from action to something else, or vice-versa,
+     * then the alignment flag might need to be refetched.
+     */
+    if (this->alignment() != m_alignment)
+        emit alignmentChanged();
 }
 
 QString SceneElement::typeAsString() const
@@ -481,14 +488,22 @@ void SceneElement::setText(const QString &val)
 
 void SceneElement::setAlignment(Qt::Alignment val)
 {
-    if (m_alignment == val)
+    Qt::Alignment val2 = m_type == SceneElement::Action ? val : Qt::Alignment(0);
+    if (m_alignment == val2)
         return;
 
-    m_alignment = val;
+    PushSceneUndoCommand cmd(m_scene);
+
+    m_alignment = val2;
     emit alignmentChanged();
 
     this->reportSceneElementChanged(
             Scene::ElementTypeChange); // because the text hasnt technically changed.
+}
+
+Qt::Alignment SceneElement::alignment() const
+{
+    return m_type == Action ? m_alignment : Qt::Alignment(0);
 }
 
 void SceneElement::setCursorPosition(int val)
@@ -2019,6 +2034,7 @@ QByteArray Scene::toByteArray() const
     for (SceneElement *element : m_elements) {
         ds << element->id();
         ds << int(element->type());
+        ds << int(element->alignment());
         ds << element->text();
         ds << element->textFormats();
     }
@@ -2051,7 +2067,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
 
     int curPosition = -1;
     ds >> curPosition;
-    this->setCursorPosition(curPosition);
+    QTimer::singleShot(0, this, [=]() { this->setCursorPosition(curPosition); });
 
     QString locType;
     ds >> locType;
@@ -2072,6 +2088,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     {
         QString id;
         int type = SceneElement::Action;
+        int alignment = 0;
         QString text;
         QVector<QTextLayout::FormatRange> formats;
     };
@@ -2083,6 +2100,7 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
         _Paragraph e;
         ds >> e.id;
         ds >> e.type;
+        ds >> e.alignment;
         ds >> e.text;
         ds >> e.formats;
         paragraphIds.append(e.id);
@@ -2101,19 +2119,19 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
     for (int i = 0; i < paragraphs.size(); i++) {
         const _Paragraph para = paragraphs.at(i);
         SceneElement *element = i <= m_elements.size() - 1 ? m_elements.at(i) : nullptr;
-        if (element && element->id() == para.id) {
-            element->setType(SceneElement::Type(para.type));
-            element->setText(para.text);
-            element->setTextFormats(para.formats);
-            continue;
-        }
 
-        element = new SceneElement(this);
+        const bool elementNeedsInsert = !element || element->id() != para.id;
+        if (elementNeedsInsert)
+            element = new SceneElement(this);
+
         element->setId(para.id);
         element->setType(SceneElement::Type(para.type));
+        element->setAlignment(Qt::Alignment(para.alignment));
         element->setText(para.text);
         element->setTextFormats(para.formats);
-        this->insertElementAt(element, i);
+
+        if (elementNeedsInsert)
+            this->insertElementAt(element, i);
     }
 
     emit sceneReset(curPosition);

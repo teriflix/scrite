@@ -177,7 +177,7 @@ public:
 
     Q_PROPERTY(Qt::Alignment alignment READ alignment WRITE setAlignment NOTIFY alignmentChanged)
     void setAlignment(Qt::Alignment val);
-    Qt::Alignment alignment() const { return m_alignment; }
+    Qt::Alignment alignment() const;
     Q_SIGNAL void alignmentChanged();
 
     Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
