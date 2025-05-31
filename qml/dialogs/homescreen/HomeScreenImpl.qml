@@ -821,6 +821,7 @@ Item {
                     Layout.preferredHeight: quickFileOptionsLabel.height
                     Layout.preferredWidth: quickFileOptionsLabel.height
 
+                    visible: Runtime.recentFiles.count > 0
                     icon.width: quickFileOptionsLabel.height * 0.75
                     icon.height: quickFileOptionsLabel.height * 0.75
                     icon.source: "qrc:/icons/action/edit.png"
