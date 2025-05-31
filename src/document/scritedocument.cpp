@@ -2968,12 +2968,22 @@ void ScriteDocument::initializeFileWatcher()
     connect(unblockFileWatcherTimer, &QTimer::timeout, m_fileWatcher,
             [=]() { m_fileWatcher->blockSignals(false); });
 
-    connect(this, &ScriteDocument::fileNameChanged, this, [=]() {
+    auto watchCurrentFile = [=]() {
         const QStringList files = m_fileWatcher->files();
+        if (!files.isEmpty() && !m_fileName.isEmpty()) {
+            if (files.first() == m_fileName)
+                return;
+        }
+
         m_fileWatcher->removePaths(files);
+
         if (!m_fileName.isEmpty())
-            m_fileWatcher->addPath(m_fileName);
-    });
+            while (m_fileWatcher->files().isEmpty())
+                m_fileWatcher->addPath(m_fileName);
+    };
+
+    connect(this, &ScriteDocument::fileNameChanged, this, watchCurrentFile, Qt::QueuedConnection);
+    connect(this, &ScriteDocument::justLoaded, this, watchCurrentFile, Qt::QueuedConnection);
 
     connect(m_fileWatcher, &QFileSystemWatcher::fileChanged, this,
             &ScriteDocument::watchedFileChanged);
