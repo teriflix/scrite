@@ -58,6 +58,7 @@ HEADERS += \
     src/automation/windowcapture.h \
     src/core/appwindow.h \
     src/core/filelocker.h \
+    src/core/filemodificationtracker.h \
     src/core/localstorage.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/peerapplookup.h \
@@ -194,6 +195,7 @@ SOURCES += \
     src/core/application_build_timestamp.cpp \
     src/core/appwindow.cpp \
     src/core/filelocker.cpp \
+    src/core/filemodificationtracker.cpp \
     src/core/localstorage.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/peerapplookup.cpp \

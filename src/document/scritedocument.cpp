@@ -43,6 +43,8 @@
 #include "finaldraftimporter.h"
 #include "finaldraftexporter.h"
 #include "screenplaysubsetreport.h"
+#include "filemodificationtracker.h"
+#include "qtextdocumentpagedprinter.h"
 #include "characterscreenplayreport.h"
 #include "scenecharactermatrixreport.h"
 
@@ -782,7 +784,7 @@ ScriteDocument::ScriteDocument(QObject *parent)
             this->save();
     });
 
-    this->initializeFileWatcher();
+    this->initializeFileModificationTracker();
 }
 
 ScriteDocument::~ScriteDocument()
@@ -2951,45 +2953,23 @@ void ScriteDocument::setDocumentId(const QString &val)
     emit documentIdChanged();
 }
 
-void ScriteDocument::initializeFileWatcher()
+void ScriteDocument::initializeFileModificationTracker()
 {
-    /** This part of the code initializes the mechanisms required to detect changes to the currently
-     * open document from another process. */
-    m_fileWatcher = new QFileSystemWatcher(this);
+    m_fileTracker = new FileModificationTracker(this);
 
-    QTimer *unblockFileWatcherTimer = new QTimer(m_fileWatcher);
-    unblockFileWatcherTimer->setInterval(250);
-    unblockFileWatcherTimer->setSingleShot(true);
+    connect(this, &ScriteDocument::aboutToSave, m_fileTracker,
+            [=]() { m_fileTracker->pauseTracking(250); });
 
-    connect(this, &ScriteDocument::aboutToSave, m_fileWatcher,
-            [=]() { m_fileWatcher->blockSignals(true); });
-    connect(this, &ScriteDocument::justSaved, unblockFileWatcherTimer,
-            QOverload<>::of(&QTimer::start));
-    connect(unblockFileWatcherTimer, &QTimer::timeout, m_fileWatcher,
-            [=]() { m_fileWatcher->blockSignals(false); });
+    auto watchCurrentFile = [=]() { m_fileTracker->setFilePath(m_fileName); };
 
-    auto watchCurrentFile = [=]() {
-        const QStringList files = m_fileWatcher->files();
-        if (!files.isEmpty() && !m_fileName.isEmpty()) {
-            if (files.first() == m_fileName)
-                return;
-        }
-
-        m_fileWatcher->removePaths(files);
-
-        if (!m_fileName.isEmpty())
-            while (m_fileWatcher->files().isEmpty())
-                m_fileWatcher->addPath(m_fileName);
-    };
-
-    connect(this, &ScriteDocument::fileNameChanged, this, watchCurrentFile, Qt::QueuedConnection);
-    connect(this, &ScriteDocument::justLoaded, this, watchCurrentFile, Qt::QueuedConnection);
-
-    connect(m_fileWatcher, &QFileSystemWatcher::fileChanged, this,
-            &ScriteDocument::watchedFileChanged);
+    connect(this, &ScriteDocument::fileNameChanged, m_fileTracker, watchCurrentFile);
+    connect(this, &ScriteDocument::justLoaded, m_fileTracker, watchCurrentFile);
+    connect(this, &ScriteDocument::documentWindowTitleChanged, m_fileTracker, watchCurrentFile);
+    connect(m_fileTracker, &FileModificationTracker::fileModified, this,
+            &ScriteDocument::trackedFileModified);
 }
 
-void ScriteDocument::watchedFileChanged(const QString &fileName)
+void ScriteDocument::trackedFileModified(const QString &fileName)
 {
     if (m_fileName == fileName) {
         emit requiresReload();

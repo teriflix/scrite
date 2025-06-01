@@ -26,7 +26,6 @@
 #include "qobjectproperty.h"
 #include "qobjectserializer.h"
 #include "documentfilesystem.h"
-#include "qtextdocumentpagedprinter.h"
 
 class Forms;
 class FileLocker;
@@ -34,6 +33,7 @@ class ScriteDocument;
 class AbstractExporter;
 class QFileSystemWatcher;
 class AbstractReportGenerator;
+class FileModificationTracker;
 
 class StructureElementConnectors : public QAbstractListModel
 {
@@ -606,8 +606,8 @@ private:
     void setSessionId(QString val);
     void setDocumentId(const QString &val);
 
-    void initializeFileWatcher();
-    void watchedFileChanged(const QString &fileName);
+    void initializeFileModificationTracker();
+    void trackedFileModified(const QString &fileName);
 
 private:
     bool m_busy = false;
@@ -632,7 +632,7 @@ private:
     ExecLaterTimer m_autoSaveTimer;
     QString m_documentWindowTitle;
     ExecLaterTimer m_clearModifyTimer;
-    QFileSystemWatcher *m_fileWatcher = nullptr;
+    FileModificationTracker *m_fileTracker = nullptr;
     int m_autoSaveDurationInSeconds = 60;
     DocumentFileSystem m_docFileSystem;
     QStringList m_spellCheckIgnoreList;
