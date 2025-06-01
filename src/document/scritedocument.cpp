@@ -2971,7 +2971,7 @@ void ScriteDocument::initializeFileModificationTracker()
 
 void ScriteDocument::trackedFileModified(const QString &fileName)
 {
-    if (m_fileName == fileName) {
+    if (!m_fileName.isEmpty() && m_fileName == fileName && QFileInfo(m_fileName).isWritable()) {
         emit requiresReload();
     }
 }
