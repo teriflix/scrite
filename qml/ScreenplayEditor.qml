@@ -1487,6 +1487,7 @@ Rectangle {
                     visible: active
                     sourceComponent: PageBreakItem {
                         placement: Qt.TopEdge
+                        // color: contentView.spacing > 0 ? defaultColor : Runtime.colors.primary.windowColor
                     }
                 }
 
@@ -1517,6 +1518,7 @@ Rectangle {
                     visible: active
                     sourceComponent: PageBreakItem {
                         placement: Qt.BottomEdge
+                        // color: contentView.spacing > 0 ? defaultColor : Runtime.colors.primary.windowColor
                     }
                 }
             }
@@ -1977,6 +1979,7 @@ Rectangle {
                     active: contentItem.theElement.pageBreakBefore
                     sourceComponent: PageBreakItem {
                         placement: Qt.TopEdge
+                        // color: contentView.spacing > 0 ? defaultColor : Runtime.colors.primary.windowColor
                     }
                 }
 
@@ -2993,6 +2996,7 @@ Rectangle {
                     active: contentItem.theElement.pageBreakAfter
                     sourceComponent: PageBreakItem {
                         placement: Qt.BottomEdge
+                        // color: contentView.spacing > 0 ? defaultColor : Runtime.colors.primary.windowColor
                     }
                 }
             }

@@ -17,6 +17,7 @@
 #include <QDateTime>
 #include <QObject>
 
+class QTimer;
 class QFileSystemWatcher;
 
 class FileModificationTracker : public QObject

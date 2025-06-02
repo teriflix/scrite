@@ -14,6 +14,8 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
+import Qt.labs.qmlmodels 1.0
+import QtQuick.Shapes 1.15
 
 import io.scrite.components 1.0
 
@@ -23,40 +25,71 @@ import "qrc:/qml/controls"
 Rectangle {
     id: root
 
+    readonly property color defaultForeground: Runtime.colors.primary.c600.background
+    readonly property color defaultColor: fullSize ? Runtime.colors.primary.c100.background : Runtime.colors.primary.c50.background
+
     property bool fullSize: true
     property int placement: Qt.TopEdge // or Qt.BottomEdge
+    property color foreground: defaultForeground
+    property real textFontSize: Math.max(Runtime.sceneEditorFontMetrics.font.pointSize*0.7, 6)
 
     implicitWidth: 100
-    implicitHeight: layout.height * (fullSize ? 1.75 : 1.25)
+    implicitHeight: loader.height * (fullSize ? 1.2 : 1.1)
 
-    color: Runtime.colors.primary.c100.background
+    color: defaultColor
 
-    RowLayout {
-        id: layout
+    Loader {
+        id: loader
 
         y: placement === Qt.TopEdge ? (root.height-height) : 0
         width: parent.width
 
-        LineItem {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
-        }
+        sourceComponent: root.fullSize ? fullSizeVariant : miniSizeVariant
+    }
 
-        VclLabel {
-            text: "Page Break"
-            font.pointSize: root.fullSize ? Runtime.idealFontMetrics.font.pointSize : Runtime.minimumFontMetrics.font.pointSize
-            padding: root.fullSize ? 5 : 2
-        }
+    Component {
+        id: fullSizeVariant
 
-        LineItem {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHCenter
+        RowLayout {
+            DashedLine {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+            }
+
+            VclLabel {
+                text: "Page Break"
+                font.pointSize: root.textFontSize
+                padding: root.fullSize ? 5 : 2
+                color: root.foreground
+            }
+
+            DashedLine {
+                Layout.fillWidth: true
+                Layout.alignment: Qt.AlignHCenter
+            }
         }
     }
 
-    component LineItem : Image {
-        fillMode: Image.TileHorizontally
-        source: "qrc:/icons/content/dash-line.png"
-        opacity: 0.25
+    Component {
+        id: miniSizeVariant
+
+        DashedLine {
+            height: 8
+        }
+    }
+
+    component DashedLine : Shape {
+        id: shape
+
+        implicitHeight: 2
+
+        ShapePath {
+            strokeColor: root.foreground
+            strokeWidth: 1
+            strokeStyle: ShapePath.DashLine
+            dashPattern: [3,5]
+            startX: 0; startY: shape.height/2
+            PathLine { x: shape.width; y: shape.height/2 }
+        }
     }
 }
