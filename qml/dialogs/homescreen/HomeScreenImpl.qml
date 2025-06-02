@@ -808,15 +808,6 @@ Item {
             RowLayout {
                 Layout.fillWidth: true
 
-                VclLabel {
-                    id: quickFileOptionsLabel
-
-                    Layout.fillWidth: true
-
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                    text: scriptalayMode ? "Scriptalay" : "Recent Files"
-                }
-
                 VclToolButton {
                     Layout.preferredHeight: quickFileOptionsLabel.height
                     Layout.preferredWidth: quickFileOptionsLabel.height
@@ -827,6 +818,18 @@ Item {
                     icon.source: "qrc:/icons/action/edit.png"
 
                     onClicked: EditRecentFilesDialog.launch()
+
+                    ToolTip.text: "Click to remove items from the recent files list."
+                    ToolTip.visible: hovered
+                }
+
+                VclLabel {
+                    id: quickFileOptionsLabel
+
+                    Layout.fillWidth: true
+
+                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                    text: scriptalayMode ? "Scriptalay" : "Recent Files"
                 }
             }
 
