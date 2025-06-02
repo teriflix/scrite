@@ -372,13 +372,18 @@ Item {
         repeat: false
 
         onTriggered: {
-            if(Runtime.applicationSettings.reloadPrompt)
+            if(Runtime.applicationSettings.reloadPrompt) {
+                const autoSave = Scrite.document.autoSave
+                Scrite.document.autoSave = false
                 MessageBox.question("Reload Required",
                                     "The currently open file was changed in the background by another process. Do you want to reload?",
                                     ["Yes", "No"], (answer) => {
                                         if(answer === "Yes")
                                             Scrite.document.reload()
+                                        else
+                                            Scrite.document.autoSave = autoSave
                                     })
+            }
         }
     }
 
