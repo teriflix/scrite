@@ -349,9 +349,14 @@ Item {
         }
 
         function onOpenedAnonymously(filePath) {
-            MessageBox.information("Anonymous Open",
-                                   "The file you just opened is backup of another file, and is therefore being opened anonymously, and in <b>read-only mode</b>.<br/><br/>" +
-                                   "<b>NOTE:</b> In order to edit the file, you will need to first Save-As.")
+            MessageBox.question("Anonymous Open",
+                   "The file you just opened is a backup of another file, and is being opened anonymously in <b>read-only</b> mode.<br/><br/>" +
+                   "<b>NOTE:</b> In order to edit the file, you will need to first Save-As.",
+                    ["Save As", "View Read Only"],
+                    (answer) => {
+                        if(answer === "Save As")
+                            SaveFileTask.saveAs()
+                    })
         }
 
         function onRequiresReload() {
