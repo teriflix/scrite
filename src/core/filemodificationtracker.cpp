@@ -76,7 +76,8 @@ void FileModificationTracker::pauseTracking(int timeout)
 
     m_paused = true;
 
-    m_checkTimer->stop();
+    if (m_checkTimer)
+        m_checkTimer->stop();
 
     QTimer::singleShot(timeout, this, &FileModificationTracker::resumeTracking);
 }
@@ -88,7 +89,8 @@ void FileModificationTracker::resumeTracking()
 
     m_paused = false;
 
-    m_checkTimer->start();
+    if (m_checkTimer)
+        m_checkTimer->start();
 }
 
 void FileModificationTracker::checkForModifications()
