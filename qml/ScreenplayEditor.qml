@@ -4038,8 +4038,6 @@ Rectangle {
                         ColumnLayout {
                             id: delegateItemLayout
 
-                            anchors.centerIn: parent
-
                             width: parent.width
                             spacing: 0
 
@@ -4056,8 +4054,8 @@ Rectangle {
 
                             Item {
                                 Layout.fillWidth: true
-
-                                height: delegateText.height + 16
+                                Layout.minimumHeight: delegateContentLayout.height + 16
+                                Layout.preferredHeight: delegateContentLayout.height + 16
 
                                 Rectangle {
                                     anchors.top: parent.top
@@ -4072,10 +4070,10 @@ Rectangle {
 
                                 SceneTypeImage {
                                     id: sceneTypeImage
-                                    width: 18
-                                    height: 18
+                                    width: 18; height: 18
                                     showTooltip: false
-                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.top: delegateText.textIsSceneHeading ? undefined : delegateContentLayout.top
+                                    anchors.verticalCenter: delegateText.textIsSceneHeading ? delegateContentLayout.verticalCenter : undefined
                                     anchors.left: parent.left
                                     anchors.leftMargin: 12
                                     sceneType: scene ? scene.type : Scene.Standard
@@ -4090,19 +4088,25 @@ Rectangle {
                                 }
 
                                 RowLayout {
+                                    id: delegateContentLayout
+
                                     property real leftMargin: 11 + (sceneTypeImage.width+12)*sceneTypeImage.t
+
                                     anchors.left: parent.left
                                     anchors.leftMargin: leftMargin
                                     anchors.right: parent.right
                                     anchors.rightMargin: (sceneListView.contentHeight > sceneListView.height ? sceneListView.ScrollBar.vertical.width : 5) + 5
                                     anchors.verticalCenter: parent.verticalCenter
+
                                     spacing: 5
 
                                     Loader {
-                                        Layout.alignment: Qt.AlignVCenter
-                                        Layout.preferredWidth: active ? height : 0
-                                        Layout.preferredHeight: active ? delegateText.height : 0
+                                        Layout.preferredWidth: 18
+                                        Layout.preferredHeight: 18
+                                        Layout.alignment: delegateText.textIsSceneHeading ? Qt.AlignVCenter : Qt.AlignTop
+
                                         active: !delegateItem.elementIsBreak && !screenplayElement.omitted && Runtime.screenplayEditorSettings.longSceneWarningEnabled && scene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
+                                        visible: active
 
                                         sourceComponent: Image {
                                             smooth: true
@@ -4133,13 +4137,14 @@ Rectangle {
                                         font.family: headingFontMetrics.font.family
                                         font.bold: Runtime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
                                         // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
+                                        verticalAlignment: Qt.AlignVCenter
                                         horizontalAlignment: Qt.AlignLeft
                                         color: Runtime.colors.primary.c10.text
                                         font.capitalization: delegateItem.elementIsBreak ||textIsSceneHeading ? Font.AllUppercase : Font.MixedCase
 
                                         elide: textIsSceneHeading ? Text.ElideMiddle : Text.ElideRight
                                         wrapMode: textIsSceneHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
-                                        maximumLineCount: wrapMode === Text.NoWrap ? 1 : 2
+                                        maximumLineCount: textIsSceneHeading ? 1 : Utils.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
 
                                         text: {
                                             let ret = "UNKNOWN"
@@ -4201,10 +4206,12 @@ Rectangle {
                                     }
 
                                     Loader {
-                                        Layout.alignment: Qt.AlignVCenter
-                                        Layout.preferredWidth: height
-                                        Layout.preferredHeight: delegateText.height
+                                        Layout.preferredWidth: 18
+                                        Layout.preferredHeight: 18
+                                        Layout.alignment: delegateText.textIsSceneHeading ? Qt.AlignVCenter : Qt.AlignTop
+
                                         active: !delegateItem.elementIsBreak && !scene.hasContent
+                                        visible: active
 
                                         sourceComponent: Image {
                                             smooth: true

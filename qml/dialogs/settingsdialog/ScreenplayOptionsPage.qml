@@ -167,6 +167,27 @@ Item {
                         onClicked: Qt.openUrlExternally("https://www.scrite.io/advanced-editing-features/#chapter10_writing_with_scene-centric_precision_in_scrite")
                     }
                 }
+
+                RowLayout {
+                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
+
+                    VclLabel {
+                        text: "Max Synopsis Lines: "
+                    }
+
+                    SpinBox {
+                        Layout.fillWidth: true
+
+                        value: Runtime.screenplayEditorSettings.slpSynopsisLineCount
+                        from: 1; to: 5
+                        hoverEnabled: true
+
+                        onValueChanged: Runtime.screenplayEditorSettings.slpSynopsisLineCount = value
+
+                        ToolTip.text: "Max lines to show on the scene list panel."
+                        ToolTip.visible: hovered
+                    }
+                }
             }
         }
 

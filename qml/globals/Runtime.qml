@@ -136,6 +136,8 @@ Item {
 
         property bool longSceneWarningEnabled: true
         property int  longSceneWordTreshold: 150
+
+        property int slpSynopsisLineCount: 2
     }
 
     readonly property Settings pdfExportSettings: Settings {
