@@ -12,8 +12,9 @@
 ****************************************************************************/
 
 #include "scritefilelistmodel.h"
-#include "application.h"
+#include "scrite.h"
 #include "scritedocument.h"
+#include "notification.h"
 
 #include <QDir>
 #include <QTimer>
@@ -23,6 +24,7 @@
 #include <QtConcurrentRun>
 #include <QtConcurrentMap>
 #include <QFileSystemWatcher>
+#include <QDesktopServices>
 
 ScriteFileListModel::ScriteFileListModel(QObject *parent) : QAbstractListModel(parent)
 {
@@ -114,8 +116,10 @@ void ScriteFileListModel::add(const QString &filePath)
 
     // Right now, we are only doing a quick load of ScriteFileInfo object for the given filePath
     ScriteFileInfo sfi = ScriteFileInfo::quickLoad(filePath);
-    if (!sfi.fileInfo.exists())
+    if (!sfi.fileInfo.exists()) {
+        this->reportNonExistentRecentFiles(QStringList { filePath });
         return;
+    }
 
     const int idx = m_files.indexOf(sfi);
     if (idx != 0) {
@@ -171,6 +175,8 @@ void ScriteFileListModel::update(const QString &filePath)
         this->beginRemoveRows(QModelIndex(), index.row(), index.row());
         m_files.removeAt(index.row());
         this->endRemoveRows();
+
+        this->reportNonExistentRecentFiles(QStringList { filePath });
 
         return;
     }
@@ -231,6 +237,40 @@ void ScriteFileListModel::updateFromScriteFileInfo(const ScriteFileInfo &sfi)
         this->beginRemoveRows(QModelIndex(), index.row(), index.row());
         m_files.removeAt(index.row());
         this->endRemoveRows();
+
+        this->reportNonExistentRecentFiles(QStringList { sfi.filePath });
+    }
+}
+
+void ScriteFileListModel::reportNonExistentRecentFiles(const QStringList &files)
+{
+    if (!files.isEmpty() && m_source == RecentFiles) {
+        Notification *notification = new Notification(this);
+        notification->setTitle("Recent Files Not Found");
+
+        QString msg =
+                "The following recent file(s) were either deleted, renamed, moved, or "
+                "otherwise not accessible and will no longer be shown in the home screen:<br/>";
+        msg += "<ul>";
+        for (const QString &file : files) {
+            msg += "<li>" + file + "</li>";
+        }
+        msg += "</ul>";
+
+        notification->setButtons({ "More Info", "Dismiss" });
+        notification->setText(msg);
+        notification->setAutoClose(false);
+        notification->setActive(true);
+        connect(notification, &Notification::buttonClicked, Scrite::window(),
+                [notification](int index) {
+                    if (index == 0)
+                        QDesktopServices::openUrl(
+                                QUrl("https://www.scrite.io/version-1-2-released/"
+                                     "#chapter7_recent_files_not_found_notification"));
+                    else
+                        notification->deleteLater();
+                });
+        connect(notification, &Notification::dismissed, notification, &Notification::deleteLater);
     }
 }
 
@@ -253,7 +293,17 @@ void ScriteFileListModel::loadRecentFiles()
         const QStringList filePaths = settings->value(recentFilesKey, QStringList()).toStringList();
         this->setFilesInternal(filePaths);
 
-        settings->setValue(recentFilesKey, this->files());
+        const QStringList filePathsSet = this->files();
+        settings->setValue(recentFilesKey, filePathsSet);
+
+        const QStringList nonExistentFiles = [](const QStringList &a,
+                                                const QStringList &b) -> QStringList {
+            QStringList result;
+            std::copy_if(a.begin(), a.end(), std::back_inserter(result),
+                         [&b](const QString &item) { return !b.contains(item); });
+            return result;
+        }(filePaths, filePathsSet);
+        this->reportNonExistentRecentFiles(nonExistentFiles);
     }
 }
 

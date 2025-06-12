@@ -91,6 +91,8 @@ private:
     void setFilesInternal(const QStringList &files);
     void updateFromScriteFileInfo(const ScriteFileInfo &sfi);
 
+    void reportNonExistentRecentFiles(const QStringList &files);
+
 private:
     int m_maxCount = 10;
     Source m_source = Custom;
