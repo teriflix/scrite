@@ -1449,8 +1449,6 @@ Item {
                         anchors.fill: parent
                         anchors.margins: 1
 
-                        model: missingRecentFilesNotificationDialog.missingFiles
-
                         highlight: Rectangle {
                             color: Runtime.colors.primary.highlight.background
                         }
@@ -1479,6 +1477,10 @@ Item {
 
                                 onClicked: missingFilesList.currentIndex = index
                             }
+                        }
+
+                        Component.onCompleted: {
+                            model = JSON.parse( JSON.stringify(missingRecentFilesNotificationDialog.missingFiles) )
                         }
                     }
                 }
