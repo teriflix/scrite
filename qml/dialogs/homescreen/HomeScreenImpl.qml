@@ -1487,9 +1487,9 @@ Item {
                     Layout.fillWidth: true
 
                     VclCheckBox {
-                        text: "Notify Missing Recent Files"
-                        checked: Runtime.applicationSettings.notifyMissingRecentFiles
-                        onToggled: Runtime.applicationSettings.notifyMissingRecentFiles = checked
+                        text: "Don't show again"
+                        checked: false
+                        onToggled: Runtime.applicationSettings.notifyMissingRecentFiles = !checked
                     }
 
                     Item {
@@ -1497,7 +1497,7 @@ Item {
                         Layout.preferredHeight: 1
                     }
 
-                    VclButton {
+                    Link {
                         text: "More Info"
                         onClicked: Qt.openUrlExternally("https://www.scrite.io/version-1-2-released/#chapter7_recent_files_not_found_notification")
                     }

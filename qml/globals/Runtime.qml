@@ -537,6 +537,12 @@ Item {
             const docFilePath = Scrite.document.fileName
             if(docFilePath !== "")
                 add(docFilePath)
+
+            // Remove this file from missing files list.
+            if(Array.isArray(missingFiles) || missingFiles.length) {
+                let f = missingFiles
+                missingFiles = f.filter(item => item === docFilePath);
+            }
         }
 
         function captureChangeInFiles() {
@@ -545,7 +551,7 @@ Item {
 
         property var missingFiles: []
         onFilesMissing: (files) => {
-            let f = Array.isArray(missingFiles) ? missingFiles : []
+            let f = Array.isArray(missingFiles) || missingFiles.length ? missingFiles : []
             f.push(...files)
             missingFiles = f
         }

@@ -365,6 +365,92 @@ Item {
         }
     }
 
+    VclDialog {
+        id: reloadPromptDialog
+
+        width: Math.min(500, Scrite.window.width * 0.5)
+        height: 275
+        title: "Reload Required"
+
+        titleBarButtons: null
+
+        content: Item {
+            property real preferredHeight: reloadPromptDialogLayout.height + 40
+
+            ColumnLayout {
+                id: reloadPromptDialogLayout
+                anchors.fill: parent
+                anchors.margins: 20
+
+                spacing: 10
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: "Current file was modified by another process in the background. Do you want to reload?"
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
+                }
+
+                RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+
+                    spacing: 20
+
+                    VclButton {
+                        text: "Yes"
+                        onClicked: {
+                            Scrite.document.reload()
+                            reloadPromptDialog.close()
+                        }
+                    }
+
+                    VclButton {
+                        text: "No"
+                        onClicked: reloadPromptDialog.close()
+                    }
+                }
+
+                ColumnLayout {
+                    spacing: 2
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+                        color: Runtime.colors.primary.borderColor
+                    }
+
+                    RowLayout {
+                        VclCheckBox {
+                            Layout.fillWidth: true
+
+                            text: "Don't show this again."
+                            checked: false
+                            onToggled: Runtime.applicationSettings.reloadPrompt = !checked
+                        }
+
+                        Item {
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 1
+                        }
+
+                        Link {
+                            text: "More Info"
+                            onClicked: Qt.openUrlExternally("https://www.scrite.io/version-1-2-released/#chapter6_reload_prompt")
+                        }
+                    }
+                }
+            }
+
+            property bool autoSaveFlag: false
+            Component.onCompleted: {
+                autoSaveFlag = Scrite.document.autoSave
+                Scrite.document.autoSave = false
+            }
+            Component.onDestruction: Scrite.document.autoSave = autoSaveFlag
+        }
+    }
+
     Timer {
         id: reloadScriteDocumentTimer
 
@@ -372,18 +458,8 @@ Item {
         repeat: false
 
         onTriggered: {
-            if(Runtime.applicationSettings.reloadPrompt) {
-                const autoSave = Scrite.document.autoSave
-                Scrite.document.autoSave = false
-                MessageBox.question("Reload Required",
-                                    "The currently open file was changed in the background by another process. Do you want to reload?",
-                                    ["Yes", "No"], (answer) => {
-                                        if(answer === "Yes")
-                                            Scrite.document.reload()
-                                        else
-                                            Scrite.document.autoSave = autoSave
-                                    })
-            }
+            if(Runtime.applicationSettings.reloadPrompt)
+                reloadPromptDialog.open()
         }
     }
 
