@@ -291,6 +291,15 @@ Item {
                     checked: Runtime.applicationSettings.reloadPrompt
                     onToggled: Runtime.applicationSettings.reloadPrompt = checked
                 }
+
+                VclCheckBox {
+                    Layout.columnSpan: 2
+                    Layout.fillWidth: true
+
+                    text: "Notify Missing Recent Files"
+                    checked: Runtime.applicationSettings.notifyMissingRecentFiles
+                    onToggled: Runtime.applicationSettings.notifyMissingRecentFiles = checked
+                }
             }
         }
 

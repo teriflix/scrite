@@ -11,23 +11,6 @@
 **
 ****************************************************************************/
 
-/**
-  This is a replacement for a bunch of UI elements that were prevalent in
-  Scrite until 0.9.4f, viz:
-  - New From Template (dialog)
-  - Scriptalay (dialog)
-  - Recent Files (menu)
-  - Vault (dialog)
-  - Import (menu)
-  - Open (menu item)
-  In the future, we may add support for open file from Google Drive in this same
-  dialog box.
-
-  By introducing this dialog box, we will deprecate (as in delete) all the QML
-  files associated with the dialog boxes and menus listed above. This will make
-  things streamlined and provide more open space in the main-window.
-*/
-
 import QtQuick 2.15
 import QtQuick.Dialogs 1.3
 import QtQuick.Layouts 1.15
@@ -1427,6 +1410,110 @@ Item {
             var task = OpenFileTask.open(path)
             task.finished.connect(closeRequest)
         }
+    }
+
+    VclDialog {
+        id: missingRecentFilesNotificationDialog
+
+        property var missingFiles: Runtime.recentFiles.missingFiles
+
+        width: root.width * 0.8
+        height: Math.min(350, root.height * 0.8)
+        title: "Recent Files Missing"
+
+        content: Item {
+            ColumnLayout {
+                anchors.fill: parent
+                anchors.margins: 20
+
+                spacing: 20
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: "The following recent file(s) were either deleted, renamed, moved, or otherwise not accessible and will no longer be shown in the home screen:"
+                    wrapMode: Text.WordWrap
+                }
+
+                Rectangle {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+
+                    color: Runtime.colors.primary.c100.background
+                    border.width: 1
+                    border.color: Runtime.colors.primary.borderColor
+
+                    ListView {
+                        id: missingFilesList
+
+                        anchors.fill: parent
+                        anchors.margins: 1
+
+                        model: missingRecentFilesNotificationDialog.missingFiles
+
+                        highlight: Rectangle {
+                            color: Runtime.colors.primary.highlight.background
+                        }
+                        highlightMoveDuration: 0
+                        highlightResizeDuration: 0
+
+                        currentIndex: -1
+
+                        delegate: VclText {
+                            required property int index
+                            required property string modelData
+
+                            width: missingFilesList.width
+                            padding: 8
+                            rightPadding: 20
+                            elide: Text.ElideMiddle
+                            text: modelData
+                            color: currentIndex === index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
+
+                            MouseArea {
+                                anchors.fill: parent
+                                hoverEnabled: parent.truncated
+
+                                ToolTip.visible: parent.truncated && containsMouse
+                                ToolTip.text: modelData
+
+                                onClicked: missingFilesList.currentIndex = index
+                            }
+                        }
+                    }
+                }
+
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    VclCheckBox {
+                        text: "Notify Missing Recent Files"
+                        checked: Runtime.applicationSettings.notifyMissingRecentFiles
+                        onToggled: Runtime.applicationSettings.notifyMissingRecentFiles = checked
+                    }
+
+                    Item {
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 1
+                    }
+
+                    VclButton {
+                        text: "More Info"
+                        onClicked: Qt.openUrlExternally("https://www.scrite.io/version-1-2-released/#chapter7_recent_files_not_found_notification")
+                    }
+                }
+            }
+        }
+
+        function reportMissingRecentFiles() {
+            if(missingFiles.length && missingFiles.length > 0)
+                open()
+        }
+
+        onClosed: Runtime.recentFiles.missingFiles = []
+        onMissingFilesChanged: Qt.callLater(reportMissingRecentFiles)
+
+        Component.onCompleted: Qt.callLater(reportMissingRecentFiles)
     }
 
     QtObject {

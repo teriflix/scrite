@@ -298,6 +298,7 @@ Item {
         property int accentColor: colors.defaultAccentColor
         property int joinDiscordPromptCounter: 0
         property bool reloadPrompt: true
+        property bool notifyMissingRecentFiles: true
 
         Component.onCompleted: {
             Qt.callLater( () => {
@@ -514,6 +515,7 @@ Item {
     readonly property ScriteFileListModel recentFiles: ScriteFileListModel {
         id: _recentFiles
         source: ScriteFileListModel.RecentFiles
+        notifyMissingFiles: true
 
         property bool preferTitleVersionText: true
 
@@ -539,6 +541,13 @@ Item {
 
         function captureChangeInFiles() {
             _recentFilesSettings.files = files
+        }
+
+        property var missingFiles: []
+        onFilesMissing: (files) => {
+            let f = Array.isArray(missingFiles) ? missingFiles : []
+            f.push(...files)
+            missingFiles = f
         }
     }
 
@@ -643,6 +652,7 @@ Item {
         category: "RecentFiles"
 
         property var files: []
+        property alias missingFiles: _recentFiles.missingFiles
         property alias preferTitleVersionText: _recentFiles.preferTitleVersionText
     }
 

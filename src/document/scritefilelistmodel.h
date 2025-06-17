@@ -42,6 +42,11 @@ public:
     Source source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
 
+    Q_PROPERTY(bool notifyMissingFiles READ isNotifyMissingFiles WRITE setNotifyMissingFiles NOTIFY notifyMissingFilesChanged)
+    void setNotifyMissingFiles(bool val);
+    bool isNotifyMissingFiles() const { return m_notifyMissingFiles; }
+    Q_SIGNAL void notifyMissingFilesChanged();
+
     // This method returns a list of all .scrite files in a given folder
     Q_INVOKABLE static QStringList filesInFolder(const QString &folder);
 
@@ -86,16 +91,20 @@ public:
         return { { FileInfoRole, QByteArrayLiteral("fileInfo") } };
     }
 
+signals:
+    void filesMissing(const QStringList &files);
+
 private:
     void loadRecentFiles();
     void setFilesInternal(const QStringList &files);
     void updateFromScriteFileInfo(const ScriteFileInfo &sfi);
 
-    void reportNonExistentRecentFiles(const QStringList &files);
+    void reportMissingFiles(const QStringList &files);
 
 private:
     int m_maxCount = 10;
     Source m_source = Custom;
+    bool m_notifyMissingFiles = false;
     QList<ScriteFileInfo> m_files;
     QFileSystemWatcher *m_watcher = nullptr;
 };
