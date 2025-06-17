@@ -515,7 +515,7 @@ Item {
     readonly property ScriteFileListModel recentFiles: ScriteFileListModel {
         id: _recentFiles
         source: ScriteFileListModel.RecentFiles
-        notifyMissingFiles: true
+        notifyMissingFiles: applicationSettings.notifyMissingRecentFiles
 
         property bool preferTitleVersionText: true
 
@@ -554,6 +554,10 @@ Item {
             let f = Array.isArray(missingFiles) || missingFiles.length ? missingFiles : []
             f.push(...files)
             missingFiles = f
+        }
+        onNotifyMissingFilesChanged: {
+            if(!notifyMissingFiles)
+                missingFiles = []
         }
     }
 

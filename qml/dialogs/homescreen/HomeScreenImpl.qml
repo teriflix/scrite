@@ -1506,8 +1506,12 @@ Item {
         }
 
         function reportMissingRecentFiles() {
-            if(missingFiles.length && missingFiles.length > 0)
-                open()
+            if(Runtime.applicationSettings.notifyMissingRecentFiles) {
+                if(missingFiles.length && missingFiles.length > 0)
+                    open()
+            } else {
+                Runtime.recentFiles.missingFiles = []
+            }
         }
 
         onClosed: Runtime.recentFiles.missingFiles = []
