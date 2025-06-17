@@ -5,7 +5,7 @@ TARGET = Scrite
 CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
 
-VERSION = 1.2.2
+VERSION = 1.2.3
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
 
 #DEFINES += SCRITE_ENABLE_AUTOMATION
@@ -343,7 +343,7 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
-    VERSION_INFO = "1.2.2-macos"
+    VERSION_INFO = "1.2.3-macos"
 
     HEADERS += src/core/systemtextinputmanager_macos.h
     OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
@@ -353,9 +353,9 @@ macx {
 
 win32 {
     contains(QT_ARCH, i386) {
-        VERSION_INFO = "1.2.2-windows-x86"
+        VERSION_INFO = "1.2.3-windows-x86"
     } else {
-        VERSION_INFO = "1.2.2-windows-x64"
+        VERSION_INFO = "1.2.3-windows-x64"
     }
 
     RC_ICONS = appicon.ico
@@ -366,7 +366,7 @@ win32 {
 
 linux {
     CONFIG+=use_gold_linker
-    VERSION_INFO = "1.2.2-linux"
+    VERSION_INFO = "1.2.3-linux"
 }
 
 include($$PWD/3rdparty/sonnet/sonnet.pri)
