@@ -184,5 +184,12 @@
         <file>qml/dialogs/homescreen/EditRecentFilesDialog.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_TwoColumnWidthDistributionEditor.qml</file>
         <file>qml/screenplay/PageBreakItem.qml</file>
+        <file>qml/timelineview/TimelineViewFooter.qml</file>
+        <file>qml/timelineview/qmldir</file>
+        <file>qml/timelineview/TimelineTracksView.qml</file>
+        <file>qml/timelineview/TimelineTools.qml</file>
+        <file>qml/timelineview/TimelineViewDelegate.qml</file>
+        <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
+        <file>qml/timelineview/TimelineListView.qml</file>
     </qresource>
 </RCC>

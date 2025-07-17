@@ -3022,7 +3022,7 @@ QHash<int, QByteArray> Screenplay::roleNames() const
 {
     static QHash<int, QByteArray> roles;
     if (roles.isEmpty()) {
-        roles[IdRole] = "id";
+        roles[IdRole] = "sceneID";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
         roles[BreakTypeRole] = "breakType";

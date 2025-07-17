@@ -1365,7 +1365,7 @@ Item {
                     return
                 }
 
-                var sceneId = event.mimeData["scrite/sceneID"]
+                var sceneId = event.mimeData[Runtime.timelineViewSettings.dropAreaKey]
                 var element = Scrite.document.structure.findElementBySceneID(sceneId)
                 if(element === null)
                     return
@@ -1482,7 +1482,7 @@ Item {
             DropArea {
                 id: catchAllDropArea
                 anchors.fill: parent
-                keys: ["scrite/sceneID"]
+                keys: [Runtime.timelineViewSettings.dropAreaKey]
                 onDropped: (drop) => {
                     var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                     if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
@@ -2462,7 +2462,9 @@ Item {
             Drag.hotSpot.x: dragImageSize.width/2 // dragHandle.x + dragHandle.width/2
             Drag.hotSpot.y: dragImageSize.height/2 // dragHandle.y + dragHandle.height/2
             Drag.mimeData: {
-                "scrite/sceneID": element.scene.id
+                let md = {}
+                md[Runtime.timelineViewSettings.dropAreaKey] = element.scene.id
+                return md
             }
             Drag.source: element.scene
 
@@ -3240,7 +3242,11 @@ Item {
             Drag.supportedActions: Qt.LinkAction
             Drag.hotSpot.x: dragImageSize.width/2 // dragHandle.x + dragHandle.width/2
             Drag.hotSpot.y: dragImageSize.height/2 // dragHandle.y + dragHandle.height/2
-            Drag.mimeData: { "scrite/sceneID": element.scene.id }
+            Drag.mimeData: {
+                let md = {}
+                md[Runtime.timelineViewSettings.dropAreaKey] = element.scene.id
+                return md
+            }
             Drag.source: element.scene
 
             // Accept drops for stacking items on top of each other.
@@ -3257,7 +3263,7 @@ Item {
                 DropArea {
                     id: dropAreaForStacking
                     anchors.fill: parent
-                    keys: ["scrite/sceneID"]
+                    keys: [Runtime.timelineViewSettings.dropAreaKey]
                     onDropped: (drop) => {
                         var otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                         if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {

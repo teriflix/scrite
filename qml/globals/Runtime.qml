@@ -84,6 +84,7 @@ Item {
         category: "Timeline View"
 
         property string textMode: "HeadingOrTitle"
+        readonly property string dropAreaKey: "scrite/sceneID"
     }
 
     readonly property Settings screenplayEditorSettings: Settings {
