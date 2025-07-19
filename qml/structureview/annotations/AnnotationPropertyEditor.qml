@@ -25,11 +25,12 @@ import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
-// For use from within StructureView.qml only!
-
 Item {
-    property Annotation annotation
-    property BoundingBoxEvaluator itemsBoundingBox
+    id: root
+
+    required property Annotation annotation
+
+    required property BoundingBoxEvaluator canvasItemsBoundingBox
 
     Flickable {
         id: propertyEditorView
@@ -66,7 +67,7 @@ Item {
                     width: parent.width
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
-                    text: "<b>Position:</b> " + Math.round(annotation.geometry.x-itemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-itemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
+                    text: "<b>Position:</b> " + Math.round(annotation.geometry.x-root.canvasItemsBoundingBox.left) + ", " + Math.round(annotation.geometry.y-root.canvasItemsBoundingBox.top) + ". <b>Size:</b> " + Math.round(annotation.geometry.width) + " x " + Math.round(annotation.geometry.height)
                 }
             }
 

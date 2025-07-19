@@ -27,6 +27,7 @@
 #include <QThreadPool>
 #include <QJsonObject>
 #include <QQuickPaintedItem>
+#include <QFutureWatcherBase>
 
 #include "qobjectproperty.h"
 
@@ -283,6 +284,10 @@ public:
     BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
+    Q_PROPERTY(bool isUpdatingPreview READ isUpdatingPreview NOTIFY isUpdatingPreviewChanged)
+    bool isUpdatingPreview() const { return !m_updatePreviewFutureWatcher.isNull(); }
+    Q_SIGNAL void isUpdatingPreviewChanged();
+
     // QQuickPaintedItem interface
     void paint(QPainter *painter);
 
@@ -294,6 +299,7 @@ private:
     QImage m_previewImage;
     QColor m_backgroundColor = Qt::white;
     qreal m_backgroundOpacity = 1.0;
+    QPointer<QFutureWatcherBase> m_updatePreviewFutureWatcher;
     QObjectProperty<BoundingBoxEvaluator> m_evaluator;
 };
 

@@ -17,9 +17,10 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 Item {
-    id: rubberband
-    signal tryStart(point pos)
+    id: root
+
     signal select(rect rectangle)
+    signal tryStart(point pos)
 
     property bool selectionMode: false
     property bool active: false
@@ -43,7 +44,7 @@ Item {
         y: rectangle.y
         width: rectangle.width
         height: rectangle.height
-        visible: rubberband.active
+        visible: root.active
     }
 
     MouseArea {
@@ -52,9 +53,9 @@ Item {
         onPressed: {
             if(mouse.modifiers & Qt.ControlModifier || parent.selectionMode) {
                 var pos = Qt.point(mouse.x, mouse.y)
-                rubberband.tryStart(pos)
+                root.tryStart(pos)
 
-                if(rubberband.active) {
+                if(root.active) {
                     selection.from = pos
                     selection.to = selection.from
                     selecting = true
@@ -62,23 +63,23 @@ Item {
                 } else
                     mouse.accepted = false
             } else {
-                rubberBand.active = false
+                _rubberband.active = false
                 mouse.accepted = false
             }
         }
         onPositionChanged: {
-            if(rubberband.active) {
+            if(root.active) {
                 selection.to = Qt.point(mouse.x, mouse.y)
                 mouse.accepted = true
             } else
                 mouse.accepted = false
         }
         onReleased: {
-            if(rubberband.active) {
+            if(root.active) {
                 selection.to = Qt.point(mouse.x, mouse.y)
-                rubberband.select(selection.rectangle)
+                root.select(selection.rectangle)
                 selecting = false
-                rubberband.active = false
+                root.active = false
                 mouse.accepted = true
             } else
                 mouse.accepted = false

@@ -20,22 +20,24 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 VclMenu {
-    id: colorMenu
-    width: minCellSize * 5 + 10
-    height: minCellSize * (4 + Math.ceil((Runtime.workspaceSettings.customColors.length+1)/4)) +  10
+    id: root
 
-    signal menuItemClicked(string color)
     readonly property real minCellSize: 50
     property color selectedColor: "white"
 
+    signal menuItemClicked(string color)
+
+    width: minCellSize * 5 + 10
+    height: minCellSize * (4 + Math.ceil((Runtime.workspaceSettings.customColors.length+1)/4)) +  10
+
     VclMenuItem {
-        width: colorMenu.width
+        width: root.width
         height: colorGrid.height
 
         background: Item { }
         contentItem: Grid {
             id: colorGrid
-            width: colorMenu.width
+            width: root.width
             property int currentIndex: -1
 
             property real cellSize: width / columns
@@ -59,8 +61,8 @@ VclMenu {
                         colors.pop()
                     Runtime.workspaceSettings.customColors = colors
 
-                    colorMenu.menuItemClicked(modelData)
-                    colorMenu.close()
+                    root.menuItemClicked(modelData)
+                    root.close()
                 }
             }
         }
@@ -93,8 +95,8 @@ VclMenu {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    colorMenu.menuItemClicked(modelData)
-                    colorMenu.close()
+                    root.menuItemClicked(modelData)
+                    root.close()
                 }
                 onEntered: colorGrid.currentIndex = index
             }

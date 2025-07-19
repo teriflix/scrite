@@ -1353,6 +1353,14 @@ Item {
                          }, callback )
         }
 
+        Connections {
+            target: Runtime
+
+            function onResetMainWindowUi(callback) {
+                mainUiContentLoader.reset(callback)
+            }
+        }
+
         Component.onCompleted: Utils.execLater(mainUiContentLoader, 200, () => { mainUiContentLoader.opacity = 1 } )
     }
 
@@ -1753,6 +1761,9 @@ Item {
                                         tipName: "structure"
                                         enabled: structureViewLoader.visible
                                     }
+
+                                    onEditorRequest: { } // TODO
+                                    onReleaseEditorRequest: { } // TODO
                                 }
 
                                 DisabledFeatureNotice {

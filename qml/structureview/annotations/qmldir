@@ -1,0 +1,13 @@
+AbstractAnnotationDelegate 1.0 AbstractAnnotationDelegate.qml
+singleton AnnotationFactory 1.0 AnnotationFactory.qml
+AnnotationGrip 1.0 AnnotationGrip.qml
+AnnotationPropertyEditor 1.0 AnnotationPropertyEditor.qml
+singleton AnnotationPropertyEditorDock 1.0 AnnotationPropertyEditorDock.qml
+AnnotationToolBar 1.0 AnnotationToolBar.qml
+CreateAnnotationMouseArea 1.0 CreateAnnotationMouseArea.qml
+singleton ImageAnnotationFactory 1.0 ImageAnnotationFactory.qml
+singleton LineAnnotationFactory 1.0 LineAnnotationFactory.qml
+singleton OvalAnnotationFactory 1.0 OvalAnnotationFactory.qml
+singleton RectangleAnnotationFactory 1.0 RectangleAnnotationFactory.qml
+singleton TextAnnotationFactory 1.0 TextAnnotationFactory.qml
+singleton UrlAnnotationFactory 1.0 UrlAnnotationFactory.qml

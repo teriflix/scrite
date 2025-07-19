@@ -12,6 +12,21 @@ function execLater(contextObject, delay, callback, args)
     timer.start()
 }
 
+function newAnnotation(parent, type, geometry, config) {
+    if(!parent || !type || !geometry)
+        return null
+
+    let annot = Qt.createQmlObject("import io.scrite.components 1.0; Annotation { objectName: \"ica\" }", parent)
+    annot.type = type
+    annot.geometry = geometry
+    if(config) {
+        for(member in config)
+            annot.setAttribute(member, config[member])
+    }
+
+    return annot
+}
+
 function bounded(min, val, max)
 {
     return Math.min(Math.max(min, val), max)

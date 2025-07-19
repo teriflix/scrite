@@ -1,0 +1,14 @@
+AbstractSelection 1.0 AbstractSelection.qml
+AbstractStructureElementUI 1.0 AbstractStructureElementUI.qml
+ActiveStructureElementBackdrop 1.0 ActiveStructureElementBackdrop.qml
+CreateStructureElementMouseArea 1.0 CreateStructureElementMouseArea.qml
+SelectionContextMenu 1.0 SelectionContextMenu.qml
+StructureCanvasEpisodeBox 1.0 StructureCanvasEpisodeBox.qml
+StructureCanvasGroupBox 1.0 StructureCanvasGroupBox.qml
+StructureElementConnectorDelegate 1.0 StructureElementConnectorDelegate.qml
+StructureElementContextMenu 1.0 StructureElementContextMenu.qml
+StructureElementIndexCard 1.0 StructureElementIndexCard.qml
+StructureElementsLayoutTask 1.0 StructureElementsLayoutTask.qml
+StructureElementsSelection 1.0 StructureElementsSelection.qml
+StructureElementStackTabBar 1.0 StructureElementStackTabBar.qml
+StructureElementSynopsisBox 1.0 StructureElementSynopsisBox.qml

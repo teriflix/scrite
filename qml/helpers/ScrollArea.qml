@@ -22,50 +22,23 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 Flickable {
-    id: scrollAreaFlickable
-
-    property rect visibleRect: Qt.rect(contentX, contentY, width, height)
-    property real initialContentWidth: 100
-    property real initialContentHeight: 100
-    property real suggestedScale: zoomScale
-    property alias handlePinchZoom: pinchHandler.enabled
-    property bool showScrollBars: true
-    property bool zoomOnScroll: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
-    property bool animatePanAndZoom: true
-    property alias minimumScale: pinchHandler.minimumScale
-    property alias maximumScale: pinchHandler.maximumScale
-    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-
-    boundsBehavior: Flickable.StopAtBounds
-    clip: true
+    id: root
 
     property bool changing: false
-    TrackerPack {
-        delay: 250
+    property bool zoomOnScroll: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
+    property bool showScrollBars: true
+    property bool animatePanAndZoom: true
+    property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
 
-        TrackProperty {
-            target: scrollAreaFlickable
-            property: "contentX"
-            onTracked: scrollAreaFlickable.changing = true
-        }
-        TrackProperty {
-            target: scrollAreaFlickable
-            property: "contentY"
-            onTracked: scrollAreaFlickable.changing = true
-        }
-        TrackProperty {
-            target: scrollAreaFlickable
-            property: "moving"
-            onTracked: scrollAreaFlickable.changing = true
-        }
-        TrackProperty {
-            target: scrollAreaFlickable
-            property: "flicking"
-            onTracked: scrollAreaFlickable.changing = true
-        }
+    property real zoomScale: 1
+    property rect visibleRect: Qt.rect(contentX, contentY, width, height)
+    property real suggestedScale: zoomScale
+    property real initialContentWidth: 100
+    property real initialContentHeight: 100
 
-        onTracked: scrollAreaFlickable.changing = false
-    }
+    property alias handlePinchZoom: pinchHandler.enabled
+    property alias minimumScale: pinchHandler.minimumScale
+    property alias maximumScale: pinchHandler.maximumScale
 
     signal zoomScaleChangedInteractively()
 
@@ -104,47 +77,6 @@ Flickable {
         ensureVisible(area, s)
     }
 
-    property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
-    Behavior on contentX {
-        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
-        NumberAnimation { id: contentXAnimation; duration: 250 }
-    }
-    Behavior on contentY {
-        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
-        NumberAnimation { id: contentYAnimation; duration: 250 }
-    }
-    Behavior on zoomScale {
-        id: zoomScaleBehavior
-        property bool allow: true
-        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom && allow
-        NumberAnimation { id: zoomScaleAnimation; duration: 250 }
-    }
-
-    ScrollBar.horizontal: VclScrollBar { flickable: scrollAreaFlickable }
-    ScrollBar.vertical: VclScrollBar { flickable: scrollAreaFlickable }
-
-    Timer {
-        id: ensureItemVisibleTimer
-        property Item item
-        property real scaling
-        property real leaveMargin
-        repeat: false
-        interval: 250
-        running: false
-        onTriggered: {
-            if(scrollAreaFlickable.moving || scrollAreaFlickable.flicking) {
-                Qt.callLater(start)
-                return
-            }
-
-            ensureItemVisible(item, scaling, leaveMargin)
-            item = null
-            scaling = 1
-            leaveMargin = 0
-            delay = 250
-        }
-    }
-
     function ensureItemVisibleLater(item, scaling, leaveMargin, delay) {
         ensureItemVisibleTimer.item = item
         ensureItemVisibleTimer.scaling = scaling ? scaling : 1
@@ -160,8 +92,6 @@ Flickable {
         ensureVisible(area, scaling, leaveMargin)
     }
 
-    property var ensureVisibleParams
-
     function ensureVisible(area, scaling, leaveMargin) {
         if(leaveMargin === undefined)
             leaveMargin = 20
@@ -172,12 +102,12 @@ Flickable {
                         area.width*scaling, area.height*scaling )
 
         if(area.right > contentWidth || area.bottom > contentHeight || width < 0 || height < 0) {
-            ensureVisibleParams = {
+            _private.ensureVisibleParams = {
                 "area": area, "scaling": scaling, "leaveMargin": leaveMargin
             }
-            Utils.execLater(scrollAreaFlickable, 500, function() {
-                var params = ensureVisibleParams
-                ensureVisibleParams = undefined
+            Utils.execLater(root, 500, function() {
+                var params = _private.ensureVisibleParams
+                _private.ensureVisibleParams = undefined
                 ensureVisible(params.area, params.scaling, params.leaveMargin)
             })
             return
@@ -242,40 +172,10 @@ Flickable {
             contentY = Math.max(Math.min(cy, contentHeight-height-1),0)
     }
 
-    property real zoomScale: 1
+    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-    onZoomScaleChanged: {
-        var cursorPos = Scrite.app.cursorPosition()
-        var fCursorPos = Scrite.app.mapGlobalPositionToItem(scrollAreaFlickable, cursorPos)
-        var fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
-        var visibleArea = Qt.rect(contentX, contentY, width, height)
-        var mousePoint = fContainsCursor ?
-                    Scrite.app.mapGlobalPositionToItem(contentItem, Scrite.app.cursorPosition()) :
-                    Qt.point(contentX+width/2, contentY+height/2)
-        var newWidth = initialContentWidth * zoomScale
-        var newHeight = initialContentHeight * zoomScale
-        resizeContent(newWidth, newHeight, mousePoint)
-        returnToBoundsTimer.start()
-    }
-
-    PinchHandler {
-        id: pinchHandler
-        target: null
-        onTargetChanged: target = null
-
-        minimumScale: Math.min(parent.scale, 0.25)
-        maximumScale: Math.max(4, parent.scale)
-        minimumRotation: 0
-        maximumRotation: 0
-        minimumPointCount: 2
-
-        onScaleChanged: {
-            zoomScaleBehavior.allow = false
-            zoomScale = activeScale
-            zoomScaleChangedInteractively()
-            zoomScaleBehavior.allow = true
-        }
-    }
+    ScrollBar.horizontal: VclScrollBar { flickable: root }
+    ScrollBar.vertical: VclScrollBar { flickable: root }
 
     EventFilter.active: zoomOnScroll
     EventFilter.events: [EventFilter.Wheel]
@@ -289,12 +189,130 @@ Flickable {
         result.filter = true
     }
 
+    clip: true
+    boundsBehavior: Flickable.StopAtBounds
+
+    Behavior on contentX {
+        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
+        NumberAnimation { id: contentXAnimation; duration: 250 }
+    }
+
+    Behavior on contentY {
+        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom
+        NumberAnimation { id: contentYAnimation; duration: 250 }
+    }
+
+    Behavior on zoomScale {
+        id: zoomScaleBehavior
+        property bool allow: true
+        enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom && allow
+        NumberAnimation { id: zoomScaleAnimation; duration: 250 }
+    }
+
+    Timer {
+        id: ensureItemVisibleTimer
+
+        property Item item
+        property real scaling
+        property real leaveMargin
+
+        repeat: false
+        interval: 250
+        running: false
+
+        onTriggered: {
+            if(root.moving || root.flicking) {
+                Qt.callLater(start)
+                return
+            }
+
+            ensureItemVisible(item, scaling, leaveMargin)
+            item = null
+            scaling = 1
+            leaveMargin = 0
+            delay = 250
+        }
+    }
+
     Timer {
         id: returnToBoundsTimer
         objectName: "ScrollArea.returnToBoundsTimer"
-        running: false
+
         repeat: false
+        running: false
         interval: 500
+
         onTriggered: parent.returnToBounds()
+    }
+
+    TrackerPack {
+        delay: 250
+
+        TrackProperty {
+            target: root
+            property: "contentX"
+            onTracked: root.changing = true
+        }
+
+        TrackProperty {
+            target: root
+            property: "contentY"
+            onTracked: root.changing = true
+        }
+
+        TrackProperty {
+            target: root
+            property: "moving"
+            onTracked: root.changing = true
+        }
+
+        TrackProperty {
+            target: root
+            property: "flicking"
+            onTracked: root.changing = true
+        }
+
+        onTracked: root.changing = false
+    }
+
+    PinchHandler {
+        id: pinchHandler
+
+        target: null
+
+        minimumScale: Math.min(parent.scale, 0.25)
+        maximumScale: Math.max(4, parent.scale)
+        minimumRotation: 0
+        maximumRotation: 0
+        minimumPointCount: 2
+
+        onScaleChanged: {
+            zoomScaleBehavior.allow = false
+            zoomScale = activeScale
+            zoomScaleChangedInteractively()
+            zoomScaleBehavior.allow = true
+        }
+
+        onTargetChanged: target = null
+    }
+
+    onZoomScaleChanged: {
+        var cursorPos = Scrite.app.cursorPosition()
+        var fCursorPos = Scrite.app.mapGlobalPositionToItem(root, cursorPos)
+        var fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
+        var visibleArea = Qt.rect(contentX, contentY, width, height)
+        var mousePoint = fContainsCursor ?
+                    Scrite.app.mapGlobalPositionToItem(contentItem, Scrite.app.cursorPosition()) :
+                    Qt.point(contentX+width/2, contentY+height/2)
+        var newWidth = initialContentWidth * zoomScale
+        var newHeight = initialContentHeight * zoomScale
+        resizeContent(newWidth, newHeight, mousePoint)
+        returnToBoundsTimer.start()
+    }
+
+    QtObject {
+        id: _private
+
+        property var ensureVisibleParams
     }
 }

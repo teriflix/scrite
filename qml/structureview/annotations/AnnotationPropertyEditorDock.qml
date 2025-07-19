@@ -29,7 +29,7 @@ FloatingDock {
     id: root
 
     property Annotation annotation
-    property BoundingBoxEvaluator itemsBoundingBox
+    property BoundingBoxEvaluator canvasItemsBoundingBox
 
     x: 80
     y: Scrite.window.height * 0.15
@@ -41,7 +41,7 @@ FloatingDock {
 
     content: AnnotationPropertyEditor {
         annotation: root.annotation
-        itemsBoundingBox: root.itemsBoundingBox
+        canvasItemsBoundingBox: root.canvasItemsBoundingBox
     }
 
     onCloseRequest: {

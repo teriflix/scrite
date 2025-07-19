@@ -504,6 +504,7 @@ Item {
     readonly property int e_ScritedTab: 3
     property int mainWindowTab: e_ScreenplayTab
     signal activateMainWindowTab(int tabType)
+    signal resetMainWindowUi(var callback)
 
     property bool loadMainUiContent: true
 
@@ -565,16 +566,17 @@ Item {
     // This model is how the screenplay of the current ScriteDocument is accessed.
     readonly property ScreenplayAdapter screenplayAdapter: ScreenplayAdapter {
         property string sessionId
+
         source: {
             if(Scrite.document.sessionId !== sessionId)
-            return null
+                return null
 
             if(mainWindowTab === e_ScreenplayTab)
-            return Scrite.document.screenplay
+                return Scrite.document.screenplay
 
             if(Scrite.document.screenplay.currentElementIndex < 0) {
-                var index = Scrite.document.structure.currentElementIndex
-                var element = Scrite.document.structure.elementAt(index)
+                let index = Scrite.document.structure.currentElementIndex
+                let element = Scrite.document.structure.elementAt(index)
                 if(element) {
                     if(element.scene.addedToScreenplay) {
                         Scrite.document.screenplay.currentElementIndex = element.scene.screenplayElementIndexList[0]

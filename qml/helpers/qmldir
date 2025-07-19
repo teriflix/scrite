@@ -26,7 +26,6 @@ SceneFeaturedImage 1.0 SceneFeaturedImage.qml
 SceneTypeImage 1.0 SceneTypeImage.qml
 ScrollArea 1.0 ScrollArea.qml
 SearchBar 1.0 SearchBar.qml
-Selection 1.0 Selection.qml
 SidePanel 1.0 SidePanel.qml
 SpecialSymbolsSupport 1.0 SpecialSymbolsSupport.qml
 SpellingSuggestionsMenu 1.0 SpellingSuggestionsMenu.qml

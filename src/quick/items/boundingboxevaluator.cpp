@@ -734,7 +734,7 @@ void BoundingBoxPreview::paint(QPainter *painter)
 
 void BoundingBoxPreview::updatePreviewImage()
 {
-    if (m_evaluator == nullptr)
+    if (m_evaluator == nullptr || this->isUpdatingPreview())
         return;
 
     auto capturePreviewAsPicture = [=]() -> QImage {
@@ -787,19 +787,20 @@ void BoundingBoxPreview::updatePreviewImage()
         return image;
     };
 
-    const QString futureWatcherName = QStringLiteral("RedrawFutureWatcher");
-    if (this->findChild<QFutureWatcherBase *>(futureWatcherName) != nullptr)
-        return;
-
     QFuture<QImage> future = QtConcurrent::run(&m_evaluator->m_threadPool, capturePreviewAsPicture);
     QFutureWatcher<QImage> *futureWatcher = new QFutureWatcher<QImage>(this);
-    futureWatcher->setObjectName(futureWatcherName);
     connect(futureWatcher, &QFutureWatcher<QImage>::finished, this, [=]() {
         m_previewImage = future.result();
         futureWatcher->deleteLater();
         this->update();
     });
     futureWatcher->setFuture(future);
+
+    connect(futureWatcher, &QObject::destroyed, this, &BoundingBoxPreview::isUpdatingPreviewChanged,
+            Qt::QueuedConnection);
+
+    m_updatePreviewFutureWatcher = futureWatcher;
+    emit isUpdatingPreviewChanged();
 }
 
 void BoundingBoxPreview::resetEvaluator()

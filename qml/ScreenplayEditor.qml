@@ -27,7 +27,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
-import "qrc:/qml/structure"
+import "qrc:/qml/structureview"
 import "qrc:/qml/screenplay"
 import "qrc:/qml/floatingdockpanels"
 

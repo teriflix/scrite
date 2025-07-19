@@ -25,35 +25,38 @@ import "qrc:/qml/dialogs"
 import "qrc:/qml/notifications"
 
 VclMenu {
-    id: structureGroupsMenu
+    id: root
 
-    property SceneGroup sceneGroup: null
-    signal toggled(int row, string name)
-    closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
-    enabled: !Scrite.document.readOnly
-
-    title: "Tag Groups"
     property string innerTitle: ""
+    property SceneGroup sceneGroup: null
+
+    signal toggled(int row, string name)
 
     width: 450
     height: 500
 
+    title: "Tag Groups"
+    enabled: !Scrite.document.readOnly
+    closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
+
     HelpTipNotification {
         id: htn
+
         tipName: "story_beat_tagging"
         enabled: false
     }
-    onOpened: htn.enabled = true
 
     VclMenuItem {
-        width: structureGroupsMenu.width
-        height: structureGroupsMenu.height
+        width: root.width
+        height: root.height
 
         background: Item { }
+
         contentItem: Item {
             ColumnLayout {
                 anchors.fill: parent
-                anchors.bottomMargin: structureGroupsMenu.bottomPadding
+                anchors.bottomMargin: root.bottomPadding
+
                 spacing: 10
 
                 Rectangle {
@@ -62,6 +65,7 @@ VclMenu {
 
                     border.width: 1
                     border.color: Runtime.colors.primary.borderColor
+
                     enabled: Runtime.appFeatures.structure.enabled && sceneGroup.sceneCount > 0
                     opacity: enabled ? 1 : 0.5
 
@@ -73,13 +77,17 @@ VclMenu {
 
                     VclLabel {
                         id: innerTitleText
-                        width: parent.width - 8
-                        anchors.horizontalCenter: parent.horizontalCenter
+
                         anchors.top: parent.top
                         anchors.margins: 3
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        width: parent.width - 8
+                        visible: text !== ""
                         wrapMode: Text.WordWrap
+
                         text: {
-                            var ret = innerTitle
+                            let ret = innerTitle
                             if(sceneGroup.hasSceneStackIds) {
                                 if(ret !== "")
                                     ret += "<br/>"
@@ -87,25 +95,61 @@ VclMenu {
                             }
                             return ret;
                         }
-                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        visible: text !== ""
-                        horizontalAlignment: Text.AlignHCenter
-                        padding: 5
-                        color: Runtime.colors.primary.c700.text
+
                         font.bold: true
+                        font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+                        color: Runtime.colors.primary.c700.text
+                        padding: 5
+                        horizontalAlignment: Text.AlignHCenter
                     }
 
                     ListView {
                         id: groupsView
+
+                        property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
+                        property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
+
+                        function adjustScrolling() {
+                            if(!showingFilteredItems) {
+                                positionViewAtBeginning()
+                                return
+                            }
+
+                            let prefCategory = Scrite.document.structure.preferredGroupCategory
+
+                            let acts = sceneGroup.sceneActs
+                            let index = -1
+                            for(let i=0; i<sceneGroup.count; i++) {
+                                let item = sceneGroup.at(i)
+
+                                if(item.category.toUpperCase() !== prefCategory)
+                                    continue
+
+                                if( item.act === "" || acts.indexOf(item.act) >= 0) {
+                                    positionViewAtIndex(i, ListView.Beginning)
+                                    return
+                                }
+                            }
+                        }
+
+                        function adjustScrollingLater() {
+                            Utils.execLater(groupsView, 50, adjustScrolling)
+                        }
+
+                        ScrollBar.vertical: VclScrollBar { flickable: groupsView }
                         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
                         anchors.left: parent.left
                         anchors.top: innerTitleText.visible ? innerTitleText.bottom : parent.top
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom
                         anchors.margins: 5
+
                         clip: true
                         model: sceneGroup
                         keyNavigationEnabled: false
+
                         section.property: "category"
                         section.criteria: ViewSection.FullString
                         section.delegate: Rectangle {
@@ -122,53 +166,30 @@ VclMenu {
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
                         }
-                        property bool scrollBarVisible: groupsView.height < groupsView.contentHeight
-                        ScrollBar.vertical: VclScrollBar { flickable: groupsView }
-                        property bool showingFilteredItems: sceneGroup.hasSceneActs && sceneGroup.hasGroupActs
-                        onShowingFilteredItemsChanged: adjustScrollingLater()
-
-                        function adjustScrolling() {
-                            if(!showingFilteredItems) {
-                                positionViewAtBeginning()
-                                return
-                            }
-
-                            var prefCategory = Scrite.document.structure.preferredGroupCategory
-
-                            var acts = sceneGroup.sceneActs
-                            var index = -1
-                            for(var i=0; i<sceneGroup.count; i++) {
-                                var item = sceneGroup.at(i)
-
-                                if(item.category.toUpperCase() !== prefCategory)
-                                    continue
-
-                                if( item.act === "" || acts.indexOf(item.act) >= 0) {
-                                    positionViewAtIndex(i, ListView.Beginning)
-                                    return
-                                }
-                            }
-                        }
-
-                        function adjustScrollingLater() {
-                            Utils.execLater(groupsView, 50, adjustScrolling)
-                        }
 
                         delegate: Rectangle {
-                            width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
-                            height: 30
-                            color: groupItemMouseArea.containsMouse ? Runtime.colors.primary.button.background : Qt.rgba(0,0,0,0)
-                            opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
                             property bool doesNotBelongToAnyAct: arrayItem.act === ""
                             property bool filtered: doesNotBelongToAnyAct || sceneGroup.sceneActs.indexOf(arrayItem.act) >= 0
+
+                            width: groupsView.width - (groupsView.scrollBarVisible ? 20 : 1)
+                            height: 30
+
+                            color: groupItemMouseArea.containsMouse ? Runtime.colors.primary.button.background : Qt.rgba(0,0,0,0)
+                            opacity: groupsView.showingFilteredItems ? (filtered ? 1 : 0.5) : 1
 
                             Row {
                                 anchors.fill: parent
                                 anchors.leftMargin: 8
                                 anchors.rightMargin: 8
+
                                 spacing: 5
 
                                 Image {
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    width: 24; height: 24
+
+                                    source: "qrc:/icons/navigation/check.png"
                                     opacity: {
                                         switch(arrayItem.checked) {
                                         case "no": return 0
@@ -177,33 +198,38 @@ VclMenu {
                                         }
                                         return 0
                                     }
-                                    source: "qrc:/icons/navigation/check.png"
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    width: 24; height: 24
                                 }
 
                                 VclLabel {
-                                    text: arrayItem.label
-                                    width: parent.width - parent.spacing - 24
                                     anchors.verticalCenter: parent.verticalCenter
+
+                                    width: parent.width - parent.spacing - 24
+
+                                    text: arrayItem.label
+                                    elide: Text.ElideRight
+                                    leftPadding: arrayItem.type > 0 ? 20 : 0
+
                                     font.bold: groupsView.showingFilteredItems ? filtered : doesNotBelongToAnyAct
                                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                    leftPadding: arrayItem.type > 0 ? 20 : 0
-                                    elide: Text.ElideRight
                                 }
                             }
 
                             MouseArea {
                                 id: groupItemMouseArea
+
                                 anchors.fill: parent
+
                                 hoverEnabled: true
+
                                 onClicked: {
                                     sceneGroup.toggle(index)
-                                    structureGroupsMenu.toggled(index, arrayItem.name)
+                                    root.toggled(index, arrayItem.name)
                                     Scrite.user.logActivity2("structure", "tag: " + arrayItem.name)
                                 }
                             }
                         }
+
+                        onShowingFilteredItemsChanged: adjustScrollingLater()
                     }
                 }
 
@@ -217,11 +243,15 @@ VclMenu {
 
             DisabledFeatureNotice {
                 anchors.fill: parent
+
                 color: Qt.rgba(1,1,1,0.8)
                 visible: !Runtime.appFeatures.structure.enabled
                 featureName: "Structure Tagging"
-                onClicked: structureGroupsMenu.close()
+
+                onClicked: root.close()
             }
         }
     }
+
+    onOpened: htn.enabled = true
 }

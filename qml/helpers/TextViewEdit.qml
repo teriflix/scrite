@@ -20,99 +20,89 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 Loader {
-    id: textViewEdit
-    property bool readOnly: true
-    property string text
-    property alias font: fontMetrics.font
-    property int horizontalAlignment: Text.AlignHCenter
-    property int verticalAlignment: Text.AlignTop
-    property int wrapMode: Text.WordWrap
-    property int elide: Text.ElideNone
-    property SearchEngine searchEngine
-    property int searchSequenceNumber: -1
-    property bool hasFocus: item ? item.activeFocus : false
+    id: root
+
     property var completionStrings: []
-    property real contentWidth: item ? item.contentWidth : fontMetrics.advanceWidth(text)
+
+    property int elide: Text.ElideNone
+    property int wrapMode: Text.WordWrap
+    property int verticalAlignment: Text.AlignTop
+    property int horizontalAlignment: Text.AlignHCenter
+    property int searchSequenceNumber: -1
+
+    property bool readOnly: true
+    property bool hasFocus: item ? item.activeFocus : false
     property bool frameVisible: false
-    property alias fontAscent: fontMetrics.ascent
-    property alias fontDescent: fontMetrics.descent
-    property alias fontHeight: fontMetrics.height
-    property real leftPadding: 0
-    property real rightPadding: 0
+
     property real topPadding: 0
+    property real leftPadding: 0
+    property real contentWidth: item ? item.contentWidth : _private.fontMetrics.advanceWidth(text)
+    property real rightPadding: 0
     property real bottomPadding: 0
+
     property color textColor: "black"
+
+    property alias font: _private.fontMetrics.font
+    property alias fontHeight: _private.fontMetrics.height
+    property alias fontAscent: _private.fontMetrics.ascent
+    property alias fontDescent: _private.fontMetrics.descent
+
+    property string text
+
+    property SearchEngine searchEngine
 
     signal textEdited(string text)
     signal editingFinished()
     signal highlightRequest()
 
-    FontMetrics {
-        id: fontMetrics
-    }
+    sourceComponent: visible ? (readOnly ? _private.textViewComponent : _private.textEditComponent) : null
 
-    sourceComponent: visible ? (readOnly ? textViewComponent : textEditComponent) : null
+    QtObject {
+        id: _private
 
-    Component {
-        id: textViewComponent
+        readonly property FontMetrics fontMetrics: FontMetrics { }
 
-        VclLabel {
-            property string markupText
-            text: markupText !== "" ? markupText : textViewEdit.text
-            font: textViewEdit.font
-            wrapMode: textViewEdit.wrapMode
-            elide: textViewEdit.elide
-            horizontalAlignment: textViewEdit.horizontalAlignment
-            verticalAlignment: textViewEdit.verticalAlignment
-            padding: 5
-            color: textColor
-            textFormat: markupText === "" ? Text.PlainText : Text.RichText
-            leftPadding: textViewEdit.leftPadding
-            topPadding: textViewEdit.topPadding
-            rightPadding: textViewEdit.rightPadding
-            bottomPadding: textViewEdit.bottomPadding
+        readonly property Component textViewComponent: VclLabel {
+            readonly property bool editorKind: false
 
             property var searchResults: []
-            SearchAgent.engine: searchEngine
-            SearchAgent.sequenceNumber: searchSequenceNumber
+            property string markupText
+
+            SearchAgent.engine: root.searchEngine
+            SearchAgent.sequenceNumber: root.searchSequenceNumber
             SearchAgent.searchResultCount: searchResults.length
-            SearchAgent.onSearchRequest: searchResults = SearchAgent.indexesOf(string, text)
+
+            SearchAgent.onSearchRequest: (string) => { root.searchResults = SearchAgent.indexesOf(string, text) }
+            SearchAgent.onClearHighlight: markupText = ""
+            SearchAgent.onClearSearchRequest: searchResults = []
             SearchAgent.onCurrentSearchResultIndexChanged: {
                 if(SearchAgent.currentSearchResultIndex < 0)
                     return
                 var result = searchResults[SearchAgent.currentSearchResultIndex]
-                markupText = SearchAgent.createMarkupText(textViewEdit.text, result.from, result.to, Scrite.app.palette.highlight, Scrite.app.palette.highlightedText)
-                textViewEdit.highlightRequest()
+                markupText = SearchAgent.createMarkupText(root.text, result.from, result.to, Scrite.app.palette.highlight, Scrite.app.palette.highlightedText)
+                root.highlightRequest()
             }
-            SearchAgent.onClearSearchRequest: searchResults = []
-            SearchAgent.onClearHighlight: markupText = ""
+
+            text: markupText !== "" ? markupText : root.text
+            font: root.font
+            elide: root.elide
+            color: textColor
+            wrapMode: root.wrapMode
+            textFormat: markupText === "" ? Text.PlainText : Text.RichText
+            horizontalAlignment: root.horizontalAlignment
+            verticalAlignment: root.verticalAlignment
+
+            padding: 5
+            topPadding: root.topPadding
+            leftPadding: root.leftPadding
+            rightPadding: root.rightPadding
+            bottomPadding: root.bottomPadding
         }
-    }
 
-    Component {
-        id: textEditComponent
+        readonly property Component textEditComponent: TextArea {
+            id: _textArea
 
-        TextArea {
-            id: textArea
-            text: textViewEdit.text
-            font: textViewEdit.font
-            palette: Scrite.app.palette
-            wrapMode: textViewEdit.wrapMode
-            horizontalAlignment: textViewEdit.horizontalAlignment
-            verticalAlignment: textViewEdit.verticalAlignment
-            onTextChanged: { textViewEdit.textEdited(text); completionModel.allowEnable = true }
-            selectByMouse: true
-            selectByKeyboard: true
-            background: Rectangle {
-                visible: frameVisible
-                border.width: 1
-                border.color: Runtime.colors.primary.borderColor
-            }
-            opacity: activeFocus ? 1 : 0.5
-            leftPadding: textViewEdit.leftPadding
-            topPadding: textViewEdit.topPadding
-            rightPadding: textViewEdit.rightPadding
-            bottomPadding: textViewEdit.bottomPadding
+            readonly property bool editorKind: true
 
             Component.onCompleted: {
                 selectAll()
@@ -120,13 +110,13 @@ Loader {
             }
 
             Component.onDestruction: {
-                textViewEdit.text = text
-                textViewEdit.editingFinished()
+                root.text = text
+                root.editingFinished()
             }
 
             onEditingFinished: {
-                textViewEdit.text = text
-                textViewEdit.editingFinished()
+                root.text = text
+                root.editingFinished()
             }
 
             Transliterator.defaultFont: font
@@ -135,57 +125,96 @@ Loader {
             Transliterator.hasActiveFocus: activeFocus
             Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
 
-            onFocusChanged: completionModel.allowEnable = true
+            text: root.text
+            font: root.font
+            palette: Scrite.app.palette
+            wrapMode: root.wrapMode
+            verticalAlignment: root.verticalAlignment
+            horizontalAlignment: root.horizontalAlignment
+
+            selectByMouse: true
+            selectByKeyboard: true
+            background: Rectangle {
+                visible: frameVisible
+                border.width: 1
+                border.color: Runtime.colors.primary.borderColor
+            }
+            opacity: activeFocus ? 1 : 0.5
+            leftPadding: root.leftPadding
+            topPadding: root.topPadding
+            rightPadding: root.rightPadding
+            bottomPadding: root.bottomPadding
+
+            onTextChanged: {
+                root.textEdited(text);
+                _completionModel.allowEnable = true
+            }
+
+            onFocusChanged: _completionModel.allowEnable = true
 
             CompletionModel {
-                id: completionModel
+                id: _completionModel
+
+                property bool hasItems: count > 0
                 property bool allowEnable: true
-                property string suggestion: currentCompletion
                 property bool hasSuggestion: count > 0
-                enabled: allowEnable && textArea.activeFocus
-                sortStrings: false
+
+                property string suggestion: currentCompletion
+
+                enabled: allowEnable && _textArea.activeFocus
                 strings: completionStrings
-                completionPrefix: textArea.text
-                filterKeyStrokes: textArea.activeFocus
+                sortStrings: false
+                completionPrefix: _textArea.text
+                filterKeyStrokes: _textArea.activeFocus
+
                 onRequestCompletion: {
-                    textArea.text = currentCompletion
-                    textArea.cursorPosition = textArea.length
+                    _textArea.text = currentCompletion
+                    _textArea.cursorPosition = _textArea.length
                     allowEnable = false
                 }
-                property bool hasItems: count > 0
+
                 onHasItemsChanged: {
                     if(hasItems)
-                        completionViewPopup.open()
+                        _completionViewPopup.open()
                     else
-                        completionViewPopup.close()
+                        _completionViewPopup.close()
                 }
             }
 
             Popup {
-                id: completionViewPopup
-                x: parent.cursorRectangle.x - Scrite.app.boundingRect(completionModel.completionPrefix, parent.font).width
+                id: _completionViewPopup
+
+                x: parent.cursorRectangle.x - Scrite.app.boundingRect(_completionModel.completionPrefix, parent.font).width
                 y: parent.cursorRectangle.y + parent.cursorRectangle.height
-                width: Scrite.app.largestBoundingRect(completionModel.strings, textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
-                height: completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
+                width: Scrite.app.largestBoundingRect(_completionModel.strings, _textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
+                height: _completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
+
                 focus: false
                 closePolicy: Popup.NoAutoClose
+
                 contentItem: ListView {
-                    id: completionView
-                    model: completionModel
+                    id: _completionView
+
                     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+                    height: contentHeight
+
+                    model: _completionModel
+                    currentIndex: _completionModel.currentRow
                     keyNavigationEnabled: false
+
                     delegate: VclLabel {
-                        width: completionView.width-1
+                        width: _completionView.width-1
+
                         text: string
+                        font: _textArea.font
+                        color: _root_elementIndex === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                         padding: 5
-                        font: textArea.font
-                        color: index === completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                     }
+
                     highlight: Rectangle {
                         color: Runtime.colors.primary.highlight.background
                     }
-                    currentIndex: completionModel.currentRow
-                    height: contentHeight
                 }
             }
 
@@ -194,12 +223,12 @@ Loader {
             }
 
             Keys.onReturnPressed: {
-                if(completionModel.hasSuggestion) {
-                    textArea.text = completionModel.suggestion
-                    textArea.cursorPosition = textArea.length
-                    completionModel.allowEnable = false
+                if(_completionModel.hasSuggestion) {
+                    _textArea.text = _completionModel.suggestion
+                    _textArea.cursorPosition = _textArea.length
+                    _completionModel.allowEnable = false
                 } else if(event.modifiers !== Qt.NoModifier)
-                    textArea.append("\n")
+                    _textArea.append("\n")
                 else
                     editingFinished()
             }

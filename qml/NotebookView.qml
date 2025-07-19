@@ -28,7 +28,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebook"
-import "qrc:/qml/structure"
+import "qrc:/qml/structureview"
 import "qrc:/qml/notifications"
 
 Rectangle {
