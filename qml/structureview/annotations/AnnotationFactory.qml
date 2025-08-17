@@ -67,7 +67,7 @@ QtObject {
         if(!annotation || annotationIndex < 0 || parent === null)
             return null
 
-        let comp = getAnnotationDelegate(annotation.type)
+        let comp = delegateFor(annotation.type)
         const props = {
             "annotation": annotation,
             "annotationIndex": annotationIndex

@@ -32,7 +32,10 @@ Item {
 
     required property VclMenu canvasContextMenu
 
-    readonly property var annotationsList: AnnotationFactory.keys
+    readonly property var availableAnnotationKeys: AnnotationFactory.keys
+
+    required property bool canvasScrollMoving
+    required property bool canvasScrollFlicking
 
     required property real canvasScale
     required property rect canvasScrollViewportRect
@@ -45,6 +48,18 @@ Item {
 
     function createAnnotation(type, x, y) {
         return _private.createAnnotation(type, x, y)
+    }
+
+    function dropRectangleAnnotation(x, y, w, h) {
+        let rectAnnot = _private.createAnnotation("rectangle", x, y)
+        rectAnnot.place(x, y, w, h)
+        return rectAnnot
+    }
+
+    function dropImageAnnotation(x, y, imagePath) {
+        let imageAnnot = _private.createAnnotation("image", x, y)
+        imageAnnot.setAttribute("image", imageAnnot.addImage(imagePath))
+        return imageAnnot
     }
 
     function resetGrip() {
@@ -122,6 +137,7 @@ Item {
         sourceComponent: AnnotationGrip {
             annotation: _gripLoader.annotation
             annotationItem: _gripLoader.annotationItem
+            annotationContainer: root
             structureCanvasScale: root.canvasScale
 
             onResetRequest: _gripLoader.reset()
@@ -189,12 +205,16 @@ Item {
         }
 
         function createAnnotationDelegate(annotation, annotationIndex, parent) {
-            let delgate = AnnotationFactory.createDelegate(annotation, annotationIndex, parent)
+            let delegate = AnnotationFactory.createDelegate(annotation, annotationIndex, parent)
             if(delegate) {
+                delegate.currentAnnotationItem = Qt.binding( () => { return _gripLoader.annotationItem } )
+                delegate.canvasScrollMoving = Qt.binding( () => { return root.canvasScrollMoving } )
+                delegate.canvasScrollFlicking = Qt.binding( () => { return root.canvasScrollFlicking } )
                 delegate.BoundingBoxItem.evaluator = root.canvasItemsBoundingBox
                 delegate.BoundingBoxItem.livePreview = true
                 delegate.gripRequest.connect(_private.gripDelegate)
             }
+            return delegate
         }
 
         function gripDelegate(delegate, annotation) {

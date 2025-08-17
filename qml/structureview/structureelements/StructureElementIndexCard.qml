@@ -21,6 +21,7 @@ import io.scrite.components 1.0
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/structureview"
 
@@ -860,7 +861,7 @@ AbstractStructureElementUI {
                         text: "Yes"
                         focusPolicy: Qt.NoFocus
 
-                        onClicked: root.deleteElementRequest(root.element)(root.element)
+                        onClicked: root.deleteElementRequest(root.element)
                     }
 
                     VclButton {

@@ -23,80 +23,70 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 
-Item {
+Rectangle {
     id: root
 
     required property Annotation annotation
 
     signal resetRequest()
 
-    width: _tools.width
-    height: _tools.height
+    width: _toolsLayout.width+5
+    height: _toolsLayout.height+5
 
-    Rectangle {
-        id: _tools
+    color: Runtime.colors.primary.c100.background
+    border.width: 1
+    border.color: Runtime.colors.primary.borderColor
 
-        anchors.left: parent.left
-        anchors.bottom: parent.top
-        anchors.bottomMargin: parent.gripSize
+    Row {
+        id: _toolsLayout
 
-        width: _toolsLayout.width+5
-        height: _toolsLayout.height+5
+        anchors.centerIn: parent
 
-        color: Runtime.colors.primary.c100.background
-        border.width: 1
-        border.color: Runtime.colors.primary.borderColor
+        FlatToolButton {
+            ToolTip.text: "Edit properties of this annotation"
 
-        Row {
-            id: _toolsLayout
+            down: AnnotationPropertyEditorDock.visible
+            iconSource: "qrc:/icons/action/edit.png"
 
-            anchors.centerIn: parent
+            onClicked: Runtime.structureCanvasSettings.displayAnnotationProperties = !Runtime.structureCanvasSettings.displayAnnotationProperties
+        }
 
-            FlatToolButton {
-                ToolTip.text: "Edit properties of this annotation"
+        FlatToolButton {
+            ToolTip.text: "Bring this annotation to front"
 
-                down: AnnotationPropertyEditorDock.visible
-                iconSource: "qrc:/icons/action/edit.png"
+            enabled: Scrite.document.structure.canBringToFront(root.annotation)
+            iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
 
-                onClicked: Runtime.structureCanvasSettings.displayAnnotationProperties = !Runtime.structureCanvasSettings.displayAnnotationProperties
+            onClicked: {
+                let a = root.annotation
+                Scrite.document.structure.bringToFront(a)
             }
+        }
 
-            FlatToolButton {
-                ToolTip.text: "Bring this annotation to front"
+        FlatToolButton {
+            ToolTip.text: "Send this annotation to back"
 
-                enabled: Scrite.document.structure.canBringToFront(root.annotation)
-                iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
+            enabled: Scrite.document.structure.canSendToBack(root.annotation)
+            iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
 
-                onClicked: {
-                    let a = root.annotation
-                    Scrite.document.structure.bringToFront(a)
-                }
+            onClicked: {
+                root.resetRequest()
+                Scrite.document.structure.sendToBack(a)
             }
+        }
 
-            FlatToolButton {
-                ToolTip.text: "Send this annotation to back"
+        FlatToolButton {
+            ToolTip.text: "Delete this annotation"
 
-                enabled: Scrite.document.structure.canSendToBack(root.annotation)
-                iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
+            iconSource: "qrc:/icons/action/delete.png"
 
-                onClicked: {
-                    root.resetRequest()
-                    Scrite.document.structure.sendToBack(a)
-                }
-            }
+            onClicked: {
+                root.resetRequest()
 
-            FlatToolButton {
-                ToolTip.text: "Delete this annotation"
-
-                iconSource: "qrc:/icons/action/delete.png"
-
-                onClicked: {
-                    root.resetRequest()
-
-                    let a = root.annotation
-                    Scrite.document.structure.removeAnnotation(a)
-                }
+                let a = root.annotation
+                Scrite.document.structure.removeAnnotation(a)
             }
         }
     }
 }
+

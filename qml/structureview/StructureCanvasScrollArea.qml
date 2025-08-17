@@ -50,7 +50,6 @@ ScrollArea {
     readonly property alias groupCategory: _canvas.groupCategory
     readonly property alias annotationGrip: _canvas.annotationGrip
     readonly property alias annotationLayer: _canvas.annotationLayer
-    readonly property alias annotationsList: _canvas.annotationsList
     readonly property alias editElementItem: _canvas.editElementItem
     readonly property alias canvasGroupBoxCount: _canvas.groupBoxCount
     readonly property alias itemsBoundingBox: _canvas.itemsBoundingBox
@@ -59,6 +58,7 @@ ScrollArea {
     readonly property alias currentElementItem: _canvas.currentElementItem
     readonly property alias draggedElementItem: _canvas.draggedElementItem
     readonly property alias interactiveCreationMode: _canvas.interactiveCreationMode
+    readonly property alias availableAnnotationKeys: _canvas.availableAnnotationKeys
 
     signal editorRequest()
     signal releaseEditorRequest()
@@ -119,7 +119,7 @@ ScrollArea {
     initialContentWidth: _canvas.width
     initialContentHeight: _canvas.height
 
-    interactive: !(_canvas.rubberband.active || _canvas.selection.active || root.canvasPreviewInteracting || _canvas.annotationGrip) && _canvas.currentElementItem === null && _canvas.editElementItem === null && _canvas.draggedElementItem === null
+    interactive: _private.interactive
     minimumScale: _canvas.itemsBoundingBox.itemCount > 0 ? Math.min(0.25, width/_canvas.itemsBoundingBox.width, height/_canvas.itemsBoundingBox.height) : 0.25
     zoomOnScroll: Runtime.workspaceSettings.mouseWheelZoomsInStructureCanvas
     showScrollBars: Scrite.document.structure.elementCount >= 1
@@ -145,7 +145,7 @@ ScrollArea {
         onZoomOneRequest: () => { _private.zoomOne() }
         onZoomOneToItemRequest: (item) => { _private.zoomOneToItem(item) }
         onEditorRequest: () => { root.editorRequest() }
-        onDeleteElementRequest: (element) => { root.confirmAndDeleteElement(element) }
+        onDeleteElementRequest: (element) => { _private.deleteElement(element) }
         onSelectionModeOffRequest: () => { root.selectionModeOffRequest() }
         onDenyCanvasPreviewRequest: () => { root.denyCanvasPreviewRequest() }
         onAllowCanvasPreviewRequest: () => { root.allowCanvasPreviewRequest() }
@@ -173,6 +173,18 @@ ScrollArea {
         id: _private
 
         property bool updateScriteDocumentUserDataEnabled: false
+
+        property bool interactive: {
+            const canvasInteractionGoingOn =  (_canvas.rubberband.active ||
+                                               _canvas.selection.active ||
+                                               root.canvasPreviewInteracting ||
+                                               _canvas.annotationGrip)
+            const canvasItemInteractionGoingOn = (/*_canvas.currentElementItem ||*/
+                                                  _canvas.editElementItem ||
+                                                  _canvas.draggedElementItem)
+
+            return !canvasInteractionGoingOn && !canvasItemInteractionGoingOn
+        }
 
         function enablePanAndZoomAnimation(delay) {
             if(animatePanAndZoom === true)
@@ -266,11 +278,24 @@ ScrollArea {
         }
 
         function zoomOneMiddleArea() {
-            let middleArea = Qt.rect((_canvas.width-root.width)/2,
-                                     (_canvas.height-root.height)/2,
-                                     root.width,
-                                     root.height)
-            root.ensureVisible(middleArea)
+
+            if(_canvas.itemsBoundingBox.itemCount > 0) {
+                const bbox = _canvas.itemsBoundingBox.boundingBox
+                if(bbox.width < root.width && bbox.height < root.height) {
+                    root.ensureVisible(bbox)
+                } else {
+                    const areaSize = Qt.size(root.width*0.5, root.height*0.5)
+                    const bboxCenter = Qt.point(bbox.x + bbox.width/2, bbox.y + bbox.height/2)
+                    const middleArea = Qt.rect(bboxCenter.x - areaSize.width/2, bboxCenter.y - areaSize.height/2, areaSize.width, areaSize.height)
+                    root.ensureVisible(middleArea)
+                }
+            } else {
+                const middleArea = Qt.rect((_canvas.width-root.width)/2,
+                                         (_canvas.height-root.height)/2,
+                                         root.width,
+                                         root.height)
+                root.ensureVisible(middleArea)
+            }
         }
 
         function zoomOneToItem(item) {

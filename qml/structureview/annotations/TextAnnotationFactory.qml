@@ -26,7 +26,7 @@ import "qrc:/qml/controls"
 QtObject {
     id: root
 
-    readonly property string type: "line"
+    readonly property string type: "text"
 
     function create(parent, x, y) {
         if(Scrite.document.readOnly)

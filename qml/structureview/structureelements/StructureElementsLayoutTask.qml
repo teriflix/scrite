@@ -23,8 +23,12 @@ import "qrc:/qml/structureview"
 SequentialAnimation {
     id: root
 
+    signal clearSelectionRequest()
     signal denyCanvasPreviewRequest()
     signal allowCanvasPreviewRequest()
+    signal selectItemsInBoundaryRequest(var boundary)
+
+    property alias layoutType: root.__layoutType
 
     running: false
 
@@ -40,7 +44,7 @@ SequentialAnimation {
     ScriptAction {
         script: {
             root.denyCanvasPreviewRequest()
-            root.clear()
+            root.clearSelectionRequest()
         }
     }
 
@@ -70,14 +74,14 @@ SequentialAnimation {
 
     ScriptAction {
         script: {
-            let rect = {
+            const boundary = {
                 "top": __layoutItemBounds.top,
                 "left": __layoutItemBounds.left,
                 "right": __layoutItemBounds.left + __layoutItemBounds.width-1,
                 "bottom": __layoutItemBounds.top + __layoutItemBounds.height-1
             };
             __layoutItemBounds = undefined
-            root.init(_elementItems, rect)
+            root.selectItemsInBoundaryRequest(boundary)
             root.allowCanvasPreviewRequest()
         }
     }

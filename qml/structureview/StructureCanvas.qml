@@ -46,6 +46,7 @@ GridBackground {
 
     property alias groupCategory: _elementLayer.groupCategory
     property alias createItemMode: _createItemHandler.mode
+    property alias rubberbandSelectionMode: _elementLayer.rubberbandSelectionMode
 
     property bool scaleIsLessForEdit: (350*root.scale < root.canvasScrollHeight*0.25)
 
@@ -57,12 +58,12 @@ GridBackground {
     readonly property alias episodeBoxCount: _elementLayer.episodeBoxCount
     readonly property alias annotationGrip: _annotationLayer.grip
     readonly property alias annotationLayer: _annotationLayer
-    readonly property alias annotationsList: _annotationLayer.annotationsList
     readonly property alias editElementItem: _elementLayer.editElementItem
     readonly property alias itemsBoundingBox: _private.itemsBoundingBox
     readonly property alias currentElementItem: _elementLayer.currentElementItem
     readonly property alias draggedElementItem: _elementLayer.draggedElementItem
     readonly property alias interactiveCreationMode: _createItemHandler.active
+    readonly property alias availableAnnotationKeys: _annotationLayer.availableAnnotationKeys
 
     readonly property Annotation currentAnnotation: _annotationLayer.grip ? _annotationLayer.grip.annotation : null
 
@@ -134,6 +135,8 @@ GridBackground {
 
         canvasScale: root.scale
         canvasContextMenu: _canvasContextMenu
+        canvasScrollMoving: root.canvasScrollMoving
+        canvasScrollFlicking: root.canvasScrollFlicking
         canvasItemsBoundingBox: _private.itemsBoundingBox
 
         canvasScrollViewportRect: root.canvasScrollViewportRect
@@ -212,8 +215,7 @@ GridBackground {
                                     }
 
         onRectangleAnnotationRequest: (x, y, w, h) => {
-                                        let rectAnnot = _annotationLayer.createAnnotation("rectangle", x, y)
-                                        rectAnnot.resize(w, h)
+                                        _annotationLayer.dropRectangleAnnotation(x, y, w, h)
                                       }
     }
 
@@ -238,7 +240,12 @@ GridBackground {
         active: mode !== ""
         visible: active
         enabled: active
-        sourceComponent: mode === "element" ? _private.elementCreationMouseArea : _private.annotationCreationMouseArea
+        sourceComponent: {
+            if(mode === "")
+                return null
+
+            return mode === "element" ? _private.elementCreationMouseArea : _private.annotationCreationMouseArea
+        }
 
         onActiveChanged: {
             if(active)
@@ -294,7 +301,7 @@ GridBackground {
 
         readonly property Component annotationCreationMouseArea: CreateAnnotationMouseArea {
             scale: root.scale
-            annotationType: _createItemHandler.what
+            annotationType: _createItemHandler.mode
 
             onDone: _createItemHandler.done()
 

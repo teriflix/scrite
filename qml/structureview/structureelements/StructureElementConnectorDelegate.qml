@@ -41,7 +41,7 @@ StructureElementConnector {
         return false
     }
     lineType: StructureElementConnector.CurvedLine
-    outlineWidth: Scrite.app.devicePixelRatio * root.canvasScale * Runtime.structureCanvasSettings.lineWidthOfConnectors
+    outlineWidth: Scrite.app.devicePixelRatio * Utils.bounded(1, Math.round(root.canvasScale * Runtime.structureCanvasSettings.connectorLineWidth), 5)
     arrowAndLabelSpacing: _labelBg.width
 
     Rectangle {

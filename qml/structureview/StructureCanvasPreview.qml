@@ -142,8 +142,8 @@ Item {
                 var scale = _preview.width / Math.max(root.canvasScroll.itemsBoundingBox.width, 500)
                 var ix = (x/scale)+root.canvasScroll.itemsBoundingBox.left
                 var iy = (y/scale)+root.canvasScroll.itemsBoundingBox.top
-                root.canvasScroll.contentX = ix * _canvas.scale
-                root.canvasScroll.contentY = iy * _canvas.scale
+                root.canvasScroll.contentX = ix * root.canvasScroll.canvas.scale
+                root.canvasScroll.contentY = iy * root.canvasScroll.canvas.scale
             }
         }
     }

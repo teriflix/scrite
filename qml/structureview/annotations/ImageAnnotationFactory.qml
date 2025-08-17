@@ -59,13 +59,13 @@ QtObject {
 
             property bool isSet: _d.annotation.attributes.image !== "" && status === Image.Ready
 
-            width: parent.width - 10
+            width: _d.width - 10
             height: sourceSize.height / sourceSize.width * width
-            anchors.top: parent.top
+            anchors.top: _d.top
             anchors.topMargin: 5
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenter: _d.horizontalCenter
 
-            smooth: _canvasScroll.moving || _canvasScroll.flicking ? false : true
+            smooth: _d.canvasScrollMoving || _d.canvasScrollFlicking ? false : true
             mipmap: smooth
             source: _d.annotation.imageUrl(_d.annotation.attributes.image)
             fillMode: Image.Stretch
@@ -79,13 +79,13 @@ QtObject {
 
         VclLabel {
             anchors.top: _image.bottom
-            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenter: _d.horizontalCenter
             anchors.topMargin: 5
 
             width: _image.width
-            height: Math.max(parent.height - _image.height - 10, 0)
+            height: Math.max(_d.height - _image.height - 10, 0)
 
-            text: _image.isSet ? _d.annotation.attributes.caption : (_annotationGripLoader.annotationItem === _d ? "Set an image" : "Click to set an image")
+            text: _image.isSet ? _d.annotation.attributes.caption : (currentAnnotationItem === _d ? "Set an image" : "Click to set an image")
             color: _d.annotation.attributes.captionColor
             elide: Text.ElideRight
             visible: height > 0

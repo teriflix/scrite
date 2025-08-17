@@ -27,6 +27,7 @@ AbstractSelection {
     signal allowCanvasPreviewRequest()
     signal ensureItemVisibleRequest(Item item)
     signal rectangleAnnotationRequest(real x, real y, real w, real h)
+    signal initiateSelectionInBoundaryRequest(var boundary)
 
     function layout(type) {
         if(Scrite.document.readOnly || Scrite.document.structure.forceBeatBoardLayout)
@@ -77,8 +78,12 @@ AbstractSelection {
         id: _private
 
         readonly property SequentialAnimation layoutAnimation: StructureElementsLayoutTask {
+            onClearSelectionRequest: root.clear()
             onDenyCanvasPreviewRequest: root.denyCanvasPreviewRequest()
             onAllowCanvasPreviewRequest: root.allowCanvasPreviewRequest()
+            onSelectItemsInBoundaryRequest: (boundary) => {
+                                                 root.initiateSelectionInBoundaryRequest(boundary)
+                                             }
         }
     }
 }

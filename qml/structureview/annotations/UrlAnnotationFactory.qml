@@ -37,6 +37,7 @@ QtObject {
         let geometry = Qt.rect(x-w/2, y-20, w, h)
 
         let annot = Utils.newAnnotation(parent, type, geometry)
+        annot.resizable = false
         Scrite.document.structure.addAnnotation(annot)
         return annot
     }
@@ -45,8 +46,6 @@ QtObject {
         id: _d
 
         property bool annotationHasLocalImage: _d.annotation.attributes.imageName !== undefined && _d.annotation.attributes.imageName !== ""
-
-        Component.onCompleted: _d.annotation.resizable = false
 
         color: Runtime.colors.primary.c50.background
         border {

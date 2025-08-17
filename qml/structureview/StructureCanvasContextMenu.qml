@@ -23,6 +23,8 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/structureview"
+import "qrc:/qml/structureview/annotations"
+import "qrc:/qml/structureview/structureelements"
 
 VclMenu {
     id: root
@@ -62,19 +64,17 @@ VclMenu {
         title: "Annotation"
 
         Repeater {
-            model: root.annotationsList
+            model: AnnotationFactory.keys
 
             VclMenuItem {
                 required property var modelData
 
-                property var annotationInfo: modelData
-
-                text: annotationInfo.title
-                enabled: !Scrite.document.readOnly && annotationInfo.what !== ""
+                text: modelData.title
+                enabled: !Scrite.document.readOnly && modelData.what !== ""
 
                 onClicked: {
-                    Qt.callLater( function() { root.close() } )
-                    root.createAnnotationRequest(annotationInfo.what, Qt.point(root.x, root.y))
+                    Qt.callLater(root.close)
+                    root.createAnnotationRequest(root.x, root.y, modelData.what)
                 }
             }
         }

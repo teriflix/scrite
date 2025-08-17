@@ -39,7 +39,6 @@ MouseArea {
                                 result.filter = false
                             }
 
-    enabled: false
     hoverEnabled: true
     acceptedButtons: Qt.LeftButton
 
@@ -55,7 +54,6 @@ MouseArea {
         sourceSize.height: height
 
         source: "qrc:/icons/action/add_scene.png"
-        visible: root.enabled
     }
 
     onClicked: {

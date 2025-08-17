@@ -68,7 +68,7 @@ Item {
         property bool showPreview: true
         property bool displayAnnotationProperties: true
         property bool showPullHandleAnimation: true
-        property real lineWidthOfConnectors: 1.5
+        property real connectorLineWidth: 2
 
         function restoreDefaultGridColor() {
             gridColor = Runtime.colors.accent.c400.background

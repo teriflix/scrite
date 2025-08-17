@@ -113,10 +113,10 @@ Rectangle {
                         text: "New Scene"
                         enabled: !Scrite.document.readOnly
 
-                        onClicked: {
-                            newSceneRequest()
-                            Qt.callLater( function() { _newSceneMenu.close() } )
-                        }
+                        onClicked: () => {
+                                       Qt.callLater( _newSceneMenu.close )
+                                       root.newSceneRequest()
+                                   }
                     }
 
                     ColorMenu {
@@ -125,10 +125,10 @@ Rectangle {
                         selectedColor: _newSceneButton.activeColor
 
                         onMenuItemClicked: (color) => {
-                            _newSceneButton.activeColor = color
-                            newColoredSceneRequest( _newSceneButton.activeColor)
-                            Qt.callLater( function() { _newSceneMenu.close() } )
-                        }
+                                               Qt.callLater( _newSceneMenu.close )
+                                               _newSceneButton.activeColor = color
+                                               root.newColoredSceneRequest( _newSceneButton.activeColor)
+                                           }
                     }
                 }
             }
@@ -156,7 +156,7 @@ Rectangle {
                     id: _newAnnotationMenu
 
                     Repeater {
-                        model: root.canvasScroll.annotationList
+                        model: root.canvasScroll.availableAnnotationKeys
 
                         VclMenuItem {
                             required property var modelData
@@ -164,10 +164,10 @@ Rectangle {
                             text: modelData.title
                             enabled: !Scrite.document.readOnly && modelData.what !== ""
 
-                            onClicked: {
-                                newAnnotationRequest(modelData.what)
-                                Qt.callLater( function() { _newAnnotationMenu.close() } )
-                            }
+                            onClicked: () => {
+                                           Qt.callLater( _newAnnotationMenu.close )
+                                           root.newAnnotationRequest(modelData.what)
+                                       }
                         }
                     }
                 }

@@ -56,7 +56,10 @@ Item {
     readonly property alias currentElementItem: _private.currentElementItem
     readonly property alias draggedElementItem: _private.draggedElementItem
 
-    property bool selectionMode: false
+    property alias rubberbandSelectionMode: _rubberband.selectionMode
+    readonly property alias rubberbandActive: _rubberband.active
+    readonly property alias rubberbandSelecting: _rubberband.selecting
+
     property bool groupsBeingMoved: false
 
     property string groupCategory: Scrite.document.structure.preferredGroupCategory
@@ -100,7 +103,6 @@ Item {
         anchors.fill: parent
 
         z: active ? 1000 : -1
-        selectionMode: root.selectionMode
 
         onSelect: {
             _selection.init(_elementItems, rectangle)
@@ -262,6 +264,7 @@ Item {
         onAllowCanvasPreviewRequest: root.allowCanvasPreviewRequest()
         onEnsureItemVisibleRequest: (item) => { root.ensureItemVisibleRequest(item) }
         onRectangleAnnotationRequest: (x, y, w, h) => { root.rectangleAnnotationRequest(x, y, w, h) }
+        onInitiateSelectionInBoundaryRequest: (boundary) => { init(_elementItems, boundary) }
     }
 
     StructureElementContextMenu {

@@ -89,7 +89,7 @@ Item {
                           }
 
         onNewSceneRequest: () => {
-                               _canvasScroll.createNewScene("white")
+                               _canvasScroll.createNewScene(Runtime.workspaceSettings.defaultSceneColor)
                            }
 
         onSelectAllRequest: () => {
@@ -116,6 +116,10 @@ Item {
                                       _canvasScroll.canvas.selection.layout(layout)
                                   }
 
+        onSelectionModeChanged: () => {
+                                    _canvasScroll.canvas.rubberbandSelectionMode = selectionMode
+                                }
+
         onDeleteElementRequest: (element) => {
                                     _canvasScroll.confirmAndDeleteElement(element)
                                 }
@@ -129,11 +133,10 @@ Item {
         z: -10
         allowedType: Attachments.PhotosOnly
 
-        // TODO
-        // onDropped: {
-        //     const pos = _canvasScroll.canvas.mapFromItem(_canvasScroll, mouse.x, mouse.y)
-        //     createNewImageAnnotation(pos.x, pos.y, attachment.filePath) // TODO
-        // }
+        onDropped: () => {
+                           const pos = _canvasScroll.canvas.mapFromItem(_canvasScroll, mouse.x, mouse.y)
+                           _canvasScroll.canvas.annotationLayer.dropImageAnnotation(pos.x, pos.y, attachment.filePath)
+                   }
     }
 
     StructureViewStatusBar {
@@ -155,7 +158,12 @@ Item {
         onZoomOutRequest: () => { _canvasScroll.zoomOut() }
         onZoomToRequest: (zoomValue) => { _canvasScroll.zoomTo(zoomValue) }
         onZoomFitRequest: (boundingBox) => { _canvasScroll.zoomFit(boundingBox) }
-        onZoomOneRequest: () => { _canvasScroll.zoomOne() }
+        onZoomOneRequest: () => {
+                                  if(_canvasScroll.currentElementItem)
+                                        _canvasScroll.zoomOneToItem(_canvasScroll.currentElementItem)
+                                  else
+                                        _canvasScroll.zoomOne()
+                          }
     }
 
     Rectangle {

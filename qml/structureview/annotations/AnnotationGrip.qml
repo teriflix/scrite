@@ -28,6 +28,7 @@ Item {
 
     required property Item annotationItem
     required property Annotation annotation
+    required property Item annotationContainer
     required property real structureCanvasScale
 
     signal resetRequest()
@@ -47,20 +48,16 @@ Item {
 
     enabled: !Scrite.document.readOnly
 
-    Popup {
-        parent: Overlay.overlay
+    AnnotationToolBar {
+        anchors.left: parent.left
+        anchors.bottom: parent.top
+        anchors.margins: _private.gripSize
 
-        x: visible ? root.annotationItem.mapToGlobal(0, 0).x + 10 : 0
-        y: visible ? root.annotationItem.mapToGlobal(0, 0).y - 10 : 0
+        scale: 1.0 / root.structureCanvasScale
 
-        visible: root.annotation !== null && root.annotationItem !== null
-        closePolicy: Popup.NoAutoClose
+        annotation: root.annotation
 
-        contentItem: AnnotationToolBar {
-            annotation: root.annotation
-
-            onResetRequest: root.resetRequest()
-        }
+        onResetRequest: root.resetRequest()
     }
 
     PainterPathItem {
@@ -114,7 +111,7 @@ Item {
         dragAxis: Drag.XAxis
 
         onGripPressed: root.requestCanvasFocus()
-        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, _rightGrip.x + _rightGrip.width/2, root.height))
+        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, x + width/2, root.height))
     }
 
     GripHandle {
@@ -125,8 +122,7 @@ Item {
         dragAxis: Drag.YAxis
 
         onGripPressed: root.requestCanvasFocus()
-        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, root.width, _bottomGrip.y + _bottomGrip.height/2))
-
+        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, root.width, y + height/2))
     }
 
     GripHandle {
@@ -137,7 +133,7 @@ Item {
         dragAxis: Drag.XAndYAxis
 
         onGripPressed: root.requestCanvasFocus()
-        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, _bottomRightGrip.x + _bottomRightGrip.width/2, _bottomRightGrip.y + _bottomRightGrip.height/2))
+        onGripHandleMoved: _private.snapAnnotationGeometryToGrid(Qt.rect(root.x, root.y, x + width/2, y + height/2))
     }
 
     onXChanged: _private.geoUpdateTimer.start()
@@ -146,13 +142,13 @@ Item {
     onHeightChanged: _private.geoUpdateTimer.start()
 
     component GripHandle : Rectangle {
-        id: __gripHandle
+        id: _gripHandle
 
         property int dragAxis: Drag.XAxis
         property int minimumDragDistance: 20
 
-        signal gripHandleMoved()
         signal gripPressed()
+        signal gripHandleMoved()
 
         width: _private.gripSize
         height: _private.gripSize
@@ -178,28 +174,16 @@ Item {
             cursorShape: Qt.SizeHorCursor
             hoverEnabled: true
 
-            drag.axis: Drag.XAxis
+            drag.axis: _gripHandle.dragAxis
             drag.target: parent
-            drag.minimumX: __gripHandle.minimumDragDistance
-            drag.minimumY: __gripHandle.minimumDragDistance
+            drag.minimumX: _gripHandle.minimumDragDistance
+            drag.minimumY: _gripHandle.minimumDragDistance
 
-            onPressed: __gripHandle.gripPressed()
+            onPressed: _gripHandle.gripPressed()
         }
 
-        // Private section
-        property Timer updateTimer: null
         function gripHandleWasMoved() {
-            if(updateTimer === null) {
-                updateTimer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject);
-                updateTimer.interval = _private.geometryUpdateInterval
-                updateTimer.repeat = false
-                updateTimer.triggered.connect( () => {
-                                                __gripHandle.gripHandleMoved()
-                                                Qt.callLater(updateTimer.destroy)
-                                                updateTimer = null
-                                              })
-            }
-            updateTimer.start()
+            Utils.execLater(_gripHandle, _private.geometryUpdateInterval, _gripHandle.gripHandleMoved)
         }
     }
 

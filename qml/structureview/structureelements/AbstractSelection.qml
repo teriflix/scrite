@@ -26,10 +26,10 @@ Item {
     property bool canLayout: items.length >= 2
     property bool interactive: true
 
-    property rect rect: Qt.rect(_tightRect.x, _tightRect.y, _tightRect.width, _tightRect.height)
-
     property alias active: _tightRect.visible
     property alias contextMenu: _selectionMenu.menu
+
+    readonly property alias rect: _private.rect
 
     signal moveItem(Item item, real dx, real dy)
     signal placeItem(Item item)
@@ -64,8 +64,9 @@ Item {
         return bounds
     }
 
-    // For intializing from a repeater and a rectangle
-    function init(repeater, rectangle, includeInvisibleItems) {
+    // For intializing from a repeater and a boundary
+    // Here boundary is a JSON like {left: x, top: y, right: r, bottom: b }
+    function init(repeater, boundary, includeInvisibleItems) {
         if(repeater === undefined || repeater === null)
             return
 
@@ -84,8 +85,8 @@ Item {
             let p1 = Qt.point(item.x, item.y)
             let p2 = Qt.point(item.x+item.width, item.y+item.height)
             let areaContainsPoint = function(p) {
-                return rectangle.left <= p.x && p.x <= rectangle.right &&
-                        rectangle.top <= p.y && p.y <= rectangle.bottom;
+                return boundary.left <= p.x && p.x <= boundary.right &&
+                        boundary.top <= p.y && p.y <= boundary.bottom;
             }
             if(areaContainsPoint(p1) || areaContainsPoint(p2)) {
                 bounds.unite(p1)
@@ -260,5 +261,11 @@ Item {
 
         onXChanged: if(root.items.length > 0) shiftElements()
         onYChanged: if(root.items.length > 0) shiftElements()
+    }
+
+    QtObject {
+        id: _private
+
+        property rect rect: Qt.rect(_tightRect.x, _tightRect.y, _tightRect.width, _tightRect.height)
     }
 }

@@ -5128,9 +5128,6 @@ StructureElementConnector::StructureElementConnector(QQuickItem *parent)
     this->setRenderType(OutlineOnly);
     this->setOutlineColor(Qt::black);
 
-    const qreal dpr = this->window() ? this->window()->devicePixelRatio() : 1.0;
-    this->setOutlineWidth(4 * dpr);
-
     connect(this, &AbstractShapeItem::contentRectChanged, this,
             &StructureElementConnector::updateArrowAndLabelPositions);
     connect(this, &AbstractShapeItem::contentRectChanged, this,

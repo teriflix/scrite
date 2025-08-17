@@ -37,6 +37,7 @@ void AbstractShapeItem::setRenderType(AbstractShapeItem::RenderType val)
         return;
 
     m_renderType = val;
+    m_path = QPainterPath(); // to force update
     emit renderTypeChanged();
 
     this->update();
@@ -86,6 +87,7 @@ void AbstractShapeItem::setOutlineWidth(const qreal &val)
     }
 
     m_outlineWidth = val;
+    m_path = QPainterPath(); // to force update
     emit outlineWidthChanged();
 
     this->update();
@@ -97,6 +99,7 @@ void AbstractShapeItem::setOutlineStyle(AbstractShapeItem::OutlineStyle val)
         return;
 
     m_outlineStyle = val;
+    m_path = QPainterPath(); // to force update
     emit outlineStyleChanged();
 
     this->update();
@@ -302,7 +305,6 @@ QSGNode *AbstractShapeItem::constructSceneGraph() const
         QSGGeometry *outlineGeometry = qFuzzyCompare(m_outlineWidth, 1)
                 ? createLineGeometry(polygon)
                 : createStrokeGeometry(polygon);
-        //        QSGGeometry *outlineGeometry = createLineGeometry(polygon);
         outlineNode->setGeometry(outlineGeometry);
 
         QSGFlatColorMaterial *outlineMaterial = new QSGFlatColorMaterial();

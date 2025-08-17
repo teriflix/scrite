@@ -23,6 +23,10 @@ Rectangle {
     required property int annotationIndex
     required property Annotation annotation
 
+    property Item currentAnnotationItem
+    property bool canvasScrollMoving
+    property bool canvasScrollFlicking
+
     signal gripRequest(Item delegate, Annotation annotation)
 
     x: annotation.geometry.x
@@ -40,11 +44,10 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
-        enabled: annotationGripLoader.annotationItem !== root
-        onClicked: parent.grip()
+        enabled: currentAnnotationItem !== root
+        onClicked: root.gripRequest(root, root.annotation)
         onDoubleClicked: {
             root.gripRequest(root, root.annotation)
-
             Runtime.structureCanvasSettings.displayAnnotationProperties = true
         }
     }
