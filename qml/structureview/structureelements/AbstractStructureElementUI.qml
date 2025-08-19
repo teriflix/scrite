@@ -27,6 +27,7 @@ Item {
     required property bool canvasScrollFlicking
     required property bool canvasScaleIsLessForEdit
 
+    required property Item canvasScrollViewport
     required property rect canvasScrollViewportRect
 
     required property TabSequenceManager canvasTabSequence

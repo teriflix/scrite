@@ -43,6 +43,7 @@ Item {
 
     required property real canvasScale
 
+    required property Item canvasScrollViewport
     required property TabSequenceManager canvasTabSequence
     required property BoundingBoxEvaluator canvasItemsBoundingBox
 
@@ -138,6 +139,7 @@ Item {
             episodeBoxIndex: index
             episodeBoxCount: root.episodeBoxes.length
 
+            canvasScrollViewport: root.canvasScrollViewport
             canvasItemsBoundingBox: root.canvasItemsBoundingBox
             canvasScrollViewportRect: root.canvasScrollViewportRect
 
@@ -154,15 +156,16 @@ Item {
             required property int index
             required property var modelData
 
+            enabled: !root.canvasInInteractiveCreationMode && !root.canvasHasAnnotationGrip
+
             groupBox: modelData
             elementItems: _elementItems
             groupBoxIndex: index
             groupBoxCount: root.groupBoxes.length
 
+            canvasScrollViewport: root.canvasScrollViewport
             canvasItemsBoundingBox: root.canvasItemsBoundingBox
             canvasScrollViewportRect: root.canvasScrollViewportRect
-
-            enabled: !root.canvasInInteractiveCreationMode && !root.canvasHasAnnotationGrip
 
             onSetSelectionRequest: (items) => { _selection.set(items) }
             onClearSelectionRequest: () => { _selection.clear() }
@@ -211,6 +214,7 @@ Item {
 
             elementStack: objectItem
 
+            canvasScrollViewport: root.canvasScrollViewport
             canvasItemsBoundingBox: root.canvasItemsBoundingBox
             canvasScrollViewportRect: root.canvasScrollViewportRect
         }
@@ -309,9 +313,10 @@ Item {
             canvasTabSequence: root.canvasTabSequence
             canvasScrollMoving: root.canvasScrollMoving
             canvasScrollFlicking: root.canvasScrollFlicking
+            canvasScrollViewport: root.canvasScrollViewport
+            canvasItemsBoundingBox: root.canvasItemsBoundingBox
             canvasScaleIsLessForEdit: root.canvasScaleIsLessForEdit
             canvasScrollViewportRect: root.canvasScrollViewportRect
-            canvasItemsBoundingBox: root.canvasItemsBoundingBox
 
             onIsEditingChanged: {
                 if(isEditing)
@@ -367,9 +372,10 @@ Item {
             canvasTabSequence: root.canvasTabSequence
             canvasScrollMoving: root.canvasScrollMoving
             canvasScrollFlicking: root.canvasScrollFlicking
+            canvasScrollViewport: root.canvasScrollViewport
+            canvasItemsBoundingBox: root.canvasItemsBoundingBox
             canvasScaleIsLessForEdit: root.canvasScaleIsLessForEdit
             canvasScrollViewportRect: root.canvasScrollViewportRect
-            canvasItemsBoundingBox: root.canvasItemsBoundingBox
 
             onIsEditingChanged: {
                 if(isEditing)
@@ -406,7 +412,7 @@ Item {
                                         root.deleteElementRequest(element)
                                     }
 
-            onFinishEditingRequest: () => { } // ???
+            onFinishEditingRequest: () => { } // TODO ???
 
             onCanvasActiveFocusRequest: () => {
                                             root.canvasActiveFocusRequest()
@@ -416,6 +422,7 @@ Item {
         readonly property DelayedPropertyBinder currentElementItemBinder: DelayedPropertyBinder {
             initial: null
             set: _elementItems.count > Scrite.document.structure.currentElementIndex ? _elementItems.itemAt(Scrite.document.structure.currentElementIndex) : null
+            onGetChanged: { if(get) root.ensureItemVisibleRequest(get) }
         }
 
         readonly property TrackerPack boxEvaluationTracker: TrackerPack {

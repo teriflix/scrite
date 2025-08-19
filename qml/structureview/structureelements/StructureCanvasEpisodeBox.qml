@@ -41,13 +41,14 @@ Rectangle {
 
     required property rect canvasScrollViewportRect
 
+    required property Item canvasScrollViewport
     required property BoundingBoxEvaluator canvasItemsBoundingBox
 
     BoundingBoxItem.evaluator: canvasItemsBoundingBox
     BoundingBoxItem.stackOrder: 1.0 + (episodeBoxIndex/episodeBoxCount)
     BoundingBoxItem.livePreview: false
+    BoundingBoxItem.viewportItem: canvasScrollViewport
     BoundingBoxItem.viewportRect: canvasScrollViewportRect
-    BoundingBoxItem.viewportItem: root
     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
     BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0.05)
     BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0.5)

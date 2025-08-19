@@ -56,7 +56,7 @@ AbstractStructureElementUI {
     BoundingBoxItem.stackOrder: 3.0 + (root.elementIndex/Scrite.document.structure.elementCount)
     BoundingBoxItem.livePreview: false
     BoundingBoxItem.viewportRect: root.canvasScrollViewportRect
-    BoundingBoxItem.viewportItem: root
+    BoundingBoxItem.viewportItem: root.canvasScrollViewport
     BoundingBoxItem.visibilityMode: _private.isStackedOnTop ? BoundingBoxItem.VisibleUponViewportIntersection : BoundingBoxItem.IgnoreVisibility
     BoundingBoxItem.previewFillColor: Scrite.app.translucent(root.element.scene.color, _private.isSelected ? 0.75 : 0.1)
     BoundingBoxItem.previewBorderColor: Scrite.app.isLightColor(root.element.scene.color) ? "black" : root.element.scene.color

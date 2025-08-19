@@ -31,11 +31,12 @@ Item {
 
     required property rect canvasScrollViewportRect
 
+    required property Item canvasScrollViewport
     required property BoundingBoxEvaluator canvasItemsBoundingBox
 
     BoundingBoxItem.evaluator: canvasItemsBoundingBox
     BoundingBoxItem.livePreview: false
-    BoundingBoxItem.viewportItem: root
+    BoundingBoxItem.viewportItem: canvasScrollViewport
     BoundingBoxItem.viewportRect: canvasScrollViewportRect
     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
     BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
@@ -47,15 +48,6 @@ Item {
     y: _private.geometry.y
     width: _private.geometry.width
     height: _private.geometry.height
-
-    onXChanged: Qt.callLater(reportGeometry)
-    onYChanged: Qt.callLater(reportGeometry)
-    onWidthChanged: Qt.callLater(reportGeometry)
-    onHeightChanged: Qt.callLater(reportGeometry)
-
-    function reportGeometry() {
-        console.log("Stack Tab Bar: " + x + ", " + y + " - (" + width + "x" + height +")")
-    }
 
     Loader {
         anchors.left: parent.left

@@ -40,6 +40,7 @@ Rectangle {
     required property int groupBoxIndex
     required property int groupBoxCount
 
+    required property Item canvasScrollViewport
     required property rect canvasScrollViewportRect
 
     required property Repeater elementItems
@@ -52,7 +53,7 @@ Rectangle {
     BoundingBoxItem.evaluator: canvasItemsBoundingBox
     BoundingBoxItem.stackOrder: 2.0 + (groupBoxIndex/groupBoxCount)
     BoundingBoxItem.livePreview: false
-    BoundingBoxItem.viewportItem: root
+    BoundingBoxItem.viewportItem: canvasScrollViewport
     BoundingBoxItem.viewportRect: canvasScrollViewportRect
     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
     BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
@@ -65,7 +66,6 @@ Rectangle {
 
     color: Scrite.app.translucent(Runtime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
     radius: 0
-    // enabled: !_createItemMouseHandler.enabled && !_annotationGripLoader.active
 
     border.width: 1
     border.color: Runtime.colors.accent.borderColor
@@ -79,6 +79,7 @@ Rectangle {
 
         drag.axis: __controlPressed || Scrite.document.structure.forceBeatBoardLayout ? Drag.None : Drag.XAndYAxis
         drag.target: __controlPressed || Scrite.document.structure.forceBeatBoardLayout ? null : root
+
         cursorShape: Qt.SizeAllCursor
 
         onPressed: (mouse) => {

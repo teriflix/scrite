@@ -159,6 +159,7 @@ GridBackground {
 
         canvasScale: root.scale
         canvasTabSequence: _private.tabSequence
+        canvasScrollViewport: root
         canvasHasActiveFocus: root.activeFocus
         canvasItemsBoundingBox: _private.itemsBoundingBox
         canvasPreviewIsUpdating: root.canvasPreviewUpdatingThumbnail
@@ -282,7 +283,8 @@ GridBackground {
 
         readonly property BoundingBoxEvaluator itemsBoundingBox : BoundingBoxEvaluator {
             margin: 50
-            initialRect: Scrite.document.structure.annotationsBoundingBox
+            initialRect: Scrite.app.uniteRectangles(Scrite.document.structure.annotationsBoundingBox,
+                                                    root.canvasScrollViewportRect)
         }
 
         readonly property DelayedPropertyBinder widthBinder: DelayedPropertyBinder {

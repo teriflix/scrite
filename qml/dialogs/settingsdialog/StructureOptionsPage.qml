@@ -273,5 +273,42 @@ Item {
                 }
             }
         }
+
+        GroupBox {
+            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
+
+            label: VclLabel {
+                text: "Preview"
+            }
+
+            ColumnLayout {
+                width: parent.width
+
+                spacing: 10
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: "Configure the max-size (width or height) the preview panel can occupy in the structure canvas."
+                    wrapMode: Text.WordWrap
+                }
+
+                VclTextField {
+                    Layout.fillWidth: true
+
+                    placeholderText: "Preview Size (50 - 1000)"
+                    text: Runtime.structureCanvasSettings.previewSize
+                    validator: DoubleValidator {
+                        bottom: 50
+                        top: 1000
+                        decimals: 0
+                    }
+
+                    onTextEdited: Runtime.structureCanvasSettings.previewSize = parseFloat(text)
+                }
+            }
+        }
     }
 }

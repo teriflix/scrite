@@ -31,8 +31,6 @@ Item {
 
     required property StructureCanvasScrollArea canvasScroll
 
-    readonly property real maxSize: 150
-
     property alias interacting: _panMouseArea.pressed
     property alias updatingThumbnail: _preview.isUpdatingPreview
 
@@ -156,30 +154,16 @@ Item {
     QtObject {
         id: _private
 
+        property real previewSize: Runtime.structureCanvasSettings.previewSize
+
         function evaluatePreviewSize() {
-            var w = Math.max(root.canvasScroll.itemsBoundingBox.width, 500)
-            var h = Math.max(root.canvasScroll.itemsBoundingBox.height, 500)
-
-            var scale = 1
-            if(w < h)
-                scale = maxSize / w
-            else
-                scale = maxSize / h
-
-            w *= scale
-            h *= scale
-
-            if(w > root.canvasScroll.width-60)
-                scale = (root.canvasScroll.width-60)/w
-            else if(h >= root.canvasScroll.height-60)
-                scale = (root.canvasScroll.height-60)/h
-            else
-                scale = 1
-
-            w *= scale
-            h *= scale
-
-            return Qt.size(w+10, h+10)
+            const maxSize = Math.min( Math.min(root.canvasScroll.width-60, root.canvasScroll.height-60), previewSize)
+            const w = root.canvasScroll.itemsBoundingBox.width
+            const h = root.canvasScroll.itemsBoundingBox.height
+            const scale = Math.min(maxSize/w, maxSize/h)
+            return Qt.size(w*scale+10, h*scale+10)
         }
+
+        onPreviewSizeChanged: root.canvasScroll.itemsBoundingBox.markPreviewDirty()
     }
 }

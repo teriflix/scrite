@@ -30,7 +30,6 @@ BoxShadow {
     property StructureElement currentElement: currentElementItem ? currentElementItem.element : null
     property AbstractStructureElementUI currentElementItem: null
 
-    signal ensureItemVisibleRequest(Item item)
     signal deleteElementRequest(StructureElement element)
 
     EventFilter.target: Scrite.app
@@ -48,8 +47,6 @@ BoxShadow {
 
         NumberAnimation { duration: 250 }
     }
-
-    onCurrentElementItemChanged: root.ensureItemVisibleRequest(currentElementItem)
 
     QtObject {
         id: _private

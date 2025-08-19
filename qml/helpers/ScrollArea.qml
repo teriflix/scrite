@@ -31,8 +31,8 @@ Flickable {
     property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
 
     property real zoomScale: 1
-    property rect visibleRect: Qt.rect(contentX, contentY, width, height)
     property real suggestedScale: zoomScale
+    property rect visibleContentRect: Qt.rect(contentX, contentY, width/zoomScale, height/zoomScale)
     property real initialContentWidth: 100
     property real initialContentHeight: 100
 
@@ -67,28 +67,21 @@ Flickable {
         if(area.width <= 0 || area.height <= 0)
             return
 
-        var s = Math.min(width/area.width, height/area.height)
-        var center = Qt.point(area.x + area.width/2, area.y + area.height/2)
-        var w = width/s
-        var h = height/s
-        area = Qt.rect(Math.max(center.x-w/2,0), Math.max(center.y-h/2,0), w, h)
+        const s = Math.min(width/area.width, height/area.height)
+        const center = Qt.point(area.x + area.width/2, area.y + area.height/2)
+        const w = width/s
+        const h = height/s
+
+        const area2 = Qt.rect(Math.max(center.x-w/2,0), Math.max(center.y-h/2,0), w, h)
 
         zoomScale = s
-        ensureVisible(area, s)
-    }
-
-    function ensureItemVisibleLater(item, scaling, leaveMargin, delay) {
-        ensureItemVisibleTimer.item = item
-        ensureItemVisibleTimer.scaling = scaling ? scaling : 1
-        ensureItemVisibleTimer.leaveMargin = leaveMargin ? leaveMargin : 0
-        ensureItemVisibleTimer.interval = delay ? delay : 500
-        ensureItemVisibleTimer.start()
+        ensureVisible(area2, s)
     }
 
     function ensureItemVisible(item, scaling, leaveMargin) {
         if(item === null)
             return
-        var area = Qt.rect(item.x, item.y, item.width, item.height)
+        const area = Qt.rect(item.x, item.y, item.width, item.height)
         ensureVisible(area, scaling, leaveMargin)
     }
 
@@ -106,7 +99,7 @@ Flickable {
                 "area": area, "scaling": scaling, "leaveMargin": leaveMargin
             }
             Utils.execLater(root, 500, function() {
-                var params = _private.ensureVisibleParams
+                const params = _private.ensureVisibleParams
                 _private.ensureVisibleParams = undefined
                 ensureVisible(params.area, params.scaling, params.leaveMargin)
             })
@@ -114,32 +107,32 @@ Flickable {
         }
 
         // Check if the areaangle can be contained within the viewport
-        if(area.width > visibleRect.width || area.height > visibleRect.height) {
+        if(area.width > visibleContentRect.width || area.height > visibleContentRect.height) {
             // We are here if area cannot fit into the space of the flickable.
             // In this case, we just try and fit the center point of area into the
             // view.
-            var w = width*0.2
-            var h = height*0.2
+            const w = width*0.2
+            const h = height*0.2
             area = Qt.rect( (area.left+area.right)/2-h/2,
                             (area.top+area.bottom)/2-w/2,
                             w, h )
         }
 
         // Check if item is already visible
-        if(area.left >= visibleRect.left && area.top >= visibleRect.top &&
-           area.right <= visibleRect.right && area.bottom <= visibleRect.bottom)
+        if(area.left >= visibleContentRect.left && area.top >= visibleContentRect.top &&
+           area.right <= visibleContentRect.right && area.bottom <= visibleContentRect.bottom)
             return; // already visible
 
-        var cx = undefined
-        var cy = undefined
-        if(area.left >= visibleRect.right || area.right >= visibleRect.right)
+        let cx = undefined
+        let cy = undefined
+        if(area.left >= visibleContentRect.right || area.right >= visibleContentRect.right)
             cx = (area.right + leaveMargin) - width
-        else if(area.right <= visibleArea.left || area.left <= visibleRect.left)
+        else if(area.right <= visibleArea.left || area.left <= visibleContentRect.left)
             cx = area.left - leaveMargin
 
-        if(area.top >= visibleRect.bottom || area.bottom >= visibleRect.bottom)
+        if(area.top >= visibleContentRect.bottom || area.bottom >= visibleContentRect.bottom)
             cy = (area.bottom + leaveMargin) - height
-        else if(area.bottom <= visibleRect.top || area.top <= visibleRect.top)
+        else if(area.bottom <= visibleContentRect.top || area.top <= visibleContentRect.top)
             cy = area.top - leaveMargin
 
         if(cx !== undefined)
@@ -150,20 +143,20 @@ Flickable {
 
     function ensureVisibleFast(area) {
         // Check if item is already visible
-        if(area.left >= visibleRect.left && area.top >= visibleRect.top &&
-           area.right <= visibleRect.right && area.bottom <= visibleRect.bottom)
+        if(area.left >= visibleContentRect.left && area.top >= visibleContentRect.top &&
+           area.right <= visibleContentRect.right && area.bottom <= visibleContentRect.bottom)
             return; // already visible
 
-        var cx = undefined
-        var cy = undefined
-        if(area.left >= visibleRect.right || area.right >= visibleRect.right)
+        let cx = undefined
+        let cy = undefined
+        if(area.left >= visibleContentRect.right || area.right >= visibleContentRect.right)
             cx = area.right - width
-        else if(area.right <= visibleArea.left || area.left <= visibleRect.left)
+        else if(area.right <= visibleArea.left || area.left <= visibleContentRect.left)
             cx = area.left
 
-        if(area.top >= visibleRect.bottom || area.bottom >= visibleRect.bottom)
+        if(area.top >= visibleContentRect.bottom || area.bottom >= visibleContentRect.bottom)
             cy = area.bottom - height
-        else if(area.bottom <= visibleRect.top || area.top <= visibleRect.top)
+        else if(area.bottom <= visibleContentRect.top || area.top <= visibleContentRect.top)
             cy = area.top
 
         if(cx !== undefined)
@@ -207,31 +200,6 @@ Flickable {
         property bool allow: true
         enabled: Runtime.applicationSettings.enableAnimations && animatePanAndZoom && allow
         NumberAnimation { id: zoomScaleAnimation; duration: 250 }
-    }
-
-    Timer {
-        id: ensureItemVisibleTimer
-
-        property Item item
-        property real scaling
-        property real leaveMargin
-
-        repeat: false
-        interval: 250
-        running: false
-
-        onTriggered: {
-            if(root.moving || root.flicking) {
-                Qt.callLater(start)
-                return
-            }
-
-            ensureItemVisible(item, scaling, leaveMargin)
-            item = null
-            scaling = 1
-            leaveMargin = 0
-            delay = 250
-        }
     }
 
     Timer {
@@ -297,15 +265,16 @@ Flickable {
     }
 
     onZoomScaleChanged: {
-        var cursorPos = Scrite.app.cursorPosition()
-        var fCursorPos = Scrite.app.mapGlobalPositionToItem(root, cursorPos)
-        var fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
-        var visibleArea = Qt.rect(contentX, contentY, width, height)
-        var mousePoint = fContainsCursor ?
-                    Scrite.app.mapGlobalPositionToItem(contentItem, Scrite.app.cursorPosition()) :
-                    Qt.point(contentX+width/2, contentY+height/2)
-        var newWidth = initialContentWidth * zoomScale
-        var newHeight = initialContentHeight * zoomScale
+        let cursorPos = Scrite.app.cursorPosition()
+        let fCursorPos = Scrite.app.mapGlobalPositionToItem(root, cursorPos)
+        let fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
+        let visibleArea = Qt.rect(contentX, contentY, width, height)
+        let mousePoint = fContainsCursor ?
+                Scrite.app.mapGlobalPositionToItem(contentItem, Scrite.app.cursorPosition()) :
+                Qt.point(contentX+width/2, contentY+height/2)
+        let newWidth = initialContentWidth * zoomScale
+        let newHeight = initialContentHeight * zoomScale
+
         resizeContent(newWidth, newHeight, mousePoint)
         returnToBoundsTimer.start()
     }
