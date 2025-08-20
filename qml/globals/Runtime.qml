@@ -43,6 +43,7 @@ Item {
     property ObjectListModel dialogs: ObjectListModel { }
     property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
+    readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
 
     // Persistent Settings
     readonly property Settings userAccountDialogSettings: Settings {
@@ -70,6 +71,7 @@ Item {
         property bool showPullHandleAnimation: true
         property real connectorLineWidth: 2
         property real previewSize: 300
+        property real overflowFactor: 0.05
 
         function restoreDefaultGridColor() {
             gridColor = Runtime.colors.accent.c400.background

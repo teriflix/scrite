@@ -96,6 +96,15 @@ void BoundingBoxEvaluator::setBoundingBox(const QRectF &val)
     emit boundingBoxChanged();
 }
 
+void BoundingBoxEvaluator::setTightBoundingBox(const QRectF &val)
+{
+    if (m_tightBoundingBox == val)
+        return;
+
+    m_tightBoundingBox = val;
+    emit tightBoundingBoxChanged();
+}
+
 void BoundingBoxEvaluator::addItem(BoundingBoxItem *item)
 {
     connect(item, &BoundingBoxItem::aboutToDestroy, this, &BoundingBoxEvaluator::removeItem);
@@ -120,15 +129,27 @@ void BoundingBoxEvaluator::removeItem(BoundingBoxItem *item)
 void BoundingBoxEvaluator::evaluateNow()
 {
     QRectF rect = m_initialRect;
+    QRectF trect;
 
     for (BoundingBoxItem *item : qAsConst(m_items)) {
-        if (item->item())
-            rect |= item->boundingRect();
+        if (item->item()) {
+            if (rect.isNull())
+                rect = item->boundingRect();
+            else
+                rect |= item->boundingRect();
+
+            if (trect.isNull())
+                trect = item->boundingRect();
+            else
+                trect |= item->boundingRect();
+        }
     }
 
     rect.adjust(-m_margin, -m_margin, m_margin, m_margin);
+    trect.adjust(-m_margin, -m_margin, m_margin, m_margin);
 
     this->setBoundingBox(rect);
+    this->setTightBoundingBox(trect);
     this->markPreviewDirty();
 }
 

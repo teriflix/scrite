@@ -71,7 +71,7 @@ Item {
 
         canvasScroll: _canvasScroll
 
-        visible: allowed && Runtime.structureCanvasSettings.showPreview && parent.width > 400
+        visible: allowed && Runtime.structureCanvasSettings.showPreview && parent.width > 400 && isContentOverflowing
     }
 
     StructureViewToolBar {
@@ -143,7 +143,7 @@ Item {
         id: _statusBar
 
         canvasScale: _canvasScroll.canvasScale
-        canvasPreviewVisible: _canvasPreview.visible
+        canvasPreviewVisible: Runtime.structureCanvasSettings.showPreview
         canvasEpisodeBoxCount: _canvasScroll.canvasEpisodeBoxCount
         canvasItemsBoundingBox: _canvasScroll.itemsBoundingBox
         canvasScrollInteractive: _canvasScroll.interactive
@@ -194,6 +194,32 @@ Item {
             wrapMode: Text.WordWrap
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             horizontalAlignment: Text.AlignHCenter
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        readonly property SequentialAnimation initSequence: SequentialAnimation {
+            PauseAnimation { duration: 50 }
+
+            ScriptAction {
+                script: _canvasScroll.zoomOne()
+            }
+
+            PauseAnimation { duration: 10 }
+
+            ScriptAction {
+                script: {
+                    const item = _canvasScroll.currentElementItem
+                    _canvasScroll.contentX = item ? item.x - 50 : 4950
+                    _canvasScroll.contentY = item ? item.y - 100 : 4950
+                }
+            }
+        }
+
+        Component.onCompleted: {
+            initSequence.start()
         }
     }
 }

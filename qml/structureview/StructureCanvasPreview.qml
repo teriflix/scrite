@@ -31,8 +31,9 @@ Item {
 
     required property StructureCanvasScrollArea canvasScroll
 
-    property alias interacting: _panMouseArea.pressed
-    property alias updatingThumbnail: _preview.isUpdatingPreview
+    readonly property alias interacting: _panMouseArea.pressed
+    readonly property alias updatingThumbnail: _preview.isUpdatingPreview
+    readonly property alias isContentOverflowing: _private.isContentOverflowing
 
     property bool allowed: true
 
@@ -64,10 +65,10 @@ Item {
             enabled: root.canvasScroll.itemsBoundingBox.itemCount > 0
 
             onClicked: {
-                var scale = root.canvasScroll.itemsBoundingBox.width / _preview.width
-                var x = root.canvasScroll.itemsBoundingBox.x + mouse.x * scale - root.canvasScroll.width/2
-                var y = root.canvasScroll.itemsBoundingBox.y + mouse.y * scale - root.canvasScroll.height/2
-                var area = Qt.rect(x,y,root.canvasScroll.width,root.canvasScroll.height)
+                let scale = root.canvasScroll.itemsBoundingBox.width / _preview.width
+                let x = root.canvasScroll.itemsBoundingBox.x + mouse.x * scale - root.canvasScroll.width/2
+                let y = root.canvasScroll.itemsBoundingBox.y + mouse.y * scale - root.canvasScroll.height/2
+                let area = Qt.rect(x,y,root.canvasScroll.width,root.canvasScroll.height)
 
                 root.canvasScroll.zoomOne()
                 root.canvasScroll.ensureVisible(area)
@@ -90,16 +91,13 @@ Item {
                 id: _geometryBinder
 
                 set: {
-                    if(!root.visible)
-                        return Qt.rect(0,0,0,0)
-
-                    var visibleRect = root.canvasScroll.viewportRect
+                    let visibleRect = root.canvasScroll.viewportRect
                     if( Scrite.app.isRectangleInRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox) )
                         return Qt.rect(0,0,0,0)
 
-                    var intersect = Scrite.app.intersectedRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox)
-                    var scale = _preview.width / Math.max(root.canvasScroll.itemsBoundingBox.width, 500)
-                    var ret = Qt.rect( (intersect.x-root.canvasScroll.itemsBoundingBox.left)*scale,
+                    let intersect = Scrite.app.intersectedRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox)
+                    let scale = _preview.width / Math.max(root.canvasScroll.itemsBoundingBox.width, 500)
+                    let ret = Qt.rect( (intersect.x-root.canvasScroll.itemsBoundingBox.left)*scale,
                                        (intersect.y-root.canvasScroll.itemsBoundingBox.top)*scale,
                                        (intersect.width*scale),
                                        (intersect.height*scale) )
@@ -137,9 +135,9 @@ Item {
             }
 
             function panViewport() {
-                var scale = _preview.width / Math.max(root.canvasScroll.itemsBoundingBox.width, 500)
-                var ix = (x/scale)+root.canvasScroll.itemsBoundingBox.left
-                var iy = (y/scale)+root.canvasScroll.itemsBoundingBox.top
+                let scale = _preview.width / Math.max(root.canvasScroll.itemsBoundingBox.width, 500)
+                let ix = (x/scale)+root.canvasScroll.itemsBoundingBox.left
+                let iy = (y/scale)+root.canvasScroll.itemsBoundingBox.top
                 root.canvasScroll.contentX = ix * root.canvasScroll.canvas.scale
                 root.canvasScroll.contentY = iy * root.canvasScroll.canvas.scale
             }
@@ -155,6 +153,13 @@ Item {
         id: _private
 
         property real previewSize: Runtime.structureCanvasSettings.previewSize
+
+        property bool isContentOverflowing: {
+            const of = 0.075 // Runtime.structureCanvasSettings.overflowFactor
+            const xf = _preview.width * of
+            const yf = _preview.height * of
+            return _viewportIndicator.x >= xf || _viewportIndicator.y >= yf || _viewportIndicator.width < (_preview.width - 2*xf) || _viewportIndicator.height < (_preview.height - 2*yf)
+        }
 
         function evaluatePreviewSize() {
             const maxSize = Math.min( Math.min(root.canvasScroll.width-60, root.canvasScroll.height-60), previewSize)

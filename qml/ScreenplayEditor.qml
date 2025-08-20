@@ -28,7 +28,7 @@ import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/structureview"
-import "qrc:/qml/screenplay"
+import "qrc:/qml/screenplayeditor"
 import "qrc:/qml/floatingdockpanels"
 
 Rectangle {
@@ -37,12 +37,12 @@ Rectangle {
     // This way we can avoid having a SceneEditor and ScreenplayEditor as two distinct
     // QML components.
 
-    id: screenplayEditor
+    id: root
 
     property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
     property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout
     property alias source: sourcePropertyAlias.value
-    property alias searchBarVisible: searchBarArea.visible
+    property alias searchBarVisible: _searchBarArea.visible
     property bool commentsPanelAllowed: true
     property alias enableSceneListPanel: sceneListSidePanel.visible
     property alias sceneListPanelExpanded: sceneListSidePanel.expanded
@@ -51,25 +51,25 @@ Rectangle {
     signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
     signal additionalSceneMenuItemClicked(Scene scene, string menuItemName)
 
-    property alias zoomLevel: zoomSlider.zoomLevel
+    property alias zoomLevel: _statusBar.zoomLevel
     property int zoomLevelModifier: 0
 
     function zoomLevelModifierToApply() {
-        return zoomSlider.zoomLevelModifierToApply()
+        return _statusBar.zoomSlider.zoomLevelModifierToApply()
     }
 
     function toggleSearchBar(showReplace) {
         if(typeof showReplace === "boolean")
-            searchBar.showReplace = showReplace
+            _searchBarArea.searchBar.showReplace = showReplace
 
-        if(searchBarArea.visible) {
-            if(searchBar.hasFocus)
-                searchBarArea.visible = false
+        if(_searchBarArea.visible) {
+            if(_searchBarArea.searchBar.hasFocus)
+                _searchBarArea.visible = false
             else
-                searchBar.assumeFocus()
+                _searchBarArea.searchBar.assumeFocus()
         } else {
-            searchBarArea.visible = true
-            searchBar.assumeFocus()
+            _searchBarArea.visible = true
+            _searchBarArea.searchBar.assumeFocus()
         }
     }
 
@@ -195,114 +195,24 @@ Rectangle {
                     item.assumeFocus()
             })
         }
-        function onLoadingChanged() { zoomSlider.reset() }
+        function onLoadingChanged() { _statusBar.zoomSlider.reset() }
     }
 
-    Rectangle {
-        id: searchBarArea
-
-        width: ruler.width
-        height: searchBar.height * opacity
+    ScreenplayEditorSearchBar {
+        id: _searchBarArea
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 1
-
-        color: Runtime.colors.primary.c100.background
-        border.width: 1
-        border.color: Runtime.colors.primary.borderColor
-
-        visible: false
-
-        enabled: Runtime.screenplayAdapter.screenplay
-
-        SearchBar {
-            id: searchBar
-
-            width: searchBarArea.width * 0.6
-
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            searchEngine.objectName: "Screenplay Search Engine"
-
-            showReplace: false
-            allowReplace: !Scrite.document.readOnly
-
-            onShowReplaceRequest: showReplace = flag
-
-            Repeater {
-                id: searchAgents
-                model: Runtime.screenplayAdapter.screenplay ? 1 : 0
-
-                Item {
-                    property string searchString
-                    property var searchResults: []
-                    property int previousSceneIndex: -1
-
-                    signal replaceCurrentRequest(string replacementText)
-
-                    SearchAgent.onReplaceAll: {
-                        Runtime.screenplayTextDocument.syncEnabled = false
-                        Runtime.screenplayAdapter.screenplay.replace(searchString, replacementText, 0)
-                        Runtime.screenplayTextDocument.syncEnabled = true
-                    }
-                    SearchAgent.onReplaceCurrent: replaceCurrentRequest(replacementText)
-
-                    SearchAgent.engine: searchBar.searchEngine
-
-                    SearchAgent.onSearchRequest: {
-                        searchString = string
-                        searchResults = Runtime.screenplayAdapter.screenplay.search(string, 0)
-                        SearchAgent.searchResultCount = searchResults.length
-                    }
-
-                    SearchAgent.onCurrentSearchResultIndexChanged: {
-                        if(SearchAgent.currentSearchResultIndex >= 0) {
-                            var searchResult = searchResults[SearchAgent.currentSearchResultIndex]
-                            var sceneIndex = searchResult["sceneIndex"]
-                            if(sceneIndex !== previousSceneIndex)
-                                clearPreviousElementUserData()
-                            var sceneResultIndex = searchResult["sceneResultIndex"]
-                            var screenplayElement = Runtime.screenplayAdapter.screenplay.elementAt(sceneIndex)
-                            var data = {
-                                "searchString": searchString,
-                                "sceneResultIndex": sceneResultIndex,
-                                "currentSearchResultIndex": SearchAgent.currentSearchResultIndex,
-                                "searchResultCount": SearchAgent.searchResultCount
-                            }
-                            contentView.positionViewAtIndex(sceneIndex, ListView.Visible)
-                            screenplayElement.userData = data
-                            previousSceneIndex = sceneIndex
-                        }
-                    }
-
-                    SearchAgent.onClearSearchRequest: {
-                        Runtime.screenplayAdapter.screenplay.currentElementIndex = previousSceneIndex
-                        searchString = ""
-                        searchResults = []
-                        clearPreviousElementUserData()
-                    }
-
-                    function clearPreviousElementUserData() {
-                        if(previousSceneIndex >= 0) {
-                            var screenplayElement = Runtime.screenplayAdapter.screenplay.elementAt(previousSceneIndex)
-                            if(screenplayElement)
-                                screenplayElement.userData = undefined
-                        }
-                        previousSceneIndex = -1
-                    }
-                }
-            }
-        }
     }
 
     Item {
         id: screenplayEditorWorkspace
-        anchors.top: searchBarArea.visible ? searchBarArea.bottom : parent.top
+        anchors.top: _searchBarArea.visible ? _searchBarArea.bottom : parent.top
         anchors.left: sidePanels.right
         anchors.right: parent.right
-        anchors.bottom: statusBar.top
+        anchors.bottom: _statusBar.top
         clip: true
 
         EventFilter.events: [EventFilter.Wheel]
@@ -314,7 +224,7 @@ Rectangle {
 
         Item {
             id: pageRulerArea
-            width: pageLayout.paperWidth * screenplayEditor.zoomLevel * Screen.devicePixelRatio
+            width: pageLayout.paperWidth * root.zoomLevel * Screen.devicePixelRatio
             height: parent.height
             anchors.left: parent.left
             anchors.leftMargin: leftMargin
@@ -520,7 +430,7 @@ Rectangle {
 
                     Item {
                         width: contentView.width
-                        height: 10 * zoomSlider.zoomLevel
+                        height: 10 * _statusBar.zoomSlider.zoomLevel
                     }
                 }
 
@@ -610,7 +520,7 @@ Rectangle {
 
                     Item {
                         width: contentView.width
-                        height: contentView.height * 0.25 * zoomSlider.zoomLevel
+                        height: contentView.height * 0.25 * _statusBar.zoomSlider.zoomLevel
                     }
                 }
 
@@ -810,7 +720,7 @@ Rectangle {
                 font.pixelSize: 10
                 leftMargin: pageLayout.leftMargin * Screen.devicePixelRatio
                 rightMargin: pageLayout.rightMargin * Screen.devicePixelRatio
-                zoomLevel: screenplayEditor.zoomLevel
+                zoomLevel: root.zoomLevel
                 resolution: Scrite.document.displayFormat.pageLayout.resolution
                 visible: Runtime.screenplayEditorSettings.displayRuler
 
@@ -832,7 +742,7 @@ Rectangle {
         id: verticalScrollBar
         anchors.top: screenplayEditorWorkspace.top
         anchors.right: parent.right
-        anchors.bottom: statusBar.enabled ? statusBar.top : parent.bottom
+        anchors.bottom: _statusBar.enabled ? _statusBar.top : parent.bottom
         orientation: Qt.Vertical
         minimumSize: 0.1
         policy: Runtime.screenplayAdapter.elementCount > 0 ? ScrollBar.AlwaysOn : ScrollBar.AlwaysOff
@@ -848,526 +758,48 @@ Rectangle {
         }
     }
 
-    Rectangle {
-        id: statusBar
-        height: 30
+    ScreenplayEditorStatusBar {
+        id: _statusBar
+
+        sceneHeadingFontMetrics: _headingFontMetrics
+        screenplayEditorListView: contentView
+        screenplayEditorLastItemIndex: contentView.lastItemIndex
+        screenplayEditorFirstItemIndex: contentView.firstItemIndex
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        color: Runtime.colors.primary.windowColor
-        border.width: 1
-        border.color: Runtime.colors.primary.borderColor
-        clip: true
-        enabled: (width > (metricsDisplay.width + zoomSlider.width + 40))
-        opacity: enabled ? 1 : 0
-
-        Item {
-            anchors.fill: metricsDisplay
-
-            ToolTip.text: "Page count and time estimates are approximate, assuming " + Runtime.screenplayTextDocument.timePerPageAsString + " per page."
-            ToolTip.delay: 1000
-            ToolTip.visible: metricsDisplayOverlayMouseArea.containsMouse
-
-            MouseArea {
-                id: metricsDisplayOverlayMouseArea
-                anchors.fill: parent
-                hoverEnabled: true
-            }
-        }
-
-        Row {
-            id: metricsDisplay
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: 20
-            spacing: 10
-
-            Image {
-                id: toggleLockButton
-                height: parent.height; width: height; mipmap: true
-                anchors.verticalCenter: parent.verticalCenter
-                enabled: !Scrite.document.readOnly
-                source: {
-                    if(Scrite.document.readOnly)
-                        return "qrc:/icons/action/lock_outline.png"
-                    if(Scrite.user.loggedIn)
-                        return Scrite.document.hasCollaborators ? "qrc:/icons/file/protected.png" : "qrc:/icons/file/unprotected.png"
-                    return Scrite.document.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
-                }
-                scale: toggleLockMouseArea.containsMouse ? (toggleLockMouseArea.pressed ? 1 : 1.5) : 1
-                visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
-                Behavior on scale { NumberAnimation { duration: 250 } }
-
-                MouseArea {
-                    id: toggleLockMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    ToolTip.text: {
-                        if(Scrite.document.readOnly)
-                            return "Cannot lock/unlock for editing on this computer."
-                        if(Scrite.user.loggedIn)
-                            return Scrite.document.hasCollaborators ? "Add/Remove collaborators who can view & edit this document." : "Protect this document so that you and select collaborators can view/edit it."
-                        return Scrite.document.locked ? "Unlock to allow editing on this and other computers." : "Lock to allow editing of this document only on this computer."
-                    }
-                    ToolTip.visible: containsMouse
-                    ToolTip.delay: 1000
-
-                    onClicked: {
-                        if(Scrite.user.loggedIn)
-                            CollaboratorsDialog.launch()
-                        else
-                            toggleLock()
-                    }
-
-                    function toggleLock() {
-                        var locked = !Scrite.document.locked
-                        Scrite.document.locked = locked
-
-                        var message = ""
-                        if(locked)
-                            message = "Document LOCKED. You will be able to edit it only on this computer."
-                        else
-                            message = "Document unlocked. You will be able to edit it on this and any other computer."
-
-                        MessageBox.information("Document Lock Status", message)
-                    }
-                }
-            }
-
-            Image {
-                source: "qrc:/icons/navigation/refresh.png"
-                height: parent.height; width: height; mipmap: true
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
-                scale: refreshMouseArea.containsMouse ? (refreshMouseArea.pressed ? 1 : 1.5) : 1
-                visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
-                Behavior on scale { NumberAnimation { duration: 250 } }
-
-                MouseArea {
-                    id: refreshMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                        if(Runtime.screenplayTextDocument.paused)
-                            Runtime.screenplayTextDocument.paused = false
-                        else
-                            Runtime.screenplayTextDocument.reload()
-                    }
-                    ToolTip.visible: containsMouse && !pressed
-                    ToolTip.text: enabled ? "Computes page layout from scratch, thereby reevaluating page count and time." : "Resume page and time computation."
-                    ToolTip.delay: 1000
-                }
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.borderColor
-                visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
-            }
-
-            Image {
-                id: pageCountButton
-                source: "qrc:/icons/content/page_count.png"
-                height: parent.height; width: height; mipmap: true
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
-                scale: pageCountMouseAra.containsMouse ? (pageCountMouseAra.pressed ? 1 : 1.5) : 1
-                Behavior on scale { NumberAnimation { duration: 250 } }
-
-                MouseArea {
-                    id: pageCountMouseAra
-                    anchors.fill: parent
-                    onClicked: Runtime.screenplayTextDocument.paused = !Runtime.screenplayTextDocument.paused
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse && !pressed
-                    ToolTip.text: "Click here to toggle page computation, in case the app is not responding fast while typing."
-                    ToolTip.delay: 1000
-                }
-            }
-
-            VclText {
-                font.pixelSize: statusBar.height * 0.5
-                text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentPage + " of " + Runtime.screenplayTextDocument.pageCount)
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: Runtime.screenplayTextDocument.paused ? 0.5 : 1
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.borderColor
-            }
-
-            Image {
-                source: "qrc:/icons/content/time.png"
-                height: parent.height; width: height; mipmap: true
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
-                scale: timeMouseArea.containsMouse ? (timeMouseArea.pressed ? 1 : 1.5) : 1
-                Behavior on scale { NumberAnimation { duration: 250 } }
-
-                MouseArea {
-                    id: timeMouseArea
-                    anchors.fill: parent
-                    onClicked: Runtime.screenplayTextDocument.paused = !Runtime.screenplayTextDocument.paused
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse && !pressed
-                    ToolTip.text: "Click here to toggle time computation, in case the app is not responding fast while typing."
-                    ToolTip.delay: 1000
-                }
-            }
-
-            VclText {
-                font.pixelSize: statusBar.height * 0.5
-                text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentTimeAsString + " of " + (Runtime.screenplayTextDocument.pageCount > 1 ? Runtime.screenplayTextDocument.totalTimeAsString : Runtime.screenplayTextDocument.timePerPageAsString))
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: Runtime.screenplayTextDocument.paused ? 0.5 : 1
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.borderColor
-                visible: wordCountLabel.visible
-            }
-
-            VclText {
-                id: wordCountLabel
-                font.pixelSize: statusBar.height * 0.5
-                text: {
-                    const currentScene = Runtime.screenplayAdapter.currentScene
-                    const currentSceneWordCount = currentScene ? currentScene.wordCount + " / " : ""
-                    const totalWordCount = Runtime.screenplayAdapter.wordCount + (Runtime.screenplayAdapter.wordCount !== 1 ? " words" : " word")
-                    return currentSceneWordCount + totalWordCount
-                }
-                anchors.verticalCenter: parent.verticalCenter
-                visible: taggingOptionsPosMapper.mappedPosition.x > width
-
-                ItemPositionMapper {
-                    id: taggingOptionsPosMapper
-                    from: taggingOptions
-                    position: Qt.point(0,0)
-                    to: wordCountLabel
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    ToolTip.visible: containsMouse
-                    ToolTip.text: "Displays 'current scene word count' / 'whole screenplay word count'."
-                    ToolTip.delay: 1000
-                }
-            }
-        }
-
-        Item {
-            id: headingTextAreaOnStatusBar
-            anchors.left: metricsDisplay.right
-            anchors.right: taggingOptions.visible ? taggingOptions.left : zoomSlider.left
-            anchors.margins: 5
-            clip: true
-            height: parent.height
-
-            ItemPositionMapper {
-                id: contentViewPositionMapper
-                from: contentView
-                position: Qt.point(0,0)
-                to: headingTextAreaOnStatusBar
-            }
-
-            Item {
-                x: contentViewPositionMapper.mappedPosition.x
-                width: contentView.width
-                height: parent.height
-                visible: x > 0
-
-                property ScreenplayElement currentSceneElement: {
-                    if(Runtime.screenplayAdapter.isSourceScene || Runtime.screenplayAdapter.elementCount === 0)
-                        return null
-
-                    var element = null
-                    if(contentView.isVisible(Runtime.screenplayAdapter.currentIndex)) {
-                        element = Runtime.screenplayAdapter.currentElement
-                    } else {
-                        var data = Runtime.screenplayAdapter.at(contentView.firstItemIndex)
-                        element = data ? data.screenplayElement : null
-                    }
-
-                    return element
-                }
-                property Scene currentScene: currentSceneElement ? currentSceneElement.scene : null
-                property SceneHeading currentSceneHeading: currentScene && currentScene.heading.enabled ? currentScene.heading : null
-
-                VclLabel {
-                    id: currentSceneNumber
-                    anchors.verticalCenter: currentSceneHeadingText.verticalCenter
-                    anchors.left: currentSceneHeadingText.left
-                    anchors.leftMargin: Math.min(-recommendedMargin, -contentWidth)
-                    font: currentSceneHeadingText.font
-                    text: parent.currentSceneHeading ? parent.currentSceneElement.resolvedSceneNumber + ". " : ''
-                    property real recommendedMargin: headingFontMetrics.averageCharacterWidth*5 + ruler.leftMarginPx*0.075
-                }
-
-                VclText {
-                    id: currentSceneHeadingText
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.leftMargin: ruler.leftMarginPx
-                    anchors.rightMargin: ruler.rightMarginPx
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.verticalCenterOffset: height*0.1
-                    font.family: headingFontMetrics.font.family
-                    font.pixelSize: parent.height * 0.6
-                    elide: Text.ElideRight
-                    text: parent.currentSceneHeading ? parent.currentSceneHeading.text : ''
-                }
-            }
-        }
-
-        Row {
-            id: taggingOptions
-            spacing: 10
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: zoomSlider.left
-            anchors.rightMargin: spacing
-            height: zoomSlider.height
-
-            FlatToolButton {
-                iconSource: "qrc:/icons/action/layout_grouping.png"
-                height: parent.height; width: height
-                anchors.verticalCenter: parent.verticalCenter
-                down: taggingMenu.active
-                onClicked: taggingMenu.show()
-                ToolTip.text: "Grouping Options"
-                visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
-
-                MenuLoader {
-                    id: taggingMenu
-                    anchors.left: parent.left
-                    anchors.bottom: parent.top
-                    menu: VclMenu {
-                        id: layoutGroupingMenu
-                        width: 350
-
-                        VclMenuItem {
-                            text: "None"
-                            icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-                            font.bold: Scrite.document.structure.preferredGroupCategory === ""
-                            onTriggered: Scrite.document.structure.preferredGroupCategory = ""
-                        }
-
-                        MenuSeparator { }
-
-                        Repeater {
-                            model: Scrite.document.structure.groupCategories
-
-                            VclMenuItem {
-                                text: Scrite.app.camelCased(modelData)
-                                icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-                                font.bold: Scrite.document.structure.preferredGroupCategory === modelData
-                                onTriggered: Scrite.document.structure.preferredGroupCategory = modelData
-                            }
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.borderColor
-            }
-        }
-
-        ZoomSlider {
-            id: zoomSlider
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            property var zoomLevels: screenplayFormat.fontZoomLevels
-            zoomLevel: zoomLevels[value]
-            from: 0; to: zoomLevels.length-1
-            height: parent.height-6
-            stepSize: 1
-            zoomSliderVisible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
-            function reset() {
-                var zls = zoomLevels
-                for(var i=0; i<zls.length; i++) {
-                    if(zls[i] === 1) {
-                        value = i
-                        return
-                    }
-                }
-            }
-
-            onValueChanged: screenplayFormat.fontZoomLevelIndex = value
-            Component.onCompleted: {
-                reset()
-                value = value + zoomLevelModifier
-                screenplayFormat.fontZoomLevelIndex = value
-            }
-
-            function zoomLevelModifierToApply() {
-                var zls = zoomLevels
-                var oneLevel = value
-                for(var i=0; i<zls.length; i++) {
-                    if(zls[i] === 1) {
-                        oneLevel = i
-                        break
-                    }
-                }
-                return value - oneLevel
-            }
-
-            Connections {
-                target: screenplayFormat
-                function onFontZoomLevelIndexChanged() {
-                    if(!Scrite.document.empty)
-                        zoomSlider.value = screenplayFormat.fontZoomLevelIndex
-                }
-            }
-
-            Connections {
-                target: Scrite.app.transliterationEngine
-                function onPreferredFontFamilyForLanguageChanged() {
-                    const oldValue = zoomSlider.value
-                    zoomSlider.value = screenplayFormat.fontZoomLevelIndex
-                    Qt.callLater( (val) => { zoomSlider.value = val }, oldValue )
-                }
-            }
-
-            property int savedZoomValue: -1
-
-            Announcement.onIncoming: (type,data) => {
-                                         const stype = "" + type
-                                         const sdata = "" + data
-                                         if(stype === "DF77A452-FDB2-405C-8A0F-E48982012D36") {
-                                             if(sdata === "save") {
-                                                 zoomSlider.savedZoomValue = zoomSlider.value
-                                                 zoomSlider.reset()
-                                             } else if(sdata === "restore") {
-                                                 if(zoomSlider.savedZoomValue >= 0)
-                                                    zoomSlider.value = zoomSlider.savedZoomValue
-                                                 zoomSlider.savedZoomValue = -1
-                                             }
-                                         }
-                                     }
-        }
     }
 
     Component {
         id: episodeBreakComponent
 
-        Rectangle {
-            id: episodeBreakItem
-            property int theIndex: componentIndex
-            property Scene theScene: componentData.scene
-            property ScreenplayElement theElement: componentData.screenplayElement
-            height: episodeBreakSubtitle.height + headingFontMetrics.lineSpacing*0.1
-            color: Runtime.colors.primary.c10.background
+        ScreenplayElementBreakDelegate {
+            // TODO: We should avoid leap-of-faith context variable access.
+            // So, componentData is absurd from that perspective.
 
-            TextField {
-                id: episodeBreakTitle
-                maximumLength: 5
-                width: headingFontMetrics.averageCharacterWidth*maximumLength
-                anchors.right: episodeBreakSubtitle.left
-                anchors.rightMargin: ruler.leftMarginPx * 0.075
-                anchors.bottom: parent.bottom
-                horizontalAlignment: Text.AlignRight
-                text: "Ep " + (theElement.episodeIndex+1)
-                readOnly: true
-                visible: episodeBreakSubtitle.length > 0
-                font: episodeBreakSubtitle.font
-                background: Item { }
-                            }
+            font.bold: true
+            font.family: _headingFontMetrics.font.family
+            font.pointSize: _headingFontMetrics.font.pointSize+2
 
-            VclTextField {
-                id: episodeBreakSubtitle
-                label: ""
-                anchors.left: parent.left
-                anchors.right: deleteBreakButton.left
-                anchors.leftMargin: ruler.leftMarginPx
-                anchors.rightMargin: 5
-                anchors.bottom: parent.bottom
-                placeholderText: theElement.breakTitle
-                font.family: headingFontMetrics.font.family
-                font.bold: true
-                font.pointSize: headingFontMetrics.font.pointSize+2
-                text: theElement.breakSubtitle
-                enableTransliteration: true
-                onTextEdited: theElement.breakSubtitle = text
-                onEditingComplete: theElement.breakSubtitle = text
-            }
-
-            FlatToolButton {
-                id: deleteBreakButton
-                iconSource: "qrc:/icons/action/delete.png"
-                width: headingFontMetrics.lineSpacing
-                height: headingFontMetrics.lineSpacing
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: ruler.rightMarginPx
-                onClicked: Runtime.screenplayAdapter.screenplay.removeElement(episodeBreakItem.theElement)
-                ToolTip.text: "Deletes this episode break."
-            }
+            documentMargins: Utils.rectFromMargins(ruler.leftMarginPx, ruler.topMarginPx, ruler.rightMarginPx, ruler.bottomMarginPx)
+            screenplayElement: componentData.screenplayElement
         }
     }
 
     Component {
         id: actBreakComponent
 
-        Rectangle {
-            id: actBreakItem
-            property int theIndex: componentIndex
-            property Scene theScene: componentData.scene
-            property ScreenplayElement theElement: componentData.screenplayElement
-            height: actBreakTitle.height
-            color: Runtime.colors.primary.c10.background
+        ScreenplayElementBreakDelegate {
+            // TODO: We should avoid leap-of-faith context variable access.
+            // So, componentData is absurd from that perspective.
 
-            TextField {
-                id: actBreakTitle
-                maximumLength: 7
-                width: headingFontMetrics.averageCharacterWidth*maximumLength
-                anchors.right: actBreakSubtitle.left
-                anchors.rightMargin: ruler.leftMarginPx * 0.075
-                anchors.bottom: parent.bottom
-                horizontalAlignment: Text.AlignRight
-                text: theElement.breakTitle
-                readOnly: true
-                visible: actBreakSubtitle.length > 0
-                font: actBreakSubtitle.font
-                background: Item { }
-            }
+            font.bold: true
+            font.family: _headingFontMetrics.font.family
+            font.pointSize: _headingFontMetrics.font.pointSize+2
 
-            VclTextField {
-                id: actBreakSubtitle
-                label: ""
-                anchors.left: parent.left
-                anchors.right: deleteBreakButton.left
-                anchors.leftMargin: ruler.leftMarginPx
-                anchors.rightMargin: 5
-                anchors.bottom: parent.bottom
-                placeholderText: theElement.breakTitle
-                font.family: headingFontMetrics.font.family
-                font.bold: true
-                font.pointSize: headingFontMetrics.font.pointSize+2
-                text: theElement.breakSubtitle
-                enableTransliteration: true
-                onTextEdited: theElement.breakSubtitle = text
-                onEditingComplete: theElement.breakSubtitle = text
-            }
-
-            FlatToolButton {
-                id: deleteBreakButton
-                iconSource: "qrc:/icons/action/delete.png"
-                width: headingFontMetrics.lineSpacing
-                height: headingFontMetrics.lineSpacing
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.right: parent.right
-                anchors.rightMargin: ruler.rightMarginPx
-                onClicked: Runtime.screenplayAdapter.screenplay.removeElement(actBreakItem.theElement)
-                ToolTip.text: "Deletes this act break."
-            }
+            documentMargins: Utils.rectFromMargins(ruler.leftMarginPx, ruler.topMarginPx, ruler.rightMarginPx, ruler.bottomMarginPx)
+            screenplayElement: componentData.screenplayElement
         }
     }
 
@@ -1406,7 +838,7 @@ Rectangle {
                 anchors.verticalCenter: sceneHeadingText.verticalCenter
                 anchors.right: sceneHeadingText.left
                 anchors.rightMargin: 20
-                width: headingFontMetrics.averageCharacterWidth*5
+                width: _headingFontMetrics.averageCharacterWidth*5
                 color: screenplayElement.hasUserSceneNumber ? "black" : "gray"
                 text: screenplayElement.resolvedSceneNumber
             }
@@ -1562,7 +994,7 @@ Rectangle {
                 shots: Scrite.document.structure.shots
                 transitions: Scrite.document.structure.transitions
                 characterNames: Scrite.document.structure.characterNames
-                screenplayFormat: screenplayEditor.screenplayFormat
+                screenplayFormat: root.screenplayFormat
                 screenplayElement: contentItem.theElement
                 forceSyncDocument: !sceneTextEditor.activeFocus
                 spellCheckEnabled: !Scrite.document.readOnly && spellCheckEnabledFlag.value
@@ -1606,7 +1038,7 @@ Rectangle {
                         ruler.paragraphLeftMargin = 0
                         ruler.paragraphRightMargin = 0
                     } else {
-                        var elementFormat = screenplayEditor.screenplayFormat.elementFormat(currentParagraphType)
+                        var elementFormat = root.screenplayFormat.elementFormat(currentParagraphType)
                         ruler.paragraphLeftMargin = ruler.leftMargin + pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
                         ruler.paragraphRightMargin = ruler.rightMargin + pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
                     }
@@ -1631,7 +1063,7 @@ Rectangle {
                 id: commentsSidePanel
 
                 property color theSceneDarkColor: Scrite.app.isLightColor(contentItem.theScene.color) ? Runtime.colors.primary.c500.background : contentItem.theScene.color
-                property real screenY: screenplayEditor.mapFromItem(parent, 0, 0).y
+                property real screenY: root.mapFromItem(parent, 0, 0).y
                 property real maxTopMargin: contentItem.height-height-20
 
                 z: contentItem.isCurrent ? 1 : 0
@@ -1732,7 +1164,7 @@ Rectangle {
                 Connections {
                     target: contentView
                     function onContentYChanged() {
-                        commentsSidePanel.screenY = screenplayEditor.mapFromItem(commentsSidePanel.parent, 0, 0).y
+                        commentsSidePanel.screenY = root.mapFromItem(commentsSidePanel.parent, 0, 0).y
                     }
                 }
 
@@ -2119,7 +1551,7 @@ Rectangle {
 
                         ResetOnChange {
                             id: document
-                            trackChangesOn: sceneDocumentBinder.documentLoadCount + zoomSlider.value
+                            trackChangesOn: sceneDocumentBinder.documentLoadCount + _statusBar.zoomSlider.value
                             from: null
                             to: Runtime.screenplayTextDocument.paused ? null : Runtime.screenplayTextDocument
                             delay: 100
@@ -2882,7 +2314,7 @@ Rectangle {
                     }
 
                     Connections {
-                        target: searchAgents.count > 0 ? searchAgents.itemAt(0).SearchAgent : null
+                        target: _searchBarArea.searchAgent
                         ignoreUnknownSignals: true
                         function onReplaceCurrent(replacementText) {
                             if(textDocumentSearch.currentResultIndex >= 0) {
@@ -3177,10 +2609,10 @@ Rectangle {
 
                     Row {
                         anchors.verticalCenter: sceneNumberField.verticalCenter
-                        anchors.verticalCenterOffset: -headingFontMetrics.descent
+                        anchors.verticalCenterOffset: -_headingFontMetrics.descent
 
                         Loader {
-                            width: headingFontMetrics.height
+                            width: _headingFontMetrics.height
                             height: width
                             active: Runtime.screenplayEditorSettings.longSceneWarningEnabled && headingItem.theScene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
 
@@ -3203,7 +2635,7 @@ Rectangle {
                         }
 
                         SceneTypeImage {
-                            width: headingFontMetrics.height
+                            width: _headingFontMetrics.height
                             height: width
                             lightBackground: Scrite.app.isLightColor(headingItem.color)
                             sceneType: headingItem.theScene.type
@@ -3215,10 +2647,10 @@ Rectangle {
                         id: sceneNumberField
                         label: cursorVisible ? "Scene No." : ""
                         labelAlwaysVisible: false
-                        width: headingFontMetrics.averageCharacterWidth*maximumLength
+                        width: _headingFontMetrics.averageCharacterWidth*maximumLength
                         text: headingItem.theElement.userSceneNumber
                         anchors.bottom: parent.bottom
-                        font: headingFontMetrics.font
+                        font: _headingFontMetrics.font
                         onTextChanged: headingItem.theElement.userSceneNumber = text
                         maximumLength: 5
                         background: Item { }
@@ -3259,10 +2691,10 @@ Rectangle {
                         id: sceneHeadingFieldArea
                         anchors.left: parent.left
                         anchors.right: sceneTaggingButton.visible ? sceneTaggingButton.left : sceneMenuButton.left
-                        height: headingFontMetrics.lineSpacing * lineCount
-                        property int lineCount: Math.ceil((sceneHeadingField.length * headingFontMetrics.averageCharacterWidth)/width)
+                        height: _headingFontMetrics.lineSpacing * lineCount
+                        property int lineCount: Math.ceil((sceneHeadingField.length * _headingFontMetrics.averageCharacterWidth)/width)
                         anchors.verticalCenter: parent.verticalCenter
-                        anchors.verticalCenterOffset: headingFontMetrics.descent
+                        anchors.verticalCenterOffset: _headingFontMetrics.descent
 
                         VclTextField {
                             id: sceneHeadingField
@@ -3291,14 +2723,14 @@ Rectangle {
                             label: ""
                             placeholderText: sceneHeading.enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
                             maximumLength: 140
-                            font.family: headingFontMetrics.font.family
-                            font.pointSize: headingFontMetrics.font.pointSize
-                            font.bold: headingFontMetrics.font.bold
-                            font.underline: headingFontMetrics.font.underline
-                            font.italic: headingFontMetrics.font.italic
-                            font.letterSpacing: headingFontMetrics.font.letterSpacing
+                            font.family: _headingFontMetrics.font.family
+                            font.pointSize: _headingFontMetrics.font.pointSize
+                            font.bold: _headingFontMetrics.font.bold
+                            font.underline: _headingFontMetrics.font.underline
+                            font.italic: _headingFontMetrics.font.italic
+                            font.letterSpacing: _headingFontMetrics.font.letterSpacing
                             font.capitalization: activeFocus ? (currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
-                            color: headingItem.theElement.omitted ? "gray" : headingFontMetrics.format.textColor
+                            color: headingItem.theElement.omitted ? "gray" : _headingFontMetrics.format.textColor
                             wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                             background: Item { }
                             onEditingComplete: updateSceneHeading(text)
@@ -3386,8 +2818,8 @@ Rectangle {
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.right: sceneMenuButton.left
                         anchors.rightMargin: parent.spacing
-                        width: headingFontMetrics.lineSpacing
-                        height: headingFontMetrics.lineSpacing
+                        width: _headingFontMetrics.lineSpacing
+                        height: _headingFontMetrics.lineSpacing
                         ToolTip.text: "Tag Scene"
 
                         MenuLoader {
@@ -3418,8 +2850,8 @@ Rectangle {
                         down: sceneMenu.visible
                         anchors.right: parent.right
                         anchors.verticalCenter: parent.verticalCenter
-                        width: headingFontMetrics.lineSpacing
-                        height: headingFontMetrics.lineSpacing
+                        width: _headingFontMetrics.lineSpacing
+                        height: _headingFontMetrics.lineSpacing
                         visible: enabled
                         enabled: !Scrite.document.readOnly
 
@@ -3663,7 +3095,7 @@ Rectangle {
     }
 
     FontMetrics {
-        id: headingFontMetrics
+        id: _headingFontMetrics
         readonly property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Heading)
         font: format.font2
     }
@@ -3706,8 +3138,8 @@ Rectangle {
                     enabled: !Scrite.document.readOnly
                     topPadding: Math.max(5, 5 * zoomLevel); bottomPadding: topPadding
                     leftPadding: Math.max(10, 10 * zoomLevel); rightPadding: leftPadding
-                    font.family: headingFontMetrics.font.family
-                    font.capitalization: headingFontMetrics.font.capitalization
+                    font.family: _headingFontMetrics.font.family
+                    font.capitalization: _headingFontMetrics.font.capitalization
                     font.pointSize: sceneHeadingFieldsFontPointSize
                     onClicked: requestCharacterMenu(modelData, characterNameLabel)
                     onCloseRequest: {
@@ -3751,8 +3183,8 @@ Rectangle {
                         width: parent.width
                         y: fontDescent
                         readOnly: false
-                        font.family: headingFontMetrics.font.family
-                        font.capitalization: headingFontMetrics.font.capitalization
+                        font.family: _headingFontMetrics.font.family
+                        font.capitalization: _headingFontMetrics.font.capitalization
                         font.pointSize: sceneHeadingFieldsFontPointSize
                         horizontalAlignment: Text.AlignLeft
                         wrapMode: Text.NoWrap
@@ -3812,7 +3244,7 @@ Rectangle {
         id: sidePanels
         anchors.top: screenplayEditorWorkspace.top
         anchors.left: parent.left
-        anchors.bottom: statusBar.top
+        anchors.bottom: _statusBar.top
         anchors.topMargin: 5
         anchors.bottomMargin: 5
         width: sceneListSidePanel.visible ? sceneListSidePanel.width : 0
@@ -4134,7 +3566,7 @@ Rectangle {
 
                                         property bool textIsSceneHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
 
-                                        font.family: headingFontMetrics.font.family
+                                        font.family: _headingFontMetrics.font.family
                                         font.bold: Runtime.screenplayAdapter.currentIndex === index || delegateItem.elementIsBreak
                                         // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                                         verticalAlignment: Qt.AlignVCenter
@@ -4477,65 +3909,17 @@ Rectangle {
     }
 
     function requestCharacterMenu(characterName, popupSource) {
-        characterMenu.popupSource = popupSource
-        characterMenu.characterName = characterName
-        characterMenu.popup()
+        _characterMenu.popupSource = popupSource
+        _characterMenu.characterName = characterName
+        _characterMenu.popup()
     }
 
-    VclMenu {
-        id: characterMenu
+    ScreenplayEditorCharacterMenu {
+        id: _characterMenu
 
-        property Item popupSource
-        property string characterName
-
-        width: 350
-
-        onAboutToHide: {
-            popupSource = null
-            characterName = ""
-        }
-
-        Repeater {
-            model: Runtime.characterListReports
-
-            VclMenuItem {
-                required property var modelData
-
-                text: modelData.name
-                icon.source: "qrc" + modelData.icon
-
-                onTriggered: ReportConfigurationDialog.launch(modelData.name,
-                                                              {"characterNames": [characterMenu.characterName]},
-                                                              {"initialPage": modelData.group})
-            }
-        }
-
-        Repeater {
-            model: Runtime.characterListReports.length > 0 ? additionalCharacterMenuItems : []
-
-            VclMenuItem {
-                required property var modelData
-                text: modelData.name
-                icon.source: "qrc" + modelData.icon
-
-                onTriggered: additionalCharacterMenuItemClicked(characterMenu.characterName, modelData.name)
-            }
-        }
-
-        Repeater {
-            model: Runtime.characterListReports.length > 0 ? 1 : 0
-
-            VclMenuItem {
-                text: "Rename/Merge Character"
-                icon.source: "qrc:/icons/screenplay/character.png"
-
-                onTriggered: {
-                    const character = Scrite.document.structure.addCharacter(characterMenu.characterName)
-                    if(character)
-                        RenameCharacterDialog.launch(character)
-                }
-            }
-        }
+        onAdditionalCharacterMenuItemClicked: (characterName, menuItemName) => {
+                                                  root.additionalCharacterMenuItemClicked(characterName, menuItemName)
+                                              }
     }
 
     Component {
@@ -4761,7 +4145,7 @@ Rectangle {
     Component.onCompleted: {
         restoreLayoutDetails()
 
-        Runtime.screenplayEditor = screenplayEditor
+        Runtime.screenplayEditor = root
         if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab)
             Scrite.user.logActivity1("screenplay")
 
@@ -4791,7 +4175,7 @@ Rectangle {
         }
     }
 
-    property real sceneHeadingFieldsFontPointSize: Math.max(headingFontMetrics.font.pointSize*0.7, 6)
+    property real sceneHeadingFieldsFontPointSize: Math.max(_headingFontMetrics.font.pointSize*0.7, 6)
 
     Rectangle {
         anchors.fill: parent

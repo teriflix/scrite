@@ -56,6 +56,11 @@ public:
     QRectF boundingBox() const { return m_boundingBox; }
     Q_SIGNAL void boundingBoxChanged();
 
+    // Bounding box without initialRect consideration
+    Q_PROPERTY(QRectF tightBoundingBox READ tightBoundingBox NOTIFY tightBoundingBox)
+    QRectF tightBoundingBox() const { return m_tightBoundingBox; }
+    Q_SIGNAL void tightBoundingBoxChanged();
+
     Q_PROPERTY(qreal x READ x NOTIFY boundingBoxChanged)
     qreal x() const { return m_boundingBox.x(); }
 
@@ -106,6 +111,7 @@ public:
 protected:
     void timerEvent(QTimerEvent *event);
     void setBoundingBox(const QRectF &val);
+    void setTightBoundingBox(const QRectF &val);
     void evaluateLater() { m_evaluationTimer.start(100, this); }
     void evaluateNow();
 
@@ -127,6 +133,7 @@ private:
     qreal m_previewScale = 1.0;
     QRectF m_initialRect;
     QRectF m_boundingBox;
+    QRectF m_tightBoundingBox;
     QThreadPool m_threadPool;
     mutable QMutex m_previewLock;
     ExecLaterTimer m_evaluationTimer;

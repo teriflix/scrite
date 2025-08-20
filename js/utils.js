@@ -12,6 +12,10 @@ function execLater(contextObject, delay, callback, args)
     timer.start()
 }
 
+function rectFromMargins(left, top, right, bottom) {
+    return Qt.rect(left, top, right-left+1, bottom-top+1)
+}
+
 function newAnnotation(parent, type, geometry, config) {
     if(!parent || !type || !geometry)
         return null

@@ -24,7 +24,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
-import "qrc:/qml/screenplay"
+import "qrc:/qml/screenplayeditor"
 import "qrc:/qml/timelineview"
 
 Item {

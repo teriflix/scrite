@@ -20,108 +20,124 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 /**
-  ToolButton from QtQuick.Controls is what we normally use in Scrite.
-  ToolButton2 customises the built-in ToolButton to provide a standard behaviour
-    across all tool-buttons in Scrite.
+ToolButton from QtQuick.Controls is what we normally use in Scrite.
+ToolButton2 customises the built-in ToolButton to provide a standard behaviour
+across all tool-buttons in Scrite.
 
-  This component (ToolButton3) is for use specifically in the new main-window toolbar.
-  This new toolbar design is based on UI/UX suggestions from Surya Vasishta.
-  */
+This component (ToolButton3) is for use specifically in the new main-window toolbar.
+This new toolbar design is based on UI/UX suggestions from Surya Vasishta.
+*/
 
 Item {
-    id: toolButton
+    id: root
 
-    property string iconSource: ""
+    property int menuArrow: Qt.RightArrow
+
     property real suggestedWidth: 42
     property real suggestedHeight: suggestedWidth
-    property alias shortcut: toolButtonShortcut.sequence
-    property string shortcutText: toolButtonShortcut.portableText
-    property bool down: toolButtonMouseArea.pressed
-    property alias downIndicatorColor: downIndicator.color
-    property bool checkable: false
-    property bool checked: false
-    property alias hovered: toolButtonMouseArea.containsMouse
+
+    property alias hovered: _mouseArea.containsMouse
+    property alias margins: _icon.anchorMargins
+    property alias shortcut: _shortcut.sequence
+    property alias toolButtonImage: _icon
+    property alias downIndicatorColor: _downIndicator.color
+
     property string text
-    property bool autoRepeat: false
-    property alias toolButtonImage: iconImage
+    property string iconSource: ""
+    property string shortcutText: _shortcut.portableText
+
+    property bool down: _mouseArea.pressed
     property bool hasMenu: false
-    property int menuArrow: Qt.RightArrow
+    property bool checked: false
+    property bool checkable: false
+    property bool autoRepeat: false
+
+    readonly property alias containsMouse: _mouseArea.containsMouse
 
     signal toggled()
     signal clicked()
 
-    implicitWidth: suggestedWidth
-    implicitHeight: suggestedHeight
+    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
+    ToolTip.visible: ToolTip.text === "" ? false : (_mouseArea.containsMouse && !down)
+    ToolTip.delay: 500
 
     width: suggestedWidth
     height: suggestedHeight
+
+    implicitWidth: suggestedWidth
+    implicitHeight: suggestedHeight
+
     opacity: enabled ? 1 : 0.5
 
     Rectangle {
-        id: downIndicator
+        id: _downIndicator
+
         anchors.fill: parent
+
         color: Qt.rgba(0,0,0,0.15)
         visible: parent.checkable && parent.checked || parent.down
     }
 
     Image {
-        id: iconImage
-        z: 1
-        anchors.fill: parent
-        anchors.margins: anchorMargins
-        source: parent.iconSource
-        fillMode: Image.PreserveAspectFit
-        smooth: true
-        mipmap: true
-        opacity: enabled ? (toolButtonMouseArea.containsMouse ? 1 : 0.9) : 0.45
+        id: _icon
+
         property real anchorMargins: {
-            var am = toolButtonMouseArea.containsMouse ? 8 : 10
+            const am = _mouseArea.containsMouse ? 8 : 10
             return parent.width-2*am < 16 ? (parent.width*0.15) : am
         }
+
+        anchors.fill: parent
+        anchors.margins: anchorMargins
+
+        z: 1
+        source: parent.iconSource
+        smooth: true
+        mipmap: true
+        opacity: enabled ? (_mouseArea.containsMouse ? 1 : 0.9) : 0.45
+        fillMode: Image.PreserveAspectFit
+
         Behavior on anchorMargins {
-            enabled: iconImage.anchorMargins > 0 && Runtime.applicationSettings.enableAnimations
-            NumberAnimation {
-                duration: 250
-            }
+            enabled: _icon.anchorMargins > 0 && Runtime.applicationSettings.enableAnimations
+            NumberAnimation { duration: 250 }
         }
     }
 
     Image {
-        visible: hasMenu
+        anchors.right: menuArrow === Qt.RightArrow ? parent.right : undefined
+        anchors.rightMargin: menuArrow === Qt.RightArrow ? -parent.width/10 : 0
+        anchors.verticalCenter: menuArrow === Qt.RightArrow ? parent.verticalCenter : undefined
+
+        anchors.bottom: menuArrow === Qt.DownArrow ? parent.bottom : undefined
+        anchors.bottomMargin:  menuArrow === Qt.DownArrow ? -parent.height/10 : 0
+        anchors.horizontalCenter: menuArrow === Qt.DownArrow ? parent.horizontalCenter : undefined
+
         width: parent.width/2.5
         height: parent.height/2.5
 
-        anchors.verticalCenter: menuArrow === Qt.RightArrow ? parent.verticalCenter : undefined
-        anchors.right: menuArrow === Qt.RightArrow ? parent.right : undefined
-        anchors.rightMargin: menuArrow === Qt.RightArrow ? -parent.width/10 : 0
+        visible: hasMenu
 
-        anchors.horizontalCenter: menuArrow === Qt.DownArrow ? parent.horizontalCenter : undefined
-        anchors.bottom: menuArrow === Qt.DownArrow ? parent.bottom : undefined
-        anchors.bottomMargin:  menuArrow === Qt.DownArrow ? -parent.height/10 : 0
-
-        fillMode: Image.PreserveAspectFit
-        opacity: iconImage.opacity
         source: menuArrow === Qt.RightArrow ? "qrc:/icons/navigation/arrow_right.png" : "qrc:/icons/navigation/arrow_down.png"
+        opacity: _icon.opacity
+        fillMode: Image.PreserveAspectFit
     }
 
     Shortcut {
-        id: toolButtonShortcut
+        id: _shortcut
+
         context: Qt.ApplicationShortcut
         enabled: Runtime.allowAppUsage
-        onActivated: toolButton.click()
+
+        onActivated: root.click()
     }
 
-    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
-    ToolTip.visible: ToolTip.text === "" ? false : (toolButtonMouseArea.containsMouse && !down)
-    ToolTip.delay: 500
-
-    property bool containsMouse: toolButtonMouseArea.containsMouse
-
     MouseArea {
-        id: toolButtonMouseArea
+        id: _mouseArea
+
         anchors.fill: parent
+
         hoverEnabled: true
-        onClicked: toolButton.click()
+
+        onClicked: root.click()
     }
 
     function click() {

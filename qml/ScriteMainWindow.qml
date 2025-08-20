@@ -29,7 +29,7 @@ import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/scrited"
 import "qrc:/qml/controls"
-import "qrc:/qml/screenplay"
+import "qrc:/qml/screenplayeditor"
 import "qrc:/qml/notifications"
 import "qrc:/qml/floatingdockpanels"
 

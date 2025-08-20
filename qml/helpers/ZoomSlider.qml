@@ -30,19 +30,24 @@ Row {
     property alias zoomLevel: zoomSlider.zoomLevel
     property alias zoomSliderVisible: zoomSlider.visible
 
-    signal zoomOutRequest()
-    signal zoomInRequest()
     signal sliderMoved()
+    signal zoomInRequest()
+    signal zoomOutRequest()
 
     FlatToolButton {
         id: decrZoom
+
+        ToolTip.text: "Zoom Out"
+
+        anchors.verticalCenter: parent.verticalCenter
+
         suggestedWidth: parent.height
         suggestedHeight: parent.height
-        iconSource: "qrc:/icons/navigation/zoom_out.png"
-        autoRepeat: true
-        ToolTip.text: "Zoom Out"
-        anchors.verticalCenter: parent.verticalCenter
+
         enabled: zoomSlider.value > zoomSlider.from
+        autoRepeat: true
+        iconSource: "qrc:/icons/navigation/zoom_out.png"
+
         onClicked: {
             if(zoomSlider.stepSize > 0)
                 zoomSlider.value = zoomSlider.value-zoomSlider.stepSize
@@ -53,23 +58,34 @@ Row {
 
     Slider {
         id: zoomSlider
-        orientation: Qt.Horizontal
-        from: 0.4; to: 2; value: 1
-        stepSize: 0.1
+
         property real zoomLevel: value
+
         anchors.verticalCenter: parent.verticalCenter
+
+        to: 2
+        from: 0.4
+        value: 1
+        stepSize: 0.1
+        orientation: Qt.Horizontal
+
         onMoved: sliderMoved()
     }
 
     FlatToolButton {
         id: incrZoom
+
+        ToolTip.text: "Zoom In"
+
+        anchors.verticalCenter: parent.verticalCenter
+
         suggestedWidth: parent.height
         suggestedHeight: parent.height
-        iconSource: "qrc:/icons/navigation/zoom_in.png"
-        autoRepeat: true
-        ToolTip.text: "Zoom In"
-        anchors.verticalCenter: parent.verticalCenter
+
         enabled: zoomSlider.value < zoomSlider.to
+        autoRepeat: true
+        iconSource: "qrc:/icons/navigation/zoom_in.png"
+
         onClicked: {
             if(zoomSlider.stepSize > 0)
                 zoomSlider.value = zoomSlider.value+zoomSlider.stepSize
@@ -82,16 +98,14 @@ Row {
 
     VclLabel {
         id: percentText
-        anchors.verticalCenter: parent.verticalCenter
-        text: Math.round(zoomSlider.zoomLevel * 100) + "%"
-        horizontalAlignment: Text.AlignRight
-        width: fontMetrics.advanceWidth("999%")
-        font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-        FontMetrics {
-            id: fontMetrics
-            font: percentText.font
-        }
+        anchors.verticalCenter: parent.verticalCenter
+
+        width: Runtime.minimumFontMetrics.advanceWidth("999%")
+
+        text: Math.round(zoomSlider.zoomLevel * 100) + "%"
+        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+        horizontalAlignment: Text.AlignRight
     }
 
     Item { width: parent.height/3; height: parent.height }
