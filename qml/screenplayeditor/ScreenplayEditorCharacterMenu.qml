@@ -32,6 +32,8 @@ VclMenu {
 
     property string characterName
 
+    property var additionalCharacterMenuItems: []
+
     signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
 
     width: 350

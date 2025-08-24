@@ -227,6 +227,19 @@
         <file>qml/screenplayeditor/ScreenplayEditorStatusBar.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorCharacterMenu.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
-        <file>qml/screenplayeditor/ScreenplayElementBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/AbstractScreenplayElementBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/AbstractScreenplayElementDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/OmittedScreenplayElementDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementPlaceholderDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayEpisodeBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayActBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayIntervalBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementSceneDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/AbstractScenePartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneHeadingPartEditor.qml</file>
+        <file>qml/helpers/SceneHeadingTextField.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneCharacterListPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneStoryBeatTagsPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneSynopsisPartEditor.qml</file>
     </qresource>
 </RCC>

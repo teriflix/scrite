@@ -1663,6 +1663,42 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
 #endif
 }
 
+void Scene::setTags(const QStringList &val)
+{
+    if (m_tags == val)
+        return;
+
+    m_tags = val;
+    emit tagsChanged();
+}
+
+void Scene::addTag(const QString &tag)
+{
+    if (this->hasTag(tag))
+        return;
+
+    QStringList tags = m_tags;
+    tags << tag;
+    std::sort(tags.begin(), tags.end(), [](const QString &a, const QString &b) {
+        return QString::localeAwareCompare(a.toLower(), b.toLower()) < 0;
+    });
+
+    this->setTags(tags);
+}
+
+void Scene::removeTag(const QString &tag)
+{
+    if (this->hasTag(tag)) {
+        m_tags.removeOne(tag);
+        emit tagsChanged();
+    }
+}
+
+bool Scene::hasTag(const QString &tag) const
+{
+    return m_tags.contains(tag, Qt::CaseInsensitive);
+}
+
 QQmlListProperty<SceneElement> Scene::elements()
 {
     return QQmlListProperty<SceneElement>(reinterpret_cast<QObject *>(this),

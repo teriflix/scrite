@@ -25,6 +25,7 @@
 #include "screenplaytextdocument.h"
 
 #include <QDir>
+#include <QSet>
 #include <QtMath>
 #include <QStack>
 #include <QBuffer>
@@ -302,6 +303,8 @@ void StructureElement::setScene(Scene *val)
             &StructureElement::sceneHeadingChanged);
     connect(m_scene->heading(), &SceneHeading::locationChanged, this,
             &StructureElement::sceneLocationChanged);
+
+    connect(m_scene, &Scene::tagsChanged, m_structure, &Structure::updateSceneTagsLater);
 
     emit sceneChanged();
 }
@@ -5095,6 +5098,28 @@ void Structure::updateCharacterNamesShotsTransitionsAndTags()
 void Structure::updateCharacterNamesShotsTransitionsAndTagsLater()
 {
     m_updateCharacterNamesShotsTransitionsAndTagsTimer.start(0, this);
+}
+
+void Structure::updateSceneTags()
+{
+    QSet<QString> allTags;
+
+    for (const StructureElement *element : qAsConst(m_elements)) {
+        const Scene *scene = element->scene();
+        const QStringList tags = scene->tags();
+        allTags += QSet<QString>(tags.begin(), tags.end());
+    }
+
+    const QStringList allTags2 = QStringList(allTags.begin(), allTags.end());
+    if (m_sceneTags != allTags2) {
+        m_sceneTags = allTags2;
+        emit sceneTagsChanged();
+    }
+}
+
+void Structure::updateSceneTagsLater()
+{
+    m_updateSceneTagsTimer.start(0, this);
 }
 
 void Structure::staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr)
