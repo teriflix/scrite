@@ -23,6 +23,7 @@ RectangleTabView 1.0 RectangleTabView.qml
 RichTextEdit 1.0 RichTextEdit.qml
 RubberBand 1.0 RubberBand.qml
 SceneFeaturedImage 1.0 SceneFeaturedImage.qml
+SceneHeadingTextField 1.0 SceneHeadingTextField.qml
 SceneTypeImage 1.0 SceneTypeImage.qml
 ScrollArea 1.0 ScrollArea.qml
 SearchBar 1.0 SearchBar.qml

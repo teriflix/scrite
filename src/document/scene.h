@@ -462,6 +462,15 @@ public:
     Q_INVOKABLE bool isInGroup(const QString &group) const;
     void verifyGroups(const QJsonArray &groupsModel);
 
+    Q_PROPERTY(QStringList tags READ tags WRITE setTags NOTIFY tagsChanged)
+    void setTags(const QStringList &val);
+    QStringList tags() const { return m_tags; }
+    Q_SIGNAL void tagsChanged();
+
+    Q_INVOKABLE void addTag(const QString &tag);
+    Q_INVOKABLE void removeTag(const QString &tag);
+    Q_INVOKABLE bool hasTag(const QString &tag) const;
+
     Q_PROPERTY(int wordCount READ wordCount NOTIFY wordCountChanged)
     int wordCount() const { return m_wordCount; }
     Q_SIGNAL void wordCountChanged();
@@ -586,6 +595,7 @@ private:
     QColor m_color = QColor(Qt::white);
     QString m_synopsis;
     QString m_comments;
+    QStringList m_tags;
     QStringList m_groups;
     QStringList m_indexCardFieldValues;
     int m_actIndex = -1;

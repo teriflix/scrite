@@ -931,6 +931,10 @@ public:
     QStringList characterTags() const { return m_characterTags; }
     Q_SIGNAL void characterTagsChanged();
 
+    Q_PROPERTY(QStringList sceneTags READ sceneTags NOTIFY sceneTagsChanged)
+    QStringList sceneTags() const { return m_sceneTags; }
+    Q_SIGNAL void sceneTagsChanged();
+
     QStringList filteredCharacterNames(const QStringList &tags) const;
 
     Q_PROPERTY(QAbstractListModel *annotationsModel READ annotationsModel CONSTANT STORED false)
@@ -1101,14 +1105,19 @@ private:
     void onAboutToRemoveSceneElement(SceneElement *element);
     void updateCharacterNamesShotsTransitionsAndTags();
     void updateCharacterNamesShotsTransitionsAndTagsLater();
+    void updateSceneTags();
+    void updateSceneTagsLater();
+
     ExecLaterTimer m_updateCharacterNamesShotsTransitionsAndTagsTimer;
+    ExecLaterTimer m_updateSceneTagsTimer;
     CharacterElementMap m_characterElementMap;
     TransitionElementMap m_transitionElementMap;
     ShotElementMap m_shotElementMap;
+    QStringList m_shots;
+    QStringList m_sceneTags;
+    QStringList m_transitions;
     QStringList m_characterTags;
     QStringList m_characterNames;
-    QStringList m_shots;
-    QStringList m_transitions;
 
     static void staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr);
     static void staticClearAnnotations(QQmlListProperty<Annotation> *list);

@@ -44,6 +44,12 @@ Item {
     property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
     readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
+    readonly property color headingColorTint: "#E7FFFFFF"
+
+    // Global functions
+    function tintSceneHeadingColor(sceneColor) {
+        return Qt.tint(sceneColor, headingColorTint)
+    }
 
     // Persistent Settings
     readonly property Settings userAccountDialogSettings: Settings {
@@ -94,6 +100,7 @@ Item {
         fileName: Scrite.app.settingsFilePath
         category: "Screenplay Editor"
 
+        property bool placeholderContentInterval: 500 // ms after which placeholder is swapped to content in delegates
         property bool screenplayEditorAddButtonsAnimationShown: false
         property bool refreshButtonInStatsReportAnimationDone: false
         property bool firstSwitchToStructureTab: true
@@ -650,6 +657,7 @@ Item {
         readonly property QtObject focusOptions: QtObject {
             readonly property string sceneSynopsis: "Scene Synopsis"
             readonly property string addMuteCharacter: "Add Mute Character"
+            readonly property string addSceneTag: "Add Scene Tag"
             readonly property string sceneHeading: "Scene Heading"
             readonly property string sceneNumber: "Scene Number"
             readonly property string scene: "Scene"

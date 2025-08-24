@@ -806,81 +806,12 @@ Rectangle {
     Component {
         id: placeholderSceneComponent
 
-        Rectangle {
-            required property int spElementIndex
-            required property var spElementData
-            required property int spElementType
+        ScreenplayElementPlaceholderDelegate {
+            zoomLevel: _statusBar.zoomLevel
+            documentMargins: Utils.rectFromMargins(ruler.leftMarginPx, ruler.topMarginPx, ruler.rightMarginPx, ruler.bottomMarginPx)
+            headingFontMetrics: _headingFontMetrics
 
-            property bool evaluateSuggestedSceneHeight: true
-
-            border.width: 1
-            border.color: screenplayElement.scene ? screenplayElement.scene.color : Runtime.colors.primary.c400.background
-            color: screenplayElement.scene ? Qt.tint(screenplayElement.scene.color, "#E7FFFFFF") : Runtime.colors.primary.c300.background
-
-            readonly property ScreenplayElement screenplayElement: spElementData.screenplayElement
-            readonly property Scene scene: spElementData.scene
-            readonly property int screenplayElementType: spElementData.screenplayElementType
-            property real suggestedSceneHeight: screenplayElement.omitted ? (sceneHeadingText.height + sceneHeadingText.anchors.topMargin*2) : sizeHint.height
-
-            SceneSizeHintItem {
-                id: sizeHint
-                visible: false
-                asynchronous: false
-                width: contentWidth * zoomLevel
-                height: contentHeight * zoomLevel + ((screenplayElement.pageBreakBefore ? 1 : 0) + (screenplayElement.pageBreakAfter ? 1 : 0))*40
-                format: Scrite.document.printFormat
-                scene: parent.scene
-                active: parent.evaluateSuggestedSceneHeight && !parent.screenplayElement.omitted
-            }
-
-            VclLabel {
-                font: sceneHeadingText.font
-                anchors.verticalCenter: sceneHeadingText.verticalCenter
-                anchors.right: sceneHeadingText.left
-                anchors.rightMargin: 20
-                width: _headingFontMetrics.averageCharacterWidth*5
-                color: screenplayElement.hasUserSceneNumber ? "black" : "gray"
-                text: screenplayElement.resolvedSceneNumber
-            }
-
-            VclLabel {
-                id: sceneHeadingText
-                anchors.left: parent.left
-                anchors.leftMargin: ruler.leftMarginPx
-                anchors.right: parent.right
-                anchors.rightMargin: ruler.rightMarginPx
-                anchors.top: parent.top
-                anchors.topMargin: 20
-
-                width: parent.width - 20
-                property SceneElementFormat headingFormat: screenplayFormat.elementFormat(SceneElement.Heading)
-                font: headingFormat.font2
-
-                color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
-                elide: Text.ElideMiddle
-                text: {
-                    if(screenplayElementType === ScreenplayElement.BreakElementType)
-                        return screenplayElement.breakTitle
-                    if(screenplayElement.omitted)
-                        return "[OMITTED]"
-                    if(scene && scene.heading.enabled)
-                        return scene.heading.text
-                    return "NO SCENE HEADING"
-                }
-            }
-
-            Image {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.top: sceneHeadingText.bottom
-                anchors.topMargin: 20 * zoomLevel
-                anchors.bottomMargin: 20 * zoomLevel
-                fillMode: Image.TileVertically
-                source: "qrc:/images/sample_scene.png"
-                opacity: 0.5
-                visible: !parent.screenplayElement.omitted
-            }
+            anchors.fill: parent
         }
     }
 
@@ -4255,7 +4186,8 @@ Rectangle {
             }
 
             Component.onCompleted: {
-                const heightHint = componentData.screenplayElement.heightHint
+                const screenplayElement = componentData.screenplayElement
+                const heightHint = screenplayElement.heightHint
                 if( componentData.screenplayElementType === ScreenplayElement.BreakElementType ||
                     contentView.loadAllDelegates || Runtime.screenplayEditorSettings.optimiseScrolling ||
                     componentData.scene.elementCount <= 1) {
@@ -4265,16 +4197,13 @@ Rectangle {
                     }
 
                 const placeHolderSceneProps = {
-                    "spElementIndex": componentIndex,
-                    "spElementData": componentData,
-                    "spElementType": screenplayElementType,
-                    "evaluateSuggestedSceneHeight": heightHint === 0
+                    "evaluateSizeHint": heightHint === 0,
+                    "screenplayElement": screenplayElement
                 };
                 placeHolderSceneItem = placeholderSceneComponent.createObject(contentViewDelegateLoader, placeHolderSceneProps)
-                placeHolderSceneItem.anchors.fill = contentViewDelegateLoader
 
-                if(heightHint === 0)
-                    height = Qt.binding( () => { return placeHolderSceneItem.suggestedSceneHeight } )
+                if(placeHolderSceneProps.evaluateSizeHint === 0)
+                    height = Qt.binding( () => { return placeHolderSceneItem.implicitHeight } )
                 else
                     height = heightHint * zoomLevel
 

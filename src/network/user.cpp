@@ -464,7 +464,7 @@ bool User::isLoggedIn() const
 
 void User::logActivity2(const QString &activity, const QJsonValue &data)
 {
-    if (m_info.isValid() && !this->isBusy()) {
+    if (m_info.isValid() && !this->isBusy() && m_info.consentToActivityLog) {
         UserActivityRestApiCall *call = new UserActivityRestApiCall(qApp);
         call->setActivity("desktop/" + activity);
         call->setActivityData(data);

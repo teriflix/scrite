@@ -1,0 +1,5 @@
+AbstractScenePartEditor 1.0 AbstractScenePartEditor.qml
+SceneCharacterListPartEditor 1.0 SceneCharacterListPartEditor.qml
+SceneHeadingPartEditor 1.0 SceneHeadingPartEditor.qml
+SceneStoryBeatTagsPartEditor 1.0 SceneStoryBeatTagsPartEditor.qml
+SceneSynopsisPartEditor 1.0 SceneSynopsisPartEditor.qml

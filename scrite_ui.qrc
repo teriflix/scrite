@@ -3,8 +3,8 @@
         <file alias="getBoxToBoxArrow.js">js/getBoxToBoxArrow.js</file>
     </qresource>
     <qresource prefix="/">
-        <file>js/utils.js</file>
         <file>LICENSE.txt</file>
+        <file>js/utils.js</file>
         <file>main.qml</file>
         <file>qml/NotebookView.qml</file>
         <file>qml/ScreenplayEditor.qml</file>
@@ -130,6 +130,7 @@
         <file>qml/helpers/RichTextEdit.qml</file>
         <file>qml/helpers/RubberBand.qml</file>
         <file>qml/helpers/SceneFeaturedImage.qml</file>
+        <file>qml/helpers/SceneHeadingTextField.qml</file>
         <file>qml/helpers/SceneTypeImage.qml</file>
         <file>qml/helpers/ScrollArea.qml</file>
         <file>qml/helpers/SearchBar.qml</file>
@@ -168,8 +169,24 @@
         <file>qml/screenplayeditor/PageBreakItem.qml</file>
         <file>qml/screenplayeditor/PageNumberBubble.qml</file>
         <file>qml/screenplayeditor/ScreenplayBreakElementsContextMenu.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorCharacterMenu.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorStatusBar.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorToolbar.qml</file>
         <file>qml/screenplayeditor/ScreenplaySceneElementsContextMenu.qml</file>
+        <file>qml/screenplayeditor/delegates/AbstractScreenplayElementBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/AbstractScreenplayElementDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/OmittedScreenplayElementDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayActBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementPlaceholderDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementSceneDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayEpisodeBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayIntervalBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/AbstractScenePartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneCharacterListPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneHeadingPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneStoryBeatTagsPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneSynopsisPartEditor.qml</file>
         <file>qml/screenplayeditor/qmldir</file>
         <file>qml/scrited/ScritedToolbar.qml</file>
         <file>qml/scrited/qmldir</file>
@@ -224,9 +241,6 @@
         <file>qml/timelineview/TimelineViewFooter.qml</file>
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
         <file>qml/timelineview/qmldir</file>
-        <file>qml/screenplayeditor/ScreenplayEditorStatusBar.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorCharacterMenu.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
-        <file>qml/screenplayeditor/ScreenplayElementBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/qmldir</file>
     </qresource>
 </RCC>
