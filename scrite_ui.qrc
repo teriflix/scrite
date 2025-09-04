@@ -251,5 +251,8 @@
         <file>qml/ScriteMainWindow.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorCompletionPopup.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorSpellingSuggestionsMenu.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorContextMenu.qml</file>
     </qresource>
 </RCC>

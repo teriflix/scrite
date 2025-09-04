@@ -1,6 +1,6 @@
 function execLater(contextObject, delay, callback, args)
 {
-    var timer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject);
+    let timer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject);
     timer.interval = delay === undefined ? 100 : delay
     timer.repeat = false
     timer.triggered.connect(() => {
@@ -10,6 +10,8 @@ function execLater(contextObject, delay, callback, args)
             timer.destroy()
     })
     timer.start()
+
+    return timer
 }
 
 function rectFromMargins(left, top, right, bottom) {
