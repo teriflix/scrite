@@ -145,7 +145,6 @@ AbstractScreenplayElementDelegate {
             }
         }
 
-        // Active scene highlighter
         Rectangle {
             anchors.top: parent.top
             anchors.left: parent.left
@@ -158,6 +157,4 @@ AbstractScreenplayElementDelegate {
             visible: root.hasFocus
         }
     }
-
-
 }

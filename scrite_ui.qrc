@@ -6,12 +6,7 @@
         <file>LICENSE.txt</file>
         <file>js/utils.js</file>
         <file>main.qml</file>
-        <file>qml/NotebookView.qml</file>
-        <file>qml/ScreenplayEditor.qml</file>
-        <file>qml/ScriteMainWindow.qml</file>
-        <file>qml/ScritedView.qml</file>
-        <file>qml/StructureView.qml</file>
-        <file>qml/TimelineView.qml</file>
+        <file>qml/controls/qmldir</file>
         <file>qml/controls/VclButton.qml</file>
         <file>qml/controls/VclCheckBox.qml</file>
         <file>qml/controls/VclComboBox.qml</file>
@@ -26,28 +21,6 @@
         <file>qml/controls/VclText.qml</file>
         <file>qml/controls/VclTextField.qml</file>
         <file>qml/controls/VclToolButton.qml</file>
-        <file>qml/controls/qmldir</file>
-        <file>qml/dialogs/AboutDialog.qml</file>
-        <file>qml/dialogs/BackupsDialog.qml</file>
-        <file>qml/dialogs/CollaboratorsDialog.qml</file>
-        <file>qml/dialogs/ExportConfigurationDialog.qml</file>
-        <file>qml/dialogs/FontSelectionDialog.qml</file>
-        <file>qml/dialogs/HomeScreen.qml</file>
-        <file>qml/dialogs/JoinDiscordCommunity.qml</file>
-        <file>qml/dialogs/MessageBox.qml</file>
-        <file>qml/dialogs/PdfDialog.qml</file>
-        <file>qml/dialogs/RenameCharacterDialog.qml</file>
-        <file>qml/dialogs/ReportConfigurationDialog.qml</file>
-        <file>qml/dialogs/SettingsDialog.qml</file>
-        <file>qml/dialogs/SplashScreen.qml</file>
-        <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
-        <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
-        <file>qml/dialogs/SubscriptionDetailsDialog.qml</file>
-        <file>qml/dialogs/SubscriptionPlanComparisonDialog.qml</file>
-        <file>qml/dialogs/TitlePageDialog.qml</file>
-        <file>qml/dialogs/TrialNotActivatedDialog.qml</file>
-        <file>qml/dialogs/UserAccountDialog.qml</file>
-        <file>qml/dialogs/WaitDialog.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_CheckBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_IntegerSpinBox.qml</file>
         <file>qml/dialogs/exportconfigurationdialog/editor_TextBox.qml</file>
@@ -58,7 +31,6 @@
         <file>qml/dialogs/homescreen/Poster.qml</file>
         <file>qml/dialogs/homescreen/qmldir</file>
         <file>qml/dialogs/pdfdialog/PdfDialogImpl.qml</file>
-        <file>qml/dialogs/qmldir</file>
         <file>qml/dialogs/reportconfigurationdialog/CharactersView.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_CheckBox.qml</file>
         <file>qml/dialogs/reportconfigurationdialog/editor_EnumSelector.qml</file>
@@ -76,6 +48,7 @@
         <file>qml/dialogs/settingsdialog/ApplicationOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationSettingsTab.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
+        <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageFontsPage.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageSettingsTab.qml</file>
@@ -90,7 +63,6 @@
         <file>qml/dialogs/settingsdialog/StructureOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/StructureSettingsTab.qml</file>
         <file>qml/dialogs/settingsdialog/StructureStoryBeatsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
         <file>qml/dialogs/useraccountdialog/AccountEmailScreen.qml</file>
         <file>qml/dialogs/useraccountdialog/ActivationCodeScreen.qml</file>
         <file>qml/dialogs/useraccountdialog/JunctionScreen.qml</file>
@@ -98,14 +70,36 @@
         <file>qml/dialogs/useraccountdialog/ReloadUserScreen.qml</file>
         <file>qml/dialogs/useraccountdialog/UserProfileScreen.qml</file>
         <file>qml/dialogs/useraccountdialog/WelcomeScreen.qml</file>
+        <file>qml/dialogs/AboutDialog.qml</file>
+        <file>qml/dialogs/BackupsDialog.qml</file>
+        <file>qml/dialogs/CollaboratorsDialog.qml</file>
+        <file>qml/dialogs/ExportConfigurationDialog.qml</file>
+        <file>qml/dialogs/FontSelectionDialog.qml</file>
+        <file>qml/dialogs/HomeScreen.qml</file>
+        <file>qml/dialogs/JoinDiscordCommunity.qml</file>
+        <file>qml/dialogs/MessageBox.qml</file>
+        <file>qml/dialogs/PdfDialog.qml</file>
+        <file>qml/dialogs/qmldir</file>
+        <file>qml/dialogs/RenameCharacterDialog.qml</file>
+        <file>qml/dialogs/ReportConfigurationDialog.qml</file>
+        <file>qml/dialogs/SettingsDialog.qml</file>
+        <file>qml/dialogs/SplashScreen.qml</file>
+        <file>qml/dialogs/StructureIndexCardFieldsDialog.qml</file>
+        <file>qml/dialogs/StructureStoryBeatsDialog.qml</file>
+        <file>qml/dialogs/SubscriptionDetailsDialog.qml</file>
+        <file>qml/dialogs/SubscriptionPlanComparisonDialog.qml</file>
+        <file>qml/dialogs/TitlePageDialog.qml</file>
+        <file>qml/dialogs/TrialNotActivatedDialog.qml</file>
+        <file>qml/dialogs/UserAccountDialog.qml</file>
+        <file>qml/dialogs/WaitDialog.qml</file>
         <file>qml/floatingdockpanels/FloatingDock.qml</file>
         <file>qml/floatingdockpanels/FloatingDockLayer.qml</file>
         <file>qml/floatingdockpanels/FloatingMarkupToolsDock.qml</file>
         <file>qml/floatingdockpanels/FloatingShortcutsDock.qml</file>
         <file>qml/floatingdockpanels/qmldir</file>
+        <file>qml/globals/qmldir</file>
         <file>qml/globals/Runtime.qml</file>
         <file>qml/globals/SubscriptionPlanOperations.qml</file>
-        <file>qml/globals/qmldir</file>
         <file>qml/helpers/AlphabetMappings.qml</file>
         <file>qml/helpers/AttachmentsDropArea.qml</file>
         <file>qml/helpers/AttachmentsView.qml</file>
@@ -126,6 +120,7 @@
         <file>qml/helpers/MenuLoader.qml</file>
         <file>qml/helpers/PageView.qml</file>
         <file>qml/helpers/PdfView.qml</file>
+        <file>qml/helpers/qmldir</file>
         <file>qml/helpers/RectangleTabView.qml</file>
         <file>qml/helpers/RichTextEdit.qml</file>
         <file>qml/helpers/RubberBand.qml</file>
@@ -141,22 +136,22 @@
         <file>qml/helpers/TagText.qml</file>
         <file>qml/helpers/TextAreaInput.qml</file>
         <file>qml/helpers/TextAreaSpellingSuggestionsMenu.qml</file>
+        <file>qml/helpers/TextEditCursorDelegate.qml</file>
         <file>qml/helpers/TextTabBar.qml</file>
         <file>qml/helpers/TextViewEdit.qml</file>
         <file>qml/helpers/TrapeziumTabView.qml</file>
         <file>qml/helpers/UiElementHighlight.qml</file>
         <file>qml/helpers/UserAccountToolButton.qml</file>
         <file>qml/helpers/ZoomSlider.qml</file>
-        <file>qml/helpers/qmldir</file>
         <file>qml/notebook/AddCharactersDialog.qml</file>
         <file>qml/notebook/AddRelationshipDialog.qml</file>
         <file>qml/notebook/CharacterRelationshipsGraphView.qml</file>
         <file>qml/notebook/FormField.qml</file>
         <file>qml/notebook/FormMenu.qml</file>
         <file>qml/notebook/FormView.qml</file>
+        <file>qml/notebook/qmldir</file>
         <file>qml/notebook/RelationshipNameEditorDialog.qml</file>
         <file>qml/notebook/TextNoteView.qml</file>
-        <file>qml/notebook/qmldir</file>
         <file>qml/notifications/AutoUpdateNotifications.qml</file>
         <file>qml/notifications/HelpTipNotification.qml</file>
         <file>qml/notifications/NotificationsLayer.qml</file>
@@ -166,13 +161,21 @@
         <file>qml/overlays/DocumentBusyOverlay.qml</file>
         <file>qml/overlays/OverlaysLayer.qml</file>
         <file>qml/overlays/qmldir</file>
-        <file>qml/screenplayeditor/PageBreakItem.qml</file>
-        <file>qml/screenplayeditor/ScreenplayBreakElementsContextMenu.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorCharacterMenu.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorStatusBar.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorToolbar.qml</file>
-        <file>qml/screenplayeditor/ScreenplaySceneElementsContextMenu.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/AbstractScenePartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneCharacterListPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneHeadingPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneStoryBeatTagsPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/editors/SceneSynopsisPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/PageNumberBubble.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/qmldir</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorBackground.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/AbstractScenePartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/qmldir</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneCharacterListPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneContentEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneHeadingPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneStoryBeatTagsPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneSynopsisPartEditor.qml</file>
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/OmittedScreenplayElementDelegate.qml</file>
@@ -181,24 +184,16 @@
         <file>qml/screenplayeditor/delegates/ScreenplayElementSceneDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayEpisodeBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayIntervalBreakDelegate.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/AbstractScenePartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneCharacterListPartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneHeadingPartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneStoryBeatTagsPartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneSynopsisPartEditor.qml</file>
+        <file>qml/screenplayeditor/PageBreakItem.qml</file>
         <file>qml/screenplayeditor/qmldir</file>
-        <file>qml/scrited/ScritedToolbar.qml</file>
+        <file>qml/screenplayeditor/ScreenplayBreakElementsContextMenu.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorCharacterMenu.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorStatusBar.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorToolbar.qml</file>
+        <file>qml/screenplayeditor/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/scrited/qmldir</file>
-        <file>qml/structureview/AnnotationLayer.qml</file>
-        <file>qml/structureview/IndexCardFields.qml</file>
-        <file>qml/structureview/StructureCanvas.qml</file>
-        <file>qml/structureview/StructureCanvasContextMenu.qml</file>
-        <file>qml/structureview/StructureCanvasPreview.qml</file>
-        <file>qml/structureview/StructureCanvasScrollArea.qml</file>
-        <file>qml/structureview/StructureElementLayer.qml</file>
-        <file>qml/structureview/StructureGroupsMenu.qml</file>
-        <file>qml/structureview/StructureViewStatusBar.qml</file>
-        <file>qml/structureview/StructureViewToolBar.qml</file>
+        <file>qml/scrited/ScritedToolbar.qml</file>
         <file>qml/structureview/annotations/AbstractAnnotationDelegate.qml</file>
         <file>qml/structureview/annotations/AnnotationFactory.qml</file>
         <file>qml/structureview/annotations/AnnotationGrip.qml</file>
@@ -209,42 +204,52 @@
         <file>qml/structureview/annotations/ImageAnnotationFactory.qml</file>
         <file>qml/structureview/annotations/LineAnnotationFactory.qml</file>
         <file>qml/structureview/annotations/OvalAnnotationFactory.qml</file>
+        <file>qml/structureview/annotations/qmldir</file>
         <file>qml/structureview/annotations/RectangleAnnotationFactory.qml</file>
         <file>qml/structureview/annotations/TextAnnotationFactory.qml</file>
         <file>qml/structureview/annotations/UrlAnnotationFactory.qml</file>
-        <file>qml/structureview/annotations/qmldir</file>
-        <file>qml/structureview/qmldir</file>
         <file>qml/structureview/structureelements/AbstractSelection.qml</file>
         <file>qml/structureview/structureelements/AbstractStructureElementUI.qml</file>
         <file>qml/structureview/structureelements/ActiveStructureElementBackdrop.qml</file>
         <file>qml/structureview/structureelements/CreateStructureElementMouseArea.qml</file>
+        <file>qml/structureview/structureelements/qmldir</file>
         <file>qml/structureview/structureelements/SelectionContextMenu.qml</file>
         <file>qml/structureview/structureelements/StructureCanvasEpisodeBox.qml</file>
         <file>qml/structureview/structureelements/StructureCanvasGroupBox.qml</file>
         <file>qml/structureview/structureelements/StructureElementConnectorDelegate.qml</file>
         <file>qml/structureview/structureelements/StructureElementContextMenu.qml</file>
         <file>qml/structureview/structureelements/StructureElementIndexCard.qml</file>
-        <file>qml/structureview/structureelements/StructureElementStackTabBar.qml</file>
-        <file>qml/structureview/structureelements/StructureElementSynopsisBox.qml</file>
         <file>qml/structureview/structureelements/StructureElementsLayoutTask.qml</file>
         <file>qml/structureview/structureelements/StructureElementsSelection.qml</file>
-        <file>qml/structureview/structureelements/qmldir</file>
+        <file>qml/structureview/structureelements/StructureElementStackTabBar.qml</file>
+        <file>qml/structureview/structureelements/StructureElementSynopsisBox.qml</file>
+        <file>qml/structureview/AnnotationLayer.qml</file>
+        <file>qml/structureview/IndexCardFields.qml</file>
+        <file>qml/structureview/qmldir</file>
+        <file>qml/structureview/StructureCanvas.qml</file>
+        <file>qml/structureview/StructureCanvasContextMenu.qml</file>
+        <file>qml/structureview/StructureCanvasPreview.qml</file>
+        <file>qml/structureview/StructureCanvasScrollArea.qml</file>
+        <file>qml/structureview/StructureElementLayer.qml</file>
+        <file>qml/structureview/StructureGroupsMenu.qml</file>
+        <file>qml/structureview/StructureViewStatusBar.qml</file>
+        <file>qml/structureview/StructureViewToolBar.qml</file>
         <file>qml/tasks/OpenFileTask.qml</file>
         <file>qml/tasks/OpenFromLibraryTask.qml</file>
-        <file>qml/tasks/SaveFileTask.qml</file>
         <file>qml/tasks/qmldir</file>
+        <file>qml/tasks/SaveFileTask.qml</file>
+        <file>qml/timelineview/qmldir</file>
         <file>qml/timelineview/TimelineListView.qml</file>
         <file>qml/timelineview/TimelineTools.qml</file>
         <file>qml/timelineview/TimelineTracksView.qml</file>
         <file>qml/timelineview/TimelineViewDelegate.qml</file>
         <file>qml/timelineview/TimelineViewFooter.qml</file>
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
-        <file>qml/timelineview/qmldir</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/qmldir</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneContentEditor.qml</file>
-        <file>qml/helpers/TextEditCursorDelegate.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorBackground.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/qmldir</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/PageNumberBubble.qml</file>
+        <file>qml/NotebookView.qml</file>
+        <file>qml/ScreenplayEditor.qml</file>
+        <file>qml/ScritedView.qml</file>
+        <file>qml/ScriteMainWindow.qml</file>
+        <file>qml/StructureView.qml</file>
+        <file>qml/TimelineView.qml</file>
     </qresource>
 </RCC>
