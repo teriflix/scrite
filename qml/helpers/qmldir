@@ -33,6 +33,7 @@ SpellingSuggestionsMenu 1.0 SpellingSuggestionsMenu.qml
 TagText 1.0 TagText.qml
 TextAreaInput 1.0 TextAreaInput.qml
 TextAreaSpellingSuggestionsMenu 1.0 TextAreaSpellingSuggestionsMenu.qml
+TextEditCursorDelegate 1.0 TextEditCursorDelegate.qml
 TextTabBar 1.0 TextTabBar.qml
 TextViewEdit 1.0 TextViewEdit.qml
 TrapeziumTabView 1.0 TrapeziumTabView.qml

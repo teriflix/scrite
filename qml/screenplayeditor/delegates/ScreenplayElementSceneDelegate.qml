@@ -128,7 +128,21 @@ AbstractScreenplayElementDelegate {
                 }
             }
 
-            // Scene Content Area
+            SceneContentEditor {
+                Layout.fillWidth: true
+
+                index: root.index
+                sceneID: root.sceneID
+                screenplayElement: root.screenplayElement
+                screenplayElementDelegateHasFocus: root.hasFocus
+
+                zoomLevel: root.zoomLevel
+                fontMetrics: root.fontMetrics
+                pageMargins: root.pageMargins
+                placeholderMode: root.placeholderMode
+
+                onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+            }
         }
 
         // Active scene highlighter
@@ -144,4 +158,6 @@ AbstractScreenplayElementDelegate {
             visible: root.hasFocus
         }
     }
+
+
 }

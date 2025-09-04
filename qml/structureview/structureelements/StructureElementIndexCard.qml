@@ -413,10 +413,9 @@ AbstractStructureElementUI {
                                 onTextChanged: root.element.scene.synopsis = text
 
                                 onActiveFocusChanged: {
-                                    if(activeFocus) {
+                                    if(activeFocus)
                                         root.select()
-                                        _cursorFocusAnimation.active = true
-                                    } else
+                                    else
                                         root.element.scene.trimSynopsis()
                                     _synopsisFieldLoader.hasFocus = activeFocus
                                 }
@@ -440,45 +439,7 @@ AbstractStructureElementUI {
 
                                 TextAreaSpellingSuggestionsMenu { }
 
-                                Loader {
-                                    id: _cursorFocusAnimation
-                                    x: _synopsisField.cursorRectangle.x
-                                    y: _synopsisField.cursorRectangle.y
-                                    width: _synopsisField.cursorRectangle.width
-                                    height: _synopsisField.cursorRectangle.height
-                                    active: false
-                                    sourceComponent: Item {
-                                        Rectangle {
-                                            id: _cursorFocusRect
-
-                                            property real t: 10
-                                            property bool scaledDown: t <= 1
-
-                                            anchors.centerIn: parent
-
-                                            width: t*parent.width
-                                            height: Math.max(t*parent.height*0.5, parent.height)
-
-                                            color: "black"
-                                            opacity: 1.0 - (t/10)*0.8
-                                            visible: false
-
-                                            Behavior on t {
-                                                NumberAnimation { duration: 500 }
-                                            }
-
-                                            onScaledDownChanged: {
-                                                if(scaledDown)
-                                                    _cursorFocusAnimation.active = false
-                                            }
-                                        }
-
-                                        Component.onCompleted: Utils.execLater(_cursorFocusRect, 250, function() {
-                                            _cursorFocusRect.visible = true
-                                            _cursorFocusRect.t = 1
-                                        })
-                                    }
-                                }
+                                cursorDelegate: TextEditCursorDelegate { }
                             }
                         }
 

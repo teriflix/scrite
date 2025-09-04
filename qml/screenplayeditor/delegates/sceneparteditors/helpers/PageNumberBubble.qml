@@ -20,30 +20,38 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 PainterPathItem {
+    id: root
+
     property string pageNumber: "-1"
+
     readonly property var colors: Runtime.colors.primary.c600
 
     VclLabel {
-        id: sceneNumberText
+        id: _sceneNumberText
+
         anchors.centerIn: parent
-        font: defaultFontMetrics.font
-        text: parent.pageNumber
+
+        font: Runtime.idealFontMetrics.font
+        text: pageNumber
         color: colors.text
-        leftPadding: 4; rightPadding: 4
-        topPadding: 3; bottomPadding: 1
+        topPadding: 3
+        leftPadding: 4
+        rightPadding: 4
+        bottomPadding: 1
     }
 
-    width: Math.max(sceneNumberText.contentWidth * 1.5, 30)
-    height: sceneNumberText.height
+    width: Math.max(_sceneNumberText.contentWidth * 1.5, 30)
+    height: _sceneNumberText.height
 
-    renderType: PainterPathItem.OutlineAndFill
     fillColor: colors.background
-    outlineWidth: 1
+    renderType: PainterPathItem.OutlineAndFill
     outlineColor: colors.background
+    outlineWidth: 1
 
     painterPath: PainterPath {
-        id: bubblePath
-        property real  arrowSize: sceneNumberText.height/4
+        id: _bubblePath
+
+        property real  arrowSize: _sceneNumberText.height/4
         property point p1: Qt.point(itemRect.left, itemRect.top)
         property point p2: Qt.point(itemRect.right, itemRect.top)
         property point p3: Qt.point(itemRect.right, itemRect.center.y - arrowSize)
@@ -52,13 +60,13 @@ PainterPathItem {
         property point p6: Qt.point(itemRect.right, itemRect.bottom)
         property point p7: Qt.point(itemRect.left, itemRect.bottom)
 
-        MoveTo { x: bubblePath.p1.x; y: bubblePath.p1.y }
-        LineTo { x: bubblePath.p2.x; y: bubblePath.p2.y }
-        LineTo { x: bubblePath.p3.x; y: bubblePath.p3.y }
-        LineTo { x: bubblePath.p4.x; y: bubblePath.p4.y }
-        LineTo { x: bubblePath.p5.x; y: bubblePath.p5.y }
-        LineTo { x: bubblePath.p6.x; y: bubblePath.p6.y }
-        LineTo { x: bubblePath.p7.x; y: bubblePath.p7.y }
+        MoveTo { x: _bubblePath.p1.x; y: _bubblePath.p1.y }
+        LineTo { x: _bubblePath.p2.x; y: _bubblePath.p2.y }
+        LineTo { x: _bubblePath.p3.x; y: _bubblePath.p3.y }
+        LineTo { x: _bubblePath.p4.x; y: _bubblePath.p4.y }
+        LineTo { x: _bubblePath.p5.x; y: _bubblePath.p5.y }
+        LineTo { x: _bubblePath.p6.x; y: _bubblePath.p6.y }
+        LineTo { x: _bubblePath.p7.x; y: _bubblePath.p7.y }
         CloseSubpath { }
     }
 }

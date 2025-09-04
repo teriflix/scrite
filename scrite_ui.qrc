@@ -167,7 +167,6 @@
         <file>qml/overlays/OverlaysLayer.qml</file>
         <file>qml/overlays/qmldir</file>
         <file>qml/screenplayeditor/PageBreakItem.qml</file>
-        <file>qml/screenplayeditor/PageNumberBubble.qml</file>
         <file>qml/screenplayeditor/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorCharacterMenu.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
@@ -242,5 +241,10 @@
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
         <file>qml/timelineview/qmldir</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/qmldir</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/SceneContentEditor.qml</file>
+        <file>qml/helpers/TextEditCursorDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorBackground.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/qmldir</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/PageNumberBubble.qml</file>
     </qresource>
 </RCC>
