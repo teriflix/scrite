@@ -32,6 +32,8 @@ Rectangle {
     readonly property alias searchAgent: _searchAgentLoader.searchAgent
     readonly property alias searchAgentItem: _searchAgentLoader.item
 
+    signal replaceCurrentRequest(string replacementText, SearchAgent agent)
+
     width: ruler.width
     height: _searchBar.height * opacity
 
@@ -61,7 +63,7 @@ Rectangle {
 
             active: Runtime.screenplayAdapter.screenplay ? true : false
 
-            Item {
+            sourceComponent: Item {
                 property var searchResults: []
 
                 property int previousSceneIndex: -1
@@ -122,6 +124,14 @@ Rectangle {
                             screenplayElement.userData = undefined
                     }
                     previousSceneIndex = -1
+                }
+            }
+
+            onItemChanged: {
+                if(item) {
+                    item.replaceCurrentRequest.connect( (replacementText) => {
+                                                            root.replaceCurrentRequest(replacementText, searchAgent)
+                                                       } )
                 }
             }
         }

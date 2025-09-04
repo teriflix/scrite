@@ -48,6 +48,11 @@ FocusScope {
     // Signals
     signal ensureVisible(Item item, rect area)
 
+    // Signals, but must actually be implemented as methods by implementations of this abstract item.
+    // Not all implementations need to implement this, only those that implement find and replace.
+    // As of now, its only SceneContentEditor
+    signal __searchBarSaysReplaceCurrent(string replacementText, SearchAgent agent)
+
     QtObject {
         id: _private
 

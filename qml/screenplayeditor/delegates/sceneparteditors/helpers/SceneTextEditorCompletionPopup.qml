@@ -33,6 +33,8 @@ Item {
 
     readonly property alias model: _private.completionModel
 
+    signal completionRequest(string suggestion)
+
     Popup {
         id: _completionPopup
 
@@ -112,7 +114,6 @@ Item {
         readonly property CompletionModel completionModel: CompletionModel {
             property bool completable: false
             property bool hasSuggestion: completionModelCount.value > 0
-            property bool actuallyEnable: true
 
             property string suggestion: currentCompletion
 
@@ -125,8 +126,9 @@ Item {
             minimumCompletionPrefixLength: 0
 
             onRequestCompletion: {
-                sceneTextEditor.acceptCompletionSuggestion()
-                Announcement.shout("E69D2EA0-D26D-4C60-B551-FD3B45C5BE60", root.sceneDocumentBinder.scene.id)
+                root.completionRequest(suggestion)
+                // Do we really need this anymore?
+                // Announcement.shout("E69D2EA0-D26D-4C60-B551-FD3B45C5BE60", root.sceneDocumentBinder.scene.id)
             }
 
             onHasSuggestionChanged: {

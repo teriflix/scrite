@@ -123,4 +123,7 @@ Rectangle {
 
         property SceneElementFormat headingFormat: Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
     }
+
+    on__FocusIn: () => { }     // TODO
+    on__FocusOut: () => { }    // TODO
 }

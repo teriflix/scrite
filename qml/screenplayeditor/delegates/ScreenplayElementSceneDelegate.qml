@@ -29,6 +29,12 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors"
 AbstractScreenplayElementDelegate {
     id: root
 
+    signal scrollToNextSceneRequest()
+    signal scrollToPreviousSceneRequest()
+
+    signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
+    signal mergeWithPreviousSceneRequest()
+
     content: Item {
         height: _layout.height
 
@@ -52,6 +58,8 @@ AbstractScreenplayElementDelegate {
                     spacing: 5
 
                     SceneHeadingPartEditor {
+                        id: _sceneHeadingEditor
+
                         Layout.fillWidth: true
 
                         index: root.index
@@ -129,6 +137,8 @@ AbstractScreenplayElementDelegate {
             }
 
             SceneContentEditor {
+                id: _sceneContentEditor
+
                 Layout.fillWidth: true
 
                 index: root.index
@@ -136,12 +146,19 @@ AbstractScreenplayElementDelegate {
                 screenplayElement: root.screenplayElement
                 screenplayElementDelegateHasFocus: root.hasFocus
 
+                focus: true
                 zoomLevel: root.zoomLevel
                 fontMetrics: root.fontMetrics
                 pageMargins: root.pageMargins
                 placeholderMode: root.placeholderMode
 
                 onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                onEditSceneHeadingRequest: () => { _sceneHeadingEditor.focus = true }
+                onScrollToNextSceneRequest: () => { root.scrollToNextSceneRequest() }
+                onScrollToPreviousSceneRequest: () => { root.scrollToPreviousSceneRequest() }
+                onSplitSceneRequest: (paragraph, cursorPosition) => { root.splitSceneRequest(paragraph, cursorPosition) }
+                onMergeWithPreviousSceneRequest: () => { root.mergeWithPreviousSceneRequest() }
             }
         }
 
@@ -157,4 +174,10 @@ AbstractScreenplayElementDelegate {
             visible: root.hasFocus
         }
     }
+
+    on__FocusIn: (cursorPosition) => { _sceneContentEditor.assumeFocusAt(cursorPosition) }
+    on__FocusOut: () => { }
+    on__SearchBarSaysReplaceCurrent: (replacementText, searchAgent) => {
+                                         _sceneContentEditor.__searchBarSaysReplaceCurrent(replacementText, searchAgent)
+                                     }
 }

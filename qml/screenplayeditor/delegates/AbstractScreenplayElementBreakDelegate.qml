@@ -114,4 +114,7 @@ AbstractScreenplayElementDelegate {
             }
         }
     }
+
+    on__FocusIn: () => { }     // TODO
+    on__FocusOut: () => { }    // TODO
 }

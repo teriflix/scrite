@@ -106,4 +106,14 @@ private:
     int m_priority = 0;
 };
 
+class ShortcutsModelRecord : public ShortcutsModelItem
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    ShortcutsModelRecord(QObject *parent = nullptr) : ShortcutsModelItem(parent) { }
+    ~ShortcutsModelRecord() { }
+};
+
 #endif // SHORTCUTSMODEL_H

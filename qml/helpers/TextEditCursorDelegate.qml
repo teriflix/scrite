@@ -26,6 +26,11 @@ Item {
 
     property color color: Runtime.colors.primary.c100.text
 
+    function highlight() {
+        if(textEdit.activeFocus)
+            _private.startFocusAnimation()
+    }
+
     x: _private.cursorRect.x
     y: _private.cursorRect.y
     width: _private.cursorRect.width

@@ -65,6 +65,7 @@ FocusScope {
     // Signals that need to be handled in implementations
     signal __focusIn(int cursorPosition)
     signal __focusOut()
+    signal __searchBarSaysReplaceCurrent(string replacementText, SearchAgent agent)
 
     height: _layout.height
 
@@ -85,6 +86,12 @@ FocusScope {
             id: _contentLoader
 
             Layout.fillWidth: true
+
+            onItemChanged: {
+                if(item) {
+                    root.__searchBarSaysReplaceCurrent.connect(item.__searchBarSaysReplaceCurrent)
+                }
+            }
         }
 
         Loader {
