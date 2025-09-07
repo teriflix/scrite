@@ -14,8 +14,8 @@ function execLater(contextObject, delay, callback, args)
     return timer
 }
 
-function rectFromMargins(left, top, right, bottom) {
-    return Qt.rect(left, top, right-left+1, bottom-top+1)
+function margins(left, top, right, bottom) {
+    return { "top": top, "left": left, "right": right, "bottom": bottom }
 }
 
 function newAnnotation(parent, type, geometry, config) {

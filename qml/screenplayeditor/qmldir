@@ -3,4 +3,5 @@ ScreenplayEditorCharacterMenu 1.0 ScreenplayEditorCharacterMenu.qml
 ScreenplayEditorSearchBar 1.0 ScreenplayEditorSearchBar.qml
 ScreenplayEditorStatusBar 1.0 ScreenplayEditorStatusBar.qml
 ScreenplayEditorToolbar 1.0 ScreenplayEditorToolbar.qml
+ScreenplayElementListView 1.0 ScreenplayElementListView.qml
 ScreenplaySceneElementsContextMenu 1.0 ScreenplaySceneElementsContextMenu.qml

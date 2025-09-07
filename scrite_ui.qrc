@@ -180,7 +180,6 @@
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/OmittedScreenplayElementDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayActBreakDelegate.qml</file>
-        <file>qml/screenplayeditor/delegates/ScreenplayElementPlaceholderDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayElementSceneDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayEpisodeBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayIntervalBreakDelegate.qml</file>
@@ -254,5 +253,14 @@
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorCompletionPopup.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorSpellingSuggestionsMenu.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorContextMenu.qml</file>
+        <file>qml/screenplayeditor/ScreenplayElementListView.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementListViewHeader.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementListViewFooter.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorSidePanel.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelMenu.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelHeader.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelDelegate.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelFooter.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelMoveElementsTask.qml</file>
     </qresource>
 </RCC>

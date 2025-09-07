@@ -258,10 +258,11 @@ QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
 {
     static QHash<int, QByteArray> roles;
     if (roles.isEmpty()) {
-        roles[IdRole] = "id";
+        roles[IdRole] = "sceneID";
         roles[SceneRole] = "scene";
         roles[BreakTypeRole] = "breakType";
         roles[ModelDataRole] = "modelData";
+        roles[DelegateKindRole] = "delegateKindRole";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
     }

@@ -559,6 +559,7 @@ public:
         IdRole = Qt::UserRole,
         ScreenplayElementRole,
         ScreenplayElementTypeRole,
+        DelegateKindRole,
         BreakTypeRole,
         SceneRole
     };

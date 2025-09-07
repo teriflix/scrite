@@ -32,16 +32,17 @@ FocusScope {
     required property ScreenplayElement screenplayElement
 
     // These have to be explicitly provided
+    required property var pageMargins // must set using Utils.margins() only
     required property real zoomLevel
-    required property rect pageMargins
-    required property FontMetrics fontMetrics
 
     // These have to be components only.
     default property alias content: _contentLoader.sourceComponent
 
     // These are optional
     property bool canFocus: true
+    property bool readOnly: Scrite.document.readOnly
     property Screenplay screenplay: Scrite.document.screenplay
+    property FontMetrics fontMetrics: Runtime.sceneEditorFontMetrics
     property ScreenplayFormat format: Scrite.document.displayFormat
 
     // These are readonly

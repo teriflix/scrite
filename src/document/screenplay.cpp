@@ -3011,6 +3011,26 @@ QVariant Screenplay::data(const QModelIndex &index, int role) const
         return element->breakType();
     case SceneRole:
         return QVariant::fromValue<Scene *>(element->scene());
+    case DelegateKindRole: {
+        if (element->elementType() == ScreenplayElement::BreakElementType) {
+            switch (element->breakType()) {
+            case Screenplay::Act:
+                return QStringLiteral("actBreak");
+            case Screenplay::Episode:
+                return QStringLiteral("episodeBreak");
+            case Screenplay::Interval:
+                return QStringLiteral("intervalBreak");
+            default:
+                return QStringLiteral("genericBreak");
+            }
+        }
+        if (element->elementType() == ScreenplayElement::SceneElementType) {
+            if (element->isOmitted())
+                return QStringLiteral("omittedScene");
+            return QStringLiteral("scene");
+        }
+        return QStringLiteral("generic");
+    } break;
     default:
         break;
     }
@@ -3023,10 +3043,11 @@ QHash<int, QByteArray> Screenplay::roleNames() const
     static QHash<int, QByteArray> roles;
     if (roles.isEmpty()) {
         roles[IdRole] = "sceneID";
+        roles[SceneRole] = "scene";
+        roles[BreakTypeRole] = "breakType";
+        roles[DelegateKindRole] = "delegateKindRole";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
-        roles[BreakTypeRole] = "breakType";
-        roles[SceneRole] = "scene";
     }
 
     return roles;

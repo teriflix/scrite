@@ -20,116 +20,139 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 Item {
-    id: sidePanel
-
-    property real buttonY: 0
-    property string label: ""
-    property alias buttonColor: expandCollapseButton.color
-    property alias backgroundColor: panelBackground.color
-    property color borderColor: Runtime.colors.primary.borderColor
-    property real borderWidth: 1
+    id: root
 
     property bool expanded: false
-    property alias contentData: contentLoader.contentData
-    property alias content: contentLoader.sourceComponent
-    property alias contentInstance: contentLoader.item
 
-    property alias cornerComponent: cornerLoader.sourceComponent
+    property real buttonY: 0
+    property real borderWidth: 1
+    property real maxPanelWidth: 450
+    property real buttonSize: Math.min(100, height)
+
+    property color borderColor: Runtime.colors.primary.borderColor
+
+    property string label: ""
+
+    property alias content: _contentLoader.sourceComponent
+    property alias buttonColor: _expandCollapseButton.color
+    property alias contentData: _contentLoader.contentData
+    property alias backgroundColor: _background.color
+    property alias contentInstance: _contentLoader.item
+    property alias cornerComponent: _cornerLoader.sourceComponent
+
+    readonly property real minPanelWidth: 25
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
-    property real buttonSize: Math.min(100, height)
-    readonly property real minPanelWidth: 25
-    property real maxPanelWidth: 450
     Behavior on width {
         enabled: Runtime.applicationSettings.enableAnimations
         NumberAnimation { duration: 50 }
     }
 
     BorderImage {
-        source: "qrc:/icons/content/shadow.png"
-        anchors.fill: panelBackground
-        horizontalTileMode: BorderImage.Stretch
-        verticalTileMode: BorderImage.Stretch
+        anchors.fill: _background
         anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }
+
         border { left: 21; top: 21; right: 21; bottom: 21 }
+
+        source: "qrc:/icons/content/shadow.png"
         opacity: 0.25
-        visible: contentLoader.visible
+        visible: _contentLoader.visible
+        verticalTileMode: BorderImage.Stretch
+        horizontalTileMode: BorderImage.Stretch
     }
 
     Rectangle {
-        id: panelBackground
+        id: _background
+
         anchors.fill: parent
+
         color: "white"
-        visible: contentLoader.visible
-        opacity: contentLoader.opacity
+        visible: _contentLoader.visible
+        opacity: _contentLoader.opacity
         border.color: borderColor
         border.width: borderWidth
     }
 
     Item {
-        id: contentLoaderArea
+        id: _contentArea
+
         anchors.top: parent.top
-        anchors.left: expandCollapseButton.right
+        anchors.left: _expandCollapseButton.right
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 4
         anchors.leftMargin: 0
+
         clip: true
 
         Rectangle {
-            id: textLabelBackground
-            anchors.fill: textLabel
-            color: Qt.darker(expandCollapseButton.color)
-            visible: textLabel.visible
-            opacity: textLabel.opacity
+            id: _labelBackgroud
+
+            anchors.fill: _label
+
+            color: Qt.darker(_expandCollapseButton.color)
+            visible: _label.visible
+            opacity: _label.opacity
         }
 
         VclText {
-            id: textLabel
+            id: _label
+
             anchors.top: parent.top
-            text: sidePanel.label
-            leftPadding: 5; rightPadding: 5
-            topPadding: 8; bottomPadding: 8
-            font.bold: true
-            font.pixelSize: expandCollapseButton.width * 0.45
-            font.capitalization: Font.AllUppercase
-            horizontalAlignment: Text.AlignHCenter
+
             width: parent.width
+
+            text: root.label
             elide: Text.ElideRight
-            opacity: contentLoader.opacity
-            visible: contentLoader.visible && text !== ""
-            color: Scrite.app.isLightColor(textLabelBackground.color) ? "black" : "white"
+            color: Scrite.app.isLightColor(_labelBackgroud.color) ? "black" : "white"
+            opacity: _contentLoader.opacity
+            visible: _contentLoader.visible && text !== ""
+            horizontalAlignment: Text.AlignHCenter
+
+            topPadding: 8
+            leftPadding: 5
+            rightPadding: 5
+            bottomPadding: 8
+
+            font.bold: true
+            font.pixelSize: _expandCollapseButton.width * 0.45
+            font.capitalization: Font.AllUppercase
         }
 
         Loader {
-            id: contentLoader
-            anchors.topMargin: textLabel.visible ? 2 : 0
-            anchors.top: textLabel.visible ? textLabel.bottom : parent.top
-            anchors.bottom: parent.bottom
+            id: _contentLoader
+
+            anchors.top: _label.visible ? _label.bottom : parent.top
             anchors.left: parent.left
             anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.topMargin: _label.visible ? 2 : 0
+
+            active: opacity > 0
             visible: opacity > 0
-            opacity: sidePanel.expanded ? 1 : 0
+            opacity: root.expanded ? 1 : 0
+
             property var contentData
             Behavior on opacity {
                 enabled: Runtime.applicationSettings.enableAnimations
                 NumberAnimation { duration: 50 }
             }
-            active: opacity > 0
         }
     }
 
     Rectangle {
-        id: expandCollapseButton
-        x: sidePanel.expanded ? 4 : -radius
-        y: sidePanel.expanded ? 4 : parent.buttonY
+        id: _expandCollapseButton
+
+        x: root.expanded ? 4 : -radius
+        y: root.expanded ? 4 : parent.buttonY
+        width: root.minPanelWidth
+        height: root.expanded ? parent.height-8 : root.buttonSize
+
         color: Runtime.colors.primary.button.background
-        width: parent.minPanelWidth
-        height: sidePanel.expanded ? parent.height-8 : sidePanel.buttonSize
-        radius: (1.0-contentLoader.opacity) * 6
-        border.width: contentLoader.visible ? 0 : 1
-        border.color: sidePanel.expanded ? Runtime.colors.primary.windowColor : borderColor
+        radius: (1.0-_contentLoader.opacity) * 6
+        border.width: _contentLoader.visible ? 0 : 1
+        border.color: root.expanded ? Runtime.colors.primary.windowColor : borderColor
 
         Behavior on height {
             enabled: Runtime.applicationSettings.enableAnimations
@@ -137,43 +160,51 @@ Item {
         }
 
         Item {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.horizontalCenterOffset: root.expanded ? 0 : parent.radius/2
+
             width: parent.width
             height: parent.height
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.horizontalCenterOffset: sidePanel.expanded ? 0 : parent.radius/2
 
             Image {
-                id: iconImage
+                id: _icon
+
+                anchors.centerIn: parent
+
                 width: parent.width
                 height: width
-                anchors.centerIn: parent
-                source: sidePanel.expanded ? "qrc:/icons/navigation/arrow_left.png" : "qrc:/icons/navigation/arrow_right.png"
+
+                source: root.expanded ? "qrc:/icons/navigation/arrow_left.png" : "qrc:/icons/navigation/arrow_right.png"
                 fillMode: Image.PreserveAspectFit
             }
 
             MouseArea {
-                onClicked: sidePanel.expanded = !sidePanel.expanded
                 anchors.fill: parent
+
+                onClicked: root.expanded = !root.expanded
             }
 
             Loader {
-                id: cornerLoader
+                id: _cornerLoader
+
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.bottom: iconImage.top
+                anchors.bottom: _icon.top
                 // anchors.topMargin: 2
-                anchors.bottomMargin: 2
                 anchors.leftMargin: -2
+                anchors.bottomMargin: 2
             }
         }
 
         Rectangle {
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
             anchors.left: parent.left
+            anchors.bottom: parent.bottom
             anchors.leftMargin: Math.abs(parent.x)
+
             width: 1
+
             color: borderColor
             visible: parent.x < 0
         }

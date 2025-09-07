@@ -28,16 +28,18 @@ import "qrc:/qml/controls"
 Rectangle {
     id: root
 
-    readonly property alias zoomSlider: _zoomSlider
-
     required property int screenplayEditorLastItemIndex
     required property int screenplayEditorFirstItemIndex
 
-    required property ListView screenplayEditorListView
+    required property var pageMargins
 
+    required property ListView screenplayEditorListView
     required property FontMetrics sceneHeadingFontMetrics
 
+    readonly property alias zoomSlider: _zoomSlider
     readonly property alias zoomLevel: _zoomSlider.zoomLevel
+
+    property int zoomLevelModifier: 0
 
     property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
 
@@ -206,7 +208,7 @@ Rectangle {
         id: _headingTextAreaOnStatusBar
 
         anchors.left: _metricsDisplay.right
-        anchors.right: _taggingOptions.visible ? _taggingOptions.left : _zoomSlider.left
+        anchors.right: _taggingOptions.left
         anchors.margins: 5
 
         height: parent.height
@@ -232,7 +234,7 @@ Rectangle {
             VclLabel {
                 id: _currentSceneNumber
 
-                property real recommendedMargin: sceneHeadingFontMetrics.averageCharacterWidth*5 + ruler.leftMarginPx*0.075
+                property real recommendedMargin: sceneHeadingFontMetrics.averageCharacterWidth*5 + pageMargins.left*0.075
 
                 anchors.left: _currentSceneHeadingText.left
                 anchors.leftMargin: Math.min(-recommendedMargin, -contentWidth)
@@ -248,8 +250,8 @@ Rectangle {
 
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.leftMargin: ruler.leftMarginPx
-                anchors.rightMargin: ruler.rightMarginPx
+                anchors.leftMargin: pageMargins.left
+                anchors.rightMargin: pageMargins.right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.verticalCenterOffset: height*0.1
 
@@ -366,8 +368,6 @@ Rectangle {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
 
-        height: parent.height-6
-
         to: zoomLevels.length-1
         from: 0
         stepSize: 1
@@ -405,6 +405,8 @@ Rectangle {
     }
 
     component IconButton : Image {
+        property alias containsMouse: _iconButtonMouseArea.containsMouse
+
         property string tooltipText
 
         signal clicked()

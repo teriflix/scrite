@@ -28,67 +28,81 @@ import "qrc:/qml/controls"
   */
 
 Item {
-    id: uiElementHighlight
+    id: root
 
-    property Item uiElement
-    property string description
     property int descriptionPosition: Item.Right
+
+    property string description
+
     property bool uiElementBoxVisible: false
     property bool highlightAnimationEnabled: true
+
+    property Item uiElement
 
     signal done()
     signal scaleAnimationDone()
 
     ItemPositionMapper {
-        id: uiElementPosition
+        id: _uiElementPosition
+
+        to: root
         from: uiElement
-        to: uiElementHighlight
     }
 
     Item {
-        id: uiElementOverlay
-        x: uiElementPosition.mappedPosition.x
-        y: uiElementPosition.mappedPosition.y
+        id: _uiElementOverlay
+
+        x: _uiElementPosition.mappedPosition.x
+        y: _uiElementPosition.mappedPosition.y
         width: uiElement.width * uiElement.scale
         height: uiElement.height * uiElement.scale
 
         Rectangle {
             anchors.fill: parent
             anchors.margins: -2.5
+
             color: Qt.rgba(0,0,0,0)
+            visible: uiElementBoxVisible
+
             border.width: 2
             border.color: Runtime.colors.accent.highlight.background
-            visible: uiElementBoxVisible
         }
 
         BoxShadow {
-            anchors.fill: descTip
+            anchors.fill: _descTip
         }
 
         Rectangle {
-            id: descTip
+            id: _descTip
+
+            width: _descLabel.width
+            height: _descLabel.height
+
             color: Runtime.colors.accent.highlight.background
-            width: descLabel.width
-            height: descLabel.height
             border.width: 1
             border.color: Runtime.colors.accent.borderColor
 
             VclLabel {
-                id: descLabel
+                id: _descLabel
+
                 text: description
+                color: Runtime.colors.accent.highlight.text
+
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize+2
-                color: Runtime.colors.accent.highlight.text
-                leftPadding: (descriptionPosition === Item.Right ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
-                rightPadding: (descriptionPosition === Item.Left ? descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
-                topPadding: descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? descIcon.height : 10
-                bottomPadding: descriptionPosition === Item.Top || descriptionPosition === Item.Bottom ? descIcon.height : 10
+
+                topPadding: descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? _descIcon.height : 10
+                leftPadding: (descriptionPosition === Item.Right ? _descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
+                rightPadding: (descriptionPosition === Item.Left ? _descIcon.width : (descriptionPosition === Item.Bottom || descriptionPosition === Item.Top ? 20 : 0)) + 5
+                bottomPadding: descriptionPosition === Item.Top || descriptionPosition === Item.Bottom ? _descIcon.height : 10
 
                 Image {
-                    id: descIcon
+                    id: _descIcon
+
                     width: Runtime.idealFontMetrics.height
                     height: width
                     smooth: true
+
                     source: {
                         switch(descriptionPosition) {
                         case Item.Right:
@@ -111,56 +125,56 @@ Item {
             Component.onCompleted: {
                 switch(descriptionPosition) {
                 case Item.Right:
-                    descTip.anchors.verticalCenter = uiElementOverlay.verticalCenter
-                    descTip.anchors.left = uiElementOverlay.right
-                    descIcon.anchors.verticalCenter = descLabel.verticalCenter
-                    descIcon.anchors.left = descLabel.left
+                    _descTip.anchors.verticalCenter = _uiElementOverlay.verticalCenter
+                    _descTip.anchors.left = _uiElementOverlay.right
+                    _descIcon.anchors.verticalCenter = _descLabel.verticalCenter
+                    _descIcon.anchors.left = _descLabel.left
                     break
                 case Item.Left:
-                    descTip.anchors.verticalCenter = uiElementOverlay.verticalCenter
-                    descTip.anchors.right = uiElementOverlay.left
-                    descIcon.anchors.verticalCenter = descLabel.verticalCenter
-                    descIcon.anchors.right = descLabel.right
+                    _descTip.anchors.verticalCenter = _uiElementOverlay.verticalCenter
+                    _descTip.anchors.right = _uiElementOverlay.left
+                    _descIcon.anchors.verticalCenter = _descLabel.verticalCenter
+                    _descIcon.anchors.right = _descLabel.right
                     break
                 case Item.Top:
                 case Item.TopLeft:
                 case Item.TopRight:
                     if(descriptionPosition === Item.Top) {
-                        descTip.anchors.horizontalCenter = uiElementOverlay.horizontalCenter
-                        descIcon.anchors.horizontalCenter = descLabel.horizontalCenter
+                        _descTip.anchors.horizontalCenter = _uiElementOverlay.horizontalCenter
+                        _descIcon.anchors.horizontalCenter = _descLabel.horizontalCenter
                     } else if(descriptionPosition === Item.TopRight) {
-                        descTip.anchors.left = uiElementOverlay.left
-                        descTip.anchors.leftMargin = descLabel.leftPadding
-                        descIcon.anchors.left = descLabel.left
-                        descIcon.anchors.leftMargin = descLabel.leftPadding
+                        _descTip.anchors.left = _uiElementOverlay.left
+                        _descTip.anchors.leftMargin = _descLabel.leftPadding
+                        _descIcon.anchors.left = _descLabel.left
+                        _descIcon.anchors.leftMargin = _descLabel.leftPadding
                     } else {
-                        descTip.anchors.right = uiElementOverlay.right
-                        descTip.anchors.rightMargin = descLabel.rightPadding
-                        descIcon.anchors.right = descLabel.right
-                        descIcon.anchors.right = descLabel.rightPadding
+                        _descTip.anchors.right = _uiElementOverlay.right
+                        _descTip.anchors.rightMargin = _descLabel.rightPadding
+                        _descIcon.anchors.right = _descLabel.right
+                        _descIcon.anchors.right = _descLabel.rightPadding
                     }
-                    descTip.anchors.bottom = uiElementOverlay.top
-                    descIcon.anchors.bottom = descLabel.bottom
+                    _descTip.anchors.bottom = _uiElementOverlay.top
+                    _descIcon.anchors.bottom = _descLabel.bottom
                     break
                 case Item.Bottom:
                 case Item.BottomLeft:
                 case Item.BottomRight:
                     if(descriptionPosition === Item.Top) {
-                        descTip.anchors.horizontalCenter = uiElementOverlay.horizontalCenter
-                        descIcon.anchors.horizontalCenter = descLabel.horizontalCenter
+                        _descTip.anchors.horizontalCenter = _uiElementOverlay.horizontalCenter
+                        _descIcon.anchors.horizontalCenter = _descLabel.horizontalCenter
                     } else if(descriptionPosition === Item.BottomRight) {
-                        descTip.anchors.left = uiElementOverlay.left
-                        descTip.anchors.leftMargin = descLabel.leftPadding
-                        descIcon.anchors.left = descLabel.left
-                        descIcon.anchors.leftMargin = descLabel.leftPadding
+                        _descTip.anchors.left = _uiElementOverlay.left
+                        _descTip.anchors.leftMargin = _descLabel.leftPadding
+                        _descIcon.anchors.left = _descLabel.left
+                        _descIcon.anchors.leftMargin = _descLabel.leftPadding
                     } else {
-                        descTip.anchors.right = uiElementOverlay.right
-                        descTip.anchors.rightMargin = descLabel.rightPadding
-                        descIcon.anchors.right = descLabel.right
-                        descIcon.anchors.right = descLabel.rightPadding
+                        _descTip.anchors.right = _uiElementOverlay.right
+                        _descTip.anchors.rightMargin = _descLabel.rightPadding
+                        _descIcon.anchors.right = _descLabel.right
+                        _descIcon.anchors.right = _descLabel.rightPadding
                     }
-                    descTip.anchors.top = uiElementOverlay.bottom
-                    descIcon.anchors.top = descLabel.top
+                    _descTip.anchors.top = _uiElementOverlay.bottom
+                    _descIcon.anchors.top = _descLabel.top
                     break
                 }
             }

@@ -411,7 +411,7 @@ Rectangle {
                             baseColor = styleData.value.notebookItemObject.color
 
                         if(baseColor)
-                            return Qt.tint(baseColor, "#E7FFFFFF")
+                            return Qt.tint(baseColor, Runtime.colors.sceneHeadingTint)
 
                         return Runtime.colors.primary.c10.background
                     }
@@ -636,7 +636,7 @@ Rectangle {
                     case Note.TextNoteType:
                     case Note.FormNoteType:
                         const note = notebookTree.currentData.notebookItemObject
-                        return Qt.tint(note.color, "#E7FFFFFF")
+                        return Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
                     }
                     break
                 case NotebookModel.EpisodeBreakType:
@@ -1397,7 +1397,7 @@ Rectangle {
                                 id: noteVisual
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, "#E7FFFFFF")
+                                color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, Runtime.colors.sceneHeadingTint)
 
                                 Behavior on color {
                                     enabled: Runtime.applicationSettings.enableAnimations
@@ -1511,7 +1511,7 @@ Rectangle {
         Rectangle {
             property var componentData
             property Note note: componentData ? componentData.notebookItemObject : null
-            color: Qt.tint(note.color, "#E7FFFFFF")
+            color: Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
 
             // Report support
             property bool hasReport: true
@@ -1542,7 +1542,7 @@ Rectangle {
             id: formNoteItem
             property var componentData
             property Note note: componentData.notebookItemObject
-            color: Qt.tint(note.color, "#E7FFFFFF")
+            color: Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
 
             // Report support
             property bool hasReport: true
@@ -1573,7 +1573,7 @@ Rectangle {
             id: checkListNoteItem
             property var componentData
             property Note note: componentData.notebookItemObject
-            color: Qt.tint(note.color, "#E7FFFFFF")
+            color: Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
 
             // Report support
             property bool hasReport: true
@@ -2212,7 +2212,7 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : "#E7FFFFFF")
+                                color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : Runtime.colors.sceneHeadingTint)
                                 border.width: 1
                                 border.color: Scrite.app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : character.color
 

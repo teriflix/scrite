@@ -1068,6 +1068,9 @@ private:
     bool renameCharacter(const QString &from, const QString &to, QString *errMsg);
 
 private:
+    friend class StructureLayout;
+    friend class StructureElement;
+
     qreal m_canvasWidth = 120000;
     qreal m_canvasHeight = 120000;
     qreal m_canvasGridSize = 10;
@@ -1083,7 +1086,6 @@ private:
 
     Notes *m_notes = new Notes(this);
 
-    friend class StructureLayout;
     static void staticAppendElement(QQmlListProperty<StructureElement> *list,
                                     StructureElement *ptr);
     static void staticClearElements(QQmlListProperty<StructureElement> *list);

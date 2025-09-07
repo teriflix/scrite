@@ -5104,7 +5104,8 @@ void Structure::updateSceneTags()
 {
     QSet<QString> allTags;
 
-    for (const StructureElement *element : qAsConst(m_elements)) {
+    const QList<StructureElement *> elements = m_elements.list();
+    for (const StructureElement *element : qAsConst(elements)) {
         const Scene *scene = element->scene();
         const QStringList tags = scene->tags();
         allTags += QSet<QString>(tags.begin(), tags.end());

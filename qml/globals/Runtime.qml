@@ -44,7 +44,6 @@ Item {
     property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
     readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
-    readonly property color headingColorTint: "#E7FFFFFF"
 
     // Global functions
     function tintSceneHeadingColor(sceneColor) {
@@ -100,7 +99,7 @@ Item {
         fileName: Scrite.app.settingsFilePath
         category: "Screenplay Editor"
 
-        property bool placeholderContentInterval: 500 // ms after which placeholder is swapped to content in delegates
+        property int placeholderContentInterval: 500 // ms after which placeholder is swapped to content in delegates
         property bool screenplayEditorAddButtonsAnimationShown: false
         property bool refreshButtonInStatsReportAnimationDone: false
         property bool firstSwitchToStructureTab: true
@@ -346,13 +345,13 @@ Item {
     }
 
     readonly property FontMetrics sceneEditorFontMetrics: FontMetrics {
-        property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Action)
-        property int lettersPerLine: 70
-        property int marginLetters: 5
-        property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
-        property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
-        property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
-        font: format ? format.font2 : Scrite.document.formatting.defaultFont2
+        readonly property int lettersPerLine: 70
+        readonly property int marginLetters: 5
+        readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
+        readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
+        readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
+
+        font: Scrite.document.formatting.defaultFont2
     }
 
     // Color Palettes
@@ -461,6 +460,8 @@ Item {
         readonly property color transparent: "transparent"
         readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
         readonly property var   forScene: Scrite.app.standardColors(Scrite.app.versionNumber)
+        readonly property color sceneHeadingTint: "#E7FFFFFF"
+        readonly property color selectedSceneHeadingTint: "#9CFFFFFF"
     }
 
     // All the app-features
