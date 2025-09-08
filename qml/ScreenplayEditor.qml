@@ -3819,6 +3819,19 @@ Rectangle {
         property bool expanded: sceneListSidePanel.expanded
         onExpandedChanged: contentView.commentsExpandCounter = 0
 
+        Shortcut {
+            sequence: "Alt+0"
+            enabled: sceneListSidePanel.visible
+            onActivated: sceneListSidePanel.expanded = !sceneListSidePanel.expanded
+
+            ShortcutsModelItem.priority: 1
+            ShortcutsModelItem.group: "Application"
+            ShortcutsModelItem.title: sceneListSidePanel.expanded ? "Collapse Side Panel" : "Expand Side Panel"
+            ShortcutsModelItem.enabled: enabled
+            ShortcutsModelItem.visible: sceneListSidePanel.visible
+            ShortcutsModelItem.shortcut: nativeText
+        }
+
         SidePanel {
             id: sceneListSidePanel
             height: parent.height

@@ -185,10 +185,11 @@ void ShortcutsModelItem::setShortcut(const QString &val)
 
 void ShortcutsModelItem::setGroup(const QString &val)
 {
-    if (m_group == val)
+    const QString val2 = val.trimmed();
+    if (m_group == val2)
         return;
 
-    m_group = val;
+    m_group = val2;
     emit groupChanged();
 
     ShortcutsModel::instance()->update(this, true);
