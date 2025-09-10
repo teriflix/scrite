@@ -247,7 +247,9 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                         scenePropsE.setAttribute(QStringLiteral("Title"), selement->nativeTitle());
 
                     const QColor sceneColor = scene->color();
-                    const QColor tintColor(QStringLiteral(Runtime.colors.sceneHeadingTint));
+                    const QColor tintColor = QColor(
+                            QStringLiteral("#9CFFFFFF")); // TODO: We really need to standardize
+                                                          // these hardcoded colors
                     const QColor exportSceneColor =
                             QColor::fromRgbF((sceneColor.redF() + tintColor.redF()) / 2,
                                              (sceneColor.greenF() + tintColor.greenF()) / 2,

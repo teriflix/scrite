@@ -29,9 +29,14 @@ import "qrc:/qml/screenplayeditor/scenelistpanel"
 Item {
     id: root
 
+    required property bool readOnly
     required property ScreenplayAdapter screenplayAdapter
 
+    property alias expanded: _sidePanel.expanded
+
     signal positionScreenplayEditorAtTitlePage()
+
+    width: _sidePanel.width
 
     SidePanel {
         id: _sidePanel
@@ -50,17 +55,19 @@ Item {
         id: _private
 
         readonly property string dragDropMimeType: "sceneListView/sceneID"
+        readonly property real sceneIconSize: (Runtime.sceneEditorFontMetrics.xHeight + Runtime.sceneEditorFontMetrics.lineSpacing)/2
+        readonly property real sceneIconPadding: 8
 
         readonly property Component emptyScreenplayContent: Item {
             VclLabel {
                 anchors.top: parent.top
                 anchors.topMargin: 50
-                anchors.horizontalCenter: sceneListView.horizontalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
 
                 width: parent.width * 0.9
 
                 text: "Scene headings will be listed here as you add them into your screenplay."
-                visible: Runtime.screenplayAdapter.elementCount === 0
+                visible: root.screenplayAdapter.elementCount === 0
                 wrapMode: Text.WordWrap
                 horizontalAlignment: Text.AlignHCenter
             }
@@ -83,11 +90,11 @@ Item {
 
                 ScrollBar.vertical: VclScrollBar { flickable: _sceneListView }
 
-                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-
                 FocusTracker.window: Scrite.window
                 FocusTracker.indicator.target: Runtime.undoStack
                 FocusTracker.indicator.property: "sceneListPanelActive"
+
+                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                 anchors.fill: parent
 
@@ -106,6 +113,8 @@ Item {
                 preferredHighlightBegin: height*0.2
 
                 header: SceneListPanelHeader {
+                    width: _sceneListView.width
+
                     leftPadding: _sceneListView.__leftPadding
                     rightPadding: _sceneListView.__rightPadding
 
@@ -119,6 +128,8 @@ Item {
                 }
 
                 footer: SceneListPanelFooter {
+                    width: _sceneListView.width
+
                     dragDropMimeType: _private.dragDropMimeType
 
                     onDropEntered: (drag) => {
@@ -135,9 +146,14 @@ Item {
                 delegate: SceneListPanelDelegate {
                     id: _delegate
 
+                    width: _sceneListView.width
+
+                    readOnly: root.readOnly
                     leftPadding: _sceneListView.__leftPadding
                     rightPadding: _sceneListView.__rightPadding
+                    sceneIconSize: _private.sceneIconSize
                     leftPaddingRatio: _sceneListView.__leftPaddingRatio
+                    sceneIconPadding: _private.sceneIconPadding
                     dragDropMimeType: _private.dragDropMimeType
                     screenplayAdapter: root.screenplayAdapter
 
@@ -160,7 +176,7 @@ Item {
                                    }
 
                     onContextMenuRequest: () => {
-                                              if(screenplayElementType == ScreenplayElement.BreakElementType) {
+                                              if(screenplayElementType === ScreenplayElement.BreakElementType) {
                                                   _breakElementContextMenu.element = _delegate.screenplayElement
                                                   _breakElementContextMenu.popup(_delegate)
                                               } else {
@@ -174,17 +190,26 @@ Item {
                                                     }
                 }
 
-                property real __leftPadding: 0
-                property real __rightPadding: 0
-                property real __leftPaddingRatio: 0
+                property real __leftPadding: (_private.sceneIconSize + 2*_private.sceneIconPadding)*__leftPaddingRatio
+                property real __rightPadding: (_sceneListView.contentHeight > _sceneListView.height) ? 17 : 0
+                property real __leftPaddingRatio: root.screenplayAdapter.hasNonStandardScenes ? 1 : 0
+
+                Behavior on __leftPaddingRatio {
+                    enabled: Runtime.applicationSettings.enableAnimations
+                    NumberAnimation { duration: Runtime.stdAnimationDuration }
+                }
             }
 
             ScreenplayBreakElementsContextMenu {
                 id: _breakElementContextMenu
+
+                enabled: !root.readOnly
             }
 
             ScreenplaySceneElementsContextMenu {
                 id: _sceneElementsContextMenu
+
+                enabled: !root.readOnly
             }
 
             SceneListPanelMoveElementsTask {
@@ -194,7 +219,7 @@ Item {
             }
 
             Connections {
-                target: root.screenplayAdapter
+                target: root.screenplayAdapter.screenplay
                 enabled: root.screenplayAdapter.isSourceScreenplay
 
                 function onElementMoved(element, from, to) {

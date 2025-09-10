@@ -535,7 +535,7 @@ Rectangle {
                     }
                     Behavior on alpha {
                         enabled: Runtime.applicationSettings.enableAnimations
-                        NumberAnimation { duration: 250 }
+                        NumberAnimation { duration: Runtime.stdAnimationDuration }
                     }
                 }
             }
@@ -577,7 +577,7 @@ Rectangle {
             z: opacity
             Behavior on opacity {
                 enabled: Runtime.applicationSettings.enableAnimations
-                NumberAnimation { duration: 250 }
+                NumberAnimation { duration: Runtime.stdAnimationDuration }
             }
 
             property string pathString: modelData.pathString

@@ -330,7 +330,7 @@ Item {
         function onJustReset() {
             Runtime.screenplayEditorSettings.firstSwitchToStructureTab = true
             appBusyOverlay.ref()
-            Runtime.screenplayAdapter.initialLoadTreshold = 25
+            // Runtime.screenplayAdapter.initialLoadTreshold = 25
             reloadScriteDocumentTimer.stop()
             Utils.execLater(Runtime.screenplayAdapter, 250, () => {
                                 appBusyOverlay.deref()
@@ -340,12 +340,12 @@ Item {
 
         function onJustLoaded() {
             Runtime.screenplayEditorSettings.firstSwitchToStructureTab = true
-            var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
-            if(firstElement) {
-                var editorHints = firstElement.editorHints
-                if(editorHints)
-                    Runtime.screenplayAdapter.initialLoadTreshold = -1
-            }
+            // var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
+            // if(firstElement) {
+            //     var editorHints = firstElement.editorHints
+            //     if(editorHints)
+            //         Runtime.screenplayAdapter.initialLoadTreshold = -1
+            // }
         }
 
         function onOpenedAnonymously(filePath) {
@@ -1288,7 +1288,7 @@ Item {
                             width: parent.active ? 32 : 24; height: width
                             Behavior on width {
                                 enabled: Runtime.applicationSettings.enableAnimations
-                                NumberAnimation { duration: 250 }
+                                NumberAnimation { duration: Runtime.stdAnimationDuration }
                             }
 
                             fillMode: Image.PreserveAspectFit
@@ -1997,12 +1997,8 @@ Item {
         anchors.fill: parent
         busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
         visible: RefCounter.isReffed
-        function ref() {
-            RefCounter.ref()
-        }
-        function deref() {
-            RefCounter.deref()
-        }
+        function ref() { RefCounter.ref() }
+        function deref() { RefCounter.deref() }
     }
 
     HelpTipNotification {

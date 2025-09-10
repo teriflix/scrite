@@ -136,7 +136,7 @@ Item {
                 rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
                 Behavior on font.pixelSize {
                     enabled: Runtime.applicationSettings.enableAnimations
-                    NumberAnimation { duration: 250 }
+                    NumberAnimation { duration: Runtime.stdAnimationDuration }
                 }
                 Behavior on color {
                     enabled: Runtime.applicationSettings.enableAnimations

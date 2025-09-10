@@ -30,9 +30,9 @@ Item {
 
     required property string dragDropMimeType
 
-    signal dropEntered(DragEvent drag)
+    signal dropEntered(var drag) // When we move to Qt 6.9+, change type to DragEvent
     signal dropExited()
-    signal dropRequest(DragEvent drop)
+    signal dropRequest(var drop) // When we move to Qt 6.9+, change type to DragEvent
 
     height: Runtime.sceneEditorFontMetrics.lineSpacing
 

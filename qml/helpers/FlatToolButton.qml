@@ -98,7 +98,7 @@ Item {
 
         Behavior on anchorMargins {
             enabled: _icon.anchorMargins > 0 && Runtime.applicationSettings.enableAnimations
-            NumberAnimation { duration: 250 }
+            NumberAnimation { duration: Runtime.stdAnimationDuration }
         }
     }
 

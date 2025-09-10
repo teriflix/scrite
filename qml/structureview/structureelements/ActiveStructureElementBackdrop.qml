@@ -45,7 +45,7 @@ BoxShadow {
     Behavior on opacity {
         enabled: Runtime.applicationSettings.enableAnimations
 
-        NumberAnimation { duration: 250 }
+        NumberAnimation { duration: Runtime.stdAnimationDuration }
     }
 
     QtObject {

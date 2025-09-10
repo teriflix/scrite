@@ -142,7 +142,7 @@ void AbstractImporter::configureCanvas(int nrBlocks)
 
 Scene *AbstractImporter::createScene(const QString &heading)
 {
-    const QVector<QColor> sceneColors = Application::standardColors(QVersionNumber());
+    const QVector<QColor> sceneColors = Application::standardColorsForVersion(QVersionNumber());
     Structure *structure = this->document()->structure();
     Screenplay *screenplay = this->document()->screenplay();
     Scene *scene = nullptr;

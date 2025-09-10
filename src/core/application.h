@@ -44,6 +44,8 @@ class QNetworkConfigurationManager;
 class Application : public QtApplicationClass
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use Scrite.app to access the only application instance.")
 
 public:
     static QVersionNumber prepare();
@@ -338,7 +340,7 @@ public:
     void initializeStandardColors(QQmlEngine *);
 
     Q_INVOKABLE static QVector<QColor>
-    standardColors(const QVersionNumber &version = QVersionNumber());
+    standardColorsForVersion(const QVersionNumber &version = QVersionNumber());
 
     // QCoreApplication interface
     bool notify(QObject *, QEvent *);

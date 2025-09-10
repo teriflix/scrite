@@ -44,6 +44,7 @@ Item {
     property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
     readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
+    readonly property int stdAnimationDuration: 250
 
     // Global functions
     function tintSceneHeadingColor(sceneColor) {
@@ -445,6 +446,8 @@ Item {
     }
 
     readonly property QtObject colors: Item {
+        objectName: "RuntimeColors"
+
         readonly property int theme: Material.Light
         readonly property int defaultPrimaryColor: Material.Grey
         readonly property int defaultAccentColor: Material.DeepPurple
@@ -459,7 +462,7 @@ Item {
 
         readonly property color transparent: "transparent"
         readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
-        readonly property var   forScene: Scrite.app.standardColors(Scrite.app.versionNumber)
+        readonly property var   forScene: Scrite.app.standardColorsForVersion(Scrite.app.versionNumber)
         readonly property color sceneHeadingTint: "#E7FFFFFF"
         readonly property color selectedSceneHeadingTint: "#9CFFFFFF"
     }
@@ -579,13 +582,10 @@ Item {
         property string sessionId
 
         source: {
-            if(Scrite.document.sessionId !== sessionId)
-                return null
+            // if(Scrite.document.sessionId !== sessionId)
+            //     return null
 
-            if(mainWindowTab === e_ScreenplayTab)
-                return Scrite.document.screenplay
-
-            if(Scrite.document.screenplay.currentElementIndex < 0) {
+            if(mainWindowTab !== e_ScreenplayTab && Scrite.document.screenplay.currentElementIndex < 0) {
                 let index = Scrite.document.structure.currentElementIndex
                 let element = Scrite.document.structure.elementAt(index)
                 if(element) {
