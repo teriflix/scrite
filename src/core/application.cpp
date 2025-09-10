@@ -1579,7 +1579,7 @@ bool Application::reparent(QObject *object, QObject *newParent)
 
 QColor Application::pickStandardColor(int counter)
 {
-    const QVector<QColor> colors = Application::standardColors();
+    const QVector<QColor> colors = Application::standardColorsForVersion();
     if (colors.isEmpty())
         return QColor("white");
 
@@ -2294,14 +2294,14 @@ void Application::initializeStandardColors(QQmlEngine *)
     if (!m_standardColors.isEmpty())
         return;
 
-    const QVector<QColor> colors = this->standardColors();
+    const QVector<QColor> colors = this->standardColorsForVersion();
     for (int i = 0; i < colors.size(); i++)
         m_standardColors << QVariant::fromValue<QColor>(colors.at(i));
 
     emit standardColorsChanged();
 }
 
-QVector<QColor> Application::standardColors(const QVersionNumber &version)
+QVector<QColor> Application::standardColorsForVersion(const QVersionNumber &version)
 {
     // Up-until version 0.2.17 Beta
     if (!version.isNull() && version <= QVersionNumber(0, 2, 17))

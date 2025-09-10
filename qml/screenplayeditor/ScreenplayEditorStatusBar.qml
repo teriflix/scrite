@@ -417,7 +417,7 @@ Rectangle {
         scale: _iconButtonMouseArea.containsMouse ? (_iconButtonMouseArea.pressed ? 1 : 1.5) : 1
         mipmap: true
 
-        Behavior on scale { NumberAnimation { duration: 250 } }
+        Behavior on scale { NumberAnimation { duration: Runtime.stdAnimationDuration } }
 
         MouseArea {
             id: _iconButtonMouseArea

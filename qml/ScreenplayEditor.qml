@@ -34,10 +34,31 @@ import "qrc:/qml/floatingdockpanels"
 Rectangle {
     id: root
 
+    color: Runtime.colors.primary.windowColor
+
+    ScreenplayEditorSidePanel {
+        id: _sidePanel
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.bottom: _statusBar.top
+        anchors.topMargin: 5
+        anchors.bottomMargin: 5
+
+        screenplayAdapter: Runtime.screenplayAdapter
+
+        visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+
+        onPositionScreenplayEditorAtTitlePage: _screenplayEditorListView.positionViewAtBeginning()
+    }
+
     Item {
         id: _workspace
 
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.left: _sidePanel.right
+        anchors.right: parent.right
+        anchors.bottom: _statusBar.top
 
         RulerItem {
             id: _ruler
@@ -64,22 +85,22 @@ Rectangle {
             anchors.top: _ruler.bottom
             anchors.left: _ruler.left
             anchors.right: _ruler.right
-            anchors.bottom: _statusBar.top
-        }
-
-        ScreenplayEditorStatusBar {
-            id: _statusBar
-
-            anchors.left: parent.left
-            anchors.right: parent.right
             anchors.bottom: parent.bottom
-
-            pageMargins: _private.pageMargins
-            sceneHeadingFontMetrics: _private.sceneHeadingFontMetrics
-            screenplayEditorListView: _screenplayEditorListView
-            screenplayEditorLastItemIndex: 0
-            screenplayEditorFirstItemIndex: 0
         }
+    }
+
+    ScreenplayEditorStatusBar {
+        id: _statusBar
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        pageMargins: _private.pageMargins
+        sceneHeadingFontMetrics: _private.sceneHeadingFontMetrics
+        screenplayEditorListView: _screenplayEditorListView
+        screenplayEditorLastItemIndex: 0
+        screenplayEditorFirstItemIndex: 0
     }
 
     QtObject {

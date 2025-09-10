@@ -41,16 +41,18 @@ Rectangle {
     required property real leftPadding
     required property real rightPadding
     required property real leftPaddingRatio
+    required property real sceneIconSize
+    required property real sceneIconPadding
 
     required property string dragDropMimeType
 
     required property ScreenplayAdapter screenplayAdapter
 
     signal dragStarted()
-    signal dragFinished(DropAction dropAction)
-    signal dropEntered(DragEvent drag)
+    signal dragFinished(var dropAction) // When we move to Qt 6.9+, change type to DropAction
+    signal dropEntered(var drag) // When we move to Qt 6.9+, change type to DragEvent
     signal dropExited()
-    signal dropRequest(DragEvent drop)
+    signal dropRequest(var drop) // When we move to Qt 6.9+, change type to DragEvent
     signal contextMenuRequest()
     signal collapseSideListPanelRequest()
 
@@ -64,7 +66,7 @@ Rectangle {
            root.screenplayAdapter.clearSelection()
         root.screenplayElement.selected = true
         if(root.screenplayElementType === ScreenplayElement.BreakElementType)
-            root.screenplayAdapter.currentElementIndex = index
+            root.screenplayAdapter.currentIndex = index
         root.dragStarted()
     }
     Drag.onDragFinished: (dropAction) => { root.dragFinished(dropAction) }
@@ -113,11 +115,11 @@ Rectangle {
 
                 anchors.top: _private.isSceneTextModeHeading ? undefined : _contentLayout.top
                 anchors.left: parent.left
-                anchors.leftMargin: 12
+                anchors.leftMargin: root.sceneIconPadding
                 anchors.verticalCenter: _private.isSceneTextModeHeading ? _contentLayout.verticalCenter : undefined
 
-                width: Runtime.sceneEditorFontMetrics.lineSpacing
-                height: Runtime.sceneEditorFontMetrics.lineSpacing
+                width: root.sceneIconSize
+                height: root.sceneIconSize
 
                 visible: root.leftPaddingRatio > 0
                 opacity: (_private.isCurrent ? 1 : 0.5) * root.leftPaddingRatio
@@ -170,21 +172,18 @@ Rectangle {
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignVCenter
 
+                    text: _private.text
+                    elide: _private.isSceneTextModeHeading ? Text.ElideMiddle : Text.ElideRight
                     color: Runtime.colors.primary.c10.text
+                    wrapMode: _private.isSceneTextModeHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
+                    maximumLineCount: _private.isSceneTextModeHeading ? 1 : Utils.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
+                    verticalAlignment: Qt.AlignVCenter
+                    horizontalAlignment: Qt.AlignLeft
 
                     font.bold: _private.isCurrent || _private.isBreak
                     font.family: Runtime.sceneEditorFontMetrics.font.family
                     // font.pointSize: Math.ceil(Runtime.idealFontMetrics.font.pointSize*(delegateItem.elementIsBreak ? 1.2 : 1))
                     font.capitalization: _private.isBreak || _private.isSceneTextModeHeading ? Font.AllUppercase : Font.MixedCase
-
-                    verticalAlignment: Qt.AlignVCenter
-                    horizontalAlignment: Qt.AlignLeft
-
-                    elide: _private.isSceneTextModeHeading ? Text.ElideMiddle : Text.ElideRight
-                    wrapMode: _private.isSceneTextModeHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
-                    maximumLineCount: _private.isSceneTextModeHeading ? 1 : Utils.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
-
-                    text: _private.text
 
                     Loader {
                         anchors.fill: parent
@@ -212,7 +211,7 @@ Rectangle {
                     sourceComponent: Image {
                         smooth: true
                         mipmap: true
-                        source: "qrc:/icons/content/empty_scene.png"
+                        source: "qrc:/icons/content/empty_root.scene.png"
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
@@ -273,7 +272,7 @@ Rectangle {
 
         onClicked: (mouse) => {
                        if(mouse.button === Qt.RightButton) {
-                           root.screenplayAdapter.currentElementIndex = index
+                           root.screenplayAdapter.currentIndex = index
                            root.contextMenuRequest()
                            return
                        }
@@ -356,7 +355,7 @@ Rectangle {
         property bool multiSelection: root.screenplayAdapter.screenplay.selectedElementsCount > 1
 
         property bool isBreak: root.screenplayElementType === ScreenplayElement.BreakElementType
-        property bool isCurrent: _private.isCurrent
+        property bool isCurrent: root.screenplayAdapter.currentIndex === root.index
         property bool isSelection: (isCurrent || screenplayElement.selected)
         property bool isEpisodeBreak: root.screenplayElementType === ScreenplayElement.BreakElementType && root.breakType === Screenplay.Episode
         property bool isSceneTextModeHeading: Runtime.sceneListPanelSettings.sceneTextMode === "HEADING"
@@ -368,8 +367,12 @@ Rectangle {
                                                 Qt.tint(normalColor, "#40FFFFFF") : normalColor)
             return isCurrent ? Scrite.app.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
         }
-        property color normalColor: Qt.tint(scene.color, Runtime.colors.sceneHeadingTint)
-        property color selectedColor: Scrite.app.isVeryLightColor(scene.color) ? Qt.tint(Runtime.colors.primary.highlight.background, Runtime.colors.selectedSceneHeadingTint) : Qt.tint(scene.color, Runtime.colors.selectedSceneHeadingTint)
+        property color normalColor: root.scene ? Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c200.background
+        property color selectedColor: root.scene ?
+                                          (Scrite.app.isVeryLightColor(root.scene.color) ?
+                                               Qt.tint(Runtime.colors.primary.highlight.background, Runtime.colors.selectedSceneHeadingTint) :
+                                               Qt.tint(root.scene.color, Runtime.colors.selectedSceneHeadingTint)) :
+                                          Runtime.colors.primary.c300.background
 
         property var dragMimeData: {
             let ret = {}
@@ -380,13 +383,13 @@ Rectangle {
         property string text: {
             let ret = "UNKNOWN"
 
-            if(scene) {
-                const sceneHeading = scene.heading
+            if(root.scene) {
+                const sceneHeading = root.scene.heading
                 if(isSceneTextModeHeading) {
                     if(sceneHeading.enabled) {
                         ret = root.screenplayElement.resolvedSceneNumber + ". "
                         if(root.screenplayElement.omitted)
-                            ret += "[OMITTED] <font color=\"gray\">" + scene.heading.text + "</font>"
+                            ret += "[OMITTED] <font color=\"gray\">" + root.scene.heading.text + "</font>"
                         else
                             ret += sceneHeading.text
                     } else if(screenplayElement.omitted)
@@ -440,15 +443,13 @@ Rectangle {
         }
 
         function updateSceneLength() {
-            Qt.callLater( () => {
-                             _private.sceneLength = _private.evaluateSceneLength()
-                         })
+            _private.sceneLength = _private.evaluateSceneLength()
         }
 
         Component.onCompleted: {
             Runtime.screenplayTextDocument.pausedChanged.connect(updateSceneLength)
+            Runtime.screenplayTextDocument.pageBoundariesChanged.connect(updateSceneLength)
             Runtime.sceneListPanelSettings.displaySceneLengthChanged.connect(updateSceneLength)
-
         }
     }
 }

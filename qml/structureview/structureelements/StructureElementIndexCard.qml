@@ -649,7 +649,7 @@ AbstractStructureElementUI {
 
                         Behavior on scale {
                             enabled: Runtime.applicationSettings.enableAnimations
-                            NumberAnimation { duration: 250 }
+                            NumberAnimation { duration: Runtime.stdAnimationDuration }
                         }
                     }
 

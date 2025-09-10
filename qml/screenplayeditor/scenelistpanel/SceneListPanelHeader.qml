@@ -42,7 +42,6 @@ Rectangle {
         anchors.right: parent.right
         anchors.leftMargin: root.leftPadding
         anchors.rightMargin: root.rightPadding
-        anchors.verticalCenter: parent
 
         VclText {
             id: _headingText
@@ -81,7 +80,7 @@ Rectangle {
 
                 width: parent.width
 
-                VclMenu {
+                SceneListPanelMenu {
                     id: _menu
                 }
             }
