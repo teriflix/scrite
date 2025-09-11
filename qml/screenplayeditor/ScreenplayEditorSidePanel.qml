@@ -190,7 +190,7 @@ Item {
                                                     }
                 }
 
-                property real __leftPadding: (_private.sceneIconSize + 2*_private.sceneIconPadding)*__leftPaddingRatio
+                property real __leftPadding: Math.max(2*_private.sceneIconPadding, (_private.sceneIconSize + 2*_private.sceneIconPadding)*__leftPaddingRatio)
                 property real __rightPadding: (_sceneListView.contentHeight > _sceneListView.height) ? 17 : 0
                 property real __leftPaddingRatio: root.screenplayAdapter.hasNonStandardScenes ? 1 : 0
 
