@@ -40,13 +40,6 @@ Rectangle {
 
     Loader {
         id: _sidePanelLoader
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.bottom: _statusBar.top
-        anchors.topMargin: 5
-        anchors.bottomMargin: 5
-
         active: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
 
         sourceComponent: ScreenplayEditorSidePanel {
