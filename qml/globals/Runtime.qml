@@ -46,11 +46,6 @@ Item {
     readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
     readonly property int stdAnimationDuration: 250
 
-    // Global functions
-    function tintSceneHeadingColor(sceneColor) {
-        return Qt.tint(sceneColor, headingColorTint)
-    }
-
     // Persistent Settings
     readonly property Settings userAccountDialogSettings: Settings {
         fileName: Scrite.app.settingsFilePath

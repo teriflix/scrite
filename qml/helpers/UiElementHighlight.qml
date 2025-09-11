@@ -54,15 +54,15 @@ Item {
 
         x: _uiElementPosition.mappedPosition.x
         y: _uiElementPosition.mappedPosition.y
-        width: uiElement.width * uiElement.scale
-        height: uiElement.height * uiElement.scale
+        width: root.uiElement ? (root.uiElement.width * uiElement.scale) : 0
+        height: root.uiElement ? (root.uiElement.height * uiElement.scale) : 0
 
         Rectangle {
             anchors.fill: parent
             anchors.margins: -2.5
 
             color: Qt.rgba(0,0,0,0)
-            visible: uiElementBoxVisible
+            visible: root.uiElementBoxVisible
 
             border.width: 2
             border.color: Runtime.colors.accent.highlight.background
@@ -171,7 +171,7 @@ Item {
                         _descTip.anchors.right = _uiElementOverlay.right
                         _descTip.anchors.rightMargin = _descLabel.rightPadding
                         _descIcon.anchors.right = _descLabel.right
-                        _descIcon.anchors.right = _descLabel.rightPadding
+                        _descIcon.anchors.rightMargin = _descLabel.rightPadding
                     }
                     _descTip.anchors.top = _uiElementOverlay.bottom
                     _descIcon.anchors.top = _descLabel.top

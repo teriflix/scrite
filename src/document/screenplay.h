@@ -178,6 +178,8 @@ public:
     Q_SIGNAL void sceneTypeChanged();
     Q_SIGNAL void sceneGroupsChanged(ScreenplayElement *ptr);
 
+    QString delegateKind() const;
+
     // QObjectSerializer::Interface interface
     bool canSerialize(const QMetaObject *, const QMetaProperty &) const;
 
@@ -585,6 +587,7 @@ protected:
     bool event(QEvent *event);
     void timerEvent(QTimerEvent *te);
     void resetActiveScene();
+    void onScreenplayElementChanged();
     void onSceneReset(int elementIndex);
     void onScreenplayElementOmittedChanged();
     void evaluateSceneNumbers(bool minorAlso = false);

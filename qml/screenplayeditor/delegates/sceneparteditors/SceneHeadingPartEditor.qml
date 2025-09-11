@@ -33,13 +33,24 @@ AbstractScenePartEditor {
 
         width: parent.width
 
-        TextField {
+        Item {
             Layout.preferredWidth: root.pageLeftMargin
 
-            text: root.screenplayElement.hasUserSceneNumber ? root.screenplayElement.resolvedSceneNumber : ""
-            font: root.font
-            placeholderText: root.screenplayElement.sceneNumber
+            TextField {
+                anchors.right: parent.right
+                anchors.rightMargin: root.pageLeftMargin * 0.1
+                anchors.verticalCenter: parent.verticalCenter
+
+                width: root.fontMetrics.averageCharacterWidth * 5
+
+                text: root.screenplayElement.hasUserSceneNumber ? root.screenplayElement.resolvedSceneNumber : ""
+                font: root.font
+                placeholderText: root.screenplayElement.sceneNumber
+
+                background: Item { }
+            }
         }
+
 
         SceneHeadingTextField {
             Layout.fillWidth: true

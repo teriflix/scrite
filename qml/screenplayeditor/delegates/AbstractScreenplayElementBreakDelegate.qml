@@ -49,7 +49,7 @@ AbstractScreenplayElementDelegate {
         RowLayout {
             id: _layout
 
-            anchors.verticalCenter: parent
+            anchors.verticalCenter: parent.verticalCenter
 
             width: parent.width
 
@@ -78,6 +78,7 @@ AbstractScreenplayElementDelegate {
                 Layout.fillWidth: true
 
                 text: root.screenplayElement.breakSubtitle
+                font: root.font
                 label: ""
                 focus: true
                 placeholderText: root.screenplayElement.breakTitle

@@ -41,12 +41,14 @@ AbstractScreenplayElementDelegate {
         ColumnLayout {
             id: _layout
 
+            width: parent.width
+
             // Scene Heading Area
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: _headingLayout.height + root.zoomLevel * _headingLayout.spacing * 2
 
-                color: Runtime.tintSceneHeadingColor(root.scene.color)
+                color: Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint)
 
                 ColumnLayout {
                     id: _headingLayout
@@ -83,6 +85,7 @@ AbstractScreenplayElementDelegate {
                         screenplayElement: root.screenplayElement
                         screenplayElementDelegateHasFocus: root.hasFocus
 
+                        visible: Runtime.screenplayEditorSettings.displaySceneCharacters
                         zoomLevel: root.zoomLevel
                         fontMetrics: root.fontMetrics
                         pageMargins: root.pageMargins
@@ -106,6 +109,7 @@ AbstractScreenplayElementDelegate {
                         screenplayElement: root.screenplayElement
                         screenplayElementDelegateHasFocus: root.hasFocus
 
+                        visible: Runtime.screenplayEditorSettings.displaySceneCharacters
                         zoomLevel: root.zoomLevel
                         fontMetrics: root.fontMetrics
                         pageMargins: root.pageMargins
@@ -126,6 +130,7 @@ AbstractScreenplayElementDelegate {
                         screenplayElement: root.screenplayElement
                         screenplayElementDelegateHasFocus: root.hasFocus
 
+                        visible: Runtime.screenplayEditorSettings.displaySceneSynopsis
                         zoomLevel: root.zoomLevel
                         fontMetrics: root.fontMetrics
                         pageMargins: root.pageMargins
@@ -136,29 +141,39 @@ AbstractScreenplayElementDelegate {
                 }
             }
 
-            SceneContentEditor {
-                id: _sceneContentEditor
-
+            Item {
                 Layout.fillWidth: true
+                Layout.preferredHeight: _sceneContentEditor.height
 
-                index: root.index
-                sceneID: root.sceneID
-                screenplayElement: root.screenplayElement
-                screenplayElementDelegateHasFocus: root.hasFocus
+                SceneContentEditor {
+                    id: _sceneContentEditor
 
-                focus: true
-                zoomLevel: root.zoomLevel
-                fontMetrics: root.fontMetrics
-                pageMargins: root.pageMargins
-                placeholderMode: root.placeholderMode
+                    width: parent.width
 
-                onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+                    index: root.index
+                    sceneID: root.sceneID
+                    screenplayElement: root.screenplayElement
+                    screenplayElementDelegateHasFocus: root.hasFocus
 
-                onEditSceneHeadingRequest: () => { _sceneHeadingEditor.focus = true }
-                onScrollToNextSceneRequest: () => { root.scrollToNextSceneRequest() }
-                onScrollToPreviousSceneRequest: () => { root.scrollToPreviousSceneRequest() }
-                onSplitSceneRequest: (paragraph, cursorPosition) => { root.splitSceneRequest(paragraph, cursorPosition) }
-                onMergeWithPreviousSceneRequest: () => { root.mergeWithPreviousSceneRequest() }
+                    focus: true
+                    zoomLevel: root.zoomLevel
+                    fontMetrics: root.fontMetrics
+                    pageMargins: root.pageMargins
+                    placeholderMode: root.placeholderMode
+
+                    onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                    onEditSceneHeadingRequest: () => { _sceneHeadingEditor.focus = true }
+                    onScrollToNextSceneRequest: () => { root.scrollToNextSceneRequest() }
+                    onScrollToPreviousSceneRequest: () => { root.scrollToPreviousSceneRequest() }
+                    onSplitSceneRequest: (paragraph, cursorPosition) => { root.splitSceneRequest(paragraph, cursorPosition) }
+                    onMergeWithPreviousSceneRequest: () => { root.mergeWithPreviousSceneRequest() }
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+                Layout.preferredHeight: Runtime.sceneEditorFontMetrics.lineSpacing
             }
         }
 

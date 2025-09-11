@@ -32,6 +32,7 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
     this->setScreenplay(qobject_cast<Screenplay *>(parent));
 
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::omittedChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::userSceneNumberChanged, this,
             &ScreenplayElement::elementChanged);
@@ -308,6 +309,30 @@ void ScreenplayElement::setPageBreakBefore(bool val)
 int ScreenplayElement::wordCount() const
 {
     return m_scene.isNull() ? 0 : m_scene->wordCount();
+}
+
+QString ScreenplayElement::delegateKind() const
+{
+    if (m_elementType == ScreenplayElement::BreakElementType) {
+        switch (m_breakType) {
+        case Screenplay::Act:
+            return QStringLiteral("actBreak");
+        case Screenplay::Episode:
+            return QStringLiteral("episodeBreak");
+        case Screenplay::Interval:
+            return QStringLiteral("intervalBreak");
+        default:
+            return QStringLiteral("genericBreak");
+        }
+    }
+
+    if (m_elementType == ScreenplayElement::SceneElementType) {
+        if (m_omitted)
+            return QStringLiteral("omittedScene");
+        return QStringLiteral("scene");
+    }
+
+    return QStringLiteral("generic");
 }
 
 bool ScreenplayElement::canSerialize(const QMetaObject *mo, const QMetaProperty &prop) const
@@ -2237,6 +2262,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
     if (ptr == nullptr)
         return;
 
+    connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::onScreenplayElementChanged,
+            Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged,
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement,
@@ -2272,6 +2299,8 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
     if (ptr == nullptr)
         return;
 
+    disconnect(ptr, &ScreenplayElement::elementChanged, this,
+               &Screenplay::onScreenplayElementChanged);
     disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
@@ -3011,26 +3040,8 @@ QVariant Screenplay::data(const QModelIndex &index, int role) const
         return element->breakType();
     case SceneRole:
         return QVariant::fromValue<Scene *>(element->scene());
-    case DelegateKindRole: {
-        if (element->elementType() == ScreenplayElement::BreakElementType) {
-            switch (element->breakType()) {
-            case Screenplay::Act:
-                return QStringLiteral("actBreak");
-            case Screenplay::Episode:
-                return QStringLiteral("episodeBreak");
-            case Screenplay::Interval:
-                return QStringLiteral("intervalBreak");
-            default:
-                return QStringLiteral("genericBreak");
-            }
-        }
-        if (element->elementType() == ScreenplayElement::SceneElementType) {
-            if (element->isOmitted())
-                return QStringLiteral("omittedScene");
-            return QStringLiteral("scene");
-        }
-        return QStringLiteral("generic");
-    } break;
+    case DelegateKindRole:
+        return element->delegateKind();
     default:
         break;
     }
@@ -3045,7 +3056,7 @@ QHash<int, QByteArray> Screenplay::roleNames() const
         roles[IdRole] = "sceneID";
         roles[SceneRole] = "scene";
         roles[BreakTypeRole] = "breakType";
-        roles[DelegateKindRole] = "delegateKindRole";
+        roles[DelegateKindRole] = "delegateKind";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
     }
@@ -3201,6 +3212,18 @@ void Screenplay::resetActiveScene()
     m_activeScene = nullptr;
     emit activeSceneChanged();
     this->setCurrentElementIndex(-1);
+}
+
+void Screenplay::onScreenplayElementChanged()
+{
+    ScreenplayElement *ptr = qobject_cast<ScreenplayElement *>(this->sender());
+    if (ptr) {
+        const int row = m_elements.indexOf(ptr);
+        if (row >= 0) {
+            const QModelIndex index = this->index(row, 0);
+            emit dataChanged(index, index);
+        }
+    }
 }
 
 void Screenplay::onSceneReset(int elementIndex)

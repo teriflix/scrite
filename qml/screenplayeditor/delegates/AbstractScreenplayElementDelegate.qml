@@ -73,6 +73,8 @@ FocusScope {
     ColumnLayout {
         id: _layout
 
+        width: parent.width
+
         Loader {
             Layout.fillWidth: true
 
@@ -87,9 +89,10 @@ FocusScope {
             id: _contentLoader
 
             Layout.fillWidth: true
+            Layout.preferredHeight: item ? item.height : 0
 
             onItemChanged: {
-                if(item) {
+                if(item && item.__searchBarSaysReplaceCurrent) {
                     root.__searchBarSaysReplaceCurrent.connect(item.__searchBarSaysReplaceCurrent)
                 }
             }

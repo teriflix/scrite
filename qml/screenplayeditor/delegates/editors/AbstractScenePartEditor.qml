@@ -29,8 +29,8 @@ FocusScope {
     required property ScreenplayElement screenplayElement
 
     // These have to be explicitly provided
+    required property var pageMargins
     required property real zoomLevel
-    required property rect pageMargins
     required property bool placeholderMode
     required property FontMetrics fontMetrics
 

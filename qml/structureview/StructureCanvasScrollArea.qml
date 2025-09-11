@@ -231,7 +231,7 @@ ScrollArea {
                 if(Scrite.document.structure.elementCount > 0) {
                     let item = _canvas.currentElementItem
                     if(item === null)
-                        item = _elementItems.itemAt(0)
+                        item = _canvas.elementLayer.elementItemAt(0)
                     if(Runtime.firstSwitchToStructureTab)
                         root.zoomOneToItem(item)
                     else

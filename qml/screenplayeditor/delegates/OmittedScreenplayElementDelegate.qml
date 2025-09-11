@@ -38,6 +38,11 @@ AbstractScreenplayElementDelegate {
         RowLayout {
             id: _layout
 
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: root.pageLeftMargin
+            anchors.rightMargin: root.pageRightMargin
+
             VclText {
                 Layout.fillWidth: true
 

@@ -49,7 +49,8 @@ AbstractScenePartEditor {
 
         TextAreaSpellingSuggestionsMenu { }
 
-        onTextChanged: root.scene.synopsis = text
+        onTextChanged: if(activeFocus) root.scene.synopsis = text
+        onEditingFinished: root.scene.synopsis = text
 
         onActiveFocusChanged: {
             if(activeFocus)

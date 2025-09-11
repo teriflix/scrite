@@ -30,15 +30,18 @@ import "qrc:/qml/screenplayeditor/delegates"
 ListView {
     id: root
 
+    required property var pageMargins
+    required property bool readOnly
     required property real zoomLevel
-    required property rect pageMargins
 
-    property bool readOnly: Scrite.document.readOnly
-    property ScreenplayAdapter screenplayAdapter: Runtime.screenplayAdapter
-
-    ScrollBar.vertical: VclScrollBar { }
+    required property ScreenplayAdapter screenplayAdapter
 
     model: screenplayAdapter
+    currentIndex: screenplayAdapter.currentIndex
+
+    highlightMoveDuration: 0
+    highlightResizeDuration: 0
+    highlightFollowsCurrentItem: true
 
     header: ScreenplayElementListViewHeader {
         width: root.width
@@ -58,73 +61,116 @@ ListView {
         screenplayAdapter: root.screenplayAdapter
     }
 
-    delegate: DelegateChooser {
-        role: "delegateKindRole"
+    /**
+      Why are we doing all this circus instead of using DelegateChooser?
 
-        DelegateChoice {
-            roleValue: "actBreak"
+      Initially, I used DelegateChooser with role as "delegateKind", and one DelegateChoice for each
+      potential value of delegateKind. But it breaks down when the value of the delegateKind changes
+      for a row in the model, becasue DelegateChooser doesn't recreate a delegate from a new choice
+      whenever that happens. That's obviously not what we want.
+      */
+    delegate: Loader {
+        id: _delegateLoader
 
-            ScreenplayActBreakDelegate {
-                width: root.width
+        required property int index
+        required property int screenplayElementType
+        required property int breakType
+        required property string sceneID
+        required property string delegateKind
+        required property ScreenplayElement screenplayElement
 
-                readOnly: root.readOnly
-                zoomLevel: root.zoomLevel
-                pageMargins: root.pageMargins
-            }
-        }
+        width: root.width
 
-        DelegateChoice {
-            roleValue: "episodeBreak"
+        sourceComponent: _private.pickDelegateComponent(delegateKind)
 
-            ScreenplayEpisodeBreakDelegate {
-                width: root.width
-
-                readOnly: root.readOnly
-                zoomLevel: root.zoomLevel
-                pageMargins: root.pageMargins
-            }
-        }
-
-        DelegateChoice {
-            roleValue: "intervalBreak"
-
-            ScreenplayIntervalBreakDelegate {
-                width: root.width
-
-                readOnly: root.readOnly
-                zoomLevel: root.zoomLevel
-                pageMargins: root.pageMargins
-            }
-        }
-
-        DelegateChoice {
-            roleValue: "omittedScene"
-
-            OmittedScreenplayElementDelegate {
-                width: root.width
-
-                readOnly: root.readOnly
-                zoomLevel: root.zoomLevel
-                pageMargins: root.pageMargins
-            }
-        }
-
-        DelegateChoice {
-            roleValue: "scene"
-
-            ScreenplayElementSceneDelegate {
-                width: root.width
-
-                readOnly: root.readOnly
-                zoomLevel: root.zoomLevel
-                pageMargins: root.pageMargins
-            }
+        onStatusChanged: {
+            if(status === Loader.Loading)
+                Scrite.app.resetObjectProperty(_delegateLoader, "height")
         }
     }
 
     QtObject {
         id: _private
 
+        readonly property Component actBreakDelegate: ScreenplayActBreakDelegate {
+            readonly property Loader delegateLoader: parent
 
+            readOnly: root.readOnly
+            zoomLevel: root.zoomLevel
+            pageMargins: root.pageMargins
+
+            index: delegateLoader.index
+            sceneID: delegateLoader.sceneID
+            breakType: delegateLoader.breakType
+            screenplayElement: delegateLoader.screenplayElement
+            screenplayElementType: delegateLoader.screenplayElementType
+        }
+
+        readonly property Component episodeBreakDelegate: ScreenplayEpisodeBreakDelegate {
+            readonly property Loader delegateLoader: parent
+
+            readOnly: root.readOnly
+            zoomLevel: root.zoomLevel
+            pageMargins: root.pageMargins
+
+            index: delegateLoader.index
+            sceneID: delegateLoader.sceneID
+            breakType: delegateLoader.breakType
+            screenplayElement: delegateLoader.screenplayElement
+            screenplayElementType: delegateLoader.screenplayElementType
+        }
+
+        readonly property Component intervalBreakDelegate: ScreenplayIntervalBreakDelegate {
+            readonly property Loader delegateLoader: parent
+
+            readOnly: root.readOnly
+            zoomLevel: root.zoomLevel
+            pageMargins: root.pageMargins
+
+            index: delegateLoader.index
+            sceneID: delegateLoader.sceneID
+            breakType: delegateLoader.breakType
+            screenplayElement: delegateLoader.screenplayElement
+            screenplayElementType: delegateLoader.screenplayElementType
+        }
+
+        readonly property Component omittedSceneDelegate: OmittedScreenplayElementDelegate {
+            readonly property Loader delegateLoader: parent
+
+            readOnly: root.readOnly
+            zoomLevel: root.zoomLevel
+            pageMargins: root.pageMargins
+
+            index: delegateLoader.index
+            sceneID: delegateLoader.sceneID
+            breakType: delegateLoader.breakType
+            screenplayElement: delegateLoader.screenplayElement
+            screenplayElementType: delegateLoader.screenplayElementType
+        }
+
+        readonly property Component sceneDelegate: ScreenplayElementSceneDelegate {
+            readonly property Loader delegateLoader: parent
+
+            readOnly: root.readOnly
+            zoomLevel: root.zoomLevel
+            pageMargins: root.pageMargins
+
+            index: delegateLoader.index
+            sceneID: delegateLoader.sceneID
+            breakType: delegateLoader.breakType
+            screenplayElement: delegateLoader.screenplayElement
+            screenplayElementType: delegateLoader.screenplayElementType
+        }
+
+        function pickDelegateComponent(delegateKind) {
+            switch(delegateKind) {
+            case "scene": return sceneDelegate
+            case "actBreak": return actBreakDelegate;
+            case "omittedScene": return omittedSceneDelegate;
+            case "episodeBreak": return episodeBreakDelegate;
+            case "invervalBreak": return intervalBreakDelegate;
+            }
+            return null
+        }
     }
 }

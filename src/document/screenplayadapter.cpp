@@ -232,7 +232,7 @@ QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
         roles[SceneRole] = "scene";
         roles[BreakTypeRole] = "breakType";
         roles[ModelDataRole] = "modelData";
-        roles[DelegateKindRole] = "delegateKindRole";
+        roles[DelegateKindRole] = "delegateKind";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
     }
@@ -268,6 +268,8 @@ QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) 
         return element->breakType();
     case SceneRole:
         return QVariant::fromValue<Scene *>(element->scene());
+    case DelegateKindRole:
+        return element->delegateKind();
     case ModelDataRole: {
         QVariantMap ret;
         const QHash<int, QByteArray> roles = this->roleNames();

@@ -67,7 +67,7 @@ Item {
 
         anchors.fill: parent
 
-        color: "white"
+        color: Runtime.colors.primary.c50.background
         visible: _contentLoader.visible
         opacity: _contentLoader.opacity
         border.color: borderColor

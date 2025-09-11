@@ -201,8 +201,8 @@ Rectangle {
                 }
 
                 Loader {
-                    Layout.preferredWidth: 18
-                    Layout.preferredHeight: 18
+                    Layout.preferredWidth: root.sceneIconSize
+                    Layout.preferredHeight: root.sceneIconSize
                     Layout.alignment: _private.isSceneTextModeHeading ? Qt.AlignVCenter : Qt.AlignTop
 
                     active: !_private.isBreak && !root.scene.hasContent
@@ -211,7 +211,7 @@ Rectangle {
                     sourceComponent: Image {
                         smooth: true
                         mipmap: true
-                        source: "qrc:/icons/content/empty_root.scene.png"
+                        source: "qrc:/icons/content/empty_scene.png"
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {

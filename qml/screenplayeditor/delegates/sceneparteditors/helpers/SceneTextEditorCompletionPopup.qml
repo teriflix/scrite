@@ -40,7 +40,7 @@ Item {
 
         x: -Scrite.app.boundingRect(_private.completionModel.completionPrefix, Runtime.sceneEditorFontMetrics.font).width
         width: Scrite.app.largestBoundingRect(_private.completionModel.strings, Runtime.sceneEditorFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 30
-        height: _completionView.height + topInset + bottomInset + topPadding + bottomPadding
+        // height: _completionView.height + topInset + bottomInset + topPadding + bottomPadding
 
         focus: false
         closePolicy: Popup.NoAutoClose
@@ -59,9 +59,9 @@ Item {
             height: Math.min(contentHeight, maxVisibleItems*Runtime.sceneEditorFontMetrics.lineSpacing)
 
             clip: true
-            model: model
+            model: _private.completionModel
             interactive: true
-            currentIndex: model.currentRow
+            currentIndex: _private.completionModel.currentRow
 
             highlightMoveDuration: 0
             highlightResizeDuration: 0
@@ -113,7 +113,7 @@ Item {
 
         readonly property CompletionModel completionModel: CompletionModel {
             property bool completable: false
-            property bool hasSuggestion: completionModelCount.value > 0
+            property bool hasSuggestion: count > 0
 
             property string suggestion: currentCompletion
 

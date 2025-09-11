@@ -52,7 +52,7 @@ AbstractScenePartEditor {
         if(!_sceneTextEditor.activeFocus)
             _sceneTextEditor.forceActiveFocus()
 
-        if(cursorPosition < 0)
+        if(cursorPosition === undefined || cursorPosition < 0)
             _sceneTextEditor.cursorPosition = _sceneDocumentBinder.lastCursorPosition()
         else
             _sceneTextEditor.cursorPosition = cursorPosition
@@ -68,15 +68,16 @@ AbstractScenePartEditor {
 
         signal highlightCursor()
 
+        Keys.onPressed: (event) => { _private.handleSceneTextEditorKeyPressed(event) }
         Keys.onUpPressed: (event) => { _private.handleSceneTextEditorKeyUpPressed(event) }
         Keys.onDownPressed: (event) => { _private.handleSceneTextEditorKeyDownPressed(event) }
-        Keys.onPressed: (event) => { _private.handleSceneTextEditorKeyPressed(event) }
 
         EventFilter.target: Scrite.app
         EventFilter.active: activeFocus
         EventFilter.events: [EventFilter.KeyPress] // Wheel, ShortcutOverride
         EventFilter.onFilter: (object, event, result) => {
-                                  _private.handleSceneTextEditorFilteredEvent(object, event, result)
+                                  if(activeFocus)
+                                    _private.handleSceneTextEditorFilteredEvent(object, event, result)
                               }
 
         Transliterator.enabled: root.scene && !root.scene.isBeingReset && userIsTyping
@@ -152,6 +153,20 @@ AbstractScenePartEditor {
                 function onHighlightCursor() {
                     _cursor.highlight()
                 }
+            }
+
+            Shortcut {
+                enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
+                sequence: "Tab"
+
+                ShortcutsModelItem.group: "Formatting"
+                ShortcutsModelItem.title: _sceneDocumentBinder.nextTabFormatAsString
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.visible: _sceneTextEditor.activeFocus && !_completion.model.hasSuggestion
+                ShortcutsModelItem.priority: 1
+                ShortcutsModelItem.shortcut: nativeText
+
+                onActivated: _sceneDocumentBinder.tab()
             }
         }
 
@@ -331,20 +346,6 @@ AbstractScenePartEditor {
 
     // All the keyboard shortcuts
     Shortcut {
-        enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
-        sequence: "Tab"
-
-        ShortcutsModelItem.group: "Formatting"
-        ShortcutsModelItem.title: _sceneDocumentBinder.nextTabFormatAsString
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.visible: _sceneTextEditor.activeFocus && !_completion.model.hasSuggestion
-        ShortcutsModelItem.priority: 1
-        ShortcutsModelItem.shortcut: nativeText
-
-        onActivated: _sceneDocumentBinder.tab()
-    }
-
-    Shortcut {
         enabled: _private.canSplitScene
         sequence: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
 
@@ -506,8 +507,8 @@ AbstractScenePartEditor {
                 // completionModel.actuallyEnable = true
                 root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
                 // privateData.changeCurrentIndexTo(contentItem.theIndex)
-                Runtime.screenplayEditorToolbar.set(sceneTextEditor, sceneDocumentBinder)
-                FloatingMarkupToolsDock.sceneDocumentBinder = sceneDocumentBinder
+                Runtime.screenplayEditorToolbar.set(_sceneTextEditor, _sceneDocumentBinder)
+                FloatingMarkupToolsDock.sceneDocumentBinder = _sceneDocumentBinder
                 _sceneTextEditor.highlightCursor()
                 Announcement.shout(Runtime.announcementIds.sceneTextEditorReceivedFocus, _sceneTextEditor)
             } else {
@@ -567,18 +568,21 @@ AbstractScenePartEditor {
                 } )
         }
 
+        /*
+        property SceneElement currentElement: _sceneTextEditor.activeFocus ? _sceneDocumentBinder.currentElement : null
         property int currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
         onCurrentParagraphTypeChanged: {
             // TODO: Get ruler margins out in a better way
-            // if(currentParagraphType === SceneElement.Action) {
-            //     ruler.paragraphLeftMargin = 0
-            //     ruler.paragraphRightMargin = 0
-            // } else {
-            //     var elementFormat = screenplayEditor.screenplayFormat.elementFormat(_private.currentParagraphType)
-            //     ruler.paragraphLeftMargin = ruler.leftMargin + pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
-            //     ruler.paragraphRightMargin = ruler.rightMargin + pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
-            // }
+            if(currentParagraphType === SceneElement.Action) {
+                ruler.paragraphLeftMargin = 0
+                ruler.paragraphRightMargin = 0
+            } else {
+                var elementFormat = screenplayEditor.screenplayFormat.elementFormat(_private.currentParagraphType)
+                ruler.paragraphLeftMargin = ruler.leftMargin + pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
+                ruler.paragraphRightMargin = ruler.rightMargin + pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
+            }
         }
+        */
 
         function acceptCompletionSuggestion(suggestion) {
             if(suggestion !== "") {

@@ -53,7 +53,7 @@ Rectangle {
             readOnly: Scrite.document.readOnly
             screenplayAdapter: Runtime.screenplayAdapter
 
-            onPositionScreenplayEditorAtTitlePage: _screenplayEditorListView.positionViewAtBeginning()
+            onPositionScreenplayEditorAtTitlePage: _listView.positionViewAtBeginning()
         }
     }
 
@@ -64,6 +64,8 @@ Rectangle {
         anchors.left: _sidePanelLoader.right
         anchors.right: parent.right
         anchors.bottom: _statusBar.top
+
+        clip: true
 
         RulerItem {
             id: _ruler
@@ -76,7 +78,6 @@ Rectangle {
 
             visible: Runtime.screenplayEditorSettings.displayRuler
             zoomLevel: _private.zoomLevel
-
             resolution: _private.pageLayout.resolution
             leftMargin: _private.pageMargins.left
             rightMargin: _private.pageMargins.right
@@ -84,13 +85,36 @@ Rectangle {
             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
         }
 
-        ListView {
-            id: _screenplayEditorListView
+        Rectangle {
+            anchors.fill: _listView
+
+            color: Runtime.colors.primary.c50.background
+        }
+
+        ScreenplayElementListView {
+            id: _listView
+
+            ScrollBar.vertical: _scrollBar
 
             anchors.top: _ruler.bottom
             anchors.left: _ruler.left
             anchors.right: _ruler.right
             anchors.bottom: parent.bottom
+
+            readOnly: Scrite.document.readOnly
+            zoomLevel: _private.zoomLevel
+            pageMargins: _private.pageMargins
+            screenplayAdapter: Runtime.screenplayAdapter
+        }
+
+        VclScrollBar {
+            id: _scrollBar
+
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+
+            flickable: _listView
         }
     }
 
@@ -103,7 +127,7 @@ Rectangle {
 
         pageMargins: _private.pageMargins
         sceneHeadingFontMetrics: _private.sceneHeadingFontMetrics
-        screenplayEditorListView: _screenplayEditorListView
+        screenplayEditorListView: _listView
         screenplayEditorLastItemIndex: 0
         screenplayEditorFirstItemIndex: 0
     }
