@@ -35,6 +35,14 @@ AbstractScreenplayElementDelegate {
 
         height: _layout.height
 
+        /**
+          Not using Row here on purpose.
+
+          The Layout.fillWidth attached property in the first VclText makes this part of the code looks
+          so much cleaner and maintainable than having to calculate width manually.
+
+          Besides, we won't have too many break delegates anyway.
+          */
         RowLayout {
             id: _layout
 

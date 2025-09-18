@@ -95,7 +95,7 @@ Item {
         fileName: Scrite.app.settingsFilePath
         category: "Screenplay Editor"
 
-        property int placeholderContentInterval: 500 // ms after which placeholder is swapped to content in delegates
+        property int placeholderInterval: 100 // ms after which placeholder is swapped to content in delegates
         property bool screenplayEditorAddButtonsAnimationShown: false
         property bool refreshButtonInStatsReportAnimationDone: false
         property bool firstSwitchToStructureTab: true

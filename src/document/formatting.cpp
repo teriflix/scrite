@@ -1929,6 +1929,9 @@ void SceneDocumentBinder::setTextWidth(qreal val)
 
 void SceneDocumentBinder::setCursorPosition(int val)
 {
+    if (qApp->closingDown())
+        return;
+
 #if 0
     Application::log("SceneDocumentBinder(" + this->objectName() + ") cursorPosition: "
                      + QString::number(m_cursorPosition) + " to " + QString::number(val));

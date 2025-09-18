@@ -36,6 +36,8 @@ Item {
     width: _private.cursorRect.width
     height: _private.cursorRect.height
 
+    visible: textEdit.activeFocus
+
     Rectangle {
         id: _blinkingCursor
 

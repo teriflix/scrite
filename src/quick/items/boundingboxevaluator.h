@@ -57,7 +57,7 @@ public:
     Q_SIGNAL void boundingBoxChanged();
 
     // Bounding box without initialRect consideration
-    Q_PROPERTY(QRectF tightBoundingBox READ tightBoundingBox NOTIFY tightBoundingBox)
+    Q_PROPERTY(QRectF tightBoundingBox READ tightBoundingBox NOTIFY tightBoundingBoxChanged)
     QRectF tightBoundingBox() const { return m_tightBoundingBox; }
     Q_SIGNAL void tightBoundingBoxChanged();
 

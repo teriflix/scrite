@@ -58,10 +58,10 @@ private:
     void resetTarget();
 
 private:
-    QVariant m_onValue;
+    QVariant m_onValue = true;
     QQuickItem *m_item = nullptr;
     QString m_property;
-    QVariant m_offValue;
+    QVariant m_offValue = false;
     FocusTracker *m_tracker = nullptr;
     QObjectProperty<QObject> m_target;
 };
@@ -87,6 +87,14 @@ public:
     QQuickWindow *window() const { return m_window; }
     Q_SIGNAL void windowChanged();
 
+    enum FocusEvaluationMethod { StandardFocusEvaluation, ExclusiveFocusEvaluation };
+    Q_ENUM(FocusEvaluationMethod)
+
+    Q_PROPERTY(FocusEvaluationMethod evaluationMethod READ evaluationMethod WRITE setEvaluationMethod NOTIFY evaluationMethodChanged)
+    void setEvaluationMethod(FocusEvaluationMethod val);
+    FocusEvaluationMethod evaluationMethod() const { return m_evaluationMethod; }
+    Q_SIGNAL void evaluationMethodChanged();
+
     Q_PROPERTY(bool hasFocus READ hasFocus NOTIFY hasFocusChanged)
     bool hasFocus() const { return m_hasFocus; }
     Q_SIGNAL void hasFocusChanged();
@@ -103,6 +111,7 @@ private:
     bool m_hasFocus = false;
     QQuickItem *m_item = nullptr;
     FocusTrackerIndicator *m_indicator = new FocusTrackerIndicator(this);
+    FocusEvaluationMethod m_evaluationMethod = StandardFocusEvaluation;
     QObjectProperty<QQuickWindow> m_window;
 };
 

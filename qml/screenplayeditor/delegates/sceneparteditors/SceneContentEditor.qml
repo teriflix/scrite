@@ -70,7 +70,10 @@ AbstractScenePartEditor {
 
         Keys.onPressed: (event) => { _private.handleSceneTextEditorKeyPressed(event) }
         Keys.onUpPressed: (event) => { _private.handleSceneTextEditorKeyUpPressed(event) }
+        Keys.onTabPressed: (event) => { _private.handleSceneTextEditorTabPressed(event) }
         Keys.onDownPressed: (event) => { _private.handleSceneTextEditorKeyDownPressed(event) }
+        Keys.onEnterPressed: (event) => { _private.handleSceneTextEditorReturnPressed(event) }
+        Keys.onReturnPressed: (event) => { _private.handleSceneTextEditorReturnPressed(event) }
 
         EventFilter.target: Scrite.app
         EventFilter.active: activeFocus
@@ -155,18 +158,13 @@ AbstractScenePartEditor {
                 }
             }
 
-            Shortcut {
+            ShortcutsModelRecord {
+                group: "Formatting"
+                title: _sceneDocumentBinder.nextTabFormatAsString
                 enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
-                sequence: "Tab"
-
-                ShortcutsModelItem.group: "Formatting"
-                ShortcutsModelItem.title: _sceneDocumentBinder.nextTabFormatAsString
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.visible: _sceneTextEditor.activeFocus && !_completion.model.hasSuggestion
-                ShortcutsModelItem.priority: 1
-                ShortcutsModelItem.shortcut: nativeText
-
-                onActivated: _sceneDocumentBinder.tab()
+                visible: _sceneTextEditor.activeFocus && !_completion.model.hasSuggestion
+                priority: 1
+                shortcut: "Tab"
             }
         }
 
@@ -279,7 +277,7 @@ AbstractScenePartEditor {
                                         a separate signal emission from the backend. */
                                      // if(position >= 0)
                                      //    contentItem.assumeFocusLater(position, 100)
-                                     contentItem.assumeFocusAt(position)
+                                     root.assumeFocusAt(position)
                                  }
     }
 
@@ -345,32 +343,36 @@ AbstractScenePartEditor {
     }
 
     // All the keyboard shortcuts
-    Shortcut {
+    ShortcutsModelRecord {
+        id: _splitSceneShortcut
+
+        group: "Edit"
+        title: "Split Scene"
         enabled: _private.canSplitScene
-        sequence: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
+        visible: _sceneTextEditor.activeFocus
+        priority: 1
+        shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
 
-        ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: "Split Scene"
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.visible: _sceneTextEditor.activeFocus
-        ShortcutsModelItem.priority: 1
-        ShortcutsModelItem.shortcut: nativeText
-
-        onActivated: _private.splitSceneAt(_sceneTextEditor.cursorPosition)
+        function trigger() {
+            if(enabled)
+                _private.splitSceneAt(_sceneTextEditor.cursorPosition)
+        }
     }
 
-    Shortcut {
+    ShortcutsModelRecord {
+        id: _mergeSceneShortcut
+
+        group: "Edit"
+        title: "Join Previous Scene"
         enabled: _private.canJoinToPreviousScene
-        sequence: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
+        visible: _sceneTextEditor.activeFocus
+        priority: 1
+        shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
 
-        ShortcutsModelItem.group: "Edit"
-        ShortcutsModelItem.title: "Join Previous Scene"
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.visible: _sceneTextEditor.activeFocus
-        ShortcutsModelItem.priority: 1
-        ShortcutsModelItem.shortcut: nativeText
-
-        onActivated: _private.mergeWithPreviousScene(_sceneTextEditor.cursorPosition)
+        function trigger() {
+            if(enabled)
+                _private.mergeWithPreviousScene(_sceneTextEditor.cursorPosition)
+        }
     }
 
     // Other private objects
@@ -457,8 +459,39 @@ AbstractScenePartEditor {
             }
         }
 
+        function handleSceneTextEditorReturnPressed(event) {
+            event.accepted = false
+
+            // This should be same as
+            // if( event.modifiers & Qt.ControlModifier|Qt.ShiftModifier )
+            // but for whatever reason, that does not work.
+            if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
+                event.accepted = true
+                _splitSceneShortcut.trigger()
+                return
+            }
+        }
+
+        function handleSceneTextEditorTabPressed(event) {
+            if(!_sceneTextEditor.readOnly) {
+                _sceneDocumentBinder.tab()
+                event.accepted = true
+            }
+        }
+
         function handleSceneTextEditorKeyPressed(event) {
             event.accepted = false
+
+            // This should be same as
+            // if( event.modifiers & Qt.ControlModifier|Qt.ShiftModifier )
+            // but for whatever reason, that does not work.
+            if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
+                if( (Scrite.app.isMacOSPlatform && event.key === Qt.Key_Delete) || (event.key === Qt.Key_Backspace) ) {
+                    event.accepted = true
+                    _mergeSceneShortcut.trigger()
+                }
+                return
+            }
 
             if(event.modifiers === Qt.ControlModifier) {
                 switch(event.key) {
@@ -609,7 +642,7 @@ AbstractScenePartEditor {
         // operation, and we don't want the split task initiated here to be unceremoniously destroyed before
         // it gets to complete its job.
         function splitSceneAt(cursorPosition) {
-            if(!canSplitScene || cursorPositon !== _sceneDocumentBinder.currentElementCursorPosition) {
+            if(!canSplitScene || cursorPosition !== _sceneDocumentBinder.cursorPosition) {
                 MessageBox.information("Split Scene Error",
                                     "Scene can be split only when cursor is placed at the start of a paragraph.")
                 return
@@ -619,7 +652,7 @@ AbstractScenePartEditor {
         }
 
         function mergeWithPreviousScene(cursorPosition) {
-            if(!canJoinToPreviousScene || cursorPositon !== _sceneDocumentBinder.currentElementCursorPosition) {
+            if(!canJoinToPreviousScene || cursorPosition !== _sceneDocumentBinder.cursorPosition) {
                 MessageBox.information("Merge Scene Error",
                                     "Scene can be merged only when cursor is placed at the start of the first paragraph in a scene.")
                 return

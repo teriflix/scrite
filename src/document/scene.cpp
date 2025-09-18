@@ -1669,19 +1669,21 @@ void Scene::setTags(const QStringList &val)
         return;
 
     m_tags = val;
+    std::sort(m_tags.begin(), m_tags.end(), [](const QString &a, const QString &b) {
+        return QString::localeAwareCompare(a.toLower(), b.toLower()) < 0;
+    });
+    m_tags.removeAll(QString());
+
     emit tagsChanged();
 }
 
 void Scene::addTag(const QString &tag)
 {
-    if (this->hasTag(tag))
+    if (!tag.isEmpty() && this->hasTag(tag))
         return;
 
     QStringList tags = m_tags;
     tags << tag;
-    std::sort(tags.begin(), tags.end(), [](const QString &a, const QString &b) {
-        return QString::localeAwareCompare(a.toLower(), b.toLower()) < 0;
-    });
 
     this->setTags(tags);
 }

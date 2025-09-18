@@ -160,7 +160,7 @@ Item {
                 if(Notification.active && Scrite.user.info.hasUpcomingSubscription)
                     Notification.active = false
 
-                _private.trackSessionStatus.configure()
+                // _private.trackSessionStatus.configure()
             }
         }
 
@@ -231,11 +231,11 @@ Item {
         }
 
         readonly property SessionStatusRestApiCall sessionStatusApi: SessionStatusRestApiCall {
-            onFinished: {
-                if(hasResponse && !hasError) {
-                    _private.trackSessionStatus.start()
-                }
-            }
+            // onFinished: {
+            //     if(hasResponse && !hasError) {
+            //         _private.trackSessionStatus.start()
+            //     }
+            // }
         }
     }
 }

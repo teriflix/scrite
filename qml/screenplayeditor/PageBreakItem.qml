@@ -28,10 +28,10 @@ Rectangle {
     readonly property color defaultForeground: Runtime.colors.primary.c600.background
     readonly property color defaultColor: fullSize ? Runtime.colors.primary.c100.background : Runtime.colors.primary.c50.background
 
-    property bool fullSize: true
     property int placement: Qt.TopEdge // or Qt.BottomEdge
-    property color foreground: defaultForeground
+    property bool fullSize: true
     property real textFontSize: Math.max(Runtime.sceneEditorFontMetrics.font.pointSize*0.7, 6)
+    property color foreground: defaultForeground
 
     implicitWidth: 100
     implicitHeight: loader.height * (fullSize ? 1.2 : 1.1)

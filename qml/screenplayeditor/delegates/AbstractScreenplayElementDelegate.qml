@@ -39,8 +39,11 @@ FocusScope {
     default property alias content: _contentLoader.sourceComponent
 
     // These are optional
+    property int placeholderInterval: Runtime.screenplayEditorSettings.placeholderInterval
+
     property bool canFocus: true
     property bool readOnly: Scrite.document.readOnly
+    property bool usePlaceholder: false
     property Screenplay screenplay: Scrite.document.screenplay
     property FontMetrics fontMetrics: Runtime.sceneEditorFontMetrics
     property ScreenplayFormat format: Scrite.document.displayFormat
@@ -52,7 +55,7 @@ FocusScope {
     readonly property alias pageWidth: _private.pageWidth
     readonly property alias pageLeftMargin: _private.pageLeftMargin
     readonly property alias pageRightMargin: _private.pageRightMargin
-    readonly property alias placeholderMode: _private.placeholderMode
+    readonly property alias contentItem: _contentLoader.sourceComponent
 
     // Public functions with fixed functionality
     function focusIn(cursorPosition) { if(canFocus) __focusIn(cursorPosition) }
@@ -70,13 +73,28 @@ FocusScope {
 
     height: _layout.height
 
-    ColumnLayout {
+    /**
+      Initially, I did use ColumnLayout here so that we are able to consistently use QtQuick Layouts
+      everywhere. But then, the issue with ColumnLayout is that we invariably use Layout attached property
+      in it to specify layout hints. So, we will end up using two objects instead of one to simply
+      layout. As it is the delegates used for screenplay editor list view are rather heavy. We are better
+      off using lightweight Column for trival layouting.
+      */
+    Column {
         id: _layout
 
         width: parent.width
 
+        Rectangle {
+            width: parent.width
+            height: Runtime.screenplayEditorSettings.spaceBetweenScenes * root.zoomLevel
+
+            color: Runtime.colors.primary.windowColor
+            visible: height > 0
+        }
+
         Loader {
-            Layout.fillWidth: true
+            width: parent.width
 
             active: root.screenplayElement.pageBreakBefore
             visible: active
@@ -88,8 +106,13 @@ FocusScope {
         Loader {
             id: _contentLoader
 
-            Layout.fillWidth: true
-            Layout.preferredHeight: item ? item.height : 0
+            FocusTracker.objectName: "SceneDelegate-" + root.index
+            FocusTracker.window: Scrite.window
+            FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
+            FocusTracker.indicator.target: _private
+            FocusTracker.indicator.property: "hasFocus"
+
+            width: parent.width
 
             onItemChanged: {
                 if(item && item.__searchBarSaysReplaceCurrent) {
@@ -99,7 +122,7 @@ FocusScope {
         }
 
         Loader {
-            Layout.fillWidth: true
+            width: parent.width
 
             active: root.screenplayElement.pageBreakAfter
             visible: active
@@ -114,19 +137,12 @@ FocusScope {
 
         property font font: root.fontMetrics.font
 
-        property bool hasFocus: root.FocusTracker.hasFocus
+        property bool hasFocus: false
         property Scene scene: root.screenplayElement.scene
 
         property real pageWidth: (root.width - pageLeftMargin - pageRightMargin)
         property real pageLeftMargin: root.pageMargins.left
         property real pageRightMargin: root.pageMargins.right
-
-        property bool placeholderMode: Runtime.screenplayEditorSettings.placeholderContentInterval > 0
-
-        Component.onCompleted: {
-            if(placeholderMode)
-                Utils.execLater(root, Runtime.screenplayEditorSettings.placeholderContentInterval, () => { _private.placeholderMode = false } )
-        }
     }
 }
 

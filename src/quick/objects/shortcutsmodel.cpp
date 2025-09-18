@@ -17,7 +17,7 @@
 
 ShortcutsModel *ShortcutsModel::instance()
 {
-    static ShortcutsModel *theInstance = new ShortcutsModel(qApp);
+    static QPointer<ShortcutsModel> theInstance = new ShortcutsModel(qApp);
     return theInstance;
 }
 
@@ -148,12 +148,14 @@ void ShortcutsModel::setGroups(const QStringList &val)
 
 ShortcutsModelItem::ShortcutsModelItem(QObject *parent) : QObject(parent)
 {
-    ShortcutsModel::instance()->add(this);
+    if (ShortcutsModel::instance())
+        ShortcutsModel::instance()->add(this);
 }
 
 ShortcutsModelItem::~ShortcutsModelItem()
 {
-    ShortcutsModel::instance()->remove(this);
+    if (ShortcutsModel::instance())
+        ShortcutsModel::instance()->remove(this);
 }
 
 ShortcutsModelItem *ShortcutsModelItem::qmlAttachedProperties(QObject *object)

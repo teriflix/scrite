@@ -46,6 +46,14 @@ AbstractScreenplayElementDelegate {
             }
         }
 
+        /**
+          Not using Row here on purpose.
+
+          The Layout.fillWidth attached property in _titleField makes this part of the code looks
+          so much cleaner and maintainable than having to calculate width manually.
+
+          Besides, we won't have too many break delegates anyway.
+          */
         RowLayout {
             id: _layout
 

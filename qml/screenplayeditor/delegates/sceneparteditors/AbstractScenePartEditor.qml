@@ -31,12 +31,13 @@ FocusScope {
     // These have to be explicitly provided
     required property var pageMargins
     required property real zoomLevel
-    required property bool placeholderMode
+    required property string partName
     required property FontMetrics fontMetrics
 
     // These are readonly
     readonly property alias font: _private.font
     readonly property alias scene: _private.scene
+    readonly property alias hasFocus: _private.hasFocus
     readonly property alias pageWidth: _private.pageWidth
     readonly property alias pageLeftMargin: _private.pageLeftMargin
     readonly property alias pageRightMargin: _private.pageRightMargin
@@ -52,10 +53,19 @@ FocusScope {
     // As of now, its only SceneContentEditor
     signal __searchBarSaysReplaceCurrent(string replacementText, SearchAgent agent)
 
+    FocusTracker.objectName: "SceneDelegate-" + root.index + ", Part-" + partName
+    FocusTracker.window: Scrite.window
+    FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
+    FocusTracker.indicator.target: _private
+    FocusTracker.indicator.property: "hasFocus"
+
     QtObject {
         id: _private
 
         property font font: root.fontMetrics.font
+
+        property bool hasFocus: false
+
         property Scene scene: root.screenplayElement.scene
 
         property real pageWidth: (root.width - pageLeftMargin - pageRightMargin)

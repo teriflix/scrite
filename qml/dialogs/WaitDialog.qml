@@ -89,14 +89,14 @@ Item {
 
                     to: 1
                     from: 0
-                    value: dialog.progressReport.progress
+                    value: dialog.progressReport ? dialog.progressReport.progress : 0
                     visible: dialog.progressReport !== null
                 }
 
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: dialog.progressReport.progressText + " (" + Math.round(dialog.progressReport.progress*100,0) + "%)"
+                    text: dialog.progressReport ? (dialog.progressReport.progressText + " (" + Math.round(dialog.progressReport.progress*100,0) + "%)") : " - "
                     elide: Text.ElideMiddle
                     padding: 8
                     visible: dialog.progressReport !== null

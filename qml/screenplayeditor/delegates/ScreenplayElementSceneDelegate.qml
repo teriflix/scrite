@@ -35,115 +35,262 @@ AbstractScreenplayElementDelegate {
     signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
     signal mergeWithPreviousSceneRequest()
 
-    content: Item {
-        height: _layout.height
+    content: Loader {
+        id: _content
 
-        ColumnLayout {
-            id: _layout
+        height: __placeHolder ? __placeHolder.implicitHeight : (item ? item.implicitHeight : 0)
 
-            width: parent.width
+        active: root.usePlaceholder ? (root.screenplayElementType !== ScreenplayElement.SceneElementType && !root.screenplayElement.omitted)
+                                     : true
+        sourceComponent: _highResolution
 
-            // Scene Heading Area
-            Rectangle {
-                Layout.fillWidth: true
-                Layout.preferredHeight: _headingLayout.height + root.zoomLevel * _headingLayout.spacing * 2
+        Component.onCompleted: {
+            if(!active) {
+                __placeHolder = _lowResolution.createObject(_content, {"width": width})
+                Utils.execLater(_content, Runtime.screenplayEditorSettings.placeholderInterval, activateContent)
+            }
+        }
 
-                color: Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint)
+        function activateContent() {
+            active = true
+        }
 
-                ColumnLayout {
-                    id: _headingLayout
+        onLoaded: {
+            if(__placeHolder)
+                __placeHolder.destroy()
+        }
 
-                    anchors.verticalCenter: parent.verticalCenter
+        property Item __placeHolder
+    }
 
-                    width: parent.width
+    Component {
+        id: _lowResolution
 
-                    spacing: 5
+        Rectangle {
+            z: 1
 
-                    SceneHeadingPartEditor {
-                        id: _sceneHeadingEditor
+            implicitHeight: _sceneSizeHint.active ? _placeHolderLayout.height
+                                                  : root.screenplayElement.heightHint * root.zoomLevel
 
-                        Layout.fillWidth: true
+            color: root.scene ? Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
 
-                        index: root.index
-                        sceneID: root.sceneID
-                        screenplayElement: root.screenplayElement
-                        screenplayElementDelegateHasFocus: root.hasFocus
+            ColumnLayout {
+                id: _placeHolderLayout
 
-                        zoomLevel: root.zoomLevel
-                        fontMetrics: root.fontMetrics
-                        pageMargins: root.pageMargins
-                        placeholderMode: root.placeholderMode
+                width: parent.width
 
-                        onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40 // for page-break...
+
+                    visible: root.screenplayElement.pageBreakBefore
+                }
+
+                RowLayout {
+                    id: _placeHolderHeaderLayout
+
+                    Layout.fillWidth: true
+                    Layout.topMargin: 10
+
+                    VclLabel {
+                        Layout.alignment: Qt.AlignRight
+                        Layout.preferredWidth: root.pageLeftMargin
+
+                        text: root.screenplayElement.resolvedSceneNumber
+                        font: root.font
+                        color: root.screenplayElement.hasUserSceneNumber ? "black" : "gray"
+                        rightPadding: 20
+                        horizontalAlignment: Text.AlignRight
                     }
 
-                    SceneCharacterListPartEditor {
+                    VclLabel {
                         Layout.fillWidth: true
 
-                        index: root.index
-                        sceneID: root.sceneID
-                        screenplayElement: root.screenplayElement
-                        screenplayElementDelegateHasFocus: root.hasFocus
+                        font: root.font
+                        color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
+                        elide: Text.ElideMiddle
+                        rightPadding: root.pageRightMargin
 
-                        visible: Runtime.screenplayEditorSettings.displaySceneCharacters
-                        zoomLevel: root.zoomLevel
-                        fontMetrics: root.fontMetrics
-                        pageMargins: root.pageMargins
-                        placeholderMode: root.placeholderMode
-
-                        // TODO
-                        additionalCharacterMenuItems: []
-
-                        onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
-
-                        // TODO
-                        onNewCharacterAdded: (characterName) => { }
-                        onAdditionalCharacterMenuItemClicked: (characterName, menuItemName) => { }
+                        text: {
+                            if(root.screenplayElementType === ScreenplayElement.BreakElementType)
+                                return root.screenplayElement.breakTitle
+                            if(root.screenplayElement.omitted)
+                                return "[OMITTED]"
+                            if(root.scene && root.scene.heading.enabled)
+                                return root.scene.heading.text
+                            return "NO SCENE HEADING"
+                        }
                     }
+                }
 
-                    SceneStoryBeatTagsPartEditor {
-                        Layout.fillWidth: true
+                Item {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.minimumHeight: _sceneSizeHint.active ? _sceneSizeHint.height : root.fontMetrics.lineSpacing * 3
 
-                        index: root.index
-                        sceneID: root.sceneID
-                        screenplayElement: root.screenplayElement
-                        screenplayElementDelegateHasFocus: root.hasFocus
+                    Image {
+                        anchors.fill: parent
 
-                        visible: Runtime.screenplayEditorSettings.displaySceneCharacters
-                        zoomLevel: root.zoomLevel
-                        fontMetrics: root.fontMetrics
-                        pageMargins: root.pageMargins
-                        placeholderMode: root.placeholderMode
-
-                        onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
-
-                        // TODO
-                        onSceneTagAdded: (tagName) => { }
-                        onSceneTagClicked: (tagName) => { }
+                        source: "qrc:/images/sample_scene.png"
+                        opacity: 0.5
+                        fillMode: Image.TileVertically
                     }
+                }
 
-                    SceneSynopsisPartEditor {
-                        Layout.fillWidth: true
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 40 // for page-break...
 
-                        index: root.index
-                        sceneID: root.sceneID
-                        screenplayElement: root.screenplayElement
-                        screenplayElementDelegateHasFocus: root.hasFocus
-
-                        visible: Runtime.screenplayEditorSettings.displaySceneSynopsis
-                        zoomLevel: root.zoomLevel
-                        fontMetrics: root.fontMetrics
-                        pageMargins: root.pageMargins
-                        placeholderMode: root.placeholderMode
-
-                        onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
-                    }
+                    visible: root.screenplayElement.pageBreakAfter
                 }
             }
 
-            Item {
-                Layout.fillWidth: true
-                Layout.preferredHeight: _sceneContentEditor.height
+            SceneSizeHintItem {
+                id: _sceneSizeHint
+
+                width: contentWidth * zoomLevel
+                height: contentHeight * zoomLevel
+
+                scene: root.scene
+                active: root.screenplayElement.heightHint === 0
+                format: Scrite.document.printFormat
+                visible: false
+                asynchronous: false
+            }
+        }
+    }
+
+    Component {
+        id: _highResolution
+
+        Item {
+            implicitHeight: _layout.height + Runtime.sceneEditorFontMetrics.lineSpacing
+
+            /**
+              Initially, I did use ColumnLayout here so that we are able to consistently use QtQuick Layouts
+              everywhere. But then, the issue with ColumnLayout is that we invariably use Layout attached property
+              in it to specify layout hints. So, we will end up using two objects instead of one to simply
+              layout. As it is the delegates used for screenplay editor list view are rather heavy. We are better
+              off using lightweight Column for trival layouting.
+              */
+            Column {
+                id: _layout
+
+                width: parent.width
+
+                // Scene Heading Area
+                Rectangle {
+                    width: parent.width
+                    height: _headingLayout.height
+
+                    color: Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint)
+
+                    Column {
+                        id: _headingLayout
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        width: parent.width
+
+                        spacing: 5
+
+                        SceneHeadingPartEditor {
+                            id: _sceneHeadingEditor
+
+                            width: parent.width
+
+                            index: root.index
+                            sceneID: root.sceneID
+                            screenplayElement: root.screenplayElement
+                            screenplayElementDelegateHasFocus: root.hasFocus
+
+                            partName: "SceneHeading"
+                            zoomLevel: root.zoomLevel
+                            fontMetrics: root.fontMetrics
+                            pageMargins: root.pageMargins
+
+                            onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+                        }
+
+                        Loader {
+                            width: parent.width
+
+                            active: Runtime.screenplayEditorSettings.displaySceneCharacters
+                            visible: active
+
+                            sourceComponent: SceneCharacterListPartEditor {
+                                index: root.index
+                                sceneID: root.sceneID
+                                screenplayElement: root.screenplayElement
+                                screenplayElementDelegateHasFocus: root.hasFocus
+
+                                partName: "CharacterList"
+                                zoomLevel: root.zoomLevel
+                                fontMetrics: root.fontMetrics
+                                pageMargins: root.pageMargins
+
+                                // TODO
+                                additionalCharacterMenuItems: []
+
+                                onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                                // TODO
+                                onNewCharacterAdded: (characterName) => { }
+                                onAdditionalCharacterMenuItemClicked: (characterName, menuItemName) => { }
+                            }
+                        }
+
+                        Loader {
+                            width: parent.width
+
+                            active: Runtime.screenplayEditorSettings.displaySceneCharacters
+                            visible: active
+
+                            sourceComponent: SceneStoryBeatTagsPartEditor {
+                                Layout.fillWidth: true
+
+                                index: root.index
+                                sceneID: root.sceneID
+                                screenplayElement: root.screenplayElement
+                                screenplayElementDelegateHasFocus: root.hasFocus
+
+                                partName: "StoryBeats"
+                                zoomLevel: root.zoomLevel
+                                fontMetrics: root.fontMetrics
+                                pageMargins: root.pageMargins
+
+                                onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                                // TODO
+                                onSceneTagAdded: (tagName) => { }
+                                onSceneTagClicked: (tagName) => { }
+                            }
+                        }
+
+                        Loader {
+                            width: parent.width
+
+                            active: Runtime.screenplayEditorSettings.displaySceneSynopsis
+                            visible: active
+
+                            sourceComponent: SceneSynopsisPartEditor {
+                                Layout.fillWidth: true
+
+                                index: root.index
+                                sceneID: root.sceneID
+                                screenplayElement: root.screenplayElement
+                                screenplayElementDelegateHasFocus: root.hasFocus
+
+                                partName: "Synopsis"
+                                zoomLevel: root.zoomLevel
+                                fontMetrics: root.fontMetrics
+                                pageMargins: root.pageMargins
+
+                                onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+                            }
+                        }
+                    }
+                }
 
                 SceneContentEditor {
                     id: _sceneContentEditor
@@ -156,10 +303,10 @@ AbstractScreenplayElementDelegate {
                     screenplayElementDelegateHasFocus: root.hasFocus
 
                     focus: true
+                    partName: "SceneContent"
                     zoomLevel: root.zoomLevel
                     fontMetrics: root.fontMetrics
                     pageMargins: root.pageMargins
-                    placeholderMode: root.placeholderMode
 
                     onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
 
@@ -171,28 +318,26 @@ AbstractScreenplayElementDelegate {
                 }
             }
 
-            Item {
-                Layout.fillWidth: true
-                Layout.preferredHeight: Runtime.sceneEditorFontMetrics.lineSpacing
+            Connections {
+                target: root
+
+                function on__FocusIn(cursorPosition) {
+                    _sceneContentEditor.assumeFocusAt(cursorPosition)
+                }
+
+                function on__FocusOut() { }
+
+                function on__SearchBarSaysReplaceCurrent(replacementText, searchAgent) {
+                    _sceneContentEditor.__searchBarSaysReplaceCurrent(replacementText, searchAgent)
+                }
+            }
+
+            onHeightChanged: Qt.callLater(updateHeightHint)
+
+            function updateHeightHint() {
+                if(height > 0 && root && root.screenplayElement && root.zoomLevel > 0)
+                    root.screenplayElement.heightHint = height / zoomLevel
             }
         }
-
-        Rectangle {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-
-            width: 10
-
-            color: root.scene.color
-
-            visible: root.hasFocus
-        }
     }
-
-    on__FocusIn: (cursorPosition) => { _sceneContentEditor.assumeFocusAt(cursorPosition) }
-    on__FocusOut: () => { }
-    on__SearchBarSaysReplaceCurrent: (replacementText, searchAgent) => {
-                                         _sceneContentEditor.__searchBarSaysReplaceCurrent(replacementText, searchAgent)
-                                     }
 }

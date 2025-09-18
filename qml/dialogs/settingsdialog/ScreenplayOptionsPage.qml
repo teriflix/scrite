@@ -119,6 +119,7 @@ Item {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
                     text: "Smooth Scrolling"
+                    enabled: false
                     checked: Runtime.screenplayEditorSettings.optimiseScrolling
                     onToggled: Runtime.screenplayEditorSettings.optimiseScrolling = checked
                     hoverEnabled: true

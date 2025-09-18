@@ -31,7 +31,6 @@ FocusScope {
     // These have to be explicitly provided
     required property var pageMargins
     required property real zoomLevel
-    required property bool placeholderMode
     required property FontMetrics fontMetrics
 
     // These are readonly
@@ -40,7 +39,6 @@ FocusScope {
     readonly property alias pageWidth: _private.pageWidth
     readonly property alias pageLeftMargin: _private.pageLeftMargin
     readonly property alias pageRightMargin: _private.pageRightMargin
-    readonly property alias placeholderMode: _private.placeholderMode
 
     // These can be set
     property bool readOnly: Scrite.document.readOnly

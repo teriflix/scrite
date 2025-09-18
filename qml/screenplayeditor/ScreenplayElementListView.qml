@@ -36,12 +36,39 @@ ListView {
 
     required property ScreenplayAdapter screenplayAdapter
 
+    readonly property alias currentDelegate: _private.currentDelegate
+    readonly property alias currentDelegateIndex: _private.currentIndex
+    readonly property alias currentDelegateLoader: _private.currentItem
+    readonly property alias lastVisibleDelegateIndex: _private.lastItemIndex
+    readonly property alias firstVisibleDelegateIndex: _private.firstItemIndex
+
+    function isVisible(index) {
+        return _private.isVisible(index)
+    }
+
+    function scrollToFirstScene() {
+        positionViewAtBeginning()
+    }
+
+    function scrollToLastScene() {
+        positionViewAtEnd()
+    }
+
+    function scrollIntoView(index) {
+        _private.scrollIntoView(index)
+    }
+
+    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
     model: screenplayAdapter
-    currentIndex: screenplayAdapter.currentIndex
+    currentIndex: -1
+
+    clip: true
+    spacing: Runtime.screenplayEditorSettings.spaceBetweenScenes * zoomLevel
 
     highlightMoveDuration: 0
     highlightResizeDuration: 0
-    highlightFollowsCurrentItem: true
+    highlightFollowsCurrentItem: false
 
     header: ScreenplayElementListViewHeader {
         width: root.width
@@ -52,13 +79,25 @@ ListView {
         screenplayAdapter: root.screenplayAdapter
     }
 
-    footer: ScreenplayElementListViewFooter {
+    footer: Column {
         width: root.width
 
-        readOnly: root.readOnly
-        zoomLevel: root.zoomLevel
-        pageMargins: root.pageMargins
-        screenplayAdapter: root.screenplayAdapter
+        Rectangle {
+            width: parent.width
+            height: Runtime.screenplayEditorSettings.spaceBetweenScenes * root.zoomLevel
+
+            color: Runtime.colors.primary.windowColor
+            visible: height > 0
+        }
+
+        ScreenplayElementListViewFooter {
+            width: parent.width
+
+            readOnly: root.readOnly
+            zoomLevel: root.zoomLevel
+            pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
+        }
     }
 
     /**
@@ -87,10 +126,48 @@ ListView {
             if(status === Loader.Loading)
                 Scrite.app.resetObjectProperty(_delegateLoader, "height")
         }
+
+        // We need a rectangle on the extreme left highlighting the delegate that is current
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.bottom: parent.bottom
+
+            width: 10
+
+            z: 1
+            color: _delegateLoader.screenplayElement.scene ? _delegateLoader.screenplayElement.scene.color : Runtime.colors.primary.highlight.background
+            visible: root.screenplayAdapter ? root.screenplayAdapter.currentIndex === _delegateLoader.index : false
+        }
+    }
+
+    onCountChanged: _private.updateFirstAndLastPointLater()
+    onWidthChanged: _private.updateFirstAndLastPointLater()
+    onHeightChanged: _private.updateFirstAndLastPointLater()
+    onContentXChanged: _private.updateFirstAndLastPointLater()
+    onContentYChanged: _private.updateFirstAndLastPointLater()
+
+    onMovingChanged: {
+        if(!movingVertically)
+            _private.makeItemUnderCursorCurrent()
     }
 
     QtObject {
         id: _private
+
+        property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
+        property Loader currentItem: currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
+        property AbstractScreenplayElementDelegate currentDelegate: currentItem ? currentItem.item : null
+
+        property int lastItemIndex: root.count > 0 ? validOrLastIndex(root.indexAt(lastPoint.x, lastPoint.y)) : 0
+        property int firstItemIndex: root.count > 0 ? Math.max(root.indexAt(firstPoint.x, firstPoint.y), 0) : 0
+
+        property bool scrolling: root.moving
+        property bool scrollBarActive: root.ScrollBar.vertical ? root.ScrollBar.vertical.active : false
+        property bool modelCurrentIndexChangedInternally: false
+
+        property point lastPoint: root.mapToItem(root.contentItem, root.width/2, root.height-2)
+        property point firstPoint: root.mapToItem(root.contentItem, root.width/2, 1)
 
         readonly property Component actBreakDelegate: ScreenplayActBreakDelegate {
             readonly property Loader delegateLoader: parent
@@ -104,6 +181,16 @@ ListView {
             breakType: delegateLoader.breakType
             screenplayElement: delegateLoader.screenplayElement
             screenplayElementType: delegateLoader.screenplayElementType
+
+            onHasFocusChanged: {
+                if(hasFocus)
+                    _private.changeAdapterCurrentIndexInternally(index)
+            }
+
+            onEnsureVisible: (item, area) => {
+                                 if(!_private.scrolling && !_private.modelCurrentIndexChangedInternally && _private.currentIndex === index)
+                                    _private.ensureVisible(item, area)
+                             }
         }
 
         readonly property Component episodeBreakDelegate: ScreenplayEpisodeBreakDelegate {
@@ -118,6 +205,16 @@ ListView {
             breakType: delegateLoader.breakType
             screenplayElement: delegateLoader.screenplayElement
             screenplayElementType: delegateLoader.screenplayElementType
+
+            onHasFocusChanged: {
+                if(hasFocus)
+                    _private.changeAdapterCurrentIndexInternally(index)
+            }
+
+            onEnsureVisible: (item, area) => {
+                                 if(!_private.scrolling && !_private.modelCurrentIndexChangedInternally && _private.currentIndex === index)
+                                    _private.ensureVisible(item, area)
+                             }
         }
 
         readonly property Component intervalBreakDelegate: ScreenplayIntervalBreakDelegate {
@@ -132,6 +229,16 @@ ListView {
             breakType: delegateLoader.breakType
             screenplayElement: delegateLoader.screenplayElement
             screenplayElementType: delegateLoader.screenplayElementType
+
+            onHasFocusChanged: {
+                if(hasFocus)
+                    _private.changeAdapterCurrentIndexInternally(index)
+            }
+
+            onEnsureVisible: (item, area) => {
+                                 if(!_private.scrolling && !_private.modelCurrentIndexChangedInternally && _private.currentIndex === index)
+                                    _private.ensureVisible(item, area)
+                             }
         }
 
         readonly property Component omittedSceneDelegate: OmittedScreenplayElementDelegate {
@@ -146,6 +253,16 @@ ListView {
             breakType: delegateLoader.breakType
             screenplayElement: delegateLoader.screenplayElement
             screenplayElementType: delegateLoader.screenplayElementType
+
+            onHasFocusChanged: {
+                if(hasFocus)
+                    _private.changeAdapterCurrentIndexInternally(index)
+            }
+
+            onEnsureVisible: (item, area) => {
+                                 if(!_private.scrolling && !_private.modelCurrentIndexChangedInternally && _private.currentIndex === index)
+                                    _private.ensureVisible(item, area)
+                             }
         }
 
         readonly property Component sceneDelegate: ScreenplayElementSceneDelegate {
@@ -160,6 +277,43 @@ ListView {
             breakType: delegateLoader.breakType
             screenplayElement: delegateLoader.screenplayElement
             screenplayElementType: delegateLoader.screenplayElementType
+
+            usePlaceholder: root.contentHeight > root.height && _private.scrolling
+
+            onHasFocusChanged: {
+                if(hasFocus)
+                    _private.changeAdapterCurrentIndexInternally(index)
+            }
+
+            onEnsureVisible: (item, area) => {
+                                 if(!_private.scrolling && !_private.modelCurrentIndexChangedInternally && _private.currentIndex === index)
+                                    _private.ensureVisible(item, area)
+                             }
+
+            // TODO
+            onScrollToNextSceneRequest: () => { }
+            onScrollToPreviousSceneRequest: () => { }
+            onSplitSceneRequest: (paragraph, cursorPosition) => { }
+            onMergeWithPreviousSceneRequest: () => { }
+        }
+
+        readonly property Connections screenplayAdapterSignals: Connections {
+            target: root.screenplayAdapter
+
+            function onSourceChanged() {
+                _private.updateFirstAndLastPointLater()
+            }
+
+            function onCurrentIndexChanged() {
+                if(_private.modelCurrentIndexChangedInternally)
+                    return
+
+                const index = root.screenplayAdapter.currentIndex
+                if(index < 0)
+                    root.positionViewAtBeginning()
+                else
+                    root.positionViewAtIndex(index, ListView.Beginning)
+            }
         }
 
         function pickDelegateComponent(delegateKind) {
@@ -172,5 +326,86 @@ ListView {
             }
             return null
         }
+
+        function updateFirstAndLastPointLater() {
+            Qt.callLater(updateFirstAndLastPoint)
+        }
+
+        function updateFirstAndLastPoint() {
+            lastPoint = root.mapToItem(root.contentItem, root.width/2, root.height-2)
+            firstPoint = root.mapToItem(root.contentItem, root.width/2, 1)
+        }
+
+        function isVisible(index) {
+            updateFirstAndLastPoint()
+            return index >= firstItemIndex && index <= lastItemIndex
+        }
+
+        function validOrLastIndex(val) {
+            return val < 0 || val >= root.count ? root.count-1 : val
+        }
+
+        function changeAdapterCurrentIndexInternally(index) {
+            if(root.screenplayAdapter.currentIndex === index)
+                return
+
+            modelCurrentIndexChangedInternally = true
+            root.screenplayAdapter.currentIndex = index
+            modelCurrentIndexChangedInternally = false
+        }
+
+        function makeItemUnderCursorCurrent() {
+            let currentIndex = root.screenplayAdapter.currentIndex
+            if(currentIndex >= firstItemIndex && currentIndex <= lastItemIndex)
+                return
+
+            const globalCursorPos = Scrite.app.cursorPosition()
+            let localCursorPos = Scrite.app.mapGlobalPositionToItem(root, globalCursorPos)
+            localCursorPos.x = root.width/2
+            if(localCursorPos.y >= 0 && localCursorPos.y < root.height) {
+                localCursorPos = root.mapToItem(root.contentItem, localCursorPos.x, localCursorPos.y)
+                currentIndex = root.indexAt(localCursorPos.x, localCursorPos.y)
+                if(currentIndex >= 0 && currentIndex <= root.count)
+                    changeAdapterCurrentIndexInternally(currentIndex)
+            }
+        }
+
+        function scrollIntoView(index) {
+            if(isVisible(index))
+                return
+
+            if(index < 0) {
+                root.positionViewAtBeginning()
+                return
+            }
+
+            if(index < firstItemIndex && firstItemIndex-index <= 2) {
+                root.contentY -= root.height*0.2
+            } else if(index > lastItemIndex && index-lastItemIndex <= 2) {
+                root.contentY += root.height*0.2
+            } else {
+                root.positionViewAtIndex(index, ListView.Beginning)
+            }
+
+        }
+
+        function ensureVisible(item, rect) {
+            if(item === null || rect === undefined)
+                return
+
+            const pt = item.mapToItem(root.contentItem, rect.x, rect.y)
+            const endY = root.contentY + root.height - rect.height
+            const startY = root.contentY
+            if( pt.y >= startY && pt.y <= endY )
+                return
+
+            if( pt.y < startY )
+                root.contentY = Math.round(pt.y)
+            else
+                root.contentY = Math.round((pt.y + 2*rect.height) - root.height)
+        }
+
+        onLastItemIndexChanged: makeItemUnderCursorCurrent()
+        onFirstItemIndexChanged: makeItemUnderCursorCurrent()
     }
 }

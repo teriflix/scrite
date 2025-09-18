@@ -37,6 +37,8 @@ AbstractScenePartEditor {
     Flow {
         id: _layout
 
+        width: parent.width
+
         flow: Flow.LeftToRight
         spacing: 5
         leftPadding: root.pageLeftMargin
@@ -56,6 +58,7 @@ AbstractScenePartEditor {
         }
 
         Repeater {
+            id: _characterTags
             model: root.scene ? root.scene.characterNames : 0
 
             TagText {
@@ -71,11 +74,7 @@ AbstractScenePartEditor {
                     return root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
                 }
 
-                Component.onCompleted: {
-                    determineFlags()
-                    root.scene.sceneChanged.connect(determineFlags)
-                    Runtime.screenplayEditorSettings.captureInvisibleCharactersChanged.connect(determineFlags)
-                }
+                Component.onCompleted: determineFlags()
 
                 border.color: colors.text
                 border.width: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
@@ -114,44 +113,40 @@ AbstractScenePartEditor {
         Loader {
             id: _newCharacterInputLoader
 
-            width: active && item ? Math.max(item.contentWidth, 100) : 0
-
             active: false
+            visible: active
 
-            sourceComponent: Item {
-                property alias contentWidth: _newCharacterInput.contentWidth
+            sourceComponent: VclTextField {
+                Component.onCompleted: {
+                    forceActiveFocus()
+                    root.ensureVisible(_newCharacterInputLoader, Qt.rect(0,0,width,height))
+                }
 
-                height: _newCharacterInput.height
+                Keys.onEscapePressed: {
+                    text = ""
+                    _newCharacterInputLoader.active = false
+                }
 
-                Component.onCompleted: root.ensureVisible(_newCharacterInputLoader, Qt.rect(0,0,width,height))
+                readOnly: false
+                completionStrings: Scrite.document.structure.characterNames
 
-                TextViewEdit {
-                    id: _newCharacterInput
+                font.pointSize: _private.tagFontPointSize
+                font.capitalization: Font.AllUppercase
 
-                    y: fontDescent
-                    width: parent.width
-
-                    wrapMode: Text.NoWrap
-                    readOnly: false
-                    completionStrings: Scrite.document.structure.characterNames
-                    horizontalAlignment: Text.AlignLeft
-
-                    font.pointSize: _private.tagFontPointSize
-
-                    onEditingFinished: {
+                onEditingComplete: {
+                    if(text.length > 0) {
                         root.scene.addMuteCharacter(text)
                         root.newCharacterAdded(text)
-                        _newCharacterInputLoader.active = false
                     }
 
-                    Rectangle {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: parent.fontHeight - parent.fontAscent - parent.fontHeight*0.25
-                        height: 1
-                        color: Runtime.colors.accent.borderColor
-                    }
+                    _newCharacterInputLoader.active = false
+                }
+            }
+
+            onStatusChanged: {
+                if(status === Loader.Null) {
+                    Scrite.app.resetObjectProperty(_newCharacterInputLoader, "width")
+                    Scrite.app.resetObjectProperty(_newCharacterInputLoader, "height")
                 }
             }
         }
@@ -198,6 +193,9 @@ AbstractScenePartEditor {
         property real tagFontPointSize: Math.max(sceneHeadingFormat.font2.pointSize*0.7, 6)
         property SceneElementFormat sceneHeadingFormat: Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
 
+        property bool captureInvisibleCharacters: Runtime.screenplayEditorSettings.captureInvisibleCharacters
+        onCaptureInvisibleCharactersChanged: scheduleDetermineFlagsInTags()
+
         property Component characterMenu: ScreenplayEditorCharacterMenu {
             additionalCharacterMenuItems: root.additionalCharacterMenuItems
 
@@ -206,11 +204,31 @@ AbstractScenePartEditor {
                                                   }
         }
 
+        readonly property Connections sceneConnections: Connections {
+            target: root.scene
+
+            function onSceneChanged() {
+                _private.scheduleDetermineFlagsInTags()
+            }
+        }
+
         function popupCharacterMenu(characterName, parent) {
             let menu = characterMenu.createObject(parent, {"characterName": characterName})
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu
+        }
+
+        function determineFlagsInTags() {
+            const nrTags = _characterTags.count
+            for(let i=0; i<nrTags; i++) {
+                let tag = _characterTags.itemAt(i)
+                tag.determineFlags()
+            }
+        }
+
+        function scheduleDetermineFlagsInTags() {
+            Qt.callLater(determineFlagsInTags)
         }
     }
 }

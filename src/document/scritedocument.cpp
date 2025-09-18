@@ -1054,7 +1054,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     const QString defaultSceneColor =
             settings->value(QStringLiteral("Workspace/defaultSceneColor")).toString();
 
-    const QVector<QColor> standardColors = Application::standardColorsForVersion(QVersionNumber());
+    const QList<QColor> standardColors = Application::standardColorsForVersion(QVersionNumber());
     const QColor defaultColor =
             defaultSceneColor.isEmpty() ? standardColors.first() : QColor(defaultSceneColor);
 
@@ -2800,8 +2800,8 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             m_structure->setCurrentElementIndex(0);
     }
 
-    const QVector<QColor> versionColors = Application::standardColorsForVersion(version);
-    const QVector<QColor> newColors = Application::standardColorsForVersion(QVersionNumber());
+    const QList<QColor> versionColors = Application::standardColorsForVersion(version);
+    const QList<QColor> newColors = Application::standardColorsForVersion(QVersionNumber());
     if (versionColors != newColors) {
         auto evalNewColor = [versionColors, newColors](const QColor &color) {
             const int oldColorIndex = versionColors.indexOf(color);

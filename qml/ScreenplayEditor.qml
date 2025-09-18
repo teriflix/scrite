@@ -36,6 +36,13 @@ Rectangle {
 
     property alias sidePanelEnabled: _sidePanelLoader.active
 
+    EventFilter.events: [EventFilter.Wheel]
+    EventFilter.onFilter: (object,event,result) => {
+                              EventFilter.forwardEventTo(_elementListView)
+                              result.filter = true
+                              result.accepted = true
+                          }
+
     color: Runtime.colors.primary.windowColor
 
     Loader {
@@ -53,7 +60,7 @@ Rectangle {
             readOnly: Scrite.document.readOnly
             screenplayAdapter: Runtime.screenplayAdapter
 
-            onPositionScreenplayEditorAtTitlePage: _listView.positionViewAtBeginning()
+            onPositionScreenplayEditorAtTitlePage: _elementListView.positionViewAtBeginning()
         }
     }
 
@@ -86,13 +93,13 @@ Rectangle {
         }
 
         Rectangle {
-            anchors.fill: _listView
+            anchors.fill: _elementListView
 
             color: Runtime.colors.primary.c50.background
         }
 
         ScreenplayElementListView {
-            id: _listView
+            id: _elementListView
 
             ScrollBar.vertical: _scrollBar
 
@@ -114,7 +121,7 @@ Rectangle {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
-            flickable: _listView
+            flickable: _elementListView
         }
     }
 
@@ -127,7 +134,7 @@ Rectangle {
 
         pageMargins: _private.pageMargins
         sceneHeadingFontMetrics: _private.sceneHeadingFontMetrics
-        screenplayEditorListView: _listView
+        screenplayEditorListView: _elementListView
         screenplayEditorLastItemIndex: 0
         screenplayEditorFirstItemIndex: 0
     }

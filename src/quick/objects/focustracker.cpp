@@ -13,6 +13,8 @@
 
 #include "focustracker.h"
 #include "undoredo.h"
+#include "appwindow.h"
+#include "application.h"
 
 #include <QQuickItem>
 
@@ -102,6 +104,8 @@ FocusTracker::FocusTracker(QObject *parent)
 {
     ::GlobalFocusTrackerList->append(this);
 
+    this->setWindow(AppWindow::instance());
+
     connect(this, &FocusTracker::windowChanged, this, &FocusTracker::evaluateHasFocus);
 }
 
@@ -124,17 +128,30 @@ void FocusTracker::setWindow(QQuickWindow *val)
     if (m_window == val)
         return;
 
-    if (m_window != nullptr)
+    if (m_window != nullptr) {
         disconnect(m_window, &QQuickWindow::activeFocusItemChanged, this,
                    &FocusTracker::evaluateHasFocus);
+        disconnect(m_window, &QQuickWindow::activeChanged, this, &FocusTracker::evaluateHasFocus);
+    }
 
     m_window = val;
 
-    if (m_window != nullptr)
+    if (m_window != nullptr) {
         connect(m_window, &QQuickWindow::activeFocusItemChanged, this,
                 &FocusTracker::evaluateHasFocus);
+        connect(m_window, &QQuickWindow::activeChanged, this, &FocusTracker::evaluateHasFocus);
+    }
 
     emit windowChanged();
+}
+
+void FocusTracker::setEvaluationMethod(FocusEvaluationMethod val)
+{
+    if (m_evaluationMethod == val)
+        return;
+
+    m_evaluationMethod = val;
+    emit evaluationMethodChanged();
 }
 
 void FocusTracker::resetWindow()
@@ -154,32 +171,41 @@ void FocusTracker::setHasFocus(bool val)
 
 void FocusTracker::evaluateHasFocus()
 {
-    if (m_item == nullptr || (m_window != nullptr && !m_window->isActive())) {
+    if (m_item == nullptr || m_window.isNull() || !m_window->isActive()) {
+        this->setHasFocus(false);
+        return;
+    }
+
+    QQuickItem *focussedItem = m_window->activeFocusItem();
+    if (focussedItem == nullptr) {
         this->setHasFocus(false);
         return;
     }
 
     QList<QQuickItem *> trackedItems;
-    for (FocusTracker *tracker : qAsConst(*::GlobalFocusTrackerList)) {
-        if (tracker == this)
-            continue;
-        trackedItems << tracker->item();
+    if (m_evaluationMethod == ExclusiveFocusEvaluation) {
+        for (FocusTracker *tracker : qAsConst(*::GlobalFocusTrackerList)) {
+            if (tracker == this)
+                continue;
+            trackedItems << tracker->item();
+        }
     }
 
-    bool ditchFocus = false;
-    QQuickItem *item = m_window->activeFocusItem();
-    while (item != nullptr) {
-        if (item == m_item) {
+    while (focussedItem != nullptr) {
+        if (focussedItem == m_item) {
             this->setHasFocus(true);
             return;
         }
 
-        if (trackedItems.contains(item))
-            ditchFocus = true;
+        if (!trackedItems.isEmpty()) {
+            if (trackedItems.contains(focussedItem)) {
+                this->setHasFocus(false);
+                return;
+            }
+        }
 
-        item = item->parentItem();
+        focussedItem = focussedItem->parentItem();
     }
 
-    if (ditchFocus)
-        this->setHasFocus(false);
+    this->setHasFocus(false);
 }

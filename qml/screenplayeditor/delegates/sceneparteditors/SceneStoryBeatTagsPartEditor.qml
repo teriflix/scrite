@@ -68,7 +68,7 @@ AbstractScenePartEditor {
         }
 
         Repeater {
-            model: root.scene ? root.scene.groups : 0
+            model: root.scene ? root.scene.tags : 0
 
             TagText {
                 id: _openTag
@@ -98,7 +98,6 @@ AbstractScenePartEditor {
 
                 font.family: Runtime.idealFontMetrics.font.family
                 font.pointSize: _private.tagFontPointSize
-                font.capitalization: Font.AllUppercase
 
                 onClicked: root.sceneTagClicked(tagName)
 
@@ -116,42 +115,36 @@ AbstractScenePartEditor {
 
             active: false
 
-            sourceComponent: Item {
-                property alias contentWidth: _newOpenTagInput.contentWidth
+            sourceComponent: VclTextField {
+                Component.onCompleted: {
+                    forceActiveFocus()
+                    root.ensureVisible(_newOpenTagInputLoader, Qt.rect(0,0,width,height))
+                }
 
-                height: _newOpenTagInput.height
+                Keys.onEscapePressed: {
+                    text = ""
+                    _newOpenTagInputLoader.active = false
+                }
 
-                Component.onCompleted: root.ensureVisible(_newOpenTagInputLoader, Qt.rect(0,0,width,height))
+                readOnly: false
+                completionStrings: Scrite.document.structure.sceneTags
 
-                TextViewEdit {
-                    id: _newOpenTagInput
+                font.pointSize: _private.tagFontPointSize
 
-                    y: fontDescent
-                    width: parent.width
-
-                    wrapMode: Text.NoWrap
-                    readOnly: false
-                    completionStrings: Scrite.document.structure.sceneTags
-                    horizontalAlignment: Text.AlignLeft
-
-                    font.pointSize: _private.tagFontPointSize
-
-                    onEditingFinished: {
+                onEditingComplete: {
+                    if(text.length > 0) {
                         root.scene.addTag(text)
                         root.sceneTagAdded(text)
-                        _newOpenTagInputLoader.active = false
                     }
 
-                    Rectangle {
-                        anchors.left: parent.left
-                        anchors.right: parent.right
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: parent.fontHeight - parent.fontAscent - parent.fontHeight*0.25
+                    _newOpenTagInputLoader.active = false
+                }
+            }
 
-                        height: 1
-
-                        color: Runtime.colors.accent.borderColor
-                    }
+            onStatusChanged: {
+                if(status === Loader.Null) {
+                    Scrite.app.resetObjectProperty(_newOpenTagInputLoader, "width")
+                    Scrite.app.resetObjectProperty(_newOpenTagInputLoader, "height")
                 }
             }
         }

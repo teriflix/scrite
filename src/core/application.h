@@ -339,7 +339,7 @@ public:
     // Must be called from main.cpp
     void initializeStandardColors(QQmlEngine *);
 
-    Q_INVOKABLE static QVector<QColor>
+    Q_INVOKABLE static QList<QColor>
     standardColorsForVersion(const QVersionNumber &version = QVersionNumber());
 
     // QCoreApplication interface
