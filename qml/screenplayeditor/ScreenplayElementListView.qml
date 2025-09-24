@@ -162,7 +162,7 @@ ListView {
         property int lastItemIndex: root.count > 0 ? validOrLastIndex(root.indexAt(lastPoint.x, lastPoint.y)) : 0
         property int firstItemIndex: root.count > 0 ? Math.max(root.indexAt(firstPoint.x, firstPoint.y), 0) : 0
 
-        property bool scrolling: root.moving
+        property bool scrolling: scrollBarActive || root.moving
         property bool scrollBarActive: root.ScrollBar.vertical ? root.ScrollBar.vertical.active : false
         property bool modelCurrentIndexChangedInternally: false
 

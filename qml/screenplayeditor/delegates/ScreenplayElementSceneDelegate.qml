@@ -69,47 +69,48 @@ AbstractScreenplayElementDelegate {
         Rectangle {
             z: 1
 
-            implicitHeight: _sceneSizeHint.active ? _placeHolderLayout.height
+            implicitHeight: _sceneSizeHint.active ? (_headerLayout.height + _sceneSizeHint.height + _pageBreakAfter.height)
                                                   : root.screenplayElement.heightHint * root.zoomLevel
 
             color: root.scene ? Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
 
-            ColumnLayout {
-                id: _placeHolderLayout
+            Column {
+                id: _headerLayout
 
-                width: parent.width
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
 
                 Item {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 40 // for page-break...
-
-                    visible: root.screenplayElement.pageBreakBefore
+                    width: parent.width
+                    height: root.screenplayElement.pageBreakBefore ? root.fontMetrics.lineSpacing*0.7 : 1
                 }
 
-                RowLayout {
+                Row {
                     id: _placeHolderHeaderLayout
 
-                    Layout.fillWidth: true
-                    Layout.topMargin: 10
+                    width: parent.width
 
                     VclLabel {
-                        Layout.alignment: Qt.AlignRight
-                        Layout.preferredWidth: root.pageLeftMargin
+                        width: root.pageLeftMargin
 
                         text: root.screenplayElement.resolvedSceneNumber
                         font: root.font
                         color: root.screenplayElement.hasUserSceneNumber ? "black" : "gray"
+                        topPadding: root.fontMetrics.lineSpacing * 0.5
+                        bottomPadding: root.fontMetrics.lineSpacing * 0.5
                         rightPadding: 20
                         horizontalAlignment: Text.AlignRight
                     }
 
                     VclLabel {
-                        Layout.fillWidth: true
+                        width: parent.width - root.pageLeftMargin - root.pageRightMargin
 
                         font: root.font
                         color: screenplayElementType === ScreenplayElement.BreakElementType ? "gray" : "black"
                         elide: Text.ElideMiddle
-                        rightPadding: root.pageRightMargin
+                        topPadding: root.fontMetrics.lineSpacing * 0.5
+                        bottomPadding: root.fontMetrics.lineSpacing * 0.5
 
                         text: {
                             if(root.screenplayElementType === ScreenplayElement.BreakElementType)
@@ -122,40 +123,44 @@ AbstractScreenplayElementDelegate {
                         }
                     }
                 }
+            }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.minimumHeight: _sceneSizeHint.active ? _sceneSizeHint.height : root.fontMetrics.lineSpacing * 3
+            Item {
+                anchors.top: _headerLayout.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: _pageBreakAfter.top
 
-                    Image {
-                        anchors.fill: parent
+                Image {
+                    anchors.fill: parent
 
-                        source: "qrc:/images/sample_scene.png"
-                        opacity: 0.5
-                        fillMode: Image.TileVertically
-                    }
+                    source: "qrc:/images/sample_scene.png"
+                    opacity: 0.5
+                    fillMode: Image.TileVertically
                 }
 
-                Item {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 40 // for page-break...
+                SceneSizeHintItem {
+                    id: _sceneSizeHint
 
-                    visible: root.screenplayElement.pageBreakAfter
+                    width: contentWidth * zoomLevel
+                    height: contentHeight * zoomLevel
+
+                    scene: root.scene
+                    active: root.screenplayElement.heightHint === 0
+                    format: Scrite.document.printFormat
+                    visible: false
+                    asynchronous: false
                 }
             }
 
-            SceneSizeHintItem {
-                id: _sceneSizeHint
+            Item {
+                id: _pageBreakAfter
 
-                width: contentWidth * zoomLevel
-                height: contentHeight * zoomLevel
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
 
-                scene: root.scene
-                active: root.screenplayElement.heightHint === 0
-                format: Scrite.document.printFormat
-                visible: false
-                asynchronous: false
+                height: root.screenplayElement.pageBreakAfter ? root.fontMetrics.lineSpacing*0.7 : 1
             }
         }
     }
