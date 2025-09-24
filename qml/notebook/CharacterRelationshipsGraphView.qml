@@ -463,7 +463,7 @@ Rectangle {
             z: canvas.selectedNodeItem == nodeItem ? 1 : 0
             width: node.rect.width
             height: node.rect.height
-            color: character.photos.length === 0 ? Qt.tint(character.color, "#C0FFFFFF") : Qt.rgba(0,0,0,0)
+            color: character.photos.length === 0 ? Qt.tint(character.color, Runtime.colors.sceneControlTint) : Qt.rgba(0,0,0,0)
             Component.onCompleted: {
                 node.item = nodeItem
                 if(crGraph.character === node.character)
@@ -497,7 +497,7 @@ Rectangle {
                     anchors.fill: infoLabel
                     anchors.margins: -4
                     radius: 4
-                    color: node.marked ? Runtime.colors.accent.a700.background : Qt.tint(character.color, "#C0FFFFFF")
+                    color: node.marked ? Runtime.colors.accent.a700.background : Qt.tint(character.color, Runtime.colors.sceneControlTint)
                     opacity: character.photos.length === 0 ? 1 : 0.8
                     border.width: 1
                     border.color: node.marked ? Runtime.colors.accent.a700.text : "black"

@@ -74,9 +74,7 @@ AbstractScreenplayElementDelegate {
                 font: root.font
                 opacity: root.screenplayElement.breakSubtitle.length > 0 ? 1 : 0
                 readOnly: true
-                maximumLength: 5
                 horizontalAlignment: Text.AlignRight
-
                 background: Item { }
             }
 

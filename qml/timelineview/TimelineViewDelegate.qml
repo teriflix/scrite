@@ -67,11 +67,11 @@ Item {
         Rectangle {
             id: _elementItemBox
 
-            property color sceneColor2 : Qt.tint(_private.sceneColor, (root.screenplayElement.selected || _private.active) ? "#9CFFFFFF" : "#C0FFFFFF")
+            property color sceneColor2 : Qt.tint(_private.sceneColor, (root.screenplayElement.selected || _private.active) ? "#9CFFFFFF" : Runtime.colors.sceneControlTint)
 
             anchors.fill: parent
 
-            color: root.scene ? (root.screenplayElement.omitted ? Qt.tint(sceneColor2, "#C0FFFFFF") : sceneColor2) : _private.sceneColor
+            color: root.scene ? (root.screenplayElement.omitted ? Qt.tint(sceneColor2, Runtime.colors.sceneControlTint) : sceneColor2) : _private.sceneColor
             border.color: color === Qt.rgba(1,1,1,1) ? "black" : _private.sceneColor
             border.width: _private.active ? 2 : 1
 

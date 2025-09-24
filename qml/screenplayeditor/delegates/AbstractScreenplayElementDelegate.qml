@@ -34,6 +34,7 @@ FocusScope {
     // These have to be explicitly provided
     required property var pageMargins // must set using Utils.margins() only
     required property real zoomLevel
+    required property bool isCurrent
 
     // These have to be components only.
     default property alias content: _contentLoader.sourceComponent
@@ -103,23 +104,54 @@ FocusScope {
             }
         }
 
-        Loader {
-            id: _contentLoader
-
-            FocusTracker.objectName: "SceneDelegate-" + root.index
-            FocusTracker.window: Scrite.window
-            FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
-            FocusTracker.indicator.target: _private
-            FocusTracker.indicator.property: "hasFocus"
-
+        Item {
             width: parent.width
+            height: _contentLoader.height
 
-            onItemChanged: {
-                if(item && item.__searchBarSaysReplaceCurrent) {
-                    root.__searchBarSaysReplaceCurrent.connect(item.__searchBarSaysReplaceCurrent)
+            Rectangle {
+                anchors.fill: _contentLoader
+                anchors.margins: -1
+
+                color: Qt.rgba(0,0,0,0)
+                visible: Runtime.screenplayEditorSettings.spaceBetweenScenes > 0
+
+                border.width: 1
+                border.color: Runtime.colors.primary.c400.background
+            }
+
+            Loader {
+                id: _contentLoader
+
+                FocusTracker.window: Scrite.window
+                FocusTracker.objectName: "SceneDelegate-" + root.index
+                FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
+                FocusTracker.indicator.target: _private
+                FocusTracker.indicator.property: "hasFocus"
+
+                width: parent.width
+
+                onItemChanged: {
+                    if(item && item.__searchBarSaysReplaceCurrent) {
+                        root.__searchBarSaysReplaceCurrent.connect(item.__searchBarSaysReplaceCurrent)
+                    }
+                }
+
+                // We need a rectangle on the extreme left highlighting the delegate that is current
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.bottom: parent.bottom
+
+                    width: 10
+
+                    z: 1
+                    color: root.screenplayElement.scene ? root.screenplayElement.scene.color : Runtime.colors.primary.highlight.background
+                    opacity: root.hasFocus ? 1 : 0.5
+                    visible: root.isCurrent
                 }
             }
         }
+
 
         Loader {
             width: parent.width

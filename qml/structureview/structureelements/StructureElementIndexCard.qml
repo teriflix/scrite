@@ -116,7 +116,7 @@ AbstractStructureElementUI {
 
         anchors.fill: parent
 
-        color: Qt.tint(root.element.scene.color, _private.isSelected ? "#C0FFFFFF" : "#F0FFFFFF")
+        color: Qt.tint(root.element.scene.color, _private.isSelected ? Runtime.colors.sceneControlTint : "#F0FFFFFF")
         border.width: _private.isSelected ? 2 : 1
         border.color: _private.isSelected ? borderColor : Qt.lighter(borderColor)
 

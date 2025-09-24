@@ -3031,11 +3031,13 @@ void SceneDocumentBinder::resetScene()
 void SceneDocumentBinder::resetTextDocument()
 {
     m_textDocument = nullptr;
+
     this->QSyntaxHighlighter::setDocument(nullptr);
     this->setDocumentLoadCount(0);
-    this->evaluateAutoCompleteHintsAndCompletionPrefix();
-    emit textDocumentChanged();
     this->setCursorPosition(-1);
+    QTimer::singleShot(0, this, &SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix);
+
+    emit textDocumentChanged();
 }
 
 void SceneDocumentBinder::resetScreenplayFormat()
@@ -3566,7 +3568,7 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
     int completionStart = -1;
     int completionEnd = -1;
 
-    if (m_currentElement == nullptr || m_cursorPosition < 0) {
+    if (m_textDocument == nullptr || m_currentElement == nullptr || m_cursorPosition < 0) {
         this->setAutoCompleteHints(hints, priorityHints);
         this->setCompletionPrefix(completionPrefix, completionStart, completionEnd);
         return;

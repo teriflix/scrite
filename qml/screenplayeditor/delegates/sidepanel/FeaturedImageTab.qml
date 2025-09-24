@@ -17,30 +17,23 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
+import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "qrc:/qml/helpers"
+import "qrc:/qml/screenplayeditor/delegates/sceneparteditors"
 
-VclLabel {
-    property alias containsMouse: _mouseArea.containsMouse
+AbstractScenePartEditor {
+    id: root
 
-    property color hoverColor: enabled ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
-    property color defaultColor: enabled ? Runtime.colors.accent.c500.background : Runtime.colors.primary.c500.background
+    property alias mipmap: _sceneFeaturedImage.mipmap
 
-    signal clicked()
-
-    color: _mouseArea.containsMouse ? hoverColor : defaultColor
-
-    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-    font.underline: true
-
-    MouseArea {
-        id: _mouseArea
+    SceneFeaturedImage {
+        id: _sceneFeaturedImage
 
         anchors.fill: parent
 
-        cursorShape: Qt.PointingHandCursor
-        hoverEnabled: true
-
-        onClicked: parent.clicked()
+        enabled: !root.readOnly
+        fillModeAttrib: "commentsPanelFillMode"
+        defaultFillMode: Image.PreserveAspectCrop
     }
 }

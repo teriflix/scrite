@@ -461,8 +461,8 @@ public:
     Q_INVOKABLE int indexOfElement(ScreenplayElement *element) const;
     Q_INVOKABLE QList<int> sceneElementIndexes(Scene *scene, int max = -1) const;
     QList<ScreenplayElement *> sceneElements(Scene *scene, int max = -1) const;
-    Q_INVOKABLE int firstSceneIndex() const;
-    Q_INVOKABLE int lastSceneIndex() const;
+    Q_INVOKABLE int firstSceneElementIndex() const;
+    Q_INVOKABLE int lastSceneElementIndex() const;
     Q_INVOKABLE QList<int> sceneElementsInBreak(ScreenplayElement *element) const;
 
     int dialogueCount() const;
@@ -509,8 +509,8 @@ public:
 
     Q_SIGNAL void requestEditorAt(int index);
 
-    Q_INVOKABLE int previousSceneElementIndex();
-    Q_INVOKABLE int nextSceneElementIndex();
+    Q_INVOKABLE int previousSceneElementIndex() const;
+    Q_INVOKABLE int nextSceneElementIndex() const;
 
     Q_PROPERTY(Scene *activeScene READ activeScene WRITE setActiveScene NOTIFY activeSceneChanged
                        STORED false RESET resetActiveScene)

@@ -191,7 +191,25 @@ ScreenplayElement *ScreenplayAdapter::mergeElementWithPrevious(ScreenplayElement
     return nullptr;
 }
 
-int ScreenplayAdapter::previousSceneElementIndex()
+int ScreenplayAdapter::firstSceneElementIndex() const
+{
+    Screenplay *screenplay = this->screenplay();
+    if (screenplay != nullptr)
+        return screenplay->firstSceneElementIndex();
+
+    return 0;
+}
+
+int ScreenplayAdapter::lastSceneElementIndex() const
+{
+    Screenplay *screenplay = this->screenplay();
+    if (screenplay != nullptr)
+        return screenplay->lastSceneElementIndex();
+
+    return 0;
+}
+
+int ScreenplayAdapter::previousSceneElementIndex() const
 {
     Screenplay *screenplay = this->screenplay();
     if (screenplay != nullptr)
@@ -200,7 +218,7 @@ int ScreenplayAdapter::previousSceneElementIndex()
     return 0;
 }
 
-int ScreenplayAdapter::nextSceneElementIndex()
+int ScreenplayAdapter::nextSceneElementIndex() const
 {
     Screenplay *screenplay = this->screenplay();
     if (screenplay != nullptr)

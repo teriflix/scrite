@@ -1302,7 +1302,7 @@ void ScreenplayTextDocument::loadScreenplay()
             cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
     };
 
-    const int fsi = m_screenplay->firstSceneIndex();
+    const int fsi = m_screenplay->firstSceneElementIndex();
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
 
@@ -1946,7 +1946,7 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
     }
 
     QTextFrameFormat frameFormat = m_sceneFrameFormat;
-    const int fsi = m_screenplay->firstSceneIndex();
+    const int fsi = m_screenplay->firstSceneElementIndex();
     if (index > fsi) {
         SceneElement::Type firstParaType = SceneElement::Heading;
         if (!scene->heading()->isEnabled() && scene->elementCount()) {

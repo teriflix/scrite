@@ -43,7 +43,8 @@ AbstractScenePartEditor {
         readOnly: root.readOnly
         placeholderText: "Scene Synopsis"
 
-        font.pointSize: _private.synopsisFontPointSize
+        font.family: root.font.family
+        font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
 
         background: Item { }
 
@@ -67,12 +68,5 @@ AbstractScenePartEditor {
                 _synopsisInput.forceActiveFocus()
             }
         }
-    }
-
-    QtObject {
-        id: _private
-
-        property real synopsisFontPointSize: Math.max(sceneHeadingFormat.font2.pointSize*0.7, 6)
-        property SceneElementFormat sceneHeadingFormat: Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
     }
 }

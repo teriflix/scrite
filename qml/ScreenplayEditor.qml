@@ -80,6 +80,7 @@ Rectangle {
             anchors.top: parent.top
             anchors.horizontalCenter: parent.horizontalCenter
 
+            z: 1
             width: _private.pageLayout.paperWidth * _private.zoomLevel * _private.dpi
             height: Runtime.minimumFontMetrics.lineSpacing
 
@@ -96,6 +97,8 @@ Rectangle {
             anchors.fill: _elementListView
 
             color: Runtime.colors.primary.c50.background
+            border.width: 1
+            border.color: root.color
         }
 
         ScreenplayElementListView {
@@ -112,6 +115,8 @@ Rectangle {
             zoomLevel: _private.zoomLevel
             pageMargins: _private.pageMargins
             screenplayAdapter: Runtime.screenplayAdapter
+            spaceAvailableOnTheLeft: x-1
+            spaceAvailableOnTheRight: parent.width - x - width - (_scrollBar.visible ? _scrollBar.width : 0)
         }
 
         VclScrollBar {
@@ -121,6 +126,7 @@ Rectangle {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
 
+            z: 1
             flickable: _elementListView
         }
     }

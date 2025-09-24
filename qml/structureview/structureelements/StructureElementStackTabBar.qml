@@ -78,7 +78,7 @@ Item {
                 activeTabBorderWidth: (root.elementStack.hasCurrentElement ? 2 : 1)
 
                 activeTabIndex: root.elementStack.topmostElementIndex
-                activeTabColor: Qt.tint(root.elementStack.topmostElement.scene.color, (root.elementStack.hasCurrentElement ? "#C0FFFFFF" : "#F0FFFFFF"))
+                activeTabColor: Qt.tint(root.elementStack.topmostElement.scene.color, (root.elementStack.hasCurrentElement ? Runtime.colors.sceneControlTint : "#F0FFFFFF"))
                 activeTabFont.bold: true
                 activeTabTextColor: Scrite.app.textColorFor(activeTabColor)
                 activeTabBorderColor: Scrite.app.isLightColor(root.elementStack.topmostElement.scene.color) ? "black" : root.elementStack.topmostElement.scene.color

@@ -1079,7 +1079,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
 
     const bool asLastScene = m_screenplay->currentElementIndex() < 0
             || (fuzzyScreenplayInsert
-                && m_screenplay->currentElementIndex() == m_screenplay->lastSceneIndex());
+                && m_screenplay->currentElementIndex() == m_screenplay->lastSceneElementIndex());
 
     ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
     newScreenplayElement->setScene(scene);

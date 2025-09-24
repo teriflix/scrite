@@ -161,14 +161,12 @@
         <file>qml/overlays/DocumentBusyOverlay.qml</file>
         <file>qml/overlays/OverlaysLayer.qml</file>
         <file>qml/overlays/qmldir</file>
-        <file>qml/screenplayeditor/delegates/editors/AbstractScenePartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/editors/SceneCharacterListPartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/editors/SceneHeadingPartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/editors/SceneStoryBeatTagsPartEditor.qml</file>
-        <file>qml/screenplayeditor/delegates/editors/SceneSynopsisPartEditor.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/PageNumberBubble.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/qmldir</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorBackground.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorCompletionPopup.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorContextMenu.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorSpellingSuggestionsMenu.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/AbstractScenePartEditor.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/qmldir</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/SceneCharacterListPartEditor.qml</file>
@@ -176,20 +174,36 @@
         <file>qml/screenplayeditor/delegates/sceneparteditors/SceneHeadingPartEditor.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/SceneStoryBeatTagsPartEditor.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/SceneSynopsisPartEditor.qml</file>
+        <file>qml/screenplayeditor/delegates/sidepanel/CollapsedCorner.qml</file>
+        <file>qml/screenplayeditor/delegates/sidepanel/CommentsTab.qml</file>
+        <file>qml/screenplayeditor/delegates/sidepanel/ExpandedCorner.qml</file>
+        <file>qml/screenplayeditor/delegates/sidepanel/FeaturedImageTab.qml</file>
+        <file>qml/screenplayeditor/delegates/sidepanel/IndexCardFieldsTab.qml</file>
+        <file>qml/screenplayeditor/delegates/sidepanel/SceneMetaDataTab.qml</file>
+        <file>qml/screenplayeditor/delegates/sidepanel/SceneSidePanel.qml</file>
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/AbstractScreenplayElementDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/OmittedScreenplayElementDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayActBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementListViewFooter.qml</file>
+        <file>qml/screenplayeditor/delegates/ScreenplayElementListViewHeader.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayElementSceneDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayEpisodeBreakDelegate.qml</file>
         <file>qml/screenplayeditor/delegates/ScreenplayIntervalBreakDelegate.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelDelegate.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelFooter.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelHeader.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelMenu.qml</file>
+        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelMoveElementsTask.qml</file>
         <file>qml/screenplayeditor/PageBreakItem.qml</file>
         <file>qml/screenplayeditor/qmldir</file>
         <file>qml/screenplayeditor/ScreenplayBreakElementsContextMenu.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorCharacterMenu.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
+        <file>qml/screenplayeditor/ScreenplayEditorSidePanel.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorStatusBar.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorToolbar.qml</file>
+        <file>qml/screenplayeditor/ScreenplayElementListView.qml</file>
         <file>qml/screenplayeditor/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/scrited/qmldir</file>
         <file>qml/scrited/ScritedToolbar.qml</file>
@@ -250,17 +264,5 @@
         <file>qml/ScriteMainWindow.qml</file>
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorCompletionPopup.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorSpellingSuggestionsMenu.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorContextMenu.qml</file>
-        <file>qml/screenplayeditor/ScreenplayElementListView.qml</file>
-        <file>qml/screenplayeditor/delegates/ScreenplayElementListViewHeader.qml</file>
-        <file>qml/screenplayeditor/delegates/ScreenplayElementListViewFooter.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorSidePanel.qml</file>
-        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelMenu.qml</file>
-        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelHeader.qml</file>
-        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelDelegate.qml</file>
-        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelFooter.qml</file>
-        <file>qml/screenplayeditor/scenelistpanel/SceneListPanelMoveElementsTask.qml</file>
     </qresource>
 </RCC>

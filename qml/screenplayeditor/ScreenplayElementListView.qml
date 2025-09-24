@@ -33,9 +33,12 @@ ListView {
     required property var pageMargins
     required property bool readOnly
     required property real zoomLevel
+    required property real spaceAvailableOnTheLeft // Space available to the left of this list-view in the container where its placed
+    required property real spaceAvailableOnTheRight // Space available to the left of this list-view in the container where its placed
 
     required property ScreenplayAdapter screenplayAdapter
 
+    readonly property alias hasFocus: _private.hasFocus
     readonly property alias currentDelegate: _private.currentDelegate
     readonly property alias currentDelegateIndex: _private.currentIndex
     readonly property alias currentDelegateLoader: _private.currentItem
@@ -58,13 +61,18 @@ ListView {
         _private.scrollIntoView(index)
     }
 
+    FocusTracker.window: Scrite.window
+    FocusTracker.objectName: "ScreenplayElementListView"
+    FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
+    FocusTracker.indicator.target: _private
+    FocusTracker.indicator.property: "hasFocus"
+
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+    objectName: "ScreenplayEditorListView"
 
     model: screenplayAdapter
     currentIndex: -1
-
-    clip: true
-    spacing: Runtime.screenplayEditorSettings.spaceBetweenScenes * zoomLevel
 
     highlightMoveDuration: 0
     highlightResizeDuration: 0
@@ -118,26 +126,16 @@ ListView {
         required property string delegateKind
         required property ScreenplayElement screenplayElement
 
+        z: root.screenplayAdapter.currentIndex === index ? 1 : 0
+
         width: root.width
 
+        objectName: "ScreenplayElementListView-Delegate-" + index
         sourceComponent: _private.pickDelegateComponent(delegateKind)
 
         onStatusChanged: {
             if(status === Loader.Loading)
                 Scrite.app.resetObjectProperty(_delegateLoader, "height")
-        }
-
-        // We need a rectangle on the extreme left highlighting the delegate that is current
-        Rectangle {
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.bottom: parent.bottom
-
-            width: 10
-
-            z: 1
-            color: _delegateLoader.screenplayElement.scene ? _delegateLoader.screenplayElement.scene.color : Runtime.colors.primary.highlight.background
-            visible: root.screenplayAdapter ? root.screenplayAdapter.currentIndex === _delegateLoader.index : false
         }
     }
 
@@ -162,6 +160,7 @@ ListView {
         property int lastItemIndex: root.count > 0 ? validOrLastIndex(root.indexAt(lastPoint.x, lastPoint.y)) : 0
         property int firstItemIndex: root.count > 0 ? Math.max(root.indexAt(firstPoint.x, firstPoint.y), 0) : 0
 
+        property bool hasFocus: false
         property bool scrolling: scrollBarActive || root.moving
         property bool scrollBarActive: root.ScrollBar.vertical ? root.ScrollBar.vertical.active : false
         property bool modelCurrentIndexChangedInternally: false
@@ -173,6 +172,7 @@ ListView {
             readonly property Loader delegateLoader: parent
 
             readOnly: root.readOnly
+            isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
 
@@ -197,6 +197,7 @@ ListView {
             readonly property Loader delegateLoader: parent
 
             readOnly: root.readOnly
+            isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
 
@@ -221,6 +222,7 @@ ListView {
             readonly property Loader delegateLoader: parent
 
             readOnly: root.readOnly
+            isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
 
@@ -245,6 +247,7 @@ ListView {
             readonly property Loader delegateLoader: parent
 
             readOnly: root.readOnly
+            isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
 
@@ -269,8 +272,11 @@ ListView {
             readonly property Loader delegateLoader: parent
 
             readOnly: root.readOnly
+            listView: root
+            isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
+            spaceAvailableForScenePanel: root.spaceAvailableOnTheRight
 
             index: delegateLoader.index
             sceneID: delegateLoader.sceneID
@@ -290,9 +296,14 @@ ListView {
                                     _private.ensureVisible(item, area)
                              }
 
+            onJumpToLastScene: () => { _private.jumpToLastScene() }
+            onJumpToNextScene: () => { _private.jumpToNextScene() }
+            onJumpToFirstScene: () => { _private.jumpToFirstScene() }
+            onJumpToPreviousScene: () => { _private.jumpToPreviousScene() }
+            onScrollToNextSceneRequest: () => { _private.scrollToNextScene() }
+            onScrollToPreviousSceneRequest: () => { _private.scrollToPreviousScene() }
+
             // TODO
-            onScrollToNextSceneRequest: () => { }
-            onScrollToPreviousSceneRequest: () => { }
             onSplitSceneRequest: (paragraph, cursorPosition) => { }
             onMergeWithPreviousSceneRequest: () => { }
         }
@@ -313,6 +324,19 @@ ListView {
                     root.positionViewAtBeginning()
                 else
                     root.positionViewAtIndex(index, ListView.Beginning)
+
+                if(_private.hasFocus) {
+                    /**
+                      We cannot use _private.currentItem or _private.currentDelegate at this point,
+                      because those bound properties may not have gotten updated just yet.
+                      */
+                    const item = root.itemAtIndex(index)
+                    if(item) {
+                        const delegate = item.item
+                        if(delegate)
+                            delegate.focusIn(0)
+                    }
+                }
             }
         }
 
@@ -403,6 +427,86 @@ ListView {
                 root.contentY = Math.round(pt.y)
             else
                 root.contentY = Math.round((pt.y + 2*rect.height) - root.height)
+        }
+
+        function jumpToNextScene() {
+            const cidx = currentIndex
+            const nidx = root.screenplayAdapter.nextSceneElementIndex()
+            if(cidx === nidx)
+                return
+
+            root.positionViewAtIndex(nidx, ListView.Beginning)
+            changeAdapterCurrentIndexInternally(nidx)
+            if(currentDelegate)
+                currentDelegate.focusIn(0)
+            root.positionViewAtIndex(nidx, ListView.Beginning)
+        }
+
+        function jumpToLastScene() {
+            const cidx = currentIndex
+            const lidx = root.screenplayAdapter.lastSceneElementIndex()
+            if(cidx === lidx)
+                return
+
+            root.positionViewAtIndex(lidx, ListView.Beginning)
+            changeAdapterCurrentIndexInternally(lidx)
+            if(currentDelegate)
+                currentDelegate.focusIn(0)
+            root.positionViewAtIndex(lidx, ListView.Beginning)
+        }
+
+        function jumpToFirstScene() {
+            const cidx = currentIndex
+            const fidx = root.screenplayAdapter.firstSceneElementIndex()
+            if(cidx === fidx)
+                return
+
+            root.positionViewAtIndex(fidx, ListView.Beginning)
+            changeAdapterCurrentIndexInternally(fidx)
+            if(currentDelegate)
+                currentDelegate.focusIn(0)
+            root.positionViewAtIndex(fidx, ListView.Beginning)
+        }
+
+        function jumpToPreviousScene() {
+            const cidx = currentIndex
+            const pidx = root.screenplayAdapter.previousSceneElementIndex()
+            if(cidx === pidx)
+                return
+
+            root.positionViewAtIndex(pidx, ListView.Beginning)
+            changeAdapterCurrentIndexInternally(pidx)
+            if(currentDelegate)
+                currentDelegate.focusIn(0)
+            root.positionViewAtIndex(pidx, ListView.Beginning)
+        }
+
+        function scrollToNextScene() {
+            const cidx = currentIndex
+            const nidx = root.screenplayAdapter.nextSceneElementIndex()
+            if(cidx === nidx) {
+                root.positionViewAtEnd()
+                return
+            }
+
+            changeAdapterCurrentIndexInternally(nidx)
+            scrollIntoView(nidx)
+            if(currentDelegate)
+                currentDelegate.focusIn(0)
+        }
+
+        function scrollToPreviousScene() {
+            const cidx = currentIndex
+            const pidx = root.screenplayAdapter.previousSceneElementIndex()
+            if(cidx === pidx) {
+                root.positionViewAtIndex(cidx, ListView.Beginning)
+                return
+            }
+
+            changeAdapterCurrentIndexInternally(pidx)
+            scrollIntoView(pidx)
+            if(currentDelegate)
+                currentDelegate.focusIn(-1)
         }
 
         onLastItemIndexChanged: makeItemUnderCursorCurrent()

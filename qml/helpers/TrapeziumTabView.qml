@@ -44,7 +44,7 @@ Item {
             model: tabBar.visible ? tabNames : 0
 
             TrapeziumTab {
-                tabFillColor: active ? tabColor : Qt.tint(tabColor, "#C0FFFFFF")
+                tabFillColor: active ? tabColor : Qt.tint(tabColor, Runtime.colors.sceneControlTint)
                 tabBorderColor: Scrite.app.isVeryLightColor(tabColor) ? "gray" : tabColor
                 tabBorderWidth: 1
                 text: modelData

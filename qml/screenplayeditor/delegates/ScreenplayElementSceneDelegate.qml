@@ -24,11 +24,19 @@ import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
+import "qrc:/qml/screenplayeditor/delegates/sidepanel"
 import "qrc:/qml/screenplayeditor/delegates/sceneparteditors"
 
 AbstractScreenplayElementDelegate {
     id: root
 
+    required property real spaceAvailableForScenePanel
+    required property ListView listView // This must be the list-view in which the delegate is placed.
+
+    signal jumpToNextScene()
+    signal jumpToLastScene()
+    signal jumpToFirstScene()
+    signal jumpToPreviousScene()
     signal scrollToNextSceneRequest()
     signal scrollToPreviousSceneRequest()
 
@@ -40,11 +48,12 @@ AbstractScreenplayElementDelegate {
 
         height: __placeHolder ? __placeHolder.implicitHeight : (item ? item.implicitHeight : 0)
 
-        active: root.usePlaceholder ? (root.screenplayElementType !== ScreenplayElement.SceneElementType && !root.screenplayElement.omitted)
-                                     : true
+        active: false
         sourceComponent: _highResolution
 
         Component.onCompleted: {
+            active = root.usePlaceholder ? (root.screenplayElementType !== ScreenplayElement.SceneElementType && !root.screenplayElement.omitted)
+                                         : true
             if(!active) {
                 __placeHolder = _lowResolution.createObject(_content, {"width": width})
                 Utils.execLater(_content, Runtime.screenplayEditorSettings.placeholderInterval, activateContent)
@@ -56,8 +65,10 @@ AbstractScreenplayElementDelegate {
         }
 
         onLoaded: {
-            if(__placeHolder)
+            if(__placeHolder) {
                 __placeHolder.destroy()
+                __placeHolder = null
+            }
         }
 
         property Item __placeHolder
@@ -223,6 +234,31 @@ AbstractScreenplayElementDelegate {
                             active: Runtime.screenplayEditorSettings.displaySceneCharacters
                             visible: active
 
+                            sourceComponent: SceneStoryBeatTagsPartEditor {
+                                index: root.index
+                                sceneID: root.sceneID
+                                screenplayElement: root.screenplayElement
+                                screenplayElementDelegateHasFocus: root.hasFocus
+
+                                partName: "StoryBeats"
+                                zoomLevel: root.zoomLevel
+                                fontMetrics: Runtime.idealFontMetrics
+                                pageMargins: root.pageMargins
+
+                                onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                                // TODO
+                                onSceneTagAdded: (tagName) => { }
+                                onSceneTagClicked: (tagName) => { }
+                            }
+                        }
+
+                        Loader {
+                            width: parent.width
+
+                            active: Runtime.screenplayEditorSettings.displaySceneCharacters
+                            visible: active
+
                             sourceComponent: SceneCharacterListPartEditor {
                                 index: root.index
                                 sceneID: root.sceneID
@@ -231,7 +267,7 @@ AbstractScreenplayElementDelegate {
 
                                 partName: "CharacterList"
                                 zoomLevel: root.zoomLevel
-                                fontMetrics: root.fontMetrics
+                                fontMetrics: Runtime.idealFontMetrics
                                 pageMargins: root.pageMargins
 
                                 // TODO
@@ -248,39 +284,10 @@ AbstractScreenplayElementDelegate {
                         Loader {
                             width: parent.width
 
-                            active: Runtime.screenplayEditorSettings.displaySceneCharacters
-                            visible: active
-
-                            sourceComponent: SceneStoryBeatTagsPartEditor {
-                                Layout.fillWidth: true
-
-                                index: root.index
-                                sceneID: root.sceneID
-                                screenplayElement: root.screenplayElement
-                                screenplayElementDelegateHasFocus: root.hasFocus
-
-                                partName: "StoryBeats"
-                                zoomLevel: root.zoomLevel
-                                fontMetrics: root.fontMetrics
-                                pageMargins: root.pageMargins
-
-                                onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
-
-                                // TODO
-                                onSceneTagAdded: (tagName) => { }
-                                onSceneTagClicked: (tagName) => { }
-                            }
-                        }
-
-                        Loader {
-                            width: parent.width
-
                             active: Runtime.screenplayEditorSettings.displaySceneSynopsis
                             visible: active
 
                             sourceComponent: SceneSynopsisPartEditor {
-                                Layout.fillWidth: true
-
                                 index: root.index
                                 sceneID: root.sceneID
                                 screenplayElement: root.screenplayElement
@@ -288,11 +295,17 @@ AbstractScreenplayElementDelegate {
 
                                 partName: "Synopsis"
                                 zoomLevel: root.zoomLevel
-                                fontMetrics: root.fontMetrics
+                                fontMetrics: Runtime.idealFontMetrics
                                 pageMargins: root.pageMargins
 
                                 onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
                             }
+                        }
+
+                        Item {
+                            width: parent.width
+                            height: root.fontMetrics.lineSpacing/2
+                            visible: Runtime.screenplayEditorSettings.displaySceneCharacters && !Runtime.screenplayEditorSettings.displaySceneSynopsis
                         }
                     }
                 }
@@ -315,11 +328,73 @@ AbstractScreenplayElementDelegate {
 
                     onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
 
+                    onJumpToLastScene: () => { root.jumpToLastScene() }
+                    onJumpToNextScene: () => { root.jumpToNextScene() }
+                    onJumpToFirstScene: () => { root.jumpToFirstScene() }
+                    onJumpToPreviousScene: () => { root.jumpToPreviousScene() }
                     onEditSceneHeadingRequest: () => { _sceneHeadingEditor.focus = true }
                     onScrollToNextSceneRequest: () => { root.scrollToNextSceneRequest() }
                     onScrollToPreviousSceneRequest: () => { root.scrollToPreviousSceneRequest() }
                     onSplitSceneRequest: (paragraph, cursorPosition) => { root.splitSceneRequest(paragraph, cursorPosition) }
                     onMergeWithPreviousSceneRequest: () => { root.mergeWithPreviousSceneRequest() }
+                }
+            }
+
+            Loader {
+                id: _sidePanelLoader
+
+                property real __screenY: __evaluateScreenY()
+                property real __maxTopMargin: root.height - height
+
+                anchors.top: parent.top
+                anchors.left: parent.right
+                anchors.topMargin: __screenY < 0 ? Math.min(-__screenY, __maxTopMargin) : 0
+
+                active: Runtime.screenplayEditorSettings.displaySceneComments &&
+                        Runtime.mainWindowTab === Runtime.e_ScreenplayTab &&
+                        root.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth
+
+                sourceComponent: SceneSidePanel {
+                    height: 300
+
+                    index: root.index
+                    sceneID: root.sceneID
+                    screenplayElement: root.screenplayElement
+                    screenplayElementDelegateHasFocus: root.hasFocus
+
+                    partName: "SidePanel"
+                    zoomLevel: 1
+                    fontMetrics: Runtime.idealFontMetrics
+                    pageMargins: Utils.margins(0, 0, 0, 0)
+
+                    label: expanded ? evaluateLabel() : ""
+                    readOnly: root.readOnly
+                    listView: root.listView
+                    maxPanelWidth: Math.min(root.spaceAvailableForScenePanel, Runtime.maxSceneSidePanelWidth)
+
+                    onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                    function evaluateLabel() {
+                        let rsn = root.screenplayElement.resolvedSceneNumber
+                        if(rsn === "")
+                            rsn = "#" + (root.index + 1)
+
+                        if(_sidePanelLoader.__screenY >= 0)
+                            return "Scene " + rsn
+                        return rsn + ". " + (root.scene.heading.enabled ? root.scene.heading.displayText : "NO SCENE HEADING")
+                    }
+                }
+
+                Connections {
+                    target: root.listView
+
+                    function onContentYChanged() {
+                        _sidePanelLoader.__screenY = _sidePanelLoader.__evaluateScreenY()
+                    }
+                }
+
+                function __evaluateScreenY() {
+                    return root.listView.mapFromItem(root, 0, 0).y
                 }
             }
 

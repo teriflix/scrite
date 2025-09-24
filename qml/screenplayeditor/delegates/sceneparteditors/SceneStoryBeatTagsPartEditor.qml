@@ -36,22 +36,36 @@ AbstractScenePartEditor {
     Flow {
         id: _layout
 
+        width: parent.width
+
         flow: Flow.LeftToRight
+        enabled: Runtime.appFeatures.structure.enabled
+        opacity: enabled ? 1 : 0.5
         spacing: 5
         leftPadding: root.pageLeftMargin
         rightPadding: root.pageRightMargin
 
-        Link {
-            text: Scrite.document.structure.presentableGroupNames(root.scene.groups)
+        FlatToolButton {
+            ToolTip.text: "Formal Story Beats/Tags"
 
-            width: Math.min(contentWidth, root.width*0.35)
-            elide: Text.ElideRight
-            visible: text !== ""
-            topPadding: 5
-            bottomPadding: 5
-            font.pointSize: _private.tagFontPointSize
+            suggestedWidth: _openTagsLabel.height
+            suggestedHeight: _openTagsLabel.height
+
+            iconSource: "qrc:/icons/action/tag.png"
 
             onClicked: _private.popupFormalTagsMenu()
+        }
+
+        VclText {
+            width: Math.min(implicitWidth, root.width*0.9)
+
+            text: _private.presentableGroupNames + ", "
+            elide: Text.ElideRight
+            visible: _private.presentableGroupNames !== ""
+            topPadding: 5
+            bottomPadding: 5
+
+            font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
         }
 
         VclLabel {
@@ -59,12 +73,11 @@ AbstractScenePartEditor {
 
             text: "Open Tags: "
 
-            visible: root.scene.groups.length === 0
             topPadding: 5
             bottomPadding: 5
 
             font.bold: true
-            font.pointSize: _private.tagFontPointSize
+            font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
         }
 
         Repeater {
@@ -96,8 +109,8 @@ AbstractScenePartEditor {
                 rightPadding: leftPadding
                 bottomPadding: topPadding
 
-                font.family: Runtime.idealFontMetrics.font.family
-                font.pointSize: _private.tagFontPointSize
+                font.family: root.font.family
+                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
 
                 onClicked: root.sceneTagClicked(tagName)
 
@@ -129,7 +142,7 @@ AbstractScenePartEditor {
                 readOnly: false
                 completionStrings: Scrite.document.structure.sceneTags
 
-                font.pointSize: _private.tagFontPointSize
+                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
 
                 onEditingComplete: {
                     if(text.length > 0) {
@@ -188,8 +201,7 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
-        property real tagFontPointSize: Math.max(sceneHeadingFormat.font2.pointSize*0.7, 6)
-        property SceneElementFormat sceneHeadingFormat: Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
+        property string presentableGroupNames: Scrite.document.structure.presentableGroupNames(root.scene.groups)
 
         property SceneGroup formalTags: SceneGroup {
             scenes: [root.scene]
@@ -201,7 +213,7 @@ AbstractScenePartEditor {
         }
 
         function popupFormalTagsMenu(parent) {
-            let menu = formalTagsMenu.createObject(parent)
+            let menu = formalTagsMenu.createObject(root)
             menu.closed.connect(menu.destroy)
             menu.popup()
             return menu

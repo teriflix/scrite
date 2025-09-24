@@ -33,6 +33,10 @@ AbstractScenePartEditor {
 
     signal editSceneHeadingRequest()
 
+    signal jumpToNextScene()
+    signal jumpToLastScene()
+    signal jumpToFirstScene()
+    signal jumpToPreviousScene()
     signal scrollToNextSceneRequest()
     signal scrollToPreviousSceneRequest()
 
@@ -443,7 +447,10 @@ AbstractScenePartEditor {
 
             event.accepted = !_sceneDocumentBinder.canGoUp() || event.modifiers & Qt.ControlModifier
             if(event.accepted) {
-                root.scrollToPreviousSceneRequest()
+                if(_sceneTextEditor.cursorPosition > 0)
+                    _sceneTextEditor.cursorPosition = 0
+                else
+                    root.scrollToPreviousSceneRequest()
             }
         }
 
@@ -455,7 +462,10 @@ AbstractScenePartEditor {
 
             event.accepted = !_sceneDocumentBinder.canGoDown() || event.modifiers & Qt.ControlModifier
             if(event.accepted) {
-                root.scrollToNextSceneRequest()
+                if(_sceneTextEditor.cursorPosition < _sceneDocumentBinder.lastCursorPosition())
+                    _sceneTextEditor.cursorPosition = _sceneDocumentBinder.lastCursorPosition()
+                else
+                    root.scrollToNextSceneRequest()
             }
         }
 
@@ -512,6 +522,25 @@ AbstractScenePartEditor {
                     paste()
                     break
                 }
+            } else {
+                switch(event.key) {
+                case Qt.Key_PageUp:
+                    event.accepted = true
+                    root.jumpToPreviousScene()
+                    break
+                case Qt.Key_PageDown:
+                    event.accepted = true
+                    root.jumpToNextScene()
+                    break
+                case Qt.Key_Home:
+                    event.accepted = true
+                    root.jumpToFirstScene()
+                    break
+                case Qt.Key_End:
+                    event.accepted = true
+                    root.jumpToLastScene()
+                    break
+                }
             }
         }
 
@@ -520,14 +549,6 @@ AbstractScenePartEditor {
                 // Enter, Tab and other keys must not trigger Transliteration. Only space should.
                 _sceneTextEditor.userIsTyping = event.hasText
                 result.filter = event.controlModifier && (event.key === Qt.Key_Z || event.key === Qt.Key_Y)
-            } else if(event.key === Qt.Key_PageUp || event.key === Qt.Key_PageDown) {
-                if(event.key === Qt.Key_PageUp) {
-                    root.scrollToPreviousSceneRequest()
-                } else{
-                    root.scrollToNextSceneRequest()
-                }
-                result.filter = true
-                result.acceptEvent = true
             }
         }
 

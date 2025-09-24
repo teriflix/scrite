@@ -33,48 +33,48 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 
 TextField {
-    id: textField
+    id: root
 
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
     Material.theme: Material.Light
 
-    signal requestCompletion(string string)
-    signal editingComplete()
     signal returnPressed()
+    signal editingComplete()
+    signal requestCompletion(string string)
 
-    property alias completionAcceptsEnglishStringsOnly: completionModel.acceptEnglishStringsOnly
-    property alias completionSortMode: completionModel.sortMode
-    property alias completionStrings: completionModel.strings
-    property alias completionPrefix: completionModel.completionPrefix
-    property alias maxCompletionItems: completionModel.maxVisibleItems
+    property var includeSuggestion: function(suggestion) { return suggestion }
+
     property int maxVisibleItems: maxCompletionItems
     property int minimumCompletionPrefixLength: 1
+
+    property bool undoRedoEnabled: false
+    property bool tabItemUponReturn: true
+    property bool userTypedSomeText: false
+    property bool labelAlwaysVisible: false
+    property bool includeEmojiSymbols: true
+    property bool enableTransliteration: false
     property bool singleClickAutoComplete: true
+
+    property alias label: _label.text
+    property alias labelColor: _label.color
+    property alias labelTextAlign: _label.horizontalAlignment
+    property alias showingSymbols: _specialSymbolSupport.showingSymbols
+    property alias completionPrefix: _completionModel.completionPrefix
+    property alias completionStrings: _completionModel.strings
+    property alias maxCompletionItems: _completionModel.maxVisibleItems
+    property alias completionSortMode: _completionModel.sortMode
+    property alias completionAcceptsEnglishStringsOnly: _completionModel.acceptEnglishStringsOnly
+
     property Item tabItem
     property Item backTabItem
-    property bool labelAlwaysVisible: false
-    property alias label: labelText.text
-    property alias labelColor: labelText.color
-    property alias labelTextAlign: labelText.horizontalAlignment
-    property bool enableTransliteration: false
-    property bool includeEmojiSymbols: true
-    property bool undoRedoEnabled: false
-    property alias showingSymbols: specialSymbolSupport.showingSymbols
-    property var includeSuggestion: function(suggestion) {
-        return suggestion
-    }
-    property bool tabItemUponReturn: true
 
-    selectedTextColor: Runtime.colors.accent.c700.text
-    selectionColor: Runtime.colors.accent.c700.background
-    selectByMouse: true
-    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-
-    onEditingFinished: {
-        transliterate(true)
-        completionModel.allowEnable = false
-        editingComplete()
+    Component.onCompleted: {
+        if(!Scrite.app.usingMaterialTheme) {
+            background = _bgComp.createObject(root)
+            topPadding = topPadding + 4
+            bottomPadding = bottomPadding + 4
+        }
     }
 
     Component.onDestruction: {
@@ -84,48 +84,6 @@ TextField {
         }
     }
 
-    onActiveFocusChanged: {
-        if(activeFocus && !readOnly)
-            selectAll()
-        else
-            completionViewPopup.close()
-    }
-
-    CompletionModel {
-        id: completionModel
-        property bool allowEnable: true
-        property string suggestion: currentCompletion
-        property bool hasSuggestion: count > 0
-        enabled: allowEnable && textField.activeFocus && textField.length >= textField.minimumCompletionPrefixLength
-        sortStrings: false
-        completionPrefix: textField.text
-        filterKeyStrokes: textField.activeFocus
-        onRequestCompletion: autoCompleteOrFocusNext(tabItemUponReturn)
-        property bool hasItems: count > 0
-        onHasItemsChanged: {
-            if(hasItems)
-                completionViewPopup.open()
-            else
-                completionViewPopup.close()
-        }
-    }
-
-    UndoHandler {
-        enabled: undoRedoEnabled && !textField.readOnly && textField.activeFocus
-        canUndo: textField.canUndo
-        canRedo: textField.canRedo
-        onUndoRequest: textField.undo()
-        onRedoRequest: textField.redo()
-    }
-
-    onTextEdited: {
-        transliterate(false)
-        completionModel.allowEnable = true
-    }
-
-    onFocusChanged: completionModel.allowEnable = true
-
-    property bool userTypedSomeText: false
     Keys.onPressed: {
         if(event.text !== "")
             userTypedSomeText = true
@@ -135,24 +93,229 @@ TextField {
         autoCompleteOrFocusNext(tabItemUponReturn)
         returnPressed()
     }
+
     Keys.onEnterPressed: {
         autoCompleteOrFocusNext(tabItemUponReturn)
         returnPressed()
     }
 
-    Keys.onTabPressed: autoCompleteOrFocusNext(true)
+    Keys.onTabPressed: {
+        autoCompleteOrFocusNext(true)
+    }
+
+    KeyNavigation.tab: tabItem
+    KeyNavigation.backtab: backTabItem
 
     ContextMenuEvent.onPopup: (mouse) => {
-        if(!textField.activeFocus) {
-            textField.forceActiveFocus()
-            textField.cursorPosition = textField.positionAt(mouse.x, mouse.y)
+        if(!root.activeFocus) {
+            root.forceActiveFocus()
+            root.cursorPosition = root.positionAt(mouse.x, mouse.y)
         }
-        contextMenu.popup()
+        _contextMenu.popup()
+    }
+
+    selectionColor: Runtime.colors.accent.c700.background
+    selectByMouse: true
+    selectedTextColor: Runtime.colors.accent.c700.text
+
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+    CompletionModel {
+        id: _completionModel
+
+        property bool hasItems: count > 0
+        property bool allowEnable: true
+        property bool hasSuggestion: count > 0
+
+        property string suggestion: currentCompletion
+
+        enabled: allowEnable && root.activeFocus && root.length >= root.minimumCompletionPrefixLength
+        sortStrings: false
+        completionPrefix: root.text
+        filterKeyStrokes: root.activeFocus
+        onRequestCompletion: autoCompleteOrFocusNext(tabItemUponReturn)
+
+        onHasItemsChanged: {
+            if(hasItems)
+                _completionPopup.open()
+            else
+                _completionPopup.close()
+        }
+    }
+
+    UndoHandler {
+        enabled: undoRedoEnabled && !root.readOnly && root.activeFocus
+        canUndo: root.canUndo
+        canRedo: root.canRedo
+
+        onUndoRequest: root.undo()
+        onRedoRequest: root.redo()
+    }
+
+    SpecialSymbolsSupport {
+        id: _specialSymbolSupport
+
+        anchors.top: parent.bottom
+        anchors.left: parent.left
+
+        textEditor: root
+        includeEmojis: parent.includeEmojiSymbols
+        textEditorHasCursorInterface: true
+    }
+
+    VclLabel {
+        id: _label
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.top
+        anchors.verticalCenterOffset: parent.topPadding/4
+
+        text: parent.placeholderText
+        visible: parent.labelAlwaysVisible ? true : parent.text !== ""
+
+        font.pointSize: 2*Runtime.idealFontMetrics.font.pointSize/3
+    }
+
+    FontMetrics {
+        id: _fontMetrics
+
+        font: root.font
+    }
+
+    Popup {
+        id: _completionPopup
+
+        x: 0
+        y: parent.height
+        width: parent.width
+        height: visible ? _completionView.height + topInset + bottomInset + topPadding + bottomPadding : 100
+
+        focus: false
+        closePolicy: root.length === 0 ? Popup.CloseOnPressOutside : Popup.NoAutoClose
+
+        contentItem: ListView {
+            id: _completionView
+
+            property real delegateHeight: _fontMetrics.lineSpacing + 10
+
+            ScrollBar.vertical: VclScrollBar { flickable: _completionView }
+
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+            height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
+
+            clip: true
+            model: _completionModel
+            currentIndex: _completionModel.currentRow
+            keyNavigationEnabled: false
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
+
+            delegate: VclLabel {
+                required property var string
+
+                width: _completionView.width - (_completionView.contentHeight > _completionView.height ? 20 : 1)
+                height: _completionView.delegateHeight
+
+                text: string
+                font: root.font
+                color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
+                padding: 5
+
+                MouseArea {
+                    id: _textMouseArea
+
+                    anchors.fill: parent
+
+                    hoverEnabled: singleClickAutoComplete
+                    cursorShape: singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
+
+                    onClicked: {
+                        if(singleClickAutoComplete || _completionModel.currentRow === index)
+                            _completionModel.requestCompletion(parent.text)
+                        else
+                            _completionModel.currentRow = index
+                    }
+
+                    onDoubleClicked: {
+                        _completionModel.requestCompletion(parent.text)
+                    }
+
+                    onContainsMouseChanged: {
+                        if(singleClickAutoComplete)
+                            _completionModel.currentRow = index
+                    }
+                }
+            }
+
+            highlight: Rectangle {
+                color: Runtime.colors.primary.highlight.background
+            }
+        }
+    }
+
+    VclMenu {
+        id: _contextMenu
+
+        property bool __persistentSelection: false
+
+        focus: false
+
+        VclMenuItem {
+            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
+            enabled: root.selectedText !== ""
+            focusPolicy: Qt.NoFocus
+
+            onClicked: root.cut()
+        }
+
+        VclMenuItem {
+            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            enabled: root.selectedText !== ""
+            focusPolicy: Qt.NoFocus
+
+            onClicked: root.copy()
+        }
+
+        VclMenuItem {
+            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
+            focusPolicy: Qt.NoFocus
+
+            onClicked: root.paste()
+        }
+
+        onAboutToShow: {
+            __persistentSelection = root.persistentSelection
+            root.persistentSelection = true
+        }
+
+        onAboutToHide: {
+            root.persistentSelection = __persistentSelection
+        }
+    }
+
+    Component {
+        id: _bgComp
+
+        Item {
+            implicitWidth: root.width
+            implicitHeight: _fontMetrics.lineSpacing
+
+            Rectangle {
+                anchors.bottom: parent.bottom
+
+                width: parent.width
+                height: 1
+
+                color: root.activeFocus ? Runtime.colors.primary.c700.background : Runtime.colors.primary.c300.background
+            }
+        }
     }
 
     function autoCompleteOrFocusNext(doTabItem) {
-        if(completionModel.hasSuggestion && completionModel.suggestion !== text) {
-            text = includeSuggestion(completionModel.suggestion)
+        if(_completionModel.hasSuggestion && _completionModel.suggestion !== text) {
+            text = includeSuggestion(_completionModel.suggestion)
             editingFinished()
         } else if(tabItem && (doTabItem === undefined || doTabItem === true)) {
             editingFinished()
@@ -161,146 +324,40 @@ TextField {
             editingFinished()
     }
 
-    KeyNavigation.tab: tabItem
-    KeyNavigation.backtab: backTabItem
-
     function transliterate(includingLastWord) {
         if(includingLastWord === undefined)
             includingLastWord = false
+
         if(enableTransliteration & userTypedSomeText) {
             var newText = Scrite.app.transliterationEngine.transliteratedParagraph(text, includingLastWord)
             if(text === newText)
                 return
+
             userTypedSomeText = false
             text = newText
         }
     }
 
-    SpecialSymbolsSupport {
-        id: specialSymbolSupport
-        anchors.top: parent.bottom
-        anchors.left: parent.left
-        textEditor: textField
-        includeEmojis: parent.includeEmojiSymbols
-        textEditorHasCursorInterface: true
+    onTextEdited: {
+        transliterate(false)
+
+        _completionModel.allowEnable = true
     }
 
-    VclLabel {
-        id: labelText
-        text: parent.placeholderText
-        font.pointSize: 2*Runtime.idealFontMetrics.font.pointSize/3
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.verticalCenter: parent.top
-        anchors.verticalCenterOffset: parent.topPadding/4
-        visible: parent.labelAlwaysVisible ? true : parent.text !== ""
+    onFocusChanged: {
+        _completionModel.allowEnable = true
     }
 
-    FontMetrics {
-        id: fontMetrics
-        font: textField.font
+    onEditingFinished: {
+        transliterate(true)
+        _completionModel.allowEnable = false
+        editingComplete()
     }
 
-    Popup {
-        id: completionViewPopup
-        x: 0
-        y: parent.height
-        width: parent.width
-        height: visible ? completionView.height + topInset + bottomInset + topPadding + bottomPadding : 100
-        focus: false
-        closePolicy: textField.length === 0 ? Popup.CloseOnPressOutside : Popup.NoAutoClose
-        contentItem: ListView {
-            id: completionView
-            clip: true
-            model: completionModel
-            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-            highlightMoveDuration: 0
-            highlightResizeDuration: 0
-            keyNavigationEnabled: false
-            property real delegateHeight: fontMetrics.lineSpacing + 10
-            delegate: VclLabel {
-                width: completionView.width - (completionView.contentHeight > completionView.height ? 20 : 1)
-                height: completionView.delegateHeight
-                text: string
-                padding: 5
-                font: textField.font
-                color: index === completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
-                MouseArea {
-                    id: textMouseArea
-                    anchors.fill: parent
-                    hoverEnabled: singleClickAutoComplete
-                    onContainsMouseChanged: if(singleClickAutoComplete) completionModel.currentRow = index
-                    cursorShape: singleClickAutoComplete ? Qt.PointingHandCursor : Qt.ArrowCursor
-                    onClicked: {
-                        if(singleClickAutoComplete || completionModel.currentRow === index)
-                            completionModel.requestCompletion(parent.text)
-                        else
-                            completionModel.currentRow = index
-                    }
-                    onDoubleClicked: completionModel.requestCompletion(parent.text)
-                }
-            }
-            highlight: Rectangle {
-                color: Runtime.colors.primary.highlight.background
-            }
-            currentIndex: completionModel.currentRow
-            height: Math.min(contentHeight, maxVisibleItems > 0 ? delegateHeight*maxVisibleItems : contentHeight)
-            ScrollBar.vertical: VclScrollBar { flickable: completionView }
-        }
-    }
-
-    VclMenu {
-        id: contextMenu
-        focus: false
-        property bool __persistentSelection: false
-        onAboutToShow: {
-            __persistentSelection = textField.persistentSelection
-            textField.persistentSelection = true
-        }
-        onAboutToHide: textField.persistentSelection = __persistentSelection
-
-        VclMenuItem {
-            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
-            enabled: textField.selectedText !== ""
-            onClicked: textField.cut()
-            focusPolicy: Qt.NoFocus
-        }
-
-        VclMenuItem {
-            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
-            enabled: textField.selectedText !== ""
-            onClicked: textField.copy()
-            focusPolicy: Qt.NoFocus
-        }
-
-        VclMenuItem {
-            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
-            onClicked: textField.paste()
-            focusPolicy: Qt.NoFocus
-        }
-    }
-
-    Component {
-        id: backgroundComponent
-
-        Item {
-            implicitWidth: textField.width
-            implicitHeight: fontMetrics.lineSpacing
-
-            Rectangle {
-                width: parent.width
-                height: 1
-                color: textField.activeFocus ? Runtime.colors.primary.c700.background : Runtime.colors.primary.c300.background
-                anchors.bottom: parent.bottom
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        if(!Scrite.app.usingMaterialTheme) {
-            background = backgroundComponent.createObject(textField)
-            topPadding = topPadding + 4
-            bottomPadding = bottomPadding + 4
-        }
+    onActiveFocusChanged: {
+        if(activeFocus && !readOnly)
+            selectAll()
+        else
+            _completionPopup.close()
     }
 }

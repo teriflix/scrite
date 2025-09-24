@@ -25,14 +25,16 @@ import "qrc:/qml/helpers"
 
 Item {
     id: sceneFeaturedPhotoItem
-    property Scene scene
 
-    property Attachments sceneAttachments: scene.attachments
-    property Attachment featuredAttachment: sceneAttachments.featuredAttachment
-    property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
-    property string fillModeAttrib: "fillMode"
     property int defaultFillMode: Image.PreserveAspectCrop
     property bool mipmap: false
+    property string fillModeAttrib: "fillMode"
+
+    property Scene scene
+
+    property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
+    property Attachment featuredAttachment: sceneAttachments.featuredAttachment
+    property Attachments sceneAttachments: scene.attachments
 
     Image {
         anchors.fill: parent

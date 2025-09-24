@@ -44,17 +44,27 @@ AbstractScenePartEditor {
         leftPadding: root.pageLeftMargin
         rightPadding: root.pageRightMargin
 
+        FlatToolButton {
+            ToolTip.text: "Characters"
+
+            suggestedWidth: _label.height
+            suggestedHeight: _label.height
+
+            iconSource: "qrc:/icons/content/persons_add.png"
+
+            onClicked: _newCharacterInputLoader.active = true
+        }
+
         VclLabel {
             id: _label
 
             text: "Characters: "
 
-            visible: !root.scene.hasCharacters
             topPadding: 5
             bottomPadding: 5
 
             font.bold: true
-            font.pointSize: _private.tagFontPointSize
+            font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
         }
 
         Repeater {
@@ -88,8 +98,8 @@ AbstractScenePartEditor {
                 rightPadding: leftPadding
                 bottomPadding: topPadding
 
-                font.family: Runtime.idealFontMetrics.font.family
-                font.pointSize: _private.tagFontPointSize
+                font.family: root.font.family
+                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
                 font.capitalization: Font.AllUppercase
 
                 onClicked: _private.popupCharacterMenu(characterName, _characterTag)
@@ -130,7 +140,7 @@ AbstractScenePartEditor {
                 readOnly: false
                 completionStrings: Scrite.document.structure.characterNames
 
-                font.pointSize: _private.tagFontPointSize
+                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
                 font.capitalization: Font.AllUppercase
 
                 onEditingComplete: {
@@ -189,9 +199,6 @@ AbstractScenePartEditor {
 
     QtObject {
         id: _private
-
-        property real tagFontPointSize: Math.max(sceneHeadingFormat.font2.pointSize*0.7, 6)
-        property SceneElementFormat sceneHeadingFormat: Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
 
         property bool captureInvisibleCharacters: Runtime.screenplayEditorSettings.captureInvisibleCharacters
         onCaptureInvisibleCharactersChanged: scheduleDetermineFlagsInTags()

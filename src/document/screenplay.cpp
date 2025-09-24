@@ -2049,7 +2049,7 @@ QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) cons
     return elements;
 }
 
-int Screenplay::firstSceneIndex() const
+int Screenplay::firstSceneElementIndex() const
 {
     int index = 0;
     while (index < m_elements.size()) {
@@ -2063,7 +2063,7 @@ int Screenplay::firstSceneIndex() const
     return -1;
 }
 
-int Screenplay::lastSceneIndex() const
+int Screenplay::lastSceneElementIndex() const
 {
     int index = m_elements.size() - 1;
     while (index >= 0) {
@@ -2446,7 +2446,7 @@ void Screenplay::setCurrentElementIndex(int val)
         this->setActiveScene(nullptr);
 }
 
-int Screenplay::nextSceneElementIndex()
+int Screenplay::nextSceneElementIndex() const
 {
     int index = m_currentElementIndex + 1;
     while (index < m_elements.size() - 1) {
@@ -2465,7 +2465,7 @@ int Screenplay::nextSceneElementIndex()
     return m_elements.size() - 1;
 }
 
-int Screenplay::previousSceneElementIndex()
+int Screenplay::previousSceneElementIndex() const
 {
     int index = m_currentElementIndex - 1;
     while (index >= 0) {

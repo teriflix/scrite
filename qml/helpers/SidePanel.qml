@@ -37,6 +37,7 @@ Item {
     property alias buttonColor: _expandCollapseButton.color
     property alias contentData: _contentLoader.contentData
     property alias backgroundColor: _background.color
+    property alias cornerInstance: _cornerLoader.item
     property alias contentInstance: _contentLoader.item
     property alias cornerComponent: _cornerLoader.sourceComponent
 
