@@ -33,27 +33,6 @@ Item {
     required property TextEdit sceneTextEditor
     required property SceneDocumentBinder sceneDocumentBinder
 
-    // Show page numbers
-    Repeater {
-        model: Runtime.screenplayTextDocument.paused ? 0 : _pageBreaksEvaluator.pageBreaks
-
-        Item {
-            required property var modelData
-
-            property rect cursorRect: modelData.position >= 0 ? sceneTextEditor.positionToRectangle(modelData.position) : Qt.rect(0,0,0,0)
-
-            x: 0
-            y: (modelData.position >= 0 ? cursorRect.y : /*-contentItem.totalSceneHeadingHeight*/ 0) - height/2
-            width: root.width
-            height: 1
-
-            PageNumberBubble {
-                x: -width - 20
-                pageNumber: parent.modelData.pageNumber
-            }
-        }
-    }
-
     // Current line highlight
     Rectangle {
         x: 0
@@ -70,22 +49,5 @@ Item {
 
             color: root.sceneDocumentBinder.scene.color
         }
-    }
-
-    // Invisible helpers
-    ResetOnChange {
-        id: _document
-
-        to: Runtime.screenplayTextDocument.paused ? null : Runtime.screenplayTextDocument
-        from: null
-        delay: 100
-        trackChangesOn: sceneDocumentBinder.documentLoadCount + zoomLevel
-    }
-
-    ScreenplayElementPageBreaks {
-        id: _pageBreaksEvaluator
-
-        screenplayElement: sceneDocumentBinder.screenplayElement
-        screenplayDocument: Scrite.document.loading ? null : _document.value
     }
 }

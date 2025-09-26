@@ -405,6 +405,7 @@ Rectangle {
     }
 
     component IconButton : Image {
+        property alias pressed: _iconButtonMouseArea.pressed
         property alias containsMouse: _iconButtonMouseArea.containsMouse
 
         property string tooltipText

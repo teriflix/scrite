@@ -117,6 +117,17 @@ Rectangle {
             screenplayAdapter: Runtime.screenplayAdapter
             spaceAvailableOnTheLeft: x-1
             spaceAvailableOnTheRight: parent.width - x - width - (_scrollBar.visible ? _scrollBar.width : 0)
+
+            onCurrentParagraphTypeChanged: {
+                if(currentParagraphType < 0 || currentParagraphType === SceneElement.Action) {
+                    _ruler.paragraphLeftMargin = 0
+                    _ruler.paragraphRightMargin = 0
+                } else {
+                    const elementFormat = _private.screenplayFormat.elementFormat(currentParagraphType)
+                    _ruler.paragraphLeftMargin = _ruler.leftMargin + _private.pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
+                    _ruler.paragraphRightMargin = _ruler.rightMargin + _private.pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
+                }
+            }
         }
 
         VclScrollBar {
@@ -147,7 +158,6 @@ Rectangle {
 
     QtObject {
         id: _private
-
 
         property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
         property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout

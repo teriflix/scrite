@@ -41,6 +41,7 @@ ListView {
     readonly property alias hasFocus: _private.hasFocus
     readonly property alias currentDelegate: _private.currentDelegate
     readonly property alias currentDelegateIndex: _private.currentIndex
+    readonly property alias currentParagraphType: _private.currentParagraphType
     readonly property alias currentDelegateLoader: _private.currentItem
     readonly property alias lastVisibleDelegateIndex: _private.lastItemIndex
     readonly property alias firstVisibleDelegateIndex: _private.firstItemIndex
@@ -78,35 +79,8 @@ ListView {
     highlightResizeDuration: 0
     highlightFollowsCurrentItem: false
 
-    header: ScreenplayElementListViewHeader {
-        width: root.width
-
-        readOnly: root.readOnly
-        zoomLevel: root.zoomLevel
-        pageMargins: root.pageMargins
-        screenplayAdapter: root.screenplayAdapter
-    }
-
-    footer: Column {
-        width: root.width
-
-        Rectangle {
-            width: parent.width
-            height: Runtime.screenplayEditorSettings.spaceBetweenScenes * root.zoomLevel
-
-            color: Runtime.colors.primary.windowColor
-            visible: height > 0
-        }
-
-        ScreenplayElementListViewFooter {
-            width: parent.width
-
-            readOnly: root.readOnly
-            zoomLevel: root.zoomLevel
-            pageMargins: root.pageMargins
-            screenplayAdapter: root.screenplayAdapter
-        }
-    }
+    header: root.screenplayAdapter.isSourceScreenplay ? _private.header : null
+    footer: root.screenplayAdapter.isSourceScreenplay ? _private.footer : null
 
     /**
       Why are we doing all this circus instead of using DelegateChooser?
@@ -154,6 +128,8 @@ ListView {
         id: _private
 
         property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
+        property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
+
         property Loader currentItem: currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
         property AbstractScreenplayElementDelegate currentDelegate: currentItem ? currentItem.item : null
 
@@ -167,6 +143,36 @@ ListView {
 
         property point lastPoint: root.mapToItem(root.contentItem, root.width/2, root.height-2)
         property point firstPoint: root.mapToItem(root.contentItem, root.width/2, 1)
+
+        readonly property Component header: ScreenplayElementListViewHeader {
+            width: root.width
+
+            readOnly: root.readOnly
+            zoomLevel: root.zoomLevel
+            pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
+        }
+
+        readonly property Component footer: Column {
+            width: root.width
+
+            Rectangle {
+                width: parent.width
+                height: Runtime.screenplayEditorSettings.spaceBetweenScenes * root.zoomLevel
+
+                color: Runtime.colors.primary.windowColor
+                visible: height > 0
+            }
+
+            ScreenplayElementListViewFooter {
+                width: parent.width
+
+                readOnly: root.readOnly
+                zoomLevel: root.zoomLevel
+                pageMargins: root.pageMargins
+                screenplayAdapter: root.screenplayAdapter
+            }
+        }
 
         readonly property Component actBreakDelegate: ScreenplayActBreakDelegate {
             readonly property Loader delegateLoader: parent

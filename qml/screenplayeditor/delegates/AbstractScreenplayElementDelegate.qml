@@ -41,6 +41,7 @@ FocusScope {
 
     // These are optional
     property int placeholderInterval: Runtime.screenplayEditorSettings.placeholderInterval
+    property int currentParagraphType: -1
 
     property bool canFocus: true
     property bool readOnly: Scrite.document.readOnly

@@ -31,6 +31,10 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 AbstractScenePartEditor {
     id: root
 
+    readonly property TextArea editor: _sceneTextEditor
+
+    readonly property alias currentParagraphType: _private.currentParagraphType
+
     signal editSceneHeadingRequest()
 
     signal jumpToNextScene()
@@ -439,6 +443,9 @@ AbstractScenePartEditor {
         property bool scrollingBetweenScenes: false
         property bool firstInitializationDone: false
 
+        property int currentParagraphType: currentElement !== null ? currentElement.type : (_sceneTextEditor.activeFocus ? SceneElement.Action : -1)
+        property SceneElement currentElement: _sceneTextEditor.activeFocus ? _sceneDocumentBinder.currentElement : null
+
         function handleSceneTextEditorKeyUpPressed(event) {
             if(_sceneTextEditor.hasSelection) {
                 event.accepted = _sceneTextEditor.cursorPosition === 0
@@ -621,22 +628,6 @@ AbstractScenePartEditor {
                     _sceneDocumentBinder.preserveScrollAndReload()
                 } )
         }
-
-        /*
-        property SceneElement currentElement: _sceneTextEditor.activeFocus ? _sceneDocumentBinder.currentElement : null
-        property int currentParagraphType: currentElement ? currentElement.type : SceneHeading.Action
-        onCurrentParagraphTypeChanged: {
-            // TODO: Get ruler margins out in a better way
-            if(currentParagraphType === SceneElement.Action) {
-                ruler.paragraphLeftMargin = 0
-                ruler.paragraphRightMargin = 0
-            } else {
-                var elementFormat = screenplayEditor.screenplayFormat.elementFormat(_private.currentParagraphType)
-                ruler.paragraphLeftMargin = ruler.leftMargin + pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
-                ruler.paragraphRightMargin = ruler.rightMargin + pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
-            }
-        }
-        */
 
         function acceptCompletionSuggestion(suggestion) {
             if(suggestion !== "") {

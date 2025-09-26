@@ -26,6 +26,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/screenplayeditor/delegates/sidepanel"
 import "qrc:/qml/screenplayeditor/delegates/sceneparteditors"
+import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 
 AbstractScreenplayElementDelegate {
     id: root
@@ -226,6 +227,11 @@ AbstractScreenplayElementDelegate {
                             pageMargins: root.pageMargins
 
                             onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                            onHasFocusChanged: {
+                                if(hasFocus)
+                                    root.currentParagraphType = SceneElement.Heading
+                            }
                         }
 
                         Loader {
@@ -310,33 +316,98 @@ AbstractScreenplayElementDelegate {
                     }
                 }
 
-                SceneContentEditor {
-                    id: _sceneContentEditor
-
+                Item {
                     width: parent.width
+                    height: _sceneContentEditor.height
 
-                    index: root.index
-                    sceneID: root.sceneID
-                    screenplayElement: root.screenplayElement
-                    screenplayElementDelegateHasFocus: root.hasFocus
+                    SceneContentEditor {
+                        id: _sceneContentEditor
 
-                    focus: true
-                    partName: "SceneContent"
-                    zoomLevel: root.zoomLevel
-                    fontMetrics: root.fontMetrics
-                    pageMargins: root.pageMargins
+                        width: parent.width
 
-                    onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+                        index: root.index
+                        sceneID: root.sceneID
+                        screenplayElement: root.screenplayElement
+                        screenplayElementDelegateHasFocus: root.hasFocus
 
-                    onJumpToLastScene: () => { root.jumpToLastScene() }
-                    onJumpToNextScene: () => { root.jumpToNextScene() }
-                    onJumpToFirstScene: () => { root.jumpToFirstScene() }
-                    onJumpToPreviousScene: () => { root.jumpToPreviousScene() }
-                    onEditSceneHeadingRequest: () => { _sceneHeadingEditor.focus = true }
-                    onScrollToNextSceneRequest: () => { root.scrollToNextSceneRequest() }
-                    onScrollToPreviousSceneRequest: () => { root.scrollToPreviousSceneRequest() }
-                    onSplitSceneRequest: (paragraph, cursorPosition) => { root.splitSceneRequest(paragraph, cursorPosition) }
-                    onMergeWithPreviousSceneRequest: () => { root.mergeWithPreviousSceneRequest() }
+                        focus: true
+                        partName: "SceneContent"
+                        zoomLevel: root.zoomLevel
+                        fontMetrics: root.fontMetrics
+                        pageMargins: root.pageMargins
+
+                        onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+
+                        onCurrentParagraphTypeChanged: {
+                            if(hasFocus)
+                                root.currentParagraphType = currentParagraphType
+                        }
+
+                        onJumpToLastScene: () => { root.jumpToLastScene() }
+                        onJumpToNextScene: () => { root.jumpToNextScene() }
+                        onJumpToFirstScene: () => { root.jumpToFirstScene() }
+                        onJumpToPreviousScene: () => { root.jumpToPreviousScene() }
+                        onEditSceneHeadingRequest: () => { _sceneHeadingEditor.focus = true }
+                        onScrollToNextSceneRequest: () => { root.scrollToNextSceneRequest() }
+                        onScrollToPreviousSceneRequest: () => { root.scrollToPreviousSceneRequest() }
+                        onSplitSceneRequest: (paragraph, cursorPosition) => { root.splitSceneRequest(paragraph, cursorPosition) }
+                        onMergeWithPreviousSceneRequest: () => { root.mergeWithPreviousSceneRequest() }
+                    }
+
+                    Loader {
+                        id: _pageNumbersLoader
+
+                        Component.onCompleted: __displayPageNumbersIfPossible()
+
+                        anchors.fill: parent
+
+                        active: false
+
+                        sourceComponent: Item {
+                            ScreenplayElementPageBreaks {
+                                id: _pageBreaksEvaluator
+
+                                screenplayElement: root.screenplayElement
+                                screenplayDocument: Scrite.document.loading ? null : Runtime.screenplayTextDocument
+                            }
+
+                            Repeater {
+                                model: _pageBreaksEvaluator.pageBreaks
+
+                                Item {
+                                    required property var modelData
+
+                                    property int pageNumber: modelData.pageNumber
+                                    property int cursorPosition: modelData.position
+
+                                    property rect cursorRect: cursorPosition >= 0 ? _sceneContentEditor.editor.positionToRectangle(cursorPosition) : Qt.rect(0,0,0,0)
+
+                                    x: 0
+                                    y: (cursorPosition >= 0 ? cursorRect.y : -_headingLayout.height)
+                                    width: parent.width
+                                    height: cursorRect.height
+
+                                    PageNumberBubble {
+                                        anchors.right: parent.left
+                                        anchors.rightMargin: 20
+                                        anchors.verticalCenter: parent.verticalCenter
+
+                                        pageNumber: parent.pageNumber
+                                    }
+                                }
+                            }
+                        }
+
+                        property bool __showPageNumbers: !Runtime.screenplayTextDocument.paused
+                        on__ShowPageNumbersChanged: __displayPageNumbersIfPossible()
+
+                        function __displayPageNumbersIfPossible() {
+                            if(__showPageNumbers)
+                                Utils.execLater(_pageNumbersLoader, Runtime.stdAnimationDuration/2, () => { active = true })
+                            else
+                                active = false
+                        }
+                    }
                 }
             }
 

@@ -70,7 +70,7 @@ Loader {
                     icon.source: "qrc:/icons/action/add_scene.png"
 
                     onClicked: {
-                        Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.lastSceneIndex()
+                        Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.lastSceneElementIndex()
                         if(!Scrite.document.readOnly)
                             Scrite.document.createNewScene(true)
                     }

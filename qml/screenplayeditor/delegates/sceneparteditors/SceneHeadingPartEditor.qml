@@ -45,12 +45,11 @@ AbstractScenePartEditor {
 
                 text: root.screenplayElement.hasUserSceneNumber ? root.screenplayElement.resolvedSceneNumber : ""
                 font: root.font
-                placeholderText: root.screenplayElement.sceneNumber
+                placeholderText: root.scene.heading.enabled ? root.screenplayElement.sceneNumber : ("#" + (root.index+1))
 
                 background: Item { }
             }
         }
-
 
         SceneHeadingTextField {
             Layout.fillWidth: true

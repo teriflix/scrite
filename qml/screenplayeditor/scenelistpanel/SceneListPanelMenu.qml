@@ -34,7 +34,9 @@ VclMenu {
             text: "Scene Heading"
 
             readonly property string option: "HEADING"
+
             icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+
             onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
         }
 
@@ -42,7 +44,9 @@ VclMenu {
             text: "Scene Summary"
 
             readonly property string option: "SUMMARY"
+
             icon.source: Runtime.sceneListPanelSettings.sceneTextMode === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+
             onClicked: Runtime.sceneListPanelSettings.sceneTextMode = option
         }
 
@@ -52,6 +56,7 @@ VclMenu {
             text: "Show Tooltip"
 
             icon.source: Runtime.sceneListPanelSettings.showTooltip ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+
             onClicked: Runtime.sceneListPanelSettings.showTooltip = !Runtime.sceneListPanelSettings.showTooltip
         }
     }
@@ -63,27 +68,39 @@ VclMenu {
             text: "Scene Duration"
 
             readonly property string option: "TIME"
-            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+
             enabled: !Runtime.screenplayTextDocument.paused
+            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+
+            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
 
         VclMenuItem {
             text: "Page Length"
 
             readonly property string option: "PAGE"
-            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+
             enabled: !Runtime.screenplayTextDocument.paused
+            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+
+            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
 
         VclMenuItem {
             text: "None"
 
             readonly property string option: "NO"
-            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
-            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
+
             enabled: !Runtime.screenplayTextDocument.paused
+            icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
+
+            onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
         }
+    }
+
+    VclMenuItem {
+        text: "Title Page Fields"
+
+        onClicked: TitlePageDialog.launch()
     }
 }

@@ -101,7 +101,6 @@ Item {
                 clip: true
                 model: root.screenplayAdapter
                 currentIndex: root.screenplayAdapter.currentIndex
-                headerPositioning: ListView.OverlayHeader
 
                 highlightMoveDuration: 0
                 highlightResizeDuration: 0
@@ -114,6 +113,8 @@ Item {
 
                 header: SceneListPanelHeader {
                     width: _sceneListView.width
+
+                    color: root.screenplayAdapter.currentIndex < 0 ? Runtime.colors.primary.c300.background : Runtime.colors.primary.c10.background
 
                     leftPadding: _sceneListView.__leftPadding
                     rightPadding: _sceneListView.__rightPadding

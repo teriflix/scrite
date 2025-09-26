@@ -103,6 +103,7 @@ Loader {
                         }
                         return parent.width
                     }
+                    Layout.preferredHeight: sourceSize.height * (Layout.preferredWidth/sourceSize.width)
 
                     cache: false
                     source: visible ? "file:///" + _private.screenplay.coverPagePhoto : ""
