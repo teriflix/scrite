@@ -28,7 +28,7 @@ import "qrc:/qml/controls"
 FloatingDock {
     id: root
 
-    property SceneDocumentBinder binder
+    property SceneDocumentBinder sceneDocumentBinder
 
     x: adjustedX(Runtime.markupToolsSettings.contentX)
     y: adjustedY(Runtime.markupToolsSettings.contentY)
@@ -94,23 +94,23 @@ FloatingDock {
     Shortcut {
         sequence: "Shift+F3"
         context: Qt.ApplicationShortcut
-        enabled: binder && Runtime.allowAppUsage
+        enabled: sceneDocumentBinder && Runtime.allowAppUsage
         ShortcutsModelItem.title: "All CAPS"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: binder.changeCase(SceneDocumentBinder.UpperCase)
+        onActivated: sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
     }
 
     Shortcut {
         sequence: "Ctrl+Shift+F3"
         context: Qt.ApplicationShortcut
-        enabled: binder && Runtime.allowAppUsage
+        enabled: sceneDocumentBinder && Runtime.allowAppUsage
         ShortcutsModelItem.title: "All small"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: binder.changeCase(SceneDocumentBinder.LowerCase)
+        onActivated: sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
     }
 
     content: Item {
@@ -272,7 +272,7 @@ FloatingDock {
                     const alignment = _private.sceneElement.alignment === Qt.AlignLeft ? 0 : Qt.AlignLeft
                     _private.sceneElement.alignment = alignment
 
-                    const selectedElements = binder.selectedElements
+                    const selectedElements = sceneDocumentBinder.selectedElements
                     selectedElements.forEach( (element) => { element.alignment = alignment })
                 }
             }
@@ -286,7 +286,7 @@ FloatingDock {
                     const alignment = _private.sceneElement.alignment === Qt.AlignHCenter ? 0 : Qt.AlignHCenter
                     _private.sceneElement.alignment = alignment
 
-                    const selectedElements = binder.selectedElements
+                    const selectedElements = sceneDocumentBinder.selectedElements
                     selectedElements.forEach( (element) => { element.alignment = alignment })
                 }
             }
@@ -300,7 +300,7 @@ FloatingDock {
                     const alignment = _private.sceneElement.alignment === Qt.AlignRight ? 0 : Qt.AlignRight
                     _private.sceneElement.alignment = alignment
 
-                    const selectedElements = binder.selectedElements
+                    const selectedElements = sceneDocumentBinder.selectedElements
                     selectedElements.forEach( (element) => { element.alignment = alignment })
                 }
             }
@@ -316,10 +316,10 @@ FloatingDock {
                 ToolTip.text: "All CAPS\t" + Scrite.app.polishShortcutTextForDisplay("Shift+F3")
                 ToolTip.visible: containsMouse
 
-                enabled: binder
+                enabled: sceneDocumentBinder
                 hoverEnabled: true
 
-                onClicked: binder.changeCase(SceneDocumentBinder.UpperCase)
+                onClicked: sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
 
                 VclText {
                     anchors.centerIn: parent
@@ -332,10 +332,10 @@ FloatingDock {
                 ToolTip.visible: containsMouse
                 ToolTip.text: "All small\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F3")
 
-                enabled: binder
+                enabled: sceneDocumentBinder
                 hoverEnabled: true
 
-                onClicked: binder.changeCase(SceneDocumentBinder.LowerCase)
+                onClicked: sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
 
                 VclText {
                     anchors.centerIn: parent
@@ -378,8 +378,8 @@ FloatingDock {
     QtObject {
         id: _private
 
-        property TextFormat textFormat: binder ? binder.textFormat : null
-        property SceneElement sceneElement: binder ? binder.currentElement : null
+        property TextFormat textFormat: sceneDocumentBinder ? sceneDocumentBinder.textFormat : null
+        property SceneElement sceneElement: sceneDocumentBinder ? sceneDocumentBinder.currentElement : null
 
         property bool initialized: false
     }

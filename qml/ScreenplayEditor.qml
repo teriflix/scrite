@@ -208,7 +208,7 @@ Rectangle {
                                                  _ruler.zoomLevel * dpi * pageLayout.rightMargin,
                                                  _ruler.zoomLevel * dpi * pageLayout.bottomMargin )
 
-        property int currentParagraphType: currentBinder && currentBinder.currentElement ? currentBinder.currentElement.type : -1
+        property int currentParagraphType: currentSceneDocumentBinder && currentSceneDocumentBinder.currentElement ? currentSceneDocumentBinder.currentElement.type : -1
         property var currentParagraphMargins: {
             if(currentParagraphType >= 0 && currentParagraphType) {
                 const elementFormat = _private.screenplayFormat.elementFormat(currentParagraphType)
@@ -223,13 +223,15 @@ Rectangle {
 
         property alias zoomLevel: _statusBar.zoomLevel
 
-        property SceneDocumentBinder currentBinder: Runtime.screenplayEditorToolbar.binder
+        // It is so yuck that we have to ask an external ToolBar component to tell us what SceneDocumentBinder is "current", when
+        // each and every single instance of binders are created by this component itself!
+        property SceneDocumentBinder currentSceneDocumentBinder: Runtime.screenplayEditorToolbar.sceneDocumentBinder
 
         readonly property Connections scriteDocumentConnections : Connections {
             target: Scrite.document
 
-            function onAboutToSave() { _private.saveLayoutDetails() }
             function onJustLoaded() { _private.restoreLayoutDetails() }
+            function onAboutToSave() { _private.saveLayoutDetails() }
         }
 
         function saveLayoutDetails() {

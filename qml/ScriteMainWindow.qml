@@ -1128,8 +1128,8 @@ Item {
 
                 property Item sceneEditor
 
-                binder: sceneEditor ? sceneEditor.binder : null
-                editor: sceneEditor ? sceneEditor.editor : null
+                sceneDocumentBinder: sceneEditor ? sceneEditor.binder : null
+                sceneTextEditor: sceneEditor ? sceneEditor.editor : null
                 visible: {
                     var min = 0
                     var max = Runtime.showNotebookInStructure ? 1 : 2
