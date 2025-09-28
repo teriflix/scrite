@@ -67,6 +67,7 @@ AbstractScenePartEditor {
                     zoomLevel: root.zoomLevel * 0.75
                     fontMetrics: root.fontMetrics
                     pageMargins: root.pageMargins
+                    screenplayAdapter: root.screenplayAdapter
 
                     onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
 
@@ -92,6 +93,7 @@ AbstractScenePartEditor {
                     zoomLevel: root.zoomLevel * 0.75
                     fontMetrics: root.fontMetrics
                     pageMargins: root.pageMargins
+                    screenplayAdapter: root.screenplayAdapter
 
                     // TODO
                     additionalCharacterMenuItems: []
@@ -122,6 +124,7 @@ AbstractScenePartEditor {
                     zoomLevel: root.zoomLevel
                     fontMetrics: root.fontMetrics
                     pageMargins: root.pageMargins
+                    screenplayAdapter: root.screenplayAdapter
 
                     onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
                 }

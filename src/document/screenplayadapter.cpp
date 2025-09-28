@@ -172,21 +172,21 @@ bool ScreenplayAdapter::isHeightHintsAvailable() const
     return screenplay ? screenplay->isHeightHintsAvailable() : true;
 }
 
-ScreenplayElement *ScreenplayAdapter::splitElement(ScreenplayElement *ptr, SceneElement *element,
-                                                   int textPosition)
+ScreenplayElement *ScreenplayAdapter::splitElement(ScreenplayElement *screenplayElement,
+                                                   SceneElement *paragraph, int textPosition)
 {
     Screenplay *screenplay = this->isSourceScreenplay() ? this->screenplay() : nullptr;
     if (screenplay)
-        return screenplay->splitElement(ptr, element, textPosition);
+        return screenplay->splitElement(screenplayElement, paragraph, textPosition);
 
     return nullptr;
 }
 
-ScreenplayElement *ScreenplayAdapter::mergeElementWithPrevious(ScreenplayElement *ptr)
+ScreenplayElement *ScreenplayAdapter::mergeElementWithPrevious(ScreenplayElement *screenplayElement)
 {
     Screenplay *screenplay = this->isSourceScreenplay() ? this->screenplay() : nullptr;
     if (screenplay)
-        return screenplay->mergeElementWithPrevious(ptr);
+        return screenplay->mergeElementWithPrevious(screenplayElement);
 
     return nullptr;
 }

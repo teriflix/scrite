@@ -45,13 +45,15 @@ Item {
             "title": title,
             "message": message
         }
-        var dlg = dialogComponent.createObject(root, params)
+        let dlg = dialogComponent.createObject(root, params)
         if(dlg) {
             if(callback)
                 dlg.buttonClicked.connect(callback)
             dlg.closed.connect(dlg.destroy)
             dlg.open()
         }
+
+        return dlg
     }
 
     /**
@@ -72,13 +74,15 @@ Item {
             "message": question,
             "buttons": answerButtons ? answerButtons : ["Yes", "No", "Cancel"]
         }
-        var dlg = dialogComponent.createObject(root, params)
+        let dlg = dialogComponent.createObject(root, params)
         if(dlg) {
             if(callback)
                 dlg.buttonClicked.connect(callback)
             dlg.closed.connect(dlg.destroy)
             dlg.open()
         }
+
+        return dlg
     }
 
     Component {

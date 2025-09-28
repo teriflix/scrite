@@ -90,6 +90,7 @@ AbstractScenePartEditor {
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
         }
@@ -104,6 +105,7 @@ AbstractScenePartEditor {
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             mipmap: !root.listView.moving
 
@@ -120,6 +122,7 @@ AbstractScenePartEditor {
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
         }
@@ -134,6 +137,7 @@ AbstractScenePartEditor {
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
         }

@@ -70,14 +70,12 @@ AbstractScenePartEditor {
             VclToolButton {
                 id: icfEditButton
 
-                Layout.alignment: Qt.AlignLeft
-                Layout.fillWidth: !_indexCardFields.hasFields
+                Layout.fillWidth: true
 
                 ToolTip.text: "Edit Index Card Fields"
-                ToolTip.visible: _indexCardFields.hasFields ? hovered : false
+                ToolTip.visible: hovered
 
-                text: _indexCardFields.hasFields ? "" : ToolTip.text
-                visible: root.sceneIndex === Runtime.screenplayAdapter.currentIndex
+                visible: root.screenplayAdapter.currentIndex === root.index
                 icon.source: "qrc:/icons/action/edit.png"
 
                 onClicked: StructureIndexCardFieldsDialog.launch()

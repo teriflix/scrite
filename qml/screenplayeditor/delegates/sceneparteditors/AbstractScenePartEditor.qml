@@ -33,6 +33,7 @@ FocusScope {
     required property real zoomLevel
     required property string partName
     required property FontMetrics fontMetrics
+    required property ScreenplayAdapter screenplayAdapter
 
     // These are readonly
     readonly property alias font: _private.font

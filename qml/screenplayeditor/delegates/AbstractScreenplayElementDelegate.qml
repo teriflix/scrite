@@ -35,6 +35,7 @@ FocusScope {
     required property var pageMargins // must set using Utils.margins() only
     required property real zoomLevel
     required property bool isCurrent
+    required property ScreenplayAdapter screenplayAdapter
 
     // These have to be components only.
     default property alias content: _contentLoader.sourceComponent

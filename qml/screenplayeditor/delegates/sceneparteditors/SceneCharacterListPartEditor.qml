@@ -167,7 +167,7 @@ AbstractScenePartEditor {
             width: _label.height
             height: width
 
-            opacity: 0.5
+            opacity: enabled ? 1 : 0.5
             visible: enabled
             enabled: !root.readOnly
 
