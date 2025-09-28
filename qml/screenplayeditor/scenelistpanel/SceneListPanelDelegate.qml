@@ -39,6 +39,7 @@ Rectangle {
 
     // These are additional
     required property bool readOnly
+    required property bool viewHasFocus
     required property real leftPadding
     required property real rightPadding
     required property real leftPaddingRatio
@@ -49,7 +50,9 @@ Rectangle {
 
     required property ScreenplayAdapter screenplayAdapter
 
+    signal clicked()
     signal dragStarted()
+    signal doubleClicked()
     signal dragFinished(var dropAction) // When we move to Qt 6.9+, change type to DropAction
     signal dropEntered(var drag) // When we move to Qt 6.9+, change type to DragEvent
     signal dropExited()
@@ -75,6 +78,8 @@ Rectangle {
     height: _mainLayout.height
 
     color: _private.color
+    border.width: _private.isCurrent && root.viewHasFocus
+    border.color: Qt.darker(_private.color, 120)
 
     ColumnLayout {
         id: _mainLayout
@@ -264,6 +269,8 @@ Rectangle {
         drag.target: root.screenplayAdapter.isSourceScreenplay && !root.readOnly ? parent : null
 
         onDoubleClicked: (mouse) => {
+                             root.doubleClicked()
+
                              root.screenplayAdapter.screenplay.clearSelection()
                              root.screenplayElement.toggleSelection()
                              root.screenplayAdapter.currentIndex = index
@@ -271,6 +278,8 @@ Rectangle {
                          }
 
         onClicked: (mouse) => {
+                       root.clicked()
+
                        if(mouse.button === Qt.RightButton) {
                            root.screenplayAdapter.currentIndex = index
                            root.contextMenuRequest()
@@ -450,6 +459,12 @@ Rectangle {
             Runtime.screenplayTextDocument.pausedChanged.connect(updateSceneLength)
             Runtime.screenplayTextDocument.pageBoundariesChanged.connect(updateSceneLength)
             Runtime.sceneListPanelSettings.displaySceneLengthChanged.connect(updateSceneLength)
+        }
+
+        Component.onDestruction: {
+            Runtime.screenplayTextDocument.pausedChanged.disconnect(updateSceneLength)
+            Runtime.screenplayTextDocument.pageBoundariesChanged.disconnect(updateSceneLength)
+            Runtime.sceneListPanelSettings.displaySceneLengthChanged.disconnect(updateSceneLength)
         }
     }
 }

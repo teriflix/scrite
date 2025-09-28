@@ -73,7 +73,7 @@ Item {
             }
         }
 
-        readonly property Component filledScreenplayContent: Item {
+        readonly property Component filledScreenplayContent: FocusScope {
             EventFilter.target: Scrite.app
             EventFilter.active: root.screenplayAdapter.isSourceScreenplay && root.screenplayAdapter.screenplay.hasSelectedElements
             EventFilter.events: [EventFilter.KeyPress]
@@ -100,6 +100,7 @@ Item {
 
                 clip: true
                 model: root.screenplayAdapter
+                focus: true
                 currentIndex: root.screenplayAdapter.currentIndex
 
                 highlightMoveDuration: 0
@@ -107,7 +108,8 @@ Item {
                 highlightFollowsCurrentItem: true
 
                 highlightRangeMode: ListView.ApplyRange
-                keyNavigationEnabled: false
+                keyNavigationWraps: false
+                keyNavigationEnabled: true
                 preferredHighlightEnd: height*0.8
                 preferredHighlightBegin: height*0.2
 
@@ -150,6 +152,7 @@ Item {
                     width: _sceneListView.width
 
                     readOnly: root.readOnly
+                    viewHasFocus: root.FocusTracker.hasFocus
                     leftPadding: _sceneListView.__leftPadding
                     rightPadding: _sceneListView.__rightPadding
                     sceneIconSize: _private.sceneIconSize
@@ -192,7 +195,7 @@ Item {
                 }
 
                 property real __leftPadding: Math.max(2*_private.sceneIconPadding, (_private.sceneIconSize + 2*_private.sceneIconPadding)*__leftPaddingRatio)
-                property real __rightPadding: (_sceneListView.contentHeight > _sceneListView.height) ? 17 : 0
+                property real __rightPadding: (_sceneListView.contentHeight > _sceneListView.height) ? 17 : 5
                 property real __leftPaddingRatio: root.screenplayAdapter.hasNonStandardScenes ? 1 : 0
 
                 Behavior on __leftPaddingRatio {

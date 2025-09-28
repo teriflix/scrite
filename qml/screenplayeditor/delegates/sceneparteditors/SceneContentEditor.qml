@@ -443,7 +443,7 @@ AbstractScenePartEditor {
         property bool scrollingBetweenScenes: false
         property bool firstInitializationDone: false
 
-        property int currentParagraphType: currentElement !== null ? currentElement.type : (_sceneTextEditor.activeFocus ? SceneElement.Action : -1)
+        property int currentParagraphType: _sceneTextEditor.activeFocus ? (currentElement ? currentElement.type : SceneElement.Action) : -1
         property SceneElement currentElement: _sceneTextEditor.activeFocus ? _sceneDocumentBinder.currentElement : null
 
         function handleSceneTextEditorKeyUpPressed(event) {
@@ -528,6 +528,14 @@ AbstractScenePartEditor {
                     event.accepted = true
                     paste()
                     break
+                case Qt.Key_Home:
+                    event.accepted = true
+                    root.jumpToFirstScene()
+                    break
+                case Qt.Key_End:
+                    event.accepted = true
+                    root.jumpToLastScene()
+                    break
                 }
             } else {
                 switch(event.key) {
@@ -538,14 +546,6 @@ AbstractScenePartEditor {
                 case Qt.Key_PageDown:
                     event.accepted = true
                     root.jumpToNextScene()
-                    break
-                case Qt.Key_Home:
-                    event.accepted = true
-                    root.jumpToFirstScene()
-                    break
-                case Qt.Key_End:
-                    event.accepted = true
-                    root.jumpToLastScene()
                     break
                 }
             }
@@ -569,13 +569,10 @@ AbstractScenePartEditor {
                 root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
                 // privateData.changeCurrentIndexTo(contentItem.theIndex)
                 Runtime.screenplayEditorToolbar.set(_sceneTextEditor, _sceneDocumentBinder)
-                FloatingMarkupToolsDock.sceneDocumentBinder = _sceneDocumentBinder
                 _sceneTextEditor.highlightCursor()
                 Announcement.shout(Runtime.announcementIds.sceneTextEditorReceivedFocus, _sceneTextEditor)
             } else {
                 Runtime.screenplayEditorToolbar.reset(_sceneTextEditor, _sceneDocumentBinder)
-                if(FloatingMarkupToolsDock.sceneDocumentBinder === _sceneDocumentBinder)
-                    FloatingMarkupToolsDock.sceneDocumentBinder = null
             }
         }
 

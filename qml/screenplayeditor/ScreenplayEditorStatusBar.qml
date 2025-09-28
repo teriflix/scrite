@@ -438,19 +438,7 @@ Rectangle {
     QtObject {
         id: _private
 
-        property ScreenplayElement currentSceneElement: {
-            if(Runtime.screenplayAdapter.isSourceScene || Runtime.screenplayAdapter.elementCount === 0)
-                return null
-
-            const ci = Runtime.screenplayAdapter.currentIndex
-
-            if(ci >= screenplayEditorFirstItemIndex && ci <= screenplayEditorLastItemIndex) {
-                return Runtime.screenplayAdapter.currentElement
-            }
-
-            const data = Runtime.screenplayAdapter.at(screenplayEditorFirstItemIndex)
-            return data ? data.screenplayElement : null
-        }
+        property ScreenplayElement currentSceneElement: Runtime.screenplayAdapter.currentElement
         property Scene currentScene: currentSceneElement ? currentSceneElement.scene : null
         property SceneHeading currentSceneHeading: currentScene && currentScene.heading.enabled ? currentScene.heading : null
     }

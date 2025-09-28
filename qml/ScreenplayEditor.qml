@@ -34,7 +34,12 @@ import "qrc:/qml/floatingdockpanels"
 Rectangle {
     id: root
 
+    property alias searchBarVisible: _searchBarArea.visible
     property alias sidePanelEnabled: _sidePanelLoader.active
+
+    function toggleSearchBar(showReplace) {
+        _searchBarArea.toggle(showReplace)
+    }
 
     EventFilter.events: [EventFilter.Wheel]
     EventFilter.onFilter: (object,event,result) => {
@@ -45,10 +50,35 @@ Rectangle {
 
     color: Runtime.colors.primary.windowColor
 
+    ScreenplayEditorSearchBar {
+        id: _searchBarArea
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        screenplayAdapter: Runtime.screenplayAdapter
+
+        function toggle(showReplace) {
+            if(typeof showReplace === "boolean")
+                searchBar.showReplace = showReplace
+
+            if(visible) {
+                if(searchBar.hasFocus)
+                    visible = false
+                else
+                    searchBar.assumeFocus()
+            } else {
+                visible = true
+                searchBar.assumeFocus()
+            }
+        }
+    }
+
     Loader {
         id: _sidePanelLoader
 
-        anchors.top: parent.top
+        anchors.top: _searchBarArea.visible ? _searchBarArea.bottom : parent.top
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.topMargin: 5
@@ -57,17 +87,32 @@ Rectangle {
         active: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
 
         sourceComponent: ScreenplayEditorSidePanel {
+            id: _sceneListPanel
+
             readOnly: Scrite.document.readOnly
             screenplayAdapter: Runtime.screenplayAdapter
 
             onPositionScreenplayEditorAtTitlePage: _elementListView.positionViewAtBeginning()
+
+            Shortcut {
+                context: Qt.ApplicationShortcut
+                sequence: "Alt+0"
+
+                ShortcutsModelItem.group: "Application"
+                ShortcutsModelItem.title: "Toggle Scene List Panel"
+                ShortcutsModelItem.visible: true
+                ShortcutsModelItem.enabled: true
+                ShortcutsModelItem.shortcut: nativeText
+
+                onActivated: _sceneListPanel.expanded = !_sceneListPanel.expanded
+            }
         }
     }
 
     Item {
         id: _workspace
 
-        anchors.top: parent.top
+        anchors.top: _searchBarArea.visible ? _searchBarArea.bottom : parent.top
         anchors.left: _sidePanelLoader.right
         anchors.right: parent.right
         anchors.bottom: _statusBar.top
@@ -89,6 +134,8 @@ Rectangle {
             resolution: _private.pageLayout.resolution
             leftMargin: _private.pageMargins.left
             rightMargin: _private.pageMargins.right
+            paragraphLeftMargin: _private.currentParagraphMargins.left
+            paragraphRightMargin: _private.currentParagraphMargins.left
 
             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
         }
@@ -117,17 +164,6 @@ Rectangle {
             screenplayAdapter: Runtime.screenplayAdapter
             spaceAvailableOnTheLeft: x-1
             spaceAvailableOnTheRight: parent.width - x - width - (_scrollBar.visible ? _scrollBar.width : 0)
-
-            onCurrentParagraphTypeChanged: {
-                if(currentParagraphType < 0 || currentParagraphType === SceneElement.Action) {
-                    _ruler.paragraphLeftMargin = 0
-                    _ruler.paragraphRightMargin = 0
-                } else {
-                    const elementFormat = _private.screenplayFormat.elementFormat(currentParagraphType)
-                    _ruler.paragraphLeftMargin = _ruler.leftMargin + _private.pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
-                    _ruler.paragraphRightMargin = _ruler.rightMargin + _private.pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
-                }
-            }
         }
 
         VclScrollBar {
@@ -152,8 +188,8 @@ Rectangle {
         pageMargins: _private.pageMargins
         sceneHeadingFontMetrics: _private.sceneHeadingFontMetrics
         screenplayEditorListView: _elementListView
-        screenplayEditorLastItemIndex: 0
-        screenplayEditorFirstItemIndex: 0
+        screenplayEditorLastItemIndex: _elementListView.firstVisibleDelegateIndex
+        screenplayEditorFirstItemIndex: _elementListView.lastVisibleDelegateIndex
     }
 
     QtObject {
@@ -172,7 +208,65 @@ Rectangle {
                                                  _ruler.zoomLevel * dpi * pageLayout.rightMargin,
                                                  _ruler.zoomLevel * dpi * pageLayout.bottomMargin )
 
+        property int currentParagraphType: currentBinder && currentBinder.currentElement ? currentBinder.currentElement.type : -1
+        property var currentParagraphMargins: {
+            if(currentParagraphType >= 0 && currentParagraphType) {
+                const elementFormat = _private.screenplayFormat.elementFormat(currentParagraphType)
+                const lm = _ruler.leftMargin + _private.pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
+                const rm = _ruler.rightMargin + _private.pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
+                return Utils.margins(lm, 0, rm, 0)
+            }
+            return Utils.margins(0, 0, 0, 0)
+        }
+
         property real dpi: Screen.devicePixelRatio
+
         property alias zoomLevel: _statusBar.zoomLevel
+
+        property SceneDocumentBinder currentBinder: Runtime.screenplayEditorToolbar.binder
+
+        readonly property Connections scriteDocumentConnections : Connections {
+            target: Scrite.document
+
+            function onAboutToSave() { _private.saveLayoutDetails() }
+            function onJustLoaded() { _private.restoreLayoutDetails() }
+        }
+
+        function saveLayoutDetails() {
+            if(_sidePanelLoader.active) {
+                var userData = Scrite.document.userData
+                userData["screenplayEditor"] = {
+                    "version": 0,
+                    "sceneListSidePanelExpaned": _sidePanelLoader.item.expanded
+                }
+                Scrite.document.userData = userData
+            }
+        }
+
+        function restoreLayoutDetails() {
+            if(_sidePanelLoader.active) {
+                var userData = Scrite.document.userData
+                if(userData.screenplayEditor && userData.screenplayEditor.version === 0)
+                    _sidePanelLoader.item.expanded = userData.screenplayEditor.sceneListSidePanelExpaned
+            }
+        }
+
+        Component.onCompleted: {
+            restoreLayoutDetails()
+
+            Runtime.screenplayEditor = root
+
+            if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab)
+                Scrite.user.logActivity1("screenplay")
+
+            if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab) {
+                if(_elementListView.currentDelegate)
+                    _elementListView.currentDelegate.focusIn()
+            }
+        }
+
+        Component.onDestruction: {
+            Runtime.screenplayEditor = null
+        }
     }
 }

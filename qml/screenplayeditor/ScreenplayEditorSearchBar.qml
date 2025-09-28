@@ -28,21 +28,23 @@ import "qrc:/qml/controls"
 Rectangle {
     id: root
 
+    required property ScreenplayAdapter screenplayAdapter
+
     readonly property alias searchBar: _searchBar
     readonly property alias searchAgent: _searchAgentLoader.searchAgent
+    readonly property alias searchEngine: _searchBar.searchEngine
     readonly property alias searchAgentItem: _searchAgentLoader.item
 
     signal replaceCurrentRequest(string replacementText, SearchAgent agent)
 
-    width: ruler.width
-    height: _searchBar.height * opacity
+    implicitHeight: _searchBar.height * opacity
 
     color: Runtime.colors.primary.c100.background
     border.width: 1
     border.color: Runtime.colors.primary.borderColor
 
     visible: false
-    enabled: Runtime.screenplayAdapter.screenplay
+    enabled: _private.screenplay !== null
 
     SearchBar {
         id: _searchBar
@@ -59,9 +61,9 @@ Rectangle {
         Loader {
             id: _searchAgentLoader
 
-            property SearchAgent searchAgent: item ? item.SearchAgent : null
+            property SearchAgent searchAgent: item ? Scrite.app.findFirstChildOfType(item, "SearchAgent") : null
 
-            active: Runtime.screenplayAdapter.screenplay ? true : false
+            active: _private.screenplay ? true : false
 
             sourceComponent: Item {
                 property var searchResults: []
@@ -75,9 +77,7 @@ Rectangle {
                 SearchAgent.engine: _searchBar.searchEngine
 
                 SearchAgent.onReplaceAll: (replacementText) => {
-                                              Runtime.screenplayTextDocument.syncEnabled = false
-                                              Runtime.screenplayAdapter.screenplay.replace(searchString, replacementText, 0)
-                                              Runtime.screenplayTextDocument.syncEnabled = true
+                                              _private.runReplaceAllTask(searchString, replacementText)
                                           }
 
                 SearchAgent.onReplaceCurrent: (replacementText) => {
@@ -86,32 +86,37 @@ Rectangle {
 
                 SearchAgent.onSearchRequest: (string) => {
                                                  searchString = string
-                                                 searchResults = Runtime.screenplayAdapter.screenplay.search(string, 0)
+                                                 searchResults = _private.screenplay.search(string, 0)
                                                  SearchAgent.searchResultCount = searchResults.length
                                              }
 
                 SearchAgent.onCurrentSearchResultIndexChanged: () => {
                                                                    if(SearchAgent.currentSearchResultIndex >= 0) {
-                                                                       var searchResult = searchResults[SearchAgent.currentSearchResultIndex]
-                                                                       var sceneIndex = searchResult["sceneIndex"]
-                                                                       if(sceneIndex !== previousSceneIndex)
-                                                                       clearPreviousElementUserData()
-                                                                       var sceneResultIndex = searchResult["sceneResultIndex"]
-                                                                       var screenplayElement = Runtime.screenplayAdapter.screenplay.elementAt(sceneIndex)
-                                                                       var data = {
+                                                                       let searchResult = searchResults[SearchAgent.currentSearchResultIndex]
+                                                                       let sceneIndex = searchResult["sceneIndex"]
+                                                                       if(sceneIndex !== previousSceneIndex) {
+                                                                           clearPreviousElementUserData()
+                                                                       }
+
+                                                                       let sceneResultIndex = searchResult["sceneResultIndex"]
+                                                                       let screenplayElement = _private.screenplay.elementAt(sceneIndex)
+                                                                       let data = {
                                                                            "searchString": searchString,
                                                                            "sceneResultIndex": sceneResultIndex,
                                                                            "currentSearchResultIndex": SearchAgent.currentSearchResultIndex,
                                                                            "searchResultCount": SearchAgent.searchResultCount
                                                                        }
-                                                                       contentView.positionViewAtIndex(sceneIndex, ListView.Visible)
+
+                                                                       // contentView.positionViewAtIndex(sceneIndex, ListView.Visible)
+                                                                       root.screenplayAdapter.currentIndex = sceneIndex
                                                                        screenplayElement.userData = data
+
                                                                        previousSceneIndex = sceneIndex
                                                                    }
                                                                }
 
                 SearchAgent.onClearSearchRequest: () => {
-                                                      Runtime.screenplayAdapter.screenplay.currentElementIndex = previousSceneIndex
+                                                      root.screenplayAdapter.currentIndex = previousSceneIndex
                                                       searchString = ""
                                                       searchResults = []
                                                       clearPreviousElementUserData()
@@ -119,7 +124,7 @@ Rectangle {
 
                 function clearPreviousElementUserData() {
                     if(previousSceneIndex >= 0) {
-                        const screenplayElement = Runtime.screenplayAdapter.screenplay.elementAt(previousSceneIndex)
+                        const screenplayElement = _private.screenplay.elementAt(previousSceneIndex)
                         if(screenplayElement)
                             screenplayElement.userData = undefined
                     }
@@ -137,5 +142,55 @@ Rectangle {
         }
 
         onShowReplaceRequest: showReplace = flag
+    }
+
+    QtObject {
+        id: _private
+
+        property Screenplay screenplay: root.screenplayAdapter ? root.screenplayAdapter.screenplay : null
+
+        property Component replaceAllTask: SequentialAnimation {
+            id: _replaceAllTask
+
+            required property string searchString
+            required property string replacementText
+
+            property VclDialog waitDialog
+
+            property int nrReplacements: 0
+
+            ScriptAction {
+                script: {
+                    Runtime.screenplayTextDocument.syncEnabled = false
+                    _replaceAllTask.waitDialog = WaitDialog.launch("Please wait while replacing text ...")
+                }
+            }
+
+            PauseAnimation {
+                duration: Runtime.stdAnimationDuration
+            }
+
+            ScriptAction {
+                script: {
+                    _replaceAllTask.nrReplacements = _private.screenplay.replace(_replaceAllTask.searchString, _replaceAllTask.replacementText, 0)
+                    Runtime.screenplayTextDocument.syncEnabled = true
+                    _replaceAllTask.waitDialog.close()
+                }
+            }
+
+            PauseAnimation {
+                duration: Runtime.stdAnimationDuration
+            }
+        }
+
+        function runReplaceAllTask(searchString, replacementText) {
+            let task = replaceAllTask.createObject(root, {"searchString": searchString, "replacementText": replacementText})
+            task.finished.connect(() => {
+                                      const nrReplacements = task.nrReplacements
+                                      task.destroy()
+                                      MessageBox.information("Find & Replace", "Replaced " + nrReplacements + " instance(s).")
+                                  })
+            task.start()
+        }
     }
 }

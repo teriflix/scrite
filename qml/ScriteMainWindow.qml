@@ -1124,8 +1124,10 @@ Item {
 
             ScreenplayEditorToolbar {
                 id: screenplayEditorToolbar
-                property Item sceneEditor
                 anchors.verticalCenter: parent.verticalCenter
+
+                property Item sceneEditor
+
                 binder: sceneEditor ? sceneEditor.binder : null
                 editor: sceneEditor ? sceneEditor.editor : null
                 visible: {

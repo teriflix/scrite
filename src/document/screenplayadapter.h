@@ -80,9 +80,9 @@ public:
     bool isHeightHintsAvailable() const;
     Q_SIGNAL void heightHintsAvailableChanged();
 
-    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element,
-                                                int textPosition);
-    Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
+    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *screenplayElement,
+                                                SceneElement *paragarph, int textPosition);
+    Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *screenplayElement);
     Q_INVOKABLE int previousSceneElementIndex() const;
     Q_INVOKABLE int nextSceneElementIndex() const;
     Q_INVOKABLE int firstSceneElementIndex() const;

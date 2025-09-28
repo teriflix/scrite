@@ -21,24 +21,28 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/floatingdockpanels"
 
 Row {
     id: root
 
-    property SceneDocumentBinder binder
     property TextArea editor
+    property SceneDocumentBinder binder
 
     signal requestScreenplayEditor()
 
     function set(_editor, _binder) {
         editor = _editor
         binder = _binder
+        FloatingMarkupToolsDock.binder = _binder
     }
     function reset(_editor, _binder) {
         if(editor === _editor)
             editor = null
-        if(binder === _binder)
+        if(binder === _binder) {
             binder = null
+            FloatingMarkupToolsDock.binder = null
+        }
     }
 
     height: 45

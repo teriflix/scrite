@@ -22,8 +22,9 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
 import "qrc:/qml/screenplayeditor"
 import "qrc:/qml/screenplayeditor/delegates"
 
@@ -38,6 +39,8 @@ ListView {
 
     required property ScreenplayAdapter screenplayAdapter
 
+    property var additionalSceneMenuItems: []
+
     readonly property alias hasFocus: _private.hasFocus
     readonly property alias currentDelegate: _private.currentDelegate
     readonly property alias currentDelegateIndex: _private.currentIndex
@@ -45,6 +48,8 @@ ListView {
     readonly property alias currentDelegateLoader: _private.currentItem
     readonly property alias lastVisibleDelegateIndex: _private.lastItemIndex
     readonly property alias firstVisibleDelegateIndex: _private.firstItemIndex
+
+    signal additionalSceneMenuItemClicked(string name)
 
     function isVisible(index) {
         return _private.isVisible(index)
@@ -181,6 +186,7 @@ ListView {
             isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             index: delegateLoader.index
             sceneID: delegateLoader.sceneID
@@ -206,6 +212,7 @@ ListView {
             isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             index: delegateLoader.index
             sceneID: delegateLoader.sceneID
@@ -231,6 +238,7 @@ ListView {
             isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             index: delegateLoader.index
             sceneID: delegateLoader.sceneID
@@ -256,6 +264,7 @@ ListView {
             isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
 
             index: delegateLoader.index
             sceneID: delegateLoader.sceneID
@@ -282,6 +291,8 @@ ListView {
             isCurrent: _private.currentIndex === index
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
+            screenplayAdapter: root.screenplayAdapter
+            additionalSceneMenuItems: root.additionalSceneMenuItems
             spaceAvailableForScenePanel: root.spaceAvailableOnTheRight
 
             index: delegateLoader.index
@@ -309,9 +320,23 @@ ListView {
             onScrollToNextSceneRequest: () => { _private.scrollToNextScene() }
             onScrollToPreviousSceneRequest: () => { _private.scrollToPreviousScene() }
 
-            // TODO
-            onSplitSceneRequest: (paragraph, cursorPosition) => { }
-            onMergeWithPreviousSceneRequest: () => { }
+            onSplitSceneRequest: (paragraph, cursorPosition) => {
+                                     if(root.screenplayAdapter.isSourceScreenplay) {
+                                         root.screenplayAdapter.splitElement(screenplayElement, paragraph, cursorPosition)
+                                     } else {
+                                         MessageBox.information("Split Scene", "Scenes can be split only while editing the entire screenplay.")
+                                     }
+                                 }
+
+            onMergeWithPreviousSceneRequest: () => {
+                                                 if(root.screenplayAdapter.isSourceScreenplay) {
+                                                     root.screenplayAdapter.mergeElementWithPrevious(screenplayElement)
+                                                 } else {
+                                                     MessageBox.information("Merge Scene", "Scenes can be merged only while editing the entire screenplay.")
+                                                 }
+                                             }
+
+            onAdditionalSceneMenuItemClicked: (name) => { root.additionalSceneMenuItemClicked(name) }
         }
 
         readonly property Connections screenplayAdapterSignals: Connections {
@@ -515,6 +540,12 @@ ListView {
                 currentDelegate.focusIn(-1)
         }
 
+        onHasFocusChanged: {
+            if(root.screenplayAdapter.isSourceScreenplay)
+                Runtime.undoStack.screenplayEditorActive = hasFocus
+            else
+                Runtime.undoStack.sceneEditorActive = hasFocus
+        }
         onLastItemIndexChanged: makeItemUnderCursorCurrent()
         onFirstItemIndexChanged: makeItemUnderCursorCurrent()
     }

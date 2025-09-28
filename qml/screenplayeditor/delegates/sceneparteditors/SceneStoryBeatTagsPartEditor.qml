@@ -51,21 +51,27 @@ AbstractScenePartEditor {
             suggestedWidth: _openTagsLabel.height
             suggestedHeight: _openTagsLabel.height
 
+            enabled: Runtime.appFeatures.structure.enabled
+            opacity: enabled ? 1 : 0.5
             iconSource: "qrc:/icons/action/tag.png"
 
             onClicked: _private.popupFormalTagsMenu()
         }
 
-        VclText {
+        Link {
             width: Math.min(implicitWidth, root.width*0.9)
 
             text: _private.presentableGroupNames + ", "
             elide: Text.ElideRight
             visible: _private.presentableGroupNames !== ""
+            enabled: Runtime.appFeatures.structure.enabled
+            opacity: enabled ? 1 : 0.5
             topPadding: 5
             bottomPadding: 5
 
             font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
+
+            onClicked: _private.popupFormalTagsMenu()
         }
 
         VclLabel {
@@ -101,7 +107,8 @@ AbstractScenePartEditor {
 
                 text: tagName
                 color: colors.background
-                enabled: !Scrite.document.readOnly
+                enabled: !Scrite.document.readOnly && Runtime.appFeatures.structure.enabled
+                opacity: enabled ? 1 : 0.5
                 closable: true
                 textColor: colors.text
                 topPadding: Math.max(5, 5 * root.zoomLevel)
@@ -168,9 +175,8 @@ AbstractScenePartEditor {
             width: _openTagsLabel.height
             height: width
 
-            opacity: 0.5
-            visible: enabled
             enabled: !Scrite.document.readOnly
+            visible: enabled && Runtime.appFeatures.structure.enabled
 
             MouseArea {
                 ToolTip.text: "Click here to add custom scene tags."
@@ -203,13 +209,11 @@ AbstractScenePartEditor {
 
         property string presentableGroupNames: Scrite.document.structure.presentableGroupNames(root.scene.groups)
 
-        property SceneGroup formalTags: SceneGroup {
-            scenes: [root.scene]
-            structure: Scrite.document.structure
-        }
-
         property Component formalTagsMenu: StructureGroupsMenu {
-            sceneGroup: _private.formalTags
+            sceneGroup: SceneGroup {
+                scenes: [root.scene]
+                structure: Scrite.document.structure
+            }
         }
 
         function popupFormalTagsMenu(parent) {

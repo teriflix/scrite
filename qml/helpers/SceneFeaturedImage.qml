@@ -33,8 +33,8 @@ Item {
     property Scene scene
 
     property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
-    property Attachment featuredAttachment: sceneAttachments.featuredAttachment
-    property Attachments sceneAttachments: scene.attachments
+    property Attachment featuredAttachment: sceneAttachments ? sceneAttachments.featuredAttachment : null
+    property Attachments sceneAttachments: scene ? scene.attachments : null
 
     Image {
         anchors.fill: parent
@@ -169,7 +169,7 @@ Item {
 
         VclFileDialog {
             id: featuredAttachmentFileDialog
-            nameFilters: sceneAttachments.nameFilters
+            nameFilters: sceneAttachments ? sceneAttachments.nameFilters : []
             selectMultiple: false
             selectExisting: true
              // The default Ctrl+U interfers with underline

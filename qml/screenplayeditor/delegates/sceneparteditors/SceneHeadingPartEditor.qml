@@ -22,9 +22,15 @@ import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/helpers"
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
+import "qrc:/qml/structureview"
+import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 
 AbstractScenePartEditor {
     id: root
+
+    property alias additionalSceneMenuItems: _sceneMenu.additionalSceneMenuItems
+
+    signal additionalSceneMenuItemClicked(string name)
 
     height: _layout.height
 
@@ -34,7 +40,8 @@ AbstractScenePartEditor {
         width: parent.width
 
         Item {
-            Layout.preferredWidth: root.pageLeftMargin
+            Layout.minimumWidth: root.pageLeftMargin
+            Layout.maximumWidth: root.pageLeftMargin
 
             TextField {
                 anchors.right: parent.right
@@ -71,11 +78,74 @@ AbstractScenePartEditor {
         }
 
         RowLayout {
-            Layout.preferredWidth: root.pageRightMargin
+            Layout.alignment: Qt.AlignHCenter
+            Layout.minimumWidth: root.pageRightMargin
+            Layout.maximumWidth: root.pageRightMargin
 
-            // TODO: Button to tag scenes
+            FlatToolButton {
+                ToolTip.text: "Formal Story Beats/Tags"
 
-            // TODO: Menu launcher button
+                Layout.preferredWidth: suggestedWidth
+                Layout.preferredHeight: suggestedHeight
+
+                suggestedWidth: Runtime.iconImageSize
+                suggestedHeight: Runtime.iconImageSize
+
+                enabled: Runtime.appFeatures.structure.enabled
+                opacity: enabled ? 1 : 0.5
+                iconSource: "qrc:/icons/action/tag.png"
+
+                onClicked: _private.popupFormalTagsMenu()
+            }
+
+            FlatToolButton {
+                ToolTip.text: "Scene Menu"
+
+                Layout.preferredWidth: suggestedWidth
+                Layout.preferredHeight: suggestedHeight
+
+                suggestedWidth: Runtime.iconImageSize
+                suggestedHeight: Runtime.iconImageSize
+
+                iconSource: "qrc:/icons/navigation/menu.png"
+
+                onClicked: _sceneMenu.popup()
+
+                SceneMenu {
+                    id: _sceneMenu
+
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+
+                    index: root.index
+                    screenplayElement: root.screenplayElement
+                    screenplayAdapter: root.screenplayAdapter
+
+                    onAdditionalSceneMenuItemClicked: (name) => { root.additionalSceneMenuItemClicked(name) }
+                }
+            }
+
+            Image {
+                Layout.fillWidth: true
+            }
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        property Component formalTagsMenu: StructureGroupsMenu {
+            sceneGroup: SceneGroup {
+                scenes: [root.scene]
+                structure: Scrite.document.structure
+            }
+        }
+
+        function popupFormalTagsMenu(parent) {
+            let menu = formalTagsMenu.createObject(root)
+            menu.closed.connect(menu.destroy)
+            menu.popup()
+            return menu
         }
     }
 }

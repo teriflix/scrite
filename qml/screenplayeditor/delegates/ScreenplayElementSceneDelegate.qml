@@ -34,6 +34,8 @@ AbstractScreenplayElementDelegate {
     required property real spaceAvailableForScenePanel
     required property ListView listView // This must be the list-view in which the delegate is placed.
 
+    property var additionalSceneMenuItems: []
+
     signal jumpToNextScene()
     signal jumpToLastScene()
     signal jumpToFirstScene()
@@ -43,6 +45,8 @@ AbstractScreenplayElementDelegate {
 
     signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
     signal mergeWithPreviousSceneRequest()
+
+    signal additionalSceneMenuItemClicked(string name)
 
     content: Loader {
         id: _content
@@ -225,12 +229,18 @@ AbstractScreenplayElementDelegate {
                             zoomLevel: root.zoomLevel
                             fontMetrics: root.fontMetrics
                             pageMargins: root.pageMargins
+                            screenplayAdapter: root.screenplayAdapter
+                            additionalSceneMenuItems: root.additionalSceneMenuItems
 
                             onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
 
                             onHasFocusChanged: {
                                 if(hasFocus)
                                     root.currentParagraphType = SceneElement.Heading
+                            }
+
+                            onAdditionalSceneMenuItemClicked: (name) => {
+                                root.additionalSceneMenuItemClicked(name)
                             }
                         }
 
@@ -250,6 +260,7 @@ AbstractScreenplayElementDelegate {
                                 zoomLevel: root.zoomLevel
                                 fontMetrics: Runtime.idealFontMetrics
                                 pageMargins: root.pageMargins
+                                screenplayAdapter: root.screenplayAdapter
 
                                 onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
 
@@ -275,6 +286,7 @@ AbstractScreenplayElementDelegate {
                                 zoomLevel: root.zoomLevel
                                 fontMetrics: Runtime.idealFontMetrics
                                 pageMargins: root.pageMargins
+                                screenplayAdapter: root.screenplayAdapter
 
                                 // TODO
                                 additionalCharacterMenuItems: []
@@ -303,6 +315,7 @@ AbstractScreenplayElementDelegate {
                                 zoomLevel: root.zoomLevel
                                 fontMetrics: Runtime.idealFontMetrics
                                 pageMargins: root.pageMargins
+                                screenplayAdapter: root.screenplayAdapter
 
                                 onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
                             }
@@ -335,13 +348,14 @@ AbstractScreenplayElementDelegate {
                         zoomLevel: root.zoomLevel
                         fontMetrics: root.fontMetrics
                         pageMargins: root.pageMargins
+                        screenplayAdapter: root.screenplayAdapter
+
+                        onHasFocusChanged: {
+                            if(hasFocus)
+                                root.currentParagraphType = Qt.binding( () => { return currentParagraphType } )
+                        }
 
                         onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
-
-                        onCurrentParagraphTypeChanged: {
-                            if(hasFocus)
-                                root.currentParagraphType = currentParagraphType
-                        }
 
                         onJumpToLastScene: () => { root.jumpToLastScene() }
                         onJumpToNextScene: () => { root.jumpToNextScene() }
@@ -437,6 +451,7 @@ AbstractScreenplayElementDelegate {
                     zoomLevel: 1
                     fontMetrics: Runtime.idealFontMetrics
                     pageMargins: Utils.margins(0, 0, 0, 0)
+                    screenplayAdapter: root.screenplayAdapter
 
                     label: expanded ? evaluateLabel() : ""
                     readOnly: root.readOnly
