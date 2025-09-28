@@ -1124,15 +1124,12 @@ Item {
 
             ScreenplayEditorToolbar {
                 id: screenplayEditorToolbar
+
                 anchors.verticalCenter: parent.verticalCenter
 
-                property Item sceneEditor
-
-                sceneDocumentBinder: sceneEditor ? sceneEditor.binder : null
-                sceneTextEditor: sceneEditor ? sceneEditor.editor : null
                 visible: {
-                    var min = 0
-                    var max = Runtime.showNotebookInStructure ? 1 : 2
+                    const min = 0
+                    const max = Runtime.showNotebookInStructure ? 1 : 2
                     return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
                 }
 
@@ -1141,7 +1138,9 @@ Item {
 
             Row {
                 id: mainTabBar
+
                 height: parent.height
+
                 visible: appToolBar.visible
 
                 readonly property var tabs: [
