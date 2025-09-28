@@ -68,6 +68,14 @@ AbstractScenePartEditor {
         _sceneTextEditor.highlightCursor()
     }
 
+    function beforeZoomLevelChange() {
+        _private.beforeZoomLevelChange()
+    }
+
+    function afterZoomLevelChange() {
+        Utils.execLater(_private, 100, _private.afterZoomLevelChange)
+    }
+
     TextArea {
         id: _sceneTextEditor
 
@@ -129,6 +137,7 @@ AbstractScenePartEditor {
             sceneTextEditor: _sceneTextEditor
             sceneDocumentBinder: _sceneDocumentBinder
         }
+
         cursorDelegate: TextEditCursorDelegate {
             id: _cursor
 
@@ -147,9 +156,10 @@ AbstractScenePartEditor {
             SceneTextEditorCompletionPopup {
                 id: _completion
 
-                anchors.bottom: parent.bottom
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.bottom
+                anchors.left: parent.left
 
+                fontMetrics: Runtime.sceneEditorFontMetrics
                 sceneTextEditor: _sceneTextEditor
                 sceneDocumentBinder: _sceneDocumentBinder
 
@@ -227,6 +237,7 @@ AbstractScenePartEditor {
         onCutRequest: () => { _private.cut() }
         onCopyRequest: () => { _private.copy() }
         onPasteRequest: () => { _private.paste() }
+        onTranslateSelectedText: (language) => { _private.translateSelectedText(language) }
         onReloadSceneContentRequest: () => { } // TODO
         onSplitSceneAtPositionRequest: (position) => { _private.splitSceneAt(position) }
         onMergeWithPreviousSceneRequest: () => { _private.mergeWithPreviousScene(0) }
@@ -633,13 +644,20 @@ AbstractScenePartEditor {
                     _sceneTextEditor.remove(_sceneDocumentBinder.completionPrefixStart, _sceneDocumentBinder.completionPrefixEnd)
                 else
                     _sceneTextEditor.remove(_sceneDocumentBinder.currentBlockPosition(), _sceneTextEditor.cursorPosition)
-                _sceneTextEditor.insert(cursorPosition, suggestion)
+                _sceneTextEditor.insert(_sceneTextEditor.cursorPosition, suggestion)
                 _sceneTextEditor.userIsTyping = true
                 _sceneTextEditor.Transliterator.enableFromNextWord()
                 return true
             }
 
             return false
+        }
+
+        function translateSelectedText(language) {
+            _sceneTextEditor.forceActiveFocus()
+            root.scene.beginUndoCapture()
+            _sceneTextEditor.Transliterator.transliterateToLanguage(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd, language)
+            root.scene.endUndoCapture()
         }
 
         // Splitting and merging should happen from the context of the ScreenplayEditor or the ListView
@@ -668,6 +686,31 @@ AbstractScenePartEditor {
             }
 
             root.mergeWithPreviousSceneRequest()
+        }
+
+        /**
+          It appears that the TextEdit resets its cursorPosition to 0 if font changes on the text
+          editor, while it still has active focus. So, we will have to preserve cursor position
+          before such changes - and then restore it after the fact. That seems to be the only way
+          we can preserve cursorPosition consistently across such changes. This is important for us
+          because we have cursorRectangle depending on the cursorPosition, which in turn dictates
+          where we show the cursor, the highlighter and so on.
+          */
+        property int cursorPositionBeforeZoom: -1
+
+        function beforeZoomLevelChange() {
+            if(_sceneTextEditor.activeFocus) {
+                cursorPositionBeforeZoom = _sceneTextEditor.cursorPosition
+                _sceneTextEditor.cursorPosition = cursorPositionBeforeZoom + (cursorPositionBeforeZoom >= _sceneTextEditor.length-1 ? -1 : 1)
+            }
+        }
+
+        function afterZoomLevelChange() {
+            if(cursorPositionBeforeZoom >= 0) {
+                _sceneTextEditor.forceActiveFocus()
+                _sceneTextEditor.cursorPosition = cursorPositionBeforeZoom
+                cursorPositionBeforeZoom = -1
+            }
         }
     }
 }

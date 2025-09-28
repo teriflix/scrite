@@ -213,12 +213,13 @@ TextField {
             highlightResizeDuration: 0
 
             delegate: VclLabel {
-                required property var string
+                required property int index
+                required property var completionString
 
                 width: _completionView.width - (_completionView.contentHeight > _completionView.height ? 20 : 1)
                 height: _completionView.delegateHeight
 
-                text: string
+                text: completionString
                 font: root.font
                 color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                 padding: 5

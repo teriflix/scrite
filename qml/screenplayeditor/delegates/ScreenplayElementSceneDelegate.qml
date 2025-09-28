@@ -368,58 +368,26 @@ AbstractScreenplayElementDelegate {
                         onMergeWithPreviousSceneRequest: () => { root.mergeWithPreviousSceneRequest() }
                     }
 
-                    Loader {
+                    SceneTextEditorPageNumbersLoader {
                         id: _pageNumbersLoader
-
-                        Component.onCompleted: __displayPageNumbersIfPossible()
 
                         anchors.fill: parent
 
-                        active: false
+                        zoomLevel: root.zoomLevel
+                        fontMetrics: root.fontMetrics
+                        sceneTextEditor: _sceneContentEditor.editor
+                        screenplayElement: root.screenplayElement
+                    }
 
-                        sourceComponent: Item {
-                            ScreenplayElementPageBreaks {
-                                id: _pageBreaksEvaluator
+                    Connections {
+                        target: root
 
-                                screenplayElement: root.screenplayElement
-                                screenplayDocument: Scrite.document.loading ? null : Runtime.screenplayTextDocument
-                            }
-
-                            Repeater {
-                                model: _pageBreaksEvaluator.pageBreaks
-
-                                Item {
-                                    required property var modelData
-
-                                    property int pageNumber: modelData.pageNumber
-                                    property int cursorPosition: modelData.position
-
-                                    property rect cursorRect: cursorPosition >= 0 ? _sceneContentEditor.editor.positionToRectangle(cursorPosition) : Qt.rect(0,0,0,0)
-
-                                    x: 0
-                                    y: (cursorPosition >= 0 ? cursorRect.y : -_headingLayout.height)
-                                    width: parent.width
-                                    height: cursorRect.height
-
-                                    PageNumberBubble {
-                                        anchors.right: parent.left
-                                        anchors.rightMargin: 20
-                                        anchors.verticalCenter: parent.verticalCenter
-
-                                        pageNumber: parent.pageNumber
-                                    }
-                                }
-                            }
+                        function on__ZoomLevelJustChanged() {
+                            _sceneContentEditor.afterZoomLevelChange()
                         }
 
-                        property bool __showPageNumbers: !Runtime.screenplayTextDocument.paused
-                        on__ShowPageNumbersChanged: __displayPageNumbersIfPossible()
-
-                        function __displayPageNumbersIfPossible() {
-                            if(__showPageNumbers)
-                                Utils.execLater(_pageNumbersLoader, Runtime.stdAnimationDuration/2, () => { active = true })
-                            else
-                                active = false
+                        function on__ZoomLevelAboutToChange() {
+                            _sceneContentEditor.beforeZoomLevelChange()
                         }
                     }
                 }

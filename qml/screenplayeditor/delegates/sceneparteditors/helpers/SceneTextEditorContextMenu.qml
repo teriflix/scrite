@@ -37,6 +37,7 @@ MenuLoader {
     signal cutRequest()
     signal copyRequest()
     signal pasteRequest()
+    signal translateSelectedText(int language)
     signal reloadSceneContentRequest()
     signal splitSceneAtPositionRequest(int position)
     signal mergeWithPreviousSceneRequest()
@@ -116,10 +117,11 @@ MenuLoader {
                 ]
 
                 VclMenuItem {
+                    required property int index
                     required property var modelData
 
                     focusPolicy: Qt.NoFocus
-                    text: modelData.display + "\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
+                    text: modelData.display + "\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
                     enabled: _menu.sceneCurrentElement !== null
                     onClicked: {
                         _menu.sceneCurrentElement.type = modelData.value
@@ -131,24 +133,23 @@ MenuLoader {
 
         VclMenu {
             title: "Translate"
+
             enabled: sceneTextEditor.hasSelection
 
             Repeater {
                 model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
                 VclMenuItem {
+                    required property var modelData // { key: string, value: int, icon: string }
+
                     text: modelData.key
                     visible: index >= 0
                     enabled: modelData.value !== TransliterationEngine.English
                     focusPolicy: Qt.NoFocus
 
                     onClicked: {
+                        root.translateSelectedText(modelData.value)
                         root.close()
-                        sceneTextEditor.forceActiveFocus()
-                        sceneTextEditor.scene.beginUndoCapture()
-                        sceneTextEditor.Transliterator.transliterateToLanguage(sceneTextEditor.selectionStart, sceneTextEditor.selectionEnd, modelData.value)
-                        sceneTextEditor.scene.endUndoCapture()
-                        root.reloadSceneContentRequest()
                     }
                 }
             }

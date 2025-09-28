@@ -204,9 +204,12 @@ Loader {
                     keyNavigationEnabled: false
 
                     delegate: VclLabel {
+                        required property int index
+                        required property string completionString
+
                         width: _completionView.width-1
 
-                        text: string
+                        text: completionString
                         font: _textArea.font
                         color: _root_elementIndex === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                         padding: 5

@@ -45,7 +45,7 @@ ListView {
     readonly property alias currentDelegate: _private.currentDelegate
     readonly property alias currentDelegateIndex: _private.currentIndex
     readonly property alias currentParagraphType: _private.currentParagraphType
-    readonly property alias currentDelegateLoader: _private.currentItem
+    readonly property alias currentDelegateLoader: _private.currentDelegateLoader
     readonly property alias lastVisibleDelegateIndex: _private.lastItemIndex
     readonly property alias firstVisibleDelegateIndex: _private.firstItemIndex
 
@@ -66,6 +66,17 @@ ListView {
     function scrollIntoView(index) {
         _private.scrollIntoView(index)
     }
+
+    function afterZoomLevelChange() {
+        if(currentDelegate)
+            currentDelegate.afterZoomLevelChange()
+    }
+
+    function beforeZoomLevelChange() {
+        if(currentDelegate)
+            currentDelegate.beforeZoomLevelChange()
+    }
+
 
     FocusTracker.window: Scrite.window
     FocusTracker.objectName: "ScreenplayElementListView"
@@ -132,11 +143,11 @@ ListView {
     QtObject {
         id: _private
 
-        property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
+        property int currentIndex: root.screenplayAdapter && root.screenplayAdapter.elementCount === root.count ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
 
-        property Loader currentItem: currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
-        property AbstractScreenplayElementDelegate currentDelegate: currentItem ? currentItem.item : null
+        property Loader currentDelegateLoader: currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
+        property AbstractScreenplayElementDelegate currentDelegate: currentDelegateLoader ? currentDelegateLoader.item : null
 
         property int lastItemIndex: root.count > 0 ? validOrLastIndex(root.indexAt(lastPoint.x, lastPoint.y)) : 0
         property int firstItemIndex: root.count > 0 ? Math.max(root.indexAt(firstPoint.x, firstPoint.y), 0) : 0

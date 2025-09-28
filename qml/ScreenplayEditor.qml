@@ -190,6 +190,9 @@ Rectangle {
         screenplayEditorListView: _elementListView
         screenplayEditorLastItemIndex: _elementListView.firstVisibleDelegateIndex
         screenplayEditorFirstItemIndex: _elementListView.lastVisibleDelegateIndex
+
+        onZoomLevelJustChanged: _elementListView.afterZoomLevelChange()
+        onZoomLevelIsAboutToChange: _elementListView.beforeZoomLevelChange()
     }
 
     QtObject {
@@ -234,6 +237,69 @@ Rectangle {
             function onAboutToSave() { _private.saveLayoutDetails() }
         }
 
+        function initZoomLevelModifier() {
+            const evalFn = () => {
+                const pageLayout = screenplayFormat.pageLayout
+                const zoomLevels = screenplayFormat.fontZoomLevels
+                const indexOfZoomLevel = (val) => {
+                    for(var i=0; i<zoomLevels.length; i++) {
+                        if(zoomLevels[i] === val)
+                            return i
+                    }
+                    return -1
+                }
+
+                const zoomOneValue = indexOfZoomLevel(1)
+
+                const availableWidth = Runtime.mainWindowTab === Runtime.e_ScreenplayTab ? root.width-500 : root.width
+
+                let zoomValue = zoomOneValue
+                let zoomLevel = zoomLevels[zoomValue]
+                let pageWidth = pageLayout.paperWidth * zoomLevel * Screen.devicePixelRatio
+                let totalMargin = availableWidth - pageWidth
+                if(totalMargin < 0) {
+                    while(totalMargin < 20) { // 20 is width of vertical scrollbar.
+                        if(zoomValue-1 < 0)
+                            break
+                        zoomValue = zoomValue - 1
+                        zoomLevel = zoomLevels[zoomValue]
+                        pageWidth = pageLayout.paperWidth * zoomLevel * Screen.devicePixelRatio
+                        totalMargin = availableWidth - pageWidth
+                    }
+                } else if(totalMargin > pageWidth/2) {
+                    while(totalMargin > pageWidth/2) {
+                        if(zoomValue >= zoomLevels.length-1)
+                            break
+                        zoomValue = zoomValue + 1
+                        zoomLevel = zoomLevels[zoomValue]
+                        pageWidth = pageLayout.paperWidth * zoomLevel * Screen.devicePixelRatio
+                        totalMargin = availableWidth - pageWidth
+                    }
+                }
+
+                return zoomValue - zoomOneValue
+            }
+
+            screenplayFormat.pageLayout.evaluateRectsNow()
+
+            if(Runtime.screenplayEditorSettings.autoAdjustEditorWidthInScreenplayEditor)
+                _statusBar.zoomLevelModifier = evalFn()
+            else {
+                const tabWiseZoomLevelModifiers = Runtime.screenplayEditorSettings.zoomLevelModifiers
+                const currentTabZoomLevelModifier = tabWiseZoomLevelModifiers["tab"+Runtime.mainWindowTab]
+                if(currentTabZoomLevelModifier !== undefined)
+                    _statusBar.zoomLevelModifier = currentTabZoomLevelModifier
+            }
+
+            _statusBar.zoomLevelChanged.connect(_private.saveCurrentTabZoomLevelModifier)
+        }
+
+        function saveCurrentTabZoomLevelModifier() {
+            let tabWiseZoomLevelModifiers = Runtime.screenplayEditorSettings.zoomLevelModifiers
+            tabWiseZoomLevelModifiers["tab"+Runtime.mainWindowTab] = _statusBar.zoomLevelModifierToApply()
+            Runtime.screenplayEditorSettings.zoomLevelModifiers = tabWiseZoomLevelModifiers
+        }
+
         function saveLayoutDetails() {
             if(_sidePanelLoader.active) {
                 var userData = Scrite.document.userData
@@ -254,6 +320,7 @@ Rectangle {
         }
 
         Component.onCompleted: {
+            initZoomLevelModifier()
             restoreLayoutDetails()
 
             Runtime.screenplayEditor = root

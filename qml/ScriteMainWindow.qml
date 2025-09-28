@@ -1320,17 +1320,18 @@ Item {
 
     Loader {
         id: mainUiContentLoader
-        active: allowContent && !Scrite.document.loading
-        opacity: 0
-        sourceComponent: uiLayoutComponent
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
-        anchors.bottom: parent.bottom
-        onActiveChanged: screenplayEditorToolbar.sceneEditor = null
 
         property bool allowContent: Runtime.loadMainUiContent
         property string sessionId
+
+        anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        active: allowContent && !Scrite.document.loading
+        opacity: 0
+        sourceComponent: uiLayoutComponent
 
         Announcement.onIncoming: (type, data) => {
                                                if(type === Runtime.announcementIds.reloadMainUiRequest) {

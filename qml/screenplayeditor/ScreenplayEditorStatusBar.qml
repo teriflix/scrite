@@ -36,12 +36,19 @@ Rectangle {
     required property ListView screenplayEditorListView
     required property FontMetrics sceneHeadingFontMetrics
 
-    readonly property alias zoomSlider: _zoomSlider
     readonly property alias zoomLevel: _zoomSlider.zoomLevel
+    readonly property alias zoomSlider: _zoomSlider
 
     property int zoomLevelModifier: 0
 
     property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
+
+    signal zoomLevelJustChanged()
+    signal zoomLevelIsAboutToChange()
+
+    function zoomLevelModifierToApply() {
+        return _zoomSlider.zoomLevelModifierToApply()
+    }
 
     height: Math.max(_metricsDisplay.height, _taggingOptions.height, _zoomSlider.height) + 8
 
@@ -344,6 +351,13 @@ Rectangle {
             }
         }
 
+        Component.onCompleted: {
+            reset()
+            value = value + zoomLevelModifier
+            zoomLevel = zoomLevels[value]
+            screenplayFormat.fontZoomLevelIndex = value
+        }
+
         Announcement.onIncoming: (type, data) => {
                                      const stype = "" + type
                                      const sdata = "" + data
@@ -359,19 +373,12 @@ Rectangle {
                                      }
                                  }
 
-        Component.onCompleted: {
-            reset()
-            value = value + zoomLevelModifier
-            screenplayFormat.fontZoomLevelIndex = value
-        }
-
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
 
         to: zoomLevels.length-1
         from: 0
         stepSize: 1
-        zoomLevel: zoomLevels[value]
         zoomSliderVisible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
 
         Connections {
@@ -393,7 +400,13 @@ Rectangle {
             }
         }
 
-        onValueChanged: screenplayFormat.fontZoomLevelIndex = value
+        onValueChanged: {
+            screenplayFormat.fontZoomLevelIndex = value
+
+            root.zoomLevelIsAboutToChange()
+            zoomLevel = zoomLevels[value]
+            root.zoomLevelJustChanged()
+        }
     }
 
     component Separator : Rectangle {

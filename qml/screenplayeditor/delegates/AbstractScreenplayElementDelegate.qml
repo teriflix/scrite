@@ -65,6 +65,8 @@ FocusScope {
     function focusOut() { if(hasFocus) __focusOut() }
     function focusInFromTop() { if(canFocus) __focusIn(0) }
     function focusInFromBottom() { if(canFocus) __focusIn(-1) }
+    function afterZoomLevelChange() { __zoomLevelJustChanged() }
+    function beforeZoomLevelChange() { __zoomLevelAboutToChange() }
 
     // Signals that must be emitted by implementations
     signal ensureVisible(Item item, rect area)
@@ -72,6 +74,8 @@ FocusScope {
     // Signals that need to be handled in implementations
     signal __focusIn(int cursorPosition)
     signal __focusOut()
+    signal __zoomLevelJustChanged()
+    signal __zoomLevelAboutToChange()
     signal __searchBarSaysReplaceCurrent(string replacementText, SearchAgent agent)
 
     height: _layout.height

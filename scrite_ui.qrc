@@ -161,7 +161,6 @@
         <file>qml/overlays/DocumentBusyOverlay.qml</file>
         <file>qml/overlays/OverlaysLayer.qml</file>
         <file>qml/overlays/qmldir</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/PageNumberBubble.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/qmldir</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorBackground.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorCompletionPopup.qml</file>
@@ -265,5 +264,6 @@
         <file>qml/StructureView.qml</file>
         <file>qml/TimelineView.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneMenu.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorPageNumbersLoader.qml</file>
     </qresource>
 </RCC>

@@ -184,7 +184,7 @@ QVariant CompletionModel::data(const QModelIndex &index, int role) const
 QHash<int, QByteArray> CompletionModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[Qt::DisplayRole] = "string";
+    roles[Qt::DisplayRole] = "completionString";
     return roles;
 }
 

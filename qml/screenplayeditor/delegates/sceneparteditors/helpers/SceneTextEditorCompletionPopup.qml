@@ -29,6 +29,7 @@ Item {
     id: root
 
     required property TextEdit sceneTextEditor
+    required property FontMetrics fontMetrics
     required property SceneDocumentBinder sceneDocumentBinder
 
     readonly property alias model: _private.completionModel
@@ -40,7 +41,7 @@ Item {
 
         x: -Scrite.app.boundingRect(_private.completionModel.completionPrefix, Runtime.sceneEditorFontMetrics.font).width
         width: Scrite.app.largestBoundingRect(_private.completionModel.strings, Runtime.sceneEditorFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 30
-        // height: _completionView.height + topInset + bottomInset + topPadding + bottomPadding
+        height: _completionView.height + topInset + bottomInset + topPadding + bottomPadding
 
         focus: false
         closePolicy: Popup.NoAutoClose
@@ -56,7 +57,7 @@ Item {
 
             FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-            height: Math.min(contentHeight, maxVisibleItems*Runtime.sceneEditorFontMetrics.lineSpacing)
+            height: Math.min(contentHeight, maxVisibleItems * root.fontMetrics.lineSpacing)
 
             clip: true
             model: _private.completionModel
@@ -70,11 +71,14 @@ Item {
             }
 
             delegate: VclLabel {
+                required property int index
+                required property string completionString
+
                 width: _completionView.width-(_completionView.contentHeight > _completionView.height ? 20 : 1)
 
                 padding: 5
 
-                text: string
+                text: completionString
                 font: Runtime.sceneEditorFontMetrics.font
                 color: index === _completionView.currentIndex ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
 
@@ -117,11 +121,11 @@ Item {
 
             property string suggestion: currentCompletion
 
-            enabled: sceneTextEditor.activeFocus && _private.completionModelEnable.value && completable
+            enabled: root.sceneTextEditor.activeFocus && _private.completionModelEnable.value && completable
             sortStrings: false
             maxVisibleItems: -1
-            completionPrefix: sceneDocumentBinder.completionPrefix
-            filterKeyStrokes: sceneTextEditor.activeFocus
+            completionPrefix: root.sceneDocumentBinder.completionPrefix
+            filterKeyStrokes: root.sceneTextEditor.activeFocus
             acceptEnglishStringsOnly: false
             minimumCompletionPrefixLength: 0
 
@@ -139,6 +143,19 @@ Item {
                     if(_completionPopup.visible)
                         _completionPopup.close()
                 }
+            }
+
+            property int __completionMode: root.sceneDocumentBinder.completionMode
+
+            on__CompletionModeChanged: {
+                completable = false
+                Utils.execLater(_private, 250, updateModel)
+            }
+
+            function updateModel() {
+                strings = root.sceneDocumentBinder.autoCompleteHints
+                priorityStrings = root.sceneDocumentBinder.priorityAutoCompleteHints
+                completable = root.sceneDocumentBinder.completionMode !== SceneDocumentBinder.NoCompletionMode
             }
         }
     }
