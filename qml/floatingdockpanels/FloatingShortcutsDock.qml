@@ -22,6 +22,7 @@ import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
 FloatingDock {
@@ -29,7 +30,7 @@ FloatingDock {
 
     x: adjustedX(Runtime.shortcutsDockWidgetSettings.contentX)
     y: adjustedY(Runtime.shortcutsDockWidgetSettings.contentY)
-    width: 375
+    width: 425
     height: Scrite.window.height * 0.85 - titleBarHeight
     visible: Runtime.shortcutsDockWidgetSettings.visible
 
@@ -38,70 +39,127 @@ FloatingDock {
     function init() { }
     Component.onCompleted: {
         Qt.callLater( () => {
-                         saveSettingsTask.enabled = true
+                         _saveSettingsTask.enabled = true
                      })
     }
 
-    content: ListView {
-        id: shortcutsView
-        model: Scrite.shortcuts
-        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-        clip: true
-        boundsBehavior: Flickable.StopAtBounds
-        ScrollBar.vertical: VclScrollBar { }
-        section.property: "itemGroup"
-        section.criteria: ViewSection.FullString
-        section.delegate: VclLabel {
-            required property string section
+    content: ColumnLayout {
+        VclTextField {
+            id: _shortcutsFilter
 
-            width: shortcutsView.width-15
+            Layout.fillWidth: true
+            Layout.topMargin: 8
+            Layout.leftMargin: 8
+            Layout.rightMargin: 8
 
-            background: Rectangle {
-                color: Runtime.colors.accent.c100.background
+            Keys.onUpPressed: _shortcutsView.currentIndex = Math.max(0,_shortcutsView.currentIndex-1)
+            Keys.onDownPressed: _shortcutsView.currentIndex = Math.min(_shortcutsView.currentIndex+1,_shortcutsView.count-1)
+            Keys.onEscapePressed: { clear(); _private.shortcutsModel.titleFilter = "" }
+            Keys.onReturnPressed: _private.shortcutsModel.activateShortcutAt(_shortcutsView.currentIndex)
+
+            placeholderText: "Search/Filter"
+
+            onTextEdited: _private.shortcutsModel.titleFilter = text
+        }
+
+        ListView {
+            id: _shortcutsView
+
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Keys.onEscapePressed: { _shortcutsFilter.clear(); _private.shortcutsModel.titleFilter = "" }
+            Keys.onReturnPressed: _private.shortcutsModel.activateShortcutAt(currentIndex)
+
+            ScrollBar.vertical: VclScrollBar { }
+
+            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+            clip: true
+            model: _private.shortcutsModel
+            boundsBehavior: Flickable.StopAtBounds
+            keyNavigationEnabled: true
+            highlightMoveDuration: 0
+            highlightResizeDuration: 0
+            highlightFollowsCurrentItem: true
+
+            section.property: "itemGroup"
+            section.criteria: ViewSection.FullString
+            section.labelPositioning: ViewSection.InlineLabels
+            section.delegate: VclLabel {
+                required property string section
+
+                width: _shortcutsView.width
+
+                text: section
+                color: Runtime.colors.accent.c100.text
+                padding: 8
+
+                font.bold: true
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignLeft
+
+                background: Rectangle {
+                    color: Runtime.colors.accent.c100.background
+                }
             }
 
-            color: Runtime.colors.accent.c100.text
+            delegate: Item {
+                required property int index
+                required property bool itemVisible
+                required property bool itemEnabled
+                required property bool itemCanBeActivated
+                required property string itemTitle
+                required property string itemGroup
+                required property string itemShortcut
 
-            font.bold: true
+                Keys.onReturnPressed: _private.shortcutsModel.activateShortcutAt(index)
 
-            horizontalAlignment: Text.AlignLeft
-            verticalAlignment: Text.AlignVCenter
+                width: _shortcutsView.width-(_shortcutsView.contentHeight > _shortcutsView.height ? 17 : 0)
+                height: _delegateLayout.height+16
+                opacity: itemEnabled ? 1 : 0.5
 
-            padding: 8
+                Row {
+                    id: _delegateLayout
 
-            text: section
-        }
-        delegate: Item {
-            required property string itemTitle
-            required property string itemShortcut
-            required property bool itemVisible
-            required property bool itemEnabled
-
-            width: shortcutsView.width-17
-            height: itemVisible ? 40 : 0
-            opacity: itemEnabled ? 1 : 0.5
-            visible: itemVisible
-
-            Row {
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.leftMargin: 20
-                anchors.right: parent.right
-
-                VclLabel {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.leftMargin: 20
                     anchors.verticalCenter: parent.verticalCenter
-                    text: itemTitle
-                    width: parent.width * 0.65
-                    elide: Text.ElideRight
-                }
 
-                VclLabel {
-                    anchors.verticalCenter: parent.verticalCenter
-                    font.family: "Courier Prime"
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
-                    text: Scrite.app.polishShortcutTextForDisplay(itemShortcut)
-                    width: parent.width * 0.35
+                    Link {
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        text: itemTitle
+                        width: parent.width * 0.65
+                        elide: Text.ElideRight
+                        enabled: itemCanBeActivated
+                        hoverColor: Runtime.colors.accent.c100.text
+                        defaultColor: Runtime.colors.primary.c100.text
+                        font.underline: containsMouse
+
+                        onClicked: {
+                            _shortcutsView.forceActiveFocus()
+                            _shortcutsView.currentIndex = index
+                            _private.shortcutsModel.activateShortcutAt(index)
+                        }
+                    }
+
+                    VclLabel {
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        text: Scrite.app.polishShortcutTextForDisplay(itemShortcut)
+                        width: parent.width * 0.35
+
+                        font.family: "Courier Prime"
+                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+                    }
                 }
+            }
+
+            highlight: Rectangle {
+                color: Runtime.colors.primary.highlight.background
             }
         }
     }
@@ -111,17 +169,17 @@ FloatingDock {
     // This block ensures that everytime the floating dock coordinates change,
     // they are stored in persistent settings
     Connections {
-        id: saveSettingsTask
+        id: _saveSettingsTask
 
         target: root
         enabled: false
 
         function onXChanged() {
-            Qt.callLater(saveSettingsTask.saveCoordinates)
+            Qt.callLater(_saveSettingsTask.saveCoordinates)
         }
 
         function onYChanged() {
-            Qt.callLater(saveSettingsTask.saveCoordinates)
+            Qt.callLater(_saveSettingsTask.saveCoordinates)
         }
 
         function onCloseRequest() {
@@ -132,6 +190,18 @@ FloatingDock {
         function saveCoordinates() {
             Runtime.shortcutsDockWidgetSettings.contentX = Math.round(root.x)
             Runtime.shortcutsDockWidgetSettings.contentY = Math.round(root.y)
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        readonly property ShortcutsModel shortcutsModel: ShortcutsModel {
+            // We need groups to show up in a specific order, hence this property.
+            // Shortcuts belonging to other groups should show up at the end.
+            groups: [ "Application", "Formatting", "Settings", "Language", "File", "Edit" ]
+
+            onModelReset: _shortcutsView.currentIndex = 0
         }
     }
 }

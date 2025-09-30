@@ -103,8 +103,14 @@ Rectangle {
                 ShortcutsModelItem.visible: true
                 ShortcutsModelItem.enabled: true
                 ShortcutsModelItem.shortcut: nativeText
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: activate()
 
-                onActivated: _sceneListPanel.expanded = !_sceneListPanel.expanded
+                onActivated: activate()
+
+                function activate() {
+                    _sceneListPanel.expanded = !_sceneListPanel.expanded
+                }
             }
         }
     }

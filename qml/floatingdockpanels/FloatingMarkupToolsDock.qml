@@ -48,69 +48,111 @@ FloatingDock {
 
     // Shortcuts Section
     Shortcut {
-        sequence: "Ctrl+B"
         context: Qt.ApplicationShortcut
         enabled: _private.textFormat && Runtime.allowAppUsage
+        sequence: "Ctrl+B"
+        onActivated: activate()
+
         ShortcutsModelItem.title: "Bold"
-        ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleBold()
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            _private.textFormat.toggleBold()
+        }
     }
 
     Shortcut {
-        sequence: "Ctrl+I"
         context: Qt.ApplicationShortcut
         enabled: _private.textFormat && Runtime.allowAppUsage
+        sequence: "Ctrl+I"
+        onActivated: activate()
+
         ShortcutsModelItem.title: "Italics"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleItalics()
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            _private.textFormat.toggleItalics()
+        }
     }
 
     Shortcut {
+        context: Qt.ApplicationShortcut
+        enabled: _private.textFormat && Runtime.allowAppUsage
         sequence: "Ctrl+U"
-        context: Qt.ApplicationShortcut
-        enabled: _private.textFormat && Runtime.allowAppUsage
+        onActivated: activate()
+
         ShortcutsModelItem.title: "Underline"
-        ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleUnderline()
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            _private.textFormat.toggleUnderline()
+        }
     }
 
     Shortcut {
-        sequence: "Ctrl+R"
         context: Qt.ApplicationShortcut
         enabled: _private.textFormat && Runtime.allowAppUsage
+        sequence: "Ctrl+R"
+        onActivated: activate()
+
         ShortcutsModelItem.title: "Strikeout"
-        ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleStrikeout()
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            _private.textFormat.toggleStrikeout()
+        }
     }
 
     Shortcut {
-        sequence: "Shift+F3"
         context: Qt.ApplicationShortcut
         enabled: binder && Runtime.allowAppUsage
+        sequence: "Shift+F3"
+        onActivated: activate()
+
         ShortcutsModelItem.title: "All CAPS"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: binder.changeCase(SceneDocumentBinder.UpperCase)
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            binder.changeCase(SceneDocumentBinder.UpperCase)
+        }
     }
 
     Shortcut {
-        sequence: "Ctrl+Shift+F3"
         context: Qt.ApplicationShortcut
         enabled: binder && Runtime.allowAppUsage
+        sequence: "Ctrl+Shift+F3"
+        onActivated: activate()
+
         ShortcutsModelItem.title: "All small"
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.group: "Markup Tools"
         ShortcutsModelItem.enabled: enabled
-        onActivated: binder.changeCase(SceneDocumentBinder.LowerCase)
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            binder.changeCase(SceneDocumentBinder.LowerCase)
+        }
     }
 
     content: Item {

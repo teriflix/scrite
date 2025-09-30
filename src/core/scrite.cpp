@@ -64,11 +64,6 @@ ScriteDocumentVault *Scrite::vault()
     return ScriteDocumentVault::instance();
 }
 
-ShortcutsModel *Scrite::shortcuts()
-{
-    return ShortcutsModel::instance();
-}
-
 NotificationManager *Scrite::notifications()
 {
     return NotificationManager::instance();

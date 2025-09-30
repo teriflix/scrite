@@ -78,6 +78,7 @@ Loader {
 
             height: _titleCardLayout.height
 
+
             ColumnLayout {
                 id: _titleCardLayout
 
@@ -88,48 +89,56 @@ Loader {
                 anchors.leftMargin: _private.padding
                 anchors.rightMargin: _private.padding
 
-                Item { width: parent.width; height: 35 * zoomLevel }
+                Item {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 35 * zoomLevel
+                }
 
-                Image {
-                    id: _coverPicImage
-
+                Item {
                     Layout.alignment: Qt.AlignHCenter
-                    Layout.preferredWidth: {
+
+                    implicitWidth: {
                         switch(_private.screenplay.coverPagePhotoSize) {
                         case Screenplay.SmallCoverPhoto:
-                            return parent.width / 4
+                            return _titleCardLayout.width / 4
                         case Screenplay.MediumCoverPhoto:
-                            return parent.width / 2
+                            return _titleCardLayout.width / 2
                         }
-                        return parent.width
+                        return _titleCardLayout.width
                     }
-                    Layout.preferredHeight: sourceSize.height * (Layout.preferredWidth/sourceSize.width)
+                    implicitHeight: _coverPicImage.sourceSize.height * (implicitWidth/_coverPicImage.sourceSize.width)
 
-                    cache: false
-                    source: visible ? "file:///" + _private.screenplay.coverPagePhoto : ""
-                    smooth: true; mipmap: true; asynchronous: true
-                    visible: _private.screenplay.coverPagePhoto !== ""
-                    fillMode: Image.PreserveAspectFit
-
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.margins: -border.width - 4
-
-                        color: Qt.rgba(1,1,1,0.1)
-                        border { width: 2; color: _titleLink.hoverColor }
-                        visible: _coverPicMouseArea.containsMouse
-                    }
-
-                    MouseArea {
-                        id: _coverPicMouseArea
+                    Image {
+                        id: _coverPicImage
 
                         anchors.fill: parent
 
-                        enabled: !root.readOnly
-                        hoverEnabled: true
+                        cache: false
+                        source: visible ? "file:///" + _private.screenplay.coverPagePhoto : ""
+                        smooth: true; mipmap: true; asynchronous: true
+                        visible: _private.screenplay.coverPagePhoto !== ""
+                        fillMode: Image.PreserveAspectFit
 
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: _private.launchTitlePageEditorDialog()
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: -border.width - 4
+
+                            color: Qt.rgba(1,1,1,0.1)
+                            border { width: 2; color: _titleLink.hoverColor }
+                            visible: _coverPicMouseArea.containsMouse
+                        }
+
+                        MouseArea {
+                            id: _coverPicMouseArea
+
+                            anchors.fill: parent
+
+                            enabled: !root.readOnly
+                            hoverEnabled: true
+
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: _private.launchTitlePageEditorDialog()
+                        }
                     }
                 }
 

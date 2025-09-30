@@ -97,7 +97,7 @@ Item {
                             }
 
         onNotebookTabRequest: () => {
-                                  Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+                                  Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                               }
 
         onNewAnnotationRequest: (annotationType) => {

@@ -12,128 +12,59 @@
 ****************************************************************************/
 
 #include "shortcutsmodel.h"
+#include "qobjectlistmodel.h"
+#include "application.h"
+
+#include <QTimer>
 
 #include <QCoreApplication>
 
-ShortcutsModel *ShortcutsModel::instance()
+class ShortcutsModelItemListModel : public QObjectListModel<ShortcutsModelItem *>
 {
-    static QPointer<ShortcutsModel> theInstance = new ShortcutsModel(qApp);
-    return theInstance;
-}
+public:
+    ShortcutsModelItemListModel(QObject *parent = nullptr)
+        : QObjectListModel<ShortcutsModelItem *>(parent)
+    {
+    }
+    ~ShortcutsModelItemListModel() { }
 
-ShortcutsModel::ShortcutsModel(QObject *parent) : QAbstractListModel(parent)
+    void itemInsertEvent(ShortcutsModelItem *ptr)
+    {
+        connect(ptr, &ShortcutsModelItem::changed, this, &ShortcutsModelItemListModel::itemChanged);
+    }
+
+    void itemRemoveEvent(ShortcutsModelItem *ptr)
+    {
+        disconnect(ptr, &ShortcutsModelItem::changed, this,
+                   &ShortcutsModelItemListModel::itemChanged);
+    }
+
+    void itemChanged(ShortcutsModelItem *ptr)
+    {
+        const int row = this->indexOf(ptr);
+        if (row >= 0) {
+            const QModelIndex index = this->index(row, 0);
+            emit dataChanged(index, index);
+        }
+    }
+};
+
+Q_GLOBAL_STATIC(ShortcutsModelItemListModel, GlobalShortcutItemsModel);
+
+ShortcutsModel::ShortcutsModel(QObject *parent) : QSortFilterProxyModel(parent)
 {
-    setGroups({ QStringLiteral("Application"), QStringLiteral("Formatting"),
-                QStringLiteral("Settings"), QStringLiteral("Language"), QStringLiteral("File"),
-                QStringLiteral("Edit") });
+    this->setSourceModel(::GlobalShortcutItemsModel);
+    this->setFilterKeyColumn(0);
+    this->setFilterRole(ShortcutsModel::VisibleRole);
+    this->setDynamicSortFilter(true);
+    this->sort(0);
+    this->setSortRole(ShortcutsModel::GroupRole);
+
+    connect(::GlobalShortcutItemsModel, &QAbstractItemModel::dataChanged, this,
+            [=]() { this->invalidate(); });
 }
 
 ShortcutsModel::~ShortcutsModel() { }
-
-void ShortcutsModel::add(ShortcutsModelItem *item)
-{
-    if (m_items.contains(item) || item == nullptr)
-        return;
-
-    QList<ShortcutsModelItem *> items = m_items;
-    items.append(item);
-    this->sortItems(items);
-
-    const int index = items.indexOf(item);
-    this->beginInsertRows(QModelIndex(), index, index);
-    m_items = items;
-    this->endInsertRows();
-}
-
-void ShortcutsModel::remove(ShortcutsModelItem *item)
-{
-    const int index = item == nullptr ? -1 : m_items.indexOf(item);
-    if (index < 0)
-        return;
-
-    this->beginRemoveRows(QModelIndex(), index, index);
-    m_items.removeAt(index);
-    this->endRemoveRows();
-}
-
-void ShortcutsModel::update(ShortcutsModelItem *item, bool removeAndInsert)
-{
-    if (removeAndInsert) {
-        this->remove(item);
-        this->add(item);
-    } else {
-        const int row = m_items.indexOf(item);
-        if (row < 0)
-            return;
-
-        const QModelIndex modelIndex = this->index(row);
-        emit dataChanged(modelIndex, modelIndex);
-    }
-}
-
-void ShortcutsModel::sortItems(QList<ShortcutsModelItem *> &items)
-{
-    std::sort(items.begin(), items.end(),
-              [](const ShortcutsModelItem *item1, const ShortcutsModelItem *item2) {
-                  const QStringList groups = ShortcutsModel::instance()->groups();
-                  if (item1->group() != item2->group()) {
-                      const int group1Index = groups.indexOf(item1->group());
-                      const int group2Index = groups.indexOf(item2->group());
-                      if (group1Index < 0 && group2Index < 0)
-                          return item1->group() < item2->group();
-                      if (group1Index < 0)
-                          return false;
-                      if (group2Index < 0)
-                          return true;
-                      return group1Index < group2Index;
-                  }
-                  return item1->priority() > item2->priority();
-              });
-}
-
-int ShortcutsModel::rowCount(const QModelIndex &parent) const
-{
-    return parent.isValid() ? 0 : m_items.size();
-}
-
-QVariant ShortcutsModel::data(const QModelIndex &index, int role) const
-{
-    if (index.row() < 0 || index.row() >= m_items.size())
-        return QVariant();
-
-    const ShortcutsModelItem *item = m_items.at(index.row());
-    switch (role) {
-    case Qt::DisplayRole:
-    case TitleRole:
-        return item->title();
-    case ShortcutRole:
-        return item->shortcut();
-    case GroupRole:
-        return item->group();
-    case EnabledRole:
-        return item->isEnabled();
-    case VisibleRole:
-        return item->isVisible();
-    default:
-        break;
-    }
-
-    return QVariant();
-}
-
-QHash<int, QByteArray> ShortcutsModel::roleNames() const
-{
-    static QHash<int, QByteArray> roles;
-    if (roles.isEmpty()) {
-        roles[TitleRole] = "itemTitle";
-        roles[ShortcutRole] = "itemShortcut";
-        roles[GroupRole] = "itemGroup";
-        roles[EnabledRole] = "itemEnabled";
-        roles[VisibleRole] = "itemVisible";
-    }
-
-    return roles;
-}
 
 void ShortcutsModel::setGroups(const QStringList &val)
 {
@@ -141,21 +72,129 @@ void ShortcutsModel::setGroups(const QStringList &val)
         return;
 
     m_groups = val;
+    for (QString &group : m_groups)
+        group = group.toLower();
+
     emit groupsChanged();
+}
+
+void ShortcutsModel::setTitleFilter(const QString &val)
+{
+    if (m_titleFilter == val)
+        return;
+
+    m_titleFilter = val;
+    emit titleFilterChanged();
+
+    this->invalidateFilter();
+}
+
+QVariant ShortcutsModel::data(const QModelIndex &index, int role) const
+{
+    const QModelIndex sourceIndex = this->mapToSource(index);
+
+    const ShortcutsModelItem *item = qobject_cast<ShortcutsModelItem *>(
+            sourceIndex.data(AbstractQObjectListModel::ObjectItemRole).value<QObject *>());
+    switch (role) {
+    case GroupRole:
+        return item->group();
+    case TitleRole:
+        return item->title();
+    case EnabledRole:
+        return item->isEnabled();
+    case VisibleRole:
+        return item->isVisible() && !item->title().isEmpty() && !item->group().isEmpty();
+    case ShortcutRole:
+        return item->shortcut();
+    case CanActivateRole:
+        return item->canActivate();
+    default:
+        break;
+    }
+
+    return QVariant();
+}
+
+void ShortcutsModel::activateShortcutAt(int row)
+{
+    const QModelIndex index = this->index(row, 0);
+    const QModelIndex sourceIndex = this->mapToSource(index);
+    ShortcutsModelItem *item = qobject_cast<ShortcutsModelItem *>(
+            sourceIndex.data(AbstractQObjectListModel::ObjectItemRole).value<QObject *>());
+    if (item)
+        item->activate();
+}
+
+void ShortcutsModel::printWholeThing()
+{
+    Application::log("===========");
+    const int nrRows = this->rowCount();
+    for (int i = 0; i < nrRows; i++) {
+        const QModelIndex index = this->index(i, 0);
+        Application::log(QString::number(i) + ": "
+                         + index.data(ShortcutsModel::GroupRole).toString() + "/"
+                         + index.data(ShortcutsModel::TitleRole).toString());
+    }
+    Application::log("===========");
+}
+
+bool ShortcutsModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const
+{
+    const ShortcutsModelItem *left = ::GlobalShortcutItemsModel->at(source_left.row());
+    const ShortcutsModelItem *right = ::GlobalShortcutItemsModel->at(source_right.row());
+
+    const QString leftGroup = left->group().toLower();
+    const QString rightGroup = right->group().toLower();
+    const int leftGroupIndex = m_groups.indexOf(leftGroup);
+    const int rightGroupIndex = m_groups.indexOf(rightGroup);
+    if (leftGroupIndex < 0 && rightGroupIndex < 0)
+        return QString::localeAwareCompare(leftGroup, rightGroup) < 0;
+    if (leftGroupIndex < 0)
+        return false;
+    if (rightGroupIndex < 0)
+        return true;
+    if (leftGroupIndex == rightGroupIndex) {
+        if (left->priority() != right->priority())
+            return left->priority() < right->priority();
+        return QString::localeAwareCompare(left->title(), right->title()) < 0;
+    }
+    return leftGroupIndex < rightGroupIndex;
+}
+
+bool ShortcutsModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    Q_UNUSED(source_parent)
+
+    const ShortcutsModelItem *item = ::GlobalShortcutItemsModel->at(source_row);
+    return item->isVisible() && !item->title().isEmpty() && !item->group().isEmpty()
+            && item->title().startsWith(m_titleFilter, Qt::CaseInsensitive);
+}
+
+QHash<int, QByteArray> ShortcutsModel::roleNames() const
+{
+    static QHash<int, QByteArray> roles;
+    if (roles.isEmpty()) {
+        roles[TitleRole] = "itemTitle";
+        roles[GroupRole] = "itemGroup";
+        roles[EnabledRole] = "itemEnabled";
+        roles[VisibleRole] = "itemVisible";
+        roles[ShortcutRole] = "itemShortcut";
+        roles[CanActivateRole] = "itemCanBeActivated";
+    }
+
+    return roles;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
 ShortcutsModelItem::ShortcutsModelItem(QObject *parent) : QObject(parent)
 {
-    if (ShortcutsModel::instance())
-        ShortcutsModel::instance()->add(this);
+    ::GlobalShortcutItemsModel->append(this);
 }
 
 ShortcutsModelItem::~ShortcutsModelItem()
 {
-    if (ShortcutsModel::instance())
-        ShortcutsModel::instance()->remove(this);
+    ::GlobalShortcutItemsModel->remove(this);
 }
 
 ShortcutsModelItem *ShortcutsModelItem::qmlAttachedProperties(QObject *object)
@@ -170,8 +209,7 @@ void ShortcutsModelItem::setTitle(const QString &val)
 
     m_title = val;
     emit titleChanged();
-
-    ShortcutsModel::instance()->update(this);
+    emit changed(this);
 }
 
 void ShortcutsModelItem::setShortcut(const QString &val)
@@ -181,8 +219,7 @@ void ShortcutsModelItem::setShortcut(const QString &val)
 
     m_shortcut = val;
     emit shortcutChanged();
-
-    ShortcutsModel::instance()->update(this);
+    emit changed(this);
 }
 
 void ShortcutsModelItem::setGroup(const QString &val)
@@ -192,8 +229,7 @@ void ShortcutsModelItem::setGroup(const QString &val)
 
     m_group = val;
     emit groupChanged();
-
-    ShortcutsModel::instance()->update(this, true);
+    emit changed(this);
 }
 
 void ShortcutsModelItem::setPriority(int val)
@@ -203,8 +239,7 @@ void ShortcutsModelItem::setPriority(int val)
 
     m_priority = val;
     emit priorityChanged();
-
-    ShortcutsModel::instance()->update(this, true);
+    emit changed(this);
 }
 
 void ShortcutsModelItem::setEnabled(bool val)
@@ -214,8 +249,7 @@ void ShortcutsModelItem::setEnabled(bool val)
 
     m_enabled = val;
     emit enabledChanged();
-
-    ShortcutsModel::instance()->update(this);
+    emit changed(this);
 }
 
 void ShortcutsModelItem::setVisible(bool val)
@@ -225,6 +259,21 @@ void ShortcutsModelItem::setVisible(bool val)
 
     m_visible = val;
     emit visibleChanged();
+    emit changed(this);
+}
 
-    ShortcutsModel::instance()->update(this);
+void ShortcutsModelItem::setCanActivate(bool val)
+{
+    if (m_canActivate == val)
+        return;
+
+    m_canActivate = val;
+    emit canActivateChanged();
+    emit changed(this);
+}
+
+void ShortcutsModelItem::activate()
+{
+    if (m_canActivate)
+        emit activated();
 }

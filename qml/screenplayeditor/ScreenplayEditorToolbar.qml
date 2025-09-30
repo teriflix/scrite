@@ -68,24 +68,36 @@ Row {
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         context: Qt.ApplicationShortcut
         enabled: Runtime.screenplayEditor && Runtime.allowAppUsage
         sequence: "Ctrl+F"
 
-        onActivated: Runtime.screenplayEditor.toggleSearchBar(false)
+        onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditor.toggleSearchBar(false)
+        }
     }
 
     Shortcut {
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Find & Replace"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         context: Qt.ApplicationShortcut
         enabled: Runtime.screenplayEditor && Runtime.allowAppUsage
         sequence: "Ctrl+Shift+F"
 
-        onActivated: Runtime.screenplayEditor.toggleSearchBar(true)
+        onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditor.toggleSearchBar(true)
+        }
     }
 
     FlatToolButton {
@@ -220,12 +232,16 @@ Row {
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Refresh"
         ShortcutsModelItem.shortcut: shortcut
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         enabled: sceneDocumentBinder ? true : false
         shortcut: "F5"
         iconSource: "qrc:/icons/navigation/refresh.png"
 
-        onClicked: {
+        onClicked: activate()
+
+        function activate() {
             var cp = sceneTextEditor.cursorPosition
             sceneDocumentBinder.preserveScrollAndReload()
             if(cp >= 0)
@@ -237,12 +253,18 @@ Row {
         ShortcutsModelItem.group: "Edit"
         ShortcutsModelItem.title: "Redo Page Layout"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         context: Qt.ApplicationShortcut
         enabled: Runtime.screenplayEditor && Runtime.allowAppUsage
         sequence: "Shift+F5"
 
-        onActivated: Runtime.screenplayTextDocument.reload()
+        onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayTextDocument.reload()
+        }
     }
 
     Rectangle {
@@ -260,12 +282,18 @@ Row {
         ShortcutsModelItem.title: _private.breakInsertIndex < 0 ? "Add Episode Break" : "Insert Episode Break"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: shortcut
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         enabled: !Scrite.document.readOnly
         shortcut: "Ctrl+Shift+P"
         iconSource: "qrc:/icons/action/add_episode.png"
 
-        onClicked: _private.addEpisode()
+        onClicked: activate()
+
+        function activate() {
+            _private.addEpisode()
+        }
     }
 
     FlatToolButton {
@@ -275,12 +303,18 @@ Row {
         ShortcutsModelItem.title: _private.breakInsertIndex < 0 ? "Add Act Break" : "Insert Act Break"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: shortcut
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         enabled: !Scrite.document.readOnly
         shortcut: "Ctrl+Shift+B"
         iconSource: "qrc:/icons/action/add_act.png"
 
-        onClicked: _private.addAct()
+        onClicked: activate()
+
+        function activate() {
+            _private.addAct()
+        }
     }
 
     FlatToolButton {
@@ -290,12 +324,16 @@ Row {
         ShortcutsModelItem.title: "Create New Scene"
         ShortcutsModelItem.enabled: !Scrite.document.readOnly
         ShortcutsModelItem.shortcut: shortcut
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         enabled: !Scrite.document.readOnly
         shortcut: "Ctrl+Shift+N"
         iconSource: "qrc:/icons/action/add_scene.png"
 
-        onClicked: _private.addScene()
+        onClicked: activate()
+
+        function activate() { _private.addScene() }
     }
 
     Shortcut {
@@ -303,12 +341,16 @@ Row {
         ShortcutsModelItem.title: _private.breakInsertIndex < 0 ? "Add Interval Break" : "Insert Interval Break"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         context: Qt.ApplicationShortcut
         enabled: !Scrite.document.readOnly && Runtime.allowAppUsage
         sequence: "Ctrl+Shift+L"
 
-        onActivated:  {
+        onActivated: activate()
+
+        function activate() {
             requestScreenplayEditor()
             if(_private.breakInsertIndex < 0)
                 Scrite.document.screenplay.addBreakElement(Screenplay.Interval)
@@ -340,13 +382,17 @@ Row {
             ShortcutsModelItem.enabled: enabled
             ShortcutsModelItem.priority: -index
             ShortcutsModelItem.shortcut: shortcut
+            ShortcutsModelItem.canActivate: true
+            ShortcutsModelItem.onActivated: activate()
 
             down: sceneDocumentBinder ? (sceneDocumentBinder.currentElement ? sceneDocumentBinder.currentElement.type === modelData.value : false) : false
             enabled: _private.formattable
             shortcut: "Ctrl+" + index
             iconSource: modelData.icon
 
-            onClicked: {
+            onClicked: activate()
+
+            function activate() {
                 if(index === 0) {
                     if(!sceneDocumentBinder.scene.heading.enabled)
                         sceneDocumentBinder.scene.heading.enabled = true
@@ -363,11 +409,17 @@ Row {
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.enabled: _private.formattable && Runtime.screenplayEditorSettings.displaySceneCharacters
         ShortcutsModelItem.priority: -7
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         sequence: "Ctrl+7"
         enabled: Runtime.allowAppUsage
 
-        onActivated: Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.addMuteCharacter)
+        onActivated: activate()
+
+        function activate() {
+            Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.addMuteCharacter)
+        }
     }
 
     Shortcut {
@@ -376,24 +428,36 @@ Row {
         ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.enabled: _private.formattable && Runtime.screenplayEditorSettings.displaySceneSynopsis
         ShortcutsModelItem.priority: -8
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         sequence: "Ctrl+8"
         enabled: Runtime.allowAppUsage
 
-        onActivated: Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneSynopsis)
+        onActivated: activate()
+
+        function activate() {
+            Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneSynopsis)
+        }
     }
 
     Shortcut {
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: Runtime.announcementData.focusOptions.sceneNumber
-        ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.enabled: sceneDocumentBinder && sceneDocumentBinder.currentElement && sceneDocumentBinder.currentElement.scene.heading.enabled
+        ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.priority: -9
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
 
         sequence: "Ctrl+9"
         enabled: Runtime.allowAppUsage
 
-        onActivated: Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneNumber)
+        onActivated: activate()
+
+        function activate() {
+            Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneNumber)
+        }
     }
 
     QtObject {

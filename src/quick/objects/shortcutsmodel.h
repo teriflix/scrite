@@ -15,43 +15,53 @@
 #define SHORTCUTSMODEL_H
 
 #include <QQmlEngine>
-#include <QAbstractListModel>
+#include <QSortFilterProxyModel>
 
+class ExecLaterTimer;
 class ShortcutsModelItem;
-class ShortcutsModel : public QAbstractListModel
+class ShortcutsModel : public QSortFilterProxyModel
 {
     Q_OBJECT
-    QML_NAMED_ELEMENT(ScriteShortcuts)
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
+    QML_ELEMENT
 
 public:
-    static ShortcutsModel *instance();
+    ShortcutsModel(QObject *parent = nullptr);
     ~ShortcutsModel();
-
-    // QAbstractItemModel interface
-    enum Roles { TitleRole = Qt::UserRole + 1, ShortcutRole, GroupRole, EnabledRole, VisibleRole };
-    int rowCount(const QModelIndex &parent) const;
-    QVariant data(const QModelIndex &index, int role) const;
-    QHash<int, QByteArray> roleNames() const;
 
     Q_PROPERTY(QStringList groups READ groups WRITE setGroups NOTIFY groupsChanged)
     void setGroups(const QStringList &val);
     QStringList groups() const { return m_groups; }
     Q_SIGNAL void groupsChanged();
 
+    Q_PROPERTY(QString titleFilter READ titleFilter WRITE setTitleFilter NOTIFY titleFilterChanged)
+    void setTitleFilter(const QString &val);
+    QString titleFilter() const { return m_titleFilter; }
+    Q_SIGNAL void titleFilterChanged();
+
+    // QAbstractItemModel interface
+    enum Roles {
+        TitleRole = Qt::DisplayRole,
+        ShortcutRole = Qt::UserRole + 1,
+        GroupRole,
+        EnabledRole,
+        VisibleRole,
+        CanActivateRole
+    };
+    QHash<int, QByteArray> roleNames() const;
+    QVariant data(const QModelIndex &index, int role) const;
+
+    Q_INVOKABLE void activateShortcutAt(int row);
+
+    Q_INVOKABLE void printWholeThing();
+
+protected:
+    // QSortFilterProxyModel interface
+    bool lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+
 private:
-    ShortcutsModel(QObject *parent = nullptr);
-
-    void add(ShortcutsModelItem *item);
-    void remove(ShortcutsModelItem *item);
-    void update(ShortcutsModelItem *item, bool removeAndInsert = false);
-
-    void sortItems(QList<ShortcutsModelItem *> &items);
-
-private:
-    friend class ShortcutsModelItem;
     QStringList m_groups;
-    QList<ShortcutsModelItem *> m_items;
+    QString m_titleFilter;
 };
 
 class ShortcutsModelItem : public QObject
@@ -97,13 +107,25 @@ public:
     bool isVisible() const { return m_visible; }
     Q_SIGNAL void visibleChanged();
 
+    Q_PROPERTY(bool canActivate READ canActivate WRITE setCanActivate NOTIFY canActivateChanged)
+    void setCanActivate(bool val);
+    bool canActivate() const { return m_canActivate; }
+    Q_SIGNAL void canActivateChanged();
+
+    Q_INVOKABLE void activate();
+
+signals:
+    void changed(ShortcutsModelItem *ptr);
+    void activated();
+
 private:
+    int m_priority = 0;
     bool m_enabled = true;
     bool m_visible = true;
+    bool m_canActivate = false;
     QString m_group;
     QString m_title;
     QString m_shortcut;
-    int m_priority = 0;
 };
 
 class ShortcutsModelRecord : public ShortcutsModelItem

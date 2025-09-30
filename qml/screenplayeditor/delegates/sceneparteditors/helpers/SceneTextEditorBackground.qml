@@ -44,7 +44,7 @@ Item {
         visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && Runtime.screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
 
         Rectangle {
-            width: 20
+            width: 20 * root.zoomLevel
             height: parent.height
 
             color: root.sceneDocumentBinder.scene.color

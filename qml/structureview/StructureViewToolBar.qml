@@ -500,12 +500,16 @@ Rectangle {
             ShortcutsModelItem.title: "Copy Annotation"
             ShortcutsModelItem.enabled: enabled
             ShortcutsModelItem.shortcut: Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            ShortcutsModelItem.canActivate: true
+            ShortcutsModelItem.onActivated: activate()
 
             enabled: !root.canvasScroll.selection.hasItems && (root.canvasScroll.currentAnnotation != null || root.canvasScroll.currentElementItem !== null)
             shortcut: "Ctrl+C"
             iconSource: "qrc:/icons/content/content_copy.png"
 
-            onClicked: {
+            onClicked: activate()
+
+            function activate() {
                 if(root.canvasScroll.currentAnnotation != null) {
                     Scrite.document.structure.copy(root.canvasScroll.currentAnnotation)
                     AnimatedTextOverlay.show("Annotation Copied")
@@ -526,12 +530,16 @@ Rectangle {
             ShortcutsModelItem.title: "Paste"
             ShortcutsModelItem.enabled: enabled
             ShortcutsModelItem.shortcut: Scrite.app.polishShortcutTextForDisplay(shortcut)
+            ShortcutsModelItem.canActivate: true
+            ShortcutsModelItem.onActivated: activate()
 
-            shortcut: "Ctrl+V"
             enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste
+            shortcut: "Ctrl+V"
             iconSource: "qrc:/icons/content/content_paste.png"
 
-            onClicked: {
+            onClicked: activate()
+
+            function activate() {
                 let gpos = Scrite.app.globalMousePosition()
                 let pos = root.canvasScroll.mapFromGlobal(gpos.x, gpos.y)
                 if(pos.x < 0 || pos.y < 0 || pos.x >= root.canvasScroll.width || pos.y >= root.canvasScroll.height)

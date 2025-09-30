@@ -40,94 +40,150 @@ Item {
             }
 
             FlatToolButton {
-                iconSource: scritedView.mediaIsPlaying ? "qrc:/icons/mediaplayer/pause.png" : "qrc:/icons/mediaplayer/play_arrow.png"
                 ToolTip.text: "Toggle media playback.\t(Space)"
-                enabled: scritedView.mediaIsLoaded
-                onClicked: scritedView.togglePlayback()
 
                 ShortcutsModelItem.priority: 0
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: scritedView.mediaIsPlaying ? "Pause" : "Play"
                 ShortcutsModelItem.shortcut: "Space"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.mediaIsLoaded
+                iconSource: scritedView.mediaIsPlaying ? "qrc:/icons/mediaplayer/pause.png" : "qrc:/icons/mediaplayer/play_arrow.png"
+
+                onClicked: click()
+
+                function click() {
+                    scritedView.togglePlayback()
+                }
             }
 
             FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/rewind_10.png"
                 ToolTip.text: "Rewind 10 seconds.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + " + ←)"
-                enabled: scritedView.mediaIsLoaded
-                onClicked: scritedView.rewind()
 
                 ShortcutsModelItem.priority: -1
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Rewind 10s"
                 ShortcutsModelItem.shortcut: "Ctrl+←"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.mediaIsLoaded
+                iconSource: "qrc:/icons/mediaplayer/rewind_10.png"
+
+                onClicked: click()
+
+                function click() {
+                    scritedView.rewind()
+                }
             }
 
             FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/fast_rewind.png"
                 ToolTip.text: "Rewind half second.\t(←)"
-                enabled: scritedView.mediaIsLoaded
-                onClicked: scritedView.miniRewind()
 
                 ShortcutsModelItem.priority: -2
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Rewind 1s"
                 ShortcutsModelItem.shortcut: "←"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.mediaIsLoaded
+                iconSource: "qrc:/icons/mediaplayer/fast_rewind.png"
+
+                onClicked: click()
+
+                function click() {
+                    scritedView.miniRewind()
+                }
             }
 
             FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/fast_forward.png"
                 ToolTip.text: "Forward half second.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+→)"
-                enabled: scritedView.mediaIsLoaded
-                onClicked: scritedView.miniForward()
 
                 ShortcutsModelItem.priority: -3
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Forward 1s"
                 ShortcutsModelItem.shortcut: "→"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.mediaIsLoaded
+                iconSource: "qrc:/icons/mediaplayer/fast_forward.png"
+
+                onClicked: click()
+
+                function click() {
+                    scritedView.miniForward()
+                }
             }
 
             FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/forward_10.png"
                 ToolTip.text: "Forward 10 seconds.\t(→)"
-                enabled: scritedView.mediaIsLoaded
-                onClicked: scritedView.forward()
 
                 ShortcutsModelItem.priority: -4
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Forward 10s"
                 ShortcutsModelItem.shortcut: "Ctrl+→"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.mediaIsLoaded
+                iconSource: "qrc:/icons/mediaplayer/forward_10.png"
+
+                onClicked: click()
+
+                function click() {
+                    scritedView.forward()
+                }
             }
 
             FlatToolButton {
-                iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
                 ToolTip.text: "Previous Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↑)"
-                enabled: scritedView.previousSceneAvailable
-                onClicked: scritedView.scrollPreviousScene()
 
                 ShortcutsModelItem.priority: -5
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Previous Scene"
                 ShortcutsModelItem.shortcut: "Ctrl+↑"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.previousSceneAvailable
+                iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
+
+                onClicked: click()
+
+                function click() {
+                    scritedView.scrollPreviousScene()
+                }
             }
 
             FlatToolButton {
-                iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
                 ToolTip.text: "Next Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↓)"
-                enabled: scritedView.nextSceneAvailable
-                onClicked: scritedView.scrollNextScene()
 
                 ShortcutsModelItem.priority: -6
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Next Scene"
                 ShortcutsModelItem.shortcut: "Ctrl+↓"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.nextSceneAvailable
+                iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
+
+                onClicked: click()
+
+                function click() {
+                    scritedView.scrollNextScene()
+                }
             }
 
             QtObject {
@@ -165,14 +221,21 @@ Item {
             FlatToolButton {
                 iconSource: "qrc:/icons/mediaplayer/sync_with_screenplay.png"
                 ToolTip.text: "Use video time as current scene time offset.\t(> or .)"
-                enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
-                onClicked: scritedView.syncVideoTimeWithScreenplayOffsets(true)
 
                 ShortcutsModelItem.priority: -11
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Sync Time"
                 ShortcutsModelItem.shortcut: "> ."
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
+                onClicked: click()
+
+                function click() {
+                    scritedView.syncVideoTimeWithScreenplayOffsets(true)
+                }
             }
 
             QtObject {
@@ -199,21 +262,26 @@ Item {
             }
 
             VclCheckBox {
-                anchors.verticalCenter: parent.verticalCenter
-                checked: scritedView.playbackScreenplaySync
-                onToggled: scritedView.playbackScreenplaySync = checked
-                hoverEnabled: true
                 ToolTip.text: "Check this to keep media playback and screenplay in sync."
                 ToolTip.visible: hovered
-                text: "Auto Scroll"
-                enabled: scritedView.mediaIsLoaded
-                focusPolicy: Qt.NoFocus
 
                 ShortcutsModelItem.priority: -13
                 ShortcutsModelItem.group: "Scrited"
                 ShortcutsModelItem.title: "Auto Scroll " + (checked ? "OFF" : "ON")
                 ShortcutsModelItem.shortcut: "+"
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: scritedView.playbackScreenplaySync = checked
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                text: "Auto Scroll"
+                checked: scritedView.playbackScreenplaySync
+                enabled: scritedView.mediaIsLoaded
+                focusPolicy: Qt.NoFocus
+                hoverEnabled: true
+
+                onToggled: scritedView.playbackScreenplaySync = checked
             }
 
             QtObject {

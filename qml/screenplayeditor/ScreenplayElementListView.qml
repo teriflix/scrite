@@ -479,9 +479,8 @@ ListView {
 
             root.positionViewAtIndex(nidx, ListView.Beginning)
             changeAdapterCurrentIndexInternally(nidx)
-            if(currentDelegate)
-                currentDelegate.focusIn(0)
             root.positionViewAtIndex(nidx, ListView.Beginning)
+            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function jumpToLastScene() {
@@ -492,9 +491,8 @@ ListView {
 
             root.positionViewAtIndex(lidx, ListView.Beginning)
             changeAdapterCurrentIndexInternally(lidx)
-            if(currentDelegate)
-                currentDelegate.focusIn(0)
             root.positionViewAtIndex(lidx, ListView.Beginning)
+            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function jumpToFirstScene() {
@@ -505,9 +503,8 @@ ListView {
 
             root.positionViewAtIndex(fidx, ListView.Beginning)
             changeAdapterCurrentIndexInternally(fidx)
-            if(currentDelegate)
-                currentDelegate.focusIn(0)
             root.positionViewAtIndex(fidx, ListView.Beginning)
+            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function jumpToPreviousScene() {
@@ -518,9 +515,8 @@ ListView {
 
             root.positionViewAtIndex(pidx, ListView.Beginning)
             changeAdapterCurrentIndexInternally(pidx)
-            if(currentDelegate)
-                currentDelegate.focusIn(0)
             root.positionViewAtIndex(pidx, ListView.Beginning)
+            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function scrollToNextScene() {
@@ -533,8 +529,7 @@ ListView {
 
             changeAdapterCurrentIndexInternally(nidx)
             scrollIntoView(nidx)
-            if(currentDelegate)
-                currentDelegate.focusIn(0)
+            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function scrollToPreviousScene() {
@@ -547,8 +542,12 @@ ListView {
 
             changeAdapterCurrentIndexInternally(pidx)
             scrollIntoView(pidx)
+            Qt.callLater(focusCurrentDelegateAt, -1)
+        }
+
+        function focusCurrentDelegateAt(cursorPosition) {
             if(currentDelegate)
-                currentDelegate.focusIn(-1)
+                currentDelegate.focusIn(cursorPosition)
         }
 
         onHasFocusChanged: {

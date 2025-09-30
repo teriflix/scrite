@@ -174,7 +174,7 @@ Rectangle {
                 ToolTip.text: "Structure Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
-                onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
+                onClicked: Announcement.shout(Runtime.announcementIds.tabRequest, "Structure")
             }
 
             FlatToolButton {
@@ -236,12 +236,9 @@ Rectangle {
 
             FlatToolButton {
                 id: newNoteToolButton
-                iconSource: "qrc:/icons/action/note_add.png"
-                hasMenu: true
-                suggestedWidth: toolButtonSize
-                suggestedHeight: toolButtonSize
+
                 property Notes notes: notebookTree.currentNotes
-                enabled: notes && !Scrite.document.readOnly
+
                 ToolTip.text: {
                     var ret = "Adds a new text or form note"
                     if(!enabled)
@@ -249,26 +246,42 @@ Rectangle {
                     ret += " to " + notebookTree.currentData.notebookItemTitle
                     return ret
                 }
+
+                suggestedWidth: toolButtonSize
+                suggestedHeight: toolButtonSize
+
                 down: newNoteMenu.visible
-                onClicked: {
+                hasMenu: true
+                enabled: notes && !Scrite.document.readOnly
+                shortcut: "Ctrl+T"
+                iconSource: "qrc:/icons/action/note_add.png"
+
+                onClicked: click()
+
+                ShortcutsModelItem.group: "Notebook"
+                ShortcutsModelItem.title: "New Note"
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                function click() {
                     newNoteMenu.notes = notes
                     newNoteMenu.popup(newNoteToolButton, newNoteToolButton.width, 0)
                 }
-
-                shortcut: "Ctrl+T"
-                ShortcutsModelItem.group: "Notebook"
-                ShortcutsModelItem.title: "New Note"
-                ShortcutsModelItem.shortcut: shortcut
-                ShortcutsModelItem.enabled: enabled
             }
 
             FlatToolButton {
                 id: noteColorButton
-                property Character character: notebookTree.currentCharacter
+
                 property Note note: notebookTree.currentNote
                 property Notes notes: notebookTree.currentNotes
+                property Character character: notebookTree.currentCharacter
+
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
+
+                down: noteColorMenu.visible
                 hasMenu: true
                 enabled: (character || note || (notes && notes.ownerType === Notes.SceneOwner)) && !Scrite.document.readOnly
                 iconSource: {
@@ -280,12 +293,14 @@ Rectangle {
                         return "image://color/" + notes.scene.color + "/1"
                     return "image://color/#00ffffff/1"
                 }
-                down: noteColorMenu.visible
+
                 onClicked: noteColorMenu.popup(noteColorButton, noteColorButton.width, 0)
 
                 ColorMenu {
                     id: noteColorMenu
+
                     enabled: noteColorButton.enabled
+
                     onMenuItemClicked: {
                         if(noteColorButton.note)
                             noteColorButton.note.color = color
@@ -299,82 +314,81 @@ Rectangle {
 
             FlatToolButton {
                 id: bookmarkButton
+
+                property var notebookObject: notebookTree.currentData.notebookItemObject
+
+                ToolTip.text: "Toggle bookmark of a Note, Scene, Episode/Act Notes or Character"
+
+                ShortcutsModelItem.group: "Notebook"
+                ShortcutsModelItem.title: "Toggle Bookmark"
+                ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
-                ToolTip.text: "Toggle bookmark of a Note, Scene, Episode/Act Notes or Character"
+
                 enabled: noteColorButton.note || noteColorButton.notes || noteColorButton.character
-                property var notebookObject: notebookTree.currentData.notebookItemObject
+                shortcut: "Ctrl+D"
+
+                onClicked: click()
                 onNotebookObjectChanged: updateIcon()
-                onClicked: {
+
+                function click() {
                     notebookModel.bookmarkedNotes.toggleBookmark(notebookObject)
                     updateIcon()
                 }
+
                 function updateIcon() {
                     if(enabled && notebookModel.bookmarkedNotes.isBookmarked(notebookObject))
                         iconSource = "qrc:/icons/content/bookmark.png"
                     else
                         iconSource = "qrc:/icons/content/bookmark_outline.png"
                 }
-
-                shortcut: "Ctrl+D"
-                ShortcutsModelItem.group: "Notebook"
-                ShortcutsModelItem.title: "Toggle Bookmark"
-                ShortcutsModelItem.shortcut: shortcut
-                ShortcutsModelItem.enabled: enabled
             }
 
             FlatToolButton {
                 id: deleteNoteButton
+
+                ToolTip.text: "Delete the current note or character"
+
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
+
                 enabled: (noteColorButton.note || noteColorButton.character) && !Scrite.document.readOnly
-                ToolTip.text: "Delete the current note or character"
                 iconSource: "qrc:/icons/action/delete.png"
+
                 onClicked: notebookContentLoader.confirmAndDelete()
             }
         }
 
         Rectangle {
+            anchors.right: parent.right
+
             width: 1
             height: parent.height
-            anchors.right: parent.right
+
             color: Runtime.colors.primary.borderColor
         }
     }
 
     SplitView {
-        orientation: Qt.Horizontal
+        Material.background: Qt.darker(Runtime.colors.primary.button.background, 1.1)
+
         anchors.top: parent.top
         anchors.left: toolbar.right
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        Material.background: Qt.darker(Runtime.colors.primary.button.background, 1.1)
+
+        orientation: Qt.Horizontal
 
         OldControls.TreeView {
             id: notebookTree
-            SplitView.preferredWidth: Math.min(350, notebookView.width*0.25)
-            SplitView.minimumWidth: 150
-            clip: true
-            headerVisible: false
-            model: notebookModel
-            frameVisible: false
-            backgroundVisible: false
-            alternatingRowColors: false
-            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
-            rowDelegate: Rectangle {
-                height: fontMetrics.height + 20
-                color: styleData.selected ? Runtime.colors.primary.highlight.background : Runtime.colors.primary.c10.background
-            }
-            EventFilter.events: [EventFilter.Wheel]
-            EventFilter.onFilter: {
-                if(event.type === EventFilter.Wheel && event.orientation === Qt.Horizontal) {
-                    result.filter = true
-                    result.acceptEvent = true
-                }
-            }
 
             property var currentData: model.modelIndexData(currentIndex)
+
+            property Note currentNote: currentData.notebookItemType === NotebookModel.NoteType ? currentData.notebookItemObject : null
             property Notes currentNotes: {
                 if(currentData.notebookItemType === NotebookModel.NotesType)
                     return currentData.notebookItemObject
@@ -385,13 +399,38 @@ Rectangle {
                     return Scrite.document.structure.notes
                 return null
             }
-            property Note currentNote: currentData.notebookItemType === NotebookModel.NoteType ? currentData.notebookItemObject : null
             property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
+
+            SplitView.minimumWidth: 150
+            SplitView.preferredWidth: Math.min(350, notebookView.width*0.25)
+
+            EventFilter.events: [EventFilter.Wheel]
+            EventFilter.onFilter: (object, event, result) => {
+                                      if(event.type === EventFilter.Wheel && event.orientation === Qt.Horizontal) {
+                                          result.filter = true
+                                          result.acceptEvent = true
+                                      }
+                                  }
+
+            clip: true
+            model: notebookModel
+            frameVisible: false
+            headerVisible: false
+            backgroundVisible: false
+            alternatingRowColors: false
+            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
+            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
+
+            rowDelegate: Rectangle {
+                height: fontMetrics.height + 20
+                color: styleData.selected ? Runtime.colors.primary.highlight.background : Runtime.colors.primary.c10.background
+            }
 
             itemDelegate: Item {
                 Rectangle {
                     width: notebookTree.width - parent.x
                     height: fontMetrics.height + 20
+
                     color: {
                         if(styleData.selected)
                             return Runtime.colors.primary.highlight.background
@@ -419,6 +458,7 @@ Rectangle {
                     Row {
                         width: parent.width
                         height: parent.height
+
                         spacing: 5
 
                         Item {

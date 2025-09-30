@@ -51,7 +51,6 @@ int main(int argc, char **argv)
     SystemTextInputManager::instance();
     NotificationManager::instance();
     DocumentFileSystem::setMarker(QByteArrayLiteral("SCRITE"));
-    ShortcutsModel::instance();
     ScriteDocument::instance();
     ScriteDocumentVault::instance();
 

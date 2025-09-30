@@ -148,7 +148,7 @@ FocusScope {
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
 
-                    width: 10
+                    width: 10 * root.zoomLevel
 
                     z: 1
                     color: root.screenplayElement.scene ? root.screenplayElement.scene.color : Runtime.colors.primary.highlight.background

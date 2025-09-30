@@ -43,7 +43,49 @@ AbstractScenePartEditor {
             Layout.minimumWidth: root.pageLeftMargin
             Layout.maximumWidth: root.pageLeftMargin
 
+            Row {
+                anchors.left: parent.left
+                anchors.right: _sceneHeading.left
+                anchors.margins: 16 * root.zoomLevel
+                anchors.verticalCenter: parent.verticalCenter
+
+                spacing: 4 * root.zoomLevel
+
+                SceneTypeImage {
+                    width: root.fontMetrics.height
+                    height: root.fontMetrics.height
+
+                    visible: sceneType !== Scene.Standard
+                    sceneType: root.scene ? root.scene.type : Scene.Standard
+                    showTooltip: false
+                    lightBackground: Scrite.app.isLightColor(Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint))
+                }
+
+                Image {
+                    width: root.fontMetrics.height
+                    height: root.fontMetrics.height
+
+                    visible: Runtime.screenplayEditorSettings.longSceneWarningEnabled &&
+                             root.scene.wordCount > Runtime.screenplayEditorSettings.longSceneWordTreshold
+                    smooth: true
+                    mipmap: true
+                    source: "qrc:/icons/content/warning.png"
+                    fillMode: Image.PreserveAspectFit
+
+                    MouseArea {
+                        ToolTip.text: "" + root.scene.wordCount + " words (limit: " + Runtime.screenplayEditorSettings.longSceneWordTreshold + "). Refer Settings > Screenplay > Options tab."
+                        ToolTip.visible: containsMouse
+
+                        anchors.fill: parent
+
+                        hoverEnabled: enabled
+                    }
+                }
+            }
+
             TextField {
+                id: _sceneHeading
+
                 anchors.right: parent.right
                 anchors.rightMargin: root.pageLeftMargin * 0.1
                 anchors.verticalCenter: parent.verticalCenter
@@ -83,22 +125,6 @@ AbstractScenePartEditor {
             Layout.maximumWidth: root.pageRightMargin
 
             FlatToolButton {
-                ToolTip.text: "Formal Story Beats/Tags"
-
-                Layout.preferredWidth: suggestedWidth
-                Layout.preferredHeight: suggestedHeight
-
-                suggestedWidth: Runtime.iconImageSize
-                suggestedHeight: Runtime.iconImageSize
-
-                enabled: Runtime.appFeatures.structure.enabled
-                opacity: enabled ? 1 : 0.5
-                iconSource: "qrc:/icons/action/tag.png"
-
-                onClicked: _private.popupFormalTagsMenu()
-            }
-
-            FlatToolButton {
                 ToolTip.text: "Scene Menu"
 
                 Layout.preferredWidth: suggestedWidth
@@ -125,7 +151,7 @@ AbstractScenePartEditor {
                 }
             }
 
-            Image {
+            Item {
                 Layout.fillWidth: true
             }
         }

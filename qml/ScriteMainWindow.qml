@@ -53,205 +53,310 @@ Item {
     }
 
     Shortcut {
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+S"
-        enabled: Runtime.allowAppUsage
-        onActivated: SaveFileTask.saveAs()
-
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Save As"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        enabled: Runtime.allowAppUsage
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+Shift+S"
+
+        onActivated: activate()
+
+        function activate() { SaveFileTask.saveAs() }
     }
 
     Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+N"
-        onActivated: HomeScreen.launch()
-
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "New"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        enabled: Runtime.allowAppUsage
+        context: Qt.ApplicationShortcut
+        sequence: "Ctrl+N"
+
+        onActivated: activate()
+
+        function activate() { HomeScreen.launch() }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+O"
-        onActivated: HomeScreen.launch()
+        onActivated: activate()
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Open"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() { HomeScreen.launch() }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+O"
-        onActivated: HomeScreen.launch("Scriptalay")
+        onActivated: activate()
 
         ShortcutsModelItem.group: "File"
         ShortcutsModelItem.title: "Scriptalay"
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() { HomeScreen.launch("Scriptalay") }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+P"
+        onActivated: activate()
 
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Export To PDF"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: ExportConfigurationDialog.launch("Screenplay/Adobe PDF")
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() { ExportConfigurationDialog.launch("Screenplay/Adobe PDF") }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "F1"
+        onActivated: activate()
 
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Help"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Qt.openUrlExternally(helpUrl)
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() { Qt.openUrlExternally(helpUrl) }
     }
 
     Shortcut {
         id: sceneCharactersToggleShortcut
+
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+C"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Settings"
         ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters, Tags" : "Show Scene Characters, Tags"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
+        }
     }
 
     Shortcut {
         id: synopsisToggleShortcut
+
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+S"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Settings"
         ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneSynopsis ? "Hide Synopsis" : "Show Synopsis"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
+        }
     }
 
     Shortcut {
         id: commentsToggleShortcut
+
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+M"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Settings"
         ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneComments ? "Hide Comments" : "Show Comments"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
+        }
     }
 
     Shortcut {
         id: taggingToggleShortcut
+
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+G"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Settings"
         ShortcutsModelItem.title: Runtime.screenplayEditorSettings.allowTaggingOfScenes ? "Allow Tagging" : "Disable Tagging"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
+        }
     }
 
     Shortcut {
         id: spellCheckToggleShortcut
+
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+L"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Settings"
         ShortcutsModelItem.title: Runtime.screenplayEditorSettings.enableSpellCheck ? "Disable Spellcheck" : "Enable Spellcheck"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Runtime.screenplayEditorSettings.enableSpellCheck = !Runtime.screenplayEditorSettings.enableSpellCheck
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditorSettings.enableSpellCheck = !Runtime.screenplayEditorSettings.enableSpellCheck
+        }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Alt+A"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Settings"
         ShortcutsModelItem.title: Runtime.applicationSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
+        }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+H"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Settings"
         ShortcutsModelItem.title: Runtime.screenplayEditorSettings.highlightCurrentLine ? "Line Highlight Off" : "Line Highlight On"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: Runtime.screenplayEditorSettings.highlightCurrentLine = !Runtime.screenplayEditorSettings.highlightCurrentLine
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.screenplayEditorSettings.highlightCurrentLine = !Runtime.screenplayEditorSettings.highlightCurrentLine
+        }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+M"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "New Scrite Window"
         ShortcutsModelItem.enabled: true
-        ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.visible: enabled
-        onActivated: Scrite.app.launchNewInstance(Scrite.window)
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Scrite.app.launchNewInstance(Scrite.window)
+        }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Alt+1"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Screenplay"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: mainTabBar.activateTab(0)
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.activateMainWindowTab(0)
+        }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Alt+2"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Structure"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: {
-            mainTabBar.activateTab(1)
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.activateMainWindowTab(1)
             if(Runtime.showNotebookInStructure)
-                Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
+                Announcement.shout(Runtime.announcementIds.tabRequest, "Structure")
         }
     }
 
     Shortcut {
         id: notebookShortcut
+
+        property bool notebookTabVisible: mainTabBar.currentIndex === (Runtime.showNotebookInStructure ? 1 : 2)
+
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Alt+3"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Notebook"
         ShortcutsModelItem.shortcut: sequence
-        onActivated: {
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
             if(Runtime.showNotebookInStructure) {
-                if(mainTabBar.currentIndex === 1)
-                    Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+                if(Runtime.mainWindowTab === Runtime.e_StructureTab)
+                    Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                 else {
-                    mainTabBar.activateTab(1)
+                    Runtime.activateMainWindowTab(Runtime.e_StructureTab)
                     Utils.execLater(mainTabBar, 250, function() {
-                        Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+                        Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                     })
                 }
             } else
-                mainTabBar.activateTab(2)
+                Runtime.activateMainWindowTab(Runtime.e_NotebookTab)
         }
-
-        property bool notebookTabVisible: mainTabBar.currentIndex === (Runtime.showNotebookInStructure ? 1 : 2)
 
         function showBookmarkedNotes() {
             showNotes("Notebook Bookmarks")
@@ -268,12 +373,12 @@ Item {
         function showNotes(type) {
             var nbt = Runtime.showNotebookInStructure ? 1 : 2
             if(mainTabBar.currentIndex !== nbt) {
-                mainTabBar.activateTab(nbt)
+                Runtime.activateMainWindowTab(nbt)
                 Utils.execLater(mainTabBar, 250, function() {
-                    Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", type)
+                    Announcement.shout(Runtime.announcementIds.tabRequest, type)
                 })
             } else
-                Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", type)
+                Announcement.shout(Runtime.announcementIds.tabRequest, type)
         }
     }
 
@@ -281,47 +386,72 @@ Item {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+K"
-        onActivated: notebookShortcut.showBookmarkedNotes()
+        onActivated: activate()
 
         ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
         ShortcutsModelItem.title: "Bookmarked Notes"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            notebookShortcut.showBookmarkedNotes()
+        }
     }
 
     Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Ctrl+Shift+R"
-        onActivated: notebookShortcut.showCharacterNotes()
+        onActivated: activate()
 
         ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
         ShortcutsModelItem.title: "Charater Notes"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            notebookShortcut.showCharacterNotes()
+        }
     }
 
     Shortcut {
         context: Qt.ApplicationShortcut
         enabled: Runtime.allowAppUsage
         sequence: "Ctrl+Shift+Y"
-        onActivated: notebookShortcut.showStoryNotes()
+        onActivated: activate()
 
         ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
         ShortcutsModelItem.title: "Story Notes"
         ShortcutsModelItem.enabled: enabled
         ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            notebookShortcut.showStoryNotes()
+        }
     }
 
     Shortcut {
         context: Qt.ApplicationShortcut
-        sequence: "Alt+4"
         enabled: Runtime.workspaceSettings.showScritedTab && Runtime.allowAppUsage
+        sequence: "Alt+4"
+        onActivated: activate()
+
         ShortcutsModelItem.group: "Application"
         ShortcutsModelItem.title: "Scrited"
-        ShortcutsModelItem.shortcut: sequence
         ShortcutsModelItem.enabled: enabled
-        onActivated: mainTabBar.activateTab(3)
+        ShortcutsModelItem.shortcut: sequence
+        ShortcutsModelItem.canActivate: true
+        ShortcutsModelItem.onActivated: activate()
+
+        function activate() {
+            Runtime.activateMainWindowTab(Runtime.e_ScritedTab)
+        }
     }
 
     Connections {
@@ -514,7 +644,7 @@ Item {
             visible: appToolBarArea.width >= 1200
             onVisibleChanged: {
                 if(enabled && !visible)
-                    mainTabBar.activateTab(0)
+                    Runtime.activateMainWindowTab(0)
             }
 
             FlatToolButton {
@@ -547,30 +677,37 @@ Item {
 
             FlatToolButton {
                 id: cmdSave
-                iconSource: "qrc:/icons/content/save.png"
                 text: "Save"
-                shortcut: "Ctrl+S"
                 enabled: (Scrite.document.modified || Scrite.document.fileName === "") && !Scrite.document.readOnly
-                onClicked: {
-                    if(Scrite.document.fileName === "")
-                        SaveFileTask.saveAs()
-                    else
-                        SaveFileTask.saveSilently()
-                }
+                shortcut: "Ctrl+S"
+                iconSource: "qrc:/icons/content/save.png"
+
+                onClicked: activate()
 
                 ShortcutsModelItem.group: "File"
                 ShortcutsModelItem.title: text
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: activate()
+
+                function activate() {
+                    if(Scrite.document.fileName === "")
+                        SaveFileTask.saveAs()
+                    else
+                        SaveFileTask.saveSilently()
+                }
             }
 
             FlatToolButton {
                 id: cmdShare
+
                 text: "Share"
-                iconSource: "qrc:/icons/action/share.png"
-                enabled: appToolsMenu.visible === false
-                onClicked: shareMenu.open()
                 down: shareMenu.visible
+                enabled: appToolsMenu.visible === false
+                iconSource: "qrc:/icons/action/share.png"
+
+                onClicked: shareMenu.open()
 
                 Item {
                     anchors.left: parent.left
@@ -682,27 +819,38 @@ Item {
                         width: 300
 
                         VclMenuItem {
+                            id: settingsMenuItem
+
                             text: "Settings\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+,")
-                            icon.source: "qrc:/icons/action/settings_applications.png"
-                            onClicked: SettingsDialog.launch()
                             enabled: appToolBar.visible
+                            icon.source: "qrc:/icons/action/settings_applications.png"
+
+                            onClicked: activate()
 
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: "Settings"
                             ShortcutsModelItem.shortcut: "Ctrl+,"
                             ShortcutsModelItem.enabled: appToolBar.visible
+                            ShortcutsModelItem.canActivate: true
+                            ShortcutsModelItem.onActivated: activate()
+
+                            function activate() {
+                                SettingsDialog.launch()
+                            }
 
                             Shortcut {
                                 enabled: Runtime.allowAppUsage
                                 context: Qt.ApplicationShortcut
                                 sequence: "Ctrl+,"
-                                onActivated: SettingsDialog.launch()
+                                onActivated: settingsMenuItem.activate()
                             }
                         }
 
                         VclMenuItem {
                             id: shortcutsMenuItem
+
                             text: "Shortcuts\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+E")
+                            enabled: appToolBar.visible
                             icon.source: {
                                 if(Scrite.app.isMacOSPlatform)
                                     return "qrc:/icons/navigation/shortcuts_macos.png"
@@ -710,19 +858,25 @@ Item {
                                     return "qrc:/icons/navigation/shortcuts_windows.png"
                                 return "qrc:/icons/navigation/shortcuts_linux.png"
                             }
-                            onClicked: Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
-                            enabled: appToolBar.visible
+
+                            onClicked: activate()
 
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: FloatingShortcutsDock.visible ? "Hide Shortcuts" : "Show Shortcuts"
                             ShortcutsModelItem.shortcut: "Ctrl+E"
                             ShortcutsModelItem.enabled: appToolBar.visible
+                            ShortcutsModelItem.canActivate: true
+                            ShortcutsModelItem.onActivated: activate()
+
+                            function activate() {
+                                Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
+                            }
 
                             Shortcut {
                                 enabled: Runtime.allowAppUsage
                                 context: Qt.ApplicationShortcut
                                 sequence: "Ctrl+E"
-                                onActivated: Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
+                                onActivated: shortcutsMenuItem.activate()
                             }
                         }
 
@@ -739,17 +893,28 @@ Item {
                         }
 
                         VclMenuItem {
+                            id: toggleFullScreenMenuItem
+
                             text: "Toggle Fullscreen\tF7"
                             icon.source: "qrc:/icons/navigation/fullscreen.png"
-                            onClicked: Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
+
+                            onClicked: activate()
+
                             ShortcutsModelItem.group: "Application"
                             ShortcutsModelItem.title: "Toggle Fullscreen"
                             ShortcutsModelItem.shortcut: "F7"
+                            ShortcutsModelItem.canActivate: true
+                            ShortcutsModelItem.onActivated: activate()
+
+                            function activate() {
+                                Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
+                            }
+
                             Shortcut {
                                 enabled: Runtime.allowAppUsage
                                 context: Qt.ApplicationShortcut
                                 sequence: "F7"
-                                onActivated: Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
+                                onActivated: toggleFullScreenMenuItem.activate()
                             }
                         }
                     }
@@ -819,40 +984,51 @@ Item {
                         model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
                         Item {
+                            required property var modelData
+
                             Shortcut {
                                 property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
+
                                 enabled: Runtime.allowAppUsage && Scrite.app.transliterationEngine.enabledLanguages.indexOf(modelData.value) >= 0
                                 context: Qt.ApplicationShortcut
                                 sequence: "Alt+"+shortcutKey
-                                onActivated: {
+                                onActivated: activate()
+
+                                ShortcutsModelItem.title: modelData.key
+                                ShortcutsModelItem.group: "Language"
+                                ShortcutsModelItem.priority: 0
+                                ShortcutsModelItem.enabled: enabled
+                                ShortcutsModelItem.shortcut: sequence
+                                ShortcutsModelItem.canActivate: true
+                                ShortcutsModelItem.onActivated: activate()
+
+                                function activate() {
                                     Scrite.app.transliterationEngine.language = modelData.value
                                     Scrite.document.formatting.defaultLanguage = modelData.value
                                     Runtime.paragraphLanguageSettings.defaultLanguage = modelData.key
                                 }
-
-                                ShortcutsModelItem.priority: 0
-                                ShortcutsModelItem.enabled: enabled
-                                ShortcutsModelItem.title: modelData.key
-                                ShortcutsModelItem.group: "Language"
-                                ShortcutsModelItem.shortcut: sequence
                             }
                         }
                     }
 
                     Shortcut {
                         context: Qt.ApplicationShortcut
-                        sequence: "F10"
                         enabled: Runtime.allowAppUsage
-                        onActivated: {
-                            Scrite.app.transliterationEngine.cycleLanguage()
-                            Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
-                            Runtime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
-                        }
+                        sequence: "F10"
+                        onActivated: activate()
 
                         ShortcutsModelItem.priority: 1
                         ShortcutsModelItem.title: "Next Language"
                         ShortcutsModelItem.group: "Language"
                         ShortcutsModelItem.shortcut: "F10"
+                        ShortcutsModelItem.canActivate: true
+                        ShortcutsModelItem.onActivated: activate()
+
+                        function activate() {
+                            Scrite.app.transliterationEngine.cycleLanguage()
+                            Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
+                            Runtime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
+                        }
                     }
                 }
 
@@ -863,58 +1039,76 @@ Item {
             }
 
             FlatToolButton {
-                iconSource: down ? "qrc:/icons/hardware/keyboard_hide.png" : "qrc:/icons/hardware/keyboard.png"
                 ToolTip.text: "Show English to " + Scrite.app.transliterationEngine.languageAsString + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
-                shortcut: "Ctrl+K"
-                onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
-                down: alphabetMappingsPopup.visible
-                enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
-                visible: mainTabBar.currentIndex <= 2
 
-                ShortcutsModelItem.priority: 1
+                down: alphabetMappingsPopup.visible
+                visible: mainTabBar.currentIndex <= 2
+                enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
+                shortcut: "Ctrl+K"
+                iconSource: down ? "qrc:/icons/hardware/keyboard_hide.png" : "qrc:/icons/hardware/keyboard.png"
+
+                onClicked: click()
+
                 ShortcutsModelItem.group: "Language"
                 ShortcutsModelItem.title: "Alphabet Mapping"
-                ShortcutsModelItem.shortcut: shortcut
                 ShortcutsModelItem.enabled: enabled
+                ShortcutsModelItem.shortcut: shortcut
+                ShortcutsModelItem.priority: 1
+                ShortcutsModelItem.canActivate: true
+                ShortcutsModelItem.onActivated: click()
+
+                function click() {
+                    alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
+                }
 
                 Item {
                     anchors.top: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
+
                     width: alphabetMappingsPopup.width
 
                     Popup {
                         id: alphabetMappingsPopup
+
                         width: alphabetMappingsLoader.width + 30
                         height: alphabetMappingsLoader.height + 30
+
                         modal: false
                         focus: false
                         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
                         Loader {
                             id: alphabetMappingsLoader
-                            active: parent.visible
+
                             width: item ? item.width : 0
                             height: item ? item.height : 0
+
+                            active: parent.visible
+
                             sourceComponent: AlphabetMappings {
                                 enabled: Scrite.app.transliterationEngine.textInputSourceIdForLanguage(Scrite.app.transliterationEngine.language) === ""
 
                                 Rectangle {
-                                    visible: !parent.enabled
-                                    color: Runtime.colors.primary.c300.background
-                                    opacity: 0.9
                                     anchors.fill: parent
 
+                                    color: Runtime.colors.primary.c300.background
+                                    opacity: 0.9
+                                    visible: !parent.enabled
+
                                     VclLabel {
-                                        width: parent.width * 0.75
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                                         anchors.centerIn: parent
-                                        horizontalAlignment: Text.AlignHCenter
-                                        color: Runtime.colors.primary.c300.text
+
+                                        width: parent.width * 0.75
+
                                         text: {
                                             if(Scrite.app.isMacOSPlatform)
                                                 return "Scrite is using an input source from macOS while typing in " + Scrite.app.transliterationEngine.languageAsString + "."
                                             return "Scrite is using an input method & keyboard layout from Windows while typing in " + Scrite.app.transliterationEngine.languageAsString + "."
                                         }
+                                        color: Runtime.colors.primary.c300.text
+                                        horizontalAlignment: Text.AlignHCenter
+
+                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
                                     }
                                 }
                             }
@@ -925,14 +1119,19 @@ Item {
 
             VclLabel {
                 id: languageDescLabel
+
                 anchors.verticalCenter: parent.verticalCenter
-                text: Scrite.app.transliterationEngine.languageAsString
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+
                 width: 80
+
+                text: Scrite.app.transliterationEngine.languageAsString
                 visible: mainTabBar.currentIndex <= 2
+
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
 
                 MouseArea {
                     anchors.fill: parent
+
                     onClicked: languageToolButton.click()
                 }
             }
@@ -940,36 +1139,43 @@ Item {
 
         Row {
             id: appToolsMenu
+
             anchors.left: parent.left
             anchors.leftMargin: 10
             anchors.verticalCenter: parent.verticalCenter
+
             visible: !appToolBar.visible
 
             FlatToolButton {
                 text: "File"
+                down: appFileMenu.active
                 iconSource: "qrc:/icons/navigation/menu.png"
+
                 onClicked: {
                     if(appFileMenu.active)
                         appFileMenu.close()
                     else
                         appFileMenu.show()
                 }
-                down: appFileMenu.active
 
                 MenuLoader {
                     id: appFileMenu
+
                     anchors.left: parent.left
                     anchors.bottom: parent.bottom
+
                     menu: VclMenu {
                         width: 300
 
                         VclMenuItem {
                             text: "Home"
+
                             onTriggered: HomeScreen.launch()
                         }
 
                         VclMenuItem {
                             text: "Save"
+
                             onTriggered: cmdSave.doClick()
                         }
 
@@ -977,16 +1183,20 @@ Item {
 
                         VclMenu {
                             id: exportMenu2
-                            title: "Share"
+
                             width: 250
+
+                            title: "Share"
 
                             Repeater {
                                 model: Scrite.document.supportedExportFormats
 
                                 VclMenuItem {
                                     required property var modelData
+
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
+
                                     onClicked: ExportConfigurationDialog.launch(modelData.key)
                                 }
                             }
@@ -996,21 +1206,25 @@ Item {
                             VclMenuItem {
                                 text: "Scrite"
                                 icon.source: "qrc:/icons/exporter/scrite.png"
+
                                 onClicked: SaveFileTask.saveAs()
                             }
                         }
 
                         VclMenu {
-                            title: "Reports"
                             width: 300
+
+                            title: "Reports"
 
                             Repeater {
                                 model: Scrite.document.supportedReports
 
                                 VclMenuItem {
                                     required property var modelData
+
                                     text: modelData.name
                                     icon.source: "qrc" + modelData.icon
+
                                     onClicked: ReportConfigurationDialog.launch(modelData.name)
                                     // enabled: Scrite.window.width >= 800
                                 }
@@ -1028,10 +1242,14 @@ Item {
                                 model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
 
                                 VclMenuItem {
+                                    required property var modelData
+
                                     property string baseText: modelData.key
                                     property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
+
                                     text: baseText + " (" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
                                     font.bold: Scrite.app.transliterationEngine.language === modelData.value
+
                                     onClicked: {
                                         Scrite.app.transliterationEngine.language = modelData.value
                                         Scrite.document.formatting.defaultLanguage = modelData.value
@@ -1044,6 +1262,7 @@ Item {
 
                             VclMenuItem {
                                 text: "Next-Language (F10)"
+
                                 onClicked: {
                                     Scrite.app.transliterationEngine.cycleLanguage()
                                     Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
@@ -1055,38 +1274,44 @@ Item {
                         VclMenuItem {
                             text: "Alphabet Mappings For " + Scrite.app.transliterationEngine.languageAsString
                             enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
+
                             onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
                         }
 
                         MenuSeparator { }
 
                         VclMenu {
-                            title: "View"
                             width: 250
+
+                            title: "View"
 
                             VclMenuItem {
                                 text: "Screenplay (" + Scrite.app.polishShortcutTextForDisplay("Alt+1") + ")"
-                                onTriggered: mainTabBar.activateTab(0)
                                 font.bold: mainTabBar.currentIndex === 0
+
+                                onTriggered: Runtime.activateMainWindowTab(0)
                             }
 
                             VclMenuItem {
                                 text: "Structure (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
-                                onTriggered: mainTabBar.activateTab(1)
                                 font.bold: mainTabBar.currentIndex === 1
+
+                                onTriggered: Runtime.activateMainWindowTab(1)
                             }
 
                             VclMenuItem {
                                 text: "Notebook (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
-                                onTriggered: mainTabBar.activateTab(2)
-                                font.bold: mainTabBar.currentIndex === 2
                                 enabled: !Runtime.showNotebookInStructure
+                                font.bold: mainTabBar.currentIndex === 2
+
+                                onTriggered: Runtime.activateMainWindowTab(2)
                             }
 
                             VclMenuItem {
                                 text: "Scrited (" + Scrite.app.polishShortcutTextForDisplay("Alt+4") + ")"
-                                onTriggered: mainTabBar.currentIndex = 3
                                 font.bold: mainTabBar.currentIndex === 3
+
+                                onTriggered: mainTabBar.currentIndex = 3
                             }
                         }
 
@@ -1109,17 +1334,21 @@ Item {
 
         ScritedToolbar {
             id: scritedToolbar
+
             anchors.left: appToolBar.visible ? appToolBar.right : appToolsMenu.right
             anchors.right: editTools.visible ? editTools.left : parent.right
-            anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 10
+            anchors.verticalCenter: parent.verticalCenter
+
             visible: scritedView
         }
 
         Row {
             id: editTools
+
             x: appToolBar.visible ? (parent.width - userLogin.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2)
             height: parent.height
+
             spacing: 20
 
             ScreenplayEditorToolbar {
@@ -1161,37 +1390,46 @@ Item {
 
                 Connections {
                     target: Scrite.document
-                    function onJustReset() { mainTabBar.activateTab(0) }
+
+                    function onJustReset() {
+                        Runtime.activateMainWindowTab(0)
+                    }
+
                     function onAboutToSave() {
-                        var userData = Scrite.document.userData
+                        let userData = Scrite.document.userData
                         userData["mainTabBar"] = {
                             "version": 0,
                             "currentIndex": mainTabBar.currentIndex
                         }
                         Scrite.document.userData = userData
                     }
+
                     function onJustLoaded() {
-                        var userData = Scrite.document.userData
+                        let userData = Scrite.document.userData
                         if(userData.mainTabBar) {
                             var ci = userData.mainTabBar.currentIndex
                             if(ci >= 0 && ci <= 2)
-                                mainTabBar.activateTab(ci)
+                                Runtime.activateMainWindowTab(ci)
                             else
-                                mainTabBar.activateTab(0)
+                                Runtime.activateMainWindowTab(0)
                         } else
-                            mainTabBar.activateTab(0)
+                            Runtime.activateMainWindowTab(0)
                     }
                 }
 
                 function activateTab(index) {
                     if(index < 0 || index >= tabs.length || index === mainTabBar.currentIndex)
                         return
-                    var tab = tabs[index]
+
+                    let tab = tabs[index]
                     if(!tab.visible)
                         index = 0
-                    var message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
+
+                    const message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
+
                     Scrite.document.setBusyMessage(message)
                     Scrite.document.screenplay.clearSelection()
+
                     Utils.execLater(mainTabBar, 100, function() {
                         mainTabBar.currentIndex = index
                         Scrite.document.clearBusyMessage()
@@ -1206,6 +1444,7 @@ Item {
                 onCurrentIndexChanged: {
                     Runtime.mainWindowTab = tabs[currentIndex].tab
                 }
+
                 Component.onCompleted: {
                     Runtime.mainWindowTab = Runtime.e_ScreenplayTab
                     currentIndex = indexOfTab(Runtime.mainWindowTab)
@@ -1250,28 +1489,35 @@ Item {
 
                 Repeater {
                     id: mainTabBarRepeater
+
                     model: mainTabBar.tabs
 
                     Item {
                         property bool active: mainTabBar.currentIndex === index
-                        height: mainTabBar.height
+
                         width: height
+                        height: mainTabBar.height
+
                         visible: modelData.visible
                         enabled: modelData.visible
 
                         PainterPathItem {
                             anchors.fill: parent
+
                             fillColor: parent.active ? mainTabBar.activeTabColor : Runtime.colors.primary.c10.background
+                            renderType: parent.active ? PainterPathItem.OutlineAndFill : PainterPathItem.FillOnly
                             outlineColor: Runtime.colors.primary.borderColor
                             outlineWidth: 1
                             renderingMechanism: PainterPathItem.UseQPainter
-                            renderType: parent.active ? PainterPathItem.OutlineAndFill : PainterPathItem.FillOnly
+
                             painterPath: PainterPath {
                                 id: tabButtonPath
+
                                 readonly property point p1: Qt.point(itemRect.left, itemRect.bottom)
                                 readonly property point p2: Qt.point(itemRect.left, itemRect.top + 3)
                                 readonly property point p3: Qt.point(itemRect.right-1, itemRect.top + 3)
                                 readonly property point p4: Qt.point(itemRect.right-1, itemRect.bottom)
+
                                 MoveTo { x: tabButtonPath.p1.x; y: tabButtonPath.p1.y }
                                 LineTo { x: tabButtonPath.p2.x; y: tabButtonPath.p2.y }
                                 LineTo { x: tabButtonPath.p3.x; y: tabButtonPath.p3.y }
@@ -1281,30 +1527,38 @@ Item {
 
                         FontMetrics {
                             id: tabBarFontMetrics
+
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
                         }
 
                         Image {
+                            anchors.centerIn: parent
+                            anchors.verticalCenterOffset: parent.active ? 0 : 1
+
+                            width: parent.active ? 32 : 24
+                            height: width
                             source: modelData.icon
-                            width: parent.active ? 32 : 24; height: width
+                            opacity: parent.active ? 1 : 0.75
+                            fillMode: Image.PreserveAspectFit
+
                             Behavior on width {
                                 enabled: Runtime.applicationSettings.enableAnimations
+
                                 NumberAnimation { duration: Runtime.stdAnimationDuration }
                             }
 
-                            fillMode: Image.PreserveAspectFit
-                            anchors.centerIn: parent
-                            anchors.verticalCenterOffset: parent.active ? 0 : 1
-                            opacity: parent.active ? 1 : 0.75
                         }
 
                         MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: mainTabBar.activateTab(index)
                             ToolTip.text: modelData.name + "\t" + Scrite.app.polishShortcutTextForDisplay("Alt+"+(index+1))
                             ToolTip.delay: 1000
                             ToolTip.visible: containsMouse
+
+                            anchors.fill: parent
+
+                            hoverEnabled: true
+
+                            onClicked: Runtime.activateMainWindowTab(index)
                         }
                     }
                 }
@@ -1313,6 +1567,7 @@ Item {
 
         UserAccountToolButton {
             id: userLogin
+
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -1374,16 +1629,21 @@ Item {
 
             PainterPathItem {
                 id: tabBarSeparator
+
                 anchors.left: parent.left
                 anchors.right: parent.right
-                renderingMechanism: PainterPathItem.UseQPainter
-                renderType: PainterPathItem.OutlineOnly
+
                 height: 1
+
+                visible: mainTabBar.visible
+                renderType: PainterPathItem.OutlineOnly
                 outlineColor: Runtime.colors.primary.borderColor
                 outlineWidth: height
-                visible: mainTabBar.visible
+                renderingMechanism: PainterPathItem.UseQPainter
+
                 painterPath: PainterPath {
                     id: tabBarSeparatorPath
+
                     property var currentTabP1: tabBarSeparator.mapFromItem(mainTabBar, mainTabBar.currentTabP1.x, mainTabBar.currentTabP1.y)
                     property var currentTabP2: tabBarSeparator.mapFromItem(mainTabBar, mainTabBar.currentTabP2.x, mainTabBar.currentTabP2.y)
                     property point p1: Qt.point(itemRect.left, itemRect.center.y)
@@ -1400,9 +1660,12 @@ Item {
 
             Loader {
                 id: uiLoader
+
                 anchors.fill: parent
                 anchors.topMargin: 1
+
                 clip: true
+
                 sourceComponent: {
                     switch(mainTabBar.currentIndex) {
                     case 1: return structureEditorComponent
@@ -1437,11 +1700,15 @@ Item {
 
             BasicAttachmentsDropArea {
                 id: fileOpenDropArea
-                anchors.fill: parent
-                allowedType: Attachments.NoMedia
-                allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
+
                 property string droppedFilePath
                 property string droppedFileName
+
+                anchors.fill: parent
+
+                allowedType: Attachments.NoMedia
+                allowedExtensions: ["scrite", "fdx", "txt", "fountain", "html"]
+
                 onDropped: {
                     if(Scrite.document.empty)
                         Scrite.document.openOrImport(attachment.filePath)
@@ -1455,62 +1722,77 @@ Item {
 
                 Loader {
                     id: fileOpenDropAreaNotification
+
+                    Component.onDestruction: appToolBarArea.enabled = true
+
                     anchors.fill: fileOpenDropArea
+
                     active: fileOpenDropArea.active || fileOpenDropArea.droppedFilePath !== ""
                     onActiveChanged: appToolBarArea.enabled = !active
-                    Component.onDestruction: appToolBarArea.enabled = true
+
                     sourceComponent: Rectangle {
                         color: Scrite.app.translucent(Runtime.colors.primary.c500.background, 0.5)
 
                         Rectangle {
                             anchors.fill: fileOpenDropAreaNotice
                             anchors.margins: -30
-                            radius: 4
+
                             color: Runtime.colors.primary.c700.background
+                            radius: 4
                         }
 
                         Column {
                             id: fileOpenDropAreaNotice
+
                             anchors.centerIn: parent
+
                             width: parent.width * 0.5
                             spacing: 20
 
                             VclLabel {
-                                wrapMode: Text.WordWrap
                                 width: parent.width
-                                color: Runtime.colors.primary.c700.text
-                                font.bold: true
+
                                 text: fileOpenDropArea.active ? fileOpenDropArea.attachment.originalFileName : fileOpenDropArea.droppedFileName
+                                color: Runtime.colors.primary.c700.text
+                                wrapMode: Text.WordWrap
                                 horizontalAlignment: Text.AlignHCenter
+
+                                font.bold: true
                                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
                             VclLabel {
                                 width: parent.width
-                                wrapMode: Text.WordWrap
-                                color: Runtime.colors.primary.c700.text
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
                                 text: fileOpenDropArea.active ? "Drop the file here to open/import it." : "Do you want to open, import or cancel?"
+                                color: Runtime.colors.primary.c700.text
+                                wrapMode: Text.WordWrap
+                                horizontalAlignment: Text.AlignHCenter
+
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
                             VclLabel {
                                 width: parent.width
-                                wrapMode: Text.WordWrap
-                                color: Runtime.colors.primary.c700.text
-                                horizontalAlignment: Text.AlignHCenter
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                                visible: !Scrite.document.empty || Scrite.document.fileName !== ""
+
                                 text: "NOTE: Any unsaved changes in the currently open document will be discarded."
+                                color: Runtime.colors.primary.c700.text
+                                visible: !Scrite.document.empty || Scrite.document.fileName !== ""
+                                wrapMode: Text.WordWrap
+                                horizontalAlignment: Text.AlignHCenter
+
+                                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                             }
 
                             Row {
-                                spacing: 20
                                 anchors.horizontalCenter: parent.horizontalCenter
+
+                                spacing: 20
                                 visible: !Scrite.document.empty
 
                                 VclButton {
                                     text: "Open/Import"
+
                                     onClicked: {
                                         Scrite.document.openOrImport(fileOpenDropArea.droppedFilePath)
                                         fileOpenDropArea.droppedFileName = ""
@@ -1520,6 +1802,7 @@ Item {
 
                                 VclButton {
                                     text: "Cancel"
+
                                     onClicked:  {
                                         fileOpenDropArea.droppedFileName = ""
                                         fileOpenDropArea.droppedFilePath = ""
@@ -1538,23 +1821,31 @@ Item {
 
         SplitView {
             id: structureEditorSplitView1
-            orientation: Qt.Vertical
+
             Material.background: Qt.darker(Runtime.colors.primary.windowColor, 1.1)
+
+            orientation: Qt.Vertical
 
             Rectangle {
                 id: structureEditorRow1
+
                 SplitView.fillHeight: true
+
                 color: Runtime.colors.primary.c10.background
 
                 SplitView {
                     id: structureEditorSplitView2
-                    orientation: Qt.Horizontal
+
                     Material.background: Qt.darker(Runtime.colors.primary.windowColor, 1.1)
+
                     anchors.fill: parent
+
+                    orientation: Qt.Horizontal
 
                     Rectangle {
                         SplitView.fillWidth: true
                         SplitView.minimumWidth: 80
+
                         color: Runtime.colors.primary.c10.background
                         border {
                             width: Runtime.showNotebookInStructure ? 0 : 1
@@ -1563,14 +1854,16 @@ Item {
 
                         Item {
                             id: structureEditorTabs
-                            anchors.fill: parent
+
                             property int currentTabIndex: 0
+
+                            anchors.fill: parent
 
                             Announcement.onIncoming: (type,data) => {
                                 var sdata = "" + data
                                 var stype = "" + type
                                 if(Runtime.showNotebookInStructure) {
-                                    if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C") {
+                                    if(stype === Runtime.announcementIds.tabRequest) {
                                         if(sdata === "Structure")
                                             structureEditorTabs.currentTabIndex = 0
                                         else if(sdata.startsWith("Notebook")) {
@@ -1597,9 +1890,11 @@ Item {
 
                             Loader {
                                 id: structureEditorTabBar
-                                anchors.left: parent.left
+
                                 anchors.top: parent.top
+                                anchors.left: parent.left
                                 anchors.bottom: parent.bottom
+
                                 // active: !Runtime.appFeatures.structure.enabled && Runtime.showNotebookInStructure
                                 active: {
                                     if(structureEditorTabs.currentTabIndex === 0)
@@ -1609,34 +1904,42 @@ Item {
                                     return false
                                 }
                                 visible: active
+
                                 sourceComponent: Rectangle {
-                                    color: Runtime.colors.primary.c100.background
                                     width: appToolBar.height+4
+
+                                    color: Runtime.colors.primary.c100.background
 
                                     Column {
                                         anchors.horizontalCenter: parent.horizontalCenter
 
                                         FlatToolButton {
+                                            ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
+
                                             down: structureEditorTabs.currentTabIndex === 0
                                             visible: Runtime.showNotebookInStructure
                                             iconSource: "qrc:/icons/navigation/structure_tab.png"
-                                            ToolTip.text: "Structure\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
-                                            onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Structure")
+
+                                            onClicked: Announcement.shout(Runtime.announcementIds.tabRequest, "Structure")
                                         }
 
                                         FlatToolButton {
+                                            ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
+
                                             down: structureEditorTabs.currentTabIndex === 1
                                             visible: Runtime.showNotebookInStructure
                                             iconSource: "qrc:/icons/navigation/notebook_tab.png"
-                                            ToolTip.text: "Notebook Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
-                                            onClicked: Announcement.shout("190B821B-50FE-4E47-A4B2-BDBB2A13B72C", "Notebook")
+
+                                            onClicked: Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                                         }
                                     }
 
                                     Rectangle {
+                                        anchors.right: parent.right
+
                                         width: 1
                                         height: parent.height
-                                        anchors.right: parent.right
+
                                         color: Runtime.colors.primary.borderColor
                                     }
                                 }
@@ -1644,12 +1947,14 @@ Item {
 
                             Loader {
                                 id: structureViewLoader
+
                                 anchors.top: parent.top
                                 anchors.left: structureEditorTabBar.active ? structureEditorTabBar.right : parent.left
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
-                                visible: !Runtime.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
+
                                 active: Runtime.appFeatures.structure.enabled
+                                visible: !Runtime.showNotebookInStructure || structureEditorTabs.currentTabIndex === 0
                                 sourceComponent: StructureView {
                                     HelpTipNotification {
                                         tipName: "structure"
@@ -1673,8 +1978,10 @@ Item {
                                 anchors.left: structureEditorTabBar.active ? structureEditorTabBar.right : parent.left
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
-                                visible: Runtime.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+
                                 active: visible && Runtime.appFeatures.notebook.enabled
+                                visible: Runtime.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
+
                                 sourceComponent: NotebookView {
                                     toolbarSize: appToolBar.height+4
                                     toolbarSpacing: appToolBar.spacing
@@ -1696,9 +2003,13 @@ Item {
                           */
                         Loader {
                             id: splitViewAnimationLoader
-                            anchors.fill: parent
-                            active: false
+
                             property string sessionId
+
+                            anchors.fill: parent
+
+                            active: false
+
                             sourceComponent: Rectangle {
                                 color: Scrite.app.translucent(Runtime.colors.primary.button, 0.5)
 
@@ -1911,9 +2222,9 @@ Item {
             active: Runtime.appFeatures.notebook.enabled
             sourceComponent: NotebookView {
                 Announcement.onIncoming: (type,data) => {
-                    var stype = "" + "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
+                    var stype = "" + Runtime.announcementIds.tabRequest
                     var sdata = "" + data
-                    if(stype === "190B821B-50FE-4E47-A4B2-BDBB2A13B72C")
+                    if(stype === Runtime.announcementIds.tabRequest)
                         switchTo(sdata)
                 }
             }
@@ -1978,10 +2289,10 @@ Item {
     }
 
     QtObject {
-        ShortcutsModelItem.enabled: Scrite.app.isTextInputItem(Scrite.window.activeFocusItem)
-        ShortcutsModelItem.priority: 10
         ShortcutsModelItem.group: "Formatting"
         ShortcutsModelItem.title: "Symbols & Smileys"
+        ShortcutsModelItem.enabled: Scrite.app.isTextInputItem(Scrite.window.activeFocusItem)
+        ShortcutsModelItem.priority: 10
         ShortcutsModelItem.shortcut: "F3"
     }
 
