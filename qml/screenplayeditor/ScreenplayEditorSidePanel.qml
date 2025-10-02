@@ -33,6 +33,8 @@ Item {
     required property ScreenplayAdapter screenplayAdapter
 
     property alias expanded: _sidePanel.expanded
+    property alias minPanelWidth: _sidePanel.minPanelWidth
+    property alias maxPanelWidth: _sidePanel.maxPanelWidth
 
     signal positionScreenplayEditorAtTitlePage()
 
@@ -47,6 +49,7 @@ Item {
 
         label: ""
         buttonY: 20
+        maxPanelWidth: Runtime.screenplayEditorSettings.sidePanelWidth
 
         content: root.screenplayAdapter.elementCount === 0 ? _private.emptyScreenplayContent : _private.filledScreenplayContent
     }

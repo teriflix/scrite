@@ -105,20 +105,31 @@ Column {
             }
 
             lowDetailComponent: TextArea {
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                text: formField.answer === "" ? formField.placeholderText : formField.answer
-                opacity: formField.answer === "" ? 0.5 : 1
-                leftPadding: 5; rightPadding: 5
-                topPadding: 5; bottomPadding: 5
+                id: _textArea
+
+                Transliterator.enabled: false
                 Transliterator.defaultFont: font
                 Transliterator.textDocument: textDocument
                 Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
                 Transliterator.spellCheckEnabled: formField.answer !== ""
+
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                text: formField.answer === "" ? formField.placeholderText : formField.answer
+                opacity: formField.answer === "" ? 0.5 : 1
+
+                topPadding: 5
+                leftPadding: 5
+                rightPadding: 5
+                bottomPadding: 5
+
                 readOnly: true
                 selectByMouse: false
                 selectByKeyboard: false
+
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
                 background: Item { }
+
                 onPressed:  (mouse) => {
                                 const position = answerItemLoader.item.positionAt(mouse.x, mouse.y)
                                 answerItemLoader.assumeFocus(position)
@@ -127,47 +138,17 @@ Column {
 
             highDetailComponent: TextArea {
                 id: answerText
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                selectByMouse: true
-                selectByKeyboard: true
-                leftPadding: 5; rightPadding: 5
-                topPadding: 5; bottomPadding: 5
-                Transliterator.defaultFont: font
-                Transliterator.textDocument: textDocument
-                Transliterator.cursorPosition: cursorPosition
-                Transliterator.hasActiveFocus: activeFocus
-                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-                Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
-                Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
-                readOnly: Scrite.document.readOnly
-                background: Item { }
-                SpecialSymbolsSupport {
-                    anchors.top: parent.bottom
-                    anchors.left: parent.left
-                    textEditor: answerText
-                    textEditorHasCursorInterface: true
-                    enabled: !Scrite.document.readOnly
+
+                function assumeFocus(pos) {
+                    forceActiveFocus()
+                    cursorPosition = pos < 0 ? TextDocument.lastCursorPosition() : pos
                 }
-                UndoHandler {
-                    enabled: !answerText.readOnly && answerText.activeFocus && enableUndoRedo
-                    canUndo: answerText.canUndo
-                    canRedo: answerText.canRedo
-                    onUndoRequest: answerText.undo()
-                    onRedoRequest: answerText.redo()
-                }
-                TextAreaSpellingSuggestionsMenu { }
-                onActiveFocusChanged: {
-                    if(!activeFocus && !persistentSelection) {
-                        answerItemLoader.lod = answerItemLoader.eLOW
-                    }
-                }
+
                 Component.onCompleted: {
                     forceActiveFocus()
                     enableSpellCheck()
                 }
-                text: formField.answer
-                onTextChanged: formField.answer = text
+
 
                 Keys.onUpPressed: (event) => {
                                       if(TextDocument.canGoUp())
@@ -187,9 +168,59 @@ Column {
                                         }
                                     }
 
-                function assumeFocus(pos) {
-                    forceActiveFocus()
-                    cursorPosition = pos < 0 ? TextDocument.lastCursorPosition() : pos
+                Transliterator.enabled: false
+                Transliterator.defaultFont: font
+                Transliterator.textDocument: textDocument
+                Transliterator.cursorPosition: cursorPosition
+                Transliterator.hasActiveFocus: activeFocus
+                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
+                Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
+
+                ImTransliterator.popup: ImTransliteratorPopup {
+                    editorFont: answerText.font
+                }
+                ImTransliterator.enabled: !readOnly
+
+                text: formField.answer
+                readOnly: Scrite.document.readOnly
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                selectByMouse: true
+                selectByKeyboard: true
+
+                topPadding: 5
+                leftPadding: 5
+                rightPadding: 5
+                bottomPadding: 5
+
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+                background: Item { }
+
+                SpecialSymbolsSupport {
+                    anchors.top: parent.bottom
+                    anchors.left: parent.left
+                    textEditor: answerText
+                    textEditorHasCursorInterface: true
+                    enabled: !Scrite.document.readOnly
+                }
+
+                UndoHandler {
+                    enabled: !answerText.readOnly && answerText.activeFocus && enableUndoRedo
+                    canUndo: answerText.canUndo
+                    canRedo: answerText.canRedo
+                    onUndoRequest: answerText.undo()
+                    onRedoRequest: answerText.redo()
+                }
+
+                TextAreaSpellingSuggestionsMenu { }
+
+                onTextChanged: formField.answer = text
+
+                onActiveFocusChanged: {
+                    if(!activeFocus && !persistentSelection) {
+                        answerItemLoader.lod = answerItemLoader.eLOW
+                    }
                 }
             }
         }

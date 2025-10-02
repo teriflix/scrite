@@ -21,33 +21,15 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 TextArea {
-    id: txtAreaInput
+    id: root
+
     property bool undoRedoEnabled: false
     property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
 
-    palette: Scrite.app.palette
-    selectByKeyboard: true
-    selectByMouse: true
-    // renderType: Text.NativeRendering
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
-    selectedTextColor: Runtime.colors.accent.c700.text
-    selectionColor: Runtime.colors.accent.c700.background
-    background: Rectangle {
-        color: enabled ? Runtime.colors.primary.c10.background : Runtime.colors.primary.button.background
 
-        Rectangle {
-            width: parent.width
-            height: txtAreaInput.activeFocus ? 2 : 1
-            color: Runtime.colors.accent.c700.background
-            visible: txtAreaInput.enabled
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 4
-        }
-    }
-
-    Keys.onReturnPressed: Transliterator.transliterateLastWord()
-
+    Transliterator.enabled: false
     Transliterator.defaultFont: font
     Transliterator.textDocument: textDocument
     Transliterator.cursorPosition: cursorPosition
@@ -56,20 +38,45 @@ TextArea {
     Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
     Transliterator.spellCheckEnabled: spellCheckEnabled
 
+    ImTransliterator.popup: ImTransliteratorPopup {
+        editorFont: root.font
+    }
+    ImTransliterator.enabled: !readOnly
+
+    palette: Scrite.app.palette
+    selectByMouse: true
+    selectByKeyboard: true
+
+    // renderType: Text.NativeRendering
+    selectedTextColor: Runtime.colors.accent.c700.text
+    selectionColor: Runtime.colors.accent.c700.background
+    background: Rectangle {
+        color: enabled ? Runtime.colors.primary.c10.background : Runtime.colors.primary.button.background
+
+        Rectangle {
+            width: parent.width
+            height: root.activeFocus ? 2 : 1
+            color: Runtime.colors.accent.c700.background
+            visible: root.enabled
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 4
+        }
+    }
+
     SpecialSymbolsSupport {
         anchors.top: parent.bottom
         anchors.left: parent.left
-        textEditor: txtAreaInput
+        textEditor: root
         textEditorHasCursorInterface: true
         enabled: !Scrite.document.readOnly
     }
 
     UndoHandler {
-        enabled: !txtAreaInput.readOnly && txtAreaInput.activeFocus && txtAreaInput.undoRedoEnabled
-        canUndo: txtAreaInput.canUndo
-        canRedo: txtAreaInput.canRedo
-        onUndoRequest: txtAreaInput.undo()
-        onRedoRequest: txtAreaInput.redo()
+        enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled
+        canUndo: root.canUndo
+        canRedo: root.canRedo
+        onUndoRequest: root.undo()
+        onRedoRequest: root.redo()
     }
 
     TextAreaSpellingSuggestionsMenu { }
@@ -78,9 +85,9 @@ TextArea {
     ContextMenuEvent.active: spellChecker ? !spellChecker.wordUnderCursorIsMisspelled : true
     ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
     ContextMenuEvent.onPopup: (mouse) => {
-        if(!txtAreaInput.activeFocus) {
-            txtAreaInput.forceActiveFocus()
-            txtAreaInput.cursorPosition = txtAreaInput.positionAt(mouse.x, mouse.y)
+        if(!root.activeFocus) {
+            root.forceActiveFocus()
+            root.cursorPosition = root.positionAt(mouse.x, mouse.y)
         }
         __contextMenu.popup()
     }
@@ -91,28 +98,28 @@ TextArea {
 
         property bool __persistentSelection: false
         onAboutToShow: {
-            __persistentSelection = txtAreaInput.persistentSelection
-            txtAreaInput.persistentSelection = true
+            __persistentSelection = root.persistentSelection
+            root.persistentSelection = true
         }
-        onAboutToHide: txtAreaInput.persistentSelection = __persistentSelection
+        onAboutToHide: root.persistentSelection = __persistentSelection
 
         VclMenuItem {
             text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
-            enabled: txtAreaInput.selectedText !== ""
-            onClicked: txtAreaInput.cut()
+            enabled: root.selectedText !== ""
+            onClicked: root.cut()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
             text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
-            enabled: txtAreaInput.selectedText !== ""
-            onClicked: txtAreaInput.copy()
+            enabled: root.selectedText !== ""
+            onClicked: root.copy()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
             text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
-            onClicked: txtAreaInput.paste()
+            onClicked: root.paste()
             focusPolicy: Qt.NoFocus
         }
     }

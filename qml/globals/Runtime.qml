@@ -148,6 +148,7 @@ Item {
         property int  longSceneWordTreshold: 150
 
         property int slpSynopsisLineCount: 2
+        property real sidePanelWidth: 400
     }
 
     readonly property Settings pdfExportSettings: Settings {

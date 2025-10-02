@@ -203,11 +203,12 @@ AbstractStructureElementUI {
             lowDetailComponent: TextEdit {
                 id: _basicHeadingField
 
+                Component.onCompleted: _headingFieldLoader.hasFocus = false
+
+                Transliterator.enabled: false
                 Transliterator.defaultFont: font
                 Transliterator.textDocument: textDocument
                 Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-
-                Component.onCompleted: _headingFieldLoader.hasFocus = false
 
                 text: root.element.hasTitle ? root.element.title : "Index Card Title"
                 color: root.element.hasTitle ? "black" : "gray"
@@ -327,6 +328,7 @@ AbstractStructureElementUI {
 
                             anchors.fill: parent
 
+                            Transliterator.enabled: false
                             Transliterator.defaultFont: font
                             Transliterator.textDocument: textDocument
                             Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
@@ -375,24 +377,30 @@ AbstractStructureElementUI {
                             width: parent.width
                             height: parent.height-5
                             interactive: _synopsisField.activeFocus && scrollBarVisible
-                            contentWidth: _synopsisField.contentWidth
-                            contentHeight: Math.max(height, _synopsisField.contentHeight + 100)
+                            contentWidth: _synopsisField.width
+                            contentHeight: _synopsisField.height
                             flickableDirection: Flickable.VerticalFlick
 
                             TextArea {
                                 id: _synopsisField
 
+                                Component.onCompleted: _synopsisFieldLoader.hasFocus = activeFocus
+
+                                Keys.onEscapePressed: root.canvasTabSequence.releaseFocus()
+
+                                Transliterator.enabled: false
                                 Transliterator.defaultFont: font
                                 Transliterator.textDocument: textDocument
                                 Transliterator.cursorPosition: cursorPosition
                                 Transliterator.hasActiveFocus: activeFocus
-                                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
                                 Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
+                                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
 
-                                Keys.onEscapePressed: root.canvasTabSequence.releaseFocus()
-                                Component.onCompleted: _synopsisFieldLoader.hasFocus = activeFocus
+                                ImTransliterator.popup: ImTransliteratorPopup { }
+                                ImTransliterator.enabled: !readOnly
 
                                 width: _synopsisFieldFlick.scrollBarVisible ? _synopsisFieldFlick.width-20 : _synopsisFieldFlick.width
+                                height: Math.max(_synopsisFieldFlick.height, contentHeight + 100)
 
                                 background: Item { }
 
@@ -439,7 +447,9 @@ AbstractStructureElementUI {
 
                                 TextAreaSpellingSuggestionsMenu { }
 
-                                cursorDelegate: TextEditCursorDelegate { }
+                                cursorDelegate: TextEditCursorDelegate {
+                                    textEdit: _synopsisField
+                                }
                             }
                         }
 

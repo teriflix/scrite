@@ -81,40 +81,32 @@ Flickable {
     function ensureItemVisible(item, scaling, leaveMargin) {
         if(item === null)
             return
+
         const area = Qt.rect(item.x, item.y, item.width, item.height)
-        ensureVisible(area, scaling, leaveMargin)
+        ensureVisible(area,
+                      scaling === undefined ? root.zoomScale : scaling,
+                      leaveMargin === undefined ? 20 : leaveMargin)
     }
 
     function ensureVisible(area, scaling, leaveMargin) {
-        if(leaveMargin === undefined)
-            leaveMargin = 20
         if(scaling === undefined)
             scaling = 1
+        if(leaveMargin === undefined)
+            leaveMargin = 20 * scaling
+        else
+            leaveMargin *= scaling
 
-        area = Qt.rect( area.x*scaling, area.y*scaling,
-                        area.width*scaling, area.height*scaling )
+        area = Qt.rect( area.x*scaling, area.y*scaling, area.width*scaling, area.height*scaling )
 
-        if(area.right > contentWidth || area.bottom > contentHeight || width < 0 || height < 0) {
-            _private.ensureVisibleParams = {
-                "area": area, "scaling": scaling, "leaveMargin": leaveMargin
-            }
-            Utils.execLater(root, 500, function() {
-                const params = _private.ensureVisibleParams
-                _private.ensureVisibleParams = undefined
-                ensureVisible(params.area, params.scaling, params.leaveMargin)
-            })
-            return
-        }
-
-        // Check if the areaangle can be contained within the viewport
+        // Check if the area can be contained within the viewport
         if(area.width > visibleContentRect.width || area.height > visibleContentRect.height) {
             // We are here if area cannot fit into the space of the flickable.
             // In this case, we just try and fit the center point of area into the
             // view.
             const w = width*0.2
             const h = height*0.2
-            area = Qt.rect( (area.left+area.right)/2-h/2,
-                            (area.top+area.bottom)/2-w/2,
+            area = Qt.rect( (area.left+area.right)/2-w/2,
+                            (area.top+area.bottom)/2-h/2,
                             w, h )
         }
 
@@ -134,30 +126,6 @@ Flickable {
             cy = (area.bottom + leaveMargin) - height
         else if(area.bottom <= visibleContentRect.top || area.top <= visibleContentRect.top)
             cy = area.top - leaveMargin
-
-        if(cx !== undefined)
-            contentX = Math.max(Math.min(cx, contentWidth-width-1),0)
-        if(cy !== undefined)
-            contentY = Math.max(Math.min(cy, contentHeight-height-1),0)
-    }
-
-    function ensureVisibleFast(area) {
-        // Check if item is already visible
-        if(area.left >= visibleContentRect.left && area.top >= visibleContentRect.top &&
-           area.right <= visibleContentRect.right && area.bottom <= visibleContentRect.bottom)
-            return; // already visible
-
-        let cx = undefined
-        let cy = undefined
-        if(area.left >= visibleContentRect.right || area.right >= visibleContentRect.right)
-            cx = area.right - width
-        else if(area.right <= visibleArea.left || area.left <= visibleContentRect.left)
-            cx = area.left
-
-        if(area.top >= visibleContentRect.bottom || area.bottom >= visibleContentRect.bottom)
-            cy = area.bottom - height
-        else if(area.bottom <= visibleContentRect.top || area.top <= visibleContentRect.top)
-            cy = area.top
 
         if(cx !== undefined)
             contentX = Math.max(Math.min(cx, contentWidth-width-1),0)
@@ -277,11 +245,5 @@ Flickable {
 
         resizeContent(newWidth, newHeight, mousePoint)
         returnToBoundsTimer.start()
-    }
-
-    QtObject {
-        id: _private
-
-        property var ensureVisibleParams
     }
 }

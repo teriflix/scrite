@@ -338,6 +338,67 @@ private:
     TransliterationEngine::Language m_language = TransliterationEngine::English;
 };
 
+class ImTransliterator : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Use as attached property.")
+    QML_ATTACHED(ImTransliterator)
+
+public:
+    ~ImTransliterator();
+
+    static ImTransliterator *qmlAttachedProperties(QObject *object);
+
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
+    Q_PROPERTY(QObject* popup READ popup WRITE setPopup NOTIFY popupChanged)
+    void setPopup(QObject *val);
+    QObject *popup() const { return m_popup; }
+    Q_SIGNAL void popupChanged();
+
+    Q_PROPERTY(QString currentWord READ currentWord NOTIFY currentWordChanged)
+    QString currentWord() const { return m_currentWord.originalString; }
+    Q_SIGNAL void currentWordChanged();
+
+    Q_PROPERTY(QString commitString READ commitString NOTIFY commitStringChanged)
+    QString commitString() const { return m_currentWord.commitString; }
+    Q_SIGNAL void commitStringChanged();
+
+    Q_PROPERTY(QRect textRect READ textRect NOTIFY textRectChanged)
+    QRect textRect() const { return m_currentWord.textRect; }
+    Q_SIGNAL void textRectChanged() const;
+
+    Q_PROPERTY(QObject* editor READ editor CONSTANT)
+    QObject *editor() const { return m_editor; }
+
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
+private:
+    ImTransliterator(QObject *parent = nullptr);
+    bool updateWordFromInput(const QKeyEvent *keyEvent);
+    bool commitWordToEditor();
+    void resetCurrentWord();
+
+private:
+    struct Word
+    {
+        int start = -1;
+        int end = -1;
+        QRect textRect;
+        QString commitString;
+        QString originalString;
+    } m_currentWord;
+
+    bool m_enabled = false;
+    QObject *m_editor = nullptr;
+    QObject *m_popup = nullptr;
+};
+
 class TransliteratedText : public QQuickPaintedItem
 {
     Q_OBJECT

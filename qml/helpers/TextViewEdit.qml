@@ -114,16 +114,17 @@ Loader {
                 root.editingFinished()
             }
 
-            onEditingFinished: {
-                root.text = text
-                root.editingFinished()
-            }
-
+            Transliterator.enabled: false
             Transliterator.defaultFont: font
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
             Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+
+            ImTransliterator.popup: ImTransliteratorPopup {
+                editorFont: _textArea.font
+            }
+            ImTransliterator.enabled: !readOnly
 
             text: root.text
             font: root.font
@@ -151,6 +152,11 @@ Loader {
             }
 
             onFocusChanged: _completionModel.allowEnable = true
+
+            onEditingFinished: {
+                root.text = text
+                root.editingFinished()
+            }
 
             CompletionModel {
                 id: _completionModel

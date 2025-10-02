@@ -34,6 +34,8 @@ import "qrc:/qml/floatingdockpanels"
 Rectangle {
     id: root
 
+    property alias minSidePanelWidth: _private.minSidePanelWidth
+    property alias maxSidePanelWidth: _private.maxSidePanelWidth
     property alias searchBarVisible: _searchBarArea.visible
     property alias sidePanelEnabled: _sidePanelLoader.active
 
@@ -129,9 +131,25 @@ Rectangle {
             id: _ruler
 
             anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
 
+            x: {
+                if(_private.sidePanelExpanded) {
+                    let availableSpace = parent.width - width
+                    if(availableSpace > Runtime.maxSceneSidePanelWidth) {
+                        availableSpace -= Runtime.maxSceneSidePanelWidth
+                        return Math.max(availableSpace/2, 50)
+                    }
+
+                    if(availableSpace > Runtime.minSceneSidePanelWidth + 20/*for the scrollbar*/) {
+                        availableSpace -= Runtime.minSceneSidePanelWidth
+                        return Math.max(availableSpace/2, 50)
+                    }
+                }
+
+                return (parent.width - width)/2
+            }
             z: 1
+
             width: _private.pageLayout.paperWidth * _private.zoomLevel * _private.dpi
             height: Runtime.minimumFontMetrics.lineSpacing
 
@@ -201,8 +219,75 @@ Rectangle {
         onZoomLevelIsAboutToChange: _elementListView.beforeZoomLevelChange()
     }
 
+    Item {
+        id: _splitterHandle
+
+        anchors.top: _workspace.top
+        anchors.bottom: _workspace.bottom
+
+        x: _sidePanelLoader.width
+        width: 20
+        visible: _sidePanelLoader.active && _private.sidePanel.expanded
+
+        Rectangle {
+            anchors.fill: parent
+
+            color: Runtime.colors.primary.button.background
+            opacity: 0.5
+            visible: _splitterHandleMouseArea.containsMouse || _splitterHandleMouseArea.drag.active
+            border.width: 1
+            border.color: Runtime.colors.primary.borderColor
+        }
+
+        Rectangle {
+            anchors.centerIn: parent
+
+            width: 1
+            height: 10
+
+            color: (_splitterHandleMouseArea.containsMouse || _splitterHandleMouseArea.drag.active) ?
+                       Runtime.colors.primary.highlight.background : Runtime.colors.primary.button.background
+        }
+
+        MouseArea {
+            id: _splitterHandleMouseArea
+
+            anchors.fill: parent
+
+            drag.axis: Drag.XAxis
+            drag.target: parent
+            drag.minimumX: _private.minSidePanelWidth
+            drag.maximumX: _private.maxSidePanelWidth
+
+            cursorShape: Qt.SplitHCursor
+            hoverEnabled: true
+        }
+
+        onXChanged: {
+            if(_splitterHandleMouseArea.drag.active) {
+                if(__updateSidePanelWidthTimer === null)
+                    __updateSidePanelWidthTimer = Utils.execLater(_splitterHandle, Runtime.stdAnimationDuration/2, __updateSidePanelWidth)
+                else
+                    __updateSidePanelWidthTimer.restart()
+            }
+        }
+
+        property Timer __updateSidePanelWidthTimer
+
+        function __updateSidePanelWidth() {
+            _private.sidePanel.maxPanelWidth = x
+            Runtime.screenplayEditorSettings.sidePanelWidth = x
+        }
+    }
+
     QtObject {
         id: _private
+
+        property real minSidePanelWidth: root.width * 0.15
+        property real maxSidePanelWidth: root.width * 0.5
+        property bool sidePanelExpanded: sidePanel && sidePanel.expanded
+        property bool showSceneSidePanel: Runtime.screenplayEditorSettings.displaySceneComments && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+        property ScreenplayEditorSidePanel sidePanel: _sidePanelLoader.item
 
         property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
         property ScreenplayPageLayout pageLayout: screenplayFormat.pageLayout

@@ -262,28 +262,42 @@ Item {
         id: textEditor
 
         TextArea {
-            background: Rectangle {
-                color: Runtime.colors.primary.c50.background
-                border.width: 1
-                border.color: Runtime.colors.primary.borderColor
-            }
-            text: propertyValue
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            height: Math.max(80, contentHeight) + topPadding + bottomPadding
-            padding: 7.5
-            onTextChanged: Qt.callLater(commitTextChanges)
+            id: _textArea
+
             function commitTextChanges() {
                 changePropertyValue(text)
             }
-            selectByKeyboard: true
-            selectByMouse: true
-            wrapMode: Text.WordWrap
-            placeholderText: propertyInfo.placeHolderText
+
+            Transliterator.enabled: false
             Transliterator.defaultFont: font
             Transliterator.textDocument: textDocument
             Transliterator.cursorPosition: cursorPosition
             Transliterator.hasActiveFocus: activeFocus
             Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+
+            ImTransliterator.popup: ImTransliteratorPopup {
+                editorFont: _textArea.font
+            }
+            ImTransliterator.enabled: !readOnly
+
+            text: propertyValue
+            height: Math.max(80, contentHeight) + topPadding + bottomPadding
+            padding: 7.5
+
+            wrapMode: Text.WordWrap
+            selectByMouse: true
+            placeholderText: propertyInfo.placeHolderText
+            selectByKeyboard: true
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+            background: Rectangle {
+                color: Runtime.colors.primary.c50.background
+                border.width: 1
+                border.color: Runtime.colors.primary.borderColor
+            }
+
+            onTextChanged: Qt.callLater(commitTextChanges)
+
             onCursorRectangleChanged: {
                 if(activeFocus) {
                     var pt = mapToItem(propertyEditorItems, cursorRectangle.x, cursorRectangle.y)

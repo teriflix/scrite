@@ -99,20 +99,17 @@ AbstractScenePartEditor {
                                     _private.handleSceneTextEditorFilteredEvent(object, event, result)
                               }
 
-        Transliterator.enabled: root.scene && !root.scene.isBeingReset && userIsTyping
+        Transliterator.enabled: false
         Transliterator.textDocument: textDocument
         Transliterator.cursorPosition: cursorPosition
         Transliterator.hasActiveFocus: activeFocus
         Transliterator.spellCheckEnabled: false // SceneDocumentBinder handles it separately.
         Transliterator.applyLanguageFonts: false // SceneDocumentBinder handles it separately.
-        Transliterator.onAboutToTransliterate: () => {
-                                                   root.scene.beginUndoCapture(false)
-                                                   root.scene.undoRedoEnabled = false
-                                               }
-        Transliterator.onFinishedTransliterating: () => {
-                                                      root.scene.endUndoCapture()
-                                                      root.scene.undoRedoEnabled = true
-                                                  }
+
+        ImTransliterator.popup: ImTransliteratorPopup {
+            editorFont: _sceneTextEditor.font
+        }
+        ImTransliterator.enabled: !readOnly
 
         width: parent.width
 
@@ -646,7 +643,6 @@ AbstractScenePartEditor {
                     _sceneTextEditor.remove(_sceneDocumentBinder.currentBlockPosition(), _sceneTextEditor.cursorPosition)
                 _sceneTextEditor.insert(_sceneTextEditor.cursorPosition, suggestion)
                 _sceneTextEditor.userIsTyping = true
-                _sceneTextEditor.Transliterator.enableFromNextWord()
                 return true
             }
 

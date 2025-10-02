@@ -1509,6 +1509,174 @@ TransliterationEvent::~TransliterationEvent() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ImTransliterator::ImTransliterator(QObject *parent) : QObject(parent)
+{
+    if (parent != nullptr) {
+        QInputMethodQueryEvent imQuery(Qt::ImEnabled);
+        if (qApp->sendEvent(parent, &imQuery)) {
+            if (imQuery.value(Qt::ImEnabled).toBool()) {
+                parent->installEventFilter(this);
+                m_editor = parent;
+            }
+        }
+    }
+}
+
+ImTransliterator::~ImTransliterator() { }
+
+ImTransliterator *ImTransliterator::qmlAttachedProperties(QObject *object)
+{
+    return new ImTransliterator(object);
+}
+
+void ImTransliterator::setEnabled(bool val)
+{
+    if (m_enabled == val)
+        return;
+
+    m_enabled = val;
+    emit enabledChanged();
+}
+
+void ImTransliterator::setPopup(QObject *val)
+{
+    if (m_popup == val)
+        return;
+
+    if (m_popup != nullptr) {
+        m_popup->setProperty("transliterator", QVariant());
+    }
+
+    m_popup = val;
+    emit popupChanged();
+
+    if (m_popup != nullptr) {
+        m_popup->setProperty("transliterator", QVariant::fromValue<QObject *>(this));
+    }
+}
+
+bool ImTransliterator::eventFilter(QObject *object, QEvent *event)
+{
+    if (m_editor != nullptr && object == m_editor && m_enabled) {
+        if (event->type() == QEvent::FocusOut) {
+            this->commitWordToEditor();
+            return false;
+        }
+
+        if (m_editor == qApp->focusObject() && event->type() == QEvent::KeyPress) {
+            if (TransliterationEngine::instance()->transliterator() == nullptr) {
+                this->resetCurrentWord();
+                return false;
+            }
+
+            QInputMethodQueryEvent imQuery(Qt::ImEnabled);
+            if (qApp->sendEvent(m_editor, &imQuery) && !imQuery.value(Qt::ImEnabled).toBool())
+                return false;
+
+            const QKeyEvent *keyEvent = static_cast<const QKeyEvent *>(event);
+
+            if (!this->updateWordFromInput(keyEvent)) {
+                const QList<int> exceptions = { Qt::Key_Backspace, Qt::Key_Delete, Qt::Key_Shift,
+                                                Qt::Key_Control,   Qt::Key_Alt,    Qt::Key_Meta,
+                                                Qt::Key_CapsLock,  Qt::Key_NumLock };
+                const QList<int> finishKeys = { Qt::Key_Return, Qt::Key_Enter, Qt::Key_Escape };
+
+                if (!exceptions.contains(keyEvent->key()) || finishKeys.contains(keyEvent->key()))
+                    this->commitWordToEditor();
+
+                if (finishKeys.contains(keyEvent->key()))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    return QObject::eventFilter(object, event);
+}
+
+bool ImTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
+{
+    if (m_editor == nullptr || m_editor != qApp->focusObject())
+        return false;
+
+    const QList<int> delimterKeys = { Qt::Key_Space, Qt::Key_Tab, Qt::Key_Return, Qt::Key_Enter,
+                                      Qt::Key_Escape };
+    if (delimterKeys.contains(keyEvent->key()))
+        return false;
+
+    const QString inputText = keyEvent->text();
+    if (inputText.length() == 1 && inputText[0].isPunct())
+        return false;
+
+    QInputMethodQueryEvent query(Qt::ImCursorPosition | Qt::ImCursorRectangle);
+    qApp->sendEvent(m_editor, &query);
+
+    const int cursorPosition = query.value(Qt::ImCursorPosition).toInt();
+    const QRect cursorRect = query.value(Qt::ImCursorRectangle).toRect();
+
+    if (m_currentWord.start < 0 || m_currentWord.start >= cursorPosition)
+        m_currentWord.start = cursorPosition;
+    m_currentWord.end = cursorPosition;
+
+    if (keyEvent->key() == Qt::Key_Backspace) {
+        if (!m_currentWord.originalString.isEmpty())
+            m_currentWord.originalString.remove(m_currentWord.originalString.length() - 1, 1);
+    } else
+        m_currentWord.originalString += inputText;
+    emit currentWordChanged();
+
+    m_currentWord.commitString =
+            TransliterationEngine::instance()->transliteratedWord(m_currentWord.originalString);
+    emit commitStringChanged();
+
+    if (!m_currentWord.textRect.isValid() || m_currentWord.textRect.isEmpty())
+        m_currentWord.textRect = cursorRect;
+    else
+        m_currentWord.textRect |= cursorRect;
+    emit textRectChanged();
+
+    return true;
+}
+
+bool ImTransliterator::commitWordToEditor()
+{
+    if (m_editor == nullptr || m_currentWord.originalString.isEmpty())
+        return false;
+
+    if (m_currentWord.commitString == m_currentWord.originalString) {
+        this->resetCurrentWord();
+        return false;
+    }
+
+    QInputMethodQueryEvent query(Qt::ImCursorPosition);
+    qApp->sendEvent(m_editor, &query);
+    const int cp = query.value(Qt::ImCursorPosition).toInt();
+    const int offset = m_currentWord.start - cp;
+
+    QInputMethodEvent commitEvent;
+    commitEvent.setCommitString(m_currentWord.commitString, offset, qAbs(offset));
+    qApp->sendEvent(m_editor, &commitEvent);
+
+    this->resetCurrentWord();
+    return true;
+}
+
+void ImTransliterator::resetCurrentWord()
+{
+    m_currentWord.start = -1;
+    m_currentWord.end = -1;
+    m_currentWord.originalString.clear();
+    m_currentWord.commitString.clear();
+    m_currentWord.textRect = QRect();
+
+    emit currentWordChanged();
+    emit commitStringChanged();
+    emit textRectChanged();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 TransliteratedText::TransliteratedText(QQuickItem *parent)
     : QQuickPaintedItem(parent), m_updateTimer("TransliteratedText.m_updateTimer")
 {

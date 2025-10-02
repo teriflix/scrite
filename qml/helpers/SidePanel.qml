@@ -45,11 +45,6 @@ Item {
 
     width: expanded ? maxPanelWidth : minPanelWidth
 
-    Behavior on width {
-        enabled: Runtime.applicationSettings.enableAnimations
-        NumberAnimation { duration: 50 }
-    }
-
     BorderImage {
         anchors.fill: _background
         anchors { leftMargin: -11; topMargin: -11; rightMargin: -10; bottomMargin: -10 }

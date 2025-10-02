@@ -498,7 +498,7 @@ Row {
         ]
 
         function addAct() {
-            if(!Scrite.document.readOnly)
+            if(Scrite.document.readOnly)
                 return
 
             root.requestScreenplayEditor()
@@ -510,7 +510,7 @@ Row {
         }
 
         function addScene() {
-            if(!Scrite.document.readOnly)
+            if(Scrite.document.readOnly)
                 return
 
             root.requestScreenplayEditor()
@@ -519,7 +519,7 @@ Row {
         }
 
         function addEpisode() {
-            if(!Scrite.document.readOnly)
+            if(Scrite.document.readOnly)
                 return
 
             root.requestScreenplayEditor()
