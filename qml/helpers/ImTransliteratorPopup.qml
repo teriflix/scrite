@@ -13,6 +13,7 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
@@ -36,8 +37,32 @@ Popup {
     visible: transliterator ? transliterator.commitString !== "" : false
     closePolicy: Popup.NoAutoClose
 
-    contentItem: Label {
-        text: root.transliterator ? root.transliterator.commitString : ""
-        font: root.editorFont
+    contentItem: ColumnLayout {
+        Label {
+            Layout.fillWidth: true
+
+            text: root.transliterator ? root.transliterator.commitString : ""
+            font: root.editorFont
+        }
+
+        Item {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 10
+
+            Rectangle {
+                anchors.bottom: parent.bottom
+
+                width: parent.width
+                color: Runtime.colors.primary.borderColor
+            }
+        }
+
+        Link {
+            text: "Need help?"
+            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+            horizontalAlignment: Text.AlignHCenter
+
+            onClicked: Qt.openUrlExternally("https://www.scrite.io/typing-in-multiple-languages/")
+        }
     }
 }

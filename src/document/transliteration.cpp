@@ -1579,13 +1579,17 @@ bool ImTransliterator::eventFilter(QObject *object, QEvent *event)
                 const QList<int> exceptions = { Qt::Key_Backspace, Qt::Key_Delete, Qt::Key_Shift,
                                                 Qt::Key_Control,   Qt::Key_Alt,    Qt::Key_Meta,
                                                 Qt::Key_CapsLock,  Qt::Key_NumLock };
-                const QList<int> finishKeys = { Qt::Key_Return, Qt::Key_Enter, Qt::Key_Escape };
+                const QList<int> finishKeys = { Qt::Key_Return, Qt::Key_Enter };
 
-                if (!exceptions.contains(keyEvent->key()) || finishKeys.contains(keyEvent->key()))
+                if (keyEvent->key() == Qt::Key_Escape)
+                    m_currentWord.commitString = m_currentWord.originalString;
+
+                if (!exceptions.contains(keyEvent->key()) || finishKeys.contains(keyEvent->key())
+                    || keyEvent->key() == Qt::Key_Escape)
                     this->commitWordToEditor();
 
                 if (finishKeys.contains(keyEvent->key()))
-                    return true;
+                    return !m_currentWord.originalString.isEmpty();
             }
         }
 
