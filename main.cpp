@@ -15,7 +15,7 @@
 #include "scrite.h"
 #include "appwindow.h"
 #include "application.h"
-#include "shortcutsmodel.h"
+#include "languageengine.h"
 #include "scritedocument.h"
 #include "crashpadmodule.h"
 #include "documentfilesystem.h"
@@ -47,8 +47,9 @@ int main(int argc, char **argv)
         return -1;
 
     User::instance();
-    TransliterationEngine::instance();
-    SystemTextInputManager::instance();
+    LanguageEngine::instance();
+    TransliterationEngine::instance(); // REMOVE THIS
+    SystemTextInputManager::instance(); // REMOVE THIS
     NotificationManager::instance();
     DocumentFileSystem::setMarker(QByteArrayLiteral("SCRITE"));
     ScriteDocument::instance();

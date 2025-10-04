@@ -59,6 +59,7 @@ HEADERS += \
     src/core/appwindow.h \
     src/core/filelocker.h \
     src/core/filemodificationtracker.h \
+    src/core/languageengine.h \
     src/core/localstorage.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/peerapplookup.h \
@@ -196,6 +197,7 @@ SOURCES += \
     src/core/appwindow.cpp \
     src/core/filelocker.cpp \
     src/core/filemodificationtracker.cpp \
+    src/core/languageengine.cpp \
     src/core/localstorage.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/peerapplookup.cpp \
@@ -359,8 +361,9 @@ win32 {
     }
 
     RC_ICONS = appicon.ico
-    HEADERS += src/core/systemtextinputmanager_windows.h
-    SOURCES += src/core/systemtextinputmanager_windows.cpp
+    HEADERS += src/core/systemtextinputmanager_windows.h src/core/platformtransliterator_windows.h
+    SOURCES += src/core/systemtextinputmanager_windows.cpp src/core/platformtransliterator_windows.cpp
+
     LIBS += User32.lib
 }
 

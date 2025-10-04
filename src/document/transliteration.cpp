@@ -247,11 +247,11 @@ QString TransliterationEngine::shortcutLetter(TransliterationEngine::Language va
 }
 
 template<class T>
-class RawArray
+class PhTranslatorSymbolDefProcessor
 {
 public:
-    RawArray() { }
-    ~RawArray() { }
+    PhTranslatorSymbolDefProcessor() { }
+    ~PhTranslatorSymbolDefProcessor() { }
 
     void load(const T *a, int s)
     {
@@ -309,10 +309,10 @@ QJsonObject TransliterationEngine::alphabetMappingsFor(TransliterationEngine::La
     if (!ret.isEmpty())
         return ret;
 
-    RawArray<PhTranslation::VowelDef> vowels;
-    RawArray<PhTranslation::ConsonantDef> consonants;
-    RawArray<PhTranslation::DigitDef> digits;
-    RawArray<PhTranslation::SpecialSymbolDef> symbols;
+    PhTranslatorSymbolDefProcessor<PhTranslation::VowelDef> vowels;
+    PhTranslatorSymbolDefProcessor<PhTranslation::ConsonantDef> consonants;
+    PhTranslatorSymbolDefProcessor<PhTranslation::DigitDef> digits;
+    PhTranslatorSymbolDefProcessor<PhTranslation::SpecialSymbolDef> symbols;
 
 #define NUMBER_OF_ITEMS_IN(x) (sizeof(x) / sizeof(x[0]))
 #define LOAD_ARRAYS(x)                                                                             \

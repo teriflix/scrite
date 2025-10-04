@@ -29,6 +29,9 @@ Rectangle {
         { "heading": "Digits", "array": mappings.digits },
         { "heading": "Symbols", "array": mappings.symbols }
     ]
+
+    onMappingModelsChanged: Scrite.app.log( JSON.stringify(mappings) )
+
     width: layout.width + 20
     height: layout.height + 20
     color: Runtime.colors.primary.c10.background

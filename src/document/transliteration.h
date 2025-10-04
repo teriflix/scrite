@@ -342,8 +342,8 @@ class ImTransliterator : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_UNCREATABLE("Use as attached property.")
     QML_ATTACHED(ImTransliterator)
+    QML_UNCREATABLE("Use as attached property.")
 
 public:
     ~ImTransliterator();

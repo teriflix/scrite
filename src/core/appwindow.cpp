@@ -18,6 +18,7 @@
 #include "automation.h"
 #include "application.h"
 #include "scritedocument.h"
+#include "languageengine.h"
 #include "colorimageprovider.h"
 #include "basicfileiconprovider.h"
 
@@ -110,6 +111,8 @@ AppWindow::AppWindow()
     setTextRenderType(useNativeTextRendering ? NativeTextRendering : QtTextRendering);
 
     m_defaultWindowFlags = this->flags();
+
+    LanguageEngine::init("io.scrite.components", this->engine());
 
     this->setMinimumSize(QSize(800, 600));
 }
