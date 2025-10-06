@@ -26,9 +26,10 @@ import "qrc:/qml/helpers"
 PageView {
     id: root
 
-    pagesArray: ["Fonts", "Options", "Transiliteration"]
+    pagesArray: ["Options"]
     currentIndex: 0
-    pageContent: Loader {
-        source: "./Language" + root.pagesArray[root.currentIndex] + "Page.qml"
+    pageContent: LanguageOptionsPage {
+        width: root.availablePageContentWidth
+        height: root.availablePageContentHeight
     }
 }

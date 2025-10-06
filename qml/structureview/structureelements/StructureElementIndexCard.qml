@@ -396,8 +396,9 @@ AbstractStructureElementUI {
                                 Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
                                 Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
 
-                                ImTransliterator.popup: ImTransliteratorPopup { }
-                                ImTransliterator.enabled: !readOnly
+                                LanguageTransliterator.popup: LanguageTransliteratorPopup { }
+                                LanguageTransliterator.option: Runtime.language.activeTransliterationOption
+                                LanguageTransliterator.enabled: !readOnly
 
                                 width: _synopsisFieldFlick.scrollBarVisible ? _synopsisFieldFlick.width-20 : _synopsisFieldFlick.width
                                 height: Math.max(_synopsisFieldFlick.height, contentHeight + 100)

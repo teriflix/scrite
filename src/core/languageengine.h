@@ -17,9 +17,12 @@
 #include <QFont>
 #include <QObject>
 #include <QQmlEngine>
+#include <QTextLayout>
 #include <QKeySequence>
+#include <QFontDatabase>
 #include <QAbstractListModel>
 
+class QTextCursor;
 class LanguageEngine;
 class AbstractTransliterationEngine;
 
@@ -31,7 +34,7 @@ struct TransliterationOption
 
 public:
     Q_PROPERTY(QObject* transliterator MEMBER transliteratorObject)
-    QPointer<QObject> transliteratorObject; // must be of type AbstractTransliterator
+    QPointer<QObject> transliteratorObject; // must be of type AbstractTransliterationEngine
 
     Q_PROPERTY(int languageCode MEMBER languageCode)
     int languageCode = -1;
@@ -81,8 +84,6 @@ Q_DECLARE_METATYPE(QList<TransliterationOption>)
 struct Language
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(int code MEMBER code)
@@ -91,52 +92,233 @@ public:
     Q_PROPERTY(QString name READ name)
     QString name() const;
 
+    Q_PROPERTY(QString nativeName READ nativeName)
+    QString nativeName() const;
+
     Q_PROPERTY(QKeySequence keySequence MEMBER keySequence)
     QKeySequence keySequence;
-
-    Q_PROPERTY(QString shortcut READ shortcut)
-    QString shortcut() const { return keySequence.toString(); }
-
-    Q_PROPERTY(QFont font MEMBER font)
-    QFont font;
-
-    Q_PROPERTY(QFont defaultFont READ defaultFont)
-    QFont defaultFont() const;
-
-    Q_PROPERTY(QStringList aptFontFamilies READ aptFontFamilies)
-    QStringList aptFontFamilies() const;
-
-    Q_PROPERTY(int localeScript READ localeScript)
-    int localeScript() const; // Returns QLocale::Script
-
-    Q_PROPERTY(int charScript READ charScript)
-    int charScript() const; // Returns QChar::Script
-
-    Q_PROPERTY(int fontWritingSystem READ fontWritingSystem)
-    int fontWritingSystem() const; // Returns QFontDatabase::WritingSystem
 
     Q_PROPERTY(QString preferredTransliterationOptionId MEMBER preferredTransliterationOptionId)
     QString preferredTransliterationOptionId;
 
-    Q_PROPERTY(QList<TransliterationOption> transliterationOptions READ transliterationOptions)
-    QList<TransliterationOption> transliterationOptions() const;
-
-    Q_PROPERTY(TransliterationOption preferredTransliterationOption READ preferredTransliterationOption)
-    TransliterationOption preferredTransliterationOption() const;
-
     Q_PROPERTY(bool valid READ isValid)
     bool isValid() const { return code >= 0; }
+
+    Q_INVOKABLE int charScript() const; // Returns QChar::Script
+    Q_INVOKABLE int localeScript() const; // Returns QLocale::Script
+    Q_INVOKABLE int fontWritingSystem() const; // Returns QFontDatabase::WritingSystem
+    Q_INVOKABLE QString charScriptName() const;
+    Q_INVOKABLE QString localeScriptName() const;
+    Q_INVOKABLE QString fontWritingSystemName() const;
+    Q_INVOKABLE QFont font() const;
+    Q_INVOKABLE QString shortcut() const { return keySequence.toString(); }
+    Q_INVOKABLE QStringList fontFamilies() const;
+    Q_INVOKABLE TransliterationOption preferredTransliterationOption() const;
+    Q_INVOKABLE QList<TransliterationOption> transliterationOptions() const;
 
     Language &operator=(const Language &other)
     {
         this->code = other.code;
-        this->font = other.font;
         this->keySequence = other.keySequence;
         this->preferredTransliterationOptionId = other.preferredTransliterationOptionId;
         return *this;
     }
     bool operator==(const Language &other) const { return code == other.code; }
     bool operator!=(const Language &other) const { return !(*this == other); }
+
+    // A complete copy of QChar::Script, because its just not possible to bundle this into an enum
+    // For instance, Q_ENUM_NS(QChar::Script) just doesnt work as advertised.
+    // This also means that everytime we use a new Qt version, we will have to sync this enum with
+    // QChar::Script. Manual labour, I know. I wish there was a better way to do this.
+    enum CharScript {
+        Script_Unknown,
+        Script_Inherited,
+        Script_Common,
+
+        Script_Latin,
+        Script_Greek,
+        Script_Cyrillic,
+        Script_Armenian,
+        Script_Hebrew,
+        Script_Arabic,
+        Script_Syriac,
+        Script_Thaana,
+        Script_Devanagari,
+        Script_Bengali,
+        Script_Gurmukhi,
+        Script_Gujarati,
+        Script_Oriya,
+        Script_Tamil,
+        Script_Telugu,
+        Script_Kannada,
+        Script_Malayalam,
+        Script_Sinhala,
+        Script_Thai,
+        Script_Lao,
+        Script_Tibetan,
+        Script_Myanmar,
+        Script_Georgian,
+        Script_Hangul,
+        Script_Ethiopic,
+        Script_Cherokee,
+        Script_CanadianAboriginal,
+        Script_Ogham,
+        Script_Runic,
+        Script_Khmer,
+        Script_Mongolian,
+        Script_Hiragana,
+        Script_Katakana,
+        Script_Bopomofo,
+        Script_Han,
+        Script_Yi,
+        Script_OldItalic,
+        Script_Gothic,
+        Script_Deseret,
+        Script_Tagalog,
+        Script_Hanunoo,
+        Script_Buhid,
+        Script_Tagbanwa,
+        Script_Coptic,
+
+        // Unicode 4.0 additions
+        Script_Limbu,
+        Script_TaiLe,
+        Script_LinearB,
+        Script_Ugaritic,
+        Script_Shavian,
+        Script_Osmanya,
+        Script_Cypriot,
+        Script_Braille,
+
+        // Unicode 4.1 additions
+        Script_Buginese,
+        Script_NewTaiLue,
+        Script_Glagolitic,
+        Script_Tifinagh,
+        Script_SylotiNagri,
+        Script_OldPersian,
+        Script_Kharoshthi,
+
+        // Unicode 5.0 additions
+        Script_Balinese,
+        Script_Cuneiform,
+        Script_Phoenician,
+        Script_PhagsPa,
+        Script_Nko,
+
+        // Unicode 5.1 additions
+        Script_Sundanese,
+        Script_Lepcha,
+        Script_OlChiki,
+        Script_Vai,
+        Script_Saurashtra,
+        Script_KayahLi,
+        Script_Rejang,
+        Script_Lycian,
+        Script_Carian,
+        Script_Lydian,
+        Script_Cham,
+
+        // Unicode 5.2 additions
+        Script_TaiTham,
+        Script_TaiViet,
+        Script_Avestan,
+        Script_EgyptianHieroglyphs,
+        Script_Samaritan,
+        Script_Lisu,
+        Script_Bamum,
+        Script_Javanese,
+        Script_MeeteiMayek,
+        Script_ImperialAramaic,
+        Script_OldSouthArabian,
+        Script_InscriptionalParthian,
+        Script_InscriptionalPahlavi,
+        Script_OldTurkic,
+        Script_Kaithi,
+
+        // Unicode 6.0 additions
+        Script_Batak,
+        Script_Brahmi,
+        Script_Mandaic,
+
+        // Unicode 6.1 additions
+        Script_Chakma,
+        Script_MeroiticCursive,
+        Script_MeroiticHieroglyphs,
+        Script_Miao,
+        Script_Sharada,
+        Script_SoraSompeng,
+        Script_Takri,
+
+        // Unicode 7.0 additions
+        Script_CaucasianAlbanian,
+        Script_BassaVah,
+        Script_Duployan,
+        Script_Elbasan,
+        Script_Grantha,
+        Script_PahawhHmong,
+        Script_Khojki,
+        Script_LinearA,
+        Script_Mahajani,
+        Script_Manichaean,
+        Script_MendeKikakui,
+        Script_Modi,
+        Script_Mro,
+        Script_OldNorthArabian,
+        Script_Nabataean,
+        Script_Palmyrene,
+        Script_PauCinHau,
+        Script_OldPermic,
+        Script_PsalterPahlavi,
+        Script_Siddham,
+        Script_Khudawadi,
+        Script_Tirhuta,
+        Script_WarangCiti,
+
+        // Unicode 8.0 additions
+        Script_Ahom,
+        Script_AnatolianHieroglyphs,
+        Script_Hatran,
+        Script_Multani,
+        Script_OldHungarian,
+        Script_SignWriting,
+
+        // Unicode 9.0 additions
+        Script_Adlam,
+        Script_Bhaiksuki,
+        Script_Marchen,
+        Script_Newa,
+        Script_Osage,
+        Script_Tangut,
+
+        // Unicode 10.0 additions
+        Script_MasaramGondi,
+        Script_Nushu,
+        Script_Soyombo,
+        Script_ZanabazarSquare,
+
+        // Unicode 12.1 additions
+        Script_Dogra,
+        Script_GunjalaGondi,
+        Script_HanifiRohingya,
+        Script_Makasar,
+        Script_Medefaidrin,
+        Script_OldSogdian,
+        Script_Sogdian,
+        Script_Elymaic,
+        Script_Nandinagari,
+        Script_NyiakengPuachueHmong,
+        Script_Wancho,
+
+        // Unicode 13.0 additions
+        Script_Chorasmian,
+        Script_DivesAkuru,
+        Script_KhitanSmallScript,
+        Script_Yezidi,
+
+        ScriptCount
+    };
+    Q_ENUM(CharScript)
 };
 Q_DECLARE_METATYPE(Language)
 
@@ -152,9 +334,12 @@ public:
     Q_INVOKABLE int indexOfLanguage(int code) const;
     Q_INVOKABLE bool hasLanguage(int code) const; // here code should be from QLocale::Language
     Q_INVOKABLE Language findLanguage(int code) const;
+    Q_INVOKABLE Language languageAt(int index) const;
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
-    int count() const { return m_languages.size(); }
+    Q_PROPERTY(int count READ count NOTIFY countChanged) int count() const
+    {
+        return m_languages.size();
+    }
     Q_SIGNAL void countChanged();
 
     enum { LanguageRole = Qt::UserRole };
@@ -165,14 +350,20 @@ public:
 protected:
     explicit AbstractLanguagesModel(QObject *parent = nullptr);
 
-    void addLanguage(const Language &language);
-    void removeLanguage(const Language &language);
-    void removeLanguageAt(int row);
-    void updateLanguage(const Language &language);
+    int addLanguage(const Language &language);
+    int removeLanguage(const Language &language);
+    int removeLanguageAt(int row);
+    int updateLanguage(const Language &language);
     void setLanguages(const QList<Language> &languages);
     const QList<Language> &languages() const { return m_languages; }
 
+    virtual void initialize();
+    virtual QJsonValue toJson() const;
+    virtual void fromJson(const QJsonValue &value);
+
 private:
+    friend class LanguageEngine;
+
     QList<Language> m_languages;
 };
 
@@ -185,28 +376,49 @@ class SupportedLanguages : public AbstractLanguagesModel
 public:
     ~SupportedLanguages();
 
-    Q_INVOKABLE void addLanguage(int code);
-    Q_INVOKABLE void removeLanguage(int code);
-    Q_INVOKABLE void updateLanguage(int code);
+    Q_PROPERTY(int activeLanguageCode READ activeLanguageCode WRITE setActiveLanguageCode NOTIFY activeLanguageCodeChanged)
+    void setActiveLanguageCode(int val);
+    int activeLanguageCode() const { return m_activeLanguageCode; }
+    Q_SIGNAL void activeLanguageCodeChanged();
 
-    Q_INVOKABLE bool assignLanguageFont(int code, const QFont &font);
+    Q_PROPERTY(Language activeLanguage READ activeLanguage NOTIFY activeLanguageCodeChanged)
+    Language activeLanguage() const;
+
+    Q_PROPERTY(int activeLanguageRow READ activeLanguageRow NOTIFY activeLanguageRowChanged)
+    int activeLanguageRow() const;
+    Q_SIGNAL void activeLanguageRowChanged();
+
+    Q_INVOKABLE int addLanguage(int code);
+    Q_INVOKABLE int removeLanguage(int code);
+    Q_INVOKABLE int updateLanguage(int code);
+
     Q_INVOKABLE bool assignLanguageShortcut(int code, const QString &nativeSequence);
+    Q_INVOKABLE bool assignLanguageFontFamily(int code, const QString &fontFamily); // Helper
+    Q_INVOKABLE bool useLanguageTransliterator(int code, const TransliterationOption &option);
+    Q_INVOKABLE bool useLanguageTransliteratorId(int code, const QString &id);
+    Q_INVOKABLE bool resetLanguageTranslator(int code);
 
 signals:
-    void languageFontChanged(int code);
     void languageShortcutChanged(int code);
+    void languageTransliteratorChanged(int code);
 
 private:
     explicit SupportedLanguages(QObject *parent = nullptr);
 
-    void loadLanguages();
-    void saveLanguages();
     void loadBuiltInLanguages();
     void transliterationOptionsUpdated();
+    void onScriptFontFamilyChanged(QChar::Script script, const QString &fontFamily);
+
+    void initialize();
+    QJsonValue toJson() const;
+    void fromJson(const QJsonValue &value);
+
+    void onDataChanged(const QModelIndex &start, const QModelIndex &end);
+    void verifyActiveLanguage();
 
 private:
     friend class LanguageEngine;
-    QString m_settingsFileName;
+    int m_activeLanguageCode = -1;
 };
 
 class AvailableLanguages : public AbstractLanguagesModel
@@ -216,11 +428,11 @@ class AvailableLanguages : public AbstractLanguagesModel
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
-    static AvailableLanguages *instance();
     ~AvailableLanguages();
 
 private:
     explicit AvailableLanguages(QObject *parent = nullptr);
+
     void initialize();
 
     friend class LanguageEngine;
@@ -232,8 +444,6 @@ Helpers for using the static transliterator only.
 struct AlphabetMapping
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(QString latin MEMBER latin)
@@ -254,8 +464,6 @@ Q_DECLARE_METATYPE(QList<AlphabetMapping>)
 struct AlphabetMappings
 {
     Q_GADGET
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(bool valid READ isValid)
@@ -298,19 +506,28 @@ public:
     Q_PROPERTY(QList<int> supportedLanguageCodes READ supportedLanguageCodes CONSTANT)
     static QList<int> supportedLanguageCodes();
 
+    Q_INVOKABLE bool supportsLanguageCode(int code) const;
+
     Q_INVOKABLE static QString onWord(const QString &word, int code);
+    Q_INVOKABLE static QString onParagraph(const QString &paragraph, int code);
+
     Q_INVOKABLE static AlphabetMappings alphabetMappingsFor(int languageCode);
+
+    static QString shortcut(int languageCode);
 };
 
 class AbstractTransliterationEngine : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     explicit AbstractTransliterationEngine(QObject *parent = nullptr);
     ~AbstractTransliterationEngine();
 
     /* Unique name among all transliterators supported */
+    Q_PROPERTY(QString name READ name CONSTANT)
     virtual QString name() const = 0;
 
     /** should return true if it supports transliteration to the said language */
@@ -339,6 +556,27 @@ signals:
 };
 
 /*
+This is a fallback engine, that does nothing -- which means basically any keystroke
+is passed through without transliteration.
+*/
+class FallbackTransliterationEngine : public AbstractTransliterationEngine
+{
+    Q_OBJECT
+
+public:
+    explicit FallbackTransliterationEngine(QObject *parent = nullptr);
+    ~FallbackTransliterationEngine();
+
+    // AbstractTransliterator interface
+    QString name() const;
+    QList<TransliterationOption> options(int lang) const;
+    bool canActivate(const TransliterationOption &option);
+    void activate(const TransliterationOption &option);
+    void release(const TransliterationOption &option);
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+};
+
+/*
 The static transliterator is built on top of a third-party tool called PhTranslator.
 It only supports a handful of Indian languages.
 */
@@ -356,7 +594,7 @@ public:
     bool canActivate(const TransliterationOption &option);
     void activate(const TransliterationOption &option);
     void release(const TransliterationOption &option);
-    QString transliterateWord(const QString &word, const TransliterationOption &lang) const;
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
 
 /*
@@ -381,6 +619,103 @@ public:
 };
 
 /*
+Process QInputMethod events for an editor, and routes them through the any InApp transliteration
+option supplied to the 'option' property.
+ */
+class LanguageTransliterator : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_ATTACHED(LanguageTransliterator)
+    QML_UNCREATABLE("Use as attached property.")
+
+public:
+    ~LanguageTransliterator();
+
+    static LanguageTransliterator *qmlAttachedProperties(QObject *object);
+
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
+    void setEnabled(bool val);
+    bool isEnabled() const { return m_enabled; }
+    Q_SIGNAL void enabledChanged();
+
+    Q_PROPERTY(TransliterationOption option READ option WRITE setOption NOTIFY optionChanged)
+    void setOption(const TransliterationOption &val);
+    TransliterationOption option() const { return m_option; }
+    Q_SIGNAL void optionChanged();
+
+    Q_PROPERTY(QObject* popup READ popup WRITE setPopup NOTIFY popupChanged)
+    void setPopup(QObject *val);
+    QObject *popup() const { return m_popup; }
+    Q_SIGNAL void popupChanged();
+
+    Q_PROPERTY(QString currentWord READ currentWord NOTIFY currentWordChanged)
+    QString currentWord() const { return m_currentWord.originalString; }
+    Q_SIGNAL void currentWordChanged();
+
+    Q_PROPERTY(QString commitString READ commitString NOTIFY commitStringChanged)
+    QString commitString() const { return m_currentWord.commitString; }
+    Q_SIGNAL void commitStringChanged();
+
+    Q_PROPERTY(QRect textRect READ textRect NOTIFY textRectChanged)
+    QRect textRect() const { return m_currentWord.textRect; }
+    Q_SIGNAL void textRectChanged() const;
+
+    Q_PROPERTY(QObject* editor READ editor CONSTANT)
+    QObject *editor() const { return m_editor; }
+
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
+private:
+    LanguageTransliterator(QObject *parent = nullptr);
+    bool updateWordFromInput(const QKeyEvent *keyEvent);
+    bool commitWordToEditor();
+    void resetCurrentWord();
+
+private:
+    struct Word
+    {
+        int start = -1;
+        int end = -1;
+        QRect textRect;
+        QString commitString;
+        QString originalString;
+    } m_currentWord;
+
+    bool m_enabled = false;
+    QObject *m_editor = nullptr;
+    QObject *m_popup = nullptr;
+    TransliterationOption m_option;
+};
+
+/*
+Code to evaluate language boundaries and perform operations on them.
+ */
+struct ScriptBoundary
+{
+    Q_GADGET
+
+public:
+    Q_PROPERTY(int start MEMBER start)
+    int start = -1;
+
+    Q_PROPERTY(int end MEMBER end)
+    int end = -1;
+
+    Q_PROPERTY(QString text MEMBER text)
+    QString text;
+
+    Q_PROPERTY(QChar::Script script MEMBER script)
+    QChar::Script script = QChar::Script_Unknown;
+
+    Q_PROPERTY(bool valid READ isValid)
+    bool isValid() const { return start >= 0 && end > 0 && end - start > 1 && !text.isEmpty(); }
+};
+Q_DECLARE_METATYPE(ScriptBoundary)
+Q_DECLARE_METATYPE(QList<ScriptBoundary>)
+
+/*
 This class ties all the pieces together.
 */
 class LanguageEngine : public QObject
@@ -388,7 +723,6 @@ class LanguageEngine : public QObject
     Q_OBJECT
     QML_ELEMENT
     QML_SINGLETON
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     static LanguageEngine *instance();
@@ -400,35 +734,39 @@ public:
     Q_PROPERTY(SupportedLanguages* supportedLanguages READ supportedLanguages CONSTANT)
     SupportedLanguages *supportedLanguages() const { return m_supportedLanguages; }
 
-    Q_INVOKABLE QFont defaultLanguageFont(int languageCode) const;
-    Q_INVOKABLE QStringList aptFontFamilies(int languageCode) const;
+    Q_INVOKABLE bool setScriptFontFamily(QChar::Script script, const QString &fontFamily);
+    Q_INVOKABLE QString scriptFontFamily(QChar::Script script) const;
+
+    Q_INVOKABLE QStringList scriptFontFamilies(QChar::Script script) const;
 
     QList<TransliterationOption> queryTransliterationOptions(int language) const;
+
+    static QList<ScriptBoundary> determineBoundaries(const QString &paragraph);
+    static void determineBoundariesAndInsertText(QTextCursor &cursor, const QString &paragraph);
+    static QString formattedInHtml(const QString &paragraph);
+    static int wordCount(const QString &paragraph);
+    static QVector<QTextLayout::FormatRange>
+    mergeTextFormats(const QList<ScriptBoundary> &boundaries,
+                     const QVector<QTextLayout::FormatRange> &formats);
 
     static void init(const char *uri, QQmlEngine *qmlEngine);
 
 signals:
+    void scriptFontFamilyChanged(QChar::Script script, const QString &fontFamily);
     void transliterationOptionsUpdated();
 
 private:
     explicit LanguageEngine(QObject *parent = nullptr);
 
+    void loadConfiguration();
+    void saveConfiguration();
+
 private:
-    QMap<int, QFont> m_defaultLanguageFont;
+    QString m_configFileName;
     AvailableLanguages *m_availableLanguages = nullptr;
     SupportedLanguages *m_supportedLanguages = nullptr;
+    QMap<QChar::Script, QString> m_defaultScriptFontFamily, m_scriptFontFamily;
     QList<AbstractTransliterationEngine *> m_transliterators;
-};
-
-// This is done purely for the sake of exposing QChar enums to QML
-class QtChar : public QChar
-{
-    Q_GADGET
-
-public:
-    Q_ENUM(SpecialCharacter)
-    Q_ENUM(Category)
-    Q_ENUM(Script)
 };
 
 #endif // LANGUAGEENGINE_H

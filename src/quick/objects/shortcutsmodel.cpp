@@ -16,7 +16,7 @@
 #include "application.h"
 
 #include <QTimer>
-
+#include <QShortcut>
 #include <QCoreApplication>
 
 class ShortcutsModelItemListModel : public QObjectListModel<ShortcutsModelItem *>

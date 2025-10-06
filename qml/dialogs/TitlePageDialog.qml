@@ -257,7 +257,7 @@ DialogLauncher {
                                     width: _private.fieldLabelWidth
                                     horizontalAlignment: Text.AlignRight
                                     text: name
-                                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                     anchors.verticalCenter: parent.verticalCenter
                                     color: Runtime.colors.primary.c800.background
                                 }

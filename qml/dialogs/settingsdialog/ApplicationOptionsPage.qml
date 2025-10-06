@@ -190,7 +190,7 @@ Item {
                     }
 
                     Layout.fillWidth: true
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. " + secondSentence
                     wrapMode: Text.WordWrap
                 }
@@ -319,7 +319,7 @@ Item {
 
                 VclLabel {
                     Layout.fillWidth: true
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
                     wrapMode: Text.WordWrap
                 }

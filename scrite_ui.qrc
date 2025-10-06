@@ -49,10 +49,7 @@
         <file>qml/dialogs/settingsdialog/ApplicationSettingsTab.qml</file>
         <file>qml/dialogs/settingsdialog/ApplicationThemePage.qml</file>
         <file>qml/dialogs/settingsdialog/impl_SettingsDialog.qml</file>
-        <file>qml/dialogs/settingsdialog/LanguageFontsPage.qml</file>
-        <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageSettingsTab.qml</file>
-        <file>qml/dialogs/settingsdialog/LanguageTransiliterationPage.qml</file>
         <file>qml/dialogs/settingsdialog/NotebookOptionsPage.qml</file>
         <file>qml/dialogs/settingsdialog/NotebookSettingsTab.qml</file>
         <file>qml/dialogs/settingsdialog/ScreenplayFormattingRulesPage.qml</file>
@@ -100,7 +97,7 @@
         <file>qml/globals/qmldir</file>
         <file>qml/globals/Runtime.qml</file>
         <file>qml/globals/SubscriptionPlanOperations.qml</file>
-        <file>qml/helpers/AlphabetMappings.qml</file>
+        <file>qml/helpers/AlphabetMappingsView.qml</file>
         <file>qml/helpers/AttachmentsDropArea.qml</file>
         <file>qml/helpers/AttachmentsView.qml</file>
         <file>qml/helpers/BoxShadow.qml</file>
@@ -265,6 +262,8 @@
         <file>qml/TimelineView.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneMenu.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorPageNumbersLoader.qml</file>
-        <file>qml/helpers/ImTransliteratorPopup.qml</file>
+        <file>qml/helpers/LanguageTransliteratorPopup.qml</file>
+        <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
+        <file>qml/helpers/ShortcutField.qml</file>
     </qresource>
 </RCC>

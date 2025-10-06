@@ -61,7 +61,7 @@ Item {
             anchors.margins: 5
 
             wrapMode: Text.WordWrap
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
             verticalAlignment: Text.AlignVCenter
             horizontalAlignment: Text.AlignHCenter
 

@@ -24,6 +24,7 @@ import "qrc:/qml/controls"
 
 Item {
     id: root
+
     height: layout.height + 2*layout.margin
 
     ColumnLayout {
@@ -108,7 +109,7 @@ Item {
                             Layout.fillWidth: true
 
                             font.bold: false
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
                             text: "Default: 1000"
                         }
@@ -148,7 +149,7 @@ Item {
                             Layout.fillWidth: true
 
                             font.bold: false
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                            font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                             text: "Default: 50000"
                         }
 

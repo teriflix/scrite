@@ -22,7 +22,6 @@ class StandardPaths : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
     QML_SINGLETON
 
 public:

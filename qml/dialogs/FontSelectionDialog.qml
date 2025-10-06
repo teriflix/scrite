@@ -18,8 +18,8 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
-import io.scrite.components 1.0
 import io.scrite.models 1.0
+import io.scrite.components 1.0
 
 import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
@@ -28,21 +28,6 @@ import "qrc:/qml/helpers"
 
 DialogLauncher {
     id: root
-
-    readonly property var standardPreviewText: [
-        /* English */ "The bird flies in the sky.",
-        /* Bengali */ "পাখিটি আকাশে উড়ে যায়।", // The bird flies in the sky.
-        /* Gujarati */ "પંખી આકાશમાં ઊડે છે.", // The bird flies in the sky.
-        /* Hindi */ "पक्षी आसमान में उड़ता है।", // The bird flies in the sky.
-        /* Kannada */ "ಹಕ್ಕಿ ಆಕಾಶದಲ್ಲಿ ಹಾರುತ್ತದೆ.", // The bird flies in the sky.
-        /* Malayalam */ "പക്ഷി ആകാശത്ത് പറക്കുന്നു.", // The bird flies in the sky.
-        /* Marathi */ "पक्षी आकाशात उडतो.", // The bird flies in the sky.
-        /* Oriya */ "ପକ୍ଷୀ ଆକାଶରେ ଉଡେ।", // The bird flies in the sky.
-        /* Punjabi */ "ਪੰਛੀ ਅਸਮਾਨ ਵਿੱਚ ਉੱਡਦਾ ਹੈ।", // The bird flies in the sky.
-        /* Sanskrit */ "पक्षी आकाशे उड़ति।", // The bird flies in the sky.
-        /* Tamil */ "பறவை ஆகாயத்தில் பறக்கின்றது.", // The bird flies in the sky.
-        /* Telugu */ "పక్షి ఆకాశంలో ఎగురుతుంది." // The bird flies in the sky.
-    ];
 
     function launch(fontSelectedCallback, initialFontFamily) {
         const dlg = doLaunch({"initialFontFamily": ""+initialFontFamily})
@@ -59,14 +44,28 @@ DialogLauncher {
     }
 
     function launchForLanguage(language, fontSelectedCallback, initialFontFamily) {
-        const dlg = doLaunch({"language": language, "initialFontFamily": ""+initialFontFamily})
+        let languageCode = QtLocale.English
+        if(typeof language === "number") {
+            languageCode = language
+        } else {
+            languageCode = language.code
+        }
+
+        const dlg = doLaunch({"languageCode": languageCode, "initialFontFamily": ""+initialFontFamily})
         if(dlg)
             dlg.fontSelected.connect(fontSelectedCallback)
         return dlg
     }
 
     function launchWithTitleForLanguage(title, language, fontSelectedCallback, initialFontFamily) {
-        const dlg = doLaunch({"title": title, "language": language, "initialFontFamily": ""+initialFontFamily})
+        let languageCode = QtLocale.English
+        if(typeof language === "number") {
+            languageCode = language
+        } else {
+            languageCode = language.code
+        }
+
+        const dlg = doLaunch({"title": title, "languageCode": languageCode, "initialFontFamily": ""+initialFontFamily})
         if(dlg)
             dlg.fontSelected.connect(fontSelectedCallback)
         return dlg
@@ -78,8 +77,10 @@ DialogLauncher {
     dialogComponent: VclDialog {
         id: dialog
 
-        property int language: TransliterationEngine.English
-        property string previewText: root.standardPreviewText[language]
+        property var language: Runtime.language.available.findLanguage(languageCode)
+        property int languageCode: QtLocale.English
+        property bool languageUsesLatinScript: language.charScript() === QtChar.Script_Latin
+        property string previewText: language.nativeName
         property string initialFontFamily
 
         signal fontSelected(string fontFamily)
@@ -111,16 +112,17 @@ DialogLauncher {
 
             GenericArrayModel {
                 id: fontFamiliesModel
+
                 array: {
-                    const allFonts = Scrite.app.fontFamiliesFor(TransliterationEngine.English)
-                    const languageSpecificFonts = dialog.language === TransliterationEngine.English ? [] : Scrite.app.fontFamiliesFor(dialog.language)
+                    const allFonts = LanguageEngine.scriptFontFamilies(QtChar.Script_Latin)
+                    const languageSpecificFonts = dialog.languageUsesLatinScript ? [] : dialog.language.fontFamilies()
 
                     let ret = []
                     languageSpecificFonts.forEach( (font) => {
                                                     ret.push( {"category": "Suggested Fonts", "family": font} )
                                                   })
 
-                    const cat = dialog.language === TransliterationEngine.English ? "Available Fonts" : "Other Fonts"
+                    const cat = dialog.languageUsesLatinScript ? "Available Fonts" : "Other Fonts"
                     allFonts.forEach( (font) => {
                                                     if(languageSpecificFonts.indexOf(font) >= 0)
                                                         return
@@ -240,7 +242,7 @@ DialogLauncher {
 
                         section.property: "category"
                         section.criteria: ViewSection.FullString
-                        section.delegate: dialog.language === TransliterationEngine.English ? null : fontListSectionDelegate
+                        section.delegate: dialog.languageUsesLatinScript ? null : fontListSectionDelegate
 
                         delegate: Item {
                             required property int index
@@ -258,7 +260,7 @@ DialogLauncher {
                                 VclLabel {
                                     Layout.preferredWidth: parent.width * 0.5
 
-                                    text: (initialFontFamily === family ? "* " : "") + family
+                                    text: (dialog.initialFontFamily === family ? "* " : "") + family
                                     elide: Text.ElideRight
                                     padding: 3
                                 }

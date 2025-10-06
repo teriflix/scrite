@@ -57,6 +57,7 @@ HEADERS += \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
     src/core/appwindow.h \
+    src/core/enumerationmodel.h \
     src/core/filelocker.h \
     src/core/filemodificationtracker.h \
     src/core/languageengine.h \
@@ -195,6 +196,7 @@ SOURCES += \
     src/automation/windowcapture.cpp \
     src/core/application_build_timestamp.cpp \
     src/core/appwindow.cpp \
+    src/core/enumerationmodel.cpp \
     src/core/filelocker.cpp \
     src/core/filemodificationtracker.cpp \
     src/core/languageengine.cpp \

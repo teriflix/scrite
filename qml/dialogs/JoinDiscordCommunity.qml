@@ -114,7 +114,7 @@ DialogLauncher {
                     text: "Please note: There is <b>no phone or email support</b> available for Scrite."
                     color: Runtime.colors.primary.c600.background
                     wrapMode: Text.WordWrap
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
                 }
 

@@ -177,10 +177,11 @@ Column {
                 Transliterator.textDocumentUndoRedoEnabled: enableUndoRedo
                 Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
 
-                ImTransliterator.popup: ImTransliteratorPopup {
+                LanguageTransliterator.popup: LanguageTransliteratorPopup {
                     editorFont: answerText.font
                 }
-                ImTransliterator.enabled: !readOnly
+                LanguageTransliterator.option: Runtime.language.activeTransliterationOption
+                LanguageTransliterator.enabled: !readOnly
 
                 text: formField.answer
                 readOnly: Scrite.document.readOnly

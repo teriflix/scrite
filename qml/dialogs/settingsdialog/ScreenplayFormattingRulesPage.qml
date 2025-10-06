@@ -74,7 +74,9 @@ Item {
 
             VclComboBox {
                 id: languageComboBox
+
                 Layout.preferredWidth: model.longestKeyWidth() + 50
+
                 model: GenericArrayModel {
                     array: Scrite.app.enumerationModelForType("SceneElementFormat", "DefaultLanguage")
                     objectMembers: ["key", "value"]
@@ -88,6 +90,7 @@ Item {
                         return Math.ceil(ret)
                     }
                 }
+
                 textRole: "key"
                 valueRole: "value"
                 onActivated: (index) => {

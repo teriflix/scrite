@@ -27,6 +27,7 @@ SceneHeadingTextField 1.0 SceneHeadingTextField.qml
 SceneTypeImage 1.0 SceneTypeImage.qml
 ScrollArea 1.0 ScrollArea.qml
 SearchBar 1.0 SearchBar.qml
+ShortcutField 1.0 ShortcutField.qml
 SidePanel 1.0 SidePanel.qml
 SpecialSymbolsSupport 1.0 SpecialSymbolsSupport.qml
 SpellingSuggestionsMenu 1.0 SpellingSuggestionsMenu.qml

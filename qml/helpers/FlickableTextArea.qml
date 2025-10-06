@@ -88,10 +88,11 @@ Flickable {
         Transliterator.enforeDefaultFont: root.enforceDefaultFont
         Transliterator.enforceHeadingFontSize: root.enforceHeadingFontSize
 
-        ImTransliterator.popup: ImTransliteratorPopup {
+        LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _textArea.font
         }
-        ImTransliterator.enabled: !readOnly
+        LanguageTransliterator.option: Runtime.language.activeTransliterationOption
+        LanguageTransliterator.enabled: !readOnly
 
         readOnly: Scrite.document.readOnly
         background: Item { }
