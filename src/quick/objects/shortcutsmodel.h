@@ -14,6 +14,7 @@
 #ifndef SHORTCUTSMODEL_H
 #define SHORTCUTSMODEL_H
 
+#include <QShortcut>
 #include <QQmlEngine>
 #include <QSortFilterProxyModel>
 
@@ -123,6 +124,7 @@ private:
     bool m_enabled = true;
     bool m_visible = true;
     bool m_canActivate = false;
+    bool m_handleShortcut = false;
     QString m_group;
     QString m_title;
     QString m_shortcut;

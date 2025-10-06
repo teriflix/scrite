@@ -21,7 +21,8 @@ Q_GLOBAL_STATIC(WindowsBackend, Backend);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-PlatformTransliterationEngine::PlatformTransliterationEngine(QObject *parent) : AbstractTransliterationEngine(parent)
+PlatformTransliterationEngine::PlatformTransliterationEngine(QObject *parent)
+    : AbstractTransliterationEngine(parent)
 {
     connect(::Backend, &WindowsBackend::textInputSourcesChanged, this,
             &PlatformTransliterationEngine::capacityChanged);
@@ -41,7 +42,7 @@ QList<TransliterationOption> PlatformTransliterationEngine::options(int lang) co
 
 bool PlatformTransliterationEngine::canActivate(const TransliterationOption &option)
 {
-    return ::Backend->canActivate(option, this);
+    return option.transliteratorObject == this && ::Backend->canActivate(option, this);
 }
 
 void PlatformTransliterationEngine::activate(const TransliterationOption &option)
@@ -55,7 +56,7 @@ void PlatformTransliterationEngine::release(const TransliterationOption &option)
 }
 
 QString PlatformTransliterationEngine::transliterateWord(const QString &word,
-                                                  const TransliterationOption &option) const
+                                                         const TransliterationOption &option) const
 {
     // No need to implement this, because platform transliterators don't offer in-app
     // transliterations.

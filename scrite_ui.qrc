@@ -100,7 +100,7 @@
         <file>qml/globals/qmldir</file>
         <file>qml/globals/Runtime.qml</file>
         <file>qml/globals/SubscriptionPlanOperations.qml</file>
-        <file>qml/helpers/AlphabetMappings.qml</file>
+        <file>qml/helpers/AlphabetMappingsView.qml</file>
         <file>qml/helpers/AttachmentsDropArea.qml</file>
         <file>qml/helpers/AttachmentsView.qml</file>
         <file>qml/helpers/BoxShadow.qml</file>
@@ -265,6 +265,6 @@
         <file>qml/TimelineView.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneMenu.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorPageNumbersLoader.qml</file>
-        <file>qml/helpers/ImTransliteratorPopup.qml</file>
+        <file>qml/helpers/LanguageTransliteratorPopup.qml</file>
     </qresource>
 </RCC>

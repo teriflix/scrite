@@ -952,7 +952,7 @@ Rectangle {
                                 height: parent.height - headingText.height - parent.spacing
                                 wrapMode: Text.WordWrap
                                 elide: Text.ElideRight
-                                font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                 text: noteSummary
                                 color: headingText.color
                                 opacity: 0.75
@@ -1465,7 +1465,7 @@ Rectangle {
                                         height: parent.height - headingText.height - parent.spacing
                                         wrapMode: Text.WordWrap
                                         elide: Text.ElideRight
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                         text: objectItem.type === Note.TextNoteType ? deltaDoc.plainText : objectItem.summary
                                         color: headingText.color
                                         opacity: 0.75

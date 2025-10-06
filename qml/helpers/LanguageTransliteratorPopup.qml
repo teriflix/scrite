@@ -26,7 +26,7 @@ Popup {
 
     property font editorFont: Runtime.idealFontMetrics.font
 
-    property ImTransliterator transliterator
+    property LanguageTransliterator transliterator
 
     property rect textRect: transliterator ? Scrite.window.contentItem.mapFromItem(transliterator.editor, transliterator.textRect) : Qt.rgba(0,0,0,0)
 

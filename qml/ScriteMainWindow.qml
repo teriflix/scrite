@@ -929,121 +929,105 @@ Item {
             }
 
             FlatToolButton {
-                id: languageToolButton
-                iconSource: "qrc:/icons/content/language.png"
-                text: Scrite.app.transliterationEngine.languageAsString
-                shortcut: "Ctrl+L"
+                id: _languageToolButton
+
                 ToolTip.text: Scrite.app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
-                onClicked: languageMenu.visible = true
-                down: languageMenu.visible
-                visible: mainTabBar.currentIndex <= 2
+
+                text: Scrite.app.transliterationEngine.languageAsString
+                down: _languageMenu.visible
+                shortcut: "Ctrl+L"
+                visible: Runtime.mainWindowTab <= Runtime.e_NotebookTab
+                iconSource: "qrc:/icons/content/language.png"
+
+                onClicked: _languageMenu.visible = true
 
                 Item {
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
                     VclMenu {
-                        id: languageMenu
+                        id: _languageMenu
+
                         width: 250
 
                         Repeater {
-                            model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
+                            model: LanguageEngine.supportedLanguages
 
                             VclMenuItem {
-                                property string baseText: modelData.key
-                                property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
-                                property string tabs: /*Scrite.app.isWindowsPlatform ? (modelData.value === TransliterationEngine.Malayalam ? "\t" : "\t\t") : */"\t\t"
-                                text: baseText + tabs + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey)
-                                font.bold: Scrite.app.transliterationEngine.language === modelData.value
-                                focusPolicy: Qt.NoFocus
-                                enabled: Scrite.app.transliterationEngine.enabledLanguages.indexOf(modelData.value) >= 0
-                                onClicked: {
-                                    Scrite.app.transliterationEngine.language = modelData.value
-                                    Scrite.document.formatting.defaultLanguage = modelData.value
-                                    Runtime.paragraphLanguageSettings.defaultLanguage = modelData.key
-                                }
-                            }
-                        }
+                                id: _languageMenuItem
 
-                        MenuSeparator {
-                            focusPolicy: Qt.NoFocus
-                        }
+                                required property int index
+                                required property var language // This is of type Language, but we have to use var here.
+                                                               // You cannot use Q_GADGET struct names as type names in QML
+                                                               // that privilege is only reserved for QObject types.
 
-                        VclMenuItem {
-                            text: "Next-Language\tF10"
-                            focusPolicy: Qt.NoFocus
-                            onClicked: {
-                                Scrite.app.transliterationEngine.cycleLanguage()
-                                Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
-                                Runtime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
+                                text: language.name + "\t\t" + language.shortcut()
+                                font.bold: Runtime.language.activeCode === language.code
+
+                                onTriggered: Runtime.language.setActiveCode(language.code)
                             }
                         }
                     }
+                }
 
-                    Repeater {
-                        model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
+                /**
+                  What would have been ideal is if action property in the VclMenuItems created above
+                  actually handled global application shortcuts. But sadly, they don't.
 
-                        Item {
-                            required property var modelData
+                  We are forced to create Shortcut objects separately for the same. It would have been
+                  awesome if we could simply create Shortcut objects in Repeater, without nesting them
+                  in an Item. But that's not possible either, because Repeater can only create Item
+                  instances, and not anything thats just QObject subclass.
 
-                            Shortcut {
-                                property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
+                  I even tried to use QShortcut in ShortcutsModelItem C++ class, but that did not work either.
+                  Apparently we QShortcut instances can only be created on QWidget, so that's not going
+                  to work for us either. AppWindow is a QQuickView, which is QWindow and not QWidget.
 
-                                enabled: Runtime.allowAppUsage && Scrite.app.transliterationEngine.enabledLanguages.indexOf(modelData.value) >= 0
-                                context: Qt.ApplicationShortcut
-                                sequence: "Alt+"+shortcutKey
-                                onActivated: activate()
+                  We are left with no other option but to waste memory like this. :-(
+                  */
+                Repeater {
+                    model: LanguageEngine.supportedLanguages
 
-                                ShortcutsModelItem.title: modelData.key
-                                ShortcutsModelItem.group: "Language"
-                                ShortcutsModelItem.priority: 0
-                                ShortcutsModelItem.enabled: enabled
-                                ShortcutsModelItem.shortcut: sequence
-                                ShortcutsModelItem.canActivate: true
-                                ShortcutsModelItem.onActivated: activate()
+                    Item {
+                        required property int index
+                        required property var language // This is of type Language, but we have to use var here.
+                                                       // You cannot use Q_GADGET struct names as type names in QML
+                                                       // that privilege is only reserved for QObject types.
 
-                                function activate() {
-                                    Scrite.app.transliterationEngine.language = modelData.value
-                                    Scrite.document.formatting.defaultLanguage = modelData.value
-                                    Runtime.paragraphLanguageSettings.defaultLanguage = modelData.key
-                                }
-                            }
-                        }
-                    }
+                        visible: false
 
-                    Shortcut {
-                        context: Qt.ApplicationShortcut
-                        enabled: Runtime.allowAppUsage
-                        sequence: "F10"
-                        onActivated: activate()
+                        Shortcut {
+                            ShortcutsModelItem.title: language.name
+                            ShortcutsModelItem.group: "Language"
+                            ShortcutsModelItem.priority: 0
+                            ShortcutsModelItem.enabled: enabled
+                            ShortcutsModelItem.shortcut: nativeText
+                            ShortcutsModelItem.canActivate: true
+                            ShortcutsModelItem.onActivated: Runtime.language.setActiveCode(language.code)
 
-                        ShortcutsModelItem.priority: 1
-                        ShortcutsModelItem.title: "Next Language"
-                        ShortcutsModelItem.group: "Language"
-                        ShortcutsModelItem.shortcut: "F10"
-                        ShortcutsModelItem.canActivate: true
-                        ShortcutsModelItem.onActivated: activate()
+                            enabled: true
+                            context: Qt.ApplicationShortcut
+                            sequence: language.keySequence
 
-                        function activate() {
-                            Scrite.app.transliterationEngine.cycleLanguage()
-                            Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
-                            Runtime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
+                            onActivated: Runtime.language.setActiveCode(language.code)
                         }
                     }
                 }
 
                 HelpTipNotification {
                     tipName: Scrite.app.isWindowsPlatform ? "language_windows" : (Scrite.app.isMacOSPlatform ? "language_macos" : "language_linux")
-                    enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
+                    enabled: Runtime.language.activeCode !== QtLocale.English
                 }
             }
 
             FlatToolButton {
-                ToolTip.text: "Show English to " + Scrite.app.transliterationEngine.languageAsString + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
+                ToolTip.text: "Show English to " + Runtime.language.active.name + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
 
-                down: alphabetMappingsPopup.visible
-                visible: mainTabBar.currentIndex <= 2
-                enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
+                down: _alphabetMappingsPopup.visible
+                visible: mainTabBar.currentIndex <= 2 && enabled
+                enabled: Runtime.language.activeCode !== QtLocale.English &&
+                         Runtime.language.activeTransliterator.name === DefaultTransliteration.driver &&
+                         DefaultTransliteration.supportsLanguageCode(Runtime.language.activeCode)
                 shortcut: "Ctrl+K"
                 iconSource: down ? "qrc:/icons/hardware/keyboard_hide.png" : "qrc:/icons/hardware/keyboard.png"
 
@@ -1058,17 +1042,18 @@ Item {
                 ShortcutsModelItem.onActivated: click()
 
                 function click() {
-                    alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
+                    if(enabled)
+                        _alphabetMappingsPopup.visible = !_alphabetMappingsPopup.visible
                 }
 
                 Item {
                     anchors.top: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
 
-                    width: alphabetMappingsPopup.width
+                    width: _alphabetMappingsPopup.width
 
                     Popup {
-                        id: alphabetMappingsPopup
+                        id: _alphabetMappingsPopup
 
                         width: alphabetMappingsLoader.width + 30
                         height: alphabetMappingsLoader.height + 30
@@ -1085,32 +1070,8 @@ Item {
 
                             active: parent.visible
 
-                            sourceComponent: AlphabetMappings {
-                                enabled: Scrite.app.transliterationEngine.textInputSourceIdForLanguage(Scrite.app.transliterationEngine.language) === ""
-
-                                Rectangle {
-                                    anchors.fill: parent
-
-                                    color: Runtime.colors.primary.c300.background
-                                    opacity: 0.9
-                                    visible: !parent.enabled
-
-                                    VclLabel {
-                                        anchors.centerIn: parent
-
-                                        width: parent.width * 0.75
-
-                                        text: {
-                                            if(Scrite.app.isMacOSPlatform)
-                                                return "Scrite is using an input source from macOS while typing in " + Scrite.app.transliterationEngine.languageAsString + "."
-                                            return "Scrite is using an input method & keyboard layout from Windows while typing in " + Scrite.app.transliterationEngine.languageAsString + "."
-                                        }
-                                        color: Runtime.colors.primary.c300.text
-                                        horizontalAlignment: Text.AlignHCenter
-
-                                        font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
-                                    }
-                                }
+                            sourceComponent: AlphabetMappingsView {
+                                language: Runtime.language.active
                             }
                         }
                     }
@@ -1118,21 +1079,21 @@ Item {
             }
 
             VclLabel {
-                id: languageDescLabel
+                id: _languageDescLabel
 
                 anchors.verticalCenter: parent.verticalCenter
 
                 width: 80
 
-                text: Scrite.app.transliterationEngine.languageAsString
-                visible: mainTabBar.currentIndex <= 2
+                text: Runtime.language.active.name
+                visible: Runtime.mainWindowTab <= Runtime.e_NotebookTab
 
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
                 MouseArea {
                     anchors.fill: parent
 
-                    onClicked: languageToolButton.click()
+                    onClicked: _languageToolButton.click()
                 }
             }
         }
@@ -1239,43 +1200,27 @@ Item {
                             title: "Language"
 
                             Repeater {
-                                model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
+                                model: LanguageEngine.supportedLanguages
 
                                 VclMenuItem {
-                                    required property var modelData
+                                    required property int index
+                                    required property var language // This is of type Language, but we have to use var here.
+                                                                   // You cannot use Q_GADGET struct names as type names in QML
+                                                                   // that privilege is only reserved for QObject types.
 
-                                    property string baseText: modelData.key
-                                    property string shortcutKey: Scrite.app.transliterationEngine.shortcutLetter(modelData.value)
+                                    text: language.name + " (" + language.shortcut() + ")"
+                                    font.bold: Runtime.language.activeCode === language.code
 
-                                    text: baseText + " (" + Scrite.app.polishShortcutTextForDisplay("Alt+"+shortcutKey) + ")"
-                                    font.bold: Scrite.app.transliterationEngine.language === modelData.value
-
-                                    onClicked: {
-                                        Scrite.app.transliterationEngine.language = modelData.value
-                                        Scrite.document.formatting.defaultLanguage = modelData.value
-                                        Runtime.paragraphLanguageSettings.defaultLanguage = modelData.key
-                                    }
-                                }
-                            }
-
-                            MenuSeparator { }
-
-                            VclMenuItem {
-                                text: "Next-Language (F10)"
-
-                                onClicked: {
-                                    Scrite.app.transliterationEngine.cycleLanguage()
-                                    Scrite.document.formatting.defaultLanguage = Scrite.app.transliterationEngine.language
-                                    Runtime.paragraphLanguageSettings.defaultLanguage = Scrite.app.transliterationEngine.languageAsString
+                                    onTriggered: Runtime.language.setActiveCode(language.code)
                                 }
                             }
                         }
 
                         VclMenuItem {
-                            text: "Alphabet Mappings For " + Scrite.app.transliterationEngine.languageAsString
-                            enabled: Scrite.app.transliterationEngine.language !== TransliterationEngine.English
+                            text: "Alphabet Mappings For " + Runtime.language.active.name
+                            enabled: Runtime.language.activeCode !== QtLocale.English
 
-                            onClicked: alphabetMappingsPopup.visible = !alphabetMappingsPopup.visible
+                            onClicked: _alphabetMappingsPopup.visible = !_alphabetMappingsPopup.visible
                         }
 
                         MenuSeparator { }

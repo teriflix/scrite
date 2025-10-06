@@ -106,10 +106,11 @@ AbstractScenePartEditor {
         Transliterator.spellCheckEnabled: false // SceneDocumentBinder handles it separately.
         Transliterator.applyLanguageFonts: false // SceneDocumentBinder handles it separately.
 
-        ImTransliterator.popup: ImTransliteratorPopup {
+        LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _sceneTextEditor.font
         }
-        ImTransliterator.enabled: !readOnly
+        LanguageTransliterator.option: Runtime.language.activeTransliterationOption
+        LanguageTransliterator.enabled: !readOnly
 
         width: parent.width
 

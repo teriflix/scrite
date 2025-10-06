@@ -48,6 +48,23 @@ Item {
     readonly property real minSceneSidePanelWidth: 250
     readonly property real maxSceneSidePanelWidth: 400
 
+    readonly property QtObject language: QtObject {
+        readonly property LanguageEngine engine: LanguageEngine
+        readonly property SupportedLanguages supported: LanguageEngine.supportedLanguages
+        readonly property AvailableLanguages available: LanguageEngine.availableLanguages
+
+        property int activeCode: supported.activeLanguageCode
+
+        property var active: supported.activeLanguage
+        property var activeTransliterationOption: active.valid ? active.preferredTransliterationOption() : undefined
+
+        property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
+
+        function setActiveCode(code) {
+            supported.activeLanguageCode = code
+        }
+    }
+
     // Persistent Settings
     readonly property Settings userAccountDialogSettings: Settings {
         fileName: Scrite.app.settingsFilePath

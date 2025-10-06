@@ -121,10 +121,11 @@ Loader {
             Transliterator.hasActiveFocus: activeFocus
             Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
 
-            ImTransliterator.popup: ImTransliteratorPopup {
+            LanguageTransliterator.popup: LanguageTransliteratorPopup {
                 editorFont: _textArea.font
             }
-            ImTransliterator.enabled: !readOnly
+            LanguageTransliterator.option: Runtime.language.activeTransliterationOption
+            LanguageTransliterator.enabled: !readOnly
 
             text: root.text
             font: root.font

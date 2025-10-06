@@ -38,10 +38,11 @@ TextArea {
     Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
     Transliterator.spellCheckEnabled: spellCheckEnabled
 
-    ImTransliterator.popup: ImTransliteratorPopup {
+    LanguageTransliterator.popup: LanguageTransliteratorPopup {
         editorFont: root.font
     }
-    ImTransliterator.enabled: !readOnly
+    LanguageTransliterator.option: Runtime.language.activeTransliterationOption
+    LanguageTransliterator.enabled: !readOnly
 
     palette: Scrite.app.palette
     selectByMouse: true
