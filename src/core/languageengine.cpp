@@ -424,10 +424,10 @@ bool SupportedLanguages::assignLanguageShortcut(int code, const QString &nativeS
     if (!language.isValid())
         return false;
 
-    if (language.keySequence.toString(QKeySequence::PortableText) == nativeSequence)
+    if (language.keySequence.toString() == nativeSequence)
         return true;
 
-    language.keySequence = QKeySequence::fromString(nativeSequence, QKeySequence::PortableText);
+    language.keySequence = QKeySequence::fromString(nativeSequence);
     if (language.keySequence.isEmpty())
         return false;
 
@@ -515,8 +515,7 @@ void SupportedLanguages::loadBuiltInLanguages()
     const QList<int> builtInLanguages = DefaultTransliteration::supportedLanguageCodes();
     for (int code : builtInLanguages) {
         Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(code);
-        language.keySequence = QKeySequence::fromString(DefaultTransliteration::shortcut(code),
-                                                        QKeySequence::PortableText);
+        language.keySequence = QKeySequence::fromString(DefaultTransliteration::shortcut(code));
         languages.append(language);
     }
 
@@ -580,10 +579,9 @@ QJsonValue SupportedLanguages::toJson() const
         item.insert("name", language.name());
         if (language.code != QLocale::English
             && !DefaultTransliteration::supportedLanguageCodes().contains(language.code)) {
-            item.insert("shortcut", language.keySequence.toString(QKeySequence::PortableText));
+            item.insert("shortcut", language.keySequence.toString());
         } else {
-            item.insert("default-shortcut",
-                        language.keySequence.toString(QKeySequence::PortableText));
+            item.insert("default-shortcut", language.keySequence.toString());
         }
 
         if (!language.preferredTransliterationOptionId.isEmpty()
@@ -629,15 +627,13 @@ void SupportedLanguages::fromJson(const QJsonValue &value)
 
         const QString shortcut = item.value("shortcut").toString();
         if (!shortcut.isEmpty()) {
-            const QKeySequence keySequence =
-                    QKeySequence::fromString(shortcut, QKeySequence::PortableText);
+            const QKeySequence keySequence = QKeySequence::fromString(shortcut);
             if (!keySequence.isEmpty())
                 language.keySequence = keySequence;
         } else {
             const QString defaultShortcut = DefaultTransliteration::shortcut(language.code);
             if (!defaultShortcut.isEmpty())
-                language.keySequence =
-                        QKeySequence::fromString(defaultShortcut, QKeySequence::PortableText);
+                language.keySequence = QKeySequence::fromString(defaultShortcut);
         }
 
         language.preferredTransliterationOptionId = item.value("option").toString();
@@ -1145,22 +1141,19 @@ bool LanguageTransliterator::eventFilter(QObject *object, QEvent *event)
 
             const QKeyEvent *keyEvent = static_cast<const QKeyEvent *>(event);
 
+            if (keyEvent->key() == Qt::Key_Escape) {
+                this->resetCurrentWord();
+                return true;
+            }
+
             if (!this->updateWordFromInput(keyEvent)) {
                 const QList<int> exceptions = { Qt::Key_Backspace, Qt::Key_Delete, Qt::Key_Shift,
                                                 Qt::Key_Control,   Qt::Key_Alt,    Qt::Key_Meta,
                                                 Qt::Key_CapsLock,  Qt::Key_NumLock };
-                const QList<int> finishKeys = { Qt::Key_Space, Qt::Key_Tab, Qt::Key_Return,
-                                                Qt::Key_Enter, Qt::Key_Escape };
+                if (exceptions.contains(keyEvent->key()))
+                    return false;
 
-                if (keyEvent->key() == Qt::Key_Escape)
-                    m_currentWord.commitString = m_currentWord.originalString;
-
-                if (!exceptions.contains(keyEvent->key()) || finishKeys.contains(keyEvent->key())
-                    || keyEvent->key() == Qt::Key_Escape)
-                    this->commitWordToEditor();
-
-                if (finishKeys.contains(keyEvent->key()))
-                    return !m_currentWord.originalString.isEmpty();
+                this->commitWordToEditor();
             }
         }
 
@@ -1175,8 +1168,7 @@ bool LanguageTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
     if (m_editor == nullptr || m_editor != qApp->focusObject())
         return false;
 
-    const QList<int> delimterKeys = { Qt::Key_Space, Qt::Key_Tab, Qt::Key_Return, Qt::Key_Enter,
-                                      Qt::Key_Escape };
+    const QList<int> delimterKeys = { Qt::Key_Space, Qt::Key_Tab, Qt::Key_Return, Qt::Key_Enter };
     if (delimterKeys.contains(keyEvent->key()))
         return false;
 
@@ -1190,7 +1182,7 @@ bool LanguageTransliterator::updateWordFromInput(const QKeyEvent *keyEvent)
     const int cursorPosition = query.value(Qt::ImCursorPosition).toInt();
     const QRect cursorRect = query.value(Qt::ImCursorRectangle).toRect();
 
-    if (m_currentWord.start < 0 || m_currentWord.start >= cursorPosition)
+    if (m_currentWord.start < 0 || m_currentWord.originalString.isEmpty())
         m_currentWord.start = cursorPosition;
     m_currentWord.end = cursorPosition;
 
@@ -1244,13 +1236,17 @@ void LanguageTransliterator::resetCurrentWord()
 {
     m_currentWord.start = -1;
     m_currentWord.end = -1;
-    m_currentWord.originalString.clear();
-    m_currentWord.commitString.clear();
-    m_currentWord.textRect = QRect();
 
+    m_currentWord.originalString.clear();
     emit currentWordChanged();
+
+    m_currentWord.commitString.clear();
     emit commitStringChanged();
-    emit textRectChanged();
+
+    QTimer::singleShot(100, this, [=]() {
+        m_currentWord.textRect = QRect();
+        emit textRectChanged();
+    });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1402,6 +1398,10 @@ void LanguageEngine::loadConfiguration()
 
         const QJsonValue supportedLanguagesConfig = config.value("supported-languages");
         m_supportedLanguages->fromJson(supportedLanguagesConfig);
+    } else {
+        m_availableLanguages->initialize();
+        m_supportedLanguages->initialize();
+        m_supportedLanguages->fromJson(QJsonValue());
     }
 }
 

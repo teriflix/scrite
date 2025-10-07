@@ -961,7 +961,7 @@ Item {
                                                                // You cannot use Q_GADGET struct names as type names in QML
                                                                // that privilege is only reserved for QObject types.
 
-                                text: language.name + "\t\t" + language.shortcut()
+                                text: language.name + "\t\t" + Scrite.app.polishShortcutTextForDisplay(language.shortcut())
                                 font.bold: Runtime.language.activeCode === language.code
 
                                 onTriggered: Runtime.language.setActiveCode(language.code)
@@ -999,7 +999,7 @@ Item {
                         Shortcut {
                             ShortcutsModelItem.title: language.name
                             ShortcutsModelItem.group: "Language"
-                            ShortcutsModelItem.priority: 0
+                            ShortcutsModelItem.priority: index+1
                             ShortcutsModelItem.enabled: enabled
                             ShortcutsModelItem.shortcut: nativeText
                             ShortcutsModelItem.canActivate: true
@@ -1007,7 +1007,7 @@ Item {
 
                             enabled: true
                             context: Qt.ApplicationShortcut
-                            sequence: language.keySequence
+                            sequence: language.shortcut()
 
                             onActivated: Runtime.language.setActiveCode(language.code)
                         }
@@ -1037,7 +1037,7 @@ Item {
                 ShortcutsModelItem.title: "Alphabet Mapping"
                 ShortcutsModelItem.enabled: enabled
                 ShortcutsModelItem.shortcut: shortcut
-                ShortcutsModelItem.priority: 1
+                ShortcutsModelItem.priority: 0
                 ShortcutsModelItem.canActivate: true
                 ShortcutsModelItem.onActivated: click()
 
@@ -1208,7 +1208,7 @@ Item {
                                                                    // You cannot use Q_GADGET struct names as type names in QML
                                                                    // that privilege is only reserved for QObject types.
 
-                                    text: language.name + " (" + language.shortcut() + ")"
+                                    text: language.name + " (" + Scrite.app.polishShortcutTextForDisplay(language.shortcut()) + ")"
                                     font.bold: Runtime.language.activeCode === language.code
 
                                     onTriggered: Runtime.language.setActiveCode(language.code)

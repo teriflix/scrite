@@ -17,7 +17,7 @@
 #include <QGuiApplication>
 #include <QAbstractNativeEventFilter>
 
-Q_GLOBAL_STATIC(WindowsBackend, Backend);
+Q_GLOBAL_STATIC(WindowsBackend, Backend)
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -32,7 +32,7 @@ PlatformTransliterationEngine::~PlatformTransliterationEngine() { }
 
 QString PlatformTransliterationEngine::name() const
 {
-    return QStringLiteral("Windows Text Input Method");
+    return QStringLiteral("Windows");
 }
 
 QList<TransliterationOption> PlatformTransliterationEngine::options(int lang) const

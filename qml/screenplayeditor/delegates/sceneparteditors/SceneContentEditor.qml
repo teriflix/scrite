@@ -280,7 +280,9 @@ AbstractScenePartEditor {
         selectionEndPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.selectionEnd : -1
         liveSpellCheckEnabled: _sceneTextEditor.activeFocus
         selectionStartPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.selectionStart : -1
-        autoCapitalizeSentences: !root.readOnly && Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
+        autoCapitalizeSentences: !root.readOnly &&
+                                 Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences &&
+                                 (Runtime.language.activeTransliterationOption ? !Runtime.language.activeTransliterationOption.inApp : true)
 
         onDocumentInitialized: () => {
             if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes)

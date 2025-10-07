@@ -349,8 +349,8 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
     VERSION_INFO = "1.2.3-macos"
 
-    HEADERS += src/core/systemtextinputmanager_macos.h
-    OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
+    HEADERS += src/core/systemtextinputmanager_macos.h src/core/platformtransliterator_macos.h
+    OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm src/core/platformtransliterator_macos.mm
     LIBS += -framework Carbon
     CONFIG+=sdk_no_version_check
 }
@@ -372,6 +372,8 @@ win32 {
 linux {
     CONFIG+=use_gold_linker
     VERSION_INFO = "1.2.3-linux"
+
+    SOURCES += src/core/platformtransliterator_linux.cpp
 }
 
 include($$PWD/3rdparty/sonnet/sonnet.pri)

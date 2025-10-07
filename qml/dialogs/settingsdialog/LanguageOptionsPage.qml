@@ -157,7 +157,7 @@ Item {
 
                                 opacity: enabled ? 1 : 0.5
                                 enabled: !DefaultTransliteration.supportsLanguageCode(_private.language.code) && _private.language.code !== QtLocale.English
-                                shortcut: _private.language.shortcut()
+                                shortcut: Scrite.app.polishShortcutTextForDisplay(_private.language.shortcut())
 
                                 onShortcutEdited: (text) => {
                                     Runtime.language.supported.assignLanguageShortcut(_private.language.code, text)

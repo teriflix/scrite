@@ -583,9 +583,9 @@ public:
     Q_SIGNAL void autoCapitalizeSentencesChanged();
 
     // Adds : at end of shots & transitions, CONT'D for characters where applicable.
-    Q_PROPERTY(bool autoPolishParagraphs READ autoPolishParagraphs WRITE setAutoPolishParagraphs NOTIFY autoPolishParagraphsChanged)
+    Q_PROPERTY(bool autoPolishParagraphs READ isAutoPolishParagraphs WRITE setAutoPolishParagraphs NOTIFY autoPolishParagraphsChanged)
     void setAutoPolishParagraphs(bool val);
-    bool autoPolishParagraphs() const { return m_autoPolishParagraphs; }
+    bool isAutoPolishParagraphs() const { return m_autoPolishParagraphs; }
     Q_SIGNAL void autoPolishParagraphsChanged();
 
     Q_PROPERTY(qreal textWidth READ textWidth WRITE setTextWidth NOTIFY textWidthChanged)
