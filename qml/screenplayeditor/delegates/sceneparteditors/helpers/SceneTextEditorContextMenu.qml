@@ -37,7 +37,6 @@ MenuLoader {
     signal cutRequest()
     signal copyRequest()
     signal pasteRequest()
-    signal translateSelectedText(int language)
     signal reloadSceneContentRequest()
     signal splitSceneAtPositionRequest(int position)
     signal mergeWithPreviousSceneRequest()
@@ -125,30 +124,6 @@ MenuLoader {
                     enabled: _menu.sceneCurrentElement !== null
                     onClicked: {
                         _menu.sceneCurrentElement.type = modelData.value
-                        root.close()
-                    }
-                }
-            }
-        }
-
-        VclMenu {
-            title: "Translate"
-
-            enabled: sceneTextEditor.hasSelection
-
-            Repeater {
-                model: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
-
-                VclMenuItem {
-                    required property var modelData // { key: string, value: int, icon: string }
-
-                    text: modelData.key
-                    visible: index >= 0
-                    enabled: modelData.value !== TransliterationEngine.English
-                    focusPolicy: Qt.NoFocus
-
-                    onClicked: {
-                        root.translateSelectedText(modelData.value)
                         root.close()
                     }
                 }

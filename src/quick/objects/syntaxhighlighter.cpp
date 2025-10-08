@@ -14,7 +14,7 @@
 #include "application.h"
 #include "textlimiter.h"
 #include "scritedocument.h"
-#include "transliteration.h"
+#include "languageengine.h"
 #include "spellcheckservice.h"
 #include "syntaxhighlighter.h"
 
@@ -239,11 +239,31 @@ void SyntaxHighlighter::setTextDocument(QQuickTextDocument *val)
                 &SyntaxHighlighter::documentContentsChange);
         connect(m_textDocument->textDocument(), &QTextDocument::contentsChanged, this,
                 &SyntaxHighlighter::documentContentsChanged);
+
+        QTextDocument *doc = m_textDocument->textDocument();
+        if (doc != nullptr)
+            doc->setUndoRedoEnabled(val);
     }
 
     emit textDocumentChanged();
 
     this->documentContentsChanged();
+}
+
+void SyntaxHighlighter::setTextDocumentUndoRedoEnabled(bool val)
+{
+    if (m_textDocumentUndoRedoEnabled == val)
+        return;
+
+    m_textDocumentUndoRedoEnabled = val;
+
+    if (m_textDocument != nullptr) {
+        QTextDocument *doc = m_textDocument->textDocument();
+        if (doc != nullptr)
+            doc->setUndoRedoEnabled(val);
+    }
+
+    emit textDocumentUndoRedoEnabledChanged();
 }
 
 void SyntaxHighlighter::highlightBlock(const QString &text)
@@ -475,15 +495,14 @@ void LanguageFontSyntaxHighlighterDelegate::highlightBlock(const QString &text)
         this->setFormat(0, block.length(), defaultFormat);
     }
 
-    const QList<TransliterationEngine::Boundary> boundaries =
-            TransliterationEngine::instance()->evaluateBoundaries(text);
+    const QList<ScriptBoundary> boundaries = LanguageEngine::determineBoundaries(text);
 
-    for (const TransliterationEngine::Boundary &boundary : boundaries) {
-        if (boundary.isEmpty() || boundary.language == TransliterationEngine::English)
+    for (const ScriptBoundary &boundary : boundaries) {
+        if (!boundary.isValid() || boundary.script == QChar::Script_Latin)
             continue;
 
         QTextCharFormat format;
-        format.setFontFamily(boundary.font.family());
+        format.setFontFamily(boundary.fontFamily());
         this->mergeFormat(boundary.start, boundary.end - boundary.start + 1, format);
     }
 }
@@ -758,7 +777,7 @@ void SpellCheckSyntaxHighlighterDelegate::highlightBlock(const QString &text)
                 continue;
 
             const QString word = text.mid(fragment.start(), fragment.length());
-            const QChar::Script script = TransliterationEngine::determineScript(word);
+            const QChar::Script script = LanguageEngine::determineScript(word);
             if (script != QChar::Script_Latin)
                 continue;
 

@@ -15,6 +15,7 @@
 
 #include "scene.h"
 #include "screenplay.h"
+#include "languageengine.h"
 #include "scritedocument.h"
 #include "screenplaytextdocument.h"
 
@@ -335,7 +336,7 @@ bool TwoColumnReport::doGenerate(QTextDocument *document)
             if (m_useSingleFont)
                 cursor.insertText(text);
             else
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(
+                LanguageEngine::polishFontsAndInsertTextAtCursor(
                         cursor, text,
                         m_preserveMarkupFormatting ? formats : QVector<QTextLayout::FormatRange>());
         };

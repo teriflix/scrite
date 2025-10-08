@@ -268,12 +268,13 @@ Item {
                 changePropertyValue(text)
             }
 
-            Transliterator.enabled: false
-            Transliterator.defaultFont: font
-            Transliterator.textDocument: textDocument
-            Transliterator.cursorPosition: cursorPosition
-            Transliterator.hasActiveFocus: activeFocus
-            Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+            SyntaxHighlighter.delegates: [
+                LanguageFontSyntaxHighlighterDelegate {
+                    enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                    defaultFont: _textArea.font
+                }
+            ]
+            SyntaxHighlighter.textDocument: textDocument
 
             LanguageTransliterator.popup: LanguageTransliteratorPopup {
                 editorFont: _textArea.font

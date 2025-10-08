@@ -12,17 +12,18 @@
 ****************************************************************************/
 
 #include "screenplaytextdocumentoffsets.h"
-#include "timeprofiler.h"
 #include "application.h"
+#include "timeprofiler.h"
+#include "languageengine.h"
 
 #include <QDir>
 #include <QtMath>
 #include <QFileInfo>
 #include <QJsonDocument>
+#include <QJsonDocument>
 #include <QVersionNumber>
 #include <QtConcurrentRun>
 #include <QAbstractTextDocumentLayout>
-#include <QJsonDocument>
 
 class OffsetItem
 {
@@ -628,7 +629,7 @@ void ScreenplayTextDocumentOffsets::setBusy(bool val)
 
 inline void polishFontsAndInsertTextAtCursor(QTextCursor &cursor, const QString &text)
 {
-    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, text);
+    LanguageEngine::determineBoundariesAndInsertText(cursor, text);
 };
 
 void ScreenplayTextDocumentOffsets::reloadDocument()

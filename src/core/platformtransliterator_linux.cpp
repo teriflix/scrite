@@ -43,9 +43,10 @@ bool PlatformTransliterationEngine::canActivate(const TransliterationOption &opt
     return false;
 }
 
-void PlatformTransliterationEngine::activate(const TransliterationOption &option)
+bool PlatformTransliterationEngine::activate(const TransliterationOption &option)
 {
     Q_UNUSED(option)
+    return false;
 }
 
 void PlatformTransliterationEngine::release(const TransliterationOption &option)

@@ -26,23 +26,39 @@ TextArea {
     property bool undoRedoEnabled: false
     property bool spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
 
-    Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
+    Material.primary: Runtime.colors.primary.key
 
-    Transliterator.enabled: false
-    Transliterator.defaultFont: font
-    Transliterator.textDocument: textDocument
-    Transliterator.cursorPosition: cursorPosition
-    Transliterator.hasActiveFocus: activeFocus
-    Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-    Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
-    Transliterator.spellCheckEnabled: spellCheckEnabled
+    SyntaxHighlighter.delegates: [
+        LanguageFontSyntaxHighlighterDelegate {
+            enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+            defaultFont: root.font
+        },
+
+        SpellCheckSyntaxHighlighterDelegate {
+            id: _spellChecker
+            enabled: root.spellCheckEnabled
+            cursorPosition: root.cursorPosition
+        }
+    ]
+    SyntaxHighlighter.textDocument: textDocument
+    SyntaxHighlighter.textDocumentUndoRedoEnabled: undoRedoEnabled
 
     LanguageTransliterator.popup: LanguageTransliteratorPopup {
         editorFont: root.font
     }
     LanguageTransliterator.option: Runtime.language.activeTransliterationOption
     LanguageTransliterator.enabled: !readOnly
+
+    ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
+    ContextMenuEvent.active: !_spellChecker.wordUnderCursorIsMisspelled
+    ContextMenuEvent.onPopup: (mouse) => {
+        if(!root.activeFocus) {
+            root.forceActiveFocus()
+            root.cursorPosition = root.positionAt(mouse.x, mouse.y)
+        }
+        _contextMenu.popup()
+    }
 
     palette: Scrite.app.palette
     selectByMouse: true
@@ -82,22 +98,13 @@ TextArea {
 
     TextAreaSpellingSuggestionsMenu { }
 
-    property var spellChecker: Transliterator.highlighter ? Transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate") : null
-    ContextMenuEvent.active: spellChecker ? !spellChecker.wordUnderCursorIsMisspelled : true
-    ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
-    ContextMenuEvent.onPopup: (mouse) => {
-        if(!root.activeFocus) {
-            root.forceActiveFocus()
-            root.cursorPosition = root.positionAt(mouse.x, mouse.y)
-        }
-        __contextMenu.popup()
-    }
-
     VclMenu {
-        id: __contextMenu
+        id: _contextMenu
+
         focus: false
 
         property bool __persistentSelection: false
+
         onAboutToShow: {
             __persistentSelection = root.persistentSelection
             root.persistentSelection = true

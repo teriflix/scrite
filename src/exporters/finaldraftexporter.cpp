@@ -13,6 +13,7 @@
 
 #include "finaldraftexporter.h"
 #include "application.h"
+#include "languageengine.h"
 
 #include <QDomDocument>
 #include <QDomElement>
@@ -30,15 +31,6 @@ void FinalDraftExporter::setMarkLanguagesExplicitly(bool val)
 
     m_markLanguagesExplicitly = val;
     emit markLanguagesExplicitlyChanged();
-}
-
-void FinalDraftExporter::setUseScriteFonts(bool val)
-{
-    if (m_useScriteFonts == val)
-        return;
-
-    m_useScriteFonts = val;
-    emit useScriteFontsChanged();
 }
 
 void FinalDraftExporter::setIncludeSceneSynopsis(bool val)
@@ -112,9 +104,8 @@ bool FinalDraftExporter::doExport(QIODevice *device)
 
         QVector<QTextLayout::FormatRange> mergedTextFormats = textFormats;
         if (m_markLanguagesExplicitly) {
-            const QList<TransliterationEngine::Boundary> breakup =
-                    TransliterationEngine::instance()->evaluateBoundaries(text, true);
-            mergedTextFormats = TransliterationEngine::mergeTextFormats(breakup, textFormats);
+            const QList<ScriptBoundary> breakup = LanguageEngine::determineBoundaries(text);
+            mergedTextFormats = LanguageEngine::mergeTextFormats(breakup, textFormats);
         }
 
         auto createTextElement = [&]() {
@@ -171,18 +162,14 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                 }
 
                 if (m_markLanguagesExplicitly) {
-                    TransliterationEngine::Language lang =
-                            (TransliterationEngine::Language)format.format
-                                    .property(QTextFormat::UserProperty)
+                    const QMetaEnum scriptEnum = QMetaEnum::fromType<Language::CharScript>();
+                    QChar::Script script =
+                            (QChar::Script)format.format.property(QTextFormat::UserProperty)
                                     .toInt();
-                    if (lang != TransliterationEngine::English) {
-                        const QFont font = TransliterationEngine::instance()->languageFont(
-                                lang, m_useScriteFonts);
-                        textE.setAttribute(QStringLiteral("Font"), font.family());
-                        textE.setAttribute(
-                                QStringLiteral("Language"),
-                                TransliterationEngine::instance()->languageAsString(lang));
-                    }
+                    const QString fontFamily = LanguageEngine::instance()->scriptFontFamily(script);
+                    textE.setAttribute(QStringLiteral("Font"), fontFamily);
+                    textE.setAttribute(QStringLiteral("Script"),
+                                       QString::fromLatin1(scriptEnum.valueToKey(script)));
                 }
 
                 textE.appendChild(doc.createTextNode(snippet));

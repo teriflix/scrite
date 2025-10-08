@@ -108,6 +108,10 @@ bool MacOSBackend::activate(const TransliterationOption &option,
                            [option](const TextInputSource &tis) { return option.id == tis.id; });
 
     if (it != d->textInputSources.end()) {
+        const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(it->inputSource, kTISPropertyInputSourceIsSelected) == kCFBooleanTrue;
+        if(alreadyActive)
+            return true;
+
         TISInputSourceRef inputSource = (TISInputSourceRef)it->inputSource;
         return TISSelectInputSource(inputSource) == noErr;
     }
@@ -195,9 +199,9 @@ bool PlatformTransliterationEngine::canActivate(const TransliterationOption &opt
     return option.transliteratorObject == this && ::Backend->canActivate(option, this);
 }
 
-void PlatformTransliterationEngine::activate(const TransliterationOption &option)
+bool PlatformTransliterationEngine::activate(const TransliterationOption &option)
 {
-    ::Backend->activate(option, this);
+    return ::Backend->activate(option, this);
 }
 
 void PlatformTransliterationEngine::release(const TransliterationOption &option)

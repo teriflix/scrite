@@ -19,6 +19,7 @@
 #include "searchengine.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
+#include "languageengine.h"
 #include "garbagecollector.h"
 #include "qobjectserializer.h"
 #include "screenplaytextdocument.h"
@@ -369,7 +370,7 @@ void SceneHeading::setWordCount(int val)
 void SceneHeading::evaluateWordCount()
 {
     const QString text = this->toString(DisplayMode);
-    this->setWordCount(TransliterationEngine::wordCount(text));
+    this->setWordCount(LanguageEngine::wordCount(text));
 }
 
 void SceneHeading::evaluateWordCountLater()
@@ -986,7 +987,7 @@ void SceneElement::setWordCount(int val)
 
 void SceneElement::evaluateWordCount()
 {
-    this->setWordCount(TransliterationEngine::wordCount(m_text));
+    this->setWordCount(LanguageEngine::wordCount(m_text));
 }
 
 void SceneElement::evaluateWordCountLater()
@@ -2373,7 +2374,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
             cursor.insertBlock(blockFormat, charFormat);
 
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, synopsis);
         }
     }
 
@@ -2441,7 +2442,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             charFormat.setFont(textDocument->defaultFont());
 
             cursor.insertBlock(blockFormat, charFormat);
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, comments);
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, comments);
         }
     }
 
@@ -2463,7 +2464,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             const QTextCharFormat headingParaCharFormat = headingParaFormat->createCharFormat();
             cursor.setBlockFormat(headingParaBlockFormat);
             cursor.setBlockCharFormat(headingParaCharFormat);
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, m_heading->text());
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, m_heading->text());
             cursor.insertBlock();
         }
 
@@ -2474,8 +2475,8 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             const QTextCharFormat paraCharFormat = paraFormat->createCharFormat();
             cursor.setBlockFormat(paraBlockFormat);
             cursor.setBlockCharFormat(paraCharFormat);
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, para->text(),
-                                                                   para->textFormats());
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(),
+                                                             para->textFormats());
             if (para != m_elements.last())
                 cursor.insertBlock();
         }
@@ -2929,7 +2930,7 @@ SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRati
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
 #if 0
-        TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text(),
+        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text(),
                                                                QVector<QTextLayout::FormatRange>());
 #else
         cursor.insertText(scene->heading()->text());
@@ -2951,7 +2952,7 @@ SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRati
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
 #if 0
-        TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, para->text(),
+        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(),
                                                                para->textFormats());
 #else
         cursor.insertText(para->text());

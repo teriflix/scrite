@@ -24,14 +24,14 @@
 #include <QUndoStack>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QQuickWindow>
 #include <QApplication>
+#include <QFontDatabase>
 #include <QVersionNumber>
 
 #include "undoredo.h"
 #include "errorreport.h"
-#include "transliteration.h"
 #include "qobjectlistmodel.h"
-#include "systemtextinputmanager.h"
 
 typedef QApplication QtApplicationClass;
 
@@ -211,7 +211,6 @@ public:
     static QFontDatabase &fontDatabase();
 
     Q_INVOKABLE static QJsonObject systemFontInfo();
-    Q_INVOKABLE QStringList fontFamiliesFor(int language);
     Q_INVOKABLE static QColor pickColor(const QColor &initial);
     Q_INVOKABLE static QString colorName(const QColor &color) { return color.name(); }
     Q_INVOKABLE static QColor tintedColor(const QColor &c, qreal factor);
@@ -229,15 +228,6 @@ public:
 
     Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
     QString settingsFilePath() const;
-
-    Q_PROPERTY(TransliterationEngine *transliterationEngine READ transliterationEngine CONSTANT)
-    TransliterationEngine *transliterationEngine() const
-    {
-        return TransliterationEngine::instance();
-    }
-
-    Q_PROPERTY(SystemTextInputManager *textInputManager READ textInputManager CONSTANT)
-    SystemTextInputManager *textInputManager() const { return SystemTextInputManager::instance(); }
 
     Q_INVOKABLE static QPointF cursorPosition();
     Q_INVOKABLE static QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos);

@@ -22,7 +22,6 @@
 
 AbstractExporter::AbstractExporter(QObject *parent) : AbstractDeviceIO(parent)
 {
-    m_languageBundleMap = TransliterationEngine::instance()->activeLanguages();
     connect(User::instance(), &User::infoChanged, this, &AbstractExporter::featureEnabledChanged);
 }
 

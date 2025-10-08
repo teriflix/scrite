@@ -14,6 +14,7 @@
 #include "statisticsreport.h"
 #include "statisticsreport_p.h"
 #include "screenplaytextdocument.h"
+#include "languageengine.h"
 
 #include "scene.h"
 #include "hourglass.h"
@@ -585,7 +586,7 @@ void StatisticsReport::prepareTextDocument()
     };
 
     auto polishFontsAndInsertTextAtCursor = [](QTextCursor &cursor, const QString &text) {
-        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, text);
+        LanguageEngine::determineBoundariesAndInsertText(cursor, text);
     };
 
     const int nrElements = screenplay->elementCount();

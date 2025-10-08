@@ -933,10 +933,10 @@ Item {
 
                 ToolTip.text: Scrite.app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
 
-                text: Scrite.app.transliterationEngine.languageAsString
+                text: Runtime.language.active.name
                 down: _languageMenu.visible
-                shortcut: "Ctrl+L"
                 visible: Runtime.mainWindowTab <= Runtime.e_NotebookTab
+                shortcut: "Ctrl+L"
                 iconSource: "qrc:/icons/content/language.png"
 
                 onClicked: _languageMenu.visible = true

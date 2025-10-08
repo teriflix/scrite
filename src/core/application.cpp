@@ -694,24 +694,6 @@ QJsonObject Application::systemFontInfo()
     return ret;
 }
 
-QStringList Application::fontFamiliesFor(int language)
-{
-    QStringList ret;
-
-    QFontDatabase &fontdb = Application::fontDatabase();
-    QFontDatabase::WritingSystem writingSystem = language == TransliterationEngine::English
-            ? QFontDatabase::Any
-            : TransliterationEngine::writingSystemForLanguage(
-                    TransliterationEngine::Language(language));
-    const QStringList allFamilies = fontdb.families(writingSystem);
-
-    QStringList families;
-    std::copy_if(allFamilies.begin(), allFamilies.end(), std::back_inserter(ret),
-                 [fontdb](const QString &family) { return !fontdb.isPrivateFamily(family); });
-
-    return ret;
-}
-
 QColor Application::pickColor(const QColor &initial)
 {
     QColorDialog::ColorDialogOptions options =
@@ -1878,9 +1860,6 @@ QPointF Application::globalMousePosition()
 
 QString Application::camelCased(const QString &val)
 {
-    //    if(TransliterationEngine::instance()->language() != TransliterationEngine::English)
-    //        return val;
-
     QString val2 = val.toLower();
     if (val2.isEmpty())
         return val;

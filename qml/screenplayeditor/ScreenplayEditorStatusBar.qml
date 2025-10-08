@@ -391,9 +391,9 @@ Rectangle {
         }
 
         Connections {
-            target: Scrite.app.transliterationEngine
+            target: Runtime.language.engine
 
-            function onPreferredFontFamilyForLanguageChanged() {
+            function onScriptFontFamilyChanged() {
                 const oldValue = _zoomSlider.value
                 _zoomSlider.value = screenplayFormat.fontZoomLevelIndex
                 Qt.callLater( (val) => { _zoomSlider.value = val }, oldValue )

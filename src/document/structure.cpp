@@ -19,6 +19,7 @@
 #include "filemanager.h"
 #include "application.h"
 #include "deltadocument.h"
+#include "languageengine.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "structureexporter.h"
@@ -1914,7 +1915,7 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
             const QString summary = m_summary.toString();
             if (!summary.isEmpty()) {
                 addSection(QLatin1String("Summary"));
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, summary);
+                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, summary);
             }
         } else {
             const QJsonObject summary = m_summary.toObject();

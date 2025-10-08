@@ -57,7 +57,7 @@ public:
     Q_PROPERTY(bool valid READ isValid)
     bool isValid() const;
 
-    Q_INVOKABLE void activate();
+    Q_INVOKABLE bool activate();
     Q_INVOKABLE QString transliterateWord(const QString &word) const;
 
     AbstractTransliterationEngine *transliterator() const;
@@ -107,6 +107,7 @@ public:
     Q_INVOKABLE int charScript() const; // Returns QChar::Script
     Q_INVOKABLE int localeScript() const; // Returns QLocale::Script
     Q_INVOKABLE int fontWritingSystem() const; // Returns QFontDatabase::WritingSystem
+    Q_INVOKABLE bool activate();
     Q_INVOKABLE QString charScriptName() const;
     Q_INVOKABLE QString localeScriptName() const;
     Q_INVOKABLE QString fontWritingSystemName() const;
@@ -342,7 +343,14 @@ public:
     }
     Q_SIGNAL void countChanged();
 
-    enum { LanguageRole = Qt::UserRole };
+    enum {
+        LanguageRole = Qt::UserRole,
+        CodeRole,
+        NameRole,
+        NativeNameRole,
+        KeySequenceRole,
+        PreferredTransliterationOptionIdRole
+    };
     QHash<int, QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -381,8 +389,16 @@ public:
     int activeLanguageCode() const { return m_activeLanguageCode; }
     Q_SIGNAL void activeLanguageCodeChanged();
 
+    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY defaultLanguageCodeChanged)
+    void setDefaultLanguageCode(int val);
+    int defaultLanguageCode() const { return m_defaultLanguageCode; }
+    Q_SIGNAL void defaultLanguageCodeChanged();
+
     Q_PROPERTY(Language activeLanguage READ activeLanguage NOTIFY activeLanguageCodeChanged)
     Language activeLanguage() const;
+
+    Q_PROPERTY(Language defaultLanguage READ defaultLanguage NOTIFY defaultLanguageCodeChanged)
+    Language defaultLanguage() const;
 
     Q_PROPERTY(int activeLanguageRow READ activeLanguageRow NOTIFY activeLanguageRowChanged)
     int activeLanguageRow() const;
@@ -419,6 +435,7 @@ private:
 private:
     friend class LanguageEngine;
     int m_activeLanguageCode = -1;
+    int m_defaultLanguageCode = -1;
 };
 
 class AvailableLanguages : public AbstractLanguagesModel
@@ -540,7 +557,7 @@ public:
     virtual bool canActivate(const TransliterationOption &option) = 0;
 
     /** called as soon as editor receives focus **/
-    virtual void activate(const TransliterationOption &option) = 0;
+    virtual bool activate(const TransliterationOption &option) = 0;
 
     /** called as soon as editor loses focus **/
     virtual void release(const TransliterationOption &option) = 0;
@@ -571,7 +588,7 @@ public:
     QString name() const;
     QList<TransliterationOption> options(int lang) const;
     bool canActivate(const TransliterationOption &option);
-    void activate(const TransliterationOption &option);
+    bool activate(const TransliterationOption &option);
     void release(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
@@ -592,7 +609,7 @@ public:
     QString name() const;
     QList<TransliterationOption> options(int lang) const;
     bool canActivate(const TransliterationOption &option);
-    void activate(const TransliterationOption &option);
+    bool activate(const TransliterationOption &option);
     void release(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
@@ -613,7 +630,7 @@ public:
     QString name() const;
     QList<TransliterationOption> options(int lang) const;
     bool canActivate(const TransliterationOption &option);
-    void activate(const TransliterationOption &option);
+    bool activate(const TransliterationOption &option);
     void release(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
@@ -709,8 +726,11 @@ public:
     Q_PROPERTY(QChar::Script script MEMBER script)
     QChar::Script script = QChar::Script_Unknown;
 
+    Q_PROPERTY(QString fontFamily READ fontFamily)
+    QString fontFamily() const;
+
     Q_PROPERTY(bool valid READ isValid)
-    bool isValid() const { return start >= 0 && end > 0 && end - start > 1 && !text.isEmpty(); }
+    bool isValid() const;
 };
 Q_DECLARE_METATYPE(ScriptBoundary)
 Q_DECLARE_METATYPE(QList<ScriptBoundary>)
@@ -741,6 +761,7 @@ public:
 
     QList<TransliterationOption> queryTransliterationOptions(int language) const;
 
+    static QChar::Script determineScript(const QString &text);
     static QList<ScriptBoundary> determineBoundaries(const QString &paragraph);
     static void determineBoundariesAndInsertText(QTextCursor &cursor, const QString &paragraph);
     static QString formattedInHtml(const QString &paragraph);
@@ -748,6 +769,9 @@ public:
     static QVector<QTextLayout::FormatRange>
     mergeTextFormats(const QList<ScriptBoundary> &boundaries,
                      const QVector<QTextLayout::FormatRange> &formats);
+    static void polishFontsAndInsertTextAtCursor(
+            QTextCursor &cursor, const QString &text,
+            const QVector<QTextLayout::FormatRange> &formats = QVector<QTextLayout::FormatRange>());
 
     static void init(const char *uri, QQmlEngine *qmlEngine);
 
@@ -755,11 +779,15 @@ signals:
     void scriptFontFamilyChanged(QChar::Script script, const QString &fontFamily);
     void transliterationOptionsUpdated();
 
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
     explicit LanguageEngine(QObject *parent = nullptr);
 
     void loadConfiguration();
     void saveConfiguration();
+    void activateTransliterationOptionOnActiveLanguage();
 
 private:
     QString m_configFileName;

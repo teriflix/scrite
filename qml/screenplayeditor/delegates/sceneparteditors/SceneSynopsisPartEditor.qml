@@ -31,8 +31,6 @@ AbstractScenePartEditor {
     TextAreaInput {
         id: _synopsisInput
 
-        Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
-
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: root.pageLeftMargin

@@ -361,7 +361,8 @@ Loader {
                         id: _logLineField
 
                         Layout.fillWidth: true
-                        Component.onCompleted: Transliterator.highlighter.addDelegate(_loglineLimitHighlighter)
+
+                        Component.onCompleted: SyntaxHighlighter.addDelegate(_loglineLimitHighlighter)
 
                         text: _private.screenplay.logline
                         font: _private.fontMetrics.font

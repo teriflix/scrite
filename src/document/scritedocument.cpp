@@ -2898,8 +2898,12 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // From version 0.4.14 onwards we allow users to set their own custom fonts
     // for each language. This is a deviation from using "Courier Prime" as the
     // default Latin font.
-    m_formatting->useUserSpecifiedFonts();
-    m_printFormat->useUserSpecifiedFonts();
+
+    // UPDATE: From version 1.2.4, font-family can only be specified in one place,
+    // and that is LanguageEngine. Other delta formatting hints are stored in
+    // the document anyway. So the following line are no longer required
+    // m_formatting->useUserSpecifiedFonts();
+    // m_printFormat->useUserSpecifiedFonts();
 
     // Although its not specified anywhere that transitions must be right aligned,
     // many writers who are early adopters of Scrite are insisting on it.

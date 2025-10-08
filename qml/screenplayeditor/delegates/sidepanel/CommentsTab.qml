@@ -32,8 +32,6 @@ AbstractScenePartEditor {
         ToolTip.delay: 1000
         ToolTip.visible: height < contentHeight
 
-        Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
-
         anchors.fill: parent
 
         text: root.scene.comments

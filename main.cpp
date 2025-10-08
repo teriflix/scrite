@@ -48,8 +48,6 @@ int main(int argc, char **argv)
 
     User::instance();
     LanguageEngine::instance();
-    TransliterationEngine::instance(); // REMOVE THIS
-    SystemTextInputManager::instance(); // REMOVE THIS
     NotificationManager::instance();
     DocumentFileSystem::setMarker(QByteArrayLiteral("SCRITE"));
     ScriteDocument::instance();

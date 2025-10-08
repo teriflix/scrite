@@ -79,7 +79,6 @@ TextField {
 
     Component.onDestruction: {
         if(activeFocus) {
-            transliterate(true)
             editingComplete()
         }
     }
@@ -105,6 +104,12 @@ TextField {
 
     KeyNavigation.tab: tabItem
     KeyNavigation.backtab: backTabItem
+
+    LanguageTransliterator.popup: LanguageTransliteratorPopup {
+        editorFont: root.font
+    }
+    LanguageTransliterator.option: Runtime.language.activeTransliterationOption
+    LanguageTransliterator.enabled: !readOnly
 
     ContextMenuEvent.onPopup: (mouse) => {
         if(!root.activeFocus) {
@@ -325,23 +330,7 @@ TextField {
             editingFinished()
     }
 
-    function transliterate(includingLastWord) {
-        if(includingLastWord === undefined)
-            includingLastWord = false
-
-        if(enableTransliteration & userTypedSomeText) {
-            var newText = Scrite.app.transliterationEngine.transliteratedParagraph(text, includingLastWord)
-            if(text === newText)
-                return
-
-            userTypedSomeText = false
-            text = newText
-        }
-    }
-
     onTextEdited: {
-        transliterate(false)
-
         _completionModel.allowEnable = true
     }
 
@@ -350,7 +339,6 @@ TextField {
     }
 
     onEditingFinished: {
-        transliterate(true)
         _completionModel.allowEnable = false
         editingComplete()
     }

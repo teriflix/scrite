@@ -68,7 +68,6 @@ HEADERS += \
     src/core/qobjectlistmodel.h \
     src/core/qobjectproperty.h \
     src/core/scrite.h \
-    src/core/systemtextinputmanager.h \
     src/document/attachments.h \
     src/document/characterrelationshipgraph.h \
     src/document/form.h \
@@ -144,7 +143,6 @@ HEADERS += \
     src/utils/qobjectserializer.h \
     src/utils/modifiable.h \
     src/document/formatting.h \
-    src/document/transliteration.h \
     src/document/scritedocument.h \
     src/document/documentfilesystem.h \
     src/document/structure.h \
@@ -206,7 +204,6 @@ SOURCES += \
     src/core/qobjectlistmodel.cpp \
     src/core/qobjectproperty.cpp \
     src/core/scrite.cpp \
-    src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
     src/document/characterrelationshipgraph.cpp \
     src/document/form.cpp \
@@ -285,7 +282,6 @@ SOURCES += \
     src/document/structure.cpp \
     src/document/screenplaytextdocument.cpp \
     src/document/undoredo.cpp \
-    src/document/transliteration.cpp \
     src/document/screenplayadapter.cpp \
     src/document/formatting.cpp \
     src/core/autoupdate.cpp \
@@ -349,8 +345,8 @@ macx {
     QMAKE_INFO_PLIST = Info.plist
     VERSION_INFO = "1.2.3-macos"
 
-    HEADERS += src/core/systemtextinputmanager_macos.h src/core/platformtransliterator_macos.h
-    OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm src/core/platformtransliterator_macos.mm
+    HEADERS += src/core/platformtransliterator_macos.h
+    OBJECTIVE_SOURCES += src/core/platformtransliterator_macos.mm
     LIBS += -framework Carbon
     CONFIG+=sdk_no_version_check
 }
@@ -363,8 +359,8 @@ win32 {
     }
 
     RC_ICONS = appicon.ico
-    HEADERS += src/core/systemtextinputmanager_windows.h src/core/platformtransliterator_windows.h
-    SOURCES += src/core/systemtextinputmanager_windows.cpp src/core/platformtransliterator_windows.cpp
+    HEADERS += src/core/platformtransliterator_windows.h
+    SOURCES += src/core/platformtransliterator_windows.cpp
 
     LIBS += User32.lib
 }

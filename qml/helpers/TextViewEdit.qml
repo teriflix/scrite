@@ -89,10 +89,9 @@ Loader {
             color: textColor
             wrapMode: root.wrapMode
             textFormat: markupText === "" ? Text.PlainText : Text.RichText
-            horizontalAlignment: root.horizontalAlignment
             verticalAlignment: root.verticalAlignment
+            horizontalAlignment: root.horizontalAlignment
 
-            padding: 5
             topPadding: root.topPadding
             leftPadding: root.leftPadding
             rightPadding: root.rightPadding
@@ -114,12 +113,29 @@ Loader {
                 root.editingFinished()
             }
 
-            Transliterator.enabled: false
-            Transliterator.defaultFont: font
-            Transliterator.textDocument: textDocument
-            Transliterator.cursorPosition: cursorPosition
-            Transliterator.hasActiveFocus: activeFocus
-            Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+
+            Keys.onEscapePressed: {
+                editingFinished()
+            }
+
+            Keys.onReturnPressed: {
+                if(_completionModel.hasSuggestion) {
+                    _textArea.text = _completionModel.suggestion
+                    _textArea.cursorPosition = _textArea.length
+                    _completionModel.allowEnable = false
+                } else if(event.modifiers !== Qt.NoModifier)
+                    _textArea.append("\n")
+                else
+                    editingFinished()
+            }
+
+            SyntaxHighlighter.textDocument: textDocument
+            SyntaxHighlighter.delegates: [
+                LanguageFontSyntaxHighlighterDelegate {
+                    enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                    defaultFont: _textArea.font
+                }
+            ]
 
             LanguageTransliterator.popup: LanguageTransliteratorPopup {
                 editorFont: _textArea.font
@@ -130,33 +146,22 @@ Loader {
             text: root.text
             font: root.font
             palette: Scrite.app.palette
+            opacity: activeFocus ? 1 : 0.5
             wrapMode: root.wrapMode
+            selectByMouse: true
+            selectByKeyboard: true
             verticalAlignment: root.verticalAlignment
             horizontalAlignment: root.horizontalAlignment
 
-            selectByMouse: true
-            selectByKeyboard: true
+            topPadding: root.topPadding
+            leftPadding: root.leftPadding
+            rightPadding: root.rightPadding
+            bottomPadding: root.bottomPadding
+
             background: Rectangle {
                 visible: frameVisible
                 border.width: 1
                 border.color: Runtime.colors.primary.borderColor
-            }
-            opacity: activeFocus ? 1 : 0.5
-            leftPadding: root.leftPadding
-            topPadding: root.topPadding
-            rightPadding: root.rightPadding
-            bottomPadding: root.bottomPadding
-
-            onTextChanged: {
-                root.textEdited(text);
-                _completionModel.allowEnable = true
-            }
-
-            onFocusChanged: _completionModel.allowEnable = true
-
-            onEditingFinished: {
-                root.text = text
-                root.editingFinished()
             }
 
             CompletionModel {
@@ -228,19 +233,16 @@ Loader {
                 }
             }
 
-            Keys.onEscapePressed: {
-                editingFinished()
+            onTextChanged: {
+                root.textEdited(text);
+                _completionModel.allowEnable = true
             }
 
-            Keys.onReturnPressed: {
-                if(_completionModel.hasSuggestion) {
-                    _textArea.text = _completionModel.suggestion
-                    _textArea.cursorPosition = _textArea.length
-                    _completionModel.allowEnable = false
-                } else if(event.modifiers !== Qt.NoModifier)
-                    _textArea.append("\n")
-                else
-                    editingFinished()
+            onFocusChanged: _completionModel.allowEnable = true
+
+            onEditingFinished: {
+                root.text = text
+                root.editingFinished()
             }
         }
     }

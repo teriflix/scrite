@@ -19,6 +19,7 @@
 #include <QMimeData>
 #include <QMetaEnum>
 #include <QKeyEvent>
+#include <QQuickItem>
 #include <QMetaObject>
 #include <QMouseEvent>
 #include <QWheelEvent>

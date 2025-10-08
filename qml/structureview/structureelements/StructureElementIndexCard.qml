@@ -205,10 +205,13 @@ AbstractStructureElementUI {
 
                 Component.onCompleted: _headingFieldLoader.hasFocus = false
 
-                Transliterator.enabled: false
-                Transliterator.defaultFont: font
-                Transliterator.textDocument: textDocument
-                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                SyntaxHighlighter.delegates: [
+                    LanguageFontSyntaxHighlighterDelegate {
+                        enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                        defaultFont: _basicHeadingField.font
+                    }
+                ]
+                SyntaxHighlighter.textDocument: textDocument
 
                 text: root.element.hasTitle ? root.element.title : "Index Card Title"
                 color: root.element.hasTitle ? "black" : "gray"
@@ -232,8 +235,6 @@ AbstractStructureElementUI {
 
             highDetailComponent: VclTextField {
                 id: _headingField
-
-                property var currentLanguage: Scrite.app.transliterationEngine.language
 
                 Component.onCompleted: _headingFieldLoader.hasFocus = activeFocus
 
@@ -328,11 +329,18 @@ AbstractStructureElementUI {
 
                             anchors.fill: parent
 
-                            Transliterator.enabled: false
-                            Transliterator.defaultFont: font
-                            Transliterator.textDocument: textDocument
-                            Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-                            Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
+                            SyntaxHighlighter.delegates: [
+                                LanguageFontSyntaxHighlighterDelegate {
+                                    enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                    defaultFont: _synopsisTextDisplay.font
+                                },
+
+                                SpellCheckSyntaxHighlighterDelegate {
+                                    enabled: Runtime.screenplayEditorSettings.enableSpellCheck
+                                    cursorPosition: _synopsisTextDisplay.cursorPosition
+                                }
+                            ]
+                            SyntaxHighlighter.textDocument: textDocument
 
                             topPadding: 4
                             leftPadding: 4
@@ -388,13 +396,18 @@ AbstractStructureElementUI {
 
                                 Keys.onEscapePressed: root.canvasTabSequence.releaseFocus()
 
-                                Transliterator.enabled: false
-                                Transliterator.defaultFont: font
-                                Transliterator.textDocument: textDocument
-                                Transliterator.cursorPosition: cursorPosition
-                                Transliterator.hasActiveFocus: activeFocus
-                                Transliterator.spellCheckEnabled: Runtime.screenplayEditorSettings.enableSpellCheck
-                                Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                SyntaxHighlighter.delegates: [
+                                    LanguageFontSyntaxHighlighterDelegate {
+                                        enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                                        defaultFont: _synopsisField.font
+                                    },
+
+                                    SpellCheckSyntaxHighlighterDelegate {
+                                        enabled: Runtime.screenplayEditorSettings.enableSpellCheck
+                                        cursorPosition: _synopsisField.cursorPosition
+                                    }
+                                ]
+                                SyntaxHighlighter.textDocument: textDocument
 
                                 LanguageTransliterator.popup: LanguageTransliteratorPopup { }
                                 LanguageTransliterator.option: Runtime.language.activeTransliterationOption

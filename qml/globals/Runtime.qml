@@ -274,19 +274,6 @@ Item {
         property bool richTextNotesEnabled: true
     }
 
-    readonly property Settings paragraphLanguageSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Paragraph Language"
-
-        property string shotLanguage: "Default"
-        property string actionLanguage: "Default"
-        property string defaultLanguage: "English"
-        property string dialogueLanguage: "Default"
-        property string characterLanguage: "Default"
-        property string transitionLanguage: "Default"
-        property string parentheticalLanguage: "Default"
-    }
-
     readonly property Settings workspaceSettings: Settings {
         fileName: Scrite.app.settingsFilePath
         category: "Workspace"

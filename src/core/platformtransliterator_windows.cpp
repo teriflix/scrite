@@ -45,9 +45,9 @@ bool PlatformTransliterationEngine::canActivate(const TransliterationOption &opt
     return option.transliteratorObject == this && ::Backend->canActivate(option, this);
 }
 
-void PlatformTransliterationEngine::activate(const TransliterationOption &option)
+bool PlatformTransliterationEngine::activate(const TransliterationOption &option)
 {
-    ::Backend->activate(option, this);
+    return ::Backend->activate(option, this);
 }
 
 void PlatformTransliterationEngine::release(const TransliterationOption &option)
@@ -132,8 +132,11 @@ bool WindowsBackend::activate(const TransliterationOption &option,
                            [option](const TextInputSource &tis) { return option.id == tis.id; });
 
     if (it != d->textInputSources.end()) {
-        ActivateKeyboardLayout(it->hkl, 0);
-        return true;
+        if (GetKeyboardLayout(0) == it->hkl)
+            return true;
+
+        ActivateKeyboardLayout(it->hkl, KLF_SETFORPROCESS);
+        return GetKeyboardLayout(0) == it->hkl;
     }
 
     return false;

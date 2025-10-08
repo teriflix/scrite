@@ -73,12 +73,11 @@ Item {
                 anchors.margins: 1
 
                 clip: true
+                color: Runtime.colors.primary.c50.text
+                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
 
                 font.family: "Courier Prime"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                color: Runtime.colors.primary.c50.text
-
-                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
 
                 onTextChanged: cmdApplyButton.enabled = true
             }

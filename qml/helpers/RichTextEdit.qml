@@ -61,8 +61,6 @@ Item {
             onRedoRequest: scriteWebChannelObject.requestRedo()
         }
 
-        TransliterationHints.allowedMechanisms: TransliterationHints.TextInputSourceMechanism
-
         // Focus handling
         TabSequenceItem.manager: tabSequenceManager
         TabSequenceItem.sequence: tabSequenceIndex

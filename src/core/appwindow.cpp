@@ -137,14 +137,6 @@ void AppWindow::setCloseButtonVisible(bool val)
     emit closeButtonVisibleChanged();
 }
 
-void AppWindow::showEvent(QShowEvent *se)
-{
-    QQuickWindow::showEvent(se);
-    connect(this, &AppWindow::activeFocusItemChanged, TransliterationEngine::instance(),
-            &TransliterationEngine::determineEnabledLanguages);
-    TransliterationEngine::instance()->determineEnabledLanguages();
-}
-
 static inline QString getFileNameToOpenFromAppArgs()
 {
     QString ret;

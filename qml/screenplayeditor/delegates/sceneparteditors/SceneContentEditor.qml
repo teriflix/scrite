@@ -99,13 +99,6 @@ AbstractScenePartEditor {
                                     _private.handleSceneTextEditorFilteredEvent(object, event, result)
                               }
 
-        Transliterator.enabled: false
-        Transliterator.textDocument: textDocument
-        Transliterator.cursorPosition: cursorPosition
-        Transliterator.hasActiveFocus: activeFocus
-        Transliterator.spellCheckEnabled: false // SceneDocumentBinder handles it separately.
-        Transliterator.applyLanguageFonts: false // SceneDocumentBinder handles it separately.
-
         LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _sceneTextEditor.font
         }
@@ -235,7 +228,6 @@ AbstractScenePartEditor {
         onCutRequest: () => { _private.cut() }
         onCopyRequest: () => { _private.copy() }
         onPasteRequest: () => { _private.paste() }
-        onTranslateSelectedText: (language) => { _private.translateSelectedText(language) }
         onReloadSceneContentRequest: () => { } // TODO
         onSplitSceneAtPositionRequest: (position) => { _private.splitSceneAt(position) }
         onMergeWithPreviousSceneRequest: () => { _private.mergeWithPreviousScene(0) }
@@ -650,13 +642,6 @@ AbstractScenePartEditor {
             }
 
             return false
-        }
-
-        function translateSelectedText(language) {
-            _sceneTextEditor.forceActiveFocus()
-            root.scene.beginUndoCapture()
-            _sceneTextEditor.Transliterator.transliterateToLanguage(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd, language)
-            root.scene.endUndoCapture()
         }
 
         // Splitting and merging should happen from the context of the ScreenplayEditor or the ListView

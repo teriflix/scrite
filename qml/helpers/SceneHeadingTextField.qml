@@ -57,11 +57,11 @@ VclTextField {
 
     onActiveFocusChanged: () => {
                               if(activeFocus) {
-                                  _private.previouslyActiveLanguage = Scrite.app.transliterationEngine.language
+                                  _private.previouslyActiveLanguageCode = Runtime.lanugage.activeCode
                                   sceneHeadingFormat.activateDefaultLanguage()
                               } else {
                                   _private.updateText(text)
-                                  Scrite.app.transliterationEngine.language = _private.previouslyActiveLanguage
+                                  Runtime.language.setActiveCode(_private.previouslyActiveLanguageCode)
                               }
                           }
 
@@ -82,9 +82,8 @@ VclTextField {
             return ""
         }
 
-        property int currentLanguage: Scrite.app.transliterationEngine.language
-        property int fontCapitalization: activeFocus ? (currentLanguage === TransliterationEngine.English ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
-        property int previouslyActiveLanguage: TransliterationEngine.English
+        property int fontCapitalization: activeFocus ? (Runtime.language.activeCode === QtLocale.English ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
+        property int previouslyActiveLanguageCode: QtLocale.English
         property font font: root.sceneHeadingFormat.font2
 
         property int dotPosition: text.indexOf(".")

@@ -23,41 +23,44 @@ import "qrc:/qml/controls"
 Flickable {
     id: root
 
-    property Item textArea: _textArea
-    property bool scrollBarRequired: contentHeight > height
-    property bool adjustTextWidthBasedOnScrollBar: true
+    property int tabSequenceIndex: 0
+
     property bool undoRedoEnabled: true
-    property alias text: _textArea.text
-    property alias font: _textArea.font
-    property alias textDocument: _textArea.textDocument
-    property Item tabItem
-    property Item backTabItem
-    property alias readonly: _textArea.readOnly
-    property alias placeholderText: _textArea.placeholderText
-    property alias readOnly: _textArea.readOnly
-    property alias background: _textArea.background
-    property alias color: _textArea.color
+    property bool spellCheckEnabled: true
+    property bool scrollBarRequired: contentHeight > height
+    property bool tabSequenceEnabled: true
     property bool enforceDefaultFont: true
     property bool enforceHeadingFontSize: false
-    property bool spellCheckEnabled: true
+    property bool adjustTextWidthBasedOnScrollBar: true
+
+    property alias text: _textArea.text
+    property alias font: _textArea.font
+    property alias color: _textArea.color
+    property alias readOnly: _textArea.readOnly
+    property alias background: _textArea.background
+    property alias textDocument: _textArea.textDocument
+    property alias placeholderText: _textArea.placeholderText
+
+    property Item tabItem
+    property Item textArea: _textArea
+    property Item backTabItem
+
+    property SyntaxHighlighter syntaxHighlighter: _textArea.SyntaxHighlighter
     property TabSequenceManager tabSequenceManager
-    property int tabSequenceIndex: 0
-    property bool tabSequenceEnabled: true
-    property alias syntaxHighlighter: _textArea.syntaxHighlighter
-    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
     signal editingFinished()
 
-    clip: true
+    FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+    ScrollBar.vertical: VclScrollBar { flickable: root }
+
     contentWidth: _textArea.width
     contentHeight: _textArea.height
-    ScrollBar.vertical: VclScrollBar { flickable: root }
+
+    clip: true
 
     TextArea {
         id: _textArea
-
-        property SyntaxHighlighter syntaxHighlighter: Transliterator.highlighter
-        property var spellChecker: syntaxHighlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
 
         width: root.width - (root.scrollBarRequired && root.adjustTextWidthBasedOnScrollBar ? 20 : 0)
         height: Math.max(root.height-topPadding-bottomPadding, contentHeight+20)
@@ -77,22 +80,46 @@ Flickable {
         KeyNavigation.backtab: root.backTabItem
         KeyNavigation.priority: KeyNavigation.AfterItem
 
-        Transliterator.enabled: false
-        Transliterator.defaultFont: font
-        Transliterator.textDocument: textDocument
-        Transliterator.cursorPosition: cursorPosition
-        Transliterator.hasActiveFocus: activeFocus
-        Transliterator.applyLanguageFonts: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
-        Transliterator.textDocumentUndoRedoEnabled: undoRedoEnabled
-        Transliterator.spellCheckEnabled: root.spellCheckEnabled
-        Transliterator.enforeDefaultFont: root.enforceDefaultFont
-        Transliterator.enforceHeadingFontSize: root.enforceHeadingFontSize
+        SyntaxHighlighter.delegates: [
+            LanguageFontSyntaxHighlighterDelegate {
+                enabled: Runtime.screenplayEditorSettings.applyUserDefinedLanguageFonts
+                defaultFont: _textArea.font
+                enforceDefaultFont: root.enforceDefaultFont
+            },
+
+            HeadingFontSyntaxHighlighterDelegate {
+                enabled: root.enforceHeadingFontSize
+                Component.onCompleted: initializeWithNormalFontAs(_textArea.font)
+            },
+
+            SpellCheckSyntaxHighlighterDelegate {
+                id: _spellChecker
+                enabled: root.spellCheckEnabled
+                cursorPosition: _textArea.cursorPosition
+            }
+        ]
+        SyntaxHighlighter.textDocument: textDocument
+        SyntaxHighlighter.textDocumentUndoRedoEnabled: undoRedoEnabled
 
         LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _textArea.font
         }
         LanguageTransliterator.option: Runtime.language.activeTransliterationOption
         LanguageTransliterator.enabled: !readOnly
+
+        ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
+        ContextMenuEvent.active: !_spellChecker.wordUnderCursorIsMisspelled
+        ContextMenuEvent.onPopup: (mouse) => {
+            if(!_textArea.activeFocus) {
+                _textArea.forceActiveFocus()
+                _textArea.cursorPosition = _textArea.positionAt(mouse.x, mouse.y)
+            }
+            _contextMenu.popup()
+        }
+
+        TabSequenceItem.manager: tabSequenceManager
+        TabSequenceItem.enabled: tabSequenceEnabled
+        TabSequenceItem.sequence: tabSequenceIndex
 
         readOnly: Scrite.document.readOnly
         background: Item { }
@@ -104,6 +131,7 @@ Flickable {
             textEditorHasCursorInterface: true
             enabled: !Scrite.document.readOnly
         }
+
         UndoHandler {
             enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled
             canUndo: _textArea.canUndo
@@ -111,13 +139,15 @@ Flickable {
             onUndoRequest: _textArea.undo()
             onRedoRequest: _textArea.redo()
         }
+
         TextAreaSpellingSuggestionsMenu { }
+
         onCursorRectangleChanged: {
-            var cr = cursorRectangle
+            let cr = cursorRectangle
             cr = Qt.rect(cr.x, cr.y-4, cr.width, cr.height+8)
 
-            var cy = root.contentY
-            var ch = root.height
+            let cy = root.contentY
+            let ch = root.height
             if(cr.y < cy)
                 cy = Math.max(cr.y, 0)
             else if(cr.y + cr.height > cy + ch)
@@ -126,26 +156,15 @@ Flickable {
                 return
             root.contentY = cy
         }
-        onEditingFinished: root.editingFinished()
-        TabSequenceItem.manager: tabSequenceManager
-        TabSequenceItem.enabled: tabSequenceEnabled
-        TabSequenceItem.sequence: tabSequenceIndex
-    }
 
-    ContextMenuEvent.active: _textArea.spellChecker ? !_textArea.spellChecker.wordUnderCursorIsMisspelled : true
-    ContextMenuEvent.mode: ContextMenuEvent.GlobalEventFilterMode
-    ContextMenuEvent.onPopup: (mouse) => {
-        if(!_textArea.activeFocus) {
-            _textArea.forceActiveFocus()
-            _textArea.cursorPosition = _textArea.positionAt(mouse.x, mouse.y)
-        }
-        __contextMenu.popup()
+        onEditingFinished: root.editingFinished()
     }
 
     VclMenu {
-        id: __contextMenu
+        id: _contextMenu
 
         property bool __persistentSelection: false
+
         onAboutToShow: {
             __persistentSelection = _textArea.persistentSelection
             _textArea.persistentSelection = true
