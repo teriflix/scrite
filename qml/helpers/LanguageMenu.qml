@@ -32,18 +32,33 @@ VclMenu {
         model: LanguageEngine.supportedLanguages
 
         VclMenuItem {
+            id: _languageMenuItem
+
             required property int index
             required property var language // This is of type Language, but we have to use var here.
                                            // You cannot use Q_GADGET struct names as type names in QML
                                            // that privilege is only reserved for QObject types.
 
-            text: {
-                const shortcut = language.shortcut()
-                let ret = language.name
-                if(shortcut !== "")
-                    ret += "\t\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
-                return ret
+            contentItem: GridLayout {
+                columns: 2
+                rowSpacing: 5
+                columnSpacing: 5
+
+                VclText {
+                    Layout.fillWidth: true
+
+                    text: _languageMenuItem.language.name
+                    font: _languageMenuItem.font
+                }
+
+                VclText {
+                    property string shortcut: _languageMenuItem.language.shortcut()
+
+                    text: Scrite.app.polishShortcutTextForDisplay(shortcut)
+                    font: _languageMenuItem.font
+                }
             }
+
             font.bold: Runtime.language.activeCode === language.code
 
             onTriggered: Runtime.language.setActiveCode(language.code)
@@ -74,12 +89,14 @@ VclMenu {
         let widthRequired = 0
         for(let i=0; i<count; i++) {
             const item = itemAt(i)
-            if(item.text) {
-                widthRequired = Math.max( Runtime.idealFontMetrics.boundingRect(item.text).width, widthRequired )
+            if(item.language) {
+                const shortcut = Scrite.app.polishShortcutTextForDisplay(_languageMenuItem.language.shortcut())
+                widthRequired = Math.max( Runtime.idealFontMetrics.boundingRect(item.language.name).width +
+                                          Runtime.idealFontMetrics.boundingRect(shortcut).width, widthRequired )
             }
         }
 
-        width = widthRequired + 100
+        width = widthRequired + 50
     }
 
     onAboutToHide: {
