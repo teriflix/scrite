@@ -103,7 +103,7 @@ Item {
                     Layout.fillWidth: true
 
                     text: "Remove"
-                    enabled: _supportedLanguagesListView.currentIndex >= 0 && _supportedLanguagesListView.count > 1
+                    enabled: _supportedLanguagesListView.currentIndex >= 0 && _supportedLanguagesListView.count > 1 && _private.language.code !== QtLocale.English
 
                     onClicked: {
                         const row = Runtime.language.supported.removeLanguage(_private.language.code)

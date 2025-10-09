@@ -321,10 +321,11 @@ int AbstractLanguagesModel::updateLanguage(const Language &language)
 
     int row = this->indexOfLanguage(language.code);
     if (row < 0) {
-        this->beginInsertRows(QModelIndex(), m_languages.size(), m_languages.size());
-        m_languages.append(language);
+        const int insertRow = language.code == QLocale::English ? 0 : m_languages.size();
+        this->beginInsertRows(QModelIndex(), insertRow, insertRow);
+        m_languages.insert(insertRow, language);
         this->endInsertRows();
-        return m_languages.size() - 1;
+        return insertRow;
     } else {
         const QModelIndex index = this->index(row, 0);
         m_languages[row] = language;
@@ -342,8 +343,12 @@ void AbstractLanguagesModel::setLanguages(const QList<Language> &languages)
     m_languages.clear();
 
     for (const Language &language : languages) {
-        if (language.isValid())
-            m_languages.append(language);
+        if (language.isValid()) {
+            if (language.code == QLocale::English)
+                m_languages.prepend(language);
+            else
+                m_languages.append(language);
+        }
     }
 
     this->endResetModel();
@@ -445,7 +450,7 @@ int SupportedLanguages::addLanguage(int code)
 
 int SupportedLanguages::removeLanguage(int code)
 {
-    if (this->count() == 1)
+    if (this->count() == 1 || code == QLocale::English)
         return -1;
 
     int row = this->indexOfLanguage(code);
@@ -562,8 +567,6 @@ bool SupportedLanguages::resetLanguageTranslator(int code)
 
 void SupportedLanguages::loadBuiltInLanguages()
 {
-    Application::log("SupportedLanguages::loadBuiltInLanguages()");
-
     QList<Language> languages;
 
     Language language =
@@ -712,17 +715,19 @@ void SupportedLanguages::fromJson(const QJsonValue &value)
         languages.append(language);
     }
 
-    if (activeLanguageCode < 0 || defaultLanguageCode < 0) {
+    if (!languages.isEmpty())
+        this->setLanguages(languages);
+
+    if (!this->hasLanguage(QLocale::English))
         this->addLanguage(QLocale::English);
+
+    if (activeLanguageCode < 0 || defaultLanguageCode < 0) {
         activeLanguageCode = activeLanguageCode < 0 ? QLocale::English : activeLanguageCode;
         defaultLanguageCode = defaultLanguageCode < 0 ? QLocale::English : defaultLanguageCode;
     }
 
-    if (!languages.isEmpty()) {
-        this->setLanguages(languages);
-        this->setActiveLanguageCode(activeLanguageCode);
-        this->setDefaultLanguageCode(defaultLanguageCode);
-    }
+    this->setActiveLanguageCode(activeLanguageCode);
+    this->setDefaultLanguageCode(defaultLanguageCode);
 }
 
 void SupportedLanguages::onDataChanged(const QModelIndex &start, const QModelIndex &end)
