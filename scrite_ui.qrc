@@ -265,5 +265,7 @@
         <file>qml/helpers/LanguageTransliteratorPopup.qml</file>
         <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
         <file>qml/helpers/ShortcutField.qml</file>
+        <file>qml/dialogs/LanguageOptionsDialog.qml</file>
+        <file>qml/helpers/LanguageMenu.qml</file>
     </qresource>
 </RCC>

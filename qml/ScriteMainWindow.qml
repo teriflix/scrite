@@ -945,28 +945,8 @@ Item {
                     anchors.top: parent.bottom
                     anchors.left: parent.left
 
-                    VclMenu {
+                    LanguageMenu {
                         id: _languageMenu
-
-                        width: 250
-
-                        Repeater {
-                            model: LanguageEngine.supportedLanguages
-
-                            VclMenuItem {
-                                id: _languageMenuItem
-
-                                required property int index
-                                required property var language // This is of type Language, but we have to use var here.
-                                                               // You cannot use Q_GADGET struct names as type names in QML
-                                                               // that privilege is only reserved for QObject types.
-
-                                text: language.name + "\t\t" + Scrite.app.polishShortcutTextForDisplay(language.shortcut())
-                                font.bold: Runtime.language.activeCode === language.code
-
-                                onTriggered: Runtime.language.setActiveCode(language.code)
-                            }
-                        }
                     }
                 }
 
@@ -1194,27 +1174,7 @@ Item {
 
                         MenuSeparator { }
 
-                        VclMenu {
-                            // FIXME: This is a duplicate of the languageMenu.
-                            // We should remove this when we build an ActionManager.
-                            title: "Language"
-
-                            Repeater {
-                                model: LanguageEngine.supportedLanguages
-
-                                VclMenuItem {
-                                    required property int index
-                                    required property var language // This is of type Language, but we have to use var here.
-                                                                   // You cannot use Q_GADGET struct names as type names in QML
-                                                                   // that privilege is only reserved for QObject types.
-
-                                    text: language.name + " (" + Scrite.app.polishShortcutTextForDisplay(language.shortcut()) + ")"
-                                    font.bold: Runtime.language.activeCode === language.code
-
-                                    onTriggered: Runtime.language.setActiveCode(language.code)
-                                }
-                            }
-                        }
+                        LanguageMenu { }
 
                         VclMenuItem {
                             text: "Alphabet Mappings For " + Runtime.language.active.name

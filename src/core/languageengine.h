@@ -759,6 +759,7 @@ public:
 
     Q_INVOKABLE QStringList scriptFontFamilies(QChar::Script script) const;
 
+    QList<int> platformLanguages() const;
     QList<TransliterationOption> queryTransliterationOptions(int language) const;
 
     static QChar::Script determineScript(const QString &text);

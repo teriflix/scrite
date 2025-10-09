@@ -34,7 +34,7 @@ QString PlatformTransliterationEngine::name() const
 QList<TransliterationOption> PlatformTransliterationEngine::options(int lang) const
 {
     Q_UNUSED(lang)
-    return { }
+    return {};
 }
 
 bool PlatformTransliterationEngine::canActivate(const TransliterationOption &option)

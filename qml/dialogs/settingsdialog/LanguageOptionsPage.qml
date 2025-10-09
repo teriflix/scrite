@@ -321,9 +321,20 @@ Item {
     QtObject {
         id: _private
 
+        property int previouslyActiveLanguage: -1
+
         property var language: _supportedLanguagesListView.currentItem.language
 
         property ListModel transliterationOptionsModel: ListModel { }
+
+        Component.onCompleted: {
+            previouslyActiveLanguage = Runtime.language.activeCode
+            Runtime.language.setActiveCode(QtLocale.English)
+        }
+
+        Component.onDestruction: {
+            Runtime.language.setActiveCode(previouslyActiveLanguage)
+        }
 
         function populateTransliterationOptionsModel() {
             transliterationOptionsModel.clear()

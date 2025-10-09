@@ -35,6 +35,7 @@ VclDialog {
 
         TabBar {
             id: settingsDialogTabBar
+
             Layout.fillWidth: true
 
             TabButton {

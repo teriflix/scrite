@@ -1,4 +1,4 @@
-AlphabetMappings 1.0 AlphabetMappings.qml
+AlphabetMappingsView 1.0 AlphabetMappingsView.qml
 AttachmentsDropArea 1.0 AttachmentsDropArea.qml
 AttachmentsView 1.0 AttachmentsView.qml
 BoxShadow 1.0 BoxShadow.qml
@@ -12,13 +12,15 @@ DisabledFeatureNotice 1.0 DisabledFeatureNotice.qml
 FileSelector 1.0 FileSelector.qml
 FlatToolButton 1.0 FlatToolButton.qml
 FlickableTextArea 1.0 FlickableTextArea.qml
-HelpTipNotification 1.0 HelpTipNotification.qml
+LanguageMenu 1.0 LanguageMenu.qml
+LanguageTransliteratorPopup 1.0 LanguageTransliteratorPopup.qml
 Link 1.0 Link.qml
 LodLoader 1.0 LodLoader.qml
 MarkSceneAsMenu 1.0 MarkSceneAsMenu.qml
 MenuLoader 1.0 MenuLoader.qml
 PageView 1.0 PageView.qml
 PdfView 1.0 PdfView.qml
+qmldir 1.0 qmldir
 RectangleTabView 1.0 RectangleTabView.qml
 RichTextEdit 1.0 RichTextEdit.qml
 RubberBand 1.0 RubberBand.qml
@@ -29,6 +31,7 @@ ScrollArea 1.0 ScrollArea.qml
 SearchBar 1.0 SearchBar.qml
 ShortcutField 1.0 ShortcutField.qml
 SidePanel 1.0 SidePanel.qml
+SimpleToolButton 1.0 SimpleToolButton.qml
 SpecialSymbolsSupport 1.0 SpecialSymbolsSupport.qml
 SpellingSuggestionsMenu 1.0 SpellingSuggestionsMenu.qml
 TagText 1.0 TagText.qml

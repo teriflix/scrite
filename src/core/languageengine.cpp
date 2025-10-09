@@ -391,18 +391,18 @@ void SupportedLanguages::setActiveLanguageCode(int val)
     if (m_activeLanguageCode == val)
         return;
 
-    const Language language = this->findLanguage(val);
+    Language language = this->findLanguage(val);
+    if (!language.isValid())
+        language = this->findLanguage(QLocale::English);
 
-    m_activeLanguageCode = val >= 0 && language.isValid() ? val : -1;
+    m_activeLanguageCode = language.code;
 
-    if (language.isValid()) {
-        const TransliterationOption option = language.preferredTransliterationOption();
-        if (option.isValid()) {
-            AbstractTransliterationEngine *engine =
-                    qobject_cast<AbstractTransliterationEngine *>(option.transliteratorObject);
-            if (engine)
-                engine->activate(option);
-        }
+    const TransliterationOption option = language.preferredTransliterationOption();
+    if (option.isValid()) {
+        AbstractTransliterationEngine *engine =
+                qobject_cast<AbstractTransliterationEngine *>(option.transliteratorObject);
+        if (engine)
+            engine->activate(option);
     }
 
     emit activeLanguageCodeChanged();
@@ -470,18 +470,17 @@ int SupportedLanguages::updateLanguage(int code)
 {
     Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(code);
     if (language.isValid()) {
-        if (DefaultTransliteration::supportedLanguageCodes().contains(language.code)) {
-            language.keySequence =
-                    QKeySequence::fromString(DefaultTransliteration::shortcut(language.code));
-        }
-        return this->AbstractLanguagesModel::updateLanguage(language);
+        const QString defaultShortcut = DefaultTransliteration::shortcut(language.code);
+        if (!defaultShortcut.isEmpty())
+            language.keySequence = QKeySequence::fromString(defaultShortcut);
     }
-    return -1;
+    return this->AbstractLanguagesModel::updateLanguage(language);
 }
 
 bool SupportedLanguages::assignLanguageShortcut(int code, const QString &nativeSequence)
 {
-    if (DefaultTransliteration::supportedLanguageCodes().contains(code))
+    const QString defaultShortcut = DefaultTransliteration::shortcut(code);
+    if (!defaultShortcut.isEmpty())
         return false; // Keyboard shortcuts cannot be modified for built-in languages.
 
     Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(code);
@@ -625,6 +624,22 @@ void SupportedLanguages::initialize()
             &SupportedLanguages::transliterationOptionsUpdated);
     connect(LanguageEngine::instance(), &LanguageEngine::scriptFontFamilyChanged, this,
             &SupportedLanguages::onScriptFontFamilyChanged);
+
+    // English is a must
+    this->addLanguage(QLocale::English);
+
+    // Check the default/system language.
+    this->addLanguage(QLocale().language());
+    this->addLanguage(QLocale::system().language());
+
+    // Load all the platform languages.
+    const QList<int> platformLanguages = LanguageEngine::instance()->platformLanguages();
+    for (int platformLanguage : platformLanguages) {
+        if (this->hasLanguage(platformLanguage))
+            continue;
+
+        this->addLanguage(platformLanguage);
+    }
 }
 
 QJsonValue SupportedLanguages::toJson() const
@@ -665,7 +680,13 @@ QJsonValue SupportedLanguages::toJson() const
 void SupportedLanguages::fromJson(const QJsonValue &value)
 {
     auto scopeGuard = qScopeGuard([=]() {
-        if (this->count() == 0) {
+        bool needToLoadBuiltIn =
+                this->count() == 0 // Either there are no languages, which is unlikely
+                || (this->count() == 1
+                    && this->languageAt(0).code
+                            == QLocale::English); // Or there is only one and that is English
+
+        if (needToLoadBuiltIn) {
             this->loadBuiltInLanguages();
             this->setActiveLanguageCode(QLocale::English);
         }
@@ -673,8 +694,6 @@ void SupportedLanguages::fromJson(const QJsonValue &value)
 
     if (value.isNull())
         return;
-
-    QList<Language> languages;
 
     const QJsonArray array = value.toArray();
     if (array.isEmpty())
@@ -686,8 +705,11 @@ void SupportedLanguages::fromJson(const QJsonValue &value)
     for (const QJsonValue &arrayItem : array) {
         const QJsonObject item = arrayItem.toObject();
 
-        Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(
-                item.value("code").toInt());
+        int languageCode = item.value("code").toInt();
+
+        Language language = this->hasLanguage(languageCode)
+                ? this->findLanguage(languageCode)
+                : LanguageEngine::instance()->availableLanguages()->findLanguage(languageCode);
         if (!language.isValid())
             continue;
 
@@ -703,7 +725,8 @@ void SupportedLanguages::fromJson(const QJsonValue &value)
         }
 
         language.preferredTransliterationOptionId = item.value("option").toString();
-        if (!language.preferredTransliterationOption().isValid())
+        if (!language.preferredTransliterationOptionId.isEmpty()
+            && !language.preferredTransliterationOption().isValid())
             language.preferredTransliterationOptionId = QString();
 
         if (item.value("active").toBool() == true)
@@ -712,14 +735,8 @@ void SupportedLanguages::fromJson(const QJsonValue &value)
         if (item.value("default").toBool() == true)
             defaultLanguageCode = language.code;
 
-        languages.append(language);
+        this->AbstractLanguagesModel::addLanguage(language);
     }
-
-    if (!languages.isEmpty())
-        this->setLanguages(languages);
-
-    if (!this->hasLanguage(QLocale::English))
-        this->addLanguage(QLocale::English);
 
     if (activeLanguageCode < 0 || defaultLanguageCode < 0) {
         activeLanguageCode = activeLanguageCode < 0 ? QLocale::English : activeLanguageCode;
@@ -1535,6 +1552,25 @@ QStringList LanguageEngine::scriptFontFamilies(QChar::Script script) const
             if (script != QChar::Script_Latin || fontDb.isFixedPitch(fontFamily))
                 includeFontFamily(fontFamily);
         }
+    }
+
+    return ret;
+}
+
+QList<int> LanguageEngine::platformLanguages() const
+{
+    /* Returns all the languages configured in the host platform / OS */
+
+    PlatformTransliterationEngine *platformEngine =
+            this->findChild<PlatformTransliterationEngine *>();
+    if (platformEngine == nullptr)
+        return {};
+
+    QList<int> ret;
+    for (int i = 0; i < m_availableLanguages->count(); i++) {
+        const Language language = m_availableLanguages->languageAt(i);
+        if (platformEngine->canTransliterate(language.code))
+            ret.append(language.code);
     }
 
     return ret;
