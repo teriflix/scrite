@@ -22,9 +22,11 @@ import "qrc:/qml/controls"
 
 Rectangle {
     id: busyOverlay
+
     color: Runtime.colors.primary.windowColor
     opacity: 0.9
     visible: false
+
     onVisibleChanged: if(parent) parent.enabled = !visible
 
     property string busyMessage: "Busy Doing Something..."

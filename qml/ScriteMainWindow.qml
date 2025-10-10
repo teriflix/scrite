@@ -22,1460 +22,30 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/qml/tasks"
 import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/tasks"
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/scrited"
 import "qrc:/qml/controls"
-import "qrc:/qml/screenplayeditor"
+import "qrc:/qml/mainwindow" as MainWindow
 import "qrc:/qml/notifications"
+import "qrc:/qml/screenplayeditor"
 import "qrc:/qml/floatingdockpanels"
 
 Item {
     id: scriteMainWindow
+
+    Component.onCompleted: _private.init()
+
     width: 1350
     height: 700
 
-    readonly property url helpUrl: "https://www.scrite.io/index.php/help/"
-
     enabled: !Scrite.document.loading
 
-    Connections {
-        target: Runtime
-
-        function onShowNotebookInStructureChanged() {
-            Utils.execLater(mainTabBar, 100, function() {
-                mainTabBar.currentIndex = mainTabBar.currentIndex % (Runtime.showNotebookInStructure ? 2 : 3)
-            })
-        }
-    }
-
-    Shortcut {
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "Save As"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+S"
-
-        onActivated: activate()
-
-        function activate() { SaveFileTask.saveAs() }
-    }
-
-    Shortcut {
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "New"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+N"
-
-        onActivated: activate()
-
-        function activate() { HomeScreen.launch() }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+O"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "Open"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { HomeScreen.launch() }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+O"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "Scriptalay"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { HomeScreen.launch("Scriptalay") }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+P"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Export To PDF"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { ExportConfigurationDialog.launch("Screenplay/Adobe PDF") }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "F1"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Help"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { Qt.openUrlExternally(helpUrl) }
-    }
-
-    Shortcut {
-        id: sceneCharactersToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+C"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters, Tags" : "Show Scene Characters, Tags"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
-        }
-    }
-
-    Shortcut {
-        id: synopsisToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+S"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneSynopsis ? "Hide Synopsis" : "Show Synopsis"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
-        }
-    }
-
-    Shortcut {
-        id: commentsToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+M"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneComments ? "Hide Comments" : "Show Comments"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
-        }
-    }
-
-    Shortcut {
-        id: taggingToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+G"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.allowTaggingOfScenes ? "Allow Tagging" : "Disable Tagging"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
-        }
-    }
-
-    Shortcut {
-        id: spellCheckToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+L"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.enableSpellCheck ? "Disable Spellcheck" : "Enable Spellcheck"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.enableSpellCheck = !Runtime.screenplayEditorSettings.enableSpellCheck
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+A"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.applicationSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+H"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.highlightCurrentLine ? "Line Highlight Off" : "Line Highlight On"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.highlightCurrentLine = !Runtime.screenplayEditorSettings.highlightCurrentLine
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+M"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "New Scrite Window"
-        ShortcutsModelItem.enabled: true
-        ShortcutsModelItem.visible: enabled
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Scrite.app.launchNewInstance(Scrite.window)
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Alt+1"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Screenplay"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.activateMainWindowTab(0)
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Alt+2"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Structure"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.activateMainWindowTab(1)
-            if(Runtime.showNotebookInStructure)
-                Announcement.shout(Runtime.announcementIds.tabRequest, "Structure")
-        }
-    }
-
-    Shortcut {
-        id: notebookShortcut
-
-        property bool notebookTabVisible: mainTabBar.currentIndex === (Runtime.showNotebookInStructure ? 1 : 2)
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Alt+3"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Notebook"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            if(Runtime.showNotebookInStructure) {
-                if(Runtime.mainWindowTab === Runtime.e_StructureTab)
-                    Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
-                else {
-                    Runtime.activateMainWindowTab(Runtime.e_StructureTab)
-                    Utils.execLater(mainTabBar, 250, function() {
-                        Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
-                    })
-                }
-            } else
-                Runtime.activateMainWindowTab(Runtime.e_NotebookTab)
-        }
-
-        function showBookmarkedNotes() {
-            showNotes("Notebook Bookmarks")
-        }
-
-        function showStoryNotes() {
-            showNotes("Notebook Story")
-        }
-
-        function showCharacterNotes() {
-            showNotes("Notebook Characters")
-        }
-
-        function showNotes(type) {
-            var nbt = Runtime.showNotebookInStructure ? 1 : 2
-            if(mainTabBar.currentIndex !== nbt) {
-                Runtime.activateMainWindowTab(nbt)
-                Utils.execLater(mainTabBar, 250, function() {
-                    Announcement.shout(Runtime.announcementIds.tabRequest, type)
-                })
-            } else
-                Announcement.shout(Runtime.announcementIds.tabRequest, type)
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+K"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
-        ShortcutsModelItem.title: "Bookmarked Notes"
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            notebookShortcut.showBookmarkedNotes()
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+R"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
-        ShortcutsModelItem.title: "Charater Notes"
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            notebookShortcut.showCharacterNotes()
-        }
-    }
-
-    Shortcut {
-        context: Qt.ApplicationShortcut
-        enabled: Runtime.allowAppUsage
-        sequence: "Ctrl+Shift+Y"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: notebookShortcut.notebookTabVisible ? "Notebook" : "Application"
-        ShortcutsModelItem.title: "Story Notes"
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            notebookShortcut.showStoryNotes()
-        }
-    }
-
-    Shortcut {
-        context: Qt.ApplicationShortcut
-        enabled: Runtime.workspaceSettings.showScritedTab && Runtime.allowAppUsage
-        sequence: "Alt+4"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Scrited"
-        ShortcutsModelItem.enabled: enabled
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.activateMainWindowTab(Runtime.e_ScritedTab)
-        }
-    }
-
-    Connections {
-        target: Scrite.document
-
-        function onJustReset() {
-            Runtime.screenplayEditorSettings.firstSwitchToStructureTab = true
-            appBusyOverlay.ref()
-            // Runtime.screenplayAdapter.initialLoadTreshold = 25
-            reloadScriteDocumentTimer.stop()
-            Utils.execLater(Runtime.screenplayAdapter, 250, () => {
-                                appBusyOverlay.deref()
-                                Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
-                            })
-        }
-
-        function onJustLoaded() {
-            Runtime.screenplayEditorSettings.firstSwitchToStructureTab = true
-            // var firstElement = Scrite.document.screenplay.elementAt(Scrite.document.screenplay.firstSceneIndex())
-            // if(firstElement) {
-            //     var editorHints = firstElement.editorHints
-            //     if(editorHints)
-            //         Runtime.screenplayAdapter.initialLoadTreshold = -1
-            // }
-        }
-
-        function onOpenedAnonymously(filePath) {
-            MessageBox.question("Anonymous Open",
-                   "The file you just opened is a backup of another file, and is being opened anonymously in <b>read-only</b> mode.<br/><br/>" +
-                   "<b>NOTE:</b> In order to edit the file, you will need to first Save-As.",
-                    ["Save As", "View Read Only"],
-                    (answer) => {
-                        if(answer === "Save As")
-                            SaveFileTask.saveAs()
-                    })
-        }
-
-        function onRequiresReload() {
-            if(Runtime.applicationSettings.reloadPrompt)
-                reloadScriteDocumentTimer.start()
-        }
-    }
-
-    VclDialog {
-        id: reloadPromptDialog
-
-        width: Math.min(500, Scrite.window.width * 0.5)
-        height: 275
-        title: "Reload Required"
-
-        titleBarButtons: null
-
-        content: Item {
-            property real preferredHeight: reloadPromptDialogLayout.height + 40
-
-            ColumnLayout {
-                id: reloadPromptDialogLayout
-                anchors.fill: parent
-                anchors.margins: 20
-
-                spacing: 10
-
-                VclLabel {
-                    Layout.fillWidth: true
-
-                    text: "Current file was modified by another process in the background. Do you want to reload?"
-                    wrapMode: Text.WordWrap
-                    horizontalAlignment: Text.AlignHCenter
-                }
-
-                RowLayout {
-                    Layout.alignment: Qt.AlignHCenter
-
-                    spacing: 20
-
-                    VclButton {
-                        text: "Yes"
-                        onClicked: {
-                            Scrite.document.reload()
-                            reloadPromptDialog.close()
-                        }
-                    }
-
-                    VclButton {
-                        text: "No"
-                        onClicked: reloadPromptDialog.close()
-                    }
-                }
-
-                ColumnLayout {
-                    spacing: 2
-
-                    Rectangle {
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 1
-                        color: Runtime.colors.primary.borderColor
-                    }
-
-                    RowLayout {
-                        VclCheckBox {
-                            Layout.fillWidth: true
-
-                            text: "Don't show this again."
-                            checked: false
-                            onToggled: Runtime.applicationSettings.reloadPrompt = !checked
-                        }
-
-                        Item {
-                            Layout.fillWidth: true
-                            Layout.preferredHeight: 1
-                        }
-
-                        Link {
-                            text: "More Info"
-                            onClicked: Qt.openUrlExternally("https://www.scrite.io/version-1-2-released/#chapter6_reload_prompt")
-                        }
-                    }
-                }
-            }
-
-            property bool autoSaveFlag: false
-            Component.onCompleted: {
-                autoSaveFlag = Scrite.document.autoSave
-                Scrite.document.autoSave = false
-            }
-            Component.onDestruction: Scrite.document.autoSave = autoSaveFlag
-        }
-    }
-
-    Timer {
-        id: reloadScriteDocumentTimer
-
-        interval: 500
-        repeat: false
-
-        onTriggered: {
-            if(Runtime.applicationSettings.reloadPrompt)
-                reloadPromptDialog.open()
-        }
-    }
-
-    // Refactor QML TODO: Get rid of this stuff when we move to overlays and ApplicationMainWindow
-    QtObject {
-        property bool overlayRefCountModified: false
-        property bool requiresAppBusyOverlay: Runtime.undoStack.screenplayEditorActive || Runtime.undoStack.sceneEditorActive
-
-        function onUpdateScheduled() {
-            if(requiresAppBusyOverlay && !overlayRefCountModified) {
-                appBusyOverlay.ref()
-                overlayRefCountModified = true
-            }
-        }
-
-        function onUpdateFinished() {
-            if(overlayRefCountModified)
-                appBusyOverlay.deref()
-            overlayRefCountModified = false
-        }
-
-        onRequiresAppBusyOverlayChanged: {
-            if(!requiresAppBusyOverlay && overlayRefCountModified) {
-                appBusyOverlay.deref()
-                overlayRefCountModified = false
-            }
-        }
-
-        Component.onCompleted: {
-            // Cannot use Connections for this, because the Connections QML item
-            // does not allow usage of custom properties
-            Runtime.screenplayTextDocument.onUpdateScheduled.connect(onUpdateScheduled)
-            Runtime.screenplayTextDocument.onUpdateFinished.connect(onUpdateFinished)
-        }
-    }
-
-    Rectangle {
-        id: appToolBarArea
-        anchors.left: parent.left
-        anchors.right: parent.right
-
-        z: 1
-        height: 53
-        color: Runtime.colors.primary.c50.background
-        enabled: visible
-
-        Row {
-            id: appToolBar
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: 5
-            visible: appToolBarArea.width >= 1200
-            onVisibleChanged: {
-                if(enabled && !visible)
-                    Runtime.activateMainWindowTab(0)
-            }
-
-            FlatToolButton {
-                id: homeButton
-                iconSource: "qrc:/icons/action/home.png"
-                text: "Home"
-                onClicked: HomeScreen.launch()
-            }
-
-            FlatToolButton {
-                id: backupOpenButton
-                iconSource: "qrc:/icons/file/backup_open.png"
-                text: "Open Backup"
-                visible: Scrite.document.backupFilesModel.count > 0
-                onClicked: BackupsDialog.launch()
-
-                ToolTip.text: "Open any of the " + Scrite.document.backupFilesModel.count + " backup(s) available for this file."
-
-                VclText {
-                    id: backupCountHint
-                    font.pixelSize: parent.height * 0.2
-                    font.bold: true
-                    text: Scrite.document.backupFilesModel.count
-                    padding: 2
-                    color: Runtime.colors.primary.highlight.text
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                }
-            }
-
-            FlatToolButton {
-                id: cmdSave
-                text: "Save"
-                enabled: (Scrite.document.modified || Scrite.document.fileName === "") && !Scrite.document.readOnly
-                shortcut: "Ctrl+S"
-                iconSource: "qrc:/icons/content/save.png"
-
-                onClicked: activate()
-
-                ShortcutsModelItem.group: "File"
-                ShortcutsModelItem.title: text
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: shortcut
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: activate()
-
-                function activate() {
-                    if(Scrite.document.fileName === "")
-                        SaveFileTask.saveAs()
-                    else
-                        SaveFileTask.saveSilently()
-                }
-            }
-
-            FlatToolButton {
-                id: cmdShare
-
-                text: "Share"
-                down: shareMenu.visible
-                enabled: appToolsMenu.visible === false
-                iconSource: "qrc:/icons/action/share.png"
-
-                onClicked: shareMenu.open()
-
-                Item {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-
-                    VclMenu {
-                        id: shareMenu
-
-                        VclMenu {
-                            id: exportMenu
-                            width: 300
-                            title: "Export"
-
-                            Repeater {
-                                model: Scrite.document.supportedExportFormats
-
-                                VclMenuItem {
-                                    required property var modelData
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-                                    onClicked: ExportConfigurationDialog.launch(modelData.key)
-
-                                    ToolTip {
-                                        text: modelData.description + "\n\nCategory: " + modelData.category
-                                        width: 300
-                                        visible: parent.hovered
-                                        delay: Qt.styleHints.mousePressAndHoldInterval
-                                    }
-                                }
-                            }
-
-                            MenuSeparator { }
-
-                            VclMenuItem {
-                                text: "Scrite"
-                                icon.source: "qrc:/icons/exporter/scrite.png"
-                                onClicked: SaveFileTask.saveAs()
-                            }
-                        }
-
-                        VclMenu {
-                            id: reportsMenu
-                            width: 350
-                            title: "Reports"
-
-                            Repeater {
-                                model: Scrite.document.supportedReports
-
-                                VclMenuItem {
-                                    required property var modelData
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-                                    onClicked: ReportConfigurationDialog.launch(modelData.name)
-
-                                    ToolTip {
-                                        text: modelData.description
-                                        width: 300
-                                        visible: parent.hovered
-                                        delay: Qt.styleHints.mousePressAndHoldInterval
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            /*
-              Most users already know that Ctrl+Z is undo and Ctrl+Y is redo.
-              Therefore simply listing these shortcuts in shortcuts dockwidget
-              should be sufficient to establish their existence. Showing these
-              toolbuttons is robbing us of some really good screenspace.
-            */
-            QtObject {
-                ShortcutsModelItem.group: "Edit"
-                ShortcutsModelItem.title: "Undo"
-                ShortcutsModelItem.enabled: Scrite.app.canUndo && !Scrite.document.readOnly // enabled
-                ShortcutsModelItem.shortcut: "Ctrl+Z" // shortcut
-            }
-
-            QtObject {
-                ShortcutsModelItem.group: "Edit"
-                ShortcutsModelItem.title: "Redo"
-                ShortcutsModelItem.enabled: Scrite.app.canRedo && !Scrite.document.readOnly // enabled
-                ShortcutsModelItem.shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y" // shortcut
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.separatorColor
-                opacity: 0.5
-            }
-
-            FlatToolButton {
-                id: settingsAndShortcutsButton
-                iconSource: "qrc:/icons/action/settings_applications.png"
-                text: "Settings & Shortcuts"
-                down: settingsAndShortcutsMenu.visible
-                onClicked: settingsAndShortcutsMenu.visible = true
-
-                Item {
-                    anchors.top: parent.bottom
-                    anchors.left: parent.left
-
-                    VclMenu {
-                        id: settingsAndShortcutsMenu
-                        width: 300
-
-                        VclMenuItem {
-                            id: settingsMenuItem
-
-                            text: "Settings\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+,")
-                            enabled: appToolBar.visible
-                            icon.source: "qrc:/icons/action/settings_applications.png"
-
-                            onClicked: activate()
-
-                            ShortcutsModelItem.group: "Application"
-                            ShortcutsModelItem.title: "Settings"
-                            ShortcutsModelItem.shortcut: "Ctrl+,"
-                            ShortcutsModelItem.enabled: appToolBar.visible
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: activate()
-
-                            function activate() {
-                                SettingsDialog.launch()
-                            }
-
-                            Shortcut {
-                                enabled: Runtime.allowAppUsage
-                                context: Qt.ApplicationShortcut
-                                sequence: "Ctrl+,"
-                                onActivated: settingsMenuItem.activate()
-                            }
-                        }
-
-                        VclMenuItem {
-                            id: shortcutsMenuItem
-
-                            text: "Shortcuts\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+E")
-                            enabled: appToolBar.visible
-                            icon.source: {
-                                if(Scrite.app.isMacOSPlatform)
-                                    return "qrc:/icons/navigation/shortcuts_macos.png"
-                                if(Scrite.app.isWindowsPlatform)
-                                    return "qrc:/icons/navigation/shortcuts_windows.png"
-                                return "qrc:/icons/navigation/shortcuts_linux.png"
-                            }
-
-                            onClicked: activate()
-
-                            ShortcutsModelItem.group: "Application"
-                            ShortcutsModelItem.title: FloatingShortcutsDock.visible ? "Hide Shortcuts" : "Show Shortcuts"
-                            ShortcutsModelItem.shortcut: "Ctrl+E"
-                            ShortcutsModelItem.enabled: appToolBar.visible
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: activate()
-
-                            function activate() {
-                                Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
-                            }
-
-                            Shortcut {
-                                enabled: Runtime.allowAppUsage
-                                context: Qt.ApplicationShortcut
-                                sequence: "Ctrl+E"
-                                onActivated: shortcutsMenuItem.activate()
-                            }
-                        }
-
-                        VclMenuItem {
-                            icon.source: "qrc:/icons/action/help.png"
-                            text: "Help\t\tF1"
-                            onClicked: Qt.openUrlExternally(helpUrl)
-                        }
-
-                        VclMenuItem {
-                            icon.source: "qrc:/icons/action/info.png"
-                            text: "About"
-                            onClicked: AboutDialog.launch()
-                        }
-
-                        VclMenuItem {
-                            id: toggleFullScreenMenuItem
-
-                            text: "Toggle Fullscreen\tF7"
-                            icon.source: "qrc:/icons/navigation/fullscreen.png"
-
-                            onClicked: activate()
-
-                            ShortcutsModelItem.group: "Application"
-                            ShortcutsModelItem.title: "Toggle Fullscreen"
-                            ShortcutsModelItem.shortcut: "F7"
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: activate()
-
-                            function activate() {
-                                Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
-                            }
-
-                            Shortcut {
-                                enabled: Runtime.allowAppUsage
-                                context: Qt.ApplicationShortcut
-                                sequence: "F7"
-                                onActivated: toggleFullScreenMenuItem.activate()
-                            }
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.separatorColor
-                opacity: 0.5
-            }
-
-            FlatToolButton {
-                id: _languageToolButton
-
-                ToolTip.text: Scrite.app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
-
-                text: Runtime.language.active.name
-                down: _languageMenu.visible
-                visible: Runtime.mainWindowTab <= Runtime.e_NotebookTab
-                shortcut: "Ctrl+L"
-                iconSource: "qrc:/icons/content/language.png"
-
-                onClicked: _languageMenu.visible = true
-
-                Item {
-                    anchors.top: parent.bottom
-                    anchors.left: parent.left
-
-                    LanguageMenu {
-                        id: _languageMenu
-                    }
-                }
-
-                /**
-                  What would have been ideal is if action property in the VclMenuItems created above
-                  actually handled global application shortcuts. But sadly, they don't.
-
-                  We are forced to create Shortcut objects separately for the same. It would have been
-                  awesome if we could simply create Shortcut objects in Repeater, without nesting them
-                  in an Item. But that's not possible either, because Repeater can only create Item
-                  instances, and not anything thats just QObject subclass.
-
-                  I even tried to use QShortcut in ShortcutsModelItem C++ class, but that did not work either.
-                  Apparently we QShortcut instances can only be created on QWidget, so that's not going
-                  to work for us either. AppWindow is a QQuickView, which is QWindow and not QWidget.
-
-                  We are left with no other option but to waste memory like this. :-(
-                  */
-                Repeater {
-                    model: LanguageEngine.supportedLanguages
-
-                    Item {
-                        required property int index
-                        required property var language // This is of type Language, but we have to use var here.
-                                                       // You cannot use Q_GADGET struct names as type names in QML
-                                                       // that privilege is only reserved for QObject types.
-
-                        visible: false
-
-                        Shortcut {
-                            ShortcutsModelItem.title: language.name
-                            ShortcutsModelItem.group: "Language"
-                            ShortcutsModelItem.priority: index+1
-                            ShortcutsModelItem.enabled: enabled
-                            ShortcutsModelItem.shortcut: nativeText
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: Runtime.language.setActiveCode(language.code)
-
-                            enabled: true
-                            context: Qt.ApplicationShortcut
-                            sequence: language.shortcut()
-
-                            onActivated: Runtime.language.setActiveCode(language.code)
-                        }
-                    }
-                }
-
-                HelpTipNotification {
-                    tipName: Scrite.app.isWindowsPlatform ? "language_windows" : (Scrite.app.isMacOSPlatform ? "language_macos" : "language_linux")
-                    enabled: Runtime.language.activeCode !== QtLocale.English
-                }
-            }
-
-            FlatToolButton {
-                ToolTip.text: "Show English to " + Runtime.language.active.name + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
-
-                down: _alphabetMappingsPopup.visible
-                visible: mainTabBar.currentIndex <= 2 && enabled
-                enabled: Runtime.language.activeCode !== QtLocale.English &&
-                         Runtime.language.activeTransliterator.name === DefaultTransliteration.driver &&
-                         DefaultTransliteration.supportsLanguageCode(Runtime.language.activeCode)
-                shortcut: "Ctrl+K"
-                iconSource: down ? "qrc:/icons/hardware/keyboard_hide.png" : "qrc:/icons/hardware/keyboard.png"
-
-                onClicked: click()
-
-                ShortcutsModelItem.group: "Language"
-                ShortcutsModelItem.title: "Alphabet Mapping"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: shortcut
-                ShortcutsModelItem.priority: 0
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
-
-                function click() {
-                    if(enabled)
-                        _alphabetMappingsPopup.visible = !_alphabetMappingsPopup.visible
-                }
-
-                Item {
-                    anchors.top: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    width: _alphabetMappingsPopup.width
-
-                    Popup {
-                        id: _alphabetMappingsPopup
-
-                        width: alphabetMappingsLoader.width + 30
-                        height: alphabetMappingsLoader.height + 30
-
-                        modal: false
-                        focus: false
-                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-                        Loader {
-                            id: alphabetMappingsLoader
-
-                            width: item ? item.width : 0
-                            height: item ? item.height : 0
-
-                            active: parent.visible
-
-                            sourceComponent: AlphabetMappingsView {
-                                language: Runtime.language.active
-                            }
-                        }
-                    }
-                }
-            }
-
-            VclLabel {
-                id: _languageDescLabel
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                width: 80
-
-                text: Runtime.language.active.name
-                visible: Runtime.mainWindowTab <= Runtime.e_NotebookTab
-
-                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-
-                MouseArea {
-                    anchors.fill: parent
-
-                    onClicked: _languageToolButton.click()
-                }
-            }
-        }
-
-        Row {
-            id: appToolsMenu
-
-            anchors.left: parent.left
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
-
-            visible: !appToolBar.visible
-
-            FlatToolButton {
-                text: "File"
-                down: appFileMenu.active
-                iconSource: "qrc:/icons/navigation/menu.png"
-
-                onClicked: {
-                    if(appFileMenu.active)
-                        appFileMenu.close()
-                    else
-                        appFileMenu.show()
-                }
-
-                MenuLoader {
-                    id: appFileMenu
-
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-
-                    menu: VclMenu {
-                        width: 300
-
-                        VclMenuItem {
-                            text: "Home"
-
-                            onTriggered: HomeScreen.launch()
-                        }
-
-                        VclMenuItem {
-                            text: "Save"
-
-                            onTriggered: cmdSave.doClick()
-                        }
-
-                        MenuSeparator { }
-
-                        VclMenu {
-                            id: exportMenu2
-
-                            width: 250
-
-                            title: "Share"
-
-                            Repeater {
-                                model: Scrite.document.supportedExportFormats
-
-                                VclMenuItem {
-                                    required property var modelData
-
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-
-                                    onClicked: ExportConfigurationDialog.launch(modelData.key)
-                                }
-                            }
-
-                            MenuSeparator { }
-
-                            VclMenuItem {
-                                text: "Scrite"
-                                icon.source: "qrc:/icons/exporter/scrite.png"
-
-                                onClicked: SaveFileTask.saveAs()
-                            }
-                        }
-
-                        VclMenu {
-                            width: 300
-
-                            title: "Reports"
-
-                            Repeater {
-                                model: Scrite.document.supportedReports
-
-                                VclMenuItem {
-                                    required property var modelData
-
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-
-                                    onClicked: ReportConfigurationDialog.launch(modelData.name)
-                                    // enabled: Scrite.window.width >= 800
-                                }
-                            }
-                        }
-
-                        MenuSeparator { }
-
-                        LanguageMenu { }
-
-                        VclMenuItem {
-                            text: "Alphabet Mappings For " + Runtime.language.active.name
-                            enabled: Runtime.language.activeCode !== QtLocale.English
-
-                            onClicked: _alphabetMappingsPopup.visible = !_alphabetMappingsPopup.visible
-                        }
-
-                        MenuSeparator { }
-
-                        VclMenu {
-                            width: 250
-
-                            title: "View"
-
-                            VclMenuItem {
-                                text: "Screenplay (" + Scrite.app.polishShortcutTextForDisplay("Alt+1") + ")"
-                                font.bold: mainTabBar.currentIndex === 0
-
-                                onTriggered: Runtime.activateMainWindowTab(0)
-                            }
-
-                            VclMenuItem {
-                                text: "Structure (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
-                                font.bold: mainTabBar.currentIndex === 1
-
-                                onTriggered: Runtime.activateMainWindowTab(1)
-                            }
-
-                            VclMenuItem {
-                                text: "Notebook (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
-                                enabled: !Runtime.showNotebookInStructure
-                                font.bold: mainTabBar.currentIndex === 2
-
-                                onTriggered: Runtime.activateMainWindowTab(2)
-                            }
-
-                            VclMenuItem {
-                                text: "Scrited (" + Scrite.app.polishShortcutTextForDisplay("Alt+4") + ")"
-                                font.bold: mainTabBar.currentIndex === 3
-
-                                onTriggered: mainTabBar.currentIndex = 3
-                            }
-                        }
-
-                        MenuSeparator { }
-
-                        VclMenuItem {
-                            text: "Settings"
-                            // enabled: Scrite.window.width >= 1100
-                            onTriggered: SettingsDialog.launch()
-                        }
-
-                        VclMenuItem {
-                            text: "Help"
-                            onTriggered: Qt.openUrlExternally(helpUrl)
-                        }
-                    }
-                }
-            }
-        }
-
-        ScritedToolbar {
-            id: scritedToolbar
-
-            anchors.left: appToolBar.visible ? appToolBar.right : appToolsMenu.right
-            anchors.right: editTools.visible ? editTools.left : parent.right
-            anchors.margins: 10
-            anchors.verticalCenter: parent.verticalCenter
-
-            visible: scritedView
-        }
-
-        Row {
-            id: editTools
-
-            x: appToolBar.visible ? (parent.width - userLogin.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2)
-            height: parent.height
-
-            spacing: 20
-
-            ScreenplayEditorToolbar {
-                id: screenplayEditorToolbar
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                visible: {
-                    const min = 0
-                    const max = Runtime.showNotebookInStructure ? 1 : 2
-                    return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
-                }
-
-                Component.onCompleted: Runtime.screenplayEditorToolbar = screenplayEditorToolbar
-            }
-
-            Row {
-                id: mainTabBar
-
-                height: parent.height
-
-                visible: appToolBar.visible
-
-                readonly property var tabs: [
-                    { "name": "Screenplay", "icon": "qrc:/icons/navigation/screenplay_tab.png", "visible": true, "tab": Runtime.e_ScreenplayTab },
-                    { "name": "Structure", "icon": "qrc:/icons/navigation/structure_tab.png", "visible": true, "tab": Runtime.e_StructureTab },
-                    { "name": "Notebook", "icon": "qrc:/icons/navigation/notebook_tab.png", "visible": !Runtime.showNotebookInStructure, "tab": Runtime.e_NotebookTab },
-                    { "name": "Scrited", "icon": "qrc:/icons/navigation/scrited_tab.png", "visible": Runtime.workspaceSettings.showScritedTab, "tab": Runtime.e_ScritedTab }
-                ]
-                readonly property color activeTabColor: Runtime.colors.primary.windowColor
-                function indexOfTab(_Runtime_TabType) {
-                    for(var i=0; i<tabs.length; i++) {
-                        if(tabs[i].tab === _Runtime_TabType) {
-                            return i
-                        }
-                    }
-                    return -1
-                }
-
-                Connections {
-                    target: Scrite.document
-
-                    function onJustReset() {
-                        Runtime.activateMainWindowTab(0)
-                    }
-
-                    function onAboutToSave() {
-                        let userData = Scrite.document.userData
-                        userData["mainTabBar"] = {
-                            "version": 0,
-                            "currentIndex": mainTabBar.currentIndex
-                        }
-                        Scrite.document.userData = userData
-                    }
-
-                    function onJustLoaded() {
-                        let userData = Scrite.document.userData
-                        if(userData.mainTabBar) {
-                            var ci = userData.mainTabBar.currentIndex
-                            if(ci >= 0 && ci <= 2)
-                                Runtime.activateMainWindowTab(ci)
-                            else
-                                Runtime.activateMainWindowTab(0)
-                        } else
-                            Runtime.activateMainWindowTab(0)
-                    }
-                }
-
-                function activateTab(index) {
-                    if(index < 0 || index >= tabs.length || index === mainTabBar.currentIndex)
-                        return
-
-                    let tab = tabs[index]
-                    if(!tab.visible)
-                        index = 0
-
-                    const message = "Preparing the <b>" + tabs[index].name + "</b> tab, just a few seconds ..."
-
-                    Scrite.document.setBusyMessage(message)
-                    Scrite.document.screenplay.clearSelection()
-
-                    Utils.execLater(mainTabBar, 100, function() {
-                        mainTabBar.currentIndex = index
-                        Scrite.document.clearBusyMessage()
-                    })
-                }
-
-                property Item currentTab: currentIndex >= 0 && mainTabBarRepeater.count === tabs.length ? mainTabBarRepeater.itemAt(currentIndex) : null
-                property int currentIndex: -1
-                property var currentTabP1: currentTabExtents.value.p1
-                property var currentTabP2: currentTabExtents.value.p2
-
-                onCurrentIndexChanged: {
-                    Runtime.mainWindowTab = tabs[currentIndex].tab
-                }
-
-                Component.onCompleted: {
-                    Runtime.mainWindowTab = Runtime.e_ScreenplayTab
-                    currentIndex = indexOfTab(Runtime.mainWindowTab)
-
-                    const syncCurrentIndex = ()=>{
-                        const idx = indexOfTab(Runtime.mainWindowTab)
-                        if(currentIndex !== idx)
-                            currentIndex = idx
-                    }
-                    Runtime.mainWindowTabChanged.connect( () => {
-                                                                   Qt.callLater(syncCurrentIndex)
-                                                               } )
-
-                    Runtime.activateMainWindowTab.connect( (tabType) => {
-                                                                    const tabIndex = indexOfTab(tabType)
-                                                                    activateTab(tabIndex)
-                                                                } )
-                }
-
-                TrackerPack {
-                    id: currentTabExtents
-                    TrackProperty { target: mainTabBar; property: "visible" }
-                    TrackProperty { target: appToolBarArea; property: "width" }
-                    TrackProperty { target: mainTabBar; property: "currentTab" }
-
-                    property var value: fallback
-                    readonly property var fallback: {
-                        "p1": { "x": 0, "y": 0 },
-                        "p2": { "x": 0, "y": 0 }
-                    }
-
-                    onTracked:  {
-                        if(mainTabBar.visible && mainTabBar.currentTab !== null) {
-                            value = {
-                                "p1": mainTabBar.mapFromItem(mainTabBar.currentTab, 0, 0),
-                                "p2": mainTabBar.mapFromItem(mainTabBar.currentTab, mainTabBar.currentTab.width, 0)
-                            }
-                        } else
-                            value = fallback
-                    }
-                }
-
-                Repeater {
-                    id: mainTabBarRepeater
-
-                    model: mainTabBar.tabs
-
-                    Item {
-                        property bool active: mainTabBar.currentIndex === index
-
-                        width: height
-                        height: mainTabBar.height
-
-                        visible: modelData.visible
-                        enabled: modelData.visible
-
-                        PainterPathItem {
-                            anchors.fill: parent
-
-                            fillColor: parent.active ? mainTabBar.activeTabColor : Runtime.colors.primary.c10.background
-                            renderType: parent.active ? PainterPathItem.OutlineAndFill : PainterPathItem.FillOnly
-                            outlineColor: Runtime.colors.primary.borderColor
-                            outlineWidth: 1
-                            renderingMechanism: PainterPathItem.UseQPainter
-
-                            painterPath: PainterPath {
-                                id: tabButtonPath
-
-                                readonly property point p1: Qt.point(itemRect.left, itemRect.bottom)
-                                readonly property point p2: Qt.point(itemRect.left, itemRect.top + 3)
-                                readonly property point p3: Qt.point(itemRect.right-1, itemRect.top + 3)
-                                readonly property point p4: Qt.point(itemRect.right-1, itemRect.bottom)
-
-                                MoveTo { x: tabButtonPath.p1.x; y: tabButtonPath.p1.y }
-                                LineTo { x: tabButtonPath.p2.x; y: tabButtonPath.p2.y }
-                                LineTo { x: tabButtonPath.p3.x; y: tabButtonPath.p3.y }
-                                LineTo { x: tabButtonPath.p4.x; y: tabButtonPath.p4.y }
-                            }
-                        }
-
-                        FontMetrics {
-                            id: tabBarFontMetrics
-
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                        }
-
-                        Image {
-                            anchors.centerIn: parent
-                            anchors.verticalCenterOffset: parent.active ? 0 : 1
-
-                            width: parent.active ? 32 : 24
-                            height: width
-                            source: modelData.icon
-                            opacity: parent.active ? 1 : 0.75
-                            fillMode: Image.PreserveAspectFit
-
-                            Behavior on width {
-                                enabled: Runtime.applicationSettings.enableAnimations
-
-                                NumberAnimation { duration: Runtime.stdAnimationDuration }
-                            }
-
-                        }
-
-                        MouseArea {
-                            ToolTip.text: modelData.name + "\t" + Scrite.app.polishShortcutTextForDisplay("Alt+"+(index+1))
-                            ToolTip.delay: 1000
-                            ToolTip.visible: containsMouse
-
-                            anchors.fill: parent
-
-                            hoverEnabled: true
-
-                            onClicked: Runtime.activateMainWindowTab(index)
-                        }
-                    }
-                }
-            }
-        }
-
-        UserAccountToolButton {
-            id: userLogin
-
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-        }
+    MainWindow.AppToolBar {
+        id: _appToolBar
     }
 
     Loader {
@@ -1484,7 +54,7 @@ Item {
         property bool allowContent: Runtime.loadMainUiContent
         property string sessionId
 
-        anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
+        anchors.top: _appToolBar.visible ? _appToolBar.bottom : parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -1628,12 +198,12 @@ Item {
                 Loader {
                     id: fileOpenDropAreaNotification
 
-                    Component.onDestruction: appToolBarArea.enabled = true
+                    Component.onDestruction: _appToolBar.enabled = true
 
                     anchors.fill: fileOpenDropArea
 
                     active: fileOpenDropArea.active || fileOpenDropArea.droppedFilePath !== ""
-                    onActiveChanged: appToolBarArea.enabled = !active
+                    onActiveChanged: _appToolBar.enabled = !active
 
                     sourceComponent: Rectangle {
                         color: Scrite.app.translucent(Runtime.colors.primary.c500.background, 0.5)
@@ -2159,15 +729,76 @@ Item {
         }
     }
 
-    Item {
-        id: closeEventHandler
-        width: 100
-        height: 100
-        anchors.centerIn: parent
+    MainWindow.AppBusyOverlay {
+        id: _appBusyOverlay
+
+        anchors.fill: parent
+    }
+
+    MainWindow.Shortcuts {
+        id: _shortcuts
+    }
+
+    QtObject {
+        id: _private
+
+        Announcement.onIncoming: (type, data) => {
+                                     if(type === Runtime.announcementIds.showHelpTip) {
+                                         _private.showHelpTip(""+data)
+                                     }
+                                 }
+
+        Component.onCompleted: {
+            if(Scrite.app.isMacOSPlatform)
+                Scrite.app.openFileRequest.connect(handleOpenFileRequest)
+        }
+
+        readonly property Connections runtimeConnectons: Connections {
+            target: Runtime
+
+            function onShowNotebookInStructureChanged() {
+                Utils.execLater(mainTabBar, 100, function() {
+                    mainTabBar.currentIndex = mainTabBar.currentIndex % (Runtime.showNotebookInStructure ? 2 : 3)
+                })
+            }
+        }
+
+        readonly property Connections scriteDocumentConnections: Connections {
+            target: Scrite.document
+
+            function onJustReset() {
+                Runtime.screenplayEditorSettings.firstSwitchToStructureTab = true
+                _appBusyOverlay.ref()
+                MainWindow.ReloadPromptDialog.abortLaunchLater()
+                Utils.execLater(Runtime.screenplayAdapter, 250, () => {
+                                    _appBusyOverlay.deref()
+                                    Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
+                                })
+            }
+
+            function onJustLoaded() {
+                Runtime.screenplayEditorSettings.firstSwitchToStructureTab = true
+            }
+
+            function onOpenedAnonymously(filePath) {
+                MessageBox.question("Anonymous Open",
+                       "The file you just opened is a backup of another file, and is being opened anonymously in <b>read-only</b> mode.<br/><br/>" +
+                       "<b>NOTE:</b> In order to edit the file, you will need to first Save-As.",
+                        ["Save As", "View Read Only"],
+                        (answer) => {
+                            if(answer === "Save As")
+                                SaveFileTask.saveAs()
+                        })
+            }
+
+            function onRequiresReload() {
+                if(Runtime.applicationSettings.reloadPrompt)
+                    MainWindow.ReloadPromptDialog.launchLater()
+            }
+        }
 
         property bool handleCloseEvent: true
-
-        Connections {
+        readonly property Connections scriteWindowConnections: Connections {
             target: Scrite.window
 
             function onClosing(close) {
@@ -2176,13 +807,13 @@ Item {
                     return
                 }
 
-                if(closeEventHandler.handleCloseEvent) {
+                if(_private.handleCloseEvent) {
                     close.accepted = false
 
                     Scrite.app.saveWindowGeometry(Scrite.window, "Workspace")
 
                     SaveFileTask.save( () => {
-                                          closeEventHandler.handleCloseEvent = false
+                                          _private.handleCloseEvent = false
                                           if( TrialNotActivatedDialog.launch() !== null)
                                             return
                                           Scrite.window.close()
@@ -2191,82 +822,72 @@ Item {
                     close.accepted = true
             }
         }
-    }
 
-    QtObject {
-        ShortcutsModelItem.group: "Formatting"
-        ShortcutsModelItem.title: "Symbols & Smileys"
-        ShortcutsModelItem.enabled: Scrite.app.isTextInputItem(Scrite.window.activeFocusItem)
-        ShortcutsModelItem.priority: 10
-        ShortcutsModelItem.shortcut: "F3"
-    }
+        readonly property QtObject documentErrorHandler: QtObject {
+            property bool errorReportHasError: documentErrors.hasError
 
-    Component.onCompleted: {
-        if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
-            Runtime.workspaceSettings.screenplayEditorWidth = -1
-        Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
-        Qt.callLater( function() {
-            Announcement.shout("{f4048da2-775d-11ec-90d6-0242ac120003}", "restoreWindowGeometryDone")
-        })
-    }
+            property ErrorReport documentErrors: Aggregation.findErrorReport(Scrite.document)
 
-    BusyOverlay {
-        id: appBusyOverlay
-        anchors.fill: parent
-        busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
-        visible: RefCounter.isReffed
-        function ref() { RefCounter.ref() }
-        function deref() { RefCounter.deref() }
-    }
+            onErrorReportHasErrorChanged: {
+                if(errorReportHasError) {
+                    var msg = documentErrors.errorMessage;
 
-    HelpTipNotification {
-        id: htNotification
-        enabled: tipName !== ""
+                    if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
+                        msg += "<br/><br/>Click Ok to reveal <u>" + documentErrors.details.revealOnDesktopRequest + "</u> on your computer."
 
-        Component.onCompleted: {
-            Qt.callLater( () => {
-                             if(Runtime.helpNotificationSettings.dayZero === "")
-                                Runtime.helpNotificationSettings.dayZero = new Date()
-
-                             const days = Runtime.helpNotificationSettings.daysSinceZero()
-                             if(days >= 2) {
-                                 if(!Runtime.helpNotificationSettings.isTipShown("discord"))
-                                     htNotification.tipName = "discord"
-                             }
-                         })
-        }
-    }
-
-    QtObject {
-        property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
-        property bool errorReportHasError: applicationErrors.hasError
-        onErrorReportHasErrorChanged: {
-            if(errorReportHasError)
-                MessageBox.information("Scrite Error", applicationErrors.errorMessage, applicationErrors.clear)
-        }
-    }
-
-    QtObject {
-        property ErrorReport documentErrors: Aggregation.findErrorReport(Scrite.document)
-        property bool errorReportHasError: documentErrors.hasError
-        onErrorReportHasErrorChanged: {
-            if(errorReportHasError) {
-                var msg = documentErrors.errorMessage;
-
-                if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
-                    msg += "<br/><br/>Click Ok to reveal <u>" + documentErrors.details.revealOnDesktopRequest + "</u> on your computer."
-
-                MessageBox.information("Scrite Document Error", msg, () => {
-                                           if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
-                                               Scrite.app.revealFileOnDesktop(documentErrors.details.revealOnDesktopRequest)
-                                           documentErrors.clear()
-                                       })
+                    MessageBox.information("Scrite Document Error", msg, () => {
+                                               if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
+                                                   Scrite.app.revealFileOnDesktop(documentErrors.details.revealOnDesktopRequest)
+                                               documentErrors.clear()
+                                           })
+                }
             }
         }
-    }
 
-    QtObject {
-        id: _private
+        readonly property QtObject applicationErrorHandler: QtObject {
+            property bool errorReportHasError: applicationErrors.hasError
+
+            property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
+
+            onErrorReportHasErrorChanged: {
+                if(errorReportHasError)
+                    MessageBox.information("Scrite Error", applicationErrors.errorMessage, applicationErrors.clear)
+            }
+        }
+
+        readonly property QtObject discordHelpTip: HelpTipNotification {
+            id: _discordHelpTip
+
+            enabled: tipName !== ""
+
+            Component.onCompleted: {
+                Qt.callLater( () => {
+                                 if(Runtime.helpNotificationSettings.dayZero === "")
+                                    Runtime.helpNotificationSettings.dayZero = new Date()
+
+                                 const days = Runtime.helpNotificationSettings.daysSinceZero()
+                                 if(days >= 2) {
+                                     if(!Runtime.helpNotificationSettings.isTipShown("discord"))
+                                         _discordHelpTip.tipName = "discord"
+                                 }
+                             })
+            }
+        }
+
+        readonly property Component helpTipNotification : HelpTipNotification {
+            id: _helpTip
+
+            Notification.onDismissed: _helpTip.destroy()
+        }
+
+        function init() {
+            if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
+                Runtime.workspaceSettings.screenplayEditorWidth = -1
+            Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
+            Qt.callLater( function() {
+                Announcement.shout("{f4048da2-775d-11ec-90d6-0242ac120003}", "restoreWindowGeometryDone")
+            })
+        }
 
         function handleOpenFileRequest(fileName) {
             if(Scrite.app.isMacOSPlatform) {
@@ -2294,27 +915,8 @@ Item {
 
         function showHelpTip(tipName) {
             if(Runtime.helpTips[tipName] !== undefined && !Runtime.helpNotificationSettings.isTipShown(tipName)) {
-                helpTipNotification.createObject(Scrite.window.contentItem, {"tipName": tipName})
+                _private.helpTipNotification.createObject(Scrite.window.contentItem, {"tipName": tipName})
             }
-        }
-
-        Announcement.onIncoming: (type, data) => {
-                                     if(type === Runtime.announcementIds.showHelpTip) {
-                                         _private.showHelpTip(""+data)
-                                     }
-                                 }
-
-        Component.onCompleted: {
-            if(Scrite.app.isMacOSPlatform)
-                Scrite.app.openFileRequest.connect(handleOpenFileRequest)
-        }
-    }
-
-    Component {
-        id: helpTipNotification
-        HelpTipNotification {
-            id: helpTip
-            Notification.onDismissed: helpTip.destroy()
         }
     }
 }

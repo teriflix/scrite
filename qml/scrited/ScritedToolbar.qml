@@ -23,7 +23,10 @@ import "qrc:/qml/helpers"
 
 Item {
     property Item scritedView
+
     height: 45
+
+    visible: scritedView !== null
 
     Loader {
         height: parent.height
