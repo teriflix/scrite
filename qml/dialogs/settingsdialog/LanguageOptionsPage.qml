@@ -47,35 +47,85 @@ Item {
                 border.width: 1
 
                 ListView {
-                    id: _supportedLanguagesListView
+                    id: _listView
+
+                    property real delegateWidth: contentHeight > height ? width-20 : width
 
                     ScrollBar.vertical: VclScrollBar { }
 
                     anchors.fill: parent
                     anchors.margins: 1
 
+                    clip: true
                     model: Runtime.language.supported
                     currentIndex: 0
                     highlightMoveDuration: 0
                     highlightResizeDuration: 0
                     highlightFollowsCurrentItem: true
 
-                    delegate: VclLabel {
+                    delegate: Item {
                         required property int index
                         required property var language
 
-                        width: _supportedLanguagesListView.contentHeight > _supportedLanguagesListView.height ?
-                                   _supportedLanguagesListView.width-20 : _supportedLanguagesListView.width
-
-                        text: language.name
-                        color: _supportedLanguagesListView.currentIndex === index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
-                        padding: 6
+                        width: _listView.delegateWidth
+                        height: _delegateLayout.height
 
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                _supportedLanguagesListView.currentIndex = index
+                                _listView.currentIndex = index
                                 parent.forceActiveFocus()
+                            }
+                        }
+
+                        RowLayout {
+                            id: _delegateLayout
+
+                            width: parent.width
+                            spacing: 5
+
+                            Rectangle {
+                                Layout.alignment: Qt.AlignVCenter
+                                Layout.leftMargin: parent.spacing
+
+                                implicitWidth: Runtime.idealFontMetrics.averageCharacterWidth * 4
+                                implicitHeight: _delegateLabel.height-6
+
+                                color: Runtime.colors.primary.c800.background
+                                radius: Math.min(width,height) * 0.2
+
+                                VclLabel {
+                                    anchors.centerIn: parent
+
+                                    text: language.glyph
+                                    color: Runtime.colors.primary.c800.text
+
+                                    font.bold: true
+                                    font.family: language.font().family
+                                }
+                            }
+
+                            VclLabel {
+                                id: _delegateLabel
+
+                                Layout.fillWidth: true
+
+                                text: language.name
+                                color: _listView.currentIndex === index ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c100.text
+                                elide: Text.ElideMiddle
+                                padding: 10
+                            }
+
+                            VclToolButton {
+                                suggestedWidth: _delegateLabel.height
+                                suggestedHeight: _delegateLabel.height
+
+                                visible: _listView.count > 1 && language.code !== QtLocale.English
+                                opacity: hovered ? 1 : 0.5
+                                icon.source: "qrc:/icons/action/delete.png"
+                                hoverEnabled: true
+
+                                onClicked: _private.deleteLanguage(language)
                             }
                         }
                     }
@@ -83,33 +133,29 @@ Item {
                     highlight: Rectangle {
                         color: Runtime.colors.primary.highlight.background
                     }
-                }
-            }
 
-            RowLayout {
-                Layout.fillWidth: true
+                    footer: ColumnLayout {
+                        width: _listView.delegateWidth
 
-                spacing: 10
+                        spacing: 5
 
-                VclButton {
-                    Layout.fillWidth: true
+                        Rectangle {
+                            Layout.topMargin: 10
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: 1
 
-                    text: "Add"
+                            color: Runtime.colors.primary.borderColor
+                        }
 
-                    onClicked: _newLanguageDialog.open()
-                }
+                        VclButton {
+                            Layout.margins: 10
+                            Layout.fillWidth: true
 
-                VclButton {
-                    Layout.fillWidth: true
+                            text: "Add Language"
+                            flat: true
+                            icon.source: "qrc:/icons/content/add_box.png"
 
-                    text: "Remove"
-                    enabled: _supportedLanguagesListView.currentIndex >= 0 && _supportedLanguagesListView.count > 1 && _private.language.code !== QtLocale.English
-
-                    onClicked: {
-                        const row = Runtime.language.supported.removeLanguage(_private.language.code)
-                        if(row >= 0) {
-                            _supportedLanguagesListView.currentIndex = -1
-                            _supportedLanguagesListView.currentIndex = Math.max(0, Math.min(row, _supportedLanguagesListView.count-1))
+                            onClicked: _newLanguageDialog.open()
                         }
                     }
                 }
@@ -256,7 +302,7 @@ Item {
                     return
                 }
 
-                const index = availableLanguages.names.indexOf(languageName)
+                const index = availableLanguages.names.map(item => item.toLowerCase()).indexOf(languageName.toLowerCase());
                 if(index < 0) {
                     MessageBox.information("Add Language Error",
                                            "No language by name \"" + languageName + "\" was found.")
@@ -266,7 +312,7 @@ Item {
                 const languageCode = availableLanguages.codes[index]
                 const row = Runtime.language.supported.addLanguage(languageCode)
                 if(row >= 0) {
-                    _supportedLanguagesListView.currentIndex = row
+                    _listView.currentIndex = row
                     _newLanguageDialog.close()
                 } else {
                     MessageBox.information("Add Language Error",
@@ -317,13 +363,12 @@ Item {
         }
     }
 
-
     QtObject {
         id: _private
 
         property int previouslyActiveLanguage: -1
 
-        property var language: _supportedLanguagesListView.currentItem.language
+        property var language: _listView.currentItem.language
 
         property ListModel transliterationOptionsModel: ListModel { }
 
@@ -365,6 +410,15 @@ Item {
             }
 
             return { "codes": codes, "names": names }
+        }
+
+        function deleteLanguage(language) {
+            const row = Runtime.language.supported.removeLanguage(language.code)
+            if(row < 0)
+                return
+
+            _listView.currentIndex = -1
+            _listView.currentIndex = Math.max(0, Math.min(row, _listView.count-1))
         }
 
         onLanguageChanged: populateTransliterationOptionsModel()

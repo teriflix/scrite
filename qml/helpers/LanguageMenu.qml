@@ -40,9 +40,29 @@ VclMenu {
                                            // that privilege is only reserved for QObject types.
 
             contentItem: GridLayout {
-                columns: 2
-                rowSpacing: 5
+                columns: 3
+                rowSpacing: 10
                 columnSpacing: 5
+
+                Rectangle {
+                    Layout.rightMargin: parent.rowSpacing
+
+                    implicitWidth: Runtime.idealFontMetrics.averageCharacterWidth * 4
+                    implicitHeight: implicitWidth
+
+                    color: Runtime.colors.primary.c800.background
+                    radius: Math.min(width,height) * 0.2
+
+                    VclLabel {
+                        anchors.centerIn: parent
+
+                        text: _languageMenuItem.language.glyph
+                        color: Runtime.colors.primary.c800.text
+
+                        font.bold: true
+                        font.family: _languageMenuItem.language.font().family
+                    }
+                }
 
                 VclText {
                     Layout.fillWidth: true
@@ -86,17 +106,19 @@ VclMenu {
         __moreLanguages = __moreLanguagesComponent.createObject(root)
         addItem(__moreLanguages)
 
+        const iconWidth = Runtime.idealFontMetrics.averageCharacterWidth * 4 + 10
+
         let widthRequired = 0
         for(let i=0; i<count; i++) {
             const item = itemAt(i)
             if(item.language) {
-                const shortcut = Scrite.app.polishShortcutTextForDisplay(_languageMenuItem.language.shortcut())
+                const shortcut = Scrite.app.polishShortcutTextForDisplay(item.language.shortcut())
                 widthRequired = Math.max( Runtime.idealFontMetrics.boundingRect(item.language.name).width +
-                                          Runtime.idealFontMetrics.boundingRect(shortcut).width, widthRequired )
+                                          Runtime.idealFontMetrics.boundingRect(shortcut).width + iconWidth, widthRequired )
             }
         }
 
-        width = widthRequired + 50
+        contentWidth = widthRequired + 100
     }
 
     onAboutToHide: {

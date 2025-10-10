@@ -33,7 +33,7 @@ static const QMap<QLocale::Language, QChar::Script> languageScriptMap()
     // There is no Qt API to help us with this. Therefore we have to do it manually.
     // This also means that it will probably not be exhaustive.
 
-    return {
+    static const QMap<QLocale::Language, QChar::Script> ret = {
         // Latin scripts
         { QLocale::English, QChar::Script_Latin },
         { QLocale::French, QChar::Script_Latin },
@@ -93,6 +93,8 @@ static const QMap<QLocale::Language, QChar::Script> languageScriptMap()
         { QLocale::Khmer, QChar::Script_Khmer },
         { QLocale::Cherokee, QChar::Script_Cherokee },
     };
+
+    return ret;
 }
 
 static const QMap<QChar::Script, QFontDatabase::WritingSystem> scriptWritingSystemMap()
@@ -100,27 +102,196 @@ static const QMap<QChar::Script, QFontDatabase::WritingSystem> scriptWritingSyst
     // There is no Qt API to help us with this. Therefore we have to do it manually.
     // This also means that it will probably not be exhaustive.
 
-    return { { QChar::Script_Latin, QFontDatabase::Latin },
-             { QChar::Script_Cyrillic, QFontDatabase::Cyrillic },
-             { QChar::Script_Greek, QFontDatabase::Greek },
-             { QChar::Script_Arabic, QFontDatabase::Arabic },
-             { QChar::Script_Armenian, QFontDatabase::Armenian },
-             { QChar::Script_Hebrew, QFontDatabase::Hebrew },
-             { QChar::Script_Thai, QFontDatabase::Thai },
-             { QChar::Script_Lao, QFontDatabase::Lao },
-             { QChar::Script_Tibetan, QFontDatabase::Tibetan },
-             { QChar::Script_Devanagari, QFontDatabase::Devanagari },
-             { QChar::Script_Bengali, QFontDatabase::Bengali },
-             { QChar::Script_Gurmukhi, QFontDatabase::Gurmukhi },
-             { QChar::Script_Gujarati, QFontDatabase::Gujarati },
-             { QChar::Script_Oriya, QFontDatabase::Oriya },
-             { QChar::Script_Tamil, QFontDatabase::Tamil },
-             { QChar::Script_Telugu, QFontDatabase::Telugu },
-             { QChar::Script_Kannada, QFontDatabase::Kannada },
-             { QChar::Script_Malayalam, QFontDatabase::Malayalam },
-             { QChar::Script_Sinhala, QFontDatabase::Sinhala },
-             { QChar::Script_Myanmar, QFontDatabase::Myanmar },
-             { QChar::Script_Khmer, QFontDatabase::Khmer } };
+    static const QMap<QChar::Script, QFontDatabase::WritingSystem> ret = {
+        { QChar::Script_Latin, QFontDatabase::Latin },
+        { QChar::Script_Cyrillic, QFontDatabase::Cyrillic },
+        { QChar::Script_Greek, QFontDatabase::Greek },
+        { QChar::Script_Arabic, QFontDatabase::Arabic },
+        { QChar::Script_Armenian, QFontDatabase::Armenian },
+        { QChar::Script_Hebrew, QFontDatabase::Hebrew },
+        { QChar::Script_Thai, QFontDatabase::Thai },
+        { QChar::Script_Lao, QFontDatabase::Lao },
+        { QChar::Script_Tibetan, QFontDatabase::Tibetan },
+        { QChar::Script_Devanagari, QFontDatabase::Devanagari },
+        { QChar::Script_Bengali, QFontDatabase::Bengali },
+        { QChar::Script_Gurmukhi, QFontDatabase::Gurmukhi },
+        { QChar::Script_Gujarati, QFontDatabase::Gujarati },
+        { QChar::Script_Oriya, QFontDatabase::Oriya },
+        { QChar::Script_Tamil, QFontDatabase::Tamil },
+        { QChar::Script_Telugu, QFontDatabase::Telugu },
+        { QChar::Script_Kannada, QFontDatabase::Kannada },
+        { QChar::Script_Malayalam, QFontDatabase::Malayalam },
+        { QChar::Script_Sinhala, QFontDatabase::Sinhala },
+        { QChar::Script_Myanmar, QFontDatabase::Myanmar },
+        { QChar::Script_Khmer, QFontDatabase::Khmer }
+    };
+
+    return ret;
+}
+
+static const QMap<QChar::Script, QChar> glyphForScript()
+{
+    QMap<QChar::Script, QChar> ret = {
+        { QChar::Script_Unknown, QChar(0x002A) }, // '*'
+        { QChar::Script_Inherited, QChar(0x0300) }, // '◌̀' (Combining Grave Accent)
+        { QChar::Script_Common, QChar(0x003F) }, // '?'
+        { QChar::Script_Adlam, QChar(0x1E900) }, // '𞤀'
+        { QChar::Script_Ahom, QChar(0x11700) }, // '𑜴'
+        { QChar::Script_AnatolianHieroglyphs, QChar(0x14400) }, // '𔐀'
+        { QChar::Script_Arabic, QChar(0x0627) }, // 'ا'
+        { QChar::Script_Armenian, QChar(0x0531) }, // 'Ա'
+        { QChar::Script_Avestan, QChar(0x10B00) }, // '𐬀'
+        { QChar::Script_Balinese, QChar(0x1B05) }, // 'ᬅ'
+        { QChar::Script_Bamum, QChar(0xA6A0) }, // 'ꚠ'
+        { QChar::Script_BassaVah, QChar(0x16AD0) }, // '𖫐'
+        { QChar::Script_Batak, QChar(0x1BC0) }, // 'ᯀ'
+        { QChar::Script_Bengali, QChar(0x0985) }, // 'অ'
+        { QChar::Script_Bhaiksuki, QChar(0x11C00) }, // '𑰀'
+        { QChar::Script_Bopomofo, QChar(0x3105) }, // 'ㄅ'
+        { QChar::Script_Brahmi, QChar(0x11005) }, // '𑀅'
+        { QChar::Script_Braille, QChar(0x2801) }, // '⠁'
+        { QChar::Script_Buginese, QChar(0x1A00) }, // 'ᨀ'
+        { QChar::Script_Buhid, QChar(0x1740) }, // 'ᝀ'
+        { QChar::Script_CanadianAboriginal, QChar(0x1401) }, // 'ᐁ'
+        { QChar::Script_Carian, QChar(0x102A0) }, // '𐊠'
+        { QChar::Script_CaucasianAlbanian, QChar(0x10530) }, // '𐔰'
+        { QChar::Script_Chakma, QChar(0x11100) }, // '𑫀'
+        { QChar::Script_Cham, QChar(0xAA00) }, // 'ꨀ'
+        { QChar::Script_Cherokee, QChar(0x13A0) }, // 'Ꭰ'
+        { QChar::Script_Chorasmian, QChar(0x10FB0) }, // '𐾰'
+        { QChar::Script_Coptic, QChar(0x2C80) }, // 'Ⲁ'
+        { QChar::Script_Cuneiform, QChar(0x12000) }, // '𒀀'
+        { QChar::Script_Cypriot, QChar(0x10800) }, // '𐠀'
+        { QChar::Script_Cyrillic, QChar(0x0414) }, // 'Д'
+        { QChar::Script_Deseret, QChar(0x10400) }, // '𐐀'
+        { QChar::Script_Devanagari, QChar(0x0905) }, // 'अ'
+        { QChar::Script_DivesAkuru, QChar(0x11900) }, // '𑤀'
+        { QChar::Script_Dogra, QChar(0x11800) }, // '𑠀'
+        { QChar::Script_Duployan, QChar(0x1BC00) }, // '𛲀'
+        { QChar::Script_EgyptianHieroglyphs, QChar(0x13000) }, // '𓀀'
+        { QChar::Script_Elbasan, QChar(0x10500) }, // '𐔀'
+        { QChar::Script_Elymaic, QChar(0x10FE0) }, // '𐿠'
+        { QChar::Script_Ethiopic, QChar(0x1200) }, // 'ሀ'
+        { QChar::Script_Georgian, QChar(0x10A0) }, // 'Ⴀ'
+        { QChar::Script_Glagolitic, QChar(0x2C00) }, // 'Ⰰ'
+        { QChar::Script_Gothic, QChar(0x10330) }, // '𐌰'
+        { QChar::Script_Grantha, QChar(0x11305) }, // '𑌅'
+        { QChar::Script_Greek, QChar(0x0391) }, // 'Α'
+        { QChar::Script_Gujarati, QChar(0x0A85) }, // 'અ'
+        { QChar::Script_GunjalaGondi, QChar(0x11D60) }, // '𑵠'
+        { QChar::Script_Gurmukhi, QChar(0x0A05) }, // 'ਅ'
+        { QChar::Script_Han, QChar(0x4E00) }, // '一'
+        { QChar::Script_Hangul, QChar(0xAC00) }, // '가'
+        { QChar::Script_HanifiRohingya, QChar(0x10D00) }, // '𐴀'
+        { QChar::Script_Hanunoo, QChar(0x1720) }, // 'ᜠ'
+        { QChar::Script_Hatran, QChar(0x108E0) }, // '𐣠'
+        { QChar::Script_Hebrew, QChar(0x05D0) }, // 'א'
+        { QChar::Script_Hiragana, QChar(0x3042) }, // 'あ'
+        { QChar::Script_ImperialAramaic, QChar(0x10840) }, // '𐡀'
+        { QChar::Script_InscriptionalPahlavi, QChar(0x10B60) }, // '𐭠'
+        { QChar::Script_InscriptionalParthian, QChar(0x10B40) }, // '𐭀'
+        { QChar::Script_Javanese, QChar(0xA980) }, // 'ꦀ'
+        { QChar::Script_Kaithi, QChar(0x11080) }, // '𑂀'
+        { QChar::Script_Kannada, QChar(0x0C85) }, // 'ಅ'
+        { QChar::Script_Katakana, QChar(0x30A2) }, // 'ア'
+        { QChar::Script_KayahLi, QChar(0xA900) }, // '꤀'
+        { QChar::Script_Kharoshthi, QChar(0x10A00) }, // '𐨀'
+        { QChar::Script_KhitanSmallScript, QChar(0x18B00) }, // '𘬀'
+        { QChar::Script_Khmer, QChar(0x1780) }, // 'ក'
+        { QChar::Script_Khojki, QChar(0x11200) }, // '𑈀'
+        { QChar::Script_Khudawadi, QChar(0x112B0) }, // '𑊰'
+        { QChar::Script_Lao, QChar(0x0E81) }, // 'ກ'
+        { QChar::Script_Latin, QChar(0x0041) }, // 'A'
+        { QChar::Script_Lepcha, QChar(0x1C00) }, // 'ᰀ'
+        { QChar::Script_Limbu, QChar(0x1900) }, // 'ᤀ'
+        { QChar::Script_LinearA, QChar(0x10600) }, // '𐘀'
+        { QChar::Script_LinearB, QChar(0x10000) }, // '𐀀'
+        { QChar::Script_Lisu, QChar(0xA4D0) }, // 'ꓐ'
+        { QChar::Script_Lycian, QChar(0x10280) }, // '𐞀'
+        { QChar::Script_Lydian, QChar(0x10920) }, // '𐤠'
+        { QChar::Script_Mahajani, QChar(0x11150) }, // '𑅐'
+        { QChar::Script_Makasar, QChar(0x11EE0) }, // '𑻠'
+        { QChar::Script_Malayalam, QChar(0x0D05) }, // 'അ'
+        { QChar::Script_Mandaic, QChar(0x0840) }, // 'ࡀ'
+        { QChar::Script_Manichaean, QChar(0x10AC0) }, // '𐫀'
+        { QChar::Script_Marchen, QChar(0x11C70) }, // '𑱰'
+        { QChar::Script_MasaramGondi, QChar(0x11D00) }, // '𑴀'
+        { QChar::Script_Medefaidrin, QChar(0x16E40) }, // '𖹀'
+        { QChar::Script_MeeteiMayek, QChar(0xABC0) }, // 'ꯀ'
+        { QChar::Script_MendeKikakui, QChar(0x1E800) }, // '𞠀'
+        { QChar::Script_MeroiticCursive, QChar(0x109A0) }, // '𐦠'
+        { QChar::Script_MeroiticHieroglyphs, QChar(0x10980) }, // '𐦀'
+        { QChar::Script_Miao, QChar(0x16F00) }, // '𖰀'
+        { QChar::Script_Modi, QChar(0x11600) }, // '𑘀'
+        { QChar::Script_Mongolian, QChar(0x1800) }, // '᠀'
+        { QChar::Script_Mro, QChar(0x16A40) }, // '𖩀'
+        { QChar::Script_Multani, QChar(0x11280) }, // '𑊀'
+        { QChar::Script_Myanmar, QChar(0x1000) }, // 'က'
+        { QChar::Script_Nabataean, QChar(0x10880) }, // '𐢀'
+        { QChar::Script_Nandinagari, QChar(0x119A0) }, // '𑦠'
+        { QChar::Script_Newa, QChar(0x11400) }, // '𑐀'
+        { QChar::Script_NewTaiLue, QChar(0x1980) }, // 'ᦀ'
+        { QChar::Script_Nko, QChar(0x07C0) }, // '߀'
+        { QChar::Script_Nushu, QChar(0x1B170) }, // '𛅰'
+        { QChar::Script_NyiakengPuachueHmong, QChar(0x1E100) }, // '𞄀'
+        { QChar::Script_Ogham, QChar(0x1680) }, // ' '
+        { QChar::Script_OlChiki, QChar(0x1C50) }, // '᱐'
+        { QChar::Script_OldHungarian, QChar(0x10C80) }, // '𐲀'
+        { QChar::Script_OldItalic, QChar(0x10300) }, // '𐌀'
+        { QChar::Script_OldNorthArabian, QChar(0x10A80) }, // '𐪀'
+        { QChar::Script_OldPermic, QChar(0x10350) }, // '𐍐'
+        { QChar::Script_OldPersian, QChar(0x103A0) }, // '𐎠'
+        { QChar::Script_OldSogdian, QChar(0x10F00) }, // '𐼀'
+        { QChar::Script_OldSouthArabian, QChar(0x10A60) }, // '𐩠'
+        { QChar::Script_OldTurkic, QChar(0x10C00) }, // '𐰀'
+        { QChar::Script_Oriya, QChar(0x0B05) }, // 'ଅ'
+        { QChar::Script_Osage, QChar(0x104B0) }, // '𐒰'
+        { QChar::Script_Osmanya, QChar(0x10480) }, // '𐒀'
+        { QChar::Script_PahawhHmong, QChar(0x16B00) }, // '𖬀'
+        { QChar::Script_Palmyrene, QChar(0x10860) }, // '𐡠'
+        { QChar::Script_PauCinHau, QChar(0x11AC0) }, // '𑫀'
+        { QChar::Script_PhagsPa, QChar(0xA840) }, // 'ꡀ'
+        { QChar::Script_Phoenician, QChar(0x10900) }, // '𐤀'
+        { QChar::Script_PsalterPahlavi, QChar(0x10B80) }, // '𐮀'
+        { QChar::Script_Rejang, QChar(0xA930) }, // 'ꤰ'
+        { QChar::Script_Runic, QChar(0x16A0) }, // 'ᚠ'
+        { QChar::Script_Samaritan, QChar(0x0800) }, // 'ࠀ'
+        { QChar::Script_Saurashtra, QChar(0xA880) }, // 'ꢀ'
+        { QChar::Script_Sharada, QChar(0x11180) }, // '𑆀'
+        { QChar::Script_Shavian, QChar(0x10450) }, // '𐑐'
+        { QChar::Script_Siddham, QChar(0x11580) }, // '𑖀'
+        { QChar::Script_SignWriting, QChar(0x1D800) }, // '𝠀'
+        { QChar::Script_Sinhala, QChar(0x0D85) }, // 'අ'
+        { QChar::Script_Sogdian, QChar(0x10F30) }, // '𐼰'
+        { QChar::Script_SoraSompeng, QChar(0x110D0) }, // '𑃐'
+        { QChar::Script_Soyombo, QChar(0x11A50) }, // '𑩐'
+        { QChar::Script_Sundanese, QChar(0x1B83) }, // 'ᮃ'
+        { QChar::Script_SylotiNagri, QChar(0xA800) }, // 'ꠀ'
+        { QChar::Script_Syriac, QChar(0x0710) }, // 'ܐ'
+        { QChar::Script_Tagalog, QChar(0x1700) }, // 'ᜀ'
+        { QChar::Script_Tagbanwa, QChar(0x1760) }, // 'ᝠ'
+        { QChar::Script_TaiLe, QChar(0x1950) }, // 'ᥐ'
+        { QChar::Script_TaiTham, QChar(0x1A20) }, // 'ᨠ'
+        { QChar::Script_TaiViet, QChar(0xAA80) }, // 'ꪀ'
+        { QChar::Script_Takri, QChar(0x11680) }, // '𑚀'
+        { QChar::Script_Tamil, QChar(0x0B85) }, // 'அ'
+        { QChar::Script_Tangut, QChar(0x17000) }, // '𗀀'
+        { QChar::Script_Telugu, QChar(0x0C05) }, // 'అ'
+        { QChar::Script_Thaana, QChar(0x0780) }, // 'ހ'
+        { QChar::Script_Thai, QChar(0x0E01) }, // 'ก'
+        { QChar::Script_Tibetan, QChar(0x0F40) }, // 'ཀ'
+        { QChar::Script_Tifinagh, QChar(0x2D30) }, // 'ⴰ'
+        { QChar::Script_Tirhuta, QChar(0x11480) }, // '𑒀'
+        { QChar::Script_Ugaritic, QChar(0x10380) }, // '𐎀'
+        { QChar::Script_Vai, QChar(0xA500) }, // 'ꔀ'
+        { QChar::Script_Wancho, QChar(0x1E2C0) }, // '𞋀'
+        { QChar::Script_WarangCiti, QChar(0x118A0) }, // '𑢠'
+        { QChar::Script_Yezidi, QChar(0x10E80) }, // '𐺀'
+        { QChar::Script_Yi, QChar(0xA000) }, // 'ꀀ'
+        { QChar::Script_ZanabazarSquare, QChar(0x11A00) } // '𑨀'
+    };
+
+    return ret;
 }
 
 QString Language::name() const
@@ -132,6 +303,12 @@ QString Language::name() const
 QString Language::nativeName() const
 {
     return QLocale(QLocale::Language(this->code)).nativeLanguageName();
+}
+
+QString Language::glyph() const
+{
+    const QChar ch = glyphForScript().value(QChar::Script(this->charScript()));
+    return QString(ch);
 }
 
 QFont Language::font() const

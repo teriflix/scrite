@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 import "qrc:/qml/globals"
 
 ToolButton {
-    id: toolButton
+    id: root
 
     property real suggestedWidth: {
         if(display === AbstractButton.IconOnly || text.length === 0)
@@ -26,12 +26,13 @@ ToolButton {
         return 120
     }
     property real suggestedHeight: 55
+
     property string shortcut
     property string shortcutText: shortcut
 
-    Material.primary: Runtime.colors.primary.key
-    Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
+    Material.accent: Runtime.colors.accent.key
+    Material.primary: Runtime.colors.primary.key
 
     ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
     ToolTip.visible: ToolTip.text === "" ? false : hovered
@@ -39,15 +40,16 @@ ToolButton {
     implicitWidth: suggestedWidth
     implicitHeight: suggestedHeight
 
+    flat: true
+    opacity: enabled ? 1 : 0.5
+    display: AbstractButton.TextBesideIcon
+
     hoverEnabled: true
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
-    display: AbstractButton.TextBesideIcon
-    opacity: enabled ? 1 : 0.5
-    flat: true
 
     contentItem: Rectangle {
         color: Runtime.colors.primary.c10.background
-        border.width: toolButton.flat ? 0 : 1
+        border.width: root.flat ? 0 : 1
         border.color: Runtime.colors.primary.borderColor
 
         Row {
@@ -55,42 +57,48 @@ ToolButton {
             spacing: 10
 
             Image {
-                source: toolButton.icon.source
-                width: toolButton.icon.width
-                height: toolButton.icon.height
                 anchors.verticalCenter: parent.verticalCenter
-                visible: status === Image.Ready
+
+                width: root.icon.width
+                height: root.icon.height
+
+                source: root.icon.source
                 smooth: true
                 mipmap: true
+                visible: status === Image.Ready
             }
 
             Column {
-                spacing: parent.spacing/2
                 anchors.verticalCenter: parent.verticalCenter
 
+                spacing: parent.spacing/2
+
                 VclText {
-                    text: toolButton.action.text
-                    font.pixelSize: toolButton.font.pixelSize
-                    font.bold: toolButton.down
+                    text: root.action.text
+                    visible: root.display !== AbstractButton.IconOnly
+
+                    font.bold: root.down
+                    font.pixelSize: root.font.pixelSize
+
                     Behavior on color {
                         enabled: Runtime.applicationSettings.enableAnimations
                         ColorAnimation { duration: 250 }
                     }
-                    visible: toolButton.display !== AbstractButton.IconOnly
                 }
 
                 VclText {
-                    font.pixelSize: 9
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: "[" + toolButton.shortcutText + "]"
-                    visible: toolButton.shortcutText !== ""
+
+                    text: "[" + root.shortcutText + "]"
+                    visible: root.shortcutText !== ""
+                    font.pixelSize: 9
                 }
             }
         }
     }
 
     action: Action {
-        text: toolButton.text
-        shortcut: toolButton.shortcut
+        text: root.text
+        shortcut: root.shortcut
     }
 }

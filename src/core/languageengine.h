@@ -95,6 +95,9 @@ public:
     Q_PROPERTY(QString nativeName READ nativeName)
     QString nativeName() const;
 
+    Q_PROPERTY(QString glyph READ glyph)
+    QString glyph() const;
+
     Q_PROPERTY(QKeySequence keySequence MEMBER keySequence)
     QKeySequence keySequence;
 
