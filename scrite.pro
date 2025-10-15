@@ -56,6 +56,7 @@ HEADERS += \
     src/automation/pausestep.h \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
+    src/core/actionmanager.h \
     src/core/appwindow.h \
     src/core/enumerationmodel.h \
     src/core/filelocker.h \
@@ -192,6 +193,7 @@ SOURCES += \
     src/automation/pausestep.cpp \
     src/automation/scriptautomationstep.cpp \
     src/automation/windowcapture.cpp \
+    src/core/actionmanager.cpp \
     src/core/application_build_timestamp.cpp \
     src/core/appwindow.cpp \
     src/core/enumerationmodel.cpp \
