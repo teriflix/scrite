@@ -217,9 +217,9 @@ Item {
                     checked: Runtime.workspaceSettings.showScritedTab
                     onToggled: {
                         Runtime.workspaceSettings.showScritedTab = checked
-                        if(!checked && Runtime.mainWindowTab === Runtime.e_ScritedTab) {
+                        if(!checked && Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab) {
                             try {
-                                Runtime.activateMainWindowTab(Runtime.e_ScreenplayTab)
+                                Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
                             } catch(e) {
                                 console.log(e)
                             }

@@ -56,7 +56,7 @@ QtObject {
 
         ScriptAction {
             script: {
-                Runtime.activateMainWindowTab(Runtime.e_ScreenplayTab)
+                Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
                 theTaskInstance.waitDialog = WaitDialog.launch()
             }
         }

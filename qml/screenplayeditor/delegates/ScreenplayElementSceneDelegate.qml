@@ -404,7 +404,7 @@ AbstractScreenplayElementDelegate {
                 anchors.topMargin: __screenY < 0 ? Math.min(-__screenY, __maxTopMargin) : 0
 
                 active: Runtime.screenplayEditorSettings.displaySceneComments &&
-                        Runtime.mainWindowTab === Runtime.e_ScreenplayTab &&
+                        Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab &&
                         root.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth
 
                 sourceComponent: SceneSidePanel {

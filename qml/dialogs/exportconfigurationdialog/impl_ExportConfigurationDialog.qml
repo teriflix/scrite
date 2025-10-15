@@ -170,7 +170,7 @@ VclDialog {
 
                 Component.onCompleted: {
                     if(Scrite.app.verifyType(exporter, "StructureExporter"))
-                        Runtime.activateMainWindowTab(Runtime.e_StructureTab)
+                        Runtime.activateMainWindowTab(Runtime.MainWindowTab.StructureTab)
 
                     if(Scrite.app.verifyType(exporter, "AbstractTextDocumentExporter")) {
                         exporter.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences

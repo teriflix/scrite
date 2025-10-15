@@ -86,7 +86,7 @@ Rectangle {
         anchors.topMargin: 5
         anchors.bottomMargin: 5
 
-        active: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+        active: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
 
         sourceComponent: ScreenplayEditorSidePanel {
             id: _sceneListPanel
@@ -286,7 +286,7 @@ Rectangle {
         property real minSidePanelWidth: root.width * 0.15
         property real maxSidePanelWidth: root.width * 0.5
         property bool sidePanelExpanded: sidePanel && sidePanel.expanded
-        property bool showSceneSidePanel: Runtime.screenplayEditorSettings.displaySceneComments && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+        property bool showSceneSidePanel: Runtime.screenplayEditorSettings.displaySceneComments && Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
         property ScreenplayEditorSidePanel sidePanel: _sidePanelLoader.item
 
         property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat
@@ -342,7 +342,7 @@ Rectangle {
 
                 const zoomOneValue = indexOfZoomLevel(1)
 
-                const availableWidth = Runtime.mainWindowTab === Runtime.e_ScreenplayTab ? root.width-500 : root.width
+                const availableWidth = Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab ? root.width-500 : root.width
 
                 let zoomValue = zoomOneValue
                 let zoomLevel = zoomLevels[zoomValue]
@@ -416,10 +416,10 @@ Rectangle {
 
             Runtime.screenplayEditor = root
 
-            if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab)
+            if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab)
                 Scrite.user.logActivity1("screenplay")
 
-            if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab) {
+            if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab) {
                 if(_elementListView.currentDelegate)
                     _elementListView.currentDelegate.focusIn()
             }

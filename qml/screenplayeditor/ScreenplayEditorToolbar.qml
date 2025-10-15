@@ -472,7 +472,7 @@ Row {
 
             ++idx
 
-            if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab || Runtime.undoStack.screenplayEditorActive) {
+            if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab || Runtime.undoStack.screenplayEditorActive) {
                 while(idx < Scrite.document.screenplay.elementCount) {
                     const e = Scrite.document.screenplay.elementAt(idx)
                     if(e === null)
@@ -515,7 +515,7 @@ Row {
 
             root.requestScreenplayEditor()
 
-            Scrite.document.createNewScene(Runtime.mainWindowTab !== Runtime.e_ScreenplayTab ? Runtime.undoStack.screenplayEditorActive : false)
+            Scrite.document.createNewScene(Runtime.mainWindowTab !== Runtime.MainWindowTab.ScreenplayTab ? Runtime.undoStack.screenplayEditorActive : false)
         }
 
         function addEpisode() {

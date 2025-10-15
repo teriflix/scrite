@@ -87,7 +87,7 @@ Rectangle {
 
         IconButton {
             enabled: !Scrite.document.readOnly
-            visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+            visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
 
             tooltipText: {
                 if(Scrite.document.readOnly)
@@ -129,7 +129,7 @@ Rectangle {
         IconButton {
             source: "qrc:/icons/navigation/refresh.png"
             opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
-            visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+            visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
             tooltipText: enabled ? "Computes page layout from scratch, thereby reevaluating page count and time." : "Resume page and time computation."
 
             onClicked: {
@@ -141,7 +141,7 @@ Rectangle {
         }
 
         Separator {
-            visible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+            visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
         }
 
         IconButton {
@@ -281,7 +281,7 @@ Rectangle {
 
         IconButton {
             source: "qrc:/icons/action/layout_grouping.png"
-            visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+            visible: Runtime.screenplayEditorSettings.allowTaggingOfScenes && Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
             tooltipText: "Grouping Options"
 
             onClicked: _taggingMenu.show()
@@ -379,7 +379,7 @@ Rectangle {
         to: zoomLevels.length-1
         from: 0
         stepSize: 1
-        zoomSliderVisible: Runtime.mainWindowTab === Runtime.e_ScreenplayTab
+        zoomSliderVisible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
 
         Connections {
             target: screenplayFormat

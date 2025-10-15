@@ -604,7 +604,7 @@ Rectangle {
             }
 
             onClicked: {
-                if(Runtime.mainWindowTab !== Runtime.e_StructureTab || Runtime.workspaceSettings.syncCurrentSceneOnNotebook)
+                if(Runtime.mainWindowTab !== Runtime.MainWindowTab.StructureTab || Runtime.workspaceSettings.syncCurrentSceneOnNotebook)
                     activateScreenplayElement( notebookModel.modelIndexData(index) )
             }
 

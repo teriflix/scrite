@@ -346,16 +346,16 @@ Item {
 
         function activate() {
             if(Runtime.showNotebookInStructure) {
-                if(Runtime.mainWindowTab === Runtime.e_StructureTab)
+                if(Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab)
                     Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                 else {
-                    Runtime.activateMainWindowTab(Runtime.e_StructureTab)
+                    Runtime.activateMainWindowTab(Runtime.MainWindowTab.StructureTab)
                     Utils.execLater(mainTabBar, 250, function() {
                         Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                     })
                 }
             } else
-                Runtime.activateMainWindowTab(Runtime.e_NotebookTab)
+                Runtime.activateMainWindowTab(Runtime.MainWindowTab.NotebookTab)
         }
 
         function showBookmarkedNotes() {
@@ -450,7 +450,7 @@ Item {
         ShortcutsModelItem.onActivated: activate()
 
         function activate() {
-            Runtime.activateMainWindowTab(Runtime.e_ScritedTab)
+            Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScritedTab)
         }
     }
 
@@ -935,7 +935,7 @@ Item {
 
                 text: Runtime.language.active.name
                 down: _languageMenu.visible
-                visible: Runtime.mainWindowTab <= Runtime.e_NotebookTab
+                visible: Runtime.mainWindowTab <= Runtime.MainWindowTab.NotebookTab
                 shortcut: "Ctrl+L"
                 iconSource: "qrc:/icons/content/language.png"
 
@@ -1066,7 +1066,7 @@ Item {
                 width: 80
 
                 text: Runtime.language.active.name
-                visible: Runtime.mainWindowTab <= Runtime.e_NotebookTab
+                visible: Runtime.mainWindowTab <= Runtime.MainWindowTab.NotebookTab
 
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
 
@@ -1278,10 +1278,10 @@ Item {
                 visible: appToolBar.visible
 
                 readonly property var tabs: [
-                    { "name": "Screenplay", "icon": "qrc:/icons/navigation/screenplay_tab.png", "visible": true, "tab": Runtime.e_ScreenplayTab },
-                    { "name": "Structure", "icon": "qrc:/icons/navigation/structure_tab.png", "visible": true, "tab": Runtime.e_StructureTab },
-                    { "name": "Notebook", "icon": "qrc:/icons/navigation/notebook_tab.png", "visible": !Runtime.showNotebookInStructure, "tab": Runtime.e_NotebookTab },
-                    { "name": "Scrited", "icon": "qrc:/icons/navigation/scrited_tab.png", "visible": Runtime.workspaceSettings.showScritedTab, "tab": Runtime.e_ScritedTab }
+                    { "name": "Screenplay", "icon": "qrc:/icons/navigation/screenplay_tab.png", "visible": true, "tab": Runtime.MainWindowTab.ScreenplayTab },
+                    { "name": "Structure", "icon": "qrc:/icons/navigation/structure_tab.png", "visible": true, "tab": Runtime.MainWindowTab.StructureTab },
+                    { "name": "Notebook", "icon": "qrc:/icons/navigation/notebook_tab.png", "visible": !Runtime.showNotebookInStructure, "tab": Runtime.MainWindowTab.NotebookTab },
+                    { "name": "Scrited", "icon": "qrc:/icons/navigation/scrited_tab.png", "visible": Runtime.workspaceSettings.showScritedTab, "tab": Runtime.MainWindowTab.ScritedTab }
                 ]
                 readonly property color activeTabColor: Runtime.colors.primary.windowColor
                 function indexOfTab(_Runtime_TabType) {
@@ -1351,7 +1351,7 @@ Item {
                 }
 
                 Component.onCompleted: {
-                    Runtime.mainWindowTab = Runtime.e_ScreenplayTab
+                    Runtime.mainWindowTab = Runtime.MainWindowTab.ScreenplayTab
                     currentIndex = indexOfTab(Runtime.mainWindowTab)
 
                     const syncCurrentIndex = ()=>{

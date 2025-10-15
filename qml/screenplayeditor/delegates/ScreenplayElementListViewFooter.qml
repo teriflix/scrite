@@ -48,7 +48,7 @@ Loader {
             height: _buttonsLayout.height + 2*_buttonsLayout.spacing * root.zoomLevel
 
             Component.onCompleted: {
-                if(Runtime.mainWindowTab === Runtime.e_ScreenplayTab &&
+                if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab &&
                   !Runtime.screenplayEditorSettings.screenplayEditorAddButtonsAnimationShown &&
                    root.screenplayAdapter.elementCount === 1) {
                     let highlight = _private.footerButtonsHighlighterComponent.createObject(_footerButtons, {"uiElement": _buttonsLayout})

@@ -518,11 +518,8 @@ Item {
 
     // These properties are only accessible at runtime, which means they are not
     // stored in persistent settings file.
-    readonly property int e_ScreenplayTab: 0
-    readonly property int e_StructureTab: 1
-    readonly property int e_NotebookTab: 2
-    readonly property int e_ScritedTab: 3
-    property int mainWindowTab: e_ScreenplayTab
+    enum MainWindowTab { ScreenplayTab, StructureTab, NotebookTab, ScritedTab }
+    property int mainWindowTab: Runtime.MainWindowTab.ScreenplayTab
     signal activateMainWindowTab(int tabType)
     signal resetMainWindowUi(var callback)
 
@@ -591,7 +588,7 @@ Item {
             // if(Scrite.document.sessionId !== sessionId)
             //     return null
 
-            if(mainWindowTab !== e_ScreenplayTab && Scrite.document.screenplay.currentElementIndex < 0) {
+            if(mainWindowTab !== Runtime.MainWindowTab.ScreenplayTab && Scrite.document.screenplay.currentElementIndex < 0) {
                 let index = Scrite.document.structure.currentElementIndex
                 let element = Scrite.document.structure.elementAt(index)
                 if(element) {
