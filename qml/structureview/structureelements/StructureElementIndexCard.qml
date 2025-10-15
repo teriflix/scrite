@@ -198,7 +198,7 @@ AbstractStructureElementUI {
                 Qt.callLater(maybeAssumeFocus)
             }
 
-            lod: _private.isSelected && !root.canvasScaleIsLessForEdit ? eHIGH : eLOW
+            lod: _private.isSelected && !root.canvasScaleIsLessForEdit ? LodLoader.LOD.High : LodLoader.LOD.Low
 
             lowDetailComponent: TextEdit {
                 id: _basicHeadingField
@@ -273,7 +273,7 @@ AbstractStructureElementUI {
             onFocusChanged: Qt.callLater(maybeAssumeFocus)
 
             function maybeAssumeFocus() {
-                if(focus && lod === eHIGH && item) {
+                if(focus && lod === LodLoader.LOD.High && item) {
                     item.selectAll()
                     item.forceActiveFocus()
                 }
@@ -312,7 +312,7 @@ AbstractStructureElementUI {
 
                     property bool hasFocus: false
 
-                    lod: _private.isSelected && !root.canvasScaleIsLessForEdit ? eHIGH : eLOW
+                    lod: _private.isSelected && !root.canvasScaleIsLessForEdit ? LodLoader.LOD.High : LodLoader.LOD.Low
                     sanctioned: parent.visible
                     resetWidthBeforeLodChange: false
                     resetHeightBeforeLodChange: false
@@ -479,7 +479,7 @@ AbstractStructureElementUI {
                     onItemChanged: Qt.callLater(maybeAssumeFocus)
 
                     function maybeAssumeFocus() {
-                        if(focus && lod === eHIGH && item)
+                        if(focus && lod === LodLoader.LOD.High && item)
                             item.assumeFocus()
                     }
                 }

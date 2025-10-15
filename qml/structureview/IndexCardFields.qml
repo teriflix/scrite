@@ -105,7 +105,7 @@ Item {
                 }
 
                 function maybeAssumeFocus() {
-                    if(focus && lod === eHIGH && item)
+                    if(focus && lod === LodLoader.LOD.High && item)
                         item.assumeFocus()
                 }
             }

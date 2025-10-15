@@ -2973,7 +2973,7 @@ Rectangle {
                                     anchors.centerIn: parent
                                     anchors.horizontalCenterOffset: -5
 
-                                    lod: Runtime.notebookSettings.richTextNotesEnabled ? eHIGH : eLOW
+                                    lod: Runtime.notebookSettings.richTextNotesEnabled ? LodLoader.LOD.High : LodLoader.LOD.Low
                                     sanctioned: character
                                     resetWidthBeforeLodChange: false
                                     resetHeightBeforeLodChange: false

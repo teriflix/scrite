@@ -61,7 +61,7 @@ Item {
             }
             onActiveFocusChanged: {
                 if(activeFocus) {
-                    if(contentFieldLoader.item && contentFieldLoader.lod === contentFieldLoader.eLOW)
+                    if(contentFieldLoader.item && contentFieldLoader.lod === contentFieldLoader.LodLoader.LOD.Low)
                         contentFieldLoader.item.contentY = 0
                 }
             }
@@ -75,7 +75,7 @@ Item {
 
             anchors.horizontalCenter: parent.horizontalCenter
 
-            lod: Runtime.notebookSettings.richTextNotesEnabled ? eHIGH : eLOW
+            lod: Runtime.notebookSettings.richTextNotesEnabled ? LodLoader.LOD.High : LodLoader.LOD.Low
             sanctioned: note
             resetWidthBeforeLodChange: false
             resetHeightBeforeLodChange: false

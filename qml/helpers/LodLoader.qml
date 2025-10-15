@@ -16,18 +16,26 @@ import QtQuick 2.15
 import io.scrite.components 1.0
 
 Loader {
-    id: lodLoader
-    focus: true
+    id: root
 
-    readonly property int eHIGH: 1
-    readonly property int eLOW: 0
+    enum LOD { High, Low }
+
+    property int lod: LodLoader.LOD.Low
+
     property bool sanctioned: true
-
-    property int lod: eLOW
-    property Component lowDetailComponent
-    property Component highDetailComponent
     property bool resetWidthBeforeLodChange: false
     property bool resetHeightBeforeLodChange: true
+
+    property Component lowDetailComponent
+    property Component highDetailComponent
+
+    Component.onCompleted: _private.loadLodComponent()
+
+    focus: true
+    active: sanctioned
+    sourceComponent: _private.defaultDetailComponent
+
+    onLodChanged: _private.loadLodComponent()
 
     Component {
         id: defaultDetailComponent
@@ -35,33 +43,32 @@ Loader {
         Item { }
     }
 
-    active: sanctioned
-    sourceComponent: defaultDetailComponent
+    QtObject {
+        id: _private
 
-    Component.onCompleted: loadLodComponent()
+        readonly property Component defaultDetailComponent: Item { }
 
-    onLodChanged: loadLodComponent()
+        function loadLodComponent() {
+            root.active = false
 
-    function loadLodComponent() {
-        active = false
+            if(lod === LodLoader.LOD.Low)
+                root.sourceComponent = root.lowDetailComponent ? root.lowDetailComponent : defaultDetailComponent
+            else if(lod === LodLoader.LOD.High)
+                root.sourceComponent = root.highDetailComponent ? root.highDetailComponent : defaultDetailComponent
+            else
+                root.sourceComponent = defaultDetailComponent
 
-        if(lod === eLOW)
-            sourceComponent = lowDetailComponent ? lowDetailComponent : defaultDetailComponent
-        else if(lod === eHIGH)
-            sourceComponent = highDetailComponent ? highDetailComponent : defaultDetailComponent
-        else
-            sourceComponent = defaultDetailComponent
+            if(root.resetWidthBeforeLodChange) {
+                Scrite.app.resetObjectProperty(root, "width")
+                Scrite.app.resetObjectProperty(root, "implicitWidth")
+            }
 
-        if(resetWidthBeforeLodChange) {
-            Scrite.app.resetObjectProperty(lodLoader, "width")
-            Scrite.app.resetObjectProperty(lodLoader, "implicitWidth")
+            if(root.resetHeightBeforeLodChange) {
+                Scrite.app.resetObjectProperty(root, "height")
+                Scrite.app.resetObjectProperty(root, "implicitHeight")
+            }
+
+            root.active = Qt.binding( () => { return root.sanctioned } )
         }
-
-        if(resetHeightBeforeLodChange) {
-            Scrite.app.resetObjectProperty(lodLoader, "height")
-            Scrite.app.resetObjectProperty(lodLoader, "implicitHeight")
-        }
-
-        active = Qt.binding( () => { return sanctioned } )
     }
 }

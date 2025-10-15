@@ -32,14 +32,14 @@ Column {
     property int tabSequenceIndex: 0
     property int nrQuestionDigits: 2
 
-    property bool cursorVisible: _answerItemLoader.lod === _answerItemLoader.eHIGH ? _answerItemLoader.item.cursorVisible : false
+    property bool cursorVisible: _answerItemLoader.lod === _answerItemLoader.LodLoader.LOD.High ? _answerItemLoader.item.cursorVisible : false
     property bool enableUndoRedo: true
-    property bool textFieldHasActiveFocus: _answerItemLoader.lod === _answerItemLoader.eHIGH ? _answerItemLoader.item.activeFocus : false
+    property bool textFieldHasActiveFocus: _answerItemLoader.lod === _answerItemLoader.LodLoader.LOD.High ? _answerItemLoader.item.activeFocus : false
 
     property real minHeight: _questionRow.height + _answerArea.minHeight + spacing
 
     property rect cursorRectangle: {
-        const cr = _answerItemLoader.lod === _answerItemLoader.eHIGH ? _answerItemLoader.item.cursorRectangle : Qt.rect(0,0,1,12)
+        const cr = _answerItemLoader.lod === _answerItemLoader.LodLoader.LOD.High ? _answerItemLoader.item.cursorRectangle : Qt.rect(0,0,1,12)
         return mapFromItem(_answerItemLoader, cr.x, cr.y, cr.width, cr.height)
     }
 
@@ -112,18 +112,18 @@ Column {
 
             TabSequenceItem.manager: tabSequenceManager
             TabSequenceItem.sequence: tabSequenceIndex
-            TabSequenceItem.onAboutToReceiveFocus: lod = eHIGH
+            TabSequenceItem.onAboutToReceiveFocus: lod = LodLoader.LOD.High
 
             function assumeFocus(position) {
-                if(lod === eLOW)
-                    lod = eHIGH
+                if(lod === LodLoader.LOD.Low)
+                    lod = LodLoader.LOD.High
                 Qt.callLater( (pos) => { item.assumeFocus(pos) }, position )
             }
 
             width: _answerArea.width
             height: Math.max(_answerArea.minHeight-topPadding-bottomPadding, item ? item.contentHeight+20 : 0)
 
-            lod: eLOW
+            lod: LodLoader.LOD.Low
 
             lowDetailComponent: TextArea {
                 id: _textArea
@@ -253,7 +253,7 @@ Column {
 
                 onActiveFocusChanged: {
                     if(!activeFocus && !persistentSelection) {
-                        _answerItemLoader.lod = _answerItemLoader.eLOW
+                        _answerItemLoader.lod = _answerItemLoader.LodLoader.LOD.Low
                     }
                 }
             }
