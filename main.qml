@@ -30,20 +30,17 @@ import "qrc:/qml/floatingdockpanels"
 
 Rectangle {
     id: scriteRoot
+    width: 1366
+    height: 700
+    color: Runtime.colors.primary.windowColor
 
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
     Material.theme: Material.Light
     Material.background: Runtime.colors.accent.c700.background
 
-    width: 1366
-    height: 700
-
-    color: Runtime.colors.primary.windowColor
-
     ScriteMainWindow {
         anchors.fill: parent
-
         enabled: !NotificationsView.visible && Runtime.allowAppUsage
     }
 

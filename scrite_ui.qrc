@@ -267,10 +267,5 @@
         <file>qml/helpers/ShortcutField.qml</file>
         <file>qml/dialogs/LanguageOptionsDialog.qml</file>
         <file>qml/helpers/LanguageMenu.qml</file>
-        <file>qml/mainwindow/Shortcuts.qml</file>
-        <file>qml/mainwindow/ReloadPromptDialog.qml</file>
-        <file>qml/mainwindow/qmldir</file>
-        <file>qml/mainwindow/AppBusyOverlay.qml</file>
-        <file>qml/mainwindow/AppToolBar.qml</file>
     </qresource>
 </RCC>

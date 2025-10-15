@@ -26,11 +26,6 @@ import "qrc:/qml/floatingdockpanels"
 Row {
     id: root
 
-    required property Shortcut toggleTaggingShortcut
-    required property Shortcut toggleSynopsisShortcut
-    required property Shortcut toggleCommentsShortcut
-    required property Shortcut toggleSceneCharactersShortcut
-
     property TextEdit sceneTextEditor
     property SceneDocumentBinder sceneDocumentBinder
 
@@ -175,14 +170,14 @@ Row {
                 }
 
                 VclMenuItem {
-                    text: "Show Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(root.toggleSynopsisShortcut.portableText)
+                    text: "Show Scene Synopsis\t\t" + Scrite.app.polishShortcutTextForDisplay(synopsisToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.displaySceneSynopsis && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
                 }
 
                 VclMenuItem {
-                    text: "Show Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(root.toggleCommentsShortcut.portableText)
+                    text: "Show Scene Comments\t\t" + Scrite.app.polishShortcutTextForDisplay(commentsToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.displaySceneComments && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
@@ -197,14 +192,14 @@ Row {
                 }
 
                 VclMenuItem {
-                    text: "Show Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(root.toggleSceneCharactersShortcut.portableText)
+                    text: "Show Scene Characters and Tags\t" + Scrite.app.polishShortcutTextForDisplay(sceneCharactersToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.displaySceneCharacters ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 
                     onTriggered: Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
                 }
 
                 VclMenuItem {
-                    text: "Enable Tagging Of Scenes\t\t" +Scrite.app.polishShortcutTextForDisplay(root.toggleTaggingShortcut.portableText)
+                    text: "Enable Tagging Of Scenes\t\t" +Scrite.app.polishShortcutTextForDisplay(taggingToggleShortcut.ShortcutsModelItem.shortcut)
                     icon.source: Runtime.screenplayEditorSettings.allowTaggingOfScenes && enabled ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 
                     onTriggered: Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
