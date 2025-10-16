@@ -636,419 +636,93 @@ Item {
         color: Runtime.colors.primary.c50.background
         enabled: visible
 
-        Row {
+        RowLayout {
             id: appToolBar
-            anchors.verticalCenter: parent.verticalCenter
+
             anchors.left: parent.left
             anchors.leftMargin: 5
+            anchors.verticalCenter: parent.verticalCenter
+
             visible: appToolBarArea.width >= 1200
-            onVisibleChanged: {
-                if(enabled && !visible)
-                    Runtime.activateMainWindowTab(0)
-            }
 
-            // TESTING!!!!
             ActionManagerToolBar {
-                actionManager: ActionHub.paragraphFormats
-            }
-
-            FlatToolButton {
-                id: homeButton
-                iconSource: "qrc:/icons/action/home.png"
-                text: "Home"
-                onClicked: HomeScreen.launch()
-            }
-
-            FlatToolButton {
-                id: backupOpenButton
-                iconSource: "qrc:/icons/file/backup_open.png"
-                text: "Open Backup"
-                visible: Scrite.document.backupFilesModel.count > 0
-                onClicked: BackupsDialog.launch()
-
-                ToolTip.text: "Open any of the " + Scrite.document.backupFilesModel.count + " backup(s) available for this file."
-
-                VclText {
-                    id: backupCountHint
-                    font.pixelSize: parent.height * 0.2
-                    font.bold: true
-                    text: Scrite.document.backupFilesModel.count
-                    padding: 2
-                    color: Runtime.colors.primary.highlight.text
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                }
-            }
-
-            FlatToolButton {
-                id: cmdSave
-                text: "Save"
-                enabled: (Scrite.document.modified || Scrite.document.fileName === "") && !Scrite.document.readOnly
-                shortcut: "Ctrl+S"
-                iconSource: "qrc:/icons/content/save.png"
-
-                onClicked: activate()
-
-                ShortcutsModelItem.group: "File"
-                ShortcutsModelItem.title: text
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: shortcut
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: activate()
-
-                function activate() {
-                    if(Scrite.document.fileName === "")
-                        SaveFileTask.saveAs()
-                    else
-                        SaveFileTask.saveSilently()
-                }
-            }
-
-            FlatToolButton {
-                id: cmdShare
-
-                text: "Share"
-                down: shareMenu.visible
-                enabled: appToolsMenu.visible === false
-                iconSource: "qrc:/icons/action/share.png"
-
-                onClicked: shareMenu.open()
-
-                Item {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-
-                    VclMenu {
-                        id: shareMenu
-
-                        VclMenu {
-                            id: exportMenu
-                            width: 300
-                            title: "Export"
-
-                            Repeater {
-                                model: Scrite.document.supportedExportFormats
-
-                                VclMenuItem {
-                                    required property var modelData
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-                                    onClicked: ExportConfigurationDialog.launch(modelData.key)
-
-                                    ToolTip {
-                                        text: modelData.description + "\n\nCategory: " + modelData.category
-                                        width: 300
-                                        visible: parent.hovered
-                                        delay: Qt.styleHints.mousePressAndHoldInterval
-                                    }
-                                }
-                            }
-
-                            MenuSeparator { }
-
-                            VclMenuItem {
-                                text: "Scrite"
-                                icon.source: "qrc:/icons/exporter/scrite.png"
-                                onClicked: SaveFileTask.saveAs()
-                            }
-                        }
-
-                        VclMenu {
-                            id: reportsMenu
-                            width: 350
-                            title: "Reports"
-
-                            Repeater {
-                                model: Scrite.document.supportedReports
-
-                                VclMenuItem {
-                                    required property var modelData
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-                                    onClicked: ReportConfigurationDialog.launch(modelData.name)
-
-                                    ToolTip {
-                                        text: modelData.description
-                                        width: 300
-                                        visible: parent.hovered
-                                        delay: Qt.styleHints.mousePressAndHoldInterval
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            /*
-              Most users already know that Ctrl+Z is undo and Ctrl+Y is redo.
-              Therefore simply listing these shortcuts in shortcuts dockwidget
-              should be sufficient to establish their existence. Showing these
-              toolbuttons is robbing us of some really good screenspace.
-            */
-            QtObject {
-                ShortcutsModelItem.group: "Edit"
-                ShortcutsModelItem.title: "Undo"
-                ShortcutsModelItem.enabled: Scrite.app.canUndo && !Scrite.document.readOnly // enabled
-                ShortcutsModelItem.shortcut: "Ctrl+Z" // shortcut
-            }
-
-            QtObject {
-                ShortcutsModelItem.group: "Edit"
-                ShortcutsModelItem.title: "Redo"
-                ShortcutsModelItem.enabled: Scrite.app.canRedo && !Scrite.document.readOnly // enabled
-                ShortcutsModelItem.shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Z" : "Ctrl+Y" // shortcut
+                actionManager: ActionHub.fileOperations
             }
 
             Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.separatorColor
-                opacity: 0.5
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
             }
 
-            FlatToolButton {
-                id: settingsAndShortcutsButton
-                iconSource: "qrc:/icons/action/settings_applications.png"
-                text: "Settings & Shortcuts"
-                down: settingsAndShortcutsMenu.visible
-                onClicked: settingsAndShortcutsMenu.visible = true
+            ActionManagerToolButton {
+                actionManager: ActionHub.exportOptions
+            }
 
-                Item {
-                    anchors.top: parent.bottom
-                    anchors.left: parent.left
-
-                    VclMenu {
-                        id: settingsAndShortcutsMenu
-                        width: 300
-
-                        VclMenuItem {
-                            id: settingsMenuItem
-
-                            text: "Settings\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+,")
-                            enabled: appToolBar.visible
-                            icon.source: "qrc:/icons/action/settings_applications.png"
-
-                            onClicked: activate()
-
-                            ShortcutsModelItem.group: "Application"
-                            ShortcutsModelItem.title: "Settings"
-                            ShortcutsModelItem.shortcut: "Ctrl+,"
-                            ShortcutsModelItem.enabled: appToolBar.visible
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: activate()
-
-                            function activate() {
-                                SettingsDialog.launch()
-                            }
-
-                            Shortcut {
-                                enabled: Runtime.allowAppUsage
-                                context: Qt.ApplicationShortcut
-                                sequence: "Ctrl+,"
-                                onActivated: settingsMenuItem.activate()
-                            }
-                        }
-
-                        VclMenuItem {
-                            id: shortcutsMenuItem
-
-                            text: "Shortcuts\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+E")
-                            enabled: appToolBar.visible
-                            icon.source: {
-                                if(Scrite.app.isMacOSPlatform)
-                                    return "qrc:/icons/navigation/shortcuts_macos.png"
-                                if(Scrite.app.isWindowsPlatform)
-                                    return "qrc:/icons/navigation/shortcuts_windows.png"
-                                return "qrc:/icons/navigation/shortcuts_linux.png"
-                            }
-
-                            onClicked: activate()
-
-                            ShortcutsModelItem.group: "Application"
-                            ShortcutsModelItem.title: FloatingShortcutsDock.visible ? "Hide Shortcuts" : "Show Shortcuts"
-                            ShortcutsModelItem.shortcut: "Ctrl+E"
-                            ShortcutsModelItem.enabled: appToolBar.visible
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: activate()
-
-                            function activate() {
-                                Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
-                            }
-
-                            Shortcut {
-                                enabled: Runtime.allowAppUsage
-                                context: Qt.ApplicationShortcut
-                                sequence: "Ctrl+E"
-                                onActivated: shortcutsMenuItem.activate()
-                            }
-                        }
-
-                        VclMenuItem {
-                            icon.source: "qrc:/icons/action/help.png"
-                            text: "Help\t\tF1"
-                            onClicked: Qt.openUrlExternally(helpUrl)
-                        }
-
-                        VclMenuItem {
-                            icon.source: "qrc:/icons/action/info.png"
-                            text: "About"
-                            onClicked: AboutDialog.launch()
-                        }
-
-                        VclMenuItem {
-                            id: toggleFullScreenMenuItem
-
-                            text: "Toggle Fullscreen\tF7"
-                            icon.source: "qrc:/icons/navigation/fullscreen.png"
-
-                            onClicked: activate()
-
-                            ShortcutsModelItem.group: "Application"
-                            ShortcutsModelItem.title: "Toggle Fullscreen"
-                            ShortcutsModelItem.shortcut: "F7"
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: activate()
-
-                            function activate() {
-                                Runtime.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
-                            }
-
-                            Shortcut {
-                                enabled: Runtime.allowAppUsage
-                                context: Qt.ApplicationShortcut
-                                sequence: "F7"
-                                onActivated: toggleFullScreenMenuItem.activate()
-                            }
-                        }
-                    }
-                }
+            ActionManagerToolButton {
+                actionManager: ActionHub.reportOptions
             }
 
             Rectangle {
-                width: 1
-                height: parent.height
-                color: Runtime.colors.primary.separatorColor
-                opacity: 0.5
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
             }
 
-            FlatToolButton {
-                id: _languageToolButton
-
-                ToolTip.text: Scrite.app.polishShortcutTextForDisplay("Language Transliteration" + "\t" + shortcut)
-
-                text: Runtime.language.active.name
-                down: _languageMenu.visible
-                visible: Runtime.mainWindowTab <= Runtime.MainWindowTab.NotebookTab
-                shortcut: "Ctrl+L"
-                iconSource: "qrc:/icons/content/language.png"
-
-                onClicked: _languageMenu.visible = true
-
-                Item {
-                    anchors.top: parent.bottom
-                    anchors.left: parent.left
-
-                    LanguageMenu {
-                        id: _languageMenu
-                    }
-                }
-
-                /**
-                  What would have been ideal is if action property in the VclMenuItems created above
-                  actually handled global application shortcuts. But sadly, they don't.
-
-                  We are forced to create Shortcut objects separately for the same. It would have been
-                  awesome if we could simply create Shortcut objects in Repeater, without nesting them
-                  in an Item. But that's not possible either, because Repeater can only create Item
-                  instances, and not anything thats just QObject subclass.
-
-                  I even tried to use QShortcut in ShortcutsModelItem C++ class, but that did not work either.
-                  Apparently we QShortcut instances can only be created on QWidget, so that's not going
-                  to work for us either. AppWindow is a QQuickView, which is QWindow and not QWidget.
-
-                  We are left with no other option but to waste memory like this. :-(
-                  */
-                Repeater {
-                    model: LanguageEngine.supportedLanguages
-
-                    Item {
-                        required property int index
-                        required property var language // This is of type Language, but we have to use var here.
-                                                       // You cannot use Q_GADGET struct names as type names in QML
-                                                       // that privilege is only reserved for QObject types.
-
-                        visible: false
-
-                        Shortcut {
-                            ShortcutsModelItem.title: language.name
-                            ShortcutsModelItem.group: "Language"
-                            ShortcutsModelItem.priority: index+1
-                            ShortcutsModelItem.enabled: enabled
-                            ShortcutsModelItem.shortcut: nativeText
-                            ShortcutsModelItem.canActivate: true
-                            ShortcutsModelItem.onActivated: Runtime.language.setActiveCode(language.code)
-
-                            enabled: true
-                            context: Qt.ApplicationShortcut
-                            sequence: language.shortcut()
-
-                            onActivated: Runtime.language.setActiveCode(language.code)
-                        }
-                    }
-                }
-
-                HelpTipNotification {
-                    tipName: Scrite.app.isWindowsPlatform ? "language_windows" : (Scrite.app.isMacOSPlatform ? "language_macos" : "language_linux")
-                    enabled: Runtime.language.activeCode !== QtLocale.English
-                }
+            ActionManagerToolButton {
+                actionManager: ActionHub.appOptions
             }
 
-            FlatToolButton {
-                ToolTip.text: "Show English to " + Runtime.language.active.name + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.languageOptions
+            }
+
+            // Special case scenario
+            ToolButton {
+                ToolTip.text: action.tooltip
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTip.visible: hovered
+
+                Material.accent: Runtime.colors.accent.key
+                Material.background: Runtime.colors.primary.c10.background
+                Material.primary: Runtime.colors.primary.key
+                Material.theme: Runtime.colors.theme
 
                 down: _alphabetMappingsPopup.visible
-                visible: mainTabBar.currentIndex <= 2 && enabled
-                enabled: Runtime.language.activeCode !== QtLocale.English &&
-                         Runtime.language.activeTransliterator.name === DefaultTransliteration.driver &&
-                         DefaultTransliteration.supportsLanguageCode(Runtime.language.activeCode)
-                shortcut: "Ctrl+K"
-                iconSource: down ? "qrc:/icons/hardware/keyboard_hide.png" : "qrc:/icons/hardware/keyboard.png"
+                action: ActionHub.otherOptions.find("alphabetMappings")
+                display: ToolButton.IconOnly
+                visible: action.enabled
 
-                onClicked: click()
-
-                ShortcutsModelItem.group: "Language"
-                ShortcutsModelItem.title: "Alphabet Mapping"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.shortcut: shortcut
-                ShortcutsModelItem.priority: 0
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
-
-                function click() {
-                    if(enabled)
-                        _alphabetMappingsPopup.visible = !_alphabetMappingsPopup.visible
-                }
-
-                Item {
+                ActionHandler {
                     anchors.top: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
 
                     width: _alphabetMappingsPopup.width
 
+                    action: parent.action
+                    onTriggered: _alphabetMappingsPopup.open()
+
                     Popup {
                         id: _alphabetMappingsPopup
 
-                        width: alphabetMappingsLoader.width + 30
-                        height: alphabetMappingsLoader.height + 30
+                        width: _alphabetMappingsLoader.width + 30
+                        height: _alphabetMappingsLoader.height + 30
 
                         modal: false
                         focus: false
                         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
 
                         Loader {
-                            id: alphabetMappingsLoader
+                            id: _alphabetMappingsLoader
 
                             width: item ? item.width : 0
                             height: item ? item.height : 0
@@ -1064,23 +738,34 @@ Item {
             }
 
             VclLabel {
-                id: _languageDescLabel
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                width: 80
+                Layout.preferredWidth: contentWidth + rightPadding
 
                 text: Runtime.language.active.name
-                visible: Runtime.mainWindowTab <= Runtime.MainWindowTab.NotebookTab
+                rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth * 2
 
                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-
-                MouseArea {
-                    anchors.fill: parent
-
-                    onClicked: _languageToolButton.click()
-                }
             }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolBar {
+                actionManager: ActionHub.paragraphFormats
+            }
+
+            onVisibleChanged: {
+                if(enabled && !visible)
+                    Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+            }
+        }
+
+        HelpTipNotification {
+            tipName: Scrite.app.isWindowsPlatform ? "language_windows" : (Scrite.app.isMacOSPlatform ? "language_macos" : "language_linux")
+            enabled: Runtime.language.activeCode !== QtLocale.English
         }
 
         Row {

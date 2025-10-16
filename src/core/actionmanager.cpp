@@ -22,6 +22,8 @@
 static const char *_QQuickAction = "QQuickAction";
 static const QByteArray _QQuickActionSortOrderProperty = QByteArrayLiteral("sortOrder");
 static const char *_QQuickActionSortOrderChanged = SIGNAL(sortOrderChanged());
+static const QByteArray _QQuickActionVisibleProperty = QByteArrayLiteral("visible");
+static const char *_QQuickActionVisibilityChanged = SIGNAL(visibleChanged());
 
 Q_GLOBAL_STATIC(QObjectListModel<ActionManager *>, ActionManagerModel)
 
@@ -163,6 +165,14 @@ bool ActionManager::addInternal(QObject *action)
             }
         }
 
+        const QMetaProperty visibleProperty = action->metaObject()->property(
+                action->metaObject()->indexOfProperty(_QQuickActionVisibleProperty));
+        if (visibleProperty.isValid()) {
+            if (visibleProperty.isWritable() && !visibleProperty.isConstant()
+                && visibleProperty.hasNotifySignal())
+                connect(action, _QQuickActionVisibilityChanged, this, SLOT(onVisibilityChanged()));
+        }
+
         QList<QObject *> actions = m_actions;
         actions.append(action);
         sortActions(actions);
@@ -234,6 +244,17 @@ void ActionManager::onSortOrderChanged()
     }
 
     m_sortActionsTimer->start();
+}
+
+void ActionManager::onVisibilityChanged()
+{
+    QObject *action = this->sender();
+
+    int row = m_actions.indexOf(action);
+    if (row >= 0) {
+        const QModelIndex index = this->index(row, 0);
+        emit dataChanged(index, index);
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

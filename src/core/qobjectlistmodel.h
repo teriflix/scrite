@@ -267,6 +267,7 @@ public:
 
     Q_INVOKABLE void include(QObject *ptr) { this->append(ptr); }
     Q_INVOKABLE void exclude(QObject *ptr) { this->remove(ptr); }
+    Q_INVOKABLE void reset() { this->clear(); }
 
 protected:
     void itemInsertEvent(QObject *ptr)

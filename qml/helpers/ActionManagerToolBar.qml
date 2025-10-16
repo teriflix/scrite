@@ -26,14 +26,24 @@ ToolBar {
 
     required property ActionManager actionManager
 
-    property int display: AbstractButton.IconOnly
+    property int display: ToolButton.IconOnly
     property bool flat: true
+
+    Material.accent: Runtime.colors.accent.key
+    Material.background: Runtime.colors.primary.c10.background
+    Material.elevation: 0
+    Material.primary: Runtime.colors.primary.key
+    Material.theme: Runtime.colors.theme
 
     implicitWidth: _layout.width
     implicitHeight: _layout.height
 
+    focusPolicy: Qt.NoFocus
+
     RowLayout {
         id: _layout
+
+        spacing: 0
 
         Repeater {
             model: root.actionManager
@@ -46,17 +56,16 @@ ToolBar {
                 Material.primary: Runtime.colors.primary.key
                 Material.theme: Runtime.colors.theme
 
-                ToolTip.text: qmlAction.tooltip ? qmlAction.tooltip : ""
-
-                background: Rectangle {
-                    color: Runtime.colors.primary.c10.background
-                    border.width: root.flat ? 0 : 1
-                    border.color: Runtime.colors.primary.borderColor
-                }
+                ToolTip.text: qmlAction.tooltip !== undefined ? qmlAction.tooltip :
+                              (display === ToolButton.IconOnly ? qmlAction.text + "\t" + Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut) : "")
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTip.visible: ToolTip.text !== "" && hovered
 
                 flat: root.flat
                 action: qmlAction
+                visible: qmlAction.visible !== undefined ? qmlAction.visible : true
                 display: root.display
+                focusPolicy: Qt.NoFocus
 
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }

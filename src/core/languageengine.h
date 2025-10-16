@@ -340,10 +340,8 @@ public:
     Q_INVOKABLE Language findLanguage(int code) const;
     Q_INVOKABLE Language languageAt(int index) const;
 
-    Q_PROPERTY(int count READ count NOTIFY countChanged) int count() const
-    {
-        return m_languages.size();
-    }
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    int count() const { return m_languages.size(); }
     Q_SIGNAL void countChanged();
 
     enum {

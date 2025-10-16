@@ -11,7 +11,7 @@
 **
 ****************************************************************************/
 
-
+import QtQml 2.15
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -45,38 +45,63 @@ Menu {
     Repeater {
         id: _menuItems
 
-        Component.onCompleted: reload()
-
-        function reload() {
-            model = 0
-            model = root.actionManager
-
-            let width = 200
-            for(let i=0; i<count; i++) {
-                const menuItem = itemAt(i)
-                width = Math.max(menuItem.contentItem.implicitWidth, width)
-            }
-            width += root.leftPadding + root.rightPadding + 30
-
-            root.width = width
-        }
+        model: _private.visibleActions.ready ? _private.visibleActions : 0
 
         delegate: MenuItem {
-            required property var qmlAction
+            required property var objectItem
 
             Material.accent: Runtime.colors.accent.key
             Material.primary: Runtime.colors.primary.key
             Material.theme: Runtime.colors.theme
 
-            ToolTip.text: Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+            ToolTip.text: Scrite.app.polishShortcutTextForDisplay(objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.shortcut)
+            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+            ToolTip.visible: ToolTip.text !== "" && hovered
 
-            action: qmlAction
-            font.bold: qmlAction.checkable && qmlAction.checked
+            action: objectItem
+            font.bold: objectItem.checkable && objectItem.checked
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
+            // We need a better way to show shortcuts. This is not going to work!
         }
     }
 
-    onActionManagerChanged: {
-        _menuItems.reload()
+    onActionManagerChanged: { _private.visibleActions.reloadLater() }
+
+    QtObject {
+        id: _private
+
+        Component.onCompleted: visibleActions.reload()
+
+        readonly property ObjectListModel visibleActions: ObjectListModel {
+            property bool ready: false
+
+            function reloadLater() {
+                Runtime.execLater(_private.visibleActions, 100, _private.visibleActions.reload)
+            }
+
+            function reload() {
+                ready = false
+
+                reset()
+
+                for(let i=0; i<root.actionManager.count; i++) {
+                    let qmlAction = root.actionManager.at(i)
+                    if(qmlAction.visible !== undefined ? qmlAction.visible : true)
+                        include(qmlAction)
+                }
+
+                ready = true
+            }
+        }
+
+        readonly property Connections actionManagerConnections : Connections {
+            target: root.actionManager
+
+            function onModelReset() { _private.visibleActions.reloadLater() }
+            function onRowsRemoved() { _private.visibleActions.reloadLater() }
+            function onDataChanged() { _private.visibleActions.reloadLater() }
+            function onRowsInserted() { _private.visibleActions.reloadLater() }
+        }
     }
 }

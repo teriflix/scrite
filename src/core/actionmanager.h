@@ -81,6 +81,7 @@ private:
 
 private slots:
     void onSortOrderChanged();
+    void onVisibilityChanged();
 
 private:
     int m_sortOrder = 0;

@@ -269,5 +269,6 @@
         <file>qml/globals/ActionHub.qml</file>
         <file>qml/helpers/ActionManagerToolBar.qml</file>
         <file>qml/helpers/ActionManagerMenu.qml</file>
+        <file>qml/helpers/ActionManagerToolButton.qml</file>
     </qresource>
 </RCC>
