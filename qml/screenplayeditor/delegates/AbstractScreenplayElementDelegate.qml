@@ -135,6 +135,7 @@ FocusScope {
                 FocusTracker.indicator.property: "hasFocus"
 
                 width: parent.width
+                height: item ? item.height : 0
 
                 onItemChanged: {
                     if(item && item.__searchBarSaysReplaceCurrent) {

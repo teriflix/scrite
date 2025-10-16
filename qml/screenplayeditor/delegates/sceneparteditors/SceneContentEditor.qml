@@ -568,15 +568,13 @@ AbstractScenePartEditor {
 
             const activeFocus = _sceneTextEditor.activeFocus
             if(activeFocus) {
-                // completionModel.actuallyEnable = true
                 root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
-                // privateData.changeCurrentIndexTo(contentItem.theIndex)
-                Runtime.screenplayEditorToolbar.set(_sceneTextEditor, _sceneDocumentBinder)
+                // Runtime.screenplayEditorToolbar.set(_sceneTextEditor, _sceneDocumentBinder)
                 ActionHub.setBinder(_sceneDocumentBinder)
                 _sceneTextEditor.highlightCursor()
                 Announcement.shout(Runtime.announcementIds.sceneTextEditorReceivedFocus, _sceneTextEditor)
             } else {
-                Runtime.screenplayEditorToolbar.reset(_sceneTextEditor, _sceneDocumentBinder)
+                // Runtime.screenplayEditorToolbar.reset(_sceneTextEditor, _sceneDocumentBinder)
                 ActionHub.resetBinder(_sceneDocumentBinder)
             }
         }

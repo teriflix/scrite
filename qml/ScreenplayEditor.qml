@@ -61,6 +61,18 @@ Rectangle {
 
         screenplayAdapter: Runtime.screenplayAdapter
 
+        ActionHandler {
+            action: ActionHub.editOptions.find("find")
+
+            onTriggered: parent.toggle(false)
+        }
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("replace")
+
+            onTriggered: parent.toggle(true)
+        }
+
         function toggle(showReplace) {
             if(typeof showReplace === "boolean")
                 searchBar.showReplace = showReplace
@@ -317,9 +329,9 @@ Rectangle {
 
         property alias zoomLevel: _statusBar.zoomLevel
 
-        // It is so yuck that we have to ask an external ToolBar component to tell us what SceneDocumentBinder is "current", when
+        // It is so yuck that we have to ask an external entity to tell us what SceneDocumentBinder is "current", when
         // each and every single instance of binders are created by this component itself!
-        property SceneDocumentBinder currentSceneDocumentBinder: Runtime.screenplayEditorToolbar.sceneDocumentBinder
+        property SceneDocumentBinder currentSceneDocumentBinder: ActionHub.binder
 
         readonly property Connections scriteDocumentConnections : Connections {
             target: Scrite.document

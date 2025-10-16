@@ -24,36 +24,19 @@ import "qrc:/qml/globals"
 ToolButton {
     id: root
 
-    required property ActionManager actionManager
-
     Material.accent: Runtime.colors.accent.key
     Material.background: Runtime.colors.primary.c10.background
     Material.primary: Runtime.colors.primary.key
     Material.theme: Runtime.colors.theme
 
-    ToolTip.text: display === ToolButton.IconOnly ? actionManager.title : ""
+    ToolTip.text: action.tooltip !== undefined ? action.tooltip :
+                  (display === ToolButton.IconOnly ? action.text + "\t" + Scrite.app.polishShortcutTextForDisplay(action.shortcut) : "")
     ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-    ToolTip.visible: display === ToolButton.IconOnly ? hovered : false
+    ToolTip.visible: ToolTip.text !== "" && hovered
 
-    display: actionManager.iconSource !== undefined ? ToolButton.IconOnly : ToolButton.TextOnly
-    down: _menu.visible
+    display: ToolButton.IconOnly
     focusPolicy: Qt.NoFocus
-    text: actionManager.title
+    visible: action.visible !== undefined ? action.visible : true
 
-    icon.source: actionManager.iconSource !== undefined ? actionManager.iconSource : ""
-
-    onClicked: _menu.open()
-
-    Item {
-        anchors.bottom: parent.bottom
-
-        width: _menu.width
-        height: 1
-
-        ActionManagerMenu {
-            id: _menu
-
-            actionManager: root.actionManager
-        }
-    }
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

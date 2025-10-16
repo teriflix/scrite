@@ -54,8 +54,6 @@ ActionManager::ActionManager(QObject *parent) : QAbstractListModel(parent)
     connect(this, &ActionManager::modelReset, this, &ActionManager::countChanged);
     connect(this, &ActionManager::rowsRemoved, this, &ActionManager::countChanged);
     connect(this, &ActionManager::rowsInserted, this, &ActionManager::countChanged);
-
-    connect(this, &QObject::objectNameChanged, this, &ActionManager::nameChanged);
 }
 
 ActionManager::~ActionManager()
@@ -66,6 +64,15 @@ ActionManager::~ActionManager()
 ActionManagerAttached *ActionManager::qmlAttachedProperties(QObject *object)
 {
     return new ActionManagerAttached(object);
+}
+
+void ActionManager::setTitle(const QString &val)
+{
+    if (m_title == val)
+        return;
+
+    m_title = val;
+    emit titleChanged();
 }
 
 void ActionManager::setSortOrder(int val)
@@ -629,7 +636,9 @@ void ActionsModel::reload()
     for (ActionManager *actionManager : sortedManagers) {
         connect(actionManager, &ActionManager::modelReset, this,
                 &ActionsModel::onActionManagerReset);
-        connect(actionManager, &ActionManager::nameChanged, this,
+        connect(actionManager, &ActionManager::objectNameChanged, this,
+                &ActionsModel::onActionManagerNameChanged);
+        connect(actionManager, &ActionManager::titleChanged, this,
                 &ActionsModel::onActionManagerNameChanged);
         connect(actionManager, &ActionManager::rowsAboutToBeRemoved, this,
                 &ActionsModel::onActionManagerRowsRemoved);

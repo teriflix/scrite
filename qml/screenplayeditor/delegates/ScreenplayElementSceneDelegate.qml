@@ -185,7 +185,8 @@ AbstractScreenplayElementDelegate {
         id: _highResolution
 
         Item {
-            implicitHeight: _layout.height + Runtime.sceneEditorFontMetrics.lineSpacing
+            implicitHeight: Math.max(_layout.height + Runtime.sceneEditorFontMetrics.lineSpacing,
+                                     _sidePanelLoader.active && _sidePanelLoader.item.expanded ? _sidePanelLoader.height : 0)
 
             /**
               Initially, I did use ColumnLayout here so that we are able to consistently use QtQuick Layouts

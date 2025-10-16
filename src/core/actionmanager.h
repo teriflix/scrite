@@ -33,8 +33,10 @@ public:
 
     static ActionManagerAttached *qmlAttachedProperties(QObject *object);
 
-    Q_PROPERTY(QString name READ objectName WRITE setObjectName NOTIFY nameChanged)
-    Q_SIGNAL void nameChanged();
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
+    void setTitle(const QString &val);
+    QString title() const { return m_title; }
+    Q_SIGNAL void titleChanged();
 
     Q_PROPERTY(int sortOrder READ sortOrder WRITE setSortOrder NOTIFY sortOrderChanged)
     void setSortOrder(int val);
@@ -86,6 +88,7 @@ private slots:
 private:
     int m_sortOrder = 0;
     QTimer *m_sortActionsTimer = nullptr;
+    QString m_title;
     QList<QObject *> m_actions;
 };
 

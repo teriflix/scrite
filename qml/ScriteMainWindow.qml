@@ -53,246 +53,6 @@ Item {
     }
 
     Shortcut {
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "Save As"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+S"
-
-        onActivated: activate()
-
-        function activate() { SaveFileTask.saveAs() }
-    }
-
-    Shortcut {
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "New"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+N"
-
-        onActivated: activate()
-
-        function activate() { HomeScreen.launch() }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+O"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "Open"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { HomeScreen.launch() }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+O"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "File"
-        ShortcutsModelItem.title: "Scriptalay"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { HomeScreen.launch("Scriptalay") }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+P"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Export To PDF"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { ExportConfigurationDialog.launch("Screenplay/Adobe PDF") }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "F1"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "Help"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() { Qt.openUrlExternally(helpUrl) }
-    }
-
-    Shortcut {
-        id: sceneCharactersToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+C"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneCharacters ? "Hide Scene Characters, Tags" : "Show Scene Characters, Tags"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.displaySceneCharacters = !Runtime.screenplayEditorSettings.displaySceneCharacters
-        }
-    }
-
-    Shortcut {
-        id: synopsisToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+S"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneSynopsis ? "Hide Synopsis" : "Show Synopsis"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.displaySceneSynopsis = !Runtime.screenplayEditorSettings.displaySceneSynopsis
-        }
-    }
-
-    Shortcut {
-        id: commentsToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+M"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.displaySceneComments ? "Hide Comments" : "Show Comments"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.displaySceneComments = !Runtime.screenplayEditorSettings.displaySceneComments
-        }
-    }
-
-    Shortcut {
-        id: taggingToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+G"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.allowTaggingOfScenes ? "Allow Tagging" : "Disable Tagging"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.allowTaggingOfScenes = !Runtime.screenplayEditorSettings.allowTaggingOfScenes
-        }
-    }
-
-    Shortcut {
-        id: spellCheckToggleShortcut
-
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+L"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.enableSpellCheck ? "Disable Spellcheck" : "Enable Spellcheck"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.enableSpellCheck = !Runtime.screenplayEditorSettings.enableSpellCheck
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Alt+A"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.applicationSettings.enableAnimations ? "Disable Animations" : "Enable Animations"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.applicationSettings.enableAnimations = !Runtime.applicationSettings.enableAnimations
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+Shift+H"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Settings"
-        ShortcutsModelItem.title: Runtime.screenplayEditorSettings.highlightCurrentLine ? "Line Highlight Off" : "Line Highlight On"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Runtime.screenplayEditorSettings.highlightCurrentLine = !Runtime.screenplayEditorSettings.highlightCurrentLine
-        }
-    }
-
-    Shortcut {
-        enabled: Runtime.allowAppUsage
-        context: Qt.ApplicationShortcut
-        sequence: "Ctrl+M"
-        onActivated: activate()
-
-        ShortcutsModelItem.group: "Application"
-        ShortcutsModelItem.title: "New Scrite Window"
-        ShortcutsModelItem.enabled: true
-        ShortcutsModelItem.visible: enabled
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.canActivate: true
-        ShortcutsModelItem.onActivated: activate()
-
-        function activate() {
-            Scrite.app.launchNewInstance(Scrite.window)
-        }
-    }
-
-    Shortcut {
         enabled: Runtime.allowAppUsage
         context: Qt.ApplicationShortcut
         sequence: "Alt+1"
@@ -686,21 +446,9 @@ Item {
                 actionManager: ActionHub.languageOptions
             }
 
-            // Special case scenario
-            ToolButton {
-                ToolTip.text: action.tooltip
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                ToolTip.visible: hovered
-
-                Material.accent: Runtime.colors.accent.key
-                Material.background: Runtime.colors.primary.c10.background
-                Material.primary: Runtime.colors.primary.key
-                Material.theme: Runtime.colors.theme
-
+            ActionToolButton {
+                action: ActionHub.inputOptions.find("alphabetMappings")
                 down: _alphabetMappingsPopup.visible
-                action: ActionHub.otherOptions.find("alphabetMappings")
-                display: ToolButton.IconOnly
-                visible: action.enabled
 
                 ActionHandler {
                     anchors.top: parent.bottom
@@ -755,6 +503,36 @@ Item {
 
             ActionManagerToolBar {
                 actionManager: ActionHub.paragraphFormats
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionToolButton {
+                action: ActionHub.editOptions.find("find")
+            }
+
+            ActionToolButton {
+                action: ActionHub.editOptions.find("reload")
+            }
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.screenplayEditorOptions
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolBar {
+                actionManager: ActionHub.screenplayOperations
             }
 
             onVisibleChanged: {
@@ -945,20 +723,6 @@ Item {
             height: parent.height
 
             spacing: 20
-
-            ScreenplayEditorToolbar {
-                id: screenplayEditorToolbar
-
-                anchors.verticalCenter: parent.verticalCenter
-
-                visible: {
-                    const min = 0
-                    const max = Runtime.showNotebookInStructure ? 1 : 2
-                    return mainTabBar.currentIndex >= min && mainTabBar.currentIndex <= max
-                }
-
-                Component.onCompleted: Runtime.screenplayEditorToolbar = screenplayEditorToolbar
-            }
 
             Row {
                 id: mainTabBar

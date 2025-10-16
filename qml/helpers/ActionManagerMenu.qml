@@ -30,7 +30,7 @@ Menu {
     Material.primary: Runtime.colors.primary.key
     Material.theme: Runtime.colors.theme
 
-    title: actionManager ? actionManager.name : ""
+    title: actionManager ? actionManager.title : ""
     closePolicy: Popup.CloseOnEscape|Popup.CloseOnPressOutside
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
@@ -54,17 +54,21 @@ Menu {
             Material.primary: Runtime.colors.primary.key
             Material.theme: Runtime.colors.theme
 
-            ToolTip.text: Scrite.app.polishShortcutTextForDisplay(objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.shortcut)
+            ToolTip.text: objectItem.tooltip !== undefined ? objectItem.tooltip :
+                          ( [objectItem.text, Scrite.app.polishShortcutTextForDisplay(objectItem.shortcut)].join("  --  ") )
             ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
             ToolTip.visible: ToolTip.text !== "" && hovered
 
             action: objectItem
-            font.bold: objectItem.checkable && objectItem.checked
+            focusPolicy: Qt.NoFocus
+
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             // We need a better way to show shortcuts. This is not going to work!
         }
     }
+
+    onAboutToShow: _private.adjustMenuWidth()
 
     onActionManagerChanged: { _private.visibleActions.reloadLater() }
 
@@ -102,6 +106,18 @@ Menu {
             function onRowsRemoved() { _private.visibleActions.reloadLater() }
             function onDataChanged() { _private.visibleActions.reloadLater() }
             function onRowsInserted() { _private.visibleActions.reloadLater() }
+        }
+
+        function adjustMenuWidth() {
+            let width = 200
+
+            for(let i=0; i<_menuItems.count; i++) {
+                const menuItem = _menuItems.itemAt(i)
+                const itemWidth = menuItem.contentItem.implicitWidth + menuItem.leftPadding + menuItem.rightPadding
+                width = Math.max(width, itemWidth)
+            }
+
+            root.width = width + 20
         }
     }
 }
