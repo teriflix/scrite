@@ -647,6 +647,11 @@ Item {
                     Runtime.activateMainWindowTab(0)
             }
 
+            // TESTING!!!!
+            ActionManagerToolBar {
+                actionManager: ActionHub.paragraphFormats
+            }
+
             FlatToolButton {
                 id: homeButton
                 iconSource: "qrc:/icons/action/home.png"

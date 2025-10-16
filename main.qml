@@ -53,6 +53,7 @@ Rectangle {
         function initialize() {
             // Initialize runtime
             Runtime.init(scriteRoot)
+            ActionHub.init(scriteRoot)
             SubscriptionPlanOperations.init(scriteRoot)
 
             // Determine font size provided by QML

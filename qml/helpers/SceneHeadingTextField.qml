@@ -57,7 +57,7 @@ VclTextField {
 
     onActiveFocusChanged: () => {
                               if(activeFocus) {
-                                  _private.previouslyActiveLanguageCode = Runtime.lanugage.activeCode
+                                  _private.previouslyActiveLanguageCode = Runtime.language.activeCode
                                   sceneHeadingFormat.activateDefaultLanguage()
                               } else {
                                   _private.updateText(text)

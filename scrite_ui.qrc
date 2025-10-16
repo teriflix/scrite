@@ -267,5 +267,7 @@
         <file>qml/dialogs/LanguageOptionsDialog.qml</file>
         <file>qml/helpers/LanguageMenu.qml</file>
         <file>qml/globals/ActionHub.qml</file>
+        <file>qml/helpers/ActionManagerToolBar.qml</file>
+        <file>qml/helpers/ActionManagerMenu.qml</file>
     </qresource>
 </RCC>

@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "actionmanager.h"
+#include "application.h"
 #include "qobjectlistmodel.h"
 
 #include <QTimer>
@@ -93,6 +94,40 @@ QObject *ActionManager::find(const QString &actionName) const
         return *it;
 
     return nullptr;
+}
+
+QQmlListProperty<QObject> ActionManager::qmlActionsList()
+{
+    return QQmlListProperty<QObject>(
+            reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+            &ActionManager::staticAppendAction, &ActionManager::staticActionCount,
+            &ActionManager::staticActionAt, &ActionManager::staticClearActions);
+}
+
+void ActionManager::clearActions()
+{
+    while (m_actions.size())
+        this->removeAction(m_actions.first());
+}
+
+void ActionManager::staticAppendAction(QQmlListProperty<QObject> *list, QObject *ptr)
+{
+    reinterpret_cast<ActionManager *>(list->data)->addAction(ptr);
+}
+
+void ActionManager::staticClearActions(QQmlListProperty<QObject> *list)
+{
+    reinterpret_cast<ActionManager *>(list->data)->clearActions();
+}
+
+QObject *ActionManager::staticActionAt(QQmlListProperty<QObject> *list, int index)
+{
+    return reinterpret_cast<ActionManager *>(list->data)->actionAt(index);
+}
+
+int ActionManager::staticActionCount(QQmlListProperty<QObject> *list)
+{
+    return reinterpret_cast<ActionManager *>(list->data)->actionCount();
 }
 
 int ActionManager::rowCount(const QModelIndex &parent) const
@@ -192,7 +227,6 @@ void ActionManager::onSortOrderChanged()
         m_sortActionsTimer->setInterval(0);
         m_sortActionsTimer->setSingleShot(true);
         connect(m_sortActionsTimer, &QTimer::timeout, this, [=]() {
-            qDebug() << "Actually performing sorting ...";
             this->beginResetModel();
             sortActions(m_actions);
             this->endResetModel();
@@ -206,7 +240,6 @@ void ActionManager::onSortOrderChanged()
 
 ActionManagerAttached::ActionManagerAttached(QObject *parent) : QObject(parent)
 {
-
     if (parent && parent->inherits(_QQuickAction)) {
         m_action = parent;
         if (m_action != nullptr)
@@ -285,6 +318,11 @@ ActionHandler::~ActionHandler()
     ActionHandlers::instance()->remove(this);
 }
 
+ActionHandlerAttached *ActionHandler::qmlAttachedProperties(QObject *parent)
+{
+    return new ActionHandlerAttached(parent);
+}
+
 void ActionHandler::setPriority(int val)
 {
     if (m_priority == val)
@@ -331,6 +369,52 @@ void ActionHandler::onObjectDestroyed(QObject *ptr)
         m_action = nullptr;
         emit actionChanged();
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ActionHandlerAttached::ActionHandlerAttached(QObject *parent) : QObject(parent)
+{
+    if (parent && parent->inherits(_QQuickAction)) {
+        m_action = parent;
+        if (m_action != nullptr)
+            connect(ActionHandlers::instance(), &ActionHandlers::handlerAvailabilityChanged, this,
+                    &ActionHandlerAttached::onHandlerAvailabilityChanged);
+    }
+}
+
+ActionHandlerAttached::~ActionHandlerAttached() { }
+
+bool ActionHandlerAttached::canHandle() const
+{
+    return ActionHandlers::instance()->findFirst(m_action, true) != nullptr;
+}
+
+bool ActionHandlerAttached::trigger()
+{
+    ActionHandler *handler = ActionHandlers::instance()->findFirst(m_action, true);
+    if (handler) {
+        emit handler->triggered(this->parent());
+        return true;
+    }
+
+    return false;
+}
+
+bool ActionHandlerAttached::triggerAll()
+{
+    QList<ActionHandler *> handlers = ActionHandlers::instance()->findAll(m_action, true);
+
+    for (ActionHandler *handler : qAsConst(handlers))
+        emit handler->triggered(this->parent());
+
+    return !handlers.isEmpty();
+}
+
+void ActionHandlerAttached::onHandlerAvailabilityChanged(QObject *action)
+{
+    if (m_action == action)
+        emit canHandleChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

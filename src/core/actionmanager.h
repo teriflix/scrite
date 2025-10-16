@@ -24,6 +24,7 @@ class ActionManager : public QAbstractListModel
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_CLASSINFO("DefaultProperty", "actions")
     QML_ATTACHED(ActionManagerAttached)
 
 public:
@@ -51,6 +52,21 @@ public:
 
     QList<QObject *> actions() const { return m_actions; }
 
+    Q_PROPERTY(QQmlListProperty<QObject> actions READ qmlActionsList)
+    QQmlListProperty<QObject> qmlActionsList();
+    void addAction(QObject *ptr) { this->add(ptr); }
+    void removeAction(QObject *ptr) { this->remove(ptr); }
+    QObject *actionAt(int index) const { return this->at(index); }
+    int actionCount() const { return m_actions.size(); }
+    void clearActions();
+
+private:
+    static void staticAppendAction(QQmlListProperty<QObject> *list, QObject *ptr);
+    static void staticClearActions(QQmlListProperty<QObject> *list);
+    static QObject *staticActionAt(QQmlListProperty<QObject> *list, int index);
+    static int staticActionCount(QQmlListProperty<QObject> *list);
+
+public:
     // QAbstractItemModel interface
     enum RoleNames { ActionRole = Qt::UserRole };
     int rowCount(const QModelIndex &parent) const;
@@ -108,14 +124,18 @@ private:
     ActionManager *m_target = nullptr;
 };
 
+class ActionHandlerAttached;
 class ActionHandler : public QQuickItem
 {
     Q_OBJECT
     QML_ELEMENT
+    QML_ATTACHED(ActionHandlerAttached)
 
 public:
     explicit ActionHandler(QQuickItem *parent = nullptr);
     virtual ~ActionHandler();
+
+    static ActionHandlerAttached *qmlAttachedProperties(QObject *parent);
 
     Q_PROPERTY(int priority READ priority WRITE setPriority NOTIFY priorityChanged)
     void setPriority(int val);
@@ -141,6 +161,33 @@ private:
 
 private:
     int m_priority = 0;
+    QObject *m_action = nullptr;
+};
+
+class ActionHandlerAttached : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_ANONYMOUS
+
+public:
+    virtual ~ActionHandlerAttached();
+
+    Q_PROPERTY(bool canHandle READ canHandle NOTIFY canHandleChanged)
+    bool canHandle() const;
+    Q_SIGNAL void canHandleChanged();
+
+    Q_INVOKABLE bool trigger();
+    Q_INVOKABLE bool triggerAll();
+
+protected:
+    explicit ActionHandlerAttached(QObject *parent = nullptr);
+
+private:
+    void onHandlerAvailabilityChanged(QObject *action);
+
+private:
+    friend class ActionHandler;
     QObject *m_action = nullptr;
 };
 
