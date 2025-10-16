@@ -18,7 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -41,7 +40,7 @@ StructureElementConnector {
         return false
     }
     lineType: StructureElementConnector.CurvedLine
-    outlineWidth: Scrite.app.devicePixelRatio * Utils.bounded(1, Math.round(root.canvasScale * Runtime.structureCanvasSettings.connectorLineWidth), 5)
+    outlineWidth: Scrite.app.devicePixelRatio * Runtime.bounded(1, Math.round(root.canvasScale * Runtime.structureCanvasSettings.connectorLineWidth), 5)
     arrowAndLabelSpacing: _labelBg.width
 
     Rectangle {

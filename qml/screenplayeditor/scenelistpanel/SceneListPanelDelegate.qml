@@ -19,7 +19,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
@@ -181,7 +181,7 @@ Rectangle {
                     elide: _private.isSceneTextModeHeading ? Text.ElideMiddle : Text.ElideRight
                     color: Runtime.colors.primary.c10.text
                     wrapMode: _private.isSceneTextModeHeading ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere
-                    maximumLineCount: _private.isSceneTextModeHeading ? 1 : Utils.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
+                    maximumLineCount: _private.isSceneTextModeHeading ? 1 : Runtime.bounded(1,Runtime.screenplayEditorSettings.slpSynopsisLineCount,5)
                     verticalAlignment: Qt.AlignVCenter
                     horizontalAlignment: Qt.AlignLeft
 

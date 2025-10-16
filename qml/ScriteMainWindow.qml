@@ -23,7 +23,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/tasks"
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
@@ -46,7 +46,7 @@ Item {
         target: Runtime
 
         function onShowNotebookInStructureChanged() {
-            Utils.execLater(mainTabBar, 100, function() {
+            Runtime.execLater(mainTabBar, 100, function() {
                 mainTabBar.currentIndex = mainTabBar.currentIndex % (Runtime.showNotebookInStructure ? 2 : 3)
             })
         }
@@ -350,7 +350,7 @@ Item {
                     Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                 else {
                     Runtime.activateMainWindowTab(Runtime.MainWindowTab.StructureTab)
-                    Utils.execLater(mainTabBar, 250, function() {
+                    Runtime.execLater(mainTabBar, 250, function() {
                         Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
                     })
                 }
@@ -374,7 +374,7 @@ Item {
             var nbt = Runtime.showNotebookInStructure ? 1 : 2
             if(mainTabBar.currentIndex !== nbt) {
                 Runtime.activateMainWindowTab(nbt)
-                Utils.execLater(mainTabBar, 250, function() {
+                Runtime.execLater(mainTabBar, 250, function() {
                     Announcement.shout(Runtime.announcementIds.tabRequest, type)
                 })
             } else
@@ -462,7 +462,7 @@ Item {
             appBusyOverlay.ref()
             // Runtime.screenplayAdapter.initialLoadTreshold = 25
             reloadScriteDocumentTimer.stop()
-            Utils.execLater(Runtime.screenplayAdapter, 250, () => {
+            Runtime.execLater(Runtime.screenplayAdapter, 250, () => {
                                 appBusyOverlay.deref()
                                 Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
                             })
@@ -907,7 +907,7 @@ Item {
                             ShortcutsModelItem.onActivated: activate()
 
                             function activate() {
-                                Utils.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
+                                Runtime.execLater(Scrite.app, 100, function() { Scrite.app.toggleFullscreen(Scrite.window) })
                             }
 
                             Shortcut {
@@ -1335,7 +1335,7 @@ Item {
                     Scrite.document.setBusyMessage(message)
                     Scrite.document.screenplay.clearSelection()
 
-                    Utils.execLater(mainTabBar, 100, function() {
+                    Runtime.execLater(mainTabBar, 100, function() {
                         mainTabBar.currentIndex = index
                         Scrite.document.clearBusyMessage()
                     })
@@ -1498,7 +1498,7 @@ Item {
                                                     mainUiContentLoader.active = false
 
                                                     const delay = data && typeof data === "number" ? data : 100
-                                                    Utils.execLater(mainUiContentLoader, delay, () => {
+                                                    Runtime.execLater(mainUiContentLoader, delay, () => {
                                                                         mainUiContentLoader.active = true
                                                                     })
                                                 }
@@ -1523,7 +1523,7 @@ Item {
             }
         }
 
-        Component.onCompleted: Utils.execLater(mainUiContentLoader, 200, () => { mainUiContentLoader.opacity = 1 } )
+        Component.onCompleted: Runtime.execLater(mainUiContentLoader, 200, () => { mainUiContentLoader.opacity = 1 } )
     }
 
     Component {
@@ -1584,7 +1584,7 @@ Item {
                                              const stype = "" + type
                                              if(mainTabBar.currentIndex === 0 && stype === "{f4048da2-775d-11ec-90d6-0242ac120003}") {
                                                  uiLoader.active = false
-                                                 Utils.execLater(uiLoader, 250, function() {
+                                                 Runtime.execLater(uiLoader, 250, function() {
                                                     uiLoader.active = true
                                                  })
                                              }
@@ -1774,19 +1774,19 @@ Item {
                                         else if(sdata.startsWith("Notebook")) {
                                             structureEditorTabs.currentTabIndex = 1
                                             if(sdata !== "Notebook")
-                                                Utils.execLater(notebookViewLoader, 100, function() {
+                                                Runtime.execLater(notebookViewLoader, 100, function() {
                                                     notebookViewLoader.item.switchTo(sdata)
                                                 })
                                         }
                                     } else if(stype === Runtime.announcementIds.characterNotesRequest) {
                                         structureEditorTabs.currentTabIndex = 1
-                                        Utils.execLater(notebookViewLoader, 100, function() {
+                                        Runtime.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToCharacterTab(data)
                                         })
                                     }
                                     else if(stype === Runtime.announcementIds.sceneNotesRequest) {
                                         structureEditorTabs.currentTabIndex = 1
-                                        Utils.execLater(notebookViewLoader, 100, function() {
+                                        Runtime.execLater(notebookViewLoader, 100, function() {
                                             notebookViewLoader.item.switchToSceneTab(data)
                                         })
                                     }
@@ -2111,7 +2111,7 @@ Item {
                 }
 
                 if(Runtime.structureCanvasSettings.showPullHandleAnimation && mainUiContentLoader.sessionId !== Scrite.document.sessionId) {
-                    Utils.execLater(splitViewAnimationLoader, 250, function() {
+                    Runtime.execLater(splitViewAnimationLoader, 250, function() {
                         splitViewAnimationLoader.active = !screenplayEditor2.active || !structureEditorRow2.active
                     })
                     mainUiContentLoader.sessionId = Scrite.document.sessionId

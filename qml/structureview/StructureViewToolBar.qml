@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -252,7 +252,7 @@ Rectangle {
                 if(checked && Scrite.document.structure.elementCount > 0)
                     Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
 
-                Utils.execLater(root.canvasPreview, 1000, function() {
+                Runtime.execLater(root.canvasPreview, 1000, function() {
                     zoomOneRequest()
                     root.canvasPreview.allowed = true
                 })
@@ -373,7 +373,7 @@ Rectangle {
 
                     onToggled: {
                         if(root.canvasScroll.selection.hasItems)
-                            Utils.execLater(root.canvasScroll.selection, 250, function() { root.canvasScroll.selection.refit() })
+                            Runtime.execLater(root.canvasScroll.selection, 250, function() { root.canvasScroll.selection.refit() })
                     }
 
                     onAboutToShow: {

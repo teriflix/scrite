@@ -75,12 +75,13 @@ private:
 class ActionManagerAttached : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
+    QML_ANONYMOUS
 
 public:
     virtual ~ActionManagerAttached();
 
-    Q_PROPERTY(
-            ActionManager *target READ target WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY(ActionManager *target READ target WRITE setTarget NOTIFY targetChanged)
     void setTarget(ActionManager *val);
     ActionManager *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
@@ -116,8 +117,7 @@ public:
     explicit ActionHandler(QQuickItem *parent = nullptr);
     virtual ~ActionHandler();
 
-    Q_PROPERTY(
-            int priority READ priority WRITE setPriority NOTIFY priorityChanged)
+    Q_PROPERTY(int priority READ priority WRITE setPriority NOTIFY priorityChanged)
     void setPriority(int val);
     int priority() const { return m_priority; }
     Q_SIGNAL void priorityChanged();

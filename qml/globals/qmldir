@@ -1,2 +1,3 @@
+singleton ActionHub 1.0 ActionHub.qml
 singleton Runtime 1.0 Runtime.qml
 singleton SubscriptionPlanOperations 1.0 SubscriptionPlanOperations.qml

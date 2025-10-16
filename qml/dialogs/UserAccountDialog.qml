@@ -22,7 +22,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -40,7 +40,7 @@ Item {
         userAccountDialog.open()
 
         if(Scrite.user.loggedIn && profileScreen && profileScreen !== "") {
-            Utils.execLater(userAccountDialog, 500, () => {
+            Runtime.execLater(userAccountDialog, 500, () => {
                                 Announcement.shout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
                             })
         }
@@ -227,7 +227,7 @@ Item {
                 }
             }
 
-            Component.onCompleted: Utils.execLater(_private, 1000, () => { _private.trackApplicationState.tracking = true })
+            Component.onCompleted: Runtime.execLater(_private, 1000, () => { _private.trackApplicationState.tracking = true })
         }
 
         readonly property SessionStatusRestApiCall sessionStatusApi: SessionStatusRestApiCall {

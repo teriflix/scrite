@@ -16,7 +16,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -130,7 +130,7 @@ Loader {
 
         function displayPageNumbersIfPossible() {
             if(showPageNumbers)
-                Utils.execLater(root, Runtime.stdAnimationDuration/2, () => { root.active = true })
+                Runtime.execLater(root, Runtime.stdAnimationDuration/2, () => { root.active = true })
             else
                 active = false
         }

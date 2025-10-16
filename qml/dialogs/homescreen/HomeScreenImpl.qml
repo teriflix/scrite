@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/tasks"
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -111,7 +111,7 @@ Item {
             fillMode: Image.PreserveAspectFit
             smooth: true; mipmap: true
             visible: false
-            Component.onCompleted: Utils.execLater(banner, 50, () => { visible = true } )
+            Component.onCompleted: Runtime.execLater(banner, 50, () => { visible = true } )
         }
 
         RowLayout {
@@ -236,7 +236,7 @@ Item {
                 fillMode: Image.PreserveAspectFit
                 smooth: true; mipmap: true
                 visible: false
-                Component.onCompleted: Utils.execLater(parent, 50, () => { visible = true } )
+                Component.onCompleted: Runtime.execLater(parent, 50, () => { visible = true } )
             }
 
             Poster {
@@ -1541,7 +1541,7 @@ Item {
         signal showScriptalay()
 
         function switchMode() {
-            Utils.execLater(root, 500, () => {
+            Runtime.execLater(root, 500, () => {
                                 if(root.mode === "Scriptalay")
                                     _private.showScriptalay()
                             })

@@ -22,7 +22,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
@@ -266,7 +266,7 @@ Rectangle {
         onXChanged: {
             if(_splitterHandleMouseArea.drag.active) {
                 if(__updateSidePanelWidthTimer === null)
-                    __updateSidePanelWidthTimer = Utils.execLater(_splitterHandle, Runtime.stdAnimationDuration/2, __updateSidePanelWidth)
+                    __updateSidePanelWidthTimer = Runtime.execLater(_splitterHandle, Runtime.stdAnimationDuration/2, __updateSidePanelWidth)
                 else
                     __updateSidePanelWidthTimer.restart()
             }
@@ -297,7 +297,7 @@ Rectangle {
             font: _private.sceneHeadingFormat.font2
         }
 
-        property var pageMargins: Utils.margins( _ruler.zoomLevel * dpi * pageLayout.leftMargin,
+        property var pageMargins: Runtime.margins( _ruler.zoomLevel * dpi * pageLayout.leftMargin,
                                                  _ruler.zoomLevel * dpi * pageLayout.topMargin,
                                                  _ruler.zoomLevel * dpi * pageLayout.rightMargin,
                                                  _ruler.zoomLevel * dpi * pageLayout.bottomMargin )
@@ -308,9 +308,9 @@ Rectangle {
                 const elementFormat = _private.screenplayFormat.elementFormat(currentParagraphType)
                 const lm = _ruler.leftMargin + _private.pageLayout.contentWidth * elementFormat.leftMargin * Screen.devicePixelRatio
                 const rm = _ruler.rightMargin + _private.pageLayout.contentWidth * elementFormat.rightMargin * Screen.devicePixelRatio
-                return Utils.margins(lm, 0, rm, 0)
+                return Runtime.margins(lm, 0, rm, 0)
             }
-            return Utils.margins(0, 0, 0, 0)
+            return Runtime.margins(0, 0, 0, 0)
         }
 
         property real dpi: Screen.devicePixelRatio

@@ -19,7 +19,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
@@ -61,7 +61,7 @@ AbstractScreenplayElementDelegate {
                                          : true
             if(!active) {
                 __placeHolder = _lowResolution.createObject(_content, {"width": width})
-                Utils.execLater(_content, Runtime.screenplayEditorSettings.placeholderInterval, activateContent)
+                Runtime.execLater(_content, Runtime.screenplayEditorSettings.placeholderInterval, activateContent)
             }
         }
 
@@ -418,7 +418,7 @@ AbstractScreenplayElementDelegate {
                     partName: "SidePanel"
                     zoomLevel: 1
                     fontMetrics: Runtime.idealFontMetrics
-                    pageMargins: Utils.margins(0, 0, 0, 0)
+                    pageMargins: Runtime.margins(0, 0, 0, 0)
                     screenplayAdapter: root.screenplayAdapter
 
                     label: expanded ? evaluateLabel() : ""

@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -188,7 +188,7 @@ DialogLauncher {
         id: _private
 
         function switchToCharactersTabLater() {
-            Utils.execLater(_private, 200, switchToCharactersTabNow)
+            Runtime.execLater(_private, 200, switchToCharactersTabNow)
         }
 
         function switchToCharactersTabNow() {

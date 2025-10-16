@@ -21,7 +21,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -103,7 +103,7 @@ DialogLauncher {
                                     running: parent.status === Image.Loading || !parent.go
                                 }
 
-                                Component.onCompleted: Utils.execLater(coverPagePhoto, 400, () => {
+                                Component.onCompleted: Runtime.execLater(coverPagePhoto, 400, () => {
                                                                            coverPagePhoto.go = true
                                                                        } )
                             }
@@ -343,7 +343,7 @@ DialogLauncher {
                 opacity: 0
                 onOpacityChanged: {
                     if(opacity > 0)
-                    Utils.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
+                    Runtime.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
                 }
             }
         }

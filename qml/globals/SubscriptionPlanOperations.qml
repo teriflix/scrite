@@ -19,7 +19,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/controls"
 import "qrc:/qml/dialogs"
 
@@ -43,7 +43,7 @@ Item {
         if(!plan)
             return ""
 
-        let ret = Utils.toTitleCase(plan.action.kind) + " »"
+        let ret = Runtime.toTitleCase(plan.action.kind) + " »"
         if(taxonomy && taxonomy["planKinds"]) {
             const planKinds = taxonomy["planKinds"]
             for(let i=0; i<planKinds.length; i++) {
@@ -65,7 +65,7 @@ Item {
         }
 
         if(plan.kind !== "trial" && !Scrite.user.info.hasTrialSubscription && !Scrite.user.info.isEarlyAdopter) {
-            const buttons = [Utils.toTitleCase(plan.action.kind) + " " + plan.title, "Go Back"]
+            const buttons = [Runtime.toTitleCase(plan.action.kind) + " " + plan.title, "Go Back"]
             MessageBox.question("Use Trial", "We recommend that you use the app on trial first before signing up for any other plan.",
                                 buttons, (option) => {
                                     if(option === buttons[0])
@@ -224,7 +224,7 @@ Item {
                           listModel.append({
                                                "kind": "label",
                                                "attributes": {
-                                                   "text": Utils.daysSpanAsString(plan.duration),
+                                                   "text": Runtime.daysSpanAsString(plan.duration),
                                                    "color": "" + Runtime.colors.primary.c200.text,
                                                    "background": "" + Runtime.colors.primary.c200.background,
                                                    "horizontalAlignment": Text.AlignHCenter,
@@ -408,14 +408,14 @@ Item {
             let api = Qt.createQmlObject("import io.scrite.components 1.0; AppPlanTaxonomyRestApiCall {}", _private)
             api.finished.connect( () => {
                                      if(api.hasError || !api.hasResponse)
-                                        Utils.execLater(_private, 500, loadTaxonomy)
+                                        Runtime.execLater(_private, 500, loadTaxonomy)
                                      else
                                         root.taxonomy = api.taxonomy
                                      api.destroy()
                                  })
             if(!api.call()) {
                 api.destroy()
-                Utils.execLater(_private, 500, loadTaxonomy)
+                Runtime.execLater(_private, 500, loadTaxonomy)
             }
         }
 

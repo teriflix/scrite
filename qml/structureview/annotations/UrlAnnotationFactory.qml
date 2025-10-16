@@ -18,7 +18,7 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -36,7 +36,7 @@ QtObject {
         let h = 350 // Scrite.app.isMacOSPlatform ? 60 : 350
         let geometry = Qt.rect(x-w/2, y-20, w, h)
 
-        let annot = Utils.newAnnotation(parent, type, geometry)
+        let annot = Runtime.newAnnotation(parent, type, geometry)
         annot.resizable = false
         Scrite.document.structure.addAnnotation(annot)
         return annot

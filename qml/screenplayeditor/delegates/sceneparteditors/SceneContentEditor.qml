@@ -18,7 +18,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/globals"
@@ -73,7 +73,7 @@ AbstractScenePartEditor {
     }
 
     function afterZoomLevelChange() {
-        Utils.execLater(_private, 100, _private.afterZoomLevelChange)
+        Runtime.execLater(_private, 100, _private.afterZoomLevelChange)
     }
 
     TextArea {
@@ -248,7 +248,7 @@ AbstractScenePartEditor {
             const cp = _sceneTextEditor.cursorPosition
             changeTextCase(textCase)
             if(sstart >= 0 && send > 0 && send > sstart)
-                Utils.execLater(_sceneTextEditor, 150, () => {
+                Runtime.execLater(_sceneTextEditor, 150, () => {
                                     _sceneTextEditor.forceActiveFocus()
                                     _sceneTextEditor.select(sstart, send)
                                 })
@@ -413,7 +413,7 @@ AbstractScenePartEditor {
 
         function onModelReset() {
             if(_private.cursorPositionBeforeSceneReset >= 0) {
-                Utils.execLater(_sceneTextEditor, 100, (position) => {
+                Runtime.execLater(_sceneTextEditor, 100, (position) => {
                                     root.assumeFocusAt(position)
                                 }, _private.cursorPositionBeforeSceneReset )
                 _private.cursorPositionBeforeSceneReset = -1
@@ -624,7 +624,7 @@ AbstractScenePartEditor {
             if(reloadSceneContentTimer)
                 reloadSceneContentTimer.restart()
             else
-                reloadSceneContentTimer = Utils.execLater(_sceneDocumentBinder, 1000, function() {
+                reloadSceneContentTimer = Runtime.execLater(_sceneDocumentBinder, 1000, function() {
                     _sceneDocumentBinder.preserveScrollAndReload()
                 } )
         }

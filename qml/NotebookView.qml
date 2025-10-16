@@ -22,7 +22,7 @@ import QtQuick.Controls 1.4 as OldControls
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -1289,8 +1289,8 @@ Rectangle {
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: Utils.execLater(sceneTabContentArea, 100, prepare)
-                        onVisibleChanged: Utils.execLater(sceneTabContentArea, 100, prepare)
+                        Component.onCompleted: Runtime.execLater(sceneTabContentArea, 100, prepare)
+                        onVisibleChanged: Runtime.execLater(sceneTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
@@ -2421,8 +2421,8 @@ Rectangle {
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: Utils.execLater(charactersTabContentArea, 100, prepare)
-                        onVisibleChanged: Utils.execLater(charactersTabContentArea, 100, prepare)
+                        Component.onCompleted: Runtime.execLater(charactersTabContentArea, 100, prepare)
+                        onVisibleChanged: Runtime.execLater(charactersTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
                         onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
@@ -2536,12 +2536,12 @@ Rectangle {
                                 Connections {
                                     target: characterNotes
                                     function onCharacterChanged() {
-                                        Utils.execLater(this, 100, function() {
+                                        Runtime.execLater(this, 100, function() {
                                             photoSlides.currentIndex = character.hasKeyPhoto ? character.keyPhotoIndex : 0
                                         } )
                                     }
                                 }
-                                Component.onCompleted: Utils.execLater(this, 100, function() {
+                                Component.onCompleted: Runtime.execLater(this, 100, function() {
                                     photoSlides.currentIndex = character.hasKeyPhoto ? character.keyPhotoIndex : 0
                                 } )
 
@@ -3068,8 +3068,8 @@ Rectangle {
                                 showBusyIndicator = false
                             }
                         }
-                        Component.onCompleted: Utils.execLater(characterTabContentArea, 100, prepare)
-                        onVisibleChanged: Utils.execLater(characterTabContentArea, 100, prepare)
+                        Component.onCompleted: Runtime.execLater(characterTabContentArea, 100, prepare)
+                        onVisibleChanged: Runtime.execLater(characterTabContentArea, 100, prepare)
                     }
 
                     DisabledFeatureNotice {
@@ -3105,7 +3105,7 @@ Rectangle {
                                    if(note) {
                                        note.color = color
                                        note.objectName = "_newNote"
-                                       Utils.execLater(note, 10, function() {
+                                       Runtime.execLater(note, 10, function() {
                                            switchTo(note);
                                        })
                                    }
@@ -3117,7 +3117,7 @@ Rectangle {
             title: "Form Note"
             notes: newNoteMenu.notes
             onNoteAdded: (note) => {
-                             Utils.execLater(note, 10, function() {
+                             Runtime.execLater(note, 10, function() {
                                  switchTo(note);
                              })
                              newNoteMenu.close()
@@ -3131,7 +3131,7 @@ Rectangle {
                                    if(note) {
                                        note.color = color
                                        note.objectName = "_newNote"
-                                       Utils.execLater(note, 10, function() {
+                                       Runtime.execLater(note, 10, function() {
                                             switchTo(note)
                                        })
                                    }
@@ -3164,7 +3164,7 @@ Rectangle {
                     notebookContentLoader.confirmAndDelete()
                 else {
                     notebookView.switchTo(noteContextMenu.note)
-                    Utils.execLater( notebookContentLoader, 500, () => {
+                    Runtime.execLater( notebookContentLoader, 500, () => {
                                      notebookContentLoader.confirmAndDelete()
                                  } )
                 }
@@ -3227,7 +3227,7 @@ Rectangle {
                     notebookContentLoader.confirmAndDelete()
                 else {
                     notebookView.switchTo(characterContextMenu.character.notes)
-                    Utils.execLater( notebookContentLoader, 100, () => {
+                    Runtime.execLater( notebookContentLoader, 100, () => {
                                      notebookContentLoader.confirmAndDelete()
                                  } )
                 }

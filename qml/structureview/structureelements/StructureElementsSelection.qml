@@ -36,7 +36,7 @@ AbstractSelection {
         if(!hasItems) {
             root.denyCanvasPreviewRequest()
             const rect = Scrite.document.structure.layoutElements(type)
-            Utils.execLater(_selection, 1000, function() {
+            Runtime.execLater(_selection, 1000, function() {
                 root.zoomOneRequest()
                 root.allowCanvasPreviewRequest()
             })

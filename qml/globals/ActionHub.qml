@@ -11,25 +11,17 @@
 **
 ****************************************************************************/
 
+pragma Singleton
+
 import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
+import Qt.labs.settings 1.0
 
 import io.scrite.components 1.0
 
 
+
 import "qrc:/qml/globals"
-import "qrc:/qml/controls"
-import "qrc:/qml/helpers"
 
-PageView {
-    id: root
+Item {
 
-    pagesArray: ["Options"]
-    currentIndex: 0
-    pageContent: LanguageOptionsPage {
-        width: root.availablePageContentWidth
-        height: root.availablePageContentHeight
-    }
 }

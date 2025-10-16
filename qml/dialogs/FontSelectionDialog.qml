@@ -21,7 +21,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.models 1.0
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"

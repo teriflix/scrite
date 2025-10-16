@@ -18,7 +18,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
@@ -145,7 +145,7 @@ Item {
         target: Scrite.document.screenplay
         function onCurrentElementIndexChanged(val) {
             if(!Scrite.document.loading) {
-                Utils.execLater(_screenplayElementList, 150, function() {
+                Runtime.execLater(_screenplayElementList, 150, function() {
                     if(_screenplayElementList.currentIndex === 0)
                         _screenplayElementList.positionViewAtBeginning()
                     else if(_screenplayElementList.currentIndex === _screenplayElementList.count-1)
@@ -246,7 +246,7 @@ Item {
         }
 
         function requestEditorLater() {
-            Utils.execLater(root, 100, root.requestEditor)
+            Runtime.execLater(root, 100, root.requestEditor)
         }
     }
 

@@ -20,7 +20,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -231,7 +231,7 @@ Item {
 
         function reportSaveAsBackupNotPossible() {
             MessageBox.information("Save Error", "Cannot save as a backup file. Please choose another path or file name.", () => {
-                                        Utils.execLater(root, 100, root.saveAs)
+                                        Runtime.execLater(root, 100, root.saveAs)
                                    })
         }
     }

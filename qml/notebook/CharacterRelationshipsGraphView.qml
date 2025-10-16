@@ -17,7 +17,7 @@ import QtQuick.Layouts 1.0
 import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
@@ -55,7 +55,7 @@ Rectangle {
         leftMargin: 1000
         topMargin: 1000
         onUpdated: {
-            Utils.execLater(crGraph, 250, function() {
+            Runtime.execLater(crGraph, 250, function() {
                 canvasScroll.animatePanAndZoom = false
                 canvas.zoomFit()
                 canvasScroll.animatePanAndZoom = true

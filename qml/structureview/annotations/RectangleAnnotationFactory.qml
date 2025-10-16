@@ -18,7 +18,7 @@ import QtQuick 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 
@@ -37,7 +37,7 @@ QtObject {
         h = h ? h : 200
 
         let geometry = doNotAlignRect ? Qt.rect(x, y, w, h) : Qt.rect(x - w/2, y-h/2, w, h)
-        let annot = Utils.newAnnotation(parent, type, geometry, null)
+        let annot = Runtime.newAnnotation(parent, type, geometry, null)
         Scrite.document.structure.addAnnotation(annot)
 
         return annot

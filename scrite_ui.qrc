@@ -4,7 +4,6 @@
     </qresource>
     <qresource prefix="/">
         <file>LICENSE.txt</file>
-        <file>js/utils.js</file>
         <file>main.qml</file>
         <file>qml/controls/qmldir</file>
         <file>qml/controls/VclButton.qml</file>
@@ -267,5 +266,6 @@
         <file>qml/helpers/ShortcutField.qml</file>
         <file>qml/dialogs/LanguageOptionsDialog.qml</file>
         <file>qml/helpers/LanguageMenu.qml</file>
+        <file>qml/globals/ActionHub.qml</file>
     </qresource>
 </RCC>

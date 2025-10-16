@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -138,7 +138,7 @@ ScrollArea {
 
         onEditElementItemChanged: {
             if(editElementItem && _canvas.scaleIsLessForEdit) {
-                Utils.execLater(root, 500, function() { _private.zoomOneToItem(editElementItem) })
+                Runtime.execLater(root, 500, function() { _private.zoomOneToItem(editElementItem) })
             }
         }
 
@@ -193,7 +193,7 @@ ScrollArea {
             if(delay === undefined || delay === null)
                 animatePanAndZoom = true;
             else
-                Utils.execLater(root, delay, () => { root.animatePanAndZoom = true })
+                Runtime.execLater(root, delay, () => { root.animatePanAndZoom = true })
         }
 
         function updateScriteDocumentUserData() {
@@ -221,7 +221,7 @@ ScrollArea {
                 root.contentY = csData.contentY
                 root.isZoomFit = csData.isZoomFit === true
                 if(root.isZoomFit) {
-                    Utils.execLater(root, 500, function() {
+                    Runtime.execLater(root, 500, function() {
                         var area = _canvas.itemsBoundingBox.boundingBox
                         root.zoomFit(area)
                         root.enablePanAndZoomAnimation(2000)
@@ -250,7 +250,7 @@ ScrollArea {
         }
 
         function updateFromScriteDocumentUserDataLater() {
-            Utils.execLater(root, 500, updateFromScriteDocumentUserData)
+            Runtime.execLater(root, 500, updateFromScriteDocumentUserData)
         }
 
         function zoomSanityCheck() {
@@ -362,7 +362,7 @@ ScrollArea {
 
         onUpdateScriteDocumentUserDataEnabledChanged: {
             if(updateScriteDocumentUserDataEnabled)
-                Utils.execLater(root, 500, zoomSanityCheck)
+                Runtime.execLater(root, 500, zoomSanityCheck)
         }
     }
 }

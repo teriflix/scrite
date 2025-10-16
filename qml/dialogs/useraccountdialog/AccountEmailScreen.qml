@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -201,7 +201,7 @@ Item {
                 }
 
                 function determineEnabled() {
-                    enabled = Utils.validateEmail(emailField.text.trim())
+                    enabled = Runtime.validateEmail(emailField.text.trim())
                 }
 
                 Component.onCompleted: determineEnabled()
@@ -220,7 +220,7 @@ Item {
 
         function check() {
             const _email = emailField.text.trim()
-            if(Utils.validateEmail(_email)) {
+            if(Runtime.validateEmail(_email)) {
                 email = _email
 
                 let nameComps = nameField.text.trim().split(" ")

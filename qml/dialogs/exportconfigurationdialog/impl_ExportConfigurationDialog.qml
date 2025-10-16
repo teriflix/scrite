@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -315,7 +315,7 @@ VclDialog {
         property VclDialog waitDialog
     }
 
-    onClosed: Utils.execLater(exporter, 100, exporter.discard)
+    onClosed: Runtime.execLater(exporter, 100, exporter.discard)
 
     Connections {
         target: root.exporter

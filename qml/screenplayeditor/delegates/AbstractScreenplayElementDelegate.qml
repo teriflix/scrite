@@ -17,7 +17,7 @@ import QtQuick.Layouts 1.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/screenplayeditor"
 
@@ -32,7 +32,7 @@ FocusScope {
     required property ScreenplayElement screenplayElement
 
     // These have to be explicitly provided
-    required property var pageMargins // must set using Utils.margins() only
+    required property var pageMargins // must set using Runtime.margins() only
     required property real zoomLevel
     required property bool isCurrent
     required property ScreenplayAdapter screenplayAdapter

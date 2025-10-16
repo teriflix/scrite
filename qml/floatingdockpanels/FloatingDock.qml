@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -40,11 +40,11 @@ Item {
     function toggle() { visible = !visible }
     function adjustedX(xVal) {
         const availableSpace = parent ? parent.width : Scrite.window.width
-        return Utils.bounded(_private.margin, xVal, availableSpace-width-_private.margin)
+        return Runtime.bounded(_private.margin, xVal, availableSpace-width-_private.margin)
     }
     function adjustedY(yVal) {
         const availableSpace = parent ? parent.height : Scrite.window.height
-        return Utils.bounded(_private.margin, yVal, availableSpace-height-_private.margin)
+        return Runtime.bounded(_private.margin, yVal, availableSpace-height-_private.margin)
     }
 
     // Implementation

@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -366,7 +366,7 @@ GridBackground {
 
             if(event.type === EventFilter.Drop) {
                 element.stackId = ""
-                Utils.execLater(element, 250, function() {
+                Runtime.execLater(element, 250, function() {
                     if(!Scrite.document.structure.forceBeatBoardLayout) {
                         element.x = event.pos.x
                         element.y = event.pos.y

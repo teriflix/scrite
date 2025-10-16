@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -95,7 +95,7 @@ Item {
     }
 
     Component.onCompleted: {
-        Utils.execLater(root, 250, _private.reevaluateEpisodeAndGroupBoxes)
+        Runtime.execLater(root, 250, _private.reevaluateEpisodeAndGroupBoxes)
     }
 
     RubberBand {
@@ -274,14 +274,14 @@ Item {
     StructureElementContextMenu {
         id: _elementContextMenu
 
-        onRefitSelectionRequest: { Utils.execLater(_selection, 250, function() { _selection.refit() }) }
+        onRefitSelectionRequest: { Runtime.execLater(_selection, 250, function() { _selection.refit() }) }
         onEnsureItemVisibleRequest: (item) => { root.ensureItemVisibleRequest(item) }
         onDeleteElementRequest: (element) => {  root.deleteElementRequest(element) }
     }
 
     onGroupCategoryChanged: {
         Scrite.document.structure.preferredGroupCategory = groupCategory
-        Utils.execLater(root, 250, _private.reevaluateEpisodeAndGroupBoxes)
+        Runtime.execLater(root, 250, _private.reevaluateEpisodeAndGroupBoxes)
     }
 
     QtObject {
