@@ -296,8 +296,11 @@ Item {
 
                 ActionManager.target: root.languageOptions
 
-                text: language.name
+                checkable: true
+                checked: Runtime.language.activeCode === language.code
                 shortcut: language.shortcut()
+                text: language.name
+
                 // TODO iconSource to source icons through a QQuickAsyncImageProvider
 
                 onTriggered: Runtime.language.setActiveCode(language.code)

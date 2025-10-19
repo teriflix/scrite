@@ -45,7 +45,7 @@ Item {
     property bool canScrollDown: textDocumentFlick.contentY < textDocumentFlick.contentHeight - textDocumentFlick.height
 
     Component.onCompleted: {
-        scritedToolbar.scritedView = scritedView
+        _scritedToolbar.scritedView = scritedView
         if(!Runtime.scritedSettings.experimentalFeatureNoticeDisplayed) {
             Runtime.execLater(scritedView, 250, function() {
                 MessageBox.information("Experimental Feature",
@@ -56,7 +56,7 @@ Item {
         }
         Scrite.user.logActivity1("scrited")
     }
-    Component.onDestruction: scritedToolbar.scritedView = null
+    Component.onDestruction: _scritedToolbar.scritedView = null
 
     function loadMedia() {
         fileDialog.open()

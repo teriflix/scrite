@@ -29,8 +29,9 @@ import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/scrited"
 import "qrc:/qml/controls"
-import "qrc:/qml/screenplayeditor"
+import "qrc:/qml/mainwindow"
 import "qrc:/qml/notifications"
+import "qrc:/qml/screenplayeditor"
 import "qrc:/qml/floatingdockpanels"
 
 Item {
@@ -387,7 +388,7 @@ Item {
     }
 
     Rectangle {
-        id: appToolBarArea
+        id: _header
         anchors.left: parent.left
         anchors.right: parent.right
 
@@ -396,149 +397,21 @@ Item {
         color: Runtime.colors.primary.c50.background
         enabled: visible
 
-        RowLayout {
-            id: appToolBar
+        MainToolBar {
+            id: _mainToolbar
 
             anchors.left: parent.left
+            anchors.right: editTools.left
             anchors.leftMargin: 5
+            anchors.rightMargin: 5
             anchors.verticalCenter: parent.verticalCenter
 
-            visible: appToolBarArea.width >= 1200
+            visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab
 
-            ActionManagerToolBar {
-                actionManager: ActionHub.fileOperations
-            }
-
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            ActionManagerToolButton {
-                actionManager: ActionHub.exportOptions
-            }
-
-            ActionManagerToolButton {
-                actionManager: ActionHub.reportOptions
-            }
-
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            ActionManagerToolButton {
-                actionManager: ActionHub.appOptions
-            }
-
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            ActionManagerToolButton {
-                actionManager: ActionHub.languageOptions
-            }
-
-            ActionToolButton {
-                action: ActionHub.inputOptions.find("alphabetMappings")
-                down: _alphabetMappingsPopup.visible
-
-                ActionHandler {
-                    anchors.top: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-
-                    width: _alphabetMappingsPopup.width
-
-                    action: parent.action
-                    onTriggered: _alphabetMappingsPopup.open()
-
-                    Popup {
-                        id: _alphabetMappingsPopup
-
-                        width: _alphabetMappingsLoader.width + 30
-                        height: _alphabetMappingsLoader.height + 30
-
-                        modal: false
-                        focus: false
-                        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-
-                        Loader {
-                            id: _alphabetMappingsLoader
-
-                            width: item ? item.width : 0
-                            height: item ? item.height : 0
-
-                            active: parent.visible
-
-                            sourceComponent: AlphabetMappingsView {
-                                language: Runtime.language.active
-                            }
-                        }
-                    }
-                }
-            }
-
-            VclLabel {
-                Layout.preferredWidth: contentWidth + rightPadding
-
-                text: Runtime.language.active.name
-                rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth * 2
-
-                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-            }
-
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            ActionManagerToolBar {
-                actionManager: ActionHub.paragraphFormats
-            }
-
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            ActionToolButton {
-                action: ActionHub.editOptions.find("find")
-            }
-
-            ActionToolButton {
-                action: ActionHub.editOptions.find("reload")
-            }
-
-            ActionManagerToolButton {
-                actionManager: ActionHub.screenplayEditorOptions
-            }
-
-            Rectangle {
-                Layout.fillHeight: true
-                Layout.preferredWidth: 1
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            ActionManagerToolBar {
-                actionManager: ActionHub.screenplayOperations
-            }
-
-            onVisibleChanged: {
-                if(enabled && !visible)
-                    Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
-            }
+            // onVisibleChanged: {
+            //     if(enabled && !visible)
+            //         Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+            // }
         }
 
         HelpTipNotification {
@@ -546,180 +419,25 @@ Item {
             enabled: Runtime.language.activeCode !== QtLocale.English
         }
 
-        Row {
-            id: appToolsMenu
-
+        Item {
             anchors.left: parent.left
-            anchors.leftMargin: 10
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
 
-            visible: !appToolBar.visible
+            height: _scritedToolbar.height
 
-            FlatToolButton {
-                text: "File"
-                down: appFileMenu.active
-                iconSource: "qrc:/icons/navigation/menu.png"
+            ScritedToolbar {
+                id: _scritedToolbar
 
-                onClicked: {
-                    if(appFileMenu.active)
-                        appFileMenu.close()
-                    else
-                        appFileMenu.show()
-                }
+                anchors.horizontalCenter: parent.horizontalCenter
 
-                MenuLoader {
-                    id: appFileMenu
-
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-
-                    menu: VclMenu {
-                        width: 300
-
-                        VclMenuItem {
-                            text: "Home"
-
-                            onTriggered: HomeScreen.launch()
-                        }
-
-                        VclMenuItem {
-                            text: "Save"
-
-                            onTriggered: cmdSave.doClick()
-                        }
-
-                        MenuSeparator { }
-
-                        VclMenu {
-                            id: exportMenu2
-
-                            width: 250
-
-                            title: "Share"
-
-                            Repeater {
-                                model: Scrite.document.supportedExportFormats
-
-                                VclMenuItem {
-                                    required property var modelData
-
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-
-                                    onClicked: ExportConfigurationDialog.launch(modelData.key)
-                                }
-                            }
-
-                            MenuSeparator { }
-
-                            VclMenuItem {
-                                text: "Scrite"
-                                icon.source: "qrc:/icons/exporter/scrite.png"
-
-                                onClicked: SaveFileTask.saveAs()
-                            }
-                        }
-
-                        VclMenu {
-                            width: 300
-
-                            title: "Reports"
-
-                            Repeater {
-                                model: Scrite.document.supportedReports
-
-                                VclMenuItem {
-                                    required property var modelData
-
-                                    text: modelData.name
-                                    icon.source: "qrc" + modelData.icon
-
-                                    onClicked: ReportConfigurationDialog.launch(modelData.name)
-                                    // enabled: Scrite.window.width >= 800
-                                }
-                            }
-                        }
-
-                        MenuSeparator { }
-
-                        LanguageMenu { }
-
-                        VclMenuItem {
-                            text: "Alphabet Mappings For " + Runtime.language.active.name
-                            enabled: Runtime.language.activeCode !== QtLocale.English
-
-                            onClicked: _alphabetMappingsPopup.visible = !_alphabetMappingsPopup.visible
-                        }
-
-                        MenuSeparator { }
-
-                        VclMenu {
-                            width: 250
-
-                            title: "View"
-
-                            VclMenuItem {
-                                text: "Screenplay (" + Scrite.app.polishShortcutTextForDisplay("Alt+1") + ")"
-                                font.bold: mainTabBar.currentIndex === 0
-
-                                onTriggered: Runtime.activateMainWindowTab(0)
-                            }
-
-                            VclMenuItem {
-                                text: "Structure (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
-                                font.bold: mainTabBar.currentIndex === 1
-
-                                onTriggered: Runtime.activateMainWindowTab(1)
-                            }
-
-                            VclMenuItem {
-                                text: "Notebook (" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
-                                enabled: !Runtime.showNotebookInStructure
-                                font.bold: mainTabBar.currentIndex === 2
-
-                                onTriggered: Runtime.activateMainWindowTab(2)
-                            }
-
-                            VclMenuItem {
-                                text: "Scrited (" + Scrite.app.polishShortcutTextForDisplay("Alt+4") + ")"
-                                font.bold: mainTabBar.currentIndex === 3
-
-                                onTriggered: mainTabBar.currentIndex = 3
-                            }
-                        }
-
-                        MenuSeparator { }
-
-                        VclMenuItem {
-                            text: "Settings"
-                            // enabled: Scrite.window.width >= 1100
-                            onTriggered: SettingsDialog.launch()
-                        }
-
-                        VclMenuItem {
-                            text: "Help"
-                            onTriggered: Qt.openUrlExternally(helpUrl)
-                        }
-                    }
-                }
+                visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab
             }
-        }
-
-        ScritedToolbar {
-            id: scritedToolbar
-
-            anchors.left: appToolBar.visible ? appToolBar.right : appToolsMenu.right
-            anchors.right: editTools.visible ? editTools.left : parent.right
-            anchors.margins: 10
-            anchors.verticalCenter: parent.verticalCenter
-
-            visible: scritedView
         }
 
         Row {
             id: editTools
 
-            x: appToolBar.visible ? (parent.width - userLogin.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2)
+            x: _mainToolbar.visible ? (parent.width - userLogin.width - width) : (appToolsMenu.x + (parent.width - width - appToolsMenu.width - appToolsMenu.x)/2)
             height: parent.height
 
             spacing: 20
@@ -729,7 +447,7 @@ Item {
 
                 height: parent.height
 
-                visible: appToolBar.visible
+                visible: _mainToolbar.visible
 
                 readonly property var tabs: [
                     { "name": "Screenplay", "icon": "qrc:/icons/navigation/screenplay_tab.png", "visible": true, "tab": Runtime.MainWindowTab.ScreenplayTab },
@@ -826,7 +544,7 @@ Item {
                 TrackerPack {
                     id: currentTabExtents
                     TrackProperty { target: mainTabBar; property: "visible" }
-                    TrackProperty { target: appToolBarArea; property: "width" }
+                    TrackProperty { target: _header; property: "width" }
                     TrackProperty { target: mainTabBar; property: "currentTab" }
 
                     property var value: fallback
@@ -938,7 +656,7 @@ Item {
         property bool allowContent: Runtime.loadMainUiContent
         property string sessionId
 
-        anchors.top: appToolBarArea.visible ? appToolBarArea.bottom : parent.top
+        anchors.top: _header.visible ? _header.bottom : parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -1082,12 +800,12 @@ Item {
                 Loader {
                     id: fileOpenDropAreaNotification
 
-                    Component.onDestruction: appToolBarArea.enabled = true
+                    Component.onDestruction: _header.enabled = true
 
                     anchors.fill: fileOpenDropArea
 
                     active: fileOpenDropArea.active || fileOpenDropArea.droppedFilePath !== ""
-                    onActiveChanged: appToolBarArea.enabled = !active
+                    onActiveChanged: _header.enabled = !active
 
                     sourceComponent: Rectangle {
                         color: Scrite.app.translucent(Runtime.colors.primary.c500.background, 0.5)
@@ -1265,7 +983,7 @@ Item {
                                 visible: active
 
                                 sourceComponent: Rectangle {
-                                    width: appToolBar.height+4
+                                    width: _mainToolbar.height+4
 
                                     color: Runtime.colors.primary.c100.background
 
@@ -1342,9 +1060,9 @@ Item {
                                 visible: Runtime.showNotebookInStructure && structureEditorTabs.currentTabIndex === 1
 
                                 sourceComponent: NotebookView {
-                                    toolbarSize: appToolBar.height+4
-                                    toolbarSpacing: appToolBar.spacing
-                                    toolbarLeftMargin: appToolBar.anchors.leftMargin
+                                    toolbarSize: _mainToolbar.height+4
+                                    toolbarSpacing: _mainToolbar.spacing
+                                    toolbarLeftMargin: _mainToolbar.anchors.leftMargin
                                 }
 
                                 DisabledFeatureNotice {

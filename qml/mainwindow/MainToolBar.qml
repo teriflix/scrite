@@ -1,0 +1,215 @@
+/****************************************************************************
+**
+** Copyright (C) VCreate Logic Pvt. Ltd. Bengaluru
+** Author: Prashanth N Udupa (prashanth@scrite.io)
+**
+** This code is distributed under GPL v3. Complete text of the license
+** can be found here: https://www.gnu.org/licenses/gpl-3.0.txt
+**
+** This file is provided AS IS with NO WARRANTY OF ANY KIND, INCLUDING THE
+** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+**
+****************************************************************************/
+
+
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls.Material 2.15
+
+import io.scrite.components 1.0
+
+import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
+
+Item {
+    id: root
+
+    implicitHeight: _layout.height
+
+    RowLayout {
+        id: _layout
+
+        RowLayout {
+            Layout.rightMargin: Runtime.iconImageSize * 2
+
+            visible: !_group1.visible
+
+            ToolButton {
+                display: ToolButton.TextBesideIcon
+                down: _mainMenu.visible
+                text: "Scrite"
+
+                icon.source: "qrc:/icons/exporter/scrite.png"
+
+                onClicked: _mainMenu.popup()
+
+                Menu {
+                    id: _mainMenu
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.fileOperations
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.languageOptions
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.exportOptions
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.reportOptions
+                    }
+
+                    ActionManagerMenu {
+                        actionManager: ActionHub.appOptions
+                    }
+                }
+            }
+        }
+
+        RowLayout {
+            id: _group1
+
+            visible: root.width > _group1.width + _group2.width
+
+            ActionManagerToolBar {
+                actionManager: ActionHub.fileOperations
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.exportOptions
+            }
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.reportOptions
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.appOptions
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.languageOptions
+            }
+
+            ActionToolButton {
+                action: _alphabetMappingsHandler.action
+                down: _alphabetMappingsPopup.visible
+            }
+
+            VclLabel {
+                Layout.preferredWidth: contentWidth + rightPadding
+
+                text: Runtime.language.active.name
+                rightPadding: Runtime.minimumFontMetrics.averageCharacterWidth * 2
+
+                font.pointSize: Runtime.minimumFontMetrics.font.pointSize
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+        }
+
+        RowLayout {
+            id: _group2
+
+            ActionManagerToolBar {
+                actionManager: ActionHub.paragraphFormats
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionToolButton {
+                action: ActionHub.editOptions.find("find")
+            }
+
+            ActionToolButton {
+                action: ActionHub.editOptions.find("reload")
+            }
+
+            ActionManagerToolButton {
+                actionManager: ActionHub.screenplayEditorOptions
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolBar {
+                actionManager: ActionHub.screenplayOperations
+            }
+        }
+    }
+
+    ActionHandler {
+        id: _alphabetMappingsHandler
+
+        anchors.top: parent.bottom
+
+        width: _alphabetMappingsPopup.width
+
+        action: ActionHub.inputOptions.find("alphabetMappings")
+        onTriggered: _alphabetMappingsPopup.open()
+
+        Popup {
+            id: _alphabetMappingsPopup
+
+            width: _alphabetMappingsLoader.width + 30
+            height: _alphabetMappingsLoader.height + 30
+
+            modal: false
+            focus: false
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
+
+            Loader {
+                id: _alphabetMappingsLoader
+
+                width: item ? item.width : 0
+                height: item ? item.height : 0
+
+                active: parent.visible
+
+                sourceComponent: AlphabetMappingsView {
+                    language: Runtime.language.active
+                }
+            }
+        }
+    }
+}

@@ -21,291 +21,235 @@ import io.scrite.components 1.0
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
-Item {
-    property Item scritedView
-    height: 45
+ActionManagerToolBar {
+    id: root
 
-    Loader {
-        height: parent.height
-        active: scritedView
-        anchors.centerIn: parent
-        sourceComponent: Row {
-            spacing: 1
+    actionManager: _private.actions
 
-            FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/movie.png"
-                ToolTip.text: "Load a video file for this screenplay."
-                enabled: scritedView.screenplaySplitsCount > 0
-                onClicked: scritedView.loadMedia()
+    QtObject {
+        id: _private
+
+        readonly property ActionManager actions : ActionManager {
+            title: "Scrited"
+            objectName: "scritedOptions"
+
+            Action {
+                readonly property string tooltip: "Load a video file for this screenplay"
+
+                enabled: ActionManager.canHandle
+                objectName: "loadMovie"
+                text: "Load Movie"
+
+                icon.source: "qrc:/icons/mediaplayer/movie.png"
             }
 
-            FlatToolButton {
-                ToolTip.text: "Toggle media playback.\t(Space)"
+            Action {
+                readonly property string tooltip: "Toggle media playback"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Space)
 
-                ShortcutsModelItem.priority: 0
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: scritedView.mediaIsPlaying ? "Pause" : "Play"
-                ShortcutsModelItem.shortcut: "Space"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                checkable: true
+                enabled: ActionManager.canHandle
+                objectName: "loadMovie"
+                shortcut: defaultShortcut
+                text: checked ? "Pause" : "Play"
 
-                enabled: scritedView.mediaIsLoaded
-                iconSource: scritedView.mediaIsPlaying ? "qrc:/icons/mediaplayer/pause.png" : "qrc:/icons/mediaplayer/play_arrow.png"
-
-                onClicked: click()
-
-                function click() {
-                    scritedView.togglePlayback()
-                }
+                icon.source: checked ? "qrc:/icons/mediaplayer/pause.png" : "qrc:/icons/mediaplayer/play_arrow.png"
             }
 
-            FlatToolButton {
-                ToolTip.text: "Rewind 10 seconds.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + " + ←)"
+            Action {
+                readonly property string tooltip: "Rewind 10 seconds"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Left)
 
-                ShortcutsModelItem.priority: -1
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Rewind 10s"
-                ShortcutsModelItem.shortcut: "Ctrl+←"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                enabled: ActionManager.canHandle
+                objectName: "rewind10"
+                shortcut: defaultShortcut
+                text: "Rewind 10s"
 
-                enabled: scritedView.mediaIsLoaded
-                iconSource: "qrc:/icons/mediaplayer/rewind_10.png"
-
-                onClicked: click()
-
-                function click() {
-                    scritedView.rewind()
-                }
+                icon.source: "qrc:/icons/mediaplayer/rewind_10.png"
             }
 
-            FlatToolButton {
-                ToolTip.text: "Rewind half second.\t(←)"
+            Action {
+                readonly property string tooltip: "Rewind one second"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Left)
 
-                ShortcutsModelItem.priority: -2
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Rewind 1s"
-                ShortcutsModelItem.shortcut: "←"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                enabled: ActionManager.canHandle
+                objectName: "rewind1"
+                shortcut: defaultShortcut
+                text: "Rewind 1s"
 
-                enabled: scritedView.mediaIsLoaded
-                iconSource: "qrc:/icons/mediaplayer/fast_rewind.png"
-
-                onClicked: click()
-
-                function click() {
-                    scritedView.miniRewind()
-                }
+                icon.source: "qrc:/icons/mediaplayer/fast_rewind.png"
             }
 
-            FlatToolButton {
-                ToolTip.text: "Forward half second.\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+→)"
+            Action {
+                readonly property string tooltip: "Forward one second"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Right)
 
-                ShortcutsModelItem.priority: -3
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Forward 1s"
-                ShortcutsModelItem.shortcut: "→"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                enabled: ActionManager.canHandle
+                objectName: "forward1"
+                shortcut: defaultShortcut
+                text: "Forward 1s"
 
-                enabled: scritedView.mediaIsLoaded
-                iconSource: "qrc:/icons/mediaplayer/fast_forward.png"
-
-                onClicked: click()
-
-                function click() {
-                    scritedView.miniForward()
-                }
+                icon.source: "qrc:/icons/mediaplayer/fast_forward.png"
             }
 
-            FlatToolButton {
-                ToolTip.text: "Forward 10 seconds.\t(→)"
+            Action {
+                readonly property string tooltip: "Forward ten seconds"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Right)
 
-                ShortcutsModelItem.priority: -4
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Forward 10s"
-                ShortcutsModelItem.shortcut: "Ctrl+→"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                enabled: ActionManager.canHandle
+                objectName: "forward10"
+                shortcut: defaultShortcut
+                text: "Forward 10s"
 
-                enabled: scritedView.mediaIsLoaded
-                iconSource: "qrc:/icons/mediaplayer/forward_10.png"
-
-                onClicked: click()
-
-                function click() {
-                    scritedView.forward()
-                }
+                icon.source: "qrc:/icons/mediaplayer/forward_10.png"
             }
 
-            FlatToolButton {
-                ToolTip.text: "Previous Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↑)"
+            Action {
+                readonly property string tooltip: "Previous Scene"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Up)
 
-                ShortcutsModelItem.priority: -5
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Previous Scene"
-                ShortcutsModelItem.shortcut: "Ctrl+↑"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                enabled: ActionManager.canHandle
+                objectName: "previousScene"
+                shortcut: defaultShortcut
+                text: "Previous Scene"
 
-                enabled: scritedView.previousSceneAvailable
-                iconSource: "qrc:/icons/action/keyboard_arrow_up.png"
-
-                onClicked: click()
-
-                function click() {
-                    scritedView.scrollPreviousScene()
-                }
+                icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
             }
 
-            FlatToolButton {
-                ToolTip.text: "Next Scene\t(" + Scrite.app.polishShortcutTextForDisplay("Ctrl") + "+↓)"
+            Action {
+                readonly property string tooltip: "Next Scene"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Down)
 
-                ShortcutsModelItem.priority: -6
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Next Scene"
-                ShortcutsModelItem.shortcut: "Ctrl+↓"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                enabled: ActionManager.canHandle
+                objectName: "nextScene"
+                shortcut: defaultShortcut
+                text: "Next Scene"
 
-                enabled: scritedView.nextSceneAvailable
-                iconSource: "qrc:/icons/action/keyboard_arrow_down.png"
-
-                onClicked: click()
-
-                function click() {
-                    scritedView.scrollNextScene()
-                }
+                icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -7
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Scroll Up"
-                ShortcutsModelItem.shortcut: "↑"
-                ShortcutsModelItem.enabled: scritedView.canScrollUp
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Up)
+
+                enabled: ActionManager.canHandle
+                objectName: "scrollUp"
+                shortcut: defaultShortcut
+                text: "Scroll Up"
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -8
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Scroll Down"
-                ShortcutsModelItem.shortcut: "↓"
-                ShortcutsModelItem.enabled: scritedView.canScrollDown
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Down)
+
+                enabled: ActionManager.canHandle
+                objectName: "scrollDown"
+                shortcut: defaultShortcut
+                text: "Scroll Down"
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -9
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Previous Page"
-                ShortcutsModelItem.shortcut: "Alt+↑"
-                ShortcutsModelItem.enabled: scritedView.canScrollUp
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Up)
+
+                enabled: ActionManager.canHandle
+                objectName: "previousPage"
+                shortcut: defaultShortcut
+                text: "Previous Page"
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -10
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Next Page"
-                ShortcutsModelItem.shortcut: "Alt+↓"
-                ShortcutsModelItem.enabled: scritedView.canScrollDown
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Down)
+
+                enabled: ActionManager.canHandle
+                objectName: "nextPage"
+                shortcut: defaultShortcut
+                text: "Next Page"
             }
 
-            FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/sync_with_screenplay.png"
-                ToolTip.text: "Use video time as current scene time offset.\t(> or .)"
+            Action {
+                readonly property string tooltip: "Use video time as current scene time offset"
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Greater)
 
-                ShortcutsModelItem.priority: -11
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Sync Time"
-                ShortcutsModelItem.shortcut: "> ."
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: click()
+                enabled: ActionManager.canHandle
+                objectName: "syncTime"
+                shortcut: defaultShortcut
+                text: "Sync Time"
 
-                enabled: scritedView.screenplaySplitsCount > 0 && scritedView.mediaIsLoaded
-                onClicked: click()
-
-                function click() {
-                    scritedView.syncVideoTimeWithScreenplayOffsets(true)
-                }
+                icon.source: "qrc:/icons/mediaplayer/sync_with_screenplay.png"
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -12
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Adjust Offsets"
-                ShortcutsModelItem.shortcut: "Ctrl+>"
-                ShortcutsModelItem.enabled: enabled
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Greater)
+
+                enabled: ActionManager.canHandle
+                objectName: "adjustOffsets"
+                shortcut: defaultShortcut
+                text: "Adjust Offsets"
             }
 
-            FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/reset_screenplay_offsets.png"
-                ToolTip.text: "Reset time offset of all scenes."
-                enabled: scritedView.screenplaySplitsCount > 0
-                onClicked: scritedView.resetScreenplayOffsets()
+            Action {
+                readonly property string tooltip: "Reset time offset of all scenes."
+
+                enabled: ActionManager.canHandle
+                objectName: "resetOffsets"
+                text: "Reset Offsets"
+
+                icon.source: "qrc:/icons/mediaplayer/reset_screenplay_offsets.png"
             }
 
-            FlatToolButton {
-                iconSource: "qrc:/icons/mediaplayer/time_column.png"
-                ToolTip.text: "Toggle time column."
-                enabled: scritedView.screenplaySplitsCount > 0
-                down: scritedView.timeOffsetVisible
-                onClicked: scritedView.toggleTimeOffsetDisplay()
+            Action {
+                readonly property string tooltip: "Toggle time column."
+
+                checkable: true
+                checked: false
+                enabled: ActionManager.canHandle
+                objectName: "toggleTimeColumn"
+                text: "Time Column"
+
+                icon.source: "qrc:/icons/mediaplayer/time_column.png"
             }
 
-            VclCheckBox {
-                ToolTip.text: "Check this to keep media playback and screenplay in sync."
-                ToolTip.visible: hovered
+            Action {
+                readonly property string tooltip: "Check this to keep media playback and screenplay in sync."
 
-                ShortcutsModelItem.priority: -13
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Auto Scroll " + (checked ? "OFF" : "ON")
-                ShortcutsModelItem.shortcut: "+"
-                ShortcutsModelItem.enabled: enabled
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: scritedView.playbackScreenplaySync = checked
-
-                anchors.verticalCenter: parent.verticalCenter
-
+                checkable: true
+                checked: false
+                enabled: ActionManager.canHandle
+                objectName: "autoScroll"
                 text: "Auto Scroll"
-                checked: scritedView.playbackScreenplaySync
-                enabled: scritedView.mediaIsLoaded
-                focusPolicy: Qt.NoFocus
-                hoverEnabled: true
-
-                onToggled: scritedView.playbackScreenplaySync = checked
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -14
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Decrease Video Height"
-                ShortcutsModelItem.shortcut: "("
-                ShortcutsModelItem.enabled: true
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceLeft)
+
+                enabled: ActionManager.canHandle
+                objectName: "decreaseVideoHeight"
+                shortcut: defaultShortcut
+                text: "Decrease Video Height"
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -14
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Increase Video Height"
-                ShortcutsModelItem.shortcut: ")"
-                ShortcutsModelItem.enabled: true
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceRight)
+
+                enabled: ActionManager.canHandle
+                objectName: "increaseVideoHeight"
+                shortcut: defaultShortcut
+                text: "Increase Video Height"
             }
 
-            QtObject {
-                ShortcutsModelItem.priority: -15
-                ShortcutsModelItem.group: "Scrited"
-                ShortcutsModelItem.title: "Default Video Height"
-                ShortcutsModelItem.shortcut: "*"
-                ShortcutsModelItem.enabled: true
+            Action {
+                readonly property bool visible: false
+                readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Asterisk)
+
+                enabled: ActionManager.canHandle
+                objectName: "resetVideoHeight"
+                shortcut: defaultShortcut
+                text: "Reset Video Height"
             }
         }
     }

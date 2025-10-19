@@ -197,7 +197,6 @@
         <file>qml/screenplayeditor/ScreenplayEditorSearchBar.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorSidePanel.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorStatusBar.qml</file>
-        <file>qml/screenplayeditor/ScreenplayEditorToolbar.qml</file>
         <file>qml/screenplayeditor/ScreenplayElementListView.qml</file>
         <file>qml/screenplayeditor/ScreenplaySceneElementsContextMenu.qml</file>
         <file>qml/scrited/qmldir</file>
@@ -265,12 +264,12 @@
         <file>qml/dialogs/settingsdialog/LanguageOptionsPage.qml</file>
         <file>qml/helpers/ShortcutField.qml</file>
         <file>qml/dialogs/LanguageOptionsDialog.qml</file>
-        <file>qml/helpers/LanguageMenu.qml</file>
         <file>qml/globals/ActionHub.qml</file>
         <file>qml/helpers/ActionManagerToolBar.qml</file>
         <file>qml/helpers/ActionManagerMenu.qml</file>
         <file>qml/helpers/ActionManagerToolButton.qml</file>
         <file>qml/helpers/ActionToolButton.qml</file>
         <file>qml/helpers/ColorPalette.qml</file>
+        <file>qml/mainwindow/MainToolBar.qml</file>
     </qresource>
 </RCC>

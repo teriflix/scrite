@@ -33,6 +33,9 @@ public:
 
     static ActionManagerAttached *qmlAttachedProperties(QObject *object);
 
+    Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
+    Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
+
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     void setTitle(const QString &val);
     QString title() const { return m_title; }
@@ -109,6 +112,9 @@ public:
     Q_PROPERTY(bool canHandle READ canHandle NOTIFY canHandleChanged)
     bool canHandle() const;
     Q_SIGNAL void canHandleChanged();
+
+    Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
+    Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
 
     Q_INVOKABLE bool trigger();
     Q_INVOKABLE bool triggerAll();

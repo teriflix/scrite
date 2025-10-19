@@ -66,6 +66,16 @@ ActionManagerAttached *ActionManager::qmlAttachedProperties(QObject *object)
     return new ActionManagerAttached(object);
 }
 
+QString ActionManager::shortcut(int k1, int k2, int k3, int k4)
+{
+    return keySequence(k1, k2, k3, k4).toString();
+}
+
+QKeySequence ActionManager::keySequence(int k1, int k2, int k3, int k4)
+{
+    return QKeySequence(k1, k2, k3, k4);
+}
+
 void ActionManager::setTitle(const QString &val)
 {
     if (m_title == val)
@@ -297,6 +307,16 @@ void ActionManagerAttached::setTarget(ActionManager *val)
 bool ActionManagerAttached::canHandle() const
 {
     return ActionHandlers::instance()->findFirst(m_action, true) != nullptr;
+}
+
+QString ActionManagerAttached::shortcut(int k1, int k2, int k3, int k4)
+{
+    return ActionManager::shortcut(k1, k2, k3, k4);
+}
+
+QKeySequence ActionManagerAttached::keySequence(int k1, int k2, int k3, int k4)
+{
+    return ActionManager::keySequence(k1, k2, k3, k4);
 }
 
 bool ActionManagerAttached::trigger()
