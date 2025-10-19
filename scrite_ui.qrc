@@ -270,6 +270,9 @@
         <file>qml/helpers/ActionManagerToolButton.qml</file>
         <file>qml/helpers/ActionToolButton.qml</file>
         <file>qml/helpers/ColorPalette.qml</file>
-        <file>qml/mainwindow/MainToolBar.qml</file>
+        <file>qml/mainwindow/Header.qml</file>
+        <file>qml/mainwindow/Workspace.qml</file>
+        <file>qml/mainwindow/ScreenplayTab.qml</file>
+        <file>qml/mainwindow/StructureTab.qml</file>
     </qresource>
 </RCC>

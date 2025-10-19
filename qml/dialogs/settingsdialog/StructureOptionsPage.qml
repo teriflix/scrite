@@ -140,7 +140,7 @@ Item {
                     enabled: Scrite.document.structure.elementStacks.objectCount === 0
                     checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
                     onToggled: {
-                        Announcement.shout(Runtime.announcementIds.reloadMainUiRequest)
+                        Runtime.resetMainWindowUi()
                         Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
                         Scrite.document.structure.indexCardContent = Structure.Synopsis
                     }

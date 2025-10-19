@@ -11,7 +11,6 @@
 **
 ****************************************************************************/
 
-
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 1.15
@@ -23,13 +22,17 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
-Item {
+Rectangle {
     id: root
+
+    color: Runtime.colors.primary.c50.background
 
     implicitHeight: _layout.height
 
     RowLayout {
         id: _layout
+
+        width: parent.width
 
         RowLayout {
             Layout.rightMargin: Runtime.iconImageSize * 2
@@ -142,6 +145,8 @@ Item {
         RowLayout {
             id: _group2
 
+            visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab
+
             ActionManagerToolBar {
                 actionManager: ActionHub.paragraphFormats
             }
@@ -176,6 +181,56 @@ Item {
                 actionManager: ActionHub.screenplayOperations
             }
         }
+
+        ActionManagerToolBar {
+            actionManager: ActionHub.scritedOptions
+
+            visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab
+        }
+
+        Item {
+            Layout.fillWidth: true
+        }
+
+        RowLayout {
+            id: _mainTabs
+
+            Repeater {
+                model: ActionHub.mainWindowTabs
+
+                Button {
+                    required property var qmlAction
+
+                    Material.primary: Runtime.colors.primary.key
+                    Material.accent: Runtime.colors.accent.key
+                    Material.theme: Runtime.colors.theme
+
+                    ToolTip.text: {
+                        const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
+                        const sc = Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+                        return sc === "" ? tt : (tt + " (" + sc + " )")
+                    }
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                    ToolTip.visible: ToolTip.text !== "" && hovered
+
+                    action: qmlAction
+                    display: checked ? Button.TextBesideIcon : Button.IconOnly
+                    flat: true
+                    visible: qmlAction.visible !== undefined ? qmlAction.visible === true : true
+
+                    background: Item {
+                        Rectangle {
+                            anchors.fill: parent
+                            anchors.margins: -5
+
+                            color: qmlAction.checked ? Runtime.colors.primary.c300.background : Runtime.colors.transparent
+                        }
+                    }
+                }
+            }
+        }
+
+        UserAccountToolButton { }
     }
 
     ActionHandler {

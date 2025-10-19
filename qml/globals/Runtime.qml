@@ -24,7 +24,6 @@ Item {
 
     enum MainWindowTab { ScreenplayTab, StructureTab, NotebookTab, ScritedTab }
 
-    signal activateMainWindowTab(int tabType)
     signal resetMainWindowUi(var callback)
 
     readonly property int stdAnimationDuration: 250
@@ -655,6 +654,7 @@ Item {
         readonly property string characterNotesRequest: "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8"
         readonly property string closeDialogBoxRequest: "A6456A87-FC8C-405B-BDD7-7625F86272BA"
         readonly property string closeHomeScreenRequest: "4F8F6B5B-5BEB-4D01-97BA-B0018241BD38"
+        readonly property string embeddedTabRequest: "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
         readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
         readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
         readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
@@ -691,6 +691,34 @@ Item {
         parent = _parent
         visible = false
         anchors.fill = parent
+    }
+
+    function activateMainWindowTab(tab) {
+        switch(tab) {
+        case Runtime.MainWindowTab.ScreenplayTab:
+            mainWindowTab = tab
+            break
+        case Runtime.MainWindowTab.StructureTab:
+            mainWindowTab = tab
+            if(showNotebookInStructure)
+                Announcement.shout(announcementIds.embeddedTabRequest, "Structure")
+            break
+        case Runtime.MainWindowTab.NotebookTab:
+            if(showNotebookInStructure)
+                Announcement.shout(announcementIds.embeddedTabRequest, "Notebook")
+            else
+                mainWindowTab = tab
+            break
+        case Runtime.MainWindowTab.ScritedTab:
+            if(workspaceSettings.showScritedTab)
+                mainWindowTab = tab
+            else
+                mainWindowTab = Runtime.MainWindowTab.ScreenplayTab
+            break
+        default:
+            mainWindowTab = Runtime.MainWindowTab.ScreenplayTab
+            break
+        }
     }
 
     function showHelpTip(tipName) {
