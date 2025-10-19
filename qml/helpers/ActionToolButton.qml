@@ -29,12 +29,15 @@ ToolButton {
     Material.primary: Runtime.colors.primary.key
     Material.theme: Runtime.colors.theme
 
-    ToolTip.text: action.tooltip !== undefined ? action.tooltip :
-                  (display === ToolButton.IconOnly ? action.text + "\t" + Scrite.app.polishShortcutTextForDisplay(action.shortcut) : "")
+    ToolTip.text: {
+        const tt = action.tooltip !== undefined ? action.tooltip : action.text
+        const sc = Scrite.app.polishShortcutTextForDisplay(action.shortcut)
+        return sc === "" ? tt : (tt + " ( " + sc + " )")
+    }
     ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
     ToolTip.visible: ToolTip.text !== "" && hovered
 
-    display: ToolButton.IconOnly
+    display: action.icon.source == "" && action.icon.name == "" ? ToolButton.TextOnly : ToolButton.IconOnly
     focusPolicy: Qt.NoFocus
     visible: action.visible !== undefined ? action.visible : true
 

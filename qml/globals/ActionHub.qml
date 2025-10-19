@@ -14,12 +14,15 @@
 pragma Singleton
 
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import Qt.labs.settings 1.0
+import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
 import "qrc:/qml/tasks"
+import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 
 Item {
@@ -221,9 +224,9 @@ Item {
 
             icon.source: {
                 if(Scrite.app.isMacOSPlatform)
-                    return "qrc:/icons/navigation/shortcuts_macos.png"
+                return "qrc:/icons/navigation/shortcuts_macos.png"
                 if(Scrite.app.isWindowsPlatform)
-                    return "qrc:/icons/navigation/shortcuts_windows.png"
+                return "qrc:/icons/navigation/shortcuts_windows.png"
                 return "qrc:/icons/navigation/shortcuts_linux.png"
             }
 
@@ -285,12 +288,11 @@ Item {
         delegate: Item {
             required property int index
             required property var language // This is of type Language, but we have to use var here.
-                                           // You cannot use Q_GADGET struct names as type names in QML
-                                           // that privilege is only reserved for QObject types.
+            // You cannot use Q_GADGET struct names as type names in QML
+            // that privilege is only reserved for QObject types.
 
             Action {
                 property int sortOrder: index
-                property string tooltip: text + "\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
 
                 ActionManager.target: root.languageOptions
 
@@ -311,7 +313,7 @@ Item {
             readonly property string defaultShortcut: "Ctrl+K"
             property bool visible: enabled
 
-            property string tooltip: "Show English to " + Runtime.language.active.name + " alphabet mappings.\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
+            property string tooltip: "Show English to " + Runtime.language.active.name + " alphabet mappings."
 
             enabled: Runtime.language.activeCode !== QtLocale.English &&
                      Runtime.language.activeTransliterator.name === DefaultTransliteration.driver &&
@@ -326,8 +328,11 @@ Item {
 
     readonly property ActionManager paragraphFormats: ActionManager {
         function action(type) { return _paragraphFormatActions.action(type) }
+        function setBinder(binder) { root.setBinder(binder) }
+        function resetBinder(binder) { root.resetBinder(binder) }
 
         title: "Paragraph Format"
+        objectName: "paragraphFormats"
     }
 
     Repeater {
@@ -355,17 +360,18 @@ Item {
                 property int sortOrder: index
                 property string defaultShortcut: "Ctrl+" + index
 
-                property string tooltip: modelData.display + "\t" + Scrite.app.polishShortcutTextForDisplay(shortcut)
+                property string tooltip: modelData.display
 
                 ActionManager.target: root.paragraphFormats
 
                 checkable: true
                 checked: _private.binder !== null ? (_private.binder.currentElement ? _private.binder.currentElement.type === modelData.value : false) : false
                 enabled: Runtime.allowAppUsage && _private.binder !== null
-                icon.source: modelData.icon
                 objectName: modelData.name
                 shortcut: defaultShortcut
                 text: modelData.display
+
+                icon.source: modelData.icon
 
                 onTriggered: {
                     if(index === 0) {
@@ -474,6 +480,156 @@ Item {
             text: "Reload"
 
             icon.source: "qrc:/icons/navigation/refresh.png"
+        }
+    }
+
+    readonly property ActionManager markupTools: ActionManager {
+        function setBinder(binder) { root.setBinder(binder) }
+        function resetBinder(binder) { root.resetBinder(binder) }
+
+        title: "Markup Tools"
+        objectName: "markupTools"
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+B"
+
+            checkable: true
+            checked: _private.textFormat ? _private.textFormat.bold : false
+            enabled: _private.textFormat && Runtime.allowAppUsage
+            objectName: "bold"
+            shortcut: defaultShortcut
+            text: "Bold"
+
+            icon.source: "qrc:/icons/editor/format_bold.png"
+
+            onTriggered: _private.textFormat.toggleBold()
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+I"
+
+            enabled: _private.textFormat && Runtime.allowAppUsage
+            shortcut: defaultShortcut
+            checkable: true
+            checked: _private.textFormat ? _private.textFormat.italics : false
+            objectName: "italics"
+            text: "Italics"
+
+            icon.source: "qrc:/icons/editor/format_italics.png"
+
+            onTriggered: _private.textFormat.toggleItalics()
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+U"
+
+            enabled: _private.textFormat && Runtime.allowAppUsage
+            shortcut: defaultShortcut
+            checkable: true
+            checked: _private.textFormat ? _private.textFormat.underline : false
+            objectName: "underline"
+            text: "Underline"
+
+            icon.source: "qrc:/icons/editor/format_underline.png"
+
+            onTriggered: _private.textFormat.toggleUnderline()
+        }
+
+        Action {
+            readonly property string defaultShortcut: "Ctrl+R"
+
+            enabled: _private.textFormat && Runtime.allowAppUsage
+            shortcut: defaultShortcut
+            checkable: true
+            checked: _private.textFormat ? _private.textFormat.strikeout : false
+            objectName: "strikeout"
+            text: "Strikeout"
+
+            icon.source: "qrc:/icons/editor/format_strikethrough.png"
+
+            onTriggered: _private.textFormat.toggleStrikeout()
+        }
+
+        Action {
+            enabled: _private.textFormat && Runtime.allowAppUsage
+            objectName: "colors"
+            text: "Colors"
+
+            onTriggered: (source) => {
+                let popup = _private.textColorsPopup.createObject(source, {"source": source, "textFormat": _private.textFormat})
+                if(popup) {
+                    popup.closed.connect(popup.destroy)
+                    popup.open()
+                }
+            }
+        }
+
+        Action {
+            enabled: _private.textFormat && Runtime.allowAppUsage
+            objectName: "clear"
+            text: "Clear Formatting"
+
+            icon.source: "qrc:/icons/editor/format_clear.png"
+
+            onTriggered: _private.textFormat.reset()
+        }
+
+        Action {
+            enabled: _private.sceneElement && Runtime.allowAppUsage
+            checkable: true
+            checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignLeft : false
+            objectName: "alignLeft"
+            text: "Left Align"
+
+            icon.source: "qrc:/icons/editor/format_align_left.png"
+
+            onTriggered: _private.toggleSelectedElementsAlignment(Qt.AlignLeft)
+        }
+
+        Action {
+            enabled: _private.sceneElement && Runtime.allowAppUsage
+            checkable: true
+            checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignHCenter : false
+            objectName: "alignCenter"
+            text: "Center Align"
+
+            icon.source: "qrc:/icons/editor/format_align_center.png"
+
+            onTriggered: _private.toggleSelectedElementsAlignment(Qt.AlignHCenter)
+        }
+
+        Action {
+            enabled: _private.sceneElement && Runtime.allowAppUsage
+            checkable: true
+            checked: _private.sceneElement ? _private.sceneElement.alignment === Qt.AlignRight : false
+            objectName: "alignRight"
+            text: "Right Align"
+
+            icon.source: "qrc:/icons/editor/format_align_right.png"
+
+            onTriggered: _private.toggleSelectedElementsAlignment(Qt.AlignRight)
+        }
+
+        Action {
+            readonly property string tooltip: "ALL CAPS"
+            readonly property string defaultShortcut: "Shift+F3"
+
+            enabled: _private.binder && Runtime.allowAppUsage
+            text: "AB"
+            objectName: "toUppercase"
+
+            onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.UpperCase)
+        }
+
+        Action {
+            readonly property string tooltip: "all small"
+            readonly property string defaultShortcut: "Ctrl+Shift+F3"
+
+            enabled: _private.binder && Runtime.allowAppUsage
+            text: "ab"
+            objectName: "toLowercase"
+
+            onTriggered: _private.binder.changeTextCase(SceneDocumentBinder.LowerCase)
         }
     }
 
@@ -729,6 +885,8 @@ Item {
     QtObject {
         id: _private
 
+        property TextFormat textFormat: binder ? binder.textFormat : null
+        property SceneElement sceneElement: binder ? binder.currentElement : null
         property SceneDocumentBinder binder // reference to the current binder on which paragraph formatting must be applied
 
         function setBinder(binder) {
@@ -750,10 +908,106 @@ Item {
             { "value": SceneElement.Transition, "name": "transitionParagraph", "display": "Transition", "icon": "qrc:/icons/screenplay/transition.png" }
         ]
 
+        readonly property Component textColorsPopup: Popup {
+            id: _textColorsPopup
+
+            required property Item source
+            required property TextFormat textFormat
+
+            parent: source
+
+            x: 0
+            y: source.height
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+            contentItem: Item {
+                implicitWidth: 500
+                implicitHeight: 250
+
+                ColumnLayout {
+                    anchors.centerIn: parent
+
+                    spacing: 10
+
+                    Label {
+                        Layout.fillWidth: true
+
+                        text: "text"
+                        font: Runtime.sceneEditorFontMetrics.font
+                        color: _textColorsPopup.textFormat.textColor === Runtime.colors.transparent ? "black" : _textColorsPopup.textFormat.textColor
+                        padding: Runtime.sceneEditorFontMetrics.averageCharacterWidth
+                        horizontalAlignment: Text.AlignHCenter
+
+                        background: Item {
+                            Rectangle {
+                                anchors.fill: parent
+                                anchors.margins: 1
+
+                                border.width: 1
+                                border.color: "black"
+                                color: _textColorsPopup.textFormat.backgroundColor
+                            }
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+
+                        spacing: parent.spacing
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+
+                            Text {
+                                Layout.fillWidth: true
+
+                                font: Runtime.minimumFontMetrics.font
+                                text: "Background Color"
+                            }
+
+                            ColorPalette {
+                                colors: Runtime.colors.forDocument
+                                selectedColor: _textColorsPopup.textFormat.backgroundColor
+                                onColorPicked: (color) => {
+                                    _textColorsPopup.textFormat.backgroundColor = color
+                                }
+                            }
+                        }
+
+                        Rectangle {
+                            Layout.fillHeight: true
+                            Layout.preferredWidth: 1
+
+                            color: Runtime.colors.primary.borderColor
+                        }
+
+                        ColumnLayout {
+                            Layout.fillWidth: true
+
+                            Text {
+                                Layout.fillWidth: true
+
+                                font: Runtime.minimumFontMetrics.font
+                                text: "Text Color"
+                            }
+
+                            ColorPalette {
+                                colors: Runtime.colors.forDocument
+                                selectedColor: _textColorsPopup.textFormat.textColor
+                                onColorPicked: (color) => {
+                                    _textColorsPopup.textFormat.textColor = color
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         property int breakInsertIndex: {
             var idx = Scrite.document.screenplay.currentElementIndex
             if(idx < 0)
-                return -1
+            return -1
 
             ++idx
 
@@ -761,11 +1015,11 @@ Item {
                 while(idx < Scrite.document.screenplay.elementCount) {
                     const e = Scrite.document.screenplay.elementAt(idx)
                     if(e === null)
-                        break
+                    break
                     if(e.elementType === ScreenplayElement.BreakElementType)
-                        ++idx
+                    ++idx
                     else
-                        break
+                    break
                 }
             }
 
@@ -807,6 +1061,14 @@ Item {
                 Scrite.document.screenplay.addBreakElement(Screenplay.Interval)
             else
                 Scrite.document.screenplay.insertBreakElement(Screenplay.Interval, _private.breakInsertIndex)
+        }
+
+        function toggleSelectedElementsAlignment(givenAlignment) {
+            const alignment = _private.sceneElement.alignment === givenAlignment ? 0 : givenAlignment
+            _private.sceneElement.alignment = alignment
+
+            const selectedElements = binder.selectedElements
+            selectedElements.forEach( (element) => { element.alignment = alignment })
         }
     }
 }

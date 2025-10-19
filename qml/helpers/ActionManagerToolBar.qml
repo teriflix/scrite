@@ -48,26 +48,11 @@ ToolBar {
         Repeater {
             model: root.actionManager
 
-            ToolButton {
-                required property int index
+            ActionToolButton {
                 required property var qmlAction
-
-                Material.accent: Runtime.colors.accent.key
-                Material.primary: Runtime.colors.primary.key
-                Material.theme: Runtime.colors.theme
-
-                ToolTip.text: qmlAction.tooltip !== undefined ? qmlAction.tooltip :
-                              (display === ToolButton.IconOnly ? qmlAction.text + "\t" + Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut) : "")
-                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                ToolTip.visible: ToolTip.text !== "" && hovered
 
                 flat: root.flat
                 action: qmlAction
-                visible: qmlAction.visible !== undefined ? qmlAction.visible : true
-                display: root.display
-                focusPolicy: Qt.NoFocus
-
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
         }
     }

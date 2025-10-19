@@ -54,8 +54,11 @@ Menu {
             Material.primary: Runtime.colors.primary.key
             Material.theme: Runtime.colors.theme
 
-            ToolTip.text: objectItem.tooltip !== undefined ? objectItem.tooltip :
-                          ( [objectItem.text, Scrite.app.polishShortcutTextForDisplay(objectItem.shortcut)].join("  --  ") )
+            ToolTip.text: {
+                const tt = objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.text
+                const sc = Scrite.app.polishShortcutTextForDisplay(objectItem.shortcut)
+                return sc === "" ? tt : (tt + " (" + sc + " )")
+            }
             ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
             ToolTip.visible: ToolTip.text !== "" && hovered
 

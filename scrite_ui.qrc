@@ -271,5 +271,6 @@
         <file>qml/helpers/ActionManagerMenu.qml</file>
         <file>qml/helpers/ActionManagerToolButton.qml</file>
         <file>qml/helpers/ActionToolButton.qml</file>
+        <file>qml/helpers/ColorPalette.qml</file>
     </qresource>
 </RCC>

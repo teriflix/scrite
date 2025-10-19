@@ -34,7 +34,6 @@ Row {
     function set(_editor, _binder) {
         sceneTextEditor = _editor
         sceneDocumentBinder = _binder
-        FloatingMarkupToolsDock.sceneDocumentBinder = _binder
     }
 
     function reset(_editor, _binder) {
@@ -42,7 +41,6 @@ Row {
             sceneTextEditor = null
         if(sceneDocumentBinder === _binder) {
             sceneDocumentBinder = null
-            FloatingMarkupToolsDock.sceneDocumentBinder = null
         }
     }
 
