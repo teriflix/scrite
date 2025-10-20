@@ -620,12 +620,18 @@ Item {
         }
 
         Action {
+            property bool down: popup !== null
+            property QtObject popup
+
             enabled: _private.textFormat && Runtime.allowAppUsage
             objectName: "colors"
             text: "Colors"
 
             onTriggered: (source) => {
-                let popup = _private.textColorsPopup.createObject(source, {"source": source, "textFormat": _private.textFormat})
+                if(popup)
+                    popup.destroy()
+
+                popup = _private.textColorsPopup.createObject(source, {"source": source, "textFormat": _private.textFormat})
                 if(popup) {
                     popup.closed.connect(popup.destroy)
                     popup.open()
@@ -911,6 +917,370 @@ Item {
         }
     }
 
+    readonly property ActionManager structureCanvasOperations: ActionManager {
+        title: "Structure Canvas"
+        objectName: "structureCanvasOperations"
+
+        Action {
+            property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
+
+            enabled: ActionHandler.canHandle
+            objectName: "newScene"
+            text: "New Scene"
+
+            icon.source: "qrc:/icons/action/add_scene.png"
+        }
+
+        Action {
+            property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
+
+            enabled: ActionHandler.canHandle
+            objectName: "newAnnotation"
+            text: "New Annotation"
+
+            icon.source: "qrc:/icons/action/add_annotation.png"
+        }
+
+        Action {
+            checkable: true
+            checked: ActionHandler.canHandle ? ActionHandler.active.checked : false
+            enabled: ActionHandler.canHandle
+            objectName: "selectionMode"
+            text: "Selection Mode"
+
+            icon.source: "qrc:/icons/action/selection_drag.png"
+        }
+
+        Action {
+            enabled: ActionHandler.canHandle
+            objectName: "selectAll"
+            text: "Select All"
+
+            icon.source: "qrc:/icons/action/select_all.png"
+        }
+
+        Action {
+            enabled: ActionHandler.canHandle
+            objectName: "layout"
+            text: "Layout Options"
+
+            icon.source: "qrc:/icons/action/layout_options.png"
+        }
+
+        Action {
+            checkable: true
+            checked: ActionHandler.canHandle ? ActionHandler.active.checked : false
+            enabled: ActionHandler.canHandle
+            objectName: "beatBoardLayout"
+            text: "Beat Board Layout"
+
+            icon.source: "qrc:/icons/action/layout_beat_sheet.png"
+        }
+
+        Action {
+            property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
+
+            enabled: ActionHandler.canHandle
+            objectName: "grouping"
+            text: "Grouping Options"
+
+            icon.source: "qrc:/icons/action/layout_grouping.png"
+        }
+
+        Action {
+            property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
+
+            enabled: ActionHandler.canHandle
+            objectName: "tag"
+            text: "Tag"
+
+            icon.source: "qrc:/icons/action/tag.png"
+        }
+
+        Action {
+            property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
+
+            enabled: ActionHandler.canHandle
+            objectName: "sceneColor"
+            text: "Color"
+
+            icon.source: ActionHandler.canHandle ? ActionHandler.active.iconSource : "image://color/gray/1"
+        }
+
+        Action {
+            readonly property string tooltip: "Scene Type (Action/Montage/Song)"
+            property bool down: ActionHandler.canHandle ? ActionHandler.active.down : false
+
+            enabled: ActionHandler.canHandle
+            objectName: "sceneType"
+            text: "Type"
+
+            icon.source: ActionHandler.canHandle ? ActionHandler.active.iconSource : "qrc:/icons/content/standard_scene.png"
+        }
+
+        Action {
+            enabled: ActionHandler.canHandle
+            objectName: "delete"
+            text: "Delete"
+
+            icon.source: "qrc:/icons/action/delete.png"
+        }
+
+        Action {
+            property Action editCopy: editOptions.find("copy")
+
+            enabled: ActionHandler.canHandle
+            objectName: "copy"
+            shortcut: editCopy.shortcut
+            text: "Copy"
+
+            icon.source: "qrc:/icons/content/content_copy.png"
+        }
+
+        Action {
+            property Action editPaste: editOptions.find("paste")
+
+            enabled: ActionHandler.canHandle
+            objectName: "paste"
+            shortcut: editPaste.shortcut
+            text: "Paste"
+
+            icon.source: "qrc:/icons/content/content_paste.png"
+        }
+
+        Action {
+            enabled: ActionHandler.canHandle
+            objectName: "pdfExport"
+            text: "Export to PDF"
+
+            icon.source: "qrc:/icons/file/generate_pdf.png"
+        }
+    }
+
+    readonly property ActionManager scritedOptions : ActionManager {
+        title: "Scrited"
+        objectName: "scritedOptions"
+
+        Action {
+            readonly property string tooltip: "Load a video file for this screenplay"
+
+            enabled: ActionHandler.canHandle
+            objectName: "loadMovie"
+            text: "Load Movie"
+
+            icon.source: "qrc:/icons/mediaplayer/movie.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Toggle media playback"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Space)
+
+            checkable: true
+            enabled: ActionHandler.canHandle
+            objectName: "loadMovie"
+            shortcut: defaultShortcut
+            text: checked ? "Pause" : "Play"
+
+            icon.source: checked ? "qrc:/icons/mediaplayer/pause.png" : "qrc:/icons/mediaplayer/play_arrow.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Rewind 10 seconds"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Left)
+
+            enabled: ActionHandler.canHandle
+            objectName: "rewind10"
+            shortcut: defaultShortcut
+            text: "Rewind 10s"
+
+            icon.source: "qrc:/icons/mediaplayer/rewind_10.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Rewind one second"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Left)
+
+            enabled: ActionHandler.canHandle
+            objectName: "rewind1"
+            shortcut: defaultShortcut
+            text: "Rewind 1s"
+
+            icon.source: "qrc:/icons/mediaplayer/fast_rewind.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Forward one second"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Right)
+
+            enabled: ActionHandler.canHandle
+            objectName: "forward1"
+            shortcut: defaultShortcut
+            text: "Forward 1s"
+
+            icon.source: "qrc:/icons/mediaplayer/fast_forward.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Forward ten seconds"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Right)
+
+            enabled: ActionHandler.canHandle
+            objectName: "forward10"
+            shortcut: defaultShortcut
+            text: "Forward 10s"
+
+            icon.source: "qrc:/icons/mediaplayer/forward_10.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Previous Scene"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Up)
+
+            enabled: ActionHandler.canHandle
+            objectName: "previousScene"
+            shortcut: defaultShortcut
+            text: "Previous Scene"
+
+            icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Next Scene"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Down)
+
+            enabled: ActionHandler.canHandle
+            objectName: "nextScene"
+            shortcut: defaultShortcut
+            text: "Next Scene"
+
+            icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Up)
+
+            enabled: ActionHandler.canHandle
+            objectName: "scrollUp"
+            shortcut: defaultShortcut
+            text: "Scroll Up"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Down)
+
+            enabled: ActionHandler.canHandle
+            objectName: "scrollDown"
+            shortcut: defaultShortcut
+            text: "Scroll Down"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Up)
+
+            enabled: ActionHandler.canHandle
+            objectName: "previousPage"
+            shortcut: defaultShortcut
+            text: "Previous Page"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Down)
+
+            enabled: ActionHandler.canHandle
+            objectName: "nextPage"
+            shortcut: defaultShortcut
+            text: "Next Page"
+        }
+
+        Action {
+            readonly property string tooltip: "Use video time as current scene time offset"
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Greater)
+
+            enabled: ActionHandler.canHandle
+            objectName: "syncTime"
+            shortcut: defaultShortcut
+            text: "Sync Time"
+
+            icon.source: "qrc:/icons/mediaplayer/sync_with_screenplay.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Greater)
+
+            enabled: ActionHandler.canHandle
+            objectName: "adjustOffsets"
+            shortcut: defaultShortcut
+            text: "Adjust Offsets"
+        }
+
+        Action {
+            readonly property string tooltip: "Reset time offset of all scenes."
+
+            enabled: ActionHandler.canHandle
+            objectName: "resetOffsets"
+            text: "Reset Offsets"
+
+            icon.source: "qrc:/icons/mediaplayer/reset_screenplay_offsets.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Toggle time column."
+
+            checkable: true
+            checked: false
+            enabled: ActionHandler.canHandle
+            objectName: "toggleTimeColumn"
+            text: "Time Column"
+
+            icon.source: "qrc:/icons/mediaplayer/time_column.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Check this to keep media playback and screenplay in sync."
+
+            checkable: true
+            checked: false
+            enabled: ActionHandler.canHandle
+            objectName: "autoScroll"
+            text: "Auto Scroll"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceLeft)
+
+            enabled: ActionHandler.canHandle
+            objectName: "decreaseVideoHeight"
+            shortcut: defaultShortcut
+            text: "Decrease Video Height"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceRight)
+
+            enabled: ActionHandler.canHandle
+            objectName: "increaseVideoHeight"
+            shortcut: defaultShortcut
+            text: "Increase Video Height"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Asterisk)
+
+            enabled: ActionHandler.canHandle
+            objectName: "resetVideoHeight"
+            shortcut: defaultShortcut
+            text: "Reset Video Height"
+        }
+    }
+
     readonly property ActionManager applicationOptions: ActionManager {
         title: "Application"
         objectName: "applicationOptions"
@@ -937,230 +1307,6 @@ Item {
             objectName: "newScriteWindow"
 
             onTriggered: Scrite.app.launchNewInstance(Scrite.window)
-        }
-    }
-
-    readonly property ActionManager scritedOptions : ActionManager {
-        title: "Scrited"
-        objectName: "scritedOptions"
-
-        Action {
-            readonly property string tooltip: "Load a video file for this screenplay"
-
-            enabled: ActionManager.canHandle
-            objectName: "loadMovie"
-            text: "Load Movie"
-
-            icon.source: "qrc:/icons/mediaplayer/movie.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Toggle media playback"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Space)
-
-            checkable: true
-            enabled: ActionManager.canHandle
-            objectName: "loadMovie"
-            shortcut: defaultShortcut
-            text: checked ? "Pause" : "Play"
-
-            icon.source: checked ? "qrc:/icons/mediaplayer/pause.png" : "qrc:/icons/mediaplayer/play_arrow.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Rewind 10 seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Left)
-
-            enabled: ActionManager.canHandle
-            objectName: "rewind10"
-            shortcut: defaultShortcut
-            text: "Rewind 10s"
-
-            icon.source: "qrc:/icons/mediaplayer/rewind_10.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Rewind one second"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Left)
-
-            enabled: ActionManager.canHandle
-            objectName: "rewind1"
-            shortcut: defaultShortcut
-            text: "Rewind 1s"
-
-            icon.source: "qrc:/icons/mediaplayer/fast_rewind.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Forward one second"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Right)
-
-            enabled: ActionManager.canHandle
-            objectName: "forward1"
-            shortcut: defaultShortcut
-            text: "Forward 1s"
-
-            icon.source: "qrc:/icons/mediaplayer/fast_forward.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Forward ten seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Right)
-
-            enabled: ActionManager.canHandle
-            objectName: "forward10"
-            shortcut: defaultShortcut
-            text: "Forward 10s"
-
-            icon.source: "qrc:/icons/mediaplayer/forward_10.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Previous Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Up)
-
-            enabled: ActionManager.canHandle
-            objectName: "previousScene"
-            shortcut: defaultShortcut
-            text: "Previous Scene"
-
-            icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Next Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Down)
-
-            enabled: ActionManager.canHandle
-            objectName: "nextScene"
-            shortcut: defaultShortcut
-            text: "Next Scene"
-
-            icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Up)
-
-            enabled: ActionManager.canHandle
-            objectName: "scrollUp"
-            shortcut: defaultShortcut
-            text: "Scroll Up"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Down)
-
-            enabled: ActionManager.canHandle
-            objectName: "scrollDown"
-            shortcut: defaultShortcut
-            text: "Scroll Down"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Up)
-
-            enabled: ActionManager.canHandle
-            objectName: "previousPage"
-            shortcut: defaultShortcut
-            text: "Previous Page"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Down)
-
-            enabled: ActionManager.canHandle
-            objectName: "nextPage"
-            shortcut: defaultShortcut
-            text: "Next Page"
-        }
-
-        Action {
-            readonly property string tooltip: "Use video time as current scene time offset"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Greater)
-
-            enabled: ActionManager.canHandle
-            objectName: "syncTime"
-            shortcut: defaultShortcut
-            text: "Sync Time"
-
-            icon.source: "qrc:/icons/mediaplayer/sync_with_screenplay.png"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Greater)
-
-            enabled: ActionManager.canHandle
-            objectName: "adjustOffsets"
-            shortcut: defaultShortcut
-            text: "Adjust Offsets"
-        }
-
-        Action {
-            readonly property string tooltip: "Reset time offset of all scenes."
-
-            enabled: ActionManager.canHandle
-            objectName: "resetOffsets"
-            text: "Reset Offsets"
-
-            icon.source: "qrc:/icons/mediaplayer/reset_screenplay_offsets.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Toggle time column."
-
-            checkable: true
-            checked: false
-            enabled: ActionManager.canHandle
-            objectName: "toggleTimeColumn"
-            text: "Time Column"
-
-            icon.source: "qrc:/icons/mediaplayer/time_column.png"
-        }
-
-        Action {
-            readonly property string tooltip: "Check this to keep media playback and screenplay in sync."
-
-            checkable: true
-            checked: false
-            enabled: ActionManager.canHandle
-            objectName: "autoScroll"
-            text: "Auto Scroll"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceLeft)
-
-            enabled: ActionManager.canHandle
-            objectName: "decreaseVideoHeight"
-            shortcut: defaultShortcut
-            text: "Decrease Video Height"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceRight)
-
-            enabled: ActionManager.canHandle
-            objectName: "increaseVideoHeight"
-            shortcut: defaultShortcut
-            text: "Increase Video Height"
-        }
-
-        Action {
-            readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Asterisk)
-
-            enabled: ActionManager.canHandle
-            objectName: "resetVideoHeight"
-            shortcut: defaultShortcut
-            text: "Reset Video Height"
         }
     }
 

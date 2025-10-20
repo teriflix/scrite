@@ -278,12 +278,8 @@ void ActionManager::onVisibilityChanged()
 
 ActionManagerAttached::ActionManagerAttached(QObject *parent) : QObject(parent)
 {
-    if (parent && parent->inherits(_QQuickAction)) {
+    if (parent && parent->inherits(_QQuickAction))
         m_action = parent;
-        if (m_action != nullptr)
-            connect(ActionHandlers::instance(), &ActionHandlers::handlerAvailabilityChanged, this,
-                    &ActionManagerAttached::onHandlerAvailabilityChanged);
-    }
 }
 
 ActionManagerAttached::~ActionManagerAttached() { }
@@ -304,11 +300,6 @@ void ActionManagerAttached::setTarget(ActionManager *val)
     emit targetChanged();
 }
 
-bool ActionManagerAttached::canHandle() const
-{
-    return ActionHandlers::instance()->findFirst(m_action, true) != nullptr;
-}
-
 QString ActionManagerAttached::shortcut(int k1, int k2, int k3, int k4)
 {
     return ActionManager::shortcut(k1, k2, k3, k4);
@@ -319,36 +310,9 @@ QKeySequence ActionManagerAttached::keySequence(int k1, int k2, int k3, int k4)
     return ActionManager::keySequence(k1, k2, k3, k4);
 }
 
-bool ActionManagerAttached::trigger()
-{
-    ActionHandler *handler = ActionHandlers::instance()->findFirst(m_action, true);
-    if (handler) {
-        emit handler->triggered(this->parent());
-        return true;
-    }
-
-    return false;
-}
-
-bool ActionManagerAttached::triggerAll()
-{
-    QList<ActionHandler *> handlers = ActionHandlers::instance()->findAll(m_action, true);
-
-    for (ActionHandler *handler : qAsConst(handlers))
-        emit handler->triggered(this->parent());
-
-    return !handlers.isEmpty();
-}
-
 ActionManager *ActionManagerAttached::find(const QString &name) const
 {
     return ::findActionManager(name);
-}
-
-void ActionManagerAttached::onHandlerAvailabilityChanged(QObject *action)
-{
-    if (m_action == action)
-        emit canHandleChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -378,6 +342,33 @@ void ActionHandler::setPriority(int val)
 
     m_priority = val;
     emit priorityChanged();
+}
+
+void ActionHandler::setChecked(bool val)
+{
+    if (m_checked == val)
+        return;
+
+    m_checked = val;
+    emit checkedChanged();
+}
+
+void ActionHandler::setDown(bool val)
+{
+    if (m_down == val)
+        return;
+
+    m_down = val;
+    emit downChanged();
+}
+
+void ActionHandler::setIconSource(const QString &val)
+{
+    if (m_iconSource == val)
+        return;
+
+    m_iconSource = val;
+    emit iconSourceChanged();
 }
 
 void ActionHandler::setAction(QObject *val)
@@ -436,6 +427,16 @@ ActionHandlerAttached::~ActionHandlerAttached() { }
 bool ActionHandlerAttached::canHandle() const
 {
     return ActionHandlers::instance()->findFirst(m_action, true) != nullptr;
+}
+
+ActionHandler *ActionHandlerAttached::active() const
+{
+    return ActionHandlers::instance()->findFirst(m_action, true);
+}
+
+QList<ActionHandler *> ActionHandlerAttached::all() const
+{
+    return ActionHandlers::instance()->findAll(m_action, true);
 }
 
 bool ActionHandlerAttached::trigger()
@@ -521,7 +522,9 @@ void ActionHandlers::add(ActionHandler *handler)
         m_actionHandlers.append(handler);
 
         if (handler->action())
-            emit handlerAvailabilityChanged(handler->action());
+            emit handlerAvailabilityChanged(handler->action(), handler);
+        emit handlerCheckedChanged(handler->action(), handler);
+        emit handlerDownChanged(handler->action(), handler);
 
         connect(handler, &ActionHandler::actionChanged, this,
                 &ActionHandlers::notifyHandlerAvailability);
@@ -533,6 +536,9 @@ void ActionHandlers::add(ActionHandler *handler)
                 &ActionHandlers::notifyHandlerAvailability);
         connect(handler, &ActionHandler::actionAboutToChange, this,
                 &ActionHandlers::onHanlderActionAboutToChange);
+        connect(handler, &ActionHandler::checkedChanged, this,
+                &ActionHandlers::onHandlerCheckedChanged);
+        connect(handler, &ActionHandler::downChanged, this, &ActionHandlers::onHandlerDownChanged);
     }
 }
 
@@ -548,7 +554,7 @@ void ActionHandlers::remove(ActionHandler *handler)
         m_actionHandlers.removeAt(index);
 
         if (!m_appAboutToQuit && handler->action())
-            emit handlerAvailabilityChanged(handler->action());
+            emit handlerAvailabilityChanged(handler->action(), handler);
     }
 }
 
@@ -559,7 +565,7 @@ void ActionHandlers::notifyHandlerAvailability()
 
     ActionHandler *handler = qobject_cast<ActionHandler *>(this->sender());
     if (handler && handler->action()) {
-        emit handlerAvailabilityChanged(handler->action());
+        emit handlerAvailabilityChanged(handler->action(), handler);
     }
 }
 
@@ -570,6 +576,26 @@ void ActionHandlers::onHandlerPriorityChanged()
 
     std::sort(m_actionHandlers.begin(), m_actionHandlers.end(),
               [](ActionHandler *a, ActionHandler *b) { return b->priority() - a->priority() < 0; });
+}
+
+void ActionHandlers::onHandlerCheckedChanged()
+{
+    if (m_appAboutToQuit)
+        return;
+
+    ActionHandler *handler = qobject_cast<ActionHandler *>(this->sender());
+    if (handler && handler->action())
+        emit handlerCheckedChanged(handler->action(), handler);
+}
+
+void ActionHandlers::onHandlerDownChanged()
+{
+    if (m_appAboutToQuit)
+        return;
+
+    ActionHandler *handler = qobject_cast<ActionHandler *>(this->sender());
+    if (handler && handler->action())
+        emit handlerCheckedChanged(handler->action(), handler);
 }
 
 void ActionHandlers::onHanlderActionAboutToChange()

@@ -109,15 +109,8 @@ public:
     ActionManager *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
-    Q_PROPERTY(bool canHandle READ canHandle NOTIFY canHandleChanged)
-    bool canHandle() const;
-    Q_SIGNAL void canHandleChanged();
-
     Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
     Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
-
-    Q_INVOKABLE bool trigger();
-    Q_INVOKABLE bool triggerAll();
 
     Q_INVOKABLE ActionManager *find(const QString &name) const;
 
@@ -152,6 +145,21 @@ public:
     int priority() const { return m_priority; }
     Q_SIGNAL void priorityChanged();
 
+    Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY checkedChanged)
+    void setChecked(bool val);
+    bool isChecked() const { return m_checked; }
+    Q_SIGNAL void checkedChanged();
+
+    Q_PROPERTY(bool down READ isDown WRITE setDown NOTIFY downChanged)
+    void setDown(bool val);
+    bool isDown() const { return m_down; }
+    Q_SIGNAL void downChanged();
+
+    Q_PROPERTY(QString iconSource READ iconSource WRITE setIconSource NOTIFY iconSourceChanged)
+    void setIconSource(const QString &val);
+    QString iconSource() const { return m_iconSource; }
+    Q_SIGNAL void iconSourceChanged();
+
     Q_PROPERTY(QObject *action READ action WRITE setAction NOTIFY actionChanged)
     void setAction(QObject *val);
     QObject *action() const { return m_action; }
@@ -171,6 +179,9 @@ private:
 
 private:
     int m_priority = 0;
+    bool m_down = false;
+    bool m_checked = false;
+    QString m_iconSource;
     QObject *m_action = nullptr;
 };
 
@@ -186,6 +197,12 @@ public:
     Q_PROPERTY(bool canHandle READ canHandle NOTIFY canHandleChanged)
     bool canHandle() const;
     Q_SIGNAL void canHandleChanged();
+
+    Q_PROPERTY(ActionHandler* active READ active NOTIFY canHandleChanged)
+    ActionHandler *active() const;
+
+    Q_PROPERTY(QList<ActionHandler*> all READ all NOTIFY canHandleChanged)
+    QList<ActionHandler *> all() const;
 
     Q_INVOKABLE bool trigger();
     Q_INVOKABLE bool triggerAll();
@@ -213,7 +230,9 @@ public:
     QList<ActionHandler *> findAll(QObject *object, bool enabledOnly = true) const;
 
 signals:
-    void handlerAvailabilityChanged(QObject *action);
+    void handlerAvailabilityChanged(QObject *action, ActionHandler *handler);
+    void handlerCheckedChanged(QObject *action, ActionHandler *handler);
+    void handlerDownChanged(QObject *action, ActionHandler *handler);
 
 private:
     explicit ActionHandlers(QObject *parent = nullptr);
@@ -223,6 +242,8 @@ private:
 
     void notifyHandlerAvailability();
     void onHandlerPriorityChanged();
+    void onHandlerCheckedChanged();
+    void onHandlerDownChanged();
     void onHanlderActionAboutToChange();
 
 private:

@@ -44,7 +44,7 @@ Item {
     StructureCanvasScrollArea {
         id: _canvasScroll
 
-        anchors.left: _toolbar.right
+        anchors.left: parent.left
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.bottom: _statusBar.top
@@ -52,12 +52,12 @@ Item {
         canvasPreviewInteracting: _canvasPreview.interacting
         canvasPreviewUpdatingThumbnail: _canvasPreview.updatingThumbnail
 
-        newSceneColor: _toolbar.newSceneColor
+        newSceneColor: _actionHandlers.newSceneColor
 
         onEditorRequest: root.editorRequest()
         onReleaseEditorRequest: root.releaseEditorRequest()
 
-        onSelectionModeOffRequest: { _toolbar.selectionMode = false }
+        onSelectionModeOffRequest: { _actionHandlers.selectionMode = false }
         onDenyCanvasPreviewRequest: { _canvasPreview.allowed = false }
         onAllowCanvasPreviewRequest: { _canvasPreview.allowed = true }
     }
@@ -72,57 +72,6 @@ Item {
         canvasScroll: _canvasScroll
 
         visible: allowed && Runtime.structureCanvasSettings.showPreview && parent.width > 400 && isContentOverflowing
-    }
-
-    StructureViewToolBar {
-        id: _toolbar
-
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: _statusBar.top
-
-        canvasScroll: _canvasScroll
-        canvasPreview: _canvasPreview
-
-        onZoomOneRequest: () => {
-                              _canvasScroll.zoomOne()
-                          }
-
-        onNewSceneRequest: () => {
-                               _canvasScroll.createNewScene(Runtime.workspaceSettings.defaultSceneColor)
-                           }
-
-        onSelectAllRequest: () => {
-                                _canvasScroll.canvas.selectAllElements()
-                            }
-
-        onNotebookTabRequest: () => {
-                                  Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
-                              }
-
-        onNewAnnotationRequest: (annotationType) => {
-                                    _canvasScroll.createNewAnnotation(annotationType)
-                                }
-
-        onGroupCategoryRequest: (groupCategory) => {
-                                    _canvasScroll.canvas.groupCategory = groupCategory
-                                }
-
-        onNewColoredSceneRequest: (sceneColor) => {
-                                      _canvasScroll.createNewScene(sceneColor)
-                                  }
-
-        onSelectionLayoutRequest: (layout) => {
-                                      _canvasScroll.canvas.selection.layout(layout)
-                                  }
-
-        onSelectionModeChanged: () => {
-                                    _canvasScroll.canvas.rubberbandSelectionMode = selectionMode
-                                }
-
-        onDeleteElementRequest: (element) => {
-                                    _canvasScroll.confirmAndDeleteElement(element)
-                                }
     }
 
     BasicAttachmentsDropArea {
@@ -195,6 +144,57 @@ Item {
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             horizontalAlignment: Text.AlignHCenter
         }
+    }
+
+    StructureViewActionHandlers {
+        id: _actionHandlers
+
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: _statusBar.top
+
+        canvasScroll: _canvasScroll
+        canvasPreview: _canvasPreview
+
+        onZoomOneRequest: () => {
+                              _canvasScroll.zoomOne()
+                          }
+
+        onNewSceneRequest: () => {
+                               _canvasScroll.createNewScene(Runtime.workspaceSettings.defaultSceneColor)
+                           }
+
+        onSelectAllRequest: () => {
+                                _canvasScroll.canvas.selectAllElements()
+                            }
+
+        onNotebookTabRequest: () => {
+                                  Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
+                              }
+
+        onNewAnnotationRequest: (annotationType) => {
+                                    _canvasScroll.createNewAnnotation(annotationType)
+                                }
+
+        onGroupCategoryRequest: (groupCategory) => {
+                                    _canvasScroll.canvas.groupCategory = groupCategory
+                                }
+
+        onNewColoredSceneRequest: (sceneColor) => {
+                                      _canvasScroll.createNewScene(sceneColor)
+                                  }
+
+        onSelectionLayoutRequest: (layout) => {
+                                      _canvasScroll.canvas.selection.layout(layout)
+                                  }
+
+        onSelectionModeChanged: () => {
+                                    _canvasScroll.canvas.rubberbandSelectionMode = selectionMode
+                                }
+
+        onDeleteElementRequest: (element) => {
+                                    _canvasScroll.confirmAndDeleteElement(element)
+                                }
     }
 
     QtObject {

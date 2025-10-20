@@ -240,7 +240,7 @@
         <file>qml/structureview/StructureElementLayer.qml</file>
         <file>qml/structureview/StructureGroupsMenu.qml</file>
         <file>qml/structureview/StructureViewStatusBar.qml</file>
-        <file>qml/structureview/StructureViewToolBar.qml</file>
+        <file>qml/structureview/StructureViewActionHandlers.qml</file>
         <file>qml/tasks/OpenFileTask.qml</file>
         <file>qml/tasks/OpenFromLibraryTask.qml</file>
         <file>qml/tasks/qmldir</file>
