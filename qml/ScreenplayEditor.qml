@@ -25,8 +25,9 @@ import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
-import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
+import "qrc:/qml/controls"
+import "qrc:/qml/notifications"
 import "qrc:/qml/structureview"
 import "qrc:/qml/screenplayeditor"
 import "qrc:/qml/floatingdockpanels"
@@ -290,6 +291,16 @@ Rectangle {
             _private.sidePanel.maxPanelWidth = x
             Runtime.screenplayEditorSettings.sidePanelWidth = x
         }
+    }
+
+    HelpTipNotification {
+        tipName: "screenplay"
+    }
+
+    ScreenplayEditorDropArea {
+        id: _dropArea
+
+        anchors.fill: parent
     }
 
     QtObject {

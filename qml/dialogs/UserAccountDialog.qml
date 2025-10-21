@@ -41,7 +41,7 @@ Item {
 
         if(Scrite.user.loggedIn && profileScreen && profileScreen !== "") {
             Runtime.execLater(userAccountDialog, 500, () => {
-                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
+                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
                             })
         }
     }

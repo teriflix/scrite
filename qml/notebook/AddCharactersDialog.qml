@@ -192,7 +192,7 @@ DialogLauncher {
         }
 
         function switchToCharactersTabNow() {
-            Announcement.shout(Runtime.announcementIds.notebookNodeRequest, "Characters")
+            Runtime.shoutout(Runtime.announcementIds.notebookNodeRequest, "Characters")
         }
     }
 }

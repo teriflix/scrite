@@ -370,7 +370,7 @@ Item {
 
                                 onFinished: {
                                     if(!hasError)
-                                        Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
+                                        Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
                                 }
                             }
                         }
@@ -604,13 +604,13 @@ Item {
                                         if(modelData.action === UserMessageButton.CommandAction) {
                                             switch(modelData.endpoint) {
                                             case "$subscribe":
-                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
+                                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
                                                 return
                                             case "$profile":
-                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Profile")
+                                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Profile")
                                                 return
                                             case "$installations":
-                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Installations")
+                                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Installations")
                                                 return
                                             case "$homescreen":
                                                 HomeScreen.launch()

@@ -53,19 +53,14 @@ Rectangle {
 
         sourceComponent: {
             switch(Runtime.mainWindowTab) {
-            case Runtime.MainWindowTab.ScreenplayTab:
-                return _private.screenplayTab
-            case Runtime.MainWindowTab.StructureTab:
-                return structureEditorComponent
-            case Runtime.MainWindowTab.NotebookTab:
-                return notebookEditorComponent
-            case Runtime.MainWindowTab.ScritedTab:
-                return scritedComponent
-            default:
-                break
+            case Runtime.MainWindowTab.ScreenplayTab: return _private.screenplayTab
+            case Runtime.MainWindowTab.StructureTab: return _private.structureTab
+            case Runtime.MainWindowTab.NotebookTab: return _private.notebookTab
+            case Runtime.MainWindowTab.ScritedTab: return _private.scritedTab
+            default: break
             }
 
-            return screenplayEditorComponent
+            return _private.screenplayTab
         }
     }
 
@@ -73,5 +68,8 @@ Rectangle {
         id: _private
 
         readonly property Component screenplayTab: ScreenplayTab { }
+        readonly property Component structureTab: StructureTab { }
+        readonly property Component notebookTab: NotebookTab { }
+        readonly property Component scritedTab: ScritedTab { }
     }
 }

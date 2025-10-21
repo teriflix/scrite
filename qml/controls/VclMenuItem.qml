@@ -24,5 +24,6 @@ MenuItem {
     Material.accent: Runtime.colors.accent.key
     Material.theme: Runtime.colors.theme
 
+    focusPolicy: Qt.NoFocus
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 }

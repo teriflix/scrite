@@ -158,7 +158,6 @@ Item {
         property bool enableAutoCapitalizeSentences: true
         property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
         property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
-        property bool firstSwitchToStructureTab: true
         property bool highlightCurrentLine: true
         property bool includeTitlePageInPreview: true
         property bool longSceneWarningEnabled: true
@@ -693,6 +692,43 @@ Item {
         anchors.fill = parent
     }
 
+    function closeAllDialogs() {
+        Runtime.shoutout(Runtime.announcementIds.closeDialogBoxRequest, undefined)
+    }
+
+    function estimateTypeSize(itemNameOrCode, imports) {
+        const defaultImports = ["QtQuick 2.15",
+                                "QtQuick.Controls 2.15",
+                                "QtQuick.Controls.Material 2.15",
+                                "io.scrite.components 1.0",
+                                "qrc:/qml/globals",
+                                "qrc:/qml/helpers",
+                                "qrc:/qml/controls"]
+        if(imports === undefined)
+            imports = defaultImports
+        else
+            imports = imports.concat(defaultImports)
+
+        let code = ""
+        for(let i=0; i<imports.length; i++) {
+            code += "import " + imports[i] + "\n"
+        }
+
+        if(itemNameOrCode.indexOf("{") >= 0)
+            code += itemNameOrCode + "\n"
+        else
+            code += itemNameOrCode + " { visible: false }\n"
+
+        let instance = Qt.createQmlObject(code, root)
+        let instanceSize = Qt.size(0, 0)
+        if(instance) {
+            instanceSize = Qt.size(instance.width, instance.height)
+            instance.destroy()
+        }
+
+        return instanceSize
+    }
+
     function activateMainWindowTab(tab) {
         switch(tab) {
         case Runtime.MainWindowTab.ScreenplayTab:
@@ -701,11 +737,11 @@ Item {
         case Runtime.MainWindowTab.StructureTab:
             mainWindowTab = tab
             if(showNotebookInStructure)
-                Announcement.shout(announcementIds.embeddedTabRequest, "Structure")
+                Runtime.shoutout(announcementIds.embeddedTabRequest, "Structure")
             break
         case Runtime.MainWindowTab.NotebookTab:
             if(showNotebookInStructure)
-                Announcement.shout(announcementIds.embeddedTabRequest, "Notebook")
+                Runtime.shoutout(announcementIds.embeddedTabRequest, "Notebook")
             else
                 mainWindowTab = tab
             break
@@ -721,9 +757,23 @@ Item {
         }
     }
 
+    function shoutout(type, data, delay) {
+        if(typeof delay === "int" && delay > 0) {
+            execLater(root, delay, (args) => {
+                          root.shoutout(args[0], args[1], 0)
+                      }, [type, data])
+        } else {
+            Announcement.shout(type, data)
+        }
+    }
+
+    function shoutoutLater(type, delay) {
+        shoutout(type, delay, stdAnimationDuration)
+    }
+
     function showHelpTip(tipName) {
         if(helpTips !== undefined)
-            Announcement.shout(Runtime.announcementIds.showHelpTip, tipName)
+            Runtime.shoutout(Runtime.announcementIds.showHelpTip, tipName)
     }
 
     function execLater(contextObject, delay, callback, args)
@@ -876,6 +926,8 @@ Item {
     }
 
     visible: false
+
+    onShowNotebookInStructureChanged: activateMainWindowTab(Runtime.MainWindowTab.StructureTab)
 
     // Private objects
     Settings {

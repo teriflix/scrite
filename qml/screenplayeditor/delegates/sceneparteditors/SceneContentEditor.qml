@@ -572,7 +572,7 @@ AbstractScenePartEditor {
                 // Runtime.screenplayEditorToolbar.set(_sceneTextEditor, _sceneDocumentBinder)
                 ActionHub.setBinder(_sceneDocumentBinder)
                 _sceneTextEditor.highlightCursor()
-                Announcement.shout(Runtime.announcementIds.sceneTextEditorReceivedFocus, _sceneTextEditor)
+                Runtime.shoutout(Runtime.announcementIds.sceneTextEditorReceivedFocus, _sceneTextEditor)
             } else {
                 // Runtime.screenplayEditorToolbar.reset(_sceneTextEditor, _sceneDocumentBinder)
                 ActionHub.resetBinder(_sceneDocumentBinder)

@@ -45,7 +45,7 @@ Item {
 
         function maybeShowUserProfileScreen() {
             if(Scrite.user.loggedIn)
-                Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "UserProfileScreen")
+                Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "UserProfileScreen")
         }
     }
 }

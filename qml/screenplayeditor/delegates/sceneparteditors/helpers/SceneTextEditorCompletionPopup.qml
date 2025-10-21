@@ -132,7 +132,7 @@ Item {
             onRequestCompletion: {
                 root.completionRequest(suggestion)
                 // Do we really need this anymore?
-                // Announcement.shout("E69D2EA0-D26D-4C60-B551-FD3B45C5BE60", root.sceneDocumentBinder.scene.id)
+                // Runtime.shoutout("E69D2EA0-D26D-4C60-B551-FD3B45C5BE60", root.sceneDocumentBinder.scene.id)
             }
 
             onHasSuggestionChanged: {

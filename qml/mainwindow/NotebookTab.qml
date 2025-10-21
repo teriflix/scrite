@@ -27,19 +27,17 @@ import "qrc:/qml/notifications"
 Item {
     id: root
 
-    Loader {
+    NotebookView {
         anchors.fill: parent
 
-        active: Runtime.appFeatures.screenplay.enabled
-
-        sourceComponent: ScreenplayEditor { }
+        enabled: Runtime.appFeatures.notebook.enabled
     }
 
     DisabledFeatureNotice {
         anchors.fill: parent
 
-        visible: !Runtime.appFeatures.screenplay.enabled
-        featureName: "Screenplay"
+        visible: !Runtime.appFeatures.notebook.enabled
+
+        featureName: "Notebook"
     }
 }
-

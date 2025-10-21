@@ -79,7 +79,7 @@ Item {
                 return
             }
 
-            Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "ActivationCodeScreen")
+            Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "ActivationCodeScreen")
         }
     }
 

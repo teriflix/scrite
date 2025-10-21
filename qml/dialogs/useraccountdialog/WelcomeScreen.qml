@@ -72,7 +72,7 @@ Item {
 
             onClicked: {
                 Runtime.userAccountDialogSettings.welcomeScreenShown = true
-                Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
+                Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
             }
         }
     }

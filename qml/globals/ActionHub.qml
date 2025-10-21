@@ -446,7 +446,7 @@ Item {
                     if(index === 0) {
                         if(!_private.binder.scene.heading.enabled)
                         _private.binder.scene.heading.enabled = true
-                        Announcement.shout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneHeading)
+                        Runtime.shoutout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneHeading)
                     } else {
                         _private.binder.currentElement.type = modelData.value
                     }
@@ -549,6 +549,15 @@ Item {
             text: "Reload"
 
             icon.source: "qrc:/icons/navigation/refresh.png"
+        }
+
+        Action {
+            readonly property string defaultShortcut: "F3"
+
+            enabled: ActionHandler.canHandle
+            objectName: "smileysAndSymbols"
+            shortcut: defaultShortcut
+            text: "Symbols & Smileys"
         }
     }
 
@@ -711,7 +720,7 @@ Item {
     readonly property ActionManager screenplayEditorOptions: ActionManager {
         readonly property string iconSource: "qrc:/icons/content/view_options.png"
 
-        title: "Screenplay Editor Options"
+        title: "Screenplay Editor"
         objectName: "screenplayEditorOptions"
 
         Action {
@@ -862,7 +871,7 @@ Item {
     }
 
     readonly property ActionManager screenplayOperations: ActionManager {
-        title: "Screenplay Operations"
+        title: "Screenplay"
         objectName: "screenplayOperations"
 
         Action {
@@ -918,7 +927,7 @@ Item {
     }
 
     readonly property ActionManager structureCanvasOperations: ActionManager {
-        title: "Structure Canvas"
+        title: "Structure"
         objectName: "structureCanvasOperations"
 
         Action {
@@ -1054,6 +1063,57 @@ Item {
             text: "Export to PDF"
 
             icon.source: "qrc:/icons/file/generate_pdf.png"
+        }
+    }
+
+    readonly property ActionManager notebookOperations: ActionManager {
+        title: "Notebook"
+        objectName: "notebookOperations"
+
+        // TODO
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Shift+K"
+
+            enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
+            objectName: "bookmarkedNotes"
+            shortcut: defaultShortcut
+            text: "Bookmarked Notes"
+
+            onTriggered: {
+                Runtime.activateMainWindowTab(Runtime.NotebookTab)
+                Runtime.shoutoutLater(Runtime.announcementIds.tabRequest, "Notebook Bookmarks")
+            }
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Shift+Y"
+
+            enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
+            objectName: "storyNotes"
+            shortcut: defaultShortcut
+            text: "Story Notes"
+
+            onTriggered: {
+                Runtime.activateMainWindowTab(Runtime.NotebookTab)
+                Runtime.shoutoutLater(Runtime.announcementIds.tabRequest, "Notebook Story")
+            }
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Shift+R"
+
+            enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
+            objectName: "characterNotes"
+            shortcut: defaultShortcut
+            text: "Character Notes"
+
+            onTriggered: {
+                Runtime.activateMainWindowTab(Runtime.NotebookTab)
+                Runtime.shoutoutLater(Runtime.announcementIds.tabRequest, "Notebook Bookmarks")
+            }
         }
     }
 

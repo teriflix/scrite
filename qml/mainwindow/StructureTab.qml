@@ -66,15 +66,53 @@ Item {
 
                         spacing: 0
 
-                        Item {
-                            // TODO: toolbar
+                        ToolBar {
+                            id: _toolbar
+
+                            Layout.fillHeight: true
+
+                            GridLayout {
+                                id: _toolbarLayout
+
+                                readonly property size buttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly }")
+                                property int buttonCount: (toolbarActions ? toolbarActions.count : 0) + (Runtime.showNotebookInStructure ? 2 : 0)
+                                property ActionManager toolbarActions: _contentLoader.item ? _contentLoader.item.toolbarActions : null
+
+                                anchors.fill: parent
+
+                                flow: Flow.TopToBottom
+                                columns: Math.ceil( (buttonCount * _buttonSize.height)/_toolbar.height )
+
+                                ActionToolButton {
+                                    action: ActionHub.mainWindowTabs.find("structureTab")
+                                    visible: Runtime.showNotebookInStructure
+                                }
+
+                                ActionToolButton {
+                                    action: ActionHub.mainWindowTabs.find("notebookTab")
+                                    visible: Runtime.showNotebookInStructure
+                                }
+
+                                Repeater {
+                                    model: _toolbarLayout.toolbarActions
+
+                                    ActionToolButton {
+                                        required property var qmlAction
+
+                                        flat: root.flat
+                                        action: qmlAction
+                                    }
+                                }
+                            }
                         }
 
                         Loader {
+                            id: _contentLoader
+
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
-                            // TODO: structure canvas or notebook
+                            sourceComponent: _private.currentTabContent === Runtime.MainWindowTab.NotebookTab ? _private.notebook : _private.structureCanvas
                         }
                     }
                 }
@@ -91,7 +129,6 @@ Item {
             }
         }
 
-
         Item {
             id: _row2
 
@@ -104,24 +141,72 @@ Item {
 
                 anchors.fill: parent
 
+                enabled: Runtime.appFeatures.structure.enabled
                 showNotesIcon: Runtime.showNotebookInStructure
             }
-        }
 
+            DisabledFeatureNotice {
+                anchors.fill: parent
+
+                visible: !Runtime.appFeatures.structure.enabled
+                featureName: "Structure"
+            }
+        }
     }
 
     QtObject {
         id: _private
 
+        property int currentTabContent: Runtime.MainWindowTab.StructureTab // can be this or Runtime.MainWindowTab.NotebookTab
+
         property real preferredTimelineHeight: 140 + Runtime.minimumFontMetrics.height*Runtime.screenplayTracks.trackCount
         property color splitViewBackgroundColor: Qt.darker(Runtime.colors.primary.windowColor, 1.1)
 
-        readonly property Component structureCanvas: StructureView {
+        readonly property Component structureCanvas: Item {
+            readonly property ActionManager toolbarActions: Runtime.appFeatures.structure.enabled ? ActionHub.structureCanvasOperations : null
 
+            Loader {
+                anchors.fill: parent
+
+                active: Runtime.appFeatures.structure.enabled
+
+                sourceComponent: StructureView {}
+            }
+
+            DisabledFeatureNotice {
+                anchors.fill: parent
+
+                visible: !Runtime.appFeatures.structure.enabled
+                featureName: "Structure"
+            }
         }
 
-        readonly property Component notebook: NotebookView {
+        readonly property Component notebook: Item {
+            readonly property ActionManager toolbarActions: Runtime.appFeatures.notebook.enabled ? ActionHub.notebookOperations : null
 
+            Loader {
+                anchors.fill: parent
+
+                active: Runtime.appFeatures.notebook.enabled
+
+                sourceComponent: NotebookView { }
+            }
+
+            DisabledFeatureNotice {
+                anchors.fill: parent
+
+                visible: !Runtime.appFeatures.notebook.enabled
+                featureName: "Notebook"
+            }
         }
+
+        Announcement.onIncoming: (type, data) => {
+                                     if(type === announcementIds.embeddedTabRequest) {
+                                         if(data === "Notebook")
+                                            currentTabContent = Runtime.MainWindowTab.NotebookTab
+                                         else
+                                            currentTabContent = Runtime.MainWindowTab.StructureTab
+                                     }
+                                 }
     }
 }

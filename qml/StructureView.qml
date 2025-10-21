@@ -169,7 +169,7 @@ Item {
                             }
 
         onNotebookTabRequest: () => {
-                                  Announcement.shout(Runtime.announcementIds.tabRequest, "Notebook")
+                                  Runtime.shoutout(Runtime.announcementIds.tabRequest, "Notebook")
                               }
 
         onNewAnnotationRequest: (annotationType) => {

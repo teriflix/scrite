@@ -245,7 +245,6 @@ ScrollArea {
                 Scrite.document.structure.placeElementsInBeatBoardLayout(Scrite.document.screenplay)
 
             updateScriteDocumentUserDataEnabled = true
-            Runtime.screenplayEditorSettings.firstSwitchToStructureTab = false
             Runtime.firstSwitchToStructureTab = false
         }
 

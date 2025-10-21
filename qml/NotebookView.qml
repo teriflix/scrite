@@ -174,7 +174,7 @@ Rectangle {
                 ToolTip.text: "Structure Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
-                onClicked: Announcement.shout(Runtime.announcementIds.tabRequest, "Structure")
+                onClicked: Runtime.shoutout(Runtime.announcementIds.tabRequest, "Structure")
             }
 
             FlatToolButton {
@@ -1293,8 +1293,8 @@ Rectangle {
                         onVisibleChanged: Runtime.execLater(sceneTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
-                        onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
-                        Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
+                        onPdfExportPossibleChanged: Runtime.shoutout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
+                        Component.onDestruction: if(pdfExportPossible) Runtime.shoutout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
 
                         Announcement.onIncoming: (type,data) => {
                             const stype = ""+type
@@ -2425,8 +2425,8 @@ Rectangle {
                         onVisibleChanged: Runtime.execLater(charactersTabContentArea, 100, prepare)
 
                         property bool pdfExportPossible: !graphIsEmpty && visible
-                        onPdfExportPossibleChanged: Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
-                        Component.onDestruction: if(pdfExportPossible) Announcement.shout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
+                        onPdfExportPossibleChanged: Runtime.shoutout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", pdfExportPossible ? 1 : -1)
+                        Component.onDestruction: if(pdfExportPossible) Runtime.shoutout("4D37E093-1F58-4978-8060-CD6B9AD4E03C", -1)
 
                         Announcement.onIncoming: (type,data) => {
                             const stype = "" + type

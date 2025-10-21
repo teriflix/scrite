@@ -150,7 +150,7 @@ Item {
             }
 
             Session.unset("checkUserResponse")
-            Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "ReloadUserScreen")
+            Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "ReloadUserScreen")
         }
     }
 

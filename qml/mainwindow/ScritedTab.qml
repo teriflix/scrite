@@ -30,16 +30,16 @@ Item {
     Loader {
         anchors.fill: parent
 
-        active: Runtime.appFeatures.screenplay.enabled
+        active: Runtime.appFeatures.scrited.enabled
 
-        sourceComponent: ScreenplayEditor { }
+        sourceComponent: ScritedView { }
     }
 
     DisabledFeatureNotice {
         anchors.fill: parent
 
-        visible: !Runtime.appFeatures.screenplay.enabled
-        featureName: "Screenplay"
+        visible: !Runtime.appFeatures.scrited.enabled
+
+        featureName: "Notebook"
     }
 }
-
