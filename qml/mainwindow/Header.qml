@@ -214,7 +214,8 @@ Rectangle {
                     ToolTip.visible: ToolTip.text !== "" && hovered
 
                     action: qmlAction
-                    display: checked ? Button.TextBesideIcon : Button.IconOnly
+                    down: qmlAction.down !== undefined ? qmlAction.down : pressed
+                    display: down ? Button.TextBesideIcon : Button.IconOnly
                     flat: true
                     visible: qmlAction.visible !== undefined ? qmlAction.visible === true : true
 

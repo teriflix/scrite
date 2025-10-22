@@ -25,6 +25,8 @@ Item {
     enum MainWindowTab { ScreenplayTab, StructureTab, NotebookTab, ScritedTab }
 
     signal resetMainWindowUi(var callback)
+    signal aboutToSwitchTab(int from, int to)
+    signal finishedTabSwitch(int to)
 
     readonly property int stdAnimationDuration: 250
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
@@ -730,19 +732,24 @@ Item {
     }
 
     function activateMainWindowTab(tab) {
+        _mainWindowTabSwitchTask.targetTab = tab
+        /*
         switch(tab) {
         case Runtime.MainWindowTab.ScreenplayTab:
             mainWindowTab = tab
             break
         case Runtime.MainWindowTab.StructureTab:
-            mainWindowTab = tab
-            if(showNotebookInStructure)
+            if(mainWindowTab === tab && showNotebookInStructure)
                 Runtime.shoutout(announcementIds.embeddedTabRequest, "Structure")
+            else
+                mainWindowTab = tab
             break
         case Runtime.MainWindowTab.NotebookTab:
-            if(showNotebookInStructure)
-                Runtime.shoutout(announcementIds.embeddedTabRequest, "Notebook")
-            else
+            if(showNotebookInStructure) {
+                const delay = mainWindowTab === Runtime.MainWindowTab.StructureTab ? 0 : Runtime.stdAnimationDuration + 100
+                mainWindowTab = Runtime.MainWindowTab.StructureTab
+                Runtime.shoutout(announcementIds.embeddedTabRequest, "Notebook", delay)
+            } else
                 mainWindowTab = tab
             break
         case Runtime.MainWindowTab.ScritedTab:
@@ -754,7 +761,7 @@ Item {
         default:
             mainWindowTab = Runtime.MainWindowTab.ScreenplayTab
             break
-        }
+        }*/
     }
 
     function shoutout(type, data, delay) {
@@ -940,6 +947,42 @@ Item {
 
         category: "RecentFiles"
         fileName: Scrite.app.settingsFilePath
+    }
+
+    SequentialAnimation {
+        id: _mainWindowTabSwitchTask
+
+        property int targetTab: -1
+
+        loops: 1
+
+        ScriptAction {
+            script: root.aboutToSwitchTab(root.mainWindowTab, _mainWindowTabSwitchTask.targetTab)
+        }
+
+        PauseAnimation {
+            duration: root.stdAnimationDuration
+        }
+
+        ScriptAction {
+            script: root.mainWindowTab = _mainWindowTabSwitchTask.targetTab
+        }
+
+        PauseAnimation {
+            duration: root.stdAnimationDuration
+        }
+
+        ScriptAction {
+            script: {
+                root.finishedTabSwitch(_mainWindowTabSwitchTask.targetTab)
+                _mainWindowTabSwitchTask.targetTab = -1
+            }
+        }
+
+        onTargetTabChanged: {
+            if(targetTab !== root.mainWindowTab)
+                start()
+        }
     }
 
     Connections {

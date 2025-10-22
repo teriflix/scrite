@@ -38,11 +38,9 @@ Item {
         objectName: "mainWindowTabs"
 
         Action {
-            readonly property bool visible: true
             readonly property string defaultShortcut: "Alt+1"
+            property bool down: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
 
-            checkable: true
-            checked: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
             objectName: "screenplayTab"
             shortcut: defaultShortcut
             text: "Screenplay"
@@ -53,11 +51,9 @@ Item {
         }
 
         Action {
-            readonly property bool visible: true
             readonly property string defaultShortcut: "Alt+2"
+            property bool down: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
 
-            checkable: true
-            checked: Runtime.mainWindowTab === Runtime.MainWindowTab.StructureTab
             objectName: "structureTab"
             shortcut: defaultShortcut
             text: "Structure"
@@ -68,11 +64,9 @@ Item {
         }
 
         Action {
-            property bool visible: !Runtime.showNotebookInStructure
             readonly property string defaultShortcut: "Alt+3"
+            property bool down: Runtime.mainWindowTab === Runtime.MainWindowTab.NotebookTab
 
-            checkable: true
-            checked: Runtime.mainWindowTab === Runtime.MainWindowTab.NotebookTab
             objectName: "notebookTab"
             shortcut: defaultShortcut
             text: "Notebook"
@@ -83,11 +77,10 @@ Item {
         }
 
         Action {
-            property bool visible: Runtime.workspaceSettings.showScritedTab
             readonly property string defaultShortcut: "Alt+4"
+            property bool down: Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab
+            property bool visible: Runtime.workspaceSettings.showScritedTab
 
-            checkable: true
-            checked: Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab
             enabled: visible
             objectName: "scritedTab"
             shortcut: defaultShortcut

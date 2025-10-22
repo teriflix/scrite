@@ -77,7 +77,6 @@ ListView {
             currentDelegate.beforeZoomLevelChange()
     }
 
-
     FocusTracker.window: Scrite.window
     FocusTracker.objectName: "ScreenplayElementListView"
     FocusTracker.evaluationMethod: FocusTracker.StandardFocusEvaluation
@@ -154,7 +153,7 @@ ListView {
 
         property bool hasFocus: false
         property bool scrolling: scrollBarActive || root.moving
-        property bool scrollBarActive: root.ScrollBar.vertical ? root.ScrollBar.vertical.active : false
+        property bool scrollBarActive: root.ScrollBar.vertical ? root.ScrollBar.vertical.pressed : false
         property bool modelCurrentIndexChangedInternally: false
 
         property point lastPoint: root.mapToItem(root.contentItem, root.width/2, root.height-2)

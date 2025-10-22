@@ -35,7 +35,6 @@ Rectangle {
     Loader {
         id: _workspaceLoader
 
-        property int currentTab: Runtime.MainWindowTab.ScreenplayTab
         property bool allowed: false
 
         function reset(callback, delay) {
@@ -57,15 +56,15 @@ Rectangle {
 
         anchors.fill: parent
 
+        active: allowed && Runtime.loadMainUiContent && !Scrite.document.loading
         clip: true
         opacity: _private.busyMessage.visible ? 0 : 1
-        active: allowed && Runtime.loadMainUiContent && !Scrite.document.loading
 
         sourceComponent: {
-            switch(currentTab) {
+            switch(Runtime.mainWindowTab) {
             case Runtime.MainWindowTab.ScreenplayTab: return _private.screenplayTab
             case Runtime.MainWindowTab.StructureTab: return _private.structureTab
-            case Runtime.MainWindowTab.NotebookTab: return _private.notebookTab
+            case Runtime.MainWindowTab.NotebookTab: return Runtime.showNotebookInStructure ? _private.structureTab : _private.notebookTab
             case Runtime.MainWindowTab.ScritedTab: return _private.scritedTab
             default: break
             }
@@ -81,41 +80,29 @@ Rectangle {
         readonly property Component structureTab: StructureTab { }
         readonly property Component notebookTab: NotebookTab { }
         readonly property Component scritedTab: ScritedTab { }
+
         readonly property BusyMessage busyMessage: BusyMessage {
             message: "Loading tab ..."
-        }
-        readonly property SequentialAnimation tabSwitchProcess: SequentialAnimation {
-            loops: 1
 
-            ScriptAction {
-                script: {
-                    _private.busyMessage.visible = true
-                }
+            function aboutToSwitchTab(from, to) {
+                visible = true
             }
 
-            PauseAnimation {
-                duration: Runtime.applicationSettings.enableAnimations ? (Runtime.stdAnimationDuration+50) : Runtime.stdAnimationDuration/2
-            }
-
-            ScriptAction {
-                script: {
-                    _workspaceLoader.currentTab = _private.currentTab
-                }
-            }
-
-            PauseAnimation {
-                duration: Runtime.applicationSettings.enableAnimations ? (Runtime.stdAnimationDuration+50) : 0
-            }
-
-            ScriptAction {
-                script: {
-                    _private.busyMessage.visible = false
-                }
+            function finishedTabSwitch(to) {
+                visible = false
             }
         }
 
-        property int currentTab: Runtime.mainWindowTab
-        onCurrentTabChanged: tabSwitchProcess.start()
+        readonly property Connections runtimeConnections: Connections {
+            target: Runtime
 
+            function onAboutToSwitchTab(from, to) {
+                _private.busyMessage.aboutToSwitchTab(from, to)
+            }
+
+            function onFinishedTabSwitch(to) {
+                _private.busyMessage.finishedTabSwitch(to)
+            }
+        }
     }
 }

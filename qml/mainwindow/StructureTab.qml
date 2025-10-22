@@ -96,16 +96,6 @@ Item {
                                 rowSpacing: 0
                                 columnSpacing: 0
 
-                                ActionToolButton {
-                                    action: ActionHub.mainWindowTabs.find("structureTab")
-                                    visible: Runtime.showNotebookInStructure
-                                }
-
-                                ActionToolButton {
-                                    action: ActionHub.mainWindowTabs.find("notebookTab")
-                                    visible: Runtime.showNotebookInStructure
-                                }
-
                                 Repeater {
                                     model: _toolbarLayout.toolbarActions
 
@@ -129,7 +119,7 @@ Item {
                             Layout.fillWidth: true
                             Layout.fillHeight: true
 
-                            sourceComponent: _private.currentTabContent === Runtime.MainWindowTab.NotebookTab ? _private.notebook : _private.structureCanvas
+                            sourceComponent: _private.currentTab === Runtime.MainWindowTab.NotebookTab ? _private.notebook : _private.structureCanvas
                         }
                     }
                 }
@@ -177,7 +167,7 @@ Item {
     QtObject {
         id: _private
 
-        property int currentTabContent: Runtime.MainWindowTab.StructureTab // can be this or Runtime.MainWindowTab.NotebookTab
+        property int currentTab: Runtime.mainWindowTab === Runtime.MainWindowTab.NotebookTab ? Runtime.MainWindowTab.NotebookTab : Runtime.MainWindowTab.StructureTab
 
         property real preferredTimelineHeight: 140 + Runtime.minimumFontMetrics.height*Runtime.screenplayTracks.trackCount
         property color splitViewBackgroundColor: Qt.darker(Runtime.colors.primary.windowColor, 1.1)
@@ -220,12 +210,36 @@ Item {
             }
         }
 
+        readonly property BusyMessage busyMessage: BusyMessage {
+            message: "Loading tab ..."
+
+            function aboutToSwitchTab(from, to) {
+                visible = true
+            }
+
+            function finishedTabSwitch(to) {
+                visible = false
+            }
+        }
+
+        readonly property Connections runtimeConnections: Connections {
+            target: Runtime
+
+            function onAboutToSwitchTab(from, to) {
+                _private.busyMessage.aboutToSwitchTab(from, to)
+            }
+
+            function onFinishedTabSwitch(to) {
+                _private.busyMessage.finishedTabSwitch(to)
+            }
+        }
+
         Announcement.onIncoming: (type, data) => {
-                                     if(type === announcementIds.embeddedTabRequest) {
+                                     if(type === Runtime.announcementIds.embeddedTabRequest) {
                                          if(data === "Notebook")
-                                            currentTabContent = Runtime.MainWindowTab.NotebookTab
+                                            currentTab = Runtime.MainWindowTab.NotebookTab
                                          else
-                                            currentTabContent = Runtime.MainWindowTab.StructureTab
+                                            currentTab = Runtime.MainWindowTab.StructureTab
                                      }
                                  }
     }
