@@ -91,8 +91,10 @@ Item {
                                 anchors.fill: parent
 
                                 flow: Flow.TopToBottom
-                                rows: Math.floor(_toolbar.height/buttonSize.height)
-                                columns: Math.ceil( (buttonCount * buttonSize.height)/_toolbar.height )
+                                rows: Math.floor(_col1.height/buttonSize.height)
+                                columns: Math.ceil( (buttonCount * buttonSize.height)/_col1.height )
+                                rowSpacing: 0
+                                columnSpacing: 0
 
                                 ActionToolButton {
                                     action: ActionHub.mainWindowTabs.find("structureTab")
