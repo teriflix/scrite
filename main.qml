@@ -60,6 +60,7 @@ Rectangle {
             determineDefaultFontSize()
 
             // Initialize layers
+            BusyOverlay.init(scriteRoot)
             SubscriptionDetailsDialog.init()
             SubscriptionPlanComparisonDialog.init()
             UserAccountDialog.init(scriteRoot)

@@ -3,7 +3,7 @@ AttachmentsDropArea 1.0 AttachmentsDropArea.qml
 AttachmentsView 1.0 AttachmentsView.qml
 BoxShadow 1.0 BoxShadow.qml
 BusyIcon 1.0 BusyIcon.qml
-BusyOverlay 1.0 BusyOverlay.qml
+BusyMessage 1.0 BusyMessage.qml
 CheckListView 1.0 CheckListView.qml
 ColorMenu 1.0 ColorMenu.qml
 ColorToolButton 1.0 ColorToolButton.qml

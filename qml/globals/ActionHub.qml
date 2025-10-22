@@ -965,7 +965,7 @@ Item {
             objectName: "selectAll"
             text: "Select All"
 
-            icon.source: "qrc:/icons/action/select_all.png"
+            icon.source: "qrc:/icons/content/select_all.png"
         }
 
         Action {

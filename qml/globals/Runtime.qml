@@ -701,9 +701,9 @@ Item {
                                 "QtQuick.Controls 2.15",
                                 "QtQuick.Controls.Material 2.15",
                                 "io.scrite.components 1.0",
-                                "qrc:/qml/globals",
-                                "qrc:/qml/helpers",
-                                "qrc:/qml/controls"]
+                                "\"qrc:/qml/globals\"",
+                                "\"qrc:/qml/helpers\"",
+                                "\"qrc:/qml/controls\""]
         if(imports === undefined)
             imports = defaultImports
         else

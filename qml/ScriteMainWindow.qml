@@ -42,39 +42,6 @@ Item {
 
     enabled: !Scrite.document.loading
 
-    // Refactor QML TODO: Get rid of this stuff when we move to overlays and ApplicationMainWindow
-    QtObject {
-        property bool overlayRefCountModified: false
-        property bool requiresAppBusyOverlay: Runtime.undoStack.screenplayEditorActive || Runtime.undoStack.sceneEditorActive
-
-        function onUpdateScheduled() {
-            if(requiresAppBusyOverlay && !overlayRefCountModified) {
-                appBusyOverlay.ref()
-                overlayRefCountModified = true
-            }
-        }
-
-        function onUpdateFinished() {
-            if(overlayRefCountModified)
-                appBusyOverlay.deref()
-            overlayRefCountModified = false
-        }
-
-        onRequiresAppBusyOverlayChanged: {
-            if(!requiresAppBusyOverlay && overlayRefCountModified) {
-                appBusyOverlay.deref()
-                overlayRefCountModified = false
-            }
-        }
-
-        Component.onCompleted: {
-            // Cannot use Connections for this, because the Connections QML item
-            // does not allow usage of custom properties
-            Runtime.screenplayTextDocument.onUpdateScheduled.connect(onUpdateScheduled)
-            Runtime.screenplayTextDocument.onUpdateFinished.connect(onUpdateFinished)
-        }
-    }
-
     ColumnLayout {
         id: _layout
 
@@ -102,104 +69,27 @@ Item {
 
     ReloadPromptDialog { }
 
-    Item {
-        id: closeEventHandler
-        width: 100
-        height: 100
-        anchors.centerIn: parent
-
-        property bool handleCloseEvent: true
-
-        Connections {
-            target: Scrite.window
-
-            function onClosing(close) {
-                if(!Scrite.window.closeButtonVisible) {
-                    close.accepted = false
-                    return
-                }
-
-                if(closeEventHandler.handleCloseEvent) {
-                    close.accepted = false
-
-                    Scrite.app.saveWindowGeometry(Scrite.window, "Workspace")
-
-                    SaveFileTask.save( () => {
-                                          closeEventHandler.handleCloseEvent = false
-                                          if( TrialNotActivatedDialog.launch() !== null)
-                                            return
-                                          Scrite.window.close()
-                                      } )
-                } else
-                    close.accepted = true
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
-            Runtime.workspaceSettings.screenplayEditorWidth = -1
-        Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
-        _workspaceLoader.reset()
-    }
-
-    BusyOverlay {
-        id: appBusyOverlay
-        anchors.fill: parent
-        busyMessage: "Computing Page Layout, Evaluating Page Count & Time ..."
-        visible: RefCounter.isReffed
-        function ref() { RefCounter.ref() }
-        function deref() { RefCounter.deref() }
-    }
-
-    HelpTipNotification {
-        id: htNotification
-        enabled: tipName !== ""
-
-        Component.onCompleted: {
-            Qt.callLater( () => {
-                             if(Runtime.helpNotificationSettings.dayZero === "")
-                                Runtime.helpNotificationSettings.dayZero = new Date()
-
-                             const days = Runtime.helpNotificationSettings.daysSinceZero()
-                             if(days >= 2) {
-                                 if(!Runtime.helpNotificationSettings.isTipShown("discord"))
-                                     htNotification.tipName = "discord"
-                             }
-                         })
-        }
-    }
-
-    QtObject {
-        property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
-        property bool errorReportHasError: applicationErrors.hasError
-        onErrorReportHasErrorChanged: {
-            if(errorReportHasError)
-                MessageBox.information("Scrite Error", applicationErrors.errorMessage, applicationErrors.clear)
-        }
-    }
-
-    QtObject {
-        property ErrorReport documentErrors: Aggregation.findErrorReport(Scrite.document)
-        property bool errorReportHasError: documentErrors.hasError
-        onErrorReportHasErrorChanged: {
-            if(errorReportHasError) {
-                var msg = documentErrors.errorMessage;
-
-                if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
-                    msg += "<br/><br/>Click Ok to reveal <u>" + documentErrors.details.revealOnDesktopRequest + "</u> on your computer."
-
-                MessageBox.information("Scrite Document Error", msg, () => {
-                                           if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
-                                               Scrite.app.revealFileOnDesktop(documentErrors.details.revealOnDesktopRequest)
-                                           documentErrors.clear()
-                                       })
-            }
-        }
-    }
-
     QtObject {
         id: _private
+
+        readonly property Component helpTipNotification: HelpTipNotification {
+            Notification.onDismissed: helpTip.destroy()
+        }
+
+        readonly property BusyMessage busyMessage: BusyMessage {
+            function documentUpdateStarted() { visible = true }
+            function documentUpdateScheduled() { visible = true }
+            function documentUpdateFinished() { visible = false }
+
+            message: "Computing Page Layout, Evaluating Page Count & Time ..."
+        }
+
+        property bool handleCloseEvent: true
+        property bool hasDocumentErrors: documentErrors.hasError
+        property bool hasApplicationErrors: applicationErrors.hasError
+
+        property ErrorReport documentErrors: Aggregation.findErrorReport(Scrite.document)
+        property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
 
         function handleOpenFileRequest(fileName) {
             if(Scrite.app.isMacOSPlatform) {
@@ -231,6 +121,39 @@ Item {
             }
         }
 
+        function maybeShowDiscordHelpTip() {
+            if(Runtime.helpNotificationSettings.dayZero === "")
+               Runtime.helpNotificationSettings.dayZero = new Date()
+
+            const days = Runtime.helpNotificationSettings.daysSinceZero()
+            if(days >= 2) {
+                if(!Runtime.helpNotificationSettings.isTipShown("discord"))
+                    showHelpTip("discord")
+            }
+        }
+
+        function handleWindowClosing(close) {
+            if(!Scrite.window.closeButtonVisible) {
+                close.accepted = false
+                return
+            }
+
+            if(handleCloseEvent) {
+                close.accepted = false
+
+                Scrite.app.saveWindowGeometry(Scrite.window, "Workspace")
+
+                SaveFileTask.save( () => {
+                                      _private.handleCloseEvent = false
+                                      if( TrialNotActivatedDialog.launch() !== null)
+                                        return
+
+                                      Scrite.window.close()
+                                  } )
+            } else
+                close.accepted = true
+        }
+
         Announcement.onIncoming: (type, data) => {
                                      if(type === Runtime.announcementIds.showHelpTip) {
                                          _private.showHelpTip(""+data)
@@ -238,16 +161,44 @@ Item {
                                  }
 
         Component.onCompleted: {
+            Runtime.screenplayTextDocument.updateScheduled.connect(busyMessage.documentUpdateScheduled)
+            Runtime.screenplayTextDocument.updateStarted.connect(busyMessage.documentUpdateStarted)
+            Runtime.screenplayTextDocument.updateFinished.connect(busyMessage.documentUpdateFinished)
+
+            Scrite.window.closing.connect(handleWindowClosing)
+
             if(Scrite.app.isMacOSPlatform)
                 Scrite.app.openFileRequest.connect(handleOpenFileRequest)
-        }
-    }
 
-    Component {
-        id: helpTipNotification
-        HelpTipNotification {
-            id: helpTip
-            Notification.onDismissed: helpTip.destroy()
+            Qt.callLater(maybeShowDiscordHelpTip)
+
+            if(!Scrite.app.restoreWindowGeometry(Scrite.window, "Workspace"))
+                Runtime.workspaceSettings.screenplayEditorWidth = -1
+
+            Runtime.screenplayAdapter.sessionId = Scrite.document.sessionId
+
+            _workspace.reset()
         }
+
+        onHasApplicationErrorsChanged: {
+            if(hasApplicationErrors)
+                MessageBox.information("Scrite Error", applicationErrors.errorMessage, applicationErrors.clear)
+        }
+
+        onHasDocumentErrorsChanged: {
+            if(hasDocumentErrors) {
+                var msg = documentErrors.errorMessage;
+
+                if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
+                    msg += "<br/><br/>Click Ok to reveal <u>" + documentErrors.details.revealOnDesktopRequest + "</u> on your computer."
+
+                MessageBox.information("Scrite Document Error", msg, () => {
+                                           if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
+                                               Scrite.app.revealFileOnDesktop(documentErrors.details.revealOnDesktopRequest)
+                                           documentErrors.clear()
+                                       })
+            }
+        }
+
     }
 }

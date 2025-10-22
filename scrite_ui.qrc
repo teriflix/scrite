@@ -101,7 +101,7 @@
         <file>qml/helpers/AttachmentsView.qml</file>
         <file>qml/helpers/BoxShadow.qml</file>
         <file>qml/helpers/BusyIcon.qml</file>
-        <file>qml/helpers/BusyOverlay.qml</file>
+        <file>qml/helpers/BusyMessage.qml</file>
         <file>qml/helpers/CheckListView.qml</file>
         <file>qml/helpers/ColorMenu.qml</file>
         <file>qml/helpers/ColorToolButton.qml</file>
@@ -154,7 +154,6 @@
         <file>qml/notifications/NotificationsView.qml</file>
         <file>qml/notifications/qmldir</file>
         <file>qml/overlays/AnimatedTextOverlay.qml</file>
-        <file>qml/overlays/DocumentBusyOverlay.qml</file>
         <file>qml/overlays/OverlaysLayer.qml</file>
         <file>qml/overlays/qmldir</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/qmldir</file>
@@ -278,5 +277,7 @@
         <file>qml/mainwindow/ScritedTab.qml</file>
         <file>qml/screenplayeditor/ScreenplayEditorDropArea.qml</file>
         <file>qml/mainwindow/ReloadPromptDialog.qml</file>
+        <file>qml/mainwindow/qmldir</file>
+        <file>qml/overlays/BusyOverlay.qml</file>
     </qresource>
 </RCC>

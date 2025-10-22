@@ -168,10 +168,6 @@ Item {
                                 _canvasScroll.canvas.selectAllElements()
                             }
 
-        onNotebookTabRequest: () => {
-                                  Runtime.shoutout(Runtime.announcementIds.tabRequest, "Notebook")
-                              }
-
         onNewAnnotationRequest: (annotationType) => {
                                     _canvasScroll.createNewAnnotation(annotationType)
                                 }

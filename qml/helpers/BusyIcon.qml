@@ -15,30 +15,36 @@ import QtQml 2.15
 import QtQuick 2.15
 
 Item {
-    property alias running: busyIcon.visible
+    id: root
+
     property bool forDarkBackground: false
 
-    id: busyIcon
-    width: 48
+    property alias running: root.visible
+
     height: 48
+    width: 48
+
     visible: false
 
     Image {
-        id: busyIconImage
-        width: 48
-        height: 48
-        smooth: true
-        mipmap: true
-        source: forDarkBackground ? "qrc:/icons/content/time_inverted.png" : "qrc:/icons/content/time.png"
+        id: _image
+
         anchors.centerIn: parent
 
+        height: 48
+        width: 48
+
+        mipmap: true
+        smooth: true
+        source: forDarkBackground ? "qrc:/icons/content/time_inverted.png" : "qrc:/icons/content/time.png"
+
         RotationAnimator {
-            target: busyIconImage
-            from: 0
-            to: 360
             duration: 500
+            from: 0
             loops: Animation.Infinite
-            running: busyIcon.running
+            running: root.running
+            target: _image
+            to: 360
         }
     }
 }

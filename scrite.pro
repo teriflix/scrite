@@ -104,7 +104,6 @@ HEADERS += \
     src/quick/objects/itempositionmapper.h \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/propertyalias.h \
-    src/quick/objects/refcounter.h \
     src/quick/objects/syntaxhighlighter.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
@@ -241,7 +240,6 @@ SOURCES += \
     src/quick/objects/itempositionmapper.cpp \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/propertyalias.cpp \
-    src/quick/objects/refcounter.cpp \
     src/quick/objects/syntaxhighlighter.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/focustracker.cpp \

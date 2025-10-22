@@ -13,33 +13,35 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import QtQuick.Layouts 1.15
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/qml/"
 import "qrc:/qml/globals"
-import "qrc:/qml/helpers"
+import "qrc:/qml/overlays"
 import "qrc:/qml/controls"
-import "qrc:/qml/notifications"
 
-Item {
+QtObject {
     id: root
 
-    Loader {
-        anchors.fill: parent
+    property bool visible: false
 
-        active: Runtime.appFeatures.screenplay.enabled && width > 100
+    property string message: "Busy Doing Something..."
 
-        sourceComponent: ScreenplayEditor { }
+    Component.onDestruction: {
+        if(visible)
+            BusyOverlay.deref(root)
     }
 
-    DisabledFeatureNotice {
-        anchors.fill: parent
+    onVisibleChanged: {
+        if(visible)
+            BusyOverlay.ref(message, root)
+        else
+            BusyOverlay.deref(root)
+    }
 
-        visible: !Runtime.appFeatures.screenplay.enabled
-        featureName: "Screenplay"
+    onMessageChanged: {
+        if(visible)
+            BusyOverlay.ref(message, root)
     }
 }
-

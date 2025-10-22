@@ -34,8 +34,5 @@ QtObject {
         item.objectName = "OverlaysLayer"
         item.anchors.fill = _parent
         item.visible = _parent
-
-        // Init global overlays within this module
-        DocumentBusyOverlay.init()
     }
 }

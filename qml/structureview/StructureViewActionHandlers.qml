@@ -33,8 +33,8 @@ Item {
     required property StructureCanvasPreview canvasPreview
     required property StructureCanvasScrollArea canvasScroll
 
-    property alias newSceneColor: _newSceneButton.activeColor
-    property alias selectionMode: _selectionModeButton.checked
+    property alias newSceneColor: _newSceneHandler.activeColor
+    property alias selectionMode: _selectionModeHandler.checked
 
     signal zoomOneRequest()
     signal newSceneRequest()
@@ -48,6 +48,10 @@ Item {
                                               // Structure.FlowHorizontalLayout, Structure.FlowVerticalLayout
 
     ActionHandler {
+        id: _newSceneHandler
+
+        property color activeColor: "white"
+
         action: ActionHub.structureCanvasOperations.find("newScene")
         down: _newSceneMenu.visible
         enabled: !Scrite.document.readOnly
@@ -72,12 +76,12 @@ Item {
             ColorMenu {
                 title: "Colored Scene"
                 enabled: !Scrite.document.readOnly
-                selectedColor: _newSceneButton.activeColor
+                selectedColor: _newSceneHandler.activeColor
 
                 onMenuItemClicked: (color) => {
                                        Qt.callLater( _newSceneMenu.close )
-                                       _newSceneButton.activeColor = color
-                                       root.newColoredSceneRequest( _newSceneButton.activeColor)
+                                       _newSceneHandler.activeColor = color
+                                       root.newColoredSceneRequest( _newSceneHandler.activeColor)
                                    }
             }
         }
@@ -114,6 +118,8 @@ Item {
     }
 
     ActionHandler {
+        id: _selectionModeHandler
+
         action: ActionHub.structureCanvasOperations.find("selectionMode")
         enabled: !Scrite.document.readOnly && (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.canLayout : Scrite.document.structure.elementCount >= 2)
 

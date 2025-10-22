@@ -3269,10 +3269,9 @@ Rectangle {
                 id: fileManager
             }
 
-            BusyOverlay {
+            BusyMessage {
                 id: busyMessage
-                anchors.fill: parent
-                busyMessage: "Loading Stats ..."
+                message: "Loading Stats ..."
                 visible: true
             }
 

@@ -37,6 +37,7 @@ ToolButton {
     ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
     ToolTip.visible: ToolTip.text !== "" && hovered
 
+    flat: true
     down: action.down !== undefined ? action.down === true : pressed
     display: action.icon.source == "" && action.icon.name == "" ? ToolButton.TextOnly : ToolButton.IconOnly
     focusPolicy: Qt.NoFocus

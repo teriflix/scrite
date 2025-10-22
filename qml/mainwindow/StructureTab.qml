@@ -53,16 +53,20 @@ Item {
                 Item {
                     id: _col1
 
+                    SplitView.fillWidth: true
+                    SplitView.minimumWidth: 80
+
                     Rectangle {
                         anchors.fill: parent
 
-                        color: Runtime.colors.primary.c10.background
+                        color: Runtime.colors.primary.c50.background
                         border.width: 1
                         border.color: Runtime.colors.primary.borderColor
                     }
 
                     RowLayout {
                         anchors.fill: parent
+                        anchors.margins: 1
 
                         spacing: 0
 
@@ -71,17 +75,24 @@ Item {
 
                             Layout.fillHeight: true
 
+                            Material.accent: Runtime.colors.accent.key
+                            Material.background: Runtime.colors.primary.c10.background
+                            Material.elevation: 0
+                            Material.primary: Runtime.colors.primary.key
+                            Material.theme: Runtime.colors.theme
+
                             GridLayout {
                                 id: _toolbarLayout
 
-                                readonly property size buttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly }")
+                                readonly property size buttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly; }")
                                 property int buttonCount: (toolbarActions ? toolbarActions.count : 0) + (Runtime.showNotebookInStructure ? 2 : 0)
                                 property ActionManager toolbarActions: _contentLoader.item ? _contentLoader.item.toolbarActions : null
 
                                 anchors.fill: parent
 
                                 flow: Flow.TopToBottom
-                                columns: Math.ceil( (buttonCount * _buttonSize.height)/_toolbar.height )
+                                rows: Math.floor(_toolbar.height/buttonSize.height)
+                                columns: Math.ceil( (buttonCount * buttonSize.height)/_toolbar.height )
 
                                 ActionToolButton {
                                     action: ActionHub.mainWindowTabs.find("structureTab")
@@ -99,9 +110,13 @@ Item {
                                     ActionToolButton {
                                         required property var qmlAction
 
-                                        flat: root.flat
                                         action: qmlAction
                                     }
+                                }
+
+                                Item {
+                                    Layout.fillWidth: true
+                                    Layout.fillHeight: true
                                 }
                             }
                         }
@@ -119,6 +134,9 @@ Item {
 
                 Item {
                     id: _col2
+
+                    SplitView.minimumWidth: 16
+                    SplitView.preferredWidth: root.width * 0.5
 
                     ScreenplayTab {
                         id: _screenplayEditor

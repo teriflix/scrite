@@ -1443,10 +1443,9 @@ Item {
         }
     }
 
-    BusyOverlay {
-        anchors.fill: parent
+    BusyMessage {
         visible: screenplayOffsetsModel.busy
-        busyMessage: "Computing offsets & preparing screenplay for continuous scroll ..."
+        message: "Computing offsets & preparing screenplay for continuous scroll ..."
     }
 
     AttachmentsDropArea {
