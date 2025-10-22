@@ -153,7 +153,7 @@ Item {
             id: _row2
 
             SplitView.minimumHeight: 16
-            SplitView.maximumHeight: _private.preferredTimelineHeight
+            SplitView.maximumHeight: _private.preferredTimelineHeight * 2
             SplitView.preferredHeight: _private.preferredTimelineHeight
 
             TimelineView {
