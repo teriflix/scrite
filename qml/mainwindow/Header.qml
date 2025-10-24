@@ -34,42 +34,39 @@ Rectangle {
 
         width: parent.width
 
-        RowLayout {
+        ToolButton {
             Layout.rightMargin: Runtime.iconImageSize * 2
 
+            display: ToolButton.TextBesideIcon
+            down: _mainMenu.visible
+            text: "Scrite"
             visible: !_group1.visible
 
-            ToolButton {
-                display: ToolButton.TextBesideIcon
-                down: _mainMenu.visible
-                text: "Scrite"
+            icon.source: "qrc:/icons/exporter/scrite.png"
 
-                icon.source: "qrc:/icons/exporter/scrite.png"
+            onClicked: _mainMenu.popup()
 
-                onClicked: _mainMenu.popup()
+            Menu {
+                id: _mainMenu
 
-                Menu {
-                    id: _mainMenu
+                ActionManagerMenu {
+                    actionManager: ActionHub.fileOperations
+                }
 
-                    ActionManagerMenu {
-                        actionManager: ActionHub.fileOperations
-                    }
+                ActionManagerMenu {
+                    actionManager: ActionHub.languageOptions
+                }
 
-                    ActionManagerMenu {
-                        actionManager: ActionHub.languageOptions
-                    }
+                ActionManagerMenu {
+                    actionManager: ActionHub.exportOptions
+                }
 
-                    ActionManagerMenu {
-                        actionManager: ActionHub.exportOptions
-                    }
+                ActionManagerMenu {
+                    actionManager: ActionHub.reportOptions
+                }
 
-                    ActionManagerMenu {
-                        actionManager: ActionHub.reportOptions
-                    }
-
-                    ActionManagerMenu {
-                        actionManager: ActionHub.appOptions
-                    }
+                ActionManagerMenu {
+                    actionManager: ActionHub.appOptions
                 }
             }
         }
@@ -77,7 +74,7 @@ Rectangle {
         RowLayout {
             id: _group1
 
-            visible: root.width > _group1.width + _group2.width
+            visible: root.width > _group1.width + _group2.width + _mainTabs.width + _userAccount.width
 
             ActionManagerToolBar {
                 actionManager: ActionHub.fileOperations
@@ -231,7 +228,9 @@ Rectangle {
             }
         }
 
-        UserAccountToolButton { }
+        UserAccountToolButton {
+            id: _userAccount
+        }
     }
 
     ActionHandler {

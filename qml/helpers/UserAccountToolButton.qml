@@ -159,7 +159,7 @@ Item {
         }
 
         MouseArea {
-            ToolTip.text: Scrite.user.loggedIn ? "Account Profile" : "Login"
+            ToolTip.text: Scrite.user.loggedIn ? ("Account Profile (" + Scrite.app.polishShortcutTextForDisplay(_userAccountHandler.action.shortcut) + ")") : "Login"
             ToolTip.visible: containsMouse
 
             anchors.fill: parent
@@ -177,6 +177,36 @@ Item {
 
                 UserAccountDialog.launch(screenName)
             }
+        }
+
+        ActionHandler {
+            id: _userAccountHandler
+
+            action: ActionHub.applicationOptions.find("userAccount")
+            enabled: Runtime.allowAppUsage
+
+            onTriggered: UserAccountDialog.launch()
+        }
+
+        ActionHandler {
+            action: ActionHub.applicationOptions.find("messages")
+            enabled: Runtime.allowAppUsage
+
+            onTriggered: UserAccountDialog.launch("Notifications")
+        }
+
+        ActionHandler {
+            action: ActionHub.applicationOptions.find("subscriptions")
+            enabled: Runtime.allowAppUsage
+
+            onTriggered: UserAccountDialog.launch("Subscriptions")
+        }
+
+        ActionHandler {
+            action: ActionHub.applicationOptions.find("installations")
+            enabled: Runtime.allowAppUsage
+
+            onTriggered: UserAccountDialog.launch("Installations")
         }
     }
 }

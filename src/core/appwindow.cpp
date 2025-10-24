@@ -114,7 +114,7 @@ AppWindow::AppWindow()
 
     LanguageEngine::init("io.scrite.components", this->engine());
 
-    this->setMinimumSize(QSize(800, 600));
+    this->setMinimumSize(QSize(1366, 700));
 }
 
 AppWindow::~AppWindow()

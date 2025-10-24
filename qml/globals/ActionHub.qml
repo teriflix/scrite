@@ -226,7 +226,7 @@ Item {
     readonly property ActionManager reportOptions: ActionManager {
         readonly property string iconSource: "qrc:/icons/exporter/pdf.png"
 
-        title: "Export"
+        title: "Reports"
         objectName: "reportOptions"
     }
 
@@ -1360,6 +1360,46 @@ Item {
             objectName: "newScriteWindow"
 
             onTriggered: Scrite.app.launchNewInstance(Scrite.window)
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "F8"
+
+            enabled: ActionHandler.canHandle
+            objectName: "userAccount"
+            shortcut: defaultShortcut
+            text: "User Account"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "F9"
+
+            enabled: ActionHandler.canHandle
+            objectName: "messages"
+            shortcut: defaultShortcut
+            text: "Messages"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "F10"
+
+            enabled: ActionHandler.canHandle
+            objectName: "subscriptions"
+            shortcut: defaultShortcut
+            text: "Subscriptions"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "F11"
+
+            enabled: ActionHandler.canHandle
+            objectName: "installations"
+            shortcut: defaultShortcut
+            text: "Installations"
         }
     }
 
