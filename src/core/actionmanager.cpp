@@ -18,12 +18,17 @@
 #include <QTimer>
 #include <QGuiApplication>
 #include <QDynamicPropertyChangeEvent>
+#include <QDir>
+#include <QJsonDocument>
 
 static const char *_QQuickAction = "QQuickAction";
 static const QByteArray _QQuickActionSortOrderProperty = QByteArrayLiteral("sortOrder");
 static const char *_QQuickActionSortOrderChanged = SIGNAL(sortOrderChanged());
 static const QByteArray _QQuickActionVisibleProperty = QByteArrayLiteral("visible");
 static const char *_QQuickActionVisibilityChanged = SIGNAL(visibleChanged());
+static const QByteArray _QQuickActionShortcutProperty = QByteArrayLiteral("shortcut");
+static const char *_QQuickActionShortcutChanged = SIGNAL(shortcutChanged(QKeySequence));
+static const QByteArray _QQuickActionDefaultShortcutProperty = QByteArrayLiteral("defaultShortcut");
 
 Q_GLOBAL_STATIC(QObjectListModel<ActionManager *>, ActionManagerModel)
 
@@ -54,10 +59,14 @@ ActionManager::ActionManager(QObject *parent) : QAbstractListModel(parent)
     connect(this, &ActionManager::modelReset, this, &ActionManager::countChanged);
     connect(this, &ActionManager::rowsRemoved, this, &ActionManager::countChanged);
     connect(this, &ActionManager::rowsInserted, this, &ActionManager::countChanged);
+
+    connect(this, &QObject::objectNameChanged, this, &ActionManager::scheduleApplySavedShortcuts);
 }
 
 ActionManager::~ActionManager()
 {
+    this->saveShortcutMap();
+
     ActionManagerModel->remove(this);
 }
 
@@ -74,6 +83,59 @@ QString ActionManager::shortcut(int k1, int k2, int k3, int k4)
 QKeySequence ActionManager::keySequence(int k1, int k2, int k3, int k4)
 {
     return QKeySequence(k1, k2, k3, k4);
+}
+
+ActionManager *ActionManager::findManager(QObject *action)
+{
+    if (action == nullptr)
+        return nullptr;
+
+    const QList<ActionManager *> managers = ::ActionManagerModel->constList();
+    for (ActionManager *manager : managers) {
+        if (manager->actions().contains(action))
+            return manager;
+    }
+
+    return nullptr;
+}
+
+bool ActionManager::changeActionShortcut(QObject *action, const QString &shortcut)
+{
+    const ActionManager *manager = findManager(action);
+    if (manager == nullptr)
+        return false;
+
+    return action->setProperty(_QQuickActionShortcutProperty, shortcut);
+}
+
+QKeySequence ActionManager::defaultActionShortcut(QObject *action)
+{
+    const QVariant defaultShortcutValue = action->property(_QQuickActionDefaultShortcutProperty);
+    if (defaultShortcutValue.isValid()) {
+        const QKeySequence defaultShortcut = defaultShortcutValue.userType() == QMetaType::QString
+                ? QKeySequence(defaultShortcutValue.toString())
+                : defaultShortcutValue.value<QKeySequence>();
+        return defaultShortcut;
+    }
+
+    return QKeySequence();
+}
+
+bool ActionManager::restoreActionShortcut(QObject *action)
+{
+    const ActionManager *manager = findManager(action);
+    if (manager == nullptr)
+        return false;
+
+    const QKeySequence defaultShortcut = defaultActionShortcut(action);
+    if (defaultShortcut.isEmpty())
+        return false;
+
+    const QString currentShortcut = action->property(_QQuickActionShortcutProperty).toString();
+    if (currentShortcut == defaultShortcut.toString())
+        return true;
+
+    return action->setProperty(_QQuickActionShortcutProperty, defaultShortcut.toString());
 }
 
 void ActionManager::setTitle(const QString &val)
@@ -170,7 +232,6 @@ QHash<int, QByteArray> ActionManager::roleNames() const
 bool ActionManager::addInternal(QObject *action)
 {
     if (action != nullptr && !m_actions.contains(action) && action->inherits(_QQuickAction)) {
-
         connect(action, &QObject::destroyed, this, &ActionManager::onObjectDestroyed);
 
         const QMetaProperty sortOrderProperty = action->metaObject()->property(
@@ -190,6 +251,9 @@ bool ActionManager::addInternal(QObject *action)
                 connect(action, _QQuickActionVisibilityChanged, this, SLOT(onVisibilityChanged()));
         }
 
+        connect(action, _QQuickActionShortcutChanged, this,
+                SLOT(onActionShortcutChanged(QKeySequence)));
+
         QList<QObject *> actions = m_actions;
         actions.append(action);
         sortActions(actions);
@@ -199,6 +263,8 @@ bool ActionManager::addInternal(QObject *action)
         this->beginInsertRows(QModelIndex(), insertIndex, insertIndex);
         m_actions = actions;
         this->endInsertRows();
+
+        this->scheduleApplySavedShortcuts();
 
         return true;
     }
@@ -227,6 +293,36 @@ void ActionManager::onObjectDestroyed(QObject *action)
     this->removeInternal(action);
 }
 
+void ActionManager::onActionShortcutChanged(const QKeySequence &newShortcut)
+{
+    QObject *action = this->sender();
+
+    const int row = m_actions.indexOf(action);
+    if (row < 0)
+        return;
+
+    if (action->objectName().isEmpty())
+        return;
+
+    if (m_shortcutMap.value(action->objectName()).toString() == newShortcut.toString())
+        return;
+
+    const QKeySequence defaultShortcut = defaultActionShortcut(action);
+
+    /**
+     * We only want to save shortcuts for those actions that supply a defaultShortcut.
+     * If they are not supplying one, then it clearly means that shortcuts (even if
+     * assigned) are hardcoded, and not meant to be changed.
+     */
+    if (defaultShortcut.isEmpty())
+        return;
+
+    if (defaultShortcut == newShortcut)
+        m_shortcutMap.remove(action->objectName());
+    else
+        m_shortcutMap[action->objectName()] = newShortcut.toString();
+}
+
 void ActionManager::sortActions(QList<QObject *> &actions)
 {
     QMap<int, QList<QObject *>> map;
@@ -245,6 +341,85 @@ void ActionManager::sortActions(QList<QObject *> &actions)
         actions += it.value();
         ++it;
     }
+}
+
+void ActionManager::saveShortcutMap()
+{
+    if (m_shortcutMap.isEmpty())
+        return;
+
+    const QString mapFilePath = this->shortcutMapFilePath();
+    if (mapFilePath.isEmpty())
+        return;
+
+    QFile mapFile(mapFilePath);
+    if (!mapFile.open(QFile::WriteOnly))
+        return;
+
+    const QJsonObject shortcuts = QJsonObject::fromVariantMap(m_shortcutMap);
+    mapFile.write(QJsonDocument(shortcuts).toJson(QJsonDocument::Indented));
+}
+
+void ActionManager::applySavedShortcuts()
+{
+    const QVariantMap shortcutMap = [=]() {
+        QVariantMap theMap;
+
+        const QString mapFilePath = this->shortcutMapFilePath();
+        if (mapFilePath.isEmpty())
+            return theMap;
+
+        QFile mapFile(mapFilePath);
+        if (!mapFile.open(QFile::ReadOnly))
+            return theMap;
+
+        const QJsonDocument jsonDoc = QJsonDocument::fromJson(mapFile.readAll());
+        const QJsonObject shortcuts = jsonDoc.object();
+        if (shortcuts.isEmpty())
+            return theMap;
+
+        return shortcuts.toVariantMap();
+    }();
+
+    if (shortcutMap.isEmpty() || m_actions.isEmpty())
+        return;
+
+    for (QObject *action : qAsConst(m_actions)) {
+        if (shortcutMap.contains(action->objectName()))
+            changeActionShortcut(action, shortcutMap[action->objectName()].toString());
+    }
+}
+
+void ActionManager::scheduleApplySavedShortcuts()
+{
+    if (m_applySavedShortcutsTimer.isNull()) {
+        m_applySavedShortcutsTimer = new QTimer(this);
+        m_applySavedShortcutsTimer->setInterval(500);
+        m_applySavedShortcutsTimer->setSingleShot(true);
+        connect(m_applySavedShortcutsTimer, &QTimer::timeout, this,
+                &ActionManager::applySavedShortcuts);
+        connect(m_applySavedShortcutsTimer, &QTimer::timeout, m_applySavedShortcutsTimer,
+                &QObject::deleteLater);
+    }
+
+    m_applySavedShortcutsTimer->start();
+}
+
+QString ActionManager::shortcutMapFilePath() const
+{
+    if (this->objectName().isEmpty())
+        return QString();
+
+    const QString settingsFilePath = Application::instance()->settingsFilePath();
+    const QString shortcutsFolder = QString("shortcuts");
+
+    QDir configDir = QFileInfo(settingsFilePath).absoluteDir();
+    if (!configDir.cd(shortcutsFolder)) {
+        configDir.mkdir(shortcutsFolder);
+        configDir.cd(shortcutsFolder);
+    }
+
+    return configDir.absoluteFilePath(this->objectName() + ".json");
 }
 
 void ActionManager::onSortOrderChanged()

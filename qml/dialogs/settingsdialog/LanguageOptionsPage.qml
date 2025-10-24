@@ -205,8 +205,8 @@ Item {
                                 enabled: !DefaultTransliteration.supportsLanguageCode(_private.language.code) && _private.language.code !== QtLocale.English
                                 shortcut: Scrite.app.polishShortcutTextForDisplay(_private.language.shortcut())
 
-                                onShortcutEdited: (text) => {
-                                    Runtime.language.supported.assignLanguageShortcut(_private.language.code, text)
+                                onShortcutEdited: (newShortcut) => {
+                                    Runtime.language.supported.assignLanguageShortcut(_private.language.code, newShortcut)
                                 }
                             }
                         }

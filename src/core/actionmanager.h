@@ -14,7 +14,9 @@
 #ifndef ACTIONMANAGER_H
 #define ACTIONMANAGER_H
 
+#include <QTimer>
 #include <QObject>
+#include <QPointer>
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QAbstractListModel>
@@ -38,6 +40,11 @@ public:
 
     Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
     Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
+
+    static ActionManager *findManager(QObject *action);
+    static bool changeActionShortcut(QObject *action, const QString &shortcut);
+    static QKeySequence defaultActionShortcut(QObject *action);
+    Q_INVOKABLE static bool restoreActionShortcut(QObject *action);
 
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     void setTitle(const QString &val);
@@ -87,15 +94,23 @@ private:
     void onObjectDestroyed(QObject *action);
     static void sortActions(QList<QObject *> &actions);
 
+    void saveShortcutMap();
+    void applySavedShortcuts();
+    void scheduleApplySavedShortcuts();
+    QString shortcutMapFilePath() const;
+
 private slots:
     void onSortOrderChanged();
     void onVisibilityChanged();
+    void onActionShortcutChanged(const QKeySequence &newShortcut);
 
 private:
     int m_sortOrder = 0;
     QTimer *m_sortActionsTimer = nullptr;
     QString m_title;
     QList<QObject *> m_actions;
+    QVariantMap m_shortcutMap;
+    QPointer<QTimer> m_applySavedShortcutsTimer;
 };
 
 class ActionManagerAttached : public QObject

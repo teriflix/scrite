@@ -119,6 +119,8 @@ Item {
                             _actionsView.currentIndex = index
                         }
                     }
+
+                    onShortcutEdited: (newShortcut) => { qmlAction.shortcut = newShortcut }
                 }
 
                 ToolButton {
@@ -128,6 +130,8 @@ Item {
                     enabled: visible && Scrite.app.polishShortcutTextForDisplay(qmlAction.defaultShortcut) !== Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
                     opacity: enabled ? 1 : 0.5
                     icon.source: "qrc:/icons/content/undo.png"
+
+                    onClicked: actionManager.restoreActionShortcut(qmlAction)
                 }
             }
         }

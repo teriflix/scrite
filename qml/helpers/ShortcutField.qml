@@ -26,7 +26,7 @@ Item {
     property alias shortcut: _text.text
     property alias placeholderText: _placeholder.text
 
-    signal shortcutEdited(string text)
+    signal shortcutEdited(string newShortcut)
 
     implicitWidth: Math.max(_text.width, _placeholder.width)
     implicitHeight: Math.max(_text.height, _placeholder.height)
