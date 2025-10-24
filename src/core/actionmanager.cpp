@@ -101,6 +101,9 @@ ActionManager *ActionManager::findManager(QObject *action)
 
 bool ActionManager::changeActionShortcut(QObject *action, const QString &shortcut)
 {
+    if (shortcut.isEmpty())
+        return false;
+
     const ActionManager *manager = findManager(action);
     if (manager == nullptr)
         return false;
@@ -1151,4 +1154,94 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     }
 
     return accept;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ShortcutInputHandler::ShortcutInputHandler(QObject *parent) : QObject(parent) { }
+
+ShortcutInputHandler::~ShortcutInputHandler() { }
+
+ShortcutInputHandler *ShortcutInputHandler::qmlAttachedProperties(QObject *parent)
+{
+    return new ShortcutInputHandler(parent);
+}
+
+bool ShortcutInputHandler::eventFilter(QObject *object, QEvent *event)
+{
+    if (!m_handleInput || object != this->parent())
+        return false;
+
+    switch (event->type()) {
+    case QEvent::Shortcut:
+        return true;
+    case QEvent::ShortcutOverride:
+        event->accept();
+        return true;
+    case QEvent::KeyPress:
+        this->handleKeyPressEvent(static_cast<QKeyEvent *>(event));
+        return event->isAccepted();
+    case QEvent::KeyRelease:
+        this->handleKeyReleaseEvent(static_cast<QKeyEvent *>(event));
+        return event->isAccepted();
+    default:
+        break;
+    }
+
+    return false;
+}
+
+void ShortcutInputHandler::handleKeyPressEvent(QKeyEvent *event)
+{
+    event->accept();
+
+    if (m_keys.size() > 4)
+        return;
+
+    m_modifiers = event->modifiers();
+
+    const QList<int> modifierKeys(
+            { Qt::Key_Control, Qt::Key_Shift, Qt::Key_Alt, Qt::Key_Meta, Qt::Key_unknown });
+    if (modifierKeys.contains(event->key()))
+        return;
+
+    m_keys.append(m_modifiers > 0 ? event->nativeVirtualKey() : event->key());
+}
+
+void ShortcutInputHandler::handleKeyReleaseEvent(QKeyEvent *event)
+{
+    const QList<int> modifierKeys(
+            { Qt::Key_Control, Qt::Key_Shift, Qt::Key_Alt, Qt::Key_Meta, Qt::Key_unknown });
+    if (modifierKeys.contains(event->key()))
+        return;
+
+    event->accept();
+
+    auto key = [=](int index) {
+        return index < 0 || index >= m_keys.size() ? 0 : m_keys.at(index);
+    };
+
+    const QKeySequence sequence(m_modifiers + key(0), key(1), key(2), key(3));
+    if (!sequence.isEmpty())
+        emit shortcutCaptured(sequence.toString());
+
+    m_keys.clear();
+    m_modifiers = Qt::KeyboardModifiers();
+}
+
+void ShortcutInputHandler::setHandleInput(bool val)
+{
+    if (m_handleInput == val)
+        return;
+
+    m_handleInput = val;
+
+    if (this->parent()) {
+        if (val)
+            this->parent()->installEventFilter(this);
+        else
+            this->parent()->removeEventFilter(this);
+    }
+
+    emit handleInputChanged();
 }

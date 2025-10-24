@@ -31,23 +31,8 @@ Item {
     implicitWidth: Math.max(_text.width, _placeholder.width)
     implicitHeight: Math.max(_text.height, _placeholder.height)
 
-    Keys.onPressed: (event) => {
-                        var mods = ""
-                        if (event.modifiers & Qt.ControlModifier) mods += "Ctrl+"
-                        if (event.modifiers & Qt.ShiftModifier) mods += "Shift+"
-                        if (event.modifiers & Qt.AltModifier) mods += "Alt+"
-                        if (event.modifiers & Qt.MetaModifier) mods += "Meta+"
-
-                        let keyName = event.text.trim()
-                        if (keyName === "" && event.key >= Qt.Key_Space && event.key <= Qt.Key_AsciiTilde) {
-                            // For printable keys fallback - this may happen rarely
-                            keyName = String.fromCharCode(event.key);
-                        }
-
-                        shortcutEdited(mods + keyName.toUpperCase())
-
-                        event.accepted = true
-                    }
+    ShortcutInputHandler.handleInput: activeFocus
+    ShortcutInputHandler.onShortcutCaptured: (newShortcut) => { shortcutEdited(newShortcut) }
 
     Rectangle {
         id: _background

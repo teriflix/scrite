@@ -239,6 +239,7 @@ private:
 class ActionHandlers : public QObject
 {
     Q_OBJECT
+
 public:
     static ActionHandlers *instance();
 
@@ -365,6 +366,41 @@ protected:
 private:
     Filters m_filters = AllActions;
     QString m_actionTextStartsWith;
+};
+
+class ShortcutInputHandler : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_ATTACHED(ShortcutInputHandler)
+
+public:
+    virtual ~ShortcutInputHandler();
+
+    Q_PROPERTY(bool handleInput READ handleInput WRITE setHandleInput NOTIFY handleInputChanged)
+    void setHandleInput(bool val);
+    bool handleInput() const { return m_handleInput; }
+    Q_SIGNAL void handleInputChanged();
+
+    static ShortcutInputHandler *qmlAttachedProperties(QObject *parent);
+
+signals:
+    void shortcutCaptured(const QString &shortcut);
+
+protected:
+    bool eventFilter(QObject *object, QEvent *event);
+
+    void handleKeyPressEvent(QKeyEvent *event);
+    void handleKeyReleaseEvent(QKeyEvent *event);
+
+protected:
+    explicit ShortcutInputHandler(QObject *parent = nullptr);
+
+private:
+    QList<int> m_keys;
+    Qt::KeyboardModifiers m_modifiers;
+    bool m_handleInput = false;
+    QPointer<QTimer> m_releaseTimer;
 };
 
 #endif // ACTIONMANAGER_H
