@@ -26,6 +26,7 @@ import "qrc:/qml/controls"
 
 Item {
     id: root
+
     height: layout.height+20
 
     GridLayout {

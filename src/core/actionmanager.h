@@ -320,7 +320,8 @@ public:
         VisibleActions = 8,
         EnabledActions = 16,
         CustomFilter = -1,
-        ShortcutsDockFilter = ActionsWithText | ActionsWithShortcut | VisibleActions
+        ShortcutsDockFilters = ActionsWithText | ActionsWithShortcut | VisibleActions,
+        ShortcutsEditorFilters = ActionsWithText | ActionsWithShortcut | ActionsWithObjectName
     };
     Q_DECLARE_FLAGS(Filters, Filter)
     Q_FLAG(Filters)

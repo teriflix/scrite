@@ -26,6 +26,7 @@ import "qrc:/qml/dialogs"
 
 Item {
     id: root
+
     height: layout.height + 2*layout.margin
 
     GridLayout {

@@ -280,5 +280,6 @@
         <file>qml/mainwindow/qmldir</file>
         <file>qml/overlays/BusyOverlay.qml</file>
         <file>qml/mainwindow/VerticalToolBar.qml</file>
+        <file>qml/dialogs/settingsdialog/ApplicationShortcutsPage.qml</file>
     </qresource>
 </RCC>
