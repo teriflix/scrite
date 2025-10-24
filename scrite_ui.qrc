@@ -279,5 +279,6 @@
         <file>qml/mainwindow/ReloadPromptDialog.qml</file>
         <file>qml/mainwindow/qmldir</file>
         <file>qml/overlays/BusyOverlay.qml</file>
+        <file>qml/mainwindow/VerticalToolBar.qml</file>
     </qresource>
 </RCC>

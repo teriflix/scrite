@@ -1075,7 +1075,7 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.tabRequest, "Notebook Bookmarks")
+                Runtime.shoutoutLater(Runtime.announcementIds.notebookRequest, "Notebook Bookmarks")
             }
         }
 
@@ -1090,7 +1090,7 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.tabRequest, "Notebook Story")
+                Runtime.shoutoutLater(Runtime.announcementIds.notebookRequest, "Notebook Story")
             }
         }
 
@@ -1105,7 +1105,7 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.tabRequest, "Notebook Bookmarks")
+                Runtime.shoutoutLater(Runtime.announcementIds.notebookRequest, "Notebook Bookmarks")
             }
         }
     }

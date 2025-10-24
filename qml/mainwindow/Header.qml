@@ -198,7 +198,7 @@ Rectangle {
             Repeater {
                 model: ActionHub.mainWindowTabs
 
-                Button {
+                ToolButton {
                     required property var qmlAction
 
                     Material.primary: Runtime.colors.primary.key
@@ -214,7 +214,7 @@ Rectangle {
                     ToolTip.visible: ToolTip.text !== "" && hovered
 
                     action: qmlAction
-                    down: qmlAction.down !== undefined ? qmlAction.down : pressed
+                    down: qmlAction.down
                     display: down ? Button.TextBesideIcon : Button.IconOnly
                     flat: true
                     visible: qmlAction.visible !== undefined ? qmlAction.visible === true : true
@@ -224,7 +224,7 @@ Rectangle {
                             anchors.fill: parent
                             anchors.margins: -5
 
-                            color: qmlAction.checked ? Runtime.colors.primary.c300.background : Runtime.colors.transparent
+                            color: qmlAction.down ? Runtime.colors.primary.c300.background : Runtime.colors.transparent
                         }
                     }
                 }

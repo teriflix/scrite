@@ -70,47 +70,12 @@ Item {
 
                         spacing: 0
 
-                        ToolBar {
+                        VerticalToolBar {
                             id: _toolbar
 
                             Layout.fillHeight: true
 
-                            Material.accent: Runtime.colors.accent.key
-                            Material.background: Runtime.colors.primary.c10.background
-                            Material.elevation: 0
-                            Material.primary: Runtime.colors.primary.key
-                            Material.theme: Runtime.colors.theme
-
-                            GridLayout {
-                                id: _toolbarLayout
-
-                                readonly property size buttonSize: Runtime.estimateTypeSize("ToolButton { icon.source: \"qrc:/icons/content/blank.png\"; display: ToolButton.IconOnly; }")
-                                property int buttonCount: (toolbarActions ? toolbarActions.count : 0) + (Runtime.showNotebookInStructure ? 2 : 0)
-                                property ActionManager toolbarActions: _contentLoader.item ? _contentLoader.item.toolbarActions : null
-
-                                anchors.fill: parent
-
-                                flow: Flow.TopToBottom
-                                rows: Math.floor(_col1.height/buttonSize.height)
-                                columns: Math.ceil( (buttonCount * buttonSize.height)/_col1.height )
-                                rowSpacing: 0
-                                columnSpacing: 0
-
-                                Repeater {
-                                    model: _toolbarLayout.toolbarActions
-
-                                    ActionToolButton {
-                                        required property var qmlAction
-
-                                        action: qmlAction
-                                    }
-                                }
-
-                                Item {
-                                    Layout.fillWidth: true
-                                    Layout.fillHeight: true
-                                }
-                            }
+                            actions: _contentLoader.item ? _contentLoader.item.toolbarActions : null
                         }
 
                         Loader {

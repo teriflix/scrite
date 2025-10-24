@@ -664,7 +664,7 @@ Item {
         readonly property string sceneNotesRequest: "41EE5E06-FF97-4DB6-B32D-F938418C9529"
         readonly property string sceneTextEditorReceivedFocus: "598E1699-465B-40D5-8CF4-E9753E2C16E7"
         readonly property string showHelpTip: "B168E17C-14CA-454F-9DF8-CAA381D9A8A2"
-        readonly property string tabRequest: "abcd190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
+        readonly property string notebookRequest: "ABCD190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
         readonly property string userAccountDialogScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
         readonly property string userProfileScreenPage: "D97FD221-5257-4A20-B9A2-744594E99D76"
     }
@@ -732,36 +732,10 @@ Item {
     }
 
     function activateMainWindowTab(tab) {
-        _mainWindowTabSwitchTask.targetTab = tab
-        /*
-        switch(tab) {
-        case Runtime.MainWindowTab.ScreenplayTab:
-            mainWindowTab = tab
-            break
-        case Runtime.MainWindowTab.StructureTab:
-            if(mainWindowTab === tab && showNotebookInStructure)
-                Runtime.shoutout(announcementIds.embeddedTabRequest, "Structure")
-            else
-                mainWindowTab = tab
-            break
-        case Runtime.MainWindowTab.NotebookTab:
-            if(showNotebookInStructure) {
-                const delay = mainWindowTab === Runtime.MainWindowTab.StructureTab ? 0 : Runtime.stdAnimationDuration + 100
-                mainWindowTab = Runtime.MainWindowTab.StructureTab
-                Runtime.shoutout(announcementIds.embeddedTabRequest, "Notebook", delay)
-            } else
-                mainWindowTab = tab
-            break
-        case Runtime.MainWindowTab.ScritedTab:
-            if(workspaceSettings.showScritedTab)
-                mainWindowTab = tab
-            else
-                mainWindowTab = Runtime.MainWindowTab.ScreenplayTab
-            break
-        default:
-            mainWindowTab = Runtime.MainWindowTab.ScreenplayTab
-            break
-        }*/
+        if(mainWindowTab !== tab) {
+            _mainWindowTabSwitchTask.targetTab = tab
+            _mainWindowTabSwitchTask.start()
+        }
     }
 
     function shoutout(type, data, delay) {
@@ -775,7 +749,7 @@ Item {
     }
 
     function shoutoutLater(type, delay) {
-        shoutout(type, delay, stdAnimationDuration)
+        shoutout(type, delay, stdAnimationDuration + 50)
     }
 
     function showHelpTip(tipName) {
@@ -783,8 +757,7 @@ Item {
             Runtime.shoutout(Runtime.announcementIds.showHelpTip, tipName)
     }
 
-    function execLater(contextObject, delay, callback, args)
-    {
+    function execLater(contextObject, delay, callback, args) {
         let timer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject);
         timer.interval = delay === undefined ? 100 : delay
         timer.repeat = false
@@ -818,20 +791,17 @@ Item {
         return annot
     }
 
-    function bounded(min, val, max)
-    {
+    function bounded(min, val, max) {
         return Math.min(Math.max(min, val), max)
     }
 
-    function todayWithZeroTime()
-    {
+    function todayWithZeroTime() {
         let today = new Date();
         today.setHours(0, 0, 0, 0);
         return today;
     }
 
-    function formatDate(date)
-    {
+    function formatDate(date) {
         const months =
                 [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
 
@@ -841,13 +811,11 @@ Item {
         return day + " " + month;
     }
 
-    function formatDateIncludingYear(date)
-    {
+    function formatDateIncludingYear(date) {
         return formatDate(date) + " " + date.getFullYear();
     }
 
-    function formatDateRangeAsString(start_date, end_date)
-    {
+    function formatDateRangeAsString(start_date, end_date) {
         if (typeof end_date === "number") {
             const nrDays = end_date
 
@@ -862,25 +830,18 @@ Item {
         return formatDateIncludingYear(start_date) + " - " + formatDateIncludingYear(end_date)
     }
 
-    function daysSpanAsString(nrDays)
-    {
+    function daysSpanAsString(nrDays) {
         let ret = ""
-        if (nrDays < 0)
-        {
+        if (nrDays < 0) {
             ret = "Already"
-        }
-        else if (nrDays === 0) { ret = "Today" }
+        } else if (nrDays === 0) { ret = "Today" }
         else if (nrDays === 1) { ret = "Tomorrow" }
-        else
-        {
+        else {
             const years = Math.floor(nrDays / 365)
             const days = nrDays % 365
-            if (years == 0)
-            {
+            if (years == 0) {
                 ret = days + " days"
-            }
-            else
-            {
+            } else {
                 if (years === 1) {
                     ret = "1 year"
                 } else {
@@ -898,8 +859,7 @@ Item {
         return ret
     }
 
-    function daysBetween(start_date, end_date)
-    {
+    function daysBetween(start_date, end_date) {
         let from = new Date(start_date);
         let until = new Date(end_date);
 
@@ -909,14 +869,12 @@ Item {
         return Math.ceil((until - from) / (1000 * 60 * 60 * 24));
     }
 
-    function dateSpanAsString(start_date, end_date)
-    {
+    function dateSpanAsString(start_date, end_date) {
         const nr_days_remaining = daysBetween(start_date, end_date)
         return daysSpanAsString(nr_days_remaining)
     }
 
-    function toTitleCase(str)
-    {
+    function toTitleCase(str) {
         return str
                 .toLowerCase() // Convert the entire string to lowercase
                 .split(' ') // Split into words by spaces
@@ -925,8 +883,7 @@ Item {
                 .join(' '); // Join the words back with spaces
     }
 
-    function validateEmail(email)
-    {
+    function validateEmail(email) {
         const emailRegex =
                 /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return emailRegex.test(email);
@@ -934,7 +891,7 @@ Item {
 
     visible: false
 
-    onShowNotebookInStructureChanged: activateMainWindowTab(Runtime.MainWindowTab.StructureTab)
+    onShowNotebookInStructureChanged: activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
 
     // Private objects
     Settings {
@@ -961,7 +918,7 @@ Item {
         }
 
         PauseAnimation {
-            duration: root.stdAnimationDuration
+            duration: root.stdAnimationDuration/2
         }
 
         ScriptAction {
@@ -969,7 +926,7 @@ Item {
         }
 
         PauseAnimation {
-            duration: root.stdAnimationDuration
+            duration: root.stdAnimationDuration/2
         }
 
         ScriptAction {
@@ -977,11 +934,6 @@ Item {
                 root.finishedTabSwitch(_mainWindowTabSwitchTask.targetTab)
                 _mainWindowTabSwitchTask.targetTab = -1
             }
-        }
-
-        onTargetTabChanged: {
-            if(targetTab !== root.mainWindowTab)
-                start()
         }
     }
 
