@@ -635,6 +635,24 @@ ActionsModel::ActionsModel(QObject *parent) : QAbstractListModel(parent)
 
 ActionsModel::~ActionsModel() { }
 
+QString ActionsModel::groupNameAt(int row) const
+{
+    const QVariant data = this->data(this->index(row, 0), GroupNameRole);
+    return data.toString();
+}
+
+ActionManager *ActionsModel::actionManagerAt(int row) const
+{
+    const QVariant data = this->data(this->index(row, 0), ActionManagerRole);
+    return qobject_cast<ActionManager *>(data.value<QObject *>());
+}
+
+QObject *ActionsModel::actionAt(int row) const
+{
+    const QVariant data = this->data(this->index(row, 0), ActionRole);
+    return data.value<QObject *>();
+}
+
 int ActionsModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_items.size();
@@ -647,7 +665,7 @@ QVariant ActionsModel::data(const QModelIndex &index, int role) const
 
     switch (role) {
     case GroupNameRole:
-        return m_items[index.row()].actionManager->objectName();
+        return qobject_cast<ActionManager *>(m_items[index.row()].actionManager)->title();
     case ActionManagerRole:
         return QVariant::fromValue<QObject *>(m_items[index.row()].actionManager);
     case ActionRole:
@@ -860,4 +878,102 @@ QPair<int, int> ActionsModel::findRowRange(QObject *actionManager) const
     }
 
     return qMakePair(removeStart, removeEnd);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+ActionsModelFilter::ActionsModelFilter(QObject *parent) : QSortFilterProxyModel(parent)
+{
+    this->setDynamicSortFilter(true);
+}
+
+ActionsModelFilter::~ActionsModelFilter() { }
+
+void ActionsModelFilter::setSourceModel(QAbstractItemModel *model)
+{
+    if (model->metaObject()->inherits(&ActionsModel::staticMetaObject))
+        QSortFilterProxyModel::setSourceModel(model);
+}
+
+void ActionsModelFilter::setActionTextStartsWith(const QString &val)
+{
+    if (m_actionTextStartsWith == val)
+        return;
+
+    m_actionTextStartsWith = val;
+    emit actionTextStartsWithChanged();
+
+    this->invalidateFilter();
+}
+
+void ActionsModelFilter::setFilters(Filters val)
+{
+    if (m_filters == val)
+        return;
+
+    m_filters = val;
+    emit filtersChanged();
+}
+
+void ActionsModelFilter::componentComplete()
+{
+    if (this->sourceModel() == nullptr)
+        this->setSourceModel(new ActionsModel(this));
+}
+
+bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
+    if (source_parent.isValid())
+        return false;
+
+    if (m_filters == AllActions)
+        return true;
+
+    const ActionsModel *sourceActionModel = qobject_cast<ActionsModel *>(this->sourceModel());
+    if (sourceActionModel == nullptr)
+        return false;
+
+    ActionManager *manager = sourceActionModel->actionManagerAt(source_row);
+    QObject *action = sourceActionModel->actionAt(source_row);
+    if (manager == nullptr || action == nullptr)
+        return false;
+
+    if (m_filters == CustomFilter) {
+        BooleanResult result;
+
+        emit const_cast<ActionsModelFilter *>(this)->filterRequest(action, manager, &result);
+        return result.value();
+    }
+
+    bool accept = true;
+
+    if (accept && m_filters.testFlag(ActionsWithText)) {
+        const QString text = action->property("text").toString();
+        accept &= !text.isEmpty();
+
+        if (!m_actionTextStartsWith.isEmpty())
+            accept &= text.startsWith(m_actionTextStartsWith, Qt::CaseInsensitive);
+    }
+
+    if (accept && m_filters.testFlag(ActionsWithShortcut)) {
+        const QKeySequence shortcut = action->property("shortcut").value<QKeySequence>();
+        accept &= !shortcut.isEmpty();
+    }
+
+    if (accept & m_filters.testFlag(ActionsWithObjectName)) {
+        accept &= !action->objectName().isEmpty();
+    }
+
+    if (accept & m_filters.testFlag(VisibleActions)) {
+        const QVariant visibleFlag = action->property("visible");
+        if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
+            accept &= visibleFlag.toBool();
+    }
+
+    if (accept & m_filters.testFlag(EnabledActions)) {
+        const QVariant enabledFlag = action->property("enabled");
+        accept &= enabledFlag.toBool();
+    }
+
+    return accept;
 }

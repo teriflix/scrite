@@ -1363,8 +1363,8 @@ Item {
         }
 
         Action {
-            readonly property bool visible: false
             readonly property string defaultShortcut: "F8"
+            property bool visible: enabled
 
             enabled: ActionHandler.canHandle
             objectName: "userAccount"

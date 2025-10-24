@@ -43,124 +43,105 @@ FloatingDock {
                      })
     }
 
-    content: ColumnLayout {
-        VclTextField {
-            id: _shortcutsFilter
+    content: ListView {
+        id: _actionsView
 
-            Layout.fillWidth: true
-            Layout.topMargin: 8
-            Layout.leftMargin: 8
-            Layout.rightMargin: 8
+        ScrollBar.vertical: VclScrollBar { }
 
-            Keys.onUpPressed: _shortcutsView.currentIndex = Math.max(0,_shortcutsView.currentIndex-1)
-            Keys.onDownPressed: _shortcutsView.currentIndex = Math.min(_shortcutsView.currentIndex+1,_shortcutsView.count-1)
-            Keys.onEscapePressed: { clear(); _private.shortcutsModel.titleFilter = "" }
-            Keys.onReturnPressed: _private.shortcutsModel.activateShortcutAt(_shortcutsView.currentIndex)
+        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
-            placeholderText: "Search/Filter"
-
-            onTextEdited: _private.shortcutsModel.titleFilter = text
+        boundsBehavior: Flickable.StopAtBounds
+        clip: true
+        highlightFollowsCurrentItem: true
+        highlightMoveDuration: 0
+        highlightResizeDuration: 0
+        keyNavigationEnabled: true
+        model: ActionsModelFilter {
+            filters: ActionsModelFilter.ShortcutsDockFilter
         }
 
-        ListView {
-            id: _shortcutsView
+        section.property: "groupName"
+        section.criteria: ViewSection.FullString
+        section.labelPositioning: ViewSection.InlineLabels
+        section.delegate: VclLabel {
+            required property string section
 
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            width: _actionsView.width
 
-            Keys.onEscapePressed: { _shortcutsFilter.clear(); _private.shortcutsModel.titleFilter = "" }
-            Keys.onReturnPressed: _private.shortcutsModel.activateShortcutAt(currentIndex)
+            text: section
+            color: Runtime.colors.accent.c100.text
+            padding: 12
 
-            ScrollBar.vertical: VclScrollBar { }
+            font.bold: true
 
-            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+            verticalAlignment: Text.AlignVCenter
+            horizontalAlignment: Text.AlignLeft
 
-            clip: true
-            model: _private.shortcutsModel
-            boundsBehavior: Flickable.StopAtBounds
-            keyNavigationEnabled: true
-            highlightMoveDuration: 0
-            highlightResizeDuration: 0
-            highlightFollowsCurrentItem: true
+            background: Rectangle {
+                color: Runtime.colors.accent.c100.background
+            }
+        }
 
-            section.property: "itemGroup"
-            section.criteria: ViewSection.FullString
-            section.labelPositioning: ViewSection.InlineLabels
-            section.delegate: VclLabel {
-                required property string section
+        delegate: Item {
+            required property int index
+            required property string groupName
+            required property var actionManager
+            required property var qmlAction
 
-                width: _shortcutsView.width
+            width: _actionsView.height < _actionsView.contentHeight ? _actionsView.width - 17 : _actionsView.width
+            height: _delegateLayout.height
 
-                text: section
-                color: Runtime.colors.accent.c100.text
-                padding: 8
+            RowLayout {
+                id: _delegateLayout
 
-                font.bold: true
+                width: parent.width
 
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
+                opacity: qmlAction.enabled ? 1 : 0.5
 
-                background: Rectangle {
-                    color: Runtime.colors.accent.c100.background
+                Image {
+                    Layout.preferredHeight: Runtime.iconImageSize
+                    Layout.preferredWidth: Runtime.iconImageSize
+
+                    fillMode: Image.PreserveAspectFit
+                    source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
+                }
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: qmlAction.text
+                    elide: Text.ElideRight
+                    padding: 10
+                }
+
+                VclLabel {
+                    Layout.preferredWidth: _delegateLayout.width * 0.35
+
+                    text: Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+                    elide: Text.ElideRight
+
+                    font.family: "Courier Prime"
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                 }
             }
 
-            delegate: Item {
-                required property int index
-                required property bool itemVisible
-                required property bool itemEnabled
-                required property bool itemCanBeActivated
-                required property string itemTitle
-                required property string itemGroup
-                required property string itemShortcut
-
-                Keys.onReturnPressed: _private.shortcutsModel.activateShortcutAt(index)
-
-                width: _shortcutsView.width-(_shortcutsView.contentHeight > _shortcutsView.height ? 17 : 0)
-                height: _delegateLayout.height+16
-                opacity: itemEnabled ? 1 : 0.5
-
-                Row {
-                    id: _delegateLayout
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    anchors.leftMargin: 20
-                    anchors.verticalCenter: parent.verticalCenter
-
-                    Link {
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        text: itemTitle
-                        width: parent.width * 0.65
-                        elide: Text.ElideRight
-                        enabled: itemCanBeActivated
-                        hoverColor: Runtime.colors.accent.c100.text
-                        defaultColor: Runtime.colors.primary.c100.text
-                        font.underline: containsMouse
-
-                        onClicked: {
-                            _shortcutsView.forceActiveFocus()
-                            _shortcutsView.currentIndex = index
-                            _private.shortcutsModel.activateShortcutAt(index)
-                        }
-                    }
-
-                    VclLabel {
-                        anchors.verticalCenter: parent.verticalCenter
-
-                        text: Scrite.app.polishShortcutTextForDisplay(itemShortcut)
-                        width: parent.width * 0.35
-
-                        font.family: "Courier Prime"
-                        font.pointSize: Runtime.minimumFontMetrics.font.pointSize
-                    }
+            MouseArea {
+                ToolTip.text: {
+                    const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
+                    const sc = Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+                    return sc === "" ? tt : (tt + " ( " + sc + " )")
                 }
-            }
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTip.visible: ToolTip.text !== "" && containsMouse
 
-            highlight: Rectangle {
-                color: Runtime.colors.primary.highlight.background
+                anchors.fill: parent
+
+                hoverEnabled: true
             }
+        }
+
+        highlight: Rectangle {
+            color: Runtime.colors.primary.highlight.background
         }
     }
 

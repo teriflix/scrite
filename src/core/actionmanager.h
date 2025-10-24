@@ -18,6 +18,9 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QAbstractListModel>
+#include <QSortFilterProxyModel>
+
+#include "booleanresult.h"
 
 class ActionManagerAttached;
 class ActionManager : public QAbstractListModel
@@ -265,6 +268,10 @@ public:
     int count() const { return m_items.size(); }
     Q_SIGNAL void countChanged();
 
+    QString groupNameAt(int row) const;
+    ActionManager *actionManagerAt(int row) const;
+    QObject *actionAt(int row) const;
+
     // QAbstractItemModel interface
     enum { GroupNameRole, ActionManagerRole, ActionRole };
     int rowCount(const QModelIndex &parent) const;
@@ -292,6 +299,56 @@ private:
         QPointer<QObject> action;
     };
     QList<Item> m_items;
+};
+
+class ActionsModelFilter : public QSortFilterProxyModel, public QQmlParserStatus
+{
+    Q_OBJECT
+    QML_ELEMENT
+
+public:
+    explicit ActionsModelFilter(QObject *parent = nullptr);
+    virtual ~ActionsModelFilter();
+
+    void setSourceModel(QAbstractItemModel *model);
+
+    enum Filter {
+        AllActions = 0,
+        ActionsWithText = 1,
+        ActionsWithShortcut = 2,
+        ActionsWithObjectName = 4,
+        VisibleActions = 8,
+        EnabledActions = 16,
+        CustomFilter = -1,
+        ShortcutsDockFilter = ActionsWithText | ActionsWithShortcut | VisibleActions
+    };
+    Q_DECLARE_FLAGS(Filters, Filter)
+    Q_FLAG(Filters)
+
+    Q_PROPERTY(QString actionTextStartsWith READ actionTextStartsWith WRITE setActionTextStartsWith NOTIFY actionTextStartsWithChanged)
+    void setActionTextStartsWith(const QString &val);
+    QString actionTextStartsWith() const { return m_actionTextStartsWith; }
+    Q_SIGNAL void actionTextStartsWithChanged();
+
+    Q_PROPERTY(Filters filters READ filters WRITE setFilters NOTIFY filtersChanged)
+    void setFilters(Filters val);
+    Filters filters() const { return m_filters; }
+    Q_SIGNAL void filtersChanged();
+
+    // QQmlParserStatus interface
+    void classBegin() { }
+    void componentComplete();
+
+signals:
+    void filterRequest(QObject *qmlAction, ActionManager *actionManager, BooleanResult *result);
+
+protected:
+    // QSortFilterProxyModel interface
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
+
+private:
+    Filters m_filters = AllActions;
+    QString m_actionTextStartsWith;
 };
 
 #endif // ACTIONMANAGER_H

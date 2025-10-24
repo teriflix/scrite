@@ -133,6 +133,7 @@ HEADERS += \
     src/reports/statisticsreport.h \
     src/reports/statisticsreport_p.h \
     src/reports/twocolumnreport.h \
+    src/utils/booleanresult.h \
     src/utils/execlatertimer.h \
     src/utils/fountain.h \
     src/utils/graphlayout.h \
