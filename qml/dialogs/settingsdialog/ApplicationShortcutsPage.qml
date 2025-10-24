@@ -45,9 +45,7 @@ Item {
         highlightMoveDuration: 0
         highlightResizeDuration: 0
         keyNavigationEnabled: false
-        model: ActionsModelFilter {
-            filters: ActionsModelFilter.ShortcutsEditorFilters
-        }
+        model: _actionsModel
 
         section.property: "groupName"
         section.criteria: ViewSection.FullString
@@ -111,7 +109,7 @@ Item {
                 ShortcutField {
                     Layout.preferredWidth: _delegateLayout.width * 0.3
 
-                    shortcut: qmlAction.shortcut
+                    shortcut: Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
                     placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Scrite.app.polishShortcutTextForDisplay(qmlAction.defaultShortcut)) : ""
 
                     onActiveFocusChanged: {
@@ -120,7 +118,15 @@ Item {
                         }
                     }
 
-                    onShortcutEdited: (newShortcut) => { qmlAction.shortcut = newShortcut }
+                    onShortcutEdited: (newShortcut) => {
+                                          const conflictingAction = _actionsModel.findActionForShortcut(newShortcut)
+                                          if(conflictingAction) {
+                                              MessageBox.information("Shortcut Conflict",
+                                                                     Scrite.app.polishShortcutTextForDisplay(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                                          } else {
+                                            qmlAction.shortcut = newShortcut
+                                          }
+                                      }
                 }
 
                 ToolButton {
@@ -131,7 +137,7 @@ Item {
                     opacity: enabled ? 1 : 0.5
                     icon.source: "qrc:/icons/content/undo.png"
 
-                    onClicked: actionManager.restoreActionShortcut(qmlAction)
+                    onClicked: _actionsModel.restoreActionShortcut(qmlAction)
                 }
             }
         }
@@ -139,5 +145,11 @@ Item {
         highlight: Rectangle {
             color: Runtime.colors.primary.highlight.background
         }
+    }
+
+    ActionsModelFilter {
+        id: _actionsModel
+
+        filters: ActionsModelFilter.ShortcutsEditorFilters
     }
 }

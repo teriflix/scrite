@@ -206,8 +206,15 @@ Item {
                                 shortcut: Scrite.app.polishShortcutTextForDisplay(_private.language.shortcut())
 
                                 onShortcutEdited: (newShortcut) => {
-                                    Runtime.language.supported.assignLanguageShortcut(_private.language.code, newShortcut)
-                                }
+                                                      const conflictingAction = _private.actionsModel.findActionForShortcut(newShortcut)
+                                                      if(conflictingAction) {
+                                                          MessageBox.information("Shortcut Conflict",
+                                                                                 Scrite.app.polishShortcutTextForDisplay(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                                                          return
+                                                      }
+
+                                                      Runtime.language.supported.assignLanguageShortcut(_private.language.code, newShortcut)
+                                                  }
                             }
                         }
 
@@ -365,6 +372,8 @@ Item {
 
     QtObject {
         id: _private
+
+        readonly property ActionsModel actionsModel: ActionsModel { }
 
         property int previouslyActiveLanguage: -1
 

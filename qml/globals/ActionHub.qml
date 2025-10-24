@@ -476,58 +476,62 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+X"
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "selectAll"
+            shortcut: "Ctrl+A"
+            text: "Select All"
+        }
+
+        Action {
             readonly property bool visible: false
 
             enabled: ActionHandler.canHandle
             objectName: "cut"
-            shortcut: defaultShortcut
+            shortcut: "Ctrl+X"
             text: "Cut"
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+C"
             property bool visible: ActionHandler.canHandle
 
             enabled: ActionHandler.canHandle
             objectName: "copy"
-            shortcut: defaultShortcut
+            shortcut: "Ctrl+C"
             text: "Copy"
 
             icon.source: "qrc:/icons/content/content_copy.png"
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+V"
             property bool visible: ActionHandler.canHandle
 
             enabled: ActionHandler.canHandle
             objectName: "paste"
-            shortcut: defaultShortcut
+            shortcut: "Ctrl+V"
             text: "Paste"
 
             icon.source: "qrc:/icons/content/content_paste.png"
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+Z"
             property bool visible: ActionHandler.canHandle
 
             enabled: ActionHandler.canHandle
             objectName: "undo"
-            shortcut: defaultShortcut
+            shortcut: "Ctrl+Z"
             text: "Undo"
 
             icon.source: "qrc:/icons/content/undo.png"
         }
 
         Action {
-            readonly property string defaultShortcut: Scrite.app.isWindowsPlatform ? "Ctrl+Y" : "Ctrl+Shift+Z"
             property bool visible: ActionHandler.canHandle
 
             enabled: ActionHandler.canHandle
             objectName: "redo"
-            shortcut: defaultShortcut
+            shortcut: Scrite.app.isWindowsPlatform ? "Ctrl+Y" : "Ctrl+Shift+Z"
             text: "Redo"
 
             icon.source: "qrc:/icons/content/redo.png"
@@ -1139,7 +1143,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Rewind 10 seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Left)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Left)
 
             enabled: ActionHandler.canHandle
             objectName: "rewind10"
@@ -1175,7 +1179,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Forward ten seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Right)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Right)
 
             enabled: ActionHandler.canHandle
             objectName: "forward10"
@@ -1187,7 +1191,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Previous Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Up)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousScene"
@@ -1199,7 +1203,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Next Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Down)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextScene"
@@ -1231,7 +1235,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Up)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousPage"
@@ -1241,7 +1245,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt, Qt.Key_Down)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextPage"
@@ -1263,7 +1267,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control, Qt.Key_Greater)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Greater)
 
             enabled: ActionHandler.canHandle
             objectName: "adjustOffsets"

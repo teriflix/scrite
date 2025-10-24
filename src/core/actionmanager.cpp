@@ -29,6 +29,7 @@ static const char *_QQuickActionVisibilityChanged = SIGNAL(visibleChanged());
 static const QByteArray _QQuickActionShortcutProperty = QByteArrayLiteral("shortcut");
 static const char *_QQuickActionShortcutChanged = SIGNAL(shortcutChanged(QKeySequence));
 static const QByteArray _QQuickActionDefaultShortcutProperty = QByteArrayLiteral("defaultShortcut");
+static const QByteArray _QQuickActionEnabledProperty = QByteArrayLiteral("enabled");
 
 Q_GLOBAL_STATIC(QObjectListModel<ActionManager *>, ActionManagerModel)
 
@@ -141,6 +142,17 @@ bool ActionManager::restoreActionShortcut(QObject *action)
     return action->setProperty(_QQuickActionShortcutProperty, defaultShortcut.toString());
 }
 
+QObject *ActionManager::findActionForShortcut(const QString &shortcut)
+{
+    for (const ActionManager *manager : ::ActionManagerModel->constList()) {
+        QObject *action = manager->findByShortcut(shortcut);
+        if (action)
+            return action;
+    }
+
+    return nullptr;
+}
+
 void ActionManager::setTitle(const QString &val)
 {
     if (m_title == val)
@@ -173,6 +185,18 @@ QObject *ActionManager::find(const QString &actionName) const
 {
     auto it = std::find_if(m_actions.begin(), m_actions.end(), [actionName](QObject *action) {
         return (action->objectName() == actionName);
+    });
+    if (it != m_actions.end())
+        return *it;
+
+    return nullptr;
+}
+
+QObject *ActionManager::findByShortcut(const QString &shortcut) const
+{
+    auto it = std::find_if(m_actions.begin(), m_actions.end(), [shortcut](QObject *action) {
+        const QString actionShortcut = action->property(_QQuickActionShortcutProperty).toString();
+        return actionShortcut == shortcut;
     });
     if (it != m_actions.end())
         return *it;
@@ -348,12 +372,14 @@ void ActionManager::sortActions(QList<QObject *> &actions)
 
 void ActionManager::saveShortcutMap()
 {
-    if (m_shortcutMap.isEmpty())
-        return;
-
     const QString mapFilePath = this->shortcutMapFilePath();
     if (mapFilePath.isEmpty())
         return;
+
+    if (m_shortcutMap.isEmpty()) {
+        QFile::remove(mapFilePath);
+        return;
+    }
 
     QFile mapFile(mapFilePath);
     if (!mapFile.open(QFile::WriteOnly))
@@ -831,6 +857,27 @@ QObject *ActionsModel::actionAt(int row) const
     return data.value<QObject *>();
 }
 
+int ActionsModel::indexOfAction(QObject *action) const
+{
+    auto it = std::find_if(m_items.begin(), m_items.end(),
+                           [action](const Item &item) { return item.action == action; });
+
+    if (it != m_items.end())
+        return std::distance(m_items.begin(), it);
+
+    return -1;
+}
+
+QObject *ActionsModel::findActionForShortcut(const QString &shortcut) const
+{
+    return ActionManager::findActionForShortcut(shortcut);
+}
+
+bool ActionsModel::restoreActionShortcut(QObject *action) const
+{
+    return ActionManager::restoreActionShortcut(action);
+}
+
 int ActionsModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_items.size();
@@ -1093,6 +1140,34 @@ void ActionsModelFilter::setFilters(Filters val)
     emit filtersChanged();
 }
 
+QObject *ActionsModelFilter::findActionForShortcut(const QString &shortcut) const
+{
+    // NOTE: This function returns from the source model, which means the returned action
+    // may not be present as a part of the filtered set returned by this model.
+    ActionsModel *srcModel = qobject_cast<ActionsModel *>(this->sourceModel());
+    if (srcModel)
+        return srcModel->findActionForShortcut(shortcut);
+
+    return nullptr;
+}
+
+bool ActionsModelFilter::restoreActionShortcut(QObject *action) const
+{
+    // NOTE: This works only for actions avaialable as filtered through this model
+    ActionsModel *srcModel = qobject_cast<ActionsModel *>(this->sourceModel());
+    if (srcModel) {
+        const int row = srcModel->indexOfAction(action);
+        if (row < 0)
+            return false;
+
+        const QModelIndex index = this->mapFromSource(srcModel->index(row));
+        if (index.isValid())
+            return srcModel->restoreActionShortcut(action);
+    }
+
+    return false;
+}
+
 void ActionsModelFilter::componentComplete()
 {
     if (this->sourceModel() == nullptr)
@@ -1134,7 +1209,14 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     }
 
     if (accept && m_filters.testFlag(ActionsWithShortcut)) {
-        const QKeySequence shortcut = action->property("shortcut").value<QKeySequence>();
+        const QKeySequence shortcut =
+                action->property(_QQuickActionShortcutProperty).value<QKeySequence>();
+        accept &= !shortcut.isEmpty();
+    }
+
+    if (accept && m_filters.testFlag(ActionsWithDefaultShortcut)) {
+        const QKeySequence shortcut =
+                action->property(_QQuickActionDefaultShortcutProperty).value<QKeySequence>();
         accept &= !shortcut.isEmpty();
     }
 
@@ -1143,13 +1225,13 @@ bool ActionsModelFilter::filterAcceptsRow(int source_row, const QModelIndex &sou
     }
 
     if (accept & m_filters.testFlag(VisibleActions)) {
-        const QVariant visibleFlag = action->property("visible");
+        const QVariant visibleFlag = action->property(_QQuickActionVisibleProperty);
         if (visibleFlag.isValid() && visibleFlag.userType() == QMetaType::Bool)
             accept &= visibleFlag.toBool();
     }
 
     if (accept & m_filters.testFlag(EnabledActions)) {
-        const QVariant enabledFlag = action->property("enabled");
+        const QVariant enabledFlag = action->property(_QQuickActionEnabledProperty);
         accept &= enabledFlag.toBool();
     }
 
@@ -1203,6 +1285,10 @@ void ShortcutInputHandler::handleKeyPressEvent(QKeyEvent *event)
     const QList<int> modifierKeys(
             { Qt::Key_Control, Qt::Key_Shift, Qt::Key_Alt, Qt::Key_Meta, Qt::Key_unknown });
     if (modifierKeys.contains(event->key()))
+        return;
+
+    // Avoid capturing printable letters without
+    if (m_modifiers == 0 && !event->text().isEmpty())
         return;
 
     m_keys.append(m_modifiers > 0 ? event->nativeVirtualKey() : event->key());

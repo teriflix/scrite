@@ -44,10 +44,11 @@ public:
     static ActionManager *findManager(QObject *action);
     static bool changeActionShortcut(QObject *action, const QString &shortcut);
     static QKeySequence defaultActionShortcut(QObject *action);
-    Q_INVOKABLE static bool restoreActionShortcut(QObject *action);
+    static bool restoreActionShortcut(QObject *action);
+    static QObject *findActionForShortcut(const QString &shortcut);
 
-    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    void setTitle(const QString &val);
+    Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged) void setTitle(
+            const QString &val);
     QString title() const { return m_title; }
     Q_SIGNAL void titleChanged();
 
@@ -64,6 +65,7 @@ public:
     Q_INVOKABLE bool remove(QObject *action);
     Q_INVOKABLE QObject *at(int index) const { return m_actions.at(index); }
     Q_INVOKABLE QObject *find(const QString &actionName) const;
+    Q_INVOKABLE QObject *findByShortcut(const QString &shortcut) const;
 
     QList<QObject *> actions() const { return m_actions; }
 
@@ -284,9 +286,13 @@ public:
     int count() const { return m_items.size(); }
     Q_SIGNAL void countChanged();
 
-    QString groupNameAt(int row) const;
-    ActionManager *actionManagerAt(int row) const;
-    QObject *actionAt(int row) const;
+    Q_INVOKABLE QString groupNameAt(int row) const;
+    Q_INVOKABLE ActionManager *actionManagerAt(int row) const;
+    Q_INVOKABLE QObject *actionAt(int row) const;
+    Q_INVOKABLE int indexOfAction(QObject *action) const;
+
+    Q_INVOKABLE QObject *findActionForShortcut(const QString &shortcut) const;
+    Q_INVOKABLE bool restoreActionShortcut(QObject *action) const;
 
     // QAbstractItemModel interface
     enum { GroupNameRole, ActionManagerRole, ActionRole };
@@ -332,12 +338,14 @@ public:
         AllActions = 0,
         ActionsWithText = 1,
         ActionsWithShortcut = 2,
-        ActionsWithObjectName = 4,
-        VisibleActions = 8,
-        EnabledActions = 16,
+        ActionsWithDefaultShortcut = 4,
+        ActionsWithObjectName = 8,
+        VisibleActions = 16,
+        EnabledActions = 32,
         CustomFilter = -1,
         ShortcutsDockFilters = ActionsWithText | ActionsWithShortcut | VisibleActions,
-        ShortcutsEditorFilters = ActionsWithText | ActionsWithShortcut | ActionsWithObjectName
+        ShortcutsEditorFilters = ActionsWithText | ActionsWithShortcut | ActionsWithDefaultShortcut
+                | ActionsWithObjectName
     };
     Q_DECLARE_FLAGS(Filters, Filter)
     Q_FLAG(Filters)
@@ -351,6 +359,9 @@ public:
     void setFilters(Filters val);
     Filters filters() const { return m_filters; }
     Q_SIGNAL void filtersChanged();
+
+    Q_INVOKABLE QObject *findActionForShortcut(const QString &shortcut) const;
+    Q_INVOKABLE bool restoreActionShortcut(QObject *action) const;
 
     // QQmlParserStatus interface
     void classBegin() { }
