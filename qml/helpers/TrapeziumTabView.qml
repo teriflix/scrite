@@ -45,12 +45,12 @@ Item {
 
             TrapeziumTab {
                 tabFillColor: active ? tabColor : Qt.tint(tabColor, Runtime.colors.sceneControlTint)
-                tabBorderColor: Scrite.app.isVeryLightColor(tabColor) ? "gray" : tabColor
+                tabBorderColor: Color.isVeryLight(tabColor) ? "gray" : tabColor
                 tabBorderWidth: 1
                 text: modelData
                 tabIndex: index
                 tabCount: 2
-                textColor: active ? Scrite.app.textColorFor(tabColor) : "black"
+                textColor: active ? Color.textColorFor(tabColor) : "black"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 font.bold: active
                 currentTabIndex: tabBar.currentIndex
@@ -84,7 +84,7 @@ Item {
         Rectangle {
             anchors.fill: tabContentLoader
             border.width: 1
-            border.color: Scrite.app.isVeryLightColor(tabColor) ? Runtime.colors.primary.windowColor : tabColor
+            border.color: Color.isVeryLight(tabColor) ? Runtime.colors.primary.windowColor : tabColor
             color: Qt.rgba(0,0,0,0)
         }
     }

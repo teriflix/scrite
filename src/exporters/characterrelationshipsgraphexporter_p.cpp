@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "screenplay.h"
+#include "utils.h"
 #include "application.h"
 #include "scritedocument.h"
 #include "characterrelationshipsgraphexporter_p.h"
@@ -223,7 +224,7 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
 
     QAbstractTextDocumentLayout *documentLayout = document.documentLayout();
     QAbstractTextDocumentLayout::PaintContext context;
-    context.palette.setColor(QPalette::Text, Application::textColorFor(color));
+    context.palette.setColor(QPalette::Text, Utils::Color::textColorFor(color));
     painter->translate(documentRect.topLeft());
     documentLayout->draw(painter, context);
     painter->translate(documentRect.topLeft());

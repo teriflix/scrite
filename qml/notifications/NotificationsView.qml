@@ -31,7 +31,7 @@ Rectangle {
     anchors.fill: parent
 
     visible: NotificationsLayer.valid && Scrite.notifications.count > 0
-    color: Scrite.app.translucent(Runtime.colors.primary.borderColor, 0.6)
+    color: Color.translucent(Runtime.colors.primary.borderColor, 0.6)
 
     focus: visible
 

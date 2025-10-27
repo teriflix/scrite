@@ -101,7 +101,7 @@ Item {
 
             text: root.label
             elide: Text.ElideRight
-            color: Scrite.app.isLightColor(_labelBackgroud.color) ? "black" : "white"
+            color: Color.isLight(_labelBackgroud.color) ? "black" : "white"
             opacity: _contentLoader.opacity
             visible: _contentLoader.visible && text !== ""
             horizontalAlignment: Text.AlignHCenter

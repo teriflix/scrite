@@ -269,7 +269,7 @@ TextField {
         focus: false
 
         VclMenuItem {
-            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
+            text: "Cut\t" + Gui.nativeShortcut("Ctrl+X")
             enabled: root.selectedText !== ""
             focusPolicy: Qt.NoFocus
 
@@ -277,7 +277,7 @@ TextField {
         }
 
         VclMenuItem {
-            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            text: "Copy\t" + Gui.nativeShortcut("Ctrl+C")
             enabled: root.selectedText !== ""
             focusPolicy: Qt.NoFocus
 
@@ -285,7 +285,7 @@ TextField {
         }
 
         VclMenuItem {
-            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
+            text: "Paste\t" + Gui.nativeShortcut("Ctrl+V")
             focusPolicy: Qt.NoFocus
 
             onClicked: root.paste()

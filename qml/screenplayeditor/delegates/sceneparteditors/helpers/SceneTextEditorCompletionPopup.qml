@@ -39,8 +39,8 @@ Item {
     Popup {
         id: _completionPopup
 
-        x: -Scrite.app.boundingRect(_private.completionModel.completionPrefix, Runtime.sceneEditorFontMetrics.font).width
-        width: Scrite.app.largestBoundingRect(_private.completionModel.strings, Runtime.sceneEditorFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 30
+        x: -GMath.boundingRect(_private.completionModel.completionPrefix, Runtime.sceneEditorFontMetrics.font).width
+        width: GMath.largestBoundingRect(_private.completionModel.strings, Runtime.sceneEditorFontMetrics.font).width + leftInset + rightInset + leftPadding + rightPadding + 30
         height: _private.completionModel.count > 0 ? (_completionView.height + topInset + bottomInset + topPadding + bottomPadding) : 0
 
         focus: false

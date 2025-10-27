@@ -58,7 +58,7 @@ Rectangle {
     width: episodeBox.geometry.width + 80
     height: episodeBox.geometry.height + 120 + _private.topMarginForStacks + 40
 
-    color: Scrite.app.translucent(Runtime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+    color: Color.translucent(Runtime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
     border.width: 2
     border.color: Runtime.colors.accent.c600.background
 

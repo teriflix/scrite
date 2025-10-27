@@ -31,7 +31,7 @@ ToolButton {
 
     ToolTip.text: {
         const tt = action.tooltip !== undefined ? action.tooltip : action.text
-        const sc = Scrite.app.polishShortcutTextForDisplay(action.shortcut)
+        const sc = Gui.nativeShortcut(action.shortcut)
         return sc === "" ? tt : (tt + " ( " + sc + " )")
     }
     ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval

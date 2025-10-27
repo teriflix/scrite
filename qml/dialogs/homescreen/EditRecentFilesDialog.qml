@@ -157,11 +157,11 @@ DialogLauncher {
 
                                         text: fileInfo.filePath
                                         elide: Text.ElideMiddle
-                                        enabled: !Scrite.app.isLinuxPlatform
+                                        enabled: !Platform.isLinuxDesktop
                                         font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                         onClicked: {
                                             recentFilesView.currentIndex = index
-                                            Scrite.app.revealFileOnDesktop(fileInfo.filePath)
+                                            File.revealOnDesktop(fileInfo.filePath)
                                             Scrite.notifications.dismissNotification(0)
                                         }
                                     }

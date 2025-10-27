@@ -296,13 +296,13 @@ Item {
         category: "Workspace"
 
         property var customColors: []
-        property var defaultSceneColor: Scrite.app.standardColors[0]
+        property var defaultSceneColor: SceneColors.palette[0]
 
         property bool animateNotebookIcon: true
         property bool animateStructureIcon: true
         property bool autoOpenLastFile: false
-        property bool mouseWheelZoomsInCharacterGraph: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
-        property bool mouseWheelZoomsInStructureCanvas: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
+        property bool mouseWheelZoomsInCharacterGraph: Platform.isWindowsDesktop || Platform.isLinuxDesktop
+        property bool mouseWheelZoomsInStructureCanvas: Platform.isWindowsDesktop || Platform.isLinuxDesktop
         property bool scriptalayIntroduced: false
         property bool showNotebookInStructure: true
         property bool showScritedTab: false
@@ -392,7 +392,7 @@ Item {
 
         property QtObject regular: QtObject {
             property color background: Material.color(key)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c10: QtObject {
@@ -402,72 +402,72 @@ Item {
 
         property QtObject c50: QtObject {
             property color background: Material.color(key, Material.Shade50)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c100: QtObject {
             property color background: Material.color(key, Material.Shade100)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c200: QtObject {
             property color background: Material.color(key, Material.Shade200)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c300: QtObject {
             property color background: Material.color(key, Material.Shade300)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c400: QtObject {
             property color background: Material.color(key, Material.Shade400)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c500: QtObject {
             property color background: Material.color(key, Material.Shade500)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c600: QtObject {
             property color background: Material.color(key, Material.Shade600)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c700: QtObject {
             property color background: Material.color(key, Material.Shade700)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c800: QtObject {
             property color background: Material.color(key, Material.Shade800)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c900: QtObject {
             property color background: Material.color(key, Material.Shade900)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a100: QtObject {
             property color background: Material.color(key, Material.ShadeA100)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a200: QtObject {
             property color background: Material.color(key, Material.ShadeA200)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a400: QtObject {
             property color background: Material.color(key, Material.ShadeA400)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a700: QtObject {
             property color background: Material.color(key, Material.ShadeA700)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
     }
 
@@ -479,7 +479,7 @@ Item {
         readonly property int   theme: Material.Light
 
         readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
-        readonly property var   forScene: Scrite.app.standardColorsForVersion(Scrite.app.versionNumber)
+        readonly property var   forScene: SceneColors.palette
 
         readonly property color highlightedSceneControlTint: "#C0FFFFFF"
         readonly property color sceneControlTint: "#D7EEEEEE"
@@ -686,7 +686,7 @@ Item {
     }
 
     function init(_parent) {
-        if( !(_parent && Scrite.app.verifyType(_parent, "QQuickItem")) )
+        if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem
 
         parent = _parent

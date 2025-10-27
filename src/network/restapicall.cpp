@@ -14,6 +14,7 @@
 #include "restapicall.h"
 
 #include "user.h"
+#include "utils.h"
 #include "scrite.h"
 #include "application.h"
 #include "localstorage.h"
@@ -387,9 +388,7 @@ void RestApiCall::onNetworkReplyError()
     disconnect(m_reply, &QNetworkReply::finished, this, &RestApiCall::onNetworkReplyFinished);
 
     const QString code = "E_NETWORK_"
-            + Application::instance()
-                      ->enumerationKey(m_reply, "NetworkError", m_reply->error())
-                      .toUpper();
+            + Utils::Object::enumKey(m_reply, "NetworkError", m_reply->error()).toUpper();
     const QString msg = m_reply->errorString();
 
     emit networkError(code, msg);

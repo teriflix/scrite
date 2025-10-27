@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "form.h"
+#include "utils.h"
 #include "scrite.h"
 #include "undoredo.h"
 #include "hourglass.h"
@@ -451,86 +452,7 @@ void Application::setCustomFontPointSize(int val)
     this->computeIdealFontPointSize();
 }
 
-QUrl Application::toHttpUrl(const QUrl &url) const
-{
-    if (url.scheme() != QStringLiteral("https"))
-        return url;
-
-    QUrl url2 = url;
-    url2.setScheme(QStringLiteral("http"));
-    return url2;
-}
-
-QString Application::platformAsString() const
-{
-    switch (this->platform()) {
-    case Application::WindowsDesktop:
-        return QStringLiteral("Windows");
-    case Application::LinuxDesktop:
-        return QStringLiteral("Linux");
-    case Application::MacOS:
-        return QStringLiteral("macOS");
-    }
-
-    return QStringLiteral("Unknown");
-}
-
-#ifdef Q_OS_MAC
-Application::Platform Application::platform() const
-{
-    return Application::MacOS;
-}
-#else
-#ifdef Q_OS_WIN
-Application::Platform Application::platform() const
-{
-    return Application::WindowsDesktop;
-}
-
-bool Application::isNotWindows10() const
-{
-    return QOperatingSystemVersion::current() < QOperatingSystemVersion::Windows10;
-}
-#else
-Application::Platform Application::platform() const
-{
-    return Application::LinuxDesktop;
-}
-#endif
-#endif
-
-QString Application::platformVersion() const
-{
-    const auto osver = QOperatingSystemVersion::current();
-    if (osver.majorVersion() > 0) {
-#ifdef Q_OS_WIN
-        if (osver.majorVersion() == 10) {
-            if (osver.minorVersion() == 0) {
-                const QString os = (osver.microVersion() >= 22000 ? "11" : " 10");
-                return os + ", Build-" + QString::number(osver.microVersion());
-            }
-
-            return QVersionNumber(osver.majorVersion(), osver.minorVersion(), osver.microVersion())
-                    .toString();
-        }
-#else
-        return QVersionNumber(osver.majorVersion(), osver.minorVersion(), osver.microVersion())
-                .toString();
-#endif
-    }
-
-    return QSysInfo::productVersion();
-}
-
-QString Application::platformType() const
-{
-    if (QSysInfo::WordSize == 32)
-        return QStringLiteral("x86");
-
-    return QStringLiteral("x64");
-}
-
-QString Application::hostName() const
+QString Application::hostName()
 {
     return QHostInfo::localHostName();
 }
@@ -558,32 +480,9 @@ QString Application::queryQtQuickStyleFor(const QString &theme)
     return theme;
 }
 
-bool Application::usingMaterialTheme() const
+bool Application::usingMaterialTheme()
 {
     return QQuickStyle::name() == QStringLiteral("Material");
-}
-
-bool Application::isInternetAvailable() const
-{
-    return m_networkConfiguration != nullptr && m_networkConfiguration->isOnline();
-}
-
-QString Application::controlKey() const
-{
-    return this->platform() == Application::MacOS ? QStringLiteral("⌘") : "Ctrl";
-}
-
-QString Application::altKey() const
-{
-    return this->platform() == Application::MacOS ? QStringLiteral("⌥") : "Alt";
-}
-
-QString Application::polishShortcutTextForDisplay(const QString &text) const
-{
-    QString text2 = text.trimmed();
-    text2.replace(QStringLiteral("Ctrl"), this->controlKey(), Qt::CaseInsensitive);
-    text2.replace(QStringLiteral("Alt"), this->altKey(), Qt::CaseInsensitive);
-    return text2;
 }
 
 void Application::setBaseWindowTitle(const QString &val)
@@ -595,51 +494,7 @@ void Application::setBaseWindowTitle(const QString &val)
     emit baseWindowTitleChanged();
 }
 
-QString Application::typeName(const QVariant &value) const
-{
-    if (value.userType() == QMetaType::QObjectStar) {
-        QObject *object = value.value<QObject *>();
-        if (object == nullptr)
-            return QString();
-
-        return QString::fromLatin1(object->metaObject()->className());
-    }
-
-    return QString::fromLatin1(value.typeName());
-}
-
-bool Application::verifyType(const QVariant &value, const QString &name) const
-{
-    if (value.userType() == QMetaType::QObjectStar) {
-        QObject *object = value.value<QObject *>();
-        return object && object->inherits(qPrintable(name));
-    }
-
-    return QString::fromLatin1(value.typeName()) == name;
-}
-
-bool Application::isTextInputItem(QQuickItem *item) const
-{
-    return item && item->flags() & QQuickItem::ItemAcceptsInputMethod;
-}
-
-QVariant Application::objectProperty(QObject *object, const QString &name) const
-{
-    if (object != nullptr && !name.isEmpty())
-        return object->property(qPrintable(name));
-
-    return QVariant();
-}
-
-bool Application::setObjectProperty(QObject *object, const QString &name, const QVariant &value)
-{
-    if (object != nullptr && !name.isEmpty())
-        return object->setProperty(qPrintable(name), value);
-
-    return false;
-}
-
-QString Application::openSslVersionString() const
+QString Application::openSslVersionString()
 {
     return QSslSocket::sslLibraryVersionString();
 }
@@ -694,56 +549,6 @@ QJsonObject Application::systemFontInfo()
     return ret;
 }
 
-QColor Application::pickColor(const QColor &initial)
-{
-    QColorDialog::ColorDialogOptions options =
-            QColorDialog::ShowAlphaChannel | QColorDialog::DontUseNativeDialog;
-    const QColor ret = QColorDialog::getColor(initial, nullptr, "Select Color", options);
-    return ret.isValid() ? ret : initial;
-}
-
-QColor Application::tintedColor(const QColor &c, qreal tintFactor)
-{
-    const int r = c.red();
-    const int g = c.green();
-    const int b = c.blue();
-
-    const int newR = r + static_cast<int>((255 - r) * tintFactor);
-    const int newG = g + static_cast<int>((255 - g) * tintFactor);
-    const int newB = b + static_cast<int>((255 - b) * tintFactor);
-
-    return QColor(newR, newG, newB);
-}
-
-QColor Application::tintColors(const QColor &a, const QColor &b)
-{
-    auto computeTint = [](const QColor &color1, const QColor &color2, qreal tintFactor) {
-        const int r1 = color1.red();
-        const int g1 = color1.green();
-        const int b1 = color1.blue();
-
-        const int r2 = color2.red();
-        const int g2 = color2.green();
-        const int b2 = color2.blue();
-
-        const int newR = r1 + static_cast<int>((255 - r2) * tintFactor);
-        const int newG = g1 + static_cast<int>((255 - g2) * tintFactor);
-        const int newB = b1 + static_cast<int>((255 - b2) * tintFactor);
-
-        return QColor(newR, newG, newB);
-    };
-
-    const QColor _a = QColor(a.red(), a.green(), a.blue());
-    const QColor _b = QColor(b.red(), b.green(), b.blue());
-    const qreal tintFactor = b.alphaF();
-    return computeTint(_a, _b, tintFactor);
-}
-
-QRectF Application::textBoundingRect(const QString &text, const QFont &font)
-{
-    return QFontMetricsF(font).boundingRect(text);
-}
-
 void Application::revealFileOnDesktop(const QString &pathIn)
 {
     m_errorReport->clear();
@@ -753,7 +558,7 @@ void Application::revealFileOnDesktop(const QString &pathIn)
     const QFileInfo fileInfo(pathIn);
 
     // Mac, Windows support folder or file.
-    if (this->platform() == WindowsDesktop) {
+    if (Utils::Platform::isWindowsDesktop()) {
         const QString explorer = QStandardPaths::findExecutable("explorer.exe");
         if (explorer.isEmpty()) {
             m_errorReport->setErrorMessage(
@@ -766,7 +571,7 @@ void Application::revealFileOnDesktop(const QString &pathIn)
             param += QLatin1String("/select,");
         param += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
         QProcess::startDetached(explorer, param);
-    } else if (this->platform() == MacOS) {
+    } else if (Utils::Platform::isMacOSDesktop()) {
         QStringList scriptArgs;
         scriptArgs << QLatin1String("-e")
                    << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
@@ -828,266 +633,14 @@ void Application::revealFileOnDesktop(const QString &pathIn)
     notification->setActive(true);
 }
 
-QJsonArray enumerationModel(const QMetaObject *metaObject, const QString &enumName)
-{
-    QJsonArray ret;
-
-    if (metaObject == nullptr || enumName.isEmpty())
-        return ret;
-
-    const int enumIndex = metaObject->indexOfEnumerator(qPrintable(enumName));
-    if (enumIndex < 0)
-        return ret;
-
-    const QMetaEnum enumInfo = metaObject->enumerator(enumIndex);
-    if (!enumInfo.isValid())
-        return ret;
-
-    auto queryEnumIcon = [=](const char *key) {
-        const QByteArray cikey =
-                QByteArrayLiteral("enum_") + QByteArray(key) + QByteArrayLiteral("_icon");
-        const int ciIndex = metaObject->indexOfClassInfo(cikey.constData());
-        if (ciIndex < 0)
-            return QString();
-
-        const QMetaClassInfo ci = metaObject->classInfo(ciIndex);
-        return QString::fromLatin1(ci.value());
-    };
-
-    for (int i = 0; i < enumInfo.keyCount(); i++) {
-        QJsonObject item;
-        item.insert(QStringLiteral("key"), QString::fromLatin1(enumInfo.key(i)));
-        item.insert(QStringLiteral("value"), enumInfo.value(i));
-
-        const QString icon = queryEnumIcon(enumInfo.key(i));
-        if (!icon.isEmpty())
-            item.insert(QStringLiteral("icon"), icon);
-        ret.append(item);
-    }
-
-    return ret;
-}
-
-QJsonArray Application::enumerationModel(QObject *object, const QString &enumName)
-{
-    const QMetaObject *mo = object ? object->metaObject() : nullptr;
-    return ::enumerationModel(mo, enumName);
-}
-
-QJsonArray Application::enumerationModelForType(const QString &typeName, const QString &enumName)
-{
-    const int typeId = QMetaType::type(qPrintable(typeName + "*"));
-    const QMetaObject *mo =
-            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
-    return ::enumerationModel(mo, enumName);
-}
-
-QString enumerationKey(const QMetaObject *metaObject, const QString &enumName, int value)
-{
-    QString ret;
-
-    if (metaObject == nullptr || enumName.isEmpty())
-        return ret;
-
-    const int enumIndex = metaObject->indexOfEnumerator(qPrintable(enumName));
-    if (enumIndex < 0)
-        return ret;
-
-    const QMetaEnum enumInfo = metaObject->enumerator(enumIndex);
-    if (!enumInfo.isValid())
-        return ret;
-
-    return QString::fromLatin1(enumInfo.valueToKey(value));
-}
-
-QString Application::enumerationKey(QObject *object, const QString &enumName, int value)
-{
-    return ::enumerationKey(object->metaObject(), enumName, value);
-}
-
-QString Application::enumerationKeyForType(const QString &typeName, const QString &enumName,
-                                           int value)
-{
-    const int typeId = QMetaType::type(qPrintable(typeName + "*"));
-    const QMetaObject *mo =
-            typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
-    return ::enumerationKey(mo, enumName, value);
-}
-
-QJsonObject Application::fileInfo(const QString &path)
-{
-    QFileInfo fi(path);
-    QJsonObject ret;
-    ret.insert("exists", fi.exists());
-    if (!fi.exists())
-        return ret;
-
-    ret.insert("baseName", fi.completeBaseName());
-    ret.insert("absoluteFilePath", fi.absoluteFilePath());
-    ret.insert("absolutePath", fi.absolutePath());
-    ret.insert("suffix", fi.suffix());
-    ret.insert("fileName", fi.fileName());
-    return ret;
-}
-
 QString Application::settingsFilePath() const
 {
     return m_settings->fileName();
 }
 
-QPointF Application::cursorPosition()
-{
-    return QCursor::pos();
-}
-
-QPointF Application::mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos)
-{
-    if (item == nullptr)
-        return pos;
-
-    return item->mapFromGlobal(pos);
-}
-
-bool Application::isMouseOverItem(QQuickItem *item)
-{
-    if (item == nullptr)
-        return false;
-
-    const QPointF pos = Application::mapGlobalPositionToItem(item, QCursor::pos());
-    return item->boundingRect().contains(pos);
-}
-
-void Application::installOverrideCursor(Qt::CursorShape cursorShape)
-{
-    QtApplicationClass::setOverrideCursor(QCursor(cursorShape));
-}
-
-void Application::rollbackOverrideCursor()
-{
-    QtApplicationClass::restoreOverrideCursor();
-}
-
-QColor Application::translucent(const QColor &input, qreal alpha)
-{
-    QColor ret = input;
-    ret.setAlphaF(qBound(0.0, ret.alphaF() * alpha, 1.0));
-    return ret;
-}
-
 AutoUpdate *Application::autoUpdate() const
 {
     return AutoUpdate::instance();
-}
-
-QJsonObject Application::objectConfigurationFormInfo(const QObject *object, const QMetaObject *from)
-{
-    QJsonObject ret;
-    if (object == nullptr)
-        return ret;
-
-    if (from == nullptr)
-        from = object->metaObject();
-
-    const QMetaObject *mo = object->metaObject();
-    auto queryClassInfo = [mo](const char *key) {
-        const int ciIndex = mo->indexOfClassInfo(key);
-        if (ciIndex < 0)
-            return QString();
-        const QMetaClassInfo ci = mo->classInfo(ciIndex);
-        return QString::fromLatin1(ci.value());
-    };
-
-    auto queryPropertyInfo = [queryClassInfo](const QMetaProperty &prop, const char *key) {
-        const QString ciKey = QString::fromLatin1(prop.name()) + "_" + QString::fromLatin1(key);
-        return queryClassInfo(qPrintable(ciKey));
-    };
-
-    ret.insert("title", queryClassInfo("Title"));
-    ret.insert("description", queryClassInfo("Description"));
-
-    QJsonArray fields;
-    QJsonArray groupedFields;
-
-    auto addFieldToGroup = [&groupedFields, queryClassInfo](const QJsonObject &field) {
-        const QString fieldGroup = field.value("group").toString();
-        int index = -1;
-        if (fieldGroup.isEmpty() && !groupedFields.isEmpty())
-            index = 0;
-        else {
-            for (int i = 0; i < groupedFields.size(); i++) {
-                QJsonObject groupInfo = groupedFields.at(i).toObject();
-                if (groupInfo.value("name").toString() == fieldGroup) {
-                    index = i;
-                    break;
-                }
-            }
-        }
-
-        QJsonObject groupInfo;
-        if (index < 0) {
-            const QString descKey = fieldGroup + QStringLiteral("_Description");
-            groupInfo.insert("name", fieldGroup);
-            groupInfo.insert("description", queryClassInfo(qPrintable(descKey)));
-        } else {
-            groupInfo = groupedFields.at(index).toObject();
-        }
-
-        QJsonArray fields = groupInfo.value("fields").toArray();
-        fields.append(field);
-        groupInfo.insert("fields", fields);
-        if (index < 0)
-            groupedFields.append(groupInfo);
-        else
-            groupedFields.replace(index, groupInfo);
-    };
-
-    for (int i = from->propertyOffset(); i < mo->propertyCount(); i++) {
-        const QMetaProperty prop = mo->property(i);
-        if (!prop.isWritable() || !prop.isStored() || !prop.isDesignable())
-            continue;
-
-        QJsonObject field;
-        field.insert("name", QString::fromLatin1(prop.name()));
-        field.insert("label", queryPropertyInfo(prop, "FieldLabel"));
-        field.insert("note", queryPropertyInfo(prop, "FieldNote"));
-        field.insert("editor", queryPropertyInfo(prop, "FieldEditor"));
-        field.insert("min", queryPropertyInfo(prop, "FieldMinValue"));
-        field.insert("max", queryPropertyInfo(prop, "FieldMaxValue"));
-        field.insert("ideal", queryPropertyInfo(prop, "FieldDefaultValue"));
-        field.insert("group", queryPropertyInfo(prop, "FieldGroup"));
-        field.insert("feature", queryPropertyInfo(prop, "Feature"));
-
-        const QString fieldEnum = queryPropertyInfo(prop, "FieldEnum");
-        if (!fieldEnum.isEmpty()) {
-            const int enumIndex = mo->indexOfEnumerator(qPrintable(fieldEnum));
-            const QMetaEnum enumerator = mo->enumerator(enumIndex);
-
-            QJsonArray choices;
-            for (int j = 0; j < enumerator.keyCount(); j++) {
-                QJsonObject choice;
-                choice.insert("key", QString::fromLatin1(enumerator.key(j)));
-                choice.insert("value", enumerator.value(j));
-
-                const QByteArray ciKey =
-                        QByteArray(enumerator.name()) + "_" + QByteArray(enumerator.key(j));
-                const QString text = queryClassInfo(ciKey);
-                if (!text.isEmpty())
-                    choice.insert("key", text);
-
-                choices.append(choice);
-            }
-
-            field.insert("choices", choices);
-        }
-
-        fields.append(field);
-        addFieldToGroup(field);
-    }
-
-    ret.insert("fields", fields);
-    ret.insert("groupedFields", groupedFields);
-
-    return ret;
 }
 
 bool QtApplicationEventNotificationCallback(void **cbdata)
@@ -1557,75 +1110,6 @@ bool Application::reparent(QObject *object, QObject *newParent)
     }
 
     return false;
-}
-
-QColor Application::pickStandardColor(int counter)
-{
-    const QList<QColor> colors = Application::standardColorsForVersion();
-    if (colors.isEmpty())
-        return QColor("white");
-
-    QColor ret = colors.at(qMax(counter, 0) % colors.size());
-    return ret;
-}
-
-inline qreal evaluateLuminance(const QColor &color)
-{
-    return ((0.299 * color.redF()) + (0.587 * color.greenF()) + (0.114 * color.blueF()));
-}
-
-bool Application::isLightColor(const QColor &color)
-{
-    return evaluateLuminance(color) > 0.5;
-}
-
-bool Application::isVeryLightColor(const QColor &color)
-{
-    return evaluateLuminance(color) > 0.8;
-}
-
-QColor Application::textColorFor(const QColor &bgColor)
-{
-    // https://stackoverflow.com/questions/1855884/determine-font-color-based-on-background-color/1855903#1855903
-    return evaluateLuminance(bgColor) > 0.5 ? Qt::black : Qt::white;
-}
-
-QRectF Application::largestBoundingRect(const QStringList &strings, const QFont &font)
-{
-    if (strings.isEmpty())
-        return QRectF();
-
-    const QFontMetricsF fm(font);
-
-    auto evalTextRect = [fm](const QString &item) -> QRectF { return fm.boundingRect(item); };
-
-    auto pickLargestRect = [](QRectF &intermediate, const QRectF &rect) {
-        if (intermediate.isEmpty() || intermediate.width() < rect.width())
-            intermediate = rect;
-    };
-
-    // Turns out that using QtConcurrent takes more time than using a simple for loop
-    QRectF ret;
-    for (const QString &item : strings)
-        pickLargestRect(ret, evalTextRect(item));
-
-    return ret;
-}
-
-QRectF Application::boundingRect(const QString &text, const QFont &font)
-{
-    const QFontMetricsF fm(font);
-    return fm.boundingRect(text);
-}
-
-QRectF Application::intersectedRectangle(const QRectF &of, const QRectF &with)
-{
-    return of.intersected(with);
-}
-
-bool Application::doRectanglesIntersect(const QRectF &r1, const QRectF &r2)
-{
-    return r1.intersects(r2);
 }
 
 QSizeF Application::scaledSize(const QSizeF &of, const QSizeF &into)
@@ -2266,34 +1750,6 @@ QString Application::relativeTime(const QDateTime &dt)
 Forms *Application::forms() const
 {
     return Forms::global();
-}
-
-void Application::initializeStandardColors(QQmlEngine *)
-{
-    if (!m_standardColors.isEmpty())
-        return;
-
-    const QList<QColor> colors = this->standardColorsForVersion();
-    for (int i = 0; i < colors.size(); i++)
-        m_standardColors << QVariant::fromValue<QColor>(colors.at(i));
-
-    emit standardColorsChanged();
-}
-
-QList<QColor> Application::standardColorsForVersion(const QVersionNumber &version)
-{
-    // Up-until version 0.2.17 Beta
-    if (!version.isNull() && version <= QVersionNumber(0, 2, 17))
-        return QList<QColor>() << QColor("blue") << QColor("magenta") << QColor("darkgreen")
-                               << QColor("purple") << QColor("yellow") << QColor("orange")
-                               << QColor("red") << QColor("brown") << QColor("gray")
-                               << QColor("white");
-
-    // New set of colors
-    return QList<QColor>() << QColor("#2196f3") << QColor("#e91e63") << QColor("#009688")
-                           << QColor("#9c27b0") << QColor("#ffeb3b") << QColor("#ff9800")
-                           << QColor("#f44336") << QColor("#795548") << QColor("#9e9e9e")
-                           << QColor("#fafafa") << QColor("#3f51b5") << QColor("#cddc39");
 }
 
 #ifdef ENABLE_SCRIPT_HOTKEY

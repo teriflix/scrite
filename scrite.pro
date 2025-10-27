@@ -63,6 +63,8 @@ HEADERS += \
     src/core/filemodificationtracker.h \
     src/core/languageengine.h \
     src/core/localstorage.h \
+    src/core/utils.h \
+    src/network/networkstatus.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/peerapplookup.h \
     src/core/printerobject.h \
@@ -201,6 +203,8 @@ SOURCES += \
     src/core/filemodificationtracker.cpp \
     src/core/languageengine.cpp \
     src/core/localstorage.cpp \
+    src/core/utils.cpp \
+    src/network/networkstatus.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/peerapplookup.cpp \
     src/core/qobjectlistmodel.cpp \

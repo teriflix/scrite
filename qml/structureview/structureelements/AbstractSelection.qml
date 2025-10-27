@@ -221,7 +221,7 @@ Item {
 
         property point topLeft: Qt.point(0,0)
 
-        color: Scrite.app.translucent(Scrite.app.palette.highlight,0.2)
+        color: Color.translucent(Scrite.app.palette.highlight,0.2)
         border { width: 2; color: Scrite.app.palette.highlight }
         visible: parent.items.length > 0
 

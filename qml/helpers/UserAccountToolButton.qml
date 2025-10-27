@@ -159,7 +159,7 @@ Item {
         }
 
         MouseArea {
-            ToolTip.text: Scrite.user.loggedIn ? ("Account Profile (" + Scrite.app.polishShortcutTextForDisplay(_userAccountHandler.action.shortcut) + ")") : "Login"
+            ToolTip.text: Scrite.user.loggedIn ? ("Account Profile (" + Gui.nativeShortcut(_userAccountHandler.action.shortcut) + ")") : "Login"
             ToolTip.visible: containsMouse
 
             anchors.fill: parent

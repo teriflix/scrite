@@ -61,7 +61,7 @@ Item {
             Qt.callLater(destroy)
         }
 
-        property ErrorReport errorReport: Aggregation.findErrorReport(Scrite.document)
+        property ErrorReport errorReport: Aggregation.errorReport(Scrite.document)
         property bool errorReportHasError: errorReport.hasError
     }
 
@@ -192,7 +192,7 @@ Item {
             signal finished(bool success)
 
             onAccepted: {
-                const path = Scrite.app.urlToLocalFile(fileUrl)
+                const path = Url.toPath(fileUrl)
                 if(Scrite.document.canBeBackupFileName(path)) {
                     _private.reportSaveAsBackupNotPossible()
                     finished(false)
@@ -201,7 +201,7 @@ Item {
 
                 Scrite.document.saveAs(path)
 
-                const fileInfo = Scrite.app.fileInfo(path)
+                const fileInfo = File.info(path)
                 Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
                 finished(true)

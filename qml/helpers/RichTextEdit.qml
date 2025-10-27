@@ -117,7 +117,7 @@ Item {
 
         WebChannel.id: "scrite"
 
-        readonly property string fontSizeUint: Scrite.app.isMacOSPlatform ? "px" : "pt"
+        readonly property string fontSizeUint: Platform.isMacOSDesktop ? "px" : "pt"
         property bool focus: false
 
         function contentUpdated(content) {

@@ -34,7 +34,7 @@ ToolButton {
     Material.accent: Runtime.colors.accent.key
     Material.primary: Runtime.colors.primary.key
 
-    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
+    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
     ToolTip.visible: ToolTip.text === "" ? false : hovered
 
     implicitWidth: suggestedWidth

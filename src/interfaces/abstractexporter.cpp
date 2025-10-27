@@ -12,9 +12,9 @@
 ****************************************************************************/
 
 #include "abstractexporter.h"
-#include "application.h"
-#include "scrite.h"
+
 #include "user.h"
+#include "scrite.h"
 
 #include <QBuffer>
 #include <QClipboard>
@@ -80,10 +80,9 @@ QVariant AbstractExporter::getConfigurationValue(const QString &name) const
     return this->property(qPrintable(name));
 }
 
-QJsonObject AbstractExporter::configurationFormInfo() const
+Utils::ObjectConfig AbstractExporter::configurationFormInfo() const
 {
-    return Application::instance()->objectConfigurationFormInfo(
-            this, &AbstractExporter::staticMetaObject);
+    return Utils::Object::configuration(this, &AbstractExporter::staticMetaObject);
 }
 
 bool AbstractExporter::write(AbstractExporter::Target target)

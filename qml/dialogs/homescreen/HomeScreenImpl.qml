@@ -95,7 +95,7 @@ Item {
     component TopBanner : Image {
         id: banner
 
-        readonly property StackView stackView: Aggregation.firstSibling("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstSiblingByType("QQuickStackView")
 
         source: {
             if(stackView.currentItem && stackView.currentItem.bannerImage)
@@ -228,7 +228,7 @@ Item {
             fillMode: Image.PreserveAspectFit
 
             Image {
-                readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+                readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
                 anchors.centerIn: parent
                 source: (stackView.currentItem && stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
@@ -688,7 +688,7 @@ Item {
     }
 
     component OpenFileOptions : ColumnLayout {
-        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
         LinkButton {
             text: "Open ..."
@@ -845,7 +845,7 @@ Item {
     }
 
     component ImportOptions : ColumnLayout {
-        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
         // Show restore and import options
         LinkButton {
@@ -931,7 +931,7 @@ Item {
                     spacing: 20
 
                     Image {
-                        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+                        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: (_private.bannerSize.height / _private.bannerSize.width) * width
@@ -1184,7 +1184,7 @@ Item {
 
                     onAccepted: {
                         if(fileUrl != "")
-                            fileToImport.path = Scrite.app.urlToLocalFile(fileUrl)
+                            fileToImport.path = Url.toPath(fileUrl)
                     }
                 }
 
@@ -1264,7 +1264,7 @@ Item {
         property Component buttons
         property QtObject buttonsItem: buttonsLoader.item
 
-        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
         Item {
             anchors.fill: parent
@@ -1405,7 +1405,7 @@ Item {
         onAccepted: {
             Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
-            const path = Scrite.app.urlToLocalFile(fileUrl)
+            const path = Url.toPath(fileUrl)
 
             var task = OpenFileTask.open(path)
             task.finished.connect(closeRequest)

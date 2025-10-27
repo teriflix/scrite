@@ -60,7 +60,7 @@ Loader {
 
     onItemChanged: {
         if( item ) {
-            if( Scrite.app.verifyType(item, "QQuickMenu") ) {
+            if( Object.isOfType(item, "QQuickMenu") ) {
                 item.enabled = false
                 if(_private.itemInitMode === "popup")
                     item.popup()

@@ -56,7 +56,7 @@ Menu {
 
             ToolTip.text: {
                 const tt = objectItem.tooltip !== undefined ? objectItem.tooltip : objectItem.text
-                const sc = Scrite.app.polishShortcutTextForDisplay(objectItem.shortcut)
+                const sc = Gui.nativeShortcut(objectItem.shortcut)
                 return sc === "" ? tt : (tt + " (" + sc + " )")
             }
             ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval

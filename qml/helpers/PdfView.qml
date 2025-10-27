@@ -31,7 +31,7 @@ Item {
     property alias source: pdfDoc.source
     property alias pagesPerRow: pdfDoc.pagesPerRow
     property string saveFilePath
-    property string saveFileName: Scrite.app.fileName( Scrite.app.urlToLocalFile(source) ) + ".pdf"
+    property string saveFileName: Scrite.app.fileName( Url.toPath(source) ) + ".pdf"
     property bool closable: true
     property bool allowFileSave: true
     property bool allowFileReveal: false
@@ -117,7 +117,7 @@ Item {
                                         const bound = (min, val, max) => {
                                             return Math.min(max, Math.max(min,val))
                                         }
-                                        const dpr = Scrite.app.isMacOSPlatform ? Scrite.document.displayFormat.devicePixelRatio : 1.0
+                                        const dpr = Platform.isMacOSDesktop ? Scrite.document.displayFormat.devicePixelRatio : 1.0
                                         sourceSize = Qt.size(dpr*bound(pdfDoc.maxPageWidth,pdfView.pdfPageWidth,pdfDoc.maxPageWidth*2),
                                                              dpr*bound(pdfDoc.maxPageHeight,pdfView.pdfPageHeight,pdfDoc.maxPageHeight*2))
                                     }
@@ -287,7 +287,7 @@ Item {
                 visible: allowFileReveal
                 icon.source: "qrc:/icons/file/folder_open.png"
 
-                onClicked: Scrite.app.revealFileOnDesktop( Scrite.app.urlToLocalFile(pdfDoc.source) )
+                onClicked: File.revealOnDesktop( Url.toPath(pdfDoc.source) )
             }
 
             Item {
@@ -337,17 +337,17 @@ Item {
     VclFileDialog {
         id: saveFileDialog
         nameFilters: ["Adobe PDF Files (*.pdf)"]
-        folder: Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
+        folder: Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadLocation))
         selectFolder: false
         selectMultiple: false
         selectExisting: false
         sidebarVisible: true
          // The default Ctrl+U interfers with underline
         onAccepted: {
-            const targetFilePath = Scrite.app.urlToLocalFile(saveFileDialog.fileUrl)
-            const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath )
+            const targetFilePath = Url.toPath(saveFileDialog.fileUrl)
+            const downloadedFilePath = Scrite.app.copyFile( Url.toPath(pdfDoc.source), targetFilePath )
             if(downloadedFilePath !== "")
-                Scrite.app.revealFileOnDesktop(downloadedFilePath)
+                File.revealOnDesktop(downloadedFilePath)
         }
     }
 
@@ -374,9 +374,9 @@ Item {
                 targetFilePath = saveFileName
             targetFilePath = folderPath + "/" + targetFilePath
 
-            const downloadedFilePath = Scrite.app.copyFile( Scrite.app.urlToLocalFile(pdfDoc.source), targetFilePath)
+            const downloadedFilePath = Scrite.app.copyFile( Url.toPath(pdfDoc.source), targetFilePath)
             if(downloadedFilePath !== "")
-                Scrite.app.revealFileOnDesktop(downloadedFilePath)
+                File.revealOnDesktop(downloadedFilePath)
         }
     }
 }

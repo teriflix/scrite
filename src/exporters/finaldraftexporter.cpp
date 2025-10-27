@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "finaldraftexporter.h"
-#include "application.h"
+#include "utils.h"
 #include "languageengine.h"
 
 #include <QDomDocument>
@@ -264,7 +264,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                     format.start = 0;
                     format.length = synopsis.length();
                     format.format.setBackground(exportSceneColor);
-                    format.format.setForeground(Application::textColorFor(exportSceneColor));
+                    format.format.setForeground(Utils::Color::textColorFor(exportSceneColor));
                     formats.append(format);
 #endif
                         addTextToParagraph(summaryParagraphE, synopsis, Qt::Alignment(), formats);

@@ -117,7 +117,7 @@ FloatingDock {
                 VclLabel {
                     Layout.preferredWidth: _delegateLayout.width * 0.35
 
-                    text: Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+                    text: Gui.nativeShortcut(qmlAction.shortcut)
                     elide: Text.ElideRight
 
                     font.family: "Courier Prime"
@@ -128,7 +128,7 @@ FloatingDock {
             MouseArea {
                 ToolTip.text: {
                     const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
-                    const sc = Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+                    const sc = Gui.nativeShortcut(qmlAction.shortcut)
                     return sc === "" ? tt : (tt + " ( " + sc + " )")
                 }
                 ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval

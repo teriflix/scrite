@@ -148,7 +148,7 @@ Item {
             if(typeof posterSource === "string" || typeof posterSource === "url") {
                 posterSourceUrl = posterSource
                 posterSourceKind = e_ImageKind
-            } else if(typeof posterSource === "object" && Scrite.app.verifyType(posterSource, "QImage")) {
+            } else if(typeof posterSource === "object" && Object.isOfType(posterSource, "QImage")) {
                 posterQImage = posterSource
                 posterSourceKind = e_QImageKind
             }

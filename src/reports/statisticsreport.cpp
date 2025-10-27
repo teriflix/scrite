@@ -16,6 +16,7 @@
 #include "screenplaytextdocument.h"
 #include "languageengine.h"
 
+#include "utils.h"
 #include "scene.h"
 #include "hourglass.h"
 #include "screenplay.h"
@@ -338,7 +339,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
             if (actIndex > 0 && item.key == actName(0))
                 baseColor = StatisticsReport::pickColor(++episodeIndex);
 
-            const bool baseColorIsLight = Application::isLightColor(baseColor);
+            const bool baseColorIsLight = Utils::Color::isLight(baseColor);
             item.color = (actIndex++ % 2) ? baseColor.lighter(baseColorIsLight ? 150 : 240)
                                           : baseColor.lighter(baseColorIsLight ? 120 : 200);
         }

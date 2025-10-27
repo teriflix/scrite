@@ -172,21 +172,21 @@ Flickable {
         onAboutToHide: _textArea.persistentSelection = __persistentSelection
 
         VclMenuItem {
-            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
+            text: "Cut\t" + Gui.nativeShortcut("Ctrl+X")
             enabled: _textArea.selectedText !== ""
             onClicked: _textArea.cut()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
-            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            text: "Copy\t" + Gui.nativeShortcut("Ctrl+C")
             enabled: _textArea.selectedText !== ""
             onClicked: _textArea.copy()
             focusPolicy: Qt.NoFocus
         }
 
         VclMenuItem {
-            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
+            text: "Paste\t" + Gui.nativeShortcut("Ctrl+V")
             onClicked: _textArea.paste()
             focusPolicy: Qt.NoFocus
         }

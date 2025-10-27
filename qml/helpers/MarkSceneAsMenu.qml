@@ -20,7 +20,8 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 VclMenu {
-    id: msaMenu
+    id: root
+
     title: "Mark Scene As"
 
     property Scene scene
@@ -28,7 +29,7 @@ VclMenu {
     signal triggered(var type)
 
     Repeater {
-        model: Scrite.app.enumerationModelForType("Scene", "Type")
+        model: Object.typeEnumModel("Scene", "Type", root)
 
         VclMenuItem {
             text: modelData.key + (scene ? (font.bold ? " ✔" : "") : "")
@@ -38,7 +39,7 @@ VclMenu {
             onTriggered: {
                 if(scene)
                     scene.type = modelData.value
-                msaMenu.triggered(modelData.value)
+                root.triggered(modelData.value)
             }
         }
     }

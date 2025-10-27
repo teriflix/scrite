@@ -116,7 +116,7 @@ Item {
 
                         text: _private.sceneTitle
 
-                        color: root.scene ? Scrite.app.textColorFor(_elementItemBox.color) : _private.colorPalette.text
+                        color: root.scene ? Color.textColorFor(_elementItemBox.color) : _private.colorPalette.text
                         elide: Text.ElideRight
                         wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                         font.bold: _private.isBreakElement || _private.active
@@ -240,7 +240,7 @@ Item {
                     sourceComponent: Image {
                         smooth: true
                         mipmap: true
-                        source: Scrite.app.isLightColor(_elementItemBox.color) ? "qrc:/icons/content/warning.png" : "qrc:/icons/content/warning_inverted.png"
+                        source: Color.isLight(_elementItemBox.color) ? "qrc:/icons/content/warning.png" : "qrc:/icons/content/warning_inverted.png"
                         fillMode: Image.PreserveAspectFit
 
                         MouseArea {
@@ -261,7 +261,7 @@ Item {
                     visible: sceneType !== Scene.Standard
                     sceneType: root.scene ? root.scene.type : Scene.Standard
                     showTooltip: false
-                    lightBackground: Scrite.app.isLightColor(_elementItemBox.color)
+                    lightBackground: Color.isLight(_elementItemBox.color)
                 }
             }
 
@@ -394,7 +394,7 @@ Item {
 
         property var colorPalette: {
             if(root.scene) {
-                if(Scrite.app.isLightColor(root.scene.color))
+                if(Color.isLight(root.scene.color))
                     return { "background": root.scene.color, "text": "black" }
                 return { "background": root.scene.color, "text": "white" }
             }

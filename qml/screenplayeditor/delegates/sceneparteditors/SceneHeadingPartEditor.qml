@@ -58,7 +58,7 @@ AbstractScenePartEditor {
                     visible: sceneType !== Scene.Standard
                     sceneType: root.scene ? root.scene.type : Scene.Standard
                     showTooltip: false
-                    lightBackground: Scrite.app.isLightColor(Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint))
+                    lightBackground: Color.isLight(Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint))
                 }
 
                 Image {

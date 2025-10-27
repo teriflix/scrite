@@ -203,13 +203,13 @@ Item {
 
                                 opacity: enabled ? 1 : 0.5
                                 enabled: !DefaultTransliteration.supportsLanguageCode(_private.language.code) && _private.language.code !== QtLocale.English
-                                shortcut: Scrite.app.polishShortcutTextForDisplay(_private.language.shortcut())
+                                shortcut: Gui.nativeShortcut(_private.language.shortcut())
 
                                 onShortcutEdited: (newShortcut) => {
                                                       const conflictingAction = _private.actionsModel.findActionForShortcut(newShortcut)
                                                       if(conflictingAction) {
                                                           MessageBox.information("Shortcut Conflict",
-                                                                                 Scrite.app.polishShortcutTextForDisplay(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                                                                                 Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
                                                           return
                                                       }
 

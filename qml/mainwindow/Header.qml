@@ -204,7 +204,7 @@ Rectangle {
 
                     ToolTip.text: {
                         const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
-                        const sc = Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+                        const sc = Gui.nativeShortcut(qmlAction.shortcut)
                         return sc === "" ? tt : (tt + " (" + sc + " )")
                     }
                     ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval

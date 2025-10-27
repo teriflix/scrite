@@ -51,7 +51,7 @@ Item {
                 _private.dialog.close()
             }
             args.exporter = Scrite.document.createExporter(exporter)
-        } else if(Scrite.app.verifyType(exporter, "AbstractExporter")) {
+        } else if(Object.isOfType(exporter, "AbstractExporter")) {
             if(_private.dialog) {
                 if(_private.dialog.exporter === exporter)
                     return _private.dialog

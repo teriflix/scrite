@@ -114,7 +114,7 @@ VclDialog {
                 }
 
                 Component.onCompleted: {
-                    if(Scrite.app.verifyType(report, "AbstractScreenplaySubsetReport")) {
+                    if(Object.isOfType(report, "AbstractScreenplaySubsetReport")) {
                         report.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
                         report.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                     }
@@ -122,7 +122,7 @@ VclDialog {
                     if(_private.isPdfExport)
                         Runtime.showHelpTip("watermark")
                     Runtime.showHelpTip("reports")
-                    Runtime.showHelpTip(Scrite.app.typeName(report))
+                    Runtime.showHelpTip(Object.typeOf(report))
                 }
             }
         }
@@ -277,7 +277,7 @@ VclDialog {
                 ScriptAction {
                     script: {
                         Scrite.app.saveObjectConfiguration(report)
-                        _private.waitDialog = WaitDialog.launch("Generating " + report.title + " ...", Aggregation.findProgressReport(report))
+                        _private.waitDialog = WaitDialog.launch("Generating " + report.title + " ...", Aggregation.progressReport(report))
                     }
                 }
 
@@ -304,10 +304,10 @@ VclDialog {
                             if(_private.isPdfExport) {
                                 PdfDialog.launch(report.title, report.fileName, dlFileName, report.singlePageReport ? 1 : 2, _private.reportSaveFeature.enabled)
                             } else
-                                Scrite.app.revealFileOnDesktop(report.fileName)
+                                File.revealOnDesktop(report.fileName)
                             Qt.callLater(root.close)
                         } else {
-                            const reportErrors = Aggregation.findErrorReport(report)
+                            const reportErrors = Aggregation.errorReport(report)
                             MessageBox.information(report.title, reportErrors.errorMessage, () => {
                                                        Qt.callLater(root.close)
                                                    } )

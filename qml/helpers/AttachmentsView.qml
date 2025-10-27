@@ -41,7 +41,7 @@ ListView {
 
     Rectangle {
         anchors.fill: parent
-        color: Scrite.app.translucent(Runtime.colors.primary.windowColor, 0.5)
+        color: Color.translucent(Runtime.colors.primary.windowColor, 0.5)
         border.width: 1
         border.color: Runtime.colors.primary.borderColor
         z: -1

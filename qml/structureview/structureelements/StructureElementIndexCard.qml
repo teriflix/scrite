@@ -58,8 +58,8 @@ AbstractStructureElementUI {
     BoundingBoxItem.viewportRect: root.canvasScrollViewportRect
     BoundingBoxItem.viewportItem: root.canvasScrollViewport
     BoundingBoxItem.visibilityMode: _private.isStackedOnTop ? BoundingBoxItem.VisibleUponViewportIntersection : BoundingBoxItem.IgnoreVisibility
-    BoundingBoxItem.previewFillColor: Scrite.app.translucent(root.element.scene.color, _private.isSelected ? 0.75 : 0.1)
-    BoundingBoxItem.previewBorderColor: Scrite.app.isLightColor(root.element.scene.color) ? "black" : root.element.scene.color
+    BoundingBoxItem.previewFillColor: Color.translucent(root.element.scene.color, _private.isSelected ? 0.75 : 0.1)
+    BoundingBoxItem.previewBorderColor: Color.isLight(root.element.scene.color) ? "black" : root.element.scene.color
     BoundingBoxItem.previewBorderWidth: _private.isSelected ? 3 : 1.5
     BoundingBoxItem.visibilityProperty: "isVisibleInViewport"
 
@@ -112,7 +112,7 @@ AbstractStructureElementUI {
     Rectangle {
         id: _background
 
-        property color borderColor: Scrite.app.isLightColor(root.element.scene.color) ? Qt.rgba(0.75,0.75,0.75,1.0) : root.element.scene.color
+        property color borderColor: Color.isLight(root.element.scene.color) ? Qt.rgba(0.75,0.75,0.75,1.0) : root.element.scene.color
 
         anchors.fill: parent
 
@@ -581,7 +581,7 @@ AbstractStructureElementUI {
         Item {
             id: _footerRow
 
-            property bool lightBackground: Scrite.app.isLightColor(_footerBg.color)
+            property bool lightBackground: Color.isLight(_footerBg.color)
 
             Layout.fillWidth: true
             Layout.preferredHeight: _footerRowLayout.height
@@ -720,9 +720,9 @@ AbstractStructureElementUI {
         anchors.margins: -10
 
         border.width: 2
-        border.color: Scrite.app.translucent("black", alpha)
+        border.color: Color.translucent("black", alpha)
 
-        color: Scrite.app.translucent("#cfd8dc", alpha)
+        color: Color.translucent("#cfd8dc", alpha)
         radius: 6
         enabled: !_dragHandleMouseArea.drag.active && root.element.scene.addedToScreenplay
 
@@ -734,7 +734,7 @@ AbstractStructureElementUI {
             keys: [Runtime.timelineViewSettings.dropAreaKey]
 
             onDropped: (drop) => {
-                const otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
+                const otherScene = Object.typeOf(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
                 if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
                     MessageBox.information("",
                         "Scenes must be added to the timeline before they can be stacked."
@@ -812,7 +812,7 @@ AbstractStructureElementUI {
                 })
             }
 
-            color: Scrite.app.translucent(Runtime.colors.primary.c600.background,0.85)
+            color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
 
             MouseArea {
                 anchors.fill: parent

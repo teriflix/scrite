@@ -51,7 +51,7 @@ Item {
                 _private.dialog.close()
             }
             args.report = Scrite.document.createReportGenerator(report)
-        } else if(Scrite.app.verifyType(report, "AbstractReportGenerator")) {
+        } else if(Object.isOfType(report, "AbstractReportGenerator")) {
             if(_private.dialog) {
                 if(_private.dialog.report === report)
                     return _private.dialog

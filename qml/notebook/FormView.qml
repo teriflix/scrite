@@ -79,7 +79,7 @@ Item {
             Column {
                 width: parent.width
                 spacing: parent.spacing
-                property bool visibleToUser: Scrite.app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                property bool visibleToUser: GMath.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                     Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
                 opacity: visibleToUser ? 1 : 0
 
@@ -214,7 +214,7 @@ Item {
                         if(note)
                             answer = note.getFormData(objectItem.id)
                     }
-                    property bool visibleToUser: Scrite.app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                    property bool visibleToUser: GMath.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                         Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
                     opacity: visibleToUser ? 1 : 0
 
@@ -226,7 +226,7 @@ Item {
             Item {
                 width: parent.width
                 height: 20
-                property bool visibleToUser: Scrite.app.doRectanglesIntersect( Qt.rect(x,y,width,height),
+                property bool visibleToUser: GMath.doRectanglesIntersect( Qt.rect(x,y,width,height),
                                                     Qt.rect(0,formFlickable.contentY,width,formFlickable.height) )
                 opacity: visibleToUser ? 1 : 0
             }

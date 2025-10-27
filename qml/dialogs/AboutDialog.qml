@@ -62,7 +62,7 @@ DialogLauncher {
                 anchors.right: parent.right
                 anchors.margins: 30
 
-                text: "Version-"+Scrite.app.versionAsString + " for " + [Scrite.app.platformAsString, Scrite.app.platformVersion].join("-")
+                text: "Version-"+Scrite.app.versionAsString + " for " + [Platform.typeAsString, Platform.osVersionString].join("-")
                 width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), dialog.width*0.5)
                 elide: Text.ElideLeft
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -194,7 +194,7 @@ DialogLauncher {
                                            "url": "https://www.qt.io"
                                        })
 
-                                if(Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform) {
+                                if(Platform.isWindowsDesktop || Platform.isLinuxDesktop) {
                                     const v = Scrite.app.openSslVersionString
                                     append({
                                                 "credits": "<strong>" + v + "</strong> for use with https protocol.",

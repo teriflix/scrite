@@ -25,7 +25,7 @@ Flickable {
     id: root
 
     property bool changing: false
-    property bool zoomOnScroll: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
+    property bool zoomOnScroll: Platform.isWindowsDesktop || Platform.isLinuxDesktop
     property bool showScrollBars: true
     property bool animatePanAndZoom: true
     property bool animatingPanOrZoom: contentXAnimation.running || contentYAnimation.running || zoomScaleAnimation.running
@@ -233,12 +233,12 @@ Flickable {
     }
 
     onZoomScaleChanged: {
-        let cursorPos = Scrite.app.cursorPosition()
-        let fCursorPos = Scrite.app.mapGlobalPositionToItem(root, cursorPos)
+        let cursorPos = MouseCursor.position()
+        let fCursorPos = MouseCursor.itemPosition(root, cursorPos)
         let fContainsCursor = fCursorPos.x >= 0 && fCursorPos.y >= 0 && fCursorPos.x <= width && fCursorPos.y <= height
         let visibleArea = Qt.rect(contentX, contentY, width, height)
         let mousePoint = fContainsCursor ?
-                Scrite.app.mapGlobalPositionToItem(contentItem, Scrite.app.cursorPosition()) :
+                MouseCursor.itemPosition(contentItem, MouseCursor.position()) :
                 Qt.point(contentX+width/2, contentY+height/2)
         let newWidth = initialContentWidth * zoomScale
         let newHeight = initialContentHeight * zoomScale

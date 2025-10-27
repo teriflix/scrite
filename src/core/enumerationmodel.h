@@ -21,7 +21,6 @@
 /*
 We need a way to access QMetaEnum like a model from QML code. This class is meant for that.
 */
-
 class EnumerationModel : public QAbstractListModel
 {
     Q_OBJECT
@@ -29,6 +28,8 @@ class EnumerationModel : public QAbstractListModel
 
 public:
     explicit EnumerationModel(QObject *parent = nullptr);
+    explicit EnumerationModel(const QMetaObject *mo, const QString &enumName,
+                              QObject *parent = nullptr);
     ~EnumerationModel();
 
     Q_PROPERTY(QObject* object READ object WRITE setObject NOTIFY objectChanged)
@@ -45,7 +46,7 @@ public:
     Q_INVOKABLE int keyToValue(const QString &key) const;
 
     // QAbstractItemModel interface
-    enum { KeyRole = Qt::UserRole, ValueRole };
+    enum { KeyRole = Qt::UserRole, ValueRole, IconRole };
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
@@ -56,13 +57,15 @@ private:
     void clearModel();
 
 private:
-    QObject *m_object;
+    const QMetaObject *m_metaObject = nullptr;
+    QObject *m_object = nullptr;
     QString m_enumeration;
 
     struct Item
     {
         QString key;
         int value = -1;
+        QString icon;
     };
     QList<Item> m_items;
     QMetaEnum m_metaEnum;

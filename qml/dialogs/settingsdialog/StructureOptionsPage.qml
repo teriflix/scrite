@@ -79,7 +79,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Runtime.structureCanvasSettings.canvasColor = Scrite.app.pickColor(Runtime.structureCanvasSettings.canvasColor)
+                            onClicked: Runtime.structureCanvasSettings.canvasColor = Color.pick(Runtime.structureCanvasSettings.canvasColor)
                         }
                     }
 
@@ -103,7 +103,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Runtime.structureCanvasSettings.gridColor = Scrite.app.pickColor(Runtime.structureCanvasSettings.gridColor)
+                            onClicked: Runtime.structureCanvasSettings.gridColor = Color.pick(Runtime.structureCanvasSettings.gridColor)
                         }
                     }
 
@@ -268,7 +268,7 @@ Item {
 
                 FlatToolButton {
                     iconSource: "qrc:/icons/action/reset.png"
-                    onClicked: Runtime.workspaceSettings.defaultSceneColor = Scrite.app.standardColors[0]
+                    onClicked: Runtime.workspaceSettings.defaultSceneColor = SceneColors.palette[0]
                     ToolTip.text: "Reset default scene color"
                 }
             }

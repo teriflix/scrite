@@ -32,7 +32,7 @@ DialogLauncher {
     function launch(title, filePath, dlFilePath, pagesPerRow, allowSave) {
         const initialProps = {
             "title": title,
-            "source": Scrite.app.localFileToUrl(filePath),
+            "source": Url.fromPath(filePath),
             "saveFilePath": dlFilePath,
             "allowFileSave": allowSave,
             "pagesPerRow": pagesPerRow

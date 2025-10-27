@@ -207,7 +207,7 @@ Item {
                 }
 
                 VclToolButton {
-                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F") + ")"
+                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + Gui.nativeShortcut("Ctrl+Shift+F") + ")"
 
                     anchors.verticalCenter: parent.verticalCenter
 

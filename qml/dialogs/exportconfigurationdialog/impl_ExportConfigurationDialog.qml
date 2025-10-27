@@ -96,38 +96,6 @@ VclDialog {
                     }
                 }
 
-                // Show a group box for selecting fonts to export
-                // TODO: Ideally, all fonts used in the current Scrite document must
-                // be automatically checked.
-                GridLayout {
-                    Layout.fillWidth: true
-
-                    columns: 3
-                    rowSpacing: 5
-                    columnSpacing: 5
-                    visible: exporter.canBundleFonts
-
-                    Repeater {
-                        model: GenericArrayModel {
-                            array: Scrite.app.enumerationModel(Scrite.app.transliterationEngine, "Language")
-                            objectMembers: ["key", "value"]
-                        }
-
-                        VclCheckBox {
-                            required property string key
-                            required property int value
-
-                            Layout.fillWidth: true
-
-                            checkable: true
-                            checked: exporter.isFontForLanguageBundled(value)
-                            text: key
-                            onToggled: exporter.bundleFontForLanguage(value,checked)
-                            TabSequenceItem.manager: tabSequence
-                        }
-                    }
-                }
-
                 // Show configuration editors
                 Repeater {
                     model: _private.formInfo.fields
@@ -169,10 +137,10 @@ VclDialog {
                 }
 
                 Component.onCompleted: {
-                    if(Scrite.app.verifyType(exporter, "StructureExporter"))
+                    if(Object.isOfType(exporter, "StructureExporter"))
                         Runtime.activateMainWindowTab(Runtime.MainWindowTab.StructureTab)
 
-                    if(Scrite.app.verifyType(exporter, "AbstractTextDocumentExporter")) {
+                    if(Object.isOfType(exporter, "AbstractTextDocumentExporter")) {
                         exporter.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
                         exporter.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                     }
@@ -182,7 +150,7 @@ VclDialog {
             Component.onCompleted: {
                 if(_private.isPdfExport)
                     Runtime.showHelpTip("watermark")
-                Runtime.showHelpTip(Scrite.app.typeName(exporter))
+                Runtime.showHelpTip(Object.typeOf(exporter))
             }
         }
     }
@@ -235,7 +203,7 @@ VclDialog {
                         Scrite.app.saveObjectConfiguration(exporter)
 
                         const message = _private.isPdfExport ? "Generating PDF ..." : ("Exporting to \"" + exporter.fileName + "\" ...")
-                        _private.waitDialog = WaitDialog.launch(message, Aggregation.findProgressReport(exporter))
+                        _private.waitDialog = WaitDialog.launch(message, Aggregation.progressReport(exporter))
                     }
                 }
 
@@ -267,10 +235,10 @@ VclDialog {
                             if(_private.isPdfExport) {
                                 PdfDialog.launch("Screenplay", exporter.fileName, dlFileName, 2, _private.exportSaveFeature.enabled)
                             } else
-                                Scrite.app.revealFileOnDesktop(exporter.fileName)
+                                File.revealOnDesktop(exporter.fileName)
                             Qt.callLater(root.close)
                         } else {
-                            const exporterErrors = Aggregation.findErrorReport(exporter)
+                            const exporterErrors = Aggregation.errorReport(exporter)
                             MessageBox.information(exporter.formatName + " - Export", exporterErrors.errorMessage, root.close)
                         }
                     }

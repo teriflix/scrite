@@ -78,7 +78,7 @@ ListView {
     FocusTracker.indicator.target: Runtime.undoStack
     FocusTracker.indicator.property: "timelineEditorActive"
 
-    EventFilter.active: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
+    EventFilter.active: Platform.isWindowsDesktop || Platform.isLinuxDesktop
     EventFilter.events: [EventFilter.Wheel]
     EventFilter.onFilter: (watched, event, result) => {
         if(event.delta < 0)

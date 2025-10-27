@@ -14,6 +14,7 @@
 //#define DISPLAY_DOCUMENT_IN_TEXTEDIT
 
 #include "screenplaytextdocument.h"
+#include "utils.h"
 
 #include <QDir>
 #include <QUrl>
@@ -2531,7 +2532,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
                 if (!qFuzzyIsNull(bgColor.alphaF())) {
                     QTextBlockFormat sceneColorFormat;
-                    sceneColorFormat.setBackground(Application::tintedColor(bgColor, 0.8));
+                    sceneColorFormat.setBackground(Utils::Color::whitewash(bgColor, 0.8));
                     cursor.mergeBlockFormat(sceneColorFormat);
                 }
             }

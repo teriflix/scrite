@@ -83,7 +83,7 @@ Item {
             width: _geometryBinder.get.width
             height: _geometryBinder.get.height
 
-            color: Scrite.app.translucent(Runtime.colors.accent.highlight.background, 0.25)
+            color: Color.translucent(Runtime.colors.accent.highlight.background, 0.25)
             border.width: 2
             border.color: Runtime.colors.accent.borderColor
 
@@ -95,7 +95,7 @@ Item {
                     if( Scrite.app.isRectangleInRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox) )
                         return Qt.rect(0,0,0,0)
 
-                    let intersect = Scrite.app.intersectedRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox)
+                    let intersect = GMath.intersectedRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox)
                     let scale = _preview.width / Math.max(root.canvasScroll.itemsBoundingBox.width, 500)
                     let ret = Qt.rect( (intersect.x-root.canvasScroll.itemsBoundingBox.left)*scale,
                                        (intersect.y-root.canvasScroll.itemsBoundingBox.top)*scale,

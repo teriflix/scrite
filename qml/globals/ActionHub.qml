@@ -282,9 +282,9 @@ Item {
             shortcut: defaultShortcut
 
             icon.source: {
-                if(Scrite.app.isMacOSPlatform)
+                if(Platform.isMacOSDesktop)
                 return "qrc:/icons/navigation/shortcuts_macos.png"
-                if(Scrite.app.isWindowsPlatform)
+                if(Platform.isWindowsDesktop)
                 return "qrc:/icons/navigation/shortcuts_windows.png"
                 return "qrc:/icons/navigation/shortcuts_linux.png"
             }
@@ -531,7 +531,7 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "redo"
-            shortcut: Scrite.app.isWindowsPlatform ? "Ctrl+Y" : "Ctrl+Shift+Z"
+            shortcut: Platform.isWindowsDesktop ? "Ctrl+Y" : "Ctrl+Shift+Z"
             text: "Redo"
 
             icon.source: "qrc:/icons/content/redo.png"
@@ -1408,7 +1408,7 @@ Item {
     }
 
     function init(_parent) {
-        if( !(_parent && Scrite.app.verifyType(_parent, "QQuickItem")) )
+        if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem
 
         parent = _parent

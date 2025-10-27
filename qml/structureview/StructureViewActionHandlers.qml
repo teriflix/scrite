@@ -344,7 +344,9 @@ Item {
     }
 
     ActionHandler {
-        readonly property var sceneTypeModel: Scrite.app.enumerationModelForType("Scene", "Type")
+        id: _sceneTypeActionHandler
+
+        readonly property var sceneTypeModel: Object.typeEnumModel("Scene", "Type", _sceneTypeActionHandler)
         property Scene scene: root.canvasScroll.currentElementItem ? root.canvasScroll.currentElementItem.element.scene :
                               (root.canvasScroll.selection.hasItems ? root.canvasScroll.selection.items[0].element.scene : null)
         property int sceneType: (scene && scene.type !== Scene.Standard) ? scene.type : Scene.Standard

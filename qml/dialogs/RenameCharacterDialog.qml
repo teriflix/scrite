@@ -29,7 +29,7 @@ DialogLauncher {
     id: root
 
     function launch(character) {
-        if(!character || !Scrite.app.verifyType(character, "Character")) {
+        if(!character || !Object.isOfType(character, "Character")) {
             console.log("Couldn't launch " + name + ": invalid character specified.")
             return null
         }

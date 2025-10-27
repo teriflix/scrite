@@ -445,7 +445,7 @@ Item {
                         id: activeElementIndicator
 
                         opacity: 0.2
-                        backgroundColor: Scrite.app.translucent(Runtime.colors.accent.c600.background, 0.5)
+                        backgroundColor: Color.translucent(Runtime.colors.accent.c600.background, 0.5)
 
                         function updateSceneElement() {
                             for(var i=0; i<previewTextBinder.scene.elementCount; i++) {
@@ -471,7 +471,7 @@ Item {
                         sceneElement: previewTextBinder.sceneElementAt(cursorPosition)
 
                         opacity: activeElementIndicator.sceneElement === sceneElement ? 0 : 0.5
-                        backgroundColor: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.5)
+                        backgroundColor: Color.translucent(Runtime.colors.primary.c600.background, 0.5)
 
                         ToolTip.text: sceneElement ? sceneElement.typeAsString : ""
                         ToolTip.visible: opacity > 0 && sceneElement
@@ -482,7 +482,7 @@ Item {
                         property SceneElement sceneElement
                         property rect sceneElementRect
 
-                        property color backgroundColor: Scrite.app.translucent(Runtime.colors.accent.c600.background, 0.5)
+                        property color backgroundColor: Color.translucent(Runtime.colors.accent.c600.background, 0.5)
 
                         property bool valid: sceneElementRect.width > 0 && sceneElementRect.height > 0
                         visible: valid
@@ -759,7 +759,7 @@ Item {
             underlineButton.checked = font.underline
 
             textForeground.selectedColor = printElementFormat.textColor
-            textBackground.selectedColor = Scrite.app.translucent(printElementFormat.backgroundColor, 4)
+            textBackground.selectedColor = Color.translucent(printElementFormat.backgroundColor, 4)
             textAlignment.value = printElementFormat.textAlignment
             textLineHeight.value = printElementFormat.lineHeight
             firstLineIndent.value = printElementFormat.textIndent

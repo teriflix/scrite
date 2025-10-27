@@ -231,7 +231,7 @@ Dialog {
     onAboutToShow: {
         Scrite.window.closeButtonVisible = appCloseButtonVisible
         if(appOverrideCursor >= 0) {
-            Scrite.app.installOverrideCursor(appOverrideCursor);
+            MouseCursor.setShape(appOverrideCursor);
             _private.overrideCursorMustBeRestored = true
         }
         focus = true
@@ -240,7 +240,7 @@ Dialog {
     onAboutToHide: {
         Scrite.window.closeButtonVisible = true
         if(_private.overrideCursorMustBeRestored) {
-            Scrite.app.rollbackOverrideCursor()
+            MouseCursor.unsetShape()
             _private.overrideCursorMustBeRestored = false
         }
         Runtime.dialogs.exclude(root)

@@ -14,6 +14,7 @@
 #include "scritedocument.h"
 
 #include "form.h"
+#include "utils.h"
 #include "user.h"
 #include "scrite.h"
 #include "undoredo.h"
@@ -1054,7 +1055,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     const QString defaultSceneColor =
             settings->value(QStringLiteral("Workspace/defaultSceneColor")).toString();
 
-    const QList<QColor> standardColors = Application::standardColorsForVersion(QVersionNumber());
+    const QList<QColor> standardColors = Utils::SceneColors::paletteForVersion(QVersionNumber());
     const QColor defaultColor =
             defaultSceneColor.isEmpty() ? standardColors.first() : QColor(defaultSceneColor);
 
@@ -1370,8 +1371,8 @@ bool ScriteDocument::importFromClipboard()
 
     this->setLoading(true);
 
-    m_errorReport->setProxyFor(Aggregation::findErrorReport(importer.get()));
-    m_progressReport->setProxyFor(Aggregation::findProgressReport(importer.get()));
+    m_errorReport->setProxyFor(Aggregation::errorReport(importer.get()));
+    m_progressReport->setProxyFor(Aggregation::progressReport(importer.get()));
 
     importer->setDocument(this);
     this->setBusyMessage("Importing from clipboard ...");
@@ -1777,8 +1778,8 @@ bool ScriteDocument::importFile(AbstractImporter *importer, const QString &fileN
     this->setLoading(true);
 
     Aggregation aggregation;
-    m_errorReport->setProxyFor(aggregation.findErrorReport(importer));
-    m_progressReport->setProxyFor(aggregation.findProgressReport(importer));
+    m_errorReport->setProxyFor(aggregation.errorReport(importer));
+    m_progressReport->setProxyFor(aggregation.progressReport(importer));
 
     importer->setFileName(fileName);
     importer->setDocument(this);
@@ -1807,8 +1808,8 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     }
 
     Aggregation aggregation;
-    m_errorReport->setProxyFor(aggregation.findErrorReport(exporter.data()));
-    m_progressReport->setProxyFor(aggregation.findProgressReport(exporter.data()));
+    m_errorReport->setProxyFor(aggregation.errorReport(exporter.data()));
+    m_progressReport->setProxyFor(aggregation.progressReport(exporter.data()));
 
     exporter->setFileName(fileName);
     exporter->setDocument(this);
@@ -2800,8 +2801,8 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             m_structure->setCurrentElementIndex(0);
     }
 
-    const QList<QColor> versionColors = Application::standardColorsForVersion(version);
-    const QList<QColor> newColors = Application::standardColorsForVersion(QVersionNumber());
+    const QList<QColor> versionColors = Utils::SceneColors::paletteForVersion(version);
+    const QList<QColor> newColors = Utils::SceneColors::paletteForVersion(QVersionNumber());
     if (versionColors != newColors) {
         auto evalNewColor = [versionColors, newColors](const QColor &color) {
             const int oldColorIndex = versionColors.indexOf(color);

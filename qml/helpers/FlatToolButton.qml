@@ -57,7 +57,7 @@ Item {
     signal toggled()
     signal clicked()
 
-    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Scrite.app.polishShortcutTextForDisplay(shortcutText) + ")")
+    ToolTip.text: shortcutText === "" ? text : (text + "\t(" + Gui.nativeShortcut(shortcutText) + ")")
     ToolTip.visible: ToolTip.text === "" ? false : (_mouseArea.containsMouse && !down)
     ToolTip.delay: 500
 

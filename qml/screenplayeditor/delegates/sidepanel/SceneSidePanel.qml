@@ -66,7 +66,7 @@ AbstractScenePartEditor {
 
         property var tabComponentsArray: [_private.commentsTab,_private.featuredImageTab,_private.indexCardFieldsTab,_private.sceneMetaDataTab]
 
-        property color indicatorColor: Scrite.app.isLightColor(root.scene.color) ? Runtime.colors.primary.c500.background : root.scene.color
+        property color indicatorColor: Color.isLight(root.scene.color) ? Runtime.colors.primary.c500.background : root.scene.color
 
         readonly property Component collapsedCorner: CollapsedCorner {
             scene: root.scene

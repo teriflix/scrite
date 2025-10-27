@@ -130,7 +130,7 @@ Rectangle {
                 opacity: (_private.isCurrent ? 1 : 0.5) * root.leftPaddingRatio
                 sceneType: root.scene ? root.scene.type : Scene.Standard
                 showTooltip: false
-                lightBackground: Scrite.app.isLightColor(root.color)
+                lightBackground: Color.isLight(root.color)
             }
 
             RowLayout {
@@ -374,11 +374,11 @@ Rectangle {
                 return isSelection ? selectedColor :
                                            (root.screenplayAdapter.isSourceScreenplay && multiSelection ?
                                                 Qt.tint(normalColor, "#40FFFFFF") : normalColor)
-            return isCurrent ? Scrite.app.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
+            return isCurrent ? Color.translucent(Runtime.colors.accent.windowColor, 0.25) : Qt.rgba(0,0,0,0.01)
         }
         property color normalColor: root.scene ? Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c200.background
         property color selectedColor: root.scene ?
-                                          (Scrite.app.isVeryLightColor(root.scene.color) ?
+                                          (Color.isVeryLight(root.scene.color) ?
                                                Qt.tint(Runtime.colors.primary.highlight.background, Runtime.colors.selectedSceneHeadingTint) :
                                                Qt.tint(root.scene.color, Runtime.colors.selectedSceneHeadingTint)) :
                                           Runtime.colors.primary.c300.background

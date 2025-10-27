@@ -56,7 +56,7 @@ AbstractStructureElementUI {
     BoundingBoxItem.viewportItem: root.canvasScrollViewport
     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
     BoundingBoxItem.previewFillColor: _private.isSelected ? Qt.darker(root.element.scene.color) : root.element.scene.color
-    BoundingBoxItem.previewBorderColor: Scrite.app.isLightColor(root.element.scene.color) ? "black" : _background.color
+    BoundingBoxItem.previewBorderColor: Color.isLight(root.element.scene.color) ? "black" : _background.color
     BoundingBoxItem.previewBorderWidth: _private.isSelected ? 3 : 1.5
 
     Component.onCompleted: root.element.follow = root
@@ -177,7 +177,7 @@ AbstractStructureElementUI {
         opacity: 0.5
         sceneType: root.element.scene.type
         showTooltip: false
-        lightBackground: Scrite.app.isLightColor(_background.color)
+        lightBackground: Color.isLight(_background.color)
     }
 
     Image {

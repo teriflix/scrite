@@ -80,12 +80,12 @@ Item {
                 activeTabIndex: root.elementStack.topmostElementIndex
                 activeTabColor: Qt.tint(root.elementStack.topmostElement.scene.color, (root.elementStack.hasCurrentElement ? Runtime.colors.sceneControlTint : "#F0FFFFFF"))
                 activeTabFont.bold: true
-                activeTabTextColor: Scrite.app.textColorFor(activeTabColor)
-                activeTabBorderColor: Scrite.app.isLightColor(root.elementStack.topmostElement.scene.color) ? "black" : root.elementStack.topmostElement.scene.color
+                activeTabTextColor: Color.textColorFor(activeTabColor)
+                activeTabBorderColor: Color.isLight(root.elementStack.topmostElement.scene.color) ? "black" : root.elementStack.topmostElement.scene.color
                 activeTabFont.pointSize: Runtime.idealFontMetrics.font.pointSize
 
                 inactiveTabFont.pointSize: Runtime.idealFontMetrics.font.pointSize-4
-                inactiveTabTextColor: Scrite.app.translucent(Scrite.app.textColorFor(inactiveTabColor), 0.75)
+                inactiveTabTextColor: Color.translucent(Color.textColorFor(inactiveTabColor), 0.75)
 
                 minimumTabWidth: root.width*0.1
 
@@ -114,7 +114,7 @@ Item {
                         requestedAttributeValue = Qt.tint(element.scene.color, "#D0FFFFFF")
                         break
                     case SimpleTabBarItem.TabBorderColor:
-                        requestedAttributeValue = Scrite.app.isLightColor(element.scene.color) ? "gray" : element.scene.color
+                        requestedAttributeValue = Color.isLight(element.scene.color) ? "gray" : element.scene.color
                         break
                     default:
                         break

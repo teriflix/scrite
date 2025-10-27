@@ -214,7 +214,7 @@ Item {
                         VclMenuItem {
                             text: "Custom Color"
                             onClicked: {
-                                var newColor = Scrite.app.pickColor(propertyValue)
+                                var newColor = Color.pick(propertyValue)
                                 changePropertyValue( "" + newColor )
                                 colorMenu.close()
                             }
@@ -320,7 +320,7 @@ Item {
                 id: urlField
                 text: propertyValue
                 onAccepted: changePropertyValue(text)
-                placeholderText: "Enter URL and press " + (Scrite.app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
+                placeholderText: "Enter URL and press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."
                 width: parent.width
             }
 
@@ -328,7 +328,7 @@ Item {
                 width: parent.width
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize-1
                 visible: propertyValue != urlField.text
-                text: "Press " + (Scrite.app.isMacOSPlatform ? "Return" : "Enter") + " key to set."
+                text: "Press " + (Platform.isMacOSDesktop ? "Return" : "Enter") + " key to set."
             }
         }
     }
@@ -448,7 +448,7 @@ Item {
                     if(fileUrl != "") {
                         if(propertyValue != "")
                             annotation.removeImage(propertyValue)
-                        var newImageName = annotation.addImage(Scrite.app.urlToLocalFile(fileUrl))
+                        var newImageName = annotation.addImage(Url.toPath(fileUrl))
                         changePropertyValue(newImageName)
                     }
                 }

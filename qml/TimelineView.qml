@@ -178,7 +178,7 @@ Item {
                     _private.dropSceneTask.dropSource = null
                     _private.dropSceneTask.dropIndex = -2
 
-                    var sourceType = Scrite.app.typeName(source)
+                    var sourceType = Object.typeOf(source)
 
                     if(sourceType === "ScreenplayElement") {
                         Scrite.document.screenplay.moveSelectedElements(index)

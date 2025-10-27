@@ -65,7 +65,7 @@ Flickable {
                 width: _screenplayTracksFlickContent.width
                 height: Runtime.minimumFontMetrics.height + 8
 
-                color: Scrite.app.translucent( border.color, 0.1 )
+                color: Color.translucent( border.color, 0.1 )
                 border.color: Runtime.colors.accent.c900.background
                 border.width: 0.5
 
@@ -109,7 +109,7 @@ Flickable {
                         height: parent.height-4
 
                         color: parent.border.color
-                        border.color: Scrite.app.translucent(Scrite.app.textColorFor(color), 0.25)
+                        border.color: Color.translucent(Scrite.app.textColorFor(color), 0.25)
                         border.width: 0.5
 
                         anchors.verticalCenter: parent.verticalCenter

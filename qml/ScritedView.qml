@@ -633,19 +633,19 @@ Item {
                                 gradient: Gradient {
                                     GradientStop {
                                         position: 0
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 1)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 1)
                                     }
                                     GradientStop {
                                         position: 0.175
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.5)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 0.5)
                                     }
                                     GradientStop {
                                         position: 0.35
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.3)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 0.3)
                                     }
                                     GradientStop {
                                         position: 0.56
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.1)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 0.1)
                                     }
                                     GradientStop {
                                         position: 0.7
@@ -1434,7 +1434,7 @@ Item {
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
+        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && (Scrite.app.isWindowsPlatform || Platform.isLinuxDesktop)
         Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
@@ -1454,7 +1454,7 @@ Item {
         allowedType: Attachments.VideosOnly
         property string droppedFilePath
         property string droppedFileName
-        onDropped: loadMediaUrl( Scrite.app.localFileToUrl(attachment.filePath) )
+        onDropped: loadMediaUrl( Url.fromPath(attachment.filePath) )
         attachmentNoticeSuffix: "Drop this file to load video."
     }
 }

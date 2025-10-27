@@ -14,6 +14,7 @@
 #ifndef ABSTRACTEXPORTER_H
 #define ABSTRACTEXPORTER_H
 
+#include "utils.h"
 #include "abstractdeviceio.h"
 #include "garbagecollector.h"
 
@@ -49,7 +50,7 @@ public:
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
     Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
 
-    Q_INVOKABLE QJsonObject configurationFormInfo() const;
+    Q_INVOKABLE Utils::ObjectConfig configurationFormInfo() const;
 
     enum Target { FileTarget, ClipboardTarget };
     Q_ENUM(Target)

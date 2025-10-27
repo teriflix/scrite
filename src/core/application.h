@@ -84,86 +84,18 @@ public:
     int customFontPointSize() const { return m_customFontPointSize; }
     Q_SIGNAL void customFontPointSizeChanged();
 
-    Q_INVOKABLE QUrl localFileToUrl(const QString &fileName) const
-    {
-        return QUrl::fromLocalFile(fileName);
-    }
-    Q_INVOKABLE QString urlToLocalFile(const QUrl &url) const { return url.toLocalFile(); }
-    Q_INVOKABLE QUrl toHttpUrl(const QUrl &url) const;
-
     Q_PROPERTY(QVersionNumber version READ version CONSTANT)
     QVersionNumber version() const { return m_versionNumber; }
 
     Q_PROPERTY(QString versionAsString READ versionAsString CONSTANT)
     QString versionAsString() const { return m_versionNumber.toString(); }
 
-    enum Platform { LinuxDesktop, WindowsDesktop, MacOS };
-    Q_ENUM(Platform)
-    Q_PROPERTY(Platform platform READ platform CONSTANT)
-    Platform platform() const;
-
-    Q_PROPERTY(QString platformAsString READ platformAsString CONSTANT)
-    QString platformAsString() const;
-
-    Q_PROPERTY(bool isMacOSPlatform READ isMacOSPlatform CONSTANT)
-#ifdef Q_OS_MAC
-    bool isMacOSPlatform() const { return true; }
-#else
-    bool isMacOSPlatform() const { return false; }
-#endif
-
-    Q_PROPERTY(bool isWindowsPlatform READ isWindowsPlatform CONSTANT)
-#ifdef Q_OS_WIN
-    bool isWindowsPlatform() const { return true; }
-#else
-    bool isWindowsPlatform() const { return false; }
-#endif
-
-    Q_PROPERTY(bool isNotWindows10 READ isNotWindows10 CONSTANT)
-#ifdef Q_OS_WIN
-    bool isNotWindows10() const;
-#else
-    bool isNotWindows10() const { return true; }
-#endif
-
-    Q_PROPERTY(bool isLinuxPlatform READ isLinuxPlatform CONSTANT)
-#ifdef Q_OS_MAC
-    bool isLinuxPlatform() const { return false; }
-#else
-#ifdef Q_OS_UNIX
-    bool isLinuxPlatform() const { return true; }
-#else
-    bool isLinuxPlatform() const { return false; }
-#endif
-#endif
-
-    Q_PROPERTY(QString platformVersion READ platformVersion CONSTANT)
-    QString platformVersion() const;
-
-    Q_PROPERTY(QString platformType READ platformType CONSTANT)
-    QString platformType() const;
-
-    Q_PROPERTY(QString hostName READ hostName CONSTANT)
-    QString hostName() const;
-
     Q_PROPERTY(QStringList availableThemes READ availableThemes CONSTANT)
     static QStringList availableThemes();
     static QString queryQtQuickStyleFor(const QString &theme);
 
     Q_PROPERTY(bool usingMaterialTheme READ usingMaterialTheme CONSTANT)
-    bool usingMaterialTheme() const;
-
-    Q_PROPERTY(bool internetAvailable READ isInternetAvailable NOTIFY internetAvailableChanged)
-    bool isInternetAvailable() const;
-    Q_SIGNAL void internetAvailableChanged();
-
-    Q_PROPERTY(QString controlKey READ controlKey CONSTANT)
-    QString controlKey() const;
-
-    Q_PROPERTY(QString altKey READ altKey CONSTANT)
-    QString altKey() const;
-
-    Q_INVOKABLE QString polishShortcutTextForDisplay(const QString &text) const;
+    static bool usingMaterialTheme();
 
     Q_PROPERTY(QString baseWindowTitle READ baseWindowTitle WRITE setBaseWindowTitle NOTIFY
                        baseWindowTitleChanged)
@@ -171,21 +103,14 @@ public:
     QString baseWindowTitle() const { return m_baseWindowTitle; }
     Q_SIGNAL void baseWindowTitleChanged();
 
-    Q_INVOKABLE QString typeName(const QVariant &value) const;
-    Q_INVOKABLE bool verifyType(const QVariant &value, const QString &name) const;
-    Q_INVOKABLE bool isTextInputItem(QQuickItem *item) const;
-
-    Q_INVOKABLE QVariant objectProperty(QObject *object, const QString &name) const;
-    Q_INVOKABLE bool setObjectProperty(QObject *object, const QString &name, const QVariant &value);
-
     Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
     QVersionNumber versionNumber() const { return m_versionNumber; }
 
     Q_PROPERTY(QString qtVersionString READ qtVersionString CONSTANT)
-    QString qtVersionString() const { return QStringLiteral(QT_VERSION_STR); }
+    static QString qtVersionString() { return QStringLiteral(QT_VERSION_STR); }
 
     Q_PROPERTY(QString openSslVersionString READ openSslVersionString CONSTANT)
-    QString openSslVersionString() const;
+    static QString openSslVersionString();
 
     Q_PROPERTY(QUndoGroup *undoGroup READ undoGroup CONSTANT)
     QUndoGroup *undoGroup() const { return m_undoGroup; }
@@ -210,90 +135,92 @@ public:
 
     static QFontDatabase &fontDatabase();
 
+    // TODO: Move this to Platform.fontInfo() ...
     Q_INVOKABLE static QJsonObject systemFontInfo();
-    Q_INVOKABLE static QColor pickColor(const QColor &initial);
-    Q_INVOKABLE static QString colorName(const QColor &color) { return color.name(); }
-    Q_INVOKABLE static QColor tintedColor(const QColor &c, qreal factor);
-    Q_INVOKABLE static QColor tintColors(const QColor &a, const QColor &b);
-    Q_INVOKABLE static QColor translucent(const QColor &input, qreal alpha = 0.5);
-    Q_INVOKABLE static QRectF textBoundingRect(const QString &text, const QFont &font);
-    Q_INVOKABLE void revealFileOnDesktop(const QString &pathIn);
-    Q_INVOKABLE static QJsonArray enumerationModel(QObject *object, const QString &enumName);
-    Q_INVOKABLE static QJsonArray enumerationModelForType(const QString &typeName,
-                                                          const QString &enumName);
-    Q_INVOKABLE static QString enumerationKey(QObject *object, const QString &enumName, int value);
-    Q_INVOKABLE static QString enumerationKeyForType(const QString &typeName,
-                                                     const QString &enumName, int value);
-    Q_INVOKABLE static QJsonObject fileInfo(const QString &path);
+
+    // Use File.revealOnDesktop(), which calls this function anyway
+    void revealFileOnDesktop(const QString &pathIn);
 
     Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
     QString settingsFilePath() const;
-
-    Q_INVOKABLE static QPointF cursorPosition();
-    Q_INVOKABLE static QPointF mapGlobalPositionToItem(QQuickItem *item, const QPointF &pos);
-    Q_INVOKABLE static bool isMouseOverItem(QQuickItem *item);
-
-    Q_INVOKABLE static void installOverrideCursor(Qt::CursorShape cursorShape);
-    Q_INVOKABLE static void rollbackOverrideCursor();
 
     QSettings *settings() const { return m_settings; }
 
     Q_PROPERTY(AutoUpdate *autoUpdate READ autoUpdate CONSTANT)
     AutoUpdate *autoUpdate() const;
 
-    Q_INVOKABLE static QJsonObject objectConfigurationFormInfo(const QObject *object,
-                                                               const QMetaObject *from = nullptr);
-
-    Q_PROPERTY(QVariantList standardColors READ standardColorsVariantList NOTIFY
-                       standardColorsChanged STORED false)
-    QVariantList standardColorsVariantList() const { return m_standardColors; }
-    Q_SIGNAL void standardColorsChanged();
-
-    Q_INVOKABLE static QColor pickStandardColor(int counter);
-    Q_INVOKABLE static bool isLightColor(const QColor &color);
-    Q_INVOKABLE static bool isVeryLightColor(const QColor &color);
-    Q_INVOKABLE static QColor textColorFor(const QColor &bgColor);
-
-    Q_INVOKABLE static QRectF largestBoundingRect(const QStringList &text, const QFont &font);
-    Q_INVOKABLE static QRectF boundingRect(const QString &text, const QFont &font);
-    Q_INVOKABLE static QRectF intersectedRectangle(const QRectF &of, const QRectF &with);
-    Q_INVOKABLE static bool doRectanglesIntersect(const QRectF &r1, const QRectF &r2);
+    // GMath.scaledSize()
     Q_INVOKABLE static QSizeF scaledSize(const QSizeF &of, const QSizeF &into);
+
+    // GMath.uniteRectangles()
     Q_INVOKABLE static QRectF uniteRectangles(const QRectF &r1, const QRectF &r2);
+
+    // GMath.adjustRectangle()
     Q_INVOKABLE static QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top,
                                               qreal right, qreal bottom);
+
+    // GMath.isRectangleInRectangle()
     Q_INVOKABLE static bool isRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect);
+
+    // GMath.translationRequiredToBringRectangleInRectangle()
     Q_INVOKABLE static QPointF
     translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect);
+
+    // GMath.distanceBetweenPoints()
     Q_INVOKABLE static qreal distanceBetweenPoints(const QPointF &p1, const QPointF &p2);
+
+    // GMath.querySubRectangle()
     Q_INVOKABLE static QRectF querySubRectangle(const QRectF &in, const QRectF &around,
                                                 const QSizeF &atBest);
 
+    // MouseCursor.position()
     Q_INVOKABLE QPoint mouseCursorPosition() const { return QCursor::pos(); }
+
+    // MouseCursor.moveTo()
     Q_INVOKABLE void moveMouseCursor(const QPoint &pos) { QCursor::setPos(pos); }
 
+    // File.copyToFolder()
     Q_INVOKABLE static QString copyFile(const QString &fromFilePath, const QString &toFolder);
+
+    // File.write()
     Q_INVOKABLE static bool writeToFile(const QString &fileName, const QString &fileContent);
+
+    // File.read()
     Q_INVOKABLE static QString fileContents(const QString &fileName);
+
+    // File.completeBaseName()
     Q_INVOKABLE static QString fileName(const QString &path);
+
+    // File.path()
     Q_INVOKABLE static QString filePath(const QString &fileName);
+
+    // File.neighbouringFilePath()
     Q_INVOKABLE static QString neighbouringFilePath(const QString &filePath,
                                                     const QString &nfileName);
 
+    // Clipboard.set()
     Q_INVOKABLE static bool copyToClipboard(const QString &text);
 
     Q_INVOKABLE static QScreen *windowScreen(QObject *window);
 
+    // SystemEnvironment.get()
     Q_INVOKABLE static QString getEnvironmentVariable(const QString &name);
 
+    // SystemEnvironment.get()
     Q_INVOKABLE static QString getWindowsEnvironmentVariable(const QString &name,
                                                              const QString &defaultValue);
+
+    // SystemEnvironment.set()
     Q_INVOKABLE static void changeWindowsEnvironmentVariable(const QString &name,
                                                              const QString &value);
+
+    // SystemEnvironment.remove()
     Q_INVOKABLE static void removeWindowsEnvironmentVariable(const QString &name);
 
+    // MouseCursor.position()
     Q_INVOKABLE static QPointF globalMousePosition();
 
+    // SMath.titleCased()
     Q_INVOKABLE static QString camelCased(const QString &val);
 
     Q_INVOKABLE void saveWindowGeometry(QWindow *window, const QString &group);
@@ -306,23 +233,34 @@ public:
     Q_INVOKABLE void toggleFullscreen(QWindow *window);
     Q_INVOKABLE bool hasActiveFocus(QQuickWindow *window, QQuickItem *item);
 
+    // Object.resetProperty()
     Q_INVOKABLE static bool resetObjectProperty(QObject *object, const QString &propName);
 
+    // Object.save()
     Q_INVOKABLE static bool saveObjectConfiguration(QObject *object);
+
+    // Object.load()
     Q_INVOKABLE static bool restoreObjectConfiguration(QObject *object);
 
+    // Object.treeSize()
     Q_INVOKABLE static int objectTreeSize(QObject *ptr);
 
+    // SMath.createUniqueId()
     Q_INVOKABLE static QString createUniqueId();
 
+    // TMath.sleep()
     Q_INVOKABLE static void sleep(int ms);
 
+    // TMath.secondsToTime()
     Q_INVOKABLE static QTime secondsToTime(int nrSeconds);
+
+    // TMath.relativeTime()
     Q_INVOKABLE static QString relativeTime(const QDateTime &dt);
 
     Q_PROPERTY(Forms *forms READ forms CONSTANT)
     Forms *forms() const;
 
+    // Gui.emptyQImage
     Q_PROPERTY(QImage emptyQImage READ emptyQImage CONSTANT)
     static QImage emptyQImage() { return QImage(); }
 
@@ -344,18 +282,27 @@ public:
     void setHandleFileOpenEvents(bool val = true) { m_handleFileOpenEvents = val; }
 #endif
 
+    // Utils::SMath::painterPathToString()
     static QString painterPathToString(const QPainterPath &val);
+
+    // Utils::SMath::stringToPainterPath()
     static QPainterPath stringToPainterPath(const QString &val);
+
+    // Utils::SMath::replaceCharacterName()
     static QJsonObject replaceCharacterName(const QString &from, const QString &to,
                                             const QJsonObject &delta,
                                             int *nrReplacements = nullptr);
+
+    // Utils::SMath::replaceCharacterName()
     static QString replaceCharacterName(const QString &from, const QString &to, const QString &in,
                                         int *nrReplacements = nullptr);
 
     Q_SIGNAL void openFileRequest(const QString &filePath);
 
+    // Utils::File::sanitiseName
     static QString sanitiseFileName(const QString &fileName, QSet<QChar> *removedChars = nullptr);
 
+    // Gui.log() or Utils::Gui::log()
     Q_INVOKABLE static void log(const QString &message);
 
     bool event(QEvent *event);
@@ -370,15 +317,28 @@ public:
         return &(const_cast<Application *>(this)->m_objectRegistry);
     }
 
+    // ObjectRegistry.add()
     Q_INVOKABLE QString registerObject(QObject *object, const QString &name);
+
+    // ObjectRegistry.remove()
     Q_INVOKABLE void unregisterObject(QObject *object);
+
+    // ObjectRegistry.find()
     Q_INVOKABLE QObject *findRegisteredObject(const QString &name) const;
 
+    // Utils::Object::firstChildByType
     Q_INVOKABLE static QObject *findFirstChildOfType(QObject *object, const QString &className);
+
+    // Utils::Object::firstParentByType
     Q_INVOKABLE static QObject *findFirstParentOfType(QObject *object, const QString &className);
+
+    // Utils::Object::firstSiblingByType
     Q_INVOKABLE static QObject *findFirstSiblingOfType(QObject *object, const QString &className);
 
+    // Utils::Object::parentOf
     Q_INVOKABLE static QObject *parentOf(QObject *object);
+
+    // Utils::Object::reparent
     Q_INVOKABLE static bool reparent(QObject *object, QObject *newParent);
 
 private:

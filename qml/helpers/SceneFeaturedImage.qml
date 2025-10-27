@@ -87,7 +87,7 @@ Item {
             anchors.fill: parent
             active: false
             sourceComponent: Rectangle {
-                color: Scrite.app.translucent(Runtime.colors.primary.c600.background,0.85)
+                color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
 
                 MouseArea {
                     anchors.fill: parent
@@ -174,7 +174,7 @@ Item {
             selectExisting: true
              // The default Ctrl+U interfers with underline
             onAccepted: {
-                const attachment = sceneAttachments.includeAttachment( Scrite.app.urlToLocalFile(fileUrl) )
+                const attachment = sceneAttachments.includeAttachment( Url.toPath(fileUrl) )
                 if(attachment)
                     attachment.featured = true
             }

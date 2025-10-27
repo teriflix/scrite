@@ -253,7 +253,7 @@ ScrollArea {
         }
 
         function zoomSanityCheck() {
-            if( !Scrite.app.doRectanglesIntersect(_canvas.itemsBoundingBox.boundingBox, root.viewportRect) ) {
+            if( !GMath.doRectanglesIntersect(_canvas.itemsBoundingBox.boundingBox, root.viewportRect) ) {
                 let item = _currentElementItemBinder.get
                 if(item === null)
                     item = _elementItems.itemAt(0)

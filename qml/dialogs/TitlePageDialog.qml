@@ -194,7 +194,7 @@ DialogLauncher {
                          // The default Ctrl+U interfers with underline
                         onAccepted: {
                             if(fileUrl != "")
-                            Scrite.document.screenplay.setCoverPagePhoto(Scrite.app.urlToLocalFile(fileUrl))
+                            Scrite.document.screenplay.setCoverPagePhoto(Url.toPath(fileUrl))
                         }
                         folder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
                         onFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = folder

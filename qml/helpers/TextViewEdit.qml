@@ -198,7 +198,7 @@ Loader {
 
                 x: parent.cursorRectangle.x - Scrite.app.boundingRect(_completionModel.completionPrefix, parent.font).width
                 y: parent.cursorRectangle.y + parent.cursorRectangle.height
-                width: Scrite.app.largestBoundingRect(_completionModel.strings, _textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
+                width: GMath.largestBoundingRect(_completionModel.strings, _textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
                 height: _completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding
 
                 focus: false

@@ -64,7 +64,6 @@ AppWindow::AppWindow()
     ScriteDocument *scriteDocument = ScriteDocument::instance();
     scriteDocument->formatting()->setSreeenFromWindow(this);
     scriteDocument->clearModified();
-    scriteApp.initializeStandardColors(this->engine());
     this->setTitle(scriteDocument->documentWindowTitle());
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, this,
                      &QQuickView::setTitle);

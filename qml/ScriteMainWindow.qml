@@ -88,11 +88,11 @@ Item {
         property bool hasDocumentErrors: documentErrors.hasError
         property bool hasApplicationErrors: applicationErrors.hasError
 
-        property ErrorReport documentErrors: Aggregation.findErrorReport(Scrite.document)
-        property ErrorReport applicationErrors: Aggregation.findErrorReport(Scrite.app)
+        property ErrorReport documentErrors: Aggregation.errorReport(Scrite.document)
+        property ErrorReport applicationErrors: Aggregation.errorReport(Scrite.app)
 
         function handleOpenFileRequest(fileName) {
-            if(Scrite.app.isMacOSPlatform) {
+            if(Platform.isMacOSDesktop) {
                 if(Scrite.document.empty) {
                     Runtime.shoutout(Runtime.announcementIds.closeHomeScreenRequest, undefined)
                     OpenFileTask.open(fileName)
@@ -167,7 +167,7 @@ Item {
 
             Scrite.window.closing.connect(handleWindowClosing)
 
-            if(Scrite.app.isMacOSPlatform)
+            if(Platform.isMacOSDesktop)
                 Scrite.app.openFileRequest.connect(handleOpenFileRequest)
 
             Qt.callLater(maybeShowDiscordHelpTip)
@@ -194,7 +194,7 @@ Item {
 
                 MessageBox.information("Scrite Document Error", msg, () => {
                                            if(documentErrors.details && documentErrors.details.revealOnDesktopRequest)
-                                               Scrite.app.revealFileOnDesktop(documentErrors.details.revealOnDesktopRequest)
+                                               File.revealOnDesktop(documentErrors.details.revealOnDesktopRequest)
                                            documentErrors.clear()
                                        })
             }

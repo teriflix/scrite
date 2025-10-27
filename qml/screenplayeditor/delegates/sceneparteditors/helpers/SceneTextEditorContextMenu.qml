@@ -58,21 +58,21 @@ MenuLoader {
 
         VclMenuItem {
             focusPolicy: Qt.NoFocus
-            text: "Cut\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+X")
+            text: "Cut\t" + Gui.nativeShortcut("Ctrl+X")
             enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
             onClicked: { root.cutRequest(); root.close() }
         }
 
         VclMenuItem {
             focusPolicy: Qt.NoFocus
-            text: "Copy\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+C")
+            text: "Copy\t" + Gui.nativeShortcut("Ctrl+C")
             enabled: sceneTextEditor.selectionEnd > sceneTextEditor.selectionStart
             onClicked: { root.copyRequest(); root.close() }
         }
 
         VclMenuItem {
             focusPolicy: Qt.NoFocus
-            text: "Paste\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+V")
+            text: "Paste\t" + Gui.nativeShortcut("Ctrl+V")
             enabled: sceneTextEditor.canPaste
             onClicked: { root.pasteRequest(); root.close() }
         }
@@ -120,7 +120,7 @@ MenuLoader {
                     required property var modelData
 
                     focusPolicy: Qt.NoFocus
-                    text: modelData.display + "\t\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+" + (index+1))
+                    text: modelData.display + "\t\t" + Gui.nativeShortcut("Ctrl+" + (index+1))
                     enabled: _menu.sceneCurrentElement !== null
                     onClicked: {
                         _menu.sceneCurrentElement.type = modelData.value

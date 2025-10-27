@@ -120,7 +120,7 @@ Item {
 
         anchors.fill: parent
 
-        color: Scrite.app.translucent(Runtime.colors.primary.c500.background, 0.5)
+        color: Color.translucent(Runtime.colors.primary.c500.background, 0.5)
         visible: _annotationAttachmentDropArea.active
 
         Rectangle {

@@ -33,7 +33,7 @@ QtObject {
             return
 
         let w = 300
-        let h = 350 // Scrite.app.isMacOSPlatform ? 60 : 350
+        let h = 350 // Platform.isMacOSDesktop ? 60 : 350
         let geometry = Qt.rect(x-w/2, y-20, w, h)
 
         let annot = Runtime.newAnnotation(parent, type, geometry)
@@ -180,7 +180,7 @@ QtObject {
             anchors.fill: parent
             anchors.margins: 10
 
-            text: Scrite.app.isMacOSPlatform && _annotationGripLoader.annotationItem !== _d ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
+            text: Platform.isMacOSDesktop && _annotationGripLoader.annotationItem !== _d ? "Set a URL to get a clickable link here." : "Set a URL to preview it here."
             visible: _d.annotation.attributes.url === ""
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
             verticalAlignment: Text.AlignVCenter

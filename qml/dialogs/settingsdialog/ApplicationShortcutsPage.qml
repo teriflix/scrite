@@ -109,8 +109,8 @@ Item {
                 ShortcutField {
                     Layout.preferredWidth: _delegateLayout.width * 0.3
 
-                    shortcut: Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
-                    placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Scrite.app.polishShortcutTextForDisplay(qmlAction.defaultShortcut)) : ""
+                    shortcut: Gui.nativeShortcut(qmlAction.shortcut)
+                    placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) : ""
 
                     onActiveFocusChanged: {
                         if(activeFocus) {
@@ -122,7 +122,7 @@ Item {
                                           const conflictingAction = _actionsModel.findActionForShortcut(newShortcut)
                                           if(conflictingAction) {
                                               MessageBox.information("Shortcut Conflict",
-                                                                     Scrite.app.polishShortcutTextForDisplay(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                                                                     Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
                                           } else {
                                             qmlAction.shortcut = newShortcut
                                           }
@@ -133,7 +133,7 @@ Item {
                     flat: true
 
                     visible: qmlAction.defaultShortcut !== undefined
-                    enabled: visible && Scrite.app.polishShortcutTextForDisplay(qmlAction.defaultShortcut) !== Scrite.app.polishShortcutTextForDisplay(qmlAction.shortcut)
+                    enabled: visible && Gui.nativeShortcut(qmlAction.defaultShortcut) !== Gui.nativeShortcut(qmlAction.shortcut)
                     opacity: enabled ? 1 : 0.5
                     icon.source: "qrc:/icons/content/undo.png"
 

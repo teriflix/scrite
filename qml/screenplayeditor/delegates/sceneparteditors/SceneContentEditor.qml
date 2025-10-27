@@ -362,7 +362,7 @@ AbstractScenePartEditor {
         enabled: _private.canSplitScene
         visible: _sceneTextEditor.activeFocus
         priority: 1
-        shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
+        shortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
 
         function trigger() {
             if(enabled)
@@ -378,7 +378,7 @@ AbstractScenePartEditor {
         enabled: _private.canJoinToPreviousScene
         visible: _sceneTextEditor.activeFocus
         priority: 1
-        shortcut: Scrite.app.isMacOSPlatform ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
+        shortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
 
         function trigger() {
             if(enabled)
@@ -506,7 +506,7 @@ AbstractScenePartEditor {
             // if( event.modifiers & Qt.ControlModifier|Qt.ShiftModifier )
             // but for whatever reason, that does not work.
             if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
-                if( (Scrite.app.isMacOSPlatform && event.key === Qt.Key_Delete) || (event.key === Qt.Key_Backspace) ) {
+                if( (Platform.isMacOSDesktop && event.key === Qt.Key_Delete) || (event.key === Qt.Key_Backspace) ) {
                     event.accepted = true
                     _mergeSceneShortcut.trigger()
                 }

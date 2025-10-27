@@ -32,14 +32,16 @@ public:
 
     static Aggregation *qmlAttachedProperties(QObject *object);
 
-    Q_INVOKABLE static QObject *find(QObject *object, const QString &className,
-                                     const QString &objectName = QString());
-    Q_INVOKABLE static ErrorReport *findErrorReport(QObject *object);
-    Q_INVOKABLE static ProgressReport *findProgressReport(QObject *object);
+    Q_INVOKABLE static ErrorReport *errorReport(QObject *object);
+    Q_INVOKABLE static ProgressReport *progressReport(QObject *object);
 
-    Q_INVOKABLE QObject *firstChild(const QString &className);
-    Q_INVOKABLE QObject *firstParent(const QString &className);
-    Q_INVOKABLE QObject *firstSibling(const QString &className);
+    Q_INVOKABLE QObject *firstChildByType(const QString &typeName);
+    Q_INVOKABLE QObject *firstParentByType(const QString &typeName);
+    Q_INVOKABLE QObject *firstSiblingByType(const QString &typeName);
+
+    Q_INVOKABLE QObject *firstChildByName(const QString &objectName);
+    Q_INVOKABLE QObject *firstParentByName(const QString &objectName);
+    Q_INVOKABLE QObject *firstSiblingByName(const QString &objectName);
 };
 
 #endif // AGGREGATION_H

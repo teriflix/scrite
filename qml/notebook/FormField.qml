@@ -103,9 +103,9 @@ Column {
         width: _questionText.width
         height: Math.max(minHeight, _answerItemLoader.item ? _answerItemLoader.item.height : 0)
 
-        color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.75)
+        color: Color.translucent(Runtime.colors.primary.c100.background, 0.75)
         border.width: 1
-        border.color: Scrite.app.translucent(Runtime.colors.primary.borderColor, 0.25)
+        border.color: Color.translucent(Runtime.colors.primary.borderColor, 0.25)
 
         LodLoader {
             id: _answerItemLoader

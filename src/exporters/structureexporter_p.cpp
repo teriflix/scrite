@@ -18,6 +18,7 @@
 #include <QPaintEngine>
 #include <QAbstractTextDocumentLayout>
 
+#include "utils.h"
 #include "application.h"
 #include "scritedocument.h"
 #include "structureexporter.h"
@@ -187,8 +188,7 @@ StructureIndexCard::StructureIndexCard(const StructureExporter *exporter,
     }
 
     const QColor sceneColor = element->scene()->color();
-    const QColor penColor =
-            Application::instance()->isLightColor(sceneColor) ? QColor(Qt::black) : sceneColor;
+    const QColor penColor = Utils::Color::isLight(sceneColor) ? QColor(Qt::black) : sceneColor;
 
     // Transparency is best achived using opacity, rather than using alpha channel in color.
     this->setBrush(sceneColor);

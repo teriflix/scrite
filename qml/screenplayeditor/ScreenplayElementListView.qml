@@ -424,8 +424,8 @@ ListView {
             if(currentIndex >= firstItemIndex && currentIndex <= lastItemIndex)
                 return
 
-            const globalCursorPos = Scrite.app.cursorPosition()
-            let localCursorPos = Scrite.app.mapGlobalPositionToItem(root, globalCursorPos)
+            const globalCursorPos = MouseCursor.position()
+            let localCursorPos = MouseCursor.itemPosition(root, globalCursorPos)
             localCursorPos.x = root.width/2
             if(localCursorPos.y >= 0 && localCursorPos.y < root.height) {
                 localCursorPos = root.mapToItem(root.contentItem, localCursorPos.x, localCursorPos.y)

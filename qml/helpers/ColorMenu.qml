@@ -44,7 +44,7 @@ VclMenu {
             columns: Math.floor(width / minCellSize)
 
             Repeater {
-                model: Scrite.app.standardColors.concat(Runtime.workspaceSettings.customColors)
+                model: SceneColors.palette.concat(Runtime.workspaceSettings.customColors)
                 delegate: colorItemDelegate
             }
 
@@ -54,7 +54,7 @@ VclMenu {
                 suggestedHeight: colorGrid.cellSize
                 ToolTip.text: "Pick a custom color"
                 onClicked: {
-                    var color = Scrite.app.pickColor("white")
+                    var color = Color.pick("white")
                     var colors = Runtime.workspaceSettings.customColors
                     colors.unshift(color)
                     if(colors.length > 10)
@@ -74,7 +74,7 @@ VclMenu {
         Rectangle {
             width: parent.cellSize
             height: parent.cellSize
-            color: (colorGrid.currentIndex === index) ? Scrite.app.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+            color: (colorGrid.currentIndex === index) ? Color.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
             Component.onCompleted: {
                 if(modelData == selectedColor)
                     colorGrid.currentIndex = index

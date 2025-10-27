@@ -31,7 +31,7 @@ Item {
     property var taxonomy
 
     function init(_parent) {
-        if( !(_parent && Scrite.app.verifyType(_parent, "QQuickItem")) )
+        if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem
 
         parent = _parent

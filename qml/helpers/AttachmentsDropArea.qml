@@ -29,7 +29,7 @@ BasicAttachmentsDropArea {
     Rectangle {
         anchors.fill: parent
         visible: attachmentsDropArea.active
-        color: Scrite.app.translucent(Runtime.colors.primary.c500.background, 0.5)
+        color: Color.translucent(Runtime.colors.primary.c500.background, 0.5)
 
         Rectangle {
             anchors.fill: attachmentNotice

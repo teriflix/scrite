@@ -171,7 +171,7 @@ Rectangle {
                 id: structureTabButton
                 visible: Runtime.showNotebookInStructure
                 iconSource: "qrc:/icons/navigation/structure_tab.png"
-                ToolTip.text: "Structure Tab (" + Scrite.app.polishShortcutTextForDisplay("Alt+2") + ")"
+                ToolTip.text: "Structure Tab (" + Gui.nativeShortcut("Alt+2") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
                 onClicked: Runtime.shoutout(Runtime.announcementIds.tabRequest, "Structure")
@@ -182,7 +182,7 @@ Rectangle {
                 visible: Runtime.showNotebookInStructure
                 iconSource: "qrc:/icons/navigation/notebook_tab.png"
                 down: true
-                ToolTip.text: "Notebook\t(" + Scrite.app.polishShortcutTextForDisplay("Alt+3") + ")"
+                ToolTip.text: "Notebook\t(" + Gui.nativeShortcut("Alt+3") + ")"
                 suggestedWidth: toolButtonSize
                 suggestedHeight: toolButtonSize
             }
@@ -529,7 +529,7 @@ Rectangle {
                                        (styleData.value.notebookItemType === NotebookModel.NotesType &&
                                         styleData.value.notebookItemObject.ownerType === Notes.StructureOwner)
                             text: styleData.value.notebookItemTitle ? styleData.value.notebookItemTitle : ""
-                            color: Scrite.app.textColorFor(parent.parent.color)
+                            color: Color.textColorFor(parent.parent.color)
                             elide: Text.ElideRight
                             width: parent.width-(itemDelegateIcon.visible ? (itemDelegateIcon.width+parent.spacing) : 0)
                             anchors.verticalCenter: parent.verticalCenter
@@ -654,7 +654,7 @@ Rectangle {
                     case NotebookModel.CharactersCategory:
                         return Qt.rgba(0,0,0,0)
                     case NotebookModel.BookmarksCategory:
-                        return Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
+                        return Color.translucent(Runtime.colors.primary.c100.background, 0.5)
                     }
                     break
                 case NotebookModel.NotesType:
@@ -669,7 +669,7 @@ Rectangle {
                         return Qt.tint(scene.color, "#e7ffffff")
                         }
                     default:
-                        return Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
+                        return Color.translucent(Runtime.colors.primary.c100.background, 0.5)
                     }
                 case NotebookModel.NoteType:
                     switch(notebookTree.currentData.notebookItemObject.type) {
@@ -786,7 +786,7 @@ Rectangle {
                 active: false
                 sourceComponent: Rectangle {
                     id: deleteConfirmationItem
-                    color: Scrite.app.translucent(Runtime.colors.primary.c600.background,0.85)
+                    color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
                     focus: true
 
                     MouseArea {
@@ -854,7 +854,7 @@ Rectangle {
         Rectangle {
             id: bookmarksItem
             property var componentData
-            color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
+            color: Color.translucent(Runtime.colors.primary.c100.background, 0.5)
             border.width: 1
             border.color: Runtime.colors.primary.borderColor
             clip: true
@@ -908,7 +908,7 @@ Rectangle {
                                     anchors.verticalCenter: parent.verticalCenter
                                     mipmap: true
                                     source: {
-                                        if(Scrite.app.typeName(noteObject) === "Notes") {
+                                        if(Object.typeOf(noteObject) === "Notes") {
                                             switch(noteObject.ownerType) {
                                             case Notes.SceneOwner:
                                                 return "qrc:/icons/content/scene.png"
@@ -919,9 +919,9 @@ Rectangle {
                                             default:
                                                 break
                                             }
-                                        } else if(Scrite.app.typeName(noteObject) === "Character")
+                                        } else if(Object.typeOf(noteObject) === "Character")
                                             return "qrc:/icons/content/person_outline.png"
-                                        else if(Scrite.app.typeName(noteObject) === "Note") {
+                                        else if(Object.typeOf(noteObject) === "Note") {
                                             switch(styleData.value.notebookItemObject.type) {
                                             case Note.TextNoteType:
                                                 return "qrc:/icons/content/note.png"
@@ -1385,7 +1385,7 @@ Rectangle {
             property real minimumNoteSize: Math.max(200, Scrite.window.width*0.15)
             property real noteSize: notesFlick.width > minimumNoteSize ? notesFlick.width / Math.floor(notesFlick.width/minimumNoteSize) : notesFlick.width
             clip: true
-            color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
+            color: Color.translucent(Runtime.colors.primary.c100.background, 0.5)
             border.width: 1
             border.color: Runtime.colors.primary.borderColor
 
@@ -1457,7 +1457,7 @@ Rectangle {
                                         width: parent.width
                                         elide: Text.ElideRight
                                         text: objectItem.title
-                                        color: Scrite.app.isLightColor(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
+                                        color: Color.isLight(parent.parent.color) ? Qt.rgba(0.2,0.2,0.2,1.0) : Qt.rgba(0.9,0.9,0.9,1.0)
                                     }
 
                                     VclLabel {
@@ -1504,7 +1504,7 @@ Rectangle {
                         Rectangle {
                             anchors.fill: parent
                             anchors.margins: 10
-                            color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
+                            color: Color.translucent(Runtime.colors.primary.c100.background, 0.5)
                             border.width: 1
                             border.color: Runtime.colors.primary.borderColor
 
@@ -2254,7 +2254,7 @@ Rectangle {
                                 anchors.margins: 5
                                 color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : Runtime.colors.sceneHeadingTint)
                                 border.width: 1
-                                border.color: Scrite.app.isLightColor(character.color) ? (charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : character.color
+                                border.color: Color.isLight(character.color) ? (charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : character.color
 
                                 Row {
                                     anchors.fill: parent
@@ -2345,7 +2345,7 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: Scrite.app.translucent(Runtime.colors.primary.windowColor, 0.5)
+                                color: Color.translucent(Runtime.colors.primary.windowColor, 0.5)
                                 border { width: 1; color: Runtime.colors.primary.borderColor }
 
                                 RowLayout {
@@ -2531,7 +2531,7 @@ Rectangle {
                                 id: characterQuickInfoArea
                                 width: Runtime.workspaceSettings.showNotebookInStructure ? 300 : Math.max(300, Scrite.window.width*0.3)
                                 height: parent.height
-                                color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
+                                color: Color.translucent(Runtime.colors.primary.c100.background, 0.5)
 
                                 Connections {
                                     target: characterNotes
@@ -2558,7 +2558,7 @@ Rectangle {
 
                                     onAccepted: {
                                         if(fileUrl != "") {
-                                            character.addPhoto(Scrite.app.urlToLocalFile(fileUrl))
+                                            character.addPhoto(Url.toPath(fileUrl))
                                             photoSlides.currentIndex = character.photos.length - 1
                                         }
                                     }
@@ -2714,7 +2714,7 @@ Rectangle {
                                                 label: "Tags:"
                                                 width: parent.width
                                                 labelAlwaysVisible: true
-                                                placeholderText: Scrite.app.isMacOSPlatform ? "<type & hit Return, max 25 chars>" : "<type and hit Enter, max 25 chars>"
+                                                placeholderText: Platform.isMacOSDesktop ? "<type & hit Return, max 25 chars>" : "<type and hit Enter, max 25 chars>"
                                                 maximumLength: 25
                                                 TabSequenceItem.sequence: 1
                                                 TabSequenceItem.manager: characterInfoTabSequence
@@ -2946,7 +2946,7 @@ Rectangle {
                                     allowMultiple: true
                                     onDropped: {
                                         const dus = dropUrls
-                                        dus.forEach( (url) => { character.addPhoto(Scrite.app.urlToLocalFile(url)) } )
+                                        dus.forEach( (url) => { character.addPhoto(Url.toPath(url)) } )
                                         photoSlides.currentIndex = character.photos.length - 1
                                     }
                                 }
@@ -3287,7 +3287,7 @@ Rectangle {
                 generator.generate()
                 fileManager.addToAutoDeleteList(fileName)
                 pagesPerRow = 1
-                source = Scrite.app.localFileToUrl(fileName)
+                source = Url.fromPath(fileName)
                 busyMessage.visible = false
             }
 

@@ -35,7 +35,7 @@ Item {
         }
         if(message && typeof message === "string")
             initialProps.message = message
-        if(progressReport && Scrite.app.verifyType(progressReport, "ProgressReport"))
+        if(progressReport && Object.isOfType(progressReport, "ProgressReport"))
             initialProps.progressReport = progressReport
 
         var dlg = dialogComponent.createObject(root, initialProps)

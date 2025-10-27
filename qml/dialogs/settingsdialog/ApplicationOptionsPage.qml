@@ -345,8 +345,8 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclLabel { text: Scrite.app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
-            enabled: !Scrite.app.isMacOSPlatform
+            label: VclLabel { text: Platform.isMacOSDesktop ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
+            enabled: !Platform.isMacOSDesktop
             opacity: enabled ? 1 : 0.5
 
             RowLayout {

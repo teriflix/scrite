@@ -64,7 +64,7 @@ Rectangle {
     width: groupBox.geometry.width + 40
     height: groupBox.geometry.height + 40 + _private.tipMarginForStacks
 
-    color: Scrite.app.translucent(Runtime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
+    color: Color.translucent(Runtime.colors.accent.c100.background, Scrite.document.structure.forceBeatBoardLayout ? 0.3 : 0.1)
     radius: 0
 
     border.width: 1
@@ -106,7 +106,7 @@ Rectangle {
         anchors.fill: _beatLabel
         anchors.margins: -parent.radius
 
-        color: Scrite.app.translucent(Runtime.colors.accent.c200.background, 0.4)
+        color: Color.translucent(Runtime.colors.accent.c200.background, 0.4)
 
         border.width: parent.border.width
         border.color: parent.border.color

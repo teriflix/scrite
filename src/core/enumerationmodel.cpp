@@ -13,7 +13,22 @@
 
 #include "enumerationmodel.h"
 
-EnumerationModel::EnumerationModel(QObject *parent) : QAbstractListModel(parent) { }
+EnumerationModel::EnumerationModel(QObject *parent) : QAbstractListModel(parent)
+{
+    connect(this, &EnumerationModel::objectChanged, this, &EnumerationModel::loadModel);
+    connect(this, &EnumerationModel::enumerationChanged, this, &EnumerationModel::loadModel);
+}
+
+EnumerationModel::EnumerationModel(const QMetaObject *mo, const QString &enumName, QObject *parent)
+    : QAbstractListModel(parent)
+{
+    m_metaObject = mo;
+    m_enumeration = enumName;
+    this->loadModel();
+
+    connect(this, &EnumerationModel::objectChanged, this, &EnumerationModel::loadModel);
+    connect(this, &EnumerationModel::enumerationChanged, this, &EnumerationModel::loadModel);
+}
 
 EnumerationModel::~EnumerationModel() { }
 
@@ -29,6 +44,7 @@ void EnumerationModel::setObject(QObject *val)
         QObject::connect(val, &QObject::destroyed, this, &EnumerationModel::resetObject);
 
     m_object = val;
+    m_metaObject = m_object ? m_object->metaObject() : nullptr;
     emit objectChanged();
 }
 
@@ -62,8 +78,9 @@ int EnumerationModel::keyToValue(const QString &key) const
 
 QHash<int, QByteArray> EnumerationModel::roleNames() const
 {
-    return { { KeyRole, QByteArrayLiteral("enumerationKey") },
-             { ValueRole, QByteArrayLiteral("enumerationValue") } };
+    return { { KeyRole, QByteArrayLiteral("enumKey") },
+             { ValueRole, QByteArrayLiteral("enumValue") },
+             { IconRole, QByteArrayLiteral("enumIcon") } };
 }
 
 int EnumerationModel::rowCount(const QModelIndex &parent) const
@@ -81,6 +98,8 @@ QVariant EnumerationModel::data(const QModelIndex &index, int role) const
         return m_items[index.row()].key;
     case ValueRole:
         return m_items[index.row()].value;
+    case IconRole:
+        return m_items[index.row()].icon;
     }
 
     return QVariant();
@@ -89,9 +108,8 @@ QVariant EnumerationModel::data(const QModelIndex &index, int role) const
 void EnumerationModel::resetObject()
 {
     m_object = nullptr;
+    m_metaObject = nullptr;
     m_enumeration.clear();
-
-    this->clearModel();
 
     emit objectChanged();
     emit enumerationChanged();
@@ -99,12 +117,12 @@ void EnumerationModel::resetObject()
 
 void EnumerationModel::loadModel()
 {
-    if (m_object == nullptr || m_enumeration.isEmpty()) {
+    if (m_metaObject == nullptr || m_enumeration.isEmpty()) {
         this->clearModel();
         return;
     }
 
-    const QMetaObject *mo = m_object->metaObject();
+    const QMetaObject *mo = m_metaObject;
     m_metaEnum = mo->enumerator(mo->indexOfEnumerator(qPrintable(m_enumeration)));
     if (!m_metaEnum.isValid()) {
         this->clearModel();
@@ -115,8 +133,21 @@ void EnumerationModel::loadModel()
 
     m_items.clear();
 
+    auto queryEnumIcon = [=](const char *key) {
+        const QByteArray cikey =
+                QByteArrayLiteral("enum_") + QByteArray(key) + QByteArrayLiteral("_icon");
+        const int ciIndex = mo->indexOfClassInfo(cikey.constData());
+        if (ciIndex < 0)
+            return QString();
+
+        const QMetaClassInfo ci = mo->classInfo(ciIndex);
+        return QString::fromLatin1(ci.value());
+    };
+
     for (int i = 0; i < m_metaEnum.keyCount(); i++) {
-        Item item { QString::fromLatin1(m_metaEnum.key(i)), m_metaEnum.value(i) };
+
+        Item item { QString::fromLatin1(m_metaEnum.key(i)), m_metaEnum.value(i),
+                    queryEnumIcon(m_metaEnum.key(i)) };
         m_items.append(item);
     }
 

@@ -227,7 +227,7 @@ Item {
         keys: [Runtime.timelineViewSettings.dropAreaKey]
 
         onDropped: (drop) => {
-            const otherScene = Scrite.app.typeName(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
+            const otherScene = Object.typeOf(drop.source) === "ScreenplayElement" ? drop.source.scene : drop.source
             if(Scrite.document.screenplay.firstIndexOfScene(otherScene) < 0) {
                 MessageBox.information("",
                     "Scenes must be added to the timeline before they can be stacked."
