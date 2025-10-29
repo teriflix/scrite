@@ -42,14 +42,16 @@ void Utils::registerTypes()
 {
     static bool typesRegistered = false;
     if (!typesRegistered) {
-        qRegisterMetaType<Utils::FileInfo>();
-        qRegisterMetaType<Utils::ObjectConfigFieldChoice>();
-        qRegisterMetaType<QList<Utils::ObjectConfigFieldChoice>>();
-        qRegisterMetaType<Utils::ObjectConfigField>();
-        qRegisterMetaType<QList<Utils::ObjectConfigField>>();
-        qRegisterMetaType<Utils::ObjectConfigFieldGroup>();
-        qRegisterMetaType<QList<Utils::ObjectConfigFieldGroup>>();
-        qRegisterMetaType<Utils::ObjectConfig>();
+        qRegisterMetaType<Utils::FileInfo>("Utils::FileInfo");
+        qRegisterMetaType<Utils::ObjectConfigFieldChoice>("Utils::ObjectConfigFieldChoice");
+        qRegisterMetaType<QList<Utils::ObjectConfigFieldChoice>>(
+                "QList<Utils::ObjectConfigFieldChoice>");
+        qRegisterMetaType<Utils::ObjectConfigField>("Utils::ObjectConfigField");
+        qRegisterMetaType<QList<Utils::ObjectConfigField>>("QList<Utils::ObjectConfigField>");
+        qRegisterMetaType<Utils::ObjectConfigFieldGroup>("Utils::ObjectConfigFieldGroup");
+        qRegisterMetaType<QList<Utils::ObjectConfigFieldGroup>>(
+                "QList<Utils::ObjectConfigFieldGroup>");
+        qRegisterMetaType<Utils::ObjectConfig>("Utils::ObjectConfig");
 
         typesRegistered = true;
     }
@@ -493,10 +495,10 @@ Utils::ObjectConfig Utils::Object::configuration(const QObject *object, const QM
     if (object == nullptr)
         return ret;
 
-    if (from == nullptr)
+    const QMetaObject *mo = object->metaObject();
+    if (from == nullptr || !mo->inherits(from))
         from = object->metaObject();
 
-    const QMetaObject *mo = object->metaObject();
     auto queryClassInfo = [mo](const char *key) {
         const int ciIndex = mo->indexOfClassInfo(key);
         if (ciIndex < 0)
@@ -541,7 +543,7 @@ Utils::ObjectConfig Utils::Object::configuration(const QObject *object, const QM
     ret.title = queryClassInfo("Title");
     ret.description = queryClassInfo("Description");
 
-    for (int i = from->propertyOffset(); i < from->propertyCount(); i++) {
+    for (int i = from->propertyOffset(); i < mo->propertyCount(); i++) {
         const QMetaProperty prop = mo->property(i);
         if (!prop.isWritable() || !prop.isStored() || !prop.isDesignable())
             continue;

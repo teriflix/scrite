@@ -89,7 +89,7 @@ public:
 
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
     Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
-    Q_INVOKABLE Utils::ObjectConfig configurationFormInfo() const;
+    Q_INVOKABLE Utils::ObjectConfig configuration() const;
 
     Q_INVOKABLE bool generate();
     Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }

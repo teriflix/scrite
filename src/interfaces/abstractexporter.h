@@ -50,7 +50,7 @@ public:
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
     Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
 
-    Q_INVOKABLE Utils::ObjectConfig configurationFormInfo() const;
+    Q_INVOKABLE Utils::ObjectConfig configuration() const;
 
     enum Target { FileTarget, ClipboardTarget };
     Q_ENUM(Target)

@@ -22,6 +22,7 @@
 #include <QDateTime>
 
 namespace Utils {
+
 struct FileInfo
 {
     Q_GADGET
@@ -121,8 +122,8 @@ public:
     Q_PROPERTY(QString feature MEMBER feature)
     QString feature;
 
-    Q_PROPERTY(QList<ObjectConfigFieldChoice> choices MEMBER choices)
-    QList<ObjectConfigFieldChoice> choices;
+    Q_PROPERTY(QList<Utils::ObjectConfigFieldChoice> choices MEMBER choices)
+    QList<Utils::ObjectConfigFieldChoice> choices;
 
     ObjectConfigField &operator=(const ObjectConfigField &other)
     {
@@ -159,8 +160,8 @@ public:
     Q_PROPERTY(QString description MEMBER description)
     QString description;
 
-    Q_PROPERTY(QList<ObjectConfigField> fields MEMBER fields)
-    QList<ObjectConfigField> fields;
+    Q_PROPERTY(QList<Utils::ObjectConfigField> fields MEMBER fields)
+    QList<Utils::ObjectConfigField> fields;
 
     ObjectConfigFieldGroup &operator=(const ObjectConfigFieldGroup &other)
     {
@@ -191,11 +192,11 @@ public:
     Q_PROPERTY(QString description MEMBER description)
     QString description;
 
-    Q_PROPERTY(QList<ObjectConfigField> fields MEMBER fields)
-    QList<ObjectConfigField> fields;
+    Q_PROPERTY(QList<Utils::ObjectConfigField> fields MEMBER fields)
+    QList<Utils::ObjectConfigField> fields;
 
-    Q_PROPERTY(QList<ObjectConfigFieldGroup> groups MEMBER groups)
-    QList<ObjectConfigFieldGroup> groups;
+    Q_PROPERTY(QList<Utils::ObjectConfigFieldGroup> groups MEMBER groups)
+    QList<Utils::ObjectConfigFieldGroup> groups;
 
     ObjectConfig &operator=(const ObjectConfig &other)
     {
@@ -218,8 +219,23 @@ void registerTypes();
 
 }
 
+/**
+ *  Since the following types are in a namespace, whereever they are used with MOC macros
+ *  they should be mentioned with their namespace. This means, for example:
+ *
+ *  The folowing will __not__ work.
+ *   Q_PROPERTY(QList<ObjectConfigFieldChoice> choices MEMBER choices)
+ *   QList<ObjectConfigFieldChoice> choices;
+ *
+ *  Why? Because, we cannot refer to ObjectConfigFieldChoice without using Utils namespace. So, it
+ *  has to be:
+ *
+ *   Q_PROPERTY(QList<Utils::ObjectConfigFieldChoice> choices MEMBER choices)
+ *   QList<Utils::ObjectConfigFieldChoice> choices;
+ */
 Q_DECLARE_METATYPE(Utils::FileInfo)
 Q_DECLARE_METATYPE(Utils::ObjectConfigFieldChoice)
+Q_DECLARE_METATYPE(QList<Utils::ObjectConfigFieldChoice>)
 Q_DECLARE_METATYPE(Utils::ObjectConfigField)
 Q_DECLARE_METATYPE(QList<Utils::ObjectConfigField>)
 Q_DECLARE_METATYPE(Utils::ObjectConfigFieldGroup)
@@ -328,8 +344,8 @@ public:
 
     Q_INVOKABLE static bool save(QObject *object);
     Q_INVOKABLE static bool load(QObject *object);
-    Q_INVOKABLE static ObjectConfig configuration(const QObject *object,
-                                                  const QMetaObject *metaObject = nullptr);
+    Q_INVOKABLE static Utils::ObjectConfig configuration(const QObject *object,
+                                                         const QMetaObject *metaObject = nullptr);
 
     Q_INVOKABLE static int treeSize(QObject *object);
 

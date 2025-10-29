@@ -80,7 +80,7 @@ QVariant AbstractExporter::getConfigurationValue(const QString &name) const
     return this->property(qPrintable(name));
 }
 
-Utils::ObjectConfig AbstractExporter::configurationFormInfo() const
+Utils::ObjectConfig AbstractExporter::configuration() const
 {
     return Utils::Object::configuration(this, &AbstractExporter::staticMetaObject);
 }

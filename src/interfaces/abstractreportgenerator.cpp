@@ -305,7 +305,7 @@ QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) con
     return this->property(qPrintable(name));
 }
 
-Utils::ObjectConfig AbstractReportGenerator::configurationFormInfo() const
+Utils::ObjectConfig AbstractReportGenerator::configuration() const
 {
     Utils::ObjectConfig formInfo =
             Utils::Object::configuration(this, &AbstractReportGenerator::staticMetaObject);

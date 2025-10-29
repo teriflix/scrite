@@ -98,7 +98,7 @@ VclDialog {
 
                 // Show configuration editors
                 Repeater {
-                    model: _private.formInfo.fields
+                    model: _private.configuration.fields
 
                     Loader {
                         id: fieldLoader
@@ -272,7 +272,7 @@ VclDialog {
     QtObject {
         id: _private
 
-        property var formInfo: exporter ? exporter.configurationFormInfo() : {"title": "Unknown", "fields": []}
+        property var configuration: exporter ? exporter.configuration() : {"title": "Unknown", "fields": []}
         property bool isPdfExport: exporter ? exporter.format === "Screenplay/Adobe PDF" : false
         property bool exportEnabled: exporter ? exporter.featureEnabled : false
 

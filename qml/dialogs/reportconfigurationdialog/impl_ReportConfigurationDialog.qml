@@ -75,7 +75,7 @@ VclDialog {
                 id: reportConfigPageView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                pagesArray: _private.formInfo.groupedFields
+                pagesArray: _private.configuration.groups
                 pageTitleRole: "name"
                 pageListWidth: Math.max(width * 0.15, 150)
                 currentIndex: {
@@ -193,7 +193,7 @@ VclDialog {
             }
 
             Repeater {
-                model: _private.formInfo.groupedFields[0].fields
+                model: _private.configuration.groups[0].fields
                 delegate: fieldEditorLoader
             }
         }
@@ -210,7 +210,7 @@ VclDialog {
             spacing: 5
 
             Repeater {
-                model: fieldGroupIndex > 0 ? _private.formInfo.groupedFields[fieldGroupIndex].fields : []
+                model: fieldGroupIndex > 0 ? _private.configuration.groups[fieldGroupIndex].fields : []
                 delegate: fieldEditorLoader
             }
         }
@@ -351,7 +351,7 @@ VclDialog {
     QtObject {
         id: _private
 
-        property var formInfo: report ? report.configurationFormInfo() : {"title": "Unknown", "description": "", "groupedFields": []}
+        property var configuration: report ? report.configuration() : {"title": "Unknown", "description": "", "groups": []}
         property bool isPdfExport: report ? report.format === AbstractReportGenerator.AdobePDF : false
         property bool reportEnabled: report ? report.featureEnabled : false
 
