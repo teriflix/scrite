@@ -64,12 +64,12 @@ void Utils::registerTypes()
 Utils::Platform::Type Utils::Platform::type()
 {
 #ifdef Q_OS_MAC
-    return Utils::MacOS;
+    return MacOSDesktop;
 #else
 #ifdef Q_OS_WIN
-    return Utils::Platform::WindowsDesktop;
+    return WindowsDesktop;
 #else
-    return Utils::LinuxDesktop;
+    return LinuxDesktop;
 #endif
 #endif
 }
@@ -109,8 +109,8 @@ int Utils::Platform::osMajorVersion()
 QList<int> Utils::Platform::osVersion()
 {
     const QOperatingSystemVersion v = QOperatingSystemVersion::current();
-    if (v.majorVersion() > 0) {
 #ifdef Q_OS_WIN
+    if (v.majorVersion() > 0) {
         if (v.majorVersion() == 10) {
             if (v.minorVersion() == 0)
                 return { (v.microVersion() >= 22000 ? 11 : 10), v.microVersion(), 0 };
@@ -1705,7 +1705,7 @@ QVariant Utils::SystemEnvironment::get(const QString &key, const QVariant &fallb
         return settings.value(key, fallback);
     }
 #else
-        QProcessEnvironment::systemEnvironment().value(key, fallback.toString());
+    return QProcessEnvironment::systemEnvironment().value(key, fallback.toString());
 #endif
 }
 

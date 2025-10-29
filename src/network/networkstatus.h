@@ -18,6 +18,7 @@
 #include <QQmlEngine>
 #include <QNetworkAccessManager>
 
+class QTimer;
 class NetworkStatus : public QObject
 {
     Q_OBJECT
