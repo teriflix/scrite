@@ -196,7 +196,7 @@ Loader {
             Popup {
                 id: _completionViewPopup
 
-                x: parent.cursorRectangle.x - Scrite.app.boundingRect(_completionModel.completionPrefix, parent.font).width
+                x: parent.cursorRectangle.x - GMath.boundingRect(_completionModel.completionPrefix, parent.font).width
                 y: parent.cursorRectangle.y + parent.cursorRectangle.height
                 width: GMath.largestBoundingRect(_completionModel.strings, _textArea.font).width + leftInset + rightInset + leftPadding + rightPadding + 20
                 height: _completionView.contentHeight + topInset + bottomInset + topPadding + bottomPadding

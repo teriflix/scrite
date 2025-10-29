@@ -14,6 +14,7 @@
 #include "utils.h"
 
 #include "application.h"
+#include "qobjectlistmodel.h"
 #include "enumerationmodel.h"
 
 #include <QDir>
@@ -32,6 +33,7 @@
 #include <QStandardPaths>
 #include <QProcessEnvironment>
 #include <QOperatingSystemVersion>
+#include <QSslSocket>
 
 /**
  * \brief Registers meta types used by the Utils class.
@@ -133,6 +135,24 @@ QString Utils::Platform::osVersionString()
 }
 
 /**
+ * \brief Returns version of Qt used to build this app.
+ * \return A string representation of the Qt version.
+ */
+QString Utils::Platform::qtVersionString()
+{
+    return QStringLiteral(QT_VERSION_STR);
+}
+
+/**
+ * \brief Returns version of OpenSSL used to build this app.
+ * \return A string representation of the OpenSSL version.
+ */
+QString Utils::Platform::openSslVersionString()
+{
+    return QSslSocket::sslLibraryVersionString();
+}
+
+/**
  * \brief Returns the host name of the machine.
  * \return The local host name.
  */
@@ -148,6 +168,21 @@ QString Utils::Platform::hostName()
 Utils::Platform::Architecture Utils::Platform::architecture()
 {
     return QSysInfo::WordSize == 32 ? x86 : x64;
+}
+
+/**
+ * \brief Returns the architecture of the platform as a string
+ * \return Either "x86" or "x64"
+ */
+QString Utils::Platform::architectureString()
+{
+    switch (architecture()) {
+    case x86:
+        return "x86";
+    case x64:
+        return "x64";
+    }
+    return "unknown";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1198,6 +1233,7 @@ void Utils::MouseCursor::unsetShape()
 bool Utils::MouseCursor::moveTo(const QPointF &globalPos)
 {
     QCursor::setPos(globalPos.x(), globalPos.y());
+    return true;
 }
 
 /**
@@ -1287,8 +1323,9 @@ QVariantList Utils::SceneColors::paletteAsVariantList()
 {
     const QList<QColor> list = palette();
     QVariantList ret;
-    std::copy_if(list.begin(), list.end(), std::back_inserter(ret),
-                 [](const QColor &c) { return QVariant::fromValue(c); });
+    ret.reserve(list.size());
+    for (const QColor &color : list)
+        ret << QVariant::fromValue(color);
     return ret;
 }
 
@@ -1612,7 +1649,7 @@ void Utils::Clipboard::set(const QString &text)
  */
 QString Utils::Clipboard::get()
 {
-    Application::clipboard()->text();
+    return Application::clipboard()->text();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -303,7 +303,7 @@ ScrollArea {
             let bbox = _canvas.itemsBoundingBox.boundingBox
             let itemRect = Qt.rect(item.x, item.y, item.width, item.height)
             let atBest = Qt.size(root.width, root.height)
-            let visibleArea = Scrite.app.querySubRectangle(bbox, itemRect, atBest)
+            let visibleArea = GMath.querySubRectangle(bbox, itemRect, atBest)
             root.zoomFit(visibleArea)
         }
 

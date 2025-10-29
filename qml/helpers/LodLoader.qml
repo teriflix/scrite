@@ -59,13 +59,13 @@ Loader {
                 root.sourceComponent = defaultDetailComponent
 
             if(root.resetWidthBeforeLodChange) {
-                Scrite.app.resetObjectProperty(root, "width")
-                Scrite.app.resetObjectProperty(root, "implicitWidth")
+                Object.resetProperty(root, "width")
+                Object.resetProperty(root, "implicitWidth")
             }
 
             if(root.resetHeightBeforeLodChange) {
-                Scrite.app.resetObjectProperty(root, "height")
-                Scrite.app.resetObjectProperty(root, "implicitHeight")
+                Object.resetProperty(root, "height")
+                Object.resetProperty(root, "implicitHeight")
             }
 
             root.active = Qt.binding( () => { return root.sanctioned } )

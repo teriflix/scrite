@@ -1076,14 +1076,14 @@ Item {
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        text: "Since: " + Scrite.app.relativeTime(new Date(modelData.creationDate))
+                                        text: "Since: " + TMath.relativeTime(new Date(modelData.creationDate))
                                         elide: Text.ElideRight
                                     }
 
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastSessionDate))
+                                        text: "Last Login: " + TMath.relativeTime(new Date(modelData.lastSessionDate))
                                         elide: Text.ElideRight
                                     }
                                 }

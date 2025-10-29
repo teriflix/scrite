@@ -130,7 +130,7 @@ VclMenu {
 
         onTriggered: {
             let items = selection.items
-            let id = Scrite.app.createUniqueId()
+            let id = SMath.createUniqueId()
             items.forEach( function(item) {
                 item.element.stackId = id
             })

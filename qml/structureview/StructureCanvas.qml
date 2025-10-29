@@ -283,8 +283,8 @@ GridBackground {
 
         readonly property BoundingBoxEvaluator itemsBoundingBox : BoundingBoxEvaluator {
             margin: 50
-            initialRect: Scrite.app.uniteRectangles(Scrite.document.structure.annotationsBoundingBox,
-                                                    root.canvasScrollViewportRect)
+            initialRect: GMath.uniteRectangles(Scrite.document.structure.annotationsBoundingBox,
+                                               root.canvasScrollViewportRect)
         }
 
         readonly property DelayedPropertyBinder widthBinder: DelayedPropertyBinder {

@@ -65,7 +65,7 @@ Item {
             return null
         }
 
-        Scrite.app.restoreObjectConfiguration(args.report)
+        Object.load(args.report)
 
         if(reportProps) {
             for(var rprop in reportProps) {

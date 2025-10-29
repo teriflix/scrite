@@ -158,7 +158,7 @@ Item {
                     required property var modelData
 
                     text: modelData.text
-                    icon.source: modelData.icon
+                    icon.source: "qrc:/icons/action/" + modelData.icon
 
                     onClicked: selectionLayoutRequest(modelData.type)
                 }
@@ -247,7 +247,7 @@ Item {
                 VclMenuItem {
                     required property string modelData
 
-                    text: Scrite.app.camelCased(modelData)
+                    text: SMath.titleCased(modelData)
                     font.bold: root.canvasScroll.groupCategory === modelData
 
                     onTriggered: groupCategoryRequest(modelData)
@@ -416,7 +416,7 @@ Item {
         enabled: !Scrite.document.readOnly && Scrite.document.structure.canPaste
 
         onTriggered: {
-            let gpos = Scrite.app.globalMousePosition()
+            let gpos = MouseCursor.position()
             let pos = root.canvasScroll.mapFromGlobal(gpos.x, gpos.y)
             if(pos.x < 0 || pos.y < 0 || pos.x >= root.canvasScroll.width || pos.y >= root.canvasScroll.height)
                 Scrite.document.structure.paste()

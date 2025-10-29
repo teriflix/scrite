@@ -149,7 +149,7 @@ QHash<int, QByteArray> ScriteDocumentBackups::roleNames() const
 
 QString ScriteDocumentBackups::relativeTime(const QDateTime &dt)
 {
-    return Application::relativeTime(dt);
+    return Utils::TMath::relativeTime(dt);
 }
 
 void ScriteDocumentBackups::setDocumentFilePath(const QString &val)
@@ -1431,7 +1431,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 {
     HourGlass hourGlass;
     QString fileName = this->polishFileName(givenFileName.trimmed());
-    fileName = Application::instance()->sanitiseFileName(fileName);
+    fileName = Utils::File::sanitiseName(fileName);
 
     m_errorReport->clear();
 
@@ -2088,9 +2088,9 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
 
     // 2. Filename must not contain special characters
     // It is true that file names will have already been sanitized using
-    // Application::sanitiseFileName() But we double check it here anyway.
+    // Utils::File::sanitiseName() But we double check it here anyway.
     QSet<QChar> purgedChars;
-    const QString sanitisedFileName = Application::sanitiseFileName(fileName, &purgedChars);
+    const QString sanitisedFileName = Utils::File::sanitiseName(fileName, &purgedChars);
     if (sanitisedFileName != fileName || !purgedChars.isEmpty()) {
         if (purgedChars.isEmpty())
             m_errorReport->setErrorMessage(

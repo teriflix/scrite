@@ -172,7 +172,7 @@ CharacterRelationshipGraphEdge::~CharacterRelationshipGraphEdge() { }
 
 QString CharacterRelationshipGraphEdge::pathString() const
 {
-    return Application::instance()->painterPathToString(m_path);
+    return Utils::SMath::painterPathToString(m_path);
 }
 
 void CharacterRelationshipGraphEdge::setEvaluatePathAllowed(bool val)

@@ -393,7 +393,7 @@ Loader {
         }
 
         onShowTitleCardChanged: {
-            Scrite.app.resetObjectProperty(root, "height")
+            Object.resetProperty(root, "height")
         }
     }
 }

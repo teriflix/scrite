@@ -626,7 +626,7 @@ Item {
         property bool paused: Runtime.screenplayEditorSettings.pausePagination
 
         // FIXME: Do we really need this?
-        Component.onCompleted: Scrite.app.registerObject(screenplayTextDocument, "screenplayTextDocument")
+        Component.onCompleted: ObjectRegistry.add(screenplayTextDocument, "screenplayTextDocument")
 
         formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
         includeSceneSynopsis: false
@@ -645,7 +645,7 @@ Item {
     }
 
     readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {
-        Component.onCompleted: Scrite.app.registerObject(screenplayTracks, "screenplayTracks")
+        Component.onCompleted: ObjectRegistry.add(screenplayTracks, "screenplayTracks")
 
         screenplay: Scrite.document.screenplay
     }

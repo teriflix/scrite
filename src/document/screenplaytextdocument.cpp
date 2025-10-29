@@ -39,6 +39,7 @@
 #include <QPropertyAnimation>
 #include <QScopedValueRollback>
 #include <QAbstractTextDocumentLayout>
+#include <enumerationmodel.h>
 
 #include "hourglass.h"
 #include "application.h"
@@ -48,11 +49,6 @@
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "pdfexportablegraphicsscene.h"
-
-inline QTime secondsToTime(int seconds)
-{
-    return Application::secondsToTime(seconds);
-}
 
 inline QString timeToString(const QTime &t)
 {
@@ -665,7 +661,7 @@ QList<QPair<int, int>> ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *
 QTime ScreenplayTextDocument::lengthInTime(ScreenplayElement *from, ScreenplayElement *to) const
 {
     const qreal nrPages = this->lengthInPages(from, to);
-    const QTime ret = ::secondsToTime(secondsPerPage() * nrPages);
+    const QTime ret = Utils::TMath::secondsToTime(secondsPerPage() * nrPages);
     return ret;
 }
 
@@ -1108,7 +1104,7 @@ void ScreenplayTextDocument::setPageCount(qreal val)
     const int secsPerPage =
             m_timePerPage.hour() * 60 * 60 + m_timePerPage.minute() * 60 + m_timePerPage.second();
     const int totalSecs = int(qCeil(val * secsPerPage));
-    const QTime totalT = ::secondsToTime(totalSecs);
+    const QTime totalT = Utils::TMath::secondsToTime(totalSecs);
     if (m_totalTime != totalT) {
         m_totalTime = totalT;
         emit totalTimeChanged();
@@ -1133,7 +1129,7 @@ void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
             m_totalTime.hour() * 60 * 60 + m_totalTime.minute() * 60 + m_totalTime.second();
     const int currentSecs = int(m_currentPosition * qreal(totalSecs));
 
-    const QTime currentT = ::secondsToTime(currentSecs);
+    const QTime currentT = Utils::TMath::secondsToTime(currentSecs);
     if (m_currentTime != currentT) {
         m_currentTime = currentT;
         emit currentTimeChanged();
@@ -3471,15 +3467,13 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     if (sceneType == Scene::Standard)
         return;
 
-    static const QJsonArray sceneTypeModel = Application::instance()->enumerationModelForType(
-            QStringLiteral("Scene"), QStringLiteral("Type"));
-    if (sceneType < 0 || sceneType >= sceneTypeModel.size())
+    QScopedPointer<EnumerationModel> sceneTypeModel(qobject_cast<EnumerationModel *>(
+            Utils::Object::typeEnumModel(QStringLiteral("Scene"), QStringLiteral("Type"))));
+    if (sceneTypeModel.isNull() || sceneType < 0 || sceneType >= sceneTypeModel->count())
         return;
 
-    const QJsonObject sceneTypeInfo = sceneTypeModel.at(sceneType).toObject();
-
     const qreal iconSize = givenRect.height();
-    QString iconFile = sceneTypeInfo.value(QStringLiteral("icon")).toString();
+    QString iconFile = sceneTypeModel->valueToIcon(sceneType);
     if (iconFile.isEmpty())
         return;
 
@@ -3502,7 +3496,7 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     painter->drawImage(rect, icon);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, flag);
 
-    const QString iconKey = sceneTypeInfo.value(QStringLiteral("key")).toString();
+    const QString iconKey = sceneTypeModel->valueToKey(sceneType);
     QRectF iconKeyRect = rect;
     iconKeyRect.moveTop(rect.bottom() + rect.height() * 0.5);
     painter->save();

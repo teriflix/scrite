@@ -13,6 +13,7 @@
 
 #include "scritedocumentvault.h"
 
+#include "utils.h"
 #include "callgraph.h"
 #include "application.h"
 #include "timeprofiler.h"
@@ -143,7 +144,7 @@ QVariant ScriteDocumentVault::data(const QModelIndex &index, int role) const
     case TimestampAsStringRole:
         return sfi.fileInfo.lastModified().toString(QStringLiteral("dd MMM yyyy @ hh:mm:ss"));
     case RelativeTimeRole:
-        return Application::relativeTime(sfi.fileInfo.lastModified());
+        return Utils::TMath::relativeTime(sfi.fileInfo.lastModified());
     case FileInfoRole:
         return QVariant::fromValue<ScriteFileInfo>(sfi);
     }

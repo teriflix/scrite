@@ -377,7 +377,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(
         const QColor color =
                 distItem.color == Qt::transparent ? StatisticsReport::pickColor(i) : distItem.color;
         QPen pen;
-        pen.setColor(Utils::Color::isLight((color) ? Qt::gray : color);
+        pen.setColor(Utils::Color::isLight(color) ? Qt::gray : color);
         pen.setCosmetic(true);
         pen.setWidthF(0.5);
         pen.setJoinStyle(Qt::MiterJoin);
@@ -591,7 +591,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
             trackBorderItem->setPen(QPen(trackItem->brush().color().darker(), 1, Qt::SolidLine,
                                          Qt::RoundCap, Qt::MiterJoin));
 
-            const QString text = Application::camelCased(
+            const QString text = Utils::SMath::titleCased(
                     track.tag.section(QStringLiteral("/"), 1).section(QStringLiteral("("), 0, 0));
             const QString timeString = ::timeToString(track.timeLength);
             const QString percent = QString::number(qRound(100 * (track.pixel.to - track.pixel.from)

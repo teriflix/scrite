@@ -38,7 +38,7 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
         const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
         const QString sptitle = screenplay->title();
         if (graph->character()) {
-            const QString chname = Application::camelCased(graph->character()->name());
+            const QString chname = Utils::SMath::titleCased(graph->character()->name());
             return sptitle.isEmpty() ? chname : chname + QStringLiteral(" of ") + sptitle;
         }
         if (graph->scene()) {
@@ -236,7 +236,7 @@ CharacterRelationshipsGraphEdgeItem::CharacterRelationshipsGraphEdgeItem(
         const CharacterRelationshipGraphEdge *edge)
     : QGraphicsPathItem(nullptr)
 {
-    const QPainterPath path = Application::stringToPainterPath(edge->pathString());
+    const QPainterPath path = Utils::SMath::stringToPainterPath(edge->pathString());
     this->setPath(path);
 
     QPen pen;

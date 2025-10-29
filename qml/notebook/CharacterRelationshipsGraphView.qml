@@ -37,7 +37,7 @@ Rectangle {
     signal addNewRelationshipRequest(Item sourceItem)
     signal removeRelationshipWithRequest(Character otherCharacter, Item sourceItem)
 
-    color: Scrite.app.translucent(Runtime.colors.primary.c100.background, 0.5)
+    color: Color.translucent(Runtime.colors.primary.c100.background, 0.5)
     border.width: 1
     border.color: Runtime.colors.primary.borderColor
 
@@ -105,7 +105,7 @@ Rectangle {
             var bbox = nodeItemsBoxEvaluator.boundingBox
             var itemRect = Qt.rect(item.x, item.y, item.width, item.height)
             var atBest = Qt.size(canvasScroll.width, canvasScroll.height)
-            var visibleArea = Scrite.app.querySubRectangle(bbox, itemRect, atBest)
+            var visibleArea = GMath.querySubRectangle(bbox, itemRect, atBest)
             canvasScroll.zoomFit(visibleArea)
         }
 
@@ -270,7 +270,7 @@ Rectangle {
                         active: false
                         sourceComponent: Rectangle {
                             id: removeRelationshipConfirmationItem
-                            color: Scrite.app.translucent(Runtime.colors.primary.c600.background,0.85)
+                            color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
                             focus: true
                             width: removeRelationshipConfirmationContentLayout.width + 45
                             height: removeRelationshipConfirmationContentLayout.height + 40
@@ -477,9 +477,9 @@ Rectangle {
                 anchors.fill: parent
                 radius: Math.min(width,height)*0.0375
                 anchors.margins: -Math.min(width,height)*0.075
-                color: Scrite.app.translucent(character.color, 0.15)
+                color: Color.translucent(character.color, 0.15)
                 border.width: 1
-                border.color: Scrite.app.translucent(character.color, 0.5)
+                border.color: Color.translucent(character.color, 0.5)
             }
 
             Image {

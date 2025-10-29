@@ -141,7 +141,7 @@ Item {
         }
 
         function log(text) {
-            Scrite.app.log(text)
+            Gui.log(text)
         }
 
         function openUrlExternally(url) {

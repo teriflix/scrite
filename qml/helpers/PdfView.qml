@@ -31,7 +31,7 @@ Item {
     property alias source: pdfDoc.source
     property alias pagesPerRow: pdfDoc.pagesPerRow
     property string saveFilePath
-    property string saveFileName: Scrite.app.fileName( Url.toPath(source) ) + ".pdf"
+    property string saveFileName: File.completeBaseName( Url.toPath(source) ) + ".pdf"
     property bool closable: true
     property bool allowFileSave: true
     property bool allowFileReveal: false
@@ -264,7 +264,7 @@ Item {
                             text: Scrite.document.fileName === "" ?
                                       "To 'Desktop' folder" :
                                       "To the Scrite document folder"
-                            property string targetFolder: Scrite.document.fileName === "" ? StandardPaths.writableLocation(StandardPaths.DesktopLocation) : Scrite.app.filePath(Scrite.document.fileName)
+                            property string targetFolder: Scrite.document.fileName === "" ? StandardPaths.writableLocation(StandardPaths.DesktopLocation) : File.path(Scrite.document.fileName)
 
                             onClicked: _private.savePdf(targetFolder)
                         }
@@ -345,7 +345,7 @@ Item {
          // The default Ctrl+U interfers with underline
         onAccepted: {
             const targetFilePath = Url.toPath(saveFileDialog.fileUrl)
-            const downloadedFilePath = Scrite.app.copyFile( Url.toPath(pdfDoc.source), targetFilePath )
+            const downloadedFilePath = File.copyToFolder( Url.toPath(pdfDoc.source), targetFilePath )
             if(downloadedFilePath !== "")
                 File.revealOnDesktop(downloadedFilePath)
         }
@@ -369,12 +369,12 @@ Item {
         function savePdf(folderPath) {
             var targetFilePath = ""
             if(saveFilePath !== "")
-                targetFilePath = Scrite.app.fileName(saveFilePath) + ".pdf"
+                targetFilePath = File.completeBaseName(saveFilePath) + ".pdf"
             else
                 targetFilePath = saveFileName
             targetFilePath = folderPath + "/" + targetFilePath
 
-            const downloadedFilePath = Scrite.app.copyFile( Url.toPath(pdfDoc.source), targetFilePath)
+            const downloadedFilePath = File.copyToFolder( Url.toPath(pdfDoc.source), targetFilePath)
             if(downloadedFilePath !== "")
                 File.revealOnDesktop(downloadedFilePath)
         }

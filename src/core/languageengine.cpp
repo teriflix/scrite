@@ -424,8 +424,6 @@ Language AbstractLanguagesModel::languageAt(int index) const
     return index < 0 || index >= m_languages.size() ? Language() : m_languages.at(index);
 }
 
-
-
 QHash<int, QByteArray> AbstractLanguagesModel::roleNames() const
 {
     return { { LanguageRole, QByteArrayLiteral("language") },
@@ -1281,12 +1279,13 @@ bool FallbackTransliterationEngine::activate(const TransliterationOption &option
 void FallbackTransliterationEngine::release(const TransliterationOption &option)
 {
     // Do nothing
+    Q_UNUSED(option)
 }
 
 QString FallbackTransliterationEngine::transliterateWord(const QString &word,
                                                          const TransliterationOption &option) const
 {
-    Q_UNUSED(option);
+    Q_UNUSED(option)
     return word;
 }
 

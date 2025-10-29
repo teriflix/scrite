@@ -74,7 +74,7 @@ Item {
 
                 clip: true
                 color: Runtime.colors.primary.c50.text
-                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
+                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : File.read(Scrite.document.structure.defaultGroupsDataFile)
 
                 font.family: "Courier Prime"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -105,7 +105,7 @@ Item {
                     if(target === e_CurrentDocumentTarget)
                         Scrite.document.structure.groupsData = storyBeatsEditor.text
                     else {
-                        Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
+                        File.write(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
 
                         MessageBox.question("Story Beats",
                                             "Do you want to use these story beats in the current document as well?",

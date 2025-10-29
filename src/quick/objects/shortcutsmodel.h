@@ -11,6 +11,8 @@
 **
 ****************************************************************************/
 
+// TODO: get rid of this entirely
+
 #ifndef SHORTCUTSMODEL_H
 #define SHORTCUTSMODEL_H
 

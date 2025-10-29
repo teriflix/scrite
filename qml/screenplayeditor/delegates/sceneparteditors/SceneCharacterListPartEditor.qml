@@ -155,8 +155,8 @@ AbstractScenePartEditor {
 
             onStatusChanged: {
                 if(status === Loader.Null) {
-                    Scrite.app.resetObjectProperty(_newCharacterInputLoader, "width")
-                    Scrite.app.resetObjectProperty(_newCharacterInputLoader, "height")
+                    Object.resetProperty(_newCharacterInputLoader, "width")
+                    Object.resetProperty(_newCharacterInputLoader, "height")
                 }
             }
         }

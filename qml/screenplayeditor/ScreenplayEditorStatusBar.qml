@@ -309,7 +309,7 @@ Rectangle {
                         model: Scrite.document.structure.groupCategories
 
                         VclMenuItem {
-                            text: Scrite.app.camelCased(modelData)
+                            text: SMath.titleCased(modelData)
                             font.bold: Scrite.document.structure.preferredGroupCategory === modelData
                             icon.source: font.bold ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 

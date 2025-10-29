@@ -17,6 +17,7 @@ EnumerationModel::EnumerationModel(QObject *parent) : QAbstractListModel(parent)
 {
     connect(this, &EnumerationModel::objectChanged, this, &EnumerationModel::loadModel);
     connect(this, &EnumerationModel::enumerationChanged, this, &EnumerationModel::loadModel);
+    connect(this, &QAbstractListModel::modelReset, this, &EnumerationModel::countChanged);
 }
 
 EnumerationModel::EnumerationModel(const QMetaObject *mo, const QString &enumName, QObject *parent)
@@ -28,6 +29,7 @@ EnumerationModel::EnumerationModel(const QMetaObject *mo, const QString &enumNam
 
     connect(this, &EnumerationModel::objectChanged, this, &EnumerationModel::loadModel);
     connect(this, &EnumerationModel::enumerationChanged, this, &EnumerationModel::loadModel);
+    connect(this, &QAbstractListModel::modelReset, this, &EnumerationModel::countChanged);
 }
 
 EnumerationModel::~EnumerationModel() { }
@@ -60,6 +62,16 @@ void EnumerationModel::setEnumeration(const QString &val)
 QString EnumerationModel::valueToKey(int value) const
 {
     return m_metaEnum.isValid() ? QString::fromLatin1(m_metaEnum.valueToKey(value)) : QString();
+}
+
+QString EnumerationModel::valueToIcon(int value) const
+{
+    auto it = std::find_if(m_items.begin(), m_items.end(),
+                           [value](const Item &item) { return item.value == value; });
+    if (it != m_items.end())
+        return it->icon;
+
+    return QString();
 }
 
 int EnumerationModel::keyToValue(const QString &key) const

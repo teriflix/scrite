@@ -109,7 +109,7 @@ QtObject {
                         source: {
                             if(annotationHasLocalImage)
                                 _d.annotation.imageUrl(_d.annotation.attributes.imageName)
-                            return Scrite.app.toHttpUrl(_d.annotation.attributes.imageUrl)
+                            return Url.toHttp(_d.annotation.attributes.imageUrl)
                         }
 
                         onStatusChanged: {

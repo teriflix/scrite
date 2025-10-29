@@ -11,9 +11,12 @@
 **
 ****************************************************************************/
 
+// TODO: get rid of this entirely
+
 #include "shortcutsmodel.h"
 #include "qobjectlistmodel.h"
 #include "application.h"
+#include "utils.h"
 
 #include <QTimer>
 #include <QShortcut>
@@ -127,15 +130,14 @@ void ShortcutsModel::activateShortcutAt(int row)
 
 void ShortcutsModel::printWholeThing()
 {
-    Application::log("===========");
+    Utils::Gui::log("===========");
     const int nrRows = this->rowCount();
     for (int i = 0; i < nrRows; i++) {
         const QModelIndex index = this->index(i, 0);
-        Application::log(QString::number(i) + ": "
-                         + index.data(ShortcutsModel::GroupRole).toString() + "/"
-                         + index.data(ShortcutsModel::TitleRole).toString());
+        Utils::Gui::log(QString::number(i) + ": " + index.data(ShortcutsModel::GroupRole).toString()
+                        + "/" + index.data(ShortcutsModel::TitleRole).toString());
     }
-    Application::log("===========");
+    Utils::Gui::log("===========");
 }
 
 bool ShortcutsModel::lessThan(const QModelIndex &source_left, const QModelIndex &source_right) const

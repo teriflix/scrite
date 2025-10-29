@@ -32,6 +32,10 @@ public:
                               QObject *parent = nullptr);
     ~EnumerationModel();
 
+    Q_PROPERTY(int count READ count NOTIFY countChanged)
+    int count() const { return m_items.size(); }
+    Q_SIGNAL void countChanged();
+
     Q_PROPERTY(QObject* object READ object WRITE setObject NOTIFY objectChanged)
     void setObject(QObject *val);
     QObject *object() const { return m_object; }
@@ -43,6 +47,7 @@ public:
     Q_SIGNAL void enumerationChanged();
 
     Q_INVOKABLE QString valueToKey(int value) const;
+    Q_INVOKABLE QString valueToIcon(int value) const;
     Q_INVOKABLE int keyToValue(const QString &key) const;
 
     // QAbstractItemModel interface

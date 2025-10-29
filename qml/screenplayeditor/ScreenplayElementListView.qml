@@ -124,7 +124,7 @@ ListView {
 
         onStatusChanged: {
             if(status === Loader.Loading)
-                Scrite.app.resetObjectProperty(_delegateLoader, "height")
+                Object.resetProperty(_delegateLoader, "height")
         }
     }
 

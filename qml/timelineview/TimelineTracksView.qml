@@ -109,7 +109,7 @@ Flickable {
                         height: parent.height-4
 
                         color: parent.border.color
-                        border.color: Color.translucent(Scrite.app.textColorFor(color), 0.25)
+                        border.color: Color.translucent(Color.textColorFor(color), 0.25)
                         border.width: 0.5
 
                         anchors.verticalCenter: parent.verticalCenter
@@ -121,7 +121,7 @@ Flickable {
 
                             font: Runtime.minimumFontMetrics.font
                             elide: Text.ElideMiddle
-                            color: Scrite.app.textColorFor(parent.color)
+                            color: Color.textColorFor(parent.color)
                             horizontalAlignment: Text.AlignHCenter
 
                             text: _innerTrackDelegate.groupData.group

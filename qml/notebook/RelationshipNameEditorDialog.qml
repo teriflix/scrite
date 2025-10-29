@@ -96,7 +96,7 @@ DialogLauncher {
                             maximumLineCount: 2
                             horizontalAlignment: Text.AlignHCenter
 
-                            text: Scrite.app.camelCased(dialog.ofCharacter.name)
+                            text: SMath.titleCased(dialog.ofCharacter.name)
                         }
                     }
 
@@ -149,7 +149,7 @@ DialogLauncher {
                             maximumLineCount: 2
                             horizontalAlignment: Text.AlignHCenter
 
-                            text: Scrite.app.camelCased(dialog.withCharacter.name)
+                            text: SMath.titleCased(dialog.withCharacter.name)
                         }
                     }
                 }

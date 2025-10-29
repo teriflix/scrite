@@ -276,7 +276,7 @@ VclDialog {
                 // Launch wait dialog ..
                 ScriptAction {
                     script: {
-                        Scrite.app.saveObjectConfiguration(report)
+                        Object.save(report)
                         _private.waitDialog = WaitDialog.launch("Generating " + report.title + " ...", Aggregation.progressReport(report))
                     }
                 }

@@ -56,7 +56,7 @@ Item {
             fillMode: QImageItem.PreserveAspectCrop
             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
-            image: visible ? _private.posterQImage : Scrite.app.emptyQImage
+            image: visible ? _private.posterQImage : Gui.emptyQImage
         }
 
         Rectangle {
@@ -98,7 +98,7 @@ Item {
             fillMode: QImageItem.PreserveAspectFit
             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
-            image: visible ? _private.posterQImage : Scrite.app.emptyQImage
+            image: visible ? _private.posterQImage : Gui.emptyQImage
         }
     }
 
@@ -134,7 +134,7 @@ Item {
         id: _private
 
         property string posterSourceUrl
-        property var posterQImage: Scrite.app.blankQImage
+        property var posterQImage: Gui.blankQImage
         property var posterSource
 
         readonly property int e_ImageKind: 0
@@ -143,7 +143,7 @@ Item {
 
         onPosterSourceChanged: {
             posterSourceUrl = ""
-            posterQImage = Scrite.app.blankQImage
+            posterQImage = Gui.blankQImage
 
             if(typeof posterSource === "string" || typeof posterSource === "url") {
                 posterSourceUrl = posterSource

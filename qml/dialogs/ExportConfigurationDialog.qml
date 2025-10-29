@@ -65,7 +65,7 @@ Item {
             return null
         }
 
-        Scrite.app.restoreObjectConfiguration(args.exporter)
+        Object.load(args.exporter)
 
         var dlg = _private.dialogComponent.createObject(root, args)
         if(dlg) {

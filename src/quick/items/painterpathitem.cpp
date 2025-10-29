@@ -13,6 +13,7 @@
 
 #include "painterpathitem.h"
 #include "application.h"
+#include "utils.h"
 
 PainterPathItem::PainterPathItem(QQuickItem *parent)
     : AbstractShapeItem(parent), m_painterPath(this, "painterPath")
@@ -59,7 +60,7 @@ void PainterPathItem::setPath(QPainterPath val)
 
 void PainterPathItem::setPathFromString(const QString &val)
 {
-    const QPainterPath path = Application::instance()->stringToPainterPath(val);
+    const QPainterPath path = Utils::SMath::stringToPainterPath(val);
     this->setPath(path);
 }
 

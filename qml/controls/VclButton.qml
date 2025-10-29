@@ -53,6 +53,6 @@ Button {
     QtObject {
         id: _private
 
-        property rect textRect: Scrite.app.boundingRect(button.text, button.font)
+        property rect textRect: GMath.boundingRect(button.text, button.font)
     }
 }

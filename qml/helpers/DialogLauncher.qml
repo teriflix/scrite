@@ -51,7 +51,7 @@ Item {
         }
 
         if(!dialogComponent.parent) {
-            Scrite.app.reparent(dialogComponent, root)
+            Object.reparent(dialogComponent, root)
         }
 
         var dlg = initialProperties ? dialogComponent.createObject(root,initialProperties) : dialogComponent.createObject(root)

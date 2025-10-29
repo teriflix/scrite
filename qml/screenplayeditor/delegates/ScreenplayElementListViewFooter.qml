@@ -37,7 +37,7 @@ Loader {
 
     sourceComponent: screenplayAdapter.isSourceScreenplay ? _private.footerButtonsComponent : undefined
 
-    onItemChanged: Scrite.app.resetObjectProperty(root, "height")
+    onItemChanged: Object.resetProperty(root, "height")
 
     QtObject {
         id: _private

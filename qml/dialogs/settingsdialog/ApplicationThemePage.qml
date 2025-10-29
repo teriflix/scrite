@@ -115,7 +115,7 @@ Item {
                             VclLabel {
                                 anchors.centerIn: parent
                                 text: "✓"
-                                color: Scrite.app.textColorFor(parent.color)
+                                color: Color.textColorFor(parent.color)
                                 visible: Runtime.colors.accent.key === modelData
                             }
 

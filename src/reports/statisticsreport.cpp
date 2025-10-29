@@ -767,7 +767,7 @@ QTime StatisticsReport::pageLengthToTime(qreal val) const
     const ScreenplayFormat *format = this->document()->printFormat();
     const int secsPerPage = format->secondsPerPage();
     const int totalSecs = qreal(secsPerPage) * val;
-    return Application::secondsToTime(totalSecs);
+    return Utils::TMath::secondsToTime(totalSecs);
 }
 
 void StatisticsReport::polish(Distribution &report) const

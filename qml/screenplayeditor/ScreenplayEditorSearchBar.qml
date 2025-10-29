@@ -60,7 +60,7 @@ Rectangle {
         Loader {
             id: _searchAgentLoader
 
-            property SearchAgent searchAgent: item ? Scrite.app.findFirstChildOfType(item, "SearchAgent") : null
+            property SearchAgent searchAgent: item ? Object.firstChildByType(item, "SearchAgent") : null
 
             active: _private.screenplay ? true : false
 

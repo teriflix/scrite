@@ -46,7 +46,7 @@ ScrollBar {
 
     Component.onCompleted: {
         if(flickable === null)
-            flickable = Scrite.app.findFirstParentOfType(scrollBar, "QQuickFlickable")
+            flickable = Object.firstParentByType(scrollBar, "QQuickFlickable")
     }
 
     DelayedPropertyBinder {

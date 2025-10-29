@@ -309,7 +309,7 @@ Item {
                         }
                     }
 
-                    readonly property string defaultText: Scrite.app.fileContents(":/misc/homescreen_info.md")
+                    readonly property string defaultText: File.read(":/misc/homescreen_info.md")
                 }
 
                 ColumnLayout {
@@ -473,7 +473,7 @@ Item {
         property string tooltip
         property string iconSource
         property color  textColor: Runtime.colors.primary.regular.text
-        property var    iconImage: Scrite.app.emptyQImage // has to be QImage
+        property var    iconImage: Gui.emptyQImage // has to be QImage
         property bool   singleClick: true
         property bool   showPoster: false
         property bool   containsMouse: buttonMouseArea.containsMouse
@@ -513,7 +513,7 @@ Item {
                     if(iconSource !== "")
                         item.source = Qt.binding( () => { return iconSource } )
                     else
-                        item.image = Qt.binding( () => { return iconImage ? iconImage : Scrite.app.emptyQImage } )
+                        item.image = Qt.binding( () => { return iconImage ? iconImage : Gui.emptyQImage } )
                 }
             }
 
@@ -1021,7 +1021,7 @@ Item {
                                     return ret
                                 }
 
-                                readonly property string defaultText: Scrite.app.fileContents(":/misc/scriptalay_info.md")
+                                readonly property string defaultText: File.read(":/misc/scriptalay_info.md")
                             }
                         }
                     }
@@ -1134,7 +1134,7 @@ Item {
 
             property bool valid: path !== ""
             property string path
-            property var info: Scrite.app.fileInfo(path)
+            property var info: File.info(path)
             property string name: info.fileName
             property string folder: info.absolutePath
         }

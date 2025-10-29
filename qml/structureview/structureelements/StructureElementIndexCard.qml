@@ -779,7 +779,7 @@ AbstractStructureElementUI {
                 drop.acceptProposedAction()
 
                 if(myStackId === "") {
-                    var uid = Scrite.app.createUniqueId()
+                    var uid = SMath.createUniqueId()
                     root.element.stackId = uid
                     otherElement.stackId = uid
                 } else {

@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "utils.h"
 #include "scrite.h"
 #include "appwindow.h"
 #include "application.h"
@@ -46,6 +47,7 @@ int main(int argc, char **argv)
     if (!Scrite::blockingMinimumVersionCheck())
         return -1;
 
+    Utils::registerTypes();
     User::instance();
     LanguageEngine::instance();
     NotificationManager::instance();

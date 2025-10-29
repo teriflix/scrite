@@ -92,7 +92,7 @@ Item {
 
                 set: {
                     let visibleRect = root.canvasScroll.viewportRect
-                    if( Scrite.app.isRectangleInRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox) )
+                    if( GMath.isRectangleInRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox) )
                         return Qt.rect(0,0,0,0)
 
                     let intersect = GMath.intersectedRectangle(visibleRect, root.canvasScroll.itemsBoundingBox.boundingBox)

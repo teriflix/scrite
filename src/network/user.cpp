@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "utils.h"
 #include "scrite.h"
 #include "application.h"
 #include "restapicall.h"
@@ -586,10 +587,10 @@ void User::checkIfInstallationInfoNeedsUpdate()
 
         if (deviceInfo.isValid()
             && deviceInfo.appVersion == Application::instance()->versionAsString()
-            && deviceInfo.hostName == Application::instance()->hostName()
-            && deviceInfo.platform == Application::instance()->platformAsString()
-            && deviceInfo.platformVersion == Application::instance()->platformVersion()
-            && deviceInfo.platformType == Application::instance()->platformType())
+            && deviceInfo.hostName == Utils::Platform::hostName()
+            && deviceInfo.platform == Utils::Platform::typeString()
+            && deviceInfo.platformVersion == Utils::Platform::osVersionString()
+            && deviceInfo.platformType == Utils::Platform::architectureString())
             return;
 
         InstallationUpdateRestApiCall *call = new InstallationUpdateRestApiCall(this);

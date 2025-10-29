@@ -122,7 +122,7 @@ DialogLauncher {
                                         }
 
                                         QImageItem {
-                                            image: fileInfo.hasCoverPage ? fileInfo.coverPageImage : Scrite.app.emptyQImage
+                                            image: fileInfo.hasCoverPage ? fileInfo.coverPageImage : Gui.emptyQImage
                                             fillMode: QImageItem.PreserveAspectFit
                                             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
                                         }

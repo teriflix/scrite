@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "scene.h"
+#include "utils.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "formatting.h"
@@ -333,7 +334,7 @@ void SceneHeading::renameCharacter(const QString &from, const QString &to)
 {
     int nrReplacements = 0;
     const QString newLocation =
-            Application::replaceCharacterName(from, to, m_location, &nrReplacements);
+            Utils::SMath::replaceCharacterName(from, to, m_location, &nrReplacements);
     if (nrReplacements > 0) {
         m_location = newLocation.toUpper();
         emit locationChanged();
@@ -948,7 +949,7 @@ void SceneElement::renameCharacter(const QString &from, const QString &to)
      * checks. Checking for sanity in each element costs performance.
      */
     int nrReplacements = 0;
-    const QString text = Application::replaceCharacterName(from, to, m_text, &nrReplacements);
+    const QString text = Utils::SMath::replaceCharacterName(from, to, m_text, &nrReplacements);
 
     if (nrReplacements > 0) {
         switch (m_type) {
@@ -2606,7 +2607,7 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     {
         int nrReplacements = 0;
         const QString newTitle =
-                Application::replaceCharacterName(from, to, m_synopsis, &nrReplacements);
+                Utils::SMath::replaceCharacterName(from, to, m_synopsis, &nrReplacements);
         if (nrReplacements > 0) {
             m_synopsis = newTitle;
             emit synopsisChanged();
@@ -2633,7 +2634,7 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     {
         int nrReplacements = 0;
         const QString newComments =
-                Application::replaceCharacterName(from, to, m_comments, &nrReplacements);
+                Utils::SMath::replaceCharacterName(from, to, m_comments, &nrReplacements);
         if (nrReplacements > 0) {
             m_comments = newComments;
             emit commentsChanged();

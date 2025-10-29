@@ -345,9 +345,9 @@ AbstractScenePartEditor {
         }
 
         function __scrollToSelection() {
-            let rect = Scrite.app.uniteRectangles( _sceneTextEditor.positionToRectangle(__searchResultSelection.start),
-                                                     _sceneTextEditor.positionToRectangle(__searchResultSelection.end) )
-            rect = Scrite.app.adjustRectangle(rect, -20, -50, 20, 50)
+            let rect = GMath.uniteRectangles( _sceneTextEditor.positionToRectangle(__searchResultSelection.start),
+                                              _sceneTextEditor.positionToRectangle(__searchResultSelection.end) )
+            rect = GMath.adjustRectangle(rect, -20, -50, 20, 50)
 
             root.ensureVisible(_sceneTextEditor, rect)
         }

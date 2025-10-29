@@ -1430,12 +1430,12 @@ Item {
     QtObject {
         Notification.title: "Install Video Codecs"
         Notification.text: {
-            if(Scrite.app.isWindowsPlatform)
+            if(Platform.isWindowsDesktop)
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && (Scrite.app.isWindowsPlatform || Platform.isLinuxDesktop)
-        Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
+        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && (Platform.isWindowsDesktop || Platform.isLinuxDesktop)
+        Notification.buttons: Platform.isWindowsDesktop ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
                 Qt.openUrlExternally("https://www.scrite.io/video-codecs/")

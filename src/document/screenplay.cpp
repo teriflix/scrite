@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "utils.h"
 #include "undoredo.h"
 #include "fountain.h"
 #include "hourglass.h"
@@ -3602,7 +3603,7 @@ void ScreenplayTracks::refresh()
     QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator it = map.begin();
     QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator end = map.end();
     while (it != end) {
-        const QString category = Application::instance()->camelCased(it.key());
+        const QString category = Utils::SMath::titleCased(it.key());
         const QMap<QString, QList<ScreenplayElement *>> groupElementsMap = it.value();
 
         QVariantList categoryTrackItems;
@@ -3610,7 +3611,7 @@ void ScreenplayTracks::refresh()
         QMap<QString, QList<ScreenplayElement *>>::const_iterator it2 = groupElementsMap.begin();
         QMap<QString, QList<ScreenplayElement *>>::const_iterator end2 = groupElementsMap.end();
         while (it2 != end2) {
-            const QString group = Application::instance()->camelCased(it2.key());
+            const QString group = Utils::SMath::titleCased(it2.key());
             QList<ScreenplayElement *> elements = it2.value();
             std::sort(elements.begin(), elements.end(),
                       [](ScreenplayElement *a, ScreenplayElement *b) {

@@ -129,9 +129,9 @@ Item {
 
                 VclTextField {
                     Layout.fillWidth: true
-                    enabled: Scrite.app.isWindowsPlatform
+                    enabled: Platform.isWindowsDesktop
                     placeholderText: "Default: 1.0. Requires restart if changed."
-                    text: Scrite.app.isWindowsPlatform ? Scrite.app.getWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
+                    text: Platform.isWindowsDesktop ? SystemEnvironment.get("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
                     onEditingComplete: {
                         var value = parseFloat(text)
                         if(isNaN(value))
@@ -140,8 +140,8 @@ Item {
                         value = Math.min(Math.max(0.1,value),10)
                         value = Math.round(value*100)/100
 
-                        Scrite.app.removeWindowsEnvironmentVariable("SCRITE_DPI_MODE")
-                        Scrite.app.changeWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR", ""+value)
+                        SystemEnvironment.remove("SCRITE_DPI_MODE")
+                        SystemEnvironment.set("SCRITE_UI_SCALE_FACTOR", ""+value)
                     }
                 }
 

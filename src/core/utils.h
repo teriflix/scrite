@@ -214,7 +214,7 @@ public:
 };
 
 // Must be called from main() before QML engine is constructed
-static void registerTypes();
+void registerTypes();
 
 }
 
@@ -231,7 +231,7 @@ namespace Utils {
 class Platform : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(Platform)
     QML_SINGLETON
 
 public:
@@ -263,11 +263,20 @@ public:
     Q_PROPERTY(QString osVersionString READ osVersionString CONSTANT)
     static QString osVersionString();
 
+    Q_PROPERTY(QString qtVersionString READ qtVersionString CONSTANT)
+    static QString qtVersionString();
+
+    Q_PROPERTY(QString openSslVersionString READ openSslVersionString CONSTANT)
+    static QString openSslVersionString();
+
     enum Architecture { x86, x64 };
     Q_ENUM(Architecture)
 
     Q_PROPERTY(Architecture architecture READ architecture CONSTANT)
     static Architecture architecture();
+
+    Q_PROPERTY(QString architectureString READ architectureString CONSTANT)
+    static QString architectureString();
 
     Q_PROPERTY(QString hostName READ hostName CONSTANT)
     static QString hostName();
@@ -276,7 +285,7 @@ public:
 class Gui : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(Gui)
     QML_SINGLETON
 
 public:
@@ -292,7 +301,7 @@ public:
 class Url : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(Url)
     QML_SINGLETON
 
 public:
@@ -305,7 +314,7 @@ public:
 class Object : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(Object)
     QML_SINGLETON
 
 public:
@@ -347,7 +356,7 @@ public:
 class ObjectRegistry : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(ObjectRegistry)
     QML_SINGLETON
 
 public:
@@ -362,7 +371,7 @@ public:
 class Color : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(Color)
     QML_SINGLETON
 
 public:
@@ -379,7 +388,7 @@ public:
 class SceneColors : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(SceneColors)
     QML_SINGLETON
 
 public:
@@ -398,7 +407,7 @@ private:
 class File : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(File)
     QML_SINGLETON
 
 public:
@@ -421,7 +430,7 @@ public:
 class MouseCursor : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(MouseCursor)
     QML_SINGLETON
 
 public:
@@ -439,7 +448,7 @@ public:
 class GMath : public QObject // short for Geometry Math
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(GMath)
     QML_SINGLETON
 
 public:
@@ -467,7 +476,7 @@ public:
 class TMath : public QObject // short for Time Math
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(TMath)
     QML_SINGLETON
 
 public:
@@ -479,7 +488,7 @@ public:
 class Clipboard : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(Clipboard)
     QML_SINGLETON
 
 public:
@@ -490,7 +499,7 @@ public:
 class SystemEnvironment : public QObject
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(SystemEnvironment)
     QML_SINGLETON
 
 public:
@@ -503,7 +512,7 @@ public:
 class SMath : public QObject // Short for String Math
 {
     Q_OBJECT
-    QML_ELEMENT
+    QML_NAMED_ELEMENT(SMath)
     QML_SINGLETON
 
 public:

@@ -97,9 +97,9 @@ SpellingSuggestionsMenu {
 
         function update() {
             if(root.textArea === null)
-                root.textArea = Scrite.app.findFirstParentOfType(root, "QQuickTextArea")
+                root.textArea = Object.firstParentByType(root, "QQuickTextArea")
 
-            syntaxHighlighter = Scrite.app.findFirstChildOfType(root.textArea, "SyntaxHighlighter")
+            syntaxHighlighter = Object.firstChildByType(root.textArea, "SyntaxHighlighter")
             if(syntaxHighlighter)
                 spellCheck = syntaxHighlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
 

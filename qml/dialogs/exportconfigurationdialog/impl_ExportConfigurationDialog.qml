@@ -200,7 +200,7 @@ VclDialog {
                 // Launch wait dialog ..
                 ScriptAction {
                     script: {
-                        Scrite.app.saveObjectConfiguration(exporter)
+                        Object.save(exporter)
 
                         const message = _private.isPdfExport ? "Generating PDF ..." : ("Exporting to \"" + exporter.fileName + "\" ...")
                         _private.waitDialog = WaitDialog.launch(message, Aggregation.progressReport(exporter))

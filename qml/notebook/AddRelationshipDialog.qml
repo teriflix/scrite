@@ -92,7 +92,7 @@ DialogLauncher {
                             required property string modelData
                             required property int index
 
-                            property string thisCharacterName: Scrite.app.camelCased(character.name)
+                            property string thisCharacterName: SMath.titleCased(character.name)
                             property string otherCharacterName: modelData
                             property bool   checked: relationshipName.length > 0
                             property string relationship: relationshipName.text
@@ -156,7 +156,7 @@ DialogLauncher {
                                 }
 
                                 VclLabel {
-                                    text: Scrite.app.camelCased(otherCharacterName) + "."
+                                    text: SMath.titleCased(otherCharacterName) + "."
                                     color: foregroundColor
                                 }
                             }
