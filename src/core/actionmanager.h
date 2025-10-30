@@ -180,6 +180,11 @@ public:
     QString iconSource() const { return m_iconSource; }
     Q_SIGNAL void iconSourceChanged();
 
+    Q_PROPERTY(QString tooltip READ tooltip WRITE setTooltip NOTIFY tooltipChanged)
+    void setTooltip(const QString &val);
+    QString tooltip() const { return m_tooltip; }
+    Q_SIGNAL void tooltipChanged();
+
     Q_PROPERTY(QObject *action READ action WRITE setAction NOTIFY actionChanged)
     void setAction(QObject *val);
     QObject *action() const { return m_action; }
@@ -202,6 +207,7 @@ private:
     bool m_down = false;
     bool m_checked = false;
     QString m_iconSource;
+    QString m_tooltip;
     QObject *m_action = nullptr;
 };
 

@@ -1067,6 +1067,93 @@ Item {
         title: "Notebook"
         objectName: "notebookOperations"
 
+        Action {
+            readonly property string tooltip: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
+
+            checkable: true
+            checked: Runtime.workspaceSettings.syncCurrentSceneOnNotebook
+            enabled: ActionHandler.canHandle
+            objectName: "sync"
+            text: "Sync"
+
+            icon.source: "qrc:/icons/navigation/sync.png"
+
+            onToggled: {
+                Runtime.workspaceSettings.syncCurrentSceneOnNotebook = checked
+            }
+        }
+
+        Action {
+            // We won't provide shortcut here, because NotebookView is expected
+            // to handle editOptions.refresh which already has F5 mapped to it.
+
+            readonly property string tooltip: "Reloads the notebook tree."
+
+            enabled: ActionHandler.canHandle
+            objectName: "reload"
+            text: "Reload"
+
+            icon.source: "qrc:/icons/navigation/refresh.png"
+        }
+
+        Action {
+            // This is different from the action we have for generating PDF
+            // export of the screenplay itself. This is specifically for
+            // generating PDF export of the Notebook report.
+            property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : text
+
+            enabled: ActionHandler.canHandle
+            objectName: "report"
+            text: "Notebook Report"
+
+            icon.source: "qrc:/icons/file/generate_pdf.png"
+        }
+
+        Action {
+            property bool down: ActionHandler.active ? ActionHandler.active.down : false
+            property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "New text or form note."
+            readonly property string defaultShortcut: "Ctrl+T"
+
+            enabled: ActionHandler.canHandle
+            objectName: "addNote"
+            shortcut: defaultShortcut
+            text: "Add Note"
+
+            icon.source: "qrc:/icons/action/note_add.png"
+        }
+
+        Action {
+            property bool down: ActionHandler.active ? ActionHandler.active.down : false
+
+            enabled: ActionHandler.canHandle
+            objectName: "noteColor"
+            text: "Note Color"
+
+            icon.source: ActionHandler.active ? ActionHandler.active.iconSource : "image://color/#00ffffff/1"
+        }
+
+        Action {
+            readonly property string tooltip: "Toggle bookmark of a Note, Scene, Episode/Act Notes or Character"
+            readonly property string defaultShortcut: "Ctrl+D"
+
+            enabled: ActionHandler.canHandle
+            objectName: "toggleBookmark"
+            shortcut: defaultShortcut
+            text: "Toggle Bookmark"
+
+            icon.source: ActionHandler.active ? ActionHandler.active.iconSource : "qrc:/icons/content/bookmark_outline.png"
+        }
+
+        Action {
+            readonly property string tooltip: "Delete the current note or character"
+
+            enabled: ActionHandler.canHandle
+            objectName: "deleteCurrent"
+            text: "Delete"
+
+            icon.source: "qrc:/icons/action/delete.png"
+        }
+
         // TODO
         Action {
             readonly property bool visible: false

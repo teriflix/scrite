@@ -575,6 +575,15 @@ void ActionHandler::setIconSource(const QString &val)
     emit iconSourceChanged();
 }
 
+void ActionHandler::setTooltip(const QString &val)
+{
+    if (m_tooltip == val)
+        return;
+
+    m_tooltip = val;
+    emit tooltipChanged();
+}
+
 void ActionHandler::setAction(QObject *val)
 {
     if (m_action == val)

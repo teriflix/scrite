@@ -27,11 +27,22 @@ import "qrc:/qml/notifications"
 Item {
     id: root
 
-    NotebookView {
+    RowLayout {
         anchors.fill: parent
 
-        enabled: Runtime.appFeatures.notebook.enabled
+        VerticalToolBar {
+            Layout.fillHeight: true
+
+            actions: ActionHub.notebookOperations
+        }
+
+        NotebookView {
+            Layout.fillWidth: true
+
+            enabled: Runtime.appFeatures.notebook.enabled
+        }
     }
+
 
     DisabledFeatureNotice {
         anchors.fill: parent
