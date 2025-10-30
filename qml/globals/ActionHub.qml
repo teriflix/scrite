@@ -757,7 +757,7 @@ Item {
 
             checkable: true
             checked: __sceneBlocksVisible
-            text: "Block Display"
+            text: "Scene Blocks"
 
             onToggled: Runtime.screenplayEditorSettings.spaceBetweenScenes = __sceneBlocksVisible ? 0 : 40
         }
