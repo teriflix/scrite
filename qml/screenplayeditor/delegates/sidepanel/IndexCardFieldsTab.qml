@@ -58,7 +58,7 @@ AbstractScenePartEditor {
 
                 Layout.fillWidth: true
 
-                lod: eHIGH
+                lod: LodLoader.LOD.High
                 visible: hasFields
                 wrapMode: TextInput.WrapAtWordBoundaryOrAnywhere
                 structureElement: root.scene.structureElement

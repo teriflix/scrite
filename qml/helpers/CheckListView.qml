@@ -79,7 +79,7 @@ Item {
 
     ColumnLayout {
         anchors.centerIn: parent
-        width: Math.max(minTextAreaSize, Math.min(parent.width-17, maxTextAreaSize))
+        width: Math.max(_private_minTextAreaSize, Math.min(parent.width-17, maxTextAreaSize))
         height: parent.height
         spacing: 20
 

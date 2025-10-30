@@ -20,67 +20,85 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 Item {
-    id: textTabBar
-    property int tabIndex: -1
-    property string name: "Tabs"
+    id: root
+
+    property int currentTab: -1
     property var tabs: []
-    property alias spacing: tabsRow.spacing
-    height: tabsRow.height + Runtime.idealFontMetrics.descent + currentTabUnderline.height
+    property string name: "Tabs"
+    property alias spacing: _tabsRow.spacing
+
+    height: _tabsRow.height + Runtime.idealFontMetrics.descent + _currentTabUnderline.height
 
     Row {
-        id: tabsRow
+        id: _tabsRow
+
         width: parent.width
+
         spacing: 16
 
         VclLabel {
-            id: nameText
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            font.family: Runtime.idealFontMetrics.font.family
-            font.capitalization: Font.AllUppercase
-            font.bold: true
-            text: name + ": "
+            id: _nameText
+
             rightPadding: 10
+
+            text: name + ": "
+
+            font.bold: true
+            font.family: Runtime.idealFontMetrics.font.family
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.capitalization: Font.AllUppercase
         }
 
         Repeater {
-            id: tabsRepeater
+            id: _tabsRepeater
+
             model: tabs
 
             VclLabel {
+                color: root.currentTab === index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
                 font: Runtime.idealFontMetrics.font
-                color: textTabBar.tabIndex === index ? Runtime.colors.accent.c900.background : Runtime.colors.primary.c700.background
                 text: modelData
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: textTabBar.tabIndex = index
+
+                    onClicked: root.currentTab = index
                 }
             }
         }
     }
 
     ItemPositionMapper {
-        id: currentTabItemPositionMapper
-        from: tabsRepeater.count > 0 ? tabsRepeater.itemAt(textTabBar.tabIndex) : null
-        to: textTabBar
-        onMappedPositionChanged: Qt.callLater( function() { currentTabUnderline.placedOnce = true } )
+        id: _currentTabItemPositionMapper
+
+        from: _tabsRepeater.count > 0 ? _tabsRepeater.itemAt(root.currentTab) : null
+        to: root
+
+        onMappedPositionChanged: Qt.callLater( function() { _currentTabUnderline.placedOnce = true } )
     }
 
     Rectangle {
-        id: currentTabUnderline
-        x: currentTabItemPositionMapper.mappedPosition.x
-        height: 2
-        color: Runtime.colors.accent.c900.background
-        width: currentTabItemPositionMapper.from.width
-        anchors.top: tabsRow.bottom
-        anchors.topMargin: Runtime.idealFontMetrics.descent
+        id: _currentTabUnderline
+
         property bool placedOnce: false
+
+        anchors.top: _tabsRow.bottom
+        anchors.topMargin: Runtime.idealFontMetrics.descent
+
+        height: 2
+        width: _currentTabItemPositionMapper.from.width
+
+        x: _currentTabItemPositionMapper.mappedPosition.x
+
+        color: Runtime.colors.accent.c900.background
+
         Behavior on x {
-            enabled: currentTabUnderline.placedOnce && Runtime.applicationSettings.enableAnimations
+            enabled: _currentTabUnderline.placedOnce && Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
+
         Behavior on width {
-            enabled: currentTabUnderline.placedOnce && Runtime.applicationSettings.enableAnimations
+            enabled: _currentTabUnderline.placedOnce && Runtime.applicationSettings.enableAnimations
             NumberAnimation { duration: 100 }
         }
     }

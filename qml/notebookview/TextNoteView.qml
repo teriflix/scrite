@@ -47,7 +47,7 @@ Item {
         VclTextField {
             id: titleField
             text: note ? note.title : ""
-            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+            width: parent.width >= _private_maxTextAreaSize+20 ? _private_maxTextAreaSize : parent.width-20
             anchors.horizontalCenter: parent.horizontalCenter
             wrapMode: Text.WordWrap
             font.bold: true
@@ -70,7 +70,7 @@ Item {
         LodLoader {
             id: contentFieldLoader
 
-            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+            width: parent.width >= _private_maxTextAreaSize+20 ? _private_maxTextAreaSize : parent.width-20
             height: parent.height - titleField.height - parent.spacing
 
             anchors.horizontalCenter: parent.horizontalCenter

@@ -61,7 +61,7 @@ Item {
 
     Flickable {
         id: formFlickable
-        width: Math.max(minTextAreaSize, Math.min(parent.width-17, maxTextAreaSize))
+        width: Math.max(_private_minTextAreaSize, Math.min(parent.width-17, maxTextAreaSize))
         height: parent.height
         contentWidth: formContentLayout.width
         contentHeight: formContentLayout.height

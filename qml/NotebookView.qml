@@ -26,410 +26,46 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
-import "qrc:/qml/notebook"
+import "qrc:/qml/notebookview"
 import "qrc:/qml/structureview"
 import "qrc:/qml/notifications"
 
 Rectangle {
-    id: notebookView
+    id: root
 
-    property real toolbarSize: 46
-    property real toolbarSpacing: 0
-    property real toolbarLeftMargin: 0
-    property real toolButtonSize: Math.max(toolbarSize - 4, 20)
-    property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
-    property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
-
-    function switchToStoryTab() {
-        switchTo(Scrite.document.structure.notes)
-    }
-
-    function switchToSceneTab() {
-        var currentScene = Scrite.document.screenplay.activeScene
-        if(currentScene)
-            switchTo(currentScene.notes)
-    }
-
-    function switchToCharacterTab(name) {
-        var character = Scrite.document.structure.findCharacter(name)
-        if(character)
-            switchTo(character.notes)
-    }
-
-    function switchTo(item) {
-        if(typeof item === "string") {
-            var midx
-            if(item === "Notebook Bookmarks")
-                midx = notebookTree.model.findModelIndexForCategory(NotebookModel.BookmarksCategory)
-            else if(item === "Notebook Story")
-                midx = notebookTree.model.findModelIndexForCategory(NotebookModel.ScreenplayCategory)
-            else if(item === "Notebook Characters")
-                midx = notebookTree.model.findModelIndexForCategory(NotebookModel.CharactersCategory)
-            else
-                midx = notebookTree.model.findModelIndexForTopLevelItem(item)
-            notebookTree.setCurrentIndex( midx )
-        } else
-            notebookTree.setCurrentIndex( notebookTree.model.findModelIndexFor(item) )
-    }
-
-    Announcement.onIncoming: (type, data) => {
-                                 if(type === Runtime.announcementIds.characterNotesRequest) {
-                                     switchToCharacterTab(data)
-                                 } else if(type === Runtime.announcementIds.sceneNotesRequest) {
-                                     switchToSceneTab()
-                                 } else if(type === Runtime.announcementIds.notebookNodeRequest) {
-                                     if(typeof data === "string") {
-                                         switch(data) {
-                                             case "Story":
-                                                switchToStoryTab()
-                                                break
-                                             case "Screenplay":
-                                                switchTo("Notebook Story");
-                                                break
-                                             case "Characters":
-                                                switchTo("Notebook Characters");
-                                                break
-                                         }
-                                     }
-                                 }
-                             }
-
-    NotebookModel {
-        id: notebookModel
-        document: Scrite.document.loading ? null : Scrite.document
-
-        onAboutToRefresh: noteCurrentItem()
-        onJustRefreshed: restoreCurrentItem()
-        onAboutToReloadScenes: noteCurrentItem()
-        onJustReloadedScenes: restoreCurrentItem()
-        onAboutToReloadCharacters: noteCurrentItem()
-        onJustReloadedCharacters: restoreCurrentItem()
-
-        property var preferredItem
-        property var currentItem
-
-        function noteCurrentItem() {
-            currentItem = notebookTree.currentData.notebookItemObject
-        }
-
-        function restoreCurrentItem() {
-            if(preferredItem)
-                switchTo(preferredItem)
-            else
-                switchTo(currentItem)
-            currentItem = null
-            preferredItem = null
-        }
-    }
-
-    Connections {
-        target: Runtime.screenplayAdapter.isSourceScreenplay ? Scrite.document.screenplay : null
-        function onElementInserted(element, index) {
-            notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
-        }
-        function onElementMoved(element, from, to) {
-            notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
-        }
-        function onCurrentElementIndexChanged(val) {
-            if(Runtime.workspaceSettings.syncCurrentSceneOnNotebook && !notebookTree.activatingScreenplayElement)
-                notebookTree.activateFromCurrentScreenplayElement()
-        }
-    }
-
-    Connections {
-        target: Scrite.document
-        ignoreUnknownSignals: true
-        function onLoadingChanged() {
-            if(!Scrite.document.loading)
-                notebookTree.activateFromCurrentScreenplayElement()
-        }
-    }
-
-    Component.onCompleted: {
-        notebookTree.activateFromCurrentScreenplayElement()
-        Scrite.user.logActivity1("notebook")
-    }
-
-    FontMetrics {
-        id: fontMetrics
-        font.pointSize: Runtime.idealFontMetrics.font.pointSize
-    }
+    function switchTo(item) { _private.switchTo(item) }
+    function switchToCharacterTab(name) { _private.switchToCharacterTab(name) }
+    function switchToSceneTab() { _private.switchToSceneTab() }
+    function switchToStoryTab() { _private.switchToStoryTab() }
 
     SplitView {
         Material.background: Qt.darker(Runtime.colors.primary.button.background, 1.1)
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
+        anchors.fill: parent
 
         orientation: Qt.Horizontal
 
-        OldControls.TreeView {
-            id: notebookTree
-
-            property var currentData: model.modelIndexData(currentIndex)
-
-            property Note currentNote: currentData.notebookItemType === NotebookModel.NoteType ? currentData.notebookItemObject : null
-            property Notes currentNotes: {
-                if(currentData.notebookItemType === NotebookModel.NotesType)
-                    return currentData.notebookItemObject
-                if(currentData.notebookItemType === NotebookModel.NoteType)
-                    return currentData.notebookItemObject.notes
-                if(currentData.notebookItemType === NotebookModel.CategoryType &&
-                        currentData.notebookItemCategory === NotebookModel.ScreenplayCategory)
-                    return Scrite.document.structure.notes
-                return null
-            }
-            property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
+        NotesTreeView {
+            id: _notebookTree
 
             SplitView.minimumWidth: 150
             SplitView.preferredWidth: Math.min(350, notebookView.width*0.25)
 
-            EventFilter.events: [EventFilter.Wheel]
-            EventFilter.onFilter: (object, event, result) => {
-                                      if(event.type === EventFilter.Wheel && event.orientation === Qt.Horizontal) {
-                                          result.filter = true
-                                          result.acceptEvent = true
-                                      }
-                                  }
+            notebookModel: _notebookModel
 
-            clip: true
-            model: notebookModel
-            frameVisible: false
-            headerVisible: false
-            backgroundVisible: false
-            alternatingRowColors: false
-            verticalScrollBarPolicy: Qt.ScrollBarAlwaysOn
-            horizontalScrollBarPolicy: Qt.ScrollBarAlwaysOff
-
-            rowDelegate: Rectangle {
-                height: fontMetrics.height + 20
-                color: styleData.selected ? Runtime.colors.primary.highlight.background : Runtime.colors.primary.c10.background
-            }
-
-            itemDelegate: Item {
-                Rectangle {
-                    width: notebookTree.width - parent.x
-                    height: fontMetrics.height + 20
-
-                    color: {
-                        if(styleData.selected)
-                            return Runtime.colors.primary.highlight.background
-
-                        var baseColor = undefined
-
-                        if(styleData.value.notebookItemType === NotebookModel.NotesType) {
-                            switch(styleData.value.notebookItemObject.ownerType) {
-                            case Notes.SceneOwner:
-                            case Notes.CharacterOwner:
-                                baseColor = styleData.value.notebookItemObject.color
-                                break
-                            default:
-                                break
-                            }
-                        } else if(styleData.value.notebookItemType === NotebookModel.NoteType)
-                            baseColor = styleData.value.notebookItemObject.color
-
-                        if(baseColor)
-                            return Qt.tint(baseColor, Runtime.colors.sceneHeadingTint)
-
-                        return Runtime.colors.primary.c10.background
-                    }
-
-                    Row {
-                        width: parent.width
-                        height: parent.height
-
-                        spacing: 5
-
-                        Item {
-                            width: 1
-                            height: parent.height
-                            visible: itemDelegateIcon.visible
-                        }
-
-                        Image {
-                            id: itemDelegateIcon
-                            width: parent.height * 0.6
-                            height: width
-                            mipmap: true
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: source != ""
-                            opacity: {
-                                switch(styleData.value.notebookItemType) {
-                                case NotebookModel.EpisodeBreakType:
-                                case NotebookModel.ActBreakType:
-                                    return styleData.value.notebookItemObject ? 1 : 0.5
-                                }
-                                return 1
-                            }
-
-                            source: {
-                                switch(styleData.value.notebookItemType) {
-                                case NotebookModel.EpisodeBreakType:
-                                    return "qrc:/icons/content/episode.png"
-                                case NotebookModel.ActBreakType:
-                                    return "qrc:/icons/content/act.png"
-                                case NotebookModel.NotesType:
-                                    switch(styleData.value.notebookItemObject.ownerType) {
-                                    case Notes.SceneOwner:
-                                        return "qrc:/icons/content/scene.png"
-                                    case Notes.CharacterOwner:
-                                        return "qrc:/icons/content/person_outline.png"
-                                    case Notes.BreakOwner:
-                                        return "qrc:/icons/content/story.png"
-                                    default:
-                                        break
-                                    }
-                                    break;
-                                case NotebookModel.NoteType:
-                                    switch(styleData.value.notebookItemObject.type) {
-                                    case Note.TextNoteType:
-                                        return "qrc:/icons/content/note.png"
-                                    case Note.FormNoteType:
-                                        return "qrc:/icons/content/form.png"
-                                    case Note.CheckListNoteType:
-                                        return "qrc:/icons/content/checklist.png"
-                                    default:
-                                        break
-                                    }
-                                    break;
-                                }
-
-                                return ""
-                            }
-                        }
-
-                        VclLabel {
-                            id: itemDelegateText
-                            padding: 5
-                            font.family: fontMetrics.font.family
-                            font.pointSize: fontMetrics.font.pointSize
-                            font.capitalization: fontMetrics.font.capitalization
-                            font.bold: styleData.value.notebookItemType === NotebookModel.CategoryType ||
-                                       (styleData.value.notebookItemType === NotebookModel.NotesType &&
-                                        styleData.value.notebookItemObject.ownerType === Notes.StructureOwner)
-                            text: styleData.value.notebookItemTitle ? styleData.value.notebookItemTitle : ""
-                            color: Color.textColorFor(parent.parent.color)
-                            elide: Text.ElideRight
-                            width: parent.width-(itemDelegateIcon.visible ? (itemDelegateIcon.width+parent.spacing) : 0)
-                            anchors.verticalCenter: parent.verticalCenter
-                        }
-                    }
-                }
-
-                MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.RightButton
-                    onClicked: {
-                        if(styleData.value.notebookItemType === NotebookModel.NoteType) {
-                            noteContextMenu.note = styleData.value.notebookItemObject
-                            noteContextMenu.popup()
-                        } else if(styleData.value.notebookItemType === NotebookModel.NotesType &&
-                                  styleData.value.notebookItemObject.ownerType === Notes.CharacterOwner) {
-                            characterContextMenu.character = styleData.value.notebookItemObject.character
-                            characterContextMenu.characterItem = parent
-                            characterContextMenu.popup()
-                        }
-                    }
-                }
-            }
-            OldControls.TableViewColumn {
-                title: "Name"
-                role: "notebookItemData"
-                width: 300
-                movable: false
-                resizable: false
-            }
-
-            function activateFromCurrentScreenplayElement() {
-                var spobj = Scrite.document.screenplay
-                var element = spobj.elementAt(spobj.currentElementIndex)
-                if(element) {
-                    if(element.elementType === ScreenplayElement.BreakElementType)
-                        switchTo(element)
-                    else
-                        switchTo(element.scene.notes)
-                }
-            }
-
-            property bool activatingScreenplayElement: false
-            function activateScreenplayElement(_modelData) {
-                activatingScreenplayElement = true
-                Qt.callLater( () => { notebookTree.activatingScreenplayElement = false })
-
-                var makeSceneCurrent = function(notes) {
-                    if(notes.ownerType === Notes.SceneOwner) {
-                        var scene = notes.owner
-                        var idxes = scene.screenplayElementIndexList
-                        if(idxes.length > 0)
-                            Scrite.document.screenplay.currentElementIndex = idxes[0]
-                    }
-                }
-
-                switch(_modelData.notebookItemType) {
-                case NotebookModel.EpisodeBreakType:
-                case NotebookModel.ActBreakType:
-                    if(_modelData.notebookItemObject)
-                        Scrite.document.screenplay.currentElementIndex = Scrite.document.screenplay.indexOfElement(_modelData.notebookItemObject)
-                    break
-                case NotebookModel.NotesType:
-                    makeSceneCurrent(_modelData.notebookItemObject)
-                    break
-                case NotebookModel.NoteType:
-                    makeSceneCurrent(_modelData.notebookItemObject.notes)
-                    break
-                default:
-                    break
-                }
-            }
-
-            onClicked: {
-                if(Runtime.mainWindowTab !== Runtime.MainWindowTab.StructureTab || Runtime.workspaceSettings.syncCurrentSceneOnNotebook)
-                    activateScreenplayElement( notebookModel.modelIndexData(index) )
-            }
-
-            onDoubleClicked: {
-                activateScreenplayElement( notebookModel.modelIndexData(index) )
-                if(isExpanded(index))
-                    collapse(index)
-                else
-                    expand(index)
-            }
-
-            function setCurrentIndex(modelIndex) {
-                var pmi = modelIndex.parent
-                while(pmi.valid) {
-                    notebookTree.expand(pmi)
-                    pmi = pmi.parent
-                }
-
-                var row = 0
-                while(1) {
-                    var idx = notebookTree.__model.mapRowToModelIndex(row)
-                    if(!idx.valid)
-                        break
-                    if(idx === modelIndex) {
-                        notebookTree.__listView.currentIndex = row
-                        notebookTree.__listView.positionViewAtIndex(row, ListView.Contain)
-                        break
-                    }
-                    ++row
-                }
-            }
+            onSwitchRequest: (item) => { _private.switchTo(item) }
         }
 
         Rectangle {
             color: {
                 // Keep these colors in sync with actual component colors loaded
                 // by notebookContentLoader
-                if(!notebookTree.currentData)
+                if(!_notebookTree.currentData)
                     return Qt.rgba(0,0,0,0)
 
-                switch(notebookTree.currentData.notebookItemType) {
+                switch(_notebookTree.currentData.notebookItemType) {
                 case NotebookModel.CategoryType:
-                    switch(notebookTree.currentData.notebookItemCategory) {
+                    switch(_notebookTree.currentData.notebookItemCategory) {
                     case NotebookModel.ScreenplayCategory:
                         return "white"
                     case NotebookModel.UnusedScenesCategory:
@@ -440,13 +76,13 @@ Rectangle {
                     }
                     break
                 case NotebookModel.NotesType:
-                    switch(notebookTree.currentData.notebookItemObject.ownerType) {
+                    switch(_notebookTree.currentData.notebookItemObject.ownerType) {
                     case Notes.CharacterOwner: {
-                        const character = notebookTree.currentData.notebookItemObject.character
+                        const character = _notebookTree.currentData.notebookItemObject.character
                         return Qt.tint(character.color, "#e7ffffff")
                         }
                     case Notes.SceneOwner: {
-                        const notes = notebookTree.currentData.notebookItemObject
+                        const notes = _notebookTree.currentData.notebookItemObject
                         const scene = notes.scene
                         return Qt.tint(scene.color, "#e7ffffff")
                         }
@@ -454,10 +90,10 @@ Rectangle {
                         return Color.translucent(Runtime.colors.primary.c100.background, 0.5)
                     }
                 case NotebookModel.NoteType:
-                    switch(notebookTree.currentData.notebookItemObject.type) {
+                    switch(_notebookTree.currentData.notebookItemObject.type) {
                     case Note.TextNoteType:
                     case Note.FormNoteType:
-                        const note = notebookTree.currentData.notebookItemObject
+                        const note = _notebookTree.currentData.notebookItemObject
                         return Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
                     }
                     break
@@ -478,7 +114,7 @@ Rectangle {
                 }
                 active: opacity > 0
 
-                property int currentNotebookItemId: notebookTree.currentData ? notebookTree.currentData.notebookItemId : -1
+                property int currentNotebookItemId: _notebookTree.currentData ? _notebookTree.currentData.notebookItemId : -1
 
                 property bool hasReport: item && item.hasReport && item.hasReport === true
                 property string reportDescription: hasReport ? item.reportDescription : ""
@@ -501,12 +137,12 @@ Rectangle {
                 }
 
                 sourceComponent: {
-                    if(!notebookTree.currentData)
+                    if(!_notebookTree.currentData)
                         return unknownComponent
 
-                    switch(notebookTree.currentData.notebookItemType) {
+                    switch(_notebookTree.currentData.notebookItemType) {
                     case NotebookModel.CategoryType:
-                        switch(notebookTree.currentData.notebookItemCategory) {
+                        switch(_notebookTree.currentData.notebookItemCategory) {
                         case NotebookModel.ScreenplayCategory:
                             return screenplayComponent
                         case NotebookModel.UnusedScenesCategory:
@@ -518,7 +154,7 @@ Rectangle {
                         }
                         break
                     case NotebookModel.NotesType:
-                        switch(notebookTree.currentData.notebookItemObject.ownerType) {
+                        switch(_notebookTree.currentData.notebookItemObject.ownerType) {
                         case Notes.CharacterOwner:
                             return characterNotesComponent
                         case Notes.SceneOwner:
@@ -527,7 +163,7 @@ Rectangle {
                             return notesComponent
                         }
                     case NotebookModel.NoteType:
-                        switch(notebookTree.currentData.notebookItemObject.type) {
+                        switch(_notebookTree.currentData.notebookItemObject.type) {
                         case Note.TextNoteType:
                             return textNoteComponent
                         case Note.FormNoteType:
@@ -543,7 +179,7 @@ Rectangle {
 
                     return unknownComponent
                 }
-                onLoaded: item.componentData = notebookTree.currentData
+                onLoaded: item.componentData = _notebookTree.currentData
 
                 Rectangle {
                     anchors.fill: parent
@@ -582,9 +218,9 @@ Rectangle {
 
                         VclLabel {
                             text: {
-                                if(notebookTree.currentNote)
+                                if(_notebookTree.currentNote)
                                     return "Are you sure you want to delete this note?"
-                                if(notebookTree.currentCharacter)
+                                if(_notebookTree.currentCharacter)
                                     return "Are you sure you want to delete this character?"
                                 return "Cannot remove this item."
                             }
@@ -607,11 +243,11 @@ Rectangle {
                                     notebookContentLoader.item.deleteSelf()
                                     deleteConfirmationBox.active = false
                                 }
-                                visible: notebookTree.currentNote || notebookTree.currentCharacter
+                                visible: _notebookTree.currentNote || _notebookTree.currentCharacter
                             }
 
                             VclButton {
-                                text: notebookTree.currentNote || notebookTree.currentCharacter ? "No" : "OK"
+                                text: _notebookTree.currentNote || _notebookTree.currentCharacter ? "No" : "OK"
                                 focusPolicy: Qt.NoFocus
                                 onClicked: deleteConfirmationBox.active = false
                             }
@@ -645,7 +281,7 @@ Rectangle {
                 id: bookmarksView
                 anchors.fill: parent
                 anchors.rightMargin: contentHeight > height ? 17 : 12
-                model: notebookModel.bookmarkedNotes
+                model: _notebookModel.bookmarkedNotes
                 property real idealCellWidth: Math.min(250,width)
                 property int nrColumns: Math.floor(width/idealCellWidth)
                 cellWidth: width/nrColumns
@@ -777,11 +413,11 @@ Rectangle {
 
             TextTabBar {
                 id: sceneTabBar
-                tabIndex: sceneNotesTabIndex
+                currentTab: sceneNotesTabIndex
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                onTabIndexChanged: sceneNotesTabIndex = tabIndex
+                onTabIndexChanged: sceneNotesTabIndex = currentTab
                 name: componentData ? componentData.notebookItemTitle.substr(0, componentData.notebookItemTitle.indexOf(']')+1) : "Scene"
                 tabs: ["Synopsis", "Relationships", "Notes", "Comments"]
             }
@@ -796,7 +432,7 @@ Rectangle {
                 clip: true
 
                 Item {
-                    visible: sceneTabBar.tabIndex === 0
+                    visible: sceneTabBar.currentTab === 0
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
 
@@ -829,7 +465,7 @@ Rectangle {
 
                             text: scene.heading.text
                             label: ""
-                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                            width: parent.width >= _private.maxTextAreaSize+20 ? _private.maxTextAreaSize : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Heading"
                             readOnly: Scrite.document.readOnly
@@ -849,7 +485,7 @@ Rectangle {
 
                             text: scene.structureElement.nativeTitle
                             label: ""
-                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                            width: parent.width >= _private.maxTextAreaSize+20 ? _private.maxTextAreaSize : parent.width-20
                             wrapMode: Text.WordWrap
                             placeholderText: "Scene Title"
                             readOnly: Scrite.document.readOnly
@@ -959,7 +595,7 @@ Rectangle {
                             currentTabContent: currentTabIndex === 0 ? sceneSynopsisFieldComponent : featuredPhotoComponent
                             currentTabIndex: Runtime.screenplayEditorSettings.commentsPanelTabIndex
                             onCurrentTabIndexChanged: Runtime.screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
-                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                            width: parent.width >= _private.maxTextAreaSize+20 ? _private.maxTextAreaSize : parent.width-20
                             height: parent.height - sceneHeadingField.height - sceneTitleField.height - sceneCharactersList.height - parent.spacing*3
                             anchors.horizontalCenter: parent.horizontalCenter
 
@@ -1008,7 +644,7 @@ Rectangle {
 
                                         Layout.fillWidth: true
 
-                                        lod: eHIGH
+                                        lod: LodLoader.LOD.High
                                         visible: hasFields
 
                                         structureElement: scene.structureElement
@@ -1052,7 +688,7 @@ Rectangle {
                 Loader {
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
-                    visible: sceneTabBar.tabIndex === 1
+                    visible: sceneTabBar.currentTab === 1
                     active: Runtime.appFeatures.characterRelationshipGraph.enabled
                     sourceComponent: CharacterRelationshipsGraphView {
                         id: crGraphView
@@ -1105,13 +741,13 @@ Rectangle {
                     sourceComponent: notesComponent
                     active: sceneNotesItem.notes
                     onLoaded: item.notes = sceneNotesItem.notes
-                    visible: sceneTabBar.tabIndex === 2
+                    visible: sceneTabBar.currentTab === 2
                 }
 
                 Item {
                     width: sceneTabContentArea.width
                     height: sceneTabContentArea.height
-                    visible: sceneTabBar.tabIndex === 3
+                    visible: sceneTabBar.currentTab === 3
 
                     EventFilter.events: [EventFilter.Wheel]
                     EventFilter.onFilter: {
@@ -1127,7 +763,7 @@ Rectangle {
 
                         FlickableTextArea {
                             id: sceneCommentsField
-                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                            width: parent.width >= _private.maxTextAreaSize+20 ? _private.maxTextAreaSize : parent.width-20
                             height: parent.height
                             text: scene.comments
                             placeholderText: "Scene Comments"
@@ -1219,7 +855,7 @@ Rectangle {
                                 id: noteVisual
                                 anchors.fill: parent
                                 anchors.margins: 10
-                                color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, "#A0FFFFFF") : Qt.tint(objectItem.color, Runtime.colors.sceneHeadingTint)
+                                color: notesFlick.currentIndex === index ? Qt.tint(objectItem.color, Runtime.colors.currentNoteTint) : Qt.tint(objectItem.color, Runtime.colors.sceneHeadingTint)
 
                                 Behavior on color {
                                     enabled: Runtime.applicationSettings.enableAnimations
@@ -1471,7 +1107,7 @@ Rectangle {
 
                         Row {
                             id: breakElementHeadingRow
-                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                            width: parent.width >= _private.maxTextAreaSize+20 ? _private.maxTextAreaSize : parent.width-20
                             anchors.horizontalCenter: parent.horizontalCenter
                             spacing: 10
 
@@ -1500,7 +1136,7 @@ Rectangle {
                             placeholderText: breakKind + " Summary ..."
                             text: breakElement.breakSummary
                             onTextChanged: breakElement.breakSummary = text
-                            width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                            width: parent.width >= _private.maxTextAreaSize+20 ? _private.maxTextAreaSize : parent.width-20
                             height: parent.height - breakElementHeadingRow.height - parent.spacing
                             anchors.horizontalCenter: parent.horizontalCenter
                             backTabItem: breakElementHeadingField
@@ -1580,8 +1216,8 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                tabIndex: screenplayNotesTabIndex
-                onTabIndexChanged: screenplayNotesTabIndex = Math.min(tabIndex, 2)
+                currentTab: screenplayNotesTabIndex
+                onTabIndexChanged: screenplayNotesTabIndex = Math.min(currentTab, 2)
                 name: "Screenplay"
                 tabs: ["Title Page", "Logline", "Notes", "Stats"]
             }
@@ -1598,7 +1234,7 @@ Rectangle {
                 Item {
                     width: screenplayTabContentArea.width
                     height: screenplayTabContentArea.height
-                    visible: screenplayTabBar.tabIndex === 0
+                    visible: screenplayTabBar.currentTab === 0
 
                     Flickable {
                         id: titlePageFlickable
@@ -1824,7 +1460,7 @@ Rectangle {
                 Item {
                     width: screenplayTabContentArea.width
                     height: screenplayTabContentArea.height
-                    visible: screenplayTabBar.tabIndex === 1
+                    visible: screenplayTabBar.currentTab === 1
 
                     EventFilter.events: [EventFilter.Wheel]
                     EventFilter.onFilter: {
@@ -1918,14 +1554,14 @@ Rectangle {
                     height: screenplayTabContentArea.height
                     sourceComponent: notesComponent
                     onLoaded: item.notes = Scrite.document.structure.notes
-                    visible: screenplayTabBar.tabIndex === 2
+                    visible: screenplayTabBar.currentTab === 2
                 }
 
                 Loader {
                     width: screenplayTabContentArea.width
                     height: screenplayTabContentArea.height
                     sourceComponent: storyStatsReport
-                    visible: screenplayTabBar.tabIndex === 3
+                    visible: screenplayTabBar.currentTab === 3
                     active: false
                     onVisibleChanged: {
                         if(visible)
@@ -1974,8 +1610,8 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                tabIndex: charactersNotesTabIndex
-                onTabIndexChanged: charactersNotesTabIndex = tabIndex
+                currentTab: charactersNotesTabIndex
+                onTabIndexChanged: charactersNotesTabIndex = currentTab
                 name: "Characters"
                 tabs: ["List", "Relationships"]
             }
@@ -1991,7 +1627,7 @@ Rectangle {
                 Item {
                     width: charactersTabContentArea.width
                     height: charactersTabContentArea.height
-                    visible: charactersTabBar.tabIndex === 0
+                    visible: charactersTabBar.currentTab === 0
 
                     SortFilterObjectListModel {
                         id: sortedCharactersModel
@@ -2034,7 +1670,7 @@ Rectangle {
                             Rectangle {
                                 anchors.fill: parent
                                 anchors.margins: 5
-                                color: Qt.tint(character.color, charactersView.currentIndex === index ? "#A0FFFFFF" : Runtime.colors.sceneHeadingTint)
+                                color: Qt.tint(character.color, charactersView.currentIndex === index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
                                 border.width: 1
                                 border.color: Color.isLight(character.color) ? (charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : character.color
 
@@ -2107,7 +1743,7 @@ Rectangle {
                         header: addNewCharacter
 
                         Component.onCompleted: {
-                            if(charactersTabBar.tabIndex === 0)
+                            if(charactersTabBar.currentTab === 0)
                                 headerItem.assumeFocus()
                         }
                     }
@@ -2118,7 +1754,7 @@ Rectangle {
                         Item {
                             width: charactersView.width
                             height: 60
-                            enabled: charactersTabBar.tabIndex === 0
+                            enabled: charactersTabBar.currentTab === 0
 
                             function assumeFocus() {
                                 characterNameField.forceActiveFocus()
@@ -2157,7 +1793,7 @@ Rectangle {
                                                 switchTo(ch.notes)
                                             else if(!Scrite.document.readOnly) {
                                                 ch = Scrite.document.structure.addCharacter(chName)
-                                                notebookModel.preferredItem = ch.notes
+                                                _notebookModel.preferredItem = ch.notes
                                             }
                                         }
                                     }
@@ -2186,7 +1822,7 @@ Rectangle {
                 Loader {
                     width: charactersTabContentArea.width
                     height: charactersTabContentArea.height
-                    visible: charactersTabBar.tabIndex === 1
+                    visible: charactersTabBar.currentTab === 1
                     active: Runtime.appFeatures.characterRelationshipGraph.enabled
                     sourceComponent: CharacterRelationshipsGraphView {
                         id: crGraphView
@@ -2256,7 +1892,7 @@ Rectangle {
             }
 
             function deleteSelf() {
-                notebookModel.preferredItem = "Characters"
+                _notebookModel.preferredItem = "Characters"
                 Scrite.document.structure.removeCharacter(character)
             }
 
@@ -2265,8 +1901,8 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 8
-                tabIndex: characterNotesTabIndex
-                onTabIndexChanged: characterNotesTabIndex = tabIndex
+                currentTab: characterNotesTabIndex
+                onTabIndexChanged: characterNotesTabIndex = currentTab
                 name: character.name
                 tabs: ["Information", "Relationships", "Notes"]
             }
@@ -2282,7 +1918,7 @@ Rectangle {
                 Item {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
-                    visible: characterTabBar.tabIndex === 0
+                    visible: characterTabBar.currentTab === 0
 
                     EventFilter.events: [31]
                     EventFilter.onFilter: {
@@ -2750,7 +2386,7 @@ Rectangle {
 
                                     property Character character: characterNotes.character
 
-                                    width: parent.width >= maxTextAreaSize+20 ? maxTextAreaSize : parent.width-20
+                                    width: parent.width >= _private.maxTextAreaSize+20 ? _private.maxTextAreaSize : parent.width-20
                                     height: parent.height
                                     anchors.centerIn: parent
                                     anchors.horizontalCenterOffset: -5
@@ -2819,7 +2455,7 @@ Rectangle {
                 Loader {
                     width: characterTabContentArea.width
                     height: characterTabContentArea.height
-                    visible: characterTabBar.tabIndex === 1
+                    visible: characterTabBar.currentTab === 1
                     active: Runtime.appFeatures.characterRelationshipGraph.enabled
                     sourceComponent: CharacterRelationshipsGraphView {
                         id: crGraphView
@@ -2868,7 +2504,7 @@ Rectangle {
                     sourceComponent: notesComponent
                     active: characterNotes.character
                     onLoaded: item.componentData = characterNotes.componentData
-                    visible: characterTabBar.tabIndex === 2
+                    visible: characterTabBar.currentTab === 2
                 }
             }
         }
@@ -2942,10 +2578,10 @@ Rectangle {
         VclMenuItem {
             text: "Delete Note"
             onClicked: {
-                if(notebookTree.currentNote == noteContextMenu.note)
+                if(_notebookTree.currentNote == noteContextMenu.note)
                     notebookContentLoader.confirmAndDelete()
                 else {
-                    notebookView.switchTo(noteContextMenu.note)
+                    root.switchTo(noteContextMenu.note)
                     Runtime.execLater( notebookContentLoader, 500, () => {
                                      notebookContentLoader.confirmAndDelete()
                                  } )
@@ -3005,10 +2641,10 @@ Rectangle {
         VclMenuItem {
             text: "Delete Character"
             onClicked: {
-                if(notebookTree.currentCharacter == characterContextMenu.character)
+                if(_notebookTree.currentCharacter == characterContextMenu.character)
                     notebookContentLoader.confirmAndDelete()
                 else {
-                    notebookView.switchTo(characterContextMenu.character.notes)
+                    root.switchTo(characterContextMenu.character.notes)
                     Runtime.execLater( notebookContentLoader, 100, () => {
                                      notebookContentLoader.confirmAndDelete()
                                  } )
@@ -3079,5 +2715,128 @@ Rectangle {
 
     HelpTipNotification {
         tipName: "notebook"
+    }
+
+
+    NotebookModel {
+        id: _notebookModel
+
+        property var currentItem
+        property var preferredItem
+
+        function noteCurrentItem() {
+            currentItem = _notebookTree.currentData.notebookItemObject
+        }
+
+        function restoreCurrentItem() {
+            if(preferredItem)
+                switchTo(preferredItem)
+            else
+                switchTo(currentItem)
+            currentItem = null
+            preferredItem = null
+        }
+
+        document: Scrite.document.loading ? null : Scrite.document
+
+        onAboutToRefresh: noteCurrentItem()
+        onAboutToReloadCharacters: noteCurrentItem()
+        onAboutToReloadScenes: noteCurrentItem()
+        onJustRefreshed: restoreCurrentItem()
+        onJustReloadedCharacters: restoreCurrentItem()
+        onJustReloadedScenes: restoreCurrentItem()
+    }
+
+    Connections {
+        target: Runtime.screenplayAdapter.isSourceScreenplay ? Scrite.document.screenplay : null
+
+        function onElementInserted(element, index) {
+            _notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
+        }
+
+        function onElementMoved(element, from, to) {
+            _notebookModel.preferredItem = element.elementType === ScreenplayElement.BreakElementType ? element : element.scene.notes
+        }
+
+        function onCurrentElementIndexChanged(val) {
+            if(Runtime.workspaceSettings.syncCurrentSceneOnNotebook && !_notebookTree.activatingScreenplayElement)
+                _notebookTree.activateFromCurrentScreenplayElement()
+        }
+    }
+
+    Connections {
+        target: Scrite.document
+        ignoreUnknownSignals: true
+        function onLoadingChanged() {
+            if(!Scrite.document.loading)
+                _notebookTree.activateFromCurrentScreenplayElement()
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
+        property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
+
+        function switchToStoryTab() {
+            switchTo(Scrite.document.structure.notes)
+        }
+
+        function switchToSceneTab() {
+            const currentScene = Scrite.document.screenplay.activeScene
+            if(currentScene)
+                switchTo(currentScene.notes)
+        }
+
+        function switchToCharacterTab(name) {
+            const character = Scrite.document.structure.findCharacter(name)
+            if(character)
+                switchTo(character.notes)
+        }
+
+        function switchTo(item) {
+            if(typeof item === "string") {
+                let midx
+                if(item === "Notebook Bookmarks")
+                    midx = _notebookTree.model.findModelIndexForCategory(NotebookModel.BookmarksCategory)
+                else if(item === "Notebook Story")
+                    midx = _notebookTree.model.findModelIndexForCategory(NotebookModel.ScreenplayCategory)
+                else if(item === "Notebook Characters")
+                    midx = _notebookTree.model.findModelIndexForCategory(NotebookModel.CharactersCategory)
+                else
+                    midx = _notebookTree.model.findModelIndexForTopLevelItem(item)
+                _notebookTree.setCurrentIndex( midx )
+            } else
+                _notebookTree.setCurrentIndex( _notebookTree.model.findModelIndexFor(item) )
+        }
+
+        Announcement.onIncoming: (type, data) => {
+                                     // Check this..
+                                     if(type === Runtime.announcementIds.characterNotesRequest) {
+                                         switchToCharacterTab(data)
+                                     } else if(type === Runtime.announcementIds.sceneNotesRequest) {
+                                         switchToSceneTab()
+                                     } else if(type === Runtime.announcementIds.notebookNodeRequest) {
+                                         if(typeof data === "string") {
+                                             switch(data) {
+                                                 case "Story":
+                                                    switchToStoryTab()
+                                                    break
+                                                 case "Screenplay":
+                                                    switchTo("Notebook Story");
+                                                    break
+                                                 case "Characters":
+                                                    switchTo("Notebook Characters");
+                                                    break
+                                             }
+                                         }
+                                     }
+                                 }
+
+        Component.onCompleted: {
+            _notebookTree.activateFromCurrentScreenplayElement()
+            Scrite.user.logActivity1("notebook")
+        }
     }
 }

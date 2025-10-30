@@ -594,7 +594,7 @@ AbstractStructureElementUI {
                 anchors.fill: parent
                 anchors.margins: -5
 
-                color: Qt.tint(baseColor, _private.isSelected ? "#70FFFFFF" : "#A0FFFFFF")
+                color: Qt.tint(baseColor, _private.isSelected ? "#70FFFFFF" : Runtime.colors.currentNoteTint)
             }
 
             RowLayout {

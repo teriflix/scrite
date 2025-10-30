@@ -35,9 +35,7 @@ Item {
 
     property bool hasFields: indexCardFieldsModel.count > 0
 
-    property int lod: eLOW
-    readonly property int eLOW: 0 // copied from LodLoader
-    readonly property int eHIGH: 1 // copied from LodLoader
+    property int lod: LodLoader.LOD.Low
 
     property bool sanctioned: true
 
@@ -55,7 +53,7 @@ Item {
         flow: GridLayout.TopToBottom
         visible: rows > 0
         columns: 2
-        rowSpacing: root.lod === root.eLOW ? 10 : 0
+        rowSpacing: root.lod === LodLoader.LOD.Low ? 10 : 0
         columnSpacing: 10
 
         Repeater {
@@ -64,7 +62,7 @@ Item {
             VclLabel {
                 required property string name
 
-                Layout.topMargin: root.lod === root.eLOW ? 0 : 8
+                Layout.topMargin: root.lod === LodLoader.LOD.Low ? 0 : 8
                 Layout.alignment: Qt.AlignTop
 
                 text: name

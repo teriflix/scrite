@@ -50,7 +50,6 @@ AbstractScenePartEditor {
 
             width: _flickable.ScrollBar.vertical.needed ? _flickable.width-20 : _flickable.width
 
-
             Loader {
                 width: parent.width
 

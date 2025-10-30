@@ -31,175 +31,79 @@ AbstractScenePartEditor {
     signal sceneTagAdded(string tagName)
     signal sceneTagClicked(string tagName)
 
-    height: _layout.height
+    height: _tagsInput.height
 
-    Flow {
-        id: _layout
+    TextListInput {
+        id: _tagsInput
+
+        Announcement.onIncoming: (type,data) => {
+            if(!root.screenplayElementDelegateHasFocus || root.readOnly)
+                return
+
+            var sdata = "" + data
+            var stype = "" + type
+            if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.addSceneTag) {
+                acceptNewText()
+            }
+        }
 
         width: parent.width
 
-        flow: Flow.LeftToRight
-        enabled: Runtime.appFeatures.structure.enabled
-        opacity: enabled ? 1 : 0.5
-        spacing: 5
         leftPadding: root.pageLeftMargin
         rightPadding: root.pageRightMargin
 
-        FlatToolButton {
-            ToolTip.text: "Formal Story Beats/Tags"
+        enabled: Runtime.appFeatures.structure.enabled
 
-            suggestedWidth: _openTagsLabel.height
-            suggestedHeight: _openTagsLabel.height
+        addTextButtonTooltip: "Click here to add custom scene tags."
+        completionStrings: Scrite.document.structure.sceneTags
+        font: root.font
+        labelIconSource: "qrc:/icons/action/tag.png"
+        labelText: "Open Tags"
+        readOnly: !Runtime.appFeatures.structure.enabled && root.readOnly
+        textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
+        textColors: root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
+        textList: root.scene ? root.scene.tags : 0
+        zoomLevel: root.zoomLevel
 
-            enabled: Runtime.appFeatures.structure.enabled
-            opacity: enabled ? 1 : 0.5
-            iconSource: "qrc:/icons/action/tag.png"
+        onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
+        onTextClicked: (text, source) => { root.sceneTagClicked(text) }
+        onTextCloseRequest: (text, source) => { root.scene.removeTag(text) }
+        onConfigureTextRequest: (text, tag) => { tag.closable = true }
+        onNewTextRequest: (text) => {
+                              root.scene.addTag(text)
+                              root.sceneTagAdded(text)
+                          }
 
-            onClicked: _private.popupFormalTagsMenu()
-        }
+        header: Row {
+            spacing: _tagsInput.spacing
 
-        Link {
-            width: Math.min(implicitWidth, root.width*0.9)
+            FlatToolButton {
+                ToolTip.text: "Formal Story Beats/Tags"
 
-            text: _private.presentableGroupNames + ", "
-            elide: Text.ElideRight
-            visible: _private.presentableGroupNames !== ""
-            enabled: Runtime.appFeatures.structure.enabled
-            opacity: enabled ? 1 : 0.5
-            topPadding: 5
-            bottomPadding: 5
+                suggestedWidth: _tagsInput.label.height
+                suggestedHeight: _tagsInput.label.height
 
-            font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
-
-            onClicked: _private.popupFormalTagsMenu()
-        }
-
-        VclLabel {
-            id: _openTagsLabel
-
-            text: "Open Tags: "
-
-            topPadding: 5
-            bottomPadding: 5
-
-            font.bold: true
-            font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
-        }
-
-        Repeater {
-            model: root.scene ? root.scene.tags : 0
-
-            TagText {
-                id: _openTag
-
-                required property string modelData
-
-                property string tagName: modelData
-
-                property var colors: {
-                    if(containsMouse)
-                        return Runtime.colors.accent.c900
-                    return root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
-                }
-
-                border.color: colors.text
-                border.width: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
-
-                text: tagName
-                color: colors.background
-                enabled: !Scrite.document.readOnly && Runtime.appFeatures.structure.enabled
+                enabled: Runtime.appFeatures.structure.enabled
                 opacity: enabled ? 1 : 0.5
-                closable: true
-                textColor: colors.text
-                topPadding: Math.max(5, 5 * root.zoomLevel)
-                leftPadding: Math.max(10, 10 * root.zoomLevel)
-                rightPadding: leftPadding
-                bottomPadding: topPadding
+                iconSource: "qrc:/icons/action/tag.png"
 
-                font.family: root.font.family
-                font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
-
-                onClicked: root.sceneTagClicked(tagName)
-
-                onCloseRequest: {
-                    if(!Scrite.document.readOnly)
-                        root.scene.removeTag(tagName)
-                }
+                onClicked: _private.popupFormalTagsMenu()
             }
-        }
 
-        Loader {
-            id: _newOpenTagInputLoader
+            Link {
+                width: Math.min(implicitWidth, root.width*0.9)
 
-            width: active && item ? Math.max(item.contentWidth, 100) : 0
-
-            active: false
-
-            sourceComponent: VclTextField {
-                Component.onCompleted: {
-                    forceActiveFocus()
-                    root.ensureVisible(_newOpenTagInputLoader, Qt.rect(0,0,width,height))
-                }
-
-                Keys.onEscapePressed: {
-                    text = ""
-                    _newOpenTagInputLoader.active = false
-                }
-
-                readOnly: false
-                completionStrings: Scrite.document.structure.sceneTags
+                text: _private.presentableGroupNames + ", "
+                elide: Text.ElideRight
+                visible: _private.presentableGroupNames !== ""
+                enabled: Runtime.appFeatures.structure.enabled
+                opacity: enabled ? 1 : 0.5
+                topPadding: 5
+                bottomPadding: 5
 
                 font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
 
-                onEditingComplete: {
-                    if(text.length > 0) {
-                        root.scene.addTag(text)
-                        root.sceneTagAdded(text)
-                    }
-
-                    _newOpenTagInputLoader.active = false
-                }
-            }
-
-            onStatusChanged: {
-                if(status === Loader.Null) {
-                    Object.resetProperty(_newOpenTagInputLoader, "width")
-                    Object.resetProperty(_newOpenTagInputLoader, "height")
-                }
-            }
-        }
-
-        Image {
-            source: "qrc:/icons/content/add_box.png"
-
-            width: _openTagsLabel.height
-            height: width
-
-            enabled: !Scrite.document.readOnly
-            visible: enabled && Runtime.appFeatures.structure.enabled
-
-            MouseArea {
-                ToolTip.text: "Click here to add custom scene tags."
-                ToolTip.delay: 1000
-                ToolTip.visible: containsMouse
-
-                anchors.fill: parent
-
-                hoverEnabled: true
-
-                onClicked: _newOpenTagInputLoader.active = true
-                onContainsMouseChanged: parent.opacity = containsMouse ? 1 : 0.5
-            }
-
-            Announcement.onIncoming: (type,data) => {
-                if(!root.screenplayElementDelegateHasFocus || root.readOnly)
-                    return
-
-                var sdata = "" + data
-                var stype = "" + type
-                if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.addSceneTag) {
-                    _newOpenTagInputLoader.active = true
-                }
+                onClicked: _private.popupFormalTagsMenu()
             }
         }
     }

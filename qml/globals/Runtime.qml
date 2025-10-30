@@ -484,6 +484,7 @@ Item {
         readonly property color highlightedSceneControlTint: "#C0FFFFFF"
         readonly property color sceneControlTint: "#D7EEEEEE"
         readonly property color sceneHeadingTint: "#E7FFFFFF"
+        readonly property color currentNoteTint: "#A0FFFFFF"
         readonly property color selectedSceneHeadingTint: "#9CFFFFFF"
         readonly property color transparent: "transparent"
 
