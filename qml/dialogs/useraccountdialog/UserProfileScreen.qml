@@ -110,7 +110,7 @@ Item {
 
                     ToolTip.text: "Ask questions, post feedback, request features and connect with other Scrite users."
                     ToolTip.visible: containsMouse
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
 
                     cursorShape: Qt.PointingHandCursor
                     hoverEnabled: true

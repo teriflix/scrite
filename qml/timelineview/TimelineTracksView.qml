@@ -170,7 +170,7 @@ Flickable {
         Item {
             id: _toolTipItem
             property MouseArea source: null
-            ToolTip.delay: 1000
+            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
         }
     }
 }

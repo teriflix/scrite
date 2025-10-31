@@ -21,38 +21,45 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 VclMenu {
-    title: "Forms"
-    width: 325
+    id: root
 
     property Notes notes
-    property alias formTypes: formFilterModel.filterValues
+    property alias formTypes: _model.filterValues
+
     signal formClicked(string formId)
     signal noteAdded(Note note)
 
-    SortFilterObjectListModel {
-        id: formFilterModel
-        sourceModel: Scrite.document.globalForms
-        sortByProperty: "title"
-        filterByProperty: "type"
-        filterValues: notes ? [notes.compatibleFormType] : []
-    }
+    width: 325
 
-    enabled: formFilterModel.objectCount > 0
+    enabled: _model.objectCount > 0
+    title: "Forms"
 
     Repeater {
-        model: formFilterModel
+        model: _model
 
         VclMenuItem {
+            required property var objectItem
+
             text: objectItem.title
+
             onClicked: {
                 if(notes) {
                     var note = notes.addFormNote(objectItem.id)
                     note.objectName = "_newNote"
-                    noteAdded(note)
+                    root.noteAdded(note)
                 } else {
-                    formClicked(objectItem.id)
+                    root.formClicked(objectItem.id)
                 }
             }
         }
+    }
+
+    SortFilterObjectListModel {
+        id: _model
+
+        filterByProperty: "type"
+        filterValues: notes ? [notes.compatibleFormType] : []
+        sortByProperty: "title"
+        sourceModel: Scrite.document.globalForms
     }
 }

@@ -27,6 +27,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
+import "qrc:/qml/notebookview/pages"
 import "qrc:/qml/structureview"
 import "qrc:/qml/notifications"
 
@@ -578,7 +579,7 @@ Rectangle {
 
                                 MouseArea {
                                     ToolTip.text: "Click here to add a new character to this scene."
-                                    ToolTip.delay: 1000
+                                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                                     ToolTip.visible: containsMouse
                                     anchors.fill: parent
                                     hoverEnabled: true
@@ -2723,6 +2724,8 @@ Rectangle {
 
         property var currentItem
         property var preferredItem
+
+        Component.onCompleted: ObjectRegistry.add(_notebookModel, "notebookModel")
 
         function noteCurrentItem() {
             currentItem = _notebookTree.currentData.notebookItemObject

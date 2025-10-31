@@ -73,7 +73,7 @@ Item {
 
                 ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
                 ToolTip.visible: hovered
-                ToolTip.delay: 1000
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
             }
         }
 

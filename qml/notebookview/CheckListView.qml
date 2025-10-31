@@ -19,42 +19,35 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
+import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 
 Item {
     id: root
+
     property Note note
+
+    property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
+    property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
 
     Component.onDestruction: commitPendingItems()
 
     function commitPendingItems() {
-        if(checkListView.footerItem)
-            checkListView.footerItem.commit()
+        if(_checkListView.footerItem)
+            _checkListView.footerItem.commit()
 
-        checkListModel.saveUpdates()
-    }
-
-    Connections {
-        target: root
-        enabled: true
-        function onNoteChanged() {
-            if(root.note) {
-                const list = root.note ? root.note.content : []
-                list.forEach( (item) => { checkListModel.append(item) } )
-            }
-            enabled = false
-        }
+        _checkListModel.saveUpdates()
     }
 
     ListModel {
-        id: checkListModel
+        id: _checkListModel
+
         property bool dirty: false
 
         function modelUpdated() {
             dirty = true
-            Runtime.execLater(checkListModel, 250, saveUpdates)
+            Runtime.execLater(_checkListModel, 250, saveUpdates)
         }
 
         function saveUpdates() {
@@ -63,7 +56,7 @@ Item {
                 for(var i=count-1; i>=0; i--) {
                     const item = get(i)
                     if(item._text === undefined || item._text === "") {
-                        if(checkListView.focus && i === checkListView.currentIndex)
+                        if(_checkListView.focus && i === _checkListView.currentIndex)
                             newContent.push(get(i))
                         else
                             remove(i)
@@ -79,8 +72,10 @@ Item {
 
     ColumnLayout {
         anchors.centerIn: parent
-        width: Math.max(_private_minTextAreaSize, Math.min(parent.width-17, maxTextAreaSize))
+
+        width: Math.max(root.minTextAreaSize, Math.min(parent.width-20, root.maxTextAreaSize))
         height: parent.height
+
         spacing: 20
 
         Item {
@@ -89,113 +84,133 @@ Item {
         }
 
         VclTextField {
-            id: titleField
+            id: _title
+
+            Layout.fillWidth: true
+
+            placeholderText: "Title"
+            tabItem: _description
             text: note ? note.title : ""
-            width: parent.width
             wrapMode: Text.WordWrap
+
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-            placeholderText: "Title"
-            tabItem: descriptionField
+
             onTextChanged: {
                 if(note)
                     note.title = text
             }
-            Layout.fillWidth: true
         }
 
         VclTextField {
-            id: descriptionField
-            text: note ? note.content : ""
-            width: parent.width
-            wrapMode: Text.WordWrap
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            id: _description
+
+            Layout.fillWidth: true
+
+            backTabItem: _title
             placeholderText: "Description"
-            tabItem: checkListView
-            backTabItem: titleField
+            tabItem: _checkListView
+            text: note ? note.content : ""
+            wrapMode: Text.WordWrap
+
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+
             onTextChanged: {
                 if(note)
                     note.content = text
             }
-            Layout.fillWidth: true
         }
 
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
+
             color: Qt.rgba(0,0,0,0)
-            border.width: checkListView.height < checkListView.contentHeight ? 1 : 0
+            border.width: _checkListView.height < _checkListView.contentHeight ? 1 : 0
             border.color: Runtime.colors.primary.borderColor
 
             ListView {
-                id: checkListView
-                anchors.fill: parent
-                anchors.margins: 1
-                model: checkListModel
-                clip: true
-                onCurrentIndexChanged: checkListModel.modelUpdated()
+                id: _checkListView
 
-                onFocusChanged: {
-                    if(activeFocus) {
+                signal assumeFocusRequest(int focusItemIndex, bool tabReason)
+
+                function switchFocusTo(index, tabReason) {
+                    index = Math.min(Math.max(-1, index), _checkListModel.count)
+                    if(index < 0) {
                         currentIndex = 0
-                        switchFocusTo(0, true)
+                        _description.forceActiveFocus()
+                        return
                     }
+
+                    if(index === _checkListModel.count) {
+                        currentIndex = -1
+                        positionViewAtEnd()
+                    } else {
+                        currentIndex = index
+                    }
+                    Qt.callLater(assumeFocusRequest, currentIndex, tabReason)
                 }
 
+                anchors.fill: parent
+                anchors.margins: 1
+
+                model: _checkListModel
+                clip: true
+
                 delegate: CheckListItem {
-                    id: checkListItem
-                    required property string _text
-                    required property bool _checked
+                    id: _delegate
+
                     required property int index
+                    required property bool _checked
+                    required property string _text
+
+                    Connections {
+                        target: _checkListView
+
+                        function onAssumeFocusRequest(focusItemIndex, tabReason) {
+                            if(focusItemIndex === index)
+                                _delegate.assumeFocus(tabReason)
+                        }
+                    }
+
                     text: _text
                     checked: _checked
-                    width: checkListView.width - (checkListView.height < checkListView.contentHeight ? 20 : 1)
+                    width: _checkListView.width - (_checkListView.height < _checkListView.contentHeight ? 20 : 1)
 
                     onCheckedChanged: () => {
                                           _checked = checked
-                                          checkListModel.setProperty(index, "_checked", _checked)
-                                          checkListModel.modelUpdated()
+                                          _checkListModel.setProperty(index, "_checked", _checked)
+                                          _checkListModel.modelUpdated()
                                       }
+
                     onTextEdited: (text) => {
                                       _text = text
-                                      checkListModel.setProperty(index, "_text", _text)
-                                      checkListModel.modelUpdated()
+                                      _checkListModel.setProperty(index, "_text", _text)
+                                      _checkListModel.modelUpdated()
                                   }
+
                     onEditingFinished: () => {
                                            const newItem = {
                                                _checked: false,
                                                _text: ""
                                            }
-                                           checkListModel.insert(index+1, newItem)
-                                           checkListView.switchFocusTo(index+1)
-                                           checkListModel.modelUpdated()
+                                           _checkListModel.insert(index+1, newItem)
+                                           _checkListView.switchFocusTo(index+1)
+                                           _checkListModel.modelUpdated()
                                        }
-                    onScrollToNextItem: (tabReason) => { checkListView.switchFocusTo(index+1, tabReason) }
+
+                    onScrollToNextItem: (tabReason) => {
+                                            _checkListView.switchFocusTo(index+1, tabReason)
+                                        }
+
                     onScrollToPreviousItem: (tabReason) => {
                                                 if(index > 0 || tabReason)
-                                                    checkListView.switchFocusTo(index-1, tabReason)
+                                                    _checkListView.switchFocusTo(index-1, tabReason)
                                             }
-
-                    Connections {
-                        target: checkListView
-                        function onAssumeFocusRequest(focusItemIndex, tabReason) {
-                            if(focusItemIndex === index)
-                                checkListItem.assumeFocus(tabReason)
-                        }
-                    }
                 }
 
                 footer: CheckListItem {
-                    id: footerItem
-                    width: checkListView.width - (checkListView.height < checkListView.contentHeight ? 20 : 1)
-                    onEditingFinished: {
-                        commit()
-                        checkListView.switchFocusTo(checkListView.count)
-                    }
-                    onScrollToPreviousItem: (tabReason) => {
-                                                checkListView.switchFocusTo(checkListModel.count-1, tabReason)
-                                            }
-                    opacity: userIsInteracting ? 1 : (text === "" ? 0.25 : 0.85)
+                    id: _footer
 
                     function commit() {
                         if(text === "")
@@ -205,8 +220,8 @@ Item {
                             _checked: checked,
                             _text: text
                         }
-                        checkListModel.append(newItem)
-                        checkListModel.modelUpdated()
+                        _checkListModel.append(newItem)
+                        _checkListModel.modelUpdated()
                         Qt.callLater(reset)
                     }
 
@@ -216,39 +231,44 @@ Item {
                     }
 
                     Connections {
-                        target: checkListView
+                        target: _checkListView
                         function onAssumeFocusRequest(focusItemIndex, tabReason) {
                             if(focusItemIndex < 0)
-                                footerItem.assumeFocus(tabReason)
+                                _footer.assumeFocus(tabReason)
                         }
                     }
+
+                    width: _checkListView.width - (_checkListView.height < _checkListView.contentHeight ? 20 : 1)
+
+                    opacity: userIsInteracting ? 1 : (text === "" ? 0.25 : 0.85)
+
+                    onEditingFinished: {
+                        commit()
+                        _checkListView.switchFocusTo(_checkListView.count)
+                    }
+
+                    onScrollToPreviousItem: (tabReason) => {
+                                                _checkListView.switchFocusTo(_checkListModel.count-1, tabReason)
+                                            }
                 }
 
-                function switchFocusTo(index, tabReason) {
-                    index = Math.min(Math.max(-1, index), checkListModel.count)
-                    if(index < 0) {
+                onCurrentIndexChanged: {
+                    _checkListModel.modelUpdated()
+                }
+
+                onFocusChanged: {
+                    if(activeFocus) {
                         currentIndex = 0
-                        descriptionField.forceActiveFocus()
-                        return
+                        switchFocusTo(0, true)
                     }
-
-                    if(index === checkListModel.count) {
-                        currentIndex = -1
-                        positionViewAtEnd()
-                    } else {
-                        currentIndex = index
-                    }
-                    Qt.callLater(assumeFocusRequest, currentIndex, tabReason)
                 }
 
-                signal assumeFocusRequest(int focusItemIndex, bool tabReason)
             }
         }
     }
 
     component CheckListItem : Item {
         id: _checkListItem
-        height: rowLayout.height + topPadding + leftPadding
 
         property real topPadding: 2
         property real leftPadding: 2
@@ -257,9 +277,9 @@ Item {
 
         property string text
         property bool checked
-        property alias font: textField.font
-        property alias placeholderText: textField.placeholderText
-        property bool userIsInteracting: textField.activeFocus || checkBox.activeFocus
+        property alias font: _textField.font
+        property alias placeholderText: _textField.placeholderText
+        property bool userIsInteracting: _textField.activeFocus || _checkBox.activeFocus
 
         signal textEdited(string text)
         signal editingFinished()
@@ -267,40 +287,37 @@ Item {
         signal scrollToNextItem(bool tabReason)
 
         function assumeFocus(tabReason) {
-            textField.forceActiveFocus()
+            _textField.forceActiveFocus()
             if(tabReason)
-                textField.selectAll()
+                _textField.selectAll()
         }
 
+        height: _checkListItemLayout.height + topPadding + leftPadding
+
         RowLayout {
-            id: rowLayout
+            id: _checkListItemLayout
+
             anchors.verticalCenter: parent.verticalCenter
+
             width: parent.width - parent.leftPadding - parent.rightPadding
-            height: Math.max(checkBox.height, textField.height)
+            height: Math.max(_checkBox.height, _textField.height)
+
             spacing: 2
 
             CheckBox {
-                id: checkBox
-                Layout.alignment: textField.lineCount > 1 ? Qt.AlignTop : Qt.AlignBaseline
+                id: _checkBox
+
+                Layout.alignment: _textField.lineCount > 1 ? Qt.AlignTop : Qt.AlignBaseline
+
                 checked: _checkListItem.checked
                 onToggled: _checkListItem.checked = checked
             }
 
             TextAreaInput {
-                id: textField
+                id: _textField
+
                 Layout.alignment: lineCount > 1 ? Qt.AlignTop : Qt.AlignVCenter
                 Layout.fillWidth: true
-
-                text: _checkListItem.text
-                onTextChanged: {
-                    _checkListItem.text = text
-                    if(activeFocus)
-                        _checkListItem.textEdited(text)
-                }
-
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                undoRedoEnabled: true
-                spellCheckEnabled: true
 
                 TextDocument.cursorPosition: cursorPosition
 
@@ -337,7 +354,26 @@ Item {
                                            _checkListItem.scrollToPreviousItem(true)
                                            event.accepted = true
                                        }
+
+                spellCheckEnabled: true
+                text: _checkListItem.text
+                undoRedoEnabled: true
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
+                onTextChanged: {
+                    _checkListItem.text = text
+                    if(activeFocus)
+                        _checkListItem.textEdited(text)
+                }
             }
         }
+    }
+
+    onNoteChanged: {
+        if(root.note) {
+            const list = root.note ? root.note.content : []
+            list.forEach( (item) => { _checkListModel.append(item) } )
+        }
+        enabled = false
     }
 }

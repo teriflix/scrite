@@ -69,7 +69,7 @@ Item {
 
                     ToolTip.text: "If texts are not being rendered properly on your display, then switch to native text rendering. Otherwise, keep this setting unchecked."
                     ToolTip.visible: hovered
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 }
 
                 VclCheckBox {
@@ -85,7 +85,7 @@ Item {
                     }
                     ToolTip.text: "If you feel that Scrite is not responding fast enough, then you may want to switch to using a Software Renderer to speed things up. Otherwise, keep this option unchecked for best experience."
                     ToolTip.visible: hovered
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 }
             }
         }

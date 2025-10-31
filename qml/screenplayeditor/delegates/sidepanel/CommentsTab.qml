@@ -29,7 +29,7 @@ AbstractScenePartEditor {
         id: _commentsEdit
 
         ToolTip.text: "Please consider capturing long comments as scene notes in the notebook tab."
-        ToolTip.delay: 1000
+        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
         ToolTip.visible: height < contentHeight
 
         anchors.fill: parent

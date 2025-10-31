@@ -57,7 +57,7 @@ Rectangle {
 
             MouseArea {
                 ToolTip.text: _headingText.text
-                ToolTip.delay: 1000
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 ToolTip.visible: _headingText.truncated && containsMouse
 
                 anchors.fill: parent

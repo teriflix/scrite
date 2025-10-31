@@ -108,7 +108,7 @@ ColumnLayout {
                     onClicked: characterNameListView.visible = true
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Add another character."
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 }
             }
 
@@ -129,7 +129,7 @@ ColumnLayout {
                     }
                     ToolTip.visible: containsMouse
                     ToolTip.text: "Remove all characters and start fresh."
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 }
             }
         }

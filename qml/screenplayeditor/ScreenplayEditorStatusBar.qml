@@ -64,7 +64,7 @@ Rectangle {
         anchors.fill: _metricsDisplay
 
         ToolTip.text: "Page count and time estimates are approximate, assuming " + Runtime.screenplayTextDocument.timePerPageAsString + " per page."
-        ToolTip.delay: 1000
+        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
         ToolTip.visible: _metricsDisplayOverlayMouseArea.containsMouse
 
         MouseArea {
@@ -201,7 +201,7 @@ Rectangle {
 
             MouseArea {
                 ToolTip.text: "Displays 'current scene word count' / 'whole screenplay word count'."
-                ToolTip.delay: 1000
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 ToolTip.visible: containsMouse
 
                 anchors.fill: parent
@@ -437,7 +437,7 @@ Rectangle {
             id: _iconButtonMouseArea
 
             ToolTip.text: parent.tooltipText
-            ToolTip.delay: 1000
+            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
             ToolTip.visible: containsMouse && !pressed
 
             anchors.fill: parent

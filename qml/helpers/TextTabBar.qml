@@ -27,7 +27,8 @@ Item {
     property string name: "Tabs"
     property alias spacing: _tabsRow.spacing
 
-    height: _tabsRow.height + Runtime.idealFontMetrics.descent + _currentTabUnderline.height
+    height: implicitHeight
+    implicitHeight: _tabsRow.height + Runtime.idealFontMetrics.descent + _currentTabUnderline.height
 
     Row {
         id: _tabsRow

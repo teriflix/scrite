@@ -197,7 +197,7 @@ Rectangle {
 
                         sourceComponent: MouseArea {
                             ToolTip.text: _label.text
-                            ToolTip.delay: 1000
+                            ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                             ToolTip.visible: containsMouse
 
                             hoverEnabled: true

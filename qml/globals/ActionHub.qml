@@ -872,9 +872,22 @@ Item {
         objectName: "screenplayOperations"
 
         Action {
+            readonly property string defaultShortcut: "Ctrl+Shift+T"
+
+            enabled: !Scrite.document.readOnly
+            shortcut: defaultShortcut
+            text: "Title Page"
+            objectName: "titlePage"
+
+            icon.source: "qrc:/icons/action/edit_title_page.png"
+
+            onTriggered: TitlePageDialog.launch()
+        }
+
+        Action {
             readonly property string defaultShortcut: "Ctrl+Shift+N"
 
-            enabled: !Scrite.document.enabled
+            enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
             text: "New Scene"
             objectName: "newScene"
@@ -887,7 +900,7 @@ Item {
         Action {
             readonly property string defaultShortcut: "Ctrl+Shift+B"
 
-            enabled: !Scrite.document.enabled
+            enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
             text: "Act Break"
             objectName: "actBreak"
@@ -900,7 +913,7 @@ Item {
         Action {
             readonly property string defaultShortcut: "Ctrl+Shift+P"
 
-            enabled: !Scrite.document.enabled
+            enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
             text: "Episode Break"
             objectName: "episodeBreak"
@@ -914,7 +927,7 @@ Item {
             readonly property string defaultShortcut: "Ctrl+Shift+L"
             readonly property bool visible: false
 
-            enabled: !Scrite.document.enabled
+            enabled: !Scrite.document.readOnly
             shortcut: defaultShortcut
             text: "Interval Break"
             objectName: "intervalBreak"

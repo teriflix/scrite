@@ -23,73 +23,86 @@ import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
 Item {
-    id: textNoteView
+    id: root
+
     property Note note
+
+    property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
+    property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
+
     clip: true
 
     EventFilter.events: [EventFilter.Wheel]
-    EventFilter.onFilter: {
-        EventFilter.forwardEventTo(contentFieldLoader.item)
-        result.filter = true
-        result.accepted = true
-    }
+    EventFilter.onFilter: (object, event, result) => {
+                              EventFilter.forwardEventTo(_fieldLoader.item)
+                              result.filter = true
+                              result.accepted = true
+                          }
 
     Column {
-        id: noteArea
+        id: _layout
+
+        anchors.bottom: _attachmentsArea.top
+        anchors.bottomMargin: 0
         anchors.left: parent.left
+        anchors.margins: 10
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.bottom: attachmentsArea.top
-        anchors.margins: 10
-        anchors.bottomMargin: 0
+
         spacing: 10
 
         VclTextField {
-            id: titleField
-            text: note ? note.title : ""
-            width: parent.width >= _private_maxTextAreaSize+20 ? _private_maxTextAreaSize : parent.width-20
+            id: _title
+
+            TabSequenceItem.manager: _tabManager
+            TabSequenceItem.sequence: 0
+
             anchors.horizontalCenter: parent.horizontalCenter
+
+            placeholderText: "Heading"
+            text: note ? note.title : ""
+            width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
             wrapMode: Text.WordWrap
+
             font.bold: true
             font.pointSize: Runtime.idealFontMetrics.font.pointSize + 2
-            placeholderText: "Heading"
-            TabSequenceItem.manager: noteTabManager
-            TabSequenceItem.sequence: 0
+
             onTextChanged: {
                 if(note)
                     note.title = text
             }
+
             onActiveFocusChanged: {
                 if(activeFocus) {
-                    if(contentFieldLoader.item && contentFieldLoader.lod === contentFieldLoader.LodLoader.LOD.Low)
-                        contentFieldLoader.item.contentY = 0
+                    if(_fieldLoader.item && _fieldLoader.lod === _fieldLoader.LodLoader.LOD.Low)
+                        _fieldLoader.item.contentY = 0
                 }
             }
         }
 
         LodLoader {
-            id: contentFieldLoader
-
-            width: parent.width >= _private_maxTextAreaSize+20 ? _private_maxTextAreaSize : parent.width-20
-            height: parent.height - titleField.height - parent.spacing
+            id: _fieldLoader
 
             anchors.horizontalCenter: parent.horizontalCenter
 
+            width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
+            height: parent.height - _title.height - parent.spacing
+
             lod: Runtime.notebookSettings.richTextNotesEnabled ? LodLoader.LOD.High : LodLoader.LOD.Low
-            sanctioned: note
-            resetWidthBeforeLodChange: false
             resetHeightBeforeLodChange: false
+            resetWidthBeforeLodChange: false
+            sanctioned: note
 
             lowDetailComponent: FlickableTextArea {
                 DeltaDocument {
-                    id: noteContent
+                    id: _noteContent
                     content: note.content
                 }
 
-                text: noteContent.plainText
+                text: _noteContent.plainText
                 placeholderText: "Content"
                 tabSequenceIndex: 1
-                tabSequenceManager: noteTabManager
+                tabSequenceManager: _tabManager
 
                 background: Rectangle {
                     color: Runtime.colors.primary.windowColor
@@ -107,7 +120,7 @@ Item {
                 text: note.content
                 placeholderText: "Content"
                 tabSequenceIndex: 1
-                tabSequenceManager: noteTabManager
+                tabSequenceManager: _tabManager
                 adjustTextWidthBasedOnScrollBar: false
 
                 background: Rectangle {
@@ -125,32 +138,37 @@ Item {
     }
 
     TabSequenceManager {
-        id: noteTabManager
+        id: _tabManager
+
         wrapAround: true
     }
 
     AttachmentsView {
-        id: attachmentsArea
-        attachments: note ? note.attachments : null
-        orientation: ListView.Horizontal
+        id: _attachmentsArea
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+
+        attachments: note ? note.attachments : null
+        orientation: ListView.Horizontal
     }
 
     AttachmentsDropArea {
-        id: attachmentsDropArea
+        id: _attachmentsDropArea
+
         anchors.fill: parent
+
         allowMultiple: true
         target: note ? note.attachments : null
     }
 
     onNoteChanged: {
         if(note.objectName === "_newNote")
-            titleField.forceActiveFocus()
+            _title.forceActiveFocus()
         else if(note.objectName === "_focusNote") {
-            if(contentFieldLoader.item)
-                contentFieldLoader.item.assumeFocus()
+            if(_fieldLoader.item)
+                _fieldLoader.item.assumeFocus()
         }
         note.objectName = ""
     }

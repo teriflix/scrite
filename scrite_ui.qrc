@@ -116,7 +116,6 @@
         <file>qml/helpers/BoxShadow.qml</file>
         <file>qml/helpers/BusyIcon.qml</file>
         <file>qml/helpers/BusyMessage.qml</file>
-        <file>qml/helpers/CheckListView.qml</file>
         <file>qml/helpers/ColorMenu.qml</file>
         <file>qml/helpers/ColorPalette.qml</file>
         <file>qml/helpers/ColorToolButton.qml</file>
@@ -166,22 +165,28 @@
         <file>qml/mainwindow/VerticalToolBar.qml</file>
         <file>qml/mainwindow/Workspace.qml</file>
         <file>qml/mainwindow/qmldir</file>
-        <file>qml/notebookview/AbstractNotebookPage.qml</file>
         <file>qml/notebookview/AddCharactersDialog.qml</file>
         <file>qml/notebookview/AddRelationshipDialog.qml</file>
-        <file>qml/notebookview/BookmarksNotebookPage.qml</file>
         <file>qml/notebookview/CharacterRelationshipsGraphView.qml</file>
+        <file>qml/notebookview/CheckListView.qml</file>
         <file>qml/notebookview/FormField.qml</file>
         <file>qml/notebookview/FormMenu.qml</file>
         <file>qml/notebookview/FormView.qml</file>
-        <file>qml/notebookview/GenericNotebookPage.qml</file>
+        <file>qml/notebookview/NewNoteMenu.qml</file>
+        <file>qml/notebookview/NoteMenu.qml</file>
         <file>qml/notebookview/NotesTreeView.qml</file>
         <file>qml/notebookview/NotesTreeViewDelegate.qml</file>
         <file>qml/notebookview/RelationshipNameEditorDialog.qml</file>
-        <file>qml/notebookview/SceneNotesPage.qml</file>
-        <file>qml/notebookview/SceneSynopsisTab.qml</file>
         <file>qml/notebookview/TextNoteView.qml</file>
+        <file>qml/notebookview/pages/AbstractNotebookPage.qml</file>
+        <file>qml/notebookview/pages/BookmarksNotebookPage.qml</file>
+        <file>qml/notebookview/pages/GenericNotebookPage.qml</file>
+        <file>qml/notebookview/pages/SceneNotesPage.qml</file>
         <file>qml/notebookview/qmldir</file>
+        <file>qml/notebookview/tabs/NotesTab.qml</file>
+        <file>qml/notebookview/tabs/SceneCharacterRelationshipsTab.qml</file>
+        <file>qml/notebookview/tabs/SceneCommentsTab.qml</file>
+        <file>qml/notebookview/tabs/SceneSynopsisTab.qml</file>
         <file>qml/notifications/AutoUpdateNotifications.qml</file>
         <file>qml/notifications/HelpTipNotification.qml</file>
         <file>qml/notifications/NotificationsLayer.qml</file>
@@ -289,10 +294,17 @@
         <file>qml/timelineview/TimelineViewFooter.qml</file>
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
         <file>qml/timelineview/qmldir</file>
-        <file>qml/notebookview/SceneCharacterRelationshipsTab.qml</file>
-        <file>qml/notebookview/NotesTab.qml</file>
-        <file>qml/notebookview/NoteMenu.qml</file>
-        <file>qml/notebookview/NewNoteMenu.qml</file>
-        <file>qml/notebookview/SceneCommentsTab.qml</file>
+        <file>qml/notebookview/pages/TextNotePage.qml</file>
+        <file>qml/notebookview/pages/FormNotePage.qml</file>
+        <file>qml/notebookview/pages/CheckListNotePage.qml</file>
+        <file>qml/notebookview/pages/BreakNotePage.qml</file>
+        <file>qml/notebookview/pages/ScreenplayPage.qml</file>
+        <file>qml/notebookview/tabs/ScreenplayTitlePageTab.qml</file>
+        <file>qml/notebookview/tabs/ScreenplayLoglineTab.qml</file>
+        <file>qml/notebookview/tabs/ScreenplayStatsTab.qml</file>
+        <file>qml/notebookview/pages/UnusedScenesPage.qml</file>
+        <file>qml/notebookview/pages/CharactersPage.qml</file>
+        <file>qml/notebookview/tabs/AllCharactersTab.qml</file>
+        <file>qml/notebookview/tabs/AllCharactersRelationshipsTab.qml</file>
     </qresource>
 </RCC>

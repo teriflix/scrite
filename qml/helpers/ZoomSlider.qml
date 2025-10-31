@@ -116,7 +116,7 @@ Item {
                 id: _iconButtonMouseArea
 
                 ToolTip.text: parent.tooltipText
-                ToolTip.delay: 1000
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 ToolTip.visible: containsMouse && !pressed
 
                 anchors.fill: parent

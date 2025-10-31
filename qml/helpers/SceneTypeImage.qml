@@ -30,7 +30,7 @@ Image {
         }
         return ""
     }
-    ToolTip.delay: 1000
+    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
     ToolTip.visible: _mouseArea.containsMouse
 
     width: 32
