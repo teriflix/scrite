@@ -13,47 +13,30 @@
 
 import QtQml 2.15
 import QtQuick 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Controls 2.15
+import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
-import "qrc:/qml/dialogs"
 import "qrc:/qml/notebookview"
-import "qrc:/qml/notebookview/helpers"
+import "qrc:/qml/notebookview/tabs"
 
 AbstractNotebookPage {
     id: root
 
-    Rectangle {
+    signal deleteNoteRequest(Note note)
+    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
+
+    NotesTab {
         anchors.fill: parent
 
-        color: Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
-    }
+        notes: root.pageData ? root.pageData.notebookItemObject : null
 
-    FormView {
-        anchors.fill: parent
-
-        note: _private.note
-    }
-
-    ActionHandler {
-        action: ActionHub.notebookOperations.find("report")
-
-        enabled: true
-        tooltip: "Export this form as a PDF or ODT."
-
-        onTriggered: (source) => {
-                         let generator = Scrite.document.createReportGenerator("Notebook Report")
-                         generator.section = _private.note
-                         ReportConfigurationDialog.launch(rgen)
-                     }
-    }
-
-    QtObject {
-        id: _private
-
-        property Note note: root.pageData ? root.pageData.notebookItemObject : null
+        onSwitchRequest: (item) => { root.switchRequest(item) }
+        onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
     }
 }

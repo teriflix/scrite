@@ -23,6 +23,7 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
+import "qrc:/qml/notebookview/helpers"
 
 Item {
     id: root
@@ -69,7 +70,7 @@ Item {
             structure: null
             showBusyIndicator: true
 
-            onCharacterDoubleClicked: {
+            onCharacterDoubleClicked: (characterName, nodeItem) => {
                 var ch = Scrite.document.structure.findCharacter(characterName)
                 if(ch)
                     root.switchRequest(ch.notes)

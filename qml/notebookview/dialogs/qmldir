@@ -1,9 +1,3 @@
 singleton AddCharactersDialog 1.0 AddCharactersDialog.qml
 singleton AddRelationshipDialog 1.0 AddRelationshipDialog.qml
 singleton RelationshipNameEditorDialog 1.0 RelationshipNameEditorDialog.qml
-
-CharacterRelationshipsGraphView 1.0 CharacterRelationshipsGraphView.qml
-FormField 1.0 FormField.qml
-FormMenu 1.0 FormMenu.qml
-FormView 1.0 FormView.qml
-TextNoteView 1.0 TextNoteView.qml

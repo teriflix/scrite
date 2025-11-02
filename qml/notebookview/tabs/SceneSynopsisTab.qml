@@ -290,7 +290,7 @@ Item {
 
         property string presentableGroupNames: Scrite.document.structure.presentableGroupNames(root.scene.groups)
 
-        property Component formalTagsMenu: StructureGroupsMenu {
+        readonly property Component formalTagsMenu: StructureGroupsMenu {
             sceneGroup: SceneGroup {
                 scenes: [root.scene]
                 structure: Scrite.document.structure

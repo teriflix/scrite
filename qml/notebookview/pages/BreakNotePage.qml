@@ -27,9 +27,6 @@ import "qrc:/qml/notebookview"
 AbstractNotebookPage {
     id: root
 
-    required property real maxTextAreaSize
-    required property real minTextAreaSize
-
     EventFilter.events: [EventFilter.Wheel]
     EventFilter.onFilter: (object, event, result) => {
                               EventFilter.forwardEventTo(_summaryField)

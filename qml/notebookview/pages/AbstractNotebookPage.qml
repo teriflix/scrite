@@ -20,5 +20,8 @@ FocusScope {
     required property var pageData
     required property NotebookModel notebookModel
 
+    property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
+    property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
+
     clip: true
 }

@@ -29,6 +29,7 @@ import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
 import "qrc:/qml/structureview"
 import "qrc:/qml/notifications"
+import "qrc:/qml/notebookview/menus"
 
 OldControls.TreeView {
     id: root
@@ -55,6 +56,8 @@ OldControls.TreeView {
     property Character currentCharacter: currentNotes && currentNotes.ownerType === Notes.CharacterOwner ? currentNotes.character : null
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
+    signal deleteCharacterRequest(Character character)
+    signal deleteNoteRequest(Note note)
 
     function activateFromCurrentScreenplayElement() {
         const spobj = Scrite.document.screenplay
@@ -148,14 +151,11 @@ OldControls.TreeView {
         itemData: styleData
 
         onNoteMenuRequest: (note) => {
-                               noteContextMenu.note = note
-                               noteContextMenu.popup()
+                               _private.popupNoteMenu(note, _delegate)
                            }
 
         onCharacterMenuRequest: (character) => {
-                                    characterContextMenu.character = character
-                                    characterContextMenu.characterItem = _delegate
-                                    characterContextMenu.popup()
+                                    _private.popupCharacterMenu(character, _delegate)
                                 }
     }
 
@@ -178,6 +178,30 @@ OldControls.TreeView {
             collapse(index)
         else
             expand(index)
+    }
+
+    QtObject {
+        id: _private
+
+        readonly property Component noteMenu: NoteMenu {
+            onDeleteNoteRequest: () => { root.deleteNoteRequest(note) }
+        }
+
+        function popupNoteMenu(note, source) {
+            let menu = noteMenu.createObject(source, {"note": note})
+            menu.aboutToHide.connect(menu.destroy)
+            menu.popup()
+        }
+
+        readonly property Component characterMenu: CharacterMenu {
+            onDeleteCharacterRequest: () => { root.deleteCharacterRequest(character) }
+        }
+
+        function popupCharacterMenu(character, source) {
+            let menu = characterMenu.createObject(source, {"character": character})
+            menu.aboutToHide.connect(menu.destroy)
+            menu.popup()
+        }
     }
 }
 

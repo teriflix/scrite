@@ -22,6 +22,7 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
+import "qrc:/qml/notebookview/helpers"
 
 Item {
     id: root

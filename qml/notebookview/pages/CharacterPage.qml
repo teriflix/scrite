@@ -50,8 +50,8 @@ AbstractNotebookPage {
 
             Layout.fillWidth: true
 
-            name: "Screenplay"
-            tabs: ["Title Page", "Logline", "Notes", "Stats"]
+            name: "Characters"
+            tabs: ["Information", "Relationships", "Notes"]
             currentTab: 0
         }
 
@@ -68,7 +68,8 @@ AbstractNotebookPage {
 
                 active: visible
 
-                sourceComponent: ScreenplayTitlePageTab {
+                sourceComponent: CharacterInformationTab {
+                    character: _private.character
                     maxTextAreaSize: root.maxTextAreaSize
                     minTextAreaSize: root.minTextAreaSize
                 }
@@ -80,9 +81,8 @@ AbstractNotebookPage {
 
                 active: visible
 
-                sourceComponent: ScreenplayLoglineTab {
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
+                sourceComponent: CharacterRelationshipsTab {
+                    character: _private.character
                 }
             }
 
@@ -93,20 +93,11 @@ AbstractNotebookPage {
                 active: visible
 
                 sourceComponent: NotesTab {
-                    notes: _private.structure.notes
+                    notes: _private.notes
 
                     onSwitchRequest: (item) => { root.switchRequest(item) }
                     onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
                 }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: ScreenplayStatsTab { }
             }
         }
     }
@@ -114,7 +105,7 @@ AbstractNotebookPage {
     QtObject {
         id: _private
 
-        property Structure structure: Scrite.document.structure
-        property Screenplay screenplay: Scrite.document.screenplay
+        property Notes notes: character ? character.notes : null
+        property Character character: root.pageData ? root.pageData.notebookItemObject.character : null
     }
 }

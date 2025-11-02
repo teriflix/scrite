@@ -28,9 +28,6 @@ import "qrc:/qml/notebookview/tabs"
 AbstractNotebookPage {
     id: root
 
-    required property real maxTextAreaSize
-    required property real minTextAreaSize
-
     property alias currentTab: _tabBar.currentTab
 
     signal deleteNoteRequest(Note note)

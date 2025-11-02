@@ -23,13 +23,12 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
-import "qrc:/qml/structureview"
 import "qrc:/qml/notebookview/helpers"
 
 Item {
     id: root
 
-    property Scene scene
+    required property Character character
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
 
@@ -53,6 +52,8 @@ Item {
             active = Runtime.appFeatures.characterRelationshipGraph.enabled
         }
 
+        Component.onCompleted: Runtime.execLater(_graphLoader, Runtime.stdAnimationDuration/2, activate)
+
         anchors.fill: parent
 
         active: Runtime.appFeatures.characterRelationshipGraph.enabled
@@ -63,18 +64,36 @@ Item {
             property bool pdfExportPossible: !graphIsEmpty && visible
 
             Component.onCompleted: {
-                scene = root.scene
+                character = root.character
+                structure = Scrite.document.structure
                 showBusyIndicator = false
             }
 
             scene: null
+            character: null
+            structure: null
             showBusyIndicator: true
+            editRelationshipsEnabled: !Scrite.document.readOnly
 
             onCharacterDoubleClicked: (characterName, nodeItem) => {
-                var ch = Scrite.document.structure.findCharacter(characterName)
-                if(ch)
-                    root.switchRequest(ch.notes)
-            }
+                                          let ch = Scrite.document.structure.findCharacter(characterName)
+                                          if(ch) {
+                                              if(ch === root.character) {
+                                                  AddRelationshipDialog.launch(root.character)
+                                              } else {
+                                                  root.switchRequest(ch.notes)
+                                              }
+                                          }
+                                      }
+
+            onAddNewRelationshipRequest: (nodeItem) => {
+                                             AddRelationshipDialog.launch(root.character)
+                                         }
+
+            removeRelationshipWithRequest: (otherCharacter, nodeItem) => {
+                                               let relationship = root.character.findRelationship(otherCharacter)
+                                               root.character.removeRelationship(relationship)
+                                           }
 
             ActionHandler {
                 action: ActionHub.notebookOperations.find("reload")
@@ -90,6 +109,4 @@ Item {
             }
         }
     }
-
-    onSceneChanged: _graphLoader.reload()
 }

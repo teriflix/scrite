@@ -23,11 +23,13 @@ import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
+import "qrc:/qml/notebookview/menus"
 
 Item {
     id: root
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
+    signal deleteCharacterRequest(Character character)
 
     GridView {
         id: _charactersView
@@ -59,6 +61,8 @@ Item {
         }
 
         delegate: Item {
+            id: _delegate
+
             required property var objectItem
             property Character character: objectItem
 
@@ -73,9 +77,9 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 5
 
-                color: Qt.tint(character.color, _charactersView.currentIndex === index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
+                color: Qt.tint(_delegate.character.color, _charactersView.currentIndex === index ? Runtime.colors.currentNoteTint : Runtime.colors.sceneHeadingTint)
                 border.width: 1
-                border.color: Color.isLight(character.color) ? (_charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : character.color
+                border.color: Color.isLight(_delegate.character.color) ? (_charactersView.currentIndex === index ? "darkgray" : Runtime.colors.primary.borderColor) : _delegate.character.color
 
                 Row {
                     anchors.fill: parent
@@ -92,8 +96,8 @@ Item {
                         smooth: true
 
                         source: {
-                            if(character.hasKeyPhoto > 0)
-                                return "file:///" + character.keyPhoto
+                            if(_delegate.character.hasKeyPhoto > 0)
+                                return "file:///" + _delegate.character.keyPhoto
                             return "qrc:/icons/content/character_icon.png"
                         }
                     }
@@ -109,7 +113,7 @@ Item {
                             width: parent.width
 
                             elide: Text.ElideRight
-                            text: character.name
+                            text: _delegate.character.name
 
                             font.bold: true
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -120,7 +124,7 @@ Item {
 
                             elide: Text.ElideRight
                             opacity: 0.75
-                            text: "Role: " + polishStr(character.designation, "-")
+                            text: "Role: " + polishStr(_delegate.character.designation, "-")
 
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                         }
@@ -130,7 +134,7 @@ Item {
 
                             elide: Text.ElideRight
                             opacity: 0.75
-                            text: ["Age: " + polishStr(character.age, "-"), "Gender: " + polishStr(character.gender, "-")].join(", ")
+                            text: ["Age: " + polishStr(_delegate.character.age, "-"), "Gender: " + polishStr(_delegate.character.gender, "-")].join(", ")
 
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                         }
@@ -146,13 +150,12 @@ Item {
                 onClicked: (mouse) => {
                                _charactersView.currentIndex = index
                                if(mouse.button === Qt.RightButton) {
-                                   characterContextMenu.character = character
-                                   characterContextMenu.popup()
+                                   _private.popupCharacterMenu(_delegate.character, _delegate)
                                }
                            }
 
                 onDoubleClicked: (mouse) => {
-                                     root.switchRequest(character.notes)
+                                     root.switchRequest(_delegate.character.notes)
                                  }
             }
         }
@@ -257,5 +260,19 @@ Item {
 
         sortByProperty: "name"
         sourceModel: Scrite.document.structure.charactersModel
+    }
+
+    QtObject {
+        id: _private
+
+        readonly property Component characterMenu: CharacterMenu {
+            onDeleteCharacterRequest: () => { root.deleteCharacterRequest(character) }
+        }
+
+        function popupCharacterMenu(character, source) {
+            let menu = characterMenu.createObject(source, {"character": character})
+            menu.aboutToHide.connect(menu.destroy)
+            menu.popup()
+        }
     }
 }

@@ -21,6 +21,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/notebookview"
+import "qrc:/qml/notebookview/helpers"
 
 AbstractNotebookPage {
     id: root

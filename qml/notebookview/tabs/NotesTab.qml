@@ -24,6 +24,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/notebookview"
+import "qrc:/qml/notebookview/menus"
 
 Item {
     id: root
@@ -236,7 +237,7 @@ Item {
                         root.width
         }
 
-        property Component noteMenu: NoteMenu {
+        readonly property Component noteMenu: NoteMenu {
             onDeleteNoteRequest: () => { root.deleteNoteRequest(note) }
         }
 
@@ -246,7 +247,7 @@ Item {
             menu.popup()
         }
 
-        property Component newNoteMenu: NewNoteMenu {
+        readonly property Component newNoteMenu: NewNoteMenu {
             notes: root.notes
 
             onSwitchRequest: (item) => { root.switchRequest(item) }
