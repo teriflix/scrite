@@ -39,8 +39,8 @@ VclMenu {
                                    note.color = color
                                    note.objectName = "_newNote"
                                    root.switchRequest(note)
-                                   root.close()
                                }
+                               root.close()
                            }
     }
 
@@ -50,7 +50,6 @@ VclMenu {
 
         onNoteAdded: (note) => {
                          root.switchRequest(note)
-                         root.close()
                      }
     }
 

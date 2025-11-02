@@ -665,11 +665,14 @@ Item {
                     delegate: LinkButton {
                         required property int index
                         required property var record
+
                         width: templatesView.width
-                        text: record.name
-                        tooltip: record.description
+
                         iconSource: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
                         showPoster: index > 0
+                        text: record.name
+                        tooltip: record.description
+
                         onClicked: {
                             SaveFileTask.save( () => {
                                                     var task = OpenFromLibraryTask.openTemplateAt(libraryService, index)
@@ -767,10 +770,12 @@ Item {
             required property var record
 
             width: ListView.view.width
-            text: record.name
-            tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline
+
             iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
             showPoster: true
+            text: record.name
+            tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline
+
             onClicked: {
                 SaveFileTask.save( () => {
                                         var task = OpenFromLibraryTask.openScreenplayAt(libraryService, index)
@@ -849,18 +854,22 @@ Item {
 
         // Show restore and import options
         LinkButton {
+            Layout.fillWidth: true
+
             text: "Recover ..."
             tooltip: "Open cached files from your private on-disk vault."
             iconSource: "qrc:/icons/file/backup_open.png"
-            Layout.fillWidth: true
+
             onClicked: parent.stackView.push(vaultPage)
         }
 
         LinkButton {
+            Layout.fillWidth: true
+
             text: "Import ..."
             tooltip: "Import a screenplay from Final Draft, Fountain or HTML formats."
             iconSource: "qrc:/icons/file/import_export.png"
-            Layout.fillWidth: true
+
             onClicked: parent.stackView.push(importPage)
         }
     }
@@ -909,10 +918,13 @@ Item {
                     delegate: LinkButton {
                         required property int index
                         required property var record
+
                         width: screenplaysView.width
+
                         text: record.name
                         singleClick: false
                         iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
+
                         onClicked: screenplaysView.currentIndex = index
                         onDoubleClicked: {
                             screenplaysView.currentIndex = index
@@ -1080,6 +1092,7 @@ Item {
                 required property var fileInfo
                 required property string timestampAsString
                 required property string relativeTime
+
                 width: vaultFilesView.width-1
                 height: 60
 
@@ -1088,6 +1101,7 @@ Item {
                 iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
                 text: "<b>" + fileInfo.title + "</b> (" + fileInfo.sceneCount + (fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")<br/>" +
                       "<font size=\"-1\">" + fileSizeInfo + ", " + relativeTime + " on " + timestampAsString + "</font>"
+
                 property string fileSizeInfo: {
                     const fileSize = fileInfo.fileSize
                     if(fileSize < 1024)
@@ -1107,11 +1121,13 @@ Item {
 
         VclLabel {
             anchors.centerIn: parent
+
             width: parent.width * 0.8
-            visible: Scrite.vault.documentCount === 0
+
             horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
             text: "No documents found in vault."
+            visible: Scrite.vault.documentCount === 0
+            wrapMode: Text.WordWrap
         }
     }
 

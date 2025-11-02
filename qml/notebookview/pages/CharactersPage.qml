@@ -30,13 +30,8 @@ AbstractNotebookPage {
 
     property alias currentTab: _tabBar.currentTab
 
-    Rectangle {
-        id: _background
-
-        anchors.fill: parent
-
-        color: Runtime.colors.primary.c100.background
-    }
+    signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
+    signal deleteCharacterRequest(Character character)
 
     ColumnLayout {
         anchors.fill: parent
@@ -65,7 +60,10 @@ AbstractNotebookPage {
 
                 active: visible
 
-                sourceComponent: AllCharactersTab { }
+                sourceComponent: AllCharactersTab {
+                    onSwitchRequest: (item) => { root.switchRequest(item) }
+                    onDeleteCharacterRequest: (character) => { root.deleteCharacterRequest(character) }
+                }
             }
 
             Loader {
@@ -74,7 +72,9 @@ AbstractNotebookPage {
 
                 active: visible
 
-                sourceComponent: AllCharactersRelationshipsTab { }
+                sourceComponent: AllCharactersRelationshipsTab {
+                    onSwitchRequest: (item) => { root.switchRequest(item) }
+                }
             }
         }
     }

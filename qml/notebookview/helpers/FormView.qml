@@ -151,14 +151,14 @@ Item {
                     width: parent.width
 
                     placeholderText: "Description"
-                    text: note ? note.content : ""
+                    text: note ? note.summary : ""
                     wrapMode: Text.WordWrap
 
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
                     onTextChanged: {
                         if(note)
-                            note.content = text
+                            note.summary = text
                     }
 
                     onActiveFocusChanged: {

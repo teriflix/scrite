@@ -24,6 +24,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
 import "qrc:/qml/notebookview/helpers"
+import "qrc:/qml/notebookview/dialogs"
 
 Item {
     id: root
@@ -90,7 +91,7 @@ Item {
                                              AddRelationshipDialog.launch(root.character)
                                          }
 
-            removeRelationshipWithRequest: (otherCharacter, nodeItem) => {
+            onRemoveRelationshipWithRequest: (otherCharacter, nodeItem) => {
                                                let relationship = root.character.findRelationship(otherCharacter)
                                                root.character.removeRelationship(relationship)
                                            }

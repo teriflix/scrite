@@ -35,82 +35,78 @@ AbstractNotebookPage {
                           }
 
     ColumnLayout {
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.bottom: _attachmentsView.top
+        anchors.margins: 11
+        anchors.horizontalCenter: parent.horizontalCenter
 
-        RowLayout {
+        width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-30
+
+        VclLabel {
             Layout.fillWidth: true
 
-            VclLabel {
-                id: _headingLabel
+            text: _private.breakElement.breakTitle
 
-                text: _private.breakElement.breakTitle
-
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
-            }
-
-            VclTextField {
-                id: _headingField
-
-                Layout.fillWidth: true
-
-                label: ""
-                placeholderText: _private.breakKind + " Name"
-                tabItem: _summaryField
-                text: _private.breakElement.breakSubtitle
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
-
-                onTextChanged: _private.breakElement.breakSubtitle = text
-            }
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 3
         }
 
-        Item {
+        VclTextField {
+            id: _headingField
+
+            Layout.fillWidth: true
+
+            label: ""
+            placeholderText: _private.breakKind + " Name"
+            tabItem: _summaryField
+            text: _private.breakElement.breakSubtitle
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
+
+            onTextChanged: _private.breakElement.breakSubtitle = text
+        }
+
+        FlickableTextArea {
+            id: _summaryField
+
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            FlickableTextArea {
-                id: _summaryField
+            ScrollBar.vertical: _vscrollBar
 
-                ScrollBar.vertical: _vscrollBar
+            adjustTextWidthBasedOnScrollBar: false
+            backTabItem: _headingField
+            placeholderText: _private.breakKind + " Summary ..."
+            text: _private.breakElement.breakSummary
 
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                height: parent.height
-
-                adjustTextWidthBasedOnScrollBar: false
-                backTabItem: _headingField
-                placeholderText: _private.breakKind + " Summary ..."
-                text: _private.breakElement.breakSummary
-                width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width
-
-                background: Rectangle {
-                    color: Runtime.colors.primary.windowColor
-                    opacity: 0.15
-                }
-
-                onTextChanged: breakElement.breakSummary = text
+            background: Rectangle {
+                color: Runtime.colors.primary.windowColor
+                opacity: 0.15
             }
 
-            VclScrollBar {
-                id: _vscrollBar
-
-                anchors.top: parent.top
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-
-                flickable: _summaryField
-                orientation: Qt.Vertical
-            }
+            onTextChanged: _private.breakElement.breakSummary = text
         }
+    }
 
-        AttachmentsView {
-            id: _attachmentsView
+    VclScrollBar {
+        id: _vscrollBar
 
-            Layout.fillWidth: true
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.bottom: _attachmentsView.top
 
-            attachments: _private.breakElement ? _private.breakElement.attachments : null
-        }
+        flickable: _summaryField.lod
+        orientation: Qt.Vertical
+    }
+
+    AttachmentsView {
+        id: _attachmentsView
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        attachments: _private.breakElement ? _private.breakElement.attachments : null
     }
 
     AttachmentsDropArea {

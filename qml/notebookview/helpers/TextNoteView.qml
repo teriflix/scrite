@@ -117,21 +117,18 @@ Item {
             }
 
             highDetailComponent: RichTextEdit {
-                text: note.content
+                function assumeFocus() {
+                    textArea.forceActiveFocus()
+                }
+
+                adjustTextWidthBasedOnScrollBar: false
                 placeholderText: "Content"
                 tabSequenceIndex: 1
                 tabSequenceManager: _tabManager
-                adjustTextWidthBasedOnScrollBar: false
+                text: note.content
 
-                background: Rectangle {
-                    color: Runtime.colors.primary.windowColor
-                    opacity: 0.15
-                }
-
-                onTextChanged: note.content = text
-
-                function assumeFocus() {
-                    textArea.forceActiveFocus()
+                onTextChanged: {
+                    note.content = text
                 }
             }
         }

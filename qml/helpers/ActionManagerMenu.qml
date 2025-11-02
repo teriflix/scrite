@@ -64,8 +64,10 @@ Menu {
 
             action: objectItem
             focusPolicy: Qt.NoFocus
+            opacity: enabled ? 1 : 0.5
 
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            icon.color: action.icon.color
 
             // We need a better way to show shortcuts. This is not going to work!
         }

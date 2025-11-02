@@ -266,6 +266,7 @@ private:
 
     void add(ActionHandler *handler);
     void remove(ActionHandler *handler);
+    void sortHandlersByPriority();
 
     void notifyHandlerAvailability();
     void onHandlerPriorityChanged();

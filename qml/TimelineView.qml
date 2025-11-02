@@ -98,7 +98,6 @@ Item {
         anchors.right: _screenplayElementList.right
     }
 
-
     TimelineListView {
         id: _screenplayElementList
 

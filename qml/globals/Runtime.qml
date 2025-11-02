@@ -627,7 +627,7 @@ Item {
         property bool paused: Runtime.screenplayEditorSettings.pausePagination
 
         // FIXME: Do we really need this?
-        Component.onCompleted: ObjectRegistry.add(screenplayTextDocument, "screenplayTextDocument")
+        ObjectRegister.name: "screenplayTextDocument"
 
         formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
         includeSceneSynopsis: false
@@ -646,7 +646,7 @@ Item {
     }
 
     readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {
-        Component.onCompleted: ObjectRegistry.add(screenplayTracks, "screenplayTracks")
+        ObjectRegister.name: "screenplayTracks"
 
         screenplay: Scrite.document.screenplay
     }
@@ -749,8 +749,8 @@ Item {
         }
     }
 
-    function shoutoutLater(type, delay) {
-        shoutout(type, delay, stdAnimationDuration + 50)
+    function shoutoutLater(type, data) {
+        shoutout(type, data, stdAnimationDuration + 50)
     }
 
     function showHelpTip(tipName) {

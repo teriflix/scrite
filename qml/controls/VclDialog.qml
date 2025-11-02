@@ -64,9 +64,9 @@ Dialog {
 
     // Assign a component whose instance may be shown in the content
     property Component content: Item { }
-    property alias contentImplicitWidth: contentItemLoader.implicitWidth
-    property alias contentImplicitHeight: contentItemLoader.implicitHeight
-    property alias contentInstance: contentItemLoader.item
+    property alias contentImplicitWidth: _contentItemLoader.implicitWidth
+    property alias contentImplicitHeight: _contentItemLoader.implicitHeight
+    property alias contentInstance: _contentItemLoader.item
 
     // Customise the buttons to show on the tilebar on the right side.
     // By default a check-mark is shown.
@@ -88,7 +88,7 @@ Dialog {
     }
 
     property Component bottomBar
-    property alias bottomBarInstance: footerLoader.item
+    property alias bottomBarInstance: _footerLoader.item
 
     // This signal is emitted after the dialog box has been dismissed.
     signal dismissed()
@@ -118,35 +118,44 @@ Dialog {
     contentItem: Item {
         width: root.width
         height: root.height - root.header.height
-        clip: contentItemScroll.contentWidth > contentItemScroll.width ||
-              contentItemScroll.contentHeight > contentItemScroll.height
+
+        clip: _contentItemScroll.contentWidth > _contentItemScroll.width ||
+              _contentItemScroll.contentHeight > _contentItemScroll.height
 
         Flickable {
-            id: contentItemScroll
-            anchors.fill: parent
-            contentWidth: contentItemLoader.width
-            contentHeight: contentItemLoader.height
+            id: _contentItemScroll
+
             ScrollBar.vertical: VclScrollBar { }
             ScrollBar.horizontal: VclScrollBar { }
 
+            anchors.fill: parent
+
+            contentWidth: _contentItemLoader.width
+            contentHeight: _contentItemLoader.height
+
             Loader {
-                id: contentItemLoader
-                sourceComponent: content
-                active: false
+                id: _contentItemLoader
+
                 property real itemImplicitWidth: item ? item.implicitWidth : 0
                 property real itemImplicitHeight: item ? item.implicitHeight : 0
-                width: (itemImplicitWidth === 0) ? contentItemScroll.width : Math.max(contentItemScroll.width,itemImplicitWidth)
-                height: (itemImplicitHeight === 0) ? contentItemScroll.height : Math.max(contentItemScroll.height,itemImplicitHeight)
+
+                width: (itemImplicitWidth === 0) ? _contentItemScroll.width : Math.max(_contentItemScroll.width,itemImplicitWidth)
+                height: (itemImplicitHeight === 0) ? _contentItemScroll.height : Math.max(_contentItemScroll.height,itemImplicitHeight)
+
+                active: false
+                sourceComponent: content
 
                 onLoaded: item.focus = true
 
                 Connections {
                     target: root
+
                     function onAboutToShow() {
-                        contentItemLoader.active = true
+                        _contentItemLoader.active = true
                     }
+
                     function onClosed() {
-                        contentItemLoader.active = false
+                        _contentItemLoader.active = false
                     }
                 }
             }
@@ -154,69 +163,56 @@ Dialog {
     }
 
     header: Rectangle {
-        color: Runtime.colors.accent.c600.background
         width: root.width
-        height: dialogHeaderLayout.height
+        height: _dialogHeaderLayout.height
+
+        color: Runtime.colors.accent.c600.background
 
         RowLayout {
-            id: dialogHeaderLayout
-            spacing: 2
+            id: _dialogHeaderLayout
+
             width: parent.width
+
+            spacing: 2
 
             VclLabel {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
 
-                font.bold: true
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 color: Runtime.colors.accent.c600.text
                 padding: 16
                 text: root.title
+
+                font.bold: true
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
             Loader {
+                active: root.visible
+                sourceComponent: titleBarButtons
+
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: 8
-                sourceComponent: titleBarButtons
-                active: root.visible
             }
         }
     }
 
     footer: Rectangle {
-        color: Runtime.colors.primary.c200.background
-        height: footerLoader.item ? footerLoader.height : 0
         visible: height > 0
+        color: Runtime.colors.primary.c200.background
+
+        height: _footerLoader.item ? _footerLoader.height : 0
 
         Loader {
-            id: footerLoader
+            id: _footerLoader
+
             width: parent.width
+
             sourceComponent: bottomBar
         }
     }
 
     // Private section
-    QtObject {
-        id: _private
-
-        property bool overrideCursorMustBeRestored: false
-    }
-
-    Component {
-      id: customBackground
-
-      Loader {
-        width: root.width
-        height: root.height
-        sourceComponent: root.backdrop
-        active: root.visible
-
-        BoxShadow {
-          anchors.fill: parent
-        }
-      }
-    }
-
     Announcement.onIncoming: (type,data) => {
                                  if(root.closeOnDragDrop && type === Runtime.announcementIds.closeDialogBoxRequest)
                                     root.close()
@@ -224,7 +220,29 @@ Dialog {
 
     Component.onCompleted: {
         if(root.backdrop) {
-            background = customBackground.createObject(root)
+            background = _customBackground.createObject(root)
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        property bool overrideCursorMustBeRestored: false
+    }
+
+    Component {
+        id: _customBackground
+
+        Loader {
+            width: root.width
+            height: root.height
+
+            sourceComponent: root.backdrop
+            active: root.visible
+
+            BoxShadow {
+                anchors.fill: parent
+            }
         }
     }
 
@@ -237,6 +255,7 @@ Dialog {
         focus = true
         Runtime.dialogs.include(root)
     }
+
     onAboutToHide: {
         Scrite.window.closeButtonVisible = true
         if(_private.overrideCursorMustBeRestored) {
@@ -245,6 +264,12 @@ Dialog {
         }
         Runtime.dialogs.exclude(root)
     }
-    onAppCloseButtonVisibleChanged: Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
-    onClosed: Runtime.execLater(root, 50, dismissed)
+
+    onAppCloseButtonVisibleChanged: {
+        Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
+    }
+
+    onClosed: {
+        Runtime.execLater(root, 50, dismissed)
+    }
 }

@@ -49,7 +49,7 @@ Column {
     property string questionKey: questionNumber
     property string placeholderText
 
-    property TextArea textFieldItem: _answerText
+    property TextArea textFieldItem: _answerItemLoader.item
     property TabSequenceManager tabSequenceManager
 
     signal focusNextRequest()

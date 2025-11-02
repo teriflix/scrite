@@ -42,8 +42,8 @@ ToolBar {
         anchors.fill: parent
 
         flow: Flow.TopToBottom
-        rows: Math.floor(_col1.height/buttonSize.height)
-        columns: Math.ceil( (buttonCount * buttonSize.height)/_col1.height )
+        rows: Math.floor(root.height/buttonSize.height)
+        columns: Math.ceil( (buttonCount * buttonSize.height)/root.height )
         rowSpacing: 0
         columnSpacing: 0
 

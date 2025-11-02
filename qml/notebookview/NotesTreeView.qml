@@ -101,6 +101,9 @@ OldControls.TreeView {
     }
 
     function setCurrentIndex(modelIndex) {
+        if(!modelIndex.valid)
+            return
+
         let pmi = modelIndex.parent
         while(pmi.valid) {
             root.expand(pmi)
@@ -149,6 +152,7 @@ OldControls.TreeView {
         id: _delegate
 
         itemData: styleData
+        treeViewWidth: root.width
 
         onNoteMenuRequest: (note) => {
                                _private.popupNoteMenu(note, _delegate)
@@ -167,18 +171,20 @@ OldControls.TreeView {
         resizable: false
     }
 
-    onClicked: {
-        if(Runtime.mainWindowTab !== Runtime.MainWindowTab.StructureTab || Runtime.workspaceSettings.syncCurrentSceneOnNotebook)
-            activateScreenplayElement( notebookModel.modelIndexData(index) )
-    }
+    onClicked: (index) => {
+                   if(Runtime.mainWindowTab !== Runtime.MainWindowTab.StructureTab || Runtime.workspaceSettings.syncCurrentSceneOnNotebook) {
+                       activateScreenplayElement( notebookModel.modelIndexData(index) )
+                   }
+               }
 
-    onDoubleClicked: {
-        activateScreenplayElement( notebookModel.modelIndexData(index) )
-        if(isExpanded(index))
-            collapse(index)
-        else
-            expand(index)
-    }
+    onDoubleClicked: (index) => {
+                         activateScreenplayElement( notebookModel.modelIndexData(index) )
+                         if(isExpanded(index)) {
+                             collapse(index)
+                         } else {
+                             expand(index)
+                         }
+                     }
 
     QtObject {
         id: _private

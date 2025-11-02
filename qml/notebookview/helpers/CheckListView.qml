@@ -32,45 +32,6 @@ Item {
     property real maxTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 80
     property real minTextAreaSize: Runtime.idealFontMetrics.averageCharacterWidth * 20
 
-    Component.onDestruction: commitPendingItems()
-
-    function commitPendingItems() {
-        if(_checkListView.footerItem)
-            _checkListView.footerItem.commit()
-
-        _checkListModel.saveUpdates()
-    }
-
-    ListModel {
-        id: _checkListModel
-
-        property bool dirty: false
-
-        function modelUpdated() {
-            dirty = true
-            Runtime.execLater(_checkListModel, 250, saveUpdates)
-        }
-
-        function saveUpdates() {
-            if(dirty && root.note) {
-                var newContent = []
-                for(var i=count-1; i>=0; i--) {
-                    const item = get(i)
-                    if(item._text === undefined || item._text === "") {
-                        if(_checkListView.focus && i === _checkListView.currentIndex)
-                            newContent.push(get(i))
-                        else
-                            remove(i)
-                    } else
-                        newContent.push(get(i))
-                }
-                newContent = newContent.reverse()
-                root.note.content = newContent
-                dirty = false
-            }
-        }
-    }
-
     ColumnLayout {
         anchors.centerIn: parent
 
@@ -111,14 +72,14 @@ Item {
             backTabItem: _title
             placeholderText: "Description"
             tabItem: _checkListView
-            text: note ? note.content : ""
+            text: note ? note.summary : ""
             wrapMode: Text.WordWrap
 
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
             onTextChanged: {
                 if(note)
-                    note.content = text
+                    note.summary = text
             }
         }
 
@@ -151,6 +112,8 @@ Item {
                     }
                     Qt.callLater(assumeFocusRequest, currentIndex, tabReason)
                 }
+
+                ScrollBar.vertical: _vscrollBar
 
                 anchors.fill: parent
                 anchors.margins: 1
@@ -268,6 +231,16 @@ Item {
         }
     }
 
+    VclScrollBar {
+        id: _vscrollBar
+
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+
+        flickable: _checkListView
+    }
+
     component CheckListItem : Item {
         id: _checkListItem
 
@@ -370,11 +343,51 @@ Item {
         }
     }
 
-    onNoteChanged: {
-        if(root.note) {
-            const list = root.note ? root.note.content : []
-            list.forEach( (item) => { _checkListModel.append(item) } )
+    ListModel {
+        id: _checkListModel
+
+        Component.onDestruction: commitPendingItems()
+
+        function modelUpdated() {
+            dirty = true
+            Runtime.execLater(_checkListModel, 250, saveUpdates)
         }
-        enabled = false
+
+        function saveUpdates() {
+            if(dirty && root.note) {
+                var newContent = []
+                for(var i=count-1; i>=0; i--) {
+                    const item = get(i)
+                    if(item._text === undefined || item._text === "") {
+                        if(_checkListView.focus && i === _checkListView.currentIndex)
+                            newContent.push(get(i))
+                        else
+                            remove(i)
+                    } else
+                        newContent.push(get(i))
+                }
+                newContent = newContent.reverse()
+                root.note.content = newContent
+                dirty = false
+            }
+        }
+
+        function commitPendingItems() {
+            if(_checkListView.footerItem)
+                _checkListView.footerItem.commit()
+
+            _checkListModel.saveUpdates()
+        }
+
+        function loadFromNote() {
+            clear()
+
+            const list = root.note ? root.note.content : []
+            list.forEach( (item) => { append(item) } )
+        }
+
+        property bool dirty: false
     }
+
+    onNoteChanged: _checkListModel.loadFromNote()
 }

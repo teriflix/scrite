@@ -20,7 +20,7 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 ScrollBar {
-    id: scrollBar
+    id: root
 
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
@@ -46,7 +46,7 @@ ScrollBar {
 
     Component.onCompleted: {
         if(flickable === null)
-            flickable = Object.firstParentByType(scrollBar, "QQuickFlickable")
+            flickable = Object.firstParentByType(root, "QQuickFlickable")
     }
 
     DelayedPropertyBinder {

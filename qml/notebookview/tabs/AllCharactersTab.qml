@@ -24,6 +24,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
 import "qrc:/qml/notebookview/menus"
+import "qrc:/qml/notebookview/dialogs"
 
 Item {
     id: root
@@ -34,12 +35,15 @@ Item {
     GridView {
         id: _charactersView
 
-        Component.onCompleted: headerItem.assumeFocus()
+        Component.onCompleted: {
+            __evaluateCounts()
+            headerItem.assumeFocus()
+        }
 
         ScrollBar.vertical: _vscrollBar
 
         anchors.fill: parent
-        anchors.rightMargin: contentHeight > height ? 17 : 0
+        anchors.rightMargin: contentHeight > height ? 20 : 0
 
         cellHeight: 120
         cellWidth: width/__columnCount
@@ -63,12 +67,10 @@ Item {
         delegate: Item {
             id: _delegate
 
+            required property int index
             required property var objectItem
-            property Character character: objectItem
 
-            function polishStr(val,defval) {
-                return val === "" ? defval : val
-            }
+            property Character character: objectItem
 
             width: _charactersView.cellWidth
             height: _charactersView.cellHeight
@@ -124,7 +126,7 @@ Item {
 
                             elide: Text.ElideRight
                             opacity: 0.75
-                            text: "Role: " + polishStr(_delegate.character.designation, "-")
+                            text: "Role: " + _private.polishedStr(_delegate.character.designation, "-")
 
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                         }
@@ -134,7 +136,7 @@ Item {
 
                             elide: Text.ElideRight
                             opacity: 0.75
-                            text: ["Age: " + polishStr(_delegate.character.age, "-"), "Gender: " + polishStr(_delegate.character.gender, "-")].join(", ")
+                            text: ["Age: " + _private.polishedStr(_delegate.character.age, "-"), "Gender: " + _private.polishedStr(_delegate.character.gender, "-")].join(", ")
 
                             font.pointSize: Runtime.idealFontMetrics.font.pointSize - 2
                         }
@@ -163,10 +165,23 @@ Item {
         header: _headerFooter
         footer: __rowCount > __visibleRowCount ? _headerFooter : null
 
-        property int __rowCount: Math.ceil(model.objectCount/__columnCount)
-        property int __columnCount: Math.floor(width/__idealCellWidth)
-        property int __visibleRowCount: Math.ceil((height-60)/cellHeight)
-        property real __idealCellWidth: Math.min(250,width)
+        TrackerPack {
+            TrackProperty { target: _charactersView; property: "width" }
+            TrackProperty { target: _charactersView; property: "height" }
+            onTracked:  _charactersView.__evaluateCounts()
+        }
+
+        function __evaluateCounts() {
+            __idealCellWidth = Math.min(250,width)
+            __columnCount = Math.floor(width/__idealCellWidth)
+            __rowCount = Math.ceil(model.objectCount/__columnCount)
+            __visibleRowCount = Math.ceil((height-60)/cellHeight)
+        }
+
+        property int __rowCount: 0
+        property int __columnCount: 0
+        property int __visibleRowCount: 0
+        property real __idealCellWidth: 0
     }
 
     Component {
@@ -273,6 +288,10 @@ Item {
             let menu = characterMenu.createObject(source, {"character": character})
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
+        }
+
+        function polishedStr(val,defval) {
+            return val === "" ? defval : val
         }
     }
 }

@@ -39,7 +39,7 @@ Item {
         enabled: parent.visible
     }
 
-    Column {
+    ColumnLayout {
         EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
             EventFilter.forwardEventTo(_sceneSynopsisField)
@@ -48,11 +48,12 @@ Item {
         }
 
         anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
         anchors.bottom: _sceneAttachments.top
         anchors.margins: 10
         anchors.bottomMargin: 0
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
 
         spacing: 10
 
@@ -62,9 +63,7 @@ Item {
             TabSequenceItem.manager: _sceneTabSequence
             TabSequenceItem.sequence: 0
 
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
+            Layout.fillWidth: true
 
             text: root.scene.heading.text
             label: ""
@@ -86,9 +85,7 @@ Item {
             TabSequenceItem.manager: _sceneTabSequence
             TabSequenceItem.sequence: 1
 
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
+            Layout.fillWidth: true
 
             backTabItem: _sceneHeadingField
             label: ""
@@ -105,7 +102,7 @@ Item {
 
             Component.onCompleted: font.capitalization = Font.AllUppercase
 
-            width: parent.width
+            Layout.fillWidth: true
 
             addTextButtonTooltip: "Click here to capture characters who don't have any dialogues in this scene, but are still required for the scene."
             completionStrings: Scrite.document.structure.characterNames
@@ -131,7 +128,7 @@ Item {
         TextListInput {
             id: _sceneTagsList
 
-            width: parent.width
+            Layout.fillWidth: true
 
             enabled: Runtime.appFeatures.structure.enabled
 
@@ -175,8 +172,6 @@ Item {
                     topPadding: 5
                     bottomPadding: 5
 
-                    font.pointSize: Math.max(root.font.pointSize * root.zoomLevel, Runtime.minimumFontMetrics.font.pointSize)
-
                     onClicked: _private.popupFormalTagsMenu()
                 }
             }
@@ -185,10 +180,8 @@ Item {
         TrapeziumTabView {
             id: _synopsisContentTabView
 
-            anchors.horizontalCenter: parent.horizontalCenter
-
-            width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
-            height: parent.height - _sceneHeadingField.height - _sceneTitleField.height - _sceneCharactersList.height - parent.spacing*3
+            Layout.fillWidth: true
+            Layout.fillHeight: true
 
             tabNames: ["Synopsis", "Featured Photo"]
             tabColor: root.scene.color
@@ -196,73 +189,6 @@ Item {
             currentTabIndex: Runtime.screenplayEditorSettings.commentsPanelTabIndex
 
             onCurrentTabIndexChanged: Runtime.screenplayEditorSettings.commentsPanelTabIndex = currentTabIndex
-
-            Component {
-                id: _sceneSynopsisFieldComponent
-
-                ColumnLayout {
-                    property alias textArea: _sceneSynopsisField.textArea
-
-                    FlickableTextArea {
-                        id: _sceneSynopsisField
-
-                        Layout.fillWidth: true
-                        Layout.fillHeight: true
-
-                        TabSequenceItem.manager: _sceneTabSequence
-                        TabSequenceItem.sequence: 2
-                        TabSequenceItem.onAboutToReceiveFocus: Qt.callLater(textArea.forceActiveFocus)
-
-                        // Unfortunately, focus scope doesnt really work!
-                        EventFilter.target: textArea
-                        EventFilter.events: [EventFilter.KeyPress]
-                        EventFilter.active: textArea.activeFocus
-                        EventFilter.onFilter: (watched, event) => {
-                                                  if(event.key === Qt.Key_Tab)
-                                                  TabSequenceItem.focusNext()
-                                                  else if(event.key === Qt.Key_Backtab)
-                                                  TabSequenceItem.focusPrevious()
-                                              }
-
-                        background: Rectangle {
-                            color: Runtime.colors.primary.windowColor
-                            opacity: 0.15
-                        }
-
-                        text: root.scene.synopsis
-                        readOnly: Scrite.document.readOnly
-                        placeholderText: "Scene Synopsis"
-                        undoRedoEnabled: true
-                        adjustTextWidthBasedOnScrollBar: false
-
-                        onTextChanged: root.scene.synopsis = text
-                    }
-
-                    IndexCardFields {
-                        id: _indexCardFields
-
-                        Layout.fillWidth: true
-
-                        lod: LodLoader.LOD.High
-                        startTabSequence: 3
-                        structureElement: root.scene.structureElement
-                        tabSequenceEnabled: true
-                        tabSequenceManager: _sceneTabSequence
-                        visible: hasFields
-                    }
-                }
-            }
-
-            Component {
-                id: _featuredPhotoComponent
-
-                SceneFeaturedImage {
-                    defaultFillMode: Image.PreserveAspectFit
-                    fillModeAttrib: "notebookFillMode"
-                    mipmap: true
-                    scene: sceneNotesItem.scene
-                }
-            }
         }
     }
 
@@ -283,6 +209,73 @@ Item {
 
         target: root.scene ? root.scene.attachments : null
         allowMultiple: true
+    }
+
+    Component {
+        id: _sceneSynopsisFieldComponent
+
+        ColumnLayout {
+            property alias textArea: _sceneSynopsisField.textArea
+
+            FlickableTextArea {
+                id: _sceneSynopsisField
+
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+
+                TabSequenceItem.manager: _sceneTabSequence
+                TabSequenceItem.sequence: 2
+                TabSequenceItem.onAboutToReceiveFocus: Qt.callLater(textArea.forceActiveFocus)
+
+                // Unfortunately, focus scope doesnt really work!
+                EventFilter.target: textArea
+                EventFilter.events: [EventFilter.KeyPress]
+                EventFilter.active: textArea.activeFocus
+                EventFilter.onFilter: (watched, event) => {
+                                          if(event.key === Qt.Key_Tab)
+                                          TabSequenceItem.focusNext()
+                                          else if(event.key === Qt.Key_Backtab)
+                                          TabSequenceItem.focusPrevious()
+                                      }
+
+                background: Rectangle {
+                    color: Runtime.colors.primary.windowColor
+                    opacity: 0.15
+                }
+
+                text: root.scene.synopsis
+                readOnly: Scrite.document.readOnly
+                placeholderText: "Scene Synopsis"
+                undoRedoEnabled: true
+                adjustTextWidthBasedOnScrollBar: false
+
+                onTextChanged: root.scene.synopsis = text
+            }
+
+            IndexCardFields {
+                id: _indexCardFields
+
+                Layout.fillWidth: true
+
+                lod: LodLoader.LOD.High
+                startTabSequence: 3
+                structureElement: root.scene.structureElement
+                tabSequenceEnabled: true
+                tabSequenceManager: _sceneTabSequence
+                visible: hasFields
+            }
+        }
+    }
+
+    Component {
+        id: _featuredPhotoComponent
+
+        SceneFeaturedImage {
+            defaultFillMode: Image.PreserveAspectFit
+            fillModeAttrib: "notebookFillMode"
+            mipmap: true
+            scene: sceneNotesItem.scene
+        }
     }
 
     QtObject {

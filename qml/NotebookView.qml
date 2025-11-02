@@ -31,13 +31,26 @@ import "qrc:/qml/notebookview/pages"
 import "qrc:/qml/structureview"
 import "qrc:/qml/notifications"
 
-Rectangle {
+Item {
     id: root
 
     function switchTo(item) { _private.switchTo(item) }
     function switchToCharacterTab(name) { _private.switchToCharacterTab(name) }
     function switchToSceneTab() { _private.switchToSceneTab() }
     function switchToStoryTab() { _private.switchToStoryTab() }
+
+    FocusTracker.window: Scrite.window
+    FocusTracker.onHasFocusChanged: Runtime.undoStack.notebookActive = FocusTracker.hasFocus
+
+    HelpTipNotification {
+        tipName: "notebook"
+    }
+
+    Rectangle {
+        anchors.fill: parent
+
+        color: Runtime.colors.primary.c100.background
+    }
 
     SplitView {
         Material.background: Qt.darker(Runtime.colors.primary.button.background, 1.1)
@@ -50,220 +63,148 @@ Rectangle {
             id: _notebookTree
 
             SplitView.minimumWidth: 150
-            SplitView.preferredWidth: Math.min(350, notebookView.width*0.25)
+            SplitView.preferredWidth: Math.min(350, root.width*0.25)
 
             notebookModel: _notebookModel
 
-            onSwitchRequest: (item) => { _private.switchTo(item) }
+            onSwitchRequest: (item) => { _private.scheduleSwitchTo(item) }
         }
 
-        Rectangle {
-            color: {
-                // Keep these colors in sync with actual component colors loaded
-                // by notebookContentLoader
+        Loader {
+            id: _contentLoader
+
+            property int currentNotebookItemId: _notebookTree.currentData !== undefined && _notebookTree.currentData.notebookItemId !== undefined ? _notebookTree.currentData.notebookItemId : -1
+
+            active: opacity > 0
+            opacity: _contentActiveProperty.value ? 1 : 0
+            sourceComponent: {
                 if(!_notebookTree.currentData)
-                    return Qt.rgba(0,0,0,0)
+                    return _private.genericPage
 
                 switch(_notebookTree.currentData.notebookItemType) {
                 case NotebookModel.CategoryType:
                     switch(_notebookTree.currentData.notebookItemCategory) {
                     case NotebookModel.ScreenplayCategory:
-                        return "white"
+                        return _private.screenplayPage
                     case NotebookModel.UnusedScenesCategory:
+                        return _private.unusedScenesPage
                     case NotebookModel.CharactersCategory:
-                        return Qt.rgba(0,0,0,0)
+                        return _private.charactersPage
                     case NotebookModel.BookmarksCategory:
-                        return Color.translucent(Runtime.colors.primary.c100.background, 0.5)
+                        return _private.bookmarksPage
                     }
                     break
                 case NotebookModel.NotesType:
                     switch(_notebookTree.currentData.notebookItemObject.ownerType) {
-                    case Notes.CharacterOwner: {
-                        const character = _notebookTree.currentData.notebookItemObject.character
-                        return Qt.tint(character.color, "#e7ffffff")
-                        }
-                    case Notes.SceneOwner: {
-                        const notes = _notebookTree.currentData.notebookItemObject
-                        const scene = notes.scene
-                        return Qt.tint(scene.color, "#e7ffffff")
-                        }
+                    case Notes.CharacterOwner:
+                        return _private.characterPage
+                    case Notes.SceneOwner:
+                        return _private.sceneNotesPage
                     default:
-                        return Color.translucent(Runtime.colors.primary.c100.background, 0.5)
+                        return _private.notesPage
                     }
                 case NotebookModel.NoteType:
                     switch(_notebookTree.currentData.notebookItemObject.type) {
                     case Note.TextNoteType:
+                        return _private.textNotePage
                     case Note.FormNoteType:
-                        const note = _notebookTree.currentData.notebookItemObject
-                        return Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
+                        return _private.formNotePage
+                    case Note.CheckListNoteType:
+                        return _private.checkListNotePage
                     }
                     break
                 case NotebookModel.EpisodeBreakType:
                 case NotebookModel.ActBreakType:
-                    return Qt.rgba(0,0,0,0)
+                    return _private.breakSummaryPage
                 }
 
-                return Qt.rgba(0,0,0,0)
+                return _private.genericPage
             }
 
-            Loader {
-                id: notebookContentLoader
-                opacity: notebookContentActiveProperty.value ? 1 : 0
-                anchors.fill: parent
-                Behavior on opacity {
-                    NumberAnimation { duration: notebookContentActiveProperty.delay-50 }
-                }
-                active: opacity > 0
-
-                property int currentNotebookItemId: _notebookTree.currentData ? _notebookTree.currentData.notebookItemId : -1
-
-                property bool hasReport: item && item.hasReport && item.hasReport === true
-                property string reportDescription: hasReport ? item.reportDescription : ""
-                function generateReport() {
-                    if(hasReport) {
-                        var rgen = item.createReportGenerator()
-                        if(!rgen)
-                            return
-
-                        ReportConfigurationDialog.launch(rgen)
-                    }
-                }
-
-                ResetOnChange {
-                    id: notebookContentActiveProperty
-                    trackChangesOn: notebookContentLoader.currentNotebookItemId
-                    from: false
-                    to: true
-                    delay: 250
-                }
-
-                sourceComponent: {
-                    if(!_notebookTree.currentData)
-                        return _private.genericPage
-
-                    switch(_notebookTree.currentData.notebookItemType) {
-                    case NotebookModel.CategoryType:
-                        switch(_notebookTree.currentData.notebookItemCategory) {
-                        case NotebookModel.ScreenplayCategory:
-                            return _private.screenplayPage
-                        case NotebookModel.UnusedScenesCategory:
-                            return _private.unusedScenesPage
-                        case NotebookModel.CharactersCategory:
-                            return _private.charactersPage
-                        case NotebookModel.BookmarksCategory:
-                            return _private.bookmarksPage
-                        }
-                        break
-                    case NotebookModel.NotesType:
-                        switch(_notebookTree.currentData.notebookItemObject.ownerType) {
-                        case Notes.CharacterOwner:
-                            return _private.characterPage
-                        case Notes.SceneOwner:
-                            return _private.sceneNotesPage
-                        default:
-                            return notesComponent
-                        }
-                    case NotebookModel.NoteType:
-                        switch(_notebookTree.currentData.notebookItemObject.type) {
-                        case Note.TextNoteType:
-                            return _private.textNotePage
-                        case Note.FormNoteType:
-                            return _private.formNotePage
-                        case Note.CheckListNoteType:
-                            return _private.checkListNotePage
-                        }
-                        break
-                    case NotebookModel.EpisodeBreakType:
-                    case NotebookModel.ActBreakType:
-                        return _private.breakNotePage
-                    }
-
-                    return _private.genericPage
-                }
-                onLoaded: item.componentData = _notebookTree.currentData
-
-                Rectangle {
-                    anchors.fill: parent
-                    color: Qt.rgba(0,0,0,0.05)
-                    visible: notebookContentActiveProperty.value === false
-
-                    BusyIcon {
-                        running: notebookContentActiveProperty.value === false
-                        anchors.centerIn: parent
-                    }
-                }
-
-                function confirmAndDelete() {
-                    deleteConfirmationBox.active = true
-                }
-                onActiveChanged: deleteConfirmationBox.active = false
+            Behavior on opacity {
+                NumberAnimation { duration: _contentActiveProperty.delay-50 }
             }
 
-            Loader {
-                id: deleteConfirmationBox
+            ResetOnChange {
+                id: _contentActiveProperty
+
+                delay: 250
+                from: false
+                to: true
+                trackChangesOn: _contentLoader.currentNotebookItemId
+            }
+
+            Rectangle {
                 anchors.fill: parent
-                active: false
-                sourceComponent: Rectangle {
-                    id: deleteConfirmationItem
-                    color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
-                    focus: true
+                color: Qt.rgba(0,0,0,0.05)
+                visible: _contentActiveProperty.value === false
 
-                    MouseArea {
-                        anchors.fill: parent
-                    }
+                BusyIcon {
+                    running: _contentActiveProperty.value === false
+                    anchors.centerIn: parent
+                }
+            }
 
-                    Column {
-                        width: parent.width-20
-                        anchors.centerIn: parent
-                        spacing: 40
-
-                        VclLabel {
-                            text: {
-                                if(_notebookTree.currentNote)
-                                    return "Are you sure you want to delete this note?"
-                                if(_notebookTree.currentCharacter)
-                                    return "Are you sure you want to delete this character?"
-                                return "Cannot remove this item."
-                            }
-                            font.bold: true
-                            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                            width: parent.width
-                            horizontalAlignment: Text.AlignHCenter
-                            wrapMode: Text.WordWrap
-                            color: Runtime.colors.primary.c600.text
-                        }
-
-                        Row {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            spacing: 20
-
-                            VclButton {
-                                text: "Yes"
-                                focusPolicy: Qt.NoFocus
-                                onClicked: {
-                                    notebookContentLoader.item.deleteSelf()
-                                    deleteConfirmationBox.active = false
-                                }
-                                visible: _notebookTree.currentNote || _notebookTree.currentCharacter
-                            }
-
-                            VclButton {
-                                text: _notebookTree.currentNote || _notebookTree.currentCharacter ? "No" : "OK"
-                                focusPolicy: Qt.NoFocus
-                                onClicked: deleteConfirmationBox.active = false
-                            }
-                        }
+            onStatusChanged: {
+                if(status === Loader.Loading) {
+                    if(_private.deleteTriggerTimer) {
+                        _private.deleteTriggerTimer.stop()
+                        _private.deleteTriggerTimer.destroy()
                     }
                 }
             }
         }
     }
 
-    FocusTracker.window: Scrite.window
-    FocusTracker.onHasFocusChanged: Runtime.undoStack.notebookActive = FocusTracker.hasFocus
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("sync")
+        checked: Runtime.workspaceSettings.syncCurrentSceneOnNotebook
 
-    HelpTipNotification {
-        tipName: "notebook"
+        onToggled: (source) => {
+                       Runtime.workspaceSettings.syncCurrentSceneOnNotebook = !checked
+                       if(Runtime.workspaceSettings.syncCurrentSceneOnNotebook) {
+                           _notebookTree.activateFromCurrentScreenplayElement()
+                       }
+                   }
+    }
+
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("reload")
+
+        onTriggered: (source) => {
+            _notebookModel.refresh()
+        }
+    }
+
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("report")
+        priority: -1 // Meaning we get to run this only if the active page doesnt handle it
+        tooltip: "Export entire notebook as PDF or ODT."
+
+        onTriggered: (source) => {
+                         ReportConfigurationDialog.launch("Notebook Report")
+                     }
+    }
+
+    ActionHandler {
+        readonly property alias currentNote: _notebookTree.currentNote
+        property bool currentNoteIsBookmarked: false
+
+        function determineIfCurrentNoteIsBookmarked() {
+            currentNoteIsBookmarked = enabled && _notebookModel.bookmarkedNotes.isBookmarked(currentNote)
+        }
+
+        action: ActionHub.notebookOperations.find("toggleBookmark")
+        enabled: currentNote !== null
+        iconSource: currentNoteIsBookmarked ? "qrc:/icons/content/bookmark.png" : "qrc:/icons/content/bookmark_outline.png"
+        tooltip: currentNoteIsBookmarked ? "Remove bookmark on this note" : "Bookmark this note"
+
+        onTriggered: (source) => {
+                         if(_notebookModel.bookmarkedNotes.toggleBookmark(currentNote))
+                            determineIfCurrentNoteIsBookmarked()
+                     }
+
+        onCurrentNoteChanged: determineIfCurrentNoteIsBookmarked()
     }
 
     NotebookModel {
@@ -272,7 +213,7 @@ Rectangle {
         property var currentItem
         property var preferredItem
 
-        Component.onCompleted: ObjectRegistry.add(_notebookModel, "notebookModel")
+        ObjectRegister.name: "notebookModel"
 
         function noteCurrentItem() {
             currentItem = _notebookTree.currentData.notebookItemObject
@@ -316,7 +257,9 @@ Rectangle {
 
     Connections {
         target: Scrite.document
+
         ignoreUnknownSignals: true
+
         function onLoadingChanged() {
             if(!Scrite.document.loading)
                 _notebookTree.activateFromCurrentScreenplayElement()
@@ -341,6 +284,10 @@ Rectangle {
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
         }
 
         property int sceneNotesPageTabIndex: 0
@@ -353,6 +300,15 @@ Rectangle {
             currentTab: _private.sceneNotesPageTabIndex
 
             onCurrentTabChanged: _private.sceneNotesPageTabIndex = currentTab
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
+
+            onDeleteNoteRequest: (note) => {
+                                     _private.switchTo(note)
+                                     _private.scheduleDeleteRequest() // Must be called after switchTo
+                                 }
         }
 
         readonly property Component notesPage: NotesPage {
@@ -360,6 +316,15 @@ Rectangle {
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
+
+            onDeleteNoteRequest: (note) => {
+                                     _private.switchTo(note)
+                                     _private.scheduleDeleteRequest() // Must be called after switchTo
+                                 }
         }
 
         readonly property Component textNotePage: TextNotePage {
@@ -367,6 +332,10 @@ Rectangle {
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
         }
 
         readonly property Component formNotePage: FormNotePage {
@@ -374,6 +343,10 @@ Rectangle {
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
         }
 
         readonly property Component checkListNotePage: CheckListNotePage {
@@ -381,9 +354,13 @@ Rectangle {
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
             minTextAreaSize: _private.minTextAreaSize
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
         }
 
-        readonly property Component breakNotePage: BreakNotePage {
+        readonly property Component breakSummaryPage: BreakSummaryPage {
             pageData: _notebookTree.currentData
             notebookModel: _notebookModel
             maxTextAreaSize: _private.maxTextAreaSize
@@ -400,6 +377,15 @@ Rectangle {
             currentTab: _private.screenplayPageTabIndex
 
             onCurrentTabChanged: _private.screenplayPageTabIndex = currentTab
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
+
+            onDeleteNoteRequest: (note) => {
+                                     _private.switchTo(note)
+                                     _private.scheduleDeleteRequest() // Must be called after switchTo
+                                 }
         }
 
         readonly property Component unusedScenesPage: UnusedScenesPage {
@@ -419,6 +405,15 @@ Rectangle {
             currentTab: _private.charactersPageTabIndex
 
             onCurrentTabChanged: _private.charactersPageTabIndex = currentTab
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
+
+            onDeleteCharacterRequest: (character) => {
+                                          _private.switchTo(character.notes)
+                                          _private.scheduleDeleteRequest(character.notes) // Must be called after switchTo
+                                      }
         }
 
         property int characterPageTabIndex: 0
@@ -431,6 +426,15 @@ Rectangle {
             currentTab: _private.characterPageTabIndex
 
             onCurrentTabChanged: _private.characterPageTabIndex = currentTab
+
+            onSwitchRequest: (item) => {
+                                 _private.scheduleSwitchTo(item)
+                             }
+
+            onDeleteNoteRequest: (note) => {
+                                     _private.switchTo(note)
+                                     _private.scheduleDeleteRequest() // Must be called after switchTo
+                                 }
         }
 
         function switchToStoryTab() {
@@ -463,6 +467,35 @@ Rectangle {
                 _notebookTree.setCurrentIndex( midx )
             } else
                 _notebookTree.setCurrentIndex( _notebookTree.model.findModelIndexFor(item) )
+        }
+
+        readonly property Timer switchTimer: Timer {
+            property var item
+
+            interval: Runtime.stdAnimationDuration
+            repeat: false
+
+            onTriggered: {
+                if(item === undefined)
+                    return
+                _private.switchTo(item)
+                item = undefined
+            }
+        }
+
+        function scheduleSwitchTo(item) {
+            // Delay is hardcoded to 75ms, which is 25ms more than what the NotebookModel takes to sync
+            switchTimer.item = item
+            switchTimer.start()
+        }
+
+        readonly property Action deleteAction: ActionHub.notebookOperations.find("delete")
+        property Timer deleteTriggerTimer: null
+        function scheduleDeleteRequest() {
+            if(deleteTriggerTimer)
+                deleteTriggerTimer.restart()
+            else
+                deleteTriggerTimer = Runtime.execLater(deleteAction, Runtime.stdAnimationDuration, deleteAction.trigger)
         }
 
         Announcement.onIncoming: (type, data) => {

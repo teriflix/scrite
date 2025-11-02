@@ -38,6 +38,7 @@ Item {
 
         NotebookView {
             Layout.fillWidth: true
+            Layout.fillHeight: true
 
             enabled: Runtime.appFeatures.notebook.enabled
         }

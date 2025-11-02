@@ -182,7 +182,7 @@
         <file>qml/notebookview/menus/NoteMenu.qml</file>
         <file>qml/notebookview/pages/AbstractNotebookPage.qml</file>
         <file>qml/notebookview/pages/BookmarksNotebookPage.qml</file>
-        <file>qml/notebookview/pages/BreakNotePage.qml</file>
+        <file>qml/notebookview/pages/BreakSummaryPage.qml</file>
         <file>qml/notebookview/pages/CharacterPage.qml</file>
         <file>qml/notebookview/pages/CharactersPage.qml</file>
         <file>qml/notebookview/pages/CheckListNotePage.qml</file>
@@ -311,5 +311,7 @@
         <file>qml/timelineview/TimelineViewHighlightedItemAnimation.qml</file>
         <file>qml/timelineview/qmldir</file>
         <file>qml/notebookview/pages/NotesPage.qml</file>
+        <file>qml/notebookview/helpers/DeleteConfirmationPopup.qml</file>
+        <file>qml/notebookview/pages/AbstractNotePage.qml</file>
     </qresource>
 </RCC>

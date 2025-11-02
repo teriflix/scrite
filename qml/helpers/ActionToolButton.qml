@@ -42,6 +42,8 @@ ToolButton {
     display: action.icon.source == "" && action.icon.name == "" ? ToolButton.TextOnly : ToolButton.IconOnly
     focusPolicy: Qt.NoFocus
     visible: action.visible !== undefined ? action.visible : true
+    opacity: enabled ? 1 : 0.5
 
     font.pointSize: Runtime.idealFontMetrics.font.pointSize
+    icon.color: action.icon.color
 }

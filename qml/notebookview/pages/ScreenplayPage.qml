@@ -20,6 +20,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
 import "qrc:/qml/notebookview"
@@ -30,16 +31,8 @@ AbstractNotebookPage {
 
     property alias currentTab: _tabBar.currentTab
 
-    signal deleteNoteRequest(Note note)
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
-
-    Rectangle {
-        id: _background
-
-        anchors.fill: parent
-
-        color: Runtime.colors.primary.c100.background
-    }
+    signal deleteNoteRequest(Note note)
 
     ColumnLayout {
         anchors.fill: parent
@@ -109,6 +102,19 @@ AbstractNotebookPage {
                 sourceComponent: ScreenplayStatsTab { }
             }
         }
+    }
+
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("report")
+
+        enabled: true
+        tooltip: "Export entire screenplay notes as PDF or ODT."
+
+        onTriggered: (source) => {
+                         let generator = Scrite.document.createReportGenerator("Notebook Report")
+                         generator.section = _private.screenplay
+                         ReportConfigurationDialog.launch(generator)
+                     }
     }
 
     QtObject {

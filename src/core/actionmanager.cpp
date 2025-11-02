@@ -733,6 +733,7 @@ void ActionHandlers::add(ActionHandler *handler)
 
     if (handler && !m_actionHandlers.contains(handler)) {
         m_actionHandlers.append(handler);
+        sortHandlersByPriority();
 
         if (handler->action())
             emit handlerAvailabilityChanged(handler->action(), handler);
@@ -771,6 +772,15 @@ void ActionHandlers::remove(ActionHandler *handler)
     }
 }
 
+void ActionHandlers::sortHandlersByPriority()
+{
+    if (m_appAboutToQuit)
+        return;
+
+    std::sort(m_actionHandlers.begin(), m_actionHandlers.end(),
+              [](ActionHandler *a, ActionHandler *b) { return b->priority() - a->priority() < 0; });
+}
+
 void ActionHandlers::notifyHandlerAvailability()
 {
     if (m_appAboutToQuit)
@@ -784,11 +794,7 @@ void ActionHandlers::notifyHandlerAvailability()
 
 void ActionHandlers::onHandlerPriorityChanged()
 {
-    if (m_appAboutToQuit)
-        return;
-
-    std::sort(m_actionHandlers.begin(), m_actionHandlers.end(),
-              [](ActionHandler *a, ActionHandler *b) { return b->priority() - a->priority() < 0; });
+    this->sortHandlersByPriority();
 }
 
 void ActionHandlers::onHandlerCheckedChanged()

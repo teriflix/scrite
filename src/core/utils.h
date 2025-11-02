@@ -379,9 +379,34 @@ public:
     Q_PROPERTY(QAbstractListModel* model READ model CONSTANT)
     static QAbstractListModel *model();
 
-    Q_INVOKABLE static void remove(QObject *object);
-    Q_INVOKABLE static QString add(QObject *object, const QString &name);
+    static void remove(QObject *object);
+    static QString add(QObject *object, const QString &name);
+
     Q_INVOKABLE static QObject *find(const QString &name);
+};
+
+class ObjectRegister : public QObject
+{
+    Q_OBJECT
+    QML_NAMED_ELEMENT(ObjectRegister)
+    QML_ATTACHED(ObjectRegister)
+
+public:
+    virtual ~ObjectRegister();
+
+    static ObjectRegister *qmlAttachedProperties(QObject *parent);
+
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
+    void setName(const QString &val);
+    QString name() const { return m_name; }
+    Q_SIGNAL void nameChanged();
+
+private:
+    explicit ObjectRegister(QObject *parent = nullptr);
+
+private:
+    friend class ObjectRegistry;
+    QString m_name;
 };
 
 class Color : public QObject

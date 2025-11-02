@@ -50,6 +50,8 @@ Item {
 
         FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
+        ScrollBar.vertical: _scrollBar
+
         anchors.fill: parent
         anchors.margins: 20
 
@@ -60,8 +62,6 @@ Item {
         Flow {
             id: _layout
 
-            ScrollBar.vertical: _scrollBar
-
             width: _flickable.width
 
             Repeater {
@@ -70,9 +70,10 @@ Item {
                 Item {
                     id: _noteItem
 
+                    required property int index
                     required property var modelData
 
-                    property Note note: modelData.note
+                    property Note note: modelData
 
                     width: _private.noteSize
                     height: _private.noteSize
@@ -223,7 +224,22 @@ Item {
         onTriggered: (source) => {
                          let generator = Scrite.document.createReportGenerator("Notebook Report")
                          generator.section = notes.owner
-                         ReportConfigurationDialog.launch(rgen)
+                         ReportConfigurationDialog.launch(generator)
+                     }
+    }
+
+    ActionHandler {
+        property Menu newNoteMenu
+
+        action: ActionHub.notebookOperations.find("addNote")
+
+        down: newNoteMenu !== null
+
+        onTriggered: (source) => {
+                         if(newNoteMenu)
+                            newNoteMenu.popup()
+                         else
+                            newNoteMenu = _private.popupNewNoteMenu(source)
                      }
     }
 
@@ -245,6 +261,7 @@ Item {
             let menu = noteMenu.createObject(source, {"note": note})
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
+            return menu
         }
 
         readonly property Component newNoteMenu: NewNoteMenu {
@@ -257,6 +274,7 @@ Item {
             let menu = newNoteMenu.createObject(source)
             menu.aboutToHide.connect(menu.destroy)
             menu.popup()
+            return menu
         }
     }
 }

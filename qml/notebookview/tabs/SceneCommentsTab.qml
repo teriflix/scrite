@@ -44,10 +44,10 @@ Item {
 
         ScrollBar.vertical: _scrollBar
 
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.centerIn: parent
 
         width: parent.width >= root.maxTextAreaSize+20 ? root.maxTextAreaSize : parent.width-20
-        height: parent.height
+        height: parent.height - 20
 
         adjustTextWidthBasedOnScrollBar: false
         placeholderText: "Scene Comments"
@@ -57,7 +57,9 @@ Item {
 
         background: Rectangle {
             color: Runtime.colors.primary.windowColor
-            opacity: 0.15
+            opacity: 0.25
+            border.width: 1
+            border.color: Runtime.colors.primary.borderColor
         }
 
         onTextChanged: root.scene.comments = text

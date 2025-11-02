@@ -18,21 +18,12 @@ import QtQuick.Layouts 1.15
 
 import io.scrite.components 1.0
 
-import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
-import "qrc:/qml/controls"
-import "qrc:/qml/dialogs"
 import "qrc:/qml/notebookview"
 import "qrc:/qml/notebookview/helpers"
 
-AbstractNotebookPage {
+AbstractNotePage {
     id: root
-
-    Rectangle {
-        anchors.fill: parent
-
-        color: Qt.tint(note.color, Runtime.colors.sceneHeadingTint)
-    }
 
     ColumnLayout {
         anchors.fill: parent
@@ -41,13 +32,13 @@ AbstractNotebookPage {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            note: _private.note
+            note: root.note
         }
 
         AttachmentsView {
             Layout.fillWidth: true
 
-            attachments: _private.note ? _private.note.attachments : null
+            attachments: root.note ? root.note.attachments : null
         }
     }
 
@@ -57,25 +48,6 @@ AbstractNotebookPage {
         anchors.fill: parent
 
         allowMultiple: true
-        target: _private.note ? _private.note.attachments : null
-    }
-
-    ActionHandler {
-        action: ActionHub.notebookOperations.find("report")
-
-        enabled: true
-        tooltip: "Export this text note as a PDF or ODT."
-
-        onTriggered: (source) => {
-                         let generator = Scrite.document.createReportGenerator("Notebook Report")
-                         generator.section = _private.note
-                         ReportConfigurationDialog.launch(rgen)
-                     }
-    }
-
-    QtObject {
-        id: _private
-
-        property Note note: root.pageData ? root.pageData.notebookItemObject : null
+        target: root.note ? root.note.attachments : null
     }
 }

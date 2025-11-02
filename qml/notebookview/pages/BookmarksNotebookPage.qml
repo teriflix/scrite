@@ -29,18 +29,6 @@ AbstractNotebookPage {
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
 
-    Rectangle {
-        id: _background
-
-        anchors.fill: parent
-
-        clip: true
-        color: Color.translucent(Runtime.colors.primary.c100.background, 0.5)
-
-        border.color: Runtime.colors.primary.borderColor
-        border.width: 1
-    }
-
     GridView {
         id: _gridView
 
@@ -123,7 +111,7 @@ AbstractNotebookPage {
                                 } else if(Object.typeOf(_delegate.noteObject) === "Character")
                                     return "qrc:/icons/content/person_outline.png"
                                 else if(Object.typeOf(_delegate.noteObject) === "Note") {
-                                    switch(styleData.value.notebookItemObject.type) {
+                                    switch(_delegate.noteObject.type) {
                                     case Note.TextNoteType:
                                         return "qrc:/icons/content/note.png"
                                     case Note.FormNoteType:

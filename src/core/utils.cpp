@@ -326,11 +326,12 @@ bool Utils::Object::changeProperty(QObject *object, const QString &name, const Q
     if (object == nullptr)
         return false;
 
-    const int propIndex = object->metaObject()->indexOfProperty(qPrintable(name));
+    const QMetaObject *mo = object->metaObject();
+    const int propIndex = mo->indexOfProperty(qPrintable(name));
     if (propIndex < 0)
         return false;
 
-    const QMetaProperty prop = object->metaObject()->property(propIndex);
+    const QMetaProperty prop = mo->property(propIndex);
     if (!prop.isWritable())
         return false;
 
@@ -371,11 +372,12 @@ QVariant Utils::Object::queryProperty(QObject *object, const QString &name)
     if (object == nullptr)
         return QVariant();
 
-    const int propIndex = object->metaObject()->indexOfProperty(qPrintable(name));
+    const QMetaObject *mo = object->metaObject();
+    const int propIndex = mo->indexOfProperty(qPrintable(name));
     if (propIndex < 0)
         return QVariant();
 
-    const QMetaProperty prop = object->metaObject()->property(propIndex);
+    const QMetaProperty prop = mo->property(propIndex);
     if (!prop.isReadable())
         return QVariant();
 
@@ -841,6 +843,11 @@ QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const 
 
 Q_GLOBAL_STATIC(QObjectListModel<QObject *>, ObjectRegistry)
 
+// When adding objects to the registry, we are not using the built-in objectName property itself,
+// but rather a dynamic property as mentioned here. This is done on purpose, to ensure separation
+// of intents.
+static const char *objectNameProperty = "#objectName";
+
 /**
  * \brief Returns the object registry model.
  * \return A pointer to the QAbstractListModel for the registry.
@@ -881,8 +888,7 @@ QString Utils::ObjectRegistry::add(QObject *object, const QString &name)
     while (find(finalObjName))
         finalObjName = objName + QString::number(index++);
 
-    // We are not using setObjectName on purpose!!
-    object->setProperty("#objectName", finalObjName);
+    object->setProperty(objectNameProperty, finalObjName);
     ::ObjectRegistry->append(object);
 
     return finalObjName;
@@ -897,12 +903,42 @@ QObject *Utils::ObjectRegistry::find(const QString &name)
 {
     const QList<QObject *> &objects = ::ObjectRegistry->list();
     for (QObject *object : objects) {
-        const QString objName = object->property("#objectName").toString();
+        const QString objName = object->property(objectNameProperty).toString();
         if (objName == name)
             return object;
     }
 
     return nullptr;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Utils::ObjectRegister::ObjectRegister(QObject *parent) : QObject(parent) { }
+
+Utils::ObjectRegister::~ObjectRegister()
+{
+    Utils::ObjectRegistry::remove(this->parent());
+}
+
+Utils::ObjectRegister *Utils::ObjectRegister::qmlAttachedProperties(QObject *parent)
+{
+    return new Utils::ObjectRegister(parent);
+}
+
+void Utils::ObjectRegister::setName(const QString &val)
+{
+    if (m_name == val)
+        return;
+
+    if (!m_name.isEmpty())
+        Utils::ObjectRegistry::remove(this->parent());
+
+    m_name = val;
+
+    if (!m_name.isEmpty())
+        Utils::ObjectRegistry::add(this->parent(), m_name);
+
+    emit nameChanged();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1706,6 +1742,8 @@ QVariant Utils::SystemEnvironment::get(const QString &key, const QVariant &fallb
     if (settings.contains(key)) {
         return settings.value(key, fallback);
     }
+
+    return fallback;
 #else
     return QProcessEnvironment::systemEnvironment().value(key, fallback.toString());
 #endif

@@ -13,100 +13,36 @@
 
 import QtQml 2.15
 import QtQuick 2.15
-import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
-import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
-import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/notebookview"
-import "qrc:/qml/notebookview/tabs"
 import "qrc:/qml/notebookview/menus"
+import "qrc:/qml/notebookview/helpers"
 
 AbstractNotebookPage {
     id: root
 
-    property alias currentTab: _tabBar.currentTab
+    readonly property alias note: _private.note
 
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
-    signal deleteNoteRequest(Note note)
 
-    ColumnLayout {
-        anchors.fill: parent
-        anchors.margins: 11
-
-        TextTabBar {
-            id: _tabBar
-
-            Layout.fillWidth: true
-
-            name: _private.character.name
-            tabs: ["Information", "Relationships", "Notes"]
-            currentTab: 0
-        }
-
-        StackLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            clip: true
-            currentIndex: _tabBar.currentTab
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: CharacterInformationTab {
-                    character: _private.character
-                    maxTextAreaSize: root.maxTextAreaSize
-                    minTextAreaSize: root.minTextAreaSize
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: CharacterRelationshipsTab {
-                    character: _private.character
-
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                }
-            }
-
-            Loader {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-
-                active: visible
-
-                sourceComponent: NotesTab {
-                    notes: _private.notes
-
-                    onSwitchRequest: (item) => { root.switchRequest(item) }
-                    onDeleteNoteRequest: (note) => { root.deleteNoteRequest(note) }
-                }
-            }
-        }
-    }
+    backgroundColor: Qt.tint(_private.note.color, Runtime.colors.sceneHeadingTint)
 
     ActionHandler {
         action: ActionHub.notebookOperations.find("report")
 
         enabled: true
-        tooltip: "Export current character report as a PDF or ODT."
+        tooltip: "Export current text note as a PDF or ODT."
 
         onTriggered: (source) => {
                          let generator = Scrite.document.createReportGenerator("Notebook Report")
-                         generator.section = _private.character
+                         generator.section = _private.note
                          ReportConfigurationDialog.launch(generator)
                      }
     }
@@ -115,10 +51,10 @@ AbstractNotebookPage {
         action: ActionHub.notebookOperations.find("delete")
 
         enabled: true
-        tooltip: "Delete current character."
+        tooltip: "Delete current text note."
 
         onTriggered: (source) => {
-                         root.askDeleteConfirmation("Are you sure you want to delete this character?", confirmDeleteLater)
+                         root.askDeleteConfirmation("Are you sure you want to delete this text note?", confirmDeleteLater)
                      }
 
         function confirmDeleteLater() {
@@ -126,8 +62,8 @@ AbstractNotebookPage {
         }
 
         function confirmDelete() {
-            root.switchRequest("Characters")
-            Scrite.document.structure.removeCharacter(_private.character)
+            let notes = _private.note.notes
+            notes.removeNote(_private.note)
         }
     }
 
@@ -152,7 +88,7 @@ AbstractNotebookPage {
         action: ActionHub.notebookOperations.find("noteColor")
 
         down: colorMenu !== null
-        iconSource: "image://color/" + _private.character.color + "/1"
+        iconSource: "image://color/" + _private.note.color + "/1"
 
         onTriggered: (source) => {
                          if(colorMenu)
@@ -165,11 +101,10 @@ AbstractNotebookPage {
     QtObject {
         id: _private
 
-        property Notes notes: character ? character.notes : null
-        property Character character: root.pageData ? root.pageData.notebookItemObject.character : null
+        property Note note: root.pageData ? root.pageData.notebookItemObject : null
 
         readonly property Component newNoteMenu: NewNoteMenu {
-            notes: _private.notes
+            notes: _private.note.notes
 
             onSwitchRequest: (item) => { root.switchRequest(item) }
         }
@@ -182,10 +117,10 @@ AbstractNotebookPage {
         }
 
         readonly property Component colorMenu: ColorMenu {
-            selectedColor: _private.character.color
+            selectedColor: _private.note.color
 
             onMenuItemClicked: (color) => {
-                                   _private.character.color = color
+                                   _private.note.color = color
                                }
         }
 

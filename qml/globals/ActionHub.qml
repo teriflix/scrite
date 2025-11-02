@@ -1084,16 +1084,12 @@ Item {
             readonly property string tooltip: "If checked; episodes, acts and scenes selected on the notebook will be made current in screenplay editor & timeline"
 
             checkable: true
-            checked: Runtime.workspaceSettings.syncCurrentSceneOnNotebook
+            checked: ActionHandler.active ? ActionHandler.active.checked : false
             enabled: ActionHandler.canHandle
             objectName: "sync"
             text: "Sync"
 
             icon.source: "qrc:/icons/navigation/sync.png"
-
-            onToggled: {
-                Runtime.workspaceSettings.syncCurrentSceneOnNotebook = checked
-            }
         }
 
         Action {
@@ -1142,12 +1138,13 @@ Item {
             objectName: "noteColor"
             text: "Note Color"
 
-            icon.source: ActionHandler.active ? ActionHandler.active.iconSource : "image://color/#00ffffff/1"
+            icon.color: "transparent"
+            icon.source: ActionHandler.active ? ActionHandler.active.iconSource : "image://color/#ffffff/1"
         }
 
         Action {
-            readonly property string tooltip: "Toggle bookmark of a Note, Scene, Episode/Act Notes or Character"
             readonly property string defaultShortcut: "Ctrl+D"
+            property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "Toggle bookmark of a Note, Scene, Episode/Act Notes or Character"
 
             enabled: ActionHandler.canHandle
             objectName: "toggleBookmark"
@@ -1158,10 +1155,10 @@ Item {
         }
 
         Action {
-            readonly property string tooltip: "Delete the current note or character"
+            property string tooltip: ActionHandler.active ? ActionHandler.active.tooltip : "Delete the current note or character"
 
             enabled: ActionHandler.canHandle
-            objectName: "deleteCurrent"
+            objectName: "delete"
             text: "Delete"
 
             icon.source: "qrc:/icons/action/delete.png"
@@ -1179,7 +1176,7 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.notebookRequest, "Notebook Bookmarks")
+                Runtime.shoutoutLater(Runtime.announcementIds.notebookNodeRequest, "Notebook Bookmarks")
             }
         }
 
@@ -1194,7 +1191,7 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.notebookRequest, "Notebook Story")
+                Runtime.shoutoutLater(Runtime.announcementIds.notebookNodeRequest, "Notebook Story")
             }
         }
 
@@ -1209,7 +1206,7 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.notebookRequest, "Notebook Bookmarks")
+                Runtime.shoutoutLater(Runtime.announcementIds.notebookNodeRequest, "Notebook Characters")
             }
         }
     }

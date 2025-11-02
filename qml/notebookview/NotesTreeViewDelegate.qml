@@ -41,11 +41,15 @@ Item {
     // engine while instantiating TreeView delegates.
     required property var itemData
 
+    required property real treeViewWidth
+
     signal characterMenuRequest(Character character)
     signal noteMenuRequest(Note note)
 
     Rectangle {
-        width: root.width - parent.x
+        id: _container
+
+        width: root.treeViewWidth - parent.x
         height: Runtime.idealFontMetrics.height + 20
 
         color: {
@@ -73,16 +77,12 @@ Item {
         }
 
         Row {
+            id: _layout
+
             width: parent.width
             height: parent.height
 
             spacing: 5
-
-            Item {
-                width: 1
-                height: parent.height
-                visible: _icon.visible
-            }
 
             Image {
                 id: _icon
@@ -144,12 +144,12 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: parent.width-(_icon.visible ? (_icon.width+parent.spacing) : 0)
+                width: _layout.width-(_icon.visible ? (_icon.width+_layout.spacing) : 0)
 
+                color: Color.textColorFor(_container.color)
+                elide: Text.ElideRight
                 padding: 5
                 text: itemData.value.notebookItemTitle ? itemData.value.notebookItemTitle : ""
-                color: Color.textColorFor(parent.parent.color)
-                elide: Text.ElideRight
 
                 font.family: Runtime.idealFontMetrics.font.family
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize

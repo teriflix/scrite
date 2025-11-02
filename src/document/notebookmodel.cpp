@@ -270,8 +270,6 @@ QVariant NotebookModel::data(const QModelIndex &index, int role) const
             ++it;
         }
 
-        ret[QStringLiteral("modelIndex")] = index;
-
         return ret;
     }
 

@@ -45,7 +45,7 @@ Flickable {
     property Item textArea: _textArea
     property Item backTabItem
 
-    property SyntaxHighlighter syntaxHighlighter: _textArea.SyntaxHighlighter
+    property SyntaxHighlighter syntaxHighlighter: Object.firstChildByType(_textArea, "SyntaxHighlighter")
     property TabSequenceManager tabSequenceManager
 
     signal editingFinished()
