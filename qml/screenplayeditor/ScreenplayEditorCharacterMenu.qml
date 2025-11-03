@@ -32,10 +32,6 @@ VclMenu {
 
     property string characterName
 
-    property var additionalCharacterMenuItems: []
-
-    signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
-
     width: 350
 
     onAboutToHide: {
@@ -58,16 +54,16 @@ VclMenu {
         }
     }
 
-    Repeater {
-        model: Runtime.characterListReports.length > 0 ? additionalCharacterMenuItems : []
+    MenuSeparator { }
 
-        VclMenuItem {
-            required property var modelData
+    VclMenuItem {
+        text: "Character Notes"
+        icon.source: "qrc:/icons/content/note.png"
 
-            text: modelData.name
-            icon.source: "qrc" + modelData.icon
-
-            onTriggered: root.additionalCharacterMenuItemClicked(root.characterName, modelData.name)
+        onTriggered: {
+            let characterNotes = ActionHub.notebookOperations.find("characterNotes")
+            characterNotes.characterName = root.characterName
+            characterNotes.trigger()
         }
     }
 

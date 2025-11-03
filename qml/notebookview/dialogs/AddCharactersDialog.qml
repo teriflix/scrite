@@ -45,7 +45,7 @@ DialogLauncher {
             enabled: !Scrite.document.readOnly
 
             GenericArrayModel {
-                id: charactersModel
+                id: _charactersModel
 
                 Component.onCompleted: {
                     const allCharacters = Scrite.document.structure.allCharacterNames()
@@ -89,7 +89,7 @@ DialogLauncher {
                     border.width: 1
 
                     Flickable {
-                        id: charactersFlick
+                        id: _charactersFlick
 
                         anchors.fill: parent
                         anchors.margins: 1
@@ -97,21 +97,22 @@ DialogLauncher {
                         ScrollBar.vertical: VclScrollBar { }
 
                         clip: contentHeight > height
-                        contentWidth: charactersComboBoxLayout.width
-                        contentHeight: charactersComboBoxLayout.height
+                        contentWidth: _charactersComboBoxLayout.width
+                        contentHeight: _charactersComboBoxLayout.height
                         flickableDirection: Flickable.VerticalFlick
 
                         GridLayout {
-                            id: charactersComboBoxLayout
+                            id: _charactersComboBoxLayout
 
-                            width: charactersFlick.ScrollBar.vertical.needed ? charactersFlick.width-20 : charactersFlick.width
+                            width: _charactersFlick.ScrollBar.vertical.needed ? _charactersFlick.width-20 : _charactersFlick.width
                             columns: 2
                             rowSpacing: 10
                             columnSpacing: 10
 
                             Repeater {
-                                id: charactersCheckBoxes
-                                model: charactersModel
+                                id: _charactersCheckBoxes
+
+                                model: _charactersModel
 
                                 VclCheckBox {
                                     required property string modelData
@@ -129,10 +130,11 @@ DialogLauncher {
 
                     VclButton {
                         text: "Select All"
-                        enabled: charactersModel.count > 0
+                        enabled: _charactersModel.count > 0
+
                         onClicked: {
-                            for(let i=0; i<charactersCheckBoxes.count; i++) {
-                                let checkBox = charactersCheckBoxes.itemAt(i)
+                            for(let i=0; i<_charactersCheckBoxes.count; i++) {
+                                let checkBox = _charactersCheckBoxes.itemAt(i)
                                 checkBox.checked = true
                             }
                         }
@@ -140,10 +142,11 @@ DialogLauncher {
 
                     VclButton {
                         text: "Unselect All"
-                        enabled: charactersModel.count > 0
+                        enabled: _charactersModel.count > 0
+
                         onClicked: {
-                            for(let i=0; i<charactersCheckBoxes.count; i++) {
-                                let checkBox = charactersCheckBoxes.itemAt(i)
+                            for(let i=0; i<_charactersCheckBoxes.count; i++) {
+                                let checkBox = _charactersCheckBoxes.itemAt(i)
                                 checkBox.checked = false
                             }
                         }
@@ -155,11 +158,12 @@ DialogLauncher {
 
                     VclButton {
                         text: "Add Selected"
-                        enabled: charactersModel.count > 0
+                        enabled: _charactersModel.count > 0
+
                         onClicked: {
                             let count = 0
-                            for(let i=0; i<charactersCheckBoxes.count; i++) {
-                                let checkBox = charactersCheckBoxes.itemAt(i)
+                            for(let i=0; i<_charactersCheckBoxes.count; i++) {
+                                let checkBox = _charactersCheckBoxes.itemAt(i)
                                 if(checkBox.checked) {
                                     const ch = Scrite.document.structure.addCharacter(checkBox.text)
                                     if(ch)
@@ -167,32 +171,23 @@ DialogLauncher {
                                 }
                             }
 
-                            if(count > 0)
-                            MessageBox.information("Characters Added",
-                                                   "A total of " + (count === 1 ? "one character was" : count + " characters were") + " added.",
-                                                   dialog.close)
-                            else
-                            MessageBox.information("No Characters Added",
-                                                   "No characters were added.",
-                                                   dialog.close)
+                            if(count > 0) {
+                                MessageBox.information("Characters Added",
+                                                       "A total of " + (count === 1 ? "one character was" : count + " characters were") + " added.",
+                                                       dialog.close)
+                            } else {
+                                MessageBox.information("No Characters Added",
+                                                       "No characters were added.",
+                                                       dialog.close)
+                            }
 
-                            _private.switchToCharactersTabLater()
+                            let notebookView = ObjectRegistry.find("notebookView")
+                            if(notebookView)
+                                notebookView.scheduleSwitchTo("Characters")
                         }
                     }
                 }
             }
-        }
-    }
-
-    QtObject {
-        id: _private
-
-        function switchToCharactersTabLater() {
-            Runtime.execLater(_private, 200, switchToCharactersTabNow)
-        }
-
-        function switchToCharactersTabNow() {
-            Runtime.shoutout(Runtime.announcementIds.notebookNodeRequest, "Characters")
         }
     }
 }

@@ -80,7 +80,6 @@ Item {
         }
 
         anchors.fill: parent
-        anchors.margins: 1
 
         backgroundColor: "transparent"
         url: "qrc:/richtexteditor.html"

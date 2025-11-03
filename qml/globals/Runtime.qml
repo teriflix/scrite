@@ -740,7 +740,7 @@ Item {
     }
 
     function shoutout(type, data, delay) {
-        if(typeof delay === "int" && delay > 0) {
+        if(typeof delay === "number" && delay > 0) {
             execLater(root, delay, (args) => {
                           root.shoutout(args[0], args[1], 0)
                       }, [type, data])

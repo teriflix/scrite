@@ -34,15 +34,6 @@ Item {
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteNoteRequest(Note note)
 
-    Rectangle {
-        id: _background
-
-        color: Color.translucent(Runtime.colors.primary.c100.background, 0.5)
-
-        border.width: 1
-        border.color: Runtime.colors.primary.borderColor
-    }
-
     Flickable {
         id: _flickable
 
@@ -53,7 +44,6 @@ Item {
         ScrollBar.vertical: _scrollBar
 
         anchors.fill: parent
-        anchors.margins: 20
 
         clip: true
         contentWidth: width

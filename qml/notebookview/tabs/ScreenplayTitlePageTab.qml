@@ -215,7 +215,7 @@ Item {
                 Link {
                     width: parent.width
 
-                    text: root.screenplay.adddress
+                    text: root.screenplay.address
                     visible: text !== ""
                     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 

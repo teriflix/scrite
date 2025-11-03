@@ -35,8 +35,8 @@ Item {
     signal zoomInRequest()
     signal zoomOutRequest()
 
-    width: _layout.width
-    height: Runtime.idealFontMetrics.height + 8
+    implicitWidth: _layout.width
+    implicitHeight: Runtime.idealFontMetrics.height + 8
 
     RowLayout {
         id: _layout

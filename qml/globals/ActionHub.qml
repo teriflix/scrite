@@ -1164,10 +1164,10 @@ Item {
             icon.source: "qrc:/icons/action/delete.png"
         }
 
-        // TODO
         Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Shift+K"
+            property int triggerCount: 0
 
             enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
             objectName: "bookmarkedNotes"
@@ -1176,13 +1176,14 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.notebookNodeRequest, "Notebook Bookmarks")
+                triggerCount = triggerCount+1
             }
         }
 
         Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Shift+Y"
+            property int triggerCount: 0
 
             enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
             objectName: "storyNotes"
@@ -1191,13 +1192,16 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.notebookNodeRequest, "Notebook Story")
+                triggerCount = triggerCount+1
             }
         }
 
         Action {
             readonly property bool visible: false
             readonly property string defaultShortcut: "Ctrl+Shift+R"
+
+            property int triggerCount: 0
+            property string characterName
 
             enabled: Runtime.allowAppUsage && Runtime.appFeatures.notebook.enabled
             objectName: "characterNotes"
@@ -1206,7 +1210,7 @@ Item {
 
             onTriggered: {
                 Runtime.activateMainWindowTab(Runtime.NotebookTab)
-                Runtime.shoutoutLater(Runtime.announcementIds.notebookNodeRequest, "Notebook Characters")
+                triggerCount = triggerCount+1
             }
         }
     }

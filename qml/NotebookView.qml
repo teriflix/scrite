@@ -34,10 +34,13 @@ import "qrc:/qml/notifications"
 Item {
     id: root
 
+    function scheduleSwitchTo(item) { _private.scheduleSwitchTo(item) }
     function switchTo(item) { _private.switchTo(item) }
     function switchToCharacterTab(name) { _private.switchToCharacterTab(name) }
     function switchToSceneTab() { _private.switchToSceneTab() }
     function switchToStoryTab() { _private.switchToStoryTab() }
+
+    ObjectRegister.name: "notebookView"
 
     FocusTracker.window: Scrite.window
     FocusTracker.onHasFocusChanged: Runtime.undoStack.notebookActive = FocusTracker.hasFocus
@@ -205,6 +208,47 @@ Item {
                      }
 
         onCurrentNoteChanged: determineIfCurrentNoteIsBookmarked()
+    }
+
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("bookmarkedNotes")
+
+        onTriggerCountChanged: (value) => { _private.scheduleSwitchTo("Bookmarks") }
+    }
+
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("storyNotes")
+
+        onTriggerCountChanged: (value) => { _private.scheduleSwitchTo("Story") }
+    }
+
+    ActionHandler {
+        action: ActionHub.notebookOperations.find("characterNotes")
+
+        onTriggerCountChanged: (value) => {
+                                   const chName = action.characterName
+                                   action.characterName = ""
+
+                                   if(chName === "") {
+                                       _private.scheduleSwitchTo("Characters")
+                                   } else {
+                                       const ch = Scrite.document.structure.findCharacter(chName)
+                                       if(ch === null) {
+                                           MessageBox.question("Add Character",
+                                                               "A section for <b>" + chName.toUpperCase() + "</b> needs to be added to Notebook. Please confirm.",
+                                                               ["Confirm", "Cancel"], (answer) => {
+                                                                   if(answer === "Confirm") {
+                                                                       const newCh = Scrite.document.structure.addCharacter(chName)
+                                                                       if(newCh) {
+                                                                           _private.scheduleSwitchTo(newCh.notes)
+                                                                       }
+                                                                   }
+                                                               })
+                                       } else {
+                                           _private.scheduleSwitchTo(ch.notes)
+                                       }
+                                   }
+                               }
     }
 
     NotebookModel {
@@ -456,11 +500,11 @@ Item {
         function switchTo(item) {
             if(typeof item === "string") {
                 let midx
-                if(item === "Notebook Bookmarks")
+                if(item === "Bookmarks")
                     midx = _notebookTree.model.findModelIndexForCategory(NotebookModel.BookmarksCategory)
-                else if(item === "Notebook Story")
+                else if(item === "Story")
                     midx = _notebookTree.model.findModelIndexForCategory(NotebookModel.ScreenplayCategory)
-                else if(item === "Notebook Characters")
+                else if(item === "Characters")
                     midx = _notebookTree.model.findModelIndexForCategory(NotebookModel.CharactersCategory)
                 else
                     midx = _notebookTree.model.findModelIndexForTopLevelItem(item)
@@ -474,6 +518,7 @@ Item {
 
             interval: Runtime.stdAnimationDuration
             repeat: false
+            running: false
 
             onTriggered: {
                 if(item === undefined)
@@ -484,7 +529,9 @@ Item {
         }
 
         function scheduleSwitchTo(item) {
-            // Delay is hardcoded to 75ms, which is 25ms more than what the NotebookModel takes to sync
+            if(switchTimer.running)
+                return
+
             switchTimer.item = item
             switchTimer.start()
         }
@@ -497,29 +544,6 @@ Item {
             else
                 deleteTriggerTimer = Runtime.execLater(deleteAction, Runtime.stdAnimationDuration, deleteAction.trigger)
         }
-
-        Announcement.onIncoming: (type, data) => {
-                                     // Check this..
-                                     if(type === Runtime.announcementIds.characterNotesRequest) {
-                                         switchToCharacterTab(data)
-                                     } else if(type === Runtime.announcementIds.sceneNotesRequest) {
-                                         switchToSceneTab()
-                                     } else if(type === Runtime.announcementIds.notebookNodeRequest) {
-                                         if(typeof data === "string") {
-                                             switch(data) {
-                                                 case "Story":
-                                                    switchToStoryTab()
-                                                    break
-                                                 case "Screenplay":
-                                                    switchTo("Notebook Story");
-                                                    break
-                                                 case "Characters":
-                                                    switchTo("Notebook Characters");
-                                                    break
-                                             }
-                                         }
-                                     }
-                                 }
 
         Component.onCompleted: {
             _notebookTree.activateFromCurrentScreenplayElement()

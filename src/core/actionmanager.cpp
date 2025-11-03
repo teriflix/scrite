@@ -30,6 +30,8 @@ static const QByteArray _QQuickActionShortcutProperty = QByteArrayLiteral("short
 static const char *_QQuickActionShortcutChanged = SIGNAL(shortcutChanged(QKeySequence));
 static const QByteArray _QQuickActionDefaultShortcutProperty = QByteArrayLiteral("defaultShortcut");
 static const QByteArray _QQuickActionEnabledProperty = QByteArrayLiteral("enabled");
+static const QByteArray _QQuickActionTriggerCount = QByteArrayLiteral("triggerCount");
+static const char *_QQuickActionTriggerCountChanged = SIGNAL(triggerCountChanged());
 
 Q_GLOBAL_STATIC(QObjectListModel<ActionManager *>, ActionManagerModel)
 
@@ -603,6 +605,12 @@ void ActionHandler::setAction(QObject *val)
         connect(m_action, SIGNAL(toggled(QObject*)), this, SIGNAL(toggled(QObject*)));
         connect(m_action, SIGNAL(triggered(QObject*)), this, SIGNAL(triggered(QObject*)));
         // clang-format on
+
+        const QMetaObject *mo = m_action->metaObject();
+        const QMetaProperty triggerCountProp =
+                mo->property(mo->indexOfProperty(_QQuickActionTriggerCount));
+        if (triggerCountProp.isValid() && triggerCountProp.userType() == QMetaType::Int)
+            connect(m_action, _QQuickActionTriggerCountChanged, this, SLOT(checkTriggerCount()));
     }
 
     emit actionChanged();
@@ -614,12 +622,34 @@ QObject *ActionHandler::findAction(const QString &managerName, const QString &ac
     return actionManager ? actionManager->find(actionName) : nullptr;
 }
 
+void ActionHandler::componentComplete()
+{
+    QQuickItem::componentComplete();
+
+    const QMetaObject *mo = m_action->metaObject();
+    const QMetaProperty triggerCountProp =
+            mo->property(mo->indexOfProperty(_QQuickActionTriggerCount));
+    if (triggerCountProp.isValid() && triggerCountProp.userType() == QMetaType::Int)
+        checkTriggerCount();
+}
+
 void ActionHandler::onObjectDestroyed(QObject *ptr)
 {
     if (m_action == ptr && m_action != nullptr) {
         emit actionAboutToChange();
         m_action = nullptr;
         emit actionChanged();
+    }
+}
+
+void ActionHandler::checkTriggerCount()
+{
+    if (m_action != nullptr && this->isComponentComplete()) {
+        const QVariant tc = m_action->property(_QQuickActionTriggerCount);
+        if (tc.userType() == QMetaType::Int && tc.toInt() > 0) {
+            emit triggerCountChanged(tc.toInt());
+            m_action->setProperty(_QQuickActionTriggerCount, QVariant::fromValue<int>(0));
+        }
     }
 }
 

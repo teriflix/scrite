@@ -27,10 +27,7 @@ import "qrc:/qml/screenplayeditor"
 AbstractScenePartEditor {
     id: root
 
-    property var additionalCharacterMenuItems: []
-
     signal newCharacterAdded(string characterName)
-    signal additionalCharacterMenuItemClicked(string characterName, string menuItemName)
 
     height: _charactersInput.height
 
@@ -89,13 +86,7 @@ AbstractScenePartEditor {
         property bool captureInvisibleCharacters: Runtime.screenplayEditorSettings.captureInvisibleCharacters
         onCaptureInvisibleCharactersChanged: scheduleDetermineFlagsInTags()
 
-        property Component characterMenu: ScreenplayEditorCharacterMenu {
-            additionalCharacterMenuItems: root.additionalCharacterMenuItems
-
-            onAdditionalCharacterMenuItemClicked: (characterName, menuItemName) => {
-                                                      root.additionalCharacterMenuItemClicked(characterName, menuItemName)
-                                                  }
-        }
+        property Component characterMenu: ScreenplayEditorCharacterMenu { }
 
         readonly property Connections sceneConnections: Connections {
             target: root.scene

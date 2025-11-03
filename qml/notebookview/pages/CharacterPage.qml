@@ -35,13 +35,17 @@ AbstractNotebookPage {
     signal switchRequest(var item) // could be string, or any of the notebook objects like Notes, Character etc.
     signal deleteNoteRequest(Note note)
 
+    backgroundColor: Qt.tint(_private.character.color, Runtime.colors.sceneHeadingTint)
+
     ColumnLayout {
         anchors.fill: parent
-        anchors.margins: 11
 
         TextTabBar {
             id: _tabBar
 
+            Layout.topMargin: 11
+            Layout.leftMargin: 11
+            Layout.rightMargin: 11
             Layout.fillWidth: true
 
             name: _private.character.name

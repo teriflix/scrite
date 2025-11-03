@@ -289,14 +289,10 @@ AbstractScreenplayElementDelegate {
                                 pageMargins: root.pageMargins
                                 screenplayAdapter: root.screenplayAdapter
 
-                                // TODO
-                                additionalCharacterMenuItems: []
-
                                 onEnsureVisible: (item, area) => { root.ensureVisible(item, area) }
 
                                 // TODO
                                 onNewCharacterAdded: (characterName) => { }
-                                onAdditionalCharacterMenuItemClicked: (characterName, menuItemName) => { }
                             }
                         }
 

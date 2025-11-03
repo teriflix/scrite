@@ -197,7 +197,9 @@ DialogLauncher {
                         _private.waitDialog = null
 
                         if(_private.renameWasSuccessful) {
-                            Runtime.shoutout(Runtime.announcementIds.characterNotesRequest, _private.newCharacterName)
+                            let characterNotes = ActionHub.notebookOperations.find("characterNotes")
+                            characterNotes.characterName = _private.newCharacterName
+                            characterNotes.trigger()
                             Qt.callLater(dialog.close)
                         } else
                         MessageBox.information("Rename Error", dialog.character.renameError, () => {

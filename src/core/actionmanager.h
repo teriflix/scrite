@@ -192,15 +192,17 @@ public:
 
     Q_INVOKABLE QObject *findAction(const QString &managerName, const QString &actionName) const;
 
-signals:
-    void actionAboutToChange();
+    void componentComplete();
 
 signals:
+    void actionAboutToChange();
     void toggled(QObject *source = nullptr);
     void triggered(QObject *source = nullptr);
+    void triggerCountChanged(int count);
 
 private:
     void onObjectDestroyed(QObject *ptr);
+    Q_SLOT void checkTriggerCount();
 
 private:
     int m_priority = 0;
