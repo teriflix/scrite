@@ -64,7 +64,7 @@ DialogLauncher {
                           At best we can paint a 464x261 point photo on the cover page. Nothing more.
                           So, we need to provide a image preview in this aspect ratio.
                           */
-                    color: dialog.background.item.color
+                    color: dialog.background && dialog.background.item ? dialog.background.item.color : Runtime.colors.primary.c10.background
                     border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
                     border.color: "black"
                     Layout.preferredWidth: 400
