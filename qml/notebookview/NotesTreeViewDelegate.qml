@@ -43,14 +43,16 @@ Item {
 
     required property real treeViewWidth
 
-    signal characterMenuRequest(Character character)
+    signal makeCurrentRequest()
     signal noteMenuRequest(Note note)
+    signal characterMenuRequest(Character character)
 
     Rectangle {
         id: _container
 
-        width: root.treeViewWidth - parent.x
-        height: Runtime.idealFontMetrics.height + 20
+        x: -parent.x
+        width: root.treeViewWidth
+        height: _layout.height
 
         color: {
             if(itemData.selected)
@@ -75,98 +77,105 @@ Item {
 
             return Runtime.colors.primary.c10.background
         }
+    }
 
-        Row {
-            id: _layout
+    Row {
+        id: _layout
 
-            width: parent.width
-            height: parent.height
+        width: root.treeViewWidth - parent.x
+        height: Runtime.idealFontMetrics.height + 20
 
-            spacing: 5
+        spacing: 5
 
-            Image {
-                id: _icon
+        Image {
+            id: _icon
 
-                anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenter: parent.verticalCenter
 
-                width: parent.height * 0.6
-                height: width
+            width: parent.height * 0.6
+            height: width
 
-                mipmap: true
-                visible: source != ""
-                opacity: {
-                    switch(itemData.value.notebookItemType) {
-                    case NotebookModel.EpisodeBreakType:
-                    case NotebookModel.ActBreakType:
-                        return itemData.value.notebookItemObject ? 1 : 0.5
-                    }
-                    return 1
+            mipmap: true
+            visible: source != ""
+            opacity: {
+                switch(itemData.value.notebookItemType) {
+                case NotebookModel.EpisodeBreakType:
+                case NotebookModel.ActBreakType:
+                    return itemData.value.notebookItemObject ? 1 : 0.5
                 }
-
-                source: {
-                    switch(itemData.value.notebookItemType) {
-                    case NotebookModel.EpisodeBreakType:
-                        return "qrc:/icons/content/episode.png"
-                    case NotebookModel.ActBreakType:
-                        return "qrc:/icons/content/act.png"
-                    case NotebookModel.NotesType:
-                        switch(itemData.value.notebookItemObject.ownerType) {
-                        case Notes.SceneOwner:
-                            return "qrc:/icons/content/scene.png"
-                        case Notes.CharacterOwner:
-                            return "qrc:/icons/content/person_outline.png"
-                        case Notes.BreakOwner:
-                            return "qrc:/icons/content/story.png"
-                        default:
-                            break
-                        }
-                        break;
-                    case NotebookModel.NoteType:
-                        switch(itemData.value.notebookItemObject.type) {
-                        case Note.TextNoteType:
-                            return "qrc:/icons/content/note.png"
-                        case Note.FormNoteType:
-                            return "qrc:/icons/content/form.png"
-                        case Note.CheckListNoteType:
-                            return "qrc:/icons/content/checklist.png"
-                        default:
-                            break
-                        }
-                        break;
-                    }
-
-                    return ""
-                }
+                return 1
             }
 
-            VclLabel {
-                id: _text
+            source: {
+                switch(itemData.value.notebookItemType) {
+                case NotebookModel.EpisodeBreakType:
+                    return "qrc:/icons/content/episode.png"
+                case NotebookModel.ActBreakType:
+                    return "qrc:/icons/content/act.png"
+                case NotebookModel.NotesType:
+                    switch(itemData.value.notebookItemObject.ownerType) {
+                    case Notes.SceneOwner:
+                        return "qrc:/icons/content/scene.png"
+                    case Notes.CharacterOwner:
+                        return "qrc:/icons/content/person_outline.png"
+                    case Notes.BreakOwner:
+                        return "qrc:/icons/content/story.png"
+                    default:
+                        break
+                    }
+                    break;
+                case NotebookModel.NoteType:
+                    switch(itemData.value.notebookItemObject.type) {
+                    case Note.TextNoteType:
+                        return "qrc:/icons/content/note.png"
+                    case Note.FormNoteType:
+                        return "qrc:/icons/content/form.png"
+                    case Note.CheckListNoteType:
+                        return "qrc:/icons/content/checklist.png"
+                    default:
+                        break
+                    }
+                    break;
+                }
 
-                anchors.verticalCenter: parent.verticalCenter
-
-                width: _layout.width-(_icon.visible ? (_icon.width+_layout.spacing) : 0)
-
-                color: Color.textColorFor(_container.color)
-                elide: Text.ElideRight
-                padding: 5
-                text: itemData.value.notebookItemTitle ? itemData.value.notebookItemTitle : ""
-
-                font.family: Runtime.idealFontMetrics.font.family
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                font.capitalization: Runtime.idealFontMetrics.font.capitalization
-                font.bold: itemData.value.notebookItemType === NotebookModel.CategoryType ||
-                           (itemData.value.notebookItemType === NotebookModel.NotesType &&
-                            itemData.value.notebookItemObject.ownerType === Notes.StructureOwner)
+                return ""
             }
+        }
+
+        VclLabel {
+            id: _text
+
+            anchors.verticalCenter: parent.verticalCenter
+
+            width: _layout.width-(_icon.visible ? (_icon.width+_layout.spacing) : 0)
+
+            color: Color.textColorFor(_container.color)
+            elide: Text.ElideRight
+            padding: 5
+            text: itemData.value.notebookItemTitle ? itemData.value.notebookItemTitle : ""
+
+            font.family: Runtime.idealFontMetrics.font.family
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+            font.capitalization: Runtime.idealFontMetrics.font.capitalization
+            font.bold: itemData.value.notebookItemType === NotebookModel.CategoryType ||
+                       (itemData.value.notebookItemType === NotebookModel.NotesType &&
+                        itemData.value.notebookItemObject.ownerType === Notes.StructureOwner)
         }
     }
 
     MouseArea {
+        ToolTip.text: _text.text
+        ToolTip.visible: containsMouse && _text.text !== "" && _text.truncated
+        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
         anchors.fill: parent
 
         acceptedButtons: Qt.RightButton
+        hoverEnabled: _text.text !== "" && _text.truncated
 
         onClicked: {
+            root.makeCurrentRequest()
+
             if(itemData.value.notebookItemType === NotebookModel.NoteType) {
                 root.noteMenuRequest(itemData.value.notebookItemObject)
             } else if(itemData.value.notebookItemType === NotebookModel.NotesType &&

@@ -311,6 +311,7 @@ DialogLauncher {
                         ToolTip.visible: hovered && defaultsSavedNotice.opacity === 0
                         ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
                         ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
                         onClicked: {
                             Runtime.titlePageSettings.author = Scrite.document.screenplay.author
                             Runtime.titlePageSettings.contact = Scrite.document.screenplay.contact

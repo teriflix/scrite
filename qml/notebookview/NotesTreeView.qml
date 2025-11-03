@@ -152,7 +152,11 @@ OldControls.TreeView {
         id: _delegate
 
         itemData: styleData
-        treeViewWidth: root.width
+        treeViewWidth: root.__listView.width
+
+        onMakeCurrentRequest: () => {
+            root.setCurrentIndex(itemData.index)
+        }
 
         onNoteMenuRequest: (note) => {
                                _private.popupNoteMenu(note, _delegate)

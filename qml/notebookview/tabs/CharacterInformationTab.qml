@@ -62,6 +62,7 @@ Item {
 
                 anchors.fill: parent
                 anchors.margins: 1
+                anchors.leftMargin: height < contentHeight ? 11 : 1
 
                 contentWidth: _content.width
                 contentHeight: _content.height
@@ -75,12 +76,14 @@ Item {
 
                     // Quick Info
                     Item {
+                        readonly property real minimumWidth: 300
+
                         Component.onCompleted: Runtime.execLater(this, 100, function() {
                             _photoSlideView.currentIndex = root.character.hasKeyPhoto ? root.character.keyPhotoIndex : 0
                         } )
 
-                        implicitWidth: Runtime.showNotebookInStructure ? 300 : Scrite.window.width * 0.3
-                        implicitHeight: _quickInfoLayout.height
+                        implicitWidth: Runtime.showNotebookInStructure ? minimumWidth : Math.max(Scrite.window.width * 0.15, minimumWidth)
+                        implicitHeight: Math.max(_quickInfoLayout.height, _contentView.height)
 
                         ColumnLayout {
                             id: _quickInfoLayout

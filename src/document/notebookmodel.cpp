@@ -734,9 +734,13 @@ void NotesItem::updateText()
 
         StructureElement *element = m_notes->scene()->structureElement();
         QString title;
-        if (element)
+        if (element) {
             title = element->title();
-        else
+            if (title.isEmpty()) {
+                if (element->scene() && !element->scene()->heading()->isEnabled())
+                    title = QStringLiteral("NO SCENE HEADING");
+            }
+        } else
             title = m_notes->scene()->synopsis();
         if (!idxStringList.isEmpty())
             title = QStringLiteral("[") + idxStringList.join(QStringLiteral(","))

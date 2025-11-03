@@ -71,6 +71,16 @@ Item {
             notebookModel: _notebookModel
 
             onSwitchRequest: (item) => { _private.scheduleSwitchTo(item) }
+
+            onDeleteNoteRequest: (note) => {
+                                     _private.switchTo(note)
+                                     _private.scheduleDeleteRequest() // Must be called after switchTo
+                                 }
+
+            onDeleteCharacterRequest: (character) => {
+                                          _private.switchTo(character.notes)
+                                          _private.scheduleDeleteRequest(character.notes) // Must be called after switchTo
+                                      }
         }
 
         Loader {
