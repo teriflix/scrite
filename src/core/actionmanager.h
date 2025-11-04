@@ -201,6 +201,8 @@ signals:
     void triggerCountChanged(int count);
 
 private:
+    Q_SLOT void onToggled(QObject *source = nullptr);
+    Q_SLOT void onTriggered(QObject *source = nullptr);
     void onObjectDestroyed(QObject *ptr);
     Q_SLOT void checkTriggerCount();
 

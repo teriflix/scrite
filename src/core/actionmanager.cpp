@@ -12,14 +12,15 @@
 ****************************************************************************/
 
 #include "actionmanager.h"
+#include "utils.h"
 #include "application.h"
 #include "qobjectlistmodel.h"
 
+#include <QDir>
 #include <QTimer>
 #include <QGuiApplication>
-#include <QDynamicPropertyChangeEvent>
-#include <QDir>
 #include <QJsonDocument>
+#include <QDynamicPropertyChangeEvent>
 
 static const char *_QQuickAction = "QQuickAction";
 static const QByteArray _QQuickActionSortOrderProperty = QByteArrayLiteral("sortOrder");
@@ -525,8 +526,9 @@ ActionManager *ActionManagerAttached::find(const QString &name) const
 
 ActionHandler::ActionHandler(QQuickItem *parent) : QQuickItem(parent)
 {
-
     this->setFlag(QQuickItem::ItemHasContents, false);
+
+    connect(this, &QQuickItem::enabledChanged, this, &ActionHandler::checkTriggerCount);
 
     ActionHandlers::instance()->add(this);
 }
@@ -602,8 +604,8 @@ void ActionHandler::setAction(QObject *val)
         connect(m_action, &QObject::destroyed, this, &ActionHandler::onObjectDestroyed);
 
         // clang-format off
-        connect(m_action, SIGNAL(toggled(QObject*)), this, SIGNAL(toggled(QObject*)));
-        connect(m_action, SIGNAL(triggered(QObject*)), this, SIGNAL(triggered(QObject*)));
+        connect(m_action, SIGNAL(toggled(QObject*)), this, SLOT(onToggled(QObject*)));
+        connect(m_action, SIGNAL(triggered(QObject*)), this, SLOT(onTriggered(QObject*)));
         // clang-format on
 
         const QMetaObject *mo = m_action->metaObject();
@@ -633,6 +635,18 @@ void ActionHandler::componentComplete()
         checkTriggerCount();
 }
 
+void ActionHandler::onToggled(QObject *source)
+{
+    if (this->isEnabled())
+        emit toggled(source);
+}
+
+void ActionHandler::onTriggered(QObject *source)
+{
+    if (this->isEnabled())
+        emit triggered(source);
+}
+
 void ActionHandler::onObjectDestroyed(QObject *ptr)
 {
     if (m_action == ptr && m_action != nullptr) {
@@ -644,7 +658,7 @@ void ActionHandler::onObjectDestroyed(QObject *ptr)
 
 void ActionHandler::checkTriggerCount()
 {
-    if (m_action != nullptr && this->isComponentComplete()) {
+    if (m_action != nullptr && this->isComponentComplete() && this->isEnabled()) {
         const QVariant tc = m_action->property(_QQuickActionTriggerCount);
         if (tc.userType() == QMetaType::Int && tc.toInt() > 0) {
             emit triggerCountChanged(tc.toInt());
