@@ -163,6 +163,14 @@ Rectangle {
                 action: ActionHub.editOptions.find("reload")
             }
 
+            ActionToolButton {
+                action: ActionHub.editOptions.find("splitScene")
+            }
+
+            ActionToolButton {
+                action: ActionHub.editOptions.find("mergeScene")
+            }
+
             ActionManagerToolButton {
                 actionManager: ActionHub.screenplayEditorOptions
             }

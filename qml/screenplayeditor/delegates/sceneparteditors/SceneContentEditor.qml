@@ -353,37 +353,22 @@ AbstractScenePartEditor {
         }
     }
 
-    // All the keyboard shortcuts
-    ShortcutsModelRecord {
-        id: _splitSceneShortcut
-
-        group: "Edit"
-        title: "Split Scene"
+    ActionHandler {
+        action: ActionHub.editOptions.find("splitScene")
         enabled: _private.canSplitScene
-        visible: _sceneTextEditor.activeFocus
-        priority: 1
-        shortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
 
-        function trigger() {
-            if(enabled)
-                _private.splitSceneAt(_sceneTextEditor.cursorPosition)
-        }
+        onTriggered: (source) => {
+                         Qt.callLater(_private.splitSceneAt, _sceneTextEditor.cursorPosition)
+                     }
     }
 
-    ShortcutsModelRecord {
-        id: _mergeSceneShortcut
-
-        group: "Edit"
-        title: "Join Previous Scene"
+    ActionHandler {
+        action: ActionHub.editOptions.find("mergeScene")
         enabled: _private.canJoinToPreviousScene
-        visible: _sceneTextEditor.activeFocus
-        priority: 1
-        shortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
 
-        function trigger() {
-            if(enabled)
-                _private.mergeWithPreviousScene(_sceneTextEditor.cursorPosition)
-        }
+        onTriggered: (source) => {
+                         Qt.callLater(_private.mergeWithPreviousScene, _sceneTextEditor.cursorPosition)
+                     }
     }
 
     // Other private objects
@@ -485,11 +470,11 @@ AbstractScenePartEditor {
             // This should be same as
             // if( event.modifiers & Qt.ControlModifier|Qt.ShiftModifier )
             // but for whatever reason, that does not work.
-            if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
+            /*if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
                 event.accepted = true
                 _splitSceneShortcut.trigger()
                 return
-            }
+            }*/
         }
 
         function handleSceneTextEditorTabPressed(event) {
@@ -505,13 +490,13 @@ AbstractScenePartEditor {
             // This should be same as
             // if( event.modifiers & Qt.ControlModifier|Qt.ShiftModifier )
             // but for whatever reason, that does not work.
-            if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
+            /*if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
                 if( (Platform.isMacOSDesktop && event.key === Qt.Key_Delete) || (event.key === Qt.Key_Backspace) ) {
                     event.accepted = true
                     _mergeSceneShortcut.trigger()
                 }
                 return
-            }
+            }*/
 
             if(event.modifiers === Qt.ControlModifier) {
                 switch(event.key) {
@@ -654,8 +639,8 @@ AbstractScenePartEditor {
         // it gets to complete its job.
         function splitSceneAt(cursorPosition) {
             if(!canSplitScene || cursorPosition !== _sceneDocumentBinder.cursorPosition) {
-                MessageBox.information("Split Scene Error",
-                                    "Scene can be split only when cursor is placed at the start of a paragraph.")
+                // MessageBox.information("Split Scene Error",
+                //                     "Scene can be split only when cursor is placed at the start of a paragraph.")
                 return
             }
 
@@ -664,8 +649,8 @@ AbstractScenePartEditor {
 
         function mergeWithPreviousScene(cursorPosition) {
             if(!canJoinToPreviousScene || cursorPosition !== _sceneDocumentBinder.cursorPosition) {
-                MessageBox.information("Merge Scene Error",
-                                    "Scene can be merged only when cursor is placed at the start of the first paragraph in a scene.")
+                // MessageBox.information("Merge Scene Error",
+                //                     "Scene can be merged only when cursor is placed at the start of the first paragraph in a scene.")
                 return
             }
 

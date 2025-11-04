@@ -549,12 +549,35 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: "F3"
 
             enabled: ActionHandler.canHandle
             objectName: "smileysAndSymbols"
             shortcut: defaultShortcut
-            text: "Symbols & Smileys"
+            text: "Symbols & Smileys"                            
+        }
+
+        Action {
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Return" : "Ctrl+Shift+Enter"
+
+            enabled: ActionHandler.canHandle
+            objectName: "splitScene"
+            shortcut: defaultShortcut
+            text: "Split Scene"
+
+            icon.source: "qrc:/icons/action/split_scene.png"
+        }
+
+        Action {
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Shift+Delete" : "Ctrl+Shift+Backspace"
+
+            enabled: ActionHandler.canHandle
+            objectName: "mergeScene"
+            shortcut: defaultShortcut
+            text: "Join Previous Scene"
+
+            icon.source: "qrc:/icons/action/merge_scene.png"
         }
     }
 
