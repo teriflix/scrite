@@ -20,6 +20,7 @@
 #include <QDir>
 #include <QTimer>
 #include <QWindow>
+#include <QPainter>
 #include <QFileInfo>
 #include <QTextBlock>
 #include <QScopeGuard>
@@ -310,6 +311,11 @@ QString Language::glyph() const
 {
     const QChar ch = glyphForScript().value(QChar::Script(this->charScript()));
     return QString(ch);
+}
+
+QUrl Language::iconSource() const
+{
+    return LanguageIconProvider::iconUrlFor(*this);
 }
 
 QFont Language::font() const
@@ -1548,6 +1554,105 @@ bool ScriptBoundary::isValid() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
+LanguageIconProvider::LanguageIconProvider() : QQuickImageProvider(QQuickImageProvider::Image) { }
+
+LanguageIconProvider::~LanguageIconProvider() { }
+
+QString LanguageIconProvider::name()
+{
+    return QStringLiteral("language");
+}
+
+QUrl LanguageIconProvider::iconUrlFor(const Language &language)
+{
+    QString fontFamily = language.font().family();
+    fontFamily.remove(QRegularExpression("\\s"));
+
+    const QString ret = QStringLiteral("image://") + name() + "/" + QString::number(language.code)
+            + "/" + fontFamily.toLower();
+    return QUrl(ret);
+}
+
+QImage LanguageIconProvider::requestImage(const QString &id, QSize *size,
+                                          const QSize &requestedSize)
+{
+    const QStringList fields = id.split("/");
+    if (fields.isEmpty())
+        return QImage();
+
+    bool ok = false;
+    int languageCode = fields.first().toInt(&ok);
+
+    if (!ok)
+        return QImage();
+
+    const Language language =
+            LanguageEngine::instance()->availableLanguages()->findLanguage(languageCode);
+    if (!language.isValid())
+        return QImage();
+
+    const QSize defaultSize(64, 64);
+    QImage image(requestedSize.isEmpty() ? defaultSize : requestedSize, QImage::Format_ARGB32);
+    if (size)
+        *size = image.size();
+
+    image.fill(Qt::transparent);
+
+    QPainter paint(&image);
+    paint.setRenderHint(QPainter::Antialiasing);
+    paint.setRenderHint(QPainter::TextAntialiasing);
+
+    // TODO: handle light-mode / dark-mode eventually
+    const QObject *primaryColors = Utils::ObjectRegistry::find("primaryColors");
+
+    auto fetchColor = [primaryColors](const QString &groupName, const QString &key,
+                                      const QColor &defaultColor) -> QColor {
+        if (primaryColors == nullptr)
+            return defaultColor;
+
+        const QObject *group = primaryColors->property(qPrintable(groupName)).value<QObject *>();
+        if (group == nullptr)
+            return defaultColor;
+
+        QVariant value = group->property(qPrintable(key));
+        if (value.isValid()) {
+            if (value.userType() == QMetaType::QString)
+                return QColor(value.toString());
+            if (value.userType() == QMetaType::QColor)
+                return value.value<QColor>();
+            if (value.canConvert(QMetaType::QColor)) {
+                value.convert(QMetaType::QColor);
+                return value.value<QColor>();
+            }
+        }
+
+        return defaultColor;
+    };
+
+    const QColor background =
+            fetchColor(QStringLiteral("c800"), QStringLiteral("background"), Qt::darkGray);
+    const QColor foreground = fetchColor(QStringLiteral("c800"), QStringLiteral("text"), Qt::white);
+
+    paint.setBrush(QBrush(background));
+    paint.drawRoundedRect(image.rect().adjusted(2, 2, -3, -3), 20, 20, Qt::RelativeSize);
+
+    QFont font = language.font();
+    font.setPixelSize(image.height() * 0.55);
+    font.setBold(true);
+    paint.setFont(font);
+    paint.setPen(QPen(foreground));
+
+    QTextOption textOption;
+    textOption.setAlignment(Qt::AlignCenter);
+    paint.drawText(image.rect(), language.glyph(), textOption);
+
+    paint.end();
+
+    return image;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 LanguageEngine *LanguageEngine::instance()
 {
     static bool typesRegistered = false;
@@ -2015,6 +2120,8 @@ void LanguageEngine::init(const char *uri, QQmlEngine *qmlEngine)
     static bool initedOnce = false;
     if (initedOnce)
         return;
+
+    qmlEngine->addImageProvider(LanguageIconProvider::name(), new LanguageIconProvider);
 
     const char *reason = "Instantiation from QML not allowed.";
 

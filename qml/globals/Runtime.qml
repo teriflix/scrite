@@ -490,11 +490,17 @@ Item {
 
         readonly property Colors primary: Colors {
             key: Material.Grey // applicationSettings.primaryColor
+
+            ObjectRegister.name: "primaryColors"
         }
 
         readonly property Colors accent: Colors {
             key: _applicationSettings.accentColor
+
+            ObjectRegister.name: "accentColors"
         }
+
+        ObjectRegister.name: "runtimeColors"
     }
 
     // All the app-features

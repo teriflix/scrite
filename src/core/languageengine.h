@@ -21,6 +21,7 @@
 #include <QKeySequence>
 #include <QFontDatabase>
 #include <QAbstractListModel>
+#include <QQuickImageProvider>
 
 class QTextCursor;
 class LanguageEngine;
@@ -97,6 +98,9 @@ public:
 
     Q_PROPERTY(QString glyph READ glyph)
     QString glyph() const;
+
+    Q_PROPERTY(QUrl iconSource READ iconSource)
+    QUrl iconSource() const;
 
     Q_PROPERTY(QKeySequence keySequence MEMBER keySequence)
     QKeySequence keySequence;
@@ -735,6 +739,19 @@ public:
 };
 Q_DECLARE_METATYPE(ScriptBoundary)
 Q_DECLARE_METATYPE(QList<ScriptBoundary>)
+
+class LanguageIconProvider : public QQuickImageProvider
+{
+public:
+    explicit LanguageIconProvider();
+    ~LanguageIconProvider();
+
+    static QString name();
+    static QUrl iconUrlFor(const Language &language);
+
+    // QQuickImageProvider interface
+    QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
+};
 
 /*
 This class ties all the pieces together.

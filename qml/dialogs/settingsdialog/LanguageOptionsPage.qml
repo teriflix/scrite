@@ -18,7 +18,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -84,25 +83,15 @@ Item {
                             width: parent.width
                             spacing: 5
 
-                            Rectangle {
+                            Image {
                                 Layout.alignment: Qt.AlignVCenter
                                 Layout.leftMargin: parent.spacing
+                                Layout.preferredWidth: Runtime.idealFontMetrics.averageCharacterWidth * 4
+                                Layout.preferredHeight: _delegateLabel.height-6
 
-                                implicitWidth: Runtime.idealFontMetrics.averageCharacterWidth * 4
-                                implicitHeight: _delegateLabel.height-6
-
-                                color: Runtime.colors.primary.c800.background
-                                radius: Math.min(width,height) * 0.2
-
-                                VclLabel {
-                                    anchors.centerIn: parent
-
-                                    text: language.glyph
-                                    color: Runtime.colors.primary.c800.text
-
-                                    font.bold: true
-                                    font.family: language.font().family
-                                }
+                                fillMode: Image.PreserveAspectFit
+                                mipmap: true
+                                source: language.iconSource
                             }
 
                             VclLabel {

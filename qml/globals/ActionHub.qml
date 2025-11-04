@@ -329,7 +329,7 @@ Item {
     }
 
     readonly property ActionManager languageOptions: ActionManager {
-        readonly property string iconSource: "qrc:/icons/content/language.png"
+        property string iconSource: LanguageEngine.supportedLanguages.activeLanguage.iconSource
 
         title: "Languages"
         objectName: "languageOptions"
@@ -362,7 +362,7 @@ Item {
                 shortcut: language.shortcut()
                 text: language.name
 
-                // TODO iconSource to source icons through a QQuickAsyncImageProvider
+                icon.source: language.iconSource
 
                 onTriggered: Runtime.language.setActiveCode(language.code)
             }

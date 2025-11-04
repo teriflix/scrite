@@ -40,6 +40,7 @@ ToolButton {
     focusPolicy: Qt.NoFocus
     text: actionManager.title
 
+    icon.color: "transparent"
     icon.source: actionManager.iconSource !== undefined ? actionManager.iconSource : ""
 
     onClicked: _menu.open()
