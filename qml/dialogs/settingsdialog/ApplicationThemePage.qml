@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -26,6 +26,7 @@ import "qrc:/qml/dialogs"
 
 Item {
     id: root
+
     height: layout.height + 2*layout.margin
 
     GridLayout {
@@ -72,7 +73,7 @@ Item {
 
                 ToolTip.text: "Scrite's UI is designed for use with Material theme and with software rendering disabled. If the UI is not rendering properly on your computer, then switching to a different theme may help."
                 ToolTip.visible: hovered
-                ToolTip.delay: 1000
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
             }
         }
 
@@ -114,7 +115,7 @@ Item {
                             VclLabel {
                                 anchors.centerIn: parent
                                 text: "✓"
-                                color: Scrite.app.textColorFor(parent.color)
+                                color: Color.textColorFor(parent.color)
                                 visible: Runtime.colors.accent.key === modelData
                             }
 

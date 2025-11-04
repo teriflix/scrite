@@ -17,69 +17,63 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 
 Item {
-    id: searchBar
+    id: root
+
+    property bool hasFocus: _txtSearch.activeFocus || _txtReplace.activeFocus
+    property bool showReplace: false
+    property bool allowReplace: false
 
     property real borderWidth: 0
-    property bool hasFocus: txtSearch.activeFocus || txtReplace.activeFocus
-    property bool allowReplace: false
-    property bool showReplace: false
 
-    implicitWidth: 300
-    implicitHeight: searchBarLayout.height
-    width: implicitWidth
-    height: implicitHeight
-    clip: true
-
-    Behavior on height {
-        enabled: Runtime.applicationSettings.enableAnimations
-        NumberAnimation { duration: 100 }
-    }
+    property SearchEngine searchEngine: SearchEngine { }
 
     signal showReplaceRequest(bool flag)
 
     function assumeFocus() {
-        txtSearch.forceActiveFocus()
+        _txtSearch.forceActiveFocus()
     }
 
-    property SearchEngine searchEngine: SearchEngine { }
+    width: implicitWidth
+    height: implicitHeight
+    implicitWidth: 300
+    implicitHeight: _layout.height
+
+    clip: true
+
+    Behavior on height {
+        enabled: Runtime.applicationSettings.enableAnimations
+
+        NumberAnimation { duration: Runtime.stdAnimationDuration }
+    }
 
     Column {
-        id: searchBarLayout
+        id: _layout
+
         width: parent.width
+
         spacing: 10
 
         Rectangle {
-            id: findUiRect
             width: parent.width
-            height: Math.max(55, Math.max(Math.max(txtSearch.height, searchButtonsRow.height), (replaceUiRect.visible ? replaceUiRect.height : 0)))
+            height: Math.max(55, Math.max(Math.max(_txtSearch.height, _searchButtonsRow.height), (_replaceUiRect.visible ? _replaceUiRect.height : 0)))
+
             color: Runtime.colors.primary.c10.background
-            enabled: searchEngine.searchAgentCount > 0
             border.width: borderWidth
             border.color: Runtime.colors.primary.borderColor
 
+            enabled: searchEngine.searchAgentCount > 0
+
             TextAreaInput {
-                id: txtSearch
+                id: _txtSearch
+
                 property bool canClear: searchEngine.searchResultCount > 0 || text !== ""
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.right: searchButtonsRow.left
-                anchors.margins: 5
-                placeholderText: "Search"
-                KeyNavigation.tab: replaceUiRect.visible ? txtReplace : null
-                KeyNavigation.priority: KeyNavigation.BeforeItem
-                Keys.onReturnPressed: triggerSearch()
-                Keys.onEscapePressed: {
-                    if(canClear) {
-                        clearSearch()
-                        event.accepted = true
-                    }
-                }
+
                 function triggerSearch() {
                     var ss = text.trim()
                     if(searchEngine.searchString !== ss)
@@ -87,10 +81,33 @@ Item {
                     else
                         searchEngine.cycleSearchResult()
                 }
+
                 function clearSearch() {
                     clear()
                     searchEngine.clearSearch()
                 }
+
+                Keys.onReturnPressed: (event) => {
+                                          triggerSearch()
+                                      }
+
+                Keys.onEscapePressed: (event) => {
+                                          if(canClear) {
+                                              clearSearch()
+                                              event.accepted = true
+                                          }
+                                      }
+
+                KeyNavigation.tab: _replaceUiRect.visible ? _txtReplace : null
+                KeyNavigation.priority: KeyNavigation.BeforeItem
+
+                anchors.left: parent.left
+                anchors.right: _searchButtonsRow.left
+                anchors.margins: 5
+                anchors.verticalCenter: parent.verticalCenter
+
+                placeholderText: "Search"
+
                 onActiveFocusChanged: {
                     if(activeFocus)
                         selectAll()
@@ -98,138 +115,179 @@ Item {
             }
 
             Row {
-                id: searchButtonsRow
-                spacing: 2
-                anchors.verticalCenter: parent.verticalCenter
+                id: _searchButtonsRow
+
                 anchors.right: parent.right
                 anchors.rightMargin: 5
+                anchors.verticalCenter: parent.verticalCenter
+
+                spacing: 2
 
                 VclToolButton {
-                    icon.source: "qrc:/icons/action/search.png"
                     anchors.verticalCenter: parent.verticalCenter
+
                     suggestedHeight: 40
-                    onClicked: txtSearch.triggerSearch()
-                    onPressAndHold: searchOptionsMenu.popup()
+
                     hoverEnabled: false
 
+                    icon.source: "qrc:/icons/action/search.png"
+
                     VclMenu {
-                        id: searchOptionsMenu
+                        id: _optionsMenu
 
                         VclMenuItem {
                             text: "Case Sensitive"
-                            checkable: true
                             checked: searchEngine.isSearchCaseSensitive
+                            checkable: true
+
                             onToggled: searchEngine.isSearchCaseSensitive = checked
                         }
 
                         VclMenuItem {
                             text: "Whole Words"
-                            checkable: true
                             checked: searchEngine.isSearchWholeWords
+                            checkable: true
+
                             onToggled: searchEngine.isSearchWholeWords = checked
                         }
                     }
+
+                    onClicked: _txtSearch.triggerSearch()
+
+                    onPressAndHold: _optionsMenu.popup()
                 }
 
                 VclLabel {
+                    anchors.verticalCenter: parent.verticalCenter
+
                     text: {
                         if(searchEngine.searchResultCount > 0)
                             return "  " +  (searchEngine.currentSearchResultIndex+1) + "/" + searchEngine.searchResultCount + "  "
                         return ""
                     }
-                    anchors.verticalCenter: parent.verticalCenter
                 }
 
                 VclToolButton {
-                    icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
                     anchors.verticalCenter: parent.verticalCenter
+
+                    suggestedHeight: 40
+
                     enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex > 0
+                    hoverEnabled: false
+
+                    icon.source: "qrc:/icons/action/keyboard_arrow_up.png"
+
                     onClicked: searchEngine.previousSearchResult()
-                    suggestedHeight: 40
-                    hoverEnabled: false
                 }
 
                 VclToolButton {
-                    icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
                     anchors.verticalCenter: parent.verticalCenter
+
+                    suggestedHeight: 40
+
                     enabled: searchEngine.searchResultCount > 0 && searchEngine.currentSearchResultIndex < searchEngine.searchResultCount
+                    hoverEnabled: false
+
+                    icon.source: "qrc:/icons/action/keyboard_arrow_down.png"
+
                     onClicked: searchEngine.nextSearchResult()
-                    suggestedHeight: 40
-                    hoverEnabled: false
                 }
 
                 VclToolButton {
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    suggestedHeight: 40
+
+                    enabled: _txtSearch.canClear
+                    hoverEnabled: false
+
                     icon.source: "qrc:/icons/navigation/close.png"
-                    anchors.verticalCenter: parent.verticalCenter
-                    enabled: txtSearch.canClear
-                    onClicked: txtSearch.clearSearch()
-                    suggestedHeight: 40
-                    hoverEnabled: false
+
+                    onClicked: _txtSearch.clearSearch()
                 }
 
                 VclToolButton {
-                    icon.source: "qrc:/icons/action/find_replace.png"
+                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + Gui.nativeShortcut("Ctrl+Shift+F") + ")"
+
                     anchors.verticalCenter: parent.verticalCenter
-                    down: checked
-                    checked: replaceUiRect.visible
-                    checkable: true
-                    onToggled: showReplaceRequest(!showReplace)
+
                     suggestedHeight: 40
-                    hoverEnabled: true
+
+                    down: checked
+                    checked: _replaceUiRect.visible
                     visible: allowReplace
-                    ToolTip.text: (checked ? "Hide replace field." : "Show replace field.") + " (" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F") + ")"
+                    checkable: true
+                    hoverEnabled: true
+
+                    icon.source: "qrc:/icons/action/find_replace.png"
+
+                    onToggled: showReplaceRequest(!showReplace)
                 }
             }
         }
 
         Rectangle {
-            id: replaceUiRect
-            visible: showReplace
+            id: _replaceUiRect
+
             width: parent.width
-            height: Math.max(txtReplace.height, replaceButtonsRow.height)
+            height: Math.max(_txtReplace.height, _replaceButtonsRow.height)
+
             color: Runtime.colors.primary.c10.background
+            visible: showReplace
             enabled: searchEngine.searchAgentCount > 0
+
             border.width: borderWidth
             border.color: Runtime.colors.primary.borderColor
 
             TextAreaInput {
-                id: txtReplace
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                anchors.right: replaceButtonsRow.left
-                anchors.margins: 5
-                placeholderText: "Replace"
-                KeyNavigation.backtab: txtSearch
+                id: _txtReplace
+
+                Keys.onReturnPressed: _cmdReplace.click()
+
+                KeyNavigation.backtab: _txtSearch
                 KeyNavigation.priority: KeyNavigation.BeforeItem
-                Keys.onReturnPressed: cmdReplace.click()
+
+                anchors.left: parent.left
+                anchors.right: _replaceButtonsRow.left
+                anchors.margins: 5
+                anchors.verticalCenter: parent.verticalCenter
+
+                placeholderText: "Replace"
+
                 onActiveFocusChanged: {
                     if(activeFocus && searchEngine.searchResultCount === 0)
-                        txtSearch.triggerSearch()
+                        _txtSearch.triggerSearch()
                 }
             }
 
             Row {
-                id: replaceButtonsRow
+                id: _replaceButtonsRow
+
                 spacing: 10
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.rightMargin: 5
 
                 VclButton {
-                    id: cmdReplace
+                    id: _cmdReplace
+
                     text: "Replace"
-                    enabled: txtReplace.text.length > 0 && txtSearch.text.length > 0 && searchEngine.currentSearchResultIndex >= 0 && searchEngine.searchResultCount > 0
+                    enabled: _txtReplace.text.length > 0 && _txtSearch.text.length > 0 && searchEngine.currentSearchResultIndex >= 0 && searchEngine.searchResultCount > 0
+
                     onClicked: click()
+
                     function click() {
-                        searchEngine.replace(txtReplace.text)
-                        Utils.execLater(searchEngine, 250, function() { searchEngine.nextSearchResult() })
+                        searchEngine.replace(_txtReplace.text)
+                        Runtime.execLater(searchEngine, 250, function() { searchEngine.nextSearchResult() })
                     }
                 }
 
                 VclButton {
                     text: "Replace All"
-                    enabled: txtReplace.text.length > 0 && txtSearch.text.length > 0 && searchEngine.searchResultCount > 0
-                    onClicked: searchEngine.replaceAll(txtReplace.text)
+
+                    enabled: _txtReplace.text.length > 0 && _txtSearch.text.length > 0 && searchEngine.searchResultCount > 0
+
+                    onClicked: searchEngine.replaceAll(_txtReplace.text)
                 }
             }
         }

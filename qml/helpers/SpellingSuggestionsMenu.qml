@@ -23,7 +23,6 @@ import "qrc:/qml/controls"
 
 MenuLoader {
     id: root
-    enabled: !Scrite.document.readOnly
 
     property var spellingSuggestions
 
@@ -33,9 +32,9 @@ MenuLoader {
     signal addToDictionaryRequest()
     signal addToIgnoreListRequest()
 
-    menu: VclMenu {
-        id: spellingSuggestionsMenu
+    enabled: !Scrite.document.readOnly
 
+    menu: VclMenu {
         property int cursorPosition: -1
 
         onAboutToShow: root.menuAboutToShow()

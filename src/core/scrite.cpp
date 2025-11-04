@@ -20,7 +20,6 @@
 #include "restapicall.h"
 #include "application.h"
 #include "scritedocument.h"
-#include "shortcutsmodel.h"
 #include "notificationmanager.h"
 #include "scritedocumentvault.h"
 
@@ -62,11 +61,6 @@ ScriteDocument *Scrite::document()
 ScriteDocumentVault *Scrite::vault()
 {
     return ScriteDocumentVault::instance();
-}
-
-ShortcutsModel *Scrite::shortcuts()
-{
-    return ShortcutsModel::instance();
 }
 
 NotificationManager *Scrite::notifications()

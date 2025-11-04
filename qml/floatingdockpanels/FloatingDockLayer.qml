@@ -27,7 +27,7 @@ QtObject {
     property bool valid: item !== null
 
     function init(_parent) {
-        if( !(_parent && Scrite.app.verifyType(_parent, "QQuickItem")) )
+        if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem
 
         item = Qt.createQmlObject("import QtQuick 2.15; Item { }", _parent)
@@ -37,6 +37,5 @@ QtObject {
 
         // Init dock panels within this module
         FloatingMarkupToolsDock.init()
-        FloatingShortcutsDock.init()
     }
 }

@@ -14,9 +14,9 @@
 #ifndef ABSTRACTEXPORTER_H
 #define ABSTRACTEXPORTER_H
 
+#include "utils.h"
 #include "abstractdeviceio.h"
 #include "garbagecollector.h"
-#include "transliteration.h"
 
 class AbstractExporter : public AbstractDeviceIO
 {
@@ -41,20 +41,8 @@ public:
     bool isFeatureEnabled() const;
     Q_SIGNAL void featureEnabledChanged();
 
-    Q_PROPERTY(bool canBundleFonts READ canBundleFonts CONSTANT)
-    virtual bool canBundleFonts() const { return false; }
-
     Q_PROPERTY(bool canCopyToClipboard READ canCopyToClipboard CONSTANT)
     virtual bool canCopyToClipboard() const { return false; }
-
-    Q_INVOKABLE void bundleFontForLanguage(int language, bool on = true)
-    {
-        m_languageBundleMap[TransliterationEngine::Language(language)] = on;
-    }
-    Q_INVOKABLE bool isFontForLanguageBundled(int language) const
-    {
-        return m_languageBundleMap.value(TransliterationEngine::Language(language), false);
-    }
 
     Q_PROPERTY(bool requiresConfiguration READ requiresConfiguration CONSTANT)
     virtual bool requiresConfiguration() const { return false; }
@@ -62,7 +50,7 @@ public:
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
     Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
 
-    Q_INVOKABLE QJsonObject configurationFormInfo() const;
+    Q_INVOKABLE Utils::ObjectConfig configuration() const;
 
     enum Target { FileTarget, ClipboardTarget };
     Q_ENUM(Target)
@@ -74,14 +62,6 @@ public:
 protected:
     AbstractExporter(QObject *parent = nullptr);
     virtual bool doExport(QIODevice *device) = 0;
-
-    QMap<TransliterationEngine::Language, bool> languageBundleMap() const
-    {
-        return m_languageBundleMap;
-    }
-
-private:
-    QMap<TransliterationEngine::Language, bool> m_languageBundleMap;
 };
 
 #endif // ABSTRACTEXPORTER_H

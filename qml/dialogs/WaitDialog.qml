@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -35,7 +35,7 @@ Item {
         }
         if(message && typeof message === "string")
             initialProps.message = message
-        if(progressReport && Scrite.app.verifyType(progressReport, "ProgressReport"))
+        if(progressReport && Object.isOfType(progressReport, "ProgressReport"))
             initialProps.progressReport = progressReport
 
         var dlg = dialogComponent.createObject(root, initialProps)
@@ -89,14 +89,14 @@ Item {
 
                     to: 1
                     from: 0
-                    value: dialog.progressReport.progress
+                    value: dialog.progressReport ? dialog.progressReport.progress : 0
                     visible: dialog.progressReport !== null
                 }
 
                 VclLabel {
                     Layout.fillWidth: true
 
-                    text: dialog.progressReport.progressText + " (" + Math.round(dialog.progressReport.progress*100,0) + "%)"
+                    text: dialog.progressReport ? (dialog.progressReport.progressText + " (" + Math.round(dialog.progressReport.progress*100,0) + "%)") : " - "
                     elide: Text.ElideMiddle
                     padding: 8
                     visible: dialog.progressReport !== null

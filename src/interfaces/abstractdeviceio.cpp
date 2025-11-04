@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "abstractdeviceio.h"
-#include "application.h"
+#include "utils.h"
 
 #include <QFile>
 
@@ -29,7 +29,7 @@ void AbstractDeviceIO::setFileName(const QString &val)
         return;
 
     m_fileName = this->polishFileName(val2);
-    m_fileName = Application::instance()->sanitiseFileName(m_fileName);
+    m_fileName = Utils::File::sanitiseName(m_fileName);
 
     emit fileNameChanged();
 }

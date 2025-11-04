@@ -5,7 +5,7 @@ TARGET = Scrite
 CONFIG += c++17
 DEFINES += PHTRANSLATE_STATICLIB
 
-VERSION = 1.2.3
+VERSION = 1.9.0
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
 
 #DEFINES += SCRITE_ENABLE_AUTOMATION
@@ -56,17 +56,21 @@ HEADERS += \
     src/automation/pausestep.h \
     src/automation/scriptautomationstep.h \
     src/automation/windowcapture.h \
+    src/core/actionmanager.h \
     src/core/appwindow.h \
+    src/core/enumerationmodel.h \
     src/core/filelocker.h \
     src/core/filemodificationtracker.h \
+    src/core/languageengine.h \
     src/core/localstorage.h \
+    src/core/utils.h \
+    src/network/networkstatus.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/peerapplookup.h \
     src/core/printerobject.h \
     src/core/qobjectlistmodel.h \
     src/core/qobjectproperty.h \
     src/core/scrite.h \
-    src/core/systemtextinputmanager.h \
     src/document/attachments.h \
     src/document/characterrelationshipgraph.h \
     src/document/form.h \
@@ -102,7 +106,6 @@ HEADERS += \
     src/quick/objects/itempositionmapper.h \
     src/quick/objects/modelaggregator.h \
     src/quick/objects/propertyalias.h \
-    src/quick/objects/refcounter.h \
     src/quick/objects/syntaxhighlighter.h \
     src/quick/objects/tabsequencemanager.h \
     src/quick/objects/delayedpropertybinder.h \
@@ -110,7 +113,6 @@ HEADERS += \
     src/quick/objects/searchengine.h \
     src/quick/objects/eventfilter.h \
     src/quick/objects/polygontesselator.h \
-    src/quick/objects/shortcutsmodel.h \
     src/quick/objects/textdocument.h \
     src/quick/objects/textlimiter.h \
     src/quick/objects/trackobject.h \
@@ -132,6 +134,7 @@ HEADERS += \
     src/reports/statisticsreport.h \
     src/reports/statisticsreport_p.h \
     src/reports/twocolumnreport.h \
+    src/utils/booleanresult.h \
     src/utils/execlatertimer.h \
     src/utils/fountain.h \
     src/utils/graphlayout.h \
@@ -142,7 +145,6 @@ HEADERS += \
     src/utils/qobjectserializer.h \
     src/utils/modifiable.h \
     src/document/formatting.h \
-    src/document/transliteration.h \
     src/document/scritedocument.h \
     src/document/documentfilesystem.h \
     src/document/structure.h \
@@ -192,17 +194,21 @@ SOURCES += \
     src/automation/pausestep.cpp \
     src/automation/scriptautomationstep.cpp \
     src/automation/windowcapture.cpp \
+    src/core/actionmanager.cpp \
     src/core/application_build_timestamp.cpp \
     src/core/appwindow.cpp \
+    src/core/enumerationmodel.cpp \
     src/core/filelocker.cpp \
     src/core/filemodificationtracker.cpp \
+    src/core/languageengine.cpp \
     src/core/localstorage.cpp \
+    src/core/utils.cpp \
+    src/network/networkstatus.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/peerapplookup.cpp \
     src/core/qobjectlistmodel.cpp \
     src/core/qobjectproperty.cpp \
     src/core/scrite.cpp \
-    src/core/systemtextinputmanager.cpp \
     src/document/attachments.cpp \
     src/document/characterrelationshipgraph.cpp \
     src/document/form.cpp \
@@ -238,7 +244,6 @@ SOURCES += \
     src/quick/objects/itempositionmapper.cpp \
     src/quick/objects/modelaggregator.cpp \
     src/quick/objects/propertyalias.cpp \
-    src/quick/objects/refcounter.cpp \
     src/quick/objects/syntaxhighlighter.cpp \
     src/quick/objects/tabsequencemanager.cpp \
     src/quick/objects/focustracker.cpp \
@@ -248,7 +253,6 @@ SOURCES += \
     src/quick/objects/resetonchange.cpp \
     src/quick/objects/eventfilter.cpp \
     src/quick/objects/aggregation.cpp \
-    src/quick/objects/shortcutsmodel.cpp \
     src/quick/objects/textdocument.cpp \
     src/quick/objects/textlimiter.cpp \
     src/quick/objects/trackobject.cpp \
@@ -281,7 +285,6 @@ SOURCES += \
     src/document/structure.cpp \
     src/document/screenplaytextdocument.cpp \
     src/document/undoredo.cpp \
-    src/document/transliteration.cpp \
     src/document/screenplayadapter.cpp \
     src/document/formatting.cpp \
     src/core/autoupdate.cpp \
@@ -343,30 +346,33 @@ QTQUICK_COMPILER_SKIPPED_RESOURCES += scrite_misc.qrc
 macx {
     ICON = appicon.icns
     QMAKE_INFO_PLIST = Info.plist
-    VERSION_INFO = "1.2.3-macos"
+    VERSION_INFO = "1.9.0-macos"
 
-    HEADERS += src/core/systemtextinputmanager_macos.h
-    OBJECTIVE_SOURCES += src/core/systemtextinputmanager_macos.mm
+    HEADERS += src/core/platformtransliterator_macos.h
+    OBJECTIVE_SOURCES += src/core/platformtransliterator_macos.mm
     LIBS += -framework Carbon
     CONFIG+=sdk_no_version_check
 }
 
 win32 {
     contains(QT_ARCH, i386) {
-        VERSION_INFO = "1.2.3-windows-x86"
+        VERSION_INFO = "1.9.0-windows-x86"
     } else {
-        VERSION_INFO = "1.2.3-windows-x64"
+        VERSION_INFO = "1.9.0-windows-x64"
     }
 
     RC_ICONS = appicon.ico
-    HEADERS += src/core/systemtextinputmanager_windows.h
-    SOURCES += src/core/systemtextinputmanager_windows.cpp
+    HEADERS += src/core/platformtransliterator_windows.h
+    SOURCES += src/core/platformtransliterator_windows.cpp
+
     LIBS += User32.lib
 }
 
 linux {
     CONFIG+=use_gold_linker
-    VERSION_INFO = "1.2.3-linux"
+    VERSION_INFO = "1.9.0-linux"
+
+    SOURCES += src/core/platformtransliterator_linux.cpp
 }
 
 include($$PWD/3rdparty/sonnet/sonnet.pri)

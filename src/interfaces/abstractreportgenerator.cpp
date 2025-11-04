@@ -305,10 +305,10 @@ QVariant AbstractReportGenerator::getConfigurationValue(const QString &name) con
     return this->property(qPrintable(name));
 }
 
-QJsonObject AbstractReportGenerator::configurationFormInfo() const
+Utils::ObjectConfig AbstractReportGenerator::configuration() const
 {
-    QJsonObject formInfo = Application::instance()->objectConfigurationFormInfo(
-            this, &AbstractReportGenerator::staticMetaObject);
+    Utils::ObjectConfig formInfo =
+            Utils::Object::configuration(this, &AbstractReportGenerator::staticMetaObject);
     this->polishFormInfo(formInfo);
     return formInfo;
 }

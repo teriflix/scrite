@@ -19,7 +19,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -56,7 +56,7 @@ Item {
             fillMode: QImageItem.PreserveAspectCrop
             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
-            image: visible ? _private.posterQImage : Scrite.app.emptyQImage
+            image: visible ? _private.posterQImage : Gui.emptyQImage
         }
 
         Rectangle {
@@ -98,7 +98,7 @@ Item {
             fillMode: QImageItem.PreserveAspectFit
             useSoftwareRenderer: Runtime.currentUseSoftwareRenderer
 
-            image: visible ? _private.posterQImage : Scrite.app.emptyQImage
+            image: visible ? _private.posterQImage : Gui.emptyQImage
         }
     }
 
@@ -134,7 +134,7 @@ Item {
         id: _private
 
         property string posterSourceUrl
-        property var posterQImage: Scrite.app.blankQImage
+        property var posterQImage: Gui.blankQImage
         property var posterSource
 
         readonly property int e_ImageKind: 0
@@ -143,12 +143,12 @@ Item {
 
         onPosterSourceChanged: {
             posterSourceUrl = ""
-            posterQImage = Scrite.app.blankQImage
+            posterQImage = Gui.blankQImage
 
             if(typeof posterSource === "string" || typeof posterSource === "url") {
                 posterSourceUrl = posterSource
                 posterSourceKind = e_ImageKind
-            } else if(typeof posterSource === "object" && Scrite.app.verifyType(posterSource, "QImage")) {
+            } else if(typeof posterSource === "object" && Object.isOfType(posterSource, "QImage")) {
                 posterQImage = posterSource
                 posterSourceKind = e_QImageKind
             }

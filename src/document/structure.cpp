@@ -11,6 +11,7 @@
 **
 ****************************************************************************/
 
+#include "utils.h"
 #include "scrite.h"
 #include "undoredo.h"
 #include "fountain.h"
@@ -19,12 +20,14 @@
 #include "filemanager.h"
 #include "application.h"
 #include "deltadocument.h"
+#include "languageengine.h"
 #include "scritedocument.h"
 #include "garbagecollector.h"
 #include "structureexporter.h"
 #include "screenplaytextdocument.h"
 
 #include <QDir>
+#include <QSet>
 #include <QtMath>
 #include <QStack>
 #include <QBuffer>
@@ -303,6 +306,8 @@ void StructureElement::setScene(Scene *val)
     connect(m_scene->heading(), &SceneHeading::locationChanged, this,
             &StructureElement::sceneLocationChanged);
 
+    connect(m_scene, &Scene::tagsChanged, m_structure, &Structure::updateSceneTagsLater);
+
     emit sceneChanged();
 }
 
@@ -428,7 +433,7 @@ void StructureElement::renameCharacter(const QString &from, const QString &to)
     if (!m_title.isEmpty()) {
         int nrReplacements = 0;
         const QString newTitle =
-                Application::replaceCharacterName(from, to, m_title, &nrReplacements);
+                Utils::SMath::replaceCharacterName(from, to, m_title, &nrReplacements);
         if (nrReplacements > 0) {
             m_title = newTitle;
             emit titleChanged();
@@ -935,7 +940,7 @@ void StructureElementStacks::evaluateStacks()
             ++it2;
 
             while (it2 != end2) {
-                const QString id = Application::createUniqueId();
+                const QString id = Utils::SMath::createUniqueId();
                 for (StructureElement *element : qAsConst(it2.value()))
                     element->setStackId(id);
 
@@ -1035,7 +1040,7 @@ void Relationship::setDirection(Relationship::Direction val)
 
 QString Relationship::polishName(const QString &val)
 {
-    return Application::instance()->camelCased(val);
+    return Utils::SMath::titleCased(val);
 }
 
 void Relationship::setName(const QString &val)
@@ -1188,7 +1193,7 @@ bool Character::rename(const QString &givenName)
         return false;
 
     const QString newNameUpper = givenName.trimmed().toUpper();
-    const QString newNameCamel = Application::camelCased(newNameUpper);
+    const QString newNameCamel = Utils::SMath::titleCased(newNameUpper);
 
     HourGlass hourGlass;
 
@@ -1203,7 +1208,7 @@ bool Character::rename(const QString &givenName)
 
         {
             int nrReplacements = 0;
-            const QJsonObject newSummary = Application::replaceCharacterName(
+            const QJsonObject newSummary = Utils::SMath::replaceCharacterName(
                     m_name, newNameCamel, m_summary.toObject(), &nrReplacements);
             if (nrReplacements > 0) {
                 m_summary = newSummary;
@@ -1911,7 +1916,7 @@ void Character::write(QTextCursor &cursor, const WriteOptions &options) const
             const QString summary = m_summary.toString();
             if (!summary.isEmpty()) {
                 addSection(QLatin1String("Summary"));
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, summary);
+                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, summary);
             }
         } else {
             const QJsonObject summary = m_summary.toObject();
@@ -3592,8 +3597,7 @@ Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) c
             const QString slash = QStringLiteral("/");
             for (const QString &group : groups) {
                 if (group.startsWith(category, Qt::CaseInsensitive)) {
-                    const QString groupName =
-                            Application::instance()->camelCased(group.section(slash, 1));
+                    const QString groupName = Utils::SMath::titleCased(group.section(slash, 1));
                     ret.append(groupName);
                 }
             }
@@ -3686,7 +3690,7 @@ Structure::evaluateGroupsImpl(Screenplay *screenplay, const QString &category) c
                 item.first = QStringLiteral("EP %1: %2").arg(episodeNr).arg(item.first);
             }
 
-            item.first = Application::instance()->camelCased(item.first);
+            item.first = Utils::SMath::titleCased(item.first);
         }
     }
 
@@ -3710,8 +3714,8 @@ bool Structure::renameCharacter(const QString &from, const QString &to, QString 
         return true;
 
     // Format character names properly
-    const QString from2 = Application::camelCased(from.trimmed());
-    const QString to2 = Application::camelCased(to.trimmed());
+    const QString from2 = Utils::SMath::titleCased(from.trimmed());
+    const QString to2 = Utils::SMath::titleCased(to.trimmed());
 
     // Make sure that the from character exists.
     if (!m_characterElementMap.containsCharacter(from2) && !this->findCharacter(from2)) {
@@ -3990,8 +3994,8 @@ void Structure::clearAnnotations()
 
 QString Structure::defaultGroupsDataFile() const
 {
-    static const QString ret = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-            + QStringLiteral("/structure_categories_and_groups.lst");
+    static const QString ret =
+            Utils::Platform::configPath(QStringLiteral("/structure_categories_and_groups.lst"));
     return ret;
 }
 
@@ -4296,7 +4300,7 @@ QString Structure::presentableGroupNames(const QStringList &groups) const
     QMap<QString, QStringList> map;
     for (const QString &group : groups) {
         const QString categoryName = group.section(slash, 0, 0);
-        const QString groupName = Application::instance()->camelCased(group.section(slash, 1));
+        const QString groupName = Utils::SMath::titleCased(group.section(slash, 1));
         map[categoryName].append(groupName);
     }
 
@@ -4306,8 +4310,8 @@ QString Structure::presentableGroupNames(const QStringList &groups) const
     while (it != end) {
         if (!ret.isEmpty())
             ret += QStringLiteral("<br/>");
-        ret += QStringLiteral("<b>") + Application::instance()->camelCased(it.key())
-                + QStringLiteral(":</b> ") + it.value().join(QStringLiteral(", "));
+        ret += QStringLiteral("<b>") + Utils::SMath::titleCased(it.key()) + QStringLiteral(":</b> ")
+                + it.value().join(QStringLiteral(", "));
         ++it;
     }
 
@@ -4353,17 +4357,17 @@ void Structure::setDefaultIndexCardFields(const QJsonArray &val)
     emit defaultIndexCardFieldsChanged();
 
     const QByteArray bytes = QJsonDocument(val2).toJson();
-    Application::writeToFile(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-                                     + QStringLiteral("/index_card_fields.json"),
-                             bytes);
+    Utils::File::write(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                               + QStringLiteral("/index_card_fields.json"),
+                       bytes);
 }
 
 void Structure::loadDefaultIndexCardFields()
 {
-    const QByteArray bytes = Application::fileContents(QStandardPaths::writableLocation(
-                                                               QStandardPaths::AppDataLocation)
-                                                       + QStringLiteral("/index_card_fields.json"))
-                                     .toLatin1();
+    const QByteArray bytes =
+            Utils::File::read(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                              + QStringLiteral("/index_card_fields.json"))
+                    .toLatin1();
 
     m_defaultIndexCardFields = QJsonDocument::fromJson(bytes).array();
     emit defaultIndexCardFieldsChanged();
@@ -5097,6 +5101,29 @@ void Structure::updateCharacterNamesShotsTransitionsAndTagsLater()
     m_updateCharacterNamesShotsTransitionsAndTagsTimer.start(0, this);
 }
 
+void Structure::updateSceneTags()
+{
+    QSet<QString> allTags;
+
+    const QList<StructureElement *> elements = m_elements.list();
+    for (const StructureElement *element : qAsConst(elements)) {
+        const Scene *scene = element->scene();
+        const QStringList tags = scene->tags();
+        allTags += QSet<QString>(tags.begin(), tags.end());
+    }
+
+    const QStringList allTags2 = QStringList(allTags.begin(), allTags.end());
+    if (m_sceneTags != allTags2) {
+        m_sceneTags = allTags2;
+        emit sceneTagsChanged();
+    }
+}
+
+void Structure::updateSceneTagsLater()
+{
+    m_updateSceneTagsTimer.start(0, this);
+}
+
 void Structure::staticAppendAnnotation(QQmlListProperty<Annotation> *list, Annotation *ptr)
 {
     reinterpret_cast<Structure *>(list->data)->addAnnotation(ptr);
@@ -5127,9 +5154,6 @@ StructureElementConnector::StructureElementConnector(QQuickItem *parent)
 {
     this->setRenderType(OutlineOnly);
     this->setOutlineColor(Qt::black);
-
-    const qreal dpr = this->window() ? this->window()->devicePixelRatio() : 1.0;
-    this->setOutlineWidth(4 * dpr);
 
     connect(this, &AbstractShapeItem::contentRectChanged, this,
             &StructureElementConnector::updateArrowAndLabelPositions);
@@ -5349,7 +5373,7 @@ QPainterPath StructureElementConnector::curvedArrowPath(const QRectF &rect1, con
         const QString errMsg = QStringLiteral("Uncaught exception at line ")
                 + QString::number(jsValue.property(QStringLiteral("lineNumber")).toInt())
                 + QStringLiteral(": ") + jsValue.toString();
-        Application::log(errMsg);
+        Utils::Gui::log(errMsg);
 
         path.moveTo(box1.center());
         path.lineTo(box2.center());

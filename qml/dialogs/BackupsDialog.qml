@@ -21,7 +21,7 @@ import QtQuick.Controls.Material 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/tasks"
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -149,7 +149,7 @@ DialogLauncher {
 
                             var waitDialog = WaitDialog.launch()
                             Scrite.app.launchNewInstanceAndOpenAnonymously(Scrite.window, filePath)
-                            Utils.execLater(dialog, 1500, () => {
+                            Runtime.execLater(dialog, 1500, () => {
                                                 Qt.callLater(dialog.close)
                                                 if(waitDialog)
                                                 waitDialog.close()

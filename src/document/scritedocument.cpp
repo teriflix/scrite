@@ -14,6 +14,7 @@
 #include "scritedocument.h"
 
 #include "form.h"
+#include "utils.h"
 #include "user.h"
 #include "scrite.h"
 #include "undoredo.h"
@@ -148,7 +149,7 @@ QHash<int, QByteArray> ScriteDocumentBackups::roleNames() const
 
 QString ScriteDocumentBackups::relativeTime(const QDateTime &dt)
 {
-    return Application::relativeTime(dt);
+    return Utils::TMath::relativeTime(dt);
 }
 
 void ScriteDocumentBackups::setDocumentFilePath(const QString &val)
@@ -1054,7 +1055,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
     const QString defaultSceneColor =
             settings->value(QStringLiteral("Workspace/defaultSceneColor")).toString();
 
-    const QVector<QColor> standardColors = Application::standardColors(QVersionNumber());
+    const QList<QColor> standardColors = Utils::SceneColors::paletteForVersion(QVersionNumber());
     const QColor defaultColor =
             defaultSceneColor.isEmpty() ? standardColors.first() : QColor(defaultSceneColor);
 
@@ -1079,7 +1080,7 @@ Scene *ScriteDocument::createNewScene(bool fuzzyScreenplayInsert)
 
     const bool asLastScene = m_screenplay->currentElementIndex() < 0
             || (fuzzyScreenplayInsert
-                && m_screenplay->currentElementIndex() == m_screenplay->lastSceneIndex());
+                && m_screenplay->currentElementIndex() == m_screenplay->lastSceneElementIndex());
 
     ScreenplayElement *newScreenplayElement = new ScreenplayElement(m_screenplay);
     newScreenplayElement->setScene(scene);
@@ -1370,8 +1371,8 @@ bool ScriteDocument::importFromClipboard()
 
     this->setLoading(true);
 
-    m_errorReport->setProxyFor(Aggregation::findErrorReport(importer.get()));
-    m_progressReport->setProxyFor(Aggregation::findProgressReport(importer.get()));
+    m_errorReport->setProxyFor(Aggregation::errorReport(importer.get()));
+    m_progressReport->setProxyFor(Aggregation::progressReport(importer.get()));
 
     importer->setDocument(this);
     this->setBusyMessage("Importing from clipboard ...");
@@ -1430,7 +1431,7 @@ void ScriteDocument::saveAs(const QString &givenFileName)
 {
     HourGlass hourGlass;
     QString fileName = this->polishFileName(givenFileName.trimmed());
-    fileName = Application::instance()->sanitiseFileName(fileName);
+    fileName = Utils::File::sanitiseName(fileName);
 
     m_errorReport->clear();
 
@@ -1777,8 +1778,8 @@ bool ScriteDocument::importFile(AbstractImporter *importer, const QString &fileN
     this->setLoading(true);
 
     Aggregation aggregation;
-    m_errorReport->setProxyFor(aggregation.findErrorReport(importer));
-    m_progressReport->setProxyFor(aggregation.findProgressReport(importer));
+    m_errorReport->setProxyFor(aggregation.errorReport(importer));
+    m_progressReport->setProxyFor(aggregation.progressReport(importer));
 
     importer->setFileName(fileName);
     importer->setDocument(this);
@@ -1807,8 +1808,8 @@ bool ScriteDocument::exportFile(const QString &fileName, const QString &format)
     }
 
     Aggregation aggregation;
-    m_errorReport->setProxyFor(aggregation.findErrorReport(exporter.data()));
-    m_progressReport->setProxyFor(aggregation.findProgressReport(exporter.data()));
+    m_errorReport->setProxyFor(aggregation.errorReport(exporter.data()));
+    m_progressReport->setProxyFor(aggregation.progressReport(exporter.data()));
 
     exporter->setFileName(fileName);
     exporter->setDocument(this);
@@ -2087,9 +2088,9 @@ bool ScriteDocument::runSaveSanityChecks(const QString &givenFileName)
 
     // 2. Filename must not contain special characters
     // It is true that file names will have already been sanitized using
-    // Application::sanitiseFileName() But we double check it here anyway.
+    // Utils::File::sanitiseName() But we double check it here anyway.
     QSet<QChar> purgedChars;
-    const QString sanitisedFileName = Application::sanitiseFileName(fileName, &purgedChars);
+    const QString sanitisedFileName = Utils::File::sanitiseName(fileName, &purgedChars);
     if (sanitisedFileName != fileName || !purgedChars.isEmpty()) {
         if (purgedChars.isEmpty())
             m_errorReport->setErrorMessage(
@@ -2800,8 +2801,8 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
             m_structure->setCurrentElementIndex(0);
     }
 
-    const QVector<QColor> versionColors = Application::standardColors(version);
-    const QVector<QColor> newColors = Application::standardColors(QVersionNumber());
+    const QList<QColor> versionColors = Utils::SceneColors::paletteForVersion(version);
+    const QList<QColor> newColors = Utils::SceneColors::paletteForVersion(QVersionNumber());
     if (versionColors != newColors) {
         auto evalNewColor = [versionColors, newColors](const QColor &color) {
             const int oldColorIndex = versionColors.indexOf(color);
@@ -2898,8 +2899,12 @@ void ScriteDocument::deserializeFromJson(const QJsonObject &json)
     // From version 0.4.14 onwards we allow users to set their own custom fonts
     // for each language. This is a deviation from using "Courier Prime" as the
     // default Latin font.
-    m_formatting->useUserSpecifiedFonts();
-    m_printFormat->useUserSpecifiedFonts();
+
+    // UPDATE: From version 1.2.4, font-family can only be specified in one place,
+    // and that is LanguageEngine. Other delta formatting hints are stored in
+    // the document anyway. So the following line are no longer required
+    // m_formatting->useUserSpecifiedFonts();
+    // m_printFormat->useUserSpecifiedFonts();
 
     // Although its not specified anywhere that transitions must be right aligned,
     // many writers who are early adopters of Scrite are insisting on it.

@@ -64,7 +64,7 @@ protected:
 public:
     // AbstractReportGenerator interface
     bool requiresConfiguration() const { return false; }
-    void polishFormInfo(QJsonObject &) const;
+    void polishFormInfo(Utils::ObjectConfig &) const;
 
 protected:
     bool doGenerate(QTextDocument *);

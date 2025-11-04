@@ -18,7 +18,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -70,7 +69,7 @@ Item {
 
                     ToolTip.text: "If texts are not being rendered properly on your display, then switch to native text rendering. Otherwise, keep this setting unchecked."
                     ToolTip.visible: hovered
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 }
 
                 VclCheckBox {
@@ -86,7 +85,7 @@ Item {
                     }
                     ToolTip.text: "If you feel that Scrite is not responding fast enough, then you may want to switch to using a Software Renderer to speed things up. Otherwise, keep this option unchecked for best experience."
                     ToolTip.visible: hovered
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
                 }
             }
         }
@@ -130,9 +129,9 @@ Item {
 
                 VclTextField {
                     Layout.fillWidth: true
-                    enabled: Scrite.app.isWindowsPlatform
+                    enabled: Platform.isWindowsDesktop
                     placeholderText: "Default: 1.0. Requires restart if changed."
-                    text: Scrite.app.isWindowsPlatform ? Scrite.app.getWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
+                    text: Platform.isWindowsDesktop ? SystemEnvironment.get("SCRITE_UI_SCALE_FACTOR", "1.0") : "1.0"
                     onEditingComplete: {
                         var value = parseFloat(text)
                         if(isNaN(value))
@@ -141,8 +140,8 @@ Item {
                         value = Math.min(Math.max(0.1,value),10)
                         value = Math.round(value*100)/100
 
-                        Scrite.app.removeWindowsEnvironmentVariable("SCRITE_DPI_MODE")
-                        Scrite.app.changeWindowsEnvironmentVariable("SCRITE_UI_SCALE_FACTOR", ""+value)
+                        SystemEnvironment.remove("SCRITE_DPI_MODE")
+                        SystemEnvironment.set("SCRITE_UI_SCALE_FACTOR", ""+value)
                     }
                 }
 
@@ -190,7 +189,7 @@ Item {
                     }
 
                     Layout.fillWidth: true
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     text: "Move Notebook into the Structure tab to see all three aspects of your screenplay in a single view. " + secondSentence
                     wrapMode: Text.WordWrap
                 }
@@ -217,9 +216,9 @@ Item {
                     checked: Runtime.workspaceSettings.showScritedTab
                     onToggled: {
                         Runtime.workspaceSettings.showScritedTab = checked
-                        if(!checked && Runtime.mainWindowTab === Runtime.e_ScritedTab) {
+                        if(!checked && Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab) {
                             try {
-                                Runtime.activateMainWindowTab(Runtime.e_ScreenplayTab)
+                                Runtime.activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
                             } catch(e) {
                                 console.log(e)
                             }
@@ -319,7 +318,7 @@ Item {
 
                 VclLabel {
                     Layout.fillWidth: true
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     text: "If you are facing issues with PDF export, then choose Printer Driver in the combo-box below. Otherwise we strongly advise you to use PDF Driver."
                     wrapMode: Text.WordWrap
                 }
@@ -346,8 +345,8 @@ Item {
             Layout.preferredWidth: (layout.width-layout.columnSpacing)/2
             Layout.fillHeight: true
 
-            label: VclLabel { text: Scrite.app.isMacOSPlatform ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
-            enabled: !Scrite.app.isMacOSPlatform
+            label: VclLabel { text: Platform.isMacOSDesktop ? "Scroll/Flick Speed (Windows/Linux Only)" : "Scroll/Flick Speed" }
+            enabled: !Platform.isMacOSDesktop
             opacity: enabled ? 1 : 0.5
 
             RowLayout {

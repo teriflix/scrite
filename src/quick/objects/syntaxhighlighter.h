@@ -116,6 +116,11 @@ public:
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
 
+    Q_PROPERTY(bool textDocumentUndoRedoEnabled READ isTextDocumentUndoRedoEnabled WRITE setTextDocumentUndoRedoEnabled NOTIFY textDocumentUndoRedoEnabledChanged)
+    void setTextDocumentUndoRedoEnabled(bool val);
+    bool isTextDocumentUndoRedoEnabled() const { return m_textDocumentUndoRedoEnabled; }
+    Q_SIGNAL void textDocumentUndoRedoEnabledChanged();
+
 protected:
     // QSyntaxHighlighter interface
     void highlightBlock(const QString &text);
@@ -190,6 +195,7 @@ private:
 
 private:
     friend class AbstractSyntaxHighlighterDelegate;
+    bool m_textDocumentUndoRedoEnabled = false;
     QQuickTextDocument *m_textDocument = nullptr;
     QList<AbstractSyntaxHighlighterDelegate *> m_delegates, m_sortedDelegates;
 };

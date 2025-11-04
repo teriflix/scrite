@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "scene.h"
+#include "utils.h"
 #include "undoredo.h"
 #include "hourglass.h"
 #include "formatting.h"
@@ -19,6 +20,7 @@
 #include "searchengine.h"
 #include "timeprofiler.h"
 #include "scritedocument.h"
+#include "languageengine.h"
 #include "garbagecollector.h"
 #include "qobjectserializer.h"
 #include "screenplaytextdocument.h"
@@ -332,7 +334,7 @@ void SceneHeading::renameCharacter(const QString &from, const QString &to)
 {
     int nrReplacements = 0;
     const QString newLocation =
-            Application::replaceCharacterName(from, to, m_location, &nrReplacements);
+            Utils::SMath::replaceCharacterName(from, to, m_location, &nrReplacements);
     if (nrReplacements > 0) {
         m_location = newLocation.toUpper();
         emit locationChanged();
@@ -369,7 +371,7 @@ void SceneHeading::setWordCount(int val)
 void SceneHeading::evaluateWordCount()
 {
     const QString text = this->toString(DisplayMode);
-    this->setWordCount(TransliterationEngine::wordCount(text));
+    this->setWordCount(LanguageEngine::wordCount(text));
 }
 
 void SceneHeading::evaluateWordCountLater()
@@ -947,7 +949,7 @@ void SceneElement::renameCharacter(const QString &from, const QString &to)
      * checks. Checking for sanity in each element costs performance.
      */
     int nrReplacements = 0;
-    const QString text = Application::replaceCharacterName(from, to, m_text, &nrReplacements);
+    const QString text = Utils::SMath::replaceCharacterName(from, to, m_text, &nrReplacements);
 
     if (nrReplacements > 0) {
         switch (m_type) {
@@ -986,7 +988,7 @@ void SceneElement::setWordCount(int val)
 
 void SceneElement::evaluateWordCount()
 {
-    this->setWordCount(TransliterationEngine::wordCount(m_text));
+    this->setWordCount(LanguageEngine::wordCount(m_text));
 }
 
 void SceneElement::evaluateWordCountLater()
@@ -1663,6 +1665,44 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
 #endif
 }
 
+void Scene::setTags(const QStringList &val)
+{
+    if (m_tags == val)
+        return;
+
+    m_tags = val;
+    std::sort(m_tags.begin(), m_tags.end(), [](const QString &a, const QString &b) {
+        return QString::localeAwareCompare(a.toLower(), b.toLower()) < 0;
+    });
+    m_tags.removeAll(QString());
+
+    emit tagsChanged();
+}
+
+void Scene::addTag(const QString &tag)
+{
+    if (!tag.isEmpty() && this->hasTag(tag))
+        return;
+
+    QStringList tags = m_tags;
+    tags << tag;
+
+    this->setTags(tags);
+}
+
+void Scene::removeTag(const QString &tag)
+{
+    if (this->hasTag(tag)) {
+        m_tags.removeOne(tag);
+        emit tagsChanged();
+    }
+}
+
+bool Scene::hasTag(const QString &tag) const
+{
+    return m_tags.contains(tag, Qt::CaseInsensitive);
+}
+
 QQmlListProperty<SceneElement> Scene::elements()
 {
     return QQmlListProperty<SceneElement>(reinterpret_cast<QObject *>(this),
@@ -2335,7 +2375,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
             cursor.insertBlock(blockFormat, charFormat);
 
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, synopsis);
         }
     }
 
@@ -2403,7 +2443,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             charFormat.setFont(textDocument->defaultFont());
 
             cursor.insertBlock(blockFormat, charFormat);
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, comments);
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, comments);
         }
     }
 
@@ -2425,7 +2465,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             const QTextCharFormat headingParaCharFormat = headingParaFormat->createCharFormat();
             cursor.setBlockFormat(headingParaBlockFormat);
             cursor.setBlockCharFormat(headingParaCharFormat);
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, m_heading->text());
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, m_heading->text());
             cursor.insertBlock();
         }
 
@@ -2436,8 +2476,8 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             const QTextCharFormat paraCharFormat = paraFormat->createCharFormat();
             cursor.setBlockFormat(paraBlockFormat);
             cursor.setBlockCharFormat(paraCharFormat);
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, para->text(),
-                                                                   para->textFormats());
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(),
+                                                             para->textFormats());
             if (para != m_elements.last())
                 cursor.insertBlock();
         }
@@ -2567,7 +2607,7 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     {
         int nrReplacements = 0;
         const QString newTitle =
-                Application::replaceCharacterName(from, to, m_synopsis, &nrReplacements);
+                Utils::SMath::replaceCharacterName(from, to, m_synopsis, &nrReplacements);
         if (nrReplacements > 0) {
             m_synopsis = newTitle;
             emit synopsisChanged();
@@ -2594,7 +2634,7 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     {
         int nrReplacements = 0;
         const QString newComments =
-                Application::replaceCharacterName(from, to, m_comments, &nrReplacements);
+                Utils::SMath::replaceCharacterName(from, to, m_comments, &nrReplacements);
         if (nrReplacements > 0) {
             m_comments = newComments;
             emit commentsChanged();
@@ -2891,7 +2931,7 @@ SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRati
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
 #if 0
-        TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text(),
+        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text(),
                                                                QVector<QTextLayout::FormatRange>());
 #else
         cursor.insertText(scene->heading()->text());
@@ -2913,7 +2953,7 @@ SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRati
         cursor.setCharFormat(charFormat);
         cursor.setBlockFormat(blockFormat);
 #if 0
-        TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, para->text(),
+        LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(),
                                                                para->textFormats());
 #else
         cursor.insertText(para->text());

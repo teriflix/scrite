@@ -12,9 +12,9 @@
 ****************************************************************************/
 
 #include "abstractexporter.h"
-#include "application.h"
-#include "scrite.h"
+
 #include "user.h"
+#include "scrite.h"
 
 #include <QBuffer>
 #include <QClipboard>
@@ -22,7 +22,6 @@
 
 AbstractExporter::AbstractExporter(QObject *parent) : AbstractDeviceIO(parent)
 {
-    m_languageBundleMap = TransliterationEngine::instance()->activeLanguages();
     connect(User::instance(), &User::infoChanged, this, &AbstractExporter::featureEnabledChanged);
 }
 
@@ -81,10 +80,9 @@ QVariant AbstractExporter::getConfigurationValue(const QString &name) const
     return this->property(qPrintable(name));
 }
 
-QJsonObject AbstractExporter::configurationFormInfo() const
+Utils::ObjectConfig AbstractExporter::configuration() const
 {
-    return Application::instance()->objectConfigurationFormInfo(
-            this, &AbstractExporter::staticMetaObject);
+    return Utils::Object::configuration(this, &AbstractExporter::staticMetaObject);
 }
 
 bool AbstractExporter::write(AbstractExporter::Target target)

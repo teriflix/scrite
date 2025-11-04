@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "screenplay.h"
+#include "utils.h"
 #include "application.h"
 #include "scritedocument.h"
 #include "characterrelationshipsgraphexporter_p.h"
@@ -37,7 +38,7 @@ CharacterRelationshipsGraphScene::CharacterRelationshipsGraphScene(
         const Screenplay *screenplay = ScriteDocument::instance()->screenplay();
         const QString sptitle = screenplay->title();
         if (graph->character()) {
-            const QString chname = Application::camelCased(graph->character()->name());
+            const QString chname = Utils::SMath::titleCased(graph->character()->name());
             return sptitle.isEmpty() ? chname : chname + QStringLiteral(" of ") + sptitle;
         }
         if (graph->scene()) {
@@ -223,7 +224,7 @@ void CharacterRelationshipsGraphNodeItem::paint(QPainter *painter, const QStyleO
 
     QAbstractTextDocumentLayout *documentLayout = document.documentLayout();
     QAbstractTextDocumentLayout::PaintContext context;
-    context.palette.setColor(QPalette::Text, Application::textColorFor(color));
+    context.palette.setColor(QPalette::Text, Utils::Color::textColorFor(color));
     painter->translate(documentRect.topLeft());
     documentLayout->draw(painter, context);
     painter->translate(documentRect.topLeft());
@@ -235,7 +236,7 @@ CharacterRelationshipsGraphEdgeItem::CharacterRelationshipsGraphEdgeItem(
         const CharacterRelationshipGraphEdge *edge)
     : QGraphicsPathItem(nullptr)
 {
-    const QPainterPath path = Application::stringToPainterPath(edge->pathString());
+    const QPainterPath path = Utils::SMath::stringToPainterPath(edge->pathString());
     this->setPath(path);
 
     QPen pen;

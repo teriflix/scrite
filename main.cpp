@@ -12,10 +12,11 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "utils.h"
 #include "scrite.h"
 #include "appwindow.h"
 #include "application.h"
-#include "shortcutsmodel.h"
+#include "languageengine.h"
 #include "scritedocument.h"
 #include "crashpadmodule.h"
 #include "documentfilesystem.h"
@@ -46,12 +47,11 @@ int main(int argc, char **argv)
     if (!Scrite::blockingMinimumVersionCheck())
         return -1;
 
+    Utils::registerTypes();
     User::instance();
-    TransliterationEngine::instance();
-    SystemTextInputManager::instance();
+    LanguageEngine::instance();
     NotificationManager::instance();
     DocumentFileSystem::setMarker(QByteArrayLiteral("SCRITE"));
-    ShortcutsModel::instance();
     ScriteDocument::instance();
     ScriteDocumentVault::instance();
 

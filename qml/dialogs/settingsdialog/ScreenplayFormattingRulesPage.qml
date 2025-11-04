@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -74,37 +74,31 @@ Item {
 
             VclComboBox {
                 id: languageComboBox
-                Layout.preferredWidth: model.longestKeyWidth() + 50
-                model: GenericArrayModel {
-                    array: Scrite.app.enumerationModelForType("SceneElementFormat", "DefaultLanguage")
-                    objectMembers: ["key", "value"]
 
-                    function longestKeyWidth() {
-                        var ret = 0
-                        for(var i=0; i<count; i++) {
-                            const item = at(i)
-                            ret = Math.max(ret, Runtime.idealFontMetrics.boundingRect(item.key).width)
-                        }
-                        return Math.ceil(ret)
-                    }
-                }
-                textRole: "key"
-                valueRole: "value"
+                Layout.preferredWidth: _private.lanugageModel.longestKeyWidth
+
+                model: _private.lanugageModel
+
+                textRole: "languageName"
+                valueRole: "languageCode"
                 onActivated: (index) => {
-                                 const lang = model.at(index).value
-                                 _private.printElementFormat.defaultLanguage = lang
-                                 _private.displayElementFormat.defaultLanguage = lang
+                                 const lang = Runtime.language.supported.languageAt(index)
+                                 _private.printElementFormat.defaultLanguageCode = lang.code
+                                 _private.displayElementFormat.defaultLanguageCode = lang.code
                              }
             }
 
             VclComboBox {
                 id: fontSizesComboBox
+
                 readonly property var systemFonts: Scrite.app.systemFontInfo()
+
                 model: systemFonts.standardSizes
+
                 onActivated: (index) => {
                                  const fontSize = model[index]
-                                 _private.printElementFormat.setFontPointSize(fontSize)
-                                 _private.displayElementFormat.setFontPointSize(fontSize)
+                                 _private.printElementFormat.fontPointSize = fontSize
+                                 _private.displayElementFormat.fontPointSize = fontSize
                              }
             }
 
@@ -117,8 +111,8 @@ Item {
                     iconSource: "qrc:/icons/editor/format_bold.png"
                     onClicked: {
                         checked = !checked
-                        _private.printElementFormat.setFontBold(checked)
-                        _private.displayElementFormat.setFontBold(checked)
+                        _private.printElementFormat.fontBold = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
+                        _private.displayElementFormat.fontBold = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
                     }
                 }
 
@@ -128,8 +122,8 @@ Item {
                     iconSource: "qrc:/icons/editor/format_italics.png"
                     onClicked: {
                         checked = !checked
-                        _private.printElementFormat.setFontItalics(checked)
-                        _private.displayElementFormat.setFontItalics(checked)
+                        _private.printElementFormat.fontItalics = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
+                        _private.displayElementFormat.fontItalics = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
                     }
                 }
 
@@ -139,8 +133,8 @@ Item {
                     iconSource: "qrc:/icons/editor/format_underline.png"
                     onClicked: {
                         checked = !checked
-                        _private.printElementFormat.setFontUnderline(checked)
-                        _private.displayElementFormat.setFontUnderline(checked)
+                        _private.printElementFormat.fontUnderline = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
+                        _private.displayElementFormat.fontUnderline = checked ? SceneElementFormat.Set : SceneElementFormat.Unset
                     }
                 }
             }
@@ -451,7 +445,7 @@ Item {
                         id: activeElementIndicator
 
                         opacity: 0.2
-                        backgroundColor: Scrite.app.translucent(Runtime.colors.accent.c600.background, 0.5)
+                        backgroundColor: Color.translucent(Runtime.colors.accent.c600.background, 0.5)
 
                         function updateSceneElement() {
                             for(var i=0; i<previewTextBinder.scene.elementCount; i++) {
@@ -477,7 +471,7 @@ Item {
                         sceneElement: previewTextBinder.sceneElementAt(cursorPosition)
 
                         opacity: activeElementIndicator.sceneElement === sceneElement ? 0 : 0.5
-                        backgroundColor: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.5)
+                        backgroundColor: Color.translucent(Runtime.colors.primary.c600.background, 0.5)
 
                         ToolTip.text: sceneElement ? sceneElement.typeAsString : ""
                         ToolTip.visible: opacity > 0 && sceneElement
@@ -488,7 +482,7 @@ Item {
                         property SceneElement sceneElement
                         property rect sceneElementRect
 
-                        property color backgroundColor: Scrite.app.translucent(Runtime.colors.accent.c600.background, 0.5)
+                        property color backgroundColor: Color.translucent(Runtime.colors.accent.c600.background, 0.5)
 
                         property bool valid: sceneElementRect.width > 0 && sceneElementRect.height > 0
                         visible: valid
@@ -732,17 +726,40 @@ Item {
     QtObject {
         id: _private
 
+        readonly property ListModel lanugageModel: ListModel {
+            property int longestKeyWidth: -1
+
+            Component.onCompleted: {
+                const supportedLanguages = Runtime.language.supported
+                let keyWidth = 0;
+
+                append({"languageCode": -1, "languageName": "Default"})
+                keyWidth = Runtime.idealFontMetrics.boundingRect("Default").width
+
+                for(let i=0; i<supportedLanguages.count; i++) {
+                    const language = supportedLanguages.languageAt(i)
+                    append({"languageCode": language.code, "languageName": language.name})
+                    keyWidth = Math.max(keyWidth, Runtime.idealFontMetrics.boundingRect(language.name).width)
+                }
+
+                longestKeyWidth = keyWidth + 50
+            }
+        }
+
         property SceneElementFormat printElementFormat: Scrite.document.printFormat.elementFormat(paragraphTypeComboBox.currentValue)
         property SceneElementFormat displayElementFormat: Scrite.document.formatting.elementFormat(paragraphTypeComboBox.currentValue)
 
         onPrintElementFormatChanged: {
-            languageComboBox.currentIndex = languageComboBox.model.firstIndexOf("value", printElementFormat.defaultLanguageInt);
-            fontSizesComboBox.currentIndex = fontSizesComboBox.model.indexOf(printElementFormat.font.pointSize)
-            boldButton.checked = printElementFormat.font.bold
-            italicsButton.checked = printElementFormat.font.italic
-            underlineButton.checked = printElementFormat.font.underline
+            languageComboBox.currentIndex = Runtime.language.supported.indexOfLanguage(printElementFormat.defaultLanguageCode) + 1
+
+            const font = printElementFormat.font
+            fontSizesComboBox.currentIndex = fontSizesComboBox.model.indexOf(font.pointSize)
+            boldButton.checked = font.bold
+            italicsButton.checked = font.italic
+            underlineButton.checked = font.underline
+
             textForeground.selectedColor = printElementFormat.textColor
-            textBackground.selectedColor = Scrite.app.translucent(printElementFormat.backgroundColor, 4)
+            textBackground.selectedColor = Color.translucent(printElementFormat.backgroundColor, 4)
             textAlignment.value = printElementFormat.textAlignment
             textLineHeight.value = printElementFormat.lineHeight
             firstLineIndent.value = printElementFormat.textIndent

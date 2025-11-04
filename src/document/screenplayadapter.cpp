@@ -22,23 +22,6 @@ ScreenplayAdapter::ScreenplayAdapter(QObject *parent)
       m_source(this, "source"),
       m_currentElement(this, "currentElement")
 {
-    connect(this, &ScreenplayAdapter::modelReset, this,
-            &ScreenplayAdapter::updateCurrentIndexAndCount);
-    connect(this, &ScreenplayAdapter::rowsRemoved, this,
-            &ScreenplayAdapter::updateCurrentIndexAndCount);
-    connect(this, &ScreenplayAdapter::rowsInserted, this,
-            &ScreenplayAdapter::updateCurrentIndexAndCount);
-
-    connect(this, &ScreenplayAdapter::modelAboutToBeReset, this,
-            &ScreenplayAdapter::clearCurrentIndex);
-    connect(this, &ScreenplayAdapter::rowsAboutToBeRemoved, this,
-            &ScreenplayAdapter::clearCurrentIndex);
-    connect(this, &ScreenplayAdapter::rowsAboutToBeInserted, this,
-            &ScreenplayAdapter::clearCurrentIndex);
-
-    connect(this, &ScreenplayAdapter::sourceChanged, this, &ScreenplayAdapter::wordCountChanged);
-    connect(this, &ScreenplayAdapter::sourceChanged, this,
-            &ScreenplayAdapter::heightHintsAvailableChanged);
 }
 
 ScreenplayAdapter::~ScreenplayAdapter() { }
@@ -48,105 +31,94 @@ void ScreenplayAdapter::setSource(QObject *val)
     if (m_source == val)
         return;
 
-    if (this->sourceModel() != nullptr) {
-        QAbstractItemModel *srcModel = this->sourceModel();
-        Screenplay *screenplay = qobject_cast<Screenplay *>(srcModel);
-        if (screenplay != nullptr) {
-            if (screenplay->parent() == this)
-                GarbageCollector::instance()->add(screenplay);
-            else {
-                disconnect(this, &ScreenplayAdapter::currentIndexChanged, screenplay,
-                           &Screenplay::setCurrentElementIndex);
-                disconnect(screenplay, &Screenplay::currentElementIndexChanged, this,
-                           &ScreenplayAdapter::setCurrentIndex);
-                disconnect(screenplay, &Screenplay::hasNonStandardScenesChanged, this,
-                           &ScreenplayAdapter::hasNonStandardScenesChanged);
-                disconnect(screenplay, &Screenplay::wordCountChanged, this,
-                           &ScreenplayAdapter::wordCountChanged);
-            }
-        }
+    m_source = val;
+    QTimer::singleShot(0, this, &ScreenplayAdapter::sourceChanged);
+
+    if (val == nullptr) {
+        this->setSourceModel(nullptr);
+        return;
     }
 
-    this->setCurrentIndex(-1);
+    if (val->metaObject()->inherits(&Screenplay::staticMetaObject)) {
+        this->setSourceModel(qobject_cast<Screenplay *>(val));
+        return;
+    }
 
-    m_source = val;
-    m_adapterRowCount = MAX_ELEMENT_COUNT;
+    if (val->metaObject()->inherits(&Scene::staticMetaObject)) {
+        const Screenplay *masterScreenplay = ScriteDocument::instance()->screenplay();
 
-    if (m_source != nullptr) {
-        Screenplay *screenplay = qobject_cast<Screenplay *>(m_source);
-        if (screenplay != nullptr) {
-            if (m_initialLoadTreshold < 0 || screenplay->elementCount() <= m_initialLoadTreshold)
-                m_adapterRowCount = MAX_ELEMENT_COUNT;
-            else {
-                m_adapterRowCount = 0;
-                screenplay->setCurrentElementIndex(-1);
-            }
-
-            connect(this, &ScreenplayAdapter::currentIndexChanged, screenplay,
-                    &Screenplay::setCurrentElementIndex);
-            connect(screenplay, &Screenplay::currentElementIndexChanged, this,
-                    &ScreenplayAdapter::setCurrentIndex);
-            connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this,
-                    &ScreenplayAdapter::hasNonStandardScenesChanged);
-            connect(screenplay, &Screenplay::wordCountChanged, this,
-                    &ScreenplayAdapter::wordCountChanged);
-            connect(screenplay, &Screenplay::heightHintsAvailableChanged, this,
-                    &ScreenplayAdapter::heightHintsAvailableChanged);
-
-            this->setSourceModel(screenplay);
-        } else {
-            Scene *scene = qobject_cast<Scene *>(m_source);
-            if (scene != nullptr) {
-                Screenplay *masterScreenplay = ScriteDocument::instance()->screenplay();
-
-                screenplay = new Screenplay(this);
-                if (masterScreenplay != nullptr) {
-                    screenplay->setEmail(masterScreenplay->email());
-                    screenplay->setTitle(masterScreenplay->title());
-                    screenplay->setAuthor(masterScreenplay->author());
-                    screenplay->setAddress(masterScreenplay->address());
-                    screenplay->setBasedOn(masterScreenplay->basedOn());
-                    screenplay->setContact(masterScreenplay->contact());
-                    screenplay->setVersion(masterScreenplay->version());
-                    screenplay->setSubtitle(masterScreenplay->subtitle());
-                    screenplay->setPhoneNumber(masterScreenplay->phoneNumber());
-                    screenplay->setProperty("#useDocumentScreenplayForCoverPagePhoto", true);
-                }
-
-                ScreenplayElement *element = new ScreenplayElement(screenplay);
-                element->setScene(scene);
-                screenplay->addElement(element);
-
-                connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this,
-                        &ScreenplayAdapter::hasNonStandardScenesChanged);
-                connect(screenplay, &Screenplay::wordCountChanged, this,
-                        &ScreenplayAdapter::wordCountChanged);
-                connect(screenplay, &Screenplay::heightHintsAvailableChanged, this,
-                        &ScreenplayAdapter::heightHintsAvailableChanged);
-
-                this->setSourceModel(screenplay);
-            } else
-                this->setSourceModel(nullptr);
+        Screenplay *sceneScreenplay = new Screenplay(this);
+        if (masterScreenplay != nullptr) {
+            sceneScreenplay->setEmail(masterScreenplay->email());
+            sceneScreenplay->setTitle(masterScreenplay->title());
+            sceneScreenplay->setAuthor(masterScreenplay->author());
+            sceneScreenplay->setAddress(masterScreenplay->address());
+            sceneScreenplay->setBasedOn(masterScreenplay->basedOn());
+            sceneScreenplay->setContact(masterScreenplay->contact());
+            sceneScreenplay->setVersion(masterScreenplay->version());
+            sceneScreenplay->setSubtitle(masterScreenplay->subtitle());
+            sceneScreenplay->setPhoneNumber(masterScreenplay->phoneNumber());
+            sceneScreenplay->setProperty("#useDocumentScreenplayForCoverPagePhoto", true);
         }
+
+        Scene *scene = qobject_cast<Scene *>(val);
+        ScreenplayElement *element = new ScreenplayElement(sceneScreenplay);
+        element->setScene(scene);
+        sceneScreenplay->addElement(element);
+
+        this->setSourceModel(sceneScreenplay);
+        return;
+    }
+
+    // Ignore all other sources
+    m_source = nullptr;
+    this->setSourceModel(nullptr);
+}
+
+void ScreenplayAdapter::setSourceModel(QAbstractItemModel *model)
+{
+    QAbstractItemModel *currentSourceModel = this->sourceModel();
+    if (currentSourceModel) {
+        disconnect(currentSourceModel, nullptr, this, nullptr);
+        if (currentSourceModel->parent() == this)
+            currentSourceModel->deleteLater();
+        currentSourceModel = nullptr;
+    }
+
+    if (model && model->metaObject()->inherits(&Screenplay::staticMetaObject)) {
+        QIdentityProxyModel::setSourceModel(model);
+
+        Screenplay *screenplay = qobject_cast<Screenplay *>(model);
+        connect(screenplay, &Screenplay::elementCountChanged, this,
+                &ScreenplayAdapter::elementCountChanged);
+        connect(screenplay, &Screenplay::currentElementIndexChanged, this,
+                &ScreenplayAdapter::currentIndexChanged);
+        connect(screenplay, &Screenplay::hasNonStandardScenesChanged, this,
+                &ScreenplayAdapter::hasNonStandardScenesChanged);
+        connect(screenplay, &Screenplay::wordCountChanged, this,
+                &ScreenplayAdapter::wordCountChanged);
+        connect(screenplay, &Screenplay::heightHintsAvailableChanged, this,
+                &ScreenplayAdapter::heightHintsAvailableChanged);
+
     } else
-        this->setSourceModel(nullptr);
+        QIdentityProxyModel::setSourceModel(nullptr);
 
-    emit sourceChanged();
+    emit hasNonStandardScenesChanged();
+    emit wordCountChanged();
+    emit heightHintsAvailableChanged();
 
-    if (this->isSourceScreenplay())
-        this->setCurrentIndex(this->screenplay()->currentElementIndex());
-    else
-        this->setCurrentIndex(0);
+    emit currentIndexChanged();
+    emit elementCountChanged();
 }
 
 bool ScreenplayAdapter::isSourceScene() const
 {
-    return qobject_cast<Scene *>(m_source) != nullptr;
+    return m_source && m_source->metaObject()->inherits(&Scene::staticMetaObject);
 }
 
 bool ScreenplayAdapter::isSourceScreenplay() const
 {
-    return qobject_cast<Screenplay *>(m_source) != nullptr;
+    return m_source && m_source->metaObject()->inherits(&Screenplay::staticMetaObject);
 }
 
 Screenplay *ScreenplayAdapter::screenplay() const
@@ -156,83 +128,99 @@ Screenplay *ScreenplayAdapter::screenplay() const
 
 void ScreenplayAdapter::setCurrentIndex(int val)
 {
-    this->setCurrentIndexInternal(val);
-    emit currentIndexChanged(m_currentIndex);
+    Screenplay *screenplay = this->screenplay();
+    if (screenplay)
+        screenplay->setCurrentElementIndex(val);
+}
+
+int ScreenplayAdapter::currentIndex() const
+{
+    Screenplay *screenplay = this->screenplay();
+    return screenplay ? screenplay->currentElementIndex() : -1;
+}
+
+ScreenplayElement *ScreenplayAdapter::currentElement() const
+{
+    const Screenplay *screenplay = this->screenplay();
+    const int currentIndex = screenplay ? screenplay->currentElementIndex() : -1;
+    ScreenplayElement *currentElement =
+            currentIndex >= 0 ? screenplay->elementAt(currentIndex) : nullptr;
+    return currentElement;
 }
 
 Scene *ScreenplayAdapter::currentScene() const
 {
-    return m_currentElement == nullptr ? nullptr : m_currentElement->scene();
-}
-
-int ScreenplayAdapter::elementCount() const
-{
-    const int nrElements =
-            m_source.isNull() || this->sourceModel() == nullptr ? 0 : this->rowCount(QModelIndex());
-    return qMax(nrElements, 0);
+    const ScreenplayElement *currentElement = this->currentElement();
+    return currentElement ? currentElement->scene() : nullptr;
 }
 
 bool ScreenplayAdapter::hasNonStandardScenes() const
 {
     Screenplay *screenplay = this->screenplay();
-    if (screenplay != nullptr)
-        return screenplay->hasNonStandardScenes();
-
-    return false;
+    return screenplay ? screenplay->hasNonStandardScenes() : false;
 }
 
 int ScreenplayAdapter::wordCount() const
 {
     Screenplay *screenplay = this->screenplay();
-    return screenplay == nullptr ? 0 : screenplay->wordCount();
+    return screenplay ? screenplay->wordCount() : 0;
 }
 
 bool ScreenplayAdapter::isHeightHintsAvailable() const
 {
     Screenplay *screenplay = this->screenplay();
-    return screenplay == nullptr ? true : screenplay->isHeightHintsAvailable();
+    return screenplay ? screenplay->isHeightHintsAvailable() : true;
 }
 
-void ScreenplayAdapter::setInitialLoadTreshold(int val)
+ScreenplayElement *ScreenplayAdapter::splitElement(ScreenplayElement *screenplayElement,
+                                                   SceneElement *paragraph, int textPosition)
 {
-    if (m_initialLoadTreshold == val)
-        return;
-
-    m_initialLoadTreshold = val;
-    emit initialLoadTresholdChanged();
-}
-
-ScreenplayElement *ScreenplayAdapter::splitElement(ScreenplayElement *ptr, SceneElement *element,
-                                                   int textPosition)
-{
-    Screenplay *screenplay = qobject_cast<Screenplay *>(m_source);
-    if (screenplay != nullptr)
-        return screenplay->splitElement(ptr, element, textPosition);
+    Screenplay *screenplay = this->isSourceScreenplay() ? this->screenplay() : nullptr;
+    if (screenplay)
+        return screenplay->splitElement(screenplayElement, paragraph, textPosition);
 
     return nullptr;
 }
 
-ScreenplayElement *ScreenplayAdapter::mergeElementWithPrevious(ScreenplayElement *ptr)
+ScreenplayElement *ScreenplayAdapter::mergeElementWithPrevious(ScreenplayElement *screenplayElement)
 {
-    Screenplay *screenplay = qobject_cast<Screenplay *>(m_source);
-    if (screenplay != nullptr)
-        return screenplay->mergeElementWithPrevious(ptr);
+    Screenplay *screenplay = this->isSourceScreenplay() ? this->screenplay() : nullptr;
+    if (screenplay)
+        return screenplay->mergeElementWithPrevious(screenplayElement);
 
     return nullptr;
 }
 
-int ScreenplayAdapter::previousSceneElementIndex()
+int ScreenplayAdapter::firstSceneElementIndex() const
 {
-    Screenplay *screenplay = qobject_cast<Screenplay *>(m_source);
+    Screenplay *screenplay = this->screenplay();
+    if (screenplay != nullptr)
+        return screenplay->firstSceneElementIndex();
+
+    return 0;
+}
+
+int ScreenplayAdapter::lastSceneElementIndex() const
+{
+    Screenplay *screenplay = this->screenplay();
+    if (screenplay != nullptr)
+        return screenplay->lastSceneElementIndex();
+
+    return 0;
+}
+
+int ScreenplayAdapter::previousSceneElementIndex() const
+{
+    Screenplay *screenplay = this->screenplay();
     if (screenplay != nullptr)
         return screenplay->previousSceneElementIndex();
 
     return 0;
 }
 
-int ScreenplayAdapter::nextSceneElementIndex()
+int ScreenplayAdapter::nextSceneElementIndex() const
 {
-    Screenplay *screenplay = qobject_cast<Screenplay *>(m_source);
+    Screenplay *screenplay = this->screenplay();
     if (screenplay != nullptr)
         return screenplay->nextSceneElementIndex();
 
@@ -258,10 +246,11 @@ QHash<int, QByteArray> ScreenplayAdapter::roleNames() const
 {
     static QHash<int, QByteArray> roles;
     if (roles.isEmpty()) {
-        roles[IdRole] = "id";
+        roles[IdRole] = "sceneID";
         roles[SceneRole] = "scene";
         roles[BreakTypeRole] = "breakType";
         roles[ModelDataRole] = "modelData";
+        roles[DelegateKindRole] = "delegateKind";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
     }
@@ -281,92 +270,6 @@ QVariant ScreenplayAdapter::data(const QModelIndex &index, int role) const
     return this->data(element, index.row(), role);
 }
 
-int ScreenplayAdapter::rowCount(const QModelIndex &parent) const
-{
-    if (parent.isValid())
-        return 0;
-
-    const Screenplay *screenplay = this->screenplay();
-    return m_source.isNull() || screenplay == nullptr
-            ? 0
-            : qMin(screenplay->elementCount(), m_adapterRowCount);
-}
-
-void ScreenplayAdapter::fetchMore(const QModelIndex &parent)
-{
-    if (parent.isValid())
-        return;
-
-    if (this->isSourceScreenplay()) {
-        const Screenplay *screenplay = this->screenplay();
-        const int delta = m_initialLoadTreshold < 0 ? MAX_ELEMENT_COUNT : m_initialLoadTreshold;
-        const int start = qMax(0, m_adapterRowCount);
-        const int end = qMin(screenplay->elementCount() - 1, start + delta - 1);
-        if (end >= start) {
-            this->beginInsertRows(QModelIndex(), start, end);
-            m_adapterRowCount = end >= screenplay->elementCount() - 1 ? MAX_ELEMENT_COUNT : end + 1;
-            this->endInsertRows();
-
-            if (m_adapterRowCount < MAX_ELEMENT_COUNT && m_fetchMoreTimer.isNull()) {
-                m_fetchMoreTimer = new QTimer(this);
-                connect(m_fetchMoreTimer, &QTimer::timeout, this,
-                        &ScreenplayAdapter::continueFetchingMore);
-                m_fetchMoreTimer->setInterval(500);
-                m_fetchMoreTimer->setSingleShot(false);
-                m_fetchMoreTimer->start();
-            }
-        }
-    }
-}
-
-bool ScreenplayAdapter::canFetchMore(const QModelIndex &parent) const
-{
-    if (parent.isValid())
-        return false;
-
-    if (this->isSourceScreenplay())
-        return m_adapterRowCount < MAX_ELEMENT_COUNT;
-
-    return false;
-}
-
-void ScreenplayAdapter::setCurrentIndexInternal(int val)
-{
-    if (m_currentIndex < 0 && val < 0)
-        return;
-
-    if (m_source.isNull()) {
-        m_currentIndex = -1;
-        this->setCurrentElement(nullptr);
-        this->setSourceModel(nullptr);
-        return;
-    }
-
-    const int nrRows = this->elementCount();
-    val = nrRows > 0 ? qBound(-1, val, nrRows - 1) : -1;
-    if (m_currentIndex == val)
-        return;
-
-    m_currentIndex = val;
-
-    if (m_currentIndex >= 0) {
-        const QModelIndex index = this->index(m_currentIndex, 0);
-        ScreenplayElement *element =
-                this->data(index, ScreenplayElementRole).value<ScreenplayElement *>();
-        this->setCurrentElement(element);
-    } else
-        this->setCurrentElement(nullptr);
-}
-
-void ScreenplayAdapter::setCurrentElement(ScreenplayElement *val)
-{
-    if (m_currentElement == val)
-        return;
-
-    m_currentElement = val;
-    emit currentElementChanged();
-}
-
 QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) const
 {
     if (element == nullptr)
@@ -383,6 +286,8 @@ QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) 
         return element->breakType();
     case SceneRole:
         return QVariant::fromValue<Scene *>(element->scene());
+    case DelegateKindRole:
+        return element->delegateKind();
     case ModelDataRole: {
         QVariantMap ret;
         const QHash<int, QByteArray> roles = this->roleNames();
@@ -402,46 +307,10 @@ QVariant ScreenplayAdapter::data(ScreenplayElement *element, int row, int role) 
     return QVariant();
 }
 
-void ScreenplayAdapter::clearCurrentIndex()
-{
-    this->setCurrentIndexInternal(-1);
-}
-
-void ScreenplayAdapter::continueFetchingMore()
-{
-    if (this->sender() != m_fetchMoreTimer || m_fetchMoreTimer.isNull())
-        return;
-
-    if (this->canFetchMore(QModelIndex())) {
-        this->fetchMore(QModelIndex());
-        m_fetchMoreTimer->setInterval(10);
-    } else {
-        m_fetchMoreTimer->stop();
-        m_fetchMoreTimer->deleteLater();
-    }
-}
-
-void ScreenplayAdapter::updateCurrentIndexAndCount()
-{
-    Screenplay *sp = this->screenplay();
-    if (sp != nullptr)
-        this->setCurrentIndexInternal(sp->currentElementIndex());
-    else
-        this->setCurrentIndexInternal(-1);
-
-    emit elementCountChanged();
-}
-
 void ScreenplayAdapter::resetSource()
 {
     this->setSourceModel(nullptr);
 
     m_source = nullptr;
     emit sourceChanged();
-
-    m_currentElement = nullptr;
-    emit currentElementChanged();
-
-    m_currentIndex = -1;
-    emit currentIndexChanged(-1);
 }

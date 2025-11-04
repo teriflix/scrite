@@ -12,9 +12,10 @@
 ****************************************************************************/
 
 #include "fountain.h"
-#include "appwindow.h"
+#include "utils.h"
 #include "formatting.h"
 #include "application.h"
+#include "languageengine.h"
 #include "scritedocument.h"
 #include "qobjectserializer.h"
 #include "qobjectserializer.h"
@@ -29,6 +30,7 @@
 #include <QScopeGuard>
 #include <QTextCursor>
 #include <QPageLayout>
+#include <QJsonObject>
 #include <QFontDatabase>
 #include <QJsonDocument>
 #include <QTextBlockUserData>
@@ -89,13 +91,14 @@ struct ParagraphMetrics
 };
 
 SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat *parent)
-    : QObject(parent), m_font(parent->defaultFont()), m_format(parent), m_elementType(type)
+    : QObject(parent), m_elementType(type), m_format(parent)
 {
     QObject::connect(this, &SceneElementFormat::elementFormatChanged, [this]() {
         this->markAsModified();
         m_lastCreatedBlockFormatPageWidth = -1;
         m_lastCreatedCharFormatPageWidth = -1;
     });
+
     QObject::connect(this, &SceneElementFormat::fontChanged, this,
                      &SceneElementFormat::font2Changed);
     QObject::connect(m_format, &ScreenplayFormat::fontPointSizeDeltaChanged, this,
@@ -106,79 +109,83 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
 
 SceneElementFormat::~SceneElementFormat() { }
 
-void SceneElementFormat::setFont(const QFont &val)
+QFont SceneElementFormat::font() const
 {
-    if (m_font == val)
-        return;
+    Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
+            m_defaultLanguageCode < 0 ? m_format->defaultLanguageCode() : m_defaultLanguageCode);
 
-    m_font = val;
-    emit fontChanged();
-    emit elementFormatChanged();
+    QFont font = language.font();
+    if (m_fontBold != Auto)
+        font.setBold(m_fontBold == Set);
+    if (m_fontItalics != Auto)
+        font.setItalic(m_fontItalics == Set);
+    if (m_fontUnderline != Auto)
+        font.setUnderline(m_fontUnderline == Set);
+    if (m_fontPointSize > 0)
+        font.setPointSize(m_fontPointSize);
+    font.setCapitalization(m_fontCapitalization);
+
+    return font;
 }
 
 QFont SceneElementFormat::font2() const
 {
-    QFont font = m_font;
+    QFont font = this->font();
     font.setPointSize(font.pointSize() + m_format->fontPointSizeDelta());
     return font;
 }
 
-void SceneElementFormat::setFontFamily(const QString &val)
+void SceneElementFormat::setFontBold(SceneElementFormat::Tristate val)
 {
-    if (m_font.family() == val)
+    if (m_fontBold == val)
         return;
 
-    m_font.setFamily(val);
+    m_fontBold = val;
+    emit fontBoldChanged();
     emit fontChanged();
     emit elementFormatChanged();
 }
 
-void SceneElementFormat::setFontBold(bool val)
+void SceneElementFormat::setFontItalics(SceneElementFormat::Tristate val)
 {
-    if (m_font.bold() == val)
+    if (m_fontItalics == val)
         return;
 
-    m_font.setBold(val);
+    m_fontItalics = val;
+    emit fontItalicsChanged();
     emit fontChanged();
     emit elementFormatChanged();
 }
 
-void SceneElementFormat::setFontItalics(bool val)
+void SceneElementFormat::setFontUnderline(SceneElementFormat::Tristate val)
 {
-    if (m_font.italic() == val)
+    if (m_fontUnderline == val)
         return;
 
-    m_font.setItalic(val);
-    emit fontChanged();
-    emit elementFormatChanged();
-}
-
-void SceneElementFormat::setFontUnderline(bool val)
-{
-    if (m_font.underline() == val)
-        return;
-
-    m_font.setUnderline(val);
+    m_fontUnderline = val;
+    emit fontUnderlineChanged();
     emit fontChanged();
     emit elementFormatChanged();
 }
 
 void SceneElementFormat::setFontPointSize(int val)
 {
-    if (m_font.pointSize() == val)
+    if (m_fontPointSize == val)
         return;
 
-    m_font.setPointSize(val);
+    m_fontPointSize = val;
+    emit fontPointSizeChanged();
     emit fontChanged();
     emit elementFormatChanged();
 }
 
-void SceneElementFormat::setFontCapitalization(QFont::Capitalization caps)
+void SceneElementFormat::setFontCapitalization(QFont::Capitalization val)
 {
-    if (m_font.capitalization() == caps)
+    if (m_fontCapitalization == val)
         return;
 
-    m_font.setCapitalization(caps);
+    m_fontCapitalization = val;
+    emit fontCapitalizationChanged();
     emit fontChanged();
     emit elementFormatChanged();
 }
@@ -277,38 +284,21 @@ void SceneElementFormat::setRightMargin(qreal val)
     emit elementFormatChanged();
 }
 
-void SceneElementFormat::setDefaultLanguage(SceneElementFormat::DefaultLanguage val)
+void SceneElementFormat::setDefaultLanguageCode(int val)
 {
-    if (m_defaultLanguage == val)
+    if (m_defaultLanguageCode == val)
         return;
 
-    m_defaultLanguage = val;
-    emit defaultLanguageChanged();
-
-#if 0
-    Application::log("SceneElementFormat(" + QString::number(m_elementType)
-                     + ") changed default language to " + QString::number(int(val) - 1));
-#endif
+    m_defaultLanguageCode = val;
+    emit defaultLanguageCodeChanged();
+    emit fontChanged();
 }
 
 void SceneElementFormat::activateDefaultLanguage()
 {
-    if (m_defaultLanguage == Default) {
-#if 0
-        Application::log("SceneElementFormat(" + QString::number(m_elementType)
-                         + ") activating default " + QString::number(m_format->defaultLanguage()));
-#endif
-        TransliterationEngine::instance()->setLanguage(m_format->defaultLanguage());
-        return;
-    }
-
-    TransliterationEngine::Language language =
-            TransliterationEngine::Language(int(m_defaultLanguage) - 1);
-#if 0
-    Application::log("SceneElementFormat(" + QString::number(m_elementType)
-                     + ") activating explicitly " + QString::number(language));
-#endif
-    TransliterationEngine::instance()->setLanguage(language);
+    Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
+            m_defaultLanguageCode < 0 ? m_format->defaultLanguageCode() : m_defaultLanguageCode);
+    language.activate();
 }
 
 QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAlignment,
@@ -401,7 +391,7 @@ QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth
 void SceneElementFormat::applyToAll(SceneElementFormat::Properties properties)
 {
     if (properties == AllProperties) {
-        for (int i = FontFamily; i <= TextAndBackgroundColors; i++)
+        for (int i = FontSize; i <= TextIndent; i++)
             m_format->applyToAll(this, SceneElementFormat::Properties(i));
     } else
         m_format->applyToAll(this, properties);
@@ -438,7 +428,11 @@ void SceneElementFormat::commitTransaction()
 
 void SceneElementFormat::resetToFactoryDefaults()
 {
-    this->setFont(m_format->defaultFont());
+    this->setFontBold(Auto);
+    this->setFontItalics(Auto);
+    this->setFontUnderline(Auto);
+    this->setFontCapitalization(QFont::MixedCase);
+    this->setFontPointSize(-1);
     this->setLineHeight(0.85);
     this->setLeftMargin(0);
     this->setRightMargin(0);
@@ -447,37 +441,31 @@ void SceneElementFormat::resetToFactoryDefaults()
     this->setTextColor(Qt::black);
     this->setBackgroundColor(Qt::transparent);
     this->setTextAlignment(Qt::AlignLeft);
-    this->setDefaultLanguage(m_elementType == SceneElement::Heading ? English : Default);
+    this->setDefaultLanguageCode(-1);
+}
 
-    QSettings *settings = Application::instance()->settings();
-    QString defaultLanguage = QStringLiteral("Default");
-    switch (m_elementType) {
-    case SceneElement::Action:
-        settings->setValue(QStringLiteral("Paragraph Language/actionLanguage"), defaultLanguage);
-        break;
-    case SceneElement::Character:
-        settings->setValue(QStringLiteral("Paragraph Language/characterLanguage"), defaultLanguage);
-        break;
-    case SceneElement::Parenthetical:
-        settings->setValue(QStringLiteral("Paragraph Language/parentheticalLanguage"),
-                           defaultLanguage);
-        break;
-    case SceneElement::Dialogue:
-        settings->setValue(QStringLiteral("Paragraph Language/dialogueLanguage"), defaultLanguage);
-        break;
-    case SceneElement::Shot:
-        settings->setValue(QStringLiteral("Paragraph Language/shotLanguage"), defaultLanguage);
-        break;
-    case SceneElement::Transition:
-        settings->setValue(QStringLiteral("Paragraph Language/transitionLanguage"),
-                           defaultLanguage);
-        break;
-    case SceneElement::Heading:
-        settings->setValue(QStringLiteral("Paragraph Language/headingLanguage"), defaultLanguage);
-        break;
-    default:
-        break;
-    }
+void SceneElementFormat::serializeToJson(QJsonObject &json) const
+{
+    Language language =
+            LanguageEngine::instance()->supportedLanguages()->findLanguage(m_defaultLanguageCode);
+
+    json.insert(
+            "defaultLanguage",
+            QJsonObject({ { "code", language.isValid() ? language.code : -1 },
+                          { "name",
+                            language.isValid() ? language.name() : QStringLiteral("Default") } }));
+
+    const QMetaEnum elementTypeMeta = QMetaEnum::fromType<SceneElement::Type>();
+    json.insert("#kind", QString::fromLatin1(elementTypeMeta.valueToKey(m_elementType)));
+}
+
+void SceneElementFormat::deserializeFromJson(const QJsonObject &json)
+{
+    const QJsonObject language = json.value("defaultLanguage").toObject();
+    if (language.isEmpty())
+        this->setDefaultLanguageCode(-1);
+    else
+        this->setDefaultLanguageCode(language.value("code").toInt());
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -659,10 +647,8 @@ void ScreenplayPageLayout::timerEvent(QTimerEvent *event)
 ScreenplayFormat::ScreenplayFormat(QObject *parent)
     : QAbstractListModel(parent),
       m_pageWidth(750),
-      m_screen(this, "screen"),
       m_scriteDocument(qobject_cast<ScriteDocument *>(parent)),
-      m_defaultFontMetrics(m_defaultFont),
-      m_defaultFont2Metrics(m_defaultFont)
+      m_screen(this, "screen")
 {
     m_padding[0] = 0; // just to get rid of the unused private variable warning.
 
@@ -674,12 +660,6 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
     }
 
     connect(this, &ScreenplayFormat::formatChanged, [this]() { this->markAsModified(); });
-
-    connect(TransliterationEngine::instance(),
-            &TransliterationEngine::preferredFontFamilyForLanguageChanged, this, [=] {
-                this->useUserSpecifiedFonts();
-                emit formatChanged();
-            });
 
     QTimer::singleShot(0, this, &ScreenplayFormat::resetToUserDefaults);
 }
@@ -724,35 +704,27 @@ qreal ScreenplayFormat::devicePixelRatio() const
     return m_fontZoomLevels.at(index).toDouble() * this->screenDevicePixelRatio();
 }
 
-void ScreenplayFormat::setDefaultLanguage(TransliterationEngine::Language val)
+void ScreenplayFormat::setDefaultLanguageCode(int val)
 {
-#if 0
-    Application::log("ScreenplayFormat Default Language: " + QString::number(val));
-#endif
-    if (m_defaultLanguage == val)
+    if (m_defaultLanguageCode == val)
         return;
 
-    m_defaultLanguage = val;
-    emit defaultLanguageChanged();
+    m_defaultLanguageCode = val;
+    emit defaultLanguageCodeChanged();
 }
 
-void ScreenplayFormat::setDefaultFont(const QFont &val)
+QFont ScreenplayFormat::defaultFont() const
 {
-    if (m_defaultFont == val)
-        return;
-
-    m_defaultFont = val;
-
-    this->evaluateFontZoomLevels();
-    this->evaluateFontPointSizeDelta();
-
-    emit defaultFontChanged();
-    emit formatChanged();
+    Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
+            m_defaultLanguageCode < 0
+                    ? LanguageEngine::instance()->supportedLanguages()->defaultLanguageCode()
+                    : m_defaultLanguageCode);
+    return language.font();
 }
 
 QFont ScreenplayFormat::defaultFont2() const
 {
-    QFont font = m_defaultFont;
+    QFont font = this->defaultFont();
     font.setPointSize(font.pointSize() + m_fontPointSizeDelta);
     return font;
 }
@@ -801,16 +773,13 @@ void ScreenplayFormat::applyToAll(const SceneElementFormat *from,
             continue;
 
         switch (properties) {
-        case SceneElementFormat::FontFamily:
-            format->setFontFamily(from->font().family());
-            break;
         case SceneElementFormat::FontSize:
             format->setFontPointSize(from->font().pointSize());
             break;
         case SceneElementFormat::FontStyle:
-            format->setFontBold(from->font().bold());
-            format->setFontItalics(from->font().italic());
-            format->setFontUnderline(from->font().underline());
+            format->setFontBold(from->fontBold());
+            format->setFontItalics(from->fontItalics());
+            format->setFontUnderline(from->fontItalics());
             break;
         case SceneElementFormat::LineHeight:
             format->setLineHeight(from->lineHeight());
@@ -877,26 +846,13 @@ void ScreenplayFormat::resetToFactoryDefaults()
 
     this->setSecondsPerPage(60);
 
-    const QString fontFamily = TransliterationEngine::instance()->preferredFontFamilyForLanguage(
-            TransliterationEngine::English);
-    this->setDefaultFont(QFont(fontFamily, 12));
     if (m_screen != nullptr) {
         const int index = m_fontZoomLevels.indexOf(QVariant(1.0));
         this->setFontZoomLevelIndex(index);
     }
 
-    const QString defLanguage =
-            settings->value(QStringLiteral("Paragraph Language/defaultLanguage"),
-                            QStringLiteral("English"))
-                    .toString();
-    const QMetaObject *mo = &SceneElement::staticMetaObject;
-    const QMetaEnum enumerator = mo->enumerator(mo->indexOfEnumerator("Language"));
-    if (enumerator.isValid()) {
-        bool ok = false;
-        const int value = enumerator.keyToValue(qPrintable(defLanguage), &ok);
-        if (ok)
-            this->setDefaultLanguageInt(value);
-    }
+    this->setDefaultLanguageCode(
+            LanguageEngine::instance()->supportedLanguages()->defaultLanguageCode());
 
     for (int i = SceneElement::Min; i <= SceneElement::Max; i++)
         m_elementFormats.at(i)->resetToFactoryDefaults();
@@ -924,9 +880,7 @@ bool ScreenplayFormat::saveAsUserDefaults()
     const QJsonDocument jsonDoc(json);
     const QByteArray jsonStr = jsonDoc.toJson();
 
-    const QFileInfo settingsPath(Application::instance()->settingsFilePath());
-    const QString formatFile =
-            settingsPath.absoluteDir().absoluteFilePath(QStringLiteral("formatting.json"));
+    const QString formatFile = Utils::Platform::configPath(QStringLiteral("formatting.json"));
 
     QFile file(formatFile);
     if (!file.open(QFile::WriteOnly))
@@ -938,9 +892,7 @@ bool ScreenplayFormat::saveAsUserDefaults()
 
 void ScreenplayFormat::resetToUserDefaults()
 {
-    const QFileInfo settingsPath(Application::instance()->settingsFilePath());
-    const QString formatFile =
-            settingsPath.absoluteDir().absoluteFilePath(QStringLiteral("formatting.json"));
+    const QString formatFile = Utils::Platform::configPath(QStringLiteral("formatting.json"));
 
     this->resetToFactoryDefaults();
 
@@ -1005,28 +957,25 @@ void ScreenplayFormat::commitTransaction()
     m_nrChangesDuringTransation = 0;
 }
 
-void ScreenplayFormat::useUserSpecifiedFonts()
+void ScreenplayFormat::serializeToJson(QJsonObject &json) const
 {
-    const QString englishFont = TransliterationEngine::instance()->preferredFontFamilyForLanguage(
-            TransliterationEngine::English);
-    QFont defFont = this->defaultFont();
-    if (defFont.family() != englishFont) {
-        defFont.setFamily(englishFont);
-        for (int i = SceneElement::Min; i <= SceneElement::Max; i++) {
-            SceneElementFormat *format = this->elementFormat(i);
-            QFont formatFont = format->font();
-            formatFont.setFamily(englishFont);
-            format->setFont(formatFont);
-        }
-        this->setDefaultFont(defFont);
-    }
+    Language language =
+            LanguageEngine::instance()->supportedLanguages()->findLanguage(m_defaultLanguageCode);
+
+    json.insert(
+            "defaultLanguage",
+            QJsonObject({ { "code", language.isValid() ? language.code : -1 },
+                          { "name",
+                            language.isValid() ? language.name() : QStringLiteral("Default") } }));
 }
 
-void ScreenplayFormat::deserializeFromJson(const QJsonObject &)
+void ScreenplayFormat::deserializeFromJson(const QJsonObject &json)
 {
-    SceneElementFormat *headingFormat = this->elementFormat(SceneElement::Heading);
-    if (headingFormat && headingFormat->defaultLanguage() == SceneElementFormat::Default)
-        headingFormat->setDefaultLanguage(SceneElementFormat::English);
+    const QJsonObject language = json.value("defaultLanguage").toObject();
+    if (language.isEmpty())
+        this->setDefaultLanguageCode(-1);
+    else
+        this->setDefaultLanguageCode(language.value("code").toInt());
 }
 
 void ScreenplayFormat::resetScreen()
@@ -1052,7 +1001,8 @@ void ScreenplayFormat::evaluateFontPointSizeDelta()
         fontPointSize =
                 m_fontPointSizes.at(qBound(0, m_fontZoomLevelIndex, m_fontZoomLevels.size() - 1));
 
-    const int val = fontPointSize - m_defaultFont.pointSize();
+    const QFont defaultFont = this->defaultFont();
+    const int val = fontPointSize - defaultFont.pointSize();
     if (m_fontPointSizeDelta == val)
         return;
 
@@ -1063,9 +1013,10 @@ void ScreenplayFormat::evaluateFontPointSizeDelta()
 
 void ScreenplayFormat::evaluateFontZoomLevels()
 {
-    const QList<int> defaultFontPointSizes = QFontDatabase().pointSizes(m_defaultFont.family());
+    const QFont defaultFont = this->defaultFont();
+    const QList<int> defaultFontPointSizes = QFontDatabase().pointSizes(defaultFont.family());
 
-    QFont font2 = m_defaultFont;
+    QFont font2 = defaultFont;
     font2.setPointSize([=]() {
         const int ps = int(font2.pointSize() * this->screenDevicePixelRatio());
         int i = 0;
@@ -1573,7 +1524,8 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
         return;
 
     if (!m_binder->m_autoCapitalizeSentences
-        || TransliterationEngine::instance()->language() != TransliterationEngine::English)
+        || LanguageEngine::instance()->supportedLanguages()->activeLanguage().charScript()
+                != QChar::Script_Latin)
         return;
 
     // Auto-capitalize needs to be done only on action and dialogue paragraphs.
@@ -1929,8 +1881,11 @@ void SceneDocumentBinder::setTextWidth(qreal val)
 
 void SceneDocumentBinder::setCursorPosition(int val)
 {
+    if (qApp->closingDown())
+        return;
+
 #if 0
-    Application::log("SceneDocumentBinder(" + this->objectName() + ") cursorPosition: "
+    Utils::Gui::log("SceneDocumentBinder(" + this->objectName() + ") cursorPosition: "
                      + QString::number(m_cursorPosition) + " to " + QString::number(val));
 #endif
     if (m_initializingDocument || m_pastingContent || m_cursorPosition == val)
@@ -2885,15 +2840,14 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
 
     // Per-language fonts.
     if (m_applyLanguageFonts) {
-        const QList<TransliterationEngine::Boundary> boundaries =
-                TransliterationEngine::instance()->evaluateBoundaries(text);
+        const QList<ScriptBoundary> boundaries = LanguageEngine::determineBoundaries(text);
 
-        for (const TransliterationEngine::Boundary &boundary : boundaries) {
-            if (boundary.isEmpty() || boundary.language == TransliterationEngine::English)
+        for (const ScriptBoundary &boundary : boundaries) {
+            if (!boundary.isValid() || boundary.script == QChar::Script_Latin)
                 continue;
 
             QTextCharFormat format;
-            format.setFontFamily(boundary.font.family());
+            format.setFontFamily(boundary.fontFamily());
             this->mergeFormat(boundary.start, boundary.end - boundary.start + 1, format);
         }
 
@@ -2909,7 +2863,7 @@ void SceneDocumentBinder::highlightBlock(const QString &text)
                 continue;
 
             const QString word = text.mid(fragment.start(), fragment.length());
-            const QChar::Script script = TransliterationEngine::determineScript(word);
+            const QChar::Script script = LanguageEngine::determineScript(word);
             if (script != QChar::Script_Latin)
                 continue;
 
@@ -3028,11 +2982,13 @@ void SceneDocumentBinder::resetScene()
 void SceneDocumentBinder::resetTextDocument()
 {
     m_textDocument = nullptr;
+
     this->QSyntaxHighlighter::setDocument(nullptr);
     this->setDocumentLoadCount(0);
-    this->evaluateAutoCompleteHintsAndCompletionPrefix();
-    emit textDocumentChanged();
     this->setCursorPosition(-1);
+    QTimer::singleShot(0, this, &SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix);
+
+    emit textDocumentChanged();
 }
 
 void SceneDocumentBinder::resetScreenplayFormat()
@@ -3204,7 +3160,7 @@ void SceneDocumentBinder::activateCurrentElementDefaultLanguage()
         SceneElementFormat *format = m_screenplayFormat->elementFormat(m_currentElement->type());
         if (format != nullptr) {
 #if 0
-            Application::log("SceneDocumentBinder(" + this->objectName()
+            Utils::Gui::log("SceneDocumentBinder(" + this->objectName()
                              + ") activating default language for "
                              + QString::number(m_currentElement->type()));
 #endif
@@ -3563,7 +3519,7 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
     int completionStart = -1;
     int completionEnd = -1;
 
-    if (m_currentElement == nullptr || m_cursorPosition < 0) {
+    if (m_textDocument == nullptr || m_currentElement == nullptr || m_cursorPosition < 0) {
         this->setAutoCompleteHints(hints, priorityHints);
         this->setCompletionPrefix(completionPrefix, completionStart, completionEnd);
         return;

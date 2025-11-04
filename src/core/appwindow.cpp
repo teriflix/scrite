@@ -18,6 +18,7 @@
 #include "automation.h"
 #include "application.h"
 #include "scritedocument.h"
+#include "languageengine.h"
 #include "colorimageprovider.h"
 #include "basicfileiconprovider.h"
 
@@ -63,7 +64,6 @@ AppWindow::AppWindow()
     ScriteDocument *scriteDocument = ScriteDocument::instance();
     scriteDocument->formatting()->setSreeenFromWindow(this);
     scriteDocument->clearModified();
-    scriteApp.initializeStandardColors(this->engine());
     this->setTitle(scriteDocument->documentWindowTitle());
     QObject::connect(scriteDocument, &ScriteDocument::documentWindowTitleChanged, this,
                      &QQuickView::setTitle);
@@ -111,7 +111,9 @@ AppWindow::AppWindow()
 
     m_defaultWindowFlags = this->flags();
 
-    this->setMinimumSize(QSize(800, 600));
+    LanguageEngine::init("io.scrite.components", this->engine());
+
+    this->setMinimumSize(QSize(1366, 700));
 }
 
 AppWindow::~AppWindow()
@@ -132,14 +134,6 @@ void AppWindow::setCloseButtonVisible(bool val)
     this->setFlags(newFlags);
 
     emit closeButtonVisibleChanged();
-}
-
-void AppWindow::showEvent(QShowEvent *se)
-{
-    QQuickWindow::showEvent(se);
-    connect(this, &AppWindow::activeFocusItemChanged, TransliterationEngine::instance(),
-            &TransliterationEngine::determineEnabledLanguages);
-    TransliterationEngine::instance()->determineEnabledLanguages();
 }
 
 static inline QString getFileNameToOpenFromAppArgs()

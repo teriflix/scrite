@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -112,7 +112,7 @@ DialogLauncher {
                 onClicked: dialog.close()
             }
 
-            Component.onCompleted: Utils.execLater(splashImage, 5000, dialog.close)
+            Component.onCompleted: Runtime.execLater(splashImage, 5000, dialog.close)
         }
 
         QtObject {

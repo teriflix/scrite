@@ -14,7 +14,7 @@
 #include "form.h"
 #include "deltadocument.h"
 #include "characterreport.h"
-#include "transliteration.h"
+#include "languageengine.h"
 
 #include <QTextTable>
 #include <QTextCursor>
@@ -100,13 +100,12 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
         QString title = screenplay->title();
         if (title.isEmpty())
             title = "Untitled Screenplay";
-        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, title);
+        LanguageEngine::determineBoundariesAndInsertText(cursor, title);
         // cursor.insertText(title);
         if (!screenplay->subtitle().isEmpty()) {
             cursor.insertBlock();
             // cursor.insertText(screenplay->subtitle());
-            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                    cursor, screenplay->subtitle());
+            LanguageEngine::determineBoundariesAndInsertText(cursor, screenplay->subtitle());
         }
 
         blockFormat.setBottomMargin(20);
@@ -160,8 +159,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             charFormat.setFontWeight(QFont::Bold);
 
             cursor.insertBlock(blockFormat, charFormat);
-            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor,
-                                                                               characterName);
+            LanguageEngine::determineBoundariesAndInsertText(cursor, characterName);
 
             charFormat.setFontWeight(QFont::Normal);
             cursor.setCharFormat(charFormat);
@@ -262,8 +260,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                     charFormat.setFontWeight(QFont::Bold);
 
                     cursor.insertBlock(blockFormat, charFormat);
-                    TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor,
-                                                                                       heading);
+                    LanguageEngine::determineBoundariesAndInsertText(cursor, heading);
 
                     charFormat.setFontPointSize(charFormat.fontPointSize() - 2);
                     charFormat.setFontUnderline(false);
@@ -276,8 +273,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                     cursor.insertBlock(blockFormat, charFormat);
 
                     if (summaryContent.isString())
-                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                                cursor, summaryContent.toString());
+                        LanguageEngine::determineBoundariesAndInsertText(cursor,
+                                                                         summaryContent.toString());
                     else
                         DeltaDocument::blockingResolveAndInsertHtml(summaryContent.toObject(),
                                                                     cursor);
@@ -316,7 +313,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 charFormat.setFontWeight(QFont::Bold);
 
                 cursor.insertBlock(blockFormat, charFormat);
-                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, heading);
+                LanguageEngine::determineBoundariesAndInsertText(cursor, heading);
 
                 charFormat.setFontPointSize(charFormat.fontPointSize() - 2);
                 charFormat.setFontUnderline(false);
@@ -331,8 +328,8 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                 if (note->type() == Note::TextNoteType) {
                     const QJsonValue noteContent = note->content();
                     if (noteContent.isString())
-                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                                cursor, noteContent.toString());
+                        LanguageEngine::determineBoundariesAndInsertText(cursor,
+                                                                         noteContent.toString());
                     else
                         DeltaDocument::blockingResolveAndInsertHtml(noteContent.toObject(), cursor);
                 }
@@ -350,8 +347,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                             charFormat.setFontWeight(QFont::Bold);
                             cursor.insertBlock(qBlockFormat, charFormat);
                             cursor.insertBlock();
-                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                                    cursor, questionText);
+                            LanguageEngine::determineBoundariesAndInsertText(cursor, questionText);
 
                             const QString answerText = [q, note]() {
                                 const QString ret = note->getFormData(q->id()).toString();
@@ -359,8 +355,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                             }();
                             charFormat.setFontWeight(QFont::Normal);
                             cursor.insertBlock(qBlockFormat, charFormat);
-                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                                    cursor, answerText);
+                            LanguageEngine::determineBoundariesAndInsertText(cursor, answerText);
                         }
                     }
                 }
@@ -425,7 +420,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                         cursor.insertBlock(blockFormat, charFormat);
                         // cursor.insertText("Scene [" + QString::number(i+1) + "]: " +
                         // scene->heading()->text());
-                        TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                        LanguageEngine::determineBoundariesAndInsertText(
                                 cursor,
                                 "Scene [" + element->resolvedSceneNumber()
                                         + "]: " + scene->heading()->text());
@@ -474,8 +469,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                             cursor.setCharFormat(charFormat);
                             cursor.setBlockFormat(blockFormat);
                             // cursor.insertText(characterName);
-                            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
-                                    cursor, characterName);
+                            LanguageEngine::determineBoundariesAndInsertText(cursor, characterName);
 
                             cursor = dialogueTable->cellAt(dialogueTable->rows() - 1, 1)
                                              .firstCursorPosition();
@@ -506,7 +500,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
                                 } else
                                     cursor.insertBlock(blockFormat, charFormat);
                                 // cursor.insertText(element->formattedText());
-                                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                                LanguageEngine::determineBoundariesAndInsertText(
                                         cursor, element->formattedText());
                                 ++nr;
                             }
@@ -548,7 +542,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
 
                 cursor.insertBlock(blockFormat, charFormat);
 
-                TransliterationEngine::instance()->evaluateBoundariesAndInsertText(
+                LanguageEngine::determineBoundariesAndInsertText(
                         cursor,
                         names + isare + QLatin1String("present in this scene and") + isare
                                 + QLatin1String("mute."));
@@ -590,7 +584,7 @@ bool CharacterReport::doGenerate(QTextDocument *textDocument)
             charFormat.setFontCapitalization(QFont::AllUppercase);
 
             cursor.insertBlock(blockFormat, charFormat);
-            TransliterationEngine::instance()->evaluateBoundariesAndInsertText(cursor, it.key());
+            LanguageEngine::determineBoundariesAndInsertText(cursor, it.key());
             // cursor.insertText(it.key());
 
             charFormat = defaultCharFormat;

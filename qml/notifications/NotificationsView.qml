@@ -20,7 +20,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -31,7 +30,7 @@ Rectangle {
     anchors.fill: parent
 
     visible: NotificationsLayer.valid && Scrite.notifications.count > 0
-    color: Scrite.app.translucent(Runtime.colors.primary.borderColor, 0.6)
+    color: Color.translucent(Runtime.colors.primary.borderColor, 0.6)
 
     focus: visible
 

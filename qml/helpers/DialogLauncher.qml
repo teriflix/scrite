@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -51,7 +51,7 @@ Item {
         }
 
         if(!dialogComponent.parent) {
-            Scrite.app.reparent(dialogComponent, root)
+            Object.reparent(dialogComponent, root)
         }
 
         var dlg = initialProperties ? dialogComponent.createObject(root,initialProperties) : dialogComponent.createObject(root)

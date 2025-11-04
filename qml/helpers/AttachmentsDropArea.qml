@@ -20,32 +20,39 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 BasicAttachmentsDropArea {
-    id: attachmentsDropArea
-    enabled: !Scrite.document.readOnly
-    property real noticeWidthFactor: 0.5
+    id: root
 
+    property real noticeWidthFactor: 0.5
     property string attachmentNoticeSuffix: "Add as attachment by dropping it here."
+
+    enabled: !Scrite.document.readOnly
 
     Rectangle {
         anchors.fill: parent
-        visible: attachmentsDropArea.active
-        color: Scrite.app.translucent(Runtime.colors.primary.c500.background, 0.5)
+
+        color: Color.translucent(Runtime.colors.primary.c500.background, 0.5)
+        visible: root.active
 
         Rectangle {
-            anchors.fill: attachmentNotice
+            anchors.fill: _notice
             anchors.margins: -30
-            radius: 4
+
             color: Runtime.colors.primary.c700.background
+            radius: 4
         }
 
         VclLabel {
-            id: attachmentNotice
+            id: _notice
+
             anchors.centerIn: parent
+
             width: parent.width * noticeWidthFactor
-            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
             color: Runtime.colors.primary.c700.text
-            text: parent.visible ? "<b>" + attachmentsDropArea.attachment.title + "</b><br/><br/>" + attachmentNoticeSuffix : ""
             horizontalAlignment: Text.AlignHCenter
+            text: parent.visible ? "<b>" + root.attachment.title + "</b><br/><br/>" + attachmentNoticeSuffix : ""
+            wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+
             font.pointSize: Runtime.idealFontMetrics.font.pointSize
         }
     }

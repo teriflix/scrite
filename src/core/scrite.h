@@ -19,7 +19,6 @@
 #include "restapicall.h"
 #include "application.h"
 #include "scritedocument.h"
-#include "shortcutsmodel.h"
 #include "notificationmanager.h"
 #include "scritedocumentvault.h"
 
@@ -179,9 +178,6 @@ public:
 
     Q_PROPERTY(ScriteDocumentVault *vault READ vault CONSTANT)
     static ScriteDocumentVault *vault();
-
-    Q_PROPERTY(ShortcutsModel *shortcuts READ shortcuts CONSTANT)
-    static ShortcutsModel *shortcuts();
 
     Q_PROPERTY(NotificationManager *notifications READ notifications CONSTANT)
     static NotificationManager *notifications();

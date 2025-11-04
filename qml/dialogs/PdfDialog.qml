@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -32,7 +32,7 @@ DialogLauncher {
     function launch(title, filePath, dlFilePath, pagesPerRow, allowSave) {
         const initialProps = {
             "title": title,
-            "source": Scrite.app.localFileToUrl(filePath),
+            "source": Url.fromPath(filePath),
             "saveFilePath": dlFilePath,
             "allowFileSave": allowSave,
             "pagesPerRow": pagesPerRow

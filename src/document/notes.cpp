@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "utils.h"
 #include "form.h"
 #include "notes.h"
 #include "scene.h"
@@ -441,7 +442,7 @@ void Note::renameCharacter(const QString &from, const QString &to)
     {
         int nrReplacements = 0;
         const QString newTitle =
-                Application::replaceCharacterName(from, to, m_title, &nrReplacements);
+                Utils::SMath::replaceCharacterName(from, to, m_title, &nrReplacements);
         if (nrReplacements > 0) {
             m_title = newTitle;
             emit titleChanged();
@@ -451,7 +452,7 @@ void Note::renameCharacter(const QString &from, const QString &to)
     if (m_content.isString()) {
         int nrReplacements = 0;
         const QString newContent =
-                Application::replaceCharacterName(from, to, m_content.toString(), &nrReplacements);
+                Utils::SMath::replaceCharacterName(from, to, m_content.toString(), &nrReplacements);
         if (nrReplacements > 0) {
             m_content = newContent;
             emit contentChanged();
@@ -464,7 +465,7 @@ void Note::renameCharacter(const QString &from, const QString &to)
         QJsonObject::iterator end = m_formData.end();
         while (it != end) {
             int nrReplacements = 0;
-            const QString newValue = Application::replaceCharacterName(
+            const QString newValue = Utils::SMath::replaceCharacterName(
                     from, to, it.value().toString(), &nrReplacements);
             if (nrReplacements > 0) {
                 it.value() = newValue;

@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -51,7 +51,7 @@ Item {
                 _private.dialog.close()
             }
             args.exporter = Scrite.document.createExporter(exporter)
-        } else if(Scrite.app.verifyType(exporter, "AbstractExporter")) {
+        } else if(Object.isOfType(exporter, "AbstractExporter")) {
             if(_private.dialog) {
                 if(_private.dialog.exporter === exporter)
                     return _private.dialog
@@ -65,7 +65,7 @@ Item {
             return null
         }
 
-        Scrite.app.restoreObjectConfiguration(args.exporter)
+        Object.load(args.exporter)
 
         var dlg = _private.dialogComponent.createObject(root, args)
         if(dlg) {

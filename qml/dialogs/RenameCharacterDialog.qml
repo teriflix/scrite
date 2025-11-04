@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -29,7 +29,7 @@ DialogLauncher {
     id: root
 
     function launch(character) {
-        if(!character || !Scrite.app.verifyType(character, "Character")) {
+        if(!character || !Object.isOfType(character, "Character")) {
             console.log("Couldn't launch " + name + ": invalid character specified.")
             return null
         }
@@ -47,6 +47,8 @@ DialogLauncher {
 
         width: 680
         height: 300
+
+        handleLanguageShortcuts: true
         title: "Rename/Merge Character: " + _private.orignalCharacterName
 
         content: Item {
@@ -197,13 +199,16 @@ DialogLauncher {
                         _private.waitDialog = null
 
                         if(_private.renameWasSuccessful) {
-                            Announcement.shout(Runtime.announcementIds.characterNotesRequest, _private.newCharacterName)
+                            let characterNotes = ActionHub.notebookOperations.find("characterNotes")
+                            characterNotes.characterName = _private.newCharacterName
+                            characterNotes.trigger()
                             Qt.callLater(dialog.close)
-                        } else
-                        MessageBox.information("Rename Error", dialog.character.renameError, () => {
-                                                   dialog.character.clearRenameError()
-                                                   Qt.callLater(dialog.close)
-                                               } )
+                        } else {
+                            MessageBox.information("Rename Error", dialog.character.renameError, () => {
+                                                       dialog.character.clearRenameError()
+                                                       Qt.callLater(dialog.close)
+                                                   } )
+                        }
                     }
                 }
             }

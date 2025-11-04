@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -97,7 +97,7 @@ DialogLauncher {
                     ToolButton {
                         icon.source: "qrc:/icons/content/content_copy.png"
                         onClicked: {
-                            if(Scrite.app.copyToClipboard(root.inviteUrl)) {
+                            if(Clipboard.set(root.inviteUrl)) {
                                 MessageBox.information("Copy Successful",
                                                        "The invite link was copied to clipboard",
                                                        () => { })
@@ -114,7 +114,7 @@ DialogLauncher {
                     text: "Please note: There is <b>no phone or email support</b> available for Scrite."
                     color: Runtime.colors.primary.c600.background
                     wrapMode: Text.WordWrap
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                     horizontalAlignment: Text.AlignHCenter
                 }
 

@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -33,6 +33,8 @@ VclDialog {
 
     width: Math.min(Scrite.window.width*0.9, 800)
     height: Math.min(Scrite.window.height*0.9, 650)
+
+    handleLanguageShortcuts: true
     title: report ? report.title : "Report Configuration Dialog"
 
     content: report && visible ? (_private.reportEnabled ? reportConfigContent : reportFeatureDisabledContent) : null
@@ -75,7 +77,7 @@ VclDialog {
                 id: reportConfigPageView
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                pagesArray: _private.formInfo.groupedFields
+                pagesArray: _private.configuration.groups
                 pageTitleRole: "name"
                 pageListWidth: Math.max(width * 0.15, 150)
                 currentIndex: {
@@ -114,7 +116,7 @@ VclDialog {
                 }
 
                 Component.onCompleted: {
-                    if(Scrite.app.verifyType(report, "AbstractScreenplaySubsetReport")) {
+                    if(Object.isOfType(report, "AbstractScreenplaySubsetReport")) {
                         report.capitalizeSentences = Runtime.screenplayEditorSettings.enableAutoCapitalizeSentences
                         report.polishParagraphs = Runtime.screenplayEditorSettings.enableAutoPolishParagraphs
                     }
@@ -122,7 +124,7 @@ VclDialog {
                     if(_private.isPdfExport)
                         Runtime.showHelpTip("watermark")
                     Runtime.showHelpTip("reports")
-                    Runtime.showHelpTip(Scrite.app.typeName(report))
+                    Runtime.showHelpTip(Object.typeOf(report))
                 }
             }
         }
@@ -193,7 +195,7 @@ VclDialog {
             }
 
             Repeater {
-                model: _private.formInfo.groupedFields[0].fields
+                model: _private.configuration.groups[0].fields
                 delegate: fieldEditorLoader
             }
         }
@@ -210,7 +212,7 @@ VclDialog {
             spacing: 5
 
             Repeater {
-                model: fieldGroupIndex > 0 ? _private.formInfo.groupedFields[fieldGroupIndex].fields : []
+                model: fieldGroupIndex > 0 ? _private.configuration.groups[fieldGroupIndex].fields : []
                 delegate: fieldEditorLoader
             }
         }
@@ -276,8 +278,8 @@ VclDialog {
                 // Launch wait dialog ..
                 ScriptAction {
                     script: {
-                        Scrite.app.saveObjectConfiguration(report)
-                        _private.waitDialog = WaitDialog.launch("Generating " + report.title + " ...", Aggregation.findProgressReport(report))
+                        Object.save(report)
+                        _private.waitDialog = WaitDialog.launch("Generating " + report.title + " ...", Aggregation.progressReport(report))
                     }
                 }
 
@@ -304,10 +306,10 @@ VclDialog {
                             if(_private.isPdfExport) {
                                 PdfDialog.launch(report.title, report.fileName, dlFileName, report.singlePageReport ? 1 : 2, _private.reportSaveFeature.enabled)
                             } else
-                                Scrite.app.revealFileOnDesktop(report.fileName)
+                                File.revealOnDesktop(report.fileName)
                             Qt.callLater(root.close)
                         } else {
-                            const reportErrors = Aggregation.findErrorReport(report)
+                            const reportErrors = Aggregation.errorReport(report)
                             MessageBox.information(report.title, reportErrors.errorMessage, () => {
                                                        Qt.callLater(root.close)
                                                    } )
@@ -351,7 +353,7 @@ VclDialog {
     QtObject {
         id: _private
 
-        property var formInfo: report ? report.configurationFormInfo() : {"title": "Unknown", "description": "", "groupedFields": []}
+        property var configuration: report ? report.configuration() : {"title": "Unknown", "description": "", "groups": []}
         property bool isPdfExport: report ? report.format === AbstractReportGenerator.AdobePDF : false
         property bool reportEnabled: report ? report.featureEnabled : false
 
@@ -362,7 +364,7 @@ VclDialog {
         property VclDialog waitDialog
     }
 
-    onClosed: Utils.execLater(report, 100, report.discard)
+    onClosed: Runtime.execLater(report, 100, report.discard)
 
     Connections {
         target: root.report

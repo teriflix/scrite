@@ -27,15 +27,12 @@ QtObject {
     property bool valid: item !== null
 
     function init(_parent) {
-        if( !(_parent && Scrite.app.verifyType(_parent, "QQuickItem")) )
+        if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
             _parent = Scrite.window.contentItem
 
         item = Qt.createQmlObject("import QtQuick 2.15; Item { }", _parent)
         item.objectName = "OverlaysLayer"
         item.anchors.fill = _parent
         item.visible = _parent
-
-        // Init global overlays within this module
-        DocumentBusyOverlay.init()
     }
 }

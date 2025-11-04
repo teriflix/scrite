@@ -21,115 +21,136 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 ListView {
-    id: attachmentsView
+    id: root
 
     property Attachments attachments
     readonly property real delegateSize: 83
     property bool readonly: Scrite.document.readOnly
+    property bool scrollBarVisible: contentWidth > width
 
-    orientation: ListView.Horizontal
-    model: attachments
-    onAttachmentsChanged: currentIndex = -1
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-    highlight: Rectangle {
-        color: Runtime.colors.primary.highlight.background
-    }
+
+    ScrollBar.horizontal: VclScrollBar { flickable: root }
+
+    height: implicitHeight
+    implicitHeight: scrollBarVisible ? 100 : 83
+
     clip: true
     highlightMoveDuration: 0
     highlightResizeDuration: 0
-    height: scrollBarVisible ? 100 : 83
+    model: attachments
+    orientation: ListView.Horizontal
 
-    Rectangle {
-        anchors.fill: parent
-        color: Scrite.app.translucent(Runtime.colors.primary.windowColor, 0.5)
-        border.width: 1
-        border.color: Runtime.colors.primary.borderColor
-        z: -1
-
-        VclLabel {
-            anchors.fill: parent
-            anchors.margins: 10
-            anchors.leftMargin: attachmentsView.delegateSize
-            verticalAlignment: Text.AlignVCenter
-            font.pointSize: Runtime.idealFontMetrics.font.pointSize
-            opacity: 0.5
-            text: "Attachments"
-            visible: attachments && attachments.attachmentCount === 0
-        }
+    highlight: Rectangle {
+        color: Runtime.colors.primary.highlight.background
     }
 
     delegate: Item {
-        property bool isSelected: attachmentsView.currentIndex === index
-        width: attachmentsView.delegateSize
-        height: attachmentsView.delegateSize
+        id: _delegate
+
+        required property var objectItem
+
+        property bool isSelected: root.currentIndex === index
+
+        ToolTip.text: objectItem.originalFileName
+        ToolTip.visible: _delegateMouseArea.containsMouse
+        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
+        width: root.delegateSize
+        height: root.delegateSize
 
         Column {
             anchors.fill: parent
             anchors.margins: 5
+
             spacing: 0
 
             Image {
-                width: parent.height - ofnLabel.height - parent.spacing
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                width: parent.height - _ofnLabel.height - parent.spacing
                 height: width
+
                 fillMode: Image.PreserveAspectFit
                 mipmap: true
                 source: "image://fileIcon/" + objectItem.filePath
-                anchors.horizontalCenter: parent.horizontalCenter
             }
 
             VclLabel {
-                id: ofnLabel
+                id: _ofnLabel
+
                 width: parent.width
+
+                color: isSelected ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
                 elide: Text.ElideMiddle
-                padding: 2
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize/2
                 horizontalAlignment: Text.AlignHCenter
                 maximumLineCount: 1
+                padding: 2
                 text: objectItem.originalFileName
-                color: isSelected ? Runtime.colors.primary.highlight.text : Runtime.colors.primary.c10.text
+
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize/2
             }
         }
 
-        ToolTip.text: objectItem.originalFileName
-        ToolTip.visible: itemMouseArea.containsMouse
-        ToolTip.delay: 1000
-
         MouseArea {
-            id: itemMouseArea
+            id: _delegateMouseArea
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             hoverEnabled: true
             onClicked: {
-                attachmentsView.currentIndex = index
+                root.currentIndex = index
                 if(mouse.button === Qt.RightButton && !readonly)
-                    attachmentContextMenu.popup()
+                    _attachmentContextMenu.popup()
             }
             onDoubleClicked: objectItem.openAttachmentAnonymously()
         }
     }
 
     footer: Item {
-        width: attachmentsView.delegateSize
-        height: attachmentsView.delegateSize
+        width: root.delegateSize
+        height: root.delegateSize
 
         FlatToolButton {
             iconSource: "qrc:/icons/action/attach_file.png"
             anchors.centerIn: parent
-            onClicked: if(!readonly) fileDialog.open()
+            onClicked: if(!readonly) _fileDialog.open()
             visible: !readonly
         }
     }
 
-    property bool scrollBarVisible: contentWidth > width
-    ScrollBar.horizontal: VclScrollBar { flickable: attachmentsView }
+    Rectangle {
+        anchors.fill: parent
+
+        z: -1
+
+        color: Color.translucent(Runtime.colors.primary.windowColor, 0.5)
+
+        border.width: 1
+        border.color: Runtime.colors.primary.borderColor
+
+        VclLabel {
+            anchors.fill: parent
+            anchors.margins: 10
+            anchors.leftMargin: root.delegateSize
+
+            opacity: 0.5
+            text: "Attachments"
+            verticalAlignment: Text.AlignVCenter
+            visible: attachments && attachments.attachmentCount === 0
+
+            font.pointSize: Runtime.idealFontMetrics.font.pointSize
+        }
+    }
 
     VclFileDialog {
-        id: fileDialog
+        id: _fileDialog
+
         nameFilters: attachments ? attachments.nameFilters : ["All Types (*.*)"]
+        selectExisting: true
         selectFolder: false
         selectMultiple: false
         sidebarVisible: true
-        selectExisting: true
+
          // The default Ctrl+U interfers with underline
         onAccepted: {
             if(attachments === null)
@@ -140,13 +161,14 @@ ListView {
     }
 
     VclMenu {
-        id: attachmentContextMenu
+        id: _attachmentContextMenu
 
         VclMenuItem {
             text: "Edit"
-            enabled: attachmentsView.currentIndex >= 0
+            enabled: root.currentIndex >= 0
+
             onClicked: {
-                var attm = attachments.attachmentAt(attachmentsView.currentIndex)
+                let attm = attachments.attachmentAt(root.currentIndex)
                 if(attm)
                     attm.openAttachmentInPlace()
             }
@@ -156,8 +178,13 @@ ListView {
 
         VclMenuItem {
             text: "Remove"
-            enabled: attachmentsView.currentIndex >= 0
-            onClicked: attachments.removeAttachment( attachments.attachmentAt(attachmentsView.currentIndex) )
+            enabled: root.currentIndex >= 0
+
+            onClicked: {
+                attachments.removeAttachment( attachments.attachmentAt(root.currentIndex) )
+            }
         }
     }
+
+    onAttachmentsChanged: currentIndex = -1
 }

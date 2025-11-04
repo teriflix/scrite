@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "htmlexporter.h"
+#include "languageengine.h"
 
 #include <QDir>
 #include <QFileInfo>
@@ -74,15 +75,6 @@ bool HtmlExporter::doExport(QIODevice *device)
     const int bottomMargin = int(formatting->pageLayout()->bottomMargin() * layoutScale);
     const qreal contentWidth = formatting->pageLayout()->contentWidth() * layoutScale;
 
-    QMap<SceneElement::Type, QString> typeStringMap;
-    typeStringMap[SceneElement::Heading] = "heading";
-    typeStringMap[SceneElement::Action] = "action";
-    typeStringMap[SceneElement::Character] = "character";
-    typeStringMap[SceneElement::Dialogue] = "dialogue";
-    typeStringMap[SceneElement::Parenthetical] = "parenthetical";
-    typeStringMap[SceneElement::Shot] = "shot";
-    typeStringMap[SceneElement::Transition] = "transition";
-
     QTextStream ts(device);
     ts.setCodec("utf-8");
     ts.setAutoDetectUnicode(true);
@@ -96,55 +88,50 @@ bool HtmlExporter::doExport(QIODevice *device)
     ts << "  <body>\n";
     ts << "    <style>\n";
 
-    const QMetaObject *tmo = TransliterationEngine::instance()->metaObject();
-    const QMetaEnum langEnum = tmo->enumerator(tmo->indexOfEnumerator("Language"));
+    const QMap<QChar::Script, QString> scriptFonts = [screenplay]() {
+        QMap<QChar::Script, QString> ret;
+        for (int i = 0; i < screenplay->elementCount(); i++) {
+            const ScreenplayElement *element = screenplay->elementAt(i);
+            const Scene *scene = element->scene();
+            if (!scene)
+                continue;
 
-    QMap<TransliterationEngine::Language, bool> langBundleMap = this->languageBundleMap();
-    QMap<TransliterationEngine::Language, bool>::const_iterator it = langBundleMap.constBegin();
-    QMap<TransliterationEngine::Language, bool>::const_iterator end = langBundleMap.constEnd();
-    const QString fontsDir = QFileInfo(this->fileName()).absolutePath() + "/fonts";
+            const SceneHeading *heading = scene->heading();
+            if (heading->isEnabled()) {
+                const QList<ScriptBoundary> breakup =
+                        LanguageEngine::determineBoundaries(heading->displayText());
+                for (const ScriptBoundary &boundary : breakup)
+                    ret[boundary.script] = boundary.fontFamily();
+            }
 
-    while (it != end) {
-        if (it.value()) {
-            QDir().mkpath(fontsDir);
-
-            const QStringList fontSources =
-                    TransliterationEngine::instance()->languageFontFilePaths(it.key());
-            for (const QString &fontSource : fontSources) {
-                const QString lang = QString::fromLatin1(langEnum.valueToKey(it.key()));
-                const QString fontFile = QFileInfo(fontSource).fileName();
-                const QString fontDest = fontsDir + "/" + lang + "/" + fontFile;
-                QDir().mkpath(QFileInfo(fontDest).absolutePath());
-                QFile::copy(fontSource, fontDest);
-
-                QRawFont rawFont(fontSource, 12);
-
-                ts << "    @font-face {\n";
-                ts << "      font-family: lang_" << it.key() << "_" << rawFont.weight() << "_"
-                   << rawFont.style() << ";\n";
-                ts << "      src: url(fonts/" << lang << "/" << fontFile << ");\n";
-                ts << "      font-weight: " << rawFont.weight() << ";\n";
-                ts << "      font-style: ";
-                switch (rawFont.style()) {
-                case QFont::StyleNormal:
-                    ts << "normal;\n";
-                    break;
-                case QFont::StyleItalic:
-                    ts << "italic;\n";
-                    break;
-                case QFont::StyleOblique:
-                    ts << "oblique;\n";
-                    break;
-                }
-                ts << "    }\n";
-                ts << "    span.lang_" << it.key() << "_" << rawFont.weight() << "_"
-                   << rawFont.style() << " {\n";
-                ts << "      font-family: lang_" << it.key() << "_" << rawFont.weight() << "_"
-                   << rawFont.style() << ";\n";
-                ts << "    }\n";
+            for (int j = 0; j < scene->elementCount(); j++) {
+                const SceneElement *para = scene->elementAt(j);
+                const QList<ScriptBoundary> breakup =
+                        LanguageEngine::determineBoundaries(para->text());
+                for (const ScriptBoundary &boundary : breakup)
+                    ret[boundary.script] = boundary.fontFamily();
             }
         }
 
+        return ret;
+    }();
+    const QMetaEnum scriptEnum = QMetaEnum::fromType<Language::CharScript>();
+    const QMetaEnum elementTypeEnum = QMetaEnum::fromType<SceneElement::Type>();
+
+    const QString fontsDir = QFileInfo(this->fileName()).absolutePath() + "/fonts";
+
+    if (!scriptFonts.isEmpty()) {
+        QDir().mkpath(fontsDir);
+    }
+
+    auto it = scriptFonts.constBegin();
+    auto end = scriptFonts.constEnd();
+
+    while (it != end) {
+        ts << "    span." << QString::fromLatin1(scriptEnum.valueToKey(it.key())).toLower()
+           << " {\n";
+        ts << "      font-family: \"" << it.value() << "\";\n";
+        ts << "    }\n";
         ++it;
     }
 
@@ -154,12 +141,8 @@ bool HtmlExporter::doExport(QIODevice *device)
 
         SceneElement::Type elementType = SceneElement::Type(i);
         SceneElementFormat *format = formatting->elementFormat(elementType);
-        ts << "    p.scrite-" << typeStringMap.value(elementType) << " {\n";
-#if 0
+        ts << "    p.scrite-" << elementTypeEnum.valueToKey(elementType) << "-paragraph {\n";
         ts << "      font-family: \"" << format->font().family() << "\";\n";
-#else
-        ts << "      font-family: \"Courier New\", Courier, monospace;\n";
-#endif
         ts << "      font-size: " << format->font().pointSize() << "pt;\n";
         if (format->font().bold())
             ts << "      font-weight: bold;\n";
@@ -215,12 +198,13 @@ bool HtmlExporter::doExport(QIODevice *device)
 
     ts << "    <div class=\"scrite-screenplay\">\n";
 
-    auto writeParagraph = [&ts, typeStringMap,
-                           langBundleMap](SceneElement::Type type, const QString &text,
-                                          Qt::Alignment overrideAlignment = Qt::Alignment(),
-                                          const QVector<QTextLayout::FormatRange> &textFormats =
-                                                  QVector<QTextLayout::FormatRange>()) {
-        const QString styleName = "scrite-" + typeStringMap.value(type);
+    auto writeParagraph = [&ts, elementTypeEnum, scriptEnum,
+                           scriptFonts](SceneElement::Type type, const QString &text,
+                                        Qt::Alignment overrideAlignment = Qt::Alignment(),
+                                        const QVector<QTextLayout::FormatRange> &textFormats =
+                                                QVector<QTextLayout::FormatRange>()) {
+        const QString styleName =
+                "scrite-" + QString::fromLatin1(elementTypeEnum.valueToKey(type)) + "-paragraph";
         ts << "        <p class=\"" << styleName << "\" custom-style=\"" << styleName << "\"";
 
         if (overrideAlignment != 0) {
@@ -231,17 +215,15 @@ bool HtmlExporter::doExport(QIODevice *device)
 
         ts << ">";
 
-        const QList<TransliterationEngine::Boundary> breakup =
-                TransliterationEngine::instance()->evaluateBoundaries(text);
+        const QList<ScriptBoundary> breakup = LanguageEngine::determineBoundaries(text);
         const QVector<QTextLayout::FormatRange> mergedTextFormats =
-                TransliterationEngine::mergeTextFormats(breakup, textFormats);
+                LanguageEngine::mergeTextFormats(breakup, textFormats);
         for (const QTextLayout::FormatRange &format : mergedTextFormats) {
-            TransliterationEngine::Language lang = (TransliterationEngine::Language)format.format
-                                                           .property(QTextFormat::UserProperty)
-                                                           .toInt();
+            QChar::Script script =
+                    (QChar::Script)format.format.property(QTextFormat::UserProperty).toInt();
             ts << "<span ";
-            if (langBundleMap.value(lang))
-                ts << "class=\"lang_" << lang << "_" << QFont::Normal << "_" << QFont::StyleNormal
+            if (scriptFonts.contains(script))
+                ts << "class=\"" << QString::fromLatin1(scriptEnum.valueToKey(script)).toLower()
                    << "\" ";
 
             bool customStyle = false;
@@ -306,7 +288,6 @@ bool HtmlExporter::doExport(QIODevice *device)
     };
 
     const int nrScenes = screenplay->elementCount();
-    int nrHeadings = 0;
     for (int i = 0; i < nrScenes; i++) {
         const ScreenplayElement *screenplayElement = screenplay->elementAt(i);
         if (screenplayElement->elementType() != ScreenplayElement::SceneElementType)
@@ -330,7 +311,6 @@ bool HtmlExporter::doExport(QIODevice *device)
                 ? QStringLiteral("OMITTED")
                 : (heading->isEnabled() ? heading->text() : QStringLiteral("NO SCENE HEADING"));
         if (heading->isEnabled()) {
-            ++nrHeadings;
             if (m_includeSceneNumbers)
                 writeParagraph(SceneElement::Heading,
                                "[" + screenplayElement->resolvedSceneNumber() + "] " + headingText);

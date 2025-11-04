@@ -44,13 +44,13 @@ Item {
             model: tabBar.visible ? tabNames : 0
 
             TrapeziumTab {
-                tabFillColor: active ? tabColor : Qt.tint(tabColor, "#C0FFFFFF")
-                tabBorderColor: Scrite.app.isVeryLightColor(tabColor) ? "gray" : tabColor
+                tabFillColor: active ? tabColor : Qt.tint(tabColor, Runtime.colors.sceneControlTint)
+                tabBorderColor: Color.isVeryLight(tabColor) ? "gray" : tabColor
                 tabBorderWidth: 1
                 text: modelData
                 tabIndex: index
                 tabCount: 2
-                textColor: active ? Scrite.app.textColorFor(tabColor) : "black"
+                textColor: active ? Color.textColorFor(tabColor) : "black"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 font.bold: active
                 currentTabIndex: tabBar.currentIndex
@@ -84,7 +84,7 @@ Item {
         Rectangle {
             anchors.fill: tabContentLoader
             border.width: 1
-            border.color: Scrite.app.isVeryLightColor(tabColor) ? Runtime.colors.primary.windowColor : tabColor
+            border.color: Color.isVeryLight(tabColor) ? Runtime.colors.primary.windowColor : tabColor
             color: Qt.rgba(0,0,0,0)
         }
     }
@@ -136,7 +136,7 @@ Item {
                 rotation: tabBarTab.alignment === Qt.AlignRight ? 90 : 0
                 Behavior on font.pixelSize {
                     enabled: Runtime.applicationSettings.enableAnimations
-                    NumberAnimation { duration: 250 }
+                    NumberAnimation { duration: Runtime.stdAnimationDuration }
                 }
                 Behavior on color {
                     enabled: Runtime.applicationSettings.enableAnimations

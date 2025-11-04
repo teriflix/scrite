@@ -306,7 +306,7 @@ void LibraryServiceOpenRecordTask::recordFetched(const QString &name, const QByt
     if (m_library->type() == Library::Templates) {
         ScriteDocument::instance()->structure()->setCurrentElementIndex(-1);
         ScriteDocument::instance()->screenplay()->setCurrentElementIndex(
-                ScriteDocument::instance()->screenplay()->firstSceneIndex());
+                ScriteDocument::instance()->screenplay()->firstSceneElementIndex());
         ScriteDocument::instance()->structure()->setForceBeatBoardLayout(true);
 
         ScriteDocument::instance()->printFormat()->resetToUserDefaults();

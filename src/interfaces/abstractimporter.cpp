@@ -12,9 +12,9 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "utils.h"
 #include "scrite.h"
 #include "undoredo.h"
-#include "application.h"
 #include "abstractimporter.h"
 
 #include <QFile>
@@ -142,7 +142,7 @@ void AbstractImporter::configureCanvas(int nrBlocks)
 
 Scene *AbstractImporter::createScene(const QString &heading)
 {
-    const QVector<QColor> sceneColors = Application::standardColors(QVersionNumber());
+    const QList<QColor> sceneColors = Utils::SceneColors::paletteForVersion(QVersionNumber());
     Structure *structure = this->document()->structure();
     Screenplay *screenplay = this->document()->screenplay();
     Scene *scene = nullptr;

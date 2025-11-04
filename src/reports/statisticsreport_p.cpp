@@ -13,9 +13,8 @@
 
 #include "statisticsreport_p.h"
 #include "statisticsreport.h"
-
+#include "utils.h"
 #include "application.h"
-#include "screenplaytextdocument.h"
 
 #include <QPen>
 #include <QBrush>
@@ -181,7 +180,7 @@ StatisticsReportKeyNumbers::StatisticsReportKeyNumbers(const StatisticsReport *r
     };
 
     const QColor bgColor = StatisticsReport::pickColor(0);
-    const QColor textColor = Application::textColorFor(bgColor);
+    const QColor textColor = Utils::Color::textColorFor(bgColor);
 
     QPointF pos(0, 0);
 
@@ -378,7 +377,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(
         const QColor color =
                 distItem.color == Qt::transparent ? StatisticsReport::pickColor(i) : distItem.color;
         QPen pen;
-        pen.setColor(Application::isLightColor(color) ? Qt::gray : color);
+        pen.setColor(Utils::Color::isLight(color) ? Qt::gray : color);
         pen.setCosmetic(true);
         pen.setWidthF(0.5);
         pen.setJoinStyle(Qt::MiterJoin);
@@ -416,7 +415,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createDistributionItems(
         QGraphicsTextItem *label = new QGraphicsTextItem(item);
         label->setHtml(labelHtml);
         if (distItem.color == Qt::transparent || !lightenFillColors)
-            label->setDefaultTextColor(Application::textColorFor(item->brush().color()));
+            label->setDefaultTextColor(Utils::Color::textColorFor(item->brush().color()));
 
         QRectF labelRect = label->boundingRect();
         if (labelRect.width() > item->rect().width()) {
@@ -592,7 +591,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
             trackBorderItem->setPen(QPen(trackItem->brush().color().darker(), 1, Qt::SolidLine,
                                          Qt::RoundCap, Qt::MiterJoin));
 
-            const QString text = Application::camelCased(
+            const QString text = Utils::SMath::titleCased(
                     track.tag.section(QStringLiteral("/"), 1).section(QStringLiteral("("), 0, 0));
             const QString timeString = ::timeToString(track.timeLength);
             const QString percent = QString::number(qRound(100 * (track.pixel.to - track.pixel.from)
@@ -605,7 +604,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createScreenplayTracks(const Statis
 
             QGraphicsTextItem *label = new QGraphicsTextItem(trackItem);
             label->setHtml(labelHtml);
-            label->setDefaultTextColor(Application::textColorFor(trackItem->brush().color()));
+            label->setDefaultTextColor(Utils::Color::textColorFor(trackItem->brush().color()));
 
             QRectF labelRect = label->boundingRect();
             if (labelRect.width() > trackItem->rect().width()) {
@@ -848,8 +847,8 @@ StatisticsReportTimeline::createScenePullouts(const StatisticsReport *report,
 
         QGraphicsLineItem *lineItem = new QGraphicsLineItem(labelsItem);
         lineItem->setLine(QLineF(p1, p2));
-        lineItem->setPen(QPen(Application::isLightColor(sceneInfo.color) ? sceneInfo.color.darker()
-                                                                         : sceneInfo.color));
+        lineItem->setPen(QPen(Utils::Color::isLight(sceneInfo.color) ? sceneInfo.color.darker()
+                                                                     : sceneInfo.color));
 
         QGraphicsSimpleTextItem *labelItem = new QGraphicsSimpleTextItem(lineItem);
         labelItem->setText(labelText.join(QStringLiteral(", ")));
@@ -1239,7 +1238,7 @@ QGraphicsRectItem *StatisticsReportTimeline::createSeparator(QGraphicsItem *cont
 
     QGraphicsSimpleTextItem *labelText = new QGraphicsSimpleTextItem(separatorItem);
     labelText->setText(label);
-    labelText->setBrush(Application::textColorFor(color));
+    labelText->setBrush(Utils::Color::textColorFor(color));
 
     QRectF containerBRect = container->childrenBoundingRect();
     QRectF labelTextRect = labelText->boundingRect();
@@ -1302,7 +1301,7 @@ StatisticsReportDialogueActionRatio::StatisticsReportDialogueActionRatio(
         slice->setBrush(color);
         slice->setLabel(dist.percent);
         slice->setLabelFont(smallFont);
-        slice->setLabelColor(Application::textColorFor(color));
+        slice->setLabelColor(Utils::Color::textColorFor(color));
         slice->setLabelVisible(true);
         slice->setLabelPosition(QtCharts::QPieSlice::LabelInsideNormal);
         legend->add(color, dist.key);
@@ -1426,7 +1425,7 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
         QtCharts::QPieSlice *slice = typeSeries->append(label, it1->second);
         slice->setBrush(color);
         slice->setLabel(label);
-        slice->setLabelColor(Application::textColorFor(color));
+        slice->setLabelColor(Utils::Color::textColorFor(color));
         slice->setLabelPosition(QtCharts::QPieSlice::LabelInsideNormal);
         slice->setLabelVisible(true);
         slice->setLabelFont(tinyFont);
@@ -1480,7 +1479,7 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
                 barSet->setObjectName(type);
                 barSet->setColor(typeColorMap.value(type));
                 barSet->setLabelFont(smallFont);
-                barSet->setLabelColor(Application::textColorFor(barSet->color()));
+                barSet->setLabelColor(Utils::Color::textColorFor(barSet->color()));
                 momentSeries->append(barSet);
             }
 
@@ -1524,7 +1523,7 @@ StatisticsReportSceneHeadingStats::StatisticsReportSceneHeadingStats(const Stati
     locationBarSet->setColor(QColor("#864879"));
     locationSeries->append(locationBarSet);
     locationBarSet->setLabelFont(tinyFont);
-    locationBarSet->setLabelColor(Application::textColorFor(locationBarSet->color()));
+    locationBarSet->setLabelColor(Utils::Color::textColorFor(locationBarSet->color()));
 
     // Location lookup will be another legend, but without color.
     StatisticsReportGraphVLegend *locationLegend = new StatisticsReportGraphVLegend(this);

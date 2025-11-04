@@ -12,7 +12,8 @@
 ****************************************************************************/
 
 #include "aggregation.h"
-#include "application.h"
+
+#include "utils.h"
 
 Aggregation::Aggregation(QObject *parent) : QObject(parent) { }
 
@@ -23,46 +24,42 @@ Aggregation *Aggregation::qmlAttachedProperties(QObject *object)
     return new Aggregation(object);
 }
 
-QObject *Aggregation::find(QObject *object, const QString &className, const QString &objectName)
-{
-    if (object == nullptr)
-        return nullptr;
-
-    const QObjectList children = object->children();
-    for (QObject *child : children) {
-        if (child->inherits(qPrintable(className))) {
-            if (objectName.isEmpty())
-                return child;
-
-            if (child->objectName() == objectName)
-                return child;
-        }
-    }
-
-    return nullptr;
-}
-
-ErrorReport *Aggregation::findErrorReport(QObject *object)
+ErrorReport *Aggregation::errorReport(QObject *object)
 {
     return object->findChild<ErrorReport *>(QString(), Qt::FindDirectChildrenOnly);
 }
 
-ProgressReport *Aggregation::findProgressReport(QObject *object)
+ProgressReport *Aggregation::progressReport(QObject *object)
 {
     return object->findChild<ProgressReport *>(QString(), Qt::FindDirectChildrenOnly);
 }
 
-QObject *Aggregation::firstChild(const QString &className)
+QObject *Aggregation::firstChildByType(const QString &typeName)
 {
-    return Application::findFirstChildOfType(this->parent(), className);
+    return Utils::Object::firstChildByType(this->parent(), typeName);
 }
 
-QObject *Aggregation::firstParent(const QString &className)
+QObject *Aggregation::firstParentByType(const QString &typeName)
 {
-    return Application::findFirstParentOfType(this->parent(), className);
+    return Utils::Object::firstParentByType(this->parent(), typeName);
 }
 
-QObject *Aggregation::firstSibling(const QString &className)
+QObject *Aggregation::firstSiblingByType(const QString &typeName)
 {
-    return Application::findFirstSiblingOfType(this->parent(), className);
+    return Utils::Object::firstSiblingByType(this->parent(), typeName);
+}
+
+QObject *Aggregation::firstChildByName(const QString &objectName)
+{
+    return Utils::Object::firstChildByName(this->parent(), objectName);
+}
+
+QObject *Aggregation::firstParentByName(const QString &objectName)
+{
+    return Utils::Object::firstParentByName(this->parent(), objectName);
+}
+
+QObject *Aggregation::firstSiblingByName(const QString &objectName)
+{
+    return Utils::Object::firstSiblingByName(this->parent(), objectName);
 }

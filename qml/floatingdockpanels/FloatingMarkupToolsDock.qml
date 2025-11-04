@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -28,321 +28,25 @@ import "qrc:/qml/controls"
 FloatingDock {
     id: root
 
-    property SceneDocumentBinder sceneDocumentBinder
-
     x: adjustedX(Runtime.markupToolsSettings.contentX)
     y: adjustedY(Runtime.markupToolsSettings.contentY)
     width: 462
     height: 36 + 8 + titleBarHeight
-    visible: Runtime.screenplayEditorSettings.markupToolsDockVisible && Runtime.screenplayEditor
 
     title: "Markup Tools"
+    visible: Runtime.screenplayEditorSettings.markupToolsDockVisible && Runtime.screenplayEditor
 
     function init() { }
+
     Component.onCompleted: {
         Qt.callLater( () => {
-                         saveSettingsTask.enabled = true
+                         _saveSettingsTask.enabled = true
                      })
     }
 
-    // Shortcuts Section
-    Shortcut {
-        sequence: "Ctrl+B"
-        context: Qt.ApplicationShortcut
-        enabled: _private.textFormat && Runtime.allowAppUsage
-        ShortcutsModelItem.title: "Bold"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.group: "Markup Tools"
-        ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleBold()
-    }
-
-    Shortcut {
-        sequence: "Ctrl+I"
-        context: Qt.ApplicationShortcut
-        enabled: _private.textFormat && Runtime.allowAppUsage
-        ShortcutsModelItem.title: "Italics"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.group: "Markup Tools"
-        ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleItalics()
-    }
-
-    Shortcut {
-        sequence: "Ctrl+U"
-        context: Qt.ApplicationShortcut
-        enabled: _private.textFormat && Runtime.allowAppUsage
-        ShortcutsModelItem.title: "Underline"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.group: "Markup Tools"
-        ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleUnderline()
-    }
-
-    Shortcut {
-        sequence: "Ctrl+R"
-        context: Qt.ApplicationShortcut
-        enabled: _private.textFormat && Runtime.allowAppUsage
-        ShortcutsModelItem.title: "Strikeout"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.group: "Markup Tools"
-        ShortcutsModelItem.enabled: enabled
-        onActivated: _private.textFormat.toggleStrikeout()
-    }
-
-    Shortcut {
-        sequence: "Shift+F3"
-        context: Qt.ApplicationShortcut
-        enabled: sceneDocumentBinder && Runtime.allowAppUsage
-        ShortcutsModelItem.title: "All CAPS"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.group: "Markup Tools"
-        ShortcutsModelItem.enabled: enabled
-        onActivated: sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
-    }
-
-    Shortcut {
-        sequence: "Ctrl+Shift+F3"
-        context: Qt.ApplicationShortcut
-        enabled: sceneDocumentBinder && Runtime.allowAppUsage
-        ShortcutsModelItem.title: "All small"
-        ShortcutsModelItem.shortcut: sequence
-        ShortcutsModelItem.group: "Markup Tools"
-        ShortcutsModelItem.enabled: enabled
-        onActivated: sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
-    }
-
-    content: Item {
-        enabled: !Scrite.document.readOnly
-
-        RowLayout {
-            anchors.centerIn: parent
-
-            spacing: 2
-
-            SimpleToolButton {
-                ToolTip.text: "Bold\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+B")
-                ToolTip.visible: containsMouse
-
-                enabled: _private.textFormat
-                checked: _private.textFormat ? _private.textFormat.bold : false
-                iconSource: "qrc:/icons/editor/format_bold.png"
-                hoverEnabled: true
-
-                onClicked: if(_private.textFormat) _private.textFormat.toggleBold()
-            }
-
-            SimpleToolButton {
-                ToolTip.text: "Italics\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+I")
-                ToolTip.visible: containsMouse
-
-                checked: _private.textFormat ? _private.textFormat.italics : false
-                enabled: _private.textFormat
-                iconSource: "qrc:/icons/editor/format_italics.png"
-                hoverEnabled: true
-
-                onClicked: if(_private.textFormat) _private.textFormat.toggleItalics()
-            }
-
-            SimpleToolButton {
-                ToolTip.text: "Underline\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+U")
-                ToolTip.visible: containsMouse
-
-                checked: _private.textFormat ? _private.textFormat.underline : false
-                enabled: _private.textFormat
-                iconSource: "qrc:/icons/editor/format_underline.png"
-                hoverEnabled: true
-
-                onClicked: if(_private.textFormat) _private.textFormat.toggleUnderline()
-            }
-
-            SimpleToolButton {
-                ToolTip.text: "Strikeout\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+R")
-                ToolTip.visible: containsMouse
-
-                checked: _private.textFormat ? _private.textFormat.strikeout : false
-                enabled: _private.textFormat
-                iconSource: "qrc:/icons/editor/format_strikethrough.png"
-                hoverEnabled: true
-
-                onClicked: if(_private.textFormat) _private.textFormat.toggleStrikeout()
-            }
-
-            ColorToolButton {
-                id: textColorToolButton
-
-                ToolTip.text: "Text Color"
-                ToolTip.visible: containsMouse
-
-                enabled: _private.textFormat
-                hoverEnabled: true
-                selectedColor: _private.textFormat ? _private.textFormat.textColor : Runtime.colors.transparent
-
-                onColorPicked: (newColor) => {
-                                   if(_private.textFormat)
-                                        _private.textFormat.textColor = newColor
-                               }
-
-                Rectangle {
-                    anchors.centerIn: parent
-
-                    width: Math.min(parent.width,parent.height) * 0.8
-                    height: width
-
-                    color: "white"
-
-                    VclText {
-                        anchors.centerIn: parent
-
-                        color: textColorToolButton.selectedColor === Runtime.colors.transparent ? "black" : textColorToolButton.selectedColor
-
-                        font.bold: true
-                        font.pixelSize: parent.height * 0.70
-                        font.underline: true
-
-                        text: "A"
-                    }
-                }
-            }
-
-            ColorToolButton {
-                id: bgColorToolButton
-
-                ToolTip.text: "Background Color"
-                ToolTip.visible: containsMouse
-
-                enabled: _private.textFormat
-                hoverEnabled: true
-                selectedColor: _private.textFormat ? _private.textFormat.backgroundColor : Runtime.colors.transparent
-
-                onColorPicked: (newColor) => {
-                                   if(_private.textFormat)
-                                        _private.textFormat.backgroundColor = newColor
-                               }
-
-                Rectangle {
-                    anchors.centerIn: parent
-
-                    width: Math.min(parent.width,parent.height) * 0.8
-                    height: width
-
-                    border.width: 1
-                    border.color: "black"
-                    color: bgColorToolButton.selectedColor === Runtime.colors.transparent ? "white" : bgColorToolButton.selectedColor
-
-                    VclText {
-                        anchors.centerIn: parent
-
-                        color: textColorToolButton.selectedColor === Runtime.colors.transparent ? "black" : textColorToolButton.selectedColor
-
-                        font.bold: true
-                        font.pixelSize: parent.height * 0.70
-
-                        text: "A"
-                    }
-                }
-            }
-
-            SimpleToolButton {
-                ToolTip.text: "Clear formatting"
-                ToolTip.visible: containsMouse
-
-                checked: false
-                enabled: _private.textFormat
-                iconSource: "qrc:/icons/editor/format_clear.png"
-                hoverEnabled: true
-
-                onClicked: if(_private.textFormat) _private.textFormat.reset()
-            }
-
-            Rectangle {
-                Layout.preferredWidth: 1
-                Layout.fillHeight: true
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            SimpleToolButton {
-                checked: enabled ? _private.sceneElement.alignment === Qt.AlignLeft : false
-                enabled: _private.sceneElement && _private.sceneElement.type === SceneElement.Action
-                iconSource: "qrc:/icons/editor/format_align_left.png"
-
-                onClicked: {
-                    const alignment = _private.sceneElement.alignment === Qt.AlignLeft ? 0 : Qt.AlignLeft
-                    _private.sceneElement.alignment = alignment
-
-                    const selectedElements = sceneDocumentBinder.selectedElements
-                    selectedElements.forEach( (element) => { element.alignment = alignment })
-                }
-            }
-
-            SimpleToolButton {
-                checked: enabled ? _private.sceneElement.alignment === Qt.AlignHCenter : false
-                enabled: _private.sceneElement && _private.sceneElement.type === SceneElement.Action
-                iconSource: "qrc:/icons/editor/format_align_center.png"
-
-                onClicked: {
-                    const alignment = _private.sceneElement.alignment === Qt.AlignHCenter ? 0 : Qt.AlignHCenter
-                    _private.sceneElement.alignment = alignment
-
-                    const selectedElements = sceneDocumentBinder.selectedElements
-                    selectedElements.forEach( (element) => { element.alignment = alignment })
-                }
-            }
-
-            SimpleToolButton {
-                checked: enabled ? _private.sceneElement.alignment === Qt.AlignRight : false
-                enabled: _private.sceneElement && _private.sceneElement.type === SceneElement.Action
-                iconSource: "qrc:/icons/editor/format_align_right.png"
-
-                onClicked: {
-                    const alignment = _private.sceneElement.alignment === Qt.AlignRight ? 0 : Qt.AlignRight
-                    _private.sceneElement.alignment = alignment
-
-                    const selectedElements = sceneDocumentBinder.selectedElements
-                    selectedElements.forEach( (element) => { element.alignment = alignment })
-                }
-            }
-
-            Rectangle {
-                Layout.preferredWidth: 1
-                Layout.fillHeight: true
-
-                color: Runtime.colors.primary.borderColor
-            }
-
-            SimpleToolButton {
-                ToolTip.text: "All CAPS\t" + Scrite.app.polishShortcutTextForDisplay("Shift+F3")
-                ToolTip.visible: containsMouse
-
-                enabled: sceneDocumentBinder
-                hoverEnabled: true
-
-                onClicked: sceneDocumentBinder.changeCase(SceneDocumentBinder.UpperCase)
-
-                VclText {
-                    anchors.centerIn: parent
-                    font.pixelSize: parent.height*0.5
-                    text: "AB"
-                }
-            }
-
-            SimpleToolButton {
-                ToolTip.visible: containsMouse
-                ToolTip.text: "All small\t" + Scrite.app.polishShortcutTextForDisplay("Ctrl+Shift+F3")
-
-                enabled: sceneDocumentBinder
-                hoverEnabled: true
-
-                onClicked: sceneDocumentBinder.changeCase(SceneDocumentBinder.LowerCase)
-
-                VclText {
-                    anchors.centerIn: parent
-                    font.pixelSize: parent.height*0.5
-                    text: "ab"
-                }
-            }
-        }
+    content: ActionManagerToolBar {
+        enabled: !Scrite.document.readOnly && Runtime.allowAppUsage
+        actionManager: ActionHub.markupTools
     }
 
     // Private Section
@@ -350,17 +54,17 @@ FloatingDock {
     // This block ensures that everytime the floating dock coordinates change,
     // they are stored in persistent settings
     Connections {
-        id: saveSettingsTask
+        id: _saveSettingsTask
 
         target: root
         enabled: false
 
         function onXChanged() {
-            Qt.callLater(saveSettingsTask.saveCoordinates)
+            Qt.callLater(_saveSettingsTask.saveCoordinates)
         }
 
         function onYChanged() {
-            Qt.callLater(saveSettingsTask.saveCoordinates)
+            Qt.callLater(_saveSettingsTask.saveCoordinates)
         }
 
         function onCloseRequest() {
@@ -372,14 +76,5 @@ FloatingDock {
             Runtime.markupToolsSettings.contentX = Math.round(root.x)
             Runtime.markupToolsSettings.contentY = Math.round(root.y)
         }
-    }
-
-    QtObject {
-        id: _private
-
-        property TextFormat textFormat: sceneDocumentBinder ? sceneDocumentBinder.textFormat : null
-        property SceneElement sceneElement: sceneDocumentBinder ? sceneDocumentBinder.currentElement : null
-
-        property bool initialized: false
     }
 }

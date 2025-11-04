@@ -17,7 +17,6 @@
 #include "scene.h"
 #include "modifiable.h"
 #include "execlatertimer.h"
-#include "transliteration.h"
 #include "qobjectproperty.h"
 
 #include <QScreen>
@@ -32,10 +31,11 @@ class SpellCheckService;
 class ScriteDocument;
 class ScreenplayFormat;
 
-class SceneElementFormat : public QObject, public Modifiable
+class SceneElementFormat : public QObject, public Modifiable, public QObjectSerializer::Interface
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_INTERFACES(QObjectSerializer::Interface)
     QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
@@ -48,22 +48,41 @@ public:
     SceneElement::Type elementType() const { return m_elementType; }
     Q_SIGNAL void elementTypeChanged();
 
-    Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
-    void setFont(const QFont &val);
-    QFont &fontRef() { return m_font; }
-    QFont font() const { return m_font; }
+    enum Tristate { Auto = -1, Unset = 0, Set = 1 };
+    Q_ENUM(Tristate)
+
+    Q_PROPERTY(QFont font READ font NOTIFY fontChanged)
+    QFont font() const;
     Q_SIGNAL void fontChanged();
 
-    Q_PROPERTY(QFont font2 READ font2 NOTIFY font2Changed)
+    Q_PROPERTY(QFont font2 READ font2 NOTIFY font2Changed);
     QFont font2() const;
     Q_SIGNAL void font2Changed();
 
-    Q_INVOKABLE void setFontFamily(const QString &val);
-    Q_INVOKABLE void setFontBold(bool val);
-    Q_INVOKABLE void setFontItalics(bool val);
-    Q_INVOKABLE void setFontUnderline(bool val);
-    Q_INVOKABLE void setFontPointSize(int val);
-    Q_INVOKABLE void setFontCapitalization(QFont::Capitalization caps);
+    Q_PROPERTY(Tristate fontBold READ fontBold WRITE setFontBold NOTIFY fontBoldChanged)
+    void setFontBold(Tristate val);
+    Tristate fontBold() const { return m_fontBold; }
+    Q_SIGNAL void fontBoldChanged();
+
+    Q_PROPERTY(Tristate fontItalics READ fontItalics WRITE setFontItalics NOTIFY fontItalicsChanged)
+    void setFontItalics(Tristate val);
+    Tristate fontItalics() const { return m_fontItalics; }
+    Q_SIGNAL void fontItalicsChanged();
+
+    Q_PROPERTY(Tristate fontUnderline READ fontUnderline WRITE setFontUnderline NOTIFY fontUnderlineChanged)
+    void setFontUnderline(Tristate val);
+    Tristate fontUnderline() const { return m_fontUnderline; }
+    Q_SIGNAL void fontUnderlineChanged();
+
+    Q_PROPERTY(int fontPointSize READ fontPointSize WRITE setFontPointSize NOTIFY fontPointSizeChanged)
+    void setFontPointSize(int val);
+    int fontPointSize() const { return m_fontPointSize; }
+    Q_SIGNAL void fontPointSizeChanged();
+
+    Q_PROPERTY(QFont::Capitalization fontCapitalization READ fontCapitalization WRITE setFontCapitalization NOTIFY fontCapitalizationChanged)
+    void setFontCapitalization(QFont::Capitalization val);
+    QFont::Capitalization fontCapitalization() const { return m_fontCapitalization; }
+    Q_SIGNAL void fontCapitalizationChanged();
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
     void setTextColor(const QColor &val);
@@ -110,33 +129,10 @@ public:
     qreal rightMargin() const { return m_rightMargin; }
     Q_SIGNAL void rightMarginChanged();
 
-    // Must be manually kept in sync with TransliterationEngine::Language
-    enum DefaultLanguage {
-        Default,
-        English,
-        Bengali,
-        Gujarati,
-        Hindi,
-        Kannada,
-        Malayalam,
-        Marathi,
-        Oriya,
-        Punjabi,
-        Sanskrit,
-        Tamil,
-        Telugu
-    };
-    Q_ENUM(DefaultLanguage)
-    Q_PROPERTY(DefaultLanguage defaultLanguage READ defaultLanguage WRITE setDefaultLanguage NOTIFY
-                       defaultLanguageChanged)
-    void setDefaultLanguage(DefaultLanguage val);
-    DefaultLanguage defaultLanguage() const { return m_defaultLanguage; }
-    Q_SIGNAL void defaultLanguageChanged();
-
-    Q_PROPERTY(int defaultLanguageInt READ defaultLanguageInt WRITE setDefaultLanguageInt NOTIFY
-                       defaultLanguageChanged)
-    int defaultLanguageInt() const { return int(m_defaultLanguage); }
-    void setDefaultLanguageInt(int val) { this->setDefaultLanguage(DefaultLanguage(val)); }
+    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY defaultLanguageCodeChanged STORED false)
+    void setDefaultLanguageCode(int val);
+    int defaultLanguageCode() const { return m_defaultLanguageCode; }
+    Q_SIGNAL void defaultLanguageCodeChanged();
 
     Q_INVOKABLE void activateDefaultLanguage();
 
@@ -147,7 +143,6 @@ public:
     Q_SIGNAL void elementFormatChanged();
 
     enum Properties {
-        FontFamily,
         FontSize,
         FontStyle,
         LineHeight,
@@ -170,6 +165,10 @@ public:
 
     void resetToFactoryDefaults();
 
+    // Interface interface
+    void serializeToJson(QJsonObject &) const;
+    void deserializeFromJson(const QJsonObject &);
+
 private:
     friend class ScreenplayFormat;
     SceneElementFormat(SceneElement::Type type = SceneElement::Action,
@@ -177,20 +176,30 @@ private:
     void countTransactionChange() { ++m_nrChangesDuringTransation; }
 
 private:
-    QFont m_font;
+    int m_fontPointSize = -1;
+    int m_defaultLanguageCode = -1; // means default
+    int m_nrChangesDuringTransation = 0;
+
+    bool m_inTransaction = false;
+
     qreal m_textIndent = 0.0;
     qreal m_lineHeight = 1.0;
     qreal m_leftMargin = 0;
     qreal m_rightMargin = 0;
     qreal m_lineSpacingBefore = 0;
+
     QColor m_textColor = QColor(Qt::black);
     QColor m_backgroundColor = QColor(Qt::transparent);
-    bool m_inTransaction = false;
-    int m_nrChangesDuringTransation = 0;
-    ScreenplayFormat *m_format = nullptr;
+
+    Tristate m_fontBold = Auto;
+    Tristate m_fontItalics = Auto;
+    Tristate m_fontUnderline = Auto;
+
     Qt::Alignment m_textAlignment = Qt::AlignLeft;
     SceneElement::Type m_elementType = SceneElement::Action;
-    DefaultLanguage m_defaultLanguage = Default;
+    QFont::Capitalization m_fontCapitalization = QFont::MixedCase;
+
+    ScreenplayFormat *m_format = nullptr;
 
     mutable Qt::Alignment m_lastCreatedBlockAlignment;
     mutable qreal m_lastCreatedBlockFormatPageWidth = 0;
@@ -343,31 +352,20 @@ public:
     Q_PROPERTY(ScreenplayPageLayout *pageLayout READ pageLayout CONSTANT STORED false)
     ScreenplayPageLayout *pageLayout() const { return m_pageLayout; }
 
-    Q_PROPERTY(TransliterationEngine::Language defaultLanguage READ defaultLanguage WRITE
-                       setDefaultLanguage NOTIFY defaultLanguageChanged STORED false)
-    void setDefaultLanguage(TransliterationEngine::Language val);
-    TransliterationEngine::Language defaultLanguage() const { return m_defaultLanguage; }
-    Q_SIGNAL void defaultLanguageChanged();
+    Q_PROPERTY(int defaultLanguageCode READ defaultLanguageCode WRITE setDefaultLanguageCode NOTIFY defaultLanguageCodeChanged STORED false)
+    void setDefaultLanguageCode(int val);
+    int defaultLanguageCode() const { return m_defaultLanguageCode; }
+    Q_SIGNAL void defaultLanguageCodeChanged();
 
-    Q_PROPERTY(int defaultLanguageInt READ defaultLanguageInt WRITE setDefaultLanguageInt NOTIFY
-                       defaultLanguageChanged STORED false)
-    int defaultLanguageInt() const { return int(m_defaultLanguage); }
-    void setDefaultLanguageInt(int val)
-    {
-        this->setDefaultLanguage(TransliterationEngine::Language(val));
-    }
-
-    Q_PROPERTY(QFont defaultFont READ defaultFont WRITE setDefaultFont NOTIFY defaultFontChanged)
-    void setDefaultFont(const QFont &val);
-    QFont defaultFont() const { return m_defaultFont; }
-    QFont &defaultFontRef() { return m_defaultFont; }
+    Q_PROPERTY(QFont defaultFont READ defaultFont NOTIFY defaultFontChanged)
+    QFont defaultFont() const;
     Q_SIGNAL void defaultFontChanged();
 
     Q_PROPERTY(QFont defaultFont2 READ defaultFont2 NOTIFY fontPointSizeDeltaChanged)
     QFont defaultFont2() const;
 
-    QFontMetrics defaultFontMetrics() const { return m_defaultFontMetrics; }
-    QFontMetrics defaultFont2Metrics() const { return m_defaultFont2Metrics; }
+    QFontMetrics defaultFontMetrics() const { return QFontMetrics(this->defaultFont()); }
+    QFontMetrics defaultFont2Metrics() const { return QFontMetrics(this->defaultFont2()); }
 
     Q_PROPERTY(int fontPointSizeDelta READ fontPointSizeDelta NOTIFY fontPointSizeDeltaChanged)
     int fontPointSizeDelta() const { return m_fontPointSizeDelta; }
@@ -416,9 +414,8 @@ public:
     bool isInTransaction() const { return m_inTransaction; }
     Q_SIGNAL void inTransactionChanged();
 
-    void useUserSpecifiedFonts();
-
     // Interface interface
+    void serializeToJson(QJsonObject &) const;
     void deserializeFromJson(const QJsonObject &);
 
 private:
@@ -429,22 +426,23 @@ private:
 
 private:
     char m_padding[4];
-    QFont m_defaultFont;
-    qreal m_pageWidth = 750.0;
+
     int m_secondsPerPage = 60;
     int m_fontPointSizeDelta = 0;
     int m_fontZoomLevelIndex = -1;
-    bool m_inTransaction = false;
+    int m_defaultLanguageCode = QLocale::English;
     int m_nrChangesDuringTransation = 0;
+
+    bool m_inTransaction = false;
+
+    qreal m_pageWidth = 750.0;
+
     QList<int> m_fontPointSizes;
-    QVariantList m_fontZoomLevels;
-    QObjectProperty<QScreen> m_screen;
-    ScriteDocument *m_scriteDocument = nullptr;
-    QFontMetrics m_defaultFontMetrics;
-    QFontMetrics m_defaultFont2Metrics;
     QStringList m_suggestionsAtCursor;
+    QVariantList m_fontZoomLevels;
+    ScriteDocument *m_scriteDocument = nullptr;
+    QObjectProperty<QScreen> m_screen;
     ScreenplayPageLayout *m_pageLayout = new ScreenplayPageLayout(this);
-    TransliterationEngine::Language m_defaultLanguage = TransliterationEngine::English;
 
     static SceneElementFormat *staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list,
                                                      int index);
@@ -583,9 +581,9 @@ public:
     Q_SIGNAL void autoCapitalizeSentencesChanged();
 
     // Adds : at end of shots & transitions, CONT'D for characters where applicable.
-    Q_PROPERTY(bool autoPolishParagraphs READ autoPolishParagraphs WRITE setAutoPolishParagraphs NOTIFY autoPolishParagraphsChanged)
+    Q_PROPERTY(bool autoPolishParagraphs READ isAutoPolishParagraphs WRITE setAutoPolishParagraphs NOTIFY autoPolishParagraphsChanged)
     void setAutoPolishParagraphs(bool val);
-    bool autoPolishParagraphs() const { return m_autoPolishParagraphs; }
+    bool isAutoPolishParagraphs() const { return m_autoPolishParagraphs; }
     Q_SIGNAL void autoPolishParagraphsChanged();
 
     Q_PROPERTY(qreal textWidth READ textWidth WRITE setTextWidth NOTIFY textWidthChanged)

@@ -44,14 +44,14 @@ Item {
         folder: {
             if(fileInfo.absolutePath !== "") {
                 if(fileInfo.exists)
-                    return Scrite.app.localFileToUrl(fileInfo.absolutePath)
+                    return Url.fromPath(fileInfo.absolutePath)
             }
-            return Scrite.app.localFileToUrl(StandardPaths.writableLocation(StandardPaths.DownloadFolder))
+            return Url.fromPath(StandardPaths.writableLocation(StandardPaths.DownloadFolder))
         }
         selectFolder: false
         selectMultiple: false
         selectExisting: false
-        onAccepted: fileInfo.absolutePath = Scrite.app.urlToLocalFile(fileUrl)
+        onAccepted: fileInfo.absolutePath = Url.toPath(fileUrl)
          // The default Ctrl+U interfers with underline
     }
 

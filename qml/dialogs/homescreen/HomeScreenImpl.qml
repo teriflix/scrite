@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 import "qrc:/qml/tasks"
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -95,7 +95,7 @@ Item {
     component TopBanner : Image {
         id: banner
 
-        readonly property StackView stackView: Aggregation.firstSibling("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstSiblingByType("QQuickStackView")
 
         source: {
             if(stackView.currentItem && stackView.currentItem.bannerImage)
@@ -111,7 +111,7 @@ Item {
             fillMode: Image.PreserveAspectFit
             smooth: true; mipmap: true
             visible: false
-            Component.onCompleted: Utils.execLater(banner, 50, () => { visible = true } )
+            Component.onCompleted: Runtime.execLater(banner, 50, () => { visible = true } )
         }
 
         RowLayout {
@@ -228,7 +228,7 @@ Item {
             fillMode: Image.PreserveAspectFit
 
             Image {
-                readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+                readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
                 anchors.centerIn: parent
                 source: (stackView.currentItem && stackView.currentItem.bannerImage) ? "" : "qrc:/images/banner_logo_overlay.png"
@@ -236,7 +236,7 @@ Item {
                 fillMode: Image.PreserveAspectFit
                 smooth: true; mipmap: true
                 visible: false
-                Component.onCompleted: Utils.execLater(parent, 50, () => { visible = true } )
+                Component.onCompleted: Runtime.execLater(parent, 50, () => { visible = true } )
             }
 
             Poster {
@@ -309,7 +309,7 @@ Item {
                         }
                     }
 
-                    readonly property string defaultText: Scrite.app.fileContents(":/misc/homescreen_info.md")
+                    readonly property string defaultText: File.read(":/misc/homescreen_info.md")
                 }
 
                 ColumnLayout {
@@ -473,7 +473,7 @@ Item {
         property string tooltip
         property string iconSource
         property color  textColor: Runtime.colors.primary.regular.text
-        property var    iconImage: Scrite.app.emptyQImage // has to be QImage
+        property var    iconImage: Gui.emptyQImage // has to be QImage
         property bool   singleClick: true
         property bool   showPoster: false
         property bool   containsMouse: buttonMouseArea.containsMouse
@@ -513,7 +513,7 @@ Item {
                     if(iconSource !== "")
                         item.source = Qt.binding( () => { return iconSource } )
                     else
-                        item.image = Qt.binding( () => { return iconImage ? iconImage : Scrite.app.emptyQImage } )
+                        item.image = Qt.binding( () => { return iconImage ? iconImage : Gui.emptyQImage } )
                 }
             }
 
@@ -665,11 +665,14 @@ Item {
                     delegate: LinkButton {
                         required property int index
                         required property var record
+
                         width: templatesView.width
-                        text: record.name
-                        tooltip: record.description
+
                         iconSource: index === 0 ? record.poster : libraryService.templates.baseUrl + "/" + record.poster
                         showPoster: index > 0
+                        text: record.name
+                        tooltip: record.description
+
                         onClicked: {
                             SaveFileTask.save( () => {
                                                     var task = OpenFromLibraryTask.openTemplateAt(libraryService, index)
@@ -688,7 +691,7 @@ Item {
     }
 
     component OpenFileOptions : ColumnLayout {
-        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
         LinkButton {
             text: "Open ..."
@@ -767,10 +770,12 @@ Item {
             required property var record
 
             width: ListView.view.width
-            text: record.name
-            tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline
+
             iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
             showPoster: true
+            text: record.name
+            tooltip: "<i>" + record.authors + "</i><br/><br/>" + record.logline
+
             onClicked: {
                 SaveFileTask.save( () => {
                                         var task = OpenFromLibraryTask.openScreenplayAt(libraryService, index)
@@ -845,22 +850,26 @@ Item {
     }
 
     component ImportOptions : ColumnLayout {
-        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
         // Show restore and import options
         LinkButton {
+            Layout.fillWidth: true
+
             text: "Recover ..."
             tooltip: "Open cached files from your private on-disk vault."
             iconSource: "qrc:/icons/file/backup_open.png"
-            Layout.fillWidth: true
+
             onClicked: parent.stackView.push(vaultPage)
         }
 
         LinkButton {
+            Layout.fillWidth: true
+
             text: "Import ..."
             tooltip: "Import a screenplay from Final Draft, Fountain or HTML formats."
             iconSource: "qrc:/icons/file/import_export.png"
-            Layout.fillWidth: true
+
             onClicked: parent.stackView.push(importPage)
         }
     }
@@ -909,10 +918,13 @@ Item {
                     delegate: LinkButton {
                         required property int index
                         required property var record
+
                         width: screenplaysView.width
+
                         text: record.name
                         singleClick: false
                         iconSource: libraryService.screenplays.baseUrl + "/" + record.poster
+
                         onClicked: screenplaysView.currentIndex = index
                         onDoubleClicked: {
                             screenplaysView.currentIndex = index
@@ -931,7 +943,7 @@ Item {
                     spacing: 20
 
                     Image {
-                        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+                        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
                         Layout.fillWidth: true
                         Layout.preferredHeight: (_private.bannerSize.height / _private.bannerSize.width) * width
@@ -1021,7 +1033,7 @@ Item {
                                     return ret
                                 }
 
-                                readonly property string defaultText: Scrite.app.fileContents(":/misc/scriptalay_info.md")
+                                readonly property string defaultText: File.read(":/misc/scriptalay_info.md")
                             }
                         }
                     }
@@ -1080,6 +1092,7 @@ Item {
                 required property var fileInfo
                 required property string timestampAsString
                 required property string relativeTime
+
                 width: vaultFilesView.width-1
                 height: 60
 
@@ -1088,6 +1101,7 @@ Item {
                 iconSource: fileInfo.hasCoverPage ? "" : "qrc:/icons/filetype/document.png"
                 text: "<b>" + fileInfo.title + "</b> (" + fileInfo.sceneCount + (fileInfo.sceneCount === 1 ? " Scene" : " Scenes") + ")<br/>" +
                       "<font size=\"-1\">" + fileSizeInfo + ", " + relativeTime + " on " + timestampAsString + "</font>"
+
                 property string fileSizeInfo: {
                     const fileSize = fileInfo.fileSize
                     if(fileSize < 1024)
@@ -1107,11 +1121,13 @@ Item {
 
         VclLabel {
             anchors.centerIn: parent
+
             width: parent.width * 0.8
-            visible: Scrite.vault.documentCount === 0
+
             horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.WordWrap
             text: "No documents found in vault."
+            visible: Scrite.vault.documentCount === 0
+            wrapMode: Text.WordWrap
         }
     }
 
@@ -1134,7 +1150,7 @@ Item {
 
             property bool valid: path !== ""
             property string path
-            property var info: Scrite.app.fileInfo(path)
+            property var info: File.info(path)
             property string name: info.fileName
             property string folder: info.absolutePath
         }
@@ -1184,7 +1200,7 @@ Item {
 
                     onAccepted: {
                         if(fileUrl != "")
-                            fileToImport.path = Scrite.app.urlToLocalFile(fileUrl)
+                            fileToImport.path = Url.toPath(fileUrl)
                     }
                 }
 
@@ -1264,7 +1280,7 @@ Item {
         property Component buttons
         property QtObject buttonsItem: buttonsLoader.item
 
-        readonly property StackView stackView: Aggregation.firstParent("QQuickStackView")
+        readonly property StackView stackView: Aggregation.firstParentByType("QQuickStackView")
 
         Item {
             anchors.fill: parent
@@ -1405,7 +1421,7 @@ Item {
         onAccepted: {
             Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
-            const path = Scrite.app.urlToLocalFile(fileUrl)
+            const path = Url.toPath(fileUrl)
 
             var task = OpenFileTask.open(path)
             task.finished.connect(closeRequest)
@@ -1541,7 +1557,7 @@ Item {
         signal showScriptalay()
 
         function switchMode() {
-            Utils.execLater(root, 500, () => {
+            Runtime.execLater(root, 500, () => {
                                 if(root.mode === "Scriptalay")
                                     _private.showScriptalay()
                             })

@@ -20,7 +20,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -61,7 +61,7 @@ Item {
             Qt.callLater(destroy)
         }
 
-        property ErrorReport errorReport: Aggregation.findErrorReport(Scrite.document)
+        property ErrorReport errorReport: Aggregation.errorReport(Scrite.document)
         property bool errorReportHasError: errorReport.hasError
     }
 
@@ -192,7 +192,7 @@ Item {
             signal finished(bool success)
 
             onAccepted: {
-                const path = Scrite.app.urlToLocalFile(fileUrl)
+                const path = Url.toPath(fileUrl)
                 if(Scrite.document.canBeBackupFileName(path)) {
                     _private.reportSaveAsBackupNotPossible()
                     finished(false)
@@ -201,7 +201,7 @@ Item {
 
                 Scrite.document.saveAs(path)
 
-                const fileInfo = Scrite.app.fileInfo(path)
+                const fileInfo = File.info(path)
                 Runtime.workspaceSettings.lastOpenFolderUrl = folder
 
                 finished(true)
@@ -231,7 +231,7 @@ Item {
 
         function reportSaveAsBackupNotPossible() {
             MessageBox.information("Save Error", "Cannot save as a backup file. Please choose another path or file name.", () => {
-                                        Utils.execLater(root, 100, root.saveAs)
+                                        Runtime.execLater(root, 100, root.saveAs)
                                    })
         }
     }

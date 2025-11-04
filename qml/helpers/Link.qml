@@ -21,21 +21,26 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 VclLabel {
-    property alias containsMouse: linkMouseArea.containsMouse
-    signal clicked()
-
-    font.pointSize: Runtime.idealFontMetrics.font.pointSize
-    font.underline: true
-    color: linkMouseArea.containsMouse ? hoverColor : defaultColor
+    property alias containsMouse: _mouseArea.containsMouse
 
     property color hoverColor: enabled ? Runtime.colors.accent.c700.background : Runtime.colors.primary.c700.background
     property color defaultColor: enabled ? Runtime.colors.accent.c500.background : Runtime.colors.primary.c500.background
 
+    signal clicked()
+
+    color: _mouseArea.containsMouse ? hoverColor : defaultColor
+
+    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+    font.underline: true
+
     MouseArea {
-        id: linkMouseArea
+        id: _mouseArea
+
         anchors.fill: parent
-        hoverEnabled: true
-        onClicked: parent.clicked()
+
         cursorShape: Qt.PointingHandCursor
+        hoverEnabled: true
+
+        onClicked: parent.clicked()
     }
 }

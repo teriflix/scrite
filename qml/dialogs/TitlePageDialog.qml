@@ -21,7 +21,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -39,9 +39,11 @@ DialogLauncher {
     dialogComponent: VclDialog {
         id: dialog
 
-        title: "Title Page"
         width: Math.min(Scrite.window.width-80, 1050)
         height: Math.min(Scrite.window.height-80, 750)
+
+        handleLanguageShortcuts: true
+        title: "Title Page"
 
         content: Item {
             implicitHeight: titlePageSettingsLayout.implicitHeight+60
@@ -64,7 +66,7 @@ DialogLauncher {
                           At best we can paint a 464x261 point photo on the cover page. Nothing more.
                           So, we need to provide a image preview in this aspect ratio.
                           */
-                    color: dialog.background.item.color
+                    color: dialog.background && dialog.background.item ? dialog.background.item.color : Runtime.colors.primary.c10.background
                     border.width: Scrite.document.screenplay.coverPagePhoto === "" ? 1 : 0
                     border.color: "black"
                     Layout.preferredWidth: 400
@@ -103,7 +105,7 @@ DialogLauncher {
                                     running: parent.status === Image.Loading || !parent.go
                                 }
 
-                                Component.onCompleted: Utils.execLater(coverPagePhoto, 400, () => {
+                                Component.onCompleted: Runtime.execLater(coverPagePhoto, 400, () => {
                                                                            coverPagePhoto.go = true
                                                                        } )
                             }
@@ -194,7 +196,7 @@ DialogLauncher {
                          // The default Ctrl+U interfers with underline
                         onAccepted: {
                             if(fileUrl != "")
-                            Scrite.document.screenplay.setCoverPagePhoto(Scrite.app.urlToLocalFile(fileUrl))
+                            Scrite.document.screenplay.setCoverPagePhoto(Url.toPath(fileUrl))
                         }
                         folder: Runtime.workspaceSettings.lastOpenPhotosFolderUrl
                         onFolderChanged: Runtime.workspaceSettings.lastOpenPhotosFolderUrl = folder
@@ -257,7 +259,7 @@ DialogLauncher {
                                     width: _private.fieldLabelWidth
                                     horizontalAlignment: Text.AlignRight
                                     text: name
-                                    font.pointSize: Runtime.idealFontMetrics.font.pointSize-2
+                                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                                     anchors.verticalCenter: parent.verticalCenter
                                     color: Runtime.colors.primary.c800.background
                                 }
@@ -310,7 +312,8 @@ DialogLauncher {
                         hoverEnabled: true
                         ToolTip.visible: hovered && defaultsSavedNotice.opacity === 0
                         ToolTip.text: "Click this button to use Address, Author, Contact, Email, Phone and Website field values from this dialogue as default from now on."
-                        ToolTip.delay: 1000
+                        ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+
                         onClicked: {
                             Runtime.titlePageSettings.author = Scrite.document.screenplay.author
                             Runtime.titlePageSettings.contact = Scrite.document.screenplay.contact
@@ -343,7 +346,7 @@ DialogLauncher {
                 opacity: 0
                 onOpacityChanged: {
                     if(opacity > 0)
-                    Utils.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
+                    Runtime.execLater(defaultsSavedNotice, 2500, function() { defaultsSavedNotice.opacity = 0 })
                 }
             }
         }

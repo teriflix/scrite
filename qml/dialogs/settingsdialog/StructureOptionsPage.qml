@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -79,7 +79,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Runtime.structureCanvasSettings.canvasColor = Scrite.app.pickColor(Runtime.structureCanvasSettings.canvasColor)
+                            onClicked: Runtime.structureCanvasSettings.canvasColor = Color.pick(Runtime.structureCanvasSettings.canvasColor)
                         }
                     }
 
@@ -103,7 +103,7 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: Runtime.structureCanvasSettings.gridColor = Scrite.app.pickColor(Runtime.structureCanvasSettings.gridColor)
+                            onClicked: Runtime.structureCanvasSettings.gridColor = Color.pick(Runtime.structureCanvasSettings.gridColor)
                         }
                     }
 
@@ -140,7 +140,7 @@ Item {
                     enabled: Scrite.document.structure.elementStacks.objectCount === 0
                     checked: Scrite.document.structure.canvasUIMode === Structure.IndexCardUI
                     onToggled: {
-                        Announcement.shout(Runtime.announcementIds.reloadMainUiRequest)
+                        Runtime.resetMainWindowUi()
                         Scrite.document.structure.canvasUIMode = Structure.IndexCardUI
                         Scrite.document.structure.indexCardContent = Structure.Synopsis
                     }
@@ -268,8 +268,45 @@ Item {
 
                 FlatToolButton {
                     iconSource: "qrc:/icons/action/reset.png"
-                    onClicked: Runtime.workspaceSettings.defaultSceneColor = Scrite.app.standardColors[0]
+                    onClicked: Runtime.workspaceSettings.defaultSceneColor = SceneColors.palette[0]
                     ToolTip.text: "Reset default scene color"
+                }
+            }
+        }
+
+        GroupBox {
+            Layout.preferredWidth: (layout.width-(layout.columns-1)*layout.columnSpacing)/layout.columns
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignTop
+
+            label: VclLabel {
+                text: "Preview"
+            }
+
+            ColumnLayout {
+                width: parent.width
+
+                spacing: 10
+
+                VclLabel {
+                    Layout.fillWidth: true
+
+                    text: "Configure the max-size (width or height) the preview panel can occupy in the structure canvas."
+                    wrapMode: Text.WordWrap
+                }
+
+                VclTextField {
+                    Layout.fillWidth: true
+
+                    placeholderText: "Preview Size (50 - 1000)"
+                    text: Runtime.structureCanvasSettings.previewSize
+                    validator: DoubleValidator {
+                        bottom: 50
+                        top: 1000
+                        decimals: 0
+                    }
+
+                    onTextEdited: Runtime.structureCanvasSettings.previewSize = parseFloat(text)
                 }
             }
         }

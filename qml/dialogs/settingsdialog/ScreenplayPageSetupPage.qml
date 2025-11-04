@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/helpers"
@@ -26,6 +26,7 @@ import "qrc:/qml/controls"
 
 Item {
     id: root
+
     height: layout.height+20
 
     GridLayout {
@@ -45,7 +46,7 @@ Item {
 
             VclComboBox {
                 width: parent.width
-                model: Scrite.app.enumerationModelForType("ScreenplayPageLayout", "PaperSize")
+                model: Object.typeEnumModel("ScreenplayPageLayout", "PaperSize", root)
                 textRole: "key"
                 currentIndex: _private.pageSetupSettings.paperSize
                 anchors.verticalCenter: parent.verticalCenter
@@ -324,7 +325,7 @@ Item {
                     MouseArea {
                         anchors.fill: parent
                         cursorShape: Qt.PointingHandCursor
-                        onClicked: _private.pageSetupSettings.watermarkColor = Scrite.app.pickColor(_private.pageSetupSettings.watermarkColor)
+                        onClicked: _private.pageSetupSettings.watermarkColor = Color.pick(_private.pageSetupSettings.watermarkColor)
                     }
                 }
 
@@ -382,7 +383,7 @@ Item {
     QtObject {
         id: _private
 
-        readonly property var fieldsModel: Scrite.app.enumerationModelForType("HeaderFooter", "Field")
+        readonly property var fieldsModel: Object.typeEnumModel("HeaderFooter", "Field", _private)
         readonly property PageSetup pageSetupSettings: Scrite.document.pageSetup
         readonly property var systemFontInfo: Scrite.app.systemFontInfo()
     }

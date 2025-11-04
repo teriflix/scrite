@@ -19,7 +19,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 
 import "qrc:/qml/tasks"
 import "qrc:/qml/globals"
@@ -110,7 +110,7 @@ Item {
 
                     ToolTip.text: "Ask questions, post feedback, request features and connect with other Scrite users."
                     ToolTip.visible: containsMouse
-                    ToolTip.delay: 1000
+                    ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
 
                     cursorShape: Qt.PointingHandCursor
                     hoverEnabled: true
@@ -370,7 +370,7 @@ Item {
 
                                 onFinished: {
                                     if(!hasError)
-                                        Announcement.shout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
+                                        Runtime.shoutout(Runtime.announcementIds.userAccountDialogScreen, "AccountEmailScreen")
                                 }
                             }
                         }
@@ -532,7 +532,7 @@ Item {
                             VclLabel {
                                 Layout.fillWidth: true
 
-                                text: Utils.formatDateIncludingYear(modelData.timestamp)
+                                text: Runtime.formatDateIncludingYear(modelData.timestamp)
                                 color: Runtime.colors.primary.c200.text
                                 opacity: 0.75
                                 font.pointSize: Runtime.minimumFontMetrics.font.pointSize
@@ -604,13 +604,13 @@ Item {
                                         if(modelData.action === UserMessageButton.CommandAction) {
                                             switch(modelData.endpoint) {
                                             case "$subscribe":
-                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
+                                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Subscriptions")
                                                 return
                                             case "$profile":
-                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Profile")
+                                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Profile")
                                                 return
                                             case "$installations":
-                                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, "Installations")
+                                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, "Installations")
                                                 return
                                             case "$homescreen":
                                                 HomeScreen.launch()
@@ -677,11 +677,11 @@ Item {
                                 width: parent.width
 
                                 name: activeSub.plan.title
-                                duration: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(activeSub.until))
+                                duration: Runtime.dateSpanAsString(Runtime.todayWithZeroTime(), new Date(activeSub.until))
                                 exclusive: activeSub.plan.exclusive
-                                durationNote: "(" + Utils.formatDateRangeAsString(new Date(activeSub.from), new Date(activeSub.until)) + ")"
+                                durationNote: "(" + Runtime.formatDateRangeAsString(new Date(activeSub.from), new Date(activeSub.until)) + ")"
                                 price: "Active"
-                                priceNote: Utils.toTitleCase(activeSub.kind)
+                                priceNote: Runtime.toTitleCase(activeSub.kind)
                                 actionLink: "Details »"
                                 actionLinkEnabled: SubscriptionPlanOperations.taxonomy !== undefined
                                 onActionLinkClicked: SubscriptionDetailsDialog.launch(activeSub)
@@ -705,11 +705,11 @@ Item {
                                 width: parent.width
 
                                 name: upcomingSub.plan.title
-                                duration: Utils.dateSpanAsString(new Date(upcomingSub.from), new Date(upcomingSub.until))
+                                duration: Runtime.dateSpanAsString(new Date(upcomingSub.from), new Date(upcomingSub.until))
                                 exclusive: upcomingSub.plan.exclusive
-                                durationNote: "(" + Utils.formatDateRangeAsString(new Date(upcomingSub.from), new Date(upcomingSub.until)) + ")"
-                                price: Utils.toTitleCase(upcomingSub.kind)
-                                priceNote: Utils.dateSpanAsString(Utils.todayWithZeroTime(), new Date(upcomingSub.from))
+                                durationNote: "(" + Runtime.formatDateRangeAsString(new Date(upcomingSub.from), new Date(upcomingSub.until)) + ")"
+                                price: Runtime.toTitleCase(upcomingSub.kind)
+                                priceNote: Runtime.dateSpanAsString(Runtime.todayWithZeroTime(), new Date(upcomingSub.from))
                                 actionLink: "Details »"
                                 actionLinkEnabled: SubscriptionPlanOperations.taxonomy !== undefined
                                 onActionLinkClicked: SubscriptionDetailsDialog.launch(upcomingSub)
@@ -825,7 +825,7 @@ Item {
 
 
                                         name: modelData.title
-                                        duration: Utils.daysSpanAsString(modelData.duration)
+                                        duration: Runtime.daysSpanAsString(modelData.duration)
                                         exclusive: modelData.exclusive
                                         durationNote: modelData.featureNote
                                         price: {
@@ -891,10 +891,10 @@ Item {
                                         Layout.fillWidth: true
 
                                         name: modelData.plan.title
-                                        duration: Utils.dateSpanAsString(new Date(modelData.from), new Date(modelData.until))
+                                        duration: Runtime.dateSpanAsString(new Date(modelData.from), new Date(modelData.until))
                                         exclusive: modelData.plan.exclusive
-                                        durationNote: Utils.formatDateRangeAsString(new Date(modelData.from), new Date(modelData.until))
-                                        price: Utils.toTitleCase(modelData.kind)
+                                        durationNote: Runtime.formatDateRangeAsString(new Date(modelData.from), new Date(modelData.until))
+                                        price: Runtime.toTitleCase(modelData.kind)
                                         priceNote: modelData.plan.featureNote
                                         actionLink: "Details »"
                                         actionLinkEnabled: SubscriptionPlanOperations.taxonomy !== undefined
@@ -968,7 +968,7 @@ Item {
 
                     ready = call()
                     if(!ready)
-                        Utils.execLater(queryUserSubsCall, 500, go)
+                        Runtime.execLater(queryUserSubsCall, 500, go)
                 }
 
                 Component.onCompleted: go()
@@ -1076,14 +1076,14 @@ Item {
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        text: "Since: " + Scrite.app.relativeTime(new Date(modelData.creationDate))
+                                        text: "Since: " + TMath.relativeTime(new Date(modelData.creationDate))
                                         elide: Text.ElideRight
                                     }
 
                                     VclLabel {
                                         Layout.fillWidth: true
 
-                                        text: "Last Login: " + Scrite.app.relativeTime(new Date(modelData.lastSessionDate))
+                                        text: "Last Login: " + TMath.relativeTime(new Date(modelData.lastSessionDate))
                                         elide: Text.ElideRight
                                     }
                                 }

@@ -4,5 +4,4 @@ FloatingDock 1.0 FloatingDock.qml
 
 singleton FloatingDockLayer 1.0 FloatingDockLayer.qml
 
-singleton FloatingShortcutsDock 1.0 FloatingShortcutsDock.qml
 singleton FloatingMarkupToolsDock 1.0 FloatingMarkupToolsDock.qml

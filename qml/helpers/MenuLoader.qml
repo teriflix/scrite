@@ -18,13 +18,14 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+import "qrc:/qml/globals"
 
 Loader {
-    id: menuLoader
-    active: false
+    id: root
 
     property Component menu
+
+    active: false
     sourceComponent: menu
 
     function show() {
@@ -47,7 +48,7 @@ Loader {
         if(item)
             item.dismiss()
 
-        Utils.execLater( menuLoader, 0, function() { menuLoader.active = false } )
+        Runtime.execLater( root, 0, function() { root.active = false } )
     }
 
     function close() { dismiss() }
@@ -59,7 +60,7 @@ Loader {
 
     onItemChanged: {
         if( item ) {
-            if( Scrite.app.verifyType(item, "QQuickMenu") ) {
+            if( Object.isOfType(item, "QQuickMenu") ) {
                 item.enabled = false
                 if(_private.itemInitMode === "popup")
                     item.popup()
@@ -71,9 +72,10 @@ Loader {
     }
 
     DelayedPropertyBinder {
-        initial: false
         set: parent.item ? true : false
         delay: 100
+        initial: false
+
         onGetChanged: {
             if(parent.item)
                 parent.item.enabled = get
@@ -81,9 +83,10 @@ Loader {
     }
 
     Connections {
-        target: menuLoader.item
+        target: root.item
         ignoreUnknownSignals: true
-        function onVisibleChanged() { menuLoader.dismiss() }
+
+        function onVisibleChanged() { root.dismiss() }
     }
 
     QtObject {

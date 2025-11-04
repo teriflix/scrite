@@ -12,7 +12,8 @@
 ****************************************************************************/
 
 // This QML component extends SpellingSuggestionsMenu so that it can easily
-// be used within a TextArea that employs Transliterator.spellCheckEnabled = true
+// be used within a TextArea that employs a SyntaxHighlighter with a
+// SpellCheckSyntaxHighlighterDelegate delegate that's enabled.
 
 import QtQml 2.15
 import QtQuick 2.15
@@ -23,32 +24,15 @@ import io.scrite.components 1.0
 
 SpellingSuggestionsMenu {
     id: root
-    anchors.bottom: parent.bottom
 
     // Just setting this property should be enough
     property TextArea textArea
 
-    // These are implied from textArea
-    QtObject {
-        id: _private
-        property var transliterator // of type Transliterator
-        property var highlighter    // of type SpellCheckSyntaxHighlighterDelegate
-        property int cursorPosition: -1
+    anchors.bottom: parent.bottom
 
-        function update() {
-            if(root.textArea === null)
-                root.textArea = Scrite.app.findFirstParentOfType(root, "QQuickTextArea")
-
-            transliterator = root.textArea ? root.textArea.Transliterator : null
-            if(transliterator && transliterator.highlighter)
-                highlighter = transliterator.highlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
-
-            cursorPosition = -1
-        }
-    }
+    Component.onCompleted: { Qt.callLater(_private.update) }
 
     onTextAreaChanged: Qt.callLater(_private.update)
-    Component.onCompleted: { Qt.callLater(_private.update) }
 
     onMenuAboutToShow: () => {
                            _private.cursorPosition = textArea.cursorPosition
@@ -63,33 +47,36 @@ SpellingSuggestionsMenu {
 
     onReplaceRequest: (suggestion) => {
                           if(_private.cursorPosition >= 0) {
-                              _private.highlighter.replaceWordAt(_private.cursorPosition, suggestion)
+                              _private.spellCheck.replaceWordAt(_private.cursorPosition, suggestion)
                               textArea.cursorPosition = _private.cursorPosition
                           }
                     }
 
     onAddToDictionaryRequest: () => {
-                                  _private.highlighter.addWordAtPositionToDictionary(_private.cursorPosition)
+                                  _private.spellCheck.addWordAtPositionToDictionary(_private.cursorPosition)
                               }
 
     onAddToIgnoreListRequest: () => {
-                                  _private.highlighter.addWordAtPositionToIgnoreList(_private.cursorPosition)
+                                  _private.spellCheck.addWordAtPositionToIgnoreList(_private.cursorPosition)
                               }
 
     MouseArea {
         parent: textArea ? textArea : root
+
         anchors.fill: parent
-        enabled: textArea && textArea.activeFocus && _private.transliterator && _private.transliterator.spellCheckEnabled
-        acceptedButtons: Qt.RightButton
+
+        enabled: textArea && textArea.activeFocus && _private.spellCheck && _private.spellCheck.enabled
         cursorShape: Qt.IBeamCursor
+        acceptedButtons: Qt.RightButton
+
         onClicked: (mouse) => {
                        mouse.accepted = false
 
                        textArea.persistentSelection = true
                        if(!textArea.hasSelection) {
                            textArea.cursorPosition = textArea.positionAt(mouse.x, mouse.y)
-                           if(_private.highlighter.wordUnderCursorIsMisspelled) {
-                               root.spellingSuggestions = _private.highlighter.spellingSuggestionsForWordUnderCursor
+                           if(_private.spellCheck.wordUnderCursorIsMisspelled) {
+                               root.spellingSuggestions = _private.spellCheck.spellingSuggestionsForWordUnderCursor
                                root.popup()
                                mouse.accepted = true
                                return
@@ -99,22 +86,25 @@ SpellingSuggestionsMenu {
                        textArea.persistentSelection = false
                    }
     }
-}
 
-/**
-  NOTES:
-
-    In _private data, I am unable to specify type of 'transliterator' as Transliterator, because
-    textArea.Transliterator is a QObject* and it wont automatically typcast to Transliterator.
-
-    Although I can specify type of 'highlighter' as 'SpellCheckSyntaxHighlighterDelegate', I did not want to
-    do that because it would spoil the consistency of types in _private data object. Somehow it
-    wouldn't look visually pleasent to me.
-
+    // These are implied from textArea
     QtObject {
         id: _private
-        property Transliterator transliterator
-        property FontSyntaxHighlighter highlighter
-        ....
+
+        property var spellCheck    // of type SpellCheckSyntaxHighlighterDelegate
+        property int cursorPosition: -1
+        property var syntaxHighlighter // of type SyntaxHighlighter
+
+        function update() {
+            if(root.textArea === null)
+                root.textArea = Object.firstParentByType(root, "QQuickTextArea")
+
+            syntaxHighlighter = Object.firstChildByType(root.textArea, "SyntaxHighlighter")
+            if(syntaxHighlighter)
+                spellCheck = syntaxHighlighter.findDelegate("SpellCheckSyntaxHighlighterDelegate")
+
+            cursorPosition = -1
+        }
     }
-  */
+}
+

@@ -245,11 +245,10 @@ void NotebookReport::evaluateTitleAndSubtitle()
     m_subtitle += QLatin1String(" Notes");
 }
 
-void NotebookReport::polishFormInfo(QJsonObject &formInfo) const
+void NotebookReport::polishFormInfo(Utils::ObjectConfig &formInfo) const
 {
     if (m_section != nullptr) {
-        formInfo.insert(QLatin1String("description"),
-                        QLatin1String("Exports '") + m_subtitle
-                                + QLatin1String("' into PDF or ODT."));
+        formInfo.description =
+                QLatin1String("Exports '") + m_subtitle + QLatin1String("' into PDF or ODT.");
     }
 }

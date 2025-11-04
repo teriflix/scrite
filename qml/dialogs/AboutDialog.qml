@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -62,7 +62,7 @@ DialogLauncher {
                 anchors.right: parent.right
                 anchors.margins: 30
 
-                text: "Version-"+Scrite.app.versionAsString + " for " + [Scrite.app.platformAsString, Scrite.app.platformVersion].join("-")
+                text: "Version-"+Platform.osVersionString + " for " + [Platform.typeAsString, Platform.osVersionString].join("-")
                 width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), dialog.width*0.5)
                 elide: Text.ElideLeft
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
@@ -190,12 +190,12 @@ DialogLauncher {
 
                             Component.onCompleted: {
                                 append({
-                                           "credits": "<strong>Qt</strong> " + Scrite.app.qtVersionString + " as UI framework for the entire app.",
+                                           "credits": "<strong>Qt</strong> " + Platform.qtVersionString + " as UI framework for the entire app.",
                                            "url": "https://www.qt.io"
                                        })
 
-                                if(Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform) {
-                                    const v = Scrite.app.openSslVersionString
+                                if(Platform.isWindowsDesktop || Platform.isLinuxDesktop) {
+                                    const v = Platform.openSslVersionString
                                     append({
                                                 "credits": "<strong>" + v + "</strong> for use with https protocol.",
                                                 "url": "https://openssl-library.org/news/openssl-1.1.1-notes/index.html"

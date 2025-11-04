@@ -22,192 +22,70 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
-import "qrc:/qml/scrited"
+import "qrc:/qml/notifications"
 
 Item {
-    id: scritedView
-
-    property int skipDuration: 10
-    property bool mediaIsLoaded: mediaPlayer.status !== MediaPlayer.NoMedia
-    property bool mediaIsPlaying: mediaPlayer.playbackState === MediaPlayer.PlayingState
-    property bool mediaIsPaused: mediaPlayer.playbackState === MediaPlayer.PausedState
-    property alias timeOffsetVisible: screenplayOffsetsView.displayTimeOffset
-    property bool nextSceneAvailable: screenplayOffsetsView.currentIndex+1 < screenplayOffsetsView.count
-    property bool previousSceneAvailable: screenplayOffsetsView.currentIndex > 0
-    property alias screenplaySplitsCount: screenplayOffsetsView.count
-    property alias playbackScreenplaySync: mediaPlayer.keepScreenplayInSyncWithPosition
-    property bool canScrollUp: textDocumentFlick.contentY > 0
-    property bool canScrollDown: textDocumentFlick.contentY < textDocumentFlick.contentHeight - textDocumentFlick.height
-
-    Component.onCompleted: {
-        scritedToolbar.scritedView = scritedView
-        if(!Runtime.scritedSettings.experimentalFeatureNoticeDisplayed) {
-            Utils.execLater(scritedView, 250, function() {
-                MessageBox.information("Experimental Feature",
-                    "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!"
-                )
-                Runtime.scritedSettings.experimentalFeatureNoticeDisplayed = true
-            })
-        }
-        Scrite.user.logActivity1("scrited")
-    }
-    Component.onDestruction: scritedToolbar.scritedView = null
-
-    function loadMedia() {
-        fileDialog.open()
-    }
-
-    function togglePlayback() {
-        mediaPlayer.togglePlayback()
-    }
-
-    function rewind() {
-        mediaPlayer.traverse(-skipDuration)
-    }
-
-    function forward() {
-        mediaPlayer.traverse(+skipDuration)
-    }
-
-    function miniRewind() {
-        mediaPlayer.traverse(-1)
-    }
-
-    function miniForward() {
-        mediaPlayer.traverse(1)
-    }
-
-    function syncVideoTimeWithScreenplayOffsets(adjustFollowingRows) {
-        screenplayOffsetsModel.setTime(screenplayOffsetsView.currentIndex, mediaPlayer.position, adjustFollowingRows === true)
-    }
-
-    function resetScreenplayOffsets() {
-        screenplayOffsetsModel.resetAllTimes()
-    }
-
-    function scrollUp() {
-        var newY = Math.max(textDocumentFlick.contentY - textDocumentFlick.lineHeight, 0)
-        textDocumentFlick.contentY = newY
-    }
-
-    function scrollPreviousScene() {
-        screenplayOffsetsView.currentIndex = screenplayOffsetsModel.previousSceneHeadingIndex(screenplayOffsetsView.currentIndex)
-    }
-
-    function scrollPreviousScreen() {
-        var newY = Math.max(textDocumentFlick.contentY - textDocumentFlick.height, 0)
-        textDocumentFlick.contentY = newY
-    }
-
-    function scrollPreviousPage() {
-        var newY = Math.max(textDocumentFlick.contentY - textDocumentFlick.pageHeight, 0)
-        textDocumentFlick.contentY = newY
-    }
-
-    function scrollDown() {
-        var newY = Math.min(textDocumentFlick.contentY + textDocumentFlick.lineHeight, textDocumentFlick.contentHeight-textDocumentFlick.height)
-        textDocumentFlick.contentY = newY
-    }
-
-    function scrollNextScene() {
-        screenplayOffsetsView.currentIndex = screenplayOffsetsModel.nextSceneHeadingIndex(screenplayOffsetsView.currentIndex)
-    }
-
-    function scrollNextScreen() {
-        var newY = Math.min(textDocumentFlick.contentY + textDocumentFlick.height, textDocumentFlick.contentHeight-textDocumentFlick.height)
-        textDocumentFlick.contentY = newY
-    }
-
-    function scrollNextPage() {
-        var newY = Math.min(textDocumentFlick.contentY + textDocumentFlick.pageHeight)
-        textDocumentFlick.contentY = newY
-    }
-
-    function toggleTimeOffsetDisplay() {
-        screenplayOffsetsView.displayTimeOffset = !screenplayOffsetsView.displayTimeOffset
-    }
-
-    property alias currentSceneTimeIsLocked: screenplayOffsetsView.currentSceneTimeIsLocked
-    function toggleCurrentSceneTimeLock() {
-        screenplayOffsetsModel.toggleSceneTimeLock(screenplayOffsetsView.currentIndex)
-    }
-
-    function unlockAllSceneTimes() {
-        screenplayOffsetsModel.unlockAllSceneTimes()
-    }
-
-    function loadMediaUrl(fileUrl) {
-        mediaPlayer.source = fileUrl
-        mediaPlayer.play()
-        Qt.callLater( function() {
-            mediaPlayer.pause()
-            mediaPlayer.seek(0)
-            screenplayOffsetsView.adjustTextDocumentAndMedia()
-        })
-        screenplayOffsetsModel.fileName = screenplayOffsetsModel.fileNameFrom(fileUrl)
-    }
-
-    VclFileDialog {
-        id: fileDialog
-        folder: Runtime.scritedSettings.lastOpenScritedFolderUrl
-        onFolderChanged: Qt.callLater( function() { Runtime.scritedSettings.lastOpenScritedFolderUrl = fileDialog.folder } )
-        selectFolder: false
-        selectMultiple: false
-        selectExisting: true
-        onAccepted: loadMediaUrl(fileUrl)
-         // The default Ctrl+U interfers with underline
-    }
+    id: root
 
     SplitView {
-        anchors.fill: parent
-        orientation: Qt.Horizontal
         Material.background: Qt.darker(Runtime.colors.primary.button.background, 1.1)
 
-        Item {
-            id: playerArea
-            SplitView.preferredWidth: scritedView.width * Runtime.scritedSettings.playerAreaRatio
-            onWidthChanged: updateScritedSettings()
+        anchors.fill: parent
+        orientation: Qt.Horizontal
 
-            function updateScritedSettings() {
-                Runtime.scritedSettings.playerAreaRatio = width / scritedView.width
-            }
+        Item {
+            id: _playerArea
 
             property bool keyFrameGrabMode: false
+
+            SplitView.preferredWidth: root.width * Runtime.scritedSettings.playerAreaRatio
+
+            function updateScritedSettings() {
+                Runtime.scritedSettings.playerAreaRatio = width / root.width
+            }
+
             function grabKeyFrame() {
                 keyFrameGrabMode = true
-                Utils.execLater(playerArea, 250, function() {
-                    var dpi = Scrite.document.formatting.devicePixelRatio
-                    playerArea.grabToImage( function(result) {
-                        keyFrameImage.source = result.url
-                        playerArea.keyFrameGrabMode = false
-                    }, Qt.size(playerArea.width*dpi,playerArea.height*dpi))
+                Runtime.execLater(_playerArea, 250, function() {
+                    const dpi = Scrite.document.formatting.devicePixelRatio
+                    _playerArea.grabToImage( function(result) {
+                        _keyFrameImage.source = result.url
+                        _playerArea.keyFrameGrabMode = false
+                    }, Qt.size(_playerArea.width*dpi,_playerArea.height*dpi))
                 })
             }
+
+            onWidthChanged: updateScritedSettings()
 
             Column {
                 anchors.fill: parent
 
                 Rectangle {
-                    id: videoArea
+                    id: _videoArea
+
+                    property real minHeight: 10
+                    property real maxHeight: Math.max(root.height * 0.75, idealHeight)
+                    property real idealHeight: width / 16 * 9
+
                     width: parent.width
                     height: width / 16 * 9
+
                     color: "black"
-                    visible: Runtime.scritedSettings.videoPlayerVisible || mediaIsLoaded
+                    visible: Runtime.scritedSettings.videoPlayerVisible || _private.mediaIsLoaded
 
                     MediaPlayer {
-                        id: mediaPlayer
-                        notifyInterval: 1000
+                        id: _mediaPlayer
 
-                        property int sceneStartPosition: -1
                         property int sceneEndPosition: -1
+                        property int sceneStartPosition: -1
                         property bool hasScenePositions: sceneStartPosition >= 0 && sceneEndPosition > 0 && sceneEndPosition > sceneStartPosition
-                        property real sceneStartOffset: sceneStartPosition > 0 ? screenplayOffsetsModel.evaluatePointAtTime(sceneStartPosition, -1).y * textDocumentView.documentScale : 0
-                        property real sceneEndOffset: sceneEndPosition > 0 ? screenplayOffsetsModel.evaluatePointAtTime(sceneEndPosition, -1).y * textDocumentView.documentScale : 0
+                        property bool keepScreenplayInSyncWithPosition: false
+                        property real sceneEndOffset: sceneEndPosition > 0 ? _screenplayOffsetsModel.evaluatePointAtTime(sceneEndPosition, -1).y * _textDocumentView.documentScale : 0
+                        property real sceneStartOffset: sceneStartPosition > 0 ? _screenplayOffsetsModel.evaluatePointAtTime(sceneStartPosition, -1).y * _textDocumentView.documentScale : 0
 
                         function togglePlayback() {
                             if(status == MediaPlayer.NoMedia)
@@ -222,20 +100,21 @@ Item {
                         function traverse(secs) {
                             if(secs === 0)
                                 return
-                            var now = secs > 0 ? Math.ceil(position/1000) : Math.floor(position/1000)
-                            var oldPos = position
+                            const now = secs > 0 ? Math.ceil(position/1000) : Math.floor(position/1000)
+                            // const oldPos = position
                             seek( Math.min(Math.max((now+secs)*1000,0),duration) )
                         }
 
-                        property bool keepScreenplayInSyncWithPosition: false
+
+                        notifyInterval: 1000
 
                         onKeepScreenplayInSyncWithPositionChanged: {
                             if(keepScreenplayInSyncWithPosition) {
                                 if(hasScenePositions)
-                                    startingFrameAnimation.prepare()
+                                    _startingFrameAnimation.prepare()
                             } else {
-                                startingFrameOverlay.visible = false
-                                closingFrameAnimation.rollback()
+                                _startingFrameOverlay.visible = false
+                                _closingFrameAnimation.rollback()
                                 sceneStartPosition = -1
                                 sceneEndPosition = -1
                             }
@@ -244,168 +123,200 @@ Item {
                         onPositionChanged: {
                             if(keepScreenplayInSyncWithPosition && playbackState === MediaPlayer.PlayingState) {
                                 if(hasScenePositions && position >= sceneEndPosition)
-                                    closingFrameAnimation.start()
+                                    _closingFrameAnimation.start()
 
-                                var offsetInfo = screenplayOffsetsModel.offsetInfoAtTime(position, screenplayOffsetsView.currentIndex)
+                                const offsetInfo = _screenplayOffsetsModel.offsetInfoAtTime(position, _screenplayOffsetsView.currentIndex)
                                 if(offsetInfo.row < 0)
                                     return
 
-                                if(screenplayOffsetsView.currentIndex !== offsetInfo.row)
-                                    screenplayOffsetsView.currentIndex = offsetInfo.row
+                                if(_screenplayOffsetsView.currentIndex !== offsetInfo.row)
+                                    _screenplayOffsetsView.currentIndex = offsetInfo.row
 
-                                var newY = screenplayOffsetsModel.evaluatePointAtTime(position, offsetInfo.row).y * textDocumentView.documentScale
-                                var maxNewY = /*hasScenePositions ? (sceneEndOffset-textDocumentFlick.height*0.75) :*/ textDocumentView.height - textDocumentFlick.height
-                                textDocumentFlick.contentY = Math.min(newY, maxNewY)
+                                const newY = _screenplayOffsetsModel.evaluatePointAtTime(position, offsetInfo.row).y * _textDocumentView.documentScale
+                                const maxNewY = /*hasScenePositions ? (sceneEndOffset-textDocumentFlick.height*0.75) :*/ _textDocumentView.height - _textDocumentFlick.height
+                                _textDocumentFlick.contentY = Math.min(newY, maxNewY)
                             }
                         }
                     }
 
                     VideoOutput {
-                        id: videoOutput
-                        source: mediaPlayer
+                        id: _videoOutput
+
                         anchors.fill: parent
+
+                        source: _mediaPlayer
                         fillMode: VideoOutput.PreserveAspectCrop
                     }
 
                     Image {
-                        id: logoOverlay
+                        id: _logoOverlay
+
                         x: 20
                         y: 20
-                        width: Math.max(Math.min(videoOutput.width, videoOutput.height)*0.10, 80)
+                        width: Math.max(Math.min(_videoOutput.width, _videoOutput.height)*0.10, 80)
                         height: width
-                        visible: mediaIsLoaded
-                        source: "qrc:/images/appicon.png"
-                        smooth: true; mipmap: true
+
                         fillMode: Image.PreserveAspectFit
+                        smooth: true; mipmap: true
+                        source: "qrc:/images/appicon.png"
+                        visible: _private.mediaIsLoaded
                     }
 
                     FlatToolButton {
+                        ToolTip.text: "Closes the video player until a video file is loaded."
+
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.margins: 4
-                        iconSource: "qrc:/icons/navigation/arrow_up_inverted.png"
-                        visible: !mediaIsLoaded
+
                         enabled: visible
-                        opacity: hovered ? 1 : 0.5
+                        iconSource: "qrc:/icons/navigation/arrow_up_inverted.png"
                         onClicked: Runtime.scritedSettings.videoPlayerVisible = false
-                        ToolTip.text: "Closes the video player until a video file is loaded."
+                        opacity: hovered ? 1 : 0.5
+                        visible: !_private.mediaIsLoaded
                     }
 
                     Image {
-                        id: logoOverlay2
+                        id: _logoOverlay2
+
+                        property string imagePath: StandardPaths.locateFile(StandardPaths.DownloadLocation, "scrited_logo_overlay.png")
+
                         x: parent.width-width-20
                         y: 20
                         width: height
-                        height: logoOverlay.height
-                        visible: logoOverlay.visible && imagePath !== ""
-                        property string imagePath: StandardPaths.locateFile(StandardPaths.DownloadLocation, "scrited_logo_overlay.png")
-                        source: imagePath === "" ? "" : "file:///" + imagePath
-                        smooth: true; mipmap: true
+                        height: _logoOverlay.height
+
                         fillMode: Image.PreserveAspectFit
+                        smooth: true; mipmap: true
+                        source: imagePath === "" ? "" : "file:///" + imagePath
+                        visible: _logoOverlay.visible && imagePath !== ""
                     }
 
                     Rectangle {
-                        anchors.fill: urlOverlay
-                        anchors.margins: -urlOverlay.height*0.15
+                        anchors.fill: _urlOverlay
+                        anchors.margins: -_urlOverlay.height*0.15
                         anchors.leftMargin: -20
                         anchors.rightMargin: -40
-                        radius: height/2
+
                         color: "#5d3689"
-                        visible: urlOverlay.visible
+                        radius: height/2
+                        visible: _urlOverlay.visible
                     }
 
                     VclText {
-                        id: urlOverlay
-                        text: "scrite.io"
-                        font.family: "Courier Prime"
-                        font.bold: true
-                        font.pixelSize: Math.max(24, Math.min(videoOutput.width, videoOutput.height)*0.125 * 0.25)
-                        horizontalAlignment: Text.AlignRight
+                        id: _urlOverlay
+
                         anchors.bottom: parent.bottom
                         anchors.right: parent.right
                         anchors.rightMargin: 20
-                        anchors.bottomMargin: mediaPlayerControls.visible ? mediaPlayerControls.height + mediaPlayerControls.anchors.bottomMargin + 20 : (20 + logoOverlay.height/2)
+                        anchors.bottomMargin: _mediaPlayerControls.visible ? _mediaPlayerControls.height + _mediaPlayerControls.anchors.bottomMargin + 20 : (20 + _logoOverlay.height/2)
+
                         color: "white"
-                        visible: logoOverlay.visible
+                        horizontalAlignment: Text.AlignRight
+                        text: "scrite.io"
+                        visible: _logoOverlay.visible
+
+                        font.bold: true
+                        font.family: "Courier Prime"
+                        font.pixelSize: Math.max(24, Math.min(_videoOutput.width, _videoOutput.height)*0.125 * 0.25)
                     }
 
                     VclLabel {
-                        width: parent.width * 0.75
-                        wrapMode: Text.WordWrap
-                        font.pointSize: 16
-                        horizontalAlignment: Text.AlignHCenter
                         anchors.centerIn: parent
+
+                        width: parent.width * 0.75
+
                         color: "white"
-                        visible: mediaPlayer.status === MediaPlayer.NoMedia
+                        horizontalAlignment: Text.AlignHCenter
                         padding: 20
+                        visible: _mediaPlayer.status === MediaPlayer.NoMedia
+                        wrapMode: Text.WordWrap
+
                         text: {
                             if(Scrite.document.screenplay.elementCount > 0)
                                 return "Click here to load movie of \"" + Scrite.document.screenplay.title + "\"."
                             return "Load a screenplay and then click here to load its movie for syncing."
                         }
 
+                        font.pointSize: 16
+
                         MouseArea {
                             anchors.fill: parent
-                            enabled: Scrite.document.screenplay.elementCount > 0 && mediaPlayer.status === MediaPlayer.NoMedia
-                            onClicked: fileDialog.open()
+
+                            enabled: Scrite.document.screenplay.elementCount > 0 && _mediaPlayer.status === MediaPlayer.NoMedia
                             hoverEnabled: true
+
+                            onClicked: _fileDialog.open()
                             onEntered: parent.font.underline = true
                             onExited: parent.font.underline = false
                         }
                     }
 
                     Rectangle {
-                        id: mediaPlayerControls
-                        width: parent.width * 0.9
-                        radius: 6
-                        height: mediaPlayerControlsLayout.height+2*radius
-                        anchors.bottomMargin: 10
+                        id: _mediaPlayerControls
+
                         anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 10
                         anchors.horizontalCenter: parent.horizontalCenter
+
+                        width: parent.width * 0.9
+                        height: _mediaPlayerControlsLayout.height+2*radius
+
                         color: Qt.rgba(0,0,0,0.25)
-                        visible: !mediaPlayer.keepScreenplayInSyncWithPosition && !playerArea.keyFrameGrabMode
+                        radius: 6
+                        visible: !_mediaPlayer.keepScreenplayInSyncWithPosition && !_playerArea.keyFrameGrabMode
 
                         MouseArea {
-                            anchors.fill: mediaPlayerControlsLayout
+                            anchors.fill: _mediaPlayerControlsLayout
+
                             onClicked: {
-                                var pos = Math.abs((mouse.x/width) * mediaPlayer.duration)
-                                mediaPlayer.seek(pos)
+                                var pos = Math.abs((mouse.x/width) * _mediaPlayer.duration)
+                                _mediaPlayer.seek(pos)
                             }
                         }
 
                         Column {
-                            id: mediaPlayerControlsLayout
+                            id: _mediaPlayerControlsLayout
+
+                            anchors.centerIn: parent
+
                             width: parent.width-2*parent.radius
                             spacing: 5
-                            anchors.centerIn: parent
 
                             Item {
                                 width: parent.width
                                 height: 20
-                                enabled: mediaPlayer.status !== MediaPlayer.NoMedia
+
+                                enabled: _mediaPlayer.status !== MediaPlayer.NoMedia
 
                                 Rectangle {
+                                    anchors.centerIn: parent
+
                                     height: 2
                                     width: parent.width
+
                                     color: enabled ? "white" : "gray"
-                                    anchors.centerIn: parent
                                 }
 
                                 Rectangle {
+                                    x: ((_mediaPlayer.position / _mediaPlayer.duration) * parent.width) - width/2
                                     width: 5
                                     height: parent.height
+
                                     color: enabled ? "white" : "gray"
-                                    x: ((mediaPlayer.position / mediaPlayer.duration) * parent.width) - width/2
+
                                     onXChanged: {
-                                        if(positionHandleMouseArea.drag.active) {
-                                            var pos = Math.abs(((x + width/2)/parent.width) * mediaPlayer.duration)
-                                            mediaPlayer.seek( Math.round(pos/1000)*1000 )
+                                        if(_positionHandleMouseArea.drag.active) {
+                                            var pos = Math.abs(((x + width/2)/parent.width) * _mediaPlayer.duration)
+                                            _mediaPlayer.seek( Math.round(pos/1000)*1000 )
                                         }
                                     }
 
                                     MouseArea {
-                                        id: positionHandleMouseArea
+                                        id: _positionHandleMouseArea
+
                                         anchors.fill: parent
+
                                         drag.target: parent
                                         drag.axis: Drag.XAxis
                                     }
@@ -416,37 +327,44 @@ Item {
                                 width: parent.width
 
                                 VclToolButton {
-                                    icon.source: "qrc:/icons/mediaplayer/movie_inverted.png"
-                                    onClicked: fileDialog.open()
-                                    suggestedHeight: 36
                                     ToolTip.text: "Load a video file for this screenplay."
-                                    focusPolicy: Qt.NoFocus
+
                                     enabled: Scrite.document.screenplay.elementCount > 0
+                                    focusPolicy: Qt.NoFocus
+                                    suggestedHeight: 36
+
+                                    icon.source: "qrc:/icons/mediaplayer/movie_inverted.png"
+
+                                    onClicked: _fileDialog.open()
                                 }
 
                                 VclToolButton {
+                                    ToolTip.text: "Play / Pause"
+
+                                    enabled: _mediaPlayer.status !== MediaPlayer.NoMedia
+                                    focusPolicy: Qt.NoFocus
+                                    suggestedHeight: 36
+
                                     icon.source: {
-                                        if(mediaPlayer.playbackState === MediaPlayer.PlayingState)
+                                        if(_mediaPlayer.playbackState === MediaPlayer.PlayingState)
                                             return "qrc:/icons/mediaplayer/pause_inverted.png"
                                         return "qrc:/icons/mediaplayer/play_arrow_inverted.png"
                                     }
-                                    onClicked: mediaPlayer.togglePlayback()
-                                    enabled: mediaPlayer.status !== MediaPlayer.NoMedia
-                                    suggestedHeight: 36
-                                    ToolTip.text: "Play / Pause"
-                                    focusPolicy: Qt.NoFocus
+
+                                    onClicked: _mediaPlayer.togglePlayback()
                                 }
 
                                 VclLabel {
                                     Layout.fillWidth: true
                                     Layout.alignment: Qt.AlignVCenter
+
                                     width: parent.width
-                                    opacity: mediaPlayer.status !== MediaPlayer.NoMedia ? 1 : 0
-                                    enabled: mediaPlayer.status !== MediaPlayer.NoMedia
-                                    horizontalAlignment: Text.AlignHCenter
+
                                     color: "white"
-                                    font.pointSize: 16
-                                    font.family: "Courier Prime"
+                                    enabled: _mediaPlayer.status !== MediaPlayer.NoMedia
+                                    horizontalAlignment: Text.AlignHCenter
+                                    opacity: _mediaPlayer.status !== MediaPlayer.NoMedia ? 1 : 0
+
                                     text: {
                                         var msToTime = function(ms) {
                                             var secs = Math.round(ms/1000)
@@ -457,104 +375,126 @@ Item {
                                                 return hour + ":" + minute + ":" + second
                                             return minute + ":" + second
                                         }
-                                        return msToTime(mediaPlayer.position) + " / " + msToTime(mediaPlayer.duration)
+                                        return msToTime(_mediaPlayer.position) + " / " + msToTime(_mediaPlayer.duration)
                                     }
+
+                                    font.family: "Courier Prime"
+                                    font.pointSize: 16
                                 }
 
                                 VclToolButton {
+                                    ToolTip.text: "Rewind by " + _private.skipDuration + " seconds"
+
+                                    enabled: _mediaPlayer.status !== MediaPlayer.NoMedia && _mediaPlayer.position > 0
+                                    focusPolicy: Qt.NoFocus
+                                    suggestedHeight: 36
+
                                     icon.source: "qrc:/icons/mediaplayer/rewind_10_inverted.png"
-                                    enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position > 0
-                                    suggestedHeight: 36
-                                    onClicked: rewind()
-                                    ToolTip.text: "Rewind by " + skipDuration + " seconds"
-                                    focusPolicy: Qt.NoFocus
+
+                                    onClicked: _private.rewind()
                                 }
 
                                 VclToolButton {
+                                    ToolTip.text: "Forward by " + _private.skipDuration + " seconds"
+
+                                    enabled: _mediaPlayer.status !== MediaPlayer.NoMedia && _mediaPlayer.position < _mediaPlayer.duration
+                                    focusPolicy: Qt.NoFocus
+                                    suggestedHeight: 36
+
                                     icon.source: "qrc:/icons/mediaplayer/forward_10_inverted.png"
-                                    enabled: mediaPlayer.status !== MediaPlayer.NoMedia && mediaPlayer.position < mediaPlayer.duration
-                                    suggestedHeight: 36
-                                    onClicked: forward()
-                                    ToolTip.text: "Forward by " + skipDuration + " seconds"
-                                    focusPolicy: Qt.NoFocus
+                                    onClicked: _private.forward()
                                 }
 
                                 VclToolButton {
-                                    icon.source: "qrc:/icons/navigation/zoom_fit_inverted.png"
-                                    enabled: mediaPlayer.status !== MediaPlayer.NoMedia
-                                    suggestedHeight: 36
-                                    onClicked: {
-                                        if(videoOutput.fillMode === VideoOutput.PreserveAspectCrop)
-                                            videoOutput.fillMode = VideoOutput.PreserveAspectFit
-                                        else
-                                            videoOutput.fillMode = VideoOutput.PreserveAspectCrop
-                                    }
-                                    ToolTip.text: videoOutput.fillMode === VideoOutput.PreserveAspectCrop ? "Fit video" : "Fill video"
+                                    ToolTip.text: _videoOutput.fillMode === VideoOutput.PreserveAspectCrop ? "Fit video" : "Fill video"
+
+                                    enabled: _mediaPlayer.status !== MediaPlayer.NoMedia
                                     focusPolicy: Qt.NoFocus
+                                    suggestedHeight: 36
+
+                                    icon.source: "qrc:/icons/navigation/zoom_fit_inverted.png"
+
+                                    onClicked: {
+                                        if(_videoOutput.fillMode === VideoOutput.PreserveAspectCrop)
+                                            _videoOutput.fillMode = VideoOutput.PreserveAspectFit
+                                        else
+                                            _videoOutput.fillMode = VideoOutput.PreserveAspectCrop
+                                    }
                                 }
                             }
                         }
                     }
 
                     Item {
-                        id: titleCardOverlay
+                        id: _titleCardOverlay
+
                         anchors.fill: parent
+
                         visible: false
                         opacity: 0.95
 
                         Column {
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: mediaPlayerControls.visible ? mediaPlayerControls.height + 20 : 40
                             anchors.left: parent.left
+                            anchors.bottom: parent.bottom
                             anchors.leftMargin: 30
+                            anchors.bottomMargin: _mediaPlayerControls.visible ? _mediaPlayerControls.height + 20 : 40
 
                             Rectangle {
+                                width: _titleText.width
+                                height: _titleText.height
+
                                 color: "#65318f"
-                                width: titleText.width
-                                height: titleText.height
 
                                 VclLabel {
-                                    id: titleText
+                                    id: _titleText
+
+                                    color: "white"
                                     padding: 8
+                                    text: Scrite.document.screenplay.title
+
+                                    font.bold: true
                                     font.family: "Arial"
                                     font.pointSize: 28
-                                    font.bold: true
-                                    color: "white"
-                                    text: Scrite.document.screenplay.title
                                 }
                             }
 
                             Rectangle {
+                                width: _subtitleText.width
+                                height: _subtitleText.height
+
                                 color: "#e665318f"
-                                width: subtitleText.width
-                                height: subtitleText.height
-                                visible: subtitleText.text !== ""
+                                visible: _subtitleText.text !== ""
 
                                 VclLabel {
-                                    id: subtitleText
+                                    id: _subtitleText
+
+                                    color: "white"
                                     padding: 6
+                                    text: Scrite.document.screenplay.subtitle
+
+                                    font.bold: true
                                     font.family: "Arial"
                                     font.pointSize: 20
-                                    font.bold: true
-                                    color: "white"
-                                    text: Scrite.document.screenplay.subtitle
                                 }
                             }
 
                             Rectangle {
+                                width: _authorsText.width
+                                height: _authorsText.height
+
                                 color: "black"
-                                width: authorsText.width
-                                height: authorsText.height
-                                visible: authorsText.text !== ""
+                                visible: _authorsText.text !== ""
 
                                 VclLabel {
-                                    id: authorsText
+                                    id: _authorsText
+
+                                    color: "white"
                                     padding: 6
+                                    text: "Written by " + Scrite.document.screenplay.author
+
+                                    font.bold: true
                                     font.family: "Arial"
                                     font.pointSize: 20
-                                    font.bold: true
-                                    color: "white"
-                                    text: "Written by " + Scrite.document.screenplay.author
                                 }
                             }
                         }
@@ -563,89 +503,107 @@ Item {
 
                 Item {
                     width: parent.width
-                    height: parent.height - (videoArea.visible ? videoArea.height : 0)
+                    height: parent.height - (_videoArea.visible ? _videoArea.height : 0)
 
                     Component.onCompleted: {
-                        Utils.execLater(screenplayOffsetsModel, 100, function() {
-                            screenplayOffsetsModel.allowScreenplay = true
+                        Runtime.execLater(_screenplayOffsetsModel, 100, function() {
+                            _screenplayOffsetsModel.allowScreenplay = true
                         })
                     }
 
                     ScreenplayTextDocumentOffsets {
-                        id: screenplayOffsetsModel
+                        id: _screenplayOffsetsModel
+
                         property bool allowScreenplay : false
-                        screenplay: allowScreenplay ? (Scrite.document.loading ? null : Scrite.document.screenplay) : null
-                        format: Scrite.document.loading ? null : Scrite.document.printFormat
 
                         Notification.title: "Time Offsets Error"
                         Notification.text: errorMessage
                         Notification.active: hasError
                         Notification.autoClose: false
                         Notification.onDismissed: clearErrorMessage()
+
+                        format: Scrite.document.loading ? null : Scrite.document.printFormat
+                        screenplay: allowScreenplay ? (Scrite.document.loading ? null : Scrite.document.screenplay) : null
                     }
 
                     FontMetrics {
-                        id: screenplayFontMetrics
-                        font: screenplayOffsetsModel.format.defaultFont
+                        id: _screenplayFontMetrics
+
+                        font: _screenplayOffsetsModel.format.defaultFont
                     }
 
                     Item {
-                        id: textDocumentArea
-                        anchors.fill: parent
-                        clip: true
+                        id: _textDocumentArea
+
                         property bool containsMouse: false
 
+                        EventFilter.acceptHoverEvents: true
+                        EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
+                        EventFilter.onFilter: {
+                            result.acceptEvent = false
+                            result.filter = false
+                            _textDocumentArea.containsMouse = event.type === 127 || event.type === 129
+                        }
+
+                        anchors.fill: parent
+
+                        clip: true
+
                         Item {
-                            width: parent.width
-                            height: Math.max(parent.height, textDocumentView.height+parent.height)
                             x: 0
-                            y: -textDocumentFlick.contentY
+                            y: -_textDocumentFlick.contentY
+                            width: parent.width
+                            height: Math.max(parent.height, _textDocumentView.height+parent.height)
 
                             Image {
                                 anchors.fill: parent
-                                source: "qrc:/images/white-paper-texture.jpg"
+
                                 fillMode: Image.TileVertically
+                                source: "qrc:/images/white-paper-texture.jpg"
                             }
                         }
 
                         VclText {
                             anchors.centerIn: parent
-                            text: "scrite.io"
-                            font.family: "Courier Prime"
-                            font.bold: true
-                            rotation: -Math.atan( parent.height/parent.width ) * 180 / Math.PI
-                            font.pixelSize: Math.min(parent.width, parent.height) * 0.2
-                            font.letterSpacing: font.pixelSize * 0.1
+
                             opacity: 0.025
-                            visible: logoOverlay.visible
+                            rotation: -Math.atan( parent.height/parent.width ) * 180 / Math.PI
+                            text: "scrite.io"
+                            visible: _logoOverlay.visible
+
+                            font.bold: true
+                            font.family: "Courier Prime"
+                            font.pixelSize: Math.min(parent.width, parent.height) * 0.2
+                            font.letterSpacing: Math.min(parent.width, parent.height) * 0.2 * 0.1
                         }
 
                         Item {
-                            id: textDocumentFlickPadding
-                            width: parent.width
-                            height: videoArea.visible ? textDocumentArea.height*0.35 : textDocumentFlick.lineHeight
+                            id: _textDocumentFlickPadding
+
                             y: -1
+                            width: parent.width
+                            height: _videoArea.visible ? _textDocumentArea.height*0.35 : _textDocumentFlick.lineHeight
 
                             Rectangle {
                                 anchors.fill: parent
-                                visible: videoArea.visible
+                                visible: _videoArea.visible
 
                                 gradient: Gradient {
                                     GradientStop {
                                         position: 0
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 1)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 1)
                                     }
                                     GradientStop {
                                         position: 0.175
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.5)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 0.5)
                                     }
                                     GradientStop {
                                         position: 0.35
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.3)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 0.3)
                                     }
                                     GradientStop {
                                         position: 0.56
-                                        color: Scrite.app.translucent(Runtime.colors.primary.c600.background, 0.1)
+                                        color: Color.translucent(Runtime.colors.primary.c600.background, 0.1)
                                     }
                                     GradientStop {
                                         position: 0.7
@@ -660,162 +618,177 @@ Item {
                         }
 
                         Flickable {
-                            id: textDocumentFlick
-                            contentWidth: Math.ceil(width)
-                            contentHeight: Math.ceil(textDocumentView.height + height)
-                            boundsBehavior: Flickable.StopAtBounds
-                            width: parent.width
-                            anchors.top: textDocumentFlickPadding.bottom
-                            anchors.bottom: parent.bottom
-                            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+                            id: _textDocumentFlick
 
-                            property real pageHeight: (screenplayOffsetsModel.format.pageLayout.contentRect.height * textDocumentView.documentScale)
-                            property real lineHeight: screenplayFontMetrics.lineSpacing * textDocumentView.documentScale
-                            ScrollBar.vertical: textDocumentScrollBar
+                            property real pageHeight: (_screenplayOffsetsModel.format.pageLayout.contentRect.height * _textDocumentView.documentScale)
+                            property real lineHeight: _screenplayFontMetrics.lineSpacing * _textDocumentView.documentScale
 
                             // Looks like this is the only way to get the flickable
                             // to realize that it is scrollable.
                             property bool contentYAdjusted: false
+
+                            function updateCurrentIndexOnScreenplayOffsetsView() {
+                                var offsetInfo = _screenplayOffsetsModel.offsetInfoAtPoint(Qt.point(10, contentY/_textDocumentView.documentScale))
+                                if(offsetInfo.row < 0)
+                                    return
+                                _screenplayOffsetsView.currentIndex = offsetInfo.row
+                            }
+
+                            FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+                            ScrollBar.vertical: _textDocumentScrollBar
+
+                            anchors.top: _textDocumentFlickPadding.bottom
+                            anchors.bottom: parent.bottom
+
+                            contentWidth: Math.ceil(width)
+                            contentHeight: Math.ceil(_textDocumentView.height + height)
+                            boundsBehavior: Flickable.StopAtBounds
+                            width: parent.width
+
                             onContentHeightChanged: {
                                 if(contentYAdjusted)
                                     return
 
                                 const cy = contentY
-                                contentY = textDocumentView.height
+                                contentY = _textDocumentView.height
                                 Qt.callLater( (cy) => { contentY = cy }, cy )
                                 contentYAdjusted = true
                             }
 
+                            onContentYChanged: Runtime.execLater(_textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
+
+                            Behavior on contentY {
+                                enabled: _private.mediaIsLoaded && _private.mediaIsPlaying
+
+                                NumberAnimation {
+                                    duration: Math.max(_mediaPlayer.notifyInterval, 0)
+                                }
+                            }
+
+                            ResetOnChange {
+                                id: _textDocumentFlickInteraction
+
+                                delay: _mediaPlayer.notifyInterval-50
+                                from: true
+                                to: false
+                                trackChangesOn: _textDocumentFlick.contentY
+                            }
+
                             TextDocumentItem {
-                                id: textDocumentView
-                                width: textDocumentFlick.width
-                                document: screenplayOffsetsModel.document
-                                documentScale: (textDocumentFlick.width*0.90) / screenplayOffsetsModel.format.pageLayout.contentWidth
-                                flickable: textDocumentFlick
-                                verticalPadding: textDocumentFlickPadding.height * documentScale
+                                id: _textDocumentView
+
+                                width: _textDocumentFlick.width
+
+                                document: _screenplayOffsetsModel.document
+                                documentScale: (_textDocumentFlick.width*0.90) / _screenplayOffsetsModel.format.pageLayout.contentWidth
+                                flickable: _textDocumentFlick
+                                verticalPadding: _textDocumentFlickPadding.height * documentScale
 
                                 Rectangle {
-                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneStartPosition > 0 && !playerArea.keyFrameGrabMode
+                                    x: 0
+                                    y: _screenplayOffsetsModel.evaluatePointAtTime(_mediaPlayer.sceneStartPosition).y * _textDocumentView.documentScale - height
+
                                     width: parent.width
                                     height: 2
+
                                     color: "green"
-                                    x: 0
-                                    y: screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.sceneStartPosition).y * textDocumentView.documentScale - height
+                                    visible: !_mediaPlayer.keepScreenplayInSyncWithPosition && _private.mediaIsLoaded && _mediaPlayer.sceneStartPosition > 0 && !_playerArea.keyFrameGrabMode
                                 }
 
                                 Rectangle {
-                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && mediaPlayer.sceneEndPosition > 0 && !playerArea.keyFrameGrabMode
+                                    x: 0
+                                    y: _screenplayOffsetsModel.evaluatePointAtTime(_mediaPlayer.sceneEndPosition).y * _textDocumentView.documentScale + height
+
                                     width: parent.width
                                     height: 2
+
                                     color: "red"
-                                    x: 0
-                                    y: screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.sceneEndPosition).y * textDocumentView.documentScale + height
+                                    visible: !_mediaPlayer.keepScreenplayInSyncWithPosition && _private.mediaIsLoaded && _mediaPlayer.sceneEndPosition > 0 && !_playerArea.keyFrameGrabMode
                                 }
 
                                 Rectangle {
-                                    id: textDocumentTimeCursor
+                                    id: _textDocumentTimeCursor
+
+                                    x: 0
+
                                     width: parent.width
                                     height: 2
+
                                     color: Runtime.colors.primary.c500.background
-                                    visible: !mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsLoaded && !playerArea.keyFrameGrabMode
-                                    x: 0
+                                    visible: !_mediaPlayer.keepScreenplayInSyncWithPosition && _private.mediaIsLoaded && !_playerArea.keyFrameGrabMode
+
                                     Behavior on y {
-                                        enabled: mediaIsLoaded && mediaIsPlaying
-                                        NumberAnimation { duration: mediaPlayer.notifyInterval-50 }
+                                        enabled: _private.mediaIsLoaded && _private.mediaIsPlaying
+                                        NumberAnimation { duration: _mediaPlayer.notifyInterval-50 }
                                     }
 
                                     TrackerPack {
-                                        enabled: textDocumentTimeCursor.visible
+                                        enabled: _textDocumentTimeCursor.visible
 
                                         TrackProperty {
-                                            target: mediaPlayer
+                                            target: _mediaPlayer
                                             property: "position"
                                         }
 
                                         TrackSignal {
-                                            target: screenplayOffsetsModel
+                                            target: _screenplayOffsetsModel
                                             signal: "dataChanged(QModelIndex,QModelIndex,QVector<int>)"
                                         }
 
-                                        onTracked: textDocumentTimeCursor.y = screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.position).y * textDocumentView.documentScale
+                                        onTracked: _textDocumentTimeCursor.y = _screenplayOffsetsModel.evaluatePointAtTime(_mediaPlayer.position).y * _textDocumentView.documentScale
                                     }
                                 }
-                            }
-
-                            Behavior on contentY {
-                                enabled: mediaIsLoaded && mediaIsPlaying
-                                NumberAnimation {
-                                    duration: Math.max(mediaPlayer.notifyInterval, 0)
-                                }
-                            }
-
-                            onContentYChanged: Utils.execLater(textDocumentFlick, 100, updateCurrentIndexOnScreenplayOffsetsView)
-                            function updateCurrentIndexOnScreenplayOffsetsView() {
-                                var offsetInfo = screenplayOffsetsModel.offsetInfoAtPoint(Qt.point(10, contentY/textDocumentView.documentScale))
-                                if(offsetInfo.row < 0)
-                                    return
-                                screenplayOffsetsView.currentIndex = offsetInfo.row
-                            }
-
-                            ResetOnChange {
-                                id: textDocumentFlickInteraction
-                                from: true
-                                to: false
-                                trackChangesOn: textDocumentFlick.contentY
-                                delay: mediaPlayer.notifyInterval-50
                             }
                         }
 
                         VclScrollBar {
-                            id: textDocumentScrollBar
+                            id: _textDocumentScrollBar
+
                             anchors.top: parent.top
                             anchors.right: parent.right
                             anchors.bottom: parent.bottom
-                            orientation: Qt.Vertical
-                            flickable: textDocumentFlick
-                            visible: !mediaPlayer.keepScreenplayInSyncWithPosition
-                        }
 
-                        EventFilter.acceptHoverEvents: true
-                        EventFilter.events: [127,128,129] // [HoverEnter, HoverLeave, HoverMove]
-                        EventFilter.onFilter: {
-                            result.acceptEvent = false
-                            result.filter = false
-                            textDocumentArea.containsMouse = event.type === 127 || event.type === 129
+                            flickable: _textDocumentFlick
+                            orientation: Qt.Vertical
+                            visible: !_mediaPlayer.keepScreenplayInSyncWithPosition
                         }
                     }
 
                     FlatToolButton {
+                        ToolTip.text: "Shows the video player."
+
                         anchors.top: parent.top
                         anchors.right: parent.right
                         anchors.topMargin: 4
-                        anchors.rightMargin: textDocumentScrollBar.width + 4
-                        iconSource: "qrc:/icons/navigation/arrow_down.png"
-                        visible: !videoArea.visible
+                        anchors.rightMargin: _textDocumentScrollBar.width + 4
+
                         enabled: visible
+                        iconSource: "qrc:/icons/navigation/arrow_down.png"
                         opacity: hovered ? 1 : 0.5
+                        visible: !_videoArea.visible
+
                         onClicked: Runtime.scritedSettings.videoPlayerVisible = true
-                        ToolTip.text: "Shows the video player."
                     }
                 }
             }
 
             SequentialAnimation {
-                id: startingFrameAnimation
+                id: _startingFrameAnimation
 
                 function prepare() {
-                    startingFrameOverlayContent.opacity = 1
-                    startingFrameOverlay.opacity = 1
-                    startingFrameOverlay.visible = true
-                    mediaPlayer.pause()
-                    mediaPlayer.seek(mediaPlayer.sceneStartPosition)
-                    var offsetInfo = screenplayOffsetsModel.offsetInfoAtTime(mediaPlayer.sceneStartPosition, screenplayOffsetsView.currentIndex)
-                    screenplayOffsetsView.currentIndex = offsetInfo.row
-                    textDocumentFlick.contentY = screenplayOffsetsModel.evaluatePointAtTime(mediaPlayer.sceneStartPosition, offsetInfo.row).y * textDocumentView.documentScale
+                    _startingFrameOverlayContent.opacity = 1
+                    _startingFrameOverlay.opacity = 1
+                    _startingFrameOverlay.visible = true
+                    _mediaPlayer.pause()
+                    _mediaPlayer.seek(_mediaPlayer.sceneStartPosition)
+                    var offsetInfo = _screenplayOffsetsModel.offsetInfoAtTime(_mediaPlayer.sceneStartPosition, _screenplayOffsetsView.currentIndex)
+                    _screenplayOffsetsView.currentIndex = offsetInfo.row
+                    _textDocumentFlick.contentY = _screenplayOffsetsModel.evaluatePointAtTime(_mediaPlayer.sceneStartPosition, offsetInfo.row).y * _textDocumentView.documentScale
                 }
 
                 ScriptAction {
-                    script: startingFrameAnimation.prepare()
+                    script: _startingFrameAnimation.prepare()
                 }
 
                 PauseAnimation {
@@ -823,7 +796,7 @@ Item {
                 }
 
                 ScriptAction {
-                    script: keyFrameImage.visible = false
+                    script: _keyFrameImage.visible = false
                 }
 
                 PauseAnimation {
@@ -832,20 +805,20 @@ Item {
 
                 ScriptAction {
                     script: {
-                        mediaPlayer.seek(mediaPlayer.sceneStartPosition-2000)
-                        mediaPlayer.play()
+                        _mediaPlayer.seek(_mediaPlayer.sceneStartPosition-2000)
+                        _mediaPlayer.play()
                     }
                 }
 
                 NumberAnimation {
-                    target: startingFrameOverlayContent
+                    target: _startingFrameOverlayContent
                     property: "opacity"
                     from: 1; to: 0
                     duration: 1500
                 }
 
                 NumberAnimation {
-                    target: startingFrameOverlay
+                    target: _startingFrameOverlay
                     property: "opacity"
                     from: 1; to: 0
                     duration: 1500
@@ -853,11 +826,11 @@ Item {
 
                 ScriptAction {
                     script: {
-                        startingFrameOverlay.visible = false
-                        startingFrameOverlayContent.opacity = 1
-                        startingFrameOverlay.opacity = 1
-                        if(mediaPlayer.sceneEndPosition - mediaPlayer.sceneStartPosition < 30000)
-                            startingFrameAnimation.stop()
+                        _startingFrameOverlay.visible = false
+                        _startingFrameOverlayContent.opacity = 1
+                        _startingFrameOverlay.opacity = 1
+                        if(_mediaPlayer.sceneEndPosition - _mediaPlayer.sceneStartPosition < 30000)
+                            _startingFrameAnimation.stop()
                     }
                 }
 
@@ -867,13 +840,13 @@ Item {
 
                 ScriptAction {
                     script: {
-                        titleCardOverlay.opacity = 0
-                        titleCardOverlay.visible = true
+                        _titleCardOverlay.opacity = 0
+                        _titleCardOverlay.visible = true
                     }
                 }
 
                 NumberAnimation {
-                    target: titleCardOverlay
+                    target: _titleCardOverlay
                     property: "opacity"
                     duration: 1500
                     from: 0; to: 0.95
@@ -884,7 +857,7 @@ Item {
                 }
 
                 NumberAnimation {
-                    target: titleCardOverlay
+                    target: _titleCardOverlay
                     property: "opacity"
                     duration: 1500
                     from: 0.95; to: 0
@@ -892,128 +865,149 @@ Item {
 
                 ScriptAction {
                     script: {
-                        finalFrameImage.prepare()
-                        titleCardOverlay.visible = false
+                        _finalFrameImage.prepare()
+                        _titleCardOverlay.visible = false
                     }
                 }
             }
 
             Rectangle {
-                id: startingFrameOverlay
-                color: "black"
+                id: _startingFrameOverlay
+
                 anchors.fill: parent
+
+                color: "black"
                 visible: false
 
                 onVisibleChanged: {
                     if(!visible)
-                        keyFrameImage.source = ""
-                    keyFrameImage.visible = true
+                        _keyFrameImage.source = ""
+                    _keyFrameImage.visible = true
                 }
 
                 ColumnLayout {
-                    id: startingFrameOverlayContent
-                    spacing: startingFrameOverlay.height * 0.025
-                    width: parent.width * 0.8
-                    height: parent.height * 0.9
+                    id: _startingFrameOverlayContent
+
                     anchors.centerIn: parent
 
+                    width: parent.width * 0.8
+                    height: parent.height * 0.9
+
+                    spacing: _startingFrameOverlay.height * 0.025
+
                     VclLabel {
-                        text: "Script » Screen"
-                        color: "#f1be41"
-                        font.pointSize: closingFrameOverlay.height * 0.025
                         Layout.alignment: Qt.AlignHCenter
+
+                        color: "#f1be41"
+                        text: "Script » Screen"
+
+                        font.pointSize: _closingFrameOverlay.height * 0.025
                     }
 
                     Image {
-                        id: filmPoster
-                        source: "file:///" + Scrite.document.screenplay.coverPagePhoto
+                        id: _filmPoster
+
                         Layout.fillWidth: true
                         Layout.fillHeight: true
-                        fillMode: Image.PreserveAspectFit
                         Layout.alignment: Qt.AlignHCenter
+
+                        fillMode: Image.PreserveAspectFit
+                        source: Scrite.document.screenplay.coverPagePhoto !== "" ? "file:///" + Scrite.document.screenplay.coverPagePhoto : ""
                     }
 
                     VclLabel {
-                        font.pointSize: closingFrameOverlay.height * 0.05
-                        font.bold: true
-                        horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
+
                         color: "white"
+                        horizontalAlignment: Text.AlignHCenter
                         text: Scrite.document.screenplay.title
+                        wrapMode: Text.WordWrap
+
+                        font.bold: true
+                        font.pointSize: _closingFrameOverlay.height * 0.05
                     }
 
                     VclLabel {
-                        font.pointSize: closingFrameOverlay.height * 0.0225
-                        horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
+
                         color: "white"
+                        horizontalAlignment: Text.AlignHCenter
                         opacity: 0.8
                         text: Scrite.document.screenplay.subtitle
                         visible: text !== ""
+                        wrapMode: Text.WordWrap
+
+                        font.pointSize: _closingFrameOverlay.height * 0.0225
                     }
 
                     VclLabel {
-                        font.pointSize: closingFrameOverlay.height * 0.0225
-                        horizontalAlignment: Text.AlignHCenter
                         Layout.fillWidth: true
-                        wrapMode: Text.WordWrap
+
                         color: "white"
+                        horizontalAlignment: Text.AlignHCenter
                         opacity: 0.8
+                        wrapMode: Text.WordWrap
+
                         text: {
-                            var ret = "Written by " + Scrite.document.screenplay.author
-                            if(filmStudioLogo.visible)
+                            let ret = "Written by " + Scrite.document.screenplay.author
+                            if(_filmStudioLogo.visible)
                                 return ret
                             ret += "<br/><br/><font size=\"-1\">" + Scrite.document.screenplay.contact + "</font>"
                             return ret
                         }
+
+                        font.pointSize: _closingFrameOverlay.height * 0.0225
                     }
 
                     Image {
-                        id: filmStudioLogo
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        Layout.preferredWidth: startingFrameOverlay.height*0.15
-                        Layout.preferredHeight: startingFrameOverlay.height*0.15
-                        visible: imagePath !== ""
+                        id: _filmStudioLogo
+
                         property string imagePath: StandardPaths.locateFile(StandardPaths.DownloadLocation, "scrited_logo_overlay.png")
-                        source: imagePath === "" ? "" : "file:///" + imagePath
-                        mipmap: true
+
+                        Layout.alignment: Qt.AlignHCenter
+                        Layout.preferredWidth: _startingFrameOverlay.height*0.15
+                        Layout.preferredHeight: _startingFrameOverlay.height*0.15
+
                         fillMode: Image.PreserveAspectFit
+                        mipmap: true
+                        source: imagePath === "" ? "" : "file:///" + imagePath
+                        visible: imagePath !== ""
                     }
                 }
 
                 Image {
-                    id: keyFrameImage
+                    id: _keyFrameImage
+
                     anchors.fill: parent
                 }
             }
 
             SequentialAnimation {
-                id: closingFrameAnimation
+                id: _closingFrameAnimation
+
                 loops: 1
                 running: false
 
                 function rollback() {
-                    closingFrameOverlay.visible = false
-                    closingMediaPlayer.stop()
-                    mediaPlayer.volume = 1
+                    _closingFrameOverlay.visible = false
+                    _closingMediaPlayer.stop()
+                    _mediaPlayer.volume = 1
                 }
 
                 ScriptAction {
                     script: {
-                        closingMediaPlayer.stop()
-                        closingMediaPlayer.play()
-                        closingFrameOverlay.visible = true
-                        closingFrameVideo.visible = true
-                        closingFrameImage.visible = false
-                        finalFrameImage.opacity = 0
-                        finalFrameImage.visible = false
+                        _closingMediaPlayer.stop()
+                        _closingMediaPlayer.play()
+                        _closingFrameOverlay.visible = true
+                        _closingFrameVideo.visible = true
+                        _closingFrameImage.visible = false
+                        _finalFrameImage.opacity = 0
+                        _finalFrameImage.visible = false
                     }
                 }
 
                 NumberAnimation {
-                    target: mediaPlayer
+                    target: _mediaPlayer
                     property: "volume"
                     from: 1
                     to: 0.2
@@ -1026,12 +1020,12 @@ Item {
 
                 ScriptAction {
                     script: {
-                        mediaPlayer.pause()
-                        closingFrameVideo.visible = false
-                        closingFrameImage.opacity = 1
-                        closingFrameImage.visible = true
-                        finalFrameImage.opacity = 0
-                        finalFrameImage.visible = true
+                        _mediaPlayer.pause()
+                        _closingFrameVideo.visible = false
+                        _closingFrameImage.opacity = 1
+                        _closingFrameImage.visible = true
+                        _finalFrameImage.opacity = 0
+                        _finalFrameImage.visible = true
                     }
                 }
 
@@ -1041,14 +1035,14 @@ Item {
 
                 ParallelAnimation {
                     NumberAnimation {
-                        target: closingFrameImage
+                        target: _closingFrameImage
                         property: "opacity"
                         from: 1; to: 0
                         duration: 750
                     }
 
                     NumberAnimation {
-                        target: finalFrameImage
+                        target: _finalFrameImage
                         property: "opacity"
                         from: 0; to: 1
                         duration: 750
@@ -1061,47 +1055,60 @@ Item {
             }
 
             Rectangle {
-                id: closingFrameOverlay
-                color: "black"
+                id: _closingFrameOverlay
+
                 anchors.fill: parent
+
+                color: "black"
                 visible: false
 
                 MediaPlayer {
-                    id: closingMediaPlayer
+                    id: _closingMediaPlayer
+
                     autoPlay: false
                     source: "qrc:/misc/scrited_closing_frame_video.mp4"
                 }
 
                 VideoOutput {
-                    id: closingFrameVideo
+                    id: _closingFrameVideo
+
+                    anchors.centerIn: parent
+
                     width: Math.min(parent.width, parent.height)
                     height: width
-                    anchors.centerIn: parent
-                    source: closingMediaPlayer
-                    flushMode: VideoOutput.LastFrame
+
                     fillMode: VideoOutput.Stretch
+                    flushMode: VideoOutput.LastFrame
+                    source: _closingMediaPlayer
                 }
 
                 Image {
-                    id: closingFrameImage
+                    id: _closingFrameImage
+
+                    anchors.centerIn: parent
+
                     width: Math.min(parent.width, parent.height)
                     height: width
-                    anchors.centerIn: parent
+
                     mipmap: true
                     source: "qrc:/images/scrited_closing_frame.png"
                 }
 
                 Image {
-                    id: finalFrameImage
+                    id: _finalFrameImage
+
                     function prepare() {
-                        startingFrameOverlay.grabToImage(function(result) {
+                        _startingFrameOverlay.grabToImage(function(result) {
                             source = result.url
-                        }, Qt.size(startingFrameOverlay.width*2,startingFrameOverlay.height*2))
+                        }, Qt.size(_startingFrameOverlay.width*2,_startingFrameOverlay.height*2))
                     }
-                    fillMode: Image.PreserveAspectFit
+
+                    anchors.centerIn: parent
+
                     width: Math.min(parent.width, parent.height)
                     height: width
-                    anchors.centerIn: parent
+
+                    fillMode: Image.PreserveAspectFit
                     mipmap: true
                 }
             }
@@ -1109,85 +1116,113 @@ Item {
 
         Rectangle {
             SplitView.fillWidth: true
+
             color: Runtime.colors.primary.c100.background
 
             Row {
-                id: screenplayOffsesHeading
-                width: (screenplayOffsetsView.width-x)-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
-                visible: screenplayOffsetsView.count > 0
+                id: _screenplayOffsesHeading
+
                 x: 40
+                width: (_screenplayOffsetsView.width-x)-(_screenplayOffsetsView.scrollBarVisible ? 20 : 1)
+
+                visible: _screenplayOffsetsView.count > 0
 
                 VclLabel {
-                    padding: 5
+                    anchors.verticalCenter: parent.verticalCenter
+
                     width: parent.width * 0.1
+
+                    clip: true
+                    horizontalAlignment: Text.AlignHCenter
+                    padding: 5
                     text: "#"
+
                     font.bold: true
                     font.family: "Courier Prime"
                     font.pointSize: 16
-                    horizontalAlignment: Text.AlignHCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    clip: true
                 }
 
                 VclLabel {
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    width: parent.width * (_screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
+
+                    clip: true
                     padding: 5
-                    width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
-                    font.bold: true
                     text: "Scene Heading"
+
+                    font.bold: true
                     font.family: "Courier Prime"
                     font.pointSize: 16
-                    anchors.verticalCenter: parent.verticalCenter
-                    clip: true
                 }
 
                 VclLabel {
-                    padding: 5
-                    width: parent.width * 0.1
-                    font.bold: true
-                    text: "Page #"
-                    font.family: "Courier Prime"
-                    font.pointSize: 16
+                    anchors.verticalCenter: parent.verticalCenter
+
+                    clip: true
                     horizontalAlignment: Text.AlignHCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    clip: true
+                    padding: 5
+                    text: "Page #"
+                    width: parent.width * 0.1
+
+                    font.bold: true
+                    font.family: "Courier Prime"
+                    font.pointSize: 16
                 }
 
                 VclLabel {
-                    padding: 5
+                    anchors.verticalCenter: parent.verticalCenter
+
                     width: parent.width * 0.2
-                    font.bold: true
+
+                    clip: true
+                    horizontalAlignment: Text.AlignRight
+                    padding: 5
                     text: "Time"
+                    visible: _screenplayOffsetsView.displayTimeOffset
+
+                    font.bold: true
                     font.family: "Courier Prime"
                     font.pointSize: 16
-                    horizontalAlignment: Text.AlignRight
-                    anchors.verticalCenter: parent.verticalCenter
-                    clip: true
-                    visible: screenplayOffsetsView.displayTimeOffset
                 }
             }
 
             Rectangle {
+                anchors.bottom: _screenplayOffsesHeading.bottom
+
                 width: parent.width
                 height: 1
-                anchors.bottom: screenplayOffsesHeading.bottom
+
                 color: Runtime.colors.primary.borderColor
-                visible: screenplayOffsesHeading.visible
+                visible: _screenplayOffsesHeading.visible
             }
 
             ListView {
-                id: screenplayOffsetsView
-                model: screenplayOffsetsModel
-                anchors.top: screenplayOffsesHeading.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
-                clip: true
+                id: _screenplayOffsetsView
+
                 property bool displayTimeOffset: true
                 property bool scrollBarVisible: contentHeight > height
                 property bool currentSceneTimeIsLocked: currentItem ? currentItem.locked : false
 
-                ScrollBar.vertical: VclScrollBar { flickable: screenplayOffsetsView }
+                function adjustTextDocumentAndMedia() {
+                    var offsetInfo = _screenplayOffsetsModel.offsetInfoAt(_screenplayOffsetsView.currentIndex)
+                    if(!_textDocumentFlickInteraction.value)
+                        _textDocumentFlick.contentY = offsetInfo.pixelOffset * _textDocumentView.documentScale
+                    if(_mediaPlayer.status !== MediaPlayer.NoMedia)
+                        _mediaPlayer.seek(offsetInfo.timestamp)
+                }
+
+                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+                ScrollBar.vertical: VclScrollBar { flickable: _screenplayOffsetsView }
+
+                anchors.top: _screenplayOffsesHeading.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+
+                model: _screenplayOffsetsModel
+                clip: true
 
                 highlightFollowsCurrentItem: true
                 highlightMoveDuration: 0
@@ -1196,14 +1231,14 @@ Item {
                 preferredHighlightEnd: height - 1.5*preferredHighlightBegin
                 highlightRangeMode: ListView.ApplyRange
                 highlight: Rectangle {
-                    id: highlighter
+                    id: _highlighter
 
                     SequentialAnimation {
                         loops: Animation.Infinite
                         running: true
 
                         ColorAnimation {
-                            target: highlighter
+                            target: _highlighter
                             property: "color"
                             from: Runtime.colors.primary.c200.background
                             to: Runtime.colors.accent.c200.background
@@ -1211,7 +1246,7 @@ Item {
                         }
 
                         ColorAnimation {
-                            target: highlighter
+                            target: _highlighter
                             property: "color"
                             to: Runtime.colors.primary.c200.background
                             from: Runtime.colors.accent.c200.background
@@ -1219,243 +1254,503 @@ Item {
                         }
                     }
                 }
+
                 delegate: Rectangle {
+                    property bool locked: arrayItem.locked
+                    property bool isSceneItem: arrayItem.type === SceneElement.Heading
+
                     // Columns: SceneNr, Heading, PageNumber, Time
-                    width: screenplayOffsetsView.width-(screenplayOffsetsView.scrollBarVisible ? 20 : 1)
+                    width: _screenplayOffsetsView.width-(_screenplayOffsetsView.scrollBarVisible ? 20 : 1)
                     height: isSceneItem ? 40 : 30
+
                     color: {
                         if(isSceneItem)
-                            return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : Runtime.colors.primary.c300.background
-                        return screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : Runtime.colors.primary.c100.background
+                            return _screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : Runtime.colors.primary.c300.background
+                        return _screenplayOffsetsView.currentIndex === index ? Qt.rgba(0,0,0,0) : Runtime.colors.primary.c100.background
                     }
-                    property bool isSceneItem: arrayItem.type === SceneElement.Heading
-                    property bool locked: arrayItem.locked
 
                     MouseArea {
                         anchors.fill: parent
+
                         onClicked: {
-                            screenplayOffsetsView.currentIndex = index
-                            if(mediaIsLoaded && mediaIsPaused)
-                                screenplayOffsetsView.adjustTextDocumentAndMedia()
+                            _screenplayOffsetsView.currentIndex = index
+                            if(_private.mediaIsLoaded && _private.mediaIsPaused)
+                                _screenplayOffsetsView.adjustTextDocumentAndMedia()
                         }
                     }
 
                     Item {
-                        id: lockIcon
+                        id: _lockIcon
+
                         width: 40
                         height: parent.height
 
                         Image {
-                            source: arrayItem.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
                             anchors.fill: parent
-                            fillMode: Image.PreserveAspectFit
                             anchors.margins: 5
+
+                            fillMode: Image.PreserveAspectFit
                             opacity: arrayItem.locked ? 1 : 0.1
+                            source: arrayItem.locked ? "qrc:/icons/action/lock_outline.png" : "qrc:/icons/action/lock_open.png"
                         }
 
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: screenplayOffsetsModel.toggleSceneTimeLock(index)
+
+                            onClicked: _screenplayOffsetsModel.toggleSceneTimeLock(index)
                         }
                     }
 
                     Row {
-                        anchors.left: lockIcon.right
-                        anchors.right: parent.right
                         anchors.top: parent.top
+                        anchors.left: _lockIcon.right
+                        anchors.right: parent.right
                         anchors.bottom: parent.bottom
 
                         VclLabel {
-                            padding: 5
+                            anchors.verticalCenter: parent.verticalCenter
+
                             width: parent.width * 0.1
+
+                            horizontalAlignment: Text.AlignHCenter
+                            padding: 5
                             text: isSceneItem ? arrayItem.number : ""
-                            horizontalAlignment: Text.AlignHCenter
+
+                            font.bold: isSceneItem
                             font.family: "Courier Prime"
                             font.pointSize: 14
-                            font.bold: isSceneItem
-                            anchors.verticalCenter: parent.verticalCenter
                         }
 
                         VclLabel {
-                            padding: 5
-                            width: parent.width * (screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
-                            text: arrayItem.snippet
-                            font.family: "Courier Prime"
-                            font.pointSize: 14
-                            font.bold: isSceneItem
                             anchors.verticalCenter: parent.verticalCenter
+
+                            width: parent.width * (_screenplayOffsetsView.displayTimeOffset ? 0.6 : 0.8)
+
                             elide: Text.ElideMiddle
+                            padding: 5
+                            text: arrayItem.snippet
+
+                            font.bold: isSceneItem
+                            font.family: "Courier Prime"
+                            font.pointSize: 14
                         }
 
                         VclLabel {
-                            padding: 5
+                            anchors.verticalCenter: parent.verticalCenter
+
                             width: parent.width * 0.1
+
+                            horizontalAlignment: Text.AlignHCenter
+                            padding: 5
                             text: isSceneItem ? arrayItem.pageNumber : ""
+
+                            font.bold: isSceneItem
                             font.family: "Courier Prime"
                             font.pointSize: 14
-                            font.bold: isSceneItem
-                            horizontalAlignment: Text.AlignHCenter
-                            anchors.verticalCenter: parent.verticalCenter
                         }
 
                         VclLabel {
-                            padding: 5
+                            anchors.verticalCenter: parent.verticalCenter
+
                             width: parent.width * 0.2
-                            text: screenplayOffsetsModel.timestampToString(arrayItem.timestamp)
+
+                            horizontalAlignment: Text.AlignRight
+                            padding: 5
+                            text: _screenplayOffsetsModel.timestampToString(arrayItem.timestamp)
+                            visible: _screenplayOffsetsView.displayTimeOffset
+
+                            font.bold: isSceneItem
                             font.family: "Courier Prime"
                             font.pointSize: 14
-                            font.bold: isSceneItem
-                            horizontalAlignment: Text.AlignRight
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: screenplayOffsetsView.displayTimeOffset
                         }
                     }
                 }
 
                 onCountChanged: currentIndex = 0
                 onCurrentIndexChanged: {
-                    if(!mediaIsPlaying)
+                    if(!_private.mediaIsPlaying)
                         adjustTextDocumentAndMedia()
-                }
-
-                function adjustTextDocumentAndMedia() {
-                    var offsetInfo = screenplayOffsetsModel.offsetInfoAt(screenplayOffsetsView.currentIndex)
-                    if(!textDocumentFlickInteraction.value)
-                        textDocumentFlick.contentY = offsetInfo.pixelOffset * textDocumentView.documentScale
-                    if(mediaPlayer.status !== MediaPlayer.NoMedia)
-                        mediaPlayer.seek(offsetInfo.timestamp)
                 }
             }
         }
     }
 
-    EventFilter.active: !NotificationsView.visible
-    EventFilter.target: Scrite.window
-    EventFilter.events: [6] // KeyPress
-    EventFilter.onFilter: {
-        var newY = 0
-        switch(event.key) {
-        case Qt.Key_ParenLeft:
-            videoArea.height = videoArea.height-1
-            break
-        case Qt.Key_ParenRight:
-            videoArea.height = videoArea.height+1
-            break
-        case Qt.Key_Asterisk:
-            videoArea.height = videoArea.width / 16 * 9
-            break
-        case Qt.Key_Space:
-            if(mediaIsLoaded && mediaIsPaused && mediaPlayer.hasScenePositions && mediaPlayer.keepScreenplayInSyncWithPosition)
-                startingFrameAnimation.start()
+    VclFileDialog {
+        id: _fileDialog
+
+        folder: Runtime.scritedSettings.lastOpenScritedFolderUrl
+        onFolderChanged: Qt.callLater( function() { Runtime.scritedSettings.lastOpenScritedFolderUrl = _fileDialog.folder } )
+        selectFolder: false
+        selectMultiple: false
+        selectExisting: true
+        onAccepted: _private.loadMediaUrl(fileUrl)
+         // The default Ctrl+U interfers with underline
+    }
+
+    BusyMessage {
+        visible: _screenplayOffsetsModel.busy
+
+        message: "Computing offsets & preparing screenplay for continuous scroll ..."
+    }
+
+    AttachmentsDropArea {
+        property string droppedFilePath
+        property string droppedFileName
+
+        anchors.fill: parent
+
+        allowedType: Attachments.VideosOnly
+        attachmentNoticeSuffix: "Drop this file to load video."
+        enabled: !_private.mediaIsLoaded && !Scrite.document.empty
+
+        onDropped: _private.loadMediaUrl( Url.fromPath(attachment.filePath) )
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("loadMovie")
+        enabled: _private.screenplaySplitsCount > 0
+
+        onTriggered: _private.loadMedia()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("togglePlayback")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: {
+            if(_private.mediaIsLoaded && _private.mediaIsPaused && _mediaPlayer.hasScenePositions && _mediaPlayer.keepScreenplayInSyncWithPosition)
+                _startingFrameAnimation.start()
             else
-                mediaPlayer.togglePlayback()
-            break
-        case Qt.Key_Up:
-            if(event.controlModifier)
-                scrollPreviousScene()
-            else if(event.shiftModifier)
-                scrollPreviousScreen()
-            else if(event.altModifier)
-                scrollPreviousPage()
-            else
-                scrollUp()
-            break
-        case Qt.Key_Down:
-            if(event.controlModifier)
-                scrollNextScene()
-            else if(event.shiftModifier)
-                scrollNextScreen()
-            else if(event.altModifier)
-                scrollNextPage()
-            else
-                scrollDown()
-            break
-        case Qt.Key_Left:
-            if(event.controlModifier)
-                rewind()
-            else
-                miniRewind()
-            break
-        case Qt.Key_Right:
-            if(event.controlModifier)
-                forward()
-            else
-                miniForward()
-            break
-        case Qt.Key_T:
-            toggleTimeOffsetDisplay()
-            break
-        case Qt.Key_Plus:
-        case Qt.Key_Equal:
-            mediaPlayer.keepScreenplayInSyncWithPosition = !mediaPlayer.keepScreenplayInSyncWithPosition
-            break
-        case Qt.Key_Greater:
-        case Qt.Key_Period:
-            syncVideoTimeWithScreenplayOffsets(event.controlModifier)
-            break
-        case Qt.Key_L:
-            toggleCurrentSceneTimeLock()
-            break
-        case Qt.Key_U:
-            unlockAllSceneTimes()
-            break
-        case Qt.Key_S: // For start
-            if(mediaIsLoaded) {
-                if(mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsPlaying)
-                    return
-                mediaPlayer.sceneStartPosition = mediaPlayer.position
-            }
-            break
-        case Qt.Key_E: // For end
-            if(mediaIsLoaded) {
-                if(mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsPlaying)
-                    return
-                mediaPlayer.sceneEndPosition = mediaPlayer.position
-            }
-            break
-        case Qt.Key_K: // Key frame
-            if(mediaIsLoaded) {
-                if(mediaPlayer.keepScreenplayInSyncWithPosition && mediaIsPlaying)
-                    return
-                playerArea.grabKeyFrame()
-            }
-            break
-        case Qt.Key_A:
-            if(mediaIsLoaded)
-                screenplayOffsetsModel.adjustUnlockedTimes(mediaPlayer.duration)
-            break
+                _mediaPlayer.togglePlayback()
         }
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("rewind10")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: _private.rewind()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("rewind1")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: _private.miniRewind()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("forward1")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: _private.miniForward()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("forward10")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: _private.forward()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("previousScene")
+        enabled: _private.previousSceneAvailable
+
+        onTriggered: _private.scrollPreviousScene()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("nextScene")
+        enabled: _private.nextSceneAvailable
+
+        onTriggered: _private.scrollNextScene()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("scrollUp")
+        enabled: _private.canScrollUp
+
+        onTriggered: _private.scrollUp()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("scrollDown")
+        enabled: _private.canScrollDown
+
+        onTriggered: _private.scrollDown()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("previousPage")
+        enabled: _private.canScrollUp
+
+        onTriggered: _private.scrollPreviousPage()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("nextPage")
+        enabled: _private.canScrollDown
+
+        onTriggered: _private.scrollNextPage()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("previousScreen")
+        enabled: _private.canScrollUp
+
+        onTriggered: _private.scrollPreviousScreen()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("nextScreen")
+        enabled: _private.canScrollDown
+
+        onTriggered: _private.scrollNextScreen()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("syncTime")
+        enabled: _private.screenplaySplitsCount > 0 && _private.mediaIsLoaded
+
+        onTriggered: _private.syncVideoTimeWithScreenplayOffsets(true)
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("noteOffset")
+        enabled: _private.screenplaySplitsCount > 0 && _private.mediaIsLoaded
+
+        onTriggered: _private.syncVideoTimeWithScreenplayOffsets(false)
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("adjustOffsets")
+        enabled: _private.screenplaySplitsCount > 0 && _private.mediaIsLoaded
+
+        onTriggered: _private.syncVideoTimeWithScreenplayOffsets(true)
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("resetOffsets")
+        enabled: _private.screenplaySplitsCount > 0 && _private.mediaIsLoaded
+
+        onTriggered: _private.resetScreenplayOffsets()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("toggleTimeColumn")
+        checked: _screenplayOffsetsView.displayTimeOffset
+        enabled: _private.screenplaySplitsCount > 0
+
+        onToggled: _private.toggleTimeOffsetDisplay()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("autoScroll")
+        checked: _private.playbackScreenplaySync
+        enabled: _private.screenplaySplitsCount > 0
+
+        onToggled: _private.playbackScreenplaySync = !_private.playbackScreenplaySync
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("toggleSceneTimeLock")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: _private.toggleCurrentSceneTimeLock()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("unlockAllSceneTimes")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: _private.unlockAllSceneTimes()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("markStart")
+        enabled: _private.mediaIsLoaded && !(_mediaPlayer.keepScreenplayInSyncWithPosition && _private.mediaIsPlaying)
+
+        onTriggered: _mediaPlayer.sceneStartPosition = _mediaPlayer.position
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("markEnd")
+        enabled: _private.mediaIsLoaded && !(_mediaPlayer.keepScreenplayInSyncWithPosition && _private.mediaIsPlaying)
+
+        onTriggered: _mediaPlayer.sceneEndPosition = _mediaPlayer.position
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("markKeyFrame")
+        enabled: _private.mediaIsLoaded && !(_mediaPlayer.keepScreenplayInSyncWithPosition && _private.mediaIsPlaying)
+
+        onTriggered: _playerArea.grabKeyFrame()
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("adjustUnlockedTimes")
+        enabled: _private.mediaIsLoaded
+
+        onTriggered: _screenplayOffsetsModel.adjustUnlockedTimes(_mediaPlayer.duration)
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("decreaseVideoHeight")
+        enabled: _videoArea.height > _videoArea.minHeight
+
+        onTriggered: _videoArea.height = _videoArea.height-1
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("increaseVideoHeight")
+        enabled: _videoArea.height < _videoArea.maxHeight
+
+        onTriggered: _videoArea.height = _videoArea.height+1
+    }
+
+    ActionHandler {
+        action: ActionHub.scritedOptions.find("resetVideoHeight")
+        enabled: _videoArea.height != _videoArea.idealHeight
+
+        onTriggered: _videoArea.height = _videoArea.idealHeight
     }
 
     QtObject {
+        id: _private
+
+        readonly property int skipDuration: 10
+
+        property bool canScrollDown: _textDocumentFlick.contentY < _textDocumentFlick.contentHeight - _textDocumentFlick.height
+        property bool canScrollUp: _textDocumentFlick.contentY > 0
+        property bool mediaIsLoaded: _mediaPlayer.status !== MediaPlayer.NoMedia
+        property bool mediaIsPaused: _mediaPlayer.playbackState === MediaPlayer.PausedState
+        property bool mediaIsPlaying: _mediaPlayer.playbackState === MediaPlayer.PlayingState
+        property bool nextSceneAvailable: _screenplayOffsetsView.currentIndex+1 < _screenplayOffsetsView.count
+        property bool previousSceneAvailable: _screenplayOffsetsView.currentIndex > 0
+
+        property alias currentSceneTimeIsLocked: _screenplayOffsetsView.currentSceneTimeIsLocked
+        property alias playbackScreenplaySync: _mediaPlayer.keepScreenplayInSyncWithPosition
+        property alias screenplaySplitsCount: _screenplayOffsetsView.count
+        property alias timeOffsetVisible: _screenplayOffsetsView.displayTimeOffset
+
+        Component.onCompleted: {
+            if(!Runtime.scritedSettings.experimentalFeatureNoticeDisplayed) {
+                Runtime.execLater(root, 250, function() {
+                    MessageBox.information("Experimental Feature",
+                        "<strong>Scrited Tab : Study screenplay and film together.</strong><br/><br/>This is an experimental feature. Help us polish it by leaving feedback on the Forum at www.scrite.io. Thank you!"
+                    )
+                    Runtime.scritedSettings.experimentalFeatureNoticeDisplayed = true
+                })
+            }
+            Scrite.user.logActivity1("scrited")
+        }
+
         Notification.title: "Install Video Codecs"
         Notification.text: {
-            if(Scrite.app.isWindowsPlatform)
+            if(Platform.isWindowsDesktop)
                 return "Please install video codecs from the free and open-source LAVFilters project to load videos in this tab."
             return "Please install GStreamer codecs to load videos in this tab."
         }
-        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && (Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform)
-        Notification.buttons: Scrite.app.isWindowsPlatform ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
+        Notification.active: !Runtime.scritedSettings.codecsNoticeDisplayed && (Platform.isWindowsDesktop || Platform.isLinuxDesktop)
+        Notification.buttons: Platform.isWindowsDesktop ? ["Download", "Dismiss"] : ["Learn More", "Dismiss"]
         Notification.onButtonClicked: {
             if(index === 0)
                 Qt.openUrlExternally("https://www.scrite.io/video-codecs/")
             Runtime.scritedSettings.codecsNoticeDisplayed = true
         }
-    }
 
-    BusyOverlay {
-        anchors.fill: parent
-        visible: screenplayOffsetsModel.busy
-        busyMessage: "Computing offsets & preparing screenplay for continuous scroll ..."
-    }
+        function loadMedia() {
+            _fileDialog.open()
+        }
 
-    AttachmentsDropArea {
-        anchors.fill: parent
-        enabled: !mediaIsLoaded && !Scrite.document.empty
-        allowedType: Attachments.VideosOnly
-        property string droppedFilePath
-        property string droppedFileName
-        onDropped: loadMediaUrl( Scrite.app.localFileToUrl(attachment.filePath) )
-        attachmentNoticeSuffix: "Drop this file to load video."
+        function togglePlayback() {
+            _mediaPlayer.togglePlayback()
+        }
+
+        function rewind() {
+            _mediaPlayer.traverse(-_private.skipDuration)
+        }
+
+        function forward() {
+            _mediaPlayer.traverse(+_private.skipDuration)
+        }
+
+        function miniRewind() {
+            _mediaPlayer.traverse(-1)
+        }
+
+        function miniForward() {
+            _mediaPlayer.traverse(1)
+        }
+
+        function syncVideoTimeWithScreenplayOffsets(adjustFollowingRows) {
+            _screenplayOffsetsModel.setTime(_screenplayOffsetsView.currentIndex, _mediaPlayer.position, adjustFollowingRows === true)
+        }
+
+        function resetScreenplayOffsets() {
+            _screenplayOffsetsModel.resetAllTimes()
+        }
+
+        function scrollUp() {
+            var newY = Math.max(_textDocumentFlick.contentY - _textDocumentFlick.lineHeight, 0)
+            _textDocumentFlick.contentY = newY
+        }
+
+        function scrollPreviousScene() {
+            _screenplayOffsetsView.currentIndex = _screenplayOffsetsModel.previousSceneHeadingIndex(_screenplayOffsetsView.currentIndex)
+        }
+
+        function scrollPreviousScreen() {
+            var newY = Math.max(_textDocumentFlick.contentY - _textDocumentFlick.height, 0)
+            _textDocumentFlick.contentY = newY
+        }
+
+        function scrollPreviousPage() {
+            var newY = Math.max(_textDocumentFlick.contentY - _textDocumentFlick.pageHeight, 0)
+            _textDocumentFlick.contentY = newY
+        }
+
+        function scrollDown() {
+            var newY = Math.min(_textDocumentFlick.contentY + _textDocumentFlick.lineHeight, _textDocumentFlick.contentHeight-_textDocumentFlick.height)
+            _textDocumentFlick.contentY = newY
+        }
+
+        function scrollNextScene() {
+            _screenplayOffsetsView.currentIndex = _screenplayOffsetsModel.nextSceneHeadingIndex(_screenplayOffsetsView.currentIndex)
+        }
+
+        function scrollNextScreen() {
+            var newY = Math.min(_textDocumentFlick.contentY + _textDocumentFlick.height, _textDocumentFlick.contentHeight-_textDocumentFlick.height)
+            _textDocumentFlick.contentY = newY
+        }
+
+        function scrollNextPage() {
+            var newY = Math.min(_textDocumentFlick.contentY + _textDocumentFlick.pageHeight)
+            _textDocumentFlick.contentY = newY
+        }
+
+        function toggleTimeOffsetDisplay() {
+            _screenplayOffsetsView.displayTimeOffset = !_screenplayOffsetsView.displayTimeOffset
+        }
+
+        function toggleCurrentSceneTimeLock() {
+            _screenplayOffsetsModel.toggleSceneTimeLock(_screenplayOffsetsView.currentIndex)
+        }
+
+        function unlockAllSceneTimes() {
+            _screenplayOffsetsModel.unlockAllSceneTimes()
+        }
+
+        function loadMediaUrl(fileUrl) {
+            _mediaPlayer.source = fileUrl
+            _mediaPlayer.play()
+            Qt.callLater( function() {
+                _mediaPlayer.pause()
+                _mediaPlayer.seek(0)
+                _screenplayOffsetsView.adjustTextDocumentAndMedia()
+            })
+            _screenplayOffsetsModel.fileName = _screenplayOffsetsModel.fileNameFrom(fileUrl)
+        }
     }
 }

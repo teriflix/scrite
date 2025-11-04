@@ -59,3 +59,7 @@ compile_commands.json
 ~$*.pdf
 
 build/*
+
+# Language Server
+.qmlls.ini
+

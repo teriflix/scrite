@@ -14,6 +14,7 @@
 #ifndef ABSTRACTREPORTGENERATOR_H
 #define ABSTRACTREPORTGENERATOR_H
 
+#include "utils.h"
 #include "abstractdeviceio.h"
 #include "garbagecollector.h"
 
@@ -88,7 +89,7 @@ public:
 
     Q_INVOKABLE bool setConfigurationValue(const QString &name, const QVariant &value);
     Q_INVOKABLE QVariant getConfigurationValue(const QString &name) const;
-    Q_INVOKABLE QJsonObject configurationFormInfo() const;
+    Q_INVOKABLE Utils::ObjectConfig configuration() const;
 
     Q_INVOKABLE bool generate();
     Q_INVOKABLE void discard() { GarbageCollector::instance()->add(this); }
@@ -113,7 +114,7 @@ protected:
 
     virtual bool canDirectExportToOdf() const { return false; }
     virtual bool directExportToOdf(QIODevice *) { return false; }
-    virtual void polishFormInfo(QJsonObject &) const { return; }
+    virtual void polishFormInfo(Utils::ObjectConfig &) const { return; }
 
     void polishOdtContent(const QString &fileName);
 

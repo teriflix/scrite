@@ -20,7 +20,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
@@ -51,7 +51,7 @@ Item {
                 _private.dialog.close()
             }
             args.report = Scrite.document.createReportGenerator(report)
-        } else if(Scrite.app.verifyType(report, "AbstractReportGenerator")) {
+        } else if(Object.isOfType(report, "AbstractReportGenerator")) {
             if(_private.dialog) {
                 if(_private.dialog.report === report)
                     return _private.dialog
@@ -65,7 +65,7 @@ Item {
             return null
         }
 
-        Scrite.app.restoreObjectConfiguration(args.report)
+        Object.load(args.report)
 
         if(reportProps) {
             for(var rprop in reportProps) {

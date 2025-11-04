@@ -14,43 +14,41 @@
 //#define DISPLAY_DOCUMENT_IN_TEXTEDIT
 
 #include "screenplaytextdocument.h"
+#include "utils.h"
 
-#include <QAbstractTextDocumentLayout>
-#include <QDate>
-#include <QDateTime>
 #include <QDir>
-#include <QGraphicsRectItem>
-#include <QGraphicsScene>
-#include <QJsonDocument>
-#include <QPaintEngine>
-#include <QPainter>
-#include <QPdfWriter>
-#include <QPropertyAnimation>
-#include <QQmlEngine>
-#include <QScopedValueRollback>
-#include <QSettings>
-#include <QTextBlock>
-#include <QTextBlockFormat>
-#include <QTextBlockUserData>
-#include <QTextCharFormat>
-#include <QTextCursor>
-#include <QTextTable>
 #include <QUrl>
-#include <QtDebug>
+#include <QDate>
 #include <QtMath>
+#include <QtDebug>
+#include <QPainter>
+#include <QSettings>
+#include <QDateTime>
+#include <QQmlEngine>
+#include <QTextBlock>
+#include <QTextTable>
+#include <QPdfWriter>
+#include <QTextCursor>
+#include <QPaintEngine>
+#include <QJsonDocument>
+#include <QGraphicsScene>
+#include <QTextCharFormat>
+#include <QTextBlockFormat>
+#include <QGraphicsRectItem>
+#include <QTextBlockUserData>
+#include <QPropertyAnimation>
+#include <QScopedValueRollback>
+#include <QAbstractTextDocumentLayout>
+#include <enumerationmodel.h>
 
-#include "application.h"
-#include "garbagecollector.h"
 #include "hourglass.h"
-#include "pdfexportablegraphicsscene.h"
-#include "printerobject.h"
-#include "scritedocument.h"
+#include "application.h"
 #include "timeprofiler.h"
-
-inline QTime secondsToTime(int seconds)
-{
-    return Application::secondsToTime(seconds);
-}
+#include "printerobject.h"
+#include "languageengine.h"
+#include "scritedocument.h"
+#include "garbagecollector.h"
+#include "pdfexportablegraphicsscene.h"
 
 inline QString timeToString(const QTime &t)
 {
@@ -663,7 +661,7 @@ QList<QPair<int, int>> ScreenplayTextDocument::pageBreaksFor(ScreenplayElement *
 QTime ScreenplayTextDocument::lengthInTime(ScreenplayElement *from, ScreenplayElement *to) const
 {
     const qreal nrPages = this->lengthInPages(from, to);
-    const QTime ret = ::secondsToTime(secondsPerPage() * nrPages);
+    const QTime ret = Utils::TMath::secondsToTime(secondsPerPage() * nrPages);
     return ret;
 }
 
@@ -1106,7 +1104,7 @@ void ScreenplayTextDocument::setPageCount(qreal val)
     const int secsPerPage =
             m_timePerPage.hour() * 60 * 60 + m_timePerPage.minute() * 60 + m_timePerPage.second();
     const int totalSecs = int(qCeil(val * secsPerPage));
-    const QTime totalT = ::secondsToTime(totalSecs);
+    const QTime totalT = Utils::TMath::secondsToTime(totalSecs);
     if (m_totalTime != totalT) {
         m_totalTime = totalT;
         emit totalTimeChanged();
@@ -1131,7 +1129,7 @@ void ScreenplayTextDocument::setCurrentPageAndPosition(int page, qreal pos)
             m_totalTime.hour() * 60 * 60 + m_totalTime.minute() * 60 + m_totalTime.second();
     const int currentSecs = int(m_currentPosition * qreal(totalSecs));
 
-    const QTime currentT = ::secondsToTime(currentSecs);
+    const QTime currentT = Utils::TMath::secondsToTime(currentSecs);
     if (m_currentTime != currentT) {
         m_currentTime = currentT;
         emit currentTimeChanged();
@@ -1302,7 +1300,7 @@ void ScreenplayTextDocument::loadScreenplay()
             cursor.insertText(QStringLiteral(": ") + element->breakSubtitle().toUpper());
     };
 
-    const int fsi = m_screenplay->firstSceneIndex();
+    const int fsi = m_screenplay->firstSceneElementIndex();
     for (int i = 0; i < m_screenplay->elementCount(); i++) {
         const ScreenplayElement *element = m_screenplay->elementAt(i);
 
@@ -1499,7 +1497,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
         if (m_purpose == ForDisplay)
             cursor.insertText(characterName);
         else
-            TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, characterName);
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, characterName);
 
         QTextCharFormat contdMarkerFormat;
         contdMarkerFormat.setObjectType(ScreenplayTextObjectInterface::Kind);
@@ -1606,7 +1604,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart1);
                     else
-                        TransliterationUtils::polishFontsAndInsertTextAtCursor(
+                        LanguageEngine::polishFontsAndInsertTextAtCursor(
                                 cursor, blockTextPart1, dialogElement->textFormats());
                     block = cursor.block();
                     block.setUserData(new ScreenplayParagraphBlockData(dialogElement));
@@ -1615,7 +1613,7 @@ void ScreenplayTextDocument::includeMoreAndContdMarkers()
                     if (m_purpose == ForDisplay)
                         cursor.insertText(blockTextPart2);
                     else
-                        TransliterationUtils::polishFontsAndInsertTextAtCursor(
+                        LanguageEngine::polishFontsAndInsertTextAtCursor(
                                 cursor, blockTextPart2,
                                 [](const QVector<QTextLayout::FormatRange> &formats, int position) {
                                     if (position == 0)
@@ -1946,7 +1944,7 @@ void ScreenplayTextDocument::onSceneInserted(ScreenplayElement *element, int ind
     }
 
     QTextFrameFormat frameFormat = m_sceneFrameFormat;
-    const int fsi = m_screenplay->firstSceneIndex();
+    const int fsi = m_screenplay->firstSceneElementIndex();
     if (index > fsi) {
         SceneElement::Type firstParaType = SceneElement::Heading;
         if (!scene->heading()->isEnabled() && scene->elementCount()) {
@@ -2530,7 +2528,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
                 if (!qFuzzyIsNull(bgColor.alphaF())) {
                     QTextBlockFormat sceneColorFormat;
-                    sceneColorFormat.setBackground(Application::tintedColor(bgColor, 0.8));
+                    sceneColorFormat.setBackground(Utils::Color::whitewash(bgColor, 0.8));
                     cursor.mergeBlockFormat(sceneColorFormat);
                 }
             }
@@ -2548,14 +2546,12 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
         if (!element->isOmitted()) {
             if (m_purpose == ForPrinting) {
                 if (heading->isEnabled()) {
-                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
-                                                                           heading->locationType());
+                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor,
+                                                                     heading->locationType());
                     cursor.insertText(QStringLiteral(". "));
-                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
-                                                                           heading->location());
+                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, heading->location());
                     cursor.insertText(QStringLiteral(" - "));
-                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor,
-                                                                           heading->moment());
+                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, heading->moment());
 
                     insertBlock = true;
                 } /*else {
@@ -2750,7 +2746,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     chFormat.setFontWeight(QFont::Bold);
                     cursor.mergeCharFormat(chFormat);
 
-                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, title);
+                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, title);
 
                     if (!synopsis.isEmpty())
                         cursor.insertBlock();
@@ -2766,7 +2762,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                     chFormat.setFontWeight(QFont::Normal);
                     cursor.mergeCharFormat(chFormat);
 
-                    TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, synopsis);
+                    LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, synopsis);
                 }
 
                 cursor = frame->lastCursorPosition();
@@ -2795,7 +2791,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
                 charFormat.setFont(cursor.document()->defaultFont());
 
                 cursor.insertBlock(blockFormat, charFormat);
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, comments);
+                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, comments);
 
                 insertBlock = true;
             }
@@ -2839,8 +2835,7 @@ void ScreenplayTextDocument::loadScreenplayElement(const ScreenplayElement *elem
 
             const QString text = para->text();
             if (m_purpose == ForPrinting)
-                TransliterationUtils::polishFontsAndInsertTextAtCursor(cursor, text,
-                                                                       para->textFormats());
+                LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, text, para->textFormats());
             else
                 cursor.insertText(text);
 
@@ -3472,15 +3467,13 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     if (sceneType == Scene::Standard)
         return;
 
-    static const QJsonArray sceneTypeModel = Application::instance()->enumerationModelForType(
-            QStringLiteral("Scene"), QStringLiteral("Type"));
-    if (sceneType < 0 || sceneType >= sceneTypeModel.size())
+    QScopedPointer<EnumerationModel> sceneTypeModel(qobject_cast<EnumerationModel *>(
+            Utils::Object::typeEnumModel(QStringLiteral("Scene"), QStringLiteral("Type"))));
+    if (sceneTypeModel.isNull() || sceneType < 0 || sceneType >= sceneTypeModel->count())
         return;
 
-    const QJsonObject sceneTypeInfo = sceneTypeModel.at(sceneType).toObject();
-
     const qreal iconSize = givenRect.height();
-    QString iconFile = sceneTypeInfo.value(QStringLiteral("icon")).toString();
+    QString iconFile = sceneTypeModel->valueToIcon(sceneType);
     if (iconFile.isEmpty())
         return;
 
@@ -3503,7 +3496,7 @@ void ScreenplayTextObjectInterface::drawSceneIcon(QPainter *painter, const QRect
     painter->drawImage(rect, icon);
     painter->setRenderHint(QPainter::SmoothPixmapTransform, flag);
 
-    const QString iconKey = sceneTypeInfo.value(QStringLiteral("key")).toString();
+    const QString iconKey = sceneTypeModel->valueToKey(sceneType);
     QRectF iconKeyRect = rect;
     iconKeyRect.moveTop(rect.bottom() + rect.height() * 0.5);
     painter->save();

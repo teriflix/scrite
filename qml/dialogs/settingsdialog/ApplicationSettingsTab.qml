@@ -18,7 +18,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -26,10 +25,18 @@ import "qrc:/qml/helpers"
 PageView {
     id: root
 
-    pagesArray: ["Options", "Theme"]
+    objectName: "ApplicationSettingsTab"
+
+    pagesArray: ["Options", "Theme", "Shortcuts"]
     currentIndex: 0
+    pageContentSpacing: currentIndex === 2 ? 0 : 20
+
     pageContent: Loader {
         width: root.availablePageContentWidth
         source: "./Application" + root.pagesArray[root.currentIndex] + "Page.qml"
+        onItemChanged: {
+            if(item && item.availableHeight !== undefined)
+                item.availableHeight = root.availablePageContentHeight
+        }
     }
 }

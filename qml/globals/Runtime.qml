@@ -19,56 +19,91 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
-
 Item {
     id: root
 
-    visible: false
+    enum MainWindowTab { ScreenplayTab, StructureTab, NotebookTab, ScritedTab }
 
-    function init(_parent) {
-        if( !(_parent && Scrite.app.verifyType(_parent, "QQuickItem")) )
-            _parent = Scrite.window.contentItem
+    signal resetMainWindowUi(var callback)
+    signal aboutToSwitchTab(int from, int to)
+    signal finishedTabSwitch(int to)
 
-        parent = _parent
-        visible = false
-        anchors.fill = parent
-    }
-
-    // Global variables
-    readonly property real minWindowWidthForShowingNotebookInStructure: 1600
-    property bool canShowNotebookInStructure: width > minWindowWidthForShowingNotebookInStructure
-    property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
-    property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
-    property ObjectListModel dialogs: ObjectListModel { }
-    property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
+    readonly property int stdAnimationDuration: 250
     readonly property int subscriptionTreshold: 15 // if active subscription has less than these many days, then reminders are shown upon login
+
+    readonly property var characterListReports: Scrite.document.characterListReports
+    readonly property var sceneListReports: Scrite.document.sceneListReports
+
+    readonly property real iconImageSize: 30 // min width or height of icon Image QML elements
+    readonly property real maxSceneSidePanelWidth: 400
+    readonly property real minSceneSidePanelWidth: 250
+    readonly property real minWindowWidthForShowingNotebookInStructure: 1600
+
+    property int mainWindowTab: Runtime.MainWindowTab.ScreenplayTab
+
+    property var helpTips: undefined
+
+    property bool allowAppUsage: Scrite.user.loggedIn && Scrite.user.info.hasActiveSubscription
+    property bool canShowNotebookInStructure: width > minWindowWidthForShowingNotebookInStructure
+    property bool currentUseSoftwareRenderer
+    property bool firstSwitchToStructureTab: true // This is different from screenplayEditorSettings.firstSwitchToStructureTab
+    property bool loadMainUiContent: true
+    property bool showNotebookInStructure: workspaceSettings.showNotebookInStructure && canShowNotebookInStructure
+
+    property string currentTheme
+
+    // This property holds reference to an instance of ScreenplayEditor
+    property Item screenplayEditor
+
+    // This property holds reference to the global screenplay editor toolbar
+    property Item screenplayEditorToolbar
+
+    property ObjectListModel dialogs: ObjectListModel { }
+
+    readonly property QtObject language: QtObject {
+        readonly property AvailableLanguages available: LanguageEngine.availableLanguages
+        readonly property LanguageEngine engine: LanguageEngine
+        readonly property SupportedLanguages supported: LanguageEngine.supportedLanguages
+
+        property int activeCode: supported.activeLanguageCode
+
+        property var active: supported.activeLanguage
+        property var activeTransliterationOption: active.valid ? active.preferredTransliterationOption() : undefined
+
+        property AbstractTransliterationEngine activeTransliterator: activeTransliterationOption.valid ? activeTransliterationOption.transliterator : null
+
+        function setActiveCode(code) {
+            supported.activeLanguageCode = code
+        }
+    }
 
     // Persistent Settings
     readonly property Settings userAccountDialogSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "UserAccountDialog"
-
         property bool welcomeScreenShown: false
+
+        category: "UserAccountDialog"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings scrollAreaSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "ScrollArea"
         property real zoomFactor: 0.05
+
+        category: "ScrollArea"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings structureCanvasSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Structure Tab"
-
-        property bool showGrid: true
-        property color gridColor: Runtime.colors.accent.c400.background
-        property color canvasColor: Runtime.colors.accent.c50.background
-        property bool showPreview: true
         property bool displayAnnotationProperties: true
+        property bool showGrid: true
+        property bool showPreview: true
         property bool showPullHandleAnimation: true
-        property real lineWidthOfConnectors: 1.5
+
+        property real connectorLineWidth: 2
+        property real overflowFactor: 0.05
+        property real previewSize: 300
+
+        property color canvasColor: Runtime.colors.accent.c50.background
+        property color gridColor: Runtime.colors.accent.c400.background
 
         function restoreDefaultGridColor() {
             gridColor = Runtime.colors.accent.c400.background
@@ -77,139 +112,150 @@ Item {
         function restoreDefaultCanvasColor() {
             canvasColor = Runtime.colors.accent.c50.background
         }
+
+        category: "Structure Tab"
+        fileName: Platform.settingsFile
+
     }
 
     readonly property Settings timelineViewSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Timeline View"
+        readonly property string dropAreaKey: "scrite/sceneID"
 
         property string textMode: "HeadingOrTitle"
+
+        category: "Timeline View"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings screenplayEditorSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
         category: "Screenplay Editor"
+        fileName: Platform.settingsFile
 
-        property bool screenplayEditorAddButtonsAnimationShown: false
-        property bool refreshButtonInStatsReportAnimationDone: false
-        property bool firstSwitchToStructureTab: true
-        property bool displayRuler: true
-        property bool displaySceneCharacters: true
-        property bool displaySceneSynopsis: true
-        property bool displaySceneComments: false
-        property bool displayEmptyTitleCard: true
-        property bool displayAddSceneBreakButtons: true
-        property bool displayIndexCardFields: true
-        property int mainEditorZoomValue: -1
-        property int embeddedEditorZoomValue: -1
-        property bool autoAdjustEditorWidthInScreenplayEditor: true
         property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
-        property bool includeTitlePageInPreview: true
-        property bool singleClickAutoComplete: true
-        property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
-        property bool enableAutoCapitalizeSentences: true
-        property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
-        property bool captureInvisibleCharacters: false
+
+        property int commentsPanelTabIndex: 1
+        property int embeddedEditorZoomValue: -1
         property int lastLanguageRefreshNoticeBoxTimestamp: 0
         property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
-        property bool showLanguageRefreshNoticeBox: true
-        property bool showSpellCheckRefreshNoticeBox: true
-        property bool showLoglineEditor: false
-        property bool allowTaggingOfScenes: false
-        property real spaceBetweenScenes: 0
-        property int commentsPanelTabIndex: 1
-        property bool markupToolsDockVisible: true
-        property bool pausePagination: true
-        property bool pausePaginationForEachDocument: true
-        property bool highlightCurrentLine: true
-        property bool applyUserDefinedLanguageFonts: true
-        property bool optimiseScrolling: false
+        property int longSceneWordTreshold: 150
+        property int mainEditorZoomValue: -1
+        property int placeholderInterval: 100 // ms after which placeholder is swapped to content in delegates
+        property int sceneSidePanelActiveTab: 0
+        property int slpSynopsisLineCount: 2
 
+        property bool allowTaggingOfScenes: false
+        property bool applyUserDefinedLanguageFonts: true
+        property bool autoAdjustEditorWidthInScreenplayEditor: true
+        property bool captureInvisibleCharacters: false
         property bool copyAsFountain: true
         property bool copyFountainUsingStrictSyntax: true
         property bool copyFountainWithEmphasis: true
-
-        property bool pasteAsFountain: true
-        property bool pasteByMergingAdjacentElements: true
-        property bool pasteAfterResolvingEmphasis: true
-        property bool pasteByLinkingScenesWhenPossible: true
-
+        property bool displayAddSceneBreakButtons: true
+        property bool displayEmptyTitleCard: true
+        property bool displayIndexCardFields: true
+        property bool displayRuler: true
+        property bool displaySceneCharacters: true
+        property bool displaySceneComments: false
+        property bool displaySceneSynopsis: true
+        property bool enableAutoCapitalizeSentences: true
+        property bool enableAutoPolishParagraphs: true // for automatically adding/removing CONT'D where appropriate
+        property bool enableSpellCheck: true // Since this is now fixed: https://github.com/teriflix/scrite/issues/138
+        property bool highlightCurrentLine: true
+        property bool includeTitlePageInPreview: true
         property bool longSceneWarningEnabled: true
-        property int  longSceneWordTreshold: 150
+        property bool markupToolsDockVisible: true
+        property bool optimiseScrolling: false
+        property bool pasteAfterResolvingEmphasis: true
+        property bool pasteAsFountain: true
+        property bool pasteByLinkingScenesWhenPossible: true
+        property bool pasteByMergingAdjacentElements: true
+        property bool pausePagination: true
+        property bool pausePaginationForEachDocument: true
+        property bool refreshButtonInStatsReportAnimationDone: false
+        property bool sceneSidePanelOpen: false
+        property bool screenplayEditorAddButtonsAnimationShown: false
+        property bool showLanguageRefreshNoticeBox: true
+        property bool showLoglineEditor: false
+        property bool showSpellCheckRefreshNoticeBox: true
+        property bool singleClickAutoComplete: true
 
-        property int slpSynopsisLineCount: 2
+        property real sidePanelWidth: 400
+        property real spaceBetweenScenes: 0
     }
 
     readonly property Settings pdfExportSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "PdfExport"
-
         property bool usePdfDriver: true
+
+        category: "PdfExport"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings titlePageSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
         category: "TitlePage"
 
+        property bool includeTimestamp: false
+
+        property string address
         property string author
         property string contact
-        property string address
         property string email
         property string phone
         property string website
-        property bool includeTimestamp: false
     }
 
     readonly property Settings richTextEditorSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Rich Text Editor"
-
         property bool languageNoteShown: false
+
+        category: "Rich Text Editor"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings sceneListPanelSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Scene List Panel"
+        property bool showTooltip: false
 
         property string displaySceneLength: "NO" // can be PAGE, TIME
         property string sceneTextMode: "HEADING" // can be SUMMARY also
-        property bool showTooltip: false
+
+        category: "Scene List Panel"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings markupToolsSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Markup Tools"
-
         property real contentX: 20
         property real contentY: 20
+
+        category: "Markup Tools"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings scritedSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Scrited"
+        property bool codecsNoticeDisplayed: false
+        property bool experimentalFeatureNoticeDisplayed: false
+        property bool videoPlayerVisible: true
+
+        property real playerAreaRatio: 0.5
 
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
-        property bool experimentalFeatureNoticeDisplayed: false
-        property bool codecsNoticeDisplayed: false
-        property real playerAreaRatio: 0.5
-        property bool videoPlayerVisible: true
+
+        category: "Scrited"
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings shortcutsDockWidgetSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Shortcuts Dock Widget"
-
         property real contentX: -1
         property real contentY: -1
+
         property bool visible: true
+
+        category: "Shortcuts Dock Widget"
+        fileName: Platform.settingsFile
     }
 
-    property var helpTips: undefined
     readonly property Settings helpNotificationSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Help"
-
         property string dayZero
+        property string tipsShown: ""
+
         function daysSinceZero() {
             const today = new Date()
             const dzero = dayZero === "" ? today : new Date(dayZero + "Z")
@@ -217,88 +263,77 @@ Item {
             return days
         }
 
-        property string tipsShown: ""
         function isTipShown(val) {
             const ts = tipsShown.split(",")
             return ts.indexOf(val) >= 0
         }
+
         function markTipAsShown(val) {
             var ts = tipsShown.length > 0 ? tipsShown.split(",") : []
             if(ts.indexOf(val) < 0)
                 ts.push(val)
             tipsShown = ts.join(",")
         }
-    }
 
-    function showHelpTip(tipName) {
-        if(helpTips !== undefined)
-            Announcement.shout(Runtime.announcementIds.showHelpTip, tipName)
+        fileName: Platform.settingsFile
+        category: "Help"
     }
 
     readonly property Settings notebookSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Notebook"
-
         property int activeTab: 0 // 0 = Relationships, 1 = Notes
-        property int graphLayoutMaxTime: 1000
         property int graphLayoutMaxIterations: 50000
-        property bool showAllFormQuestions: true
+        property int graphLayoutMaxTime: 1000
+
         property bool richTextNotesEnabled: true
-    }
+        property bool showAllFormQuestions: true
 
-    readonly property Settings paragraphLanguageSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
-        category: "Paragraph Language"
-
-        property string shotLanguage: "Default"
-        property string actionLanguage: "Default"
-        property string defaultLanguage: "English"
-        property string dialogueLanguage: "Default"
-        property string characterLanguage: "Default"
-        property string transitionLanguage: "Default"
-        property string parentheticalLanguage: "Default"
+        fileName: Platform.settingsFile
+        category: "Notebook"
     }
 
     readonly property Settings workspaceSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
         category: "Workspace"
 
-        property real workspaceHeight
-        property real screenplayEditorWidth: -1
+        property var customColors: []
+        property var defaultSceneColor: SceneColors.palette[0]
+
+        property bool animateNotebookIcon: true
+        property bool animateStructureIcon: true
+        property bool autoOpenLastFile: false
+        property bool mouseWheelZoomsInCharacterGraph: Platform.isWindowsDesktop || Platform.isLinuxDesktop
+        property bool mouseWheelZoomsInStructureCanvas: Platform.isWindowsDesktop || Platform.isLinuxDesktop
         property bool scriptalayIntroduced: false
         property bool showNotebookInStructure: true
-        property bool syncCurrentSceneOnNotebook: true
-        property bool animateStructureIcon: true
-        property bool animateNotebookIcon: true
-        property real flickScrollSpeedFactor: 1.0
         property bool showScritedTab: false
-        property bool mouseWheelZoomsInCharacterGraph: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
-        property bool mouseWheelZoomsInStructureCanvas: Scrite.app.isWindowsPlatform || Scrite.app.isLinuxPlatform
-        property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
-        property string lastOpenPhotosFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.PicturesLocation)
-        property string lastOpenImportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property bool syncCurrentSceneOnNotebook: true
+
+        property real flickScrollSpeedFactor: 1.0
+        property real screenplayEditorWidth: -1
+        property real workspaceHeight
+
         property string lastOpenExportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property string lastOpenFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property string lastOpenImportFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
+        property string lastOpenPhotosFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.PicturesLocation)
         property string lastOpenReportsFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.DocumentsLocation)
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
-        property var customColors: []
-        property var defaultSceneColor: Scrite.app.standardColors[0]
-        property bool autoOpenLastFile: false
     }
 
     readonly property Settings applicationSettings: Settings {
-        id: applicationSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "Application"
+        id: _applicationSettings
 
-        property bool enableAnimations: true
-        property bool useSoftwareRenderer: false
-        property bool useNativeTextRendering: false
-        property string theme: "Material"
-        property int primaryColor: colors.defaultPrimaryColor
         property int accentColor: colors.defaultAccentColor
         property int joinDiscordPromptCounter: 0
-        property bool reloadPrompt: true
+        property int primaryColor: colors.defaultPrimaryColor
+
+        property bool enableAnimations: true
         property bool notifyMissingRecentFiles: true
+        property bool reloadPrompt: true
+        property bool useNativeTextRendering: false
+        property bool useSoftwareRenderer: false
+
+        property string theme: "Material"
 
         Component.onCompleted: {
             Qt.callLater( () => {
@@ -306,22 +341,21 @@ Item {
                              Runtime.currentUseSoftwareRenderer = useSoftwareRenderer
                          })
         }
-    }
 
-    property string currentTheme
-    property bool currentUseSoftwareRenderer
+        category: "Application"
+        fileName: Platform.settingsFile
+    }
 
     // Global undo-redo object
     readonly property UndoStack undoStack: UndoStack {
-        objectName: "MainUndoStack"
-
+        property bool notebookActive: false
+        property bool sceneEditorActive: false
         property bool sceneListPanelActive: false
         property bool screenplayEditorActive: false
-        property bool timelineEditorActive: false
         property bool structureEditorActive: false
-        property bool sceneEditorActive: false
-        property bool notebookActive: false
+        property bool timelineEditorActive: false
 
+        objectName: "MainUndoStack"
         active: sceneListPanelActive || screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
     }
 
@@ -335,27 +369,30 @@ Item {
     }
 
     readonly property FontMetrics sceneEditorFontMetrics: FontMetrics {
-        property SceneElementFormat format: Scrite.document.formatting.elementFormat(SceneElement.Action)
-        property int lettersPerLine: 70
-        property int marginLetters: 5
-        property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
-        property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
-        property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
-        font: format ? format.font2 : Scrite.document.formatting.defaultFont2
+        readonly property int lettersPerLine: 70
+        readonly property int marginLetters: 5
+
+        readonly property real pageWidth: Math.ceil(paragraphWidth + 2*paragraphMargin)
+        readonly property real paragraphMargin: Math.ceil(marginLetters*averageCharacterWidth)
+        readonly property real paragraphWidth: Math.ceil(lettersPerLine*averageCharacterWidth)
+
+        font: Scrite.document.formatting.defaultFont2
     }
 
     // Color Palettes
     component Colors : QtObject {
         property int key: Material.Indigo
-        property color windowColor: c300.background
+
+        property var button: c200
+        property var highlight: c400
+
         property color borderColor: c400.background
         property color separatorColor: c400.background
-        property var highlight: c400
-        property var button: c200
+        property color windowColor: c300.background
 
         property QtObject regular: QtObject {
             property color background: Material.color(key)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c10: QtObject {
@@ -365,91 +402,105 @@ Item {
 
         property QtObject c50: QtObject {
             property color background: Material.color(key, Material.Shade50)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c100: QtObject {
             property color background: Material.color(key, Material.Shade100)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c200: QtObject {
             property color background: Material.color(key, Material.Shade200)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c300: QtObject {
             property color background: Material.color(key, Material.Shade300)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c400: QtObject {
             property color background: Material.color(key, Material.Shade400)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c500: QtObject {
             property color background: Material.color(key, Material.Shade500)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c600: QtObject {
             property color background: Material.color(key, Material.Shade600)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c700: QtObject {
             property color background: Material.color(key, Material.Shade700)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c800: QtObject {
             property color background: Material.color(key, Material.Shade800)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject c900: QtObject {
             property color background: Material.color(key, Material.Shade900)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a100: QtObject {
             property color background: Material.color(key, Material.ShadeA100)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a200: QtObject {
             property color background: Material.color(key, Material.ShadeA200)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a400: QtObject {
             property color background: Material.color(key, Material.ShadeA400)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
 
         property QtObject a700: QtObject {
             property color background: Material.color(key, Material.ShadeA700)
-            property color text: Scrite.app.textColorFor(background)
+            property color text: Color.textColorFor(background)
         }
     }
 
     readonly property QtObject colors: Item {
-        readonly property int theme: Material.Light
-        readonly property int defaultPrimaryColor: Material.Grey
-        readonly property int defaultAccentColor: Material.DeepPurple
+        objectName: "RuntimeColors"
+
+        readonly property int   defaultAccentColor: Material.DeepPurple
+        readonly property int   defaultPrimaryColor: Material.Grey
+        readonly property int   theme: Material.Light
+
+        readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
+        readonly property var   forScene: SceneColors.palette
+
+        readonly property color highlightedSceneControlTint: "#C0FFFFFF"
+        readonly property color sceneControlTint: "#D7EEEEEE"
+        readonly property color sceneHeadingTint: "#E7FFFFFF"
+        readonly property color currentNoteTint: "#A0FFFFFF"
+        readonly property color selectedSceneHeadingTint: "#9CFFFFFF"
+        readonly property color transparent: "transparent"
 
         readonly property Colors primary: Colors {
             key: Material.Grey // applicationSettings.primaryColor
+
+            ObjectRegister.name: "primaryColors"
         }
 
         readonly property Colors accent: Colors {
-            key: applicationSettings.accentColor
+            key: _applicationSettings.accentColor
+
+            ObjectRegister.name: "accentColors"
         }
 
-        readonly property color transparent: "transparent"
-        readonly property var   forDocument: ["#e60000", "#ff9900", "#ffff00", "#008a00", "#0066cc", "#9933ff", "#ffffff", "#facccc", "#ffebcc", "#ffffcc", "#cce8cc", "#cce0f5", "#ebd6ff", "#bbbbbb", "#f06666", "#ffc266", "#ffff66", "#66b966", "#66a3e0", "#c285ff", "#888888", "#a10000", "#b26b00", "#b2b200", "#006100", "#0047b2", "#6b24b2", "#444444", "#5c0000", "#663d00", "#666600", "#003700", "#002966", "#3d1466"]
-        readonly property var   forScene: Scrite.app.standardColors(Scrite.app.versionNumber)
+        ObjectRegister.name: "runtimeColors"
     }
 
     // All the app-features
@@ -495,27 +546,13 @@ Item {
         }
     }
 
-    // These properties are only accessible at runtime, which means they are not
-    // stored in persistent settings file.
-    readonly property int e_ScreenplayTab: 0
-    readonly property int e_StructureTab: 1
-    readonly property int e_NotebookTab: 2
-    readonly property int e_ScritedTab: 3
-    property int mainWindowTab: e_ScreenplayTab
-    signal activateMainWindowTab(int tabType)
-
-    property bool loadMainUiContent: true
-
-    readonly property var characterListReports: Scrite.document.characterListReports
-    readonly property var sceneListReports: Scrite.document.sceneListReports
-
     // This model provides access to recently accessed files. It is updated from
     // different parts of the UI where opening / saving of files is triggered.
     // Contents of this model is listed in the HomeScreen.
     readonly property ScriteFileListModel recentFiles: ScriteFileListModel {
         id: _recentFiles
-        source: ScriteFileListModel.RecentFiles
-        notifyMissingFiles: applicationSettings.notifyMissingRecentFiles
+
+        property var missingFiles: []
 
         property bool preferTitleVersionText: true
 
@@ -549,12 +586,15 @@ Item {
             _recentFilesSettings.files = files
         }
 
-        property var missingFiles: []
+        notifyMissingFiles: _applicationSettings.notifyMissingRecentFiles
+        source: ScriteFileListModel.RecentFiles
+
         onFilesMissing: (files) => {
             let f = Array.isArray(missingFiles) || missingFiles.length ? missingFiles : []
             f.push(...files)
             missingFiles = f
         }
+
         onNotifyMissingFilesChanged: {
             if(!notifyMissingFiles)
                 missingFiles = []
@@ -564,16 +604,14 @@ Item {
     // This model is how the screenplay of the current ScriteDocument is accessed.
     readonly property ScreenplayAdapter screenplayAdapter: ScreenplayAdapter {
         property string sessionId
+
         source: {
-            if(Scrite.document.sessionId !== sessionId)
-            return null
+            // if(Scrite.document.sessionId !== sessionId)
+            //     return null
 
-            if(mainWindowTab === e_ScreenplayTab)
-            return Scrite.document.screenplay
-
-            if(Scrite.document.screenplay.currentElementIndex < 0) {
-                var index = Scrite.document.structure.currentElementIndex
-                var element = Scrite.document.structure.elementAt(index)
+            if(mainWindowTab !== Runtime.MainWindowTab.ScreenplayTab && Scrite.document.screenplay.currentElementIndex < 0) {
+                let index = Scrite.document.structure.currentElementIndex
+                let element = Scrite.document.structure.elementAt(index)
                 if(element) {
                     if(element.scene.addedToScreenplay) {
                         Scrite.document.screenplay.currentElementIndex = element.scene.screenplayElementIndexList[0]
@@ -587,66 +625,65 @@ Item {
         }
     }
 
-    // This property holds reference to an instance of ScreenplayEditor
-    property Item screenplayEditor
-
-    // This property holds reference to the global screenplay editor toolbar
-    property Item screenplayEditorToolbar
-
     // This model provides access to the paginated-text-document constructed from the screenplay
     // of the current Scrite file.
     readonly property ScreenplayTextDocument screenplayTextDocument: ScreenplayTextDocument {
         // Setting this is as good as setting the other.
         // when paused = true, page and time computation is halted.
         property bool paused: Runtime.screenplayEditorSettings.pausePagination
+
+        // FIXME: Do we really need this?
+        ObjectRegister.name: "screenplayTextDocument"
+
+        formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
+        includeSceneSynopsis: false
+        listSceneCharacters: false
+        printEachSceneOnANewPage: false
+        sceneIcons: false
+        sceneNumbers: false
+        screenplay: Scrite.document.loading || paused ? null : Runtime.screenplayAdapter.screenplay
+        secondsPerPage: Scrite.document.printFormat.secondsPerPage
+        syncEnabled: true
+        titlePage: false
+
         onPausedChanged: Qt.callLater( function() {
             Runtime.screenplayEditorSettings.pausePagination = screenplayTextDocument.paused
         })
-
-        screenplay: Scrite.document.loading || paused ? null : Runtime.screenplayAdapter.screenplay
-        formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
-        syncEnabled: true
-        sceneNumbers: false
-        titlePage: false
-        sceneIcons: false
-        listSceneCharacters: false
-        includeSceneSynopsis: false
-        printEachSceneOnANewPage: false
-        secondsPerPage: Scrite.document.printFormat.secondsPerPage
-
-        // FIXME: Do we really need this?
-        Component.onCompleted: Scrite.app.registerObject(screenplayTextDocument, "screenplayTextDocument")
     }
 
     readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {
+        ObjectRegister.name: "screenplayTracks"
+
         screenplay: Scrite.document.screenplay
-        Component.onCompleted: Scrite.app.registerObject(screenplayTracks, "screenplayTracks")
     }
 
     // Announcement IDs
     readonly property QtObject announcementIds: QtObject {
-        readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
-        readonly property string reloadMainUiRequest: "9A7F0F35-346F-461D-BB85-F5C6DC08A01D"
-        readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
-        readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
-        readonly property string closeHomeScreenRequest: "4F8F6B5B-5BEB-4D01-97BA-B0018241BD38"
         readonly property string characterNotesRequest: "7D6E5070-79A0-4FEE-8B5D-C0E0E31F1AD8"
-        readonly property string sceneNotesRequest: "41EE5E06-FF97-4DB6-B32D-F938418C9529"
-        readonly property string notebookNodeRequest: "1DC67418-2584-4598-A68A-DE5205BBC028"
-        readonly property string sceneTextEditorReceivedFocus: "598E1699-465B-40D5-8CF4-E9753E2C16E7"
         readonly property string closeDialogBoxRequest: "A6456A87-FC8C-405B-BDD7-7625F86272BA"
+        readonly property string closeHomeScreenRequest: "4F8F6B5B-5BEB-4D01-97BA-B0018241BD38"
+        readonly property string embeddedTabRequest: "190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
+        readonly property string englishFontFamilyChanged: "763E8FAD-8681-4F64-B574-F9BB7CF8A7F1"
+        readonly property string focusRequest: "2E3BBE4F-05FE-49EE-9C0E-3332825B72D8"
+        readonly property string loginRequest: "97369507-721E-4A7F-886C-4CE09A5BCCFB"
+        readonly property string notebookNodeRequest: "1DC67418-2584-4598-A68A-DE5205BBC028"
+        readonly property string reloadMainUiRequest: "9A7F0F35-346F-461D-BB85-F5C6DC08A01D"
+        readonly property string sceneNotesRequest: "41EE5E06-FF97-4DB6-B32D-F938418C9529"
+        readonly property string sceneTextEditorReceivedFocus: "598E1699-465B-40D5-8CF4-E9753E2C16E7"
+        readonly property string showHelpTip: "B168E17C-14CA-454F-9DF8-CAA381D9A8A2"
+        readonly property string notebookRequest: "ABCD190B821B-50FE-4E47-A4B2-BDBB2A13B72C"
         readonly property string userAccountDialogScreen: "24A8C9F3-1F62-4B14-A65E-250E53350152"
         readonly property string userProfileScreenPage: "D97FD221-5257-4A20-B9A2-744594E99D76"
-        readonly property string showHelpTip: "B168E17C-14CA-454F-9DF8-CAA381D9A8A2"
     }
 
     readonly property QtObject announcementData: QtObject {
         readonly property QtObject focusOptions: QtObject {
-            readonly property string sceneSynopsis: "Scene Synopsis"
             readonly property string addMuteCharacter: "Add Mute Character"
+            readonly property string addSceneTag: "Add Scene Tag"
+            readonly property string scene: "Scene"
             readonly property string sceneHeading: "Scene Heading"
             readonly property string sceneNumber: "Scene Number"
-            readonly property string scene: "Scene"
+            readonly property string sceneSynopsis: "Scene Synopsis"
         }
     }
 
@@ -655,21 +692,262 @@ Item {
 
     }
 
+    function init(_parent) {
+        if( !(_parent && Object.isOfType(_parent, "QQuickItem")) )
+            _parent = Scrite.window.contentItem
+
+        parent = _parent
+        visible = false
+        anchors.fill = parent
+    }
+
+    function closeAllDialogs() {
+        Runtime.shoutout(Runtime.announcementIds.closeDialogBoxRequest, undefined)
+    }
+
+    function estimateTypeSize(itemNameOrCode, imports) {
+        const defaultImports = ["QtQuick 2.15",
+                                "QtQuick.Controls 2.15",
+                                "QtQuick.Controls.Material 2.15",
+                                "io.scrite.components 1.0",
+                                "\"qrc:/qml/globals\"",
+                                "\"qrc:/qml/helpers\"",
+                                "\"qrc:/qml/controls\""]
+        if(imports === undefined)
+            imports = defaultImports
+        else
+            imports = imports.concat(defaultImports)
+
+        let code = ""
+        for(let i=0; i<imports.length; i++) {
+            code += "import " + imports[i] + "\n"
+        }
+
+        if(itemNameOrCode.indexOf("{") >= 0)
+            code += itemNameOrCode + "\n"
+        else
+            code += itemNameOrCode + " { visible: false }\n"
+
+        let instance = Qt.createQmlObject(code, root)
+        let instanceSize = Qt.size(0, 0)
+        if(instance) {
+            instanceSize = Qt.size(instance.width, instance.height)
+            instance.destroy()
+        }
+
+        return instanceSize
+    }
+
+    function activateMainWindowTab(tab) {
+        if(mainWindowTab !== tab) {
+            _mainWindowTabSwitchTask.targetTab = tab
+            _mainWindowTabSwitchTask.start()
+        }
+    }
+
+    function shoutout(type, data, delay) {
+        if(typeof delay === "number" && delay > 0) {
+            execLater(root, delay, (args) => {
+                          root.shoutout(args[0], args[1], 0)
+                      }, [type, data])
+        } else {
+            Announcement.shout(type, data)
+        }
+    }
+
+    function shoutoutLater(type, data) {
+        shoutout(type, data, stdAnimationDuration + 50)
+    }
+
+    function showHelpTip(tipName) {
+        if(helpTips !== undefined)
+            Runtime.shoutout(Runtime.announcementIds.showHelpTip, tipName)
+    }
+
+    function execLater(contextObject, delay, callback, args) {
+        let timer = Qt.createQmlObject("import QtQml 2.15; Timer { }", contextObject);
+        timer.interval = delay === undefined ? 100 : delay
+        timer.repeat = false
+        timer.triggered.connect(() => {
+            if (args)
+                callback(args)
+                else callback()
+                timer.destroy()
+        })
+        timer.start()
+
+        return timer
+    }
+
+    function margins(left, top, right, bottom) {
+        return { "top": top, "left": left, "right": right, "bottom": bottom }
+    }
+
+    function newAnnotation(parent, type, geometry, config) {
+        if(!parent || !type || !geometry)
+            return null
+
+        let annot = Qt.createQmlObject("import io.scrite.components 1.0; Annotation { objectName: \"ica\" }", parent)
+        annot.type = type
+        annot.geometry = geometry
+        if(config) {
+            for(member in config)
+                annot.setAttribute(member, config[member])
+        }
+
+        return annot
+    }
+
+    function bounded(min, val, max) {
+        return Math.min(Math.max(min, val), max)
+    }
+
+    function todayWithZeroTime() {
+        let today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return today;
+    }
+
+    function formatDate(date) {
+        const months =
+                [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+
+        const day = date.getDate();
+        const month = months[date.getMonth()];
+
+        return day + " " + month;
+    }
+
+    function formatDateIncludingYear(date) {
+        return formatDate(date) + " " + date.getFullYear();
+    }
+
+    function formatDateRangeAsString(start_date, end_date) {
+        if (typeof end_date === "number") {
+            const nrDays = end_date
+
+            end_date = new Date(start_date)
+            end_date.setDate(start_date.getDate() + nrDays)
+        }
+
+        if (start_date.getFullYear() === end_date.getFullYear()) {
+            return formatDate(start_date) + " - " + formatDateIncludingYear(end_date)
+        }
+
+        return formatDateIncludingYear(start_date) + " - " + formatDateIncludingYear(end_date)
+    }
+
+    function daysSpanAsString(nrDays) {
+        let ret = ""
+        if (nrDays < 0) {
+            ret = "Already"
+        } else if (nrDays === 0) { ret = "Today" }
+        else if (nrDays === 1) { ret = "Tomorrow" }
+        else {
+            const years = Math.floor(nrDays / 365)
+            const days = nrDays % 365
+            if (years == 0) {
+                ret = days + " days"
+            } else {
+                if (years === 1) {
+                    ret = "1 year"
+                } else {
+                    ret = years + " years"
+                }
+
+                if (days > 1) {
+                    ret += ", and " + days + " days"
+                } else if (days === 1) {
+                    ret += ", and 1 day"
+                }
+            }
+        }
+
+        return ret
+    }
+
+    function daysBetween(start_date, end_date) {
+        let from = new Date(start_date);
+        let until = new Date(end_date);
+
+        from.setHours(0, 0, 0, 0)
+        until.setHours(0, 0, 0, 0)
+
+        return Math.ceil((until - from) / (1000 * 60 * 60 * 24));
+    }
+
+    function dateSpanAsString(start_date, end_date) {
+        const nr_days_remaining = daysBetween(start_date, end_date)
+        return daysSpanAsString(nr_days_remaining)
+    }
+
+    function toTitleCase(str) {
+        return str
+                .toLowerCase() // Convert the entire string to lowercase
+                .split(' ') // Split into words by spaces
+                .map(word => word.charAt(0).toUpperCase()
+                             + word.slice(1)) // Capitalize the first letter of each word
+                .join(' '); // Join the words back with spaces
+    }
+
+    function validateEmail(email) {
+        const emailRegex =
+                /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return emailRegex.test(email);
+    }
+
+    visible: false
+
+    onShowNotebookInStructureChanged: activateMainWindowTab(Runtime.MainWindowTab.ScreenplayTab)
+
     // Private objects
     Settings {
         id: _recentFilesSettings
-        fileName: Scrite.app.settingsFilePath
-        category: "RecentFiles"
 
         property var files: []
+
         property alias missingFiles: _recentFiles.missingFiles
         property alias preferTitleVersionText: _recentFiles.preferTitleVersionText
+
+        category: "RecentFiles"
+        fileName: Platform.settingsFile
+    }
+
+    SequentialAnimation {
+        id: _mainWindowTabSwitchTask
+
+        property int targetTab: -1
+
+        loops: 1
+
+        ScriptAction {
+            script: root.aboutToSwitchTab(root.mainWindowTab, _mainWindowTabSwitchTask.targetTab)
+        }
+
+        PauseAnimation {
+            duration: root.stdAnimationDuration/2
+        }
+
+        ScriptAction {
+            script: root.mainWindowTab = _mainWindowTabSwitchTask.targetTab
+        }
+
+        PauseAnimation {
+            duration: root.stdAnimationDuration/2
+        }
+
+        ScriptAction {
+            script: {
+                root.finishedTabSwitch(_mainWindowTabSwitchTask.targetTab)
+                _mainWindowTabSwitchTask.targetTab = -1
+            }
+        }
     }
 
     Connections {
-        enabled: root.helpTips === undefined
-
         target: Scrite.user
+
+        enabled: root.helpTips === undefined
 
         function onLoggedInChanged() {
             if(Scrite.user.loggedIn) {

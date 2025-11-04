@@ -25,14 +25,16 @@ import "qrc:/qml/helpers"
 
 Item {
     id: sceneFeaturedPhotoItem
-    property Scene scene
 
-    property Attachments sceneAttachments: scene.attachments
-    property Attachment featuredAttachment: sceneAttachments.featuredAttachment
-    property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
-    property string fillModeAttrib: "fillMode"
     property int defaultFillMode: Image.PreserveAspectCrop
     property bool mipmap: false
+    property string fillModeAttrib: "fillMode"
+
+    property Scene scene
+
+    property Attachment featuredImage: featuredAttachment && featuredAttachment.type === Attachment.Photo ? featuredAttachment : null
+    property Attachment featuredAttachment: sceneAttachments ? sceneAttachments.featuredAttachment : null
+    property Attachments sceneAttachments: scene ? scene.attachments : null
 
     Image {
         anchors.fill: parent
@@ -85,7 +87,7 @@ Item {
             anchors.fill: parent
             active: false
             sourceComponent: Rectangle {
-                color: Scrite.app.translucent(Runtime.colors.primary.c600.background,0.85)
+                color: Color.translucent(Runtime.colors.primary.c600.background,0.85)
 
                 MouseArea {
                     anchors.fill: parent
@@ -167,12 +169,12 @@ Item {
 
         VclFileDialog {
             id: featuredAttachmentFileDialog
-            nameFilters: sceneAttachments.nameFilters
+            nameFilters: sceneAttachments ? sceneAttachments.nameFilters : []
             selectMultiple: false
             selectExisting: true
              // The default Ctrl+U interfers with underline
             onAccepted: {
-                const attachment = sceneAttachments.includeAttachment( Scrite.app.urlToLocalFile(fileUrl) )
+                const attachment = sceneAttachments.includeAttachment( Url.toPath(fileUrl) )
                 if(attachment)
                     attachment.featured = true
             }

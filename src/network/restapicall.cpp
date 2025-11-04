@@ -14,6 +14,7 @@
 #include "restapicall.h"
 
 #include "user.h"
+#include "utils.h"
 #include "scrite.h"
 #include "application.h"
 #include "localstorage.h"
@@ -274,8 +275,8 @@ bool RestApiCall::call()
 
         const QString space = QStringLiteral(" ");
         const QString ret = QStringLiteral("scrite-") + sapp->versionNumber().toString() + space
-                + sapp->platformAsString() + space + sapp->platformVersion() + space
-                + sapp->platformType() + space + sapp->installationId();
+                + Utils::Platform::typeString() + space + Utils::Platform::osVersionString() + space
+                + Utils::Platform::architectureString() + space + sapp->installationId();
         return ret;
     }();
 
@@ -289,7 +290,7 @@ bool RestApiCall::call()
     req.setRawHeader(QByteArrayLiteral("client-type"), QByteArrayLiteral("desktop-app"));
     req.setRawHeader(QByteArrayLiteral("client-version"), QByteArrayLiteral(SCRITE_VERSION));
     req.setRawHeader(QByteArrayLiteral("client-platform"),
-                     Application::instance()->platformAsString().toLatin1());
+                     Utils::Platform::typeString().toLatin1());
 
     NetworkAccessManager *nam = NetworkAccessManager::instance();
     if (this->type() == GET)
@@ -387,9 +388,7 @@ void RestApiCall::onNetworkReplyError()
     disconnect(m_reply, &QNetworkReply::finished, this, &RestApiCall::onNetworkReplyFinished);
 
     const QString code = "E_NETWORK_"
-            + Application::instance()
-                      ->enumerationKey(m_reply, "NetworkError", m_reply->error())
-                      .toUpper();
+            + Utils::Object::enumKey(m_reply, "NetworkError", m_reply->error()).toUpper();
     const QString msg = m_reply->errorString();
 
     emit networkError(code, msg);
@@ -771,7 +770,7 @@ AppLatestReleaseRestApiCall::~AppLatestReleaseRestApiCall() { }
 
 QJsonObject AppLatestReleaseRestApiCall::data() const
 {
-    return { { "platform", Application::instance()->platformAsString() } };
+    return { { "platform", Utils::Platform::typeString() } };
 }
 
 void AppLatestReleaseRestApiCall::setResponse(const QJsonObject &val)
@@ -800,12 +799,12 @@ AppRequestActivationCodeRestApiCall::~AppRequestActivationCodeRestApiCall() { }
 QJsonObject AppRequestActivationCodeRestApiCall::data() const
 {
     return { { "email", "$email" },
-             { "hostName", Application::instance()->hostName() },
+             { "hostName", Utils::Platform::hostName() },
              { "clientId", Application::instance()->installationId() },
              { "deviceId", Application::instance()->deviceId() },
-             { "platform", Application::instance()->platformAsString() },
-             { "platformVersion", Application::instance()->platformVersion() },
-             { "platformType", Application::instance()->platformType() },
+             { "platform", Utils::Platform::typeString() },
+             { "platformVersion", Utils::Platform::osVersionString() },
+             { "platformType", Utils::Platform::architectureString() },
              { "appVersion", QStringLiteral(SCRITE_VERSION) } };
 }
 
@@ -1018,11 +1017,11 @@ InstallationUpdateRestApiCall::~InstallationUpdateRestApiCall() { }
 
 QJsonObject InstallationUpdateRestApiCall::data() const
 {
-    return { { "platform", Application::instance()->platformAsString() },
-             { "platformVersion", Application::instance()->platformVersion() },
-             { "platformType", Application::instance()->platformType() },
+    return { { "platform", Utils::Platform::typeString() },
+             { "platformVersion", Utils::Platform::osVersionString() },
+             { "platformType", Utils::Platform::architectureString() },
              { "appVersion", QStringLiteral(SCRITE_VERSION) },
-             { "hostName", Application::instance()->hostName() } };
+             { "hostName", Utils::Platform::hostName() } };
 }
 
 void InstallationUpdateRestApiCall::setResponse(const QJsonObject &val)

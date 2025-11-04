@@ -20,29 +20,31 @@ import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 
 VclMenu {
-    id: colorMenu
-    width: minCellSize * 5 + 10
-    height: minCellSize * (4 + Math.ceil((Runtime.workspaceSettings.customColors.length+1)/4)) +  10
+    id: root
 
-    signal menuItemClicked(string color)
     readonly property real minCellSize: 50
     property color selectedColor: "white"
 
+    signal menuItemClicked(string color)
+
+    width: minCellSize * 5 + 10
+    height: minCellSize * (4 + Math.ceil((Runtime.workspaceSettings.customColors.length+1)/4)) +  10
+
     VclMenuItem {
-        width: colorMenu.width
+        width: root.width
         height: colorGrid.height
 
         background: Item { }
         contentItem: Grid {
             id: colorGrid
-            width: colorMenu.width
+            width: root.width
             property int currentIndex: -1
 
             property real cellSize: width / columns
             columns: Math.floor(width / minCellSize)
 
             Repeater {
-                model: Scrite.app.standardColors.concat(Runtime.workspaceSettings.customColors)
+                model: SceneColors.palette.concat(Runtime.workspaceSettings.customColors)
                 delegate: colorItemDelegate
             }
 
@@ -52,15 +54,15 @@ VclMenu {
                 suggestedHeight: colorGrid.cellSize
                 ToolTip.text: "Pick a custom color"
                 onClicked: {
-                    var color = Scrite.app.pickColor("white")
+                    var color = Color.pick("white")
                     var colors = Runtime.workspaceSettings.customColors
                     colors.unshift(color)
                     if(colors.length > 10)
                         colors.pop()
                     Runtime.workspaceSettings.customColors = colors
 
-                    colorMenu.menuItemClicked(modelData)
-                    colorMenu.close()
+                    root.menuItemClicked(modelData)
+                    root.close()
                 }
             }
         }
@@ -72,7 +74,7 @@ VclMenu {
         Rectangle {
             width: parent.cellSize
             height: parent.cellSize
-            color: (colorGrid.currentIndex === index) ? Scrite.app.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
+            color: (colorGrid.currentIndex === index) ? Color.translucent(Scrite.app.palette.highlight, 0.25) : Qt.rgba(0,0,0,0)
             Component.onCompleted: {
                 if(modelData == selectedColor)
                     colorGrid.currentIndex = index
@@ -93,8 +95,8 @@ VclMenu {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    colorMenu.menuItemClicked(modelData)
-                    colorMenu.close()
+                    root.menuItemClicked(modelData)
+                    root.close()
                 }
                 onEntered: colorGrid.currentIndex = index
             }

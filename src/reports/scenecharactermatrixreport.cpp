@@ -12,7 +12,6 @@
 ****************************************************************************/
 
 #include "scenecharactermatrixreport.h"
-#include "transliteration.h"
 #include "application.h"
 
 #include <QPrinter>

@@ -22,7 +22,7 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -40,8 +40,8 @@ Item {
         userAccountDialog.open()
 
         if(Scrite.user.loggedIn && profileScreen && profileScreen !== "") {
-            Utils.execLater(userAccountDialog, 500, () => {
-                                Announcement.shout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
+            Runtime.execLater(userAccountDialog, 500, () => {
+                                Runtime.shoutout(Runtime.announcementIds.userProfileScreenPage, profileScreen)
                             })
         }
     }
@@ -54,6 +54,8 @@ Item {
 
         width: 900
         height: 620
+
+        handleLanguageShortcuts: true
         title: screenItem ? screenItem.title : "Activation Workflow"
 
         onOpened: {
@@ -160,7 +162,7 @@ Item {
                 if(Notification.active && Scrite.user.info.hasUpcomingSubscription)
                     Notification.active = false
 
-                _private.trackSessionStatus.configure()
+                // _private.trackSessionStatus.configure()
             }
         }
 
@@ -227,15 +229,15 @@ Item {
                 }
             }
 
-            Component.onCompleted: Utils.execLater(_private, 1000, () => { _private.trackApplicationState.tracking = true })
+            Component.onCompleted: Runtime.execLater(_private, 1000, () => { _private.trackApplicationState.tracking = true })
         }
 
         readonly property SessionStatusRestApiCall sessionStatusApi: SessionStatusRestApiCall {
-            onFinished: {
-                if(hasResponse && !hasError) {
-                    _private.trackSessionStatus.start()
-                }
-            }
+            // onFinished: {
+            //     if(hasResponse && !hasError) {
+            //         _private.trackSessionStatus.start()
+            //     }
+            // }
         }
     }
 }

@@ -12,6 +12,7 @@
 ****************************************************************************/
 
 #include "user.h"
+#include "utils.h"
 #include "undoredo.h"
 #include "fountain.h"
 #include "hourglass.h"
@@ -32,6 +33,7 @@ ScreenplayElement::ScreenplayElement(QObject *parent)
     this->setScreenplay(qobject_cast<Screenplay *>(parent));
 
     connect(this, &ScreenplayElement::sceneChanged, this, &ScreenplayElement::elementChanged);
+    connect(this, &ScreenplayElement::omittedChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::expandedChanged, this, &ScreenplayElement::elementChanged);
     connect(this, &ScreenplayElement::userSceneNumberChanged, this,
             &ScreenplayElement::elementChanged);
@@ -308,6 +310,30 @@ void ScreenplayElement::setPageBreakBefore(bool val)
 int ScreenplayElement::wordCount() const
 {
     return m_scene.isNull() ? 0 : m_scene->wordCount();
+}
+
+QString ScreenplayElement::delegateKind() const
+{
+    if (m_elementType == ScreenplayElement::BreakElementType) {
+        switch (m_breakType) {
+        case Screenplay::Act:
+            return QStringLiteral("actBreak");
+        case Screenplay::Episode:
+            return QStringLiteral("episodeBreak");
+        case Screenplay::Interval:
+            return QStringLiteral("intervalBreak");
+        default:
+            return QStringLiteral("genericBreak");
+        }
+    }
+
+    if (m_elementType == ScreenplayElement::SceneElementType) {
+        if (m_omitted)
+            return QStringLiteral("omittedScene");
+        return QStringLiteral("scene");
+    }
+
+    return QStringLiteral("generic");
 }
 
 bool ScreenplayElement::canSerialize(const QMetaObject *mo, const QMetaProperty &prop) const
@@ -2024,7 +2050,7 @@ QList<ScreenplayElement *> Screenplay::sceneElements(Scene *scene, int max) cons
     return elements;
 }
 
-int Screenplay::firstSceneIndex() const
+int Screenplay::firstSceneElementIndex() const
 {
     int index = 0;
     while (index < m_elements.size()) {
@@ -2038,7 +2064,7 @@ int Screenplay::firstSceneIndex() const
     return -1;
 }
 
-int Screenplay::lastSceneIndex() const
+int Screenplay::lastSceneElementIndex() const
 {
     int index = m_elements.size() - 1;
     while (index >= 0) {
@@ -2237,6 +2263,8 @@ void Screenplay::connectToScreenplayElementSignals(ScreenplayElement *ptr)
     if (ptr == nullptr)
         return;
 
+    connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::onScreenplayElementChanged,
+            Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged,
             Qt::UniqueConnection);
     connect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement,
@@ -2272,6 +2300,8 @@ void Screenplay::disconnectFromScreenplayElementSignals(ScreenplayElement *ptr)
     if (ptr == nullptr)
         return;
 
+    disconnect(ptr, &ScreenplayElement::elementChanged, this,
+               &Screenplay::onScreenplayElementChanged);
     disconnect(ptr, &ScreenplayElement::elementChanged, this, &Screenplay::screenplayChanged);
     disconnect(ptr, &ScreenplayElement::aboutToDelete, this, &Screenplay::removeElement);
     disconnect(ptr, &ScreenplayElement::sceneReset, this, &Screenplay::onSceneReset);
@@ -2417,7 +2447,7 @@ void Screenplay::setCurrentElementIndex(int val)
         this->setActiveScene(nullptr);
 }
 
-int Screenplay::nextSceneElementIndex()
+int Screenplay::nextSceneElementIndex() const
 {
     int index = m_currentElementIndex + 1;
     while (index < m_elements.size() - 1) {
@@ -2436,7 +2466,7 @@ int Screenplay::nextSceneElementIndex()
     return m_elements.size() - 1;
 }
 
-int Screenplay::previousSceneElementIndex()
+int Screenplay::previousSceneElementIndex() const
 {
     int index = m_currentElementIndex - 1;
     while (index >= 0) {
@@ -3011,6 +3041,8 @@ QVariant Screenplay::data(const QModelIndex &index, int role) const
         return element->breakType();
     case SceneRole:
         return QVariant::fromValue<Scene *>(element->scene());
+    case DelegateKindRole:
+        return element->delegateKind();
     default:
         break;
     }
@@ -3022,11 +3054,12 @@ QHash<int, QByteArray> Screenplay::roleNames() const
 {
     static QHash<int, QByteArray> roles;
     if (roles.isEmpty()) {
-        roles[IdRole] = "id";
+        roles[IdRole] = "sceneID";
+        roles[SceneRole] = "scene";
+        roles[BreakTypeRole] = "breakType";
+        roles[DelegateKindRole] = "delegateKind";
         roles[ScreenplayElementRole] = "screenplayElement";
         roles[ScreenplayElementTypeRole] = "screenplayElementType";
-        roles[BreakTypeRole] = "breakType";
-        roles[SceneRole] = "scene";
     }
 
     return roles;
@@ -3180,6 +3213,18 @@ void Screenplay::resetActiveScene()
     m_activeScene = nullptr;
     emit activeSceneChanged();
     this->setCurrentElementIndex(-1);
+}
+
+void Screenplay::onScreenplayElementChanged()
+{
+    ScreenplayElement *ptr = qobject_cast<ScreenplayElement *>(this->sender());
+    if (ptr) {
+        const int row = m_elements.indexOf(ptr);
+        if (row >= 0) {
+            const QModelIndex index = this->index(row, 0);
+            emit dataChanged(index, index);
+        }
+    }
 }
 
 void Screenplay::onSceneReset(int elementIndex)
@@ -3558,7 +3603,7 @@ void ScreenplayTracks::refresh()
     QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator it = map.begin();
     QMap<QString, QMap<QString, QList<ScreenplayElement *>>>::iterator end = map.end();
     while (it != end) {
-        const QString category = Application::instance()->camelCased(it.key());
+        const QString category = Utils::SMath::titleCased(it.key());
         const QMap<QString, QList<ScreenplayElement *>> groupElementsMap = it.value();
 
         QVariantList categoryTrackItems;
@@ -3566,7 +3611,7 @@ void ScreenplayTracks::refresh()
         QMap<QString, QList<ScreenplayElement *>>::const_iterator it2 = groupElementsMap.begin();
         QMap<QString, QList<ScreenplayElement *>>::const_iterator end2 = groupElementsMap.end();
         while (it2 != end2) {
-            const QString group = Application::instance()->camelCased(it2.key());
+            const QString group = Utils::SMath::titleCased(it2.key());
             QList<ScreenplayElement *> elements = it2.value();
             std::sort(elements.begin(), elements.end(),
                       [](ScreenplayElement *a, ScreenplayElement *b) {

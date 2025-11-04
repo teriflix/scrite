@@ -23,7 +23,7 @@ import Qt.labs.qmlmodels 1.0
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/controls"
 import "qrc:/qml/helpers"
@@ -116,8 +116,8 @@ DialogLauncher {
 
                         text: {
                             let ret = dialog.subscription.hasExpired ? "Was used for " : (dialog.subscription.isUpcoming ? "Will be valid for " : "Valid for ")
-                            ret += "<b>" + Utils.daysSpanAsString(dialog.subscription.plan.duration) + "</b>"
-                            ret += " from <b>" + Utils.formatDateIncludingYear(new Date(dialog.subscription.from)) + "</b> until <b>" + Utils.formatDateIncludingYear(new Date(dialog.subscription.until)) + "</b>"
+                            ret += "<b>" + Runtime.daysSpanAsString(dialog.subscription.plan.duration) + "</b>"
+                            ret += " from <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.from)) + "</b> until <b>" + Runtime.formatDateIncludingYear(new Date(dialog.subscription.until)) + "</b>"
                             ret += ", on up to " + dialog.subscription.plan.devices + " devices."
                             return ret
                         }

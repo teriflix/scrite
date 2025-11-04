@@ -42,6 +42,8 @@ public:
     QObject *source() const { return m_source; }
     Q_SIGNAL void sourceChanged();
 
+    void setSourceModel(QAbstractItemModel *model);
+
     Q_PROPERTY(bool isSourceScene READ isSourceScene NOTIFY sourceChanged)
     bool isSourceScene() const;
 
@@ -51,24 +53,22 @@ public:
     Q_PROPERTY(Screenplay *screenplay READ screenplay NOTIFY sourceChanged)
     Screenplay *screenplay() const;
 
+    Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
+    int elementCount() const { return this->rowCount(QModelIndex()); }
+    Q_SIGNAL void elementCountChanged() const;
+
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
     void setCurrentIndex(int val);
-    int currentIndex() const { return m_currentIndex; }
-    Q_SIGNAL void currentIndexChanged(int val);
+    int currentIndex() const;
+    Q_SIGNAL void currentIndexChanged();
 
-    Q_PROPERTY(ScreenplayElement *currentElement READ currentElement NOTIFY currentElementChanged)
-    ScreenplayElement *currentElement() const { return m_currentElement; }
-    Q_SIGNAL void currentElementChanged();
+    Q_PROPERTY(ScreenplayElement *currentElement READ currentElement NOTIFY currentIndexChanged)
+    ScreenplayElement *currentElement() const;
 
-    Q_PROPERTY(Scene *currentScene READ currentScene NOTIFY currentElementChanged)
+    Q_PROPERTY(Scene *currentScene READ currentScene NOTIFY currentIndexChanged)
     Scene *currentScene() const;
 
-    Q_PROPERTY(int elementCount READ elementCount NOTIFY elementCountChanged)
-    int elementCount() const;
-    Q_SIGNAL void elementCountChanged();
-
-    Q_PROPERTY(
-            bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
+    Q_PROPERTY(bool hasNonStandardScenes READ hasNonStandardScenes NOTIFY hasNonStandardScenesChanged)
     bool hasNonStandardScenes() const;
     Q_SIGNAL void hasNonStandardScenesChanged();
 
@@ -80,17 +80,13 @@ public:
     bool isHeightHintsAvailable() const;
     Q_SIGNAL void heightHintsAvailableChanged();
 
-    Q_PROPERTY(int initialLoadTreshold READ initialLoadTreshold WRITE setInitialLoadTreshold NOTIFY
-                       initialLoadTresholdChanged)
-    void setInitialLoadTreshold(int val);
-    int initialLoadTreshold() const { return m_initialLoadTreshold; }
-    Q_SIGNAL void initialLoadTresholdChanged();
-
-    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *ptr, SceneElement *element,
-                                                int textPosition);
-    Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *ptr);
-    Q_INVOKABLE int previousSceneElementIndex();
-    Q_INVOKABLE int nextSceneElementIndex();
+    Q_INVOKABLE ScreenplayElement *splitElement(ScreenplayElement *screenplayElement,
+                                                SceneElement *paragarph, int textPosition);
+    Q_INVOKABLE ScreenplayElement *mergeElementWithPrevious(ScreenplayElement *screenplayElement);
+    Q_INVOKABLE int previousSceneElementIndex() const;
+    Q_INVOKABLE int nextSceneElementIndex() const;
+    Q_INVOKABLE int firstSceneElementIndex() const;
+    Q_INVOKABLE int lastSceneElementIndex() const;
     Q_INVOKABLE QVariant at(int row) const;
     Q_INVOKABLE void refresh();
 
@@ -98,6 +94,7 @@ public:
         IdRole = Qt::UserRole,
         ScreenplayElementRole,
         ScreenplayElementTypeRole,
+        DelegateKindRole,
         BreakTypeRole,
         SceneRole,
         ModelDataRole
@@ -105,19 +102,11 @@ public:
     Q_ENUM(Roles)
     QHash<int, QByteArray> roleNames() const;
     QVariant data(const QModelIndex &index, int role) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    void fetchMore(const QModelIndex &parent);
-    bool canFetchMore(const QModelIndex &parent) const;
 
 private:
-    void setCurrentIndexInternal(int val);
-    void setCurrentElement(ScreenplayElement *val);
     QVariant data(ScreenplayElement *element, int row, int role) const;
 
     void resetSource();
-    void clearCurrentIndex();
-    void continueFetchingMore();
-    void updateCurrentIndexAndCount();
 
 private:
     int m_adapterRowCount = MAX_ELEMENT_COUNT;

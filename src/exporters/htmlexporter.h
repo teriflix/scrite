@@ -42,7 +42,7 @@ public:
     bool isExportWithSceneColors() const { return m_exportWithSceneColors; }
     Q_SIGNAL void exportWithSceneColorsChanged();
 
-    bool canBundleFonts() const { return true; }
+    bool canBundleFonts() const { return false; }
     bool requiresConfiguration() const { return true; }
 
 protected:

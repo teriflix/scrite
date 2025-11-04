@@ -26,6 +26,8 @@
 
   4. Content is shown in a ScrollView, whose scrollbars show up whenever size available
      is less than the implicit-size declared by the content component.
+
+  5. Handles language change shortcuts, provided handleLanguageShortcuts is set to true.
   */
 
 import QtQuick 2.15
@@ -35,7 +37,6 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 
@@ -59,14 +60,17 @@ Dialog {
     // drops a file on the Scrite window to import it.
     property bool closeOnDragDrop: true
 
+    // If set, then this dialog box handles language change shortcuts.
+    property bool handleLanguageShortcuts: false
+
     // Assign a component whose instance may be shown as background
     property Component backdrop: null
 
     // Assign a component whose instance may be shown in the content
     property Component content: Item { }
-    property alias contentImplicitWidth: contentItemLoader.implicitWidth
-    property alias contentImplicitHeight: contentItemLoader.implicitHeight
-    property alias contentInstance: contentItemLoader.item
+    property alias contentImplicitWidth: _contentItemLoader.implicitWidth
+    property alias contentImplicitHeight: _contentItemLoader.implicitHeight
+    property alias contentInstance: _contentItemLoader.item
 
     // Customise the buttons to show on the tilebar on the right side.
     // By default a check-mark is shown.
@@ -88,7 +92,7 @@ Dialog {
     }
 
     property Component bottomBar
-    property alias bottomBarInstance: footerLoader.item
+    property alias bottomBarInstance: _footerLoader.item
 
     // This signal is emitted after the dialog box has been dismissed.
     signal dismissed()
@@ -118,35 +122,44 @@ Dialog {
     contentItem: Item {
         width: root.width
         height: root.height - root.header.height
-        clip: contentItemScroll.contentWidth > contentItemScroll.width ||
-              contentItemScroll.contentHeight > contentItemScroll.height
+
+        clip: _contentItemScroll.contentWidth > _contentItemScroll.width ||
+              _contentItemScroll.contentHeight > _contentItemScroll.height
 
         Flickable {
-            id: contentItemScroll
-            anchors.fill: parent
-            contentWidth: contentItemLoader.width
-            contentHeight: contentItemLoader.height
+            id: _contentItemScroll
+
             ScrollBar.vertical: VclScrollBar { }
             ScrollBar.horizontal: VclScrollBar { }
 
+            anchors.fill: parent
+
+            contentWidth: _contentItemLoader.width
+            contentHeight: _contentItemLoader.height
+
             Loader {
-                id: contentItemLoader
-                sourceComponent: content
-                active: false
+                id: _contentItemLoader
+
                 property real itemImplicitWidth: item ? item.implicitWidth : 0
                 property real itemImplicitHeight: item ? item.implicitHeight : 0
-                width: (itemImplicitWidth === 0) ? contentItemScroll.width : Math.max(contentItemScroll.width,itemImplicitWidth)
-                height: (itemImplicitHeight === 0) ? contentItemScroll.height : Math.max(contentItemScroll.height,itemImplicitHeight)
+
+                width: (itemImplicitWidth === 0) ? _contentItemScroll.width : Math.max(_contentItemScroll.width,itemImplicitWidth)
+                height: (itemImplicitHeight === 0) ? _contentItemScroll.height : Math.max(_contentItemScroll.height,itemImplicitHeight)
+
+                active: false
+                sourceComponent: content
 
                 onLoaded: item.focus = true
 
                 Connections {
                     target: root
+
                     function onAboutToShow() {
-                        contentItemLoader.active = true
+                        _contentItemLoader.active = true
                     }
+
                     function onClosed() {
-                        contentItemLoader.active = false
+                        _contentItemLoader.active = false
                     }
                 }
             }
@@ -154,69 +167,56 @@ Dialog {
     }
 
     header: Rectangle {
-        color: Runtime.colors.accent.c600.background
         width: root.width
-        height: dialogHeaderLayout.height
+        height: _dialogHeaderLayout.height
+
+        color: Runtime.colors.accent.c600.background
 
         RowLayout {
-            id: dialogHeaderLayout
-            spacing: 2
+            id: _dialogHeaderLayout
+
             width: parent.width
+
+            spacing: 2
 
             VclLabel {
                 Layout.alignment: Qt.AlignVCenter
                 Layout.fillWidth: true
 
-                font.bold: true
-                font.pointSize: Runtime.idealFontMetrics.font.pointSize
                 color: Runtime.colors.accent.c600.text
                 padding: 16
                 text: root.title
+
+                font.bold: true
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize
             }
 
             Loader {
+                active: root.visible
+                sourceComponent: titleBarButtons
+
                 Layout.alignment: Qt.AlignVCenter
                 Layout.rightMargin: 8
-                sourceComponent: titleBarButtons
-                active: root.visible
             }
         }
     }
 
     footer: Rectangle {
-        color: Runtime.colors.primary.c200.background
-        height: footerLoader.item ? footerLoader.height : 0
         visible: height > 0
+        color: Runtime.colors.primary.c200.background
+
+        height: _footerLoader.item ? _footerLoader.height : 0
 
         Loader {
-            id: footerLoader
+            id: _footerLoader
+
             width: parent.width
+
             sourceComponent: bottomBar
         }
     }
 
     // Private section
-    QtObject {
-        id: _private
-
-        property bool overrideCursorMustBeRestored: false
-    }
-
-    Component {
-      id: customBackground
-
-      Loader {
-        width: root.width
-        height: root.height
-        sourceComponent: root.backdrop
-        active: root.visible
-
-        BoxShadow {
-          anchors.fill: parent
-        }
-      }
-    }
-
     Announcement.onIncoming: (type,data) => {
                                  if(root.closeOnDragDrop && type === Runtime.announcementIds.closeDialogBoxRequest)
                                     root.close()
@@ -224,27 +224,86 @@ Dialog {
 
     Component.onCompleted: {
         if(root.backdrop) {
-            background = customBackground.createObject(root)
+            background = _customBackground.createObject(root)
+        }
+    }
+
+    QtObject {
+        id: _private
+
+        property bool overrideCursorMustBeRestored: false
+    }
+
+    Item {
+        visible: false
+
+        /**
+          Language shortcuts from ActionHub.languageOptions will stop working
+          whenever a dialog-box is shown. This is how Qt's Action {} items are
+          designed to work. They only respond to shortcut events if they are
+          created in the same overlay as the current one.
+
+          The following repeater creates temporary shortcuts for use within the
+          dialog box, only for language switching. All other actions remain
+          unavailable.
+          */
+        Repeater {
+            model: root.visible && root.modal && root.handleLanguageShortcuts ? LanguageEngine.supportedLanguages : 0
+
+            Item {
+                required property var language // This is of type Language, but we have to use var here.
+                // You cannot use Q_GADGET struct names as type names in QML
+                // that privilege is only reserved for QObject types.
+
+                Shortcut {
+                    sequence: language.shortcut()
+
+                    onActivated: Runtime.language.setActiveCode(language.code)
+                }
+            }
+        }
+    }
+
+    Component {
+        id: _customBackground
+
+        Loader {
+            width: root.width
+            height: root.height
+
+            sourceComponent: root.backdrop
+            active: root.visible
+
+            BoxShadow {
+                anchors.fill: parent
+            }
         }
     }
 
     onAboutToShow: {
         Scrite.window.closeButtonVisible = appCloseButtonVisible
         if(appOverrideCursor >= 0) {
-            Scrite.app.installOverrideCursor(appOverrideCursor);
+            MouseCursor.setShape(appOverrideCursor);
             _private.overrideCursorMustBeRestored = true
         }
         focus = true
         Runtime.dialogs.include(root)
     }
+
     onAboutToHide: {
         Scrite.window.closeButtonVisible = true
         if(_private.overrideCursorMustBeRestored) {
-            Scrite.app.rollbackOverrideCursor()
+            MouseCursor.unsetShape()
             _private.overrideCursorMustBeRestored = false
         }
         Runtime.dialogs.exclude(root)
     }
-    onAppCloseButtonVisibleChanged: Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
-    onClosed: Utils.execLater(root, 50, dismissed)
+
+    onAppCloseButtonVisibleChanged: {
+        Scrite.window.closeButtonVisible = visible && appCloseButtonVisible
+    }
+
+    onClosed: {
+        Runtime.execLater(root, 50, dismissed)
+    }
 }

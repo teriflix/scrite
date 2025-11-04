@@ -20,7 +20,7 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 
 ScrollBar {
-    id: scrollBar
+    id: root
 
     Material.primary: Runtime.colors.primary.key
     Material.accent: Runtime.colors.accent.key
@@ -41,12 +41,12 @@ ScrollBar {
 
     Behavior on opacity {
         enabled: Runtime.applicationSettings.enableAnimations
-        NumberAnimation { duration: 250 }
+        NumberAnimation { duration: Runtime.stdAnimationDuration }
     }
 
     Component.onCompleted: {
         if(flickable === null)
-            flickable = Scrite.app.findFirstParentOfType(scrollBar, "QQuickFlickable")
+            flickable = Object.firstParentByType(root, "QQuickFlickable")
     }
 
     DelayedPropertyBinder {

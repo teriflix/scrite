@@ -18,7 +18,7 @@ import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
 
-import "qrc:/js/utils.js" as Utils
+
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
@@ -73,12 +73,11 @@ Item {
                 anchors.margins: 1
 
                 clip: true
+                color: Runtime.colors.primary.c50.text
+                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : File.read(Scrite.document.structure.defaultGroupsDataFile)
 
                 font.family: "Courier Prime"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
-                color: Runtime.colors.primary.c50.text
-
-                text: target === e_CurrentDocumentTarget ? Scrite.document.structure.groupsData : Scrite.app.fileContents(Scrite.document.structure.defaultGroupsDataFile)
 
                 onTextChanged: cmdApplyButton.enabled = true
             }
@@ -106,7 +105,7 @@ Item {
                     if(target === e_CurrentDocumentTarget)
                         Scrite.document.structure.groupsData = storyBeatsEditor.text
                     else {
-                        Scrite.app.writeToFile(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
+                        File.write(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
 
                         MessageBox.question("Story Beats",
                                             "Do you want to use these story beats in the current document as well?",

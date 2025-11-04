@@ -30,7 +30,8 @@ TabSequenceManager::TabSequenceManager(QObject *parent) : QObject(parent)
 
 TabSequenceManager::~TabSequenceManager()
 {
-    qApp->removeEventFilter(this);
+    if (qApp)
+        qApp->removeEventFilter(this);
 }
 
 void TabSequenceManager::setEnabled(bool val)

@@ -38,9 +38,6 @@ public:
     bool isCloseButtonVisible() const { return m_closeButtonVisible; }
     Q_SIGNAL void closeButtonVisibleChanged();
 
-protected:
-    void showEvent(QShowEvent *);
-
 private:
     void initializeFileNameToOpen();
 
