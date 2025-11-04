@@ -1281,7 +1281,7 @@ Item {
 
             checkable: true
             enabled: ActionHandler.canHandle
-            objectName: "loadMovie"
+            objectName: "togglePlayback"
             shortcut: defaultShortcut
             text: checked ? "Pause" : "Play"
 
@@ -1401,6 +1401,26 @@ Item {
         }
 
         Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Shift+Qt.Key_Up)
+
+            enabled: ActionHandler.canHandle
+            objectName: "previousScreen"
+            shortcut: defaultShortcut
+            text: "Previous Screen"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Shift+Qt.Key_Down)
+
+            enabled: ActionHandler.canHandle
+            objectName: "nextScreen"
+            shortcut: defaultShortcut
+            text: "Next Screen"
+        }
+
+        Action {
             readonly property string tooltip: "Use video time as current scene time offset"
             readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Greater)
 
@@ -1414,12 +1434,22 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Greater)
+
+            enabled: ActionHandler.canHandle
+            objectName: "noteOffset"
+            shortcut: defaultShortcut
+            text: "Note Current Offset"
+        }
+
+        Action {
+            readonly property bool visible: false
             readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Greater)
 
             enabled: ActionHandler.canHandle
             objectName: "adjustOffsets"
             shortcut: defaultShortcut
-            text: "Adjust Offsets"
+            text: "Note Current & Adjust Subsequent Offsets"
         }
 
         Action {
@@ -1452,6 +1482,60 @@ Item {
             enabled: ActionHandler.canHandle
             objectName: "autoScroll"
             text: "Auto Scroll"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "toggleSceneTimeLock"
+            text: "Toggle Current Scene Time Lock"
+            shortcut: "L"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "unlockAllSceneTimes"
+            text: "Unlock All Scene Times"
+            shortcut: "U"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "markStart"
+            text: "Mark Start"
+            shortcut: "S"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "markEnd"
+            text: "Mark End"
+            shortcut: "E"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "markKeyFrame"
+            text: "Mark Key Frame"
+            shortcut: "K"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "adjustUnlockedTimes"
+            text: "Adjust Unlocked Times"
+            shortcut: "A"
         }
 
         Action {

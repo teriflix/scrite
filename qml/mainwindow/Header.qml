@@ -40,7 +40,7 @@ Rectangle {
             display: ToolButton.TextBesideIcon
             down: _mainMenu.visible
             text: "Scrite"
-            visible: !_group1.visible
+            visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab && !_group1.visible
 
             icon.source: "qrc:/icons/exporter/scrite.png"
 
@@ -74,7 +74,8 @@ Rectangle {
         RowLayout {
             id: _group1
 
-            visible: root.width > _group1.width + _group2.width + _mainTabs.width + _userAccount.width
+            visible: Runtime.mainWindowTab !== Runtime.MainWindowTab.ScritedTab &&
+                     root.width > _group1.width + _group2.width + _mainTabs.width + _userAccount.width
 
             ActionManagerToolBar {
                 actionManager: ActionHub.fileOperations
@@ -187,10 +188,25 @@ Rectangle {
             }
         }
 
-        ActionManagerToolBar {
-            actionManager: ActionHub.scritedOptions
+        RowLayout {
+            id: _scritedGroup
 
             visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScritedTab
+
+            ActionToolButton {
+                action: ActionHub.fileOperations.find("fileOpen")
+            }
+
+            Rectangle {
+                Layout.fillHeight: true
+                Layout.preferredWidth: 1
+
+                color: Runtime.colors.primary.borderColor
+            }
+
+            ActionManagerToolBar {
+                actionManager: ActionHub.scritedOptions
+            }
         }
 
         Item {
@@ -206,9 +222,9 @@ Rectangle {
                 ToolButton {
                     required property var qmlAction
 
-                    Material.primary: Runtime.colors.primary.key
-                    Material.accent: Runtime.colors.accent.key
                     Material.theme: Runtime.colors.theme
+                    Material.accent: Runtime.colors.accent.key
+                    Material.primary: Runtime.colors.primary.key
 
                     ToolTip.text: {
                         const tt = qmlAction.tooltip !== undefined ? qmlAction.tooltip : qmlAction.text
