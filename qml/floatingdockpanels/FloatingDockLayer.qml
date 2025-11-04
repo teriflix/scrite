@@ -37,6 +37,5 @@ QtObject {
 
         // Init dock panels within this module
         FloatingMarkupToolsDock.init()
-        FloatingShortcutsDock.init()
     }
 }

@@ -42,6 +42,7 @@ public:
     Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
 
     static ActionManager *findManager(QObject *action);
+    static bool canChangeActionShortcut(QObject *action);
     static bool changeActionShortcut(QObject *action, const QString &shortcut);
     static QKeySequence defaultActionShortcut(QObject *action);
     static bool restoreActionShortcut(QObject *action);
@@ -304,9 +305,10 @@ public:
 
     Q_INVOKABLE QObject *findActionForShortcut(const QString &shortcut) const;
     Q_INVOKABLE bool restoreActionShortcut(QObject *action) const;
+    Q_INVOKABLE bool isActionShortcutEditable(QObject *action) const;
 
     // QAbstractItemModel interface
-    enum { GroupNameRole, ActionManagerRole, ActionRole };
+    enum { GroupNameRole, ActionManagerRole, ActionRole, ShortcutIsEditableRole };
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
     QHash<int, QByteArray> roleNames() const;
@@ -354,7 +356,7 @@ public:
         VisibleActions = 16,
         EnabledActions = 32,
         CustomFilter = -1,
-        ShortcutsDockFilters = ActionsWithText | ActionsWithShortcut | VisibleActions,
+        ShortcutsDockFilters = ActionsWithText | ActionsWithShortcut,
         ShortcutsEditorFilters = ActionsWithText | ActionsWithShortcut | ActionsWithDefaultShortcut
                 | ActionsWithObjectName
     };

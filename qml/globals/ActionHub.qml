@@ -282,14 +282,16 @@ Item {
             shortcut: defaultShortcut
 
             icon.source: {
-                if(Platform.isMacOSDesktop)
-                return "qrc:/icons/navigation/shortcuts_macos.png"
-                if(Platform.isWindowsDesktop)
-                return "qrc:/icons/navigation/shortcuts_windows.png"
+                if(Platform.isMacOSDesktop) {
+                    return "qrc:/icons/navigation/shortcuts_macos.png"
+                }
+                if(Platform.isWindowsDesktop) {
+                    return "qrc:/icons/navigation/shortcuts_windows.png"
+                }
                 return "qrc:/icons/navigation/shortcuts_linux.png"
             }
 
-            onTriggered: Runtime.shortcutsDockWidgetSettings.visible = !Runtime.shortcutsDockWidgetSettings.visible
+            onTriggered: ShortcutEditorDialog.launch()
         }
 
         Action {

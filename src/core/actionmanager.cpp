@@ -103,13 +103,42 @@ ActionManager *ActionManager::findManager(QObject *action)
     return nullptr;
 }
 
+bool ActionManager::canChangeActionShortcut(QObject *action)
+{
+    /*
+     * Actions with editable shortcuts must meet the following criteria
+     *
+     * 1. They should have an objectName
+     * 2. They should have a readonly string property by name defaultShortcut
+     * 3. They must belong to an ActionManager
+     */
+
+    // 3rd Condition Check
+    const ActionManager *manager = findManager(action);
+    if (manager == nullptr)
+        return false;
+
+    // 1st Condition Check
+    if (action->objectName().isEmpty())
+        return false;
+
+    // 2nd Condition Check
+    const QMetaObject *mo = action->metaObject();
+    const QMetaProperty defaultShortcutProperty =
+            mo->property(mo->indexOfProperty(_QQuickActionDefaultShortcutProperty));
+    if (!defaultShortcutProperty.isValid() || defaultShortcutProperty.isWritable()
+        || defaultShortcutProperty.userType() != QMetaType::QString)
+        return false;
+
+    return true;
+}
+
 bool ActionManager::changeActionShortcut(QObject *action, const QString &shortcut)
 {
     if (shortcut.isEmpty())
         return false;
 
-    const ActionManager *manager = findManager(action);
-    if (manager == nullptr)
+    if (!canChangeActionShortcut(action))
         return false;
 
     return action->setProperty(_QQuickActionShortcutProperty, shortcut);
@@ -117,6 +146,9 @@ bool ActionManager::changeActionShortcut(QObject *action, const QString &shortcu
 
 QKeySequence ActionManager::defaultActionShortcut(QObject *action)
 {
+    if (!canChangeActionShortcut(action))
+        return QKeySequence();
+
     const QVariant defaultShortcutValue = action->property(_QQuickActionDefaultShortcutProperty);
     if (defaultShortcutValue.isValid()) {
         const QKeySequence defaultShortcut = defaultShortcutValue.userType() == QMetaType::QString
@@ -130,8 +162,7 @@ QKeySequence ActionManager::defaultActionShortcut(QObject *action)
 
 bool ActionManager::restoreActionShortcut(QObject *action)
 {
-    const ActionManager *manager = findManager(action);
-    if (manager == nullptr)
+    if (!canChangeActionShortcut(action))
         return false;
 
     const QKeySequence defaultShortcut = defaultActionShortcut(action);
@@ -937,6 +968,11 @@ bool ActionsModel::restoreActionShortcut(QObject *action) const
     return ActionManager::restoreActionShortcut(action);
 }
 
+bool ActionsModel::isActionShortcutEditable(QObject *action) const
+{
+    return ActionManager::canChangeActionShortcut(action);
+}
+
 int ActionsModel::rowCount(const QModelIndex &parent) const
 {
     return parent.isValid() ? 0 : m_items.size();
@@ -954,6 +990,8 @@ QVariant ActionsModel::data(const QModelIndex &index, int role) const
         return QVariant::fromValue<QObject *>(m_items[index.row()].actionManager);
     case ActionRole:
         return QVariant::fromValue<QObject *>(m_items[index.row()].action);
+    case ShortcutIsEditableRole:
+        return this->isActionShortcutEditable(m_items[index.row()].action);
     default:
         break;
     }
@@ -965,7 +1003,8 @@ QHash<int, QByteArray> ActionsModel::roleNames() const
 {
     return { { GroupNameRole, QByteArrayLiteral("groupName") },
              { ActionManagerRole, QByteArray("actionManager") },
-             { ActionRole, QByteArray("qmlAction") } };
+             { ActionRole, QByteArray("qmlAction") },
+             { ShortcutIsEditableRole, QByteArray("shortcutIsEditable") } };
 }
 
 void ActionsModel::reload()
@@ -1197,6 +1236,8 @@ void ActionsModelFilter::setFilters(Filters val)
 
     m_filters = val;
     emit filtersChanged();
+
+    this->invalidateFilter();
 }
 
 QObject *ActionsModelFilter::findActionForShortcut(const QString &shortcut) const

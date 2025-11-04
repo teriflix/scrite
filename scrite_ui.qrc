@@ -100,7 +100,6 @@
         <file>qml/floatingdockpanels/FloatingDock.qml</file>
         <file>qml/floatingdockpanels/FloatingDockLayer.qml</file>
         <file>qml/floatingdockpanels/FloatingMarkupToolsDock.qml</file>
-        <file>qml/floatingdockpanels/FloatingShortcutsDock.qml</file>
         <file>qml/floatingdockpanels/qmldir</file>
         <file>qml/globals/ActionHub.qml</file>
         <file>qml/globals/Runtime.qml</file>
@@ -313,5 +312,6 @@
         <file>qml/notebookview/pages/NotesPage.qml</file>
         <file>qml/notebookview/helpers/DeleteConfirmationPopup.qml</file>
         <file>qml/notebookview/pages/AbstractNotePage.qml</file>
+        <file>qml/dialogs/ShortcutEditorDialog.qml</file>
     </qresource>
 </RCC>

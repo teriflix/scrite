@@ -26,130 +26,219 @@ import "qrc:/qml/controls"
 Item {
     id: root
 
+    enum FilterMethod { EditableShortcutsOnly, AllShortcuts }
+
+    property int filterMethod: ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly
     property real availableHeight: 500
 
     height: availableHeight
 
-    ListView {
-        id: _actionsView
-
+    ColumnLayout {
         anchors.fill: parent
+        anchors.margins: 11
 
-        ScrollBar.vertical: VclScrollBar { }
+        RowLayout {
+            Layout.fillWidth: true
 
-        FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+            TextField {
+                id: _filterText
 
-        boundsBehavior: Flickable.StopAtBounds
-        clip: true
-        highlightFollowsCurrentItem: true
-        highlightMoveDuration: 0
-        highlightResizeDuration: 0
-        keyNavigationEnabled: false
-        model: _actionsModel
+                Layout.fillWidth: true
 
-        section.property: "groupName"
-        section.criteria: ViewSection.FullString
-        section.labelPositioning: ViewSection.InlineLabels
-        section.delegate: VclLabel {
-            required property string section
-
-            width: _actionsView.width
-
-            text: section
-            color: Runtime.colors.accent.c100.text
-            padding: 12
-
-            font.bold: true
-
-            verticalAlignment: Text.AlignVCenter
-            horizontalAlignment: Text.AlignLeft
-
-            background: Rectangle {
-                color: Runtime.colors.accent.c100.background
-            }
-        }
-
-        delegate: Item {
-            required property int index
-            required property string groupName
-            required property var actionManager
-            required property var qmlAction
-
-            width: _actionsView.height < _actionsView.contentHeight ? _actionsView.width - 17 : _actionsView.width
-            height: _delegateLayout.height
-
-            MouseArea {
-                anchors.fill: parent
-
-                onClicked: _actionsView.currentIndex = index
+                placeholderText: "Filter / Search"
             }
 
-            RowLayout {
-                id: _delegateLayout
+            ToolButton {
+                id: _filterMethod
 
-                width: parent.width
+                ToolTip.text: "Filter Options"
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTip.visible: hovered
 
-                Image {
-                    Layout.leftMargin: 12
-                    Layout.preferredHeight: Runtime.iconImageSize
-                    Layout.preferredWidth: Runtime.iconImageSize
+                icon.source: "qrc:/icons/content/view_options.png"
 
-                    fillMode: Image.PreserveAspectFit
-                    source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
+                onClicked: {
+                    _optionsMenu.popup()
                 }
 
-                VclLabel {
-                    Layout.fillWidth: true
+                VclMenu {
+                    id: _optionsMenu
 
-                    text: qmlAction.text
-                    elide: Text.ElideRight
-                    padding: 10
-                }
+                    width: Math.max( Runtime.idealFontMetrics.boundingRect(_option1.text).width,
+                                    Runtime.idealFontMetrics.boundingRect(_option2.text).width ) + 100
 
-                ShortcutField {
-                    Layout.preferredWidth: _delegateLayout.width * 0.3
+                    VclMenuItem {
+                        id: _option1
 
-                    shortcut: Gui.nativeShortcut(qmlAction.shortcut)
-                    placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) : ""
+                        checkable: true
+                        checked: root.filterMethod === ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly
+                        text: "Only those with editable shortcuts"
 
-                    onActiveFocusChanged: {
-                        if(activeFocus) {
-                            _actionsView.currentIndex = index
-                        }
+                        onClicked: root.filterMethod = ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly
                     }
 
-                    onShortcutEdited: (newShortcut) => {
-                                          const conflictingAction = _actionsModel.findActionForShortcut(newShortcut)
-                                          if(conflictingAction) {
-                                              MessageBox.information("Shortcut Conflict",
-                                                                     Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
-                                          } else {
-                                            qmlAction.shortcut = newShortcut
-                                          }
-                                      }
-                }
+                    VclMenuItem {
+                        id: _option2
 
-                ToolButton {
-                    flat: true
+                        checkable: true
+                        checked: root.filterMethod === ApplicationShortcutsPage.FilterMethod.AllShortcuts
+                        text: "All shortcuts"
 
-                    visible: qmlAction.defaultShortcut !== undefined
-                    enabled: visible && Gui.nativeShortcut(qmlAction.defaultShortcut) !== Gui.nativeShortcut(qmlAction.shortcut)
-                    opacity: enabled ? 1 : 0.5
-                    icon.source: "qrc:/icons/content/undo.png"
-
-                    onClicked: _actionsModel.restoreActionShortcut(qmlAction)
+                        onClicked: root.filterMethod = ApplicationShortcutsPage.FilterMethod.AllShortcuts
+                    }
                 }
             }
         }
 
-        highlight: Rectangle {
-            color: Runtime.colors.primary.highlight.background
+        Rectangle {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            color: Runtime.colors.primary.c10.background
+            border.width: 1
+            border.color: Runtime.colors.primary.borderColor
+
+            ListView {
+                id: _actionsView
+
+                anchors.fill: parent
+                anchors.margins: 1
+
+                ScrollBar.vertical: VclScrollBar { }
+
+                FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
+
+                boundsBehavior: Flickable.StopAtBounds
+                clip: true
+                highlightFollowsCurrentItem: true
+                highlightMoveDuration: 0
+                highlightResizeDuration: 0
+                keyNavigationEnabled: false
+                model: _actionsModel
+
+                section.property: "groupName"
+                section.criteria: ViewSection.FullString
+                section.labelPositioning: ViewSection.InlineLabels
+                section.delegate: VclLabel {
+                    required property string section
+
+                    width: _actionsView.width
+
+                    text: section
+                    color: Runtime.colors.accent.c100.text
+                    padding: 12
+
+                    font.bold: true
+
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignLeft
+
+                    background: Rectangle {
+                        color: Runtime.colors.accent.c100.background
+                    }
+                }
+
+                delegate: Item {
+                    required property int index
+                    required property var qmlAction
+                    required property var actionManager
+                    required property bool shortcutIsEditable
+                    required property string groupName
+
+                    width: _actionsView.height < _actionsView.contentHeight ? _actionsView.width - 17 : _actionsView.width
+                    height: _delegateLayout.height
+
+                    MouseArea {
+                        anchors.fill: parent
+
+                        onClicked: _actionsView.currentIndex = index
+                    }
+
+                    RowLayout {
+                        id: _delegateLayout
+
+                        width: parent.width
+
+                        Image {
+                            Layout.leftMargin: 12
+                            Layout.preferredHeight: Runtime.iconImageSize
+                            Layout.preferredWidth: Runtime.iconImageSize
+
+                            fillMode: Image.PreserveAspectFit
+                            source: qmlAction.icon.source !== "" ? qmlAction.icon.source : "qrc:/icons/content/blank.png"
+                        }
+
+                        VclLabel {
+                            Layout.fillWidth: true
+
+                            text: qmlAction.text
+                            elide: Text.ElideRight
+                            padding: 10
+
+                            font.italic: qmlAction.visible !== undefined ? qmlAction.visible : true
+
+                            MouseArea {
+                                ToolTip.text: "This action isn't visible in any menu or toolbar."
+                                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                                ToolTip.visible: containsMouse
+
+                                anchors.fill: parent
+
+                                enabled: parent.font.italic
+                                hoverEnabled: true
+                            }
+                        }
+
+                        ShortcutField {
+                            Layout.preferredWidth: _delegateLayout.width * 0.3
+
+                            enabled: shortcutIsEditable
+                            opacity: enabled ? 1 : 0.5
+                            shortcut: Gui.nativeShortcut(qmlAction.shortcut)
+                            placeholderText: qmlAction.defaultShortcut !== undefined ? ("Default: " + Gui.nativeShortcut(qmlAction.defaultShortcut)) : ""
+
+                            onActiveFocusChanged: {
+                                if(activeFocus) {
+                                    _actionsView.currentIndex = index
+                                }
+                            }
+
+                            onShortcutEdited: (newShortcut) => {
+                                                  const conflictingAction = _actionsModel.findActionForShortcut(newShortcut)
+                                                  if(conflictingAction) {
+                                                      MessageBox.information("Shortcut Conflict",
+                                                                             Gui.nativeShortcut(newShortcut) + " is already mapped to <b>" + conflictingAction.text + "</b>.")
+                                                  } else {
+                                                    qmlAction.shortcut = newShortcut
+                                                  }
+                                              }
+                        }
+
+                        ToolButton {
+                            flat: true
+
+                            enabled: visible && shortcutIsEditable && Gui.nativeShortcut(qmlAction.defaultShortcut) !== Gui.nativeShortcut(qmlAction.shortcut)
+                            opacity: enabled ? 1 : (shortcutIsEditable ? 0.5 : 0)
+                            icon.source: "qrc:/icons/content/undo.png"
+
+                            onClicked: _actionsModel.restoreActionShortcut(qmlAction)
+                        }
+                    }
+                }
+
+                highlight: Rectangle {
+                    color: Runtime.colors.primary.highlight.background
+                }
+            }
         }
+
     }
 
     ActionsModelFilter {
         id: _actionsModel
 
-        filters: ActionsModelFilter.ShortcutsEditorFilters
+        filters: root.filterMethod === ApplicationShortcutsPage.FilterMethod.EditableShortcutsOnly ?
+                     ActionsModelFilter.ShortcutsEditorFilters : ActionsModelFilter.ShortcutsDockFilters
+        actionTextStartsWith: _filterText.text
     }
 }
