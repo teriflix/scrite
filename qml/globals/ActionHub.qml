@@ -395,6 +395,15 @@ Item {
 
         title: "Paragraph Format"
         objectName: "paragraphFormats"
+
+        Action {
+            enabled: ActionHandler.canHandle
+            objectName: "nextFormat"
+            shortcut: "Tab"
+            text: "Next Format"
+
+            icon.source: "qrc:/icons/action/keyboard_tab.png"
+        }
     }
 
     Repeater {

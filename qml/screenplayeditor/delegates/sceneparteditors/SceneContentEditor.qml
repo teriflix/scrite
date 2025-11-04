@@ -167,13 +167,10 @@ AbstractScenePartEditor {
                 }
             }
 
-            ShortcutsModelRecord {
-                group: "Formatting"
-                title: _sceneDocumentBinder.nextTabFormatAsString
+            ActionHandler {
+                action: ActionHub.paragraphFormats.find("nextFormat")
                 enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
-                visible: _sceneTextEditor.activeFocus && !_completion.model.hasSuggestion
-                priority: 1
-                shortcut: "Tab"
+                onTriggered: (source) => { _sceneDocumentBinder.tab() }
             }
         }
 
@@ -466,15 +463,6 @@ AbstractScenePartEditor {
 
         function handleSceneTextEditorReturnPressed(event) {
             event.accepted = false
-
-            // This should be same as
-            // if( event.modifiers & Qt.ControlModifier|Qt.ShiftModifier )
-            // but for whatever reason, that does not work.
-            /*if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
-                event.accepted = true
-                _splitSceneShortcut.trigger()
-                return
-            }*/
         }
 
         function handleSceneTextEditorTabPressed(event) {
@@ -486,17 +474,6 @@ AbstractScenePartEditor {
 
         function handleSceneTextEditorKeyPressed(event) {
             event.accepted = false
-
-            // This should be same as
-            // if( event.modifiers & Qt.ControlModifier|Qt.ShiftModifier )
-            // but for whatever reason, that does not work.
-            /*if(event.modifiers & Qt.ControlModifier && event.modifiers & Qt.ShiftModifier) {
-                if( (Platform.isMacOSDesktop && event.key === Qt.Key_Delete) || (event.key === Qt.Key_Backspace) ) {
-                    event.accepted = true
-                    _mergeSceneShortcut.trigger()
-                }
-                return
-            }*/
 
             if(event.modifiers === Qt.ControlModifier) {
                 switch(event.key) {
@@ -554,12 +531,10 @@ AbstractScenePartEditor {
             const activeFocus = _sceneTextEditor.activeFocus
             if(activeFocus) {
                 root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
-                // Runtime.screenplayEditorToolbar.set(_sceneTextEditor, _sceneDocumentBinder)
                 ActionHub.setBinder(_sceneDocumentBinder)
                 _sceneTextEditor.highlightCursor()
                 Runtime.shoutout(Runtime.announcementIds.sceneTextEditorReceivedFocus, _sceneTextEditor)
             } else {
-                // Runtime.screenplayEditorToolbar.reset(_sceneTextEditor, _sceneDocumentBinder)
                 ActionHub.resetBinder(_sceneDocumentBinder)
             }
         }

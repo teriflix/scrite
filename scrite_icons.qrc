@@ -45,6 +45,8 @@
         <file>icons/action/keyboard_arrow_down_inverted.png</file>
         <file>icons/action/keyboard_arrow_up.png</file>
         <file>icons/action/keyboard_arrow_up_inverted.png</file>
+        <file>icons/action/keyboard_tab.png</file>
+        <file>icons/action/keyboard_tab_inverted.png</file>
         <file>icons/action/layout_beat_sheet.png</file>
         <file>icons/action/layout_beat_sheet_inverted.png</file>
         <file>icons/action/layout_flow_horizontally.png</file>
