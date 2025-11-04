@@ -109,23 +109,13 @@ Rectangle {
 
             onPositionScreenplayEditorAtTitlePage: _elementListView.positionViewAtBeginning()
 
-            Shortcut {
-                context: Qt.ApplicationShortcut
-                sequence: "Alt+0"
+            ActionHandler {
+                action: ActionHub.screenplayEditorOptions.find("sidePanelVisibility")
+                checked: _sceneListPanel.expanded
 
-                ShortcutsModelItem.group: "Application"
-                ShortcutsModelItem.title: "Toggle Scene List Panel"
-                ShortcutsModelItem.visible: true
-                ShortcutsModelItem.enabled: true
-                ShortcutsModelItem.shortcut: nativeText
-                ShortcutsModelItem.canActivate: true
-                ShortcutsModelItem.onActivated: activate()
-
-                onActivated: activate()
-
-                function activate() {
-                    _sceneListPanel.expanded = !_sceneListPanel.expanded
-                }
+                onToggled: (source) => {
+                               _sceneListPanel.expanded = !_sceneListPanel.expanded
+                           }
             }
         }
     }

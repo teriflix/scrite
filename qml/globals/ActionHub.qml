@@ -721,6 +721,18 @@ Item {
         objectName: "screenplayEditorOptions"
 
         Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Alt+0"
+
+            objectName: "sidePanelVisibility"
+            checkable: true
+            checked: ActionHandler.active ? ActionHandler.active.checked : false
+            enabled: ActionHandler.canHandle
+            shortcut: defaultShortcut
+            text: "Toggle Scene List Panel"
+        }
+
+        Action {
             checkable: true
             checked: Runtime.screenplayEditorSettings.displayRuler
             text: "Ruler"
