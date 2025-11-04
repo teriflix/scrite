@@ -196,8 +196,6 @@ FocusScope {
                             text: qmlAction.text
                             elide: Text.ElideRight
                             padding: 10
-
-                            font.italic: qmlAction.visible !== undefined ? qmlAction.visible : true
                         }
 
                         ShortcutField {
