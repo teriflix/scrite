@@ -375,6 +375,7 @@ public:
 
     Q_INVOKABLE QObject *findActionForShortcut(const QString &shortcut) const;
     Q_INVOKABLE bool restoreActionShortcut(QObject *action) const;
+    Q_INVOKABLE int restoreAllActionShortcuts();
 
     // QQmlParserStatus interface
     void classBegin() { }

@@ -43,6 +43,7 @@ DialogLauncher {
         title: "Shortcuts"
 
         content: ApplicationShortcutsPage {
+            focus: true
             filterMethod: ApplicationShortcutsPage.FilterMethod.AllShortcuts
         }
     }

@@ -152,7 +152,7 @@ QKeySequence ActionManager::defaultActionShortcut(QObject *action)
     const QVariant defaultShortcutValue = action->property(_QQuickActionDefaultShortcutProperty);
     if (defaultShortcutValue.isValid()) {
         const QKeySequence defaultShortcut = defaultShortcutValue.userType() == QMetaType::QString
-                ? QKeySequence(defaultShortcutValue.toString())
+                ? QKeySequence::fromString(defaultShortcutValue.toString())
                 : defaultShortcutValue.value<QKeySequence>();
         return defaultShortcut;
     }
@@ -169,9 +169,10 @@ bool ActionManager::restoreActionShortcut(QObject *action)
     if (defaultShortcut.isEmpty())
         return false;
 
-    const QString currentShortcut = action->property(_QQuickActionShortcutProperty).toString();
-    if (currentShortcut == defaultShortcut.toString())
-        return true;
+    const QString currentSequence = action->property(_QQuickActionShortcutProperty).toString();
+    const QKeySequence currentShortcut = QKeySequence::fromString(currentSequence);
+    if (currentShortcut == defaultShortcut)
+        return false;
 
     return action->setProperty(_QQuickActionShortcutProperty, defaultShortcut.toString());
 }
@@ -1266,6 +1267,24 @@ bool ActionsModelFilter::restoreActionShortcut(QObject *action) const
     }
 
     return false;
+}
+
+int ActionsModelFilter::restoreAllActionShortcuts()
+{
+    int restoreCount = 0;
+
+    // NOTE: This works only for actions avaialable as filtered through this model
+    for (int i = 0; i < this->rowCount(); i++) {
+        const QModelIndex index = this->index(i, 0);
+        QObject *action = index.data(ActionsModel::ActionRole).value<QObject *>();
+        if (this->restoreActionShortcut(action)) {
+            Utils::Gui::log(action->objectName());
+            emit dataChanged(index, index);
+            ++restoreCount;
+        }
+    }
+
+    return restoreCount;
 }
 
 void ActionsModelFilter::componentComplete()

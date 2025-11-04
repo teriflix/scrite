@@ -23,7 +23,7 @@ import "qrc:/qml/helpers"
 import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 
-Item {
+FocusScope {
     id: root
 
     enum FilterMethod { EditableShortcutsOnly, AllShortcuts }
@@ -45,6 +45,7 @@ Item {
 
                 Layout.fillWidth: true
 
+                focus: true
                 placeholderText: "Filter / Search"
             }
 
@@ -85,6 +86,27 @@ Item {
                         text: "All shortcuts"
 
                         onClicked: root.filterMethod = ApplicationShortcutsPage.FilterMethod.AllShortcuts
+                    }
+                }
+            }
+
+            ToolButton {
+                flat: true
+
+                ToolTip.text: "Restore default shortcuts to all"
+                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
+                ToolTip.visible: hovered
+
+                icon.source: "qrc:/icons/content/undo.png"
+
+                onClicked: {
+                    const restoreCount = _actionsModel.restoreAllActionShortcuts()
+                    if(restoreCount > 0) {
+                        MessageBox.information("Shortcuts Restored",
+                                               "Default shortcut was restored on " + restoreCount + " action(s).")
+                    } else {
+                        MessageBox.information("None Required",
+                                               "No shortcut required restoration. All are already set to defaults.")
                     }
                 }
             }
@@ -176,17 +198,6 @@ Item {
                             padding: 10
 
                             font.italic: qmlAction.visible !== undefined ? qmlAction.visible : true
-
-                            MouseArea {
-                                ToolTip.text: "This action isn't visible in any menu or toolbar."
-                                ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-                                ToolTip.visible: containsMouse
-
-                                anchors.fill: parent
-
-                                enabled: parent.font.italic
-                                hoverEnabled: true
-                            }
                         }
 
                         ShortcutField {
