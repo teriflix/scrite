@@ -62,7 +62,7 @@ DialogLauncher {
                 anchors.right: parent.right
                 anchors.margins: 30
 
-                text: "Version-"+Platform.osVersionString + " for " + [Platform.typeAsString, Platform.osVersionString].join("-")
+                text: "Version-"+Scrite.app.versionAsString + " for " + [Platform.typeString, Platform.osVersionString].join("-")
                 width: Math.min(Runtime.idealFontMetrics.advanceWidth(text), dialog.width*0.5)
                 elide: Text.ElideLeft
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
