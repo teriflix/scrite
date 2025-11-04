@@ -82,14 +82,14 @@ Item {
         property bool welcomeScreenShown: false
 
         category: "UserAccountDialog"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings scrollAreaSettings: Settings {
         property real zoomFactor: 0.05
 
         category: "ScrollArea"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings structureCanvasSettings: Settings {
@@ -114,7 +114,7 @@ Item {
         }
 
         category: "Structure Tab"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
 
     }
 
@@ -124,12 +124,12 @@ Item {
         property string textMode: "HeadingOrTitle"
 
         category: "Timeline View"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings screenplayEditorSettings: Settings {
         category: "Screenplay Editor"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
 
         property var zoomLevelModifiers: { "tab0": 0, "tab1": 0, "tab2": 0, "tab3": 0 }
 
@@ -187,11 +187,11 @@ Item {
         property bool usePdfDriver: true
 
         category: "PdfExport"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings titlePageSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
         category: "TitlePage"
 
         property bool includeTimestamp: false
@@ -208,7 +208,7 @@ Item {
         property bool languageNoteShown: false
 
         category: "Rich Text Editor"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings sceneListPanelSettings: Settings {
@@ -218,7 +218,7 @@ Item {
         property string sceneTextMode: "HEADING" // can be SUMMARY also
 
         category: "Scene List Panel"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings markupToolsSettings: Settings {
@@ -226,7 +226,7 @@ Item {
         property real contentY: 20
 
         category: "Markup Tools"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings scritedSettings: Settings {
@@ -239,7 +239,7 @@ Item {
         property string lastOpenScritedFolderUrl: "file:///" + StandardPaths.writableLocation(StandardPaths.MoviesLocation)
 
         category: "Scrited"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings shortcutsDockWidgetSettings: Settings {
@@ -249,7 +249,7 @@ Item {
         property bool visible: true
 
         category: "Shortcuts Dock Widget"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     readonly property Settings helpNotificationSettings: Settings {
@@ -275,7 +275,7 @@ Item {
             tipsShown = ts.join(",")
         }
 
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
         category: "Help"
     }
 
@@ -287,12 +287,12 @@ Item {
         property bool richTextNotesEnabled: true
         property bool showAllFormQuestions: true
 
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
         category: "Notebook"
     }
 
     readonly property Settings workspaceSettings: Settings {
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
         category: "Workspace"
 
         property var customColors: []
@@ -343,7 +343,7 @@ Item {
         }
 
         category: "Application"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     // Global undo-redo object
@@ -904,7 +904,7 @@ Item {
         property alias preferTitleVersionText: _recentFiles.preferTitleVersionText
 
         category: "RecentFiles"
-        fileName: Scrite.app.settingsFilePath
+        fileName: Platform.settingsFile
     }
 
     SequentialAnimation {

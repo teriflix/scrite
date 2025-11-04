@@ -106,7 +106,6 @@ public:
     Q_PROPERTY(QVersionNumber versionNumber READ versionNumber CONSTANT)
     QVersionNumber versionNumber() const { return m_versionNumber; }
 
-    Q_PROPERTY(QString settingsFilePath READ settingsFilePath CONSTANT)
     QString settingsFilePath() const;
 
     Q_PROPERTY(AutoUpdate *autoUpdate READ autoUpdate CONSTANT)

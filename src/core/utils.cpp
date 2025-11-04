@@ -164,6 +164,35 @@ QString Utils::Platform::hostName()
 }
 
 /**
+ * Returns path to the folder in which settings.ini for this platform is stored
+ */
+QString Utils::Platform::settingsPath()
+{
+    const QFileInfo fi(Application::instance()->settingsFilePath());
+    return fi.absoluteFilePath();
+}
+
+/**
+ * Returns complete path of the settings.ini on this platform
+ */
+QString Utils::Platform::settingsFile()
+{
+    return Application::instance()->settingsFilePath();
+}
+
+/**
+ * Returns complete path for the relative name supplied here, such that it shows up
+ * in the same folder as settings.ini file for this platform.
+ */
+QString Utils::Platform::configPath(const QString &relativeName)
+{
+    const QFileInfo fi(Application::instance()->settingsFilePath());
+    const QString ret = fi.absoluteDir().absoluteFilePath(relativeName);
+    QDir().mkpath(QFileInfo(ret).absolutePath());
+    return ret;
+}
+
+/**
  * \brief Returns the architecture of the platform.
  * \return The architecture as Utils::Platform::Architecture.
  */

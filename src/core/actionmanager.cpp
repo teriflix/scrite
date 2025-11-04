@@ -474,16 +474,7 @@ QString ActionManager::shortcutMapFilePath() const
     if (this->objectName().isEmpty())
         return QString();
 
-    const QString settingsFilePath = Application::instance()->settingsFilePath();
-    const QString shortcutsFolder = QString("shortcuts");
-
-    QDir configDir = QFileInfo(settingsFilePath).absoluteDir();
-    if (!configDir.cd(shortcutsFolder)) {
-        configDir.mkdir(shortcutsFolder);
-        configDir.cd(shortcutsFolder);
-    }
-
-    return configDir.absoluteFilePath(this->objectName() + ".json");
+    return Utils::Platform::configPath("shortcuts/" + this->objectName() + ".json");
 }
 
 void ActionManager::onSortOrderChanged()

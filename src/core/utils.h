@@ -296,6 +296,14 @@ public:
 
     Q_PROPERTY(QString hostName READ hostName CONSTANT)
     static QString hostName();
+
+    Q_PROPERTY(QString settingsPath READ settingsPath CONSTANT)
+    static QString settingsPath(); // Folder in which settings.ini is stored
+
+    Q_PROPERTY(QString settingsFile READ settingsFile CONSTANT)
+    static QString settingsFile(); // Complete path to settings.ini file
+
+    Q_INVOKABLE static QString configPath(const QString &relativeName);
 };
 
 class Gui : public QObject

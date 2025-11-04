@@ -13,6 +13,7 @@
 
 #include "languageengine.h"
 #include "application.h"
+#include "utils.h"
 
 #include <PhTranslateLib>
 
@@ -2038,9 +2039,7 @@ bool LanguageEngine::eventFilter(QObject *object, QEvent *event)
 
 void LanguageEngine::loadConfiguration()
 {
-    m_configFileName = QFileInfo(Application::instance()->settingsFilePath())
-                               .absoluteDir()
-                               .absoluteFilePath(QStringLiteral("language-engine.json"));
+    m_configFileName = Utils::Platform::configPath(QStringLiteral("language-engine.json"));
 
     QFile file(m_configFileName);
     if (file.open(QFile::ReadOnly)) {

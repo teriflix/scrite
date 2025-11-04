@@ -880,9 +880,7 @@ bool ScreenplayFormat::saveAsUserDefaults()
     const QJsonDocument jsonDoc(json);
     const QByteArray jsonStr = jsonDoc.toJson();
 
-    const QFileInfo settingsPath(Application::instance()->settingsFilePath());
-    const QString formatFile =
-            settingsPath.absoluteDir().absoluteFilePath(QStringLiteral("formatting.json"));
+    const QString formatFile = Utils::Platform::configPath(QStringLiteral("formatting.json"));
 
     QFile file(formatFile);
     if (!file.open(QFile::WriteOnly))
@@ -894,9 +892,7 @@ bool ScreenplayFormat::saveAsUserDefaults()
 
 void ScreenplayFormat::resetToUserDefaults()
 {
-    const QFileInfo settingsPath(Application::instance()->settingsFilePath());
-    const QString formatFile =
-            settingsPath.absoluteDir().absoluteFilePath(QStringLiteral("formatting.json"));
+    const QString formatFile = Utils::Platform::configPath(QStringLiteral("formatting.json"));
 
     this->resetToFactoryDefaults();
 
