@@ -39,9 +39,11 @@ DialogLauncher {
     dialogComponent: VclDialog {
         id: dialog
 
-        title: "Title Page"
         width: Math.min(Scrite.window.width-80, 1050)
         height: Math.min(Scrite.window.height-80, 750)
+
+        handleLanguageShortcuts: true
+        title: "Title Page"
 
         content: Item {
             implicitHeight: titlePageSettingsLayout.implicitHeight+60

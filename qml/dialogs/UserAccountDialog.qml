@@ -54,6 +54,8 @@ Item {
 
         width: 900
         height: 620
+
+        handleLanguageShortcuts: true
         title: screenItem ? screenItem.title : "Activation Workflow"
 
         onOpened: {

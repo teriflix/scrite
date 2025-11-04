@@ -47,6 +47,8 @@ DialogLauncher {
 
         width: 680
         height: 300
+
+        handleLanguageShortcuts: true
         title: "Rename/Merge Character: " + _private.orignalCharacterName
 
         content: Item {
@@ -201,11 +203,12 @@ DialogLauncher {
                             characterNotes.characterName = _private.newCharacterName
                             characterNotes.trigger()
                             Qt.callLater(dialog.close)
-                        } else
-                        MessageBox.information("Rename Error", dialog.character.renameError, () => {
-                                                   dialog.character.clearRenameError()
-                                                   Qt.callLater(dialog.close)
-                                               } )
+                        } else {
+                            MessageBox.information("Rename Error", dialog.character.renameError, () => {
+                                                       dialog.character.clearRenameError()
+                                                       Qt.callLater(dialog.close)
+                                                   } )
+                        }
                     }
                 }
             }

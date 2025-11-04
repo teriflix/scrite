@@ -33,6 +33,8 @@ VclDialog {
 
     width: Math.min(Scrite.window.width*0.9, 800)
     height: Math.min(Scrite.window.height*0.9, 650)
+
+    handleLanguageShortcuts: true
     title: report ? report.title : "Report Configuration Dialog"
 
     content: report && visible ? (_private.reportEnabled ? reportConfigContent : reportFeatureDisabledContent) : null

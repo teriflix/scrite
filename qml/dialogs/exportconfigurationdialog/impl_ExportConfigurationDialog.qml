@@ -32,6 +32,8 @@ VclDialog {
 
     width: Math.min(Scrite.window.width*0.9, 700)
     height: Math.min(Scrite.window.height*0.9, 600)
+
+    handleLanguageShortcuts: true
     title: exporter ? ("Export to " + exporter.formatName) : "Export Configuration Dialog"
 
     content: visible ? (_private.exportEnabled ? exportConfigContent : exportFeatureDisabledContent) : null

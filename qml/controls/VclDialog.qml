@@ -26,6 +26,8 @@
 
   4. Content is shown in a ScrollView, whose scrollbars show up whenever size available
      is less than the implicit-size declared by the content component.
+
+  5. Handles language change shortcuts, provided handleLanguageShortcuts is set to true.
   */
 
 import QtQuick 2.15
@@ -34,7 +36,6 @@ import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 
 import io.scrite.components 1.0
-
 
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
@@ -58,6 +59,9 @@ Dialog {
     // If set, then the dialog box automatically closes whenever user drags and
     // drops a file on the Scrite window to import it.
     property bool closeOnDragDrop: true
+
+    // If set, then this dialog box handles language change shortcuts.
+    property bool handleLanguageShortcuts: false
 
     // Assign a component whose instance may be shown as background
     property Component backdrop: null
@@ -228,6 +232,36 @@ Dialog {
         id: _private
 
         property bool overrideCursorMustBeRestored: false
+    }
+
+    Item {
+        visible: false
+
+        /**
+          Language shortcuts from ActionHub.languageOptions will stop working
+          whenever a dialog-box is shown. This is how Qt's Action {} items are
+          designed to work. They only respond to shortcut events if they are
+          created in the same overlay as the current one.
+
+          The following repeater creates temporary shortcuts for use within the
+          dialog box, only for language switching. All other actions remain
+          unavailable.
+          */
+        Repeater {
+            model: root.visible && root.modal && root.handleLanguageShortcuts ? LanguageEngine.supportedLanguages : 0
+
+            Item {
+                required property var language // This is of type Language, but we have to use var here.
+                // You cannot use Q_GADGET struct names as type names in QML
+                // that privilege is only reserved for QObject types.
+
+                Shortcut {
+                    sequence: language.shortcut()
+
+                    onActivated: Runtime.language.setActiveCode(language.code)
+                }
+            }
+        }
     }
 
     Component {
