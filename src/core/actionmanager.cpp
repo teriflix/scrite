@@ -1396,7 +1396,7 @@ void ShortcutInputHandler::handleKeyPressEvent(QKeyEvent *event)
 {
     event->accept();
 
-    if (m_keys.size() > 4)
+    if (m_keyStrokes.size() > 4)
         return;
 
     m_modifiers = event->modifiers();
@@ -1410,27 +1410,49 @@ void ShortcutInputHandler::handleKeyPressEvent(QKeyEvent *event)
     if (m_modifiers == 0 && !event->text().isEmpty())
         return;
 
-    m_keys.append(m_modifiers > 0 ? event->nativeVirtualKey() : event->key());
+    m_keyStrokes.append({ event->text(), event->key(), event->nativeVirtualKey() });
 }
 
 void ShortcutInputHandler::handleKeyReleaseEvent(QKeyEvent *event)
 {
-    const QList<int> modifierKeys(
-            { Qt::Key_Control, Qt::Key_Shift, Qt::Key_Alt, Qt::Key_Meta, Qt::Key_unknown });
-    if (modifierKeys.contains(event->key()))
-        return;
-
     event->accept();
 
-    auto key = [=](int index) {
-        return index < 0 || index >= m_keys.size() ? 0 : m_keys.at(index);
-    };
+    if (m_keyStrokes.isEmpty())
+        return;
 
-    const QKeySequence sequence(m_modifiers + key(0), key(1), key(2), key(3));
+    if (!m_keyStrokes.first().text.isEmpty() && m_modifiers == 0)
+        return;
+
+    QKeySequence sequence;
+    if (m_keyStrokes.first().text.isEmpty()) {
+        auto key = [=](int index) {
+            return index < 0 || index >= m_keyStrokes.size() ? 0 : m_keyStrokes.at(index).key;
+        };
+        sequence = QKeySequence(m_modifiers + key(0), key(1), key(2), key(3));
+    } else {
+        QStringList comps;
+
+        if (m_modifiers.testFlag(Qt::MetaModifier))
+            comps << "Meta";
+        if (m_modifiers.testFlag(Qt::ControlModifier))
+            comps << "Ctrl";
+        if (m_modifiers.testFlag(Qt::AltModifier))
+            comps << "Alt";
+        if (m_modifiers.testFlag(Qt::ShiftModifier))
+            comps << "Shift";
+
+        for (const KeyStroke &keyStroke : qAsConst(m_keyStrokes))
+            comps << keyStroke.text;
+
+        Utils::Gui::log(comps.join("+"));
+
+        sequence = QKeySequence::fromString(comps.join("+"));
+    }
+
     if (!sequence.isEmpty())
         emit shortcutCaptured(sequence.toString());
 
-    m_keys.clear();
+    m_keyStrokes.clear();
     m_modifiers = Qt::KeyboardModifiers();
 }
 

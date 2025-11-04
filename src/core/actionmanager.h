@@ -422,7 +422,13 @@ protected:
     explicit ShortcutInputHandler(QObject *parent = nullptr);
 
 private:
-    QList<int> m_keys;
+    struct KeyStroke
+    {
+        QString text;
+        int key = 0;
+        quint32 nativeScanCode = 0;
+    };
+    QList<KeyStroke> m_keyStrokes;
     Qt::KeyboardModifiers m_modifiers;
     bool m_handleInput = false;
     QPointer<QTimer> m_releaseTimer;
