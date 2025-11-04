@@ -20,7 +20,6 @@
 #include "restapicall.h"
 #include "application.h"
 #include "scritedocument.h"
-#include "shortcutsmodel.h"
 #include "notificationmanager.h"
 #include "scritedocumentvault.h"
 

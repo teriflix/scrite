@@ -173,16 +173,4 @@ FloatingDock {
             Runtime.shortcutsDockWidgetSettings.contentY = Math.round(root.y)
         }
     }
-
-    QtObject {
-        id: _private
-
-        readonly property ShortcutsModel shortcutsModel: ShortcutsModel {
-            // We need groups to show up in a specific order, hence this property.
-            // Shortcuts belonging to other groups should show up at the end.
-            groups: [ "Application", "Formatting", "Settings", "Language", "File", "Edit" ]
-
-            onModelReset: _shortcutsView.currentIndex = 0
-        }
-    }
 }
