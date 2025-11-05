@@ -189,6 +189,7 @@ Rectangle {
             zoomLevel: _private.zoomLevel
             pageMargins: _private.pageMargins
             screenplayAdapter: Runtime.screenplayAdapter
+            showSceneSidePanel: _private.showSceneSidePanel
             spaceAvailableOnTheLeft: x-1
             spaceAvailableOnTheRight: parent.width - x - width - (_scrollBar.visible ? _scrollBar.width : 0)
         }

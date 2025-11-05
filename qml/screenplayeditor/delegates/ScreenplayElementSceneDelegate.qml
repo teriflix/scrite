@@ -22,6 +22,7 @@ import "qrc:/qml/screenplayeditor/delegates/scenedelegate"
 AbstractScreenplayElementDelegate {
     id: root
 
+    required property bool showSceneSidePanel
     required property real spaceAvailableForScenePanel
     required property ListView listView // This must be the list-view in which the delegate is placed.
 
@@ -94,7 +95,9 @@ AbstractScreenplayElementDelegate {
             active: !_highResLoader.active || !_highResLoader.item
             visible: active
 
-            sourceComponent: _lowResolution
+            sourceComponent: LowResolutionSceneContent {
+                  sceneDelegate: root
+            }
         }
 
         Loader {
@@ -103,35 +106,21 @@ AbstractScreenplayElementDelegate {
             z: 1
             width: parent.width
 
-            active: root.usePlaceholder ? (root.screenplayElementType !== ScreenplayElement.SceneElementType && !root.screenplayElement.omitted)
-                                        : true
+            active: !root.usePlaceholder
             visible: status == Loader.Ready
 
-            sourceComponent: _highResolution
+            sourceComponent: HighResolutionSceneContent {
+                  sceneDelegate: root
+                  showSceneSidePanel: root.showSceneSidePanel
+            }
 
             Component.onCompleted: {
                 if(!active) {
-                    Runtime.execLater(_highResLoader, Runtime.screenplayEditorSettings.placeholderInterval, () => {
-                                          _highResLoader.active = true
-                                      })
+                      Runtime.execLater(_highResLoader, Runtime.screenplayEditorSettings.placeholderInterval, () => {
+                                              _highResLoader.active = true
+                                        })
                 }
             }
-        }
-    }
-
-    Component {
-        id: _lowResolution
-
-        LowResolutionSceneContent {
-              sceneDelegate: root
-        }
-    }
-
-    Component {
-        id: _highResolution
-
-        HighResolutionSceneContent {
-              sceneDelegate: root
         }
     }
 }

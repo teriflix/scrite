@@ -33,6 +33,7 @@ ListView {
 
     required property var pageMargins
     required property bool readOnly
+    required property bool showSceneSidePanel
     required property real zoomLevel
     required property real spaceAvailableOnTheLeft // Space available to the left of this list-view in the container where its placed
     required property real spaceAvailableOnTheRight // Space available to the left of this list-view in the container where its placed
@@ -302,6 +303,7 @@ ListView {
             zoomLevel: root.zoomLevel
             pageMargins: root.pageMargins
             screenplayAdapter: root.screenplayAdapter
+            showSceneSidePanel: root.showSceneSidePanel
             additionalSceneMenuItems: root.additionalSceneMenuItems
             spaceAvailableForScenePanel: root.spaceAvailableOnTheRight
 
