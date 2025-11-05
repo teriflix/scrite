@@ -139,7 +139,7 @@ Item {
         property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
         property int longSceneWordTreshold: 150
         property int mainEditorZoomValue: -1
-        property int placeholderInterval: 100 // ms after which placeholder is swapped to content in delegates
+        property int placeholderInterval: 500 // ms after which placeholder is swapped to content in delegates
         property int sceneSidePanelActiveTab: 0
         property int slpSynopsisLineCount: 2
 

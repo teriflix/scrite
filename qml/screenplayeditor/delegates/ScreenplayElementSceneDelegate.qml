@@ -98,29 +98,30 @@ AbstractScreenplayElementDelegate {
             sourceComponent: LowResolutionSceneContent {
                   sceneDelegate: root
             }
+
+            onLoaded: {
+                Runtime.execLater(_highResLoader, Runtime.screenplayEditorSettings.placeholderInterval, () => {
+                                        _highResLoader.active = true
+                                  })
+            }
         }
 
         Loader {
             id: _highResLoader
 
+            property bool firstLoadComplete: false
+
             z: 1
             width: parent.width
 
-            active: !root.usePlaceholder
-            visible: status == Loader.Ready
+            active: !root.usePlaceholder || firstLoadComplete
 
             sourceComponent: HighResolutionSceneContent {
                   sceneDelegate: root
                   showSceneSidePanel: root.showSceneSidePanel
             }
 
-            Component.onCompleted: {
-                if(!active) {
-                      Runtime.execLater(_highResLoader, Runtime.screenplayEditorSettings.placeholderInterval, () => {
-                                              _highResLoader.active = true
-                                        })
-                }
-            }
+            onLoaded: firstLoadComplete = true
         }
     }
 }

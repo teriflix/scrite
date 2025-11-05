@@ -86,6 +86,8 @@ ListView {
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
+    Component.onCompleted: _private.updateFirstAndLastIndexLater()
+
     objectName: "ScreenplayEditorListView"
 
     model: screenplayAdapter
@@ -129,16 +131,15 @@ ListView {
         }
     }
 
-    onCountChanged: _private.updateFirstAndLastPointLater()
-    onWidthChanged: _private.updateFirstAndLastPointLater()
-    onHeightChanged: _private.updateFirstAndLastPointLater()
-    onContentXChanged: _private.updateFirstAndLastPointLater()
-    onContentYChanged: _private.updateFirstAndLastPointLater()
-
     onMovingChanged: {
         if(!movingVertically)
-            _private.makeItemUnderCursorCurrent()
+            _private.scheduleMakeItemUnderCursorCurrent()
     }
+
+    onWidthChanged: _private.updateFirstAndLastIndexLater()
+    onHeightChanged: _private.updateFirstAndLastIndexLater()
+    onOriginYChanged: _private.updateFirstAndLastIndexLater()
+    onContentYChanged: _private.updateFirstAndLastIndexLater()
 
     QtObject {
         id: _private
@@ -149,16 +150,13 @@ ListView {
         property Loader currentDelegateLoader: currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
         property AbstractScreenplayElementDelegate currentDelegate: currentDelegateLoader ? currentDelegateLoader.item : null
 
-        property int lastItemIndex: root.count > 0 ? validOrLastIndex(root.indexAt(lastPoint.x, lastPoint.y)) : 0
-        property int firstItemIndex: root.count > 0 ? Math.max(root.indexAt(firstPoint.x, firstPoint.y), 0) : 0
+        property int lastItemIndex: -1
+        property int firstItemIndex: -1
 
         property bool hasFocus: false
         property bool scrolling: scrollBarActive || root.moving
         property bool scrollBarActive: root.ScrollBar.vertical ? root.ScrollBar.vertical.pressed : false
         property bool modelCurrentIndexChangedInternally: false
-
-        property point lastPoint: root.mapToItem(root.contentItem, root.width/2, root.height-2)
-        property point firstPoint: root.mapToItem(root.contentItem, root.width/2, 1)
 
         readonly property Component header: ScreenplayElementListViewHeader {
             width: root.width
@@ -354,8 +352,20 @@ ListView {
         readonly property Connections screenplayAdapterSignals: Connections {
             target: root.screenplayAdapter
 
-            function onSourceChanged() {
-                _private.updateFirstAndLastPointLater()
+            function onRowsInserted() {
+                _private.updateFirstAndLastIndexLater()
+            }
+
+            function onRowsRemoved() {
+                _private.updateFirstAndLastIndexLater()
+            }
+
+            function onDataChanged() {
+                _private.updateFirstAndLastIndexLater()
+            }
+
+            function onModelReset() {
+                _private.updateFirstAndLastIndexLater()
             }
 
             function onCurrentIndexChanged() {
@@ -363,6 +373,9 @@ ListView {
                     return
 
                 const index = root.screenplayAdapter.currentIndex
+                if(_private.isVisible(index))
+                    return
+
                 if(index < 0)
                     root.positionViewAtBeginning()
                 else
@@ -380,6 +393,8 @@ ListView {
                             delegate.focusIn(0)
                     }
                 }
+
+                _private.updateFirstAndLastIndexLater()
             }
         }
 
@@ -394,22 +409,42 @@ ListView {
             return null
         }
 
-        function updateFirstAndLastPointLater() {
-            Qt.callLater(updateFirstAndLastPoint)
-        }
-
-        function updateFirstAndLastPoint() {
-            lastPoint = root.mapToItem(root.contentItem, root.width/2, root.height-2)
-            firstPoint = root.mapToItem(root.contentItem, root.width/2, 1)
-        }
-
         function isVisible(index) {
-            updateFirstAndLastPoint()
+            if(root.contentHeight <= root.height)
+                return true
+
+            if( (firstItemIndex < 0 && lastItemIndex < 0) || (firstItemIndex === 0 && lastItemIndex === root.count-1) ) {
+                updateFirstAndLastIndex()
+            }
+
             return index >= firstItemIndex && index <= lastItemIndex
         }
 
-        function validOrLastIndex(val) {
-            return val < 0 || val >= root.count ? root.count-1 : val
+        function updateFirstAndLastIndex() {
+            if(root.screenplayAdapter === null) {
+                firstItemIndex = -1
+                lastItemIndex = -1
+                return
+            }
+
+            const firstPt = root.contentItem.mapFromItem(root, root.width / 2, 1)
+            const lastPt = root.contentItem.mapFromItem(root, root.width / 2, root.height-1)
+
+            let first = root.indexAt(firstPt.x, firstPt.y);
+            let last = root.indexAt(lastPt.x, lastPt.y);
+
+            if (first === -1)
+                first = 0;
+
+            if (last === -1)
+                last = root.screenplayAdapter.elementCount - 1;
+
+            firstItemIndex = first
+            lastItemIndex = last
+        }
+
+        function updateFirstAndLastIndexLater() {
+            Qt.callLater(updateFirstAndLastIndex)
         }
 
         function changeAdapterCurrentIndexInternally(index) {
@@ -422,19 +457,19 @@ ListView {
         }
 
         function makeItemUnderCursorCurrent() {
-            let currentIndex = root.screenplayAdapter.currentIndex
-            if(currentIndex >= firstItemIndex && currentIndex <= lastItemIndex)
-                return
-
             const globalCursorPos = MouseCursor.position()
             let localCursorPos = MouseCursor.itemPosition(root, globalCursorPos)
             localCursorPos.x = root.width/2
             if(localCursorPos.y >= 0 && localCursorPos.y < root.height) {
-                localCursorPos = root.mapToItem(root.contentItem, localCursorPos.x, localCursorPos.y)
+                localCursorPos = root.contentItem.mapFromItem(root, localCursorPos.x, localCursorPos.y)
                 currentIndex = root.indexAt(localCursorPos.x, localCursorPos.y)
                 if(currentIndex >= 0 && currentIndex <= root.count)
                     changeAdapterCurrentIndexInternally(currentIndex)
             }
+        }
+
+        function scheduleMakeItemUnderCursorCurrent() {
+            Runtime.execLater(_private, Runtime.screenplayEditorSettings.placeholderInterval, _private.makeItemUnderCursorCurrent)
         }
 
         function scrollIntoView(index) {
@@ -557,7 +592,9 @@ ListView {
             else
                 Runtime.undoStack.sceneEditorActive = hasFocus
         }
-        onLastItemIndexChanged: makeItemUnderCursorCurrent()
-        onFirstItemIndexChanged: makeItemUnderCursorCurrent()
+
+
+        onLastItemIndexChanged: scheduleMakeItemUnderCursorCurrent()
+        onFirstItemIndexChanged: scheduleMakeItemUnderCursorCurrent()
     }
 }
