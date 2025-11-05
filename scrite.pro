@@ -1,4 +1,5 @@
 QT += gui qml quick widgets xml concurrent network quickcontrols2 multimedia printsupport svg charts pdf webengine webenginewidgets
+CONFIG += qtquickcompiler
 DESTDIR = $$PWD/../Release/
 TARGET = Scrite
 
