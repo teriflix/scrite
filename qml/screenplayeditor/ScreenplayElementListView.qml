@@ -144,7 +144,7 @@ ListView {
     QtObject {
         id: _private
 
-        property int currentIndex: root.screenplayAdapter && root.screenplayAdapter.elementCount === root.count ? root.screenplayAdapter.currentIndex : -1
+        property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
 
         property Loader currentDelegateLoader: currentIndex >= 0 ? root.itemAtIndex(currentIndex) : null
@@ -462,9 +462,9 @@ ListView {
             localCursorPos.x = root.width/2
             if(localCursorPos.y >= 0 && localCursorPos.y < root.height) {
                 localCursorPos = root.contentItem.mapFromItem(root, localCursorPos.x, localCursorPos.y)
-                currentIndex = root.indexAt(localCursorPos.x, localCursorPos.y)
-                if(currentIndex >= 0 && currentIndex <= root.count)
-                    changeAdapterCurrentIndexInternally(currentIndex)
+                const ci = root.indexAt(localCursorPos.x, localCursorPos.y)
+                if(ci >= 0 && ci <= root.count)
+                    changeAdapterCurrentIndexInternally(ci)
             }
         }
 

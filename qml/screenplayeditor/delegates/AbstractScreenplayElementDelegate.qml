@@ -159,7 +159,6 @@ FocusScope {
             }
         }
 
-
         Loader {
             width: parent.width
 
