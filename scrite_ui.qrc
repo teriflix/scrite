@@ -311,5 +311,7 @@
         <file>qml/notebookview/helpers/DeleteConfirmationPopup.qml</file>
         <file>qml/notebookview/pages/AbstractNotePage.qml</file>
         <file>qml/dialogs/ShortcutEditorDialog.qml</file>
+        <file>qml/screenplayeditor/delegates/scenedelegate/LowResolutionSceneContent.qml</file>
+        <file>qml/screenplayeditor/delegates/scenedelegate/HighResolutionSceneContent.qml</file>
     </qresource>
 </RCC>
