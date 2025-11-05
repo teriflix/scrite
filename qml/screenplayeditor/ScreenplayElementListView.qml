@@ -40,8 +40,6 @@ ListView {
 
     required property ScreenplayAdapter screenplayAdapter
 
-    property var additionalSceneMenuItems: []
-
     readonly property alias hasFocus: _private.hasFocus
     readonly property alias currentDelegate: _private.currentDelegate
     readonly property alias currentDelegateIndex: _private.currentIndex
@@ -49,24 +47,6 @@ ListView {
     readonly property alias currentDelegateLoader: _private.currentDelegateLoader
     readonly property alias lastVisibleDelegateIndex: _private.lastItemIndex
     readonly property alias firstVisibleDelegateIndex: _private.firstItemIndex
-
-    signal additionalSceneMenuItemClicked(string name)
-
-    function isVisible(index) {
-        return _private.isVisible(index)
-    }
-
-    function scrollToFirstScene() {
-        positionViewAtBeginning()
-    }
-
-    function scrollToLastScene() {
-        positionViewAtEnd()
-    }
-
-    function scrollIntoView(index) {
-        _private.scrollIntoView(index)
-    }
 
     function afterZoomLevelChange() {
         if(currentDelegate)
@@ -92,6 +72,9 @@ ListView {
 
     model: screenplayAdapter
     currentIndex: -1
+    boundsBehavior: ListView.StopAtBounds
+    boundsMovement: ListView.StopAtBounds
+    keyNavigationEnabled: false // because we handle keyboard interactions ourselves.
 
     highlightMoveDuration: 0
     highlightResizeDuration: 0
@@ -141,8 +124,62 @@ ListView {
     onOriginYChanged: _private.updateFirstAndLastIndexLater()
     onContentYChanged: _private.updateFirstAndLastIndexLater()
 
+    Item {
+        enabled: _private.hasFocus
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("jumpFirstScene")
+
+            onTriggered: (source) => {
+                             _private.jumpToFirstScene()
+                         }
+        }
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("jumpLastScene")
+
+            onTriggered: (source) => {
+                             _private.jumpToLastScene()
+                         }
+        }
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("jumpPreviousScene")
+
+            onTriggered: (source) => {
+                             _private.jumpToPreviousScene()
+                         }
+        }
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("jumpNextScene")
+
+            onTriggered: (source) => {
+                             _private.jumpToNextScene()
+                         }
+        }
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("scrollPreviousScene")
+
+            onTriggered: (source) => {
+                             _private.scrollToPreviousScene()
+                         }
+        }
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("scrollNextScene")
+
+            onTriggered: (source) => {
+                             _private.scrollToNextScene()
+                         }
+        }
+    }
+
     QtObject {
         id: _private
+
+        readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
 
         property int currentIndex: root.screenplayAdapter ? root.screenplayAdapter.currentIndex : -1
         property int currentParagraphType: currentDelegate ? currentDelegate.currentParagraphType : -1
@@ -302,7 +339,6 @@ ListView {
             pageMargins: root.pageMargins
             screenplayAdapter: root.screenplayAdapter
             showSceneSidePanel: root.showSceneSidePanel
-            additionalSceneMenuItems: root.additionalSceneMenuItems
             spaceAvailableForScenePanel: root.spaceAvailableOnTheRight
 
             index: delegateLoader.index
@@ -323,13 +359,6 @@ ListView {
                                     _private.ensureVisible(item, area)
                              }
 
-            onJumpToLastScene: () => { _private.jumpToLastScene() }
-            onJumpToNextScene: () => { _private.jumpToNextScene() }
-            onJumpToFirstScene: () => { _private.jumpToFirstScene() }
-            onJumpToPreviousScene: () => { _private.jumpToPreviousScene() }
-            onScrollToNextSceneRequest: () => { _private.scrollToNextScene() }
-            onScrollToPreviousSceneRequest: () => { _private.scrollToPreviousScene() }
-
             onSplitSceneRequest: (paragraph, cursorPosition) => {
                                      if(root.screenplayAdapter.isSourceScreenplay) {
                                          root.screenplayAdapter.splitElement(screenplayElement, paragraph, cursorPosition)
@@ -345,8 +374,6 @@ ListView {
                                                      MessageBox.information("Merge Scene", "Scenes can be merged only while editing the entire screenplay.")
                                                  }
                                              }
-
-            onAdditionalSceneMenuItemClicked: (name) => { root.additionalSceneMenuItemClicked(name) }
         }
 
         readonly property Connections screenplayAdapterSignals: Connections {
@@ -514,9 +541,9 @@ ListView {
                 return
 
             root.positionViewAtIndex(nidx, ListView.Beginning)
+            focusCursorPosition.set(nidx, 0)
             changeAdapterCurrentIndexInternally(nidx)
             root.positionViewAtIndex(nidx, ListView.Beginning)
-            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function jumpToLastScene() {
@@ -526,9 +553,9 @@ ListView {
                 return
 
             root.positionViewAtIndex(lidx, ListView.Beginning)
+            focusCursorPosition.set(lidx, 0)
             changeAdapterCurrentIndexInternally(lidx)
             root.positionViewAtIndex(lidx, ListView.Beginning)
-            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function jumpToFirstScene() {
@@ -538,9 +565,9 @@ ListView {
                 return
 
             root.positionViewAtIndex(fidx, ListView.Beginning)
+            focusCursorPosition.set(fidx, 0)
             changeAdapterCurrentIndexInternally(fidx)
             root.positionViewAtIndex(fidx, ListView.Beginning)
-            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function jumpToPreviousScene() {
@@ -550,9 +577,9 @@ ListView {
                 return
 
             root.positionViewAtIndex(pidx, ListView.Beginning)
+            focusCursorPosition.set(pidx, 0)
             changeAdapterCurrentIndexInternally(pidx)
             root.positionViewAtIndex(pidx, ListView.Beginning)
-            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function scrollToNextScene() {
@@ -563,27 +590,22 @@ ListView {
                 return
             }
 
+            focusCursorPosition.set(nidx, 0)
             changeAdapterCurrentIndexInternally(nidx)
             scrollIntoView(nidx)
-            Qt.callLater(focusCurrentDelegateAt, 0)
         }
 
         function scrollToPreviousScene() {
             const cidx = currentIndex
             const pidx = root.screenplayAdapter.previousSceneElementIndex()
-            if(cidx === pidx) {
+            if(cidx === pidx || pidx < 0) {
                 root.positionViewAtIndex(cidx, ListView.Beginning)
                 return
             }
 
+            focusCursorPosition.set(pidx, -1)
             changeAdapterCurrentIndexInternally(pidx)
             scrollIntoView(pidx)
-            Qt.callLater(focusCurrentDelegateAt, -1)
-        }
-
-        function focusCurrentDelegateAt(cursorPosition) {
-            if(currentDelegate)
-                currentDelegate.focusIn(cursorPosition)
         }
 
         onHasFocusChanged: {
@@ -594,7 +616,7 @@ ListView {
         }
 
 
-        onLastItemIndexChanged: scheduleMakeItemUnderCursorCurrent()
-        onFirstItemIndexChanged: scheduleMakeItemUnderCursorCurrent()
+        onLastItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderCursorCurrent()
+        onFirstItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderCursorCurrent()
     }
 }

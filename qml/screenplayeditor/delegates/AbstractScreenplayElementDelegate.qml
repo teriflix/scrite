@@ -41,8 +41,8 @@ FocusScope {
     default property alias content: _contentLoader.sourceComponent
 
     // These are optional
-    property int placeholderInterval: Runtime.screenplayEditorSettings.placeholderInterval
-    property int currentParagraphType: -1
+    property int currentParagraphType: -1 // DON'T SET. Returns one of SceneElement.Type values to report the
+                                          // paragraph format under cursor, or -1 if unknown.
 
     property bool canFocus: true
     property bool readOnly: Scrite.document.readOnly

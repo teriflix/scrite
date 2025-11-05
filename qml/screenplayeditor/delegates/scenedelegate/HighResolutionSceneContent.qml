@@ -32,7 +32,7 @@ Item {
     id: root
 
     required property bool showSceneSidePanel
-    required property AbstractScreenplayElementDelegate sceneDelegate
+    required property AbstractScreenplayElementSceneDelegate sceneDelegate
 
     implicitHeight: Math.max(_layout.height + Runtime.sceneEditorFontMetrics.lineSpacing,
                              _sidePanelLoader.active && _sidePanelLoader.item.expanded ? _sidePanelLoader.height : 0)
@@ -76,21 +76,17 @@ Item {
                     screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
 
                     partName: "SceneHeading"
+                    isCurrent: sceneDelegate.isCurrent
                     zoomLevel: sceneDelegate.zoomLevel
                     fontMetrics: sceneDelegate.fontMetrics
                     pageMargins: sceneDelegate.pageMargins
                     screenplayAdapter: sceneDelegate.screenplayAdapter
-                    additionalSceneMenuItems: sceneDelegate.additionalSceneMenuItems
 
                     onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
 
                     onHasFocusChanged: {
                         if(hasFocus)
                             sceneDelegate.currentParagraphType = SceneElement.Heading
-                    }
-
-                    onAdditionalSceneMenuItemClicked: (name) => {
-                        sceneDelegate.additionalSceneMenuItemClicked(name)
                     }
                 }
 
@@ -107,6 +103,7 @@ Item {
                         screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
 
                         partName: "StoryBeats"
+                        isCurrent: sceneDelegate.isCurrent
                         zoomLevel: sceneDelegate.zoomLevel
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: sceneDelegate.pageMargins
@@ -133,6 +130,7 @@ Item {
                         screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
 
                         partName: "CharacterList"
+                        isCurrent: sceneDelegate.isCurrent
                         zoomLevel: sceneDelegate.zoomLevel
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: sceneDelegate.pageMargins
@@ -158,6 +156,7 @@ Item {
                         screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
 
                         partName: "Synopsis"
+                        isCurrent: sceneDelegate.isCurrent
                         zoomLevel: sceneDelegate.zoomLevel
                         fontMetrics: Runtime.idealFontMetrics
                         pageMargins: sceneDelegate.pageMargins
@@ -191,6 +190,7 @@ Item {
 
                 focus: true
                 partName: "SceneContent"
+                isCurrent: sceneDelegate.isCurrent
                 zoomLevel: sceneDelegate.zoomLevel
                 fontMetrics: sceneDelegate.fontMetrics
                 pageMargins: sceneDelegate.pageMargins
@@ -203,22 +203,16 @@ Item {
 
                 onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
 
-                onJumpToLastScene: () => { sceneDelegate.jumpToLastScene() }
-                onJumpToNextScene: () => { sceneDelegate.jumpToNextScene() }
-                onJumpToFirstScene: () => { sceneDelegate.jumpToFirstScene() }
-                onJumpToPreviousScene: () => { sceneDelegate.jumpToPreviousScene() }
-                onEditSceneHeadingRequest: () => { _sceneHeadingEditor.focus = true }
-                onScrollToNextSceneRequest: () => { sceneDelegate.scrollToNextSceneRequest() }
-                onScrollToPreviousSceneRequest: () => { sceneDelegate.scrollToPreviousSceneRequest() }
                 onSplitSceneRequest: (paragraph, cursorPosition) => { sceneDelegate.splitSceneRequest(paragraph, cursorPosition) }
                 onMergeWithPreviousSceneRequest: () => { sceneDelegate.mergeWithPreviousSceneRequest() }
             }
 
-            SceneTextEditorPageNumbersLoader {
+            SceneTextEditorPageNumbers {
                 id: _pageNumbersLoader
 
                 anchors.fill: parent
 
+                isCurrent: sceneDelegate.isCurrent
                 zoomLevel: sceneDelegate.zoomLevel
                 fontMetrics: sceneDelegate.fontMetrics
                 sceneTextEditor: _sceneContentEditor.editor
@@ -261,6 +255,7 @@ Item {
             screenplayElementDelegateHasFocus: sceneDelegate.hasFocus
 
             partName: "SidePanel"
+            isCurrent: sceneDelegate.isCurrent
             zoomLevel: 1
             fontMetrics: Runtime.idealFontMetrics
             pageMargins: Runtime.margins(0, 0, 0, 0)
@@ -311,10 +306,9 @@ Item {
         }
     }
 
-    onHeightChanged: Qt.callLater(updateHeightHint)
+    onHeightChanged: Qt.callLater(__updateHeightHint)
 
-    function updateHeightHint() {
+    function __updateHeightHint() {
         if(height > 0 && sceneDelegate && sceneDelegate.screenplayElement && sceneDelegate.zoomLevel > 0)
             sceneDelegate.screenplayElement.heightHint = height / zoomLevel
-    }
-}
+    }}

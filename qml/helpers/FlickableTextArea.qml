@@ -48,6 +48,7 @@ Flickable {
     property SyntaxHighlighter syntaxHighlighter: Object.firstChildByType(_textArea, "SyntaxHighlighter")
     property TabSequenceManager tabSequenceManager
 
+    signal textEdited()
     signal editingFinished()
 
     FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
@@ -157,6 +158,7 @@ Flickable {
             root.contentY = cy
         }
 
+        onTextChanged: if(activeFocus) root.textEdited()
         onEditingFinished: root.editingFinished()
     }
 

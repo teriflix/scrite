@@ -57,7 +57,8 @@ AbstractScenePartEditor {
         addTextButtonTooltip: "Click here to add custom scene tags."
         completionStrings: Scrite.document.structure.sceneTags
         font: root.font
-        labelIconSource: "qrc:/icons/action/tag.png"
+        labelIconSource:  "qrc:/icons/action/keyword.png"
+        labelIconVisible: _private.presentableGroupNames !== ""
         labelText: "Open Tags"
         readOnly: !Runtime.appFeatures.structure.enabled && root.readOnly
         textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)

@@ -30,6 +30,7 @@ FocusScope {
 
     // These have to be explicitly provided
     required property var pageMargins
+    required property bool isCurrent
     required property real zoomLevel
     required property string partName
     required property FontMetrics fontMetrics

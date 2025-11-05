@@ -69,7 +69,7 @@ Rectangle {
             default: break
             }
 
-            return _private.screenplayTab
+            return _private.unknownTab
         }
     }
 
@@ -80,6 +80,16 @@ Rectangle {
         readonly property Component structureTab: StructureTab { }
         readonly property Component notebookTab: NotebookTab { }
         readonly property Component scritedTab: ScritedTab { }
+        readonly property Component unknownTab: Item {
+            VclLabel {
+                anchors.centerIn: parent
+
+                text: "Unknown Tab"
+
+                font.bold: true
+                font.pointSize: Runtime.idealFontMetrics.font.pointSize + 5
+            }
+        }
 
         readonly property BusyMessage busyMessage: BusyMessage {
             message: "Loading tab ..."

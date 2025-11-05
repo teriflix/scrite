@@ -87,6 +87,7 @@ AbstractScenePartEditor {
             screenplayElementDelegateHasFocus: root.hasFocus
 
             partName: "CommentsTab"
+            isCurrent: root.isCurrent
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins
@@ -102,6 +103,7 @@ AbstractScenePartEditor {
             screenplayElementDelegateHasFocus: root.hasFocus
 
             partName: "FeaturedImageTab"
+            isCurrent: root.isCurrent
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins
@@ -119,6 +121,7 @@ AbstractScenePartEditor {
             screenplayElementDelegateHasFocus: root.hasFocus
 
             partName: "IndexCardFieldsTab"
+            isCurrent: root.isCurrent
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins
@@ -134,6 +137,7 @@ AbstractScenePartEditor {
             screenplayElementDelegateHasFocus: root.hasFocus
 
             partName: "SceneMetaDataTab"
+            isCurrent: root.isCurrent
             zoomLevel: root.zoomLevel
             fontMetrics: root.fontMetrics
             pageMargins: root.pageMargins

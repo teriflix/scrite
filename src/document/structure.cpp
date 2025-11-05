@@ -3995,7 +3995,7 @@ void Structure::clearAnnotations()
 QString Structure::defaultGroupsDataFile() const
 {
     static const QString ret =
-            Utils::Platform::configPath(QStringLiteral("/structure_categories_and_groups.lst"));
+            Utils::Platform::configPath(QStringLiteral("structure_categories_and_groups.lst"));
     return ret;
 }
 

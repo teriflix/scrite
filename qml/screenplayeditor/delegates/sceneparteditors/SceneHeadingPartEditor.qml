@@ -28,10 +28,6 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 AbstractScenePartEditor {
     id: root
 
-    property alias additionalSceneMenuItems: _sceneMenu.additionalSceneMenuItems
-
-    signal additionalSceneMenuItemClicked(string name)
-
     height: _layout.height
 
     RowLayout {
@@ -45,7 +41,7 @@ AbstractScenePartEditor {
 
             Row {
                 anchors.left: parent.left
-                anchors.right: _sceneHeading.left
+                anchors.right: _sceneNumber.left
                 anchors.margins: 16 * root.zoomLevel
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -84,7 +80,7 @@ AbstractScenePartEditor {
             }
 
             TextField {
-                id: _sceneHeading
+                id: _sceneNumber
 
                 anchors.right: parent.right
                 anchors.rightMargin: root.pageLeftMargin * 0.1
@@ -101,21 +97,27 @@ AbstractScenePartEditor {
         }
 
         SceneHeadingTextField {
+            id: _sceneHeading
+
             Layout.fillWidth: true
 
             focus: true
             sceneOmitted: root.screenplayElement.omitted
             sceneHeading: root.scene.heading
 
-            Announcement.onIncoming: (type,data) => {
-                if(!root.screenplayElementDelegateHasFocus || root.readOnly)
-                    return
+            ActionHandler {
+                action: ActionHub.paragraphFormats.find("headingParagraph")
+                enabled: root.isCurrent && !_sceneHeading.activeFocus
 
-                var sdata = "" + data
-                var stype = "" + type
-                if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.sceneHeading) {
-                    forceActiveFocus()
-                }
+                onTriggered: (source) => {
+                                 _sceneHeading.selectAll()
+                                 _sceneHeading.forceActiveFocus()
+                             }
+            }
+
+            onReturnPressed: {
+                const editSceneContent = ActionHub.editOptions.find("editSceneContent")
+                editSceneContent.trigger()
             }
         }
 
@@ -146,8 +148,6 @@ AbstractScenePartEditor {
                     index: root.index
                     screenplayElement: root.screenplayElement
                     screenplayAdapter: root.screenplayAdapter
-
-                    onAdditionalSceneMenuItemClicked: (name) => { root.additionalSceneMenuItemClicked(name) }
                 }
             }
 

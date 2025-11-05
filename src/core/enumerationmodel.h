@@ -21,10 +21,11 @@
 /*
 We need a way to access QMetaEnum like a model from QML code. This class is meant for that.
 */
-class EnumerationModel : public QAbstractListModel
+class EnumerationModel : public QAbstractListModel, public QQmlParserStatus
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     explicit EnumerationModel(QObject *parent = nullptr);
@@ -35,6 +36,16 @@ public:
     Q_PROPERTY(int count READ count NOTIFY countChanged)
     int count() const { return m_items.size(); }
     Q_SIGNAL void countChanged();
+
+    Q_PROPERTY(QList<int> ignoreList READ ignoreList WRITE setIgnoreList NOTIFY ignoreListChanged)
+    void setIgnoreList(QList<int> val);
+    QList<int> ignoreList() const { return m_ignoreList; }
+    Q_SIGNAL void ignoreListChanged();
+
+    Q_PROPERTY(QString className READ className WRITE setClassName NOTIFY classNameChanged)
+    void setClassName(const QString &val);
+    QString className() const;
+    Q_SIGNAL void classNameChanged();
 
     Q_PROPERTY(QObject* object READ object WRITE setObject NOTIFY objectChanged)
     void setObject(QObject *val);
@@ -49,12 +60,17 @@ public:
     Q_INVOKABLE QString valueToKey(int value) const;
     Q_INVOKABLE QString valueToIcon(int value) const;
     Q_INVOKABLE int keyToValue(const QString &key) const;
+    Q_INVOKABLE int indexOfValue(int value) const;
 
     // QAbstractItemModel interface
     enum { KeyRole = Qt::UserRole, ValueRole, IconRole };
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex &parent) const;
     QVariant data(const QModelIndex &index, int role) const;
+
+    // QQmlParserStatus interface
+    void classBegin() { m_componentComplete = false; }
+    void componentComplete();
 
 private:
     void resetObject();
@@ -74,6 +90,8 @@ private:
     };
     QList<Item> m_items;
     QMetaEnum m_metaEnum;
+    QList<int> m_ignoreList;
+    bool m_componentComplete = true;
 };
 
 #endif // ENUMERATIONMODEL_H

@@ -863,7 +863,7 @@ QAbstractListModel *Utils::Object::typeEnumModel(const QString &typeName, const 
     const QMetaObject *mo =
             typeId == QMetaType::UnknownType ? nullptr : QMetaType::metaObjectForType(typeId);
     if (mo)
-        return new EnumerationModel(mo, typeName, parent);
+        return new EnumerationModel(mo, enumName, parent);
 
     return nullptr;
 }

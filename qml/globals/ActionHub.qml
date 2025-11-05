@@ -391,7 +391,6 @@ Item {
     }
 
     readonly property ActionManager paragraphFormats: ActionManager {
-        function action(type) { return _paragraphFormatActions.action(type) }
         function setBinder(binder) { root.setBinder(binder) }
         function resetBinder(binder) { root.resetBinder(binder) }
 
@@ -411,13 +410,6 @@ Item {
     Repeater {
         id: _paragraphFormatActions
 
-        function action(type) {
-            if(type < 0 || type >= _private.availableParagraphFormats.length)
-                return null
-
-            return _paragraphFormatActions.itemAt(type)
-        }
-
         model: _private.availableParagraphFormats
 
         // Repeater delegates can only be Item {}, they cannot be QObject types.
@@ -425,35 +417,31 @@ Item {
         // nested in an Item.
         delegate: Item {
             required property int index
-            required property var modelData // { value, name, display, icon }
+            required property int enumValue
+            required property string enumKey
+            required property string enumIcon
 
             visible: false
 
             Action {
-                property int sortOrder: index
-                property string defaultShortcut: "Ctrl+" + index
-
-                property string tooltip: modelData.display
+                property int sortOrder: enumValue === SceneElement.Heading ? 0 : (index+1)
+                property string defaultShortcut: "Ctrl+" + sortOrder
 
                 ActionManager.target: root.paragraphFormats
 
                 checkable: true
-                checked: _private.binder !== null ? (_private.binder.currentElement ? _private.binder.currentElement.type === modelData.value : false) : false
+                checked: _private.binder !== null ? (_private.binder.currentElement ? _private.binder.currentElement.type === enumValue : false) : false
                 enabled: Runtime.allowAppUsage && _private.binder !== null
-                objectName: modelData.name
+                objectName: enumKey.toLowerCase() + "Paragraph"
                 shortcut: defaultShortcut
-                text: modelData.display
+                text: enumKey
 
-                icon.source: modelData.icon
+                icon.source: enumIcon
 
                 onTriggered: {
-                    if(index === 0) {
-                        if(!_private.binder.scene.heading.enabled)
-                        _private.binder.scene.heading.enabled = true
-                        Runtime.shoutout(Runtime.announcementIds.focusRequest, Runtime.announcementData.focusOptions.sceneHeading)
-                    } else {
-                        _private.binder.currentElement.type = modelData.value
-                    }
+                    // When index=0, its scene heading and that's handled separately.
+                    if(enumValue !== SceneElement.Heading)
+                        _private.binder.currentElement.type = enumValue
                 }
             }
         }
@@ -589,6 +577,92 @@ Item {
             text: "Join Previous Scene"
 
             icon.source: "qrc:/icons/action/merge_scene.png"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "editSceneContent"
+            text: "Edit Scene Content"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_Home)
+
+            enabled: ActionHandler.canHandle
+            objectName: "jumpFirstScene"
+            shortcut: defaultShortcut
+            text: "First Scene"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_End)
+
+            enabled: ActionHandler.canHandle
+            objectName: "jumpLastScene"
+            shortcut: defaultShortcut
+            text: "Last Scene"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut:Platform.isMacOSDesktop ?  "Ctrl+Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageUp)
+
+            enabled: ActionHandler.canHandle
+            objectName: "jumpPreviousScene"
+            shortcut: defaultShortcut
+            text: "Previous Scene"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageDown)
+
+            enabled: ActionHandler.canHandle
+            objectName: "jumpNextScene"
+            shortcut: defaultShortcut
+            text: "Next Scene"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "scrollPreviousScene"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            enabled: ActionHandler.canHandle
+            objectName: "scrollNextScene"
+        }
+
+        Action {
+            readonly property bool visible: false
+
+            property int cursorPosition: -2
+            property int sceneElementIndex: -1
+
+            function set(idx, pos) {
+                sceneElementIndex = idx
+                cursorPosition = pos
+            }
+
+            function get(idx) {
+                if(sceneElementIndex === idx) {
+                    const ret = cursorPosition
+                    cursorPosition = -2
+                    sceneElementIndex = -1
+                    return ret
+                }
+                return -2
+            }
+
+            objectName: "focusCursorPosition"
         }
     }
 
@@ -1290,7 +1364,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Rewind 10 seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Left)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Left)
 
             enabled: ActionHandler.canHandle
             objectName: "rewind10"
@@ -1326,7 +1400,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Forward ten seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Right)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Right)
 
             enabled: ActionHandler.canHandle
             objectName: "forward10"
@@ -1338,7 +1412,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Previous Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Up)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousScene"
@@ -1350,7 +1424,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Next Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Down)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextScene"
@@ -1382,7 +1456,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt+Qt.Key_Up)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.AltModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousPage"
@@ -1392,7 +1466,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Alt+Qt.Key_Down)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.AltModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextPage"
@@ -1402,7 +1476,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Shift+Qt.Key_Up)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ShiftModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousScreen"
@@ -1412,7 +1486,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Shift+Qt.Key_Down)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ShiftModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextScreen"
@@ -1444,7 +1518,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Control+Qt.Key_Greater)
+            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Greater)
 
             enabled: ActionHandler.canHandle
             objectName: "adjustOffsets"
@@ -1665,15 +1739,11 @@ Item {
                 _private.binder = null
         }
 
-        readonly property var availableParagraphFormats: [
-            { "value": SceneElement.Heading, "name": "headingParagraph", "display": "Current Scene Heading", "icon": "qrc:/icons/screenplay/heading.png" },
-            { "value": SceneElement.Action, "name": "actionParagraph", "display": "Action", "icon": "qrc:/icons/screenplay/action.png" },
-            { "value": SceneElement.Character, "name": "characterParagraph", "display": "Character", "icon": "qrc:/icons/screenplay/character.png" },
-            { "value": SceneElement.Dialogue, "name": "dialogueParagraph", "display": "Dialogue", "icon": "qrc:/icons/screenplay/dialogue.png" },
-            { "value": SceneElement.Parenthetical, "name": "parentheticalParagraph", "display": "Parenthetical", "icon": "qrc:/icons/screenplay/parenthetical.png" },
-            { "value": SceneElement.Shot, "name": "shotParagraph", "display": "Shot", "icon": "qrc:/icons/screenplay/shot.png" },
-            { "value": SceneElement.Transition, "name": "transitionParagraph", "display": "Transition", "icon": "qrc:/icons/screenplay/transition.png" }
-        ]
+        readonly property EnumerationModel availableParagraphFormats: EnumerationModel {
+            className: "SceneElement"
+            enumeration: "Type"
+            ignoreList: [SceneElement.All]
+        }
 
         readonly property Component textColorsPopup: Popup {
             id: _textColorsPopup

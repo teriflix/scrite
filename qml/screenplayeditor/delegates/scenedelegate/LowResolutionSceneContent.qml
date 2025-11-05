@@ -31,7 +31,7 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 Rectangle {
     id: root
 
-    required property AbstractScreenplayElementDelegate sceneDelegate
+    required property AbstractScreenplayElementSceneDelegate sceneDelegate
 
     z: 1
 

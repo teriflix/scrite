@@ -33,10 +33,7 @@ MenuLoader {
     required property ScreenplayAdapter screenplayAdapter
     required property ScreenplayElement screenplayElement
 
-    property var additionalSceneMenuItems: []
     property Scene scene: screenplayElement ? screenplayElement.scene : null
-
-    signal additionalSceneMenuItemClicked(string name)
 
     menu: VclMenu {
         id: _sceneMenu
@@ -118,27 +115,6 @@ MenuLoader {
                                                          {"sceneNumbers": sceneNumbers},
                                                          {"initialPage": modelData.group})
                     }
-                }
-            }
-        }
-
-        Repeater {
-            model: root.screenplayElement.omitted ? 0 : root.additionalSceneMenuItems.length ? 1 : 0
-
-            MenuSeparator { }
-        }
-
-        Repeater {
-            model: root.screenplayElement.omitted ? 0 : root.additionalSceneMenuItems
-
-            VclMenuItem {
-                required property var modelData
-
-                text: modelData
-
-                onTriggered: {
-                    Scrite.document.screenplay.currentElementIndex = root.index
-                    additionalSceneMenuItemClicked(modelData)
                 }
             }
         }

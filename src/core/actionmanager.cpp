@@ -651,11 +651,13 @@ void ActionHandler::componentComplete()
 {
     QQuickItem::componentComplete();
 
-    const QMetaObject *mo = m_action->metaObject();
-    const QMetaProperty triggerCountProp =
-            mo->property(mo->indexOfProperty(_QQuickActionTriggerCount));
-    if (triggerCountProp.isValid() && triggerCountProp.userType() == QMetaType::Int)
-        checkTriggerCount();
+    if (m_action != nullptr) {
+        const QMetaObject *mo = m_action->metaObject();
+        const QMetaProperty triggerCountProp =
+                mo->property(mo->indexOfProperty(_QQuickActionTriggerCount));
+        if (triggerCountProp.isValid() && triggerCountProp.userType() == QMetaType::Int)
+            checkTriggerCount();
+    }
 }
 
 void ActionHandler::onToggled(QObject *source)

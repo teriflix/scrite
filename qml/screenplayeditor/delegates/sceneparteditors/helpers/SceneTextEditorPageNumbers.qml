@@ -23,6 +23,7 @@ import "qrc:/qml/controls"
 Loader {
     id: root
 
+    required property bool isCurrent
     required property real zoomLevel
     required property TextEdit sceneTextEditor
     required property FontMetrics fontMetrics

@@ -63,6 +63,7 @@ AbstractScenePartEditor {
                     screenplayElementDelegateHasFocus: root.hasFocus
 
                     partName: "StoryBeats-SidePanel"
+                    isCurrent: root.isCurrent
                     zoomLevel: root.zoomLevel * 0.75
                     fontMetrics: root.fontMetrics
                     pageMargins: root.pageMargins
@@ -89,6 +90,7 @@ AbstractScenePartEditor {
                     screenplayElementDelegateHasFocus: root.hasFocus
 
                     partName: "CharacterList-SidePanel"
+                    isCurrent: root.isCurrent
                     zoomLevel: root.zoomLevel * 0.75
                     fontMetrics: root.fontMetrics
                     pageMargins: root.pageMargins
@@ -116,6 +118,7 @@ AbstractScenePartEditor {
                     screenplayElementDelegateHasFocus: root.hasFocus
 
                     partName: "Synopsis-SidePanel"
+                    isCurrent: root.isCurrent
                     zoomLevel: root.zoomLevel
                     fontMetrics: root.fontMetrics
                     pageMargins: root.pageMargins

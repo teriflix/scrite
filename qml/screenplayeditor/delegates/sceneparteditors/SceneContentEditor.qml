@@ -35,15 +35,6 @@ AbstractScenePartEditor {
 
     readonly property alias currentParagraphType: _private.currentParagraphType
 
-    signal editSceneHeadingRequest()
-
-    signal jumpToNextScene()
-    signal jumpToLastScene()
-    signal jumpToFirstScene()
-    signal jumpToPreviousScene()
-    signal scrollToNextSceneRequest()
-    signal scrollToPreviousSceneRequest()
-
     signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
     signal mergeWithPreviousSceneRequest()
 
@@ -61,7 +52,7 @@ AbstractScenePartEditor {
             _sceneTextEditor.forceActiveFocus()
 
         if(cursorPosition === undefined || cursorPosition < 0)
-            _sceneTextEditor.cursorPosition = _sceneDocumentBinder.lastCursorPosition()
+            _sceneTextEditor.cursorPosition = _sceneTextEditor.length
         else
             _sceneTextEditor.cursorPosition = cursorPosition
 
@@ -84,12 +75,8 @@ AbstractScenePartEditor {
 
         signal highlightCursor()
 
-        Keys.onPressed: (event) => { _private.handleSceneTextEditorKeyPressed(event) }
         Keys.onUpPressed: (event) => { _private.handleSceneTextEditorKeyUpPressed(event) }
-        Keys.onTabPressed: (event) => { _private.handleSceneTextEditorTabPressed(event) }
         Keys.onDownPressed: (event) => { _private.handleSceneTextEditorKeyDownPressed(event) }
-        Keys.onEnterPressed: (event) => { _private.handleSceneTextEditorReturnPressed(event) }
-        Keys.onReturnPressed: (event) => { _private.handleSceneTextEditorReturnPressed(event) }
 
         EventFilter.target: Scrite.app
         EventFilter.active: activeFocus
@@ -200,7 +187,7 @@ AbstractScenePartEditor {
         }
 
         onActiveFocusChanged: Qt.callLater(_private.handleSceneTextEditorFocusChange)
-        onCursorRectangleChanged: root.ensureVisible(_sceneTextEditor, cursorRectangle)
+        onCursorRectangleChanged: Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
     }
 
     SceneTextEditorSpellingSuggestionsMenu {
@@ -274,10 +261,10 @@ AbstractScenePartEditor {
                                  (Runtime.language.activeTransliterationOption ? !Runtime.language.activeTransliterationOption.inApp : true)
 
         onDocumentInitialized: () => {
-            if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes)
-                _sceneTextEditor.cursorPosition = 0
-            _private.firstInitializationDone = true
-        }
+                                   if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes)
+                                   _sceneTextEditor.cursorPosition = 0
+                                   _private.firstInitializationDone = true
+                               }
 
         onRequestCursorPosition: (position) => {
                                      /* Upon receipt of this signal, lets immediately reset cursor position.
@@ -351,8 +338,44 @@ AbstractScenePartEditor {
     }
 
     ActionHandler {
+        action: ActionHub.editOptions.find("cut")
+        enabled: !root.readOnly && _sceneTextEditor.hasSelection
+
+        onTriggered: (source) => {
+                         _private.cut()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("copy")
+        enabled: !root.readOnly && _sceneTextEditor.hasSelection
+
+        onTriggered: (source) => {
+                         _private.copy()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("paste")
+        enabled: !root.readOnly
+
+        onTriggered: (source) => {
+                         _private.paste()
+                     }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("editSceneContent")
+        enabled: !root.readOnly && root.isCurrent && !_sceneTextEditor.activeFocus
+
+        onTriggered: (source) => {
+                         _sceneTextEditor.forceActiveFocus()
+                     }
+    }
+
+    ActionHandler {
         action: ActionHub.editOptions.find("splitScene")
-        enabled: _private.canSplitScene
+        enabled: !root.readOnly && _private.canSplitScene
 
         onTriggered: (source) => {
                          Qt.callLater(_private.splitSceneAt, _sceneTextEditor.cursorPosition)
@@ -361,7 +384,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("mergeScene")
-        enabled: _private.canJoinToPreviousScene
+        enabled: !root.readOnly && _private.canJoinToPreviousScene
 
         onTriggered: (source) => {
                          Qt.callLater(_private.mergeWithPreviousScene, _sceneTextEditor.cursorPosition)
@@ -412,6 +435,10 @@ AbstractScenePartEditor {
     QtObject {
         id: _private
 
+        readonly property Action scrollNextScene: ActionHub.editOptions.find("scrollNextScene")
+        readonly property Action scrollPreviousScene: ActionHub.editOptions.find("scrollPreviousScene")
+        readonly property Action focusCursorPosition: ActionHub.editOptions.find("focusCursorPosition")
+
         property bool canSplitScene: _sceneTextEditor.activeFocus &&
                                      !root.readOnly &&
                                      _sceneDocumentBinder.currentElement &&
@@ -428,6 +455,25 @@ AbstractScenePartEditor {
         property bool scrollingBetweenScenes: false
         property bool firstInitializationDone: false
 
+        onFirstInitializationDoneChanged: {
+            if(firstInitializationDone) {
+                Qt.callLater(placeFocusCursor)
+            }
+        }
+
+        property bool focusCursorIsOnMe: focusCursorPosition.sceneElementIndex === sceneDelegate.index
+        onFocusCursorIsOnMeChanged: {
+            if(firstInitializationDone) {
+                Qt.callLater(placeFocusCursor)
+            }
+        }
+
+        function placeFocusCursor() {
+            const cursorPosition = focusCursorPosition.get(sceneDelegate.index)
+            if(cursorPosition >= -1)
+                root.assumeFocusAt(cursorPosition)
+        }
+
         property int currentParagraphType: _sceneTextEditor.activeFocus ? (currentElement ? currentElement.type : SceneElement.Action) : -1
         property SceneElement currentElement: _sceneTextEditor.activeFocus ? _sceneDocumentBinder.currentElement : null
 
@@ -441,8 +487,10 @@ AbstractScenePartEditor {
             if(event.accepted) {
                 if(_sceneTextEditor.cursorPosition > 0)
                     _sceneTextEditor.cursorPosition = 0
-                else
-                    root.scrollToPreviousSceneRequest()
+                else if(scrollPreviousScene.enabled) {
+                    _sceneTextEditor.focus = false
+                    scrollPreviousScene.trigger()
+                }
             }
         }
 
@@ -456,62 +504,9 @@ AbstractScenePartEditor {
             if(event.accepted) {
                 if(_sceneTextEditor.cursorPosition < _sceneDocumentBinder.lastCursorPosition())
                     _sceneTextEditor.cursorPosition = _sceneDocumentBinder.lastCursorPosition()
-                else
-                    root.scrollToNextSceneRequest()
-            }
-        }
-
-        function handleSceneTextEditorReturnPressed(event) {
-            event.accepted = false
-        }
-
-        function handleSceneTextEditorTabPressed(event) {
-            if(!_sceneTextEditor.readOnly) {
-                _sceneDocumentBinder.tab()
-                event.accepted = true
-            }
-        }
-
-        function handleSceneTextEditorKeyPressed(event) {
-            event.accepted = false
-
-            if(event.modifiers === Qt.ControlModifier) {
-                switch(event.key) {
-                case Qt.Key_0:
-                    event.accepted = true
-                    root.editSceneHeadingRequest()
-                    break
-                case Qt.Key_X:
-                    event.accepted = true
-                    cut()
-                    break
-                case Qt.Key_C:
-                    event.accepted = true
-                    copy()
-                    break
-                case Qt.Key_V:
-                    event.accepted = true
-                    paste()
-                    break
-                case Qt.Key_Home:
-                    event.accepted = true
-                    root.jumpToFirstScene()
-                    break
-                case Qt.Key_End:
-                    event.accepted = true
-                    root.jumpToLastScene()
-                    break
-                }
-            } else {
-                switch(event.key) {
-                case Qt.Key_PageUp:
-                    event.accepted = true
-                    root.jumpToPreviousScene()
-                    break
-                case Qt.Key_PageDown:
-                    event.accepted = true
-                    root.jumpToNextScene()
-                    break
+                else if(scrollNextScene.enabled) {
+                    _sceneTextEditor.focus = false
+                    scrollNextScene.trigger()
                 }
             }
         }
@@ -537,6 +532,10 @@ AbstractScenePartEditor {
             } else {
                 ActionHub.resetBinder(_sceneDocumentBinder)
             }
+        }
+
+        function ensureSceneTextEditorCursorIsVisible() {
+            root.ensureVisible(_sceneTextEditor, _sceneTextEditor.cursorRectangle)
         }
 
         function cut() {

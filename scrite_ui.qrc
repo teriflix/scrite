@@ -239,7 +239,7 @@
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorBackground.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorCompletionPopup.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorContextMenu.qml</file>
-        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorPageNumbersLoader.qml</file>
+        <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorPageNumbers.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/SceneTextEditorSpellingSuggestionsMenu.qml</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/helpers/qmldir</file>
         <file>qml/screenplayeditor/delegates/sceneparteditors/qmldir</file>
@@ -313,5 +313,6 @@
         <file>qml/dialogs/ShortcutEditorDialog.qml</file>
         <file>qml/screenplayeditor/delegates/scenedelegate/LowResolutionSceneContent.qml</file>
         <file>qml/screenplayeditor/delegates/scenedelegate/HighResolutionSceneContent.qml</file>
+        <file>qml/screenplayeditor/delegates/AbstractScreenplayElementSceneDelegate.qml</file>
     </qresource>
 </RCC>

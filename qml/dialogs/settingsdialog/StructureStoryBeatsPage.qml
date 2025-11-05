@@ -32,7 +32,7 @@ Item {
     property int target: e_DefaultGlobalTarget
 
     ColumnLayout {
-        id: layout
+        id: _layout
 
         anchors.fill: parent
         anchors.margins: 15
@@ -67,7 +67,7 @@ Item {
             border.color: Runtime.colors.primary.borderColor
 
             FlickableTextArea {
-                id: storyBeatsEditor
+                id: _storyBeatsEditor
 
                 anchors.fill: parent
                 anchors.margins: 1
@@ -79,7 +79,7 @@ Item {
                 font.family: "Courier Prime"
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
 
-                onTextChanged: cmdApplyButton.enabled = true
+                onTextEdited: _applyButton.enabled = true
             }
         }
 
@@ -97,22 +97,22 @@ Item {
             }
 
             VclButton {
-                id: cmdApplyButton
+                id: _applyButton
 
                 text: "Apply"
                 enabled: false
                 onClicked: {
                     if(target === e_CurrentDocumentTarget)
-                        Scrite.document.structure.groupsData = storyBeatsEditor.text
+                        Scrite.document.structure.groupsData = _storyBeatsEditor.text
                     else {
-                        File.write(Scrite.document.structure.defaultGroupsDataFile, storyBeatsEditor.text)
+                        File.write(Scrite.document.structure.defaultGroupsDataFile, _storyBeatsEditor.text)
 
                         MessageBox.question("Story Beats",
                                             "Do you want to use these story beats in the current document as well?",
                                             ["Yes", "No"],
                                             (answer) => {
                                                 if(answer === "Yes") {
-                                                    Scrite.document.structure.groupsData = storyBeatsEditor.text
+                                                    Scrite.document.structure.groupsData = _storyBeatsEditor.text
                                                 }
                                             })
                     }

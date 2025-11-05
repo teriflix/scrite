@@ -30,7 +30,19 @@ Item {
     Loader {
         anchors.fill: parent
 
-        active: Runtime.appFeatures.screenplay.enabled && width > 100
+        /**
+          Strange issue!!!!
+
+          If the value of active is determined using the expression
+          'width > 100 && Runtime.appFeatures.screenplay.enabled'
+          then, the sourceComponent is instantiated twice for some reason.
+
+          But, if its written the way it is below, then the sourceComponent is
+          instantiated once.
+
+          It is really really strange.
+          */
+        active: root.width > 100 && Runtime.appFeatures.screenplay.enabled
 
         sourceComponent: ScreenplayEditor { }
     }

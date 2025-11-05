@@ -19,26 +19,8 @@ import io.scrite.components 1.0
 import "qrc:/qml/globals"
 import "qrc:/qml/screenplayeditor/delegates/scenedelegate"
 
-AbstractScreenplayElementDelegate {
+AbstractScreenplayElementSceneDelegate {
     id: root
-
-    required property bool showSceneSidePanel
-    required property real spaceAvailableForScenePanel
-    required property ListView listView // This must be the list-view in which the delegate is placed.
-
-    property var additionalSceneMenuItems: []
-
-    signal jumpToNextScene()
-    signal jumpToLastScene()
-    signal jumpToFirstScene()
-    signal jumpToPreviousScene()
-    signal scrollToNextSceneRequest()
-    signal scrollToPreviousSceneRequest()
-
-    signal splitSceneRequest(SceneElement paragraph, int cursorPosition)
-    signal mergeWithPreviousSceneRequest()
-
-    signal additionalSceneMenuItemClicked(string name)
 
     /**
       # Why two loaders, instead of one that swaps _lowResolution with _highResolution?

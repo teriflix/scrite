@@ -134,7 +134,8 @@ Item {
 
             addTextButtonTooltip: "Click here to add custom scene tags."
             completionStrings: Scrite.document.structure.sceneTags
-            labelIconSource: "qrc:/icons/action/tag.png"
+            labelIconSource: "qrc:/icons/action/keyword.png"
+            labelIconVisible: _private.presentableGroupNames !== ""
             labelText: "Open Tags"
             readOnly: !Runtime.appFeatures.structure.enabled && Scrite.document.readOnly
             textList: root.scene ? root.scene.tags : 0

@@ -161,6 +161,14 @@ public:
         All = -1
     };
     Q_ENUM(Type)
+    Q_CLASSINFO("Type.Action:icon", "qrc:/icons/screenplay/action.png")
+    Q_CLASSINFO("Type.Character:icon", "qrc:/icons/screenplay/character.png")
+    Q_CLASSINFO("Type.Dialogue:icon", "qrc:/icons/screenplay/dialogue.png")
+    Q_CLASSINFO("Type.Parenthetical:icon", "qrc:/icons/screenplay/parenthetical.png")
+    Q_CLASSINFO("Type.Shot:icon", "qrc:/icons/screenplay/shot.png")
+    Q_CLASSINFO("Type.Transition:icon", "qrc:/icons/screenplay/transition.png")
+    Q_CLASSINFO("Type.Heading:icon", "qrc:/icons/screenplay/heading.png")
+
     Q_PROPERTY(Type type READ type WRITE setType NOTIFY typeChanged)
     Q_CLASSINFO("UndoBundleFor_type", "cursorPosition")
     void setType(Type val);
@@ -371,10 +379,10 @@ public:
     Q_SIGNAL void enabledChanged();
 
     // Keep this updated and synced with SceneTypeImage.qml
-    Q_CLASSINFO("enum_Standard_icon", "qrc:/icons/content/blank.png")
-    Q_CLASSINFO("enum_Song_icon", "qrc:/icons/content/queue_mus24px.png")
-    Q_CLASSINFO("enum_Action_icon", "qrc:/icons/content/fight_scene.png")
-    Q_CLASSINFO("enum_Montage_icon", "qrc:/icons/content/camera_alt.png")
+    Q_CLASSINFO("Type.Standard:icon", "qrc:/icons/content/blank.png")
+    Q_CLASSINFO("Type.Song:icon", "qrc:/icons/content/queue_mus24px.png")
+    Q_CLASSINFO("Type.Action:icon", "qrc:/icons/content/fight_scene.png")
+    Q_CLASSINFO("Type.Montage:icon", "qrc:/icons/content/camera_alt.png")
 
     enum Type { Standard = 0, Song, Action, Montage };
     Q_ENUM(Type)

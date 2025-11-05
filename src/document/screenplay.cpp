@@ -2460,10 +2460,7 @@ int Screenplay::nextSceneElementIndex() const
         break;
     }
 
-    if (index < m_elements.size())
-        return index;
-
-    return m_elements.size() - 1;
+    return index < m_elements.size() ? index : m_elements.size() - 1;
 }
 
 int Screenplay::previousSceneElementIndex() const
@@ -2479,10 +2476,7 @@ int Screenplay::previousSceneElementIndex() const
         break;
     }
 
-    if (index >= 0)
-        return index;
-
-    return 0;
+    return index >= 0 ? index : m_currentElementIndex;
 }
 
 void Screenplay::setActiveScene(Scene *val)

@@ -26,20 +26,30 @@ VclMenu {
 
     property Scene scene
     property bool enableValidation: true
+
     signal triggered(var type)
 
     Repeater {
-        model: Object.typeEnumModel("Scene", "Type", root)
+        model: EnumerationModel {
+            className: "Scene"
+            enumeration: "Type"
+        }
 
         VclMenuItem {
-            text: modelData.key + (scene ? (font.bold ? " ✔" : "") : "")
-            icon.source: modelData.icon
+            required property int index
+            required property int enumValue
+            required property string enumKey
+            required property string enumIcon
+
+            text: enumKey + (scene ? (font.bold ? " ✔" : "") : "")
+            icon.source: enumIcon
             enabled: enableValidation ? scene : true
-            font.bold: scene ? (enabled ? scene.type === modelData.value : false) : false
-            onTriggered: {
+            font.bold: scene ? (enabled ? scene.type === enumValue : false) : false
+
+            onClicked: {
                 if(scene)
-                    scene.type = modelData.value
-                root.triggered(modelData.value)
+                    scene.type = enumValue
+                root.triggered(enumValue)
             }
         }
     }

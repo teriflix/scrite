@@ -37,6 +37,7 @@ Flow {
     property real zoomLevel: 1.0
 
     property alias header: _headerLoader.sourceComponent
+    property alias labelIconVisible: _labelIcon.visible
 
     readonly property alias label: _label
 
@@ -71,6 +72,7 @@ Flow {
     }
 
     FlatToolButton {
+        id: _labelIcon
         ToolTip.text: root.labelText
 
         suggestedWidth: _label.height
