@@ -12,7 +12,7 @@
 ****************************************************************************/
 
 #include "application.h"
-#include "timeprofiler.h"
+#include "utils.h"
 #include "boundingboxevaluator.h"
 #include "boundingboxevaluator.h"
 
@@ -175,8 +175,10 @@ void BoundingBoxEvaluator::updatePreview()
      * get a function to create preview-picture in a thread.
      */
     QList<QJsonObject> itemInfoArray;
-    for (BoundingBoxItem *item : qAsConst(m_items))
-        itemInfoArray << item->asJson();
+    for (BoundingBoxItem *item : qAsConst(m_items)) {
+        if (item->isPreviewEnabled())
+            itemInfoArray << item->asJson();
+    }
 
     QFutureWatcher<QPicture> *futureWatcher = new QFutureWatcher<QPicture>(this);
     futureWatcher->setObjectName(futureWatcherName);
@@ -310,7 +312,14 @@ BoundingBoxItem::BoundingBoxItem(QObject *parent)
         connect(m_item, &QQuickItem::heightChanged, this, &BoundingBoxItem::determineVisibility);
     }
 
+    connect(this, &BoundingBoxItem::itemRectChanged, this, &BoundingBoxItem::requestReevaluation);
+    connect(this, &BoundingBoxItem::itemRectChanged, this, &BoundingBoxItem::determineVisibility);
+
     connect(this, &BoundingBoxItem::stackOrderChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::itemRectChanged, &m_jsonUpdateTimer,
+            QOverload<>::of(&QTimer::start));
+    connect(this, &BoundingBoxItem::previewEnabledChanged, &m_jsonUpdateTimer,
             QOverload<>::of(&QTimer::start));
     connect(this, &BoundingBoxItem::previewFillColorChanged, &m_jsonUpdateTimer,
             QOverload<>::of(&QTimer::start));
@@ -348,7 +357,19 @@ BoundingBoxItem *BoundingBoxItem::qmlAttachedProperties(QObject *object)
 
 QRectF BoundingBoxItem::boundingRect() const
 {
-    return m_item ? QRectF(m_item->x(), m_item->y(), m_item->width(), m_item->height()) : QRectF();
+    if (m_item) {
+        if (m_itemRect.isValid()
+            && (m_itemRect.userType() == QMetaType::QRect
+                || m_itemRect.userType() == QMetaType::QRectF)) {
+            QVariant itemRect = m_itemRect;
+            itemRect.convert(QMetaType::QRectF);
+            return itemRect.toRectF();
+        }
+
+        return QRectF(m_item->x(), m_item->y(), m_item->width(), m_item->height());
+    }
+
+    return QRectF();
 }
 
 void BoundingBoxItem::setEvaluator(BoundingBoxEvaluator *val)
@@ -369,6 +390,15 @@ void BoundingBoxItem::setEvaluator(BoundingBoxEvaluator *val)
     emit evaluatorChanged();
 }
 
+void BoundingBoxItem::setItemRect(const QVariant &val)
+{
+    if (m_itemRect == val)
+        return;
+
+    m_itemRect = val;
+    emit itemRectChanged();
+}
+
 void BoundingBoxItem::setStackOrder(qreal val)
 {
     if (qFuzzyCompare(m_stackOrder, val))
@@ -376,6 +406,17 @@ void BoundingBoxItem::setStackOrder(qreal val)
 
     m_stackOrder = val;
     emit stackOrderChanged();
+
+    this->updatePreviewLater();
+}
+
+void BoundingBoxItem::setPreviewEnabled(bool val)
+{
+    if (m_previewEnabled == val)
+        return;
+
+    m_previewEnabled = val;
+    emit previewEnabledChanged();
 
     this->updatePreviewLater();
 }
@@ -639,7 +680,7 @@ void BoundingBoxItem::determineVisibility()
         return;
     }
 
-    QRectF itemRect(m_item->x(), m_item->y(), m_item->width(), m_item->height());
+    QRectF itemRect = this->boundingRect();
     if (!m_viewportItem.isNull()) {
         /**
           QQuickItem::mapToItem() is slightly time-consuming function call. Maybe a good idea

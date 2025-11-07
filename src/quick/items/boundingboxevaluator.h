@@ -165,10 +165,20 @@ public:
     BoundingBoxEvaluator *evaluator() const { return m_evaluator; }
     Q_SIGNAL void evaluatorChanged();
 
+    Q_PROPERTY(QVariant itemRect READ itemRect WRITE setItemRect NOTIFY itemRectChanged)
+    void setItemRect(const QVariant &val);
+    QVariant itemRect() const { return m_itemRect; }
+    Q_SIGNAL void itemRectChanged();
+
     Q_PROPERTY(qreal stackOrder READ stackOrder WRITE setStackOrder NOTIFY stackOrderChanged)
     void setStackOrder(qreal val);
     qreal stackOrder() const { return m_stackOrder; }
     Q_SIGNAL void stackOrderChanged();
+
+    Q_PROPERTY(bool previewEnabled READ isPreviewEnabled WRITE setPreviewEnabled NOTIFY previewEnabledChanged)
+    void setPreviewEnabled(bool val);
+    bool isPreviewEnabled() const { return m_previewEnabled; }
+    Q_SIGNAL void previewEnabledChanged();
 
     Q_PROPERTY(QColor previewFillColor READ previewFillColor WRITE setPreviewFillColor NOTIFY previewFillColorChanged)
     void setPreviewFillColor(const QColor &val);
@@ -250,7 +260,9 @@ private:
     QImage m_preview;
     QImage m_staticPreview; // incase previewImageSource is set.
     qreal m_stackOrder = 0;
+    QVariant m_itemRect;
     bool m_livePreview = true;
+    bool m_previewEnabled = true;
     QRectF m_viewportRect;
     QJsonObject m_json;
     QTimer m_jsonUpdateTimer;

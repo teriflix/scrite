@@ -26,19 +26,18 @@ import "qrc:/qml/structureview"
 StructureElementConnector {
     id: root
 
+    required property Item canvasScrollViewport
     required property rect canvasScrollViewportRect
 
     required property real canvasScale
 
     required property string labelText
 
+    required property BoundingBoxEvaluator canvasItemsBoundingBox
+
     property alias labelVisible: _labelBg.visible
 
-    visible: {
-        if(canBeVisible)
-            return intersects(root.canvasScrollViewportRect)
-        return false
-    }
+    visible: canBeVisible ? GMath.doRectanglesIntersect(root.canvasScrollViewportRect, contentRect) : false
     lineType: StructureElementConnector.CurvedLine
     outlineWidth: Scrite.app.devicePixelRatio * Runtime.bounded(1, Math.round(root.canvasScale * Runtime.structureCanvasSettings.connectorLineWidth), 5)
     arrowAndLabelSpacing: _labelBg.width

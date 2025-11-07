@@ -29,6 +29,11 @@ Rectangle {
 
     signal gripRequest(Item delegate, Annotation annotation)
 
+    /**
+      BoundingBoxItem is attached to annotations within AnnotationLayer._private.createAnnotationDelegate()
+      method, which is why you won't find it here.
+      */
+
     x: annotation.geometry.x
     y: annotation.geometry.y
     width: annotation.geometry.width

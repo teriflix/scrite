@@ -187,6 +187,8 @@ Item {
             toElement: connectorToElement
             fromElement: connectorFromElement
             canvasScale: root.canvasScale
+            canvasScrollViewport: root.canvasScrollViewport
+            canvasItemsBoundingBox: root.canvasItemsBoundingBox
             canvasScrollViewportRect: root.canvasScrollViewportRect
 
             labelVisible: !root.canvasPreviewIsUpdating

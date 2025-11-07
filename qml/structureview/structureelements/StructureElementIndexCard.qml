@@ -33,7 +33,8 @@ AbstractStructureElementUI {
     readonly property alias elementStack: _private.elementStack
     readonly property alias isBeingDragged: _private.isBeingDragged
     readonly property alias isStackedOnTop: _private.isStackedOnTop
-    readonly property alias isVisibleInViewport: _private.isVisibleInViewport
+
+    property alias isVisibleInViewport: _private.isVisibleInViewport
 
     signal editorRequest()
     signal requestContextMenu(StructureElement element)

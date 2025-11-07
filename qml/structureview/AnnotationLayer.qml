@@ -113,13 +113,9 @@ Item {
             function getReady() {
                 if(active) {
                     delegate = _private.createAnnotationDelegate(annotation, annotationIndex, _annotationDelegateContainer)
-                    width = delegate.width
-                    height = delegate.height
                 } else {
                     delegate.destroy()
                     delegate = null
-                    width = 1
-                    height = 1
                 }
             }
         }

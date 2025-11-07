@@ -56,8 +56,7 @@ Rectangle {
     BoundingBoxItem.viewportItem: canvasScrollViewport
     BoundingBoxItem.viewportRect: canvasScrollViewportRect
     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
-    BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
-    BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
+    BoundingBoxItem.previewEnabled: false
 
     x: groupBox.geometry.x - 20
     y: groupBox.geometry.y - 20 - _private.tipMarginForStacks
