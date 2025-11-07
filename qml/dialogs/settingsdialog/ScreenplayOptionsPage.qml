@@ -118,19 +118,6 @@ Item {
                 VclCheckBox {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
-                    text: "Smooth Scrolling"
-                    enabled: false
-                    checked: Runtime.screenplayEditorSettings.optimiseScrolling
-                    onToggled: Runtime.screenplayEditorSettings.optimiseScrolling = checked
-                    hoverEnabled: true
-
-                    ToolTip.visible: hovered
-                    ToolTip.text: "Checking this option will make scrolling in screenplay editor smooth, but uses a lot of RAM and can cause application to freeze at times while scrolling is being computed."
-                }
-
-                VclCheckBox {
-                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
-
                     text: "Remember Time & Page Count Settings"
                     checked: !Runtime.screenplayEditorSettings.pausePaginationForEachDocument
                     onToggled: Runtime.screenplayEditorSettings.pausePaginationForEachDocument = !checked
@@ -185,7 +172,29 @@ Item {
 
                         onValueChanged: Runtime.screenplayEditorSettings.slpSynopsisLineCount = value
 
-                        ToolTip.text: "Max lines to show on the scene list panel."
+                        ToolTip.text: "Max lines to show on the scene list panel. Range: " + from + "-" + to
+                        ToolTip.visible: hovered
+                    }
+                }
+
+                RowLayout {
+                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
+
+                    VclLabel {
+                        text: "Scene Loading Interval: "
+                    }
+
+                    SpinBox {
+                        Layout.fillWidth: true
+
+                        value: Runtime.screenplayEditorSettings.placeholderInterval
+                        from: 50; to: 1000
+                        hoverEnabled: true
+                        editable: true
+
+                        onValueChanged: Runtime.screenplayEditorSettings.placeholderInterval = Runtime.bounded(from, value, to)
+
+                        ToolTip.text: "Delay in ms after which scene content is loaded while scrolling. Range: " + from + "-" + to
                         ToolTip.visible: hovered
                     }
                 }

@@ -496,7 +496,7 @@ ListView {
         }
 
         function scheduleMakeItemUnderCursorCurrent() {
-            Runtime.execLater(_private, Runtime.screenplayEditorSettings.placeholderInterval, _private.makeItemUnderCursorCurrent)
+            Runtime.execLater(_private, Runtime.placeholderInterval, _private.makeItemUnderCursorCurrent)
         }
 
         function scrollIntoView(index) {

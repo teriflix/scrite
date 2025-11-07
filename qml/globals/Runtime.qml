@@ -40,6 +40,7 @@ Item {
     readonly property real minWindowWidthForShowingNotebookInStructure: 1600
 
     property int mainWindowTab: Runtime.MainWindowTab.ScreenplayTab
+    property int placeholderInterval: bounded(50, Runtime.screenplayEditorSettings.placeholderInterval, 1000)
 
     property var helpTips: undefined
 
@@ -139,7 +140,7 @@ Item {
         property int lastSpellCheckRefreshNoticeBoxTimestamp: 0
         property int longSceneWordTreshold: 150
         property int mainEditorZoomValue: -1
-        property int placeholderInterval: 500 // ms after which placeholder is swapped to content in delegates
+        property int placeholderInterval: 250 // ms after which placeholder is swapped to content in delegates
         property int sceneSidePanelActiveTab: 0
         property int slpSynopsisLineCount: 2
 

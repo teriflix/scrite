@@ -82,7 +82,7 @@ AbstractScreenplayElementSceneDelegate {
             }
 
             onLoaded: {
-                Runtime.execLater(_highResLoader, Runtime.screenplayEditorSettings.placeholderInterval, () => {
+                Runtime.execLater(_highResLoader, Runtime.placeholderInterval, () => {
                                         _highResLoader.active = true
                                   })
             }
