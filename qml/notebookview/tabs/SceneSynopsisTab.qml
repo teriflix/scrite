@@ -40,9 +40,10 @@ Item {
     }
 
     ColumnLayout {
+        EventFilter.active: _private.sceneSynopsisField !== null
         EventFilter.events: [EventFilter.Wheel]
         EventFilter.onFilter: {
-            EventFilter.forwardEventTo(_sceneSynopsisField)
+            EventFilter.forwardEventTo(_private.sceneSynopsisField)
             result.filter = true
             result.accepted = true
         }
@@ -239,6 +240,8 @@ Item {
                                           TabSequenceItem.focusPrevious()
                                       }
 
+                Component.onCompleted: _private.sceneSynopsisField = _sceneSynopsisField
+
                 background: Rectangle {
                     color: Runtime.colors.primary.windowColor
                     opacity: 0.15
@@ -281,6 +284,8 @@ Item {
 
     QtObject {
         id: _private
+
+        property FlickableTextArea sceneSynopsisField
 
         property string presentableGroupNames: Scrite.document.structure.presentableGroupNames(root.scene.groups)
 
