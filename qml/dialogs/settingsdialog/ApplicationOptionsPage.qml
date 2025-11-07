@@ -197,7 +197,7 @@ Item {
                 VclCheckBox {
                     Layout.fillWidth: true
 
-                    text: "Move Notebook into the Structure tab"
+                    text: "Stack Structure & Notebook"
                     checked: Runtime.showNotebookInStructure
                     enabled: Runtime.canShowNotebookInStructure
                     onToggled: {
