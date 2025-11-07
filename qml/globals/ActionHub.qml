@@ -589,7 +589,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_Home)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_Home)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpFirstScene"
@@ -599,7 +599,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_End)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_End)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpLastScene"
@@ -609,7 +609,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut:Platform.isMacOSDesktop ?  "Ctrl+Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageUp)
+            readonly property string defaultShortcut:Platform.isMacOSDesktop ?  "Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageUp)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpPreviousScene"
@@ -619,7 +619,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageDown)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageDown)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpNextScene"
@@ -662,6 +662,7 @@ Item {
                 return -2
             }
 
+            enabled: false
             objectName: "focusCursorPosition"
         }
     }

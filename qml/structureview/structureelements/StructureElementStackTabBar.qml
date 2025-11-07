@@ -18,7 +18,6 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/globals"
 import "qrc:/qml/helpers"
 import "qrc:/qml/controls"
@@ -41,8 +40,6 @@ Item {
     BoundingBoxItem.visibilityMode: BoundingBoxItem.VisibleUponViewportIntersection
     BoundingBoxItem.previewFillColor: Qt.rgba(0,0,0,0)
     BoundingBoxItem.previewBorderColor: Qt.rgba(0,0,0,0)
-
-    Component.onCompleted: Qt.callLater(reportGeometry)
 
     x: _private.geometry.x
     y: _private.geometry.y
