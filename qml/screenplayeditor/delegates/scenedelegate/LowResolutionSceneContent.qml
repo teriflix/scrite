@@ -31,12 +31,14 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 Rectangle {
     id: root
 
+    required property bool showSceneSidePanel
     required property AbstractScreenplayElementSceneDelegate sceneDelegate
 
     z: 1
 
-    implicitHeight: _sceneSizeHint.active ? (_headerLayout.height + _sceneSizeHint.height + _pageBreakAfter.height)
-                                          : sceneDelegate.screenplayElement.heightHint * sceneDelegate.zoomLevel
+    implicitHeight: Math.max( (_sceneSizeHint.active ? (_headerLayout.height + _sceneSizeHint.height + _pageBreakAfter.height)
+                                                      : sceneDelegate.screenplayElement.heightHint * sceneDelegate.zoomLevel),
+                              (showSceneSidePanel && sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth ? 300 : 0) )
 
     color: sceneDelegate.scene ? Qt.tint(sceneDelegate.scene.color, Runtime.colors.sceneHeadingTint) : Runtime.colors.primary.c300.background
 

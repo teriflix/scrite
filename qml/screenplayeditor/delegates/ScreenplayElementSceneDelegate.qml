@@ -78,12 +78,13 @@ AbstractScreenplayElementSceneDelegate {
             visible: active
 
             sourceComponent: LowResolutionSceneContent {
-                  sceneDelegate: root
+                sceneDelegate: root
+                showSceneSidePanel: root.showSceneSidePanel
             }
 
             onLoaded: {
                 Runtime.execLater(_highResLoader, Runtime.placeholderInterval, () => {
-                                        _highResLoader.active = true
+                                      _highResLoader.active = true
                                   })
             }
         }
@@ -99,8 +100,8 @@ AbstractScreenplayElementSceneDelegate {
             active: !root.usePlaceholder || firstLoadComplete
 
             sourceComponent: HighResolutionSceneContent {
-                  sceneDelegate: root
-                  showSceneSidePanel: root.showSceneSidePanel
+                sceneDelegate: root
+                showSceneSidePanel: root.showSceneSidePanel
             }
 
             onLoaded: firstLoadComplete = true
