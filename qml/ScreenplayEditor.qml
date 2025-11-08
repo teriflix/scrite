@@ -136,17 +136,13 @@ Rectangle {
             anchors.top: parent.top
 
             x: {
-                if(_private.sidePanelExpanded) {
-                    let availableSpace = parent.width - width
-                    if(availableSpace > Runtime.maxSceneSidePanelWidth) {
-                        availableSpace -= Runtime.maxSceneSidePanelWidth
-                        return Math.max(availableSpace/2, 50)
-                    }
-
-                    if(availableSpace > Runtime.minSceneSidePanelWidth + 20/*for the scrollbar*/) {
-                        availableSpace -= Runtime.minSceneSidePanelWidth
-                        return Math.max(availableSpace/2, 50)
-                    }
+                if(_private.sidePanelExpanded &&
+                   _private.showSceneComments && Runtime.screenplayEditorSettings.sceneSidePanelOpen) {
+                    const commentsPanelSpace = Runtime.bounded(Runtime.minSceneSidePanelWidth,
+                                                               (parent.width - width),
+                                                               Runtime.maxSceneSidePanelWidth)
+                    return Math.max(_elementListView.minLeftMargin,
+                                    (parent.width - (width + commentsPanelSpace))/2)
                 }
 
                 return (parent.width - width)/2
@@ -178,6 +174,8 @@ Rectangle {
         ScreenplayElementListView {
             id: _elementListView
 
+            readonly property real minLeftMargin: 70
+
             ScrollBar.vertical: _scrollBar
 
             anchors.top: _ruler.bottom
@@ -189,8 +187,8 @@ Rectangle {
             zoomLevel: _private.zoomLevel
             pageMargins: _private.pageMargins
             screenplayAdapter: Runtime.screenplayAdapter
-            showSceneSidePanel: _private.showSceneSidePanel
-            spaceAvailableOnTheLeft: x-1
+            showSceneComments: _private.showSceneComments
+            spaceAvailableOnTheLeft: x-minLeftMargin-1
             spaceAvailableOnTheRight: parent.width - x - width - (_scrollBar.visible ? _scrollBar.width : 0)
         }
 
@@ -300,7 +298,7 @@ Rectangle {
         property real minSidePanelWidth: root.width * 0.15
         property real maxSidePanelWidth: root.width * 0.5
         property bool sidePanelExpanded: sidePanel && sidePanel.expanded
-        property bool showSceneSidePanel: Runtime.screenplayEditorSettings.displaySceneComments && Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
+        property bool showSceneComments: Runtime.screenplayEditorSettings.displaySceneComments && Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
         property ScreenplayEditorSidePanel sidePanel: _sidePanelLoader.item
 
         property ScreenplayFormat screenplayFormat: Scrite.document.displayFormat

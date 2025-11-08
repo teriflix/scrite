@@ -22,7 +22,7 @@ import "qrc:/qml/screenplayeditor/delegates/scenedelegate"
 AbstractScreenplayElementDelegate {
     id: root
 
-    required property bool showSceneSidePanel
+    required property bool showSceneComments
     required property real spaceAvailableForScenePanel
     required property ListView listView // This must be the list-view in which the delegate is placed.
 

@@ -31,7 +31,7 @@ import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
 Item {
     id: root
 
-    required property bool showSceneSidePanel
+    required property bool showSceneComments
     required property AbstractScreenplayElementSceneDelegate sceneDelegate
 
     implicitHeight: Math.max(_layout.height + Runtime.sceneEditorFontMetrics.lineSpacing,
@@ -243,7 +243,7 @@ Item {
         anchors.left: parent.right
         anchors.topMargin: __screenY < 0 ? Math.min(-__screenY, __maxTopMargin) : 0
 
-        active: root.showSceneSidePanel &&
+        active: root.showSceneComments &&
                 sceneDelegate.spaceAvailableForScenePanel >= Runtime.minSceneSidePanelWidth
 
         sourceComponent: SceneSidePanel {

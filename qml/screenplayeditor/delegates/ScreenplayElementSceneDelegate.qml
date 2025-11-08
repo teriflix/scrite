@@ -79,7 +79,7 @@ AbstractScreenplayElementSceneDelegate {
 
             sourceComponent: LowResolutionSceneContent {
                 sceneDelegate: root
-                showSceneSidePanel: root.showSceneSidePanel
+                showSceneComments: root.showSceneComments
             }
 
             onLoaded: {
@@ -101,7 +101,7 @@ AbstractScreenplayElementSceneDelegate {
 
             sourceComponent: HighResolutionSceneContent {
                 sceneDelegate: root
-                showSceneSidePanel: root.showSceneSidePanel
+                showSceneComments: root.showSceneComments
             }
 
             onLoaded: firstLoadComplete = true
