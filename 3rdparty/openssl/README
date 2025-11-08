@@ -1,5 +1,5 @@
 The source code and license text of OpenSSL version 1.1.1w found in this folder is
-an exact copy of what Qt 5.15.18 makes available.
+an exact copy of what Qt 5.15.19 makes available.
 
 We bundle prebuilt binaries of OpenSSL into the Linux AppImage and Windows Installers,
 for convinience. If you prefer you use any other build of OpenSSL as long as it is

@@ -3,13 +3,13 @@ $SCRITE_CRASHPAD_ROOT/bin/dump_syms ../../../Release/Scrite.app.dSYM/Contents/Re
 cp -vaRf ../../../Release/Scrite.app .
 codesign -s "$SCRITE_IDENT" ./Scrite.app/Contents/MacOS/crashpad_handler
 cp -vaf ../../Info.plist Scrite.app/Contents
-~/Qt/5.15.18/clang_64/bin/macdeployqt Scrite.app -qmldir=../../qml -verbose=1 -appstore-compliant -hardened-runtime -codesign="$SCRITE_IDENT"
+~/Qt/5.15.19/clang_64/bin/macdeployqt Scrite.app -qmldir=../../qml -verbose=1 -appstore-compliant -hardened-runtime -codesign="$SCRITE_IDENT"
 mkdir Scrite-1.9.0
 mv Scrite.app Scrite-1.9.0
 cp ../../images/dmgbackdrop.png dmgbackdrop.png
 cp ../../appicon.icns Scrite.icns
 sed "s/{{VERSION}}/Version 1.9.0/" dmgbackdrop.qml > dmgbackdropgen.qml
-~/Qt/5.15.18/clang_64/bin/qmlscene dmgbackdropgen.qml
+~/Qt/5.15.19/clang_64/bin/qmlscene dmgbackdropgen.qml
 rm -f dmgbackdropgen.qml
 
 # https://ss64.com/osx/sips.html
