@@ -1343,6 +1343,14 @@ void Scene::setColor(const QColor &val)
     emit colorChanged();
 }
 
+QColor Scene::highlightColor() const
+{
+    if (Utils::Color::isLight(m_color))
+        return m_color.darker();
+
+    return m_color;
+}
+
 void Scene::setEnabled(bool val)
 {
     if (m_enabled == val)

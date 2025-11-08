@@ -40,14 +40,14 @@ Item {
         width: parent.width
         height: sceneTextEditor.cursorRectangle.height+4*zoomLevel
 
-        color: Runtime.colors.primary.c100.background
+        color: Qt.tint(sceneDocumentBinder.scene.highlightColor, Runtime.colors.sceneHeadingTint)
         visible: sceneTextEditor.cursorVisible && sceneTextEditor.activeFocus && Runtime.screenplayEditorSettings.highlightCurrentLine && Scrite.app.usingMaterialTheme
 
         Rectangle {
             width: 20 * root.zoomLevel
             height: parent.height
 
-            color: root.sceneDocumentBinder.scene.color
+            color: root.sceneDocumentBinder.scene.highlightColor
         }
     }
 }

@@ -152,7 +152,7 @@ FocusScope {
                     width: 10 * root.zoomLevel
 
                     z: 1
-                    color: root.screenplayElement.scene ? root.screenplayElement.scene.color : Runtime.colors.primary.highlight.background
+                    color: root.screenplayElement.scene ? root.screenplayElement.scene.highlightColor : Runtime.colors.primary.highlight.background
                     opacity: root.hasFocus ? 1 : 0.5
                     visible: root.isCurrent
                 }

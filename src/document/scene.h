@@ -373,6 +373,9 @@ public:
     QColor color() const { return m_color; }
     Q_SIGNAL void colorChanged();
 
+    Q_PROPERTY(QColor highlightColor READ highlightColor NOTIFY colorChanged)
+    QColor highlightColor() const;
+
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     void setEnabled(bool val);
     bool isEnabled() const { return m_enabled; }

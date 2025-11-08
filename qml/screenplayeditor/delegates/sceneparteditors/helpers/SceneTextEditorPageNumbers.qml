@@ -66,7 +66,7 @@ Loader {
 
                         font: root.fontMetrics.font
                         text: _pageBreakItem.pageNumber
-                        color: Runtime.colors.primary.c600.text
+                        color: root.isCurrent ? Color.textColorFor(root.screenplayElement.scene.highlightColor) : Runtime.colors.primary.c600.text
                         topPadding: 3
                         leftPadding: 4
                         rightPadding: 4
@@ -76,9 +76,9 @@ Loader {
                     width: Math.max(_sceneNumberText.contentWidth * 1.5, 30)
                     height: _sceneNumberText.height
 
-                    fillColor: Runtime.colors.primary.c600.background
+                    fillColor: root.isCurrent ? root.screenplayElement.scene.highlightColor : Runtime.colors.primary.c600.background
                     renderType: PainterPathItem.OutlineAndFill
-                    outlineColor: Runtime.colors.primary.c600.background
+                    outlineColor: root.isCurrent ? root.screenplayElement.scene.highlightColor : Runtime.colors.primary.c600.background
                     outlineWidth: 1
 
                     painterPath: PainterPath {
