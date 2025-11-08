@@ -430,8 +430,8 @@ Item {
                 ActionManager.target: root.paragraphFormats
 
                 checkable: true
-                checked: _private.binder !== null ? (_private.binder.currentElement ? _private.binder.currentElement.type === enumValue : false) : false
-                enabled: Runtime.allowAppUsage && _private.binder !== null
+                checked: (_private.binder !== null ? (_private.binder.currentElement ? _private.binder.currentElement.type === enumValue : false) : false)
+                enabled: Runtime.allowAppUsage && (enumValue === SceneElement.Heading ? ActionHandler.canHandle : _private.binder !== null)
                 objectName: enumKey.toLowerCase() + "Paragraph"
                 shortcut: defaultShortcut
                 text: enumKey
@@ -581,10 +581,52 @@ Item {
 
         Action {
             readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+-"
 
             enabled: ActionHandler.canHandle
             objectName: "editSceneContent"
+            shortcut: defaultShortcut
             text: "Edit Scene Content"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+7"
+
+            enabled: ActionHandler.canHandle
+            objectName: "addMuteCharacter"
+            shortcut: defaultShortcut
+            text: "Add Mute Character"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+Shift+7"
+
+            enabled: ActionHandler.canHandle
+            objectName: "addOpenTag"
+            shortcut: defaultShortcut
+            text: "Add Keyword / Open Tag"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+8"
+
+            enabled: ActionHandler.canHandle
+            objectName: "editSceneSynopsis"
+            shortcut: defaultShortcut
+            text: "Edit Scene Synopsis"
+        }
+
+        Action {
+            readonly property bool visible: false
+            readonly property string defaultShortcut: "Ctrl+9"
+
+            enabled: ActionHandler.canHandle
+            objectName: "editSceneNumber"
+            shortcut: defaultShortcut
+            text: "Edit Scene Number"
         }
 
         Action {

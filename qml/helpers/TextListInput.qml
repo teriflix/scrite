@@ -40,12 +40,14 @@ Flow {
     property alias labelIconVisible: _labelIcon.visible
 
     readonly property alias label: _label
+    readonly property alias acceptingNewText: _newInputLoader.active
 
     signal ensureVisible(Item item, rect area)
     signal textClicked(string text, Item source)
     signal textCloseRequest(string text, Item source)
     signal configureTextRequest(string text, TagText tag)
     signal newTextRequest(string text)
+    signal newTextCancelled()
 
     function configureTextsLater() {
         Qt.callLater(configureTexts)
@@ -152,6 +154,7 @@ Flow {
 
             Keys.onEscapePressed: {
                 text = ""
+                root.newTextCancelled()
                 _newInputLoader.active = false
             }
 

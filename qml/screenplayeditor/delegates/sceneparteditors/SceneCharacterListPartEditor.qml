@@ -36,17 +36,6 @@ AbstractScenePartEditor {
 
         Component.onCompleted: font.capitalization = Font.AllUppercase
 
-        Announcement.onIncoming: (type,data) => {
-            if(!root.screenplayElementDelegateHasFocus || root.readOnly)
-                return
-
-            var sdata = "" + data
-            var stype = "" + type
-            if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.addMuteCharacter) {
-                acceptNewText()
-            }
-        }
-
         width: parent.width
 
         leftPadding: root.pageLeftMargin
@@ -77,11 +66,31 @@ AbstractScenePartEditor {
         onNewTextRequest: (text) => {
                               root.scene.addMuteCharacter(text)
                               root.newCharacterAdded(text)
+
+                              if(root.isCurrent) {
+                                  _private.editSceneContent.trigger()
+                              }
                           }
+        onNewTextCancelled: () => {
+                                if(root.isCurrent) {
+                                    _private.editSceneContent.trigger()
+                                }
+                            }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("addMuteCharacter")
+        enabled: root.isCurrent && !_charactersInput.readOnly && !_charactersInput.acceptingNewText
+
+        onTriggered: (source) => {
+                         _charactersInput.acceptNewText()
+                     }
     }
 
     QtObject {
         id: _private
+
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
 
         property bool captureInvisibleCharacters: Runtime.screenplayEditorSettings.captureInvisibleCharacters
         onCaptureInvisibleCharactersChanged: scheduleDetermineFlagsInTags()

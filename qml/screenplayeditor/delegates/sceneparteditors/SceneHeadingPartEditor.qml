@@ -82,6 +82,13 @@ AbstractScenePartEditor {
             TextField {
                 id: _sceneNumber
 
+                Keys.onPressed: (event) => {
+                                    if(event.key === Qt.Key_Escape && root.isCurrent) {
+                                        const editSceneContent = ActionHub.editOptions.find("editSceneContent")
+                                        editSceneContent.trigger()
+                                    }
+                                }
+
                 anchors.right: parent.right
                 anchors.rightMargin: root.pageLeftMargin * 0.1
                 anchors.verticalCenter: parent.verticalCenter
@@ -90,9 +97,27 @@ AbstractScenePartEditor {
 
                 text: root.screenplayElement.hasUserSceneNumber ? root.screenplayElement.resolvedSceneNumber : ""
                 font: root.font
+                readOnly: root.readOnly
                 placeholderText: root.scene.heading.enabled ? root.screenplayElement.sceneNumber : ("#" + (root.index+1))
 
                 background: Item { }
+
+                ActionHandler {
+                    action: ActionHub.editOptions.find("editSceneNumber")
+                    enabled: root.isCurrent && !root.readOnly && !_sceneNumber.activeFocus
+
+                    onTriggered: (source) => {
+                                     _sceneNumber.selectAll()
+                                     _sceneNumber.forceActiveFocus()
+                                 }
+                }
+
+                onEditingFinished: {
+                    if(root.isCurrent) {
+                        const editSceneContent = ActionHub.editOptions.find("editSceneContent")
+                        editSceneContent.trigger()
+                    }
+                }
             }
         }
 
@@ -101,13 +126,20 @@ AbstractScenePartEditor {
 
             Layout.fillWidth: true
 
+            Keys.onPressed: (event) => {
+                                if(event.key === Qt.Key_Escape && root.isCurrent) {
+                                    const editSceneContent = ActionHub.editOptions.find("editSceneContent")
+                                    editSceneContent.trigger()
+                                }
+                            }
+
             focus: true
             sceneOmitted: root.screenplayElement.omitted
             sceneHeading: root.scene.heading
 
             ActionHandler {
                 action: ActionHub.paragraphFormats.find("headingParagraph")
-                enabled: root.isCurrent && !_sceneHeading.activeFocus
+                enabled: root.isCurrent && !root.readOnly && !_sceneHeading.activeFocus
 
                 onTriggered: (source) => {
                                  _sceneHeading.selectAll()
@@ -116,8 +148,10 @@ AbstractScenePartEditor {
             }
 
             onReturnPressed: {
-                const editSceneContent = ActionHub.editOptions.find("editSceneContent")
-                editSceneContent.trigger()
+                if(root.isCurrent) {
+                    const editSceneContent = ActionHub.editOptions.find("editSceneContent")
+                    editSceneContent.trigger()
+                }
             }
         }
 

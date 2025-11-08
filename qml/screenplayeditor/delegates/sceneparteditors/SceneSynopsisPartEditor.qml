@@ -31,6 +31,14 @@ AbstractScenePartEditor {
     TextAreaInput {
         id: _synopsisInput
 
+
+        Keys.onPressed: (event) => {
+                            if(event.key === Qt.Key_Escape && root.isCurrent) {
+                                const editSceneContent = ActionHub.editOptions.find("editSceneContent")
+                                editSceneContent.trigger()
+                            }
+                        }
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: root.pageLeftMargin
@@ -55,16 +63,15 @@ AbstractScenePartEditor {
             if(activeFocus)
                 root.ensureVisible(_synopsisInput, Qt.rect(0, -10, cursorRectangle.width, cursorRectangle.height+20))
         }
+    }
 
-        Announcement.onIncoming: (type,data) => {
-            if(!root.screenplayElementDelegateHasFocus && root.readOnly)
-                return
+    ActionHandler {
+        action: ActionHub.editOptions.find("editSceneSynopsis")
+        enabled: root.isCurrent && !root.readOnly && !_synopsisInput.activeFocus
 
-            var sdata = "" + data
-            var stype = "" + type
-            if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.sceneSynopsis) {
-                _synopsisInput.forceActiveFocus()
-            }
-        }
+        onTriggered: (source) => {
+                         _synopsisInput.selectAll()
+                         _synopsisInput.forceActiveFocus()
+                     }
     }
 }

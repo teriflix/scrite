@@ -36,17 +36,6 @@ AbstractScenePartEditor {
     TextListInput {
         id: _tagsInput
 
-        Announcement.onIncoming: (type,data) => {
-            if(!root.screenplayElementDelegateHasFocus || root.readOnly)
-                return
-
-            var sdata = "" + data
-            var stype = "" + type
-            if(stype === Runtime.announcementIds.focusRequest && sdata === Runtime.announcementData.focusOptions.addSceneTag) {
-                acceptNewText()
-            }
-        }
-
         width: parent.width
 
         leftPadding: root.pageLeftMargin
@@ -73,7 +62,16 @@ AbstractScenePartEditor {
         onNewTextRequest: (text) => {
                               root.scene.addTag(text)
                               root.sceneTagAdded(text)
+
+                              if(root.isCurrent) {
+                                  _private.editSceneContent.trigger()
+                              }
                           }
+        onNewTextCancelled: () => {
+                                if(root.isCurrent) {
+                                    _private.editSceneContent.trigger()
+                                }
+                            }
 
         header: Row {
             spacing: _tagsInput.spacing
@@ -109,8 +107,19 @@ AbstractScenePartEditor {
         }
     }
 
+    ActionHandler {
+        action: ActionHub.editOptions.find("addOpenTag")
+        enabled: root.isCurrent && !_tagsInput.readOnly && !_tagsInput.acceptingNewText
+
+        onTriggered: (source) => {
+                         _tagsInput.acceptNewText()
+                     }
+    }
+
     QtObject {
         id: _private
+
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
 
         property string presentableGroupNames: Scrite.document.structure.presentableGroupNames(root.scene.groups)
 

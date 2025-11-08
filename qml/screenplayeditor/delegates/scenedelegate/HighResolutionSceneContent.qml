@@ -138,7 +138,6 @@ Item {
 
                         onEnsureVisible: (item, area) => { sceneDelegate.ensureVisible(item, area) }
 
-                        // TODO
                         onNewCharacterAdded: (characterName) => { }
                     }
                 }
