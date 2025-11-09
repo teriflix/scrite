@@ -27,6 +27,9 @@ public:
     explicit MacOSBackend(QObject *parent = nullptr);
     ~MacOSBackend();
 
+    int defaultLanguage() const;
+    int activateDefaultLanguage() const;
+
     QList<TransliterationOption> options(int lang,
                                          const PlatformTransliterationEngine *transliterator) const;
     bool canActivate(const TransliterationOption &option,

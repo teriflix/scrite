@@ -21,11 +21,11 @@ struct TextInputSource
     int languageCode = -1;
     QString displayName;
     TISInputSourceRef inputSource;
+    bool isDefault = false;
 
     bool operator==(const TextInputSource &other) const
     {
-        return this->id == other.id && this->languageCode == other.languageCode
-                && this->displayName == other.displayName && this->inputSource == other.inputSource;
+        return this->inputSource == other.inputSource;
     }
 };
 
@@ -73,6 +73,37 @@ MacOSBackend::MacOSBackend(QObject *parent) : QObject(parent), d(new MacOSBacken
 MacOSBackend::~MacOSBackend()
 {
     delete d;
+}
+
+int MacOSBackend::defaultLanguage() const
+{
+    auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
+                           [](const TextInputSource &tis) { return tis.isDefault; });
+    if(it != d->textInputSources.end())
+        return it->languageCode;
+
+    return -1;
+}
+
+int MacOSBackend::activateDefaultLanguage() const
+{
+    // Find the default keyboard layout
+    auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
+                           [](const TextInputSource &tis) { return tis.isDefault; });
+
+    // If found, then activate it.
+    if (it != d->textInputSources.end()) {
+        const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(it->inputSource, kTISPropertyInputSourceIsSelected) == kCFBooleanTrue;
+        if(alreadyActive)
+            return it->languageCode;
+
+        TISInputSourceRef inputSource = (TISInputSourceRef)it->inputSource;
+        if(TISSelectInputSource(inputSource) == noErr)
+            return it->languageCode;
+    }
+
+    // Report error otherwise
+    return -1;
 }
 
 QList<TransliterationOption>
@@ -133,6 +164,9 @@ bool MacOSBackend::reload()
 
     CFArrayRef sourceList = TISCreateInputSourceList(NULL, false);
     const int nrSources = CFArrayGetCount(sourceList);
+    TISInputSourceRef defaultSource = (nrSources > 0)
+            ? (TISInputSourceRef)CFArrayGetValueAtIndex(sourceList, 0)
+            : NULL;
 
     for (int i = 0; i < nrSources; i++) {
         TextInputSource tis;
@@ -144,6 +178,7 @@ bool MacOSBackend::reload()
             && kTISTypeKeyboardLayout != inputSourceType)
             continue;
 
+        tis.isDefault = (tis.inputSource == defaultSource);
         tis.id = QString::fromCFString(
                 (CFStringRef)TISGetInputSourceProperty(tis.inputSource, kTISPropertyInputSourceID));
         tis.displayName = QString::fromCFString(
@@ -163,8 +198,11 @@ bool MacOSBackend::reload()
         }
     }
 
+    CFRelease(sourceList);
+
     if (d->textInputSources != textInputSources) {
         d->textInputSources = textInputSources;
+        emit textInputSourcesChanged();
         return true;
     }
 
@@ -180,6 +218,8 @@ PlatformTransliterationEngine::PlatformTransliterationEngine(QObject *parent)
 {
     connect(::Backend, &MacOSBackend::textInputSourcesChanged, this,
             &PlatformTransliterationEngine::capacityChanged);
+    connect(::Backend, &MacOSBackend::textInputSourcesChanged, this,
+            &PlatformTransliterationEngine::defaultLanguageChanged);
 }
 
 PlatformTransliterationEngine::~PlatformTransliterationEngine() { }
@@ -187,6 +227,29 @@ PlatformTransliterationEngine::~PlatformTransliterationEngine() { }
 QString PlatformTransliterationEngine::name() const
 {
     return QStringLiteral("macOS");
+}
+
+int PlatformTransliterationEngine::defaultLanguage() const
+{
+    return ::Backend->defaultLanguage();
+}
+
+int PlatformTransliterationEngine::activateDefaultLanguage()
+{
+    // Ask the backend to activate the default language
+    int code = ::Backend->activateDefaultLanguage();
+    if (code >= 0)
+        return code;
+
+           // If it couldn't then fallback to English as default language
+    const QList<TransliterationOption> englishOptions = this->options(QLocale::English);
+    if (englishOptions.isEmpty())
+        return -1; // No clue what to do now.
+
+    if (this->activate(englishOptions.first()))
+        return QLocale::English;
+
+    return -1;
 }
 
 QList<TransliterationOption> PlatformTransliterationEngine::options(int lang) const
@@ -202,11 +265,6 @@ bool PlatformTransliterationEngine::canActivate(const TransliterationOption &opt
 bool PlatformTransliterationEngine::activate(const TransliterationOption &option)
 {
     return ::Backend->activate(option, this);
-}
-
-void PlatformTransliterationEngine::release(const TransliterationOption &option)
-{
-    ::Backend->release(option, this);
 }
 
 QString PlatformTransliterationEngine::transliterateWord(const QString &word,

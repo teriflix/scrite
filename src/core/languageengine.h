@@ -554,6 +554,11 @@ public:
     explicit AbstractTransliterationEngine(QObject *parent = nullptr);
     ~AbstractTransliterationEngine();
 
+    /** Returns the default language supported by this engine */
+    Q_PROPERTY(int defaultLanguage READ defaultLanguage NOTIFY defaultLanguageChanged)
+    virtual int defaultLanguage() const { return QLocale::English; }
+    void defaultLanguageChanged();
+
     /* Unique name among all transliterators supported */
     Q_PROPERTY(QString name READ name CONSTANT)
     virtual QString name() const = 0;
@@ -569,9 +574,6 @@ public:
 
     /** called as soon as editor receives focus **/
     virtual bool activate(const TransliterationOption &option) = 0;
-
-    /** called as soon as editor loses focus **/
-    virtual void release(const TransliterationOption &option) = 0;
 
     /** caled to fetch the transliterated word for the said language **/
     virtual QString transliterateWord(const QString &word,
@@ -596,11 +598,11 @@ public:
     ~FallbackTransliterationEngine();
 
     // AbstractTransliterator interface
+    int defaultLanguage() const;
     QString name() const;
     QList<TransliterationOption> options(int lang) const;
     bool canActivate(const TransliterationOption &option);
     bool activate(const TransliterationOption &option);
-    void release(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
 
@@ -621,7 +623,6 @@ public:
     QList<TransliterationOption> options(int lang) const;
     bool canActivate(const TransliterationOption &option);
     bool activate(const TransliterationOption &option);
-    void release(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
 
@@ -637,12 +638,16 @@ public:
     explicit PlatformTransliterationEngine(QObject *parent = nullptr);
     ~PlatformTransliterationEngine();
 
+    int defaultLanguage() const;
+
+    // Activates the default language and returns its code
+    int activateDefaultLanguage();
+
     // AbstractTransliterator interface
     QString name() const;
     QList<TransliterationOption> options(int lang) const;
     bool canActivate(const TransliterationOption &option);
     bool activate(const TransliterationOption &option);
-    void release(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
 };
 
