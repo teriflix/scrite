@@ -18,10 +18,13 @@
 #include <QString>
 #include <QImage>
 #include <QFileInfo>
+#include <QQmlEngine>
 
 struct ScriteFileInfo
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     // Test whether a file info instance is valid or not

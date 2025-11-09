@@ -85,6 +85,8 @@ Q_DECLARE_METATYPE(QList<TransliterationOption>)
 struct Language
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(int code MEMBER code)
@@ -466,6 +468,8 @@ Helpers for using the static transliterator only.
 struct AlphabetMapping
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(QString latin MEMBER latin)
@@ -486,6 +490,8 @@ Q_DECLARE_METATYPE(QList<AlphabetMapping>)
 struct AlphabetMappings
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(bool valid READ isValid)
@@ -717,6 +723,8 @@ Code to evaluate language boundaries and perform operations on them.
 struct ScriptBoundary
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(int start MEMBER start)

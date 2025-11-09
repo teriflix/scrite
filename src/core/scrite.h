@@ -31,6 +31,8 @@
 struct Country
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(QString code MEMBER code)
@@ -59,6 +61,8 @@ Q_DECLARE_METATYPE(Country)
 struct Currency
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(QString code MEMBER code)
@@ -93,6 +97,8 @@ Q_DECLARE_METATYPE(Currency)
 struct Locale
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(Country country MEMBER country)

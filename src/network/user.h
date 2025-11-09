@@ -23,6 +23,8 @@
 struct UserInstallationInfo
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     UserInstallationInfo() { }
@@ -84,6 +86,8 @@ Q_DECLARE_METATYPE(QList<UserInstallationInfo>)
 struct UserSubscriptionPlanInfo
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     UserSubscriptionPlanInfo() { }
@@ -133,6 +137,8 @@ Q_DECLARE_METATYPE(QList<UserSubscriptionPlanInfo>)
 struct UserSubscriptionInfo
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     UserSubscriptionInfo() { }
@@ -196,6 +202,8 @@ Q_DECLARE_METATYPE(QList<UserSubscriptionInfo>)
 struct UserInfo
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     UserInfo() { }
@@ -300,6 +308,7 @@ struct UserMessageButton
 {
     Q_GADGET
     QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     UserMessageButton() { }
@@ -337,6 +346,8 @@ Q_DECLARE_METATYPE(QList<UserMessageButton>)
 struct UserMessage
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     UserMessage() { }
