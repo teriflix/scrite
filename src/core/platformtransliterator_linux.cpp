@@ -31,6 +31,11 @@ QString PlatformTransliterationEngine::name() const
     return QStringLiteral("Linux");
 }
 
+int PlatformTransliterationEngine::activateDefaultLanguage()
+{
+    return QLocale::English;
+}
+
 QList<TransliterationOption> PlatformTransliterationEngine::options(int lang) const
 {
     Q_UNUSED(lang)
@@ -47,11 +52,6 @@ bool PlatformTransliterationEngine::activate(const TransliterationOption &option
 {
     Q_UNUSED(option)
     return false;
-}
-
-void PlatformTransliterationEngine::release(const TransliterationOption &option)
-{
-    Q_UNUSED(option)
 }
 
 QString PlatformTransliterationEngine::transliterateWord(const QString &word,

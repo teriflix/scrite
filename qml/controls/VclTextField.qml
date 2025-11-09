@@ -138,7 +138,10 @@ TextField {
         sortStrings: false
         completionPrefix: root.text
         filterKeyStrokes: root.activeFocus
-        onRequestCompletion: autoCompleteOrFocusNext(tabItemUponReturn)
+
+        onRequestCompletion: {
+            autoCompleteOrFocusNext(tabItemUponReturn)
+        }
 
         onHasItemsChanged: {
             if(hasItems)

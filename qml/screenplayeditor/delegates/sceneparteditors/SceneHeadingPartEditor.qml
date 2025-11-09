@@ -96,7 +96,7 @@ AbstractScenePartEditor {
                 width: root.fontMetrics.averageCharacterWidth * 5
 
                 text: root.screenplayElement.hasUserSceneNumber ? root.screenplayElement.resolvedSceneNumber : ""
-                font: root.font
+                font: _sceneHeading.font
                 readOnly: root.readOnly
                 placeholderText: root.scene.heading.enabled ? root.screenplayElement.sceneNumber : ("#" + (root.index+1))
 

@@ -262,6 +262,8 @@ private:
 struct ScreenplayBreakInfo
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(int index MEMBER index)

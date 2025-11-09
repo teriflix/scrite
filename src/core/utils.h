@@ -26,6 +26,8 @@ namespace Utils {
 struct FileInfo
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     QFileInfo info;
@@ -69,6 +71,8 @@ public:
 class ObjectConfigFieldChoice
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(QString key MEMBER key)
@@ -93,6 +97,8 @@ public:
 struct ObjectConfigField
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(QString name MEMBER name)
@@ -152,6 +158,8 @@ public:
 struct ObjectConfigFieldGroup
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(QString name MEMBER name)
@@ -181,6 +189,8 @@ public:
 struct ObjectConfig
 {
     Q_GADGET
+    QML_ELEMENT
+    QML_UNCREATABLE("Instantiation from QML not allowed.")
 
 public:
     Q_PROPERTY(bool valid READ isValid)

@@ -27,11 +27,17 @@ public:
     explicit WindowsBackend(QObject *parent = nullptr);
     ~WindowsBackend();
 
+    int defaultLanguage() const;
+    int activateDefaultLanguage() const;
+
     QList<TransliterationOption> options(int lang,
                                          const PlatformTransliterationEngine *transliterator) const;
-    bool canActivate(const TransliterationOption &option, PlatformTransliterationEngine *transliterator);
-    bool activate(const TransliterationOption &option, PlatformTransliterationEngine *transliterator);
-    bool release(const TransliterationOption &option, PlatformTransliterationEngine *transliterator);
+    bool canActivate(const TransliterationOption &option,
+                     PlatformTransliterationEngine *transliterator);
+    bool activate(const TransliterationOption &option,
+                  PlatformTransliterationEngine *transliterator);
+    bool release(const TransliterationOption &option,
+                 PlatformTransliterationEngine *transliterator);
 
     bool eventFilter(QObject *object, QEvent *event);
 

@@ -35,6 +35,29 @@ QString PlatformTransliterationEngine::name() const
     return QStringLiteral("Windows");
 }
 
+int PlatformTransliterationEngine::defaultLanguage() const
+{
+    return ::Backend->defaultLanguage();
+}
+
+int PlatformTransliterationEngine::activateDefaultLanguage()
+{
+    // Ask the backend to activate the default language
+    int code = ::Backend->activateDefaultLanguage();
+    if (code >= 0)
+        return code;
+
+    // If it couldn't then fallback to English as default language
+    const QList<TransliterationOption> englishOptions = this->options(QLocale::English);
+    if (englishOptions.isEmpty())
+        return -1; // No clue what to do now.
+
+    if (this->activate(englishOptions.first()))
+        return QLocale::English;
+
+    return -1;
+}
+
 QList<TransliterationOption> PlatformTransliterationEngine::options(int lang) const
 {
     return ::Backend->options(lang, this);
@@ -48,11 +71,6 @@ bool PlatformTransliterationEngine::canActivate(const TransliterationOption &opt
 bool PlatformTransliterationEngine::activate(const TransliterationOption &option)
 {
     return ::Backend->activate(option, this);
-}
-
-void PlatformTransliterationEngine::release(const TransliterationOption &option)
-{
-    ::Backend->release(option, this);
 }
 
 QString PlatformTransliterationEngine::transliterateWord(const QString &word,
@@ -74,12 +92,9 @@ struct TextInputSource
     int languageCode = -1;
     QString id;
     QString displayName;
+    bool isDefault = false;
 
-    bool operator==(const TextInputSource &other) const
-    {
-        return this->hkl == other.hkl && this->languageCode == other.languageCode
-                && this->id == other.id && this->displayName == other.displayName;
-    }
+    bool operator==(const TextInputSource &other) const { return this->hkl == other.hkl; }
 };
 
 struct WindowsBackendData
@@ -97,6 +112,32 @@ WindowsBackend::WindowsBackend(QObject *parent) : QObject(parent), d(new Windows
 WindowsBackend::~WindowsBackend()
 {
     delete d;
+}
+
+int WindowsBackend::defaultLanguage() const
+{
+    auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
+                           [](const TextInputSource &tis) { return tis.isDefault; });
+    if (it != d->textInputSources.end())
+        return it->languageCode;
+
+    return -1;
+}
+
+int WindowsBackend::activateDefaultLanguage() const
+{
+    // Find the default keyboard layout
+    auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
+                           [](const TextInputSource &tis) { return tis.isDefault; });
+
+    // If found, then activate it.
+    if (it != d->textInputSources.end()) {
+        ActivateKeyboardLayout(it->hkl, KLF_SETFORPROCESS);
+        return GetKeyboardLayout(0) == it->hkl ? it->languageCode : -1;
+    }
+
+    // Report error otherwise
+    return -1;
 }
 
 QList<TransliterationOption>
@@ -178,6 +219,9 @@ bool WindowsBackend::reload()
     if (nrKeyboards > 0) {
         QList<TextInputSource> textInputSources;
 
+        HKL defaultHkl = nullptr;
+        SystemParametersInfo(SPI_GETDEFAULTINPUTLANG, 0, &defaultHkl, 0);
+
         QVector<HKL> keyboards(nrKeyboards, nullptr);
         nrKeyboards = GetKeyboardLayoutList(nrKeyboards, keyboards.data());
         for (int i = 0; i < nrKeyboards; i++) {
@@ -205,12 +249,13 @@ bool WindowsBackend::reload()
             GetLocaleInfoW(locale, LOCALE_SNAME, name, 256);
             const QLocale keyboardLocale(QString::fromWCharArray(name).left(2));
 
-            textInputSources << TextInputSource(
-                    { keyboard, keyboardLocale.language(), id, displayName });
+            textInputSources << TextInputSource({ keyboard, keyboardLocale.language(), id,
+                                                  displayName, defaultHkl == keyboard });
         }
 
         if (d->textInputSources != textInputSources) {
             d->textInputSources = textInputSources;
+            emit textInputSourcesChanged();
             return true;
         }
     }

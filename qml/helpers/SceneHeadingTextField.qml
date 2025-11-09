@@ -29,7 +29,7 @@ VclTextField {
     property SceneElementFormat sceneHeadingFormat: Scrite.document.displayFormat.elementFormat(SceneElement.Heading)
 
     label: ""
-    text: _private.text
+    text: _private.headingText
     color: sceneOmitted ? "gray" : sceneHeadingFormat.textColor
     readOnly: Scrite.document.readOnly || !(sceneHeading.enabled && !sceneOmitted)
     wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -51,9 +51,13 @@ VclTextField {
 
     background: Item { }
 
-    includeSuggestion: (suggestion) => { return _private.includeSuggestion(suggestion) }
+    includeSuggestion: (suggestion) => {
+                           return _private.includeSuggestion(suggestion)
+                       }
 
-    onEditingComplete: (text) => { _private.updateText(text) }
+    onEditingComplete: (text) => {
+                           _private.updateText(text)
+                       }
 
     onActiveFocusChanged: () => {
                               if(activeFocus) {
@@ -68,11 +72,7 @@ VclTextField {
     QtObject {
         id: _private
 
-        Component.onCompleted: {
-            root.font.capitalization = Qt.binding( () => { return _private.fontCapitalization } )
-        }
-
-        property string text: {
+        property string headingText: {
             if(sceneOmitted)
                 return "[OMITTED] " + (hovered ? sceneHeading.displayText : "")
 
@@ -82,15 +82,15 @@ VclTextField {
             return ""
         }
 
-        property int fontCapitalization: activeFocus ? (Runtime.language.activeCode === QtLocale.English ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
+        property int fontCapitalization: activeFocus ? (Runtime.language.active.charScript() === Language.Script_Latin ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
         property int previouslyActiveLanguageCode: QtLocale.English
         property font font: root.sceneHeadingFormat.font2
 
         property int dotPosition: text.indexOf(".")
         property int dashPosition: text.lastIndexOf("-")
-        property bool editingLocationTypePart: dotPosition < 0 || cursorPosition < dotPosition
-        property bool editingMomentPart: dashPosition > 0 && cursorPosition >= dashPosition
-        property bool editingLocationPart: dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false
+        property bool editingLocationTypePart: activeFocus ? dotPosition < 0 || cursorPosition < dotPosition : false
+        property bool editingMomentPart: activeFocus ? dashPosition > 0 && cursorPosition >= dashPosition : false
+        property bool editingLocationPart: activeFocus ? dotPosition > 0 ? (cursorPosition >= dotPosition && (dashPosition < 0 ? true : cursorPosition < dashPosition)) : false : false
 
         property var completionStrings: {
             if(editingLocationPart)

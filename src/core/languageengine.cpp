@@ -1261,6 +1261,14 @@ FallbackTransliterationEngine::FallbackTransliterationEngine(QObject *parent)
 
 FallbackTransliterationEngine::~FallbackTransliterationEngine() { }
 
+int FallbackTransliterationEngine::defaultLanguage() const
+{
+    /* Here we assume that the default platform-language doesn't change
+     * within a single session of Scrite. That's a fair assumption to make */
+    PlatformTransliterationEngine platformEngine;
+    return platformEngine.defaultLanguage();
+}
+
 QString FallbackTransliterationEngine::name() const
 {
     return QStringLiteral("Default");
@@ -1268,7 +1276,18 @@ QString FallbackTransliterationEngine::name() const
 
 QList<TransliterationOption> FallbackTransliterationEngine::options(int lang) const
 {
-    return { { (QObject *)this, lang, this->name(), QStringLiteral("Keyboard Layout"), false } };
+    const int defLang = this->defaultLanguage();
+    const QString suffix = QStringLiteral("Keyboard Layout");
+    QString optionName = suffix;
+
+    if (defLang > 0) {
+        const Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(
+                this->defaultLanguage());
+        if (language.isValid())
+            optionName = language.name() + QStringLiteral(" - ") + suffix;
+    }
+
+    return { { (QObject *)this, lang, this->name(), optionName, false } };
 }
 
 bool FallbackTransliterationEngine::canActivate(const TransliterationOption &option)
@@ -1278,15 +1297,9 @@ bool FallbackTransliterationEngine::canActivate(const TransliterationOption &opt
 
 bool FallbackTransliterationEngine::activate(const TransliterationOption &option)
 {
-    // Do nothing
-    Q_UNUSED(option)
-    return true;
-}
-
-void FallbackTransliterationEngine::release(const TransliterationOption &option)
-{
-    // Do nothing
-    Q_UNUSED(option)
+    Q_UNUSED(option);
+    PlatformTransliterationEngine platformEngine;
+    return platformEngine.activateDefaultLanguage() > 0;
 }
 
 QString FallbackTransliterationEngine::transliterateWord(const QString &word,
@@ -1331,12 +1344,6 @@ bool StaticTransliterationEngine::activate(const TransliterationOption &option)
     // Nothing to do here
     Q_UNUSED(option)
     return true;
-}
-
-void StaticTransliterationEngine::release(const TransliterationOption &option)
-{
-    // Nothing to do here
-    Q_UNUSED(option)
 }
 
 QString StaticTransliterationEngine::transliterateWord(const QString &word,

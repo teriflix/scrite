@@ -79,7 +79,7 @@ DialogLauncher {
 
         property var language: Runtime.language.available.findLanguage(languageCode)
         property int languageCode: QtLocale.English
-        property bool languageUsesLatinScript: language.charScript() === QtChar.Script_Latin
+        property bool languageUsesLatinScript: language.charScript() === Language.Script_Latin
         property string previewText: language.nativeName
         property string initialFontFamily
 
@@ -114,7 +114,7 @@ DialogLauncher {
                 id: fontFamiliesModel
 
                 array: {
-                    const allFonts = LanguageEngine.scriptFontFamilies(QtChar.Script_Latin)
+                    const allFonts = LanguageEngine.scriptFontFamilies(Language.Script_Latin)
                     const languageSpecificFonts = dialog.languageUsesLatinScript ? [] : dialog.language.fontFamilies()
 
                     let ret = []
