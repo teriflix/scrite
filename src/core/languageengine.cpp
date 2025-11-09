@@ -1283,8 +1283,15 @@ QList<TransliterationOption> FallbackTransliterationEngine::options(int lang) co
     if (defLang > 0) {
         const Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(
                 this->defaultLanguage());
-        if (language.isValid())
-            optionName = language.name() + QStringLiteral(" - ") + suffix;
+        if (language.isValid()) {
+            PlatformTransliterationEngine platformEngine;
+            const QList<TransliterationOption> platformOptions =
+                    platformEngine.options(language.code);
+            if (platformOptions.isEmpty())
+                optionName = language.name() + QStringLiteral(" - ") + suffix;
+            else
+                optionName = platformOptions.first().name + QStringLiteral(" - ") + suffix;
+        }
     }
 
     return { { (QObject *)this, lang, this->name(), optionName, false } };

@@ -26,6 +26,8 @@ PlatformTransliterationEngine::PlatformTransliterationEngine(QObject *parent)
 {
     connect(::Backend, &WindowsBackend::textInputSourcesChanged, this,
             &PlatformTransliterationEngine::capacityChanged);
+    connect(::Backend, &MacOSBackend::textInputSourcesChanged, this,
+            &PlatformTransliterationEngine::defaultLanguageChanged);
 }
 
 PlatformTransliterationEngine::~PlatformTransliterationEngine() { }

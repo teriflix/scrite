@@ -557,7 +557,7 @@ public:
     /** Returns the default language supported by this engine */
     Q_PROPERTY(int defaultLanguage READ defaultLanguage NOTIFY defaultLanguageChanged)
     virtual int defaultLanguage() const { return QLocale::English; }
-    void defaultLanguageChanged();
+    Q_SIGNAL void defaultLanguageChanged();
 
     /* Unique name among all transliterators supported */
     Q_PROPERTY(QString name READ name CONSTANT)

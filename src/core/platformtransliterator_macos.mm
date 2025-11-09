@@ -52,6 +52,8 @@ static void macOSNotificationHandler(CFNotificationCenterRef center, void *obser
 
 struct MacOSBackendData
 {
+    CFArrayRef sourceList;
+
     QList<TextInputSource> textInputSources;
 };
 
@@ -72,6 +74,9 @@ MacOSBackend::MacOSBackend(QObject *parent) : QObject(parent), d(new MacOSBacken
 
 MacOSBackend::~MacOSBackend()
 {
+    if (d->sourceList != nullptr)
+        CFRelease(d->sourceList);
+
     delete d;
 }
 
@@ -79,7 +84,7 @@ int MacOSBackend::defaultLanguage() const
 {
     auto it = std::find_if(d->textInputSources.begin(), d->textInputSources.end(),
                            [](const TextInputSource &tis) { return tis.isDefault; });
-    if(it != d->textInputSources.end())
+    if (it != d->textInputSources.end())
         return it->languageCode;
 
     return -1;
@@ -93,12 +98,14 @@ int MacOSBackend::activateDefaultLanguage() const
 
     // If found, then activate it.
     if (it != d->textInputSources.end()) {
-        const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(it->inputSource, kTISPropertyInputSourceIsSelected) == kCFBooleanTrue;
-        if(alreadyActive)
+        const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(
+                                           it->inputSource, kTISPropertyInputSourceIsSelected)
+                == kCFBooleanTrue;
+        if (alreadyActive)
             return it->languageCode;
 
         TISInputSourceRef inputSource = (TISInputSourceRef)it->inputSource;
-        if(TISSelectInputSource(inputSource) == noErr)
+        if (TISSelectInputSource(inputSource) == noErr)
             return it->languageCode;
     }
 
@@ -139,8 +146,10 @@ bool MacOSBackend::activate(const TransliterationOption &option,
                            [option](const TextInputSource &tis) { return option.id == tis.id; });
 
     if (it != d->textInputSources.end()) {
-        const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(it->inputSource, kTISPropertyInputSourceIsSelected) == kCFBooleanTrue;
-        if(alreadyActive)
+        const bool alreadyActive = (CFBooleanRef)TISGetInputSourceProperty(
+                                           it->inputSource, kTISPropertyInputSourceIsSelected)
+                == kCFBooleanTrue;
+        if (alreadyActive)
             return true;
 
         TISInputSourceRef inputSource = (TISInputSourceRef)it->inputSource;
@@ -162,21 +171,25 @@ bool MacOSBackend::reload()
 {
     QList<TextInputSource> textInputSources;
 
-    CFArrayRef sourceList = TISCreateInputSourceList(NULL, false);
-    const int nrSources = CFArrayGetCount(sourceList);
-    TISInputSourceRef defaultSource = (nrSources > 0)
-            ? (TISInputSourceRef)CFArrayGetValueAtIndex(sourceList, 0)
-            : NULL;
+    if (d->sourceList != nullptr)
+        CFRelease(d->sourceList);
+
+    d->sourceList = TISCreateInputSourceList(NULL, false);
+    const int nrSources = CFArrayGetCount(d->sourceList);
+    TISInputSourceRef defaultSource =
+            (nrSources > 0) ? (TISInputSourceRef)CFArrayGetValueAtIndex(d->sourceList, 0) : NULL;
 
     for (int i = 0; i < nrSources; i++) {
         TextInputSource tis;
 
-        tis.inputSource = (TISInputSourceRef)CFArrayGetValueAtIndex(sourceList, i);
+        tis.inputSource = (TISInputSourceRef)CFArrayGetValueAtIndex(d->sourceList, i);
         const void *inputSourceType =
                 TISGetInputSourceProperty(tis.inputSource, kTISPropertyInputSourceType);
         if (kTISTypeKeyboardInputMode != inputSourceType
             && kTISTypeKeyboardLayout != inputSourceType)
             continue;
+
+        CFRetain(tis.inputSource);
 
         tis.isDefault = (tis.inputSource == defaultSource);
         tis.id = QString::fromCFString(
@@ -197,8 +210,6 @@ bool MacOSBackend::reload()
             textInputSources << tis;
         }
     }
-
-    CFRelease(sourceList);
 
     if (d->textInputSources != textInputSources) {
         d->textInputSources = textInputSources;
@@ -241,7 +252,7 @@ int PlatformTransliterationEngine::activateDefaultLanguage()
     if (code >= 0)
         return code;
 
-           // If it couldn't then fallback to English as default language
+    // If it couldn't then fallback to English as default language
     const QList<TransliterationOption> englishOptions = this->options(QLocale::English);
     if (englishOptions.isEmpty())
         return -1; // No clue what to do now.
