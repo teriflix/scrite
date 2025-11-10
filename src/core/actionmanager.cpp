@@ -1257,7 +1257,6 @@ int ActionsModelFilter::restoreAllActionShortcuts()
         const QModelIndex index = this->index(i, 0);
         QObject *action = index.data(ActionsModel::ActionRole).value<QObject *>();
         if (this->restoreActionShortcut(action)) {
-            Utils::Gui::log(action->objectName());
             emit dataChanged(index, index);
             ++restoreCount;
         }
@@ -1422,8 +1421,6 @@ void ShortcutInputHandler::handleKeyReleaseEvent(QKeyEvent *event)
 
         for (const KeyStroke &keyStroke : qAsConst(m_keyStrokes))
             comps << keyStroke.text;
-
-        Utils::Gui::log(comps.join("+"));
 
         sequence = QKeySequence::fromString(comps.join("+"));
     }
