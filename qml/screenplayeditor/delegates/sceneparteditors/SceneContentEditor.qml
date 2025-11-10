@@ -180,7 +180,6 @@ AbstractScenePartEditor {
 
         onActiveFocusChanged: Qt.callLater(_private.handleSceneTextEditorFocusChange)
         onCursorRectangleChanged: Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
-        onCursorPositionChanged: Gui.log("_sceneTextEditor.cursorPosition = " + cursorPosition)
     }
 
     SceneTextEditorSpellingSuggestionsMenu {
