@@ -633,7 +633,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Ctrl+9"
+            readonly property string defaultShortcut: "Alt+0"
 
             enabled: ActionHandler.canHandle
             objectName: "editSceneNumber"
