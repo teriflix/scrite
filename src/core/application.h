@@ -114,27 +114,6 @@ public:
     Q_PROPERTY(Forms *forms READ forms CONSTANT)
     Forms *forms() const;
 
-    Q_PROPERTY(QUndoGroup *undoGroup READ undoGroup CONSTANT)
-    QUndoGroup *undoGroup() const { return m_undoGroup; }
-
-    Q_INVOKABLE UndoStack *findUndoStack(const QString &objectName) const;
-
-    Q_PROPERTY(bool canUndo READ canUndo NOTIFY canUndoChanged)
-    bool canUndo() const { return m_undoGroup->canUndo(); }
-    Q_SIGNAL void canUndoChanged();
-
-    Q_PROPERTY(bool canRedo READ canRedo NOTIFY canRedoChanged)
-    bool canRedo() const { return m_undoGroup->canRedo(); }
-    Q_SIGNAL void canRedoChanged();
-
-    Q_PROPERTY(QString undoText READ undoText NOTIFY undoTextChanged)
-    QString undoText() const { return m_undoGroup->undoText(); }
-    Q_SIGNAL void undoTextChanged();
-
-    Q_PROPERTY(QString redoText READ redoText NOTIFY redoTextChanged)
-    QString redoText() const { return m_undoGroup->redoText(); }
-    Q_SIGNAL void redoTextChanged();
-
     static QFontDatabase &fontDatabase();
 
     // TODO: Move this to Platform.fontInfo() ...

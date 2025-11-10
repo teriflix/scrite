@@ -38,9 +38,6 @@ public:
 
     static ActionManagerAttached *qmlAttachedProperties(QObject *object);
 
-    Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
-    Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
-
     static ActionManager *findManager(QObject *action);
     static bool canChangeActionShortcut(QObject *action);
     static bool changeActionShortcut(QObject *action, const QString &shortcut);
@@ -130,10 +127,8 @@ public:
     ActionManager *target() const { return m_target; }
     Q_SIGNAL void targetChanged();
 
-    Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
-    Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
-
     Q_INVOKABLE ActionManager *find(const QString &name) const;
+    Q_INVOKABLE QObject *findActionForShortcut(const QString &shortcut) const;
 
 protected:
     explicit ActionManagerAttached(QObject *parent = nullptr);
@@ -242,7 +237,7 @@ protected:
     explicit ActionHandlerAttached(QObject *parent = nullptr);
 
 private:
-    void onHandlerAvailabilityChanged(QObject *action);
+    void onHandlerAvailabilityChanged(QObject *action, ActionHandler *handler);
 
 private:
     friend class ActionHandler;
@@ -340,6 +335,7 @@ class ActionsModelFilter : public QSortFilterProxyModel, public QQmlParserStatus
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_INTERFACES(QQmlParserStatus)
 
 public:
     explicit ActionsModelFilter(QObject *parent = nullptr);

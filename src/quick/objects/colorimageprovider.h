@@ -19,6 +19,8 @@
 class ColorImageProvider : public QQuickImageProvider
 {
 public:
+    static QString name();
+
     explicit ColorImageProvider();
     ~ColorImageProvider();
 

@@ -801,8 +801,8 @@ void Notes::removeNote(Note *ptr)
 
     this->removeAt(index);
 
-    if (UndoStack::active() && RemoveNoteUndoCommand::noteCurrentlyBeingRemoved.isNull())
-        UndoStack::active()->push(new RemoveNoteUndoCommand(this, ptr));
+    if (UndoHub::active() && RemoveNoteUndoCommand::noteCurrentlyBeingRemoved.isNull())
+        UndoHub::active()->push(new RemoveNoteUndoCommand(this, ptr));
 
     ptr->deleteLater();
 }

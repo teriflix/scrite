@@ -42,9 +42,6 @@ Item {
 
     ObjectRegister.name: "notebookView"
 
-    FocusTracker.window: Scrite.window
-    FocusTracker.onHasFocusChanged: Runtime.undoStack.notebookActive = FocusTracker.hasFocus
-
     HelpTipNotification {
         tipName: "notebook"
     }

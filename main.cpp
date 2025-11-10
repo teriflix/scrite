@@ -52,6 +52,7 @@ int main(int argc, char **argv)
     LanguageEngine::instance();
     NotificationManager::instance();
     DocumentFileSystem::setMarker(QByteArrayLiteral("SCRITE"));
+    UndoHub::instance();
     ScriteDocument::instance();
     ScriteDocumentVault::instance();
 

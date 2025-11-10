@@ -19,6 +19,11 @@
 
 #include <QPainter>
 
+QString BasicFileIconProvider::name()
+{
+    return QStringLiteral("fileIcon");
+}
+
 BasicFileIconProvider::BasicFileIconProvider() : QQuickImageProvider(QQuickImageProvider::Image) { }
 
 BasicFileIconProvider::~BasicFileIconProvider() { }

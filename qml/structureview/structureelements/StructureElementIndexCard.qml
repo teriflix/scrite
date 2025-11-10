@@ -930,7 +930,7 @@ AbstractStructureElementUI {
         }
 
         onIsSelectedChanged: {
-            if(_private.isSelected && (Runtime.undoStack.structureEditorActive || Scrite.document.structure.elementCount === 1))
+            if(_private.isSelected && (FocusInspector.hasFocus(Runtime.structureView) || Scrite.document.structure.elementCount === 1))
                 _synopsisFieldLoader.forceActiveFocus()
             else
                 root.canvasTabSequence.releaseFocus()

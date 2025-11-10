@@ -115,4 +115,15 @@ private:
     QObjectProperty<QQuickWindow> m_window;
 };
 
+class FocusInspector : public QObject
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
+
+public:
+    // Returns true of item or any child of item has focus
+    Q_INVOKABLE static bool hasFocus(QQuickItem *item);
+};
+
 #endif // FOCUSTRACKER_H

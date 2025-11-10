@@ -93,10 +93,6 @@ Item {
 
                 ScrollBar.vertical: VclScrollBar { flickable: _sceneListView }
 
-                FocusTracker.window: Scrite.window
-                FocusTracker.indicator.target: Runtime.undoStack
-                FocusTracker.indicator.property: "sceneListPanelActive"
-
                 FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                 anchors.fill: parent

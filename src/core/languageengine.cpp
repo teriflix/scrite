@@ -351,7 +351,7 @@ bool Language::activate()
 
 QString Language::charScriptName() const
 {
-    const QMetaEnum scriptEnum = QMetaEnum::fromType<Language::CharScript>();
+    const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
     const QString scriptName = QString::fromLatin1(scriptEnum.valueToKey(this->charScript()));
     if (!scriptName.isEmpty())
         return scriptName.mid(7); // After Script_
@@ -2129,8 +2129,6 @@ void LanguageEngine::polishFontsAndInsertTextAtCursor(
 
 void LanguageEngine::init(const char *uri, QQmlEngine *qmlEngine)
 {
-    Q_UNUSED(qmlEngine)
-
     static bool initedOnce = false;
     if (initedOnce)
         return;
@@ -2142,6 +2140,7 @@ void LanguageEngine::init(const char *uri, QQmlEngine *qmlEngine)
     // @uri io.scrite.components
     // @reason Instantiation from QML not allowed.
     qmlRegisterSingletonInstance(uri, 1, 0, "LanguageEngine", LanguageEngine::instance());
+    qmlRegisterUncreatableMetaObject(QtChar::staticMetaObject, uri, 1, 0, "QtChar", reason);
     qmlRegisterUncreatableMetaObject(QLocale::staticMetaObject, uri, 1, 0, "QtLocale", reason);
     qmlRegisterUncreatableMetaObject(QFontDatabase::staticMetaObject, uri, 1, 0, "QtFontDatabase",
                                      reason);
@@ -2169,7 +2168,7 @@ void LanguageEngine::loadConfiguration()
 
         const QJsonArray scriptFonts = config.value("script-fonts").toArray();
         if (!scriptFonts.isEmpty()) {
-            const QMetaEnum scriptEnum = QMetaEnum::fromType<Language::CharScript>();
+            const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
 
             for (const QJsonValue &scriptFontsItem : scriptFonts) {
                 const QJsonObject scriptFont = scriptFontsItem.toObject();
@@ -2210,7 +2209,7 @@ void LanguageEngine::saveConfiguration()
 
             // Save script font associations.
             if (!m_scriptFontFamily.isEmpty()) {
-                const QMetaEnum scriptEnum = QMetaEnum::fromType<Language::CharScript>();
+                const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
 
                 QJsonArray scriptFonts;
 

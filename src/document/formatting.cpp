@@ -1665,14 +1665,14 @@ private:
 
 SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
     : QSyntaxHighlighter(parent),
-      m_scene(this, "scene"),
-      m_rehighlightTimer("SceneDocumentBinder.m_rehighlightTimer"),
       m_initializeDocumentTimer("SceneDocumentBinder.m_initializeDocumentTimer"),
+      m_rehighlightTimer("SceneDocumentBinder.m_rehighlightTimer"),
       m_sceneElementTaskTimer("SceneDocumentBinder.m_sceneElementTaskTimer"),
-      m_currentElement(this, "currentElement"),
       m_textDocument(this, "textDocument"),
-      m_screenplayFormat(this, "screenplayFormat"),
-      m_screenplayElement(this, "screenplayElement")
+      m_scene(this, "scene"),
+      m_currentElement(this, "currentElement"),
+      m_screenplayElement(this, "screenplayElement"),
+      m_screenplayFormat(this, "screenplayFormat")
 {
     connect(this, &SceneDocumentBinder::currentElementChanged, this,
             &SceneDocumentBinder::nextTabFormatChanged);

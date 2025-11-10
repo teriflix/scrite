@@ -33,8 +33,6 @@ Item {
     signal editorRequest()
     signal releaseEditorRequest()
 
-    Component.onCompleted: Scrite.user.logActivity1("structure")
-
     Rectangle {
         anchors.fill: _canvasScroll
 
@@ -215,7 +213,13 @@ Item {
         }
 
         Component.onCompleted: {
+            Runtime.structureView = root
+            Scrite.user.logActivity1("structure")
             initSequence.start()
+        }
+
+        Component.onDestruction: {
+            Runtime.structureView = null
         }
     }
 }

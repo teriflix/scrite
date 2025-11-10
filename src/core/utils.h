@@ -326,6 +326,13 @@ public:
     Q_PROPERTY(QImage emptyQImage READ emptyQImage CONSTANT)
     static QImage emptyQImage();
 
+    Q_INVOKABLE static QString shortcut(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
+    Q_INVOKABLE static QKeySequence keySequence(int k1, int k2 = 0, int k3 = 0, int k4 = 0);
+
+    // StandardKey is one of QKeySequence::StandardKey in C++, or StandardKey.xyz in QML
+    Q_INVOKABLE static QString standardShortcut(int standardKey);
+    Q_INVOKABLE static QKeySequence standardKeySequence(int standardKey);
+
     Q_INVOKABLE static QString nativeShortcut(const QString &shortcut);
     Q_INVOKABLE static bool acceptsTextInput(QQuickItem *item);
 
@@ -401,6 +408,15 @@ public:
     static QString add(QObject *object, const QString &name);
 
     Q_INVOKABLE static QObject *find(const QString &name);
+
+    template<class T>
+    static T *lookup(const QString &name)
+    {
+        QObject *object = ObjectRegistry::find(name);
+        if (object)
+            return qobject_cast<T *>(object);
+        return nullptr;
+    }
 };
 
 class ObjectRegister : public QObject

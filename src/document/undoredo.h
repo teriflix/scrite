@@ -21,29 +21,63 @@
 #include <QJsonObject>
 #include <QQmlProperty>
 #include <QQmlEngine>
+#include <QUndoGroup>
 
 #include "qobjectfactory.h"
 #include "garbagecollector.h"
 #include "qobjectserializer.h"
 
+class UndoHub : public QUndoGroup
+{
+    Q_OBJECT
+    QML_ELEMENT
+    QML_SINGLETON
+
+    Q_PROPERTY(bool canUndo READ canUndo NOTIFY _canUndoChanged)
+    Q_PROPERTY(bool canRedo READ canRedo NOTIFY _canRedoChanged)
+    Q_PROPERTY(QUndoStack *active READ activeStack WRITE setActiveStack NOTIFY _activeStackChanged)
+
+public:
+    static void init(const char *uri, QQmlEngine *qmlEngine);
+    static UndoHub *instance();
+
+    virtual ~UndoHub();
+
+    Q_INVOKABLE static void clearAllStacks();
+
+    static bool enabled;
+    Q_INVOKABLE static QUndoStack *active(); // This is different from QUndoGroup::activeStack(), in
+                                             // that it returns nullptr, if enabled = false
+
+signals:
+    /** we need these because Q_PROPERTY NOTIFY signals cannot have args, but the ones from the base
+     * class do */
+    void _canUndoChanged();
+    void _canRedoChanged();
+    void _activeStackChanged();
+
+private:
+    explicit UndoHub(QObject *parent = nullptr);
+};
+
 class UndoStack : public QUndoStack
 {
     Q_OBJECT
     QML_ELEMENT
+    Q_PROPERTY(bool isActive READ isActive WRITE setActive NOTIFY activeChanged)
 
 public:
     explicit UndoStack(QObject *parent = nullptr);
     ~UndoStack();
 
-    Q_PROPERTY(bool active READ isActive WRITE setActive NOTIFY activeChanged)
-    void setActive(bool val);
-    bool isActive() const;
-    Q_SIGNAL void activeChanged();
+signals:
+    void activeChanged();
 
-    static void clearAllStacks();
+private:
+    void onActiveInGroupChanged(QUndoStack *stack);
 
-    static bool ignoreUndoCommands;
-    static QUndoStack *active();
+private:
+    bool m_active = false;
 };
 
 class ObjectPropertyInfoList;
@@ -67,8 +101,6 @@ struct ObjectPropertyInfo
     static ObjectPropertyInfo *get(QObject *object, const QByteArray &property);
     static void lockUndoRedoFor(QObject *object);
     static void unlockUndoRedoFor(QObject *object);
-
-    static int querySetCounter(QObject *object, const QByteArray &property);
 
 private:
     friend class ObjectPropertyInfoList;
@@ -228,8 +260,8 @@ public:
 
     void pushToActiveStack()
     {
-        if (m_parentPropertyInfo != nullptr && UndoStack::active() && !m_child.isNull())
-            UndoStack::active()->push(this);
+        if (m_parentPropertyInfo != nullptr && UndoHub::active() && !m_child.isNull())
+            UndoHub::active()->push(this);
         else
             delete this;
     }
@@ -325,7 +357,7 @@ public:
                           ObjectList::Operation operation,
                           const ObjectListPropertyMethods<ParentClass, ChildClass> &methods)
     {
-        if (UndoStack::active())
+        if (UndoHub::active())
             m_command = new ObjectListCommand<ParentClass, ChildClass>(child, parent, propertyName,
                                                                        operation, methods);
     }
@@ -337,65 +369,6 @@ public:
 
 private:
     ObjectListCommand<ParentClass, ChildClass> *m_command = nullptr;
-};
-
-class UndoResult : public QObject
-{
-    Q_OBJECT
-    QML_ELEMENT
-    QML_UNCREATABLE("Instantiation from QML not allowed.")
-
-public:
-    explicit UndoResult(QObject *parent = nullptr);
-    ~UndoResult();
-
-    Q_PROPERTY(bool success READ isSuccess WRITE setSuccess NOTIFY successChanged)
-    void setSuccess(bool val);
-    bool isSuccess() const { return m_success; }
-    Q_SIGNAL void successChanged();
-
-private:
-    bool m_success = true;
-};
-
-class UndoHandler : public QObject
-{
-    Q_OBJECT
-    QML_ELEMENT
-
-public:
-    static QList<UndoHandler *> all();
-    static bool handleUndo();
-    static bool handleRedo();
-
-    explicit UndoHandler(QObject *parent = nullptr);
-    ~UndoHandler();
-
-    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
-    void setEnabled(bool val);
-    bool isEnabled() const { return m_enabled; }
-    Q_SIGNAL void enabledChanged();
-
-    Q_PROPERTY(bool canUndo READ canUndo WRITE setCanUndo NOTIFY canUndoChanged)
-    void setCanUndo(bool val);
-    bool canUndo() const { return m_canUndo; }
-    Q_SIGNAL void canUndoChanged();
-
-    Q_PROPERTY(bool canRedo READ canRedo WRITE setCanRedo NOTIFY canRedoChanged)
-    void setCanRedo(bool val);
-    bool canRedo() const { return m_canRedo; }
-    Q_SIGNAL void canRedoChanged();
-
-    bool undo();
-    bool redo();
-
-    Q_SIGNAL void undoRequest(UndoResult *result);
-    Q_SIGNAL void redoRequest(UndoResult *result);
-
-private:
-    bool m_enabled = false;
-    bool m_canUndo = false;
-    bool m_canRedo = false;
 };
 
 #endif // UNDOREDO_H

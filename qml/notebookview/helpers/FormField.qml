@@ -239,12 +239,18 @@ Column {
                     enabled: !Scrite.document.readOnly
                 }
 
-                UndoHandler {
-                    enabled: !_answerText.readOnly && _answerText.activeFocus && enableUndoRedo
-                    canUndo: _answerText.canUndo
-                    canRedo: _answerText.canRedo
-                    onUndoRequest: _answerText.undo()
-                    onRedoRequest: _answerText.redo()
+                ActionHandler {
+                    action: ActionHub.editOptions.find("undo")
+                    enabled: !_answerText.readOnly && _answerText.activeFocus && enableUndoRedo && _answerText.canUndo
+
+                    onTriggered: (source) => { _answerText.undo() }
+                }
+
+                ActionHandler {
+                    action: ActionHub.editOptions.find("redo")
+                    enabled: !_answerText.readOnly && _answerText.activeFocus && enableUndoRedo && _answerText.canRedo
+
+                    onTriggered: (source) => { _answerText.redo() }
                 }
 
                 TextAreaSpellingSuggestionsMenu { }

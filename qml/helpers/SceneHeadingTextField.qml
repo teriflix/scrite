@@ -36,6 +36,7 @@ VclTextField {
     hoverEnabled: sceneOmitted
     maximumLength: 140
     placeholderText: sceneHeading.enabled ? "INT. SOMEPLACE - DAY" : "NO SCENE HEADING"
+    undoRedoEnabled: false
     completionPrefix: _private.completionPrefix
     completionStrings: _private.completionStrings
     enableTransliteration: true
@@ -82,7 +83,7 @@ VclTextField {
             return ""
         }
 
-        property int fontCapitalization: activeFocus ? (Runtime.language.active.charScript() === Language.Script_Latin ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
+        property int fontCapitalization: activeFocus ? (Runtime.language.active.charScript() === QtChar.Script_Latin ? Font.AllUppercase : Font.MixedCase) : Font.AllUppercase
         property int previouslyActiveLanguageCode: QtLocale.English
         property font font: root.sceneHeadingFormat.font2
 

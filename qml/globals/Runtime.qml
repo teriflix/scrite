@@ -56,6 +56,9 @@ Item {
     // This property holds reference to an instance of ScreenplayEditor
     property Item screenplayEditor
 
+    // This property holds reference to an instance of StructureView
+    property Item structureView
+
     // This property holds reference to the global screenplay editor toolbar
     property Item screenplayEditorToolbar
 
@@ -347,17 +350,12 @@ Item {
         fileName: Platform.settingsFile
     }
 
-    // Global undo-redo object
+    // Global undo-redo stack
     readonly property UndoStack undoStack: UndoStack {
-        property bool notebookActive: false
-        property bool sceneEditorActive: false
-        property bool sceneListPanelActive: false
-        property bool screenplayEditorActive: false
-        property bool structureEditorActive: false
-        property bool timelineEditorActive: false
+        ObjectRegister.name: objectName
 
         objectName: "MainUndoStack"
-        active: sceneListPanelActive || screenplayEditorActive || timelineEditorActive || structureEditorActive || sceneEditorActive || notebookActive
+        active: true
     }
 
     // App-wide font-metrics

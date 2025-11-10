@@ -88,12 +88,18 @@ TextArea {
         enabled: !Scrite.document.readOnly
     }
 
-    UndoHandler {
-        enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled
-        canUndo: root.canUndo
-        canRedo: root.canRedo
-        onUndoRequest: root.undo()
-        onRedoRequest: root.redo()
+    ActionHandler {
+        action: ActionHub.editOptions.find("undo")
+        enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled && root.canUndo
+
+        onTriggered: (source) => { root.undo() }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("redo")
+        enabled: !root.readOnly && root.activeFocus && root.undoRedoEnabled && root.canRedo
+
+        onTriggered: (source) => { root.redo() }
     }
 
     TextAreaSpellingSuggestionsMenu { }

@@ -12,49 +12,75 @@
 ****************************************************************************/
 
 #include "undoredo.h"
-#include "application.h"
+#include "utils.h"
 
+#include <QApplication>
 #include <QQmlListReference>
 
-UndoStack::UndoStack(QObject *parent) : QUndoStack(parent)
+void UndoHub::init(const char *uri, QQmlEngine *qmlEngine)
 {
-    Application::instance()->undoGroup()->addStack(this);
+    Q_UNUSED(qmlEngine)
 
-    connect(Application::instance()->undoGroup(), &QUndoGroup::activeStackChanged, this,
-            &UndoStack::activeChanged);
+    static bool initedOnce = false;
+    if (initedOnce)
+        return;
+
+    // @uri io.scrite.components
+    // @reason Instantiation from QML not allowed.
+    qmlRegisterSingletonInstance(uri, 1, 0, "UndoHub", UndoHub::instance());
+
+    initedOnce = true;
 }
 
-UndoStack::~UndoStack() { }
-
-void UndoStack::setActive(bool val)
+UndoHub *UndoHub::instance()
 {
-    if (val)
-        Application::instance()->undoGroup()->setActiveStack(this);
-    else if (this->isActive())
-        Application::instance()->undoGroup()->setActiveStack(nullptr);
+    static QPointer<UndoHub> theInstance(new UndoHub(qApp));
+    return theInstance;
 }
 
-bool UndoStack::isActive() const
+UndoHub::UndoHub(QObject *parent) : QUndoGroup(parent)
 {
-    return Application::instance()->undoGroup()->activeStack() == this;
+    connect(this, &QUndoGroup::canUndoChanged, this, &UndoHub::_canUndoChanged);
+    connect(this, &QUndoGroup::canRedoChanged, this, &UndoHub::_canRedoChanged);
+    connect(this, &QUndoGroup::activeStackChanged, this, &UndoHub::_activeStackChanged);
 }
 
-void UndoStack::clearAllStacks()
+UndoHub::~UndoHub() { }
+
+void UndoHub::clearAllStacks()
 {
-    const QList<QUndoStack *> stacks = Application::instance()->undoGroup()->stacks();
+    const QList<QUndoStack *> stacks = UndoHub::instance()->stacks();
     for (QUndoStack *stack : stacks)
         stack->clear();
 }
 
-bool UndoStack::ignoreUndoCommands = false;
+bool UndoHub::enabled = true;
 
-QUndoStack *UndoStack::active()
+QUndoStack *UndoHub::active()
 {
-    if (ignoreUndoCommands)
-        return nullptr;
+    return UndoHub::enabled ? UndoHub::instance()->activeStack() : nullptr;
+}
 
-    QUndoStack *ret = Application::instance()->undoGroup()->activeStack();
-    return ret;
+///////////////////////////////////////////////////////////////////////////////
+
+UndoStack::UndoStack(QObject *parent) : QUndoStack(parent)
+{
+    UndoHub::instance()->addStack(this);
+}
+
+UndoStack::~UndoStack()
+{
+    if (UndoHub::instance())
+        UndoHub::instance()->removeStack(this);
+}
+
+void UndoStack::onActiveInGroupChanged(QUndoStack *stack)
+{
+    const bool a = stack == this;
+    if (a != m_active) {
+        m_active = a;
+        emit activeChanged();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -204,22 +230,6 @@ void ObjectPropertyInfo::unlockUndoRedoFor(QObject *object)
         object->setProperty(objectUndoRedoLockProperty(), false);
 }
 
-int ObjectPropertyInfo::querySetCounter(QObject *object, const QByteArray &property)
-{
-    if (object == nullptr || property.isEmpty())
-        return -1;
-
-    const int propIndex = object->metaObject()->indexOfProperty(property);
-    if (propIndex < 0)
-        return -1;
-
-    const QByteArray counterProp = property + "_counter";
-    const QVariant counterVal = object->property(counterProp);
-    int counter = counterVal.isValid() ? counterVal.toInt() : 0;
-    object->setProperty(counterProp, counter + 1);
-    return counter;
-}
-
 void ObjectPropertyInfo::deleteSelf()
 {
     delete this;
@@ -253,9 +263,9 @@ ObjectPropertyUndoCommand::~ObjectPropertyUndoCommand()
 
 void ObjectPropertyUndoCommand::pushToActiveStack()
 {
-    if (m_propertyInfo != nullptr && UndoStack::active()) {
+    if (m_propertyInfo != nullptr && UndoHub::active()) {
         m_newValue = m_propertyInfo->read();
-        UndoStack::active()->push(this);
+        UndoHub::active()->push(this);
     } else
         delete this;
 }
@@ -291,8 +301,7 @@ bool ObjectPropertyUndoCommand::mergeWith(const QUndoCommand *other)
 PushObjectPropertyUndoCommand::PushObjectPropertyUndoCommand(QObject *object,
                                                              const QByteArray &property, bool flag)
 {
-    const int counter = ObjectPropertyInfo::querySetCounter(object, property);
-    if (flag && UndoStack::active() && counter > 0)
+    if (flag && UndoHub::active())
         m_command = new ObjectPropertyUndoCommand(object, property);
 }
 
@@ -300,103 +309,4 @@ PushObjectPropertyUndoCommand::~PushObjectPropertyUndoCommand()
 {
     if (m_command)
         m_command->pushToActiveStack();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-UndoResult::UndoResult(QObject *parent) : QObject(parent) { }
-
-UndoResult::~UndoResult() { }
-
-void UndoResult::setSuccess(bool val)
-{
-    if (m_success == val)
-        return;
-
-    m_success = val;
-    emit successChanged();
-}
-
-Q_GLOBAL_STATIC(QList<UndoHandler *>, AllUndoHandlers);
-
-QList<UndoHandler *> UndoHandler::all()
-{
-    return *AllUndoHandlers;
-}
-
-bool UndoHandler::handleUndo()
-{
-    const QList<UndoHandler *> handlers = UndoHandler::all();
-    for (UndoHandler *handler : qAsConst(handlers)) {
-        if (handler->isEnabled() && handler->canUndo()) {
-            if (handler->undo())
-                return true;
-        }
-    }
-
-    return false;
-}
-
-bool UndoHandler::handleRedo()
-{
-    const QList<UndoHandler *> handlers = UndoHandler::all();
-    for (UndoHandler *handler : qAsConst(handlers)) {
-        if (handler->isEnabled() && handler->canRedo()) {
-            if (handler->redo())
-                return true;
-        }
-    }
-
-    return false;
-}
-
-UndoHandler::UndoHandler(QObject *parent) : QObject(parent)
-{
-    ::AllUndoHandlers->append(this);
-}
-
-UndoHandler::~UndoHandler()
-{
-    ::AllUndoHandlers->removeOne(this);
-}
-
-void UndoHandler::setEnabled(bool val)
-{
-    if (m_enabled == val)
-        return;
-
-    m_enabled = val;
-    emit enabledChanged();
-}
-
-void UndoHandler::setCanUndo(bool val)
-{
-    if (m_canUndo == val)
-        return;
-
-    m_canUndo = val;
-    emit canUndoChanged();
-}
-
-void UndoHandler::setCanRedo(bool val)
-{
-    if (m_canRedo == val)
-        return;
-
-    m_canRedo = val;
-    emit canRedoChanged();
-}
-
-bool UndoHandler::undo()
-{
-    UndoResult result;
-    emit undoRequest(&result);
-    return result.isSuccess();
-}
-
-bool UndoHandler::redo()
-{
-    UndoResult result;
-    emit redoRequest(&result);
-    return result.isSuccess();
 }

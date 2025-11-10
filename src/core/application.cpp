@@ -14,7 +14,6 @@
 #include "form.h"
 #include "utils.h"
 #include "scrite.h"
-#include "undoredo.h"
 #include "hourglass.h"
 #include "autoupdate.h"
 #include "application.h"
@@ -124,10 +123,6 @@ Application::Application(int &argc, char **argv, const QVersionNumber &version)
     QFontDatabase::addApplicationFont(QStringLiteral(":font/Rubik/Rubik-Bold.ttf"));
     this->setFont(QFont(QStringLiteral("Rubik")));
 
-    connect(m_undoGroup, &QUndoGroup::canUndoChanged, this, &Application::canUndoChanged);
-    connect(m_undoGroup, &QUndoGroup::canRedoChanged, this, &Application::canRedoChanged);
-    connect(m_undoGroup, &QUndoGroup::undoTextChanged, this, &Application::undoTextChanged);
-    connect(m_undoGroup, &QUndoGroup::redoTextChanged, this, &Application::redoTextChanged);
     connect(this, &QGuiApplication::fontChanged, this, &Application::applicationFontChanged);
 
     this->setWindowIcon(QIcon(":/images/appicon.png"));
@@ -484,19 +479,6 @@ void Application::setBaseWindowTitle(const QString &val)
     emit baseWindowTitleChanged();
 }
 
-UndoStack *Application::findUndoStack(const QString &objectName) const
-{
-    const QList<QUndoStack *> stacks = m_undoGroup->stacks();
-    for (QUndoStack *stack : stacks) {
-        if (stack->objectName() == objectName) {
-            UndoStack *ret = qobject_cast<UndoStack *>(stack);
-            return ret;
-        }
-    }
-
-    return nullptr;
-}
-
 QFontDatabase &Application::fontDatabase()
 {
     static QFontDatabase theGlobalFontDatabase;
@@ -653,39 +635,17 @@ bool Application::notify(QObject *object, QEvent *event)
     if (event->type() == QEvent::DeferredDelete)
         return QtApplicationClass::notify(object, event);
 
+#ifdef ENABLE_CRASHPAD_CRASH_TEST
     if (event->type() == QEvent::KeyPress) {
         QKeyEvent *ke = static_cast<QKeyEvent *>(event);
 
-#ifdef ENABLE_CRASHPAD_CRASH_TEST
         if (ke->modifiers() & Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier
             && ke->key() == Qt::Key_R) {
             CrashpadModule::crash();
             return true;
         }
-#endif
-
-        if (ke->modifiers() & Qt::ControlModifier && ke->key() == Qt::Key_M) {
-            emit minimizeWindowRequest();
-            return true;
-        }
-
-        if (ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Z) {
-            if (!UndoHandler::handleUndo())
-                m_undoGroup->undo();
-            return true;
-        }
-
-        if ((ke->modifiers() == Qt::ControlModifier && ke->key() == Qt::Key_Y)
-#ifdef Q_OS_MAC
-            || (ke->modifiers() & Qt::ControlModifier && ke->modifiers() & Qt::ShiftModifier
-                && ke->key() == Qt::Key_Z)
-#endif
-        ) {
-            if (!UndoHandler::handleRedo())
-                m_undoGroup->redo();
-            return true;
-        }
     }
+#endif
 
     const bool ret = QtApplicationClass::notify(object, event);
 

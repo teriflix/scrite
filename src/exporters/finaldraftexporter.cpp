@@ -162,7 +162,7 @@ bool FinalDraftExporter::doExport(QIODevice *device)
                 }
 
                 if (m_markLanguagesExplicitly) {
-                    const QMetaEnum scriptEnum = QMetaEnum::fromType<Language::CharScript>();
+                    const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
                     QChar::Script script =
                             (QChar::Script)format.format.property(QTextFormat::UserProperty)
                                     .toInt();

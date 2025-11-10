@@ -151,13 +151,18 @@ TextField {
         }
     }
 
-    UndoHandler {
-        enabled: undoRedoEnabled && !root.readOnly && root.activeFocus
-        canUndo: root.canUndo
-        canRedo: root.canRedo
+    ActionHandler {
+        action: ActionHub.editOptions.find("undo")
+        enabled: root.undoRedoEnabled && !root.readOnly && root.activeFocus && root.canUndo
 
-        onUndoRequest: root.undo()
-        onRedoRequest: root.redo()
+        onTriggered: (source) => { root.undo() }
+    }
+
+    ActionHandler {
+        action: ActionHub.editOptions.find("redo")
+        enabled: root.undoRedoEnabled && !root.readOnly && root.activeFocus && root.canRedo
+
+        onTriggered: (source) => { root.redo() }
     }
 
     SpecialSymbolsSupport {

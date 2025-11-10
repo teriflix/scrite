@@ -34,7 +34,6 @@ VclMenu {
     }
 
     onAboutToShow: {
-        Runtime.undoStack.sceneListPanelActive = true
         if(element.selected) {
             Scrite.document.screenplay.gatherSelectedScenes(sceneGroup)
         } else {
@@ -100,7 +99,6 @@ VclMenu {
         scene: root.element ? root.element.scene : null
         enabled: !Scrite.document.readOnly && !omitIncludeMenuItem.omitted
         onTriggered: {
-            Runtime.undoStack.sceneListPanelActive = true
             for(var i=0; i<sceneGroup.sceneCount; i++) {
                 sceneGroup.sceneAt(i).type = scene.type
             }

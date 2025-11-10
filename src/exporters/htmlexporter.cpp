@@ -115,7 +115,7 @@ bool HtmlExporter::doExport(QIODevice *device)
 
         return ret;
     }();
-    const QMetaEnum scriptEnum = QMetaEnum::fromType<Language::CharScript>();
+    const QMetaEnum scriptEnum = QMetaEnum::fromType<QtChar::Script>();
     const QMetaEnum elementTypeEnum = QMetaEnum::fromType<SceneElement::Type>();
 
     const QString fontsDir = QFileInfo(this->fileName()).absolutePath() + "/fonts";

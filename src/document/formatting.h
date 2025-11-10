@@ -839,53 +839,65 @@ private:
     friend class SpellCheckService;
     friend class ForceCursorPositionHack;
     friend class SceneDocumentBlockUserData;
-    qreal m_textWidth = 0;
-    int m_cursorPosition = -1;
-    int m_selectionEndPosition = -1;
-    int m_selectionStartPosition = -1;
-    bool m_applyTextFormat = false;
-    bool m_acceptTextFormatChanges = true;
-    bool m_pastingContent = false;
-    int m_documentLoadCount = 0;
-    TextFormat *m_textFormat = new TextFormat(this);
-    bool m_sceneIsBeingReset = false;
-    bool m_sceneIsBeingRefreshed = false;
-    bool m_sceneElementTaskIsRunning = false;
-    bool m_forceSyncDocument = false;
-    bool m_spellCheckEnabled = true;
-    bool m_applyLanguageFonts = false;
-    QString m_completionPrefix;
+
     int m_completionPrefixEnd = -1;
     int m_completionPrefixStart = -1;
-    CompletionMode m_completionMode = NoCompletionMode;
-    bool m_initializingDocument = false;
-    QStringList m_shots;
-    QStringList m_transitions;
-    QStringList m_characterNames;
-    bool m_liveSpellCheckEnabled = true;
+    int m_currentElementCursorPosition = -1;
+    int m_cursorPosition = -1;
+    int m_documentLoadCount = 0;
+    int m_selectionEndPosition = -1;
+    int m_selectionStartPosition = -1;
+
+    bool m_acceptTextFormatChanges = true;
+    bool m_applyFormattingEvenInTransaction = false;
+    bool m_applyLanguageFonts = false;
+    bool m_applyNextCharFormat = false;
+    bool m_applyTextFormat = false;
     bool m_autoCapitalizeSentences = true;
     bool m_autoPolishParagraphs = true;
-    QObjectProperty<Scene> m_scene;
-    bool m_applyNextCharFormat = false;
-    QTextCharFormat m_nextCharFormat;
-    ExecLaterTimer m_rehighlightTimer;
-    QStringList m_autoCompleteHints;
-    QStringList m_priorityAutoCompleteHints;
-    QStringList m_spellingSuggestions;
-    int m_currentElementCursorPosition = -1;
+    bool m_forceSyncDocument = false;
+    bool m_initializingDocument = false;
+    bool m_liveSpellCheckEnabled = true;
+    bool m_pastingContent = false;
+    bool m_sceneElementTaskIsRunning = false;
+    bool m_sceneIsBeingRefreshed = false;
+    bool m_sceneIsBeingReset = false;
+    bool m_spellCheckEnabled = true;
     bool m_wordUnderCursorIsMisspelled = false;
-    ExecLaterTimer m_initializeDocumentTimer;
-    ExecLaterTimer m_sceneElementTaskTimer;
+
+    qreal m_textWidth = 0;
+
+    QString m_completionPrefix;
+
+    QStringList m_autoCompleteHints;
+    QStringList m_characterNames;
+    QStringList m_priorityAutoCompleteHints;
+    QStringList m_shots;
+    QStringList m_spellingSuggestions;
+    QStringList m_transitions;
+
+    CompletionMode m_completionMode = NoCompletionMode;
+
+    SceneElement::Type m_autoCompleteHintsFor = SceneElement::Action;
+
     ExecLaterTimer m_applyBlockFormatTimer;
-    QList<SceneElement::Type> m_tabHistory;
-    bool m_applyFormattingEvenInTransaction = false;
+    ExecLaterTimer m_initializeDocumentTimer;
+    ExecLaterTimer m_rehighlightTimer;
+    ExecLaterTimer m_sceneElementTaskTimer;
+
+    QTextCharFormat m_nextCharFormat;
+
     QList<QTextBlock> m_applyBlockFormatQueue;
     QList<QTextBlock> m_rehighlightBlockQueue;
-    QObjectProperty<SceneElement> m_currentElement;
+    QList<SceneElement::Type> m_tabHistory;
+
     QObjectProperty<QQuickTextDocument> m_textDocument;
-    QObjectProperty<ScreenplayFormat> m_screenplayFormat;
+    QObjectProperty<Scene> m_scene;
+    QObjectProperty<SceneElement> m_currentElement;
     QObjectProperty<ScreenplayElement> m_screenplayElement;
-    SceneElement::Type m_autoCompleteHintsFor = SceneElement::Action;
+    QObjectProperty<ScreenplayFormat> m_screenplayFormat;
+
+    TextFormat *m_textFormat = new TextFormat(this);
 };
 
 #endif // FORMATTING_H

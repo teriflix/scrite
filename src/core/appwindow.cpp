@@ -15,8 +15,8 @@
 #include "scrite.h"
 #include "appwindow.h"
 #include "callgraph.h"
-#include "automation.h"
 #include "application.h"
+#include "actionmanager.h"
 #include "scritedocument.h"
 #include "languageengine.h"
 #include "colorimageprovider.h"
@@ -76,25 +76,22 @@ AppWindow::AppWindow()
     // If supplied in args, load the file-name
     this->initializeFileNameToOpen();
 
-    // Other inits
-    this->setResizeMode(QQuickView::SizeRootObjectToView);
-    // this->setTextRenderType(QQuickView::NativeTextRendering);
-    Automation::init(this);
-
-    // Register image providers
-    this->engine()->addImageProvider(QStringLiteral("color"), new ColorImageProvider);
-    this->engine()->addImageProvider(QStringLiteral("fileIcon"), new BasicFileIconProvider);
-
     // Force registration of QML types in io.scrite.components
     extern void qml_register_types_io_scrite_components();
     qml_register_types_io_scrite_components();
 
-    // Register singletons
-    const char *uri = "io.scrite.models";
-    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "Model",
-                                                   "Base type of models (QAbstractItemModel)");
-    qmlRegisterUncreatableType<QFontDatabase>(uri, 1, 0, "FontDatabase",
-                                              "Refers to a QFontDatabase instance.");
+    // Other inits
+    this->setResizeMode(QQuickView::SizeRootObjectToView);
+    // this->setTextRenderType(QQuickView::NativeTextRendering);
+
+    // Init modules
+    static const char *uri = "io.scrite.components";
+    UndoHub::init(uri, this->engine());
+    LanguageEngine::init(uri, this->engine());
+
+    // Register image providers
+    this->engine()->addImageProvider(ColorImageProvider::name(), new ColorImageProvider);
+    this->engine()->addImageProvider(BasicFileIconProvider::name(), new BasicFileIconProvider);
 
     const bool useNativeTextRendering = [=]() -> bool {
 #ifdef Q_OS_WIN
@@ -110,8 +107,6 @@ AppWindow::AppWindow()
     setTextRenderType(useNativeTextRendering ? NativeTextRendering : QtTextRendering);
 
     m_defaultWindowFlags = this->flags();
-
-    LanguageEngine::init("io.scrite.components", this->engine());
 
     this->setMinimumSize(QSize(1366, 700));
 }

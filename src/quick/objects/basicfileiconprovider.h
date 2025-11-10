@@ -35,10 +35,12 @@
 class BasicFileIconProvider : public QQuickImageProvider
 {
 public:
+    static QString name();
+
     explicit BasicFileIconProvider();
     ~BasicFileIconProvider();
 
-           // QQuickImageProvider interface
+    // QQuickImageProvider interface
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 
     static QImage requestImage(const QFileInfo &fi);

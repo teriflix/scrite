@@ -133,12 +133,18 @@ Flickable {
             enabled: !Scrite.document.readOnly
         }
 
-        UndoHandler {
-            enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled
-            canUndo: _textArea.canUndo
-            canRedo: _textArea.canRedo
-            onUndoRequest: _textArea.undo()
-            onRedoRequest: _textArea.redo()
+        ActionHandler {
+            action: ActionHub.editOptions.find("undo")
+            enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canRedo
+
+            onTriggered: (source) => { _textArea.undo() }
+        }
+
+        ActionHandler {
+            action: ActionHub.editOptions.find("redo")
+            enabled: !_textArea.readOnly && _textArea.activeFocus && root.undoRedoEnabled && _textArea.canRedo
+
+            onTriggered: (source) => { _textArea.redo() }
         }
 
         TextAreaSpellingSuggestionsMenu { }

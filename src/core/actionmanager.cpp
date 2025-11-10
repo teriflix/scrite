@@ -79,16 +79,6 @@ ActionManagerAttached *ActionManager::qmlAttachedProperties(QObject *object)
     return new ActionManagerAttached(object);
 }
 
-QString ActionManager::shortcut(int k1, int k2, int k3, int k4)
-{
-    return keySequence(k1, k2, k3, k4).toString();
-}
-
-QKeySequence ActionManager::keySequence(int k1, int k2, int k3, int k4)
-{
-    return QKeySequence(k1, k2, k3, k4);
-}
-
 ActionManager *ActionManager::findManager(QObject *action)
 {
     if (action == nullptr)
@@ -530,19 +520,14 @@ void ActionManagerAttached::setTarget(ActionManager *val)
     emit targetChanged();
 }
 
-QString ActionManagerAttached::shortcut(int k1, int k2, int k3, int k4)
-{
-    return ActionManager::shortcut(k1, k2, k3, k4);
-}
-
-QKeySequence ActionManagerAttached::keySequence(int k1, int k2, int k3, int k4)
-{
-    return ActionManager::keySequence(k1, k2, k3, k4);
-}
-
 ActionManager *ActionManagerAttached::find(const QString &name) const
 {
     return ::findActionManager(name);
+}
+
+QObject *ActionManagerAttached::findActionForShortcut(const QString &shortcut) const
+{
+    return ActionManager::findActionForShortcut(shortcut);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -742,8 +727,10 @@ bool ActionHandlerAttached::triggerAll()
     return !handlers.isEmpty();
 }
 
-void ActionHandlerAttached::onHandlerAvailabilityChanged(QObject *action)
+void ActionHandlerAttached::onHandlerAvailabilityChanged(QObject *action, ActionHandler *handler)
 {
+    Q_UNUSED(handler);
+
     if (m_action == action)
         emit canHandleChanged();
 }
@@ -771,8 +758,9 @@ ActionHandler *ActionHandlers::findFirst(QObject *object, bool enabledOnly) cons
     auto it = std::find_if(m_actionHandlers.constBegin(), m_actionHandlers.constEnd(),
                            [object, enabledOnly](ActionHandler *handler) {
                                return handler->action() == object
-                                       && (enabledOnly ? handler->isEnabled() : true);
+                                       && (!enabledOnly || handler->isEnabled());
                            });
+
     if (it != m_actionHandlers.end())
         return *it;
 
@@ -788,8 +776,7 @@ QList<ActionHandler *> ActionHandlers::findAll(QObject *object, bool enabledOnly
 
     std::copy_if(m_actionHandlers.constBegin(), m_actionHandlers.constEnd(),
                  std::back_inserter(ret), [object, enabledOnly](ActionHandler *handler) {
-                     return handler->action() == object
-                             && (enabledOnly ? handler->isEnabled() : true);
+                     return handler->action() == object && (!enabledOnly || handler->isEnabled());
                  });
 
     return ret;
@@ -856,9 +843,8 @@ void ActionHandlers::notifyHandlerAvailability()
         return;
 
     ActionHandler *handler = qobject_cast<ActionHandler *>(this->sender());
-    if (handler && handler->action()) {
+    if (handler && handler->action())
         emit handlerAvailabilityChanged(handler->action(), handler);
-    }
 }
 
 void ActionHandlers::onHandlerPriorityChanged()
@@ -898,7 +884,7 @@ void ActionHandlers::onHanlderActionAboutToChange()
         // clang-format off
         QMetaObject::invokeMethod(this, "handlerAvailabilityChanged",
                                   Qt::QueuedConnection,
-                                  Q_ARG(QObject*, oldAction));
+                                  Q_ARG(QObject*, oldAction), Q_ARG(ActionHandler*, nullptr));
         // clang-format on
     }
 }

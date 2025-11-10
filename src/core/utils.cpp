@@ -227,6 +227,26 @@ QImage Utils::Gui::emptyQImage()
     return QImage();
 }
 
+QString Utils::Gui::shortcut(int k1, int k2, int k3, int k4)
+{
+    return keySequence(k1, k2, k3, k4).toString();
+}
+
+QKeySequence Utils::Gui::keySequence(int k1, int k2, int k3, int k4)
+{
+    return QKeySequence(k1, k2, k3, k4);
+}
+
+QString Utils::Gui::standardShortcut(int standardKey)
+{
+    return QKeySequence(QKeySequence::StandardKey(standardKey)).toString();
+}
+
+QKeySequence Utils::Gui::standardKeySequence(int standardKey)
+{
+    return QKeySequence(QKeySequence::StandardKey(standardKey));
+}
+
 /**
  * \brief Converts a portable shortcut string to native format.
  * \param shortcut The shortcut string in portable format.
@@ -1347,16 +1367,17 @@ QList<QColor> Utils::SceneColors::paletteForVersion(const QVersionNumber &versio
 {
     // Up-until version 0.2.17 Beta
     if (!version.isNull() && version <= QVersionNumber(0, 2, 17))
-        return QList<QColor>() << QColor("blue") << QColor("magenta") << QColor("darkgreen")
-                               << QColor("purple") << QColor("yellow") << QColor("orange")
-                               << QColor("red") << QColor("brown") << QColor("gray")
-                               << QColor("white");
+        return QList<QColor>() << QColor(Qt::blue) << QColor(Qt::magenta) << QColor(Qt::darkGreen)
+                               << QColor(128, 0, 128 /* purple */) << QColor(Qt::yellow)
+                               << QColor(255, 165, 0 /* orange */) << QColor(Qt::red)
+                               << QColor(165, 42, 42 /* brown */) << QColor(Qt::gray)
+                               << QColor(Qt::white);
 
     // New set of colors
-    return QList<QColor>() << QColor("#2196f3") << QColor("#e91e63") << QColor("#009688")
-                           << QColor("#9c27b0") << QColor("#ffeb3b") << QColor("#ff9800")
-                           << QColor("#f44336") << QColor("#795548") << QColor("#9e9e9e")
-                           << QColor("#fafafa") << QColor("#3f51b5") << QColor("#cddc39");
+    return QList<QColor>() << QColor(33, 150, 243) << QColor(233, 30, 99) << QColor(0, 150, 136)
+                           << QColor(156, 39, 176) << QColor(255, 235, 59) << QColor(255, 152, 0)
+                           << QColor(244, 67, 54) << QColor(121, 85, 72) << QColor(158, 158, 158)
+                           << QColor(250, 250, 250) << QColor(63, 81, 181) << QColor(205, 220, 57);
 }
 
 /**

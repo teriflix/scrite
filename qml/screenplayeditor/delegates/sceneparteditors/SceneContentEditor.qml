@@ -71,20 +71,12 @@ AbstractScenePartEditor {
         id: _sceneTextEditor
 
         property bool hasSelection: selectionStart >= 0 && selectionEnd >= 0 && selectionEnd > selectionStart
-        property bool userIsTyping: false
 
         signal highlightCursor()
 
+        Keys.onPressed: (event) => { _private.handleSceneTextEditorKeyPressed(event) }
         Keys.onUpPressed: (event) => { _private.handleSceneTextEditorKeyUpPressed(event) }
         Keys.onDownPressed: (event) => { _private.handleSceneTextEditorKeyDownPressed(event) }
-
-        EventFilter.target: Scrite.app
-        EventFilter.active: activeFocus
-        EventFilter.events: [EventFilter.KeyPress] // Wheel, ShortcutOverride
-        EventFilter.onFilter: (object, event, result) => {
-                                  if(activeFocus)
-                                    _private.handleSceneTextEditorFilteredEvent(object, event, result)
-                              }
 
         LanguageTransliterator.popup: LanguageTransliteratorPopup {
             editorFont: _sceneTextEditor.font
@@ -477,6 +469,19 @@ AbstractScenePartEditor {
         property int currentParagraphType: _sceneTextEditor.activeFocus ? (currentElement ? currentElement.type : SceneElement.Action) : -1
         property SceneElement currentElement: _sceneTextEditor.activeFocus ? _sceneDocumentBinder.currentElement : null
 
+        function handleSceneTextEditorKeyPressed(event) {
+            event.accepted = false
+
+            const shortcut = Gui.shortcut(event.modifiers + event.key)
+            const action = ActionHub.editOptions.findByShortcut(shortcut)
+            if(action) {
+                if(action.enabled) {
+                    action.trigger()
+                    event.accepted = true
+                }
+            }
+        }
+
         function handleSceneTextEditorKeyUpPressed(event) {
             if(_sceneTextEditor.hasSelection) {
                 event.accepted = _sceneTextEditor.cursorPosition === 0
@@ -508,14 +513,6 @@ AbstractScenePartEditor {
                     _sceneTextEditor.focus = false
                     scrollNextScene.trigger()
                 }
-            }
-        }
-
-        function handleSceneTextEditorFilteredEvent(object, event, result) {
-            if(object === _sceneTextEditor) {
-                // Enter, Tab and other keys must not trigger Transliteration. Only space should.
-                _sceneTextEditor.userIsTyping = event.hasText
-                result.filter = event.controlModifier && (event.key === Qt.Key_Z || event.key === Qt.Key_Y)
             }
         }
 
@@ -590,13 +587,11 @@ AbstractScenePartEditor {
 
         function acceptCompletionSuggestion(suggestion) {
             if(suggestion !== "") {
-                _sceneTextEditor.userIsTyping = false
                 if(_sceneDocumentBinder.hasCompletionPrefixBoundary)
                     _sceneTextEditor.remove(_sceneDocumentBinder.completionPrefixStart, _sceneDocumentBinder.completionPrefixEnd)
                 else
                     _sceneTextEditor.remove(_sceneDocumentBinder.currentBlockPosition(), _sceneTextEditor.cursorPosition)
                 _sceneTextEditor.insert(_sceneTextEditor.cursorPosition, suggestion)
-                _sceneTextEditor.userIsTyping = true
                 return true
             }
 

@@ -9,7 +9,6 @@ DEFINES += PHTRANSLATE_STATICLIB
 VERSION = 1.9.0
 DEFINES += SCRITE_VERSION=\\\"$$VERSION\\\"
 
-#DEFINES += SCRITE_ENABLE_AUTOMATION
 #QT += testlib
 
 CONFIG += qmltypes
@@ -35,7 +34,6 @@ INCLUDEPATH += ../apikeys ../profilingtools . \
         ./src/document \
         ./src/interfaces \
         ./src/reports \
-        ./src/automation
         ./src/restapikey
 
 HEADERS += \
@@ -51,12 +49,6 @@ HEADERS += \
     3rdparty/poly2tri/sweep/cdt.h \
     3rdparty/poly2tri/sweep/sweep.h \
     3rdparty/poly2tri/sweep/sweep_context.h \
-    src/automation/automation.h \
-    src/automation/automationrecorder.h \
-    src/automation/eventautomationstep.h \
-    src/automation/pausestep.h \
-    src/automation/scriptautomationstep.h \
-    src/automation/windowcapture.h \
     src/core/actionmanager.h \
     src/core/appwindow.h \
     src/core/enumerationmodel.h \
@@ -188,13 +180,6 @@ SOURCES += \
     3rdparty/poly2tri/sweep/cdt.cc \
     3rdparty/poly2tri/sweep/sweep.cc \
     3rdparty/poly2tri/sweep/sweep_context.cc \
-    src/automation/automation.cpp \
-    src/automation/automation_module.cpp \
-    src/automation/automationrecorder.cpp \
-    src/automation/eventautomationstep.cpp \
-    src/automation/pausestep.cpp \
-    src/automation/scriptautomationstep.cpp \
-    src/automation/windowcapture.cpp \
     src/core/actionmanager.cpp \
     src/core/application_build_timestamp.cpp \
     src/core/appwindow.cpp \

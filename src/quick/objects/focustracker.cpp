@@ -209,3 +209,26 @@ void FocusTracker::evaluateHasFocus()
 
     this->setHasFocus(false);
 }
+
+bool FocusInspector::hasFocus(QQuickItem *item)
+{
+    if (item == nullptr)
+        return false;
+
+    QQuickWindow *window = item->window();
+    if (window == nullptr)
+        return false;
+
+    QQuickItem *focussedItem = window->activeFocusItem();
+    if (focussedItem == nullptr)
+        return false;
+
+    while (focussedItem != nullptr) {
+        if (focussedItem == item)
+            return true;
+
+        focussedItem = focussedItem->parentItem();
+    }
+
+    return false;
+}

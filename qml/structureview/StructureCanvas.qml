@@ -89,10 +89,6 @@ GridBackground {
         return _elementLayer.elementItemAt(index)
     }
 
-    FocusTracker.window: Scrite.window
-    FocusTracker.indicator.target: Runtime.undoStack
-    FocusTracker.indicator.property: "structureEditorActive"
-
     EventFilter.events: [EventFilter.DragEnter, EventFilter.DragMove, EventFilter.Drop]
     EventFilter.onFilter: (object, event, result) => {
                               _private.filterEvent(event, result)

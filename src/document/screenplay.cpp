@@ -1311,8 +1311,8 @@ void Screenplay::moveSelectedElements(int toRow)
         emit this->requestEditorAt(toRow);
     });
 
-    if (UndoStack::active())
-        UndoStack::active()->push(cmd);
+    if (UndoHub::active())
+        UndoHub::active()->push(cmd);
     else
         delete cmd;
 }
@@ -1474,8 +1474,8 @@ void Screenplay::removeSelectedElements()
     for (ScreenplayElement *element : qAsConst(selectedElements))
         this->removeElement(element);
 
-    if (UndoStack::active())
-        UndoStack::active()->push(cmd);
+    if (UndoHub::active())
+        UndoHub::active()->push(cmd);
     else
         delete cmd;
 
@@ -1664,8 +1664,8 @@ void Screenplay::clearElements()
     this->evaluateSceneNumbersLater();
     this->validateCurrentElementIndex();
 
-    if (UndoStack::active())
-        UndoStack::active()->push(new UndoClearScreenplayCommand(this, sceneIds));
+    if (UndoHub::active())
+        UndoHub::active()->push(new UndoClearScreenplayCommand(this, sceneIds));
 
     if (info)
         info->unlock();
@@ -1741,12 +1741,12 @@ void SplitElementUndoCommand::commit(Scene *splitScene)
     m_splitSceneID = splitScene->id();
     m_splitScenesData[0] = m_screenplayElement->scene()->toByteArray();
     m_splitScenesData[1] = splitScene->toByteArray();
-    UndoStack::active()->push(this);
+    UndoHub::active()->push(this);
 }
 
 void SplitElementUndoCommand::undo()
 {
-    QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+    QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
 
     QPair<StructureElement *, StructureElement *> pair = this->findStructureElements();
     if (pair.first == nullptr || pair.second == nullptr) {
@@ -1793,7 +1793,7 @@ void SplitElementUndoCommand::redo()
         return;
     }
 
-    QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+    QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
 
     QPair<StructureElement *, StructureElement *> pair = this->findStructureElements();
     if (pair.first == nullptr || pair.second != nullptr) {
@@ -1903,7 +1903,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
     QScopedPointer<SplitElementUndoCommand> undoCommand(new SplitElementUndoCommand(ptr));
 
     {
-        QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+        QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
 
         if (ptr == nullptr)
             return ret;
@@ -1948,7 +1948,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
         ptr->setHeightHint(0);
     }
 
-    if (ret != nullptr && UndoStack::active() != nullptr) {
+    if (ret != nullptr && UndoHub::active() != nullptr) {
         undoCommand->commit(ret->scene());
         undoCommand.take();
     }
@@ -1959,7 +1959,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
 ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *element)
 {
     /* We dont capture undo for this action, because user can always split scene once again */
-    QScopedValueRollback<bool> undoLock(UndoStack::ignoreUndoCommands, true);
+    QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
     Screenplay *screenplay = this;
 
     if (element == nullptr || element->scene() == nullptr)
@@ -2935,8 +2935,8 @@ void Screenplay::pasteAfter(int index)
     if (cmd == nullptr)
         return;
 
-    if (UndoStack::active()) {
-        UndoStack::active()->push(cmd);
+    if (UndoHub::active()) {
+        UndoHub::active()->push(cmd);
     } else {
         cmd->redo();
         delete cmd;

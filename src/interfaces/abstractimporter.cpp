@@ -107,7 +107,7 @@ bool AbstractImporter::read()
     this->progress()->setProgressText(QString("Importing from \"%1\"").arg(classInfo.value()));
 
     this->progress()->start();
-    UndoStack::ignoreUndoCommands = true;
+    UndoHub::enabled = true;
     const bool ret = this->doImport(&file);
     if (ret) {
         for (int i = 0; i < structure->elementCount(); i++) {
@@ -117,8 +117,8 @@ bool AbstractImporter::read()
         }
     }
     screenplay->setCurrentElementIndex(0);
-    UndoStack::ignoreUndoCommands = false;
-    UndoStack::clearAllStacks();
+    UndoHub::enabled = false;
+    UndoHub::clearAllStacks();
     this->progress()->finish();
 
     return ret;

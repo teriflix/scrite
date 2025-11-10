@@ -16,6 +16,8 @@
 #include <QtMath>
 #include <QPainter>
 
+QString ColorImageProvider::name() { return QStringLiteral("color"); }
+
 ColorImageProvider::ColorImageProvider() : QQuickImageProvider(QQuickImageProvider::Image) { }
 
 ColorImageProvider::~ColorImageProvider() { }

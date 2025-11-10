@@ -608,14 +608,6 @@ ListView {
             scrollIntoView(pidx)
         }
 
-        onHasFocusChanged: {
-            if(root.screenplayAdapter.isSourceScreenplay)
-                Runtime.undoStack.screenplayEditorActive = hasFocus
-            else
-                Runtime.undoStack.sceneEditorActive = hasFocus
-        }
-
-
         onLastItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderCursorCurrent()
         onFirstItemIndexChanged: if(scrolling || root.flicking) scheduleMakeItemUnderCursorCurrent()
     }

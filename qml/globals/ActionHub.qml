@@ -97,7 +97,7 @@ Item {
         objectName: "fileOperations"
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+O"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Open)
 
             enabled: Runtime.allowAppUsage
             objectName: "fileOpen"
@@ -111,7 +111,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Ctrl+N"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.New)
 
             enabled: Runtime.allowAppUsage
             objectName: "fileNew"
@@ -146,7 +146,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+S"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Save)
 
             enabled: Runtime.allowAppUsage && (Scrite.document.modified || Scrite.document.fileName === "") && !Scrite.document.readOnly
             objectName: "fileSave"
@@ -178,7 +178,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: "Ctrl+P"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Print)
 
             text: "Export To PDF"
             enabled: Runtime.allowAppUsage
@@ -452,7 +452,7 @@ Item {
         objectName: "editOptions"
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+F"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Find)
 
             enabled: ActionHandler.canHandle
             objectName: "find"
@@ -463,7 +463,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+Shift+F"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Replace)
             readonly property bool visible: false
 
             enabled: ActionHandler.canHandle
@@ -479,7 +479,7 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "selectAll"
-            shortcut: "Ctrl+A"
+            shortcut: Gui.standardShortcut(StandardKey.SelectAll)
             text: "Select All"
         }
 
@@ -488,7 +488,7 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "cut"
-            shortcut: "Ctrl+X"
+            shortcut: Gui.standardShortcut(StandardKey.Cut)
             text: "Cut"
         }
 
@@ -497,7 +497,7 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "copy"
-            shortcut: "Ctrl+C"
+            shortcut: Gui.standardShortcut(StandardKey.Copy)
             text: "Copy"
 
             icon.source: "qrc:/icons/content/content_copy.png"
@@ -508,7 +508,7 @@ Item {
 
             enabled: ActionHandler.canHandle
             objectName: "paste"
-            shortcut: "Ctrl+V"
+            shortcut: Gui.standardShortcut(StandardKey.Paste)
             text: "Paste"
 
             icon.source: "qrc:/icons/content/content_paste.png"
@@ -517,27 +517,39 @@ Item {
         Action {
             property bool visible: ActionHandler.canHandle
 
-            enabled: ActionHandler.canHandle
+            enabled: true
             objectName: "undo"
-            shortcut: "Ctrl+Z"
+            shortcut: Gui.standardShortcut(StandardKey.Undo)
             text: "Undo"
 
             icon.source: "qrc:/icons/content/undo.png"
+
+            onTriggered: (source) => {
+                if(!ActionHandler.canHandle) {
+                    UndoHub.undo()
+                }
+            }
         }
 
         Action {
             property bool visible: ActionHandler.canHandle
 
-            enabled: ActionHandler.canHandle
+            enabled: true
             objectName: "redo"
-            shortcut: Platform.isWindowsDesktop ? "Ctrl+Y" : "Ctrl+Shift+Z"
+            shortcut: Gui.standardShortcut(StandardKey.Redo)
             text: "Redo"
 
             icon.source: "qrc:/icons/content/redo.png"
+
+            onTriggered: (source) => {
+                if(!ActionHandler.canHandle) {
+                    UndoHub.redo()
+                }
+            }
         }
 
         Action {
-            readonly property string defaultShortcut: "F5"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Refresh)
 
             enabled: ActionHandler.canHandle
             objectName: "reload"
@@ -631,7 +643,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_Home)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+," : Gui.shortcut(Qt.AltModifier+Qt.Key_Home)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpFirstScene"
@@ -641,7 +653,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_End)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Ctrl+Alt+." : Gui.shortcut(Qt.AltModifier+Qt.Key_End)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpLastScene"
@@ -651,7 +663,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut:Platform.isMacOSDesktop ?  "Alt+," : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageUp)
+            readonly property string defaultShortcut:Platform.isMacOSDesktop ?  "Alt+," : Gui.shortcut(Qt.AltModifier+Qt.Key_PageUp)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpPreviousScene"
@@ -661,7 +673,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+." : ActionManager.shortcut(Qt.AltModifier+Qt.Key_PageDown)
+            readonly property string defaultShortcut: Platform.isMacOSDesktop ? "Alt+." : Gui.shortcut(Qt.AltModifier+Qt.Key_PageDown)
 
             enabled: ActionHandler.canHandle
             objectName: "jumpNextScene"
@@ -717,7 +729,7 @@ Item {
         objectName: "markupTools"
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+B"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Bold)
 
             checkable: true
             checked: _private.textFormat ? _private.textFormat.bold : false
@@ -732,7 +744,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+I"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Italic)
 
             enabled: _private.textFormat && Runtime.allowAppUsage
             shortcut: defaultShortcut
@@ -747,7 +759,7 @@ Item {
         }
 
         Action {
-            readonly property string defaultShortcut: "Ctrl+U"
+            readonly property string defaultShortcut: Gui.standardShortcut(StandardKey.Underline)
 
             enabled: _private.textFormat && Runtime.allowAppUsage
             shortcut: defaultShortcut
@@ -1394,7 +1406,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Toggle media playback"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Space)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Space)
 
             checkable: true
             enabled: ActionHandler.canHandle
@@ -1407,7 +1419,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Rewind 10 seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Left)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.Key_Left)
 
             enabled: ActionHandler.canHandle
             objectName: "rewind10"
@@ -1419,7 +1431,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Rewind one second"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Left)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Left)
 
             enabled: ActionHandler.canHandle
             objectName: "rewind1"
@@ -1431,7 +1443,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Forward one second"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Right)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Right)
 
             enabled: ActionHandler.canHandle
             objectName: "forward1"
@@ -1443,7 +1455,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Forward ten seconds"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Right)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.Key_Right)
 
             enabled: ActionHandler.canHandle
             objectName: "forward10"
@@ -1455,7 +1467,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Previous Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Up)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousScene"
@@ -1467,7 +1479,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Next Scene"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Down)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextScene"
@@ -1479,7 +1491,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Up)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "scrollUp"
@@ -1489,7 +1501,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Down)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "scrollDown"
@@ -1499,7 +1511,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.AltModifier+Qt.Key_Up)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.AltModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousPage"
@@ -1509,7 +1521,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.AltModifier+Qt.Key_Down)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.AltModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextPage"
@@ -1519,7 +1531,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ShiftModifier+Qt.Key_Up)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ShiftModifier+Qt.Key_Up)
 
             enabled: ActionHandler.canHandle
             objectName: "previousScreen"
@@ -1529,7 +1541,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ShiftModifier+Qt.Key_Down)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ShiftModifier+Qt.Key_Down)
 
             enabled: ActionHandler.canHandle
             objectName: "nextScreen"
@@ -1539,7 +1551,7 @@ Item {
 
         Action {
             readonly property string tooltip: "Use video time as current scene time offset"
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Greater)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Greater)
 
             enabled: ActionHandler.canHandle
             objectName: "syncTime"
@@ -1551,7 +1563,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Greater)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Greater)
 
             enabled: ActionHandler.canHandle
             objectName: "noteOffset"
@@ -1561,7 +1573,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.ControlModifier+Qt.Key_Greater)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.ControlModifier+Qt.Key_Greater)
 
             enabled: ActionHandler.canHandle
             objectName: "adjustOffsets"
@@ -1657,7 +1669,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceLeft)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_BraceLeft)
 
             enabled: ActionHandler.canHandle
             objectName: "decreaseVideoHeight"
@@ -1667,7 +1679,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_BraceRight)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_BraceRight)
 
             enabled: ActionHandler.canHandle
             objectName: "increaseVideoHeight"
@@ -1677,7 +1689,7 @@ Item {
 
         Action {
             readonly property bool visible: false
-            readonly property string defaultShortcut: ActionManager.shortcut(Qt.Key_Asterisk)
+            readonly property string defaultShortcut: Gui.shortcut(Qt.Key_Asterisk)
 
             enabled: ActionHandler.canHandle
             objectName: "resetVideoHeight"
@@ -1891,15 +1903,17 @@ Item {
 
             ++idx
 
-            if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab || Runtime.undoStack.screenplayEditorActive) {
+            if(Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab || FocusInspector.hasFocus(Runtime.screenplayEditor)) {
                 while(idx < Scrite.document.screenplay.elementCount) {
                     const e = Scrite.document.screenplay.elementAt(idx)
-                    if(e === null)
-                    break
-                    if(e.elementType === ScreenplayElement.BreakElementType)
-                    ++idx
-                    else
-                    break
+                    if(e === null) {
+                        break
+                    }
+                    if(e.elementType === ScreenplayElement.BreakElementType) {
+                        ++idx
+                    } else {
+                        break
+                    }
                 }
             }
 
@@ -1920,7 +1934,7 @@ Item {
             if(Scrite.document.readOnly)
                 return
 
-            Scrite.document.createNewScene(Runtime.mainWindowTab !== Runtime.MainWindowTab.ScreenplayTab ? Runtime.undoStack.screenplayEditorActive : false)
+            Scrite.document.createNewScene(Runtime.mainWindowTab !== Runtime.MainWindowTab.ScreenplayTab ? FocusInspector.hasFocus(Runtime.screenplayEditor) : false)
         }
 
         function addEpisode() {

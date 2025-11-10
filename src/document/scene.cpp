@@ -161,7 +161,7 @@ Scene *SceneUndoCommand::fromByteArray(const QByteArray &bytes) const
 class PushSceneUndoCommand
 {
     friend class SceneElement;
-    static UndoStack *allowedStack;
+    static bool enabled;
 
 public:
     PushSceneUndoCommand(Scene *scene, bool allowMerging = true);
@@ -171,25 +171,20 @@ private:
     SceneUndoCommand *m_command = nullptr;
 };
 
-UndoStack *PushSceneUndoCommand::allowedStack = nullptr;
+bool PushSceneUndoCommand::enabled = true;
 
 PushSceneUndoCommand::PushSceneUndoCommand(Scene *scene, bool allowMerging)
 {
-    if (allowedStack == nullptr)
-        allowedStack = Application::instance()->findUndoStack("MainUndoStack");
-
-    if (SceneUndoCommand::current == nullptr && allowedStack != nullptr
-        && UndoStack::active() != nullptr && UndoStack::active() == allowedStack && scene != nullptr
+    if (enabled && SceneUndoCommand::current == nullptr && UndoHub::active() && scene != nullptr
         && scene->isUndoRedoEnabled())
         m_command = new SceneUndoCommand(scene, allowMerging);
 }
 
 PushSceneUndoCommand::~PushSceneUndoCommand()
 {
-    if (m_command != nullptr && SceneUndoCommand::current == nullptr && allowedStack != nullptr
-        && UndoStack::active() != nullptr && UndoStack::active() == allowedStack)
-        UndoStack::active()->push(m_command);
-    else
+    if (enabled && m_command != nullptr && UndoHub::active()) {
+        UndoHub::active()->push(m_command);
+    } else
         delete m_command;
 }
 
@@ -449,26 +444,8 @@ void SceneElement::setType(SceneElement::Type val)
 
 QString SceneElement::typeAsString() const
 {
-    switch (m_type) {
-    case Action:
-        return "Action";
-    case Character:
-        return "Character";
-    case Dialogue:
-        return "Dialogue";
-    case Parenthetical:
-        return "Parenthetical";
-    case Shot:
-        return "Shot";
-    case Transition:
-        return "Transition";
-    case Heading:
-        return "Scene Heading";
-    default:
-        break;
-    }
-
-    return "Unknown";
+    const QMetaEnum typeEnum = QMetaEnum::fromType<SceneElement::Type>();
+    return QString::fromLatin1(typeEnum.valueToKey(m_type));
 }
 
 void SceneElement::setText(const QString &val)
@@ -661,8 +638,7 @@ bool SceneElement::polishText(Scene *previousScene)
             polishedText += closeB;
     }
 
-    QScopedValueRollback<UndoStack *> undoStackRollback(PushSceneUndoCommand::allowedStack,
-                                                        nullptr);
+    QScopedValueRollback<bool> undoStackRollback(PushSceneUndoCommand::enabled, false);
     const QString oldText = m_text;
     this->setText(polishedText);
     return oldText != m_text;

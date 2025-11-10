@@ -85,15 +85,19 @@ Item {
         url: "qrc:/richtexteditor.html"
         webChannel: _scriteWebChannel
 
-        UndoHandler {
+        ActionHandler {
+            action: ActionHub.editOptions.find("undo")
             enabled: !_webEngineView.readOnly && _scriteWebChannelObject.focus && _webEngineView.activeFocus
-            canUndo: true
-            canRedo: true
 
-            onUndoRequest: _scriteWebChannelObject.requestUndo()
-            onRedoRequest: _scriteWebChannelObject.requestRedo()
+            onTriggered: (source) => { _scriteWebChannelObject.requestUndo() }
         }
 
+        ActionHandler {
+            action: ActionHub.editOptions.find("redo")
+            enabled: !_webEngineView.readOnly && _scriteWebChannelObject.focus && _webEngineView.activeFocus
+
+            onTriggered: (source) => { _scriteWebChannelObject.requestRedo() }
+        }
 
         // Send messages to the HTML side.
         onWidthChanged: Qt.callLater(reportSizeChange)
