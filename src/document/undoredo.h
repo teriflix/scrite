@@ -45,7 +45,7 @@ public:
 
     Q_INVOKABLE static void clearAllStacks();
 
-    static bool enabled;
+    static bool blocked;
     Q_INVOKABLE static QUndoStack *active(); // This is different from QUndoGroup::activeStack(), in
                                              // that it returns nullptr, if enabled = false
 

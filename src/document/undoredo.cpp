@@ -54,11 +54,11 @@ void UndoHub::clearAllStacks()
         stack->clear();
 }
 
-bool UndoHub::enabled = true;
+bool UndoHub::blocked = false;
 
 QUndoStack *UndoHub::active()
 {
-    return UndoHub::enabled ? UndoHub::instance()->activeStack() : nullptr;
+    return UndoHub::blocked ? nullptr : UndoHub::instance()->activeStack();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

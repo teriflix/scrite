@@ -1743,7 +1743,7 @@ void SplitElementUndoCommand::commit(Scene *splitScene)
 
 void SplitElementUndoCommand::undo()
 {
-    QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
 
     QPair<StructureElement *, StructureElement *> pair = this->findStructureElements();
     if (pair.first == nullptr || pair.second == nullptr) {
@@ -1790,7 +1790,7 @@ void SplitElementUndoCommand::redo()
         return;
     }
 
-    QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
 
     QPair<StructureElement *, StructureElement *> pair = this->findStructureElements();
     if (pair.first == nullptr || pair.second != nullptr) {
@@ -1900,7 +1900,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
     QScopedPointer<SplitElementUndoCommand> undoCommand(new SplitElementUndoCommand(ptr));
 
     {
-        QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
+        QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
 
         if (ptr == nullptr)
             return ret;
@@ -1956,7 +1956,7 @@ ScreenplayElement *Screenplay::splitElement(ScreenplayElement *ptr, SceneElement
 ScreenplayElement *Screenplay::mergeElementWithPrevious(ScreenplayElement *element)
 {
     /* We dont capture undo for this action, because user can always split scene once again */
-    QScopedValueRollback<bool> undoLock(UndoHub::enabled, true);
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
     Screenplay *screenplay = this;
 
     if (element == nullptr || element->scene() == nullptr)

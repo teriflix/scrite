@@ -1229,6 +1229,7 @@ void ScriteDocument::reset()
         disconnect(m_printFormat, &ScreenplayFormat::formatChanged, this,
                    &ScriteDocument::markAsModified);
 
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
     UndoHub::clearAllStacks();
     m_docFileSystem.hardReset();
 
@@ -2347,6 +2348,9 @@ void ScriteDocument::setFileName(const QString &val)
 
 bool ScriteDocument::load(const QString &fileName, bool anonymousLoad)
 {
+    QScopedValueRollback<bool> undoLock(UndoHub::blocked, true);
+    UndoHub::clearAllStacks();
+
     m_errorReport->clear();
 
     QJsonObject details;
@@ -2489,12 +2493,9 @@ bool ScriteDocument::load(const QString &fileName, bool anonymousLoad)
 
     loadCleanup.begin();
 
-    UndoHub::enabled = true;
     const bool ret = QObjectSerializer::fromJson(json, this);
     if (m_screenplay->currentElementIndex() == 0)
         m_screenplay->setCurrentElementIndex(-1);
-    UndoHub::enabled = false;
-    UndoHub::clearAllStacks();
 
     // When we finish loading, QML begins lazy initialization of the UI
     // for displaying the document. In the process even a small 1/2 pixel
