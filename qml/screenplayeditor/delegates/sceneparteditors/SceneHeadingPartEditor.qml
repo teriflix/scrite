@@ -18,9 +18,9 @@ import QtQuick.Controls 2.15
 
 import io.scrite.components 1.0
 
-
 import "qrc:/qml/helpers"
 import "qrc:/qml/globals"
+import "qrc:/qml/dialogs"
 import "qrc:/qml/controls"
 import "qrc:/qml/structureview"
 import "qrc:/qml/screenplayeditor/delegates/sceneparteditors/helpers"
@@ -48,6 +48,8 @@ AbstractScenePartEditor {
                 spacing: 4 * root.zoomLevel
 
                 SceneTypeImage {
+                    id: _sceneTypeIcon
+
                     width: root.fontMetrics.height
                     height: root.fontMetrics.height
 
@@ -55,6 +57,8 @@ AbstractScenePartEditor {
                     sceneType: root.scene ? root.scene.type : Scene.Standard
                     showTooltip: false
                     lightBackground: Color.isLight(Qt.tint(root.scene.color, Runtime.colors.sceneHeadingTint))
+
+                    onClicked: _private.popupMarkSceneAsMenu(_sceneTypeIcon)
                 }
 
                 Image {
@@ -75,6 +79,8 @@ AbstractScenePartEditor {
                         anchors.fill: parent
 
                         hoverEnabled: enabled
+
+                        onClicked: SettingsDialog.launch("Screenplay")
                     }
                 }
             }
@@ -203,6 +209,17 @@ AbstractScenePartEditor {
         id: _private
 
         readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
+
+        property Component markSceneAsMenu: MarkSceneAsMenu {
+            scene: root.scene
+        }
+
+        function popupMarkSceneAsMenu(parent) {
+            let menu = markSceneAsMenu.createObject(root)
+            menu.closed.connect(menu.destroy)
+            menu.popup()
+            return menu
+        }
 
         property Component formalTagsMenu: StructureGroupsMenu {
             sceneGroup: SceneGroup {

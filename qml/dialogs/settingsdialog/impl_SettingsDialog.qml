@@ -26,6 +26,8 @@ import "qrc:/qml/helpers"
 VclDialog {
     id: root
 
+    property string activeTab
+
     title: "Settings"
     width: Math.min(Scrite.window.width-80, 1049)
     height: Math.min(Scrite.window.height-80, 750)
@@ -33,8 +35,20 @@ VclDialog {
     content: ColumnLayout {
         spacing: 0
 
+        Component.onCompleted: {
+            if(root.activeTab !== "") {
+                for(let i=0; i<_tabBar.count; i++) {
+                    const tab = _tabBar.itemAt(i)
+                    if(tab.text === root.activeTab) {
+                        _tabBar.currentIndex = i
+                        break
+                    }
+                }
+            }
+        }
+
         TabBar {
-            id: settingsDialogTabBar
+            id: _tabBar
 
             Layout.fillWidth: true
 
@@ -65,17 +79,16 @@ VclDialog {
             color: Runtime.colors.primary.c50.background
 
             Loader {
-                id: settingsDialogContent
                 anchors.fill: parent
 
-                property real pageListWidth: (width/settingsDialogTabBar.count)
+                property real pageListWidth: (width/_tabBar.count)
 
-                source: "./" + settingsDialogTabBar.currentItem.text + "SettingsTab.qml"
+                source: "./" + _tabBar.currentItem.text + "SettingsTab.qml"
                 onItemChanged: {
                     if(item) {
                         item.pageListWidth = Qt.binding( () => { return pageListWidth } )
 
-                        Runtime.showHelpTip("settings" + settingsDialogTabBar.currentItem.text)
+                        Runtime.showHelpTip("settings" + _tabBar.currentItem.text)
                     }
                 }
             }

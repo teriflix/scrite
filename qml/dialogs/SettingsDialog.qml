@@ -27,7 +27,7 @@ import "qrc:/qml/helpers"
 DialogLauncher {
     id: root
 
-    function launch() { return doLaunch() }
+    function launch(activeTab) { return doLaunch({"activeTab": activeTab}) }
 
     name: "SettingsDialog"
     singleInstanceOnly: true

@@ -17,9 +17,13 @@ import QtQuick.Controls 2.15
 import io.scrite.components 1.0
 
 Image {
+    id: root
+
     property int sceneType: Scene.Standard
     property bool showTooltip: true
     property bool lightBackground: true
+
+    signal clicked()
 
     ToolTip.text: {
         switch(sceneType) {
@@ -31,7 +35,7 @@ Image {
         return ""
     }
     ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
-    ToolTip.visible: _mouseArea.containsMouse
+    ToolTip.visible: _mouseArea.containsMouse && showTooltip
 
     width: 32
     height: 32
@@ -54,7 +58,10 @@ Image {
 
         anchors.fill: parent
 
-        enabled: parent.showTooltip && parent.sceneType !== Scene.Standard
+        enabled: parent.sceneType !== Scene.Standard
+        hoverEnabled: root.showTooltip
         propagateComposedEvents: true
+
+        onClicked: root.clicked()
     }
 }
