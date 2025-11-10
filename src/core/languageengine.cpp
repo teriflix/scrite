@@ -1254,70 +1254,6 @@ AbstractTransliterationEngine::~AbstractTransliterationEngine() { }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FallbackTransliterationEngine::FallbackTransliterationEngine(QObject *parent)
-    : AbstractTransliterationEngine(parent)
-{
-}
-
-FallbackTransliterationEngine::~FallbackTransliterationEngine() { }
-
-int FallbackTransliterationEngine::defaultLanguage() const
-{
-    /* Here we assume that the default platform-language doesn't change
-     * within a single session of Scrite. That's a fair assumption to make */
-    PlatformTransliterationEngine platformEngine;
-    return platformEngine.defaultLanguage();
-}
-
-QString FallbackTransliterationEngine::name() const
-{
-    return QStringLiteral("Default");
-}
-
-QList<TransliterationOption> FallbackTransliterationEngine::options(int lang) const
-{
-    const int defLang = this->defaultLanguage();
-    const QString suffix = QStringLiteral("Keyboard Layout");
-    QString optionName = suffix;
-
-    if (defLang > 0) {
-        const Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(
-                this->defaultLanguage());
-        if (language.isValid()) {
-            PlatformTransliterationEngine platformEngine;
-            const QList<TransliterationOption> platformOptions =
-                    platformEngine.options(language.code);
-            if (platformOptions.isEmpty())
-                optionName = language.name() + QStringLiteral(" - ") + suffix;
-            else
-                optionName = platformOptions.first().name + QStringLiteral(" - ") + suffix;
-        }
-    }
-
-    return { { (QObject *)this, lang, this->name(), optionName, false } };
-}
-
-bool FallbackTransliterationEngine::canActivate(const TransliterationOption &option)
-{
-    return option.transliteratorObject == this;
-}
-
-bool FallbackTransliterationEngine::activate(const TransliterationOption &option)
-{
-    Q_UNUSED(option);
-    PlatformTransliterationEngine platformEngine;
-    return platformEngine.activateDefaultLanguage() > 0;
-}
-
-QString FallbackTransliterationEngine::transliterateWord(const QString &word,
-                                                         const TransliterationOption &option) const
-{
-    Q_UNUSED(option)
-    return word;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 StaticTransliterationEngine::StaticTransliterationEngine(QObject *parent)
     : AbstractTransliterationEngine(parent)
 {
@@ -1357,6 +1293,70 @@ QString StaticTransliterationEngine::transliterateWord(const QString &word,
                                                        const TransliterationOption &option) const
 {
     return DefaultTransliteration::onWord(word, option.languageCode);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+FallbackTransliterationEngine::FallbackTransliterationEngine(
+        AbstractTransliterationEngine *platformEngine, QObject *parent)
+    : AbstractTransliterationEngine(parent), m_platformEngine(platformEngine)
+{
+    if (!m_platformEngine.isNull())
+        connect(m_platformEngine, &PlatformTransliterationEngine::defaultLanguageChanged, this,
+                &FallbackTransliterationEngine::defaultLanguageChanged);
+}
+
+FallbackTransliterationEngine::~FallbackTransliterationEngine() { }
+
+int FallbackTransliterationEngine::defaultLanguage() const
+{
+    return m_platformEngine.isNull() ? QLocale::English : m_platformEngine->defaultLanguage();
+}
+
+QString FallbackTransliterationEngine::name() const
+{
+    return QStringLiteral("Default");
+}
+
+QList<TransliterationOption> FallbackTransliterationEngine::options(int lang) const
+{
+    const int defLang = this->defaultLanguage();
+    const QString suffix = QStringLiteral("Keyboard Layout");
+    QString optionName = suffix;
+
+    if (defLang > 0 && !m_platformEngine.isNull()) {
+        const Language language = LanguageEngine::instance()->availableLanguages()->findLanguage(
+                this->defaultLanguage());
+        if (language.isValid()) {
+            const QList<TransliterationOption> platformOptions =
+                    m_platformEngine->options(language.code);
+            if (platformOptions.isEmpty())
+                optionName = language.name() + QStringLiteral(" - ") + suffix;
+            else
+                optionName = platformOptions.first().name + QStringLiteral(" - ") + suffix;
+        }
+    }
+
+    return { { (QObject *)this, lang, this->name(), optionName, false } };
+}
+
+bool FallbackTransliterationEngine::canActivate(const TransliterationOption &option)
+{
+    return option.transliteratorObject == this;
+}
+
+bool FallbackTransliterationEngine::activate(const TransliterationOption &option)
+{
+    Q_UNUSED(option);
+    PlatformTransliterationEngine platformEngine;
+    return platformEngine.activateDefaultLanguage() > 0;
+}
+
+QString FallbackTransliterationEngine::transliterateWord(const QString &word,
+                                                         const TransliterationOption &option) const
+{
+    Q_UNUSED(option)
+    return word;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1697,7 +1697,7 @@ LanguageEngine::LanguageEngine(QObject *parent) : QObject(parent)
     // default. So, that should go first in the list.
     m_transliterators << new PlatformTransliterationEngine(this);
     m_transliterators << new StaticTransliterationEngine(this);
-    m_transliterators << new FallbackTransliterationEngine(this);
+    m_transliterators << new FallbackTransliterationEngine(m_transliterators.first(), this);
     for (AbstractTransliterationEngine *transliterator : qAsConst(m_transliterators))
         connect(transliterator, &AbstractTransliterationEngine::capacityChanged, this,
                 &LanguageEngine::transliterationOptionsUpdated);

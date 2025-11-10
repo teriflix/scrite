@@ -392,27 +392,6 @@ signals:
 };
 
 /*
-This is a fallback engine, that does nothing -- which means basically any keystroke
-is passed through without transliteration.
-*/
-class FallbackTransliterationEngine : public AbstractTransliterationEngine
-{
-    Q_OBJECT
-
-public:
-    explicit FallbackTransliterationEngine(QObject *parent = nullptr);
-    ~FallbackTransliterationEngine();
-
-    // AbstractTransliterator interface
-    int defaultLanguage() const;
-    QString name() const;
-    QList<TransliterationOption> options(int lang) const;
-    bool canActivate(const TransliterationOption &option);
-    bool activate(const TransliterationOption &option);
-    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
-};
-
-/*
 The static transliterator is built on top of a third-party tool called PhTranslator.
 It only supports a handful of Indian languages.
 */
@@ -455,6 +434,31 @@ public:
     bool canActivate(const TransliterationOption &option);
     bool activate(const TransliterationOption &option);
     QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+};
+
+/*
+This is a fallback engine, that does nothing -- which means basically any keystroke
+is passed through without transliteration.
+*/
+class FallbackTransliterationEngine : public AbstractTransliterationEngine
+{
+    Q_OBJECT
+
+public:
+    explicit FallbackTransliterationEngine(AbstractTransliterationEngine *platformEngine,
+                                           QObject *parent = nullptr);
+    ~FallbackTransliterationEngine();
+
+    // AbstractTransliterator interface
+    int defaultLanguage() const;
+    QString name() const;
+    QList<TransliterationOption> options(int lang) const;
+    bool canActivate(const TransliterationOption &option);
+    bool activate(const TransliterationOption &option);
+    QString transliterateWord(const QString &word, const TransliterationOption &option) const;
+
+private:
+    QPointer<AbstractTransliterationEngine> m_platformEngine;
 };
 
 /*
