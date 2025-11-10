@@ -83,9 +83,11 @@ AbstractScenePartEditor {
                 id: _sceneNumber
 
                 Keys.onPressed: (event) => {
+                                    event.accepted = false
+
                                     if(event.key === Qt.Key_Escape && root.isCurrent) {
-                                        const editSceneContent = ActionHub.editOptions.find("editSceneContent")
-                                        editSceneContent.trigger()
+                                        event.accepted = true
+                                        _private.editSceneContent.trigger()
                                     }
                                 }
 
@@ -114,8 +116,7 @@ AbstractScenePartEditor {
 
                 onEditingFinished: {
                     if(root.isCurrent) {
-                        const editSceneContent = ActionHub.editOptions.find("editSceneContent")
-                        editSceneContent.trigger()
+                        _private.editSceneContent.trigger()
                     }
                 }
             }
@@ -127,9 +128,11 @@ AbstractScenePartEditor {
             Layout.fillWidth: true
 
             Keys.onPressed: (event) => {
+                                event.accepted = false
+
                                 if(event.key === Qt.Key_Escape && root.isCurrent) {
-                                    const editSceneContent = ActionHub.editOptions.find("editSceneContent")
-                                    editSceneContent.trigger()
+                                    event.accepted = true
+                                    _private.editSceneContent.trigger()
                                 }
                             }
 
@@ -147,10 +150,15 @@ AbstractScenePartEditor {
                              }
             }
 
+            onEditingFinished: {
+                if(root.isCurrent) {
+                    _private.editSceneContent.trigger()
+                }
+            }
+
             onReturnPressed: {
                 if(root.isCurrent) {
-                    const editSceneContent = ActionHub.editOptions.find("editSceneContent")
-                    editSceneContent.trigger()
+                    _private.editSceneContent.trigger()
                 }
             }
         }
@@ -193,6 +201,8 @@ AbstractScenePartEditor {
 
     QtObject {
         id: _private
+
+        readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
 
         property Component formalTagsMenu: StructureGroupsMenu {
             sceneGroup: SceneGroup {
