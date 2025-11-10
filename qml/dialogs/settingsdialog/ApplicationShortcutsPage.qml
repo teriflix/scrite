@@ -131,6 +131,7 @@ FocusScope {
                 FlickScrollSpeedControl.factor: Runtime.workspaceSettings.flickScrollSpeedFactor
 
                 boundsBehavior: Flickable.StopAtBounds
+                boundsMovement: ListView.StopAtBounds
                 clip: true
                 highlightFollowsCurrentItem: true
                 highlightMoveDuration: 0
