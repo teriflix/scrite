@@ -112,7 +112,6 @@ private:
 
 private:
     bool m_enabled = true;
-    char m_padding[3];
     Scene *m_scene = nullptr;
     QString m_moment = "DAY";
     QString m_location = "Somewhere";
@@ -187,12 +186,6 @@ public:
     void setAlignment(Qt::Alignment val);
     Qt::Alignment alignment() const;
     Q_SIGNAL void alignmentChanged();
-
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged STORED false)
-    void setCursorPosition(int val);
-    int cursorPosition() const;
-    Q_SIGNAL void cursorPositionChanged();
 
     QString formattedText() const;
 
@@ -601,44 +594,48 @@ private:
     friend class SceneHeading;
     friend class SceneDocumentBinder;
 
-    QString m_act;
-    Type m_type = Standard;
-    QColor m_color = QColor(Qt::white);
-    QString m_synopsis;
-    QString m_comments;
-    QStringList m_tags;
-    QStringList m_groups;
-    QStringList m_indexCardFieldValues;
     int m_actIndex = -1;
+    int m_cursorPosition = -1;
     int m_episodeIndex = -1;
     int m_wordCount = 0;
-    QBasicTimer m_wordCountTimer;
-    QString m_episode;
-    StructureElement *m_structureElement = nullptr;
-    QString m_summary;
+
+    Type m_type = Standard;
 
     bool m_enabled = true;
-    char m_padding[7];
-    mutable QString m_id;
-    int m_cursorPosition = -1;
-    SceneHeading *m_heading = new SceneHeading(this);
+    bool m_inSetElementsList = false;
     bool m_isBeingReset = false;
     bool m_undoRedoEnabled = false;
-    bool m_inSetElementsList = false;
-    PushSceneUndoCommand *m_pushUndoCommand = nullptr;
-    QJsonObject m_characterRelationshipGraph;
+
+    QString m_act;
+    QString m_comments;
+    QString m_episode;
+    QString m_summary;
+    QString m_synopsis;
+    mutable QString m_id;
+
+    QStringList m_groups;
+    QStringList m_indexCardFieldValues;
     QStringList m_sortedCharacterNames;
-    CharacterElementMap m_characterElementMap;
+    QStringList m_tags;
+
+    QColor m_color = QColor(Qt::white);
+    QBasicTimer m_wordCountTimer;
+    QJsonObject m_characterRelationshipGraph;
     QList<int> m_screenplayElementIndexList;
+
+    CharacterElementMap m_characterElementMap;
+
+    Attachments *m_attachments = new Attachments(this);
+    Notes *m_notes = new Notes(this);
+    PushSceneUndoCommand *m_pushUndoCommand = nullptr;
+    SceneHeading *m_heading = new SceneHeading(this);
+    StructureElement *m_structureElement = nullptr;
 
     static void staticAppendElement(QQmlListProperty<SceneElement> *list, SceneElement *ptr);
     static void staticClearElements(QQmlListProperty<SceneElement> *list);
     static SceneElement *staticElementAt(QQmlListProperty<SceneElement> *list, int index);
     static int staticElementCount(QQmlListProperty<SceneElement> *list);
     QList<SceneElement *> m_elements;
-
-    Notes *m_notes = new Notes(this);
-    Attachments *m_attachments = new Attachments(this);
 };
 
 class ScreenplayFormat;

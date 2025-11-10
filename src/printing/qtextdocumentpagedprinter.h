@@ -110,7 +110,6 @@ public:
 private:
     friend class QTextDocumentPagedPrinter;
     Type m_type = Header;
-    char m_padding1[4];
     QFont m_font;
     Field m_left = Nothing;
     Field m_center = Nothing;
@@ -123,7 +122,6 @@ private:
         QString content;
         int flags;
     };
-    char m_padding2[3];
     QVector<ColumnContent> m_columns;
     qreal m_opacity = 0.5;
     QRectF m_rect;
@@ -195,7 +193,6 @@ private:
     Qt::Alignment m_alignment = Qt::AlignCenter;
     bool m_enabled = false;
     bool m_visibleFromPageOne = false;
-    char m_padding[2];
     QRectF m_rect;
 };
 

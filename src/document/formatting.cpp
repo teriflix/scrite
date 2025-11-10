@@ -476,7 +476,6 @@ ScreenplayPageLayout::ScreenplayPageLayout(ScreenplayFormat *parent)
     : QObject(parent), m_format(parent)
 {
     m_resolution = qt_defaultDpi();
-    m_padding[0] = 0; // just to get rid of the unused private variable warning.
 
     connect(m_format, &ScreenplayFormat::screenChanged, this,
             &ScreenplayPageLayout::evaluateRectsLater);
@@ -650,8 +649,6 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
       m_scriteDocument(qobject_cast<ScriteDocument *>(parent)),
       m_screen(this, "screen")
 {
-    m_padding[0] = 0; // just to get rid of the unused private variable warning.
-
     for (int i = SceneElement::Min; i <= SceneElement::Max; i++) {
         SceneElementFormat *elementFormat = new SceneElementFormat(SceneElement::Type(i), this);
         connect(elementFormat, &SceneElementFormat::elementFormatChanged, this,
@@ -3023,13 +3020,15 @@ void SceneDocumentBinder::initializeDocument()
 
     QTextDocument *document = m_textDocument->textDocument();
     QSignalBlocker documentSignalBlocker(document);
-    document->clear();
     document->setDefaultFont(defaultFont);
     document->setUseDesignMetrics(true);
 
+    QTextCursor cursor(document);
+    cursor.select(QTextCursor::Document);
+    cursor.removeSelectedText();
+
     const int nrElements = m_scene->elementCount();
 
-    QTextCursor cursor(document);
     QList<QTextBlock> blocks;
 
     // In the first pass, we simply insert text into the document.
@@ -3393,6 +3392,17 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
             qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!",
                      __LINE__, from);
             return;
+        }
+
+        if (m_cursorPosition >= 0 && block.contains(from) && m_scene != nullptr) {
+            /* If we are here, it means that the user is currently typing in the TextArea within
+             * SceneContentEditor. And it so happens that cursor-position will get set only after
+             * the text on the sceneElement is set here. This causes the undo command to have
+             * scene-position that is out of sync with the actual position. Hence, we evaluate the
+             * cursor position based on the parameters given to this function before we set the text
+             * on the SceneElement
+             */
+            m_scene->setCursorPosition(from + charsAdded - charsRemoved);
         }
 
         sceneElement->setText(block.text());

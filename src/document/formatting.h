@@ -312,7 +312,6 @@ private:
     QRectF m_headerRect;
     QRectF m_footerRect;
     PaperSize m_paperSize = Letter;
-    char m_padding[4];
     QPageLayout m_pageLayout;
     qreal m_customResolution = 0;
     qreal m_defaultResolution = 0;
@@ -425,8 +424,6 @@ private:
     void countTransactionChange() { ++m_nrChangesDuringTransation; }
 
 private:
-    char m_padding[4];
-
     int m_secondsPerPage = 60;
     int m_fontPointSizeDelta = 0;
     int m_fontZoomLevelIndex = -1;
@@ -541,8 +538,7 @@ public:
     explicit SceneDocumentBinder(QObject *parent = nullptr);
     ~SceneDocumentBinder();
 
-    Q_PROPERTY(ScreenplayFormat *screenplayFormat READ screenplayFormat WRITE setScreenplayFormat
-                       NOTIFY screenplayFormatChanged RESET resetScreenplayFormat)
+    Q_PROPERTY(ScreenplayFormat *screenplayFormat READ screenplayFormat WRITE setScreenplayFormat NOTIFY screenplayFormatChanged RESET resetScreenplayFormat)
     void setScreenplayFormat(ScreenplayFormat *val);
     ScreenplayFormat *screenplayFormat() const { return m_screenplayFormat; }
     Q_SIGNAL void screenplayFormatChanged();
@@ -557,8 +553,7 @@ public:
     ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
     Q_SIGNAL void screenplayElementChanged();
 
-    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY
-                       textDocumentChanged RESET resetTextDocument)
+    Q_PROPERTY(QQuickTextDocument *textDocument READ textDocument WRITE setTextDocument NOTIFY textDocumentChanged RESET resetTextDocument)
     void setTextDocument(QQuickTextDocument *val);
     QQuickTextDocument *textDocument() const { return m_textDocument; }
     Q_SIGNAL void textDocumentChanged();
@@ -591,20 +586,17 @@ public:
     qreal textWidth() const { return m_textWidth; }
     Q_SIGNAL void textWidthChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();
 
-    Q_PROPERTY(int selectionStartPosition READ selectionStartPosition WRITE
-                       setSelectionStartPosition NOTIFY selectionStartPositionChanged)
+    Q_PROPERTY(int selectionStartPosition READ selectionStartPosition WRITE setSelectionStartPosition NOTIFY selectionStartPositionChanged)
     void setSelectionStartPosition(int val);
     int selectionStartPosition() const { return m_selectionStartPosition; }
     Q_SIGNAL void selectionStartPositionChanged();
 
-    Q_PROPERTY(int selectionEndPosition READ selectionEndPosition WRITE setSelectionEndPosition
-                       NOTIFY selectionEndPositionChanged)
+    Q_PROPERTY(int selectionEndPosition READ selectionEndPosition WRITE setSelectionEndPosition NOTIFY selectionEndPositionChanged)
     void setSelectionEndPosition(int val);
     int selectionEndPosition() const { return m_selectionEndPosition; }
     Q_SIGNAL void selectionEndPositionChanged();
@@ -614,8 +606,8 @@ public:
 
     Q_INVOKABLE bool changeTextCase(SceneDocumentBinder::TextCasing casing);
 
-    Q_PROPERTY(bool applyTextFormat READ isApplyTextFormat WRITE setApplyTextFormat NOTIFY
-                       applyTextFormatChanged) void setApplyTextFormat(bool val);
+    Q_PROPERTY(bool applyTextFormat READ isApplyTextFormat WRITE setApplyTextFormat NOTIFY applyTextFormatChanged)
+    void setApplyTextFormat(bool val);
     bool isApplyTextFormat() const { return m_applyTextFormat; }
     Q_SIGNAL void applyTextFormatChanged();
 
@@ -624,14 +616,12 @@ public:
 
     Q_SIGNAL void requestCursorPosition(int position);
 
-    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY
-                       characterNamesChanged)
+    Q_PROPERTY(QStringList characterNames READ characterNames WRITE setCharacterNames NOTIFY characterNamesChanged)
     void setCharacterNames(const QStringList &val);
     QStringList characterNames() const { return m_characterNames; }
     Q_SIGNAL void characterNamesChanged();
 
-    Q_PROPERTY(
-            QStringList transitions READ transitions WRITE setTransitions NOTIFY transitionsChanged)
+    Q_PROPERTY(QStringList transitions READ transitions WRITE setTransitions NOTIFY transitionsChanged)
     void setTransitions(const QStringList &val);
     QStringList transitions() const { return m_transitions; }
     Q_SIGNAL void transitionsChanged();
@@ -641,13 +631,11 @@ public:
     QStringList shots() const { return m_shots; }
     Q_SIGNAL void shotsChanged();
 
-    Q_PROPERTY(SceneElement *currentElement READ currentElement NOTIFY currentElementChanged RESET
-                       resetCurrentElement)
+    Q_PROPERTY(SceneElement *currentElement READ currentElement NOTIFY currentElementChanged RESET resetCurrentElement)
     SceneElement *currentElement() const { return m_currentElement; }
     Q_SIGNAL void currentElementChanged();
 
-    Q_PROPERTY(int currentElementCursorPosition READ currentElementCursorPosition NOTIFY
-                       cursorPositionChanged)
+    Q_PROPERTY(int currentElementCursorPosition READ currentElementCursorPosition NOTIFY cursorPositionChanged)
     int currentElementCursorPosition() const { return m_currentElementCursorPosition; }
 
     Q_PROPERTY(QList<SceneElement*> selectedElements READ selectedElements NOTIFY selectedElementsChanged)
@@ -657,14 +645,12 @@ public:
     Q_INVOKABLE SceneElement *sceneElementAt(int cursorPosition) const;
     Q_INVOKABLE QRectF sceneElementBoundingRect(SceneElement *sceneElement) const;
 
-    Q_PROPERTY(bool forceSyncDocument READ isForceSyncDocument WRITE setForceSyncDocument NOTIFY
-                       forceSyncDocumentChanged)
+    Q_PROPERTY(bool forceSyncDocument READ isForceSyncDocument WRITE setForceSyncDocument NOTIFY forceSyncDocumentChanged)
     void setForceSyncDocument(bool val);
     bool isForceSyncDocument() const { return m_forceSyncDocument; }
     Q_SIGNAL void forceSyncDocumentChanged();
 
-    Q_PROPERTY(bool applyLanguageFonts READ isApplyLanguageFonts WRITE setApplyLanguageFonts NOTIFY
-                       applyLanguageFontsChanged)
+    Q_PROPERTY(bool applyLanguageFonts READ isApplyLanguageFonts WRITE setApplyLanguageFonts NOTIFY applyLanguageFontsChanged)
     void setApplyLanguageFonts(bool val);
     bool isApplyLanguageFonts() const { return m_applyLanguageFonts; }
     Q_SIGNAL void applyLanguageFontsChanged();
@@ -687,13 +673,11 @@ public:
     Q_INVOKABLE int cursorPositionAtBlock(int blockNumber) const;
     Q_INVOKABLE int currentBlockPosition() const;
 
-    Q_PROPERTY(QStringList spellingSuggestions READ spellingSuggestions NOTIFY
-                       spellingSuggestionsChanged)
+    Q_PROPERTY(QStringList spellingSuggestions READ spellingSuggestions NOTIFY spellingSuggestionsChanged)
     QStringList spellingSuggestions() const { return m_spellingSuggestions; }
     Q_SIGNAL void spellingSuggestionsChanged();
 
-    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY
-                       wordUnderCursorIsMisspelledChanged)
+    Q_PROPERTY(bool wordUnderCursorIsMisspelled READ isWordUnderCursorIsMisspelled NOTIFY wordUnderCursorIsMisspelledChanged)
     bool isWordUnderCursorIsMisspelled() const { return m_wordUnderCursorIsMisspelled; }
     Q_SIGNAL void wordUnderCursorIsMisspelledChanged();
 
@@ -724,8 +708,7 @@ public:
     Q_PROPERTY(QStringList priorityAutoCompleteHints READ priorityAutoCompleteHints NOTIFY autoCompleteHintsChanged)
     QStringList priorityAutoCompleteHints() const { return m_priorityAutoCompleteHints; }
 
-    Q_PROPERTY(SceneElement::Type autoCompleteHintsFor READ autoCompleteHintsFor NOTIFY
-                       autoCompleteHintsForChanged)
+    Q_PROPERTY(SceneElement::Type autoCompleteHintsFor READ autoCompleteHintsFor NOTIFY autoCompleteHintsForChanged)
     SceneElement::Type autoCompleteHintsFor() const { return m_autoCompleteHintsFor; }
     Q_SIGNAL void autoCompleteHintsForChanged();
 
@@ -771,9 +754,7 @@ public:
     Q_INVOKABLE void copy(int fromPosition, int toPosition);
     Q_INVOKABLE int paste(int fromPosition = -1);
 
-    Q_PROPERTY(bool applyFormattingEvenInTransaction READ isApplyFormattingEvenInTransaction WRITE
-                       setApplyFormattingEvenInTransaction NOTIFY
-                               applyFormattingEvenInTransactionChanged)
+    Q_PROPERTY(bool applyFormattingEvenInTransaction READ isApplyFormattingEvenInTransaction WRITE setApplyFormattingEvenInTransaction NOTIFY applyFormattingEvenInTransactionChanged)
     void setApplyFormattingEvenInTransaction(bool val);
     bool isApplyFormattingEvenInTransaction() const { return m_applyFormattingEvenInTransaction; }
     Q_SIGNAL void applyFormattingEvenInTransactionChanged();

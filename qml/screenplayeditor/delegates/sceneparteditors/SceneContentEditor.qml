@@ -180,6 +180,7 @@ AbstractScenePartEditor {
 
         onActiveFocusChanged: Qt.callLater(_private.handleSceneTextEditorFocusChange)
         onCursorRectangleChanged: Qt.callLater(_private.ensureSceneTextEditorCursorIsVisible)
+        onCursorPositionChanged: Gui.log("_sceneTextEditor.cursorPosition = " + cursorPosition)
     }
 
     SceneTextEditorSpellingSuggestionsMenu {
@@ -237,7 +238,7 @@ AbstractScenePartEditor {
         transitions: Scrite.document.structure.transitions
         textDocument: _sceneTextEditor.textDocument
         characterNames: Scrite.document.structure.characterNames
-        cursorPosition: _sceneTextEditor.activeFocus ? _sceneTextEditor.cursorPosition : -1
+        cursorPosition: _sceneTextEditor.activeFocus && !root.readOnly ? _sceneTextEditor.cursorPosition : -1
         applyTextFormat: true
         screenplayFormat: Scrite.document.displayFormat
         screenplayElement: root.screenplayElement
@@ -259,12 +260,7 @@ AbstractScenePartEditor {
                                }
 
         onRequestCursorPosition: (position) => {
-                                     /* Upon receipt of this signal, lets immediately reset cursor position.
-                                        if there is a need for delayed setting of cursor position, let that be
-                                        a separate signal emission from the backend. */
-                                     // if(position >= 0)
-                                     //    contentItem.assumeFocusLater(position, 100)
-                                     root.assumeFocusAt(position)
+                                     _sceneTextEditor.cursorPosition = position < 0 ? _sceneTextEditor.length : position
                                  }
     }
 

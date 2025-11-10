@@ -79,21 +79,19 @@ private:
 
 private:
     friend class PushSceneUndoCommand;
-    Scene *m_scene = nullptr;
+    bool m_allowMerging = true;
     QString m_sceneId;
     QByteArray m_after;
     QByteArray m_before;
-    bool m_allowMerging = true;
-    char m_padding[7];
     QDateTime m_timestamp;
+    Scene *m_scene = nullptr;
 };
 
 SceneUndoCommand *SceneUndoCommand::current = nullptr;
 
 SceneUndoCommand::SceneUndoCommand(Scene *scene, bool allowMerging)
-    : m_scene(scene), m_allowMerging(allowMerging), m_timestamp(QDateTime::currentDateTime())
+    : m_allowMerging(allowMerging), m_timestamp(QDateTime::currentDateTime()), m_scene(scene)
 {
-    m_padding[0] = 0; // just to get rid of the unused private variable warning.
     m_sceneId = m_scene->id();
     m_before = this->toByteArray(scene);
 }
@@ -193,7 +191,6 @@ PushSceneUndoCommand::~PushSceneUndoCommand()
 SceneHeading::SceneHeading(QObject *parent)
     : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
 {
-    m_padding[0] = 0; // just to get rid of the unused private variable warning.
     connect(this, &SceneHeading::momentChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::enabledChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::locationChanged, this, &SceneHeading::textChanged);
@@ -476,23 +473,13 @@ void SceneElement::setAlignment(Qt::Alignment val)
     m_alignment = val2;
     emit alignmentChanged();
 
-    this->reportSceneElementChanged(
-            Scene::ElementTypeChange); // because the text hasnt technically changed.
+    // because the text hasnt technically changed.
+    this->reportSceneElementChanged(Scene::ElementTypeChange);
 }
 
 Qt::Alignment SceneElement::alignment() const
 {
     return m_type == Action ? m_alignment : Qt::Alignment(0);
-}
-
-void SceneElement::setCursorPosition(int val)
-{
-    m_scene->setCursorPosition(val);
-}
-
-int SceneElement::cursorPosition() const
-{
-    return m_scene->cursorPosition();
 }
 
 QString SceneElement::formattedText() const
@@ -1078,7 +1065,6 @@ void DistinctElementValuesMap::include(const DistinctElementValuesMap &other)
 
 Scene::Scene(QObject *parent) : QAbstractListModel(parent)
 {
-    m_padding[0] = 0; // just to get rid of the unused private variable warning.
     this->setStructureElement(qobject_cast<StructureElement *>(parent));
 
     connect(this, &Scene::synopsisChanged, this, &Scene::sceneChanged);
@@ -1745,7 +1731,6 @@ void Scene::insertElementAt(SceneElement *ptr, int index)
     m_elements.insert(index, ptr);
     connect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
     connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
-    connect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
     if (!m_inSetElementsList)
         this->endInsertRows();
@@ -1777,7 +1762,6 @@ void Scene::removeElement(SceneElement *ptr)
 
     disconnect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
     disconnect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
-    disconnect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
 
     if (!m_inSetElementsList)
         this->endRemoveRows();
@@ -1804,7 +1788,6 @@ void Scene::setElements(const QList<SceneElement *> &list)
         ptr->setParent(this);
         connect(ptr, &SceneElement::elementChanged, this, &Scene::sceneChanged);
         connect(ptr, &SceneElement::aboutToDelete, this, &Scene::removeElement);
-        connect(this, &Scene::cursorPositionChanged, ptr, &SceneElement::cursorPositionChanged);
         m_elements.append(ptr);
     }
 
@@ -2091,7 +2074,6 @@ bool Scene::resetFromByteArray(const QByteArray &bytes)
 
     int curPosition = -1;
     ds >> curPosition;
-    QTimer::singleShot(0, this, [=]() { this->setCursorPosition(curPosition); });
 
     QString locType;
     ds >> locType;

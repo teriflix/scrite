@@ -28,11 +28,7 @@
 #include <QPaintEngine>
 #include <QAbstractTextDocumentLayout>
 
-HeaderFooter::HeaderFooter(Type type, QObject *parent) : QObject(parent), m_type(type)
-{
-    m_padding1[0] = 0; // just to get rid of the unused private variable warning.
-    m_padding2[0] = 0; // just to get rid of the unused private variable warning.
-}
+HeaderFooter::HeaderFooter(Type type, QObject *parent) : QObject(parent), m_type(type) { }
 
 HeaderFooter::~HeaderFooter() { }
 
@@ -189,8 +185,6 @@ void HeaderFooter::finish()
 
 Watermark::Watermark(QObject *parent) : QObject(parent)
 {
-    m_padding[0] = 0;
-
     m_enabled = !AppFeature::isEnabled(Scrite::WatermarkFeature);
     m_visibleFromPageOne = !AppFeature::isEnabled(Scrite::WatermarkFeature);
 }
@@ -235,8 +229,7 @@ void Watermark::setColor(const QColor &val)
 
 void Watermark::setOpacity(qreal val)
 {
-    if (qFuzzyCompare(m_opacity, val)
-        || !AppFeature::isEnabled(Scrite::WatermarkFeature))
+    if (qFuzzyCompare(m_opacity, val) || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_opacity = val;
@@ -245,8 +238,7 @@ void Watermark::setOpacity(qreal val)
 
 void Watermark::setRotation(qreal val)
 {
-    if (qFuzzyCompare(m_rotation, val)
-        || !AppFeature::isEnabled(Scrite::WatermarkFeature))
+    if (qFuzzyCompare(m_rotation, val) || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_rotation = val;
@@ -264,8 +256,7 @@ void Watermark::setAlignment(Qt::Alignment val)
 
 void Watermark::setVisibleFromPageOne(bool val)
 {
-    if (m_visibleFromPageOne == val
-        || !AppFeature::isEnabled(Scrite::WatermarkFeature))
+    if (m_visibleFromPageOne == val || !AppFeature::isEnabled(Scrite::WatermarkFeature))
         return;
 
     m_visibleFromPageOne = val;
