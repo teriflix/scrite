@@ -75,14 +75,6 @@ Item {
             Notification.onDismissed: helpTip.destroy()
         }
 
-        readonly property BusyMessage busyMessage: BusyMessage {
-            function documentUpdateStarted() { visible = true }
-            function documentUpdateScheduled() { visible = true }
-            function documentUpdateFinished() { visible = false }
-
-            message: "Computing Page Layout, Evaluating Page Count & Time ..."
-        }
-
         property bool handleCloseEvent: true
         property bool hasDocumentErrors: documentErrors.hasError
         property bool hasApplicationErrors: applicationErrors.hasError
@@ -160,10 +152,6 @@ Item {
                                  }
 
         Component.onCompleted: {
-            Runtime.screenplayTextDocument.updateScheduled.connect(busyMessage.documentUpdateScheduled)
-            Runtime.screenplayTextDocument.updateStarted.connect(busyMessage.documentUpdateStarted)
-            Runtime.screenplayTextDocument.updateFinished.connect(busyMessage.documentUpdateFinished)
-
             Scrite.window.closing.connect(handleWindowClosing)
 
             if(Platform.isMacOSDesktop)

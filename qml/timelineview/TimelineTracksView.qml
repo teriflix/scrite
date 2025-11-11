@@ -145,10 +145,10 @@ Flickable {
                                         ttText += "1 Scene"
                                     else
                                         ttText += (1 + _innerTrackDelegate.groupData.endIndex - _innerTrackDelegate.groupData.startIndex) + " Scenes"
-                                    if(!Runtime.screenplayTextDocument.paused) {
+                                    if(!Runtime.paginator.paused) {
                                         var from = Scrite.document.screenplay.elementWithIndex(_innerTrackDelegate.groupData.startIndex)
                                         var to = Scrite.document.screenplay.elementWithIndex(_innerTrackDelegate.groupData.endIndex)
-                                        ttText += ", Length: " + Runtime.screenplayTextDocument.lengthInTimeAsString(from, to)
+                                        ttText += ", Duration: " + TMath.timeLengthString(Runtime.paginator.timeLength(from, to))
                                     }
 
                                     _toolTipItem.x = mouseX + parent.x

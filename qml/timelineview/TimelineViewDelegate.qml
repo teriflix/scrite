@@ -405,11 +405,16 @@ Item {
 
         property color sceneColor: colorPalette.background
 
+        readonly property ScreenplayPaginatorWatcher sceneLengthWatcher: ScreenplayPaginatorWatcher {
+            paginator: Runtime.paginator.paused ? null : Runtime.paginator
+            element: root.screenplayElement
+        }
+
         function evalToolTipText() {
-            var ret = ""
+            let ret = ""
 
             if(_private.isBreakElement) {
-                var idxList = Scrite.document.screenplay.sceneElementsInBreak(root.screenplayElement)
+                const idxList = Scrite.document.screenplay.sceneElementsInBreak(root.screenplayElement)
                 if(idxList.length === 0)
                     return "No Scenes"
 
@@ -418,11 +423,8 @@ Item {
                 else
                     ret = idxList.length + " Scenes"
 
-                if(!Runtime.screenplayTextDocument.paused) {
-                    var from = Scrite.document.screenplay.elementAt(idxList[0])
-                    var to = Scrite.document.screenplay.elementAt(idxList[idxList.length-1])
-                    ret += ", Length: " + Runtime.screenplayTextDocument.lengthInTimeAsString(from, to)
-                }
+                if(_private.sceneLengthWatcher.hasValidRecord)
+                    ret += ", Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength)
 
                 return ret
             }
@@ -430,16 +432,18 @@ Item {
             if(root.screenplayElement.omitted)
                 return "Omitted Scene"
 
-            var pc = root.scene.elementCount
+            let pc = root.scene.elementCount
             ret += pc + " " + (pc > 1 ? "Paragraphs" : "Paragraph")
 
-            if(!Runtime.screenplayTextDocument.paused)
-                ret += ", Length: " + Runtime.screenplayTextDocument.lengthInTimeAsString(root.screenplayElement, null)
+            if(_private.sceneLengthWatcher.hasValidRecord)
+                ret += ", Duration: " + TMath.timeLengthString(_private.sceneLengthWatcher.timeLength)
 
             if(parent.width < screenplayElementList.minimumDelegateWidthForTextVisibility) {
-                var str = _private.sceneTitle
+                let str = _private.sceneTitle
+
                 if(str.length > 140)
                     str = str.substring(0, 130) + "..."
+
                 if(str.length > 0)
                     ret = "(" + ret + ") " + str
             }

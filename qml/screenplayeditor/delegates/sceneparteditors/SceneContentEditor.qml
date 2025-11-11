@@ -74,6 +74,7 @@ AbstractScenePartEditor {
 
         signal highlightCursor()
 
+        Keys.onTabPressed: (event) => { _private.handleSceneTextEditorTabPressed(event) }
         Keys.onPressed: (event) => { _private.handleSceneTextEditorKeyPressed(event) }
         Keys.onUpPressed: (event) => { _private.handleSceneTextEditorKeyUpPressed(event) }
         Keys.onDownPressed: (event) => { _private.handleSceneTextEditorKeyDownPressed(event) }
@@ -147,6 +148,8 @@ AbstractScenePartEditor {
             }
 
             ActionHandler {
+                id: _nextFormatHandler
+
                 action: ActionHub.paragraphFormats.find("nextFormat")
                 enabled: _sceneTextEditor.activeFocus && !root.readOnly && !_completion.model.hasSuggestion
                 onTriggered: (source) => { _sceneDocumentBinder.tab() }
@@ -463,6 +466,11 @@ AbstractScenePartEditor {
 
         property int currentParagraphType: _sceneTextEditor.activeFocus ? (currentElement ? currentElement.type : SceneElement.Action) : -1
         property SceneElement currentElement: _sceneTextEditor.activeFocus ? _sceneDocumentBinder.currentElement : null
+
+        function handleSceneTextEditorTabPressed(event) {
+            event.accepted = true
+            _sceneDocumentBinder.tab()
+        }
 
         function handleSceneTextEditorKeyPressed(event) {
             event.accepted = false

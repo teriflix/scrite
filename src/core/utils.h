@@ -15,11 +15,12 @@
 #define UTILS_H
 
 #include <QImage>
+#include <QtMath>
 #include <QFileInfo>
+#include <QDateTime>
 #include <QQuickItem>
 #include <QVersionNumber>
 #include <QAbstractItemModel>
-#include <QDateTime>
 
 namespace Utils {
 
@@ -149,8 +150,8 @@ public:
     {
         return this->name == other.name && this->label == other.label && this->note == other.note
                 && this->editor == other.editor && this->min == other.min && this->max == other.max
-                && this->ideal == other.ideal && this->group == other.group
-                && this->feature == other.feature && this->choices == other.choices;
+                && this->ideal == other.ideal && this->group == other.group && this->feature == other.feature
+                && this->choices == other.choices;
     }
     bool operator!=(const ObjectConfigField &other) const { return !(*this == other); }
 };
@@ -180,8 +181,7 @@ public:
     }
     bool operator==(const ObjectConfigFieldGroup &other) const
     {
-        return this->name == other.name && this->description == other.description
-                && this->fields == other.fields;
+        return this->name == other.name && this->description == other.description && this->fields == other.fields;
     }
     bool operator!=(const ObjectConfigFieldGroup &other) const { return !(*this == other); }
 };
@@ -218,8 +218,8 @@ public:
     }
     bool operator==(const ObjectConfig &other) const
     {
-        return this->title == other.title && this->description == other.description
-                && this->fields == other.fields && this->groups == other.groups;
+        return this->title == other.title && this->description == other.description && this->fields == other.fields
+                && this->groups == other.groups;
     }
     bool operator!=(const ObjectConfig &other) const { return !(*this == other); }
 };
@@ -362,8 +362,7 @@ public:
     Q_INVOKABLE static bool isOfType(const QVariant &value, const QString &typeName);
     Q_INVOKABLE static QString typeOf(const QVariant &value);
 
-    Q_INVOKABLE static bool changeProperty(QObject *object, const QString &name,
-                                           const QVariant &value);
+    Q_INVOKABLE static bool changeProperty(QObject *object, const QString &name, const QVariant &value);
     Q_INVOKABLE static bool resetProperty(QObject *object, const QString &propName);
     Q_INVOKABLE static QVariant queryProperty(QObject *object, const QString &name);
 
@@ -387,11 +386,10 @@ public:
     Q_INVOKABLE static bool reparent(QObject *object, QObject *newParent);
 
     Q_INVOKABLE static QString enumKey(QObject *object, const QString &enumName, int value);
-    Q_INVOKABLE static QString typeEnumKey(const QString &typeName, const QString &enumName,
-                                           int value);
+    Q_INVOKABLE static QString typeEnumKey(const QString &typeName, const QString &enumName, int value);
     Q_INVOKABLE static QAbstractListModel *enumModel(QObject *object, const QString &enumName);
-    Q_INVOKABLE static QAbstractListModel *
-    typeEnumModel(const QString &typeName, const QString &enumName, QObject *parent = nullptr);
+    Q_INVOKABLE static QAbstractListModel *typeEnumModel(const QString &typeName, const QString &enumName,
+                                                         QObject *parent = nullptr);
 };
 
 class ObjectRegistry : public QObject
@@ -467,8 +465,7 @@ class SceneColors : public QObject
     QML_SINGLETON
 
 public:
-    Q_INVOKABLE static QList<QColor>
-    paletteForVersion(const QVersionNumber &version = QVersionNumber());
+    Q_INVOKABLE static QList<QColor> paletteForVersion(const QVersionNumber &version = QVersionNumber());
 
     Q_PROPERTY(QVariantList palette READ paletteAsVariantList CONSTANT)
     static QList<QColor> palette();
@@ -492,8 +489,7 @@ public:
 
     Q_INVOKABLE static QString copyToFolder(const QString &fromFilePath, const QString &toFolder);
     Q_INVOKABLE static QString completeBaseName(const QString &path);
-    Q_INVOKABLE static QString neighbouringFilePath(const QString &filePath,
-                                                    const QString &nfileName);
+    Q_INVOKABLE static QString neighbouringFilePath(const QString &filePath, const QString &nfileName);
     Q_INVOKABLE static QString path(const QString &name);
     Q_INVOKABLE static QString read(const QString &fileName);
 
@@ -532,20 +528,18 @@ public:
 
     Q_INVOKABLE static qreal distanceBetweenPoints(const QPointF &p1, const QPointF &p2);
 
-    Q_INVOKABLE static QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top,
-                                              qreal right, qreal bottom);
+    Q_INVOKABLE static QRectF adjustRectangle(const QRectF &rect, qreal left, qreal top, qreal right, qreal bottom);
     Q_INVOKABLE static QRectF boundingRect(const QString &text, const QFont &font);
     Q_INVOKABLE static QRectF intersectedRectangle(const QRectF &of, const QRectF &with);
     Q_INVOKABLE static QRectF largestBoundingRect(const QStringList &strings, const QFont &font);
-    Q_INVOKABLE static QRectF querySubRectangle(const QRectF &in, const QRectF &around,
-                                                const QSizeF &atBest);
+    Q_INVOKABLE static QRectF querySubRectangle(const QRectF &in, const QRectF &around, const QSizeF &atBest);
     Q_INVOKABLE static QRectF uniteRectangles(const QRectF &r1, const QRectF &r2);
 
     Q_INVOKABLE static QSizeF scaledSize(const QSizeF &of, const QSizeF &into);
 
     Q_INVOKABLE static QPointF centerOf(const QRectF &rect);
-    Q_INVOKABLE static QPointF
-    translationRequiredToBringRectangleInRectangle(const QRectF &bigRect, const QRectF &smallRect);
+    Q_INVOKABLE static QPointF translationRequiredToBringRectangleInRectangle(const QRectF &bigRect,
+                                                                              const QRectF &smallRect);
 };
 
 class TMath : public QObject // short for Time Math
@@ -558,6 +552,10 @@ public:
     Q_INVOKABLE static void sleep(int ms);
     Q_INVOKABLE static QTime secondsToTime(int nrSeconds);
     Q_INVOKABLE static QString relativeTime(const QDateTime &dt);
+    Q_INVOKABLE static QString timeLengthString(const QTime &time);
+    Q_INVOKABLE static QString timeToString(const QTime &time);
+    Q_INVOKABLE static QString dateToString(const QDate &date);
+    Q_INVOKABLE static QString dateTimeToString(const QDateTime &dateTime);
 };
 
 class Clipboard : public QObject
@@ -599,8 +597,7 @@ public:
 
     static QPainterPath stringToPainterPath(const QString &val);
 
-    static QJsonObject replaceCharacterName(const QString &from, const QString &to,
-                                            const QJsonObject &delta,
+    static QJsonObject replaceCharacterName(const QString &from, const QString &to, const QJsonObject &delta,
                                             int *nrReplacements = nullptr);
     static QString replaceCharacterName(const QString &from, const QString &to, const QString &in,
                                         int *nrReplacements = nullptr);

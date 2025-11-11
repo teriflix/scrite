@@ -234,11 +234,11 @@ Rectangle {
                 VclLabel {
                     Layout.alignment: Qt.AlignVCenter
 
-                    text: _private.sceneLength
+                    text: _private.sceneLengthWatcher.sceneLength
                     color: Runtime.colors.primary.c10.text
-                    visible: !Runtime.screenplayTextDocument.paused && (Runtime.sceneListPanelSettings.displaySceneLength === "PAGE" || Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
-                    opacity: 0.5
+                    opacity: _private.isBreak ? 0.75 : 0.5
 
+                    font.bold: _private.isBreak
                     font.pointSize: Runtime.idealFontMetrics.font.pointSize-3
                 }
             }
@@ -437,34 +437,22 @@ Rectangle {
             return ret
         }
 
-        property string sceneLength: evaluateSceneLength()
+        readonly property ScreenplayPaginatorWatcher sceneLengthWatcher: ScreenplayPaginatorWatcher {
+            property string sceneLength: {
+                if(paginator === null || element === null || !hasValidRecord)
+                    return ""
 
-        function evaluateSceneLength() {
-            if(root.scene) {
-                if(Runtime.sceneListPanelSettings.displaySceneLength === "PAGE") {
-                    const pl = Runtime.screenplayTextDocument.lengthInPages(root.screenplayElement, null)
-                    return Math.round(pl*100,2)/100
-                }
                 if(Runtime.sceneListPanelSettings.displaySceneLength === "TIME")
-                    return Runtime.screenplayTextDocument.lengthInTimeAsString(root.screenplayElement, null)
+                    return TMath.timeLengthString(timeLength)
+
+                if(Runtime.sceneListPanelSettings.displaySceneLength === "PAGE")
+                    return pageLength.toFixed(2)
+
+                return ""
             }
-            return ""
-        }
 
-        function updateSceneLength() {
-            _private.sceneLength = _private.evaluateSceneLength()
-        }
-
-        Component.onCompleted: {
-            Runtime.screenplayTextDocument.pausedChanged.connect(updateSceneLength)
-            Runtime.screenplayTextDocument.pageBoundariesChanged.connect(updateSceneLength)
-            Runtime.sceneListPanelSettings.displaySceneLengthChanged.connect(updateSceneLength)
-        }
-
-        Component.onDestruction: {
-            Runtime.screenplayTextDocument.pausedChanged.disconnect(updateSceneLength)
-            Runtime.screenplayTextDocument.pageBoundariesChanged.disconnect(updateSceneLength)
-            Runtime.sceneListPanelSettings.displaySceneLengthChanged.disconnect(updateSceneLength)
+            paginator: Runtime.paginator.paused || Runtime.sceneListPanelSettings.displaySceneLength === "NO" ? null : Runtime.paginator
+            element: root.screenplayElement
         }
     }
 }

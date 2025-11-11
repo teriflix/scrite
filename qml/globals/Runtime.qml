@@ -624,30 +624,18 @@ Item {
         }
     }
 
-    // This model provides access to the paginated-text-document constructed from the screenplay
-    // of the current Scrite file.
-    readonly property ScreenplayTextDocument screenplayTextDocument: ScreenplayTextDocument {
-        // Setting this is as good as setting the other.
-        // when paused = true, page and time computation is halted.
+    readonly property ScreenplayPaginator paginator : ScreenplayPaginator {
         property bool paused: Runtime.screenplayEditorSettings.pausePagination
+        property ScreenplayElement currentElement: screenplay !== null ? Runtime.screenplayAdapter.currentElement : null
 
-        // FIXME: Do we really need this?
-        ObjectRegister.name: "screenplayTextDocument"
+        enabled: !paused && !Scrite.document.loading
+        format: Scrite.document.printFormat
+        screenplay: Runtime.screenplayAdapter.screenplay
+        cursorPosition: currentElement ? (currentElement.scene ? Math.max(currentElement.scene.cursorPosition,0) : 0) : -1
 
-        formatting: Scrite.document.loading || paused ? null : Scrite.document.printFormat
-        includeSceneSynopsis: false
-        listSceneCharacters: false
-        printEachSceneOnANewPage: false
-        sceneIcons: false
-        sceneNumbers: false
-        screenplay: Scrite.document.loading || paused ? null : Runtime.screenplayAdapter.screenplay
-        secondsPerPage: Scrite.document.printFormat.secondsPerPage
-        syncEnabled: true
-        titlePage: false
-
-        onPausedChanged: Qt.callLater( function() {
-            Runtime.screenplayEditorSettings.pausePagination = screenplayTextDocument.paused
-        })
+        function toggle() { Runtime.screenplayEditorSettings.pausePagination = !Runtime.screenplayEditorSettings.pausePagination }
+        function pause() { Runtime.screenplayEditorSettings.pausePagination = false }
+        function resume() { Runtime.screenplayEditorSettings.pausePagination = true }
     }
 
     readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {

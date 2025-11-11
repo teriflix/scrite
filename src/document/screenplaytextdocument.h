@@ -33,13 +33,7 @@ class ScreenplayTextDocument;
 class AbstractScreenplayTextDocumentInjectionInterface
 {
 public:
-    enum InjectLocation {
-        AfterTitlePage,
-        AfterSceneHeading,
-        AfterLastScene,
-        BeforeSceneElement,
-        AfterSceneElement
-    };
+    enum InjectLocation { AfterTitlePage, AfterSceneHeading, AfterLastScene, BeforeSceneElement, AfterSceneElement };
     virtual void inject(QTextCursor &, InjectLocation) { }
     virtual bool filterSceneElement() const { return false; }
 
@@ -56,7 +50,7 @@ private:
     const SceneElement *m_sceneElement = nullptr;
 };
 
-#define AbstractScreenplayTextDocumentInjectionInterface_iid                                       \
+#define AbstractScreenplayTextDocumentInjectionInterface_iid                                                           \
     "io.scrite.AbstractScreenplayTextDocumentInjectionInterface"
 Q_DECLARE_INTERFACE(AbstractScreenplayTextDocumentInjectionInterface,
                     AbstractScreenplayTextDocumentInjectionInterface_iid)
@@ -408,16 +402,12 @@ public:
     explicit ScreenplayElementPageBreaks(QObject *parent = nullptr);
     ~ScreenplayElementPageBreaks();
 
-    Q_PROPERTY(ScreenplayTextDocument *screenplayDocument READ screenplayDocument WRITE
-                       setScreenplayDocument NOTIFY screenplayDocumentChanged RESET
-                               resetScreenplayDocument)
+    Q_PROPERTY(ScreenplayTextDocument *screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged RESET resetScreenplayDocument)
     void setScreenplayDocument(ScreenplayTextDocument *val);
     ScreenplayTextDocument *screenplayDocument() const { return m_screenplayDocument; }
     Q_SIGNAL void screenplayDocumentChanged();
 
-    Q_PROPERTY(
-            ScreenplayElement *screenplayElement READ screenplayElement WRITE setScreenplayElement
-                    NOTIFY screenplayElementChanged RESET resetScreenplayElement)
+    Q_PROPERTY( ScreenplayElement *screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged RESET resetScreenplayElement)
     void setScreenplayElement(ScreenplayElement *val);
     ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
     Q_SIGNAL void screenplayElementChanged();
@@ -474,10 +464,10 @@ public:
                     const QTextFormat &format);
 
 private:
-    void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc,
-                         int posInDocument, const QTextFormat &format);
-    void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc,
-                        int posInDocument, const QTextFormat &format);
+    void drawSceneNumber(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
+                         const QTextFormat &format);
+    void drawMoreMarker(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
+                        const QTextFormat &format);
     void drawSceneIcon(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument,
                        const QTextFormat &format);
     void drawText(QPainter *painter, const QRectF &rect, const QString &text);

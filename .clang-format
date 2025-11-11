@@ -16,7 +16,7 @@ Standard: Cpp11
 # Column width is limited to 100 in accordance with Qt Coding Style.
 # https://wiki.qt.io/Qt_Coding_Style
 # Note that this may be changed at some point in the future.
-ColumnLimit: 100
+ColumnLimit: 120
 # How much weight do extra characters after the line length limit have.
 # PenaltyExcessCharacter: 4
 

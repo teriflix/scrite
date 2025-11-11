@@ -37,7 +37,7 @@ Loader {
         Repeater {
             id: _pageBreaks
 
-            model: _pageBreaksEvaluator.pageBreaks
+            model: _paginatorWatcher.pageBreaks
 
             Item {
                 id: _pageBreakItem
@@ -45,7 +45,7 @@ Loader {
                 required property var modelData
 
                 property int pageNumber: modelData.pageNumber
-                property int cursorPosition: modelData.position
+                property int cursorPosition: modelData.cursorPosition
 
                 property rect cursorRect: _private.evaluateCursorRectAtPosition(cursorPosition)
 
@@ -106,11 +106,11 @@ Loader {
             }
         }
 
-        ScreenplayElementPageBreaks {
-            id: _pageBreaksEvaluator
+        ScreenplayPaginatorWatcher {
+            id: _paginatorWatcher
 
-            screenplayElement: _screenplayElement.value
-            screenplayDocument: Scrite.document.loading ? null : Runtime.screenplayTextDocument
+            paginator: _private.showPageNumbers ? Runtime.paginator : nullptr
+            element: root.screenplayElement
         }
 
         ResetOnChange {
@@ -125,7 +125,7 @@ Loader {
     QtObject {
         id: _private
 
-        property bool showPageNumbers: !Runtime.screenplayTextDocument.paused
+        property bool showPageNumbers: !Runtime.paginator.paused
 
         onShowPageNumbersChanged: displayPageNumbersIfPossible()
 

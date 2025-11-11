@@ -160,7 +160,7 @@ Rectangle {
 
             ScriptAction {
                 script: {
-                    Runtime.screenplayTextDocument.syncEnabled = false
+                    Runtime.paginator.pause()
                     _replaceAllTask.waitDialog = WaitDialog.launch("Please wait while replacing text ...")
                 }
             }
@@ -172,7 +172,7 @@ Rectangle {
             ScriptAction {
                 script: {
                     _replaceAllTask.nrReplacements = _private.screenplay.replace(_replaceAllTask.searchString, _replaceAllTask.replacementText, 0)
-                    Runtime.screenplayTextDocument.syncEnabled = true
+                    Runtime.paginator.resume()
                     _replaceAllTask.waitDialog.close()
                 }
             }

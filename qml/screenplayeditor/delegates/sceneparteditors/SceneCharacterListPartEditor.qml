@@ -93,7 +93,6 @@ AbstractScenePartEditor {
         readonly property Action editSceneContent: ActionHub.editOptions.find("editSceneContent")
 
         property bool captureInvisibleCharacters: Runtime.screenplayEditorSettings.captureInvisibleCharacters
-        onCaptureInvisibleCharactersChanged: scheduleDetermineFlagsInTags()
 
         property Component characterMenu: ScreenplayEditorCharacterMenu { }
 

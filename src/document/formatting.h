@@ -335,8 +335,7 @@ public:
     Q_PROPERTY(ScriteDocument *scriteDocument READ scriteDocument CONSTANT STORED false)
     ScriteDocument *scriteDocument() const { return m_scriteDocument; }
 
-    Q_PROPERTY(QScreen *screen READ screen WRITE setScreen NOTIFY screenChanged RESET resetScreen
-                       STORED false)
+    Q_PROPERTY(QScreen *screen READ screen WRITE setScreen NOTIFY screenChanged RESET resetScreen STORED false)
     Q_INVOKABLE void setScreen(QScreen *val);
     QScreen *screen() const { return m_screen; }
     Q_SIGNAL void screenChanged();

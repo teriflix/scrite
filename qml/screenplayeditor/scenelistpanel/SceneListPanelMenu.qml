@@ -69,7 +69,7 @@ VclMenu {
 
             readonly property string option: "TIME"
 
-            enabled: !Runtime.screenplayTextDocument.paused
+            enabled: !Runtime.paginator.paused
             icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
@@ -80,7 +80,7 @@ VclMenu {
 
             readonly property string option: "PAGE"
 
-            enabled: !Runtime.screenplayTextDocument.paused
+            enabled: !Runtime.paginator.paused
             icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option
@@ -91,7 +91,7 @@ VclMenu {
 
             readonly property string option: "NO"
 
-            enabled: !Runtime.screenplayTextDocument.paused
+            enabled: !Runtime.paginator.paused
             icon.source: Runtime.sceneListPanelSettings.displaySceneLength === option ? "qrc:/icons/navigation/check.png" : "qrc:/icons/content/blank.png"
 
             onClicked: Runtime.sceneListPanelSettings.displaySceneLength = option

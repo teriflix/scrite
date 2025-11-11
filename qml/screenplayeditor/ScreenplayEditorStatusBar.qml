@@ -63,7 +63,7 @@ Rectangle {
     Item {
         anchors.fill: _metricsDisplay
 
-        ToolTip.text: "Page count and time estimates are approximate, assuming " + Runtime.screenplayTextDocument.timePerPageAsString + " per page."
+        ToolTip.text: "Page count and time estimates are approximate, assuming " + Scrite.document.printFormat.secondsPerPage + "(s) per page."
         ToolTip.delay: Qt.styleHints.mousePressAndHoldInterval
         ToolTip.visible: _metricsDisplayOverlayMouseArea.containsMouse
 
@@ -128,16 +128,11 @@ Rectangle {
 
         IconButton {
             source: "qrc:/icons/navigation/refresh.png"
-            opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
+            opacity: Runtime.screenplayEditorSettings.pausePagination ? 0.85 : 1
             visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
             tooltipText: enabled ? "Computes page layout from scratch, thereby reevaluating page count and time." : "Resume page and time computation."
 
-            onClicked: {
-                if(Runtime.screenplayTextDocument.paused)
-                    Runtime.screenplayTextDocument.paused = false
-                else
-                    Runtime.screenplayTextDocument.reload()
-            }
+            onClicked: Runtime.paginator.reset()
         }
 
         Separator {
@@ -146,15 +141,23 @@ Rectangle {
 
         IconButton {
             source: "qrc:/icons/content/page_count.png"
-            opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
+            opacity: Runtime.paginator.paused ? 0.85 : 1
             tooltipText: containsMouse && !pressed
 
-            onClicked: Runtime.screenplayTextDocument.paused = !Runtime.screenplayTextDocument.paused
+            onClicked: Runtime.paginator.toggle()
         }
 
         VclText {
-            text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentPage + " of " + Runtime.screenplayTextDocument.pageCount)
-            opacity: Runtime.screenplayTextDocument.paused ? 0.5 : 1
+            text: {
+                if(Runtime.paginator.paused)
+                    return ""
+
+                if(Runtime.paginator.cursorPosition >= 0)
+                    return Runtime.paginator.cursorPage + " of " + Runtime.paginator.pageCount
+
+                return Runtime.paginator.pageCount
+            }
+            opacity: Runtime.paginator.paused ? 0.5 : 1
             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
         }
 
@@ -162,15 +165,23 @@ Rectangle {
 
         IconButton {
             source: "qrc:/icons/content/time.png"
-            opacity: Runtime.screenplayTextDocument.paused ? 0.85 : 1
+            opacity: Runtime.paginator.paused ? 0.85 : 1
             tooltipText: "Click here to toggle time computation, in case the app is not responding fast while typing."
 
-            onClicked: Runtime.screenplayTextDocument.paused = !Runtime.screenplayTextDocument.paused
+            onClicked: Runtime.paginator.toggle()
         }
 
         VclText {
-            text: Runtime.screenplayTextDocument.paused ? "- of -" : (Runtime.screenplayTextDocument.currentTimeAsString + " of " + (Runtime.screenplayTextDocument.pageCount > 1 ? Runtime.screenplayTextDocument.totalTimeAsString : Runtime.screenplayTextDocument.timePerPageAsString))
-            opacity: Runtime.screenplayTextDocument.paused ? 0.5 : 1
+            text: {
+                if(Runtime.paginator.paused)
+                    return ""
+
+                if(Runtime.paginator.cursorPosition >= 0)
+                    return TMath.timeLengthString(Runtime.paginator.cursorTime) + " of " + TMath.timeLengthString(Runtime.paginator.totalTime)
+
+                return TMath.timeLengthString(Runtime.paginator.totalTime)
+            }
+            opacity: Runtime.paginator.paused ? 0.5 : 1
             font.pointSize: Runtime.minimumFontMetrics.font.pointSize
         }
 

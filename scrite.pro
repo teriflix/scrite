@@ -57,6 +57,8 @@ HEADERS += \
     src/core/languageengine.h \
     src/core/localstorage.h \
     src/core/utils.h \
+    src/document/screenplaypaginator.h \
+    src/document/screenplaypaginatorworker.h \
     src/network/networkstatus.h \
     src/core/pdfexportablegraphicsscene.h \
     src/core/peerapplookup.h \
@@ -189,6 +191,8 @@ SOURCES += \
     src/core/languageengine.cpp \
     src/core/localstorage.cpp \
     src/core/utils.cpp \
+    src/document/screenplaypaginator.cpp \
+    src/document/screenplaypaginatorworker.cpp \
     src/network/networkstatus.cpp \
     src/core/pdfexportablegraphicsscene.cpp \
     src/core/peerapplookup.cpp \
