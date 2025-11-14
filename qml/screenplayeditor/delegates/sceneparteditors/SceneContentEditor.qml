@@ -566,16 +566,28 @@ AbstractScenePartEditor {
 
                 const cursorPositionBeforePaste = _sceneTextEditor.cursorPosition
                 const cursorPositionAfterPaste = _sceneDocumentBinder.paste(_sceneTextEditor.cursorPosition)
-                if(cursorPositionAfterPaste < 0)
+                if(cursorPositionAfterPaste < 0) {
                     _sceneTextEditor.paste()
-                else
-                    _sceneTextEditor.cursorPosition = cursorPositionAfterPaste
-                _sceneTextEditor.highlightCursor()
+                    _sceneTextEditor.highlightCursor()
+                } else {
+                    _sceneTextEditor.cursorPosition = 0
+                    placeCursorAt(cursorPositionAfterPaste)
+                }
             }
         }
 
         function reload() {
             _sceneDocumentBinder.preserveScrollAndReload()
+        }
+
+        function placeCursorAt(position) {
+            if(_sceneTextEditor.activeFocus) {
+                _sceneTextEditor.cursorPosition = position > 0 ? 0 : _sceneTextEditor.length
+                Qt.callLater( () => {
+                                 _sceneTextEditor.cursorPosition = position
+                                 _sceneTextEditor.highlightCursor()
+                             })
+            }
         }
 
         property Timer reloadSceneContentTimer

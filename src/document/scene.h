@@ -88,8 +88,8 @@ public:
     Q_PROPERTY(QString displayText READ displayText NOTIFY textChanged)
     QString displayText() const { return this->toString(DisplayMode); }
 
-    static bool parse(const QString &text, QString &locationType, QString &location,
-                      QString &moment, bool strict = false);
+    static bool parse(const QString &text, QString &locationType, QString &location, QString &moment,
+                      bool strict = false);
 
     Q_INVOKABLE void parseFrom(const QString &text);
 
@@ -208,6 +208,8 @@ public:
     // For use with SceneDocumentBinder, ScreenplayTextDocument
     void setTextFormats(const QVector<QTextLayout::FormatRange> &formats);
     QVector<QTextLayout::FormatRange> textFormats() const { return m_textFormats; }
+    void reportAllChanges();
+    void dropAllChanges();
 
     static QJsonArray textFormatsToJson(const QVector<QTextLayout::FormatRange> &formats);
     static QVector<QTextLayout::FormatRange> textFormatsFromJson(const QJsonArray &array);
@@ -273,10 +275,7 @@ public:
     QStringList characterNames() const { return this->distinctValues(); }
     bool containsCharacter(const QString &name) const { return this->containsValue(name); }
     QList<SceneElement *> characterElements() const { return this->elements(); }
-    QList<SceneElement *> characterElements(const QString &name) const
-    {
-        return this->elements(name);
-    }
+    QList<SceneElement *> characterElements(const QString &name) const { return this->elements(name); }
 };
 
 class TransitionElementMap : public DistinctElementValuesMap
@@ -288,10 +287,7 @@ public:
     QStringList transitions() const { return this->distinctValues(); }
     bool containsTransition(const QString &name) const { return this->containsValue(name); }
     QList<SceneElement *> transitionElements() const { return this->elements(); }
-    QList<SceneElement *> transitionElements(const QString &name) const
-    {
-        return this->elements(name);
-    }
+    QList<SceneElement *> transitionElements(const QString &name) const { return this->elements(name); }
 };
 
 class ShotElementMap : public DistinctElementValuesMap

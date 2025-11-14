@@ -188,8 +188,7 @@ PushSceneUndoCommand::~PushSceneUndoCommand()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SceneHeading::SceneHeading(QObject *parent)
-    : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
+SceneHeading::SceneHeading(QObject *parent) : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
 {
     connect(this, &SceneHeading::momentChanged, this, &SceneHeading::textChanged);
     connect(this, &SceneHeading::enabledChanged, this, &SceneHeading::textChanged);
@@ -199,8 +198,7 @@ SceneHeading::SceneHeading(QObject *parent)
         this->markAsModified();
         this->evaluateWordCountLater();
     });
-    connect(this, &SceneHeading::wordCountChanged, m_scene, &Scene::evaluateWordCountLater,
-            Qt::UniqueConnection);
+    connect(this, &SceneHeading::wordCountChanged, m_scene, &Scene::evaluateWordCountLater, Qt::UniqueConnection);
 }
 
 SceneHeading::~SceneHeading() { }
@@ -252,8 +250,7 @@ void SceneHeading::setMoment(const QString &val2)
     emit momentChanged();
 }
 
-bool SceneHeading::parse(const QString &text, QString &locationType, QString &location,
-                         QString &moment, bool strict)
+bool SceneHeading::parse(const QString &text, QString &locationType, QString &location, QString &moment, bool strict)
 {
     const Structure *structure = ScriteDocument::instance()->structure();
     const QString heading = text.toUpper().trimmed();
@@ -296,8 +293,7 @@ bool SceneHeading::parse(const QString &text, QString &locationType, QString &lo
     if (strict)
         return Structure::standardLocationTypes().contains(locationType);
 
-    return structure->standardLocationTypes().contains(locationType)
-            && structure->standardMoments().contains(moment);
+    return structure->standardLocationTypes().contains(locationType) && structure->standardMoments().contains(moment);
 }
 
 void SceneHeading::parseFrom(const QString &text)
@@ -325,8 +321,7 @@ void SceneHeading::timerEvent(QTimerEvent *event)
 void SceneHeading::renameCharacter(const QString &from, const QString &to)
 {
     int nrReplacements = 0;
-    const QString newLocation =
-            Utils::SMath::replaceCharacterName(from, to, m_location, &nrReplacements);
+    const QString newLocation = Utils::SMath::replaceCharacterName(from, to, m_location, &nrReplacements);
     if (nrReplacements > 0) {
         m_location = newLocation.toUpper();
         emit locationChanged();
@@ -373,16 +368,14 @@ void SceneHeading::evaluateWordCountLater()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SceneElement::SceneElement(QObject *parent)
-    : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
+SceneElement::SceneElement(QObject *parent) : QObject(parent), m_scene(qobject_cast<Scene *>(parent))
 {
     connect(this, &SceneElement::typeChanged, this, &SceneElement::elementChanged);
     connect(this, &SceneElement::textChanged, this, &SceneElement::elementChanged);
     connect(this, &SceneElement::elementChanged, [=]() { this->markAsModified(); });
 
     if (m_scene != nullptr)
-        connect(this, &SceneElement::wordCountChanged, m_scene, &Scene::evaluateWordCountLater,
-                Qt::UniqueConnection);
+        connect(this, &SceneElement::wordCountChanged, m_scene, &Scene::evaluateWordCountLater, Qt::UniqueConnection);
 }
 
 SceneElement::~SceneElement()
@@ -648,8 +641,7 @@ bool SceneElement::capitalizeSentences()
 QList<int> SceneElement::autoCapitalizePositions() const
 {
     // Auto-capitalize needs to be done only on action and dialogue paragraphs.
-    if (!QList<SceneElement::Type>({ SceneElement::Action, SceneElement::Dialogue })
-                 .contains(m_type))
+    if (!QList<SceneElement::Type>({ SceneElement::Action, SceneElement::Dialogue }).contains(m_type))
         return QList<int>();
 
     return SceneElement::autoCapitalizePositions(m_text);
@@ -659,10 +651,9 @@ QList<int> SceneElement::autoCapitalizePositions(const QString &text)
 {
     QList<int> ret;
 
-    static QList<QChar> sentenceBreaks(
-            { '.', '!', '?' }); // I want to use QChar::isPunct(), but it
-                                // returns true for non-sentence breaking
-                                // punctuations also, which we don't want.
+    static QList<QChar> sentenceBreaks({ '.', '!', '?' }); // I want to use QChar::isPunct(), but it
+                                                           // returns true for non-sentence breaking
+                                                           // punctuations also, which we don't want.
     bool needsCapping = true;
     for (int i = 0; i < text.length(); i++) {
         const QChar ch = text.at(i);
@@ -759,6 +750,24 @@ void SceneElement::setTextFormats(const QVector<QTextLayout::FormatRange> &forma
     emit elementChanged();
 
     this->reportSceneElementChanged(Scene::ElementTextChange);
+}
+
+void SceneElement::reportAllChanges()
+{
+    m_changeTimer.stop();
+    if (m_scene != nullptr) {
+        if (m_changeCounters.take(Scene::ElementTypeChange) > 0)
+            emit m_scene->sceneElementChanged(this, Scene::ElementTypeChange);
+        if (m_changeCounters.take(Scene::ElementTextChange) > 0)
+            emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
+    }
+    m_changeCounters.clear();
+}
+
+void SceneElement::dropAllChanges()
+{
+    m_changeTimer.stop();
+    m_changeCounters.clear();
 }
 
 QJsonArray SceneElement::textFormatsToJson(const QVector<QTextLayout::FormatRange> &formats)
@@ -874,8 +883,7 @@ bool SceneElement::event(QEvent *event)
 {
     if (event->type() == QEvent::ParentChange) {
         if (m_scene != nullptr)
-            disconnect(this, &SceneElement::wordCountChanged, m_scene,
-                       &Scene::evaluateWordCountLater);
+            disconnect(this, &SceneElement::wordCountChanged, m_scene, &Scene::evaluateWordCountLater);
         m_scene = qobject_cast<Scene *>(this->parent());
         if (m_scene != nullptr)
             connect(this, &SceneElement::wordCountChanged, m_scene, &Scene::evaluateWordCountLater,
@@ -888,14 +896,7 @@ bool SceneElement::event(QEvent *event)
 void SceneElement::timerEvent(QTimerEvent *event)
 {
     if (event->timerId() == m_changeTimer.timerId()) {
-        m_changeTimer.stop();
-        if (m_scene != nullptr) {
-            if (m_changeCounters.take(Scene::ElementTypeChange) > 0)
-                emit m_scene->sceneElementChanged(this, Scene::ElementTypeChange);
-            if (m_changeCounters.take(Scene::ElementTextChange) > 0)
-                emit m_scene->sceneElementChanged(this, Scene::ElementTextChange);
-        }
-        m_changeCounters.clear();
+        this->reportAllChanges();
     } else if (event->timerId() == m_wordCountTimer.timerId()) {
         m_wordCountTimer.stop();
         this->evaluateWordCount();
@@ -977,8 +978,7 @@ bool DistinctElementValuesMap::include(SceneElement *element)
 
         QString newName = element->formattedText();
         newName = newName.section('(', 0, 0).trimmed();
-        if ((m_type == SceneElement::Shot || m_type == SceneElement::Transition)
-            && newName.endsWith(':'))
+        if ((m_type == SceneElement::Shot || m_type == SceneElement::Transition) && newName.endsWith(':'))
             newName = newName.left(newName.length() - 1);
         if (newName.isEmpty())
             return ret;
@@ -1008,8 +1008,7 @@ bool DistinctElementValuesMap::remove(SceneElement *element)
             }
 
             if (list.size() == 1) {
-                const QVariant value =
-                        m_type == SceneElement::Character ? list.first()->property("#mute") : false;
+                const QVariant value = m_type == SceneElement::Character ? list.first()->property("#mute") : false;
                 if (value.isValid() && value.toBool())
                     return true;
             }
@@ -1596,15 +1595,14 @@ void Scene::verifyGroups(const QJsonArray &groupsModel)
 
     auto verifyGroupsImpl = [](const QJsonArray &model, const QStringList &groups) {
         QStringList ret;
-        std::copy_if(groups.begin(), groups.end(), std::back_inserter(ret),
-                     [model](const QString &group) {
-                         for (const QJsonValue &item : model) {
-                             const QJsonObject obj = item.toObject();
-                             if (obj.value(QStringLiteral("name")).toString() == group)
-                                 return true;
-                         }
-                         return false;
-                     });
+        std::copy_if(groups.begin(), groups.end(), std::back_inserter(ret), [model](const QString &group) {
+            for (const QJsonValue &item : model) {
+                const QJsonObject obj = item.toObject();
+                if (obj.value(QStringLiteral("name")).toString() == group)
+                    return true;
+            }
+            return false;
+        });
         ret.sort(Qt::CaseInsensitive);
         return ret;
     };
@@ -1675,10 +1673,9 @@ bool Scene::hasTag(const QString &tag) const
 
 QQmlListProperty<SceneElement> Scene::elements()
 {
-    return QQmlListProperty<SceneElement>(reinterpret_cast<QObject *>(this),
-                                          static_cast<void *>(this), &Scene::staticAppendElement,
-                                          &Scene::staticElementCount, &Scene::staticElementAt,
-                                          &Scene::staticClearElements);
+    return QQmlListProperty<SceneElement>(reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+                                          &Scene::staticAppendElement, &Scene::staticElementCount,
+                                          &Scene::staticElementAt, &Scene::staticClearElements);
 }
 
 SceneElement *Scene::appendElement(const QString &text, int type)
@@ -1951,9 +1948,8 @@ Scene *Scene::splitScene(SceneElement *element, int textPosition, QObject *paren
                 newScene->heading()->setEnabled(true);
                 newScene->heading()->setLocationType(this->heading()->locationType());
                 newScene->heading()->setLocation(oldElementText);
-                newScene->heading()->setMoment(this->heading()->moment().isEmpty()
-                                                       ? QString()
-                                                       : QStringLiteral("CONTINUOUS"));
+                newScene->heading()->setMoment(this->heading()->moment().isEmpty() ? QString()
+                                                                                   : QStringLiteral("CONTINUOUS"));
                 this->removeElement(oldElement);
                 continue;
             }
@@ -2216,8 +2212,7 @@ private:
 
 void Scene::deserializeFromJson(const QJsonObject &json)
 {
-    const QJsonArray invisibleCharacters =
-            json.value(QStringLiteral("#invisibleCharacters")).toArray();
+    const QJsonArray invisibleCharacters = json.value(QStringLiteral("#invisibleCharacters")).toArray();
     if (!invisibleCharacters.isEmpty())
         new AddInvisibleCharactersTimer(invisibleCharacters, this);
 
@@ -2279,8 +2274,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
             headingBlockFormat.setHeadingLevel(options.headingLevel);
             QTextCharFormat headingCharFormat;
             headingCharFormat.setFontWeight(QFont::Bold);
-            headingCharFormat.setFontPointSize(
-                    ScreenplayTextDocument::headingFontPointSize(options.headingLevel));
+            headingCharFormat.setFontPointSize(ScreenplayTextDocument::headingFontPointSize(options.headingLevel));
             headingBlockFormat.setTopMargin(headingCharFormat.fontPointSize() / 2);
             if (cursor.block().text().isEmpty()) {
                 cursor.setBlockFormat(headingBlockFormat);
@@ -2294,19 +2288,15 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
     // Featured Photo
     if (options.includeFeaturedPhoto) {
         const Attachments *sceneAttachments = m_attachments;
-        const Attachment *featuredAttachment =
-                sceneAttachments ? sceneAttachments->featuredAttachment() : nullptr;
+        const Attachment *featuredAttachment = sceneAttachments ? sceneAttachments->featuredAttachment() : nullptr;
         const Attachment *featuredImage =
-                featuredAttachment && featuredAttachment->type() == Attachment::Photo
-                ? featuredAttachment
-                : nullptr;
+                featuredAttachment && featuredAttachment->type() == Attachment::Photo ? featuredAttachment : nullptr;
 
         if (featuredImage) {
             const QUrl url(QStringLiteral("scrite://") + featuredImage->filePath());
             const QImage image(featuredImage->fileSource().toLocalFile());
 
-            textDocument->addResource(QTextDocument::ImageResource, url,
-                                      QVariant::fromValue<QImage>(image));
+            textDocument->addResource(QTextDocument::ImageResource, url, QVariant::fromValue<QImage>(image));
 
             const QSizeF imageSize = image.size().scaled(QSize(320, 240), Qt::KeepAspectRatio);
 
@@ -2370,9 +2360,7 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
                 const QJsonObject field = fields.at(i).toObject();
                 const QString key = field.value(QStringLiteral("name")).toString();
                 const QString desc = field.value(QStringLiteral("description")).toString();
-                const QString value = i < m_indexCardFieldValues.size()
-                        ? m_indexCardFieldValues.at(i)
-                        : QString();
+                const QString value = i < m_indexCardFieldValues.size() ? m_indexCardFieldValues.at(i) : QString();
 
                 cursor = table->cellAt(i, 0).firstCursorPosition();
                 cursor.insertText(key);
@@ -2424,10 +2412,8 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
         cursor.insertFrame(sceneFrameFormat);
 
         if (m_heading && m_heading->isEnabled()) {
-            SceneElementFormat *headingParaFormat =
-                    printFormat->elementFormat(SceneElement::Heading);
-            const QTextBlockFormat headingParaBlockFormat =
-                    headingParaFormat->createBlockFormat(Qt::Alignment());
+            SceneElementFormat *headingParaFormat = printFormat->elementFormat(SceneElement::Heading);
+            const QTextBlockFormat headingParaBlockFormat = headingParaFormat->createBlockFormat(Qt::Alignment());
             const QTextCharFormat headingParaCharFormat = headingParaFormat->createCharFormat();
             cursor.setBlockFormat(headingParaBlockFormat);
             cursor.setBlockCharFormat(headingParaCharFormat);
@@ -2437,13 +2423,11 @@ void Scene::write(QTextCursor &cursor, const WriteOptions &options) const
 
         for (SceneElement *para : m_elements) {
             SceneElementFormat *paraFormat = printFormat->elementFormat(para->type());
-            const QTextBlockFormat paraBlockFormat =
-                    paraFormat->createBlockFormat(para->alignment());
+            const QTextBlockFormat paraBlockFormat = paraFormat->createBlockFormat(para->alignment());
             const QTextCharFormat paraCharFormat = paraFormat->createCharFormat();
             cursor.setBlockFormat(paraBlockFormat);
             cursor.setBlockCharFormat(paraCharFormat);
-            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(),
-                                                             para->textFormats());
+            LanguageEngine::polishFontsAndInsertTextAtCursor(cursor, para->text(), para->textFormats());
             if (para != m_elements.last())
                 cursor.insertBlock();
         }
@@ -2572,8 +2556,7 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     // Rename character name in title.
     {
         int nrReplacements = 0;
-        const QString newTitle =
-                Utils::SMath::replaceCharacterName(from, to, m_synopsis, &nrReplacements);
+        const QString newTitle = Utils::SMath::replaceCharacterName(from, to, m_synopsis, &nrReplacements);
         if (nrReplacements > 0) {
             m_synopsis = newTitle;
             emit synopsisChanged();
@@ -2599,8 +2582,7 @@ void Scene::renameCharacter(const QString &from, const QString &to)
     // Rename in comments
     {
         int nrReplacements = 0;
-        const QString newComments =
-                Utils::SMath::replaceCharacterName(from, to, m_comments, &nrReplacements);
+        const QString newComments = Utils::SMath::replaceCharacterName(from, to, m_comments, &nrReplacements);
         if (nrReplacements > 0) {
             m_comments = newComments;
             emit commentsChanged();
@@ -2787,8 +2769,7 @@ void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
 
     if (m_format != nullptr) {
         disconnect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::formatReset);
-        disconnect(m_format, &ScreenplayFormat::formatChanged, this,
-                   &SceneSizeHintItem::onFormatChanged);
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     }
 
     m_format = val;
@@ -2796,8 +2777,7 @@ void SceneSizeHintItem::setFormat(ScreenplayFormat *val)
     if (m_format != nullptr) {
         connect(m_format, &ScreenplayFormat::destroyed, this, &SceneSizeHintItem::formatReset);
         if (m_trackFormatChanges)
-            connect(m_format, &ScreenplayFormat::formatChanged, this,
-                    &SceneSizeHintItem::onFormatChanged);
+            connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     }
 
     emit formatChanged();
@@ -2814,11 +2794,9 @@ void SceneSizeHintItem::setTrackFormatChanges(bool val)
     emit trackFormatChangesChanged();
 
     if (val)
-        connect(m_format, &ScreenplayFormat::formatChanged, this,
-                &SceneSizeHintItem::onFormatChanged);
+        connect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
     else
-        disconnect(m_format, &ScreenplayFormat::formatChanged, this,
-                   &SceneSizeHintItem::onFormatChanged);
+        disconnect(m_format, &ScreenplayFormat::formatChanged, this, &SceneSizeHintItem::onFormatChanged);
 }
 
 void SceneSizeHintItem::setAsynchronous(bool val)
@@ -2872,10 +2850,8 @@ struct SceneSizeHintItem_TaskResult
 };
 Q_DECLARE_METATYPE(SceneSizeHintItem_TaskResult)
 
-SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRatio,
-                                                     const Scene *scene,
-                                                     const ScreenplayFormat *format,
-                                                     bool evaluateSize = true,
+SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRatio, const Scene *scene,
+                                                     const ScreenplayFormat *format, bool evaluateSize = true,
                                                      bool evaluateImage = true)
 {
     SceneSizeHintItem_TaskResult result;
@@ -2948,10 +2924,8 @@ SceneSizeHintItem_TaskResult SceneSizeHintItem_Task2(const qreal devicePixelRati
     return result;
 }
 
-SceneSizeHintItem_TaskResult SceneSizeHintItem_Task(const qreal devicePixelRatio,
-                                                    const QJsonObject &sceneJson,
-                                                    const QJsonObject &formatJson,
-                                                    bool evaluateSize = true,
+SceneSizeHintItem_TaskResult SceneSizeHintItem_Task(const qreal devicePixelRatio, const QJsonObject &sceneJson,
+                                                    const QJsonObject &formatJson, bool evaluateSize = true,
                                                     bool evaluateImage = true)
 {
     SceneSizeHintItem_TaskResult result;
@@ -2985,8 +2959,7 @@ void SceneSizeHintItem::timerEvent(QTimerEvent *te)
         }
 
         const QQuickWindow *window = this->window();
-        if (!m_componentComplete || !m_active || m_scene == nullptr || m_format == nullptr
-            || window == nullptr) {
+        if (!m_componentComplete || !m_active || m_scene == nullptr || m_format == nullptr || window == nullptr) {
             this->setContentWidth(0);
             this->setContentHeight(0);
             this->setHasPendingComputeSize(false);
@@ -3006,15 +2979,14 @@ void SceneSizeHintItem::timerEvent(QTimerEvent *te)
                 this->updateSize(result.documentSize);
                 this->update();
             });
-            connect(watcher, &QFutureWatcher<SceneSizeHintItem_TaskResult>::finished, watcher,
-                    &QObject::deleteLater);
+            connect(watcher, &QFutureWatcher<SceneSizeHintItem_TaskResult>::finished, watcher, &QObject::deleteLater);
 
             const QJsonObject sceneJson = QObjectSerializer::toJson(m_scene);
             const QJsonObject formatJson = QObjectSerializer::toJson(m_format);
 
             QFuture<SceneSizeHintItem_TaskResult> future =
-                    QtConcurrent::run(SceneSizeHintItem_Task, window->effectiveDevicePixelRatio(),
-                                      sceneJson, formatJson, true, this->isVisible());
+                    QtConcurrent::run(SceneSizeHintItem_Task, window->effectiveDevicePixelRatio(), sceneJson,
+                                      formatJson, true, this->isVisible());
             watcher->setFuture(future);
         } else {
             this->updateSizeAndImageNow();
@@ -3088,15 +3060,14 @@ void SceneSizeHintItem::updateSizeAndImageLater()
 void SceneSizeHintItem::updateSizeAndImageNow()
 {
     const QQuickWindow *window = this->window();
-    if (!m_componentComplete || !m_active || m_scene == nullptr || m_format == nullptr
-        || window == nullptr) {
+    if (!m_componentComplete || !m_active || m_scene == nullptr || m_format == nullptr || window == nullptr) {
         this->setContentWidth(0);
         this->setContentHeight(0);
         this->setHasPendingComputeSize(false);
         m_documentImage = QImage();
     } else {
-        const SceneSizeHintItem_TaskResult result = SceneSizeHintItem_Task2(
-                window->effectiveDevicePixelRatio(), m_scene, m_format, true, this->isVisible());
+        const SceneSizeHintItem_TaskResult result = SceneSizeHintItem_Task2(window->effectiveDevicePixelRatio(),
+                                                                            m_scene, m_format, true, this->isVisible());
         m_documentImage = result.documentImage;
         this->updateSize(result.documentSize);
     }
@@ -3162,9 +3133,7 @@ void SceneSizeHintItem::setHasPendingComputeSize(bool val)
 ///////////////////////////////////////////////////////////////////////////////
 
 SceneGroup::SceneGroup(QObject *parent)
-    : GenericArrayModel(parent),
-      m_groups(GenericArrayModel::internalArray()),
-      m_structure(this, "structure")
+    : GenericArrayModel(parent), m_groups(GenericArrayModel::internalArray()), m_structure(this, "structure")
 {
     connect(this, &SceneGroup::sceneCountChanged, this, &SceneGroup::reevalLater);
 
@@ -3378,8 +3347,7 @@ void SceneGroup::reeval()
         QString checkedVal = notCheckedVal;
 
         if (groupCounter.contains(name))
-            checkedVal = groupCounter.value(name) == m_scenes.size() ? fullyCheckedVal
-                                                                     : partiallyCheckedVal;
+            checkedVal = groupCounter.value(name) == m_scenes.size() ? fullyCheckedVal : partiallyCheckedVal;
 
         if (item.value(checkedKey) != checkedVal) {
             item.insert(checkedKey, checkedVal);

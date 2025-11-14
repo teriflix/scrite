@@ -51,8 +51,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event)
     {
         Q_UNUSED(watched);
-        if (QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::ShortcutOverride,
-                         QEvent::Shortcut })
+        if (QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::ShortcutOverride, QEvent::Shortcut })
                     .contains(event->type()))
             return true;
         return false;
@@ -84,10 +83,7 @@ struct ParagraphMetrics
     {
         return QFont::Capitalization(paragraphMetrics[type][3].toInt());
     }
-    Qt::Alignment textAlignOf(int type) const
-    {
-        return Qt::Alignment(paragraphMetrics[type][4].toInt());
-    }
+    Qt::Alignment textAlignOf(int type) const { return Qt::Alignment(paragraphMetrics[type][4].toInt()); }
 };
 
 SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat *parent)
@@ -99,10 +95,8 @@ SceneElementFormat::SceneElementFormat(SceneElement::Type type, ScreenplayFormat
         m_lastCreatedCharFormatPageWidth = -1;
     });
 
-    QObject::connect(this, &SceneElementFormat::fontChanged, this,
-                     &SceneElementFormat::font2Changed);
-    QObject::connect(m_format, &ScreenplayFormat::fontPointSizeDeltaChanged, this,
-                     &SceneElementFormat::font2Changed);
+    QObject::connect(this, &SceneElementFormat::fontChanged, this, &SceneElementFormat::font2Changed);
+    QObject::connect(m_format, &ScreenplayFormat::fontPointSizeDeltaChanged, this, &SceneElementFormat::font2Changed);
     QObject::connect(m_format, &ScreenplayFormat::fontPointSizeDeltaChanged, this,
                      &SceneElementFormat::elementFormatChanged);
 }
@@ -305,15 +299,12 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAli
                                                        const qreal *givenContentWidth) const
 {
     if (m_lastCreatedBlockFormatPageWidth > 0 && givenContentWidth
-        && *givenContentWidth == m_lastCreatedBlockFormatPageWidth
-        && overrideAlignment == m_lastCreatedBlockAlignment)
+        && *givenContentWidth == m_lastCreatedBlockFormatPageWidth && overrideAlignment == m_lastCreatedBlockAlignment)
         return m_lastCreatedBlockFormat;
 
     const qreal dpr = m_format->devicePixelRatio();
-    const QFontMetrics fm =
-            m_format->screen() ? m_format->defaultFont2Metrics() : m_format->defaultFontMetrics();
-    const qreal contentWidth =
-            givenContentWidth ? *givenContentWidth : m_format->pageLayout()->contentWidth();
+    const QFontMetrics fm = m_format->screen() ? m_format->defaultFont2Metrics() : m_format->defaultFontMetrics();
+    const qreal contentWidth = givenContentWidth ? *givenContentWidth : m_format->pageLayout()->contentWidth();
     const qreal leftMargin = contentWidth * m_leftMargin * dpr;
     const qreal rightMargin = contentWidth * m_rightMargin * dpr;
     const qreal topMargin = fm.lineSpacing() * m_lineSpacingBefore;
@@ -346,8 +337,7 @@ QTextBlockFormat SceneElementFormat::createBlockFormat(Qt::Alignment overrideAli
 
 QTextCharFormat SceneElementFormat::createCharFormat(const qreal *givenPageWidth) const
 {
-    if (m_lastCreatedCharFormatPageWidth > 0 && givenPageWidth
-        && *givenPageWidth == m_lastCreatedCharFormatPageWidth)
+    if (m_lastCreatedCharFormatPageWidth > 0 && givenPageWidth && *givenPageWidth == m_lastCreatedCharFormatPageWidth)
         return m_lastCreatedCharFormat;
 
     QTextCharFormat format;
@@ -406,8 +396,7 @@ void SceneElementFormat::beginTransaction()
     emit inTransactionChanged();
 
     m_nrChangesDuringTransation = 0;
-    connect(this, &SceneElementFormat::elementFormatChanged, this,
-            &SceneElementFormat::countTransactionChange);
+    connect(this, &SceneElementFormat::elementFormatChanged, this, &SceneElementFormat::countTransactionChange);
 }
 
 void SceneElementFormat::commitTransaction()
@@ -418,8 +407,7 @@ void SceneElementFormat::commitTransaction()
     m_inTransaction = false;
     emit inTransactionChanged();
 
-    disconnect(this, &SceneElementFormat::elementFormatChanged, this,
-               &SceneElementFormat::countTransactionChange);
+    disconnect(this, &SceneElementFormat::elementFormatChanged, this, &SceneElementFormat::countTransactionChange);
     if (m_nrChangesDuringTransation > 0)
         emit elementFormatChanged();
 
@@ -446,14 +434,11 @@ void SceneElementFormat::resetToFactoryDefaults()
 
 void SceneElementFormat::serializeToJson(QJsonObject &json) const
 {
-    Language language =
-            LanguageEngine::instance()->supportedLanguages()->findLanguage(m_defaultLanguageCode);
+    Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(m_defaultLanguageCode);
 
-    json.insert(
-            "defaultLanguage",
-            QJsonObject({ { "code", language.isValid() ? language.code : -1 },
-                          { "name",
-                            language.isValid() ? language.name() : QStringLiteral("Default") } }));
+    json.insert("defaultLanguage",
+                QJsonObject({ { "code", language.isValid() ? language.code : -1 },
+                              { "name", language.isValid() ? language.name() : QStringLiteral("Default") } }));
 
     const QMetaEnum elementTypeMeta = QMetaEnum::fromType<SceneElement::Type>();
     json.insert("#kind", QString::fromLatin1(elementTypeMeta.valueToKey(m_elementType)));
@@ -472,13 +457,11 @@ void SceneElementFormat::deserializeFromJson(const QJsonObject &json)
 
 Q_DECL_IMPORT int qt_defaultDpi();
 
-ScreenplayPageLayout::ScreenplayPageLayout(ScreenplayFormat *parent)
-    : QObject(parent), m_format(parent)
+ScreenplayPageLayout::ScreenplayPageLayout(ScreenplayFormat *parent) : QObject(parent), m_format(parent)
 {
     m_resolution = qt_defaultDpi();
 
-    connect(m_format, &ScreenplayFormat::screenChanged, this,
-            &ScreenplayPageLayout::evaluateRectsLater);
+    connect(m_format, &ScreenplayFormat::screenChanged, this, &ScreenplayPageLayout::evaluateRectsLater);
     this->evaluateRectsLater();
 }
 
@@ -526,8 +509,7 @@ void ScreenplayPageLayout::loadCustomResolutionFromSettings()
 #else
         const qreal fallback = 0;
 #endif
-        this->setCustomResolution(
-                settings->value("ScreenplayPageLayout/customResolution", fallback).toDouble());
+        this->setCustomResolution(settings->value("ScreenplayPageLayout/customResolution", fallback).toDouble());
     }
 }
 
@@ -549,10 +531,8 @@ void ScreenplayPageLayout::setCustomResolution(qreal val)
 void ScreenplayPageLayout::configure(QTextDocument *document) const
 {
     const bool stdResolution = qFuzzyCompare(m_resolution, qt_defaultDpi());
-    const QMarginsF pixelMargins =
-            stdResolution ? m_margins : m_pageLayout.marginsPixels(qt_defaultDpi());
-    const QSizeF pageSize = stdResolution ? m_paperRect.size()
-                                          : m_pageLayout.pageSize().sizePixels(qt_defaultDpi());
+    const QMarginsF pixelMargins = stdResolution ? m_margins : m_pageLayout.marginsPixels(qt_defaultDpi());
+    const QSizeF pageSize = stdResolution ? m_paperRect.size() : m_pageLayout.pageSize().sizePixels(qt_defaultDpi());
 
     document->setUseDesignMetrics(true);
     document->setPageSize(pageSize);
@@ -583,12 +563,10 @@ void ScreenplayPageLayout::evaluateRects()
     if (m_format->screen()) {
         const qreal pdpi = m_format->screen()->physicalDotsPerInch();
         const qreal dpr = m_format->screen()->devicePixelRatio();
-        const qreal dres =
-                !qFuzzyIsNull(pdpi) && !qFuzzyIsNull(dpr) ? (pdpi / dpr) : qt_defaultDpi();
+        const qreal dres = !qFuzzyIsNull(pdpi) && !qFuzzyIsNull(dpr) ? (pdpi / dpr) : qt_defaultDpi();
         this->setDefaultResolution(dres);
         this->loadCustomResolutionFromSettings();
-        this->setResolution(qFuzzyIsNull(m_customResolution) ? m_defaultResolution
-                                                             : m_customResolution);
+        this->setResolution(qFuzzyIsNull(m_customResolution) ? m_defaultResolution : m_customResolution);
     } else
         this->setResolution(qt_defaultDpi());
 
@@ -651,8 +629,7 @@ ScreenplayFormat::ScreenplayFormat(QObject *parent)
 {
     for (int i = SceneElement::Min; i <= SceneElement::Max; i++) {
         SceneElementFormat *elementFormat = new SceneElementFormat(SceneElement::Type(i), this);
-        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this,
-                &ScreenplayFormat::formatChanged);
+        connect(elementFormat, &SceneElementFormat::elementFormatChanged, this, &ScreenplayFormat::formatChanged);
         m_elementFormats.append(elementFormat);
     }
 
@@ -684,8 +661,7 @@ void ScreenplayFormat::setSreeenFromWindow(QObject *windowObject)
     QScreen *screen = Application::instance()->windowScreen(windowObject);
     if (screen) {
         this->setScreen(screen);
-        connect(windowObject, SIGNAL(screenChanged(QScreen *)), this, SLOT(setScreen(QScreen *)),
-                Qt::UniqueConnection);
+        connect(windowObject, SIGNAL(screenChanged(QScreen *)), this, SLOT(setScreen(QScreen *)), Qt::UniqueConnection);
     }
 }
 
@@ -713,9 +689,8 @@ void ScreenplayFormat::setDefaultLanguageCode(int val)
 QFont ScreenplayFormat::defaultFont() const
 {
     Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(
-            m_defaultLanguageCode < 0
-                    ? LanguageEngine::instance()->supportedLanguages()->defaultLanguageCode()
-                    : m_defaultLanguageCode);
+            m_defaultLanguageCode < 0 ? LanguageEngine::instance()->supportedLanguages()->defaultLanguageCode()
+                                      : m_defaultLanguageCode);
     return language.font();
 }
 
@@ -754,13 +729,12 @@ SceneElementFormat *ScreenplayFormat::elementFormat(int type) const
 
 QQmlListProperty<SceneElementFormat> ScreenplayFormat::elementFormats()
 {
-    return QQmlListProperty<SceneElementFormat>(
-            reinterpret_cast<QObject *>(this), static_cast<void *>(this),
-            &ScreenplayFormat::staticElementFormatCount, &ScreenplayFormat::staticElementFormatAt);
+    return QQmlListProperty<SceneElementFormat>(reinterpret_cast<QObject *>(this), static_cast<void *>(this),
+                                                &ScreenplayFormat::staticElementFormatCount,
+                                                &ScreenplayFormat::staticElementFormatAt);
 }
 
-void ScreenplayFormat::applyToAll(const SceneElementFormat *from,
-                                  SceneElementFormat::Properties properties)
+void ScreenplayFormat::applyToAll(const SceneElementFormat *from, SceneElementFormat::Properties properties)
 {
     if (from == nullptr)
         return;
@@ -808,8 +782,7 @@ int ScreenplayFormat::rowCount(const QModelIndex &parent) const
 QVariant ScreenplayFormat::data(const QModelIndex &index, int role) const
 {
     if (role == SceneElementFomat && index.isValid())
-        return QVariant::fromValue<QObject *>(
-                qobject_cast<QObject *>(m_elementFormats.at(index.row())));
+        return QVariant::fromValue<QObject *>(qobject_cast<QObject *>(m_elementFormats.at(index.row())));
 
     return QVariant();
 }
@@ -848,8 +821,7 @@ void ScreenplayFormat::resetToFactoryDefaults()
         this->setFontZoomLevelIndex(index);
     }
 
-    this->setDefaultLanguageCode(
-            LanguageEngine::instance()->supportedLanguages()->defaultLanguageCode());
+    this->setDefaultLanguageCode(LanguageEngine::instance()->supportedLanguages()->defaultLanguageCode());
 
     for (int i = SceneElement::Min; i <= SceneElement::Max; i++)
         m_elementFormats.at(i)->resetToFactoryDefaults();
@@ -928,8 +900,7 @@ void ScreenplayFormat::beginTransaction()
     emit inTransactionChanged();
 
     m_nrChangesDuringTransation = 0;
-    connect(this, &ScreenplayFormat::formatChanged, this,
-            &ScreenplayFormat::countTransactionChange);
+    connect(this, &ScreenplayFormat::formatChanged, this, &ScreenplayFormat::countTransactionChange);
 
     for (int i = SceneElement::Min; i <= SceneElement::Max; i++)
         m_elementFormats.at(i)->beginTransaction();
@@ -946,8 +917,7 @@ void ScreenplayFormat::commitTransaction()
     m_inTransaction = false;
     emit inTransactionChanged();
 
-    disconnect(this, &ScreenplayFormat::formatChanged, this,
-               &ScreenplayFormat::countTransactionChange);
+    disconnect(this, &ScreenplayFormat::formatChanged, this, &ScreenplayFormat::countTransactionChange);
     if (m_nrChangesDuringTransation > 0)
         emit formatChanged();
 
@@ -956,14 +926,11 @@ void ScreenplayFormat::commitTransaction()
 
 void ScreenplayFormat::serializeToJson(QJsonObject &json) const
 {
-    Language language =
-            LanguageEngine::instance()->supportedLanguages()->findLanguage(m_defaultLanguageCode);
+    Language language = LanguageEngine::instance()->supportedLanguages()->findLanguage(m_defaultLanguageCode);
 
-    json.insert(
-            "defaultLanguage",
-            QJsonObject({ { "code", language.isValid() ? language.code : -1 },
-                          { "name",
-                            language.isValid() ? language.name() : QStringLiteral("Default") } }));
+    json.insert("defaultLanguage",
+                QJsonObject({ { "code", language.isValid() ? language.code : -1 },
+                              { "name", language.isValid() ? language.name() : QStringLiteral("Default") } }));
 }
 
 void ScreenplayFormat::deserializeFromJson(const QJsonObject &json)
@@ -991,12 +958,10 @@ void ScreenplayFormat::evaluateFontPointSizeDelta()
 
     int fontPointSize = 0;
     if (m_fontZoomLevelIndex < 0) {
-        const int index =
-                qBound(0, m_fontZoomLevels.indexOf(QVariant(1.0)), m_fontZoomLevels.size() - 1);
+        const int index = qBound(0, m_fontZoomLevels.indexOf(QVariant(1.0)), m_fontZoomLevels.size() - 1);
         fontPointSize = m_fontPointSizes.at(index);
     } else
-        fontPointSize =
-                m_fontPointSizes.at(qBound(0, m_fontZoomLevelIndex, m_fontZoomLevels.size() - 1));
+        fontPointSize = m_fontPointSizes.at(qBound(0, m_fontZoomLevelIndex, m_fontZoomLevels.size() - 1));
 
     const QFont defaultFont = this->defaultFont();
     const int val = fontPointSize - defaultFont.pointSize();
@@ -1081,8 +1046,7 @@ void ScreenplayFormat::evaluateFontZoomLevels()
     emit fontZoomLevelIndexChanged();
 }
 
-SceneElementFormat *
-ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)
+SceneElementFormat *ScreenplayFormat::staticElementFormatAt(QQmlListProperty<SceneElementFormat> *list, int index)
 {
     index = index % (SceneElement::Max + 1);
     return reinterpret_cast<ScreenplayFormat *>(list->data)->m_elementFormats.at(index);
@@ -1259,9 +1223,8 @@ QTextCharFormat TextFormat::toCharFormat(const QList<int> &properties) const
 
 QList<int> TextFormat::allProperties()
 {
-    return { QTextFormat::ForegroundBrush,   QTextFormat::BackgroundBrush,
-             QTextFormat::FontWeight,        QTextFormat::FontItalic,
-             QTextFormat::FontUnderline,     QTextFormat::FontStrikeOut,
+    return { QTextFormat::ForegroundBrush,   QTextFormat::BackgroundBrush, QTextFormat::FontWeight,
+             QTextFormat::FontItalic,        QTextFormat::FontUnderline,   QTextFormat::FontStrikeOut,
              QTextFormat::TextUnderlineStyle };
 }
 
@@ -1273,8 +1236,7 @@ public:
     enum { Type = 1001 };
     const int type = Type;
 
-    explicit SceneDocumentBlockUserData(const QTextBlock &block, SceneElement *element,
-                                        SceneDocumentBinder *binder);
+    explicit SceneDocumentBlockUserData(const QTextBlock &block, SceneElement *element, SceneDocumentBinder *binder);
     ~SceneDocumentBlockUserData();
 
     QTextBlockFormat blockFormat;
@@ -1318,16 +1280,14 @@ private:
     QMetaObject::Connection m_spellCheckConnection;
 };
 
-SceneDocumentBlockUserData::SceneDocumentBlockUserData(const QTextBlock &textBlock,
-                                                       SceneElement *element,
+SceneDocumentBlockUserData::SceneDocumentBlockUserData(const QTextBlock &textBlock, SceneElement *element,
                                                        SceneDocumentBinder *binder)
     : m_textBlock(textBlock), m_sceneElement(element), m_binder(binder)
 {
     if (m_binder->isSpellCheckEnabled()) {
         m_spellCheck = element->spellCheck();
-        m_spellCheckConnection =
-                QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), m_binder,
-                                 SLOT(onSpellCheckUpdated()), Qt::UniqueConnection);
+        m_spellCheckConnection = QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), m_binder,
+                                                  SLOT(onSpellCheckUpdated()), Qt::UniqueConnection);
         m_spellCheck->scheduleUpdate();
     }
 
@@ -1358,9 +1318,8 @@ void SceneDocumentBlockUserData::initializeSpellCheck(SceneDocumentBinder *binde
     if (binder->isSpellCheckEnabled()) {
         m_spellCheck = m_sceneElement->spellCheck();
         if (!m_spellCheckConnection)
-            m_spellCheckConnection =
-                    QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), binder,
-                                     SLOT(onSpellCheckUpdated()), Qt::UniqueConnection);
+            m_spellCheckConnection = QObject::connect(m_spellCheck, SIGNAL(misspelledFragmentsChanged()), binder,
+                                                      SLOT(onSpellCheckUpdated()), Qt::UniqueConnection);
         m_spellCheck->scheduleUpdate();
     } else {
         if (m_spellCheckConnection)
@@ -1392,8 +1351,7 @@ TextFragment SceneDocumentBlockUserData::findMisspelledFragment(int start, int e
 {
     const QList<TextFragment> fragments = this->misspelledFragments();
     for (const TextFragment &fragment : fragments) {
-        if ((fragment.start() >= start && fragment.start() < end)
-            || (fragment.end() > start && fragment.end() <= end))
+        if ((fragment.start() >= start && fragment.start() < end) || (fragment.end() > start && fragment.end() <= end))
             return fragment;
     }
     return TextFragment();
@@ -1429,8 +1387,7 @@ SceneDocumentBlockUserData *SceneDocumentBlockUserData::get(QTextBlockUserData *
     if (userData == nullptr)
         return nullptr;
 
-    SceneDocumentBlockUserData *userData2 =
-            reinterpret_cast<SceneDocumentBlockUserData *>(userData);
+    SceneDocumentBlockUserData *userData2 = reinterpret_cast<SceneDocumentBlockUserData *>(userData);
     return userData2->type == SceneDocumentBlockUserData::Type ? userData2 : nullptr;
 }
 
@@ -1521,8 +1478,7 @@ void SceneDocumentBlockUserData::autoCapitalizeNow()
         return;
 
     if (!m_binder->m_autoCapitalizeSentences
-        || LanguageEngine::instance()->supportedLanguages()->activeLanguage().charScript()
-                != QChar::Script_Latin)
+        || LanguageEngine::instance()->supportedLanguages()->activeLanguage().charScript() != QChar::Script_Latin)
         return;
 
     // Auto-capitalize needs to be done only on action and dialogue paragraphs.
@@ -1586,8 +1542,7 @@ bool SceneDocumentBlockUserData::markCursorPosition()
     if (m_binder.isNull() || !m_textBlock.isValid())
         return false;
 
-    if (m_binder->m_cursorPosition < 0
-        || m_binder->m_cursorPosition > m_textBlock.document()->characterCount())
+    if (m_binder->m_cursorPosition < 0 || m_binder->m_cursorPosition > m_textBlock.document()->characterCount())
         return false;
 
     QTextCursor cursor(m_textBlock);
@@ -1671,10 +1626,8 @@ SceneDocumentBinder::SceneDocumentBinder(QObject *parent)
       m_screenplayElement(this, "screenplayElement"),
       m_screenplayFormat(this, "screenplayFormat")
 {
-    connect(this, &SceneDocumentBinder::currentElementChanged, this,
-            &SceneDocumentBinder::nextTabFormatChanged);
-    connect(m_textFormat, &TextFormat::formatChanged, this,
-            &SceneDocumentBinder::onTextFormatChanged);
+    connect(this, &SceneDocumentBinder::currentElementChanged, this, &SceneDocumentBinder::nextTabFormatChanged);
+    connect(m_textFormat, &TextFormat::formatChanged, this, &SceneDocumentBinder::onTextFormatChanged);
     connect(this, &SceneDocumentBinder::currentElementChanged, this,
             &SceneDocumentBinder::activateCurrentElementDefaultLanguage);
     connect(m_textFormat, &TextFormat::formatChanged, this,
@@ -1693,16 +1646,14 @@ void SceneDocumentBinder::setScreenplayFormat(ScreenplayFormat *val)
         return;
 
     if (m_screenplayFormat != nullptr) {
-        disconnect(m_screenplayFormat, &ScreenplayFormat::formatChanged, this,
-                   &SceneDocumentBinder::refresh);
+        disconnect(m_screenplayFormat, &ScreenplayFormat::formatChanged, this, &SceneDocumentBinder::refresh);
         disconnect(m_screenplayFormat, &ScreenplayFormat::inTransactionChanged, this,
                    &SceneDocumentBinder::rehighlightLater);
     }
 
     m_screenplayFormat = val;
     if (m_screenplayFormat != nullptr) {
-        connect(m_screenplayFormat, &ScreenplayFormat::formatChanged, this,
-                &SceneDocumentBinder::refresh);
+        connect(m_screenplayFormat, &ScreenplayFormat::formatChanged, this, &SceneDocumentBinder::refresh);
         connect(m_screenplayFormat, &ScreenplayFormat::inTransactionChanged, this,
                 &SceneDocumentBinder::rehighlightLater);
 
@@ -1721,10 +1672,8 @@ void SceneDocumentBinder::setScene(Scene *val)
         return;
 
     if (m_scene != nullptr) {
-        disconnect(m_scene, &Scene::sceneElementChanged, this,
-                   &SceneDocumentBinder::onSceneElementChanged);
-        disconnect(m_scene, &Scene::sceneAboutToReset, this,
-                   &SceneDocumentBinder::onSceneAboutToReset);
+        disconnect(m_scene, &Scene::sceneElementChanged, this, &SceneDocumentBinder::onSceneElementChanged);
+        disconnect(m_scene, &Scene::sceneAboutToReset, this, &SceneDocumentBinder::onSceneAboutToReset);
         disconnect(m_scene, &Scene::sceneReset, this, &SceneDocumentBinder::onSceneReset);
         disconnect(m_scene, &Scene::sceneRefreshed, this, &SceneDocumentBinder::onSceneRefreshed);
     }
@@ -1732,10 +1681,8 @@ void SceneDocumentBinder::setScene(Scene *val)
     m_scene = val;
 
     if (m_scene != nullptr) {
-        connect(m_scene, &Scene::sceneElementChanged, this,
-                &SceneDocumentBinder::onSceneElementChanged);
-        connect(m_scene, &Scene::sceneAboutToReset, this,
-                &SceneDocumentBinder::onSceneAboutToReset);
+        connect(m_scene, &Scene::sceneElementChanged, this, &SceneDocumentBinder::onSceneElementChanged);
+        connect(m_scene, &Scene::sceneAboutToReset, this, &SceneDocumentBinder::onSceneAboutToReset);
         connect(m_scene, &Scene::sceneReset, this, &SceneDocumentBinder::onSceneReset);
         connect(m_scene, &Scene::sceneRefreshed, this, &SceneDocumentBinder::onSceneRefreshed);
     }
@@ -1752,16 +1699,15 @@ void SceneDocumentBinder::setScreenplayElement(ScreenplayElement *val)
 
     if (m_screenplayElement != nullptr) {
         Screenplay *screenplay = m_screenplayElement->screenplay();
-        disconnect(screenplay, &Screenplay::elementMoved, this,
-                   &SceneDocumentBinder::polishAllSceneElements);
+        disconnect(screenplay, &Screenplay::elementMoved, this, &SceneDocumentBinder::polishAllSceneElements);
     }
 
     m_screenplayElement = val;
 
     if (m_screenplayElement != nullptr) {
         Screenplay *screenplay = m_screenplayElement->screenplay();
-        connect(screenplay, &Screenplay::elementMoved, this,
-                &SceneDocumentBinder::polishAllSceneElements, Qt::UniqueConnection);
+        connect(screenplay, &Screenplay::elementMoved, this, &SceneDocumentBinder::polishAllSceneElements,
+                Qt::UniqueConnection);
     }
 
     emit screenplayElementChanged();
@@ -1777,14 +1723,12 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
     if (this->document() != nullptr) {
         this->document()->setUndoRedoEnabled(true);
 
-        disconnect(this->document(), &QTextDocument::contentsChange, this,
-                   &SceneDocumentBinder::onContentsChange);
+        disconnect(this->document(), &QTextDocument::contentsChange, this, &SceneDocumentBinder::onContentsChange);
         disconnect(this->document(), &QTextDocument::blockCountChanged, this,
                    &SceneDocumentBinder::syncSceneFromDocument);
 
         if (m_scene != nullptr)
-            disconnect(m_scene, &Scene::sceneElementChanged, this,
-                       &SceneDocumentBinder::onSceneElementChanged);
+            disconnect(m_scene, &Scene::sceneElementChanged, this, &SceneDocumentBinder::onSceneElementChanged);
 
         this->setCurrentElement(nullptr);
         this->setCursorPosition(-1);
@@ -1806,14 +1750,14 @@ void SceneDocumentBinder::setTextDocument(QQuickTextDocument *val)
     if (m_textDocument != nullptr) {
         this->document()->setUndoRedoEnabled(false);
 
-        connect(this->document(), &QTextDocument::contentsChange, this,
-                &SceneDocumentBinder::onContentsChange, Qt::UniqueConnection);
-        connect(this->document(), &QTextDocument::blockCountChanged, this,
-                &SceneDocumentBinder::syncSceneFromDocument, Qt::UniqueConnection);
+        connect(this->document(), &QTextDocument::contentsChange, this, &SceneDocumentBinder::onContentsChange,
+                Qt::UniqueConnection);
+        connect(this->document(), &QTextDocument::blockCountChanged, this, &SceneDocumentBinder::syncSceneFromDocument,
+                Qt::UniqueConnection);
 
         if (m_scene != nullptr)
-            connect(m_scene, &Scene::sceneElementChanged, this,
-                    &SceneDocumentBinder::onSceneElementChanged, Qt::UniqueConnection);
+            connect(m_scene, &Scene::sceneElementChanged, this, &SceneDocumentBinder::onSceneElementChanged,
+                    Qt::UniqueConnection);
 
 #if 0 // At the moment, this seems to be causing more trouble than help.
         this->document()->setTextWidth(m_textWidth);
@@ -1952,8 +1896,7 @@ void SceneDocumentBinder::setCursorPosition(int val)
     if (userData == nullptr) {
         this->setCurrentElement(nullptr);
         m_textFormat->reset();
-        qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!",
-                 __LINE__, val);
+        qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!", __LINE__, val);
     } else {
         this->setCurrentElement(userData->sceneElement());
         this->setWordUnderCursorIsMisspelled(cursor.isMisspelled());
@@ -2104,8 +2047,7 @@ QList<SceneElement *> SceneDocumentBinder::selectedElements() const
 {
     QList<SceneElement *> ret;
 
-    if (m_selectionStartPosition < 0 || m_selectionEndPosition < 0
-        || m_selectionEndPosition < m_selectionStartPosition)
+    if (m_selectionStartPosition < 0 || m_selectionEndPosition < 0 || m_selectionEndPosition < m_selectionStartPosition)
         return ret;
 
     QTextDocument *doc = m_textDocument ? m_textDocument->textDocument() : nullptr;
@@ -2160,8 +2102,7 @@ QRectF SceneDocumentBinder::sceneElementBoundingRect(SceneElement *sceneElement)
             QAbstractTextDocumentLayout *layout = doc->documentLayout();
             QRectF blockRect = layout->blockBoundingRect(block);
 
-            SceneElementFormat *elementFormat =
-                    m_screenplayFormat->elementFormat(sceneElement->type());
+            SceneElementFormat *elementFormat = m_screenplayFormat->elementFormat(sceneElement->type());
 
             const qreal dpr = m_screenplayFormat->devicePixelRatio();
             const qreal contentWidth = doc->textWidth();
@@ -2223,16 +2164,14 @@ QString SceneDocumentBinder::nextTabFormatAsString() const
     if (ntf < 0)
         return QStringLiteral("Change Format");
 
-    const QString current =
-            m_currentElement ? typeToString(m_currentElement->type()) : typeToString(-1);
+    const QString current = m_currentElement ? typeToString(m_currentElement->type()) : typeToString(-1);
     const QString next = typeToString(ntf);
     return current + QString(QChar(0x2192)) + next;
 }
 
 int SceneDocumentBinder::nextTabFormat() const
 {
-    if (m_cursorPosition < 0 || m_textDocument == nullptr || m_currentElement == nullptr
-        || this->document() == nullptr)
+    if (m_cursorPosition < 0 || m_textDocument == nullptr || m_currentElement == nullptr || this->document() == nullptr)
         return -1;
 
     const int elementNr = m_scene->indexOfElement(m_currentElement);
@@ -2403,8 +2342,7 @@ int SceneDocumentBinder::cursorPositionAtBlock(int blockNumber) const
 {
     if (this->document() != nullptr) {
         const QTextBlock block = this->document()->findBlockByNumber(blockNumber);
-        if (m_cursorPosition >= block.position()
-            && m_cursorPosition < block.position() + block.length())
+        if (m_cursorPosition >= block.position() && m_cursorPosition < block.position() + block.length())
             return m_cursorPosition;
 
         return block.position() + block.length() - 1;
@@ -2471,8 +2409,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
         // Copy the scene heading and synopsis to both fountain and JSON representations
         Fountain::Element fElement;
         fElement.text = m_scene->heading()->displayText();
-        fElement.sceneNumber =
-                m_screenplayElement ? m_screenplayElement->userSceneNumber() : QString();
+        fElement.sceneNumber = m_screenplayElement ? m_screenplayElement->userSceneNumber() : QString();
         fElement.type = Fountain::Element::SceneHeading;
         fBody.append(fElement);
 
@@ -2528,8 +2465,7 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
             formatsToCopy.append(fmt);
         }
 
-        addParaToContent(element->type(), element->alignment(), cursor.selectedText(),
-                         formatsToCopy);
+        addParaToContent(element->type(), element->alignment(), cursor.selectedText(), formatsToCopy);
 
         Fountain::Element fElement;
         fElement.text = cursor.selectedText();
@@ -2566,10 +2502,9 @@ void SceneDocumentBinder::copy(int fromPosition, int toPosition)
     QClipboard *clipboard = Application::instance()->clipboard();
     QMimeData *mimeData = new QMimeData;
     mimeData->setData(QStringLiteral("scrite/scene"), contentJson);
-    mimeData->setText(Fountain::Writer(fBody,
-                                       fBody.size() > 1 ? Screenplay::fountainCopyOptions()
-                                                        : Fountain::Writer::NoOption)
-                              .toString());
+    mimeData->setText(
+            Fountain::Writer(fBody, fBody.size() > 1 ? Screenplay::fountainCopyOptions() : Fountain::Writer::NoOption)
+                    .toString());
     clipboard->setMimeData(mimeData);
 }
 
@@ -2583,10 +2518,7 @@ int SceneDocumentBinder::paste(int fromPosition)
     struct Paragraph
     {
         Paragraph() { }
-        Paragraph(const QString &_text, SceneElement::Type _type = SceneElement::Action)
-            : text(_text), type(_type)
-        {
-        }
+        Paragraph(const QString &_text, SceneElement::Type _type = SceneElement::Action) : text(_text), type(_type) { }
 
         QString text;
         SceneElement::Type type = SceneElement::Action;
@@ -2627,8 +2559,7 @@ int SceneDocumentBinder::paste(int fromPosition)
                         case Fountain::Element::SceneHeading:
                             if (applySceneHeading) {
                                 m_scene->heading()->parseFrom(element.text);
-                                if (!element.sceneNumber.isEmpty()
-                                    && m_screenplayElement != nullptr)
+                                if (!element.sceneNumber.isEmpty() && m_screenplayElement != nullptr)
                                     m_screenplayElement->setUserSceneNumber(element.sceneNumber);
                                 applySceneHeading = false;
                                 includeParagraph = false;
@@ -2701,22 +2632,20 @@ int SceneDocumentBinder::paste(int fromPosition)
 
             if (applySceneHeading && type == SceneElement::Heading) {
                 m_scene->heading()->parseFrom(text);
-                m_screenplayElement->setUserSceneNumber(
-                        itemObject.value(QStringLiteral("sceneNumber")).toString());
+                m_screenplayElement->setUserSceneNumber(itemObject.value(QStringLiteral("sceneNumber")).toString());
                 m_scene->setSynopsis(itemObject.value(QStringLiteral("synopsis")).toString());
                 applySceneHeading = false;
                 continue;
             }
 
             Paragraph paragraph;
-            paragraph.type = (type < SceneElement::Min || type > SceneElement::Max
-                              || type == SceneElement::Heading)
+            paragraph.type = (type < SceneElement::Min || type > SceneElement::Max || type == SceneElement::Heading)
                     ? SceneElement::Action
                     : SceneElement::Type(type);
             paragraph.text = text;
             paragraph.alignment = alignment == 0 ? Qt::Alignment() : Qt::Alignment(alignment);
-            paragraph.formats = SceneElement::textFormatsFromJson(
-                    itemObject.value(QStringLiteral("formats")).toArray());
+            paragraph.formats =
+                    SceneElement::textFormatsFromJson(itemObject.value(QStringLiteral("formats")).toArray());
             paragraphs.append(paragraph);
 
             applySceneHeading = false;
@@ -2731,8 +2660,6 @@ int SceneDocumentBinder::paste(int fromPosition)
     const bool pasteFormatting = paragraphs.size() > 1;
     QTextBlock lastPastedBlock;
 
-    int finalCursorPos = fromPosition;
-
     for (int i = 0; i < paragraphs.size(); i++) {
         const Paragraph paragraph = paragraphs.at(i);
         if (i > 0)
@@ -2740,8 +2667,18 @@ int SceneDocumentBinder::paste(int fromPosition)
 
         const int bstart = cursor.position();
         cursor.insertText(paragraph.text);
-        const int bend = cursor.position();
-        finalCursorPos = bend;
+
+        if (!paragraph.formats.isEmpty()) {
+            cursor.setPosition(bstart);
+            for (const QTextLayout::FormatRange &format : paragraph.formats) {
+                cursor.setPosition(bstart + format.start);
+                cursor.setPosition(bstart + format.start + format.length, QTextCursor::KeepAnchor);
+                cursor.setCharFormat(format.format);
+                cursor.clearSelection();
+            }
+        }
+
+        cursor.movePosition(QTextCursor::StartOfBlock);
 
         lastPastedBlock = cursor.block();
         SceneDocumentBlockUserData *userData = SceneDocumentBlockUserData::get(lastPastedBlock);
@@ -2752,34 +2689,31 @@ int SceneDocumentBinder::paste(int fromPosition)
             if (userData->sceneElement()) {
                 userData->sceneElement()->setType(paragraph.type);
                 userData->sceneElement()->setAlignment(paragraph.alignment);
+                userData->sceneElement()->dropAllChanges();
+
+                const SceneElementFormat *format = m_screenplayFormat->elementFormat(paragraph.type);
+                userData->blockFormat = format->createBlockFormat(paragraph.alignment);
+                userData->charFormat = format->createCharFormat();
+                cursor.setBlockFormat(userData->blockFormat);
+
+                this->rehighlightBlock(lastPastedBlock);
             }
-            userData->resetFormat();
         }
 
-        if (!paragraph.formats.isEmpty()) {
-            cursor.setPosition(bstart);
-            for (const QTextLayout::FormatRange &format : paragraph.formats) {
-                cursor.setPosition(bstart + format.start);
-                cursor.setPosition(bstart + format.start + format.length, QTextCursor::KeepAnchor);
-                cursor.setCharFormat(format.format);
-                cursor.clearSelection();
-            }
-            cursor.setPosition(bend);
-        }
+        cursor.movePosition(QTextCursor::EndOfBlock);
     }
-
-    const int cp = finalCursorPos;
-    emit requestCursorPosition(cp);
 
     m_sceneElementTaskTimer.stop();
     this->performAllSceneElementTasks();
 
-    QTimer::singleShot(50, this, [this, cp]() {
-        this->refresh();
-        emit requestCursorPosition(cp);
-    });
+    emit requestCursorPosition(cursor.position());
 
-    return cp;
+    // QTimer::singleShot(50, this, [this, cp]() {
+    //     this->refresh();
+    //     emit requestCursorPosition(cp);
+    // });
+
+    return cursor.position();
 }
 
 void SceneDocumentBinder::setApplyFormattingEvenInTransaction(bool val)
@@ -2949,8 +2883,7 @@ bool SceneDocumentBinder::eventFilter(QObject *watched, QEvent *event)
     Q_UNUSED(watched)
 
     if (m_cursorPosition >= 0
-        && QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::Shortcut,
-                        QEvent::ShortcutOverride })
+        && QList<int>({ QEvent::KeyPress, QEvent::KeyRelease, QEvent::Shortcut, QEvent::ShortcutOverride })
                    .contains(event->type())) {
         if (m_sceneElementTaskTimer.isActive())
             m_sceneElementTaskTimer.start(500, this);
@@ -2998,8 +2931,7 @@ void SceneDocumentBinder::resetScreenplayElement()
 {
     if (m_screenplayElement != nullptr) {
         Screenplay *screenplay = m_screenplayElement->screenplay();
-        disconnect(screenplay, &Screenplay::elementMoved, this,
-                   &SceneDocumentBinder::polishAllSceneElements);
+        disconnect(screenplay, &Screenplay::elementMoved, this, &SceneDocumentBinder::polishAllSceneElements);
     }
 
     m_screenplayElement = nullptr;
@@ -3068,8 +3000,7 @@ void SceneDocumentBinder::initializeDocument()
         }
         cursor.setBlockFormat(userData->blockFormat);
 
-        const QVector<QTextLayout::FormatRange> formatRanges =
-                userData->sceneElement()->textFormats();
+        const QVector<QTextLayout::FormatRange> formatRanges = userData->sceneElement()->textFormats();
         if (formatRanges.isEmpty())
             continue;
 
@@ -3077,8 +3008,7 @@ void SceneDocumentBinder::initializeDocument()
 
         for (const QTextLayout::FormatRange &formatRange : formatRanges) {
             cursor.setPosition(startPos + formatRange.start);
-            cursor.setPosition(startPos + formatRange.start + formatRange.length,
-                               QTextCursor::KeepAnchor);
+            cursor.setPosition(startPos + formatRange.start + formatRange.length, QTextCursor::KeepAnchor);
             cursor.mergeCharFormat(formatRange.format);
             cursor.clearSelection();
         }
@@ -3119,19 +3049,15 @@ void SceneDocumentBinder::setCurrentElement(SceneElement *val)
         return;
 
     if (m_currentElement != nullptr) {
-        disconnect(m_currentElement, &SceneElement::aboutToDelete, this,
-                   &SceneDocumentBinder::resetCurrentElement);
-        disconnect(m_currentElement, &SceneElement::typeChanged, this,
-                   &SceneDocumentBinder::nextTabFormatChanged);
+        disconnect(m_currentElement, &SceneElement::aboutToDelete, this, &SceneDocumentBinder::resetCurrentElement);
+        disconnect(m_currentElement, &SceneElement::typeChanged, this, &SceneDocumentBinder::nextTabFormatChanged);
     }
 
     m_currentElement = val;
 
     if (m_currentElement != nullptr) {
-        connect(m_currentElement, &SceneElement::aboutToDelete, this,
-                &SceneDocumentBinder::resetCurrentElement);
-        connect(m_currentElement, &SceneElement::typeChanged, this,
-                &SceneDocumentBinder::nextTabFormatChanged);
+        connect(m_currentElement, &SceneElement::aboutToDelete, this, &SceneDocumentBinder::resetCurrentElement);
+        connect(m_currentElement, &SceneElement::typeChanged, this, &SceneDocumentBinder::nextTabFormatChanged);
     }
 
     emit currentElementChanged();
@@ -3183,8 +3109,7 @@ private:
     SceneDocumentBinder *m_binder = nullptr;
 };
 
-ForceCursorPositionHack::ForceCursorPositionHack(const QTextBlock &block, int cbp,
-                                                 SceneDocumentBinder *binder)
+ForceCursorPositionHack::ForceCursorPositionHack(const QTextBlock &block, int cbp, SceneDocumentBinder *binder)
     : QObject(const_cast<QTextDocument *>(block.document())),
       m_block(block),
       m_cursorBlockPosition(cbp),
@@ -3237,14 +3162,12 @@ void ForceCursorPositionHack::timerEvent(QTimerEvent *event)
     }
 }
 
-void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
-                                                Scene::SceneElementChangeType type)
+void SceneDocumentBinder::onSceneElementChanged(SceneElement *element, Scene::SceneElementChangeType type)
 {
     if (m_initializingDocument)
         return;
 
-    if (m_textDocument == nullptr || this->document() == nullptr || m_scene == nullptr
-        || element->scene() != m_scene)
+    if (m_textDocument == nullptr || this->document() == nullptr || m_scene == nullptr || element->scene() != m_scene)
         return;
 
     if (m_forceSyncDocument)
@@ -3273,8 +3196,7 @@ void SceneDocumentBinder::onSceneElementChanged(SceneElement *element,
             QTextCursor cursor(block);
             cursor.setBlockFormat(userData->blockFormat);
 
-            if (m_cursorPosition >= block.position()
-                && m_cursorPosition <= block.position() + block.length())
+            if (m_cursorPosition >= block.position() && m_cursorPosition <= block.position() + block.length())
                 new ForceCursorPositionHack(block, m_cursorPosition - block.position(), this);
 
             this->rehighlightBlockLater(block);
@@ -3326,8 +3248,7 @@ void SceneDocumentBinder::onSpellCheckUpdated()
 
 void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int charsAdded)
 {
-    if (m_initializingDocument || m_sceneIsBeingReset || m_sceneElementTaskIsRunning
-        || m_cursorPosition < 0)
+    if (m_initializingDocument || m_sceneIsBeingReset || m_sceneElementTaskIsRunning || m_cursorPosition < 0)
         return;
 
     if (m_textDocument == nullptr || m_scene == nullptr || this->document() == nullptr)
@@ -3389,8 +3310,7 @@ void SceneDocumentBinder::onContentsChange(int from, int charsRemoved, int chars
 
         SceneElement *sceneElement = userData->sceneElement();
         if (sceneElement == nullptr) {
-            qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!",
-                     __LINE__, from);
+            qWarning("[%d] TextDocument has a block at %d that isnt backed by a SceneElement!!", __LINE__, from);
             return;
         }
 
@@ -3464,8 +3384,7 @@ void SceneDocumentBinder::syncSceneFromDocument(int nrBlocks)
             SceneElement *newElement = new SceneElement(m_scene);
 
             if (previousBlock.isValid()) {
-                SceneDocumentBlockUserData *prevUserData =
-                        SceneDocumentBlockUserData::get(previousBlock);
+                SceneDocumentBlockUserData *prevUserData = SceneDocumentBlockUserData::get(previousBlock);
                 SceneElement *prevElement = prevUserData->sceneElement();
                 newElement->setType(prevElement->type());
 
@@ -3549,8 +3468,7 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
         const QString bracketOpen = QLatin1String(" (");
         const QString blockText = block.text();
         if (blockText != bracketOpen && blockText.contains(bracketOpen)) {
-            const QTextCursor bracketCursor =
-                    m_textDocument->textDocument()->find(bracketOpen, block.position());
+            const QTextCursor bracketCursor = m_textDocument->textDocument()->find(bracketOpen, block.position());
             if (m_cursorPosition > bracketCursor.selectionStart()) {
                 /*
                 There are several common notations that can be used in brackets after a character's
@@ -3589,12 +3507,10 @@ void SceneDocumentBinder::evaluateAutoCompleteHintsAndCompletionPrefix()
                 But we will list it anyway because users will flapg it as a bug.
                  */
                 static QStringList commonBracketNotations(
-                        { QLatin1String("V.O."), QLatin1String("O.S."), QLatin1String("O.C."),
-                          QLatin1String("CONT'D"), QLatin1String("PHONE"),
-                          QLatin1String("INTO PHONE"), QLatin1String("FILTERED"),
-                          QLatin1String("SUBTITLED"), QLatin1String("THROUGH TRANSLATOR"),
-                          QLatin1String("OVER RADIO"), QLatin1String("ON TV"),
-                          QLatin1String("ON COMPUTER"), QLatin1String("ON SPEAKERPHONE"),
+                        { QLatin1String("V.O."), QLatin1String("O.S."), QLatin1String("O.C."), QLatin1String("CONT'D"),
+                          QLatin1String("PHONE"), QLatin1String("INTO PHONE"), QLatin1String("FILTERED"),
+                          QLatin1String("SUBTITLED"), QLatin1String("THROUGH TRANSLATOR"), QLatin1String("OVER RADIO"),
+                          QLatin1String("ON TV"), QLatin1String("ON COMPUTER"), QLatin1String("ON SPEAKERPHONE"),
                           QLatin1String("OVER INTERCOM") });
                 hints = commonBracketNotations;
                 priorityHints = commonBracketNotations;
@@ -3649,8 +3565,7 @@ void SceneDocumentBinder::setAutoCompleteHintsFor(SceneElement::Type val)
     emit autoCompleteHintsForChanged();
 }
 
-void SceneDocumentBinder::setAutoCompleteHints(const QStringList &hints,
-                                               const QStringList &priorityHints)
+void SceneDocumentBinder::setAutoCompleteHints(const QStringList &hints, const QStringList &priorityHints)
 {
     if (m_autoCompleteHints == hints && m_priorityAutoCompleteHints == priorityHints)
         return;
@@ -3752,8 +3667,7 @@ void SceneDocumentBinder::applyBlockFormatLater(const QTextBlock &block)
 
 void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
 {
-    if (!m_acceptTextFormatChanges || !m_applyTextFormat
-        || m_textFormat->isUpdatingFromCharFormat())
+    if (!m_acceptTextFormatChanges || !m_applyTextFormat || m_textFormat->isUpdatingFromCharFormat())
         return;
 
     const QTextCharFormat updatedFormat = m_textFormat->toCharFormat(properties);
@@ -3831,8 +3745,7 @@ void SceneDocumentBinder::onTextFormatChanged(const QList<int> &properties)
             int start = fragment.block.position() + textFormat.start;
             int end = fragment.block.position() + textFormat.start + textFormat.length;
 
-            if ((start >= fragment.start && start <= fragment.end)
-                || (end >= fragment.start && end <= fragment.end)
+            if ((start >= fragment.start && start <= fragment.end) || (end >= fragment.start && end <= fragment.end)
                 || (start < fragment.start && end > fragment.end)) {
 
                 start = qMax(start, fragment.start);
