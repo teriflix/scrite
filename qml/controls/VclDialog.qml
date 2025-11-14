@@ -186,6 +186,7 @@ Dialog {
                 color: Runtime.colors.accent.c600.text
                 padding: 16
                 text: root.title
+                elide: Text.ElideRight
 
                 font.bold: true
                 font.pointSize: Runtime.idealFontMetrics.font.pointSize
