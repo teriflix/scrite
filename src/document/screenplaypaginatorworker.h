@@ -110,7 +110,6 @@ class ScreenplayPaginatorWorker : public QObject
     Q_OBJECT
 
 public:
-    static const int syncInterval;
     virtual ~ScreenplayPaginatorWorker();
 
     Q_PROPERTY(bool synchronousSync READ isSynchronousSync WRITE setSynchronousSync NOTIFY synchronousSyncChanged)
@@ -156,6 +155,7 @@ private:
     ScreenplayFormat *m_defaultFormat = nullptr;
     QJsonObject m_formatJson;
     bool m_synchronousSync = false;
+    int m_syncInterval = 500;
 };
 
 #endif // SCREENPLAYPAGINATORWORKER_H
