@@ -47,7 +47,7 @@ Item {
             VclComboBox {
                 width: parent.width
                 model: Object.typeEnumModel("ScreenplayPageLayout", "PaperSize", root)
-                textRole: "key"
+                textRole: "enumKey"
                 currentIndex: _private.pageSetupSettings.paperSize
                 anchors.verticalCenter: parent.verticalCenter
                 onActivated: {
@@ -107,7 +107,7 @@ Item {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
-                        textRole: "key"
+                        textRole: "enumKey"
                         currentIndex: _private.pageSetupSettings.headerLeft
                         onActivated: _private.pageSetupSettings.headerLeft = currentIndex
                     }
@@ -126,7 +126,7 @@ Item {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
-                        textRole: "key"
+                        textRole: "enumKey"
                         currentIndex: _private.pageSetupSettings.headerCenter
                         onActivated: _private.pageSetupSettings.headerCenter = currentIndex
                     }
@@ -145,7 +145,7 @@ Item {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
-                        textRole: "key"
+                        textRole: "enumKey"
                         currentIndex: _private.pageSetupSettings.headerRight
                         onActivated: _private.pageSetupSettings.headerRight = currentIndex
                     }
@@ -176,7 +176,7 @@ Item {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
-                        textRole: "key"
+                        textRole: "enumKey"
                         currentIndex: _private.pageSetupSettings.footerLeft
                         onActivated: _private.pageSetupSettings.footerLeft = currentIndex
                     }
@@ -195,7 +195,7 @@ Item {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
-                        textRole: "key"
+                        textRole: "enumKey"
                         currentIndex: _private.pageSetupSettings.footerCenter
                         onActivated: _private.pageSetupSettings.footerCenter = currentIndex
                     }
@@ -214,7 +214,7 @@ Item {
                         Layout.fillWidth: true
 
                         model: _private.fieldsModel
-                        textRole: "key"
+                        textRole: "enumKey"
                         currentIndex: _private.pageSetupSettings.footerRight
                         onActivated: _private.pageSetupSettings.footerRight = currentIndex
                     }
