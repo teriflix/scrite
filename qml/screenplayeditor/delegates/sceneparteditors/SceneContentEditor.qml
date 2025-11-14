@@ -207,7 +207,7 @@ AbstractScenePartEditor {
         onCutRequest: () => { _private.cut() }
         onCopyRequest: () => { _private.copy() }
         onPasteRequest: () => { _private.paste() }
-        onReloadSceneContentRequest: () => { } // TODO
+        onReloadSceneContentRequest: () => { _private.reload() }
         onSplitSceneAtPositionRequest: (position) => { _private.splitSceneAt(position) }
         onMergeWithPreviousSceneRequest: () => { _private.mergeWithPreviousScene(0) }
     }
@@ -256,13 +256,14 @@ AbstractScenePartEditor {
                                  (Runtime.language.activeTransliterationOption ? !Runtime.language.activeTransliterationOption.inApp : true)
 
         onDocumentInitialized: () => {
-                                   if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes)
-                                   _sceneTextEditor.cursorPosition = 0
+                                   if(!_private.firstInitializationDone && !_private.scrollingBetweenScenes) {
+                                       _sceneTextEditor.cursorPosition = 0
+                                   }
                                    _private.firstInitializationDone = true
                                }
 
         onRequestCursorPosition: (position) => {
-                                     _sceneTextEditor.cursorPosition = position < 0 ? _sceneTextEditor.length : position
+                                     _private.placeCursorAt(position < 0 ? _sceneTextEditor.length : position)
                                  }
     }
 

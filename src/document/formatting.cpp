@@ -2951,7 +2951,7 @@ void SceneDocumentBinder::initializeDocument()
     defaultFont.setPointSize(defaultFont.pointSize() + m_screenplayFormat->fontPointSizeDelta());
 
     QTextDocument *document = m_textDocument->textDocument();
-    QSignalBlocker documentSignalBlocker(document);
+    // QSignalBlocker documentSignalBlocker(document);
     document->setDefaultFont(defaultFont);
     document->setUseDesignMetrics(true);
 
@@ -3016,7 +3016,7 @@ void SceneDocumentBinder::initializeDocument()
         cursor.movePosition(QTextCursor::EndOfBlock, QTextCursor::MoveAnchor);
     }
 
-    documentSignalBlocker.unblock();
+    // documentSignalBlocker.unblock();
 
     if (m_cursorPosition <= 0 && m_currentElement == nullptr && nrElements == 1)
         this->setCurrentElement(m_scene->elementAt(0));
