@@ -491,6 +491,11 @@ Item {
             key: Material.Grey // applicationSettings.primaryColor
 
             ObjectRegister.name: "primaryColors"
+
+            property QtObject editor: QtObject {
+                readonly property color background: colors.theme === Material.Light ? "white" : "black"
+                readonly property color text: colors.theme === Material.Light ? "black" : "white"
+            }
         }
 
         readonly property Colors accent: Colors {

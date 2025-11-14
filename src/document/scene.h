@@ -392,14 +392,12 @@ public:
     bool isBeingReset() const { return m_isBeingReset; }
     Q_SIGNAL void resetStateChanged();
 
-    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY
-                       undoRedoEnabledChanged STORED false)
+    Q_PROPERTY(bool undoRedoEnabled READ isUndoRedoEnabled WRITE setUndoRedoEnabled NOTIFY undoRedoEnabledChanged STORED false)
     void setUndoRedoEnabled(bool val);
     bool isUndoRedoEnabled() const { return m_undoRedoEnabled; }
     Q_SIGNAL void undoRedoEnabledChanged();
 
-    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY
-                       cursorPositionChanged STORED false)
+    Q_PROPERTY(int cursorPosition READ cursorPosition WRITE setCursorPosition NOTIFY cursorPositionChanged STORED false)
     void setCursorPosition(int val);
     int cursorPosition() const { return m_cursorPosition; }
     Q_SIGNAL void cursorPositionChanged();

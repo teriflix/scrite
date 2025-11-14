@@ -2230,6 +2230,8 @@ void Scene::deserializeFromJson(const QJsonObject &json)
     const QString titleAttr = QStringLiteral("title");
     if (json.contains(titleAttr))
         this->setSynopsis(json.value(titleAttr).toString());
+
+    this->setUndoRedoEnabled(true);
 }
 
 bool Scene::canSetPropertyFromObjectList(const QString &propName) const

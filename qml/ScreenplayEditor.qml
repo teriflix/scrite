@@ -166,7 +166,7 @@ Rectangle {
         Rectangle {
             anchors.fill: _elementListView
 
-            color: Runtime.colors.primary.c50.background
+            color: Runtime.colors.primary.editor.background
             border.width: 1
             border.color: root.color
         }
