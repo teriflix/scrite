@@ -56,6 +56,7 @@ HEADERS += \
     src/core/filemodificationtracker.h \
     src/core/languageengine.h \
     src/core/localstorage.h \
+    src/core/systemrequirements.h \
     src/core/utils.h \
     src/document/screenplaypaginator.h \
     src/document/screenplaypaginatorworker.h \
@@ -190,6 +191,7 @@ SOURCES += \
     src/core/filemodificationtracker.cpp \
     src/core/languageengine.cpp \
     src/core/localstorage.cpp \
+    src/core/systemrequirements.cpp \
     src/core/utils.cpp \
     src/document/screenplaypaginator.cpp \
     src/document/screenplaypaginatorworker.cpp \

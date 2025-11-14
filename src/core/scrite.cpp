@@ -77,25 +77,21 @@ void Scrite::setFileNameToOpen(const QString &val)
 
 QStringList Scrite::defaultTransitions()
 {
-    return QStringList(
-            { QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"), QStringLiteral("FADE IN"),
-              QStringLiteral("FADE OUT"), QStringLiteral("FADE TO"), QStringLiteral("FLASHBACK"),
-              QStringLiteral("FLASH CUT TO"), QStringLiteral("FREEZE FRAME"),
-              QStringLiteral("IRIS IN"), QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"),
-              QStringLiteral("MATCH CUT TO"), QStringLiteral("MATCH DISSOLVE TO"),
-              QStringLiteral("SMASH CUT TO"), QStringLiteral("STOCK SHOT"),
-              QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
+    return QStringList({ QStringLiteral("CUT TO"), QStringLiteral("DISSOLVE TO"), QStringLiteral("FADE IN"),
+                         QStringLiteral("FADE OUT"), QStringLiteral("FADE TO"), QStringLiteral("FLASHBACK"),
+                         QStringLiteral("FLASH CUT TO"), QStringLiteral("FREEZE FRAME"), QStringLiteral("IRIS IN"),
+                         QStringLiteral("IRIS OUT"), QStringLiteral("JUMP CUT TO"), QStringLiteral("MATCH CUT TO"),
+                         QStringLiteral("MATCH DISSOLVE TO"), QStringLiteral("SMASH CUT TO"),
+                         QStringLiteral("STOCK SHOT"), QStringLiteral("TIME CUT"), QStringLiteral("WIPE TO") });
 }
 
 QStringList Scrite::defaultShots()
 {
-    return QStringList({ QStringLiteral("AIR"), QStringLiteral("CLOSE ON"),
-                         QStringLiteral("CLOSER ON"), QStringLiteral("CLOSEUP"),
-                         QStringLiteral("ESTABLISHING"), QStringLiteral("EXTREME CLOSEUP"),
+    return QStringList({ QStringLiteral("AIR"), QStringLiteral("CLOSE ON"), QStringLiteral("CLOSER ON"),
+                         QStringLiteral("CLOSEUP"), QStringLiteral("ESTABLISHING"), QStringLiteral("EXTREME CLOSEUP"),
                          QStringLiteral("INSERT"), QStringLiteral("POV"), QStringLiteral("SURFACE"),
-                         QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"),
-                         QStringLiteral("UNDERWATER"), QStringLiteral("WIDE"),
-                         QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
+                         QStringLiteral("THREE SHOT"), QStringLiteral("TWO SHOT"), QStringLiteral("UNDERWATER"),
+                         QStringLiteral("WIDE"), QStringLiteral("WIDE ON"), QStringLiteral("WIDER ANGLE") });
 }
 
 Locale Scrite::locale()
@@ -131,18 +127,12 @@ QString Scrite::currencySymbol(const QString &code)
 bool Scrite::isFeatureEnabled(AppFeature feature, const QStringList &features)
 {
     static const QMap<AppFeature, QString> featureNameMap = {
-        { Scrite::ScreenplayFeature, "screenplay" },
-        { Scrite::StructureFeature, "structure" },
-        { Scrite::NotebookFeature, "notebook" },
-        { Scrite::RelationshipGraphFeature, "relationshipgraph" },
-        { Scrite::ScriptalayFeature, "scriptalay" },
-        { Scrite::TemplateFeature, "template" },
-        { Scrite::ReportFeature, "report" },
-        { Scrite::ImportFeature, "import" },
-        { Scrite::ExportFeature, "export" },
-        { Scrite::ScritedFeature, "scrited" },
-        { Scrite::WatermarkFeature, "watermark" },
-        { Scrite::RecentFilesFeature, "recentfiles" },
+        { Scrite::ScreenplayFeature, "screenplay" }, { Scrite::StructureFeature, "structure" },
+        { Scrite::NotebookFeature, "notebook" },     { Scrite::RelationshipGraphFeature, "relationshipgraph" },
+        { Scrite::ScriptalayFeature, "scriptalay" }, { Scrite::TemplateFeature, "template" },
+        { Scrite::ReportFeature, "report" },         { Scrite::ImportFeature, "import" },
+        { Scrite::ExportFeature, "export" },         { Scrite::ScritedFeature, "scrited" },
+        { Scrite::WatermarkFeature, "watermark" },   { Scrite::RecentFilesFeature, "recentfiles" },
         { Scrite::VaultFilesFeature, "vaultfiles" }
     };
 
@@ -165,21 +155,18 @@ bool Scrite::isFeatureNameEnabled(const QString &featureName, const QStringList 
     };
 
     const bool featureEnabled =
-            std::find_if(features.constBegin(), features.constEnd(), featurePredicate)
-            != features.constEnd();
+            std::find_if(features.constBegin(), features.constEnd(), featurePredicate) != features.constEnd();
     const bool allFeaturesEnabled =
-            std::find_if(features.constBegin(), features.constEnd(), wildCardPredicate)
-            != features.constEnd();
+            std::find_if(features.constBegin(), features.constEnd(), wildCardPredicate) != features.constEnd();
     const bool featureDisabled =
-            std::find_if(features.constBegin(), features.constEnd(), notFeaturePredicate)
-            != features.constEnd();
+            std::find_if(features.constBegin(), features.constEnd(), notFeaturePredicate) != features.constEnd();
     return (allFeaturesEnabled || featureEnabled) && !featureDisabled;
 }
 
 void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
 {
-    const QFileInfoList entries = dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs,
-                                                    QDir::Name | QDir::DirsLast);
+    const QFileInfoList entries =
+            dir.entryInfoList(QDir::NoDotAndDotDot | QDir::Files | QDir::Dirs, QDir::Name | QDir::DirsLast);
     for (const QFileInfo &entry : entries) {
         if (entry.isDir()) {
             doZipRecursively(entry.absoluteFilePath(), rootDir, qzip);
@@ -215,8 +202,7 @@ void doZipRecursively(const QDir &dir, const QDir &rootDir, QuaZip &qzip)
     }
 }
 
-bool Scrite::doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir,
-                   const QList<QPair<QString, int>> &files)
+bool Scrite::doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir, const QList<QPair<QString, int>> &files)
 {
     const QString zipFileName = zipFileInfo.absoluteFilePath();
 
@@ -337,69 +323,4 @@ bool Scrite::doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir)
     qzip.close();
 
     return true;
-}
-
-#include <QNetworkInterface>
-#include <QHostAddress>
-
-bool Scrite::isNetworkAvailable()
-{
-    const auto allNetworkInterfaces = QNetworkInterface::allInterfaces();
-
-    foreach (const QNetworkInterface &iface, allNetworkInterfaces) {
-        if (iface.flags().testFlag(QNetworkInterface::IsUp)
-            && iface.flags().testFlag(QNetworkInterface::IsRunning)
-            && !iface.flags().testFlag(QNetworkInterface::IsLoopBack)) {
-            foreach (const QHostAddress &addr, iface.allAddresses()) {
-                if (addr.protocol() == QAbstractSocket::IPv4Protocol
-                    && addr != QHostAddress(QHostAddress::LocalHost)) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
-}
-
-#include <QMessageBox>
-#include <QProgressDialog>
-#include <QDesktopServices>
-
-bool Scrite::blockingMinimumVersionCheck()
-{
-    bool success = true;
-
-    AppMinimumVersionRestApiCall call;
-
-    if (Scrite::isNetworkAvailable()) {
-        QEventLoop eventLoop;
-
-        QProgressDialog msgBox(nullptr, Qt::CustomizeWindowHint | Qt::WindowTitleHint);
-        msgBox.setWindowTitle(QString("Scrite version %1").arg(SCRITE_VERSION));
-        msgBox.setLabelText("Checking if your version of Scrite is supported. Please wait ...");
-        msgBox.setValue(25);
-        msgBox.setCancelButton(nullptr);
-        msgBox.show();
-
-        connect(&call, &AppMinimumVersionRestApiCall::finished, &eventLoop, &QEventLoop::quit);
-
-        call.setReportNetworkErrors(true);
-        call.setAutoDelete(false);
-        call.call();
-
-        eventLoop.exec();
-
-        success = call.hasError() ? true : (call.hasResponse() && call.isVersionSupported());
-    }
-
-    if (!success) {
-        QMessageBox::information(nullptr, "Unsupported Version of Scrite",
-                                 QString("You are using Scrite version %1, which is no longer "
-                                         "supported. Please download the latest version.")
-                                         .arg(SCRITE_VERSION));
-        QDesktopServices::openUrl(QUrl("https://www.scrite.io/downloads"));
-    }
-
-    return success;
 }

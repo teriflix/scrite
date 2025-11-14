@@ -22,6 +22,7 @@
 #include "documentfilesystem.h"
 #include "scritedocumentvault.h"
 #include "notificationmanager.h"
+#include "systemrequirements.h"
 
 #include <QQuickStyle>
 
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
 
     Application scriteApp(argc, argv, Application::prepare());
 
-    if (!Scrite::blockingMinimumVersionCheck())
+    if (!SystemRequirements::checkAndReport())
         return -1;
 
     Utils::registerTypes();

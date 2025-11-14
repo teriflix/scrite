@@ -77,14 +77,8 @@ public:
         code = other.code;
         symbol = other.symbol;
     }
-    bool operator==(const Currency &other) const
-    {
-        return code == other.code && symbol == other.symbol;
-    }
-    bool operator!=(const Currency &other) const
-    {
-        return code != other.code || symbol != other.symbol;
-    }
+    bool operator==(const Currency &other) const { return code == other.code && symbol == other.symbol; }
+    bool operator!=(const Currency &other) const { return code != other.code || symbol != other.symbol; }
     Currency &operator=(const Currency &other)
     {
         code = other.code;
@@ -113,14 +107,8 @@ public:
         country = other.country;
         currency = other.currency;
     }
-    bool operator==(const Locale &other) const
-    {
-        return country == other.country && currency == other.currency;
-    }
-    bool operator!=(const Locale &other) const
-    {
-        return country != other.country || currency != other.currency;
-    }
+    bool operator==(const Locale &other) const { return country == other.country && currency == other.currency; }
+    bool operator!=(const Locale &other) const { return country != other.country || currency != other.currency; }
     Locale &operator=(const Locale &other)
     {
         country = other.country;
@@ -203,18 +191,12 @@ public:
 
     Q_INVOKABLE static QString currencySymbol(const QString &code);
 
-    Q_INVOKABLE static bool isFeatureEnabled(Scrite::AppFeature feature,
-                                             const QStringList &features);
-    Q_INVOKABLE static bool isFeatureNameEnabled(const QString &feature,
-                                                 const QStringList &features);
+    Q_INVOKABLE static bool isFeatureEnabled(Scrite::AppFeature feature, const QStringList &features);
+    Q_INVOKABLE static bool isFeatureNameEnabled(const QString &feature, const QStringList &features);
 
-    static bool doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir,
-                      const QList<QPair<QString, int>> &files);
+    static bool doZip(const QFileInfo &zipFileInfo, const QDir &sourceDir, const QList<QPair<QString, int>> &files);
     static bool doZip(const QFileInfo &zipFileInfo, const QDir &rootDir);
     static bool doUnzip(const QFileInfo &zipFileInfo, const QTemporaryDir &dstDir);
-
-    Q_INVOKABLE static bool isNetworkAvailable();
-    static bool blockingMinimumVersionCheck();
 
 private:
     static QString m_fileNameToOpen;
