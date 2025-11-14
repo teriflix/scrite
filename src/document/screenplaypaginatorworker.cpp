@@ -144,23 +144,145 @@ QList<SceneContent> SceneContent::fromScreenplay(const Screenplay *screenplay)
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
+PaginatorDocumentInsights::PaginatorDocumentInsights() { }
+
+PaginatorDocumentInsights::PaginatorDocumentInsights(const PaginatorDocumentInsights &other)
+{
+    this->contentRangeMap = other.contentRangeMap;
+}
+
+bool PaginatorDocumentInsights::operator==(const PaginatorDocumentInsights &other)
+{
+    return this->contentRangeMap == other.contentRangeMap;
+}
+
+bool PaginatorDocumentInsights::operator!=(const PaginatorDocumentInsights &other)
+{
+    return this->contentRangeMap != other.contentRangeMap;
+}
+
+PaginatorDocumentInsights &PaginatorDocumentInsights::operator=(const PaginatorDocumentInsights &other)
+{
+    this->contentRangeMap = other.contentRangeMap;
+    return *this;
+}
+
+bool PaginatorDocumentInsights::isEmpty() const
+{
+    return contentRangeMap.isEmpty();
+}
+
+QTextBlock PaginatorDocumentInsights::findBlock(const SceneHeading *heading) const
+{
+    if (heading == nullptr || heading->scene() == nullptr)
+        return QTextBlock();
+
+    return this->findBlock(heading->scene()->id(), QString());
+}
+
+QTextBlock PaginatorDocumentInsights::findBlock(const SceneElement *paragraph) const
+{
+    if (paragraph == nullptr || paragraph->scene() == nullptr)
+        return QTextBlock();
+
+    return this->findBlock(paragraph->scene()->id(), paragraph->id());
+}
+
+QTextBlock PaginatorDocumentInsights::findBlock(const QString &sceneId, const QString &paragraphId) const
+{
+    if (sceneId.isEmpty())
+        return QTextBlock();
+
+    BlockRange range = this->findBlockRangeBySceneId(sceneId);
+    if (!range.isValid())
+        return QTextBlock();
+
+    QTextBlock block = range.from;
+    while (block.isValid() && block.position() <= range.until.position()) {
+        const ScreenplayPaginatorBlockData *data = ScreenplayPaginatorBlockData::get(block);
+
+        if (data->sceneId != sceneId)
+            return QTextBlock();
+
+        if (data->paragraphId == paragraphId)
+            return block;
+
+        block = block.next();
+    }
+
+    return QTextBlock();
+}
+
+PaginatorDocumentInsights::BlockRange PaginatorDocumentInsights::findBlockRangeBySceneId(const QString &sceneId) const
+{
+    const QList<BlockRange> blockRanges = this->contentRangeMap.values();
+    auto it = std::find_if(blockRanges.begin(), blockRanges.end(),
+                           [sceneId](const BlockRange &item) { return (item.sceneId == sceneId); });
+    if (it != blockRanges.end())
+        return *it;
+    return BlockRange();
+}
+
+PaginatorDocumentInsights::BlockRange PaginatorDocumentInsights::findBlockRangeBySerialNumber(int serialNumber) const
+{
+    return this->contentRangeMap.value(serialNumber);
+}
+
+bool PaginatorDocumentInsights::BlockRange::isValid() const
+{
+    return serialNumber >= 0 && from.isValid() && until.isValid();
+}
+
+PaginatorDocumentInsights::BlockRange::BlockRange() { }
+
+PaginatorDocumentInsights::BlockRange::BlockRange(const BlockRange &other)
+{
+    *this = other;
+}
+
+bool PaginatorDocumentInsights::BlockRange::operator==(const BlockRange &other) const
+{
+    return this->serialNumber == other.serialNumber && this->sceneId == other.sceneId && this->from == other.from
+            && this->until == other.until;
+}
+
+PaginatorDocumentInsights::BlockRange &PaginatorDocumentInsights::BlockRange::operator=(const BlockRange &other)
+{
+    this->serialNumber = other.serialNumber;
+    this->sceneId = other.sceneId;
+    this->from = other.from;
+    this->until = other.until;
+    return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
 const char *PaginatorDocumentInsights::property = "#PaginatorDocumentInsights";
 const int ScreenplayPaginatorWorker::syncInterval = 500;
 
-ScreenplayPaginatorWorker::ScreenplayPaginatorWorker(QTextDocument *document, QObject *parent)
-    : QObject(parent), m_document(document)
+ScreenplayPaginatorWorker::ScreenplayPaginatorWorker(QTextDocument *document, ScreenplayFormat *format, QObject *parent)
+    : QObject(parent), m_document(document), m_defaultFormat(format)
 {
     ::registerPaginatorTypes();
 }
 
 ScreenplayPaginatorWorker::~ScreenplayPaginatorWorker() { }
 
+void ScreenplayPaginatorWorker::setSynchronousSync(bool val)
+{
+    if (m_synchronousSync == val)
+        return;
+
+    m_synchronousSync = val;
+    emit synchronousSyncChanged();
+}
+
 void ScreenplayPaginatorWorker::useFormat(const QJsonObject &format)
 {
-    m_formatJson = format;
-
-    if (!m_screenplayContent.isEmpty())
+    if (m_defaultFormat == nullptr) {
+        m_formatJson = format;
         this->scheduleSyncDocument(Q_FUNC_INFO);
+    }
 }
 
 void ScreenplayPaginatorWorker::reset(const QList<SceneContent> &screenplayContent)
@@ -258,7 +380,7 @@ void ScreenplayPaginatorWorker::syncDocument()
         m_syncDocumentTimer->stop();
 
     const qint64 now = QDateTime::currentMSecsSinceEpoch();
-    if (now - m_lastSyncDocumentTimestamp < ScreenplayPaginatorWorker::syncInterval)
+    if (!m_synchronousSync && now - m_lastSyncDocumentTimestamp < ScreenplayPaginatorWorker::syncInterval)
         return;
 
     m_lastSyncDocumentTimestamp = now;
@@ -294,12 +416,21 @@ void ScreenplayPaginatorWorker::syncDocument()
     // its possible that this ScreenplayPaginatorWorker instance is created, only
     // to be thrown into a separate thread. So, we have to create a brand new
     // ScreenplayFormat instance, disconnected from ScriteDocument and the rest of it.
+
+    // Unless we have accepted the ScreenplayFormat in the constructor itself, in which
+    // case we are allowed to use that format directly. In such cases, we will always ignore
+    // any JSON supplied via useFormat() method.
     if (m_format == nullptr) {
-        m_format = new ScreenplayFormat(this);
+        if (m_defaultFormat != nullptr && m_defaultFormat->thread() == QThread::currentThread())
+            m_format = m_defaultFormat;
+        else {
+            m_format = new ScreenplayFormat(this);
+            m_format->pageLayout()->evaluateRectsNow();
+        }
     }
 
     // Everytime this function is called, its possible that the format got updated.
-    if (!m_formatJson.isEmpty()) {
+    if (m_format != m_defaultFormat && !m_formatJson.isEmpty()) {
         QObjectSerializer::fromJson(m_formatJson, m_format);
         m_format->pageLayout()->evaluateRectsNow();
         m_formatJson = QJsonObject();
@@ -380,6 +511,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 
             ScreenplayPaginatorBlockData *blockData = new ScreenplayPaginatorBlockData;
             blockData->serialNumber = content.serialNumber;
+            blockData->paragraphType = SceneElement::Type(paragraph.type);
             blockData->sceneId = paragraph.sceneId;
             blockData->paragraphId = paragraph.id;
 
@@ -451,7 +583,7 @@ void ScreenplayPaginatorWorker::syncDocument()
     // All done, emit result.
     emit paginationComplete(records, pixelLength, pageCount, totalTime);
 
-#if 0
+#if 1
     QTextDocumentWriter writer(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/scrite.odt");
     writer.write(m_document);
 
@@ -462,6 +594,11 @@ void ScreenplayPaginatorWorker::syncDocument()
 
 void ScreenplayPaginatorWorker::scheduleSyncDocument(const char *purpose)
 {
+    if (m_synchronousSync) {
+        this->syncDocument();
+        return;
+    }
+
     if (m_syncDocumentTimer == nullptr) {
         m_syncDocumentTimer = new QTimer(this);
         m_syncDocumentTimer->setSingleShot(true);

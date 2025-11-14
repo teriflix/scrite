@@ -180,7 +180,19 @@ void ScreenplayPaginator::reset()
     this->onCursorPositionChanged();
 }
 
-QTextDocument *ScreenplayPaginator::paginatedDocument(Screenplay *screenplay, ScreenplayFormat *format,
+bool ScreenplayPaginator::paginateIntoDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
+                                               QTextDocument *document)
+{
+    ScreenplayPaginatorWorker worker(document, const_cast<ScreenplayFormat *>(format));
+    worker.setSynchronousSync(true);
+    if (format)
+        worker.useFormat(QObjectSerializer::toJson(format));
+    if (screenplay)
+        worker.reset(SceneContent::fromScreenplay(screenplay));
+    return document;
+}
+
+QTextDocument *ScreenplayPaginator::paginatedDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
                                                       QObject *documentParent)
 {
     if (screenplay == nullptr || format == nullptr)
@@ -194,11 +206,11 @@ QTextDocument *ScreenplayPaginator::paginatedDocument(Screenplay *screenplay, Sc
 
     QTextDocument *document = new QTextDocument(documentParent);
 
-    ScreenplayPaginatorWorker worker(document);
-    worker.useFormat(QObjectSerializer::toJson(format));
-    worker.reset(SceneContent::fromScreenplay(screenplay));
+    if (paginateIntoDocument(screenplay, format, document))
+        return document;
 
-    return document;
+    delete document;
+    return nullptr;
 }
 
 qreal ScreenplayPaginator::pixelLength(const ScreenplayElement *element, const QTextDocument *document)
@@ -253,6 +265,41 @@ qreal ScreenplayPaginator::pixelLength(const Scene *scene, const QTextDocument *
         return 0;
 
     return pixelLength(range.from, range.until, document);
+}
+
+qreal ScreenplayPaginator::pixelLength(const SceneHeading *sceneHeading, const QTextDocument *document)
+{
+    if (document == nullptr || sceneHeading == nullptr || sceneHeading->scene() == nullptr)
+        return 0;
+
+    if (document->thread() != QThread::currentThread() || sceneHeading->thread() != QThread::currentThread())
+        return 0;
+
+    const PaginatorDocumentInsights insights =
+            document->property(PaginatorDocumentInsights::property).value<PaginatorDocumentInsights>();
+    if (insights.isEmpty())
+        return 0;
+
+    const PaginatorDocumentInsights::BlockRange range = insights.findBlockRangeBySceneId(sceneHeading->scene()->id());
+    if (!range.isValid())
+        return 0;
+
+    // Lookup block range corresponding to the scene's paragraphs
+    QTextBlock block = range.from;
+    while (block.isValid()) {
+        ScreenplayPaginatorBlockData *data = ScreenplayPaginatorBlockData::get(block);
+        if (data && data->sceneId == sceneHeading->scene()->id() && data->paragraphId.isEmpty())
+            break;
+
+        if (block == range.until) {
+            block = QTextBlock();
+            break;
+        }
+
+        block = block.next();
+    }
+
+    return pixelLength(block, block, document);
 }
 
 qreal ScreenplayPaginator::pixelLength(const SceneElement *paragraph, const QTextDocument *document)

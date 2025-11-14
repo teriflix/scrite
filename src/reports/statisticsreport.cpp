@@ -12,21 +12,23 @@
 ****************************************************************************/
 
 #include "statisticsreport.h"
+#include "screenplaypaginatorworker.h"
 #include "statisticsreport_p.h"
-#include "screenplaytextdocument.h"
 #include "languageengine.h"
 
 #include "utils.h"
 #include "scene.h"
 #include "hourglass.h"
 #include "screenplay.h"
-#include "application.h"
 #include "scritedocument.h"
 
 #include <QTextTable>
 #include <QScopeGuard>
 #include <QTextCursor>
 #include <QTextDocument>
+#include <QTextDocumentWriter>
+#include <QPdfWriter>
+#include <QStandardPaths>
 
 StatisticsReport::StatisticsReport(QObject *parent) : AbstractReportGenerator(parent) { }
 
@@ -35,17 +37,17 @@ StatisticsReport::~StatisticsReport() { }
 const QVector<QColor> StatisticsReport::colors(ColorGroup group)
 {
     if (group == Character)
-        return QVector<QColor>({ QColor("#5e368a"), QColor("#e8bf5a") });
+        return QVector<QColor>({ QColor(94, 54, 138), QColor(232, 191, 90) });
     if (group == Beat)
         return QVector<QColor>(
-                { QColor("#CEE5D0"), QColor("#F3F0D7"), QColor("#FED2AA"), QColor("#FFBF86"),
-                  QColor("#DBD0C0"), QColor("#FAEEE0"), QColor("#F9E4C8"), QColor("#F9CF93"),
-                  QColor("#79B4B7"), QColor("#FEFBF3"), QColor("#F8F0DF"), QColor("#9D9D9D"),
-                  QColor("#FFE699"), QColor("#FFF9B6"), QColor("#FF9292"), QColor("#FFCCD2"),
-                  QColor("#E99497"), QColor("#F3C583"), QColor("#E8E46E"), QColor("#B3E283"),
-                  QColor("#867AE9"), QColor("#FFF5AB"), QColor("#FFCEAD"), QColor("#C449C2") });
+                { QColor(206, 229, 208), QColor(243, 240, 215), QColor(254, 210, 170), QColor(255, 191, 134),
+                  QColor(219, 208, 192), QColor(250, 238, 224), QColor(249, 228, 200), QColor(249, 207, 147),
+                  QColor(121, 180, 183), QColor(254, 251, 243), QColor(248, 240, 223), QColor(157, 157, 157),
+                  QColor(255, 230, 153), QColor(255, 249, 182), QColor(255, 146, 146), QColor(255, 204, 210),
+                  QColor(233, 148, 151), QColor(243, 197, 131), QColor(232, 228, 110), QColor(179, 226, 131),
+                  QColor(134, 122, 233), QColor(255, 245, 171), QColor(255, 206, 173), QColor(196, 73, 194) });
 
-    return QVector<QColor>({ QColor("#864879"), QColor("#3F3351") });
+    return QVector<QColor>({ QColor(134, 72, 121), QColor(63, 51, 81) });
 }
 
 const QColor StatisticsReport::pickColor(int index, bool cycleAround, ColorGroup group)
@@ -134,9 +136,11 @@ void StatisticsReport::setMaxCharacterPresenceGraphs(int val)
 QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool compact) const
 {
     QList<StatisticsReport::Distribution> ret;
-
     QMap<SceneElement::Type, StatisticsReport::Distribution> map;
-    if (m_textBlockMap.isEmpty() || m_textDocument.isEmpty())
+
+    const PaginatorDocumentInsights insights =
+            m_textDocument.property(PaginatorDocumentInsights::property).value<PaginatorDocumentInsights>();
+    if (m_textDocument.isEmpty() || insights.isEmpty())
         return ret;
 
     auto add = [&map](SceneElement::Type type, qreal pixelLength) {
@@ -148,21 +152,13 @@ QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool co
 
     {
         // First, lets sum up pixel lengths of all paragraph types.
-        auto it = m_textBlockMap.constBegin();
-        auto end = m_textBlockMap.constEnd();
-        while (it != end) {
-            const QObject *object = it.key();
-            const SceneElement *paragraph = qobject_cast<const SceneElement *>(object);
-            if (paragraph) {
-                if (paragraph)
-                    add(paragraph->type(), this->pixelLength(paragraph));
-            } else {
-                const SceneHeading *heading = qobject_cast<const SceneHeading *>(object);
-                if (heading)
-                    add(SceneElement::Heading, this->pixelLength(heading));
+        QTextBlock block = m_textDocument.firstBlock();
+        while (block.isValid()) {
+            const ScreenplayPaginatorBlockData *data = ScreenplayPaginatorBlockData::get(block);
+            if (data) {
+                add(data->paragraphType, ScreenplayPaginator::pixelLength(block, block, &m_textDocument));
             }
-
-            ++it;
+            block = block.next();
         }
 
         if (compact) {
@@ -237,8 +233,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::dialogueDistribution() c
         ++it;
     }
 
-    std::sort(ret.begin(), ret.end(),
-              [](const Distribution &a, const Distribution &b) { return a.ratio > b.ratio; });
+    std::sort(ret.begin(), ret.end(), [](const Distribution &a, const Distribution &b) { return a.ratio > b.ratio; });
 
     return ret;
 }
@@ -280,20 +275,17 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
     const Screenplay *screenplay = this->document()->screenplay();
     const Structure *structure = this->document()->structure();
     const auto actElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
-        return e->elementType() == ScreenplayElement::BreakElementType
-                && e->breakType() == Screenplay::Act;
+        return e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Act;
     });
 
     if (actElements.isEmpty())
         return ret;
 
     const QString prefrredGroupCategory = structure->preferredGroupCategory();
-    const QStringList actNames =
-            structure->categoryActNames().value(prefrredGroupCategory).toStringList();
+    const QStringList actNames = structure->categoryActNames().value(prefrredGroupCategory).toStringList();
     auto actName = [actNames](int actIndex) {
-        return actIndex >= 0 && actIndex < actNames.size()
-                ? actNames.at(actIndex)
-                : QStringLiteral("ACT %1").arg(actIndex + 1);
+        return actIndex >= 0 && actIndex < actNames.size() ? actNames.at(actIndex)
+                                                           : QStringLiteral("ACT %1").arg(actIndex + 1);
     };
 
     typedef QPair<QString, QList<Scene *>> ActSceneListPair;
@@ -326,8 +318,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
     }
 
     int episodeIndex = 0;
-    QColor baseColor = screenplay->episodeCount() > 0 ? StatisticsReport::pickColor(episodeIndex)
-                                                      : Qt::transparent;
+    QColor baseColor = screenplay->episodeCount() > 0 ? StatisticsReport::pickColor(episodeIndex) : Qt::transparent;
     actIndex = 0;
     for (auto actScenes : qAsConst(actScenesList)) {
         StatisticsReport::Distribution item;
@@ -360,8 +351,7 @@ QList<StatisticsReport::Distribution> StatisticsReport::episodeDistribution() co
 
     const Screenplay *screenplay = this->document()->screenplay();
     const auto episodeElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
-        return e->elementType() == ScreenplayElement::BreakElementType
-                && e->breakType() == Screenplay::Episode;
+        return e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Episode;
     });
     if (episodeElements.isEmpty())
         return ret;
@@ -473,8 +463,8 @@ bool StatisticsReport::doGenerate(QTextDocument *textDocument)
     cursor = table->cellAt(0, 1).firstCursorPosition();
     cursor.insertText(QString::number(this->pageCount()));
     cursor = table->cellAt(0, 2).firstCursorPosition();
-    cursor.insertHtml(QStringLiteral(
-            "<font size=\"-2\">Page count may change in generated PDFs of the screenplay.</font>"));
+    cursor.insertHtml(
+            QStringLiteral("<font size=\"-2\">Page count may change in generated PDFs of the screenplay.</font>"));
 
     // Number of scenes
     cursor = table->cellAt(1, 0).firstCursorPosition();
@@ -553,8 +543,7 @@ bool StatisticsReport::directPrintToPdf(QPdfWriter *pdfWriter)
     StatisticsReportPage scene(this);
     scene.setWatermark(this->watermark());
     scene.setComment(this->comment());
-    scene.addStandardItems(StatisticsReportPage::WatermarkOverlayLayer
-                           | StatisticsReportPage::FooterLayer
+    scene.addStandardItems(StatisticsReportPage::WatermarkOverlayLayer | StatisticsReportPage::FooterLayer
                            | StatisticsReportPage::DontIncludeScriteLink);
     scene.setTitle(screenplay->title() + QStringLiteral(" - Statistics"));
     const bool ret = scene.exportToPdf(pdfWriter);
@@ -566,217 +555,32 @@ void StatisticsReport::prepareTextDocument()
     HourGlass hourGlass;
     this->cleanupTextDocument();
 
-    const Screenplay *screenplay = this->document()->screenplay();
-    const ScreenplayFormat *format = this->document()->printFormat();
-    const qreal pageWidth = qCeil(format->pageLayout()->contentWidth());
-    m_pageHeight = qCeil(format->pageLayout()->contentRect().height());
-    m_millisecondsPerPixel = (format->secondsPerPage() * 1000) / m_pageHeight;
+    ScreenplayPaginator::paginateIntoDocument(this->document()->screenplay(), this->document()->printFormat(),
+                                              &m_textDocument);
 
-    m_textDocument.setUseDesignMetrics(true);
-    m_textDocument.setTextWidth(pageWidth);
-    m_textDocument.setDefaultFont(format->defaultFont());
+#if 1
+    QTextDocumentWriter writer(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
+                               + "/scrite-stats.odt");
+    writer.write(&m_textDocument);
 
-    QTextCursor cursor(&m_textDocument);
-    auto prepareCursor = [=](QTextCursor &cursor, SceneElement::Type paraType,
-                             Qt::Alignment overrideAlignment) {
-        const SceneElementFormat *eformat = format->elementFormat(paraType);
-        QTextBlockFormat blockFormat = eformat->createBlockFormat(overrideAlignment, &pageWidth);
-        QTextCharFormat charFormat = eformat->createCharFormat(&pageWidth);
-        cursor.setCharFormat(charFormat);
-        cursor.setBlockFormat(blockFormat);
-    };
-
-    auto polishFontsAndInsertTextAtCursor = [](QTextCursor &cursor, const QString &text) {
-        LanguageEngine::determineBoundariesAndInsertText(cursor, text);
-    };
-
-    const int nrElements = screenplay->elementCount();
-    for (int i = 0; i < nrElements; i++) {
-        const ScreenplayElement *element = screenplay->elementAt(i);
-        if (element->scene() == nullptr || element->isOmitted())
-            continue;
-
-        const Scene *scene = element->scene();
-        if (scene->heading()->isEnabled()) {
-            if (cursor.position() > 0)
-                cursor.insertBlock();
-            prepareCursor(cursor, SceneElement::Heading, Qt::Alignment());
-            polishFontsAndInsertTextAtCursor(cursor, scene->heading()->text());
-            m_textBlockMap.insert(scene->heading(), cursor.block());
-        }
-
-        for (int p = 0; p < scene->elementCount(); p++) {
-            if (cursor.position() > 0)
-                cursor.insertBlock();
-
-            const SceneElement *para = scene->elementAt(p);
-            prepareCursor(cursor, para->type(), para->alignment());
-            polishFontsAndInsertTextAtCursor(cursor, para->text());
-            m_textBlockMap.insert(para, cursor.block());
-        }
-    }
-
-    if (m_textDocument.isEmpty() || m_textBlockMap.isEmpty()) {
-        m_paragraphsLength = 0;
-        m_lineHeight = 1;
-        return;
-    }
-
-    QAbstractTextDocumentLayout *layout = m_textDocument.documentLayout();
-    auto it = m_textBlockMap.constBegin();
-    auto end = m_textBlockMap.constEnd();
-    m_lineHeight = m_pageHeight;
-    while (it != end) {
-        const QTextBlock paraBlock = m_textBlockMap.value(it.key());
-        const QRectF paraBlockRect = layout->blockBoundingRect(paraBlock);
-        const qreal paraHeight = paraBlockRect.height();
-
-        m_paragraphsLength += paraHeight;
-        if (paraHeight > 0)
-            m_lineHeight = qMin(paraHeight, m_lineHeight);
-
-        ++it;
-    }
-
-    for (int i = 0; i < nrElements; i++) {
-        const ScreenplayElement *element = screenplay->elementAt(i);
-        if (element->scene() == nullptr || element->isOmitted())
-            continue;
-
-        const Scene *scene = element->scene();
-        const QObject *para = scene->heading()->isEnabled() ? (QObject *)scene->heading()
-                                                            : (QObject *)scene->elementAt(0);
-        const QTextBlock block = m_textBlockMap.value(para);
-        if (block.isValid()) {
-            QTextCursor cursor(block);
-            cursor.select(QTextCursor::BlockUnderCursor);
-
-            QTextBlockFormat format;
-            format.setTopMargin(block.blockFormat().topMargin() + m_lineHeight);
-            cursor.mergeBlockFormat(format);
-        }
-    }
+    QPdfWriter pdfWriter(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/scrite-stats.pdf");
+    m_textDocument.print(&pdfWriter);
+#endif
 }
 
 void StatisticsReport::cleanupTextDocument()
 {
-    m_textBlockMap.clear();
     m_textDocument.clear();
-    m_pageHeight = 0;
-    m_paragraphsLength = 0;
-    m_millisecondsPerPixel = 0;
 }
 
-qreal StatisticsReport::pixelLength() const
+void StatisticsReport::polish(Distribution &distribution) const
 {
-    return m_textDocument.isEmpty() ? 0.0 : m_textDocument.size().height();
-}
+    const qreal totalPixelLength = this->pixelLength();
 
-qreal StatisticsReport::pixelLength(const Scene *scene) const
-{
-    return scene ? qMax(this->boundingRect(scene).height(), 0.0) : 0;
-}
-
-qreal StatisticsReport::pixelLength(const SceneHeading *heading) const
-{
-    return qMax(this->boundingRect(heading).height(), 0.0);
-}
-
-qreal StatisticsReport::pixelLength(const SceneElement *para) const
-{
-    return qMax(this->boundingRect(para).height(), 0.0);
-}
-
-qreal StatisticsReport::pixelLength(const ScreenplayElement *element) const
-{
-    return qMax(this->boundingRect(element).height(), 0.0);
-}
-
-QRectF StatisticsReport::boundingRect(const Scene *scene) const
-{
-    QRectF nullRect;
-    if (scene == nullptr || m_textDocument.isEmpty() || qFuzzyIsNull(m_pageHeight))
-        return nullRect;
-
-    QTextBlock fromBlock, toBlock;
-
-    if (scene->heading()->isEnabled()) {
-        if (!m_textBlockMap.contains(scene->heading()))
-            return nullRect;
-
-        fromBlock = m_textBlockMap.value(scene->heading());
-        toBlock = fromBlock;
-    } else {
-        const SceneElement *firstPara = scene->elementAt(0);
-        if (firstPara == nullptr || !m_textBlockMap.contains(firstPara))
-            return nullRect;
-
-        fromBlock = m_textBlockMap.value(firstPara);
-        toBlock = fromBlock;
-    }
-
-    const SceneElement *lastPara = scene->elementAt(scene->elementCount() - 1);
-    if (!lastPara || !m_textBlockMap.contains(lastPara))
-        return nullRect;
-
-    toBlock = m_textBlockMap.value(lastPara);
-
-    QAbstractTextDocumentLayout *layout = m_textDocument.documentLayout();
-    const QRectF fromBlockRect = layout->blockBoundingRect(fromBlock);
-    const QRectF toBlockRect = layout->blockBoundingRect(toBlock);
-    return QRectF(fromBlockRect.topLeft(), toBlockRect.bottomRight() + QPointF(0, m_lineHeight));
-}
-
-QRectF StatisticsReport::boundingRectOfHeadingOrParagraph(const QObject *object) const
-{
-    QRectF nullRect;
-    if (object == nullptr || m_textDocument.isEmpty() || qFuzzyIsNull(m_pageHeight))
-        return nullRect;
-
-    if (!m_textBlockMap.contains(object))
-        return nullRect;
-
-    QAbstractTextDocumentLayout *layout = m_textDocument.documentLayout();
-    const QTextBlock paraBlock = m_textBlockMap.value(object);
-    const QRectF paraBlockRect = layout->blockBoundingRect(paraBlock);
-    return paraBlockRect;
-}
-
-QRectF StatisticsReport::boundingRect(const ScreenplayElement *element) const
-{
-    QRectF nullRect;
-    if (element->scene())
-        return this->boundingRect(element->scene());
-
-    const Screenplay *screenplay = this->document()->screenplay();
-    ScreenplayElement *ncelement = const_cast<ScreenplayElement *>(element);
-    const QList<int> idxList = screenplay->sceneElementsInBreak(ncelement);
-    if (idxList.isEmpty())
-        return nullRect;
-
-    const QRectF firstRect = this->boundingRect(screenplay->elementAt(idxList.first()));
-    const QRectF lastRect = this->boundingRect(screenplay->elementAt(idxList.last()));
-    if (firstRect.isNull() || lastRect.isNull())
-        return nullRect;
-
-    return QRectF(firstRect.topLeft(), lastRect.bottomRight() + QPointF(0, m_lineHeight));
-}
-
-QTime StatisticsReport::pageLengthToTime(qreal val) const
-{
-    const ScreenplayFormat *format = this->document()->printFormat();
-    const int secsPerPage = format->secondsPerPage();
-    const int totalSecs = qreal(secsPerPage) * val;
-    return Utils::TMath::secondsToTime(totalSecs);
-}
-
-void StatisticsReport::polish(Distribution &report) const
-{
-    if (!qFuzzyIsNull(m_paragraphsLength)) {
-        report.ratio = report.pixelLength / m_paragraphsLength;
-        const int cent = qRound(report.ratio * 100);
-        report.percent = QString::number(cent) + QStringLiteral("%");
-        report.pageLength = this->pageLength(report.pixelLength);
-        report.timeLength = this->pixelLengthToTime(report.pixelLength);
-    }
+    distribution.ratio = distribution.pixelLength / totalPixelLength;
+    const int cent = qRound(distribution.ratio * 100);
+    distribution.percent = QString::number(cent) + QStringLiteral("%");
+    distribution.ratio = distribution.pixelLength / totalPixelLength;
+    distribution.pageLength = this->pageLength(distribution.pixelLength);
+    distribution.timeLength = this->pixelLengthToTime(distribution.pixelLength);
 }

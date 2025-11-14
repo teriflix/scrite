@@ -71,58 +71,33 @@ class PaginatorDocumentInsights
 public:
     static const char *property;
 
-    PaginatorDocumentInsights() { }
-    PaginatorDocumentInsights(const PaginatorDocumentInsights &other) { this->contentRangeMap = other.contentRangeMap; }
-    bool operator==(const PaginatorDocumentInsights &other) { return this->contentRangeMap == other.contentRangeMap; }
-    bool operator!=(const PaginatorDocumentInsights &other) { return this->contentRangeMap != other.contentRangeMap; }
-    PaginatorDocumentInsights &operator=(const PaginatorDocumentInsights &other)
-    {
-        this->contentRangeMap = other.contentRangeMap;
-        return *this;
-    }
+    PaginatorDocumentInsights();
+    PaginatorDocumentInsights(const PaginatorDocumentInsights &other);
+    bool operator==(const PaginatorDocumentInsights &other);
+    bool operator!=(const PaginatorDocumentInsights &other);
+    PaginatorDocumentInsights &operator=(const PaginatorDocumentInsights &other);
 
     struct BlockRange
     {
-        bool isValid() const { return serialNumber >= 0 && from.isValid() && until.isValid(); }
+        bool isValid() const;
         int serialNumber = -1;
         QString sceneId;
         QTextBlock from;
         QTextBlock until;
 
-        BlockRange() { }
-        BlockRange(const BlockRange &other) { *this = other; }
-        bool operator==(const BlockRange &other) const
-        {
-            return this->serialNumber == other.serialNumber && this->sceneId == other.sceneId
-                    && this->from == other.from && this->until == other.until;
-        }
+        BlockRange();
+        BlockRange(const BlockRange &other);
+        bool operator==(const BlockRange &other) const;
         bool operator!=(const BlockRange &other) const { return !(*this == other); }
-        BlockRange &operator=(const BlockRange &other)
-        {
-            this->serialNumber = other.serialNumber;
-            this->sceneId = other.sceneId;
-            this->from = other.from;
-            this->until = other.until;
-            return *this;
-        }
+        BlockRange &operator=(const BlockRange &other);
     };
 
-    bool isEmpty() const { return contentRangeMap.isEmpty(); }
-
-    BlockRange findBlockRangeBySerialNumber(int serialNumber) const
-    {
-        return this->contentRangeMap.value(serialNumber);
-    }
-
-    BlockRange findBlockRangeBySceneId(const QString &sceneId) const
-    {
-        const QList<BlockRange> blockRanges = this->contentRangeMap.values();
-        auto it = std::find_if(blockRanges.begin(), blockRanges.end(),
-                               [sceneId](const BlockRange &item) { return (item.sceneId == sceneId); });
-        if (it != blockRanges.end())
-            return *it;
-        return BlockRange();
-    }
+    bool isEmpty() const;
+    BlockRange findBlockRangeBySerialNumber(int serialNumber) const;
+    BlockRange findBlockRangeBySceneId(const QString &sceneId) const;
+    QTextBlock findBlock(const SceneHeading *heading) const;
+    QTextBlock findBlock(const SceneElement *paragraph) const;
+    QTextBlock findBlock(const QString &sceneId, const QString &paragraphId) const;
 
 private:
     friend class ScreenplayPaginatorWorker;
@@ -137,6 +112,11 @@ class ScreenplayPaginatorWorker : public QObject
 public:
     static const int syncInterval;
     virtual ~ScreenplayPaginatorWorker();
+
+    Q_PROPERTY(bool synchronousSync READ isSynchronousSync WRITE setSynchronousSync NOTIFY synchronousSyncChanged)
+    void setSynchronousSync(bool val);
+    bool isSynchronousSync() const { return m_synchronousSync; }
+    Q_SIGNAL void synchronousSyncChanged();
 
 public slots:
     void useFormat(const QJsonObject &format);
@@ -155,7 +135,8 @@ signals:
                             const QTime &totalTime);
 
 private:
-    explicit ScreenplayPaginatorWorker(QTextDocument *document = nullptr, QObject *parent = nullptr);
+    explicit ScreenplayPaginatorWorker(QTextDocument *document = nullptr, ScreenplayFormat *format = nullptr,
+                                       QObject *parent = nullptr);
 
     void syncDocument();
     void scheduleSyncDocument(const char *purpose = nullptr);
@@ -172,8 +153,9 @@ private:
     QTimer *m_syncDocumentTimer = nullptr;
     qint64 m_lastSyncDocumentTimestamp = 0;
     ScreenplayFormat *m_format = nullptr;
+    ScreenplayFormat *m_defaultFormat = nullptr;
     QJsonObject m_formatJson;
-    qreal m_lineHeight = 0;
+    bool m_synchronousSync = false;
 };
 
 #endif // SCREENPLAYPAGINATORWORKER_H

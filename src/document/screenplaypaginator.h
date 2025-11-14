@@ -26,6 +26,7 @@ public:
     int serialNumber = -1;
     QString sceneId;
     QString paragraphId;
+    SceneElement::Type paragraphType;
 
     static ScreenplayPaginatorBlockData *get(const QTextBlock &block)
     {
@@ -125,10 +126,13 @@ public:
     // is a document constructed by this paginator only, using the paginatedDocument()
     // method. These methods bother to do any computation at all only if the
     // QTextDocument pointer passed to it belong to the same thread as the current one.
-    static QTextDocument *paginatedDocument(Screenplay *screenplay, ScreenplayFormat *format,
+    static bool paginateIntoDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
+                                     QTextDocument *document);
+    static QTextDocument *paginatedDocument(const Screenplay *screenplay, const ScreenplayFormat *format,
                                             QObject *documentParent = nullptr);
     static qreal pixelLength(const ScreenplayElement *element, const QTextDocument *document);
     static qreal pixelLength(const Scene *scene, const QTextDocument *document);
+    static qreal pixelLength(const SceneHeading *sceneHeading, const QTextDocument *document);
     static qreal pixelLength(const SceneElement *paragraph, const QTextDocument *document);
     static qreal pixelLength(const QTextDocument *document);
     static qreal pixelLength(const QTextBlock &from, const QTextBlock &until, const QTextDocument *document);

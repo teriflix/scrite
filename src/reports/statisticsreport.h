@@ -18,6 +18,7 @@
 #include <QList>
 #include <QtMath>
 
+#include "screenplaypaginator.h"
 #include "abstractreportgenerator.h"
 
 class StatisticsReportPage;
@@ -157,84 +158,49 @@ private:
     void prepareTextDocument();
     void cleanupTextDocument();
 
-    qreal pageHeight() const { return m_pageHeight; }
+    qreal pageHeight() const { return m_textDocument.pageSize().height(); }
 
-    QTime timeLength() const { return this->pixelLengthToTime(this->pixelLength()); }
-    QTime timeLength(const Scene *scene) const
+    QTime timeLength() const
     {
-        return this->pixelLengthToTime(this->pixelLength(scene));
+        return ScreenplayPaginator::pixelToTimeLength(this->pixelLength(), this->document()->printFormat(),
+                                                      &m_textDocument);
     }
-    QTime timeLength(const SceneHeading *heading) const
-    {
-        return this->pixelLengthToTime(this->pixelLength(heading));
-    }
-    QTime timeLength(const SceneElement *para) const
-    {
-        return this->pixelLengthToTime(this->pixelLength(para));
-    }
-    QTime timeLength(const ScreenplayElement *element) const
-    {
-        return this->pixelLengthToTime(this->pixelLength(element));
-    }
-
-    qreal pageLength() const { return this->pageLength(this->pixelLength()); }
+    qreal pageLength() const { return ScreenplayPaginator::pixelToPageLength(this->pixelLength(), &m_textDocument); }
+    qreal pixelLength() const { return ScreenplayPaginator::pixelLength(&m_textDocument); }
     qreal pageLength(qreal pixelLength) const
     {
-        return qFuzzyIsNull(m_pageHeight) ? 0 : pixelLength / m_pageHeight;
+        return ScreenplayPaginator::pixelToPageLength(pixelLength, &m_textDocument);
     }
-    qreal pageLength(const Scene *scene) const
-    {
-        return this->pageLength(this->pixelLength(scene));
-    }
-    qreal pageLength(const SceneHeading *heading) const
-    {
-        return this->pageLength(this->pixelLength(heading));
-    }
-    qreal pageLength(const SceneElement *para) const
-    {
-        return this->pageLength(this->pixelLength(para));
-    }
-    qreal pageLength(const ScreenplayElement *element) const
-    {
-        return this->pageLength(this->pixelLength(element));
-    }
-
-    qreal pixelLength() const;
-    qreal pixelLength(const Scene *scene) const;
-    qreal pixelLength(const SceneHeading *heading) const;
-    qreal pixelLength(const SceneElement *para) const;
-    qreal pixelLength(const ScreenplayElement *element) const;
-
-    QRectF boundingRect(const Scene *scene) const;
-    QRectF boundingRect(const SceneHeading *heading) const
-    {
-        return this->boundingRectOfHeadingOrParagraph(heading);
-    }
-    QRectF boundingRect(const SceneElement *para) const
-    {
-        return this->boundingRectOfHeadingOrParagraph(para);
-    }
-    QRectF boundingRectOfHeadingOrParagraph(const QObject *object) const;
-    QRectF boundingRect(const ScreenplayElement *element) const;
-
     QTime pixelLengthToTime(qreal val) const
     {
-        return this->pageLengthToTime(this->pageLength(val));
+        return ScreenplayPaginator::pixelToTimeLength(val, this->document()->printFormat(), &m_textDocument);
     }
-    QTime pageLengthToTime(qreal val) const;
 
-    void polish(Distribution &report) const;
+    template<class T>
+    QTime timeLength(const T *obj) const
+    {
+        return ScreenplayPaginator::pixelToTimeLength(this->pixelLength(obj), this->document()->printFormat(),
+                                                      &m_textDocument);
+    }
+
+    template<class T>
+    qreal pageLength(const T *obj) const
+    {
+        return ScreenplayPaginator::pixelToPageLength(this->pixelLength(obj), &m_textDocument);
+    }
+
+    template<class T>
+    qreal pixelLength(const T *obj) const
+    {
+        return ScreenplayPaginator::pixelLength(obj, &m_textDocument);
+    }
+
+    void polish(Distribution &distribution) const;
 
 private:
     QTextDocument m_textDocument;
-    QMap<const QObject *, QTextBlock> m_textBlockMap;
-    qreal m_pageHeight = 0;
-    qreal m_lineHeight = 0;
-    qreal m_scaleFactor = 1.0;
     int m_maxLocationPresenceGraphs = 6;
     int m_maxCharacterPresenceGraphs = 6;
-    qreal m_paragraphsLength = 0; // usually smaller than pageHeight
-    qreal m_millisecondsPerPixel = 0;
     QStringList m_locations;
     QStringList m_characterNames;
     bool m_includeLocationPresenceGraphs = true;
