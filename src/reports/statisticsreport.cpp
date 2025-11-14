@@ -22,13 +22,13 @@
 #include "screenplay.h"
 #include "scritedocument.h"
 
-#include <QTextTable>
+#include <QPdfWriter>
 #include <QScopeGuard>
+#include <QStandardPaths>
 #include <QTextCursor>
 #include <QTextDocument>
 #include <QTextDocumentWriter>
-#include <QPdfWriter>
-#include <QStandardPaths>
+#include <QTextTable>
 
 StatisticsReport::StatisticsReport(QObject *parent) : AbstractReportGenerator(parent) { }
 
@@ -40,12 +40,14 @@ const QVector<QColor> StatisticsReport::colors(ColorGroup group)
         return QVector<QColor>({ QColor(94, 54, 138), QColor(232, 191, 90) });
     if (group == Beat)
         return QVector<QColor>(
-                { QColor(206, 229, 208), QColor(243, 240, 215), QColor(254, 210, 170), QColor(255, 191, 134),
-                  QColor(219, 208, 192), QColor(250, 238, 224), QColor(249, 228, 200), QColor(249, 207, 147),
-                  QColor(121, 180, 183), QColor(254, 251, 243), QColor(248, 240, 223), QColor(157, 157, 157),
-                  QColor(255, 230, 153), QColor(255, 249, 182), QColor(255, 146, 146), QColor(255, 204, 210),
-                  QColor(233, 148, 151), QColor(243, 197, 131), QColor(232, 228, 110), QColor(179, 226, 131),
-                  QColor(134, 122, 233), QColor(255, 245, 171), QColor(255, 206, 173), QColor(196, 73, 194) });
+                { QColor(206, 229, 208), QColor(243, 240, 215), QColor(254, 210, 170),
+                  QColor(255, 191, 134), QColor(219, 208, 192), QColor(250, 238, 224),
+                  QColor(249, 228, 200), QColor(249, 207, 147), QColor(121, 180, 183),
+                  QColor(254, 251, 243), QColor(248, 240, 223), QColor(157, 157, 157),
+                  QColor(255, 230, 153), QColor(255, 249, 182), QColor(255, 146, 146),
+                  QColor(255, 204, 210), QColor(233, 148, 151), QColor(243, 197, 131),
+                  QColor(232, 228, 110), QColor(179, 226, 131), QColor(134, 122, 233),
+                  QColor(255, 245, 171), QColor(255, 206, 173), QColor(196, 73, 194) });
 
     return QVector<QColor>({ QColor(134, 72, 121), QColor(63, 51, 81) });
 }
@@ -139,7 +141,8 @@ QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool co
     QMap<SceneElement::Type, StatisticsReport::Distribution> map;
 
     const PaginatorDocumentInsights insights =
-            m_textDocument.property(PaginatorDocumentInsights::property).value<PaginatorDocumentInsights>();
+            m_textDocument.property(PaginatorDocumentInsights::property)
+                    .value<PaginatorDocumentInsights>();
     if (m_textDocument.isEmpty() || insights.isEmpty())
         return ret;
 
@@ -156,7 +159,8 @@ QList<StatisticsReport::Distribution> StatisticsReport::textDistribution(bool co
         while (block.isValid()) {
             const ScreenplayPaginatorBlockData *data = ScreenplayPaginatorBlockData::get(block);
             if (data) {
-                add(data->paragraphType, ScreenplayPaginator::pixelLength(block, block, &m_textDocument));
+                add(data->paragraphType,
+                    ScreenplayPaginator::pixelLength(block, block, &m_textDocument));
             }
             block = block.next();
         }
@@ -233,7 +237,8 @@ QList<StatisticsReport::Distribution> StatisticsReport::dialogueDistribution() c
         ++it;
     }
 
-    std::sort(ret.begin(), ret.end(), [](const Distribution &a, const Distribution &b) { return a.ratio > b.ratio; });
+    std::sort(ret.begin(), ret.end(),
+              [](const Distribution &a, const Distribution &b) { return a.ratio > b.ratio; });
 
     return ret;
 }
@@ -275,17 +280,20 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
     const Screenplay *screenplay = this->document()->screenplay();
     const Structure *structure = this->document()->structure();
     const auto actElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
-        return e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Act;
+        return e->elementType() == ScreenplayElement::BreakElementType
+                && e->breakType() == Screenplay::Act;
     });
 
     if (actElements.isEmpty())
         return ret;
 
     const QString prefrredGroupCategory = structure->preferredGroupCategory();
-    const QStringList actNames = structure->categoryActNames().value(prefrredGroupCategory).toStringList();
+    const QStringList actNames =
+            structure->categoryActNames().value(prefrredGroupCategory).toStringList();
     auto actName = [actNames](int actIndex) {
-        return actIndex >= 0 && actIndex < actNames.size() ? actNames.at(actIndex)
-                                                           : QStringLiteral("ACT %1").arg(actIndex + 1);
+        return actIndex >= 0 && actIndex < actNames.size()
+                ? actNames.at(actIndex)
+                : QStringLiteral("ACT %1").arg(actIndex + 1);
     };
 
     typedef QPair<QString, QList<Scene *>> ActSceneListPair;
@@ -318,7 +326,8 @@ QList<StatisticsReport::Distribution> StatisticsReport::actDistribution() const
     }
 
     int episodeIndex = 0;
-    QColor baseColor = screenplay->episodeCount() > 0 ? StatisticsReport::pickColor(episodeIndex) : Qt::transparent;
+    QColor baseColor = screenplay->episodeCount() > 0 ? StatisticsReport::pickColor(episodeIndex)
+                                                      : Qt::transparent;
     actIndex = 0;
     for (auto actScenes : qAsConst(actScenesList)) {
         StatisticsReport::Distribution item;
@@ -351,7 +360,8 @@ QList<StatisticsReport::Distribution> StatisticsReport::episodeDistribution() co
 
     const Screenplay *screenplay = this->document()->screenplay();
     const auto episodeElements = screenplay->getFilteredElements([](ScreenplayElement *e) {
-        return e->elementType() == ScreenplayElement::BreakElementType && e->breakType() == Screenplay::Episode;
+        return e->elementType() == ScreenplayElement::BreakElementType
+                && e->breakType() == Screenplay::Episode;
     });
     if (episodeElements.isEmpty())
         return ret;
@@ -463,8 +473,8 @@ bool StatisticsReport::doGenerate(QTextDocument *textDocument)
     cursor = table->cellAt(0, 1).firstCursorPosition();
     cursor.insertText(QString::number(this->pageCount()));
     cursor = table->cellAt(0, 2).firstCursorPosition();
-    cursor.insertHtml(
-            QStringLiteral("<font size=\"-2\">Page count may change in generated PDFs of the screenplay.</font>"));
+    cursor.insertHtml(QStringLiteral(
+            "<font size=\"-2\">Page count may change in generated PDFs of the screenplay.</font>"));
 
     // Number of scenes
     cursor = table->cellAt(1, 0).firstCursorPosition();
@@ -543,7 +553,8 @@ bool StatisticsReport::directPrintToPdf(QPdfWriter *pdfWriter)
     StatisticsReportPage scene(this);
     scene.setWatermark(this->watermark());
     scene.setComment(this->comment());
-    scene.addStandardItems(StatisticsReportPage::WatermarkOverlayLayer | StatisticsReportPage::FooterLayer
+    scene.addStandardItems(StatisticsReportPage::WatermarkOverlayLayer
+                           | StatisticsReportPage::FooterLayer
                            | StatisticsReportPage::DontIncludeScriteLink);
     scene.setTitle(screenplay->title() + QStringLiteral(" - Statistics"));
     const bool ret = scene.exportToPdf(pdfWriter);
@@ -555,10 +566,10 @@ void StatisticsReport::prepareTextDocument()
     HourGlass hourGlass;
     this->cleanupTextDocument();
 
-    ScreenplayPaginator::paginateIntoDocument(this->document()->screenplay(), this->document()->printFormat(),
-                                              &m_textDocument);
+    ScreenplayPaginator::paginateIntoDocument(this->document()->screenplay(),
+                                              this->document()->printFormat(), &m_textDocument);
 
-#if 1
+#if 0
     QTextDocumentWriter writer(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation)
                                + "/scrite-stats.odt");
     writer.write(&m_textDocument);
