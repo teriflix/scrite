@@ -162,7 +162,8 @@ private:
 
     qreal cursorPixelOffset(int cursorPosition, int currentSerialNumber) const;
     qreal cursorPixelOffset(const QTextCursor &cursor) const;
-    QList<ScenePageBreak> evaluateScenePageBreaks(const PaginatorDocumentInsights::BlockRange &blockRange) const;
+    QList<ScenePageBreak> evaluateScenePageBreaks(const PaginatorDocumentInsights::BlockRange &blockRange,
+                                                  int &lastPageNumber) const;
 
 private:
     friend class ScreenplayPaginator;
@@ -172,6 +173,7 @@ private:
     qint64 m_lastSyncDocumentTimestamp = 0;
     ScreenplayFormat *m_format = nullptr;
     QJsonObject m_formatJson;
+    qreal m_lineHeight = 0;
 };
 
 #endif // SCREENPLAYPAGINATORWORKER_H

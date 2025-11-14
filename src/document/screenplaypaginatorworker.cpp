@@ -27,6 +27,8 @@
 #include <QTextDocument>
 #include <QStandardPaths>
 #include <QTextDocumentWriter>
+#include <QAbstractTextDocumentLayout>
+#include <QPdfWriter>
 
 static void registerPaginatorTypes()
 {
@@ -394,6 +396,7 @@ void ScreenplayPaginatorWorker::syncDocument()
 
     // For each block range, construct a record
     QMap<int, int> serialNumberMap;
+    int lastPageNr = -1;
 
     QList<ScreenplayPaginatorRecord> records;
     records.reserve(m_screenplayContent.size());
@@ -414,7 +417,7 @@ void ScreenplayPaginatorWorker::syncDocument()
         record.pixelLength = ScreenplayPaginator::pixelLength(range.from, range.until, m_document);
         record.pageLength = ScreenplayPaginator::pixelToPageLength(record.pixelLength, m_document);
         record.timeLength = ScreenplayPaginator::pixelToTimeLength(record.pixelLength, m_format, m_document);
-        record.pageBreaks = this->evaluateScenePageBreaks(range);
+        record.pageBreaks = this->evaluateScenePageBreaks(range, lastPageNr);
 
         serialNumberMap[sceneContent.serialNumber] = records.size();
 
@@ -451,6 +454,9 @@ void ScreenplayPaginatorWorker::syncDocument()
 #if 0
     QTextDocumentWriter writer(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/scrite.odt");
     writer.write(m_document);
+
+    QPdfWriter pdfWriter(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation) + "/scrite.pdf");
+    m_document->print(&pdfWriter);
 #endif
 }
 
@@ -528,7 +534,8 @@ qreal ScreenplayPaginatorWorker::cursorPixelOffset(const QTextCursor &cursor) co
 }
 
 QList<ScenePageBreak>
-ScreenplayPaginatorWorker::evaluateScenePageBreaks(const PaginatorDocumentInsights::BlockRange &range) const
+ScreenplayPaginatorWorker::evaluateScenePageBreaks(const PaginatorDocumentInsights::BlockRange &range,
+                                                   int &lastPageNumber) const
 {
     QList<ScenePageBreak> ret;
     if (QThread::currentThread()->isFinished() || QThread::currentThread()->isInterruptionRequested())
@@ -545,8 +552,18 @@ ScreenplayPaginatorWorker::evaluateScenePageBreaks(const PaginatorDocumentInsigh
     if (blockData == nullptr)
         return ret;
 
-    if (blockData->paragraphId.isEmpty())
+    if (blockData->paragraphId.isEmpty()) {
+        // Check if scene heading of this scene is the first line of the current page
+        QTextCursor cursor(block);
+        qreal pixelOffset = this->cursorPixelOffset(cursor);
+        int cursorPageNr = qMax(qCeil(ScreenplayPaginator::pixelToPageLength(pixelOffset, m_document)), 1);
+        if (cursorPageNr > lastPageNumber) {
+            ret.append(ScenePageBreak(-1, cursorPageNr));
+            lastPageNumber = cursorPageNr;
+        }
+
         block = block.next();
+    }
 
     const int firstPosition = block.position();
     const int lastPosition = [=]() -> int {
@@ -559,19 +576,15 @@ ScreenplayPaginatorWorker::evaluateScenePageBreaks(const PaginatorDocumentInsigh
 
     QTextCursor cursor(block);
 
-    int pageNr = -1;
-
     while (cursor.position() < lastPosition || cursor.atEnd()) {
         if (QThread::currentThread()->isFinished() || QThread::currentThread()->isInterruptionRequested())
             return QList<ScenePageBreak>();
 
         qreal pixelOffset = this->cursorPixelOffset(cursor);
         int cursorPageNr = qMax(qCeil(ScreenplayPaginator::pixelToPageLength(pixelOffset, m_document)), 1);
-        if (pageNr < 0)
-            pageNr = cursorPageNr;
-        else if (pageNr != cursorPageNr) {
+        if (cursorPageNr > lastPageNumber) {
             ret.append(ScenePageBreak(cursor.position() - firstPosition, cursorPageNr));
-            pageNr = cursorPageNr;
+            lastPageNumber = cursorPageNr;
         }
 
         if (!cursor.movePosition(QTextCursor::Down))
