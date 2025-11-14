@@ -43,12 +43,12 @@ AbstractScenePartEditor {
 
         enabled: Runtime.appFeatures.structure.enabled
 
-        addTextButtonTooltip: "Click here to add custom scene tags."
+        addTextButtonTooltip: "Click here to tag the scene with custom keywords."
         completionStrings: Scrite.document.structure.sceneTags
         font: root.font
         labelIconSource:  "qrc:/icons/action/keyword.png"
         labelIconVisible: _private.presentableGroupNames !== ""
-        labelText: "Open Tags"
+        labelText: "Keywords"
         readOnly: !Runtime.appFeatures.structure.enabled && root.readOnly
         textBorderWidth: root.screenplayElementDelegateHasFocus ? 0 : Math.max(0.5, 1 * zoomLevel)
         textColors: root.screenplayElementDelegateHasFocus ? Runtime.colors.accent.c600 : Runtime.colors.accent.c10
@@ -92,7 +92,7 @@ AbstractScenePartEditor {
             Link {
                 width: Math.min(implicitWidth, root.width*0.9)
 
-                text: _private.presentableGroupNames + ", "
+                text: _private.presentableGroupNames
                 elide: Text.ElideRight
                 visible: _private.presentableGroupNames !== ""
                 enabled: Runtime.appFeatures.structure.enabled

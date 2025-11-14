@@ -133,11 +133,11 @@ Item {
 
             enabled: Runtime.appFeatures.structure.enabled
 
-            addTextButtonTooltip: "Click here to add custom scene tags."
+            addTextButtonTooltip: "Click here to tag the scene with custom keywords."
             completionStrings: Scrite.document.structure.sceneTags
             labelIconSource: "qrc:/icons/action/keyword.png"
             labelIconVisible: _private.presentableGroupNames !== ""
-            labelText: "Open Tags"
+            labelText: "Keywords"
             readOnly: !Runtime.appFeatures.structure.enabled && Scrite.document.readOnly
             textList: root.scene ? root.scene.tags : 0
 
@@ -166,7 +166,7 @@ Item {
                 Link {
                     width: Math.min(implicitWidth, root.width*0.9)
 
-                    text: _private.presentableGroupNames + ", "
+                    text: _private.presentableGroupNames
                     elide: Text.ElideRight
                     visible: _private.presentableGroupNames !== ""
                     enabled: Runtime.appFeatures.structure.enabled
