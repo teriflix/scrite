@@ -36,7 +36,6 @@
 #elif defined(Q_OS_LINUX)
 #include <sys/sysinfo.h>
 #elif defined(Q_OS_MACOS)
-#include <sys/types.hh>
 #include <sys/sysctl.h>
 #endif
 
@@ -74,10 +73,12 @@ bool isNetworkAvailable()
 {
     const auto allNetworkInterfaces = QNetworkInterface::allInterfaces();
     foreach (const QNetworkInterface &iface, allNetworkInterfaces) {
-        if (iface.flags().testFlag(QNetworkInterface::IsUp) && iface.flags().testFlag(QNetworkInterface::IsRunning)
+        if (iface.flags().testFlag(QNetworkInterface::IsUp)
+            && iface.flags().testFlag(QNetworkInterface::IsRunning)
             && !iface.flags().testFlag(QNetworkInterface::IsLoopBack)) {
             foreach (const QHostAddress &addr, iface.allAddresses()) {
-                if (addr.protocol() == QAbstractSocket::IPv4Protocol && addr != QHostAddress(QHostAddress::LocalHost)) {
+                if (addr.protocol() == QAbstractSocket::IPv4Protocol
+                    && addr != QHostAddress(QHostAddress::LocalHost)) {
                     return true;
                 }
             }
@@ -113,14 +114,16 @@ QString SystemRequirements::describe(const QList<Aspect> aspects)
 #elif defined(Q_OS_MACOS)
             descriptions << QObject::tr("macOS 10.15 (Catalina) or later");
 #elif defined(Q_OS_LINUX)
-            descriptions << QObject::tr("A modern Linux distribution (like Ubuntu 20.04+, CentOS/RHEL 8+, Fedora 30+, "
-                                        "Mint 20+, openSuSE 15.2+)");
+            descriptions << QObject::tr(
+                    "A modern Linux distribution (like Ubuntu 20.04+, CentOS/RHEL 8+, Fedora 30+, "
+                    "Mint 20+, openSuSE 15.2+)");
 #else
             descriptions << QObject::tr("A supported operating system");
 #endif
             break;
         case SupportedScriteVersion:
-            descriptions << QObject::tr("Support for Scrite version ") + QString::fromLatin1(SCRITE_VERSION);
+            descriptions << QObject::tr("Support for Scrite version ")
+                            + QString::fromLatin1(SCRITE_VERSION);
         default:
             break;
         }
@@ -245,23 +248,26 @@ bool SystemRequirements::checkAndReport(const QList<Aspect> aspects)
             QMessageBox::StandardButton answer = QMessageBox::question(
                     nullptr, QObject::tr("System Requirements Not Met"),
                     QObject::tr("The following requirements were not met:\n\n") + errorString
-                            + QObject::tr("\n\nYou may notice issues with performance and function. Do you want to "
+                            + QObject::tr("\n\nYou may notice issues with performance and "
+                                          "function. Do you want to "
                                           "continue using Scrite anyway?"),
                     QMessageBox::Yes | QMessageBox::No);
             return answer == QMessageBox::Yes;
         } else {
             aspectsToCheck.removeOne(Aspect::SupportedScriteVersion);
 
-            QString message = QObject::tr("The following mandatory requirements were not met:\n\n") + errorString
+            QString message = QObject::tr("The following mandatory requirements were not met:\n\n")
+                    + errorString
                     + QObject::tr("\n\nScrite cannot be used on this device. Please use a "
                                   "device that supports these requirements:\n\n")
                     + describe(aspectsToCheck);
 
             if (failedChecks.contains(Aspect::SupportedScriteVersion)) {
-                message +=
-                        QObject::tr("\n\nAdditionally, please download a supported version of Scrite, since version ")
+                message += QObject::tr("\n\nAdditionally, please download a supported version of "
+                                       "Scrite, since version ")
                         + QString::fromLatin1(SCRITE_VERSION)
-                        + QObject::tr(" is not supported anymore. Click Ok to visit the downloads page on the Scrite "
+                        + QObject::tr(" is not supported anymore. Click Ok to visit the downloads "
+                                      "page on the Scrite "
                                       "website to download the latest supported version.");
             }
 
@@ -371,7 +377,8 @@ bool SystemRequirements::hasSupportedScriteVersion()
         AppMinimumVersionRestApiCall call;
         QEventLoop eventLoop;
 
-        QObject::connect(&call, &AppMinimumVersionRestApiCall::finished, &eventLoop, &QEventLoop::quit);
+        QObject::connect(&call, &AppMinimumVersionRestApiCall::finished, &eventLoop,
+                         &QEventLoop::quit);
 
         call.setReportNetworkErrors(true);
         call.setAutoDelete(false);
