@@ -329,16 +329,16 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("cut")
-        enabled: !root.readOnly && _sceneTextEditor.hasSelection
+        enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
 
-        onTriggered: (source) => {
+        onTriggered: (source) => {                         
                          _private.cut()
                      }
     }
 
     ActionHandler {
         action: ActionHub.editOptions.find("copy")
-        enabled: !root.readOnly && _sceneTextEditor.hasSelection
+        enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus
 
         onTriggered: (source) => {
                          _private.copy()
@@ -347,7 +347,7 @@ AbstractScenePartEditor {
 
     ActionHandler {
         action: ActionHub.editOptions.find("paste")
-        enabled: !root.readOnly
+        enabled: !root.readOnly && root.isCurrent && _sceneTextEditor.activeFocus
 
         onTriggered: (source) => {
                          _private.paste()
@@ -542,15 +542,15 @@ AbstractScenePartEditor {
             if(root.readOnly)
                 return
 
-            if(_sceneTextEditor.hasSelection) {
+            if(_sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus) {
                 _sceneDocumentBinder.copy(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
-                _sceneTextEditor.remove(selectionStart, selectionEnd)
+                _sceneTextEditor.remove(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
                 _sceneTextEditor.highlightCursor()
             }
         }
 
         function copy() {
-            if(_sceneTextEditor.hasSelection)
+            if(_sceneTextEditor.hasSelection && _sceneTextEditor.activeFocus)
                 _sceneDocumentBinder.copy(_sceneTextEditor.selectionStart, _sceneTextEditor.selectionEnd)
         }
 
@@ -558,7 +558,7 @@ AbstractScenePartEditor {
             if(root.readOnly)
                 return
 
-            if(_sceneTextEditor.canPaste) {
+            if(_sceneTextEditor.canPaste && _sceneTextEditor.activeFocus) {
                 // Fix for https://github.com/teriflix/scrite/issues/195
                 // [0.5.2 All] Pasting doesnt replace the selected text #195
                 if(_sceneTextEditor.hasSelection)
