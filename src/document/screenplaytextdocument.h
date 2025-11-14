@@ -11,6 +11,14 @@
 **
 ****************************************************************************/
 
+// Cleanup TODO:
+// Once upon a time, this class was used for both PDF/ODT generation and for
+// in memory QTextDocument representation of the screenplay, for pagination.
+// Now, its only used for PDF/ODT generation. So, we no longer need pagination
+// code in this class.
+// At some point, this whole class needs to be reviewed and trimmed of all
+// unwanted fat.
+
 #ifndef SCREENPLAYTEXTDOCUMENT_H
 #define SCREENPLAYTEXTDOCUMENT_H
 
@@ -391,41 +399,6 @@ private:
     QMap<QObject *, const ScreenplayElement *> m_frameElementMap;
     QMap<const ScreenplayElement *, QTextFrame *> m_elementFrameMap;
     ProgressReport *m_progressReport = nullptr;
-};
-
-class ScreenplayElementPageBreaks : public QObject
-{
-    Q_OBJECT
-    QML_ELEMENT
-
-public:
-    explicit ScreenplayElementPageBreaks(QObject *parent = nullptr);
-    ~ScreenplayElementPageBreaks();
-
-    Q_PROPERTY(ScreenplayTextDocument *screenplayDocument READ screenplayDocument WRITE setScreenplayDocument NOTIFY screenplayDocumentChanged RESET resetScreenplayDocument)
-    void setScreenplayDocument(ScreenplayTextDocument *val);
-    ScreenplayTextDocument *screenplayDocument() const { return m_screenplayDocument; }
-    Q_SIGNAL void screenplayDocumentChanged();
-
-    Q_PROPERTY( ScreenplayElement *screenplayElement READ screenplayElement WRITE setScreenplayElement NOTIFY screenplayElementChanged RESET resetScreenplayElement)
-    void setScreenplayElement(ScreenplayElement *val);
-    ScreenplayElement *screenplayElement() const { return m_screenplayElement; }
-    Q_SIGNAL void screenplayElementChanged();
-
-    Q_PROPERTY(QJsonArray pageBreaks READ pageBreaks NOTIFY pageBreaksChanged)
-    QJsonArray pageBreaks() const { return m_pageBreaks; }
-    Q_SIGNAL void pageBreaksChanged();
-
-private:
-    void resetScreenplayDocument();
-    void resetScreenplayElement();
-    void updatePageBreaks();
-    void setPageBreaks(const QJsonArray &val);
-
-private:
-    QJsonArray m_pageBreaks;
-    QObjectProperty<ScreenplayElement> m_screenplayElement;
-    QObjectProperty<ScreenplayTextDocument> m_screenplayDocument;
 };
 
 class ScreenplayTitlePageObjectInterface : public QObject, public QTextObjectInterface
