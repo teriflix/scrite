@@ -57,15 +57,17 @@ BasicAttachmentsDropArea {
                     Layout.fillWidth: true
 
                     text: "NOTE: Any unsaved changes in the currently open document will be discarded."
-                    color: Runtime.colors.primary.c700.text
+                    color: Runtime.colors.primary.c400.text
                     visible: !Scrite.document.empty || Scrite.document.fileName !== ""
                     wrapMode: Text.WordWrap
                     horizontalAlignment: Text.AlignHCenter
 
-                    font.pointSize: Runtime.idealFontMetrics.font.pointSize
+                    font.pointSize: Runtime.minimumFontMetrics.font.pointSize
                 }
 
                 RowLayout {
+                    Layout.alignment: Qt.AlignHCenter
+
                     spacing: 20
 
                     VclButton {
