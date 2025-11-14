@@ -129,6 +129,7 @@ ListView {
 
         ActionHandler {
             action: ActionHub.editOptions.find("jumpFirstScene")
+            enabled: _private.currentIndex > _private.firstSceneElementIndex
 
             onTriggered: (source) => {
                              _private.jumpToFirstScene()
@@ -137,6 +138,7 @@ ListView {
 
         ActionHandler {
             action: ActionHub.editOptions.find("jumpLastScene")
+            enabled: _private.currentIndex < _private.lastSceneElementIndex
 
             onTriggered: (source) => {
                              _private.jumpToLastScene()
@@ -145,6 +147,7 @@ ListView {
 
         ActionHandler {
             action: ActionHub.editOptions.find("jumpPreviousScene")
+            enabled: _private.currentIndex > _private.firstSceneElementIndex
 
             onTriggered: (source) => {
                              _private.jumpToPreviousScene()
@@ -153,6 +156,7 @@ ListView {
 
         ActionHandler {
             action: ActionHub.editOptions.find("jumpNextScene")
+            enabled: _private.currentIndex < _private.lastSceneElementIndex
 
             onTriggered: (source) => {
                              _private.jumpToNextScene()
@@ -161,6 +165,7 @@ ListView {
 
         ActionHandler {
             action: ActionHub.editOptions.find("scrollPreviousScene")
+            enabled: _private.currentIndex > _private.firstSceneElementIndex
 
             onTriggered: (source) => {
                              _private.scrollToPreviousScene()
@@ -169,6 +174,7 @@ ListView {
 
         ActionHandler {
             action: ActionHub.editOptions.find("scrollNextScene")
+            enabled: _private.currentIndex < _private.lastSceneElementIndex
 
             onTriggered: (source) => {
                              _private.scrollToNextScene()
@@ -189,6 +195,9 @@ ListView {
 
         property int lastItemIndex: -1
         property int firstItemIndex: -1
+
+        property int lastSceneElementIndex: -1
+        property int firstSceneElementIndex: -1
 
         property bool hasFocus: false
         property bool scrolling: scrollBarActive || root.moving
@@ -387,6 +396,10 @@ ListView {
                 _private.updateFirstAndLastIndexLater()
             }
 
+            function onRowsMoved() {
+                _private.updateFirstAndLastIndexLater()
+            }
+
             function onDataChanged() {
                 _private.updateFirstAndLastIndexLater()
             }
@@ -451,6 +464,8 @@ ListView {
             if(root.screenplayAdapter === null) {
                 firstItemIndex = -1
                 lastItemIndex = -1
+                firstSceneElementIndex = -1
+                lastSceneElementIndex = -1
                 return
             }
 
@@ -468,6 +483,9 @@ ListView {
 
             firstItemIndex = first
             lastItemIndex = last
+
+            firstSceneElementIndex = root.screenplayAdapter.firstSceneElementIndex()
+            lastSceneElementIndex = root.screenplayAdapter.lastSceneElementIndex()
         }
 
         function updateFirstAndLastIndexLater() {
@@ -548,7 +566,7 @@ ListView {
 
         function jumpToLastScene() {
             const cidx = currentIndex
-            const lidx = root.screenplayAdapter.lastSceneElementIndex()
+            const lidx = _private.lastSceneElementIndex
             if(cidx === lidx)
                 return
 
@@ -560,7 +578,7 @@ ListView {
 
         function jumpToFirstScene() {
             const cidx = currentIndex
-            const fidx = root.screenplayAdapter.firstSceneElementIndex()
+            const fidx = _private.firstSceneElementIndex
             if(cidx === fidx)
                 return
 
