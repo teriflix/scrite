@@ -746,7 +746,10 @@ void ScreenplayPaginatorWatcher::onPaginationUpdated()
 
 void ScreenplayPaginatorWatcher::setRecord(const ScreenplayPaginatorRecord &val)
 {
-    if (m_record == val || val.screenplayElement != m_element)
+    if (m_record == val)
+        return;
+
+    if (val.isValid() && val.screenplayElement != m_element)
         return;
 
     m_record = val;
