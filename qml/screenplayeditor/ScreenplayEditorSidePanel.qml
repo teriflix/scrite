@@ -102,6 +102,8 @@ Item {
                 focus: true
                 currentIndex: root.screenplayAdapter.currentIndex
 
+                boundsBehavior: ListView.StopAtBounds
+                boundsMovement: ListView.StopAtBounds
                 highlightMoveDuration: 0
                 highlightResizeDuration: 0
                 highlightFollowsCurrentItem: true
