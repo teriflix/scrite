@@ -16,7 +16,7 @@ Standard: Cpp11
 # Column width is limited to 100 in accordance with Qt Coding Style.
 # https://wiki.qt.io/Qt_Coding_Style
 # Note that this may be changed at some point in the future.
-ColumnLimit: 120
+ColumnLimit: 100
 # How much weight do extra characters after the line length limit have.
 # PenaltyExcessCharacter: 4
 
@@ -82,5 +82,5 @@ ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH, forever, Q_FOREVER, QBENCH
 BreakConstructorInitializers: BeforeColon
 
 StatementAttributeLikeMacros: [emit, Q_EMIT]
-StatementMacros: [Q_UNUSED, PROFILE_THIS_FUNCTION, PROFILE_THIS_FUNCTION2]
+StatementMacros: [Q_UNUSED, PROFILE_THIS_FUNCTION, PROFILE_THIS_FUNCTION2, Q_PROPERTY, Q_CLASSINFO]
 WhitespaceSensitiveMacros: [Q_OBJECT, Q_PROPERTY, Q_CLASSINFO, QML_ELEMENT, QML_SINGLETON, QML_NAMED_ELEMENT, QML_ANONYMOUS, QML_ATTACHED, QML_UNCREATABLE]
