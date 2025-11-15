@@ -128,9 +128,8 @@ Rectangle {
 
         IconButton {
             source: "qrc:/icons/navigation/refresh.png"
-            opacity: Runtime.screenplayEditorSettings.pausePagination ? 0.85 : 1
             visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
-            tooltipText: enabled ? "Computes page layout from scratch, thereby reevaluating page count and time." : "Resume page and time computation."
+            tooltipText: "Computes page layout from scratch, thereby reevaluating page count and time."
 
             onClicked: Runtime.paginator.reset()
         }
@@ -139,12 +138,13 @@ Rectangle {
             visible: Runtime.mainWindowTab === Runtime.MainWindowTab.ScreenplayTab
         }
 
-        IconButton {
-            source: "qrc:/icons/content/page_count.png"
-            opacity: Runtime.paginator.paused ? 0.85 : 1
-            tooltipText: containsMouse && !pressed
+        Image {
+            Layout.preferredWidth: Runtime.idealFontMetrics.height
+            Layout.preferredHeight: Runtime.idealFontMetrics.height
 
-            onClicked: Runtime.paginator.toggle()
+            source: "qrc:/icons/content/page_count.png"
+            enabled: !Runtime.paginator.paused
+            opacity: enabled ? 1 : 0.5
         }
 
         VclText {
@@ -163,12 +163,13 @@ Rectangle {
 
         Separator { }
 
-        IconButton {
-            source: "qrc:/icons/content/time.png"
-            opacity: Runtime.paginator.paused ? 0.85 : 1
-            tooltipText: "Click here to toggle time computation, in case the app is not responding fast while typing."
+        Image {
+            Layout.preferredWidth: Runtime.idealFontMetrics.height
+            Layout.preferredHeight: Runtime.idealFontMetrics.height
 
-            onClicked: Runtime.paginator.toggle()
+            source: "qrc:/icons/content/time.png"
+            enabled: !Runtime.paginator.paused
+            opacity: enabled ? 1 : 0.5
         }
 
         VclText {

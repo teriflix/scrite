@@ -431,27 +431,4 @@ Item {
 
         onTriggered: ExportConfigurationDialog.launch(Scrite.document.structure.createExporterObject())
     }
-
-    /*
-    Loader {
-        anchors.fill: parent
-
-        active: Runtime.workspaceSettings.animateNotebookIcon && Runtime.showNotebookInStructure
-
-        sourceComponent: UiElementHighlight {
-            property bool scaleDone: false
-
-            uiElement: _notebookTabButton
-            description: _notebookTabButton.ToolTip.text
-
-            Component.onDestruction: {
-                if(scaleDone)
-                    Runtime.workspaceSettings.animateNotebookIcon = false
-            }
-
-            onDone: Runtime.workspaceSettings.animateNotebookIcon = false
-            onScaleAnimationDone: scaleDone = true
-        }
-    }
-    */
 }

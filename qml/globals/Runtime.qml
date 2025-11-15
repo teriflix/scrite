@@ -173,8 +173,6 @@ Item {
         property bool pasteAsFountain: true
         property bool pasteByLinkingScenesWhenPossible: true
         property bool pasteByMergingAdjacentElements: true
-        property bool pausePagination: true
-        property bool pausePaginationForEachDocument: true
         property bool refreshButtonInStatsReportAnimationDone: false
         property bool sceneSidePanelOpen: false
         property bool screenplayEditorAddButtonsAnimationShown: false
@@ -630,7 +628,7 @@ Item {
     }
 
     readonly property ScreenplayPaginator paginator : ScreenplayPaginator {
-        property bool paused: Runtime.screenplayEditorSettings.pausePagination
+        property bool paused: false
         property ScreenplayElement currentElement: screenplay !== null ? Runtime.screenplayAdapter.currentElement : null
 
         enabled: !paused && !Scrite.document.loading
@@ -638,9 +636,9 @@ Item {
         screenplay: Runtime.screenplayAdapter.screenplay
         cursorPosition: currentElement ? (currentElement.scene ? Math.max(currentElement.scene.cursorPosition,0) : 0) : -1
 
-        function toggle() { Runtime.screenplayEditorSettings.pausePagination = !Runtime.screenplayEditorSettings.pausePagination }
-        function pause() { Runtime.screenplayEditorSettings.pausePagination = false }
-        function resume() { Runtime.screenplayEditorSettings.pausePagination = true }
+        function toggle() { paused = !paused }
+        function pause() { paused = true }
+        function resume() { paused = false }
     }
 
     readonly property ScreenplayTracks screenplayTracks : ScreenplayTracks {

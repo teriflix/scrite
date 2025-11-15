@@ -115,18 +115,6 @@ Item {
                     ToolTip.visible: hovered
                 }
 
-                VclCheckBox {
-                    Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
-
-                    text: "Remember Time & Page Count Settings"
-                    checked: !Runtime.screenplayEditorSettings.pausePaginationForEachDocument
-                    onToggled: Runtime.screenplayEditorSettings.pausePaginationForEachDocument = !checked
-                    hoverEnabled: true
-
-                    ToolTip.visible: hovered
-                    ToolTip.text: "Time & Page counting is disabled each time a new document is loaded. Check this option to have Scrite remember your preference across documents."
-                }
-
                 RowLayout {
                     Layout.preferredWidth: (parent.width-parent.columnSpacing) / parent.columns
 
