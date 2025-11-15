@@ -63,3 +63,7 @@ build/*
 # Language Server
 .qmlls.ini
 
+# Node.js dependencies for scripts
+/tools/codingstyle/node_modules
+/tools/codingstyle/package.json
+/tools/codingstyle/package-lock.json
