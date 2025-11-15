@@ -263,7 +263,7 @@ AbstractScenePartEditor {
                                }
 
         onRequestCursorPosition: (position) => {
-                                     _private.placeCursorAt(position < 0 ? _sceneTextEditor.length : position)
+                                     _sceneTextEditor.cursorPosition = position < 0 ? _sceneTextEditor.length : position
                                  }
     }
 
